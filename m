@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cRgLn-0006tV-OM
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:44 -0500
+	(envelope-from <mst@redhat.com>) id 1cRgNP-0008RE-Gv
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:29:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cRgLk-0005g3-HL
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45032)
+	(envelope-from <mst@redhat.com>) id 1cRgNJ-0006zZ-Tc
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:29:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46036)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cRgLk-0005fL-8O
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:32 -0500
-Date: Thu, 12 Jan 2017 16:27:30 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cRgNJ-0006yu-L6
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:29:09 -0500
+Date: Thu, 12 Jan 2017 16:29:08 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170112162441-mutt-send-email-mst@kernel.org>
-References: <1483428594-28880-1-git-send-email-peterx@redhat.com>
+Message-ID: <20170112162828-mutt-send-email-mst@kernel.org>
+References: <20170111173457.30455-1-lersek@redhat.com>
+	<20170111173457.30455-3-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1483428594-28880-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 00/17] VT-d: vfio enablement and
- misc enhances
+In-Reply-To: <20170111173457.30455-3-lersek@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 wave 1 2/4] fw-cfg: turn
+ FW_CFG_FILE_SLOTS into a device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,159 +28,278 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Jan 03, 2017 at 03:29:37PM +0800, Peter Xu wrote:
-> (I renamed the title for this RFC v2, since starting from this version
->  the series will be based on master, also I picked up some more fixes
->  for vt-d into this series)
+On Wed, Jan 11, 2017 at 06:34:55PM +0100, Laszlo Ersek wrote:
+> We'd like to raise the value of FW_CFG_FILE_SLOTS. Doing it naively could
+> lead to problems with backward migration: a more recent QEMU (running an
+> older machine type) would allow the guest, in fw_cfg_select(), to select a
+> high key value that is unavailable in the same machine type implemented by
+> the older (target) QEMU. On the target host, fw_cfg_data_read() for
+> example could dereference nonexistent entries.
 > 
-> v2:
-> - change comment for "end" parameter in vtd_page_walk() [Tianyu]
-> - change comment for "a iova" to "an iova" [Yi]
-> - fix fault printed val for GPA address in vtd_page_walk_level (debug
->   only)
-> - rebased to master (rather than Aviv's v6 series) and merged Aviv's
->   series v6: picked patch 1 (as patch 1 in this series), dropped patch
->   2, re-wrote patch 3 (as patch 17 of this series).
-> - picked up two more bugfix patches from Jason's DMAR series
-> - picked up the following patch as well:
->   "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
+> As first step, size the FWCfgState.entries[*] and FWCfgState.entry_order
+> arrays dynamically. All three array sizes will be influenced by the new
+> field (and device property) FWCfgState.file_slots.
 > 
-> This RFC series is a re-work for Aviv B.D.'s vfio enablement series
-> with vt-d:
+> Make the following changes:
 > 
->   https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
+> - Replace the FW_CFG_FILE_SLOTS macro with FW_CFG_FILE_SLOTS_MIN (minimum
+>   count of fw_cfg file slots) in the header file. The value remains 0x10.
 > 
-> Aviv has done a great job there, and what we still lack there are
-> mostly the following:
+> - Replace all uses of FW_CFG_FILE_SLOTS with a helper function called
+>   fw_cfg_file_slots(), returning the new property.
 > 
-> (1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
->     memory region.
+> - Eliminate the macro FW_CFG_MAX_ENTRY, and replace all its uses with a
+>   helper function called fw_cfg_max_entry().
 > 
-> (2) VT-d still haven't provide a correct replay() mechanism (e.g.,
->     when IOMMU domain switches, things will broke).
+> - In the MMIO- and IO-mapped realize functions both, allocate all three
+>   arrays dynamically, based on the new property.
 > 
-> This series should have solved the above two issues.
+> - The new property defaults to FW_CFG_FILE_SLOTS_MIN. This is going to be
+>   customized in the following patches.
 > 
-> Online repo:
+> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> ---
 > 
->   https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement-v2
+> Notes:
+>     v5:
+>     - change the type of "FWCfgState.file_slots" to "uint16_t" [Igor]
+>     
+>     - same for the retval of the trivial wrapper function
+>       fw_cfg_file_slots(), and for the corresponding "file_slots" device
+>       properties
+>     
+>     - preserve the fw_cfg_file_slots() wrapper func (Igor was okay with it
+>       in the end)
+>     
+>     - rename FW_CFG_FILE_SLOTS_TRAD to FW_CFG_FILE_SLOTS_MIN
+>     
+>     - Remove explicit qdev_prop_set_uint32() calls from fw_cfg_init_io_dma()
+>       and fw_cfg_init_mem_wide(), but set the property default to
+>       FW_CFG_FILE_SLOTS_MIN (0x10). This is the main change relative to v4;
+>       the idea is that per-board opt-in shouldn't be necessary for an
+>       increased file_slots count *in addition to* selecting a 2.9 machine
+>       type. [Igor]
+>     
+>     - delay the now-unused FW_CFG_FILE_SLOTS_DFLT macro to a later patch
+>     
+>     v4:
+>     - I know that upstream doesn't care about backward migration, but some
+>       downstreams might.
 > 
-> I would be glad to hear about any review comments for above patches.
+>  docs/specs/fw_cfg.txt          |  2 +-
+>  include/hw/nvram/fw_cfg_keys.h |  3 +-
+>  hw/nvram/fw_cfg.c              | 71 +++++++++++++++++++++++++++++++++++++-----
+>  3 files changed, 65 insertions(+), 11 deletions(-)
+> 
+> diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
+> index a19e2adbe1c6..9373bbc64743 100644
+> --- a/docs/specs/fw_cfg.txt
+> +++ b/docs/specs/fw_cfg.txt
+> @@ -156,7 +156,7 @@ Selector Reg.    Range Usage
+>  0xc000 - 0xffff  Arch. Specific (0x0000 - 0x3fff, RW, ignored in v2.4+)
+>  
+>  In practice, the number of allowed firmware configuration items is given
+> -by the value of FW_CFG_MAX_ENTRY (see fw_cfg.h).
+> +by the value (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS_MIN) (see fw_cfg.h).
+>  
+>  = Guest-side DMA Interface =
+>  
+> diff --git a/include/hw/nvram/fw_cfg_keys.h b/include/hw/nvram/fw_cfg_keys.h
+> index 0f3e871884c0..b6919451f5bd 100644
+> --- a/include/hw/nvram/fw_cfg_keys.h
+> +++ b/include/hw/nvram/fw_cfg_keys.h
+> @@ -29,8 +29,7 @@
+>  #define FW_CFG_FILE_DIR         0x19
+>  
+>  #define FW_CFG_FILE_FIRST       0x20
+> -#define FW_CFG_FILE_SLOTS       0x10
+> -#define FW_CFG_MAX_ENTRY        (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS)
+> +#define FW_CFG_FILE_SLOTS_MIN   0x10
+>  
+>  #define FW_CFG_WRITE_CHANNEL    0x4000
+>  #define FW_CFG_ARCH_LOCAL       0x8000
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index e0145c11a19b..313d943ebd27 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -33,6 +33,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/config-file.h"
+>  #include "qemu/cutils.h"
+> +#include "qapi/error.h"
+>  
+>  #define FW_CFG_NAME "fw_cfg"
+>  #define FW_CFG_PATH "/machine/" FW_CFG_NAME
+> @@ -71,8 +72,9 @@ struct FWCfgState {
+>      SysBusDevice parent_obj;
+>      /*< public >*/
+>  
+> -    FWCfgEntry entries[2][FW_CFG_MAX_ENTRY];
+> -    int entry_order[FW_CFG_MAX_ENTRY];
+> +    uint16_t file_slots;
+> +    FWCfgEntry *entries[2];
+> +    int *entry_order;
+>      FWCfgFiles *files;
+>      uint16_t cur_entry;
+>      uint32_t cur_offset;
+> @@ -257,13 +259,24 @@ static void fw_cfg_write(FWCfgState *s, uint8_t value)
+>      /* nothing, write support removed in QEMU v2.4+ */
+>  }
+>  
+> +static inline uint16_t fw_cfg_file_slots(const FWCfgState *s)
+> +{
+> +    return s->file_slots;
+> +}
+> +
+> +/* Note: this function returns an exclusive limit. */
+> +static inline uint32_t fw_cfg_max_entry(const FWCfgState *s)
+> +{
+> +    return FW_CFG_FILE_FIRST + fw_cfg_file_slots(s);
+> +}
+> +
+>  static int fw_cfg_select(FWCfgState *s, uint16_t key)
+>  {
+>      int arch, ret;
+>      FWCfgEntry *e;
+>  
+>      s->cur_offset = 0;
+> -    if ((key & FW_CFG_ENTRY_MASK) >= FW_CFG_MAX_ENTRY) {
+> +    if ((key & FW_CFG_ENTRY_MASK) >= fw_cfg_max_entry(s)) {
+>          s->cur_entry = FW_CFG_INVALID;
+>          ret = 0;
+>      } else {
+> @@ -610,7 +623,7 @@ static void fw_cfg_add_bytes_read_callback(FWCfgState *s, uint16_t key,
+>  
+>      key &= FW_CFG_ENTRY_MASK;
+>  
+> -    assert(key < FW_CFG_MAX_ENTRY && len < UINT32_MAX);
+> +    assert(key < fw_cfg_max_entry(s) && len < UINT32_MAX);
+>      assert(s->entries[arch][key].data == NULL); /* avoid key conflict */
+>  
+>      s->entries[arch][key].data = data;
+> @@ -628,7 +641,7 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s, uint16_t key,
+>  
+>      key &= FW_CFG_ENTRY_MASK;
+>  
+> -    assert(key < FW_CFG_MAX_ENTRY && len < UINT32_MAX);
+> +    assert(key < fw_cfg_max_entry(s) && len < UINT32_MAX);
+>  
+>      /* return the old data to the function caller, avoid memory leak */
+>      ptr = s->entries[arch][key].data;
+> @@ -777,13 +790,13 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
+>      int order = 0;
+>  
+>      if (!s->files) {
+> -        dsize = sizeof(uint32_t) + sizeof(FWCfgFile) * FW_CFG_FILE_SLOTS;
+> +        dsize = sizeof(uint32_t) + sizeof(FWCfgFile) * fw_cfg_file_slots(s);
+>          s->files = g_malloc0(dsize);
+>          fw_cfg_add_bytes(s, FW_CFG_FILE_DIR, s->files, dsize);
+>      }
+>  
+>      count = be32_to_cpu(s->files->count);
+> -    assert(count < FW_CFG_FILE_SLOTS);
+> +    assert(count < fw_cfg_file_slots(s));
+>  
+>      /* Find the insertion point. */
+>      if (mc->legacy_fw_cfg_order) {
+> @@ -857,7 +870,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+>      assert(s->files);
+>  
+>      index = be32_to_cpu(s->files->count);
+> -    assert(index < FW_CFG_FILE_SLOTS);
+> +    assert(index < fw_cfg_file_slots(s));
+>  
+>      for (i = 0; i < index; i++) {
+>          if (strcmp(filename, s->files->f[i].name) == 0) {
+> @@ -1014,12 +1027,38 @@ static const TypeInfo fw_cfg_info = {
+>      .class_init    = fw_cfg_class_init,
+>  };
+>  
+> +static void fw_cfg_file_slots_allocate(FWCfgState *s, Error **errp)
+> +{
+> +    uint16_t file_slots_max;
+> +
+> +    if (fw_cfg_file_slots(s) < FW_CFG_FILE_SLOTS_MIN) {
+> +        error_setg(errp, "\"file_slots\" must be at least 0x%x",
+> +                   FW_CFG_FILE_SLOTS_MIN);
+> +        return;
+> +    }
+> +
+> +    /* (UINT16_MAX & FW_CFG_ENTRY_MASK) is the highest inclusive selector value
+> +     * that we permit. The actual (exclusive) value coming from the
+> +     * configuration is (FW_CFG_FILE_FIRST + fw_cfg_file_slots(s)). */
+> +    file_slots_max = (UINT16_MAX & FW_CFG_ENTRY_MASK) - FW_CFG_FILE_FIRST + 1;
+> +    if (fw_cfg_file_slots(s) > file_slots_max) {
+> +        error_setg(errp, "\"file_slots\" must not exceed 0x%" PRIx16,
+> +                   file_slots_max);
+> +        return;
+> +    }
+> +
+> +    s->entries[0] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+> +    s->entries[1] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+> +    s->entry_order = g_new0(int, fw_cfg_max_entry(s));
+> +}
+>  
+>  static Property fw_cfg_io_properties[] = {
+>      DEFINE_PROP_UINT32("iobase", FWCfgIoState, iobase, -1),
+>      DEFINE_PROP_UINT32("dma_iobase", FWCfgIoState, dma_iobase, -1),
+>      DEFINE_PROP_BOOL("dma_enabled", FWCfgIoState, parent_obj.dma_enabled,
+>                       true),
+> +    DEFINE_PROP_UINT16("file_slots", FWCfgIoState, parent_obj.file_slots,
+> +                       FW_CFG_FILE_SLOTS_MIN),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -1027,6 +1066,13 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+>  {
+>      FWCfgIoState *s = FW_CFG_IO(dev);
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> +    Error *local_err = NULL;
+> +
+> +    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+>  
+>      /* when using port i/o, the 8-bit data register ALWAYS overlaps
+>       * with half of the 16-bit control register. Hence, the total size
+> @@ -1063,6 +1109,8 @@ static Property fw_cfg_mem_properties[] = {
+>      DEFINE_PROP_UINT32("data_width", FWCfgMemState, data_width, -1),
+>      DEFINE_PROP_BOOL("dma_enabled", FWCfgMemState, parent_obj.dma_enabled,
+>                       true),
+> +    DEFINE_PROP_UINT16("file_slots", FWCfgMemState, parent_obj.file_slots,
+> +                       FW_CFG_FILE_SLOTS_MIN),
 
-This all looks good to me. The series needs to be
-rebased on top of latest bits.
-In particular, Jason made changes which conflict
-with this.
+I think it's an internal compatibility thing, so we want to call it
+x-file-slots instead.
 
 
-> =========
-> Test Done
-> =========
-> 
-> Build test passed for x86_64/arm/ppc64.
-> 
-> Simply tested with x86_64, assigning two PCI devices to a single VM,
-> boot the VM using:
-> 
-> bin=x86_64-softmmu/qemu-system-x86_64
-> $bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
->      -device intel-iommu,intremap=on,eim=off,cache-mode=on \
->      -netdev user,id=net0,hostfwd=tcp::5555-:22 \
->      -device virtio-net-pci,netdev=net0 \
->      -device vfio-pci,host=03:00.0 \
->      -device vfio-pci,host=02:00.0 \
->      -trace events=".trace.vfio" \
->      /var/lib/libvirt/images/vm1.qcow2
-> 
-> pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
-> vtd_page_walk*
-> vtd_replay*
-> vtd_inv_desc*
-> 
-> Then, in the guest, run the following tool:
-> 
->   https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
-> 
-> With parameter:
-> 
->   ./vfio-bind-group 00:03.0 00:04.0
-> 
-> Check host side trace log, I can see pages are replayed and mapped in
-> 00:04.0 device address space, like:
-> 
-> ...
-> vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
-> vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
-> vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
-> vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
-> vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
-> ...
-> 
-> =========
-> Todo List
-> =========
-> 
-> - error reporting for the assigned devices (as Tianyu has mentioned)
-> 
-> - per-domain address-space: A better solution in the future may be -
->   we maintain one address space per IOMMU domain in the guest (so
->   multiple devices can share a same address space if they are sharing
->   the same IOMMU domains in the guest), rather than one address space
->   per device (which is current implementation of vt-d). However that's
->   a step further than this series, and let's see whether we can first
->   provide a workable version of device assignment with vt-d
->   protection.
-> 
-> - more to come...
-> 
-> Thanks,
-> 
-> Aviv Ben-David (1):
->   IOMMU: add option to enable VTD_CAP_CM to vIOMMU capility exposoed to
->     guest
-> 
-> Jason Wang (3):
->   memory: handle alias for iommu notifier
->   memory: handle alias in memory_region_is_iommu()
->   intel_iommu: allocate new key when creating new address space
-> 
-> Peter Xu (13):
->   intel_iommu: simplify irq region translation
->   intel_iommu: renaming gpa to iova where proper
->   intel_iommu: fix trace for inv desc handling
->   intel_iommu: fix trace for addr translation
->   intel_iommu: vtd_slpt_level_shift check level
->   memory: add section range info for IOMMU notifier
->   memory: provide iommu_replay_all()
->   memory: introduce memory_region_notify_one()
->   memory: add MemoryRegionIOMMUOps.replay() callback
->   intel_iommu: provide its own replay() callback
->   intel_iommu: do replay when context invalidate
->   intel_iommu: allow dynamic switch of IOMMU region
->   intel_iommu: enable vfio devices
-> 
->  hw/i386/intel_iommu.c          | 597 +++++++++++++++++++++++++++++++----------
->  hw/i386/intel_iommu_internal.h |   1 +
->  hw/i386/trace-events           |  28 ++
->  hw/vfio/common.c               |   7 +-
->  include/exec/memory.h          |  33 +++
->  include/hw/i386/intel_iommu.h  |  12 +
->  memory.c                       |  51 +++-
->  7 files changed, 572 insertions(+), 157 deletions(-)
-> 
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -1071,6 +1119,13 @@ static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
+>      FWCfgMemState *s = FW_CFG_MEM(dev);
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>      const MemoryRegionOps *data_ops = &fw_cfg_data_mem_ops;
+> +    Error *local_err = NULL;
+> +
+> +    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+>  
+>      memory_region_init_io(&s->ctl_iomem, OBJECT(s), &fw_cfg_ctl_mem_ops,
+>                            FW_CFG(s), "fwcfg.ctl", FW_CFG_CTL_SIZE);
 > -- 
-> 2.7.4
+> 2.9.3
+> 
