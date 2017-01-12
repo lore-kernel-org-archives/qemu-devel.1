@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cRZgs-0003QV-Ih
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:21:00 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cRZgx-0003V6-9u
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:21:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cRZgp-0003Jj-BQ
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:20:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49877)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cRZgs-0003K7-FK
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:20:59 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35664)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cRZgp-0003JP-1f
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:20:51 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	id 1cRZgs-0003Jz-5c
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:20:54 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v0C7IsfZ101507
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 02:20:50 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27x2m3ct7v-1
+	v0C7It4E018119
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 02:20:53 -0500
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27wyp9tgxc-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 02:20:49 -0500
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 02:20:52 -0500
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Thu, 12 Jan 2017 00:20:48 -0700
+	Thu, 12 Jan 2017 00:20:52 -0700
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Thu, 12 Jan 2017 08:19:46 +0100
+Date: Thu, 12 Jan 2017 08:19:47 +0100
 In-Reply-To: <20170112071947.98071-1-bjsdjshi@linux.vnet.ibm.com>
 References: <20170112071947.98071-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170112071947.98071-15-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH RFC v2 14/15] docs: add documentation for
- vfio-ccw
+Message-Id: <20170112071947.98071-16-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH RFC v2 15/15] vfio: ccw: introduce support for
+ ccw0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,337 +41,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
 Cc: bjsdjshi@linux.vnet.ibm.com, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-Add file Documentation/s390/vfio-ccw.txt that includes details
-of vfio-ccw.
+Although Linux does not use format-0 channel command words (CCW0)
+these are a non-optional part of the platform spec, and for the sake
+of platform compliance, and possibly some non-Linux guests, we have
+to support CCW0.
 
+Making the kernel execute a format 0 channel program is too much hassle
+because we would need to allocate and use memory which can be addressed
+by 24 bit physical addresses (because of CCW0.cda). So we implement CCW0
+support by translating the channel program into an equivalent CCW1
+program instead.
+
+Signed-off-by: Kai Yue Wang <wkywang@linux.vnet.ibm.com>
 Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Acked-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 ---
- Documentation/s390/00-INDEX     |   2 +
- Documentation/s390/vfio-ccw.txt | 303 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 305 insertions(+)
- create mode 100644 Documentation/s390/vfio-ccw.txt
+ arch/s390/Kconfig              |  7 +++++
+ drivers/s390/cio/vfio_ccw_cp.c | 58 ++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 63 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/s390/00-INDEX b/Documentation/s390/00-INDEX
-index 9189535..317f037 100644
---- a/Documentation/s390/00-INDEX
-+++ b/Documentation/s390/00-INDEX
-@@ -22,5 +22,7 @@ qeth.txt
- 	- HiperSockets Bridge Port Support.
- s390dbf.txt
- 	- information on using the s390 debug feature.
-+vfio-ccw.txt
-+	  information on the vfio-ccw I/O subchannel driver.
- zfcpdump.txt
- 	- information on the s390 SCSI dump tool.
-diff --git a/Documentation/s390/vfio-ccw.txt b/Documentation/s390/vfio-ccw.txt
-new file mode 100644
-index 0000000..ace169b
---- /dev/null
-+++ b/Documentation/s390/vfio-ccw.txt
-@@ -0,0 +1,303 @@
-+vfio-ccw: the basic infrastructure
-+==================================
+diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+index 32008b8..f25d077 100644
+--- a/arch/s390/Kconfig
++++ b/arch/s390/Kconfig
+@@ -680,6 +680,13 @@ config VFIO_CCW
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called vfio_ccw.
+ 
++config VFIO_CCW_CCW0
++	def_bool n
++	prompt "Support for CCW0 translation"
++	depends on VFIO_CCW
++	help
++	  Enable translation for CCW0 programs for VFIO-CCW subchannels.
 +
-+Introduction
-+------------
+ endmenu
+ 
+ menu "Dump support"
+diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+index b81aff3..ee2c332 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.c
++++ b/drivers/s390/cio/vfio_ccw_cp.c
+@@ -19,6 +19,26 @@
+ 
+ #include "vfio_ccw_cp.h"
+ 
++#ifdef CONFIG_VFIO_CCW_CCW0
++/**
++ * struct ccw0 - channel command word
++ * @cmd_code: command code
++ * @cda: data address
++ * @flags: flags, like IDA addressing, etc.
++ * @reserved: will be ignored
++ * @count: byte count
++ *
++ * The format-0 ccw structure.
++ */
++struct ccw0 {
++	__u8 cmd_code;
++	__u32 cda : 24;
++	__u8  flags;
++	__u8  reserved;
++	__u16 count;
++} __packed __aligned(8);
++#endif
 +
-+Here we describe the vfio support for I/O subchannel devices for
-+Linux/s390. Motivation for vfio-ccw is to passthrough subchannels to a
-+virtual machine, while vfio is the means.
+ /*
+  * Max length for ccw chain.
+  * XXX: Limit to 256, need to check more?
+@@ -247,12 +267,42 @@ static long copy_from_iova(struct device *mdev,
+ 	return l;
+ }
+ 
++#ifdef CONFIG_VFIO_CCW_CCW0
++static long copy_ccw_from_iova(struct ccwprogram *cp,
++			       struct ccw1 *to, u64 iova,
++			       unsigned long len)
++{
++	struct ccw0 ccw0;
++	struct ccw1 *pccw1;
++	int ret;
++	int i;
 +
-+Different than other hardware architectures, s390 has defined a unified
-+I/O access method, which is so called Channel I/O. It has its own access
-+patterns:
-+- Channel programs run asynchronously on a separate (co)processor.
-+- The channel subsystem will access any memory designated by the caller
-+  in the channel program directly, i.e. there is no iommu involved.
-+Thus when we introduce vfio support for these devices, we realize it
-+with a mediated device (mdev) implementation. The vfio mdev will be
-+added to an iommu group, so as to make itself able to be managed by the
-+vfio framework. And we add read/write callbacks for special vfio I/O
-+regions to pass the channel programs from the mdev to its parent device
-+(the real I/O subchannel device) to do further address translation and
-+to perform I/O instructions.
++	ret = copy_from_iova(cp->mdev, to, iova, len * sizeof(struct ccw1));
++	if (ret)
++		return ret;
 +
-+This document does not intend to explain the s390 I/O architecture in
-+every detail. More information/reference could be found here:
-+- A good start to know Channel I/O in general:
-+  https://en.wikipedia.org/wiki/Channel_I/O
-+- s390 architecture:
-+  s390 Principles of Operation manual (IBM Form. No. SA22-7832)
-+- The existing Qemu code which implements a simple emulated channel
-+  subsystem could also be a good reference. It makes it easier to follow
-+  the flow.
-+  qemu/hw/s390x/css.c
++	if (!cp->orb.cmd.fmt) {
++		pccw1 = to;
++		for (i = 0; i < len; i++) {
++			ccw0 = *(struct ccw0 *)pccw1;
++			pccw1->cmd_code = ccw0.cmd_code;
++			pccw1->flags = ccw0.flags;
++			pccw1->count = ccw0.count;
++			pccw1->cda = ccw0.cda;
++			pccw1++;
++		}
++	}
 +
-+For vfio mediated device framework:
-+- Documentation/vfio-mediated-device.txt
++	return ret;
++}
++#else
+ static long copy_ccw_from_iova(struct ccwprogram *cp,
+ 			       struct ccw1 *to, u64 iova,
+ 			       unsigned long len)
+ {
+ 	return copy_from_iova(cp->mdev, to, iova, len * sizeof(struct ccw1));
+ }
++#endif
+ 
+ /*
+  * Helpers to operate ccwchain.
+@@ -619,10 +669,14 @@ int cp_init(struct ccwprogram *cp, struct device *mdev, union orb *orb)
+ 	 * Only support prefetch enable mode now.
+ 	 * Only support 64bit addressing idal.
+ 	 * Only support 4k IDAW.
+-	 * Only support ccw1.
+ 	 */
+-	if (!orb->cmd.pfch || !orb->cmd.c64 || orb->cmd.i2k || !orb->cmd.fmt)
++	if (!orb->cmd.pfch || !orb->cmd.c64 || orb->cmd.i2k)
++		return -EOPNOTSUPP;
 +
-+Motivation of vfio-ccw
-+----------------------
-+
-+Currently, a guest virtualized via qemu/kvm on s390 only sees
-+paravirtualized virtio devices via the "Virtio Over Channel I/O
-+(virtio-ccw)" transport. This makes virtio devices discoverable via
-+standard operating system algorithms for handling channel devices.
-+
-+However this is not enough. On s390 for the majority of devices, which
-+use the standard Channel I/O based mechanism, we also need to provide
-+the functionality of passing through them to a Qemu virtual machine.
-+This includes devices that don't have a virtio counterpart (e.g. tape
-+drives) or that have specific characteristics which guests want to
-+exploit.
-+
-+For passing a device to a guest, we want to use the same interface as
-+everybody else, namely vfio. Thus, we would like to introduce vfio
-+support for channel devices. And we would like to name this new vfio
-+device "vfio-ccw".
-+
-+Access patterns of CCW devices
-+------------------------------
-+
-+s390 architecture has implemented a so called channel subsystem, that
-+provides a unified view of the devices physically attached to the
-+systems. Though the s390 hardware platform knows about a huge variety of
-+different peripheral attachments like disk devices (aka. DASDs), tapes,
-+communication controllers, etc. They can all be accessed by a well
-+defined access method and they are presenting I/O completion a unified
-+way: I/O interruptions.
-+
-+All I/O requires the use of channel command words (CCWs). A CCW is an
-+instruction to a specialized I/O channel processor. A channel program is
-+a sequence of CCWs which are executed by the I/O channel subsystem.  To
-+issue a CCW program to the channel subsystem, it is required to build an
-+operation request block (ORB), which can be used to point out the format
-+of the CCW and other control information to the system. The operating
-+system signals the I/O channel subsystem to begin executing the channel
-+program with a SSCH (start sub-channel) instruction. The central
-+processor is then free to proceed with non-I/O instructions until
-+interrupted. The I/O completion result is received by the interrupt
-+handler in the form of interrupt response block (IRB).
-+
-+Back to vfio-ccw, in short:
-+- ORBs and CCW programs are built in guest kernel (with guest physical
-+  addresses).
-+- ORBs and CCW programs are passed to the host kernel.
-+- Host kernel translates the guest physical addresses to real addresses
-+  and starts the I/O with issuing a privileged Channel I/O instruction
-+  (e.g SSCH).
-+- CCW programs run asynchronously on a separate processor.
-+- I/O completion will be signaled to the host with I/O interruptions.
-+  And it will be copied as IRB to user space to pass it back to the
-+  guest.
-+
-+Physical vfio ccw device and its child mdev
-+-------------------------------------------
-+
-+As mentioned above, we realize vfio-ccw with a mdev implementation.
-+
-+Channel I/O does not have IOMMU hardware support, so the physical
-+vfio-ccw device does not have an IOMMU level translation or isolation.
-+
-+Sub-channel I/O instructions are all privileged instructions, When
-+handling the I/O instruction interception, vfio-ccw has the software
-+policing and translation how the CCW program is programmed before it
-+gets sent to hardware.
-+
-+Within this implementation, we have two drivers for two types of
-+devices:
-+- The vfio_ccw driver for the physical subchannel device.
-+  This is an I/O subchannel driver for the real subchannel device.  It
-+  realizes a group of callbacks and registers to the mdev framework as a
-+  parent (physical) device. As a consequence, mdev provides vfio_ccw a
-+  generic interface (sysfs) to create mdev devices. A vfio mdev could be
-+  created by vfio_ccw then and added to the mediated bus. It is the vfio
-+  device that added to an IOMMU group and a vfio group.
-+  vfio_ccw also provides an I/O region to accept ccw program request
-+  from user space and store I/O interrupt result for user space to
-+  retrieve. To notify user space an I/O completion, it offers an
-+  interface to setup an eventfd fd for asynchronous signaling.
-+
-+- The vfio_mdev driver for the mediated vfio ccw device.
-+  This is provided by the mdev framework. It is a vfio device driver for
-+  the mdev that created by vfio_ccw.
-+  It realize a group of vfio device driver callbacks, adds itself to a
-+  vfio group, and registers itself to the mdev framework as a mdev
-+  driver.
-+  It uses a vfio iommu backend that uses the existing map and unmap
-+  ioctls, but rather than programming them into an IOMMU for a device,
-+  it simply stores the translations for use by later requests. This
-+  means that a device programmed in a VM with guest physical addresses
-+  can have the vfio kernel convert that address to process virtual
-+  address, pin the page and program the hardware with the host physical
-+  address in one step.
-+  For a mdev, the vfio iommu backend will not pin the pages during the
-+  VFIO_IOMMU_MAP_DMA ioctl. Mdev framework will only maintain a database
-+  of the iova<->vaddr mappings in this operation. And they export a
-+  vfio_pin_pages and a vfio_unpin_pages interfaces from the vfio iommu
-+  backend for the physical devices to pin and unpin pages by demand.
-+
-+Below is a high Level block diagram.
-+
-+ +-------------+
-+ |             |
-+ | +---------+ | mdev_register_driver() +--------------+
-+ | |  Mdev   | +<-----------------------+              |
-+ | |  bus    | |                        | vfio_mdev.ko |
-+ | | driver  | +----------------------->+              |<-> VFIO user
-+ | +---------+ |    probe()/remove()    +--------------+    APIs
-+ |             |
-+ |  MDEV CORE  |
-+ |   MODULE    |
-+ |   mdev.ko   |
-+ | +---------+ | mdev_register_device() +--------------+
-+ | |Physical | +<-----------------------+              |
-+ | | device  | |                        |  vfio_ccw.ko |<-> subchannel
-+ | |interface| +----------------------->+              |     device
-+ | +---------+ |       callback         +--------------+
-+ +-------------+
-+
-+The process of how these work together.
-+1. vfio_ccw.ko drives the physical I/O subchannel, and registers the
-+   physical device (with callbacks) to mdev framework.
-+   When vfio_ccw probing the subchannel device, it registers device
-+   pointer and callbacks to the mdev framework. Mdev related file nodes
-+   under the device node in sysfs would be created for the subchannel
-+   device, namely 'mdev_create', 'mdev_destroy' and
-+   'mdev_supported_types'.
-+2. Create a mediated vfio ccw device.
-+   Use the 'mdev_create' sysfs file, we need to manually create one (and
-+   only one for our case) mediated device.
-+3. vfio_mdev.ko drives the mediated ccw device.
-+   vfio_mdev is also the vfio device drvier. It will probe the mdev and
-+   add it to an iommu_group and a vfio_group. Then we could pass through
-+   the mdev to a guest.
-+
-+vfio-ccw I/O region
-+-------------------
-+
-+An I/O region is used to accept ccw program request from user space
-+and store I/O interrupt result for user space to retrieve. The
-+defination of the region is:
-+
-+struct ccw_io_region {
-+#define ORB_AREA_SIZE 12
-+	__u8	orb_area[ORB_AREA_SIZE];
-+#define SCSW_AREA_SIZE 12
-+	__u8	scsw_area[SCSW_AREA_SIZE];
-+#define IRB_AREA_SIZE 96
-+	__u8	irb_area[IRB_AREA_SIZE];
-+	__u32	ret_code;
-+} __packed;
-+
-+While starting an I/O request, orb_area should be filled with the
-+guest ORB, and scsw_area should be filled with the SCSW of the Virtual
-+Subchannel.
-+
-+irb_area stores the I/O result.
-+
-+ret_code stores a return code for each access of the region.
-+
-+vfio-ccw patches overview
-+-------------------------
-+
-+For now, our patches are rebased on the latest mdev implementation.
-+vfio-ccw follows what vfio-pci did on the s390 paltform and uses
-+vfio-iommu-type1 as the vfio iommu backend. It's a good start to launch
-+the code review for vfio-ccw. Note that the implementation is far from
-+complete yet; but we'd like to get feedback for the general
-+architecture.
-+
-+* CCW translation APIs
-+- Description:
-+  These introduce a group of APIs (start with 'cp_') to do CCW
-+  translation. The CCWs passed in by a user space program are
-+  organized with their guest physical memory addresses. These APIs
-+  will copy the CCWs into the kernel space, and assemble a runnable
-+  kernel CCW program by updating the guest physical addresses with
-+  their corresponding host physical addresses.
-+- Patches:
-+  vfio: ccw: introduce ccwprogram interfaces
-+
-+* vfio_ccw device driver
-+- Description:
-+  The following patches utilizes the CCW translation APIs and introduce
-+  vfio_ccw, which is the driver for the I/O subchannel devices you want
-+  to pass through.
-+  vfio_ccw implements the following vfio ioctls:
-+    VFIO_DEVICE_GET_INFO
-+    VFIO_DEVICE_GET_IRQ_INFO
-+    VFIO_DEVICE_GET_REGION_INFO
-+    VFIO_DEVICE_RESET
-+    VFIO_DEVICE_SET_IRQS
-+  This provides an I/O region, so that the user space program can pass a
-+  CCW program to the kernel, to do further CCW translation before
-+  issuing them to a real device.
-+  This also provides the SET_IRQ ioctl to setup an event notifier to
-+  notify the user space program the I/O completion in an asynchronous
-+  way.
-+- Patches:
-+  vfio: ccw: basic implementation for vfio_ccw driver
-+  vfio: ccw: introduce ccw_io_region
-+  vfio: ccw: realize VFIO_DEVICE_GET_REGION_INFO
-+  vfio: ccw: realize VFIO_DEVICE_RESET ioctl
-+  vfio: ccw: introduce ioctls to get/set VFIO_CCW_IO_IRQ
-+
-+The user of vfio-ccw is not limited to Qemu, while Qemu is definitely a
-+good example to get understand how these patches work. Here is a little
-+bit more detail how an I/O request triggered by the Qemu guest will be
-+handled (without error handling).
-+
-+Explanation:
-+Q1-Q7: Qemu side process.
-+K1-K5: Kernel side process.
-+
-+Q1. Get I/O region info during initialization.
-+Q2. Setup event notifier and handler to handle I/O completion.
-+
-+... ...
-+
-+Q3. Intercept a ssch instruction.
-+Q4. Write the guest ccw program and ORB to the I/O region.
-+    K1. Copy from guest to kernel.
-+    K2. Translate the guest ccw program to a host kernel space ccw
-+        program, which becomes runnable for a real device.
-+    K3. With the necessary information contained in the orb passed in
-+        by Qemu, issue the ccwchain to the device.
-+    K4. Return the ssch CC code.
-+Q5. Return the CC code to the guest.
-+
-+... ...
-+
-+    K5. Interrupt handler gets the I/O result and write the result to
-+        the I/O region.
-+    K6. Signal Qemu to retrieve the result.
-+Q6. Get the signal and event handler reads out the result from the I/O
-+    region.
-+Q7. Update the irb for the guest.
-+
-+Limitations
-+-----------
-+
-+The current vfio-ccw implementation focuses on supporting basic commands
-+needed to implement block device functionality (read/write) of DASD/ECKD
-+device only. Some commands may need special handling in the future, for
-+example, anything related to path grouping.
-+
-+DASD is a kind of storage device. While ECKD is a data recording format.
-+More information for DASD and ECKD could be found here:
-+https://en.wikipedia.org/wiki/Direct-access_storage_device
-+https://en.wikipedia.org/wiki/Count_key_data
-+
-+Together with the corresponding work in Qemu, we can bring the passed
-+through DASD/ECKD device online in a guest now and use it as a block
-+device.
-+
-+Reference
-+---------
-+1. ESA/s390 Principles of Operation manual (IBM Form. No. SA22-7832)
-+2. ESA/390 Common I/O Device Commands manual (IBM Form. No. SA22-7204)
-+3. https://en.wikipedia.org/wiki/Channel_I/O
-+4. Documentation/s390/cds.txt
-+5. Documentation/vfio.txt
-+6. Documentation/vfio-mediated-device.txt
++#ifndef CONFIG_VFIO_CCW_CCW0
++	if (!orb->cmd.fmt)
+ 		return -EOPNOTSUPP;
++#endif
+ 
+ 	INIT_LIST_HEAD(&cp->ccwchain_list);
+ 	memcpy(&cp->orb, orb, sizeof(*orb));
 -- 
 2.8.4
