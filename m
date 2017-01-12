@@ -1,41 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cRgP6-0002Ku-03
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:31:04 -0500
+	(envelope-from <mst@redhat.com>) id 1cRgPA-0002OB-PV
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:31:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cRgP1-0000jm-56
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:31:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57444)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cRgP0-0000j7-Vn
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:30:55 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 346097DCEC
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 14:30:55 +0000 (UTC)
-Date: Thu, 12 Jan 2017 14:30:49 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170112143049.GA993@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170106155543.12827-3-berrange@redhat.com>
-	<20170110163713.GA19869@stefanha-x1.localdomain>
-	<eabc1ecd-439c-69cc-facb-281699a4d26e@redhat.com>
-	<20170111171202.GG9269@stefanha-x1.localdomain>
-	<20170111171646.GR12072@redhat.com>
-	<6d64c194-bb64-9ac2-3281-9a9329f6a52b@redhat.com>
-	<20170111174045.GT12072@redhat.com>
-	<6ff77c17-5516-e967-27ec-6fb3bf2160d4@redhat.com>
-	<87fukpf5ub.fsf@ac.upc.edu>
-	<9456f50a-811a-03a7-2bf7-0533dabb0650@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1cRgP5-0000m5-TQ
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:31:04 -0500
+Date: Thu, 12 Jan 2017 16:30:47 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170112163009-mutt-send-email-mst@kernel.org>
+References: <20170111173457.30455-1-lersek@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9456f50a-811a-03a7-2bf7-0533dabb0650@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/47] trace: switch io/ directory to
- modular trace.h file
+In-Reply-To: <20170111173457.30455-1-lersek@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 wave 1 0/4] fw-cfg: support writeable
+ blobs and more files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,53 +23,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, Alexander Graf <agraf@suse.de>, Anthony Perard <anthony.perard@citrix.com>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Michael Walle <michael@walle.cc>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-arm@nongnu.org
 
-On Thu, Jan 12, 2017 at 09:48:20AM +0100, Paolo Bonzini wrote:
->=20
->=20
-> On 12/01/2017 02:02, Llu=C3=ADs Vilanova wrote:
-> > Paolo Bonzini writes:
-> > [...]
-> >> A weird idea: what about doing
-> >=20
-> >>     -DGENERATED_TRACERS_H=3D\"hw/scsi/generated-tracers.h\"
-> >=20
-> >> and then having
-> >=20
-> >>      #ifdef GENERATED_TRACE_H
-> >>      #include GENERATED_TRACE_H
-> >>      #endif
-> >=20
-> >> in include/trace.h?
-> >=20
-> >> Then you can use full include path for special cases such as
-> >> include/hw/xen/xen_common.h, but the common case is handled directly
-> >> with just
-> >=20
-> >>      #include "trace.h"
-> >=20
-> >> which refers to $(srcdir)/include/trace.h? (Take the above with a gr=
-ain
-> >> of salt because I haven't reviewed the patches closely).
-> >=20
-> > Feels like too much black magic to me for the benefit of a bit less t=
-yping.
->=20
-> It's not less typing, it's about consistency.   Includes from the
-> current directory are currently included with no path.
+On Wed, Jan 11, 2017 at 06:34:53PM +0100, Laszlo Ersek wrote:
+> This is the first (fw_cfg) half of the v5 iteration of the series posted
+> here:
+> <http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00129.html>.
+> 
+> In this version, the fw_cfg patches have been separated into a
+> standalone "wave", for helping review / maintenance, and also for
+> enabling independent features on top of writeable blobs. More
+> importantly, I've addressed Igor's v4 feedback. See the individual
+> patches for the details.
+> 
+> Patch #3 is included verbatim from Eduardo's pending series (see the
+> patch notes for the archive URL), as a dependency for patch #4. If
+> Eduardo's series is merged first, patch #3 can be dropped (in fact
+> git-rebase should do it automatically).
+> 
+> Please excuse the surprisingly long list of CC's, it's due to the fact
+> that fw_cfg is quite widely used (see patch #4).
 
-I think I am able to workaround the problems by just renaming the
-top level file to trace-root.h to avoid ambiguity. Just testing
-builds now...
+Looks good. So what's the plan for merging this?
+I think I'll merge part 1 and then Paolo merges part 2 -
+is that what you had in mind?
 
-Regards,
-Daniel
---=20
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
-/ :|
-|: http://libvirt.org              -o-             http://virt-manager.or=
-g :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
-/ :|
+> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Michael Walle <michael@walle.cc>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Shannon Zhao <zhaoshenglong@huawei.com>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: qemu-arm@nongnu.org
+> 
+> Thanks
+> Laszlo
+> 
+> 
+> Eduardo Habkost (1):
+>   pc: Add 2.9 machine-types
+> 
+> Laszlo Ersek (2):
+>   fw-cfg: turn FW_CFG_FILE_SLOTS into a device property
+>   fw-cfg: bump "file_slots" to 0x20 for 2.9+ machine types
+> 
+> Michael S. Tsirkin (1):
+>   fw-cfg: support writeable blobs
+> 
+>  docs/specs/fw_cfg.txt          |  36 ++++++++++----
+>  hw/lm32/lm32_hwsetup.h         |   2 +-
+>  include/hw/compat.h            |  10 +++-
+>  include/hw/i386/pc.h           |   2 +
+>  include/hw/loader.h            |   7 +--
+>  include/hw/nvram/fw_cfg.h      |   3 +-
+>  include/hw/nvram/fw_cfg_keys.h |   3 +-
+>  hw/arm/virt-acpi-build.c       |   2 +-
+>  hw/core/loader.c               |  18 ++++---
+>  hw/i386/acpi-build.c           |   4 +-
+>  hw/i386/pc_piix.c              |  15 ++++--
+>  hw/i386/pc_q35.c               |  13 ++++-
+>  hw/nvram/fw_cfg.c              | 110 +++++++++++++++++++++++++++++++++++------
+>  13 files changed, 177 insertions(+), 48 deletions(-)
+> 
+> -- 
+> 2.9.3
