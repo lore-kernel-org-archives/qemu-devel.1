@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cRhhq-0002AO-KG
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:54:31 -0500
+	(envelope-from <mst@redhat.com>) id 1cRhjX-0003et-1K
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:56:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cRhhl-0001re-Nj
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:54:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58020)
+	(envelope-from <mst@redhat.com>) id 1cRhjP-0002Tv-Bj
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:56:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cRhhl-0001rM-HQ
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:54:21 -0500
-References: <20170112105132.10394-1-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d3016482-2e21-7be1-326e-d43066fdff42@redhat.com>
-Date: Thu, 12 Jan 2017 10:54:19 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cRhjP-0002Te-6f
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:56:03 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 519514A543
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 15:56:03 +0000 (UTC)
+Date: Thu, 12 Jan 2017 17:56:02 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170112173724-mutt-send-email-mst@kernel.org>
+References: <1484137136-8021-1-git-send-email-marcel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170112105132.10394-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ide: avoid unbounded recursion
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484137136-8021-1-git-send-email-marcel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2 0/3] hw/pcie: Introduce Generic PCI
+ Express Root Port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +33,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Lieven <pl@kamp.de>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-
-
-On 01/12/2017 05:51 AM, Paolo Bonzini wrote:
-> The end_transfer_func can call ide_transfer_start immediately, before
-> returning, and unbounded recursion can happen at least for
-> ide_atapi_cmd_reply_end.  Use a bottom half to defer the call and
-> limit stack usage.
+On Wed, Jan 11, 2017 at 02:18:53PM +0200, Marcel Apfelbaum wrote:
+> v1 -> v2:
+>  - Rebased on master.
 > 
-> Cc: Peter Lieven <pl@kamp.de>
-> Cc: John Snow <jsnow@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/ide/core.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+> The Generic Root Port behaves the same as the
+> Intel's IOH device with id 3420, without having
+> Intel specific attributes.
 > 
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index 43709e5..7b9831f 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -482,6 +482,13 @@ static void ide_clear_retry(IDEState *s)
->      s->bus->retry_nsector = 0;
->  }
->  
-> +static void ide_start_transfer_bh_cb(void *opaque)
-> +{
-> +    IDEDMA *dma = opaque;
-> +
-> +    dma->ops->start_transfer(dma);
-> +}
-> +
->  /* prepare data transfer and tell what to do after */
->  void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
->                          EndTransferFunc *end_transfer_func)
-> @@ -494,7 +501,12 @@ void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
->          s->status |= DRQ_STAT;
->      }
->      if (s->bus->dma->ops->start_transfer) {
-> -        s->bus->dma->ops->start_transfer(s->bus->dma);
-> +        /* There can be unbounded recursion between ops->start_transfer
-> +         * and end_transfer_func, so defer to a bottom half.
-> +         */
-> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
-> +                                ide_start_transfer_bh_cb,
-> +                                s->bus->dma);
->      }
->  }
->  
+> The device has two purposes:
+>  (1) Can be used on both X86 and ARM machines.
+>  (2) It will allow us to tweak the behaviour
+>     (e.g add vendor-specific PCI capabilities)
+>      - something that obviously cannot be done
+>        on a known device.
 > 
+> Patch 1/3: Introduce a base class for Root Ports - most of the code
+>            is migrated from IOH3420 implementation.
+> Patch 2/3: Derives the IOH3420 from the new base class
+> Patch 3/3: Introduces the generic Root Port.
+> 
+> Tested with Linux and Windows guests only on x86 hosts.
 
-Oh, is that all it took? Sorry for putting this off.
+So I understand how it's helpful to share code
+with an existing bridge, but I worries me that
+you picked up some arbitrary values from the intel chip
+and promote them as a standard pcie thing.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+You want to have e.g. base-pcie-root-port and
+inherit that. Only put really common stuff in there.
+Similar to how we do it in hw/pci/pci_bridge.c
+
+
+Now we do not want to over-engineer, so I understand
+how you might want to say hey I use this option
+and intel does the same so we do not need a flag
+for that now. And that's fine but please add a comment
+to that end.
+
+And when you do you will discover there's some stuff you
+might be able to simplify, e.g. I don't yet see why
+you would want AER support there.
+
+> Marcel Apfelbaum (3):
+>   hw/pcie: Introduce a base class for PCI Express Root Ports
+>   hw/ioh3420: derive from PCI Express Root Port base class
+>   hw/pcie: Introduce Generic PCI Express Root Port
+> 
+>  default-configs/arm-softmmu.mak    |   1 +
+>  default-configs/i386-softmmu.mak   |   1 +
+>  default-configs/x86_64-softmmu.mak |   1 +
+>  hw/pci-bridge/Makefile.objs        |   1 +
+>  hw/pci-bridge/ioh3420.c            | 152 ++-----------------------
+>  hw/pci-bridge/pcie_root_port.c     | 228 +++++++++++++++++++++++++++++++++++++
+>  include/hw/pci/pci.h               |   1 +
+>  include/hw/pci/pcie_port.h         |  18 +++
+>  8 files changed, 258 insertions(+), 145 deletions(-)
+>  create mode 100644 hw/pci-bridge/pcie_root_port.c
+> 
+> -- 
+> 2.5.5
