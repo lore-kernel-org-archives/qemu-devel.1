@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRbV5-0007mI-Gu
+	(envelope-from <bounces@canonical.com>) id 1cRbV5-0007mG-9p
 	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:16:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRbV0-0005KG-4y
+	(envelope-from <bounces@canonical.com>) id 1cRbV0-0005KB-4T
 	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:16:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45344)
+Received: from indium.canonical.com ([91.189.90.7]:45341)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRbUz-0005Jp-VD
+	id 1cRbUz-0005Jo-VJ
 	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:16:46 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRbUy-000384-FP
+	id 1cRbUy-00038A-2Z
 	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 09:16:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 732522E80C8
+	by loganberry.canonical.com (Postfix) with ESMTP id 11F9C2E80CB
 	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 09:16:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Jan 2017 08:56:59 -0000
+Date: Thu, 12 Jan 2017 08:56:52 -0000
 From: Paolo Bonzini <bonzini@gnu.org>
 Reply-To: Bug 1268671 <1268671@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20140113174654.7725.99941.malonedeb@soybean.canonical.com>
-Message-Id: <20170112085659.20600.47075.malone@wampee.canonical.com>
+Message-Id: <20170112085652.20935.59320.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1268671] Re: CentOS guest crashing due to
  assertion failure in qemu-char.c
@@ -39,7 +39,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1212722
+It's a glib bug.  It's fixed in RHEL 6.9 beta and in due time the fix
+will get to CentOS.
+
+** Changed in: qemu
+       Status: Incomplete =3D> Invalid
+
+** Bug watch added: Red Hat Bugzilla #1212722
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1212722
 
 -- =
 
