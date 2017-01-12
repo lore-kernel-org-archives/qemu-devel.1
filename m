@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cRdPl-0005cz-B8
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 06:19:32 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cRdSH-0007NS-Rg
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 06:22:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cRdPg-0003ix-PP
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 06:19:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44194)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cRdPg-0003iZ-Iy
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 06:19:24 -0500
-References: <1482307137-5106-1-git-send-email-peterx@redhat.com>
-	<1482307137-5106-2-git-send-email-peterx@redhat.com>
-	<f6e71117-81ce-db81-d469-d0b48b7cc794@redhat.com>
-	<20170112055027.GK4450@pxdev.xzpeter.org>
-	<37865480-14d1-3a13-c083-013e834de1fc@redhat.com>
-	<20170112094606.GO4450@pxdev.xzpeter.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9b2f5d9e-34f1-043b-346c-cab477376163@redhat.com>
-Date: Thu, 12 Jan 2017 12:19:21 +0100
+	(envelope-from <mjt@tls.msk.ru>) id 1cRdSD-0004cJ-Qt
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 06:22:05 -0500
+References: <20170103191933.19416-1-marcandre.lureau@redhat.com>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <3699459d-f069-252f-4295-a13af1f01dac@msgid.tls.msk.ru>
+Date: Thu, 12 Jan 2017 14:22:00 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170112094606.GO4450@pxdev.xzpeter.org>
+In-Reply-To: <20170103191933.19416-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory: provide common macros for
- mtree_print_mr()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] win32: use glib gpoll if glib >= 2.50
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +22,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: sw@weilnetz.de, QEMU Trivial <qemu-trivial@nongnu.org>
 
+03.01.2017 22:19, Marc-Andr=C3=A9 Lureau wrote:
+> A fix has been committed in upstream glib commit
+> 210a9796f78eb90f76f1bd6a304e9fea05e97617.
+> (See also related bug https://bugzilla.gnome.org/show_bug.cgi?id=3D7644=
+15)
+>=20
+> It is desirable to use the glib version instead of qemu copy, since it
+> provides more debugging facilities (G_MAIN_POLL_DEBUG etc), and
+> hopefully has a better maintainance. Hopefully, we can drop the qemu
+> copy in a few years.
 
+Applied to -trivial, thank you!
 
-On 12/01/2017 10:46, Peter Xu wrote:
-> Yes, above suggestion makes sense to me, since after all the RW
-> permissions are derived from the type of memory regions, and the type
-> itself tells more things than the RW bits. So I totally agree we can
-> replace the "RW" chars with its type directly (if no one else
-> disagree, of course).
-> 
-> While for below patch, do you want me to include it as well as a
-> standalone patch, for the purpose of refactoring
-> memory_access_is_direct()? Since IMHO it's tiny clearer and more
-> readable than before.
-
-It is more readable, but my plan was to turn these fields into a single
-field (with bits) to speed up memory_access_is_direct.  For that we'd
-need to undo your change.  So I'm undecided.
-
-Paolo
+/mjt
