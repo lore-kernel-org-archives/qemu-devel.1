@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRifJ-0002E2-Bd
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cRifI-0002Bo-0r
 	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRifE-00081v-Go
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:53 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33944)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cRifG-00082Q-4R
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:52 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33946)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cRifE-00081S-AR
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:48 -0500
-Received: by mail-wm0-x243.google.com with SMTP id c85so4978126wmi.1
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 08:55:48 -0800 (PST)
+	id 1cRifF-00082C-UD
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:50 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so4978232wmi.1
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 08:55:49 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 12 Jan 2017 17:55:30 +0100
-Message-Id: <20170112165531.11882-10-pbonzini@redhat.com>
+Date: Thu, 12 Jan 2017 17:55:31 +0100
+Message-Id: <20170112165531.11882-11-pbonzini@redhat.com>
 In-Reply-To: <20170112165531.11882-1-pbonzini@redhat.com>
 References: <20170112165531.11882-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/10] aio: document locking
+Subject: [Qemu-devel] [PATCH 10/10] async: optimize aio_bh_poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +30,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, stefanha@redhat.com
 
+Avoid entering the slow path of qemu_lockcnt_dec_and_lock if
+no bottom half has to be deleted.
+
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/multiple-iothreads.txt | 13 +++++--------
- include/block/aio.h         | 32 ++++++++++++++++----------------
- 2 files changed, 21 insertions(+), 24 deletions(-)
+ async.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/docs/multiple-iothreads.txt b/docs/multiple-iothreads.txt
-index 0e7cdb2..e4d340b 100644
---- a/docs/multiple-iothreads.txt
-+++ b/docs/multiple-iothreads.txt
-@@ -84,9 +84,8 @@ How to synchronize with an IOThread
- AioContext is not thread-safe so some rules must be followed when using file
- descriptors, event notifiers, timers, or BHs across threads:
+diff --git a/async.c b/async.c
+index 2305e11..0d218ab 100644
+--- a/async.c
++++ b/async.c
+@@ -92,6 +92,7 @@ int aio_bh_poll(AioContext *ctx)
+ {
+     QEMUBH *bh, **bhp, *next;
+     int ret;
++    bool deleted = false;
  
--1. AioContext functions can be called safely from file descriptor, event
--notifier, timer, or BH callbacks invoked by the AioContext.  No locking is
--necessary.
-+1. AioContext functions can always be called safely.  They handle their
-+own locking internally.
+     qemu_lockcnt_inc(&ctx->list_lock);
  
- 2. Other threads wishing to access the AioContext must use
- aio_context_acquire()/aio_context_release() for mutual exclusion.  Once the
-@@ -94,16 +93,14 @@ context is acquired no other thread can access it or run event loop iterations
- in this AioContext.
+@@ -112,9 +113,17 @@ int aio_bh_poll(AioContext *ctx)
+             bh->idle = 0;
+             aio_bh_call(bh);
+         }
++        if (bh->deleted) {
++            deleted = true;
++        }
+     }
  
- aio_context_acquire()/aio_context_release() calls may be nested.  This
--means you can call them if you're not sure whether #1 applies.
-+means you can call them if you're not sure whether #2 applies.
- 
- There is currently no lock ordering rule if a thread needs to acquire multiple
- AioContexts simultaneously.  Therefore, it is only safe for code holding the
- QEMU global mutex to acquire other AioContexts.
- 
--Side note: the best way to schedule a function call across threads is to create
--a BH in the target AioContext beforehand and then call qemu_bh_schedule().  No
--acquire/release or locking is needed for the qemu_bh_schedule() call.  But be
--sure to acquire the AioContext for aio_bh_new() if necessary.
-+Side note: the best way to schedule a function call across threads is to call
-+aio_bh_schedule_oneshot().  No acquire/release or locking is needed.
- 
- AioContext and the block layer
- ------------------------------
-diff --git a/include/block/aio.h b/include/block/aio.h
-index be3adfe..7df271d 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -53,18 +53,12 @@ struct LinuxAioState;
- struct AioContext {
-     GSource source;
- 
--    /* Protects all fields from multi-threaded access */
-+    /* Used by AioContext users to protect from multi-threaded access.  */
-     QemuRecMutex lock;
- 
--    /* The list of registered AIO handlers */
-+    /* The list of registered AIO handlers.  Protected by ctx->list_lock. */
-     QLIST_HEAD(, AioHandler) aio_handlers;
- 
--    /* This is a simple lock used to protect the aio_handlers list.
--     * Specifically, it's used to ensure that no callbacks are removed while
--     * we're walking and dispatching callbacks.
--     */
--    int walking_handlers;
+     /* remove deleted bhs */
++    if (!deleted) {
++        qemu_lockcnt_dec(&ctx->list_lock);
++        return ret;
++    }
++
+     if (qemu_lockcnt_dec_and_lock(&ctx->list_lock)) {
+         bhp = &ctx->first_bh;
+         while (*bhp) {
+@@ -128,7 +137,6 @@ int aio_bh_poll(AioContext *ctx)
+         }
+         qemu_lockcnt_unlock(&ctx->list_lock);
+     }
 -
-     /* Used to avoid unnecessary event_notifier_set calls in aio_notify;
-      * accessed with atomic primitives.  If this field is 0, everything
-      * (file descriptors, bottom halves, timers) will be re-evaluated
-@@ -90,9 +84,9 @@ struct AioContext {
-      */
-     uint32_t notify_me;
- 
--    /* A lock to protect between bh's adders and deleter, and to ensure
--     * that no callbacks are removed while we're walking and dispatching
--     * them.
-+    /* A lock to protect between QEMUBH and AioHandler adders and deleter,
-+     * and to ensure that no callbacks are removed while we're walking and
-+     * dispatching them.
-      */
-     QemuLockCnt list_lock;
- 
-@@ -114,7 +108,9 @@ struct AioContext {
-     bool notified;
-     EventNotifier notifier;
- 
--    /* Thread pool for performing work and receiving completion callbacks */
-+    /* Thread pool for performing work and receiving completion callbacks.
-+     * Has its own locking.
-+     */
-     struct ThreadPool *thread_pool;
- 
- #ifdef CONFIG_LINUX_AIO
-@@ -124,7 +120,9 @@ struct AioContext {
-     struct LinuxAioState *linux_aio;
- #endif
- 
--    /* TimerLists for calling timers - one per clock type */
-+    /* TimerLists for calling timers - one per clock type.  Has its own
-+     * locking.
-+     */
-     QEMUTimerListGroup tlg;
- 
-     int external_disable_cnt;
-@@ -178,9 +176,11 @@ void aio_context_unref(AioContext *ctx);
-  * automatically takes care of calling aio_context_acquire and
-  * aio_context_release.
-  *
-- * Access to timers and BHs from a thread that has not acquired AioContext
-- * is possible.  Access to callbacks for now must be done while the AioContext
-- * is owned by the thread (FIXME).
-+ * Note that this is separate from bdrv_drained_begin/bdrv_drained_end.  A
-+ * thread still has to call those to avoid being interrupted by the guest.
-+ *
-+ * Bottom halves, timers and callbacks can be created or removed without
-+ * acquiring the AioContext.
-  */
- void aio_context_acquire(AioContext *ctx);
+     return ret;
+ }
  
 -- 
 2.9.3
