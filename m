@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cRVYm-0007iw-Nc
+	(envelope-from <rth7680@gmail.com>) id 1cRVYn-0007jp-Jn
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cRVYl-0006ho-MI
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:16 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33533)
+	(envelope-from <rth7680@gmail.com>) id 1cRVYm-0006iA-QZ
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:17 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35131)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cRVYl-0006hg-Ia
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:15 -0500
-Received: by mail-qt0-x243.google.com with SMTP id n13so849333qtc.0
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 18:56:15 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cRVYm-0006hx-Lv
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:16 -0500
+Received: by mail-qt0-x242.google.com with SMTP id f4so837673qte.2
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 18:56:16 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 11 Jan 2017 18:55:39 -0800
-Message-Id: <20170112025606.27332-4-rth@twiddle.net>
+Date: Wed, 11 Jan 2017 18:55:40 -0800
+Message-Id: <20170112025606.27332-5-rth@twiddle.net>
 In-Reply-To: <20170112025606.27332-1-rth@twiddle.net>
 References: <20170112025606.27332-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 03/30] target-sparc: use explicit mmu register
- pointers
+Subject: [Qemu-devel] [PULL 04/30] target-sparc: add UA2005 TTE bit #defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,142 +31,53 @@ Cc: atar4qemu@gmail.com, mark.cave-ayland@ilande.co.uk, peter.maydell@linaro.org
 
 From: Artyom Tarasenko <atar4qemu@gmail.com>
 
-Use explicit register pointers while accessing D/I-MMU registers.
-Call cpu_unassigned_access on access to missing registers.
-
 Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <5ed7a0c7bb8c269e2bea4b196c08ca66702d5102.1484165352.git.atar4qemu@gmail.com>
+Message-Id: <036aeab15d1b655352ec81abdd8696d5d3579938.1484165352.git.atar4qemu@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/sparc/cpu.h         |  4 +++
- target/sparc/ldst_helper.c | 66 +++++++++++++++++++++++++++++++++++++---------
- 2 files changed, 58 insertions(+), 12 deletions(-)
+ target/sparc/cpu.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 68e39bc..687e158 100644
+index 687e158..b41f5c5 100644
 --- a/target/sparc/cpu.h
 +++ b/target/sparc/cpu.h
-@@ -443,6 +443,8 @@ struct CPUSPARCState {
-             uint64_t sfar;
-             uint64_t tsb;
-             uint64_t tag_access;
-+            uint64_t virtual_watchpoint;
-+            uint64_t physical_watchpoint;
-         } immu;
-     };
-     union {
-@@ -455,6 +457,8 @@ struct CPUSPARCState {
-             uint64_t sfar;
-             uint64_t tsb;
-             uint64_t tag_access;
-+            uint64_t virtual_watchpoint;
-+            uint64_t physical_watchpoint;
-         } dmmu;
-     };
-     SparcTLBEntry itlb[64];
-diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-index fdca87f..043cbf8 100644
---- a/target/sparc/ldst_helper.c
-+++ b/target/sparc/ldst_helper.c
-@@ -1220,14 +1220,25 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
-     case ASI_IMMU: /* I-MMU regs */
-         {
-             int reg = (addr >> 3) & 0xf;
--
--            if (reg == 0) {
--                /* I-TSB Tag Target register */
-+            switch (reg) {
-+            case 0:
-+                /* 0x00 I-TSB Tag Target register */
-                 ret = ultrasparc_tag_target(env->immu.tag_access);
--            } else {
--                ret = env->immuregs[reg];
-+                break;
-+            case 3: /* SFSR */
-+                ret = env->immu.sfsr;
-+                break;
-+            case 5: /* TSB access */
-+                ret = env->immu.tsb;
-+                break;
-+            case 6:
-+                /* 0x30 I-TSB Tag Access register */
-+                ret = env->immu.tag_access;
-+                break;
-+            default:
-+                cpu_unassigned_access(cs, addr, false, false, 1, size);
-+                ret = 0;
-             }
--
-             break;
-         }
-     case ASI_IMMU_TSB_8KB_PTR: /* I-MMU 8k TSB pointer */
-@@ -1263,12 +1274,38 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
-     case ASI_DMMU: /* D-MMU regs */
-         {
-             int reg = (addr >> 3) & 0xf;
--
--            if (reg == 0) {
--                /* D-TSB Tag Target register */
-+            switch (reg) {
-+            case 0:
-+                /* 0x00 D-TSB Tag Target register */
-                 ret = ultrasparc_tag_target(env->dmmu.tag_access);
--            } else {
--                ret = env->dmmuregs[reg];
-+                break;
-+            case 1: /* 0x08 Primary Context */
-+                ret = env->dmmu.mmu_primary_context;
-+                break;
-+            case 2: /* 0x10 Secondary Context */
-+                ret = env->dmmu.mmu_secondary_context;
-+                break;
-+            case 3: /* SFSR */
-+                ret = env->dmmu.sfsr;
-+                break;
-+            case 4: /* 0x20 SFAR */
-+                ret = env->dmmu.sfar;
-+                break;
-+            case 5: /* 0x28 TSB access */
-+                ret = env->dmmu.tsb;
-+                break;
-+            case 6: /* 0x30 D-TSB Tag Access register */
-+                ret = env->dmmu.tag_access;
-+                break;
-+            case 7:
-+                ret = env->dmmu.virtual_watchpoint;
-+                break;
-+            case 8:
-+                ret = env->dmmu.physical_watchpoint;
-+                break;
-+            default:
-+                cpu_unassigned_access(cs, addr, false, false, 1, size);
-+                ret = 0;
-             }
-             break;
-         }
-@@ -1456,6 +1493,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
-             case 8:
-                 return;
-             default:
-+                cpu_unassigned_access(cs, addr, true, false, 1, size);
-                 break;
-             }
+@@ -304,19 +304,36 @@ enum {
+ #define TTE_W_OK_BIT        (1ULL <<  1)
+ #define TTE_GLOBAL_BIT      (1ULL <<  0)
  
-@@ -1526,9 +1564,13 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
-                 env->dmmu.tag_access = val;
-                 break;
-             case 7: /* Virtual Watchpoint */
-+                env->dmmu.virtual_watchpoint = val;
-+                break;
-             case 8: /* Physical Watchpoint */
-+                env->dmmu.physical_watchpoint = val;
-+                break;
-             default:
--                env->dmmuregs[reg] = val;
-+                cpu_unassigned_access(cs, addr, true, false, 1, size);
-                 break;
-             }
++#define TTE_NFO_BIT_UA2005  (1ULL << 62)
++#define TTE_USED_BIT_UA2005 (1ULL << 47)
++#define TTE_LOCKED_BIT_UA2005 (1ULL <<  61)
++#define TTE_SIDEEFFECT_BIT_UA2005 (1ULL <<  11)
++#define TTE_PRIV_BIT_UA2005 (1ULL <<  8)
++#define TTE_W_OK_BIT_UA2005 (1ULL <<  6)
++
+ #define TTE_IS_VALID(tte)   ((tte) & TTE_VALID_BIT)
+ #define TTE_IS_NFO(tte)     ((tte) & TTE_NFO_BIT)
+ #define TTE_IS_USED(tte)    ((tte) & TTE_USED_BIT)
+ #define TTE_IS_LOCKED(tte)  ((tte) & TTE_LOCKED_BIT)
+ #define TTE_IS_SIDEEFFECT(tte) ((tte) & TTE_SIDEEFFECT_BIT)
++#define TTE_IS_SIDEEFFECT_UA2005(tte) ((tte) & TTE_SIDEEFFECT_BIT_UA2005)
+ #define TTE_IS_PRIV(tte)    ((tte) & TTE_PRIV_BIT)
+ #define TTE_IS_W_OK(tte)    ((tte) & TTE_W_OK_BIT)
++
++#define TTE_IS_NFO_UA2005(tte)     ((tte) & TTE_NFO_BIT_UA2005)
++#define TTE_IS_USED_UA2005(tte)    ((tte) & TTE_USED_BIT_UA2005)
++#define TTE_IS_LOCKED_UA2005(tte)  ((tte) & TTE_LOCKED_BIT_UA2005)
++#define TTE_IS_SIDEEFFECT_UA2005(tte) ((tte) & TTE_SIDEEFFECT_BIT_UA2005)
++#define TTE_IS_PRIV_UA2005(tte)    ((tte) & TTE_PRIV_BIT_UA2005)
++#define TTE_IS_W_OK_UA2005(tte)    ((tte) & TTE_W_OK_BIT_UA2005)
++
+ #define TTE_IS_GLOBAL(tte)  ((tte) & TTE_GLOBAL_BIT)
  
+ #define TTE_SET_USED(tte)   ((tte) |= TTE_USED_BIT)
+ #define TTE_SET_UNUSED(tte) ((tte) &= ~TTE_USED_BIT)
+ 
+ #define TTE_PGSIZE(tte)     (((tte) >> 61) & 3ULL)
++#define TTE_PGSIZE_UA2005(tte)     ((tte) & 7ULL)
+ #define TTE_PA(tte)         ((tte) & 0x1ffffffe000ULL)
+ 
+ #define SFSR_NF_BIT         (1ULL << 24)   /* JPS1 NoFault */
 -- 
 2.9.3
