@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUkJ-0003Ji-C1
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:10 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRUrn-0003IV-3P
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:11:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUkF-0006r0-TW
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:07 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:03:21 +1100
-Message-Id: <20170112020327.24882-62-david@gibson.dropbear.id.au>
-In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 61/67] pseries: Rewrite CAS PVR compatibility
- logic
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRUrj-0000qQ-UW
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:11:51 -0500
+Received: from [59.151.112.132] (port=43888 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRUri-0000px-U9
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:11:47 -0500
+References: <20161229091619.31049-1-fanc.fnst@cn.fujitsu.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <5876E730.2080603@cn.fujitsu.com>
+Date: Thu, 12 Jan 2017 10:17:20 +0800
+MIME-Version: 1.0
+In-Reply-To: <20161229091619.31049-1-fanc.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH RFC] migration: set cpu throttle value by
+ workload
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,184 +27,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+To: Chao Fan <fanc.fnst@cn.fujitsu.com>, quintela@redhat.com, amit.shah@redhat.com
+Cc: qemu-devel@nongnu.org, douly.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, izumi.taku@jp.fujitsu.com
 
-During boot, PAPR guests negotiate CPU model support with the
-ibm,client-architecture-support mechanism.  The logic to implement this in
-qemu is very convoluted.  This cleans it up to be cleaner, using the new
-ppc_check_compat() call.
+Hi,
+We have been waiting for a long time on this topic，we have interests in
+improving the migration performance, and we think this could benefit in
+certain condition like heavy work load, the throttle value is a dynamic
+value than fixed increment. Your comments would be important to us,
+thanks in advance.
 
-The new logic for choosing a compatibility mode is:
-    1. Usually, use the most recent compatibility mode that is
-            a) supported by the guest
-            b) supported by the CPU
-        and c) no later than the maximum allowed (if specified)
-    2. If no suitable compatibility mode was found, the guest *does*
-       support this CPU explicitly, and no maximum compatibility mode is
-       specified, then use "raw" mode for the current CPU
-    3. Otherwise, fail the boot.
-
-This differs from the results of the old code: the old code preferred using
-"raw" mode to a compatibility mode, whereas the new code prefers a
-compatibility mode if available.  Using compatibility mode preferentially
-means that we're more likely to be able to migrate the guest to a similar
-but not identical host.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_hcall.c | 104 ++++++++++++++++-----------------------------------
- hw/ppc/trace-events  |   2 +-
- 2 files changed, 34 insertions(+), 72 deletions(-)
-
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index fd9f1d4..43a1fef 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -935,98 +935,60 @@ static void do_set_compat(CPUState *cs, run_on_cpu_data arg)
-     ppc_set_compat(cpu, s->compat_pvr, &s->err);
- }
- 
--#define get_compat_level(cpuver) ( \
--    ((cpuver) == CPU_POWERPC_LOGICAL_2_05) ? 2050 : \
--    ((cpuver) == CPU_POWERPC_LOGICAL_2_06) ? 2060 : \
--    ((cpuver) == CPU_POWERPC_LOGICAL_2_06_PLUS) ? 2061 : \
--    ((cpuver) == CPU_POWERPC_LOGICAL_2_07) ? 2070 : 0)
--
--static void cas_handle_compat_cpu(PowerPCCPUClass *pcc, uint32_t pvr,
--                                  unsigned max_lvl, unsigned *compat_lvl,
--                                  unsigned *compat_pvr)
--{
--    unsigned lvl = get_compat_level(pvr);
--    bool is205, is206, is207;
--
--    if (!lvl) {
--        return;
--    }
--
--    /* If it is a logical PVR, try to determine the highest level */
--    is205 = (pcc->pcr_supported & PCR_COMPAT_2_05) &&
--            (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_05));
--    is206 = (pcc->pcr_supported & PCR_COMPAT_2_06) &&
--            ((lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06)) ||
--             (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06_PLUS)));
--    is207 = (pcc->pcr_supported & PCR_COMPAT_2_07) &&
--            (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_07));
--
--    if (is205 || is206 || is207) {
--        if (!max_lvl) {
--            /* User did not set the level, choose the highest */
--            if (*compat_lvl <= lvl) {
--                *compat_lvl = lvl;
--                *compat_pvr = pvr;
--            }
--        } else if (max_lvl >= lvl) {
--            /* User chose the level, don't set higher than this */
--            *compat_lvl = lvl;
--            *compat_pvr = pvr;
--        }
--    }
--}
--
--static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
-+static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-                                                   sPAPRMachineState *spapr,
-                                                   target_ulong opcode,
-                                                   target_ulong *args)
- {
-     target_ulong list = ppc64_phys_to_real(args[0]);
-     target_ulong ov_table;
--    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu_);
-     CPUState *cs;
--    bool cpu_match = false;
--    unsigned old_compat_pvr = cpu_->compat_pvr;
--    unsigned compat_lvl = 0, compat_pvr = 0;
--    unsigned max_lvl = get_compat_level(cpu_->max_compat);
--    int counter;
-+    bool explicit_match = false; /* Matched the CPU's real PVR */
-+    uint32_t max_compat = cpu->max_compat;
-+    uint32_t best_compat = 0;
-+    int i;
-     sPAPROptionVector *ov5_guest, *ov5_cas_old, *ov5_updates;
- 
--    /* Parse PVR list */
--    for (counter = 0; counter < 512; ++counter) {
-+    /*
-+     * We scan the supplied table of PVRs looking for two things
-+     *   1. Is our real CPU PVR in the list?
-+     *   2. What's the "best" listed logical PVR
-+     */
-+    for (i = 0; i < 512; ++i) {
-         uint32_t pvr, pvr_mask;
- 
-         pvr_mask = ldl_be_phys(&address_space_memory, list);
--        list += 4;
--        pvr = ldl_be_phys(&address_space_memory, list);
--        list += 4;
--
--        trace_spapr_cas_pvr_try(pvr);
--        if (!max_lvl &&
--            ((cpu_->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask))) {
--            cpu_match = true;
--            compat_pvr = 0;
--        } else if (pvr == cpu_->compat_pvr) {
--            cpu_match = true;
--            compat_pvr = cpu_->compat_pvr;
--        } else if (!cpu_match) {
--            cas_handle_compat_cpu(pcc, pvr, max_lvl, &compat_lvl, &compat_pvr);
--        }
--        /* Terminator record */
-+        pvr = ldl_be_phys(&address_space_memory, list + 4);
-+        list += 8;
-+
-         if (~pvr_mask & pvr) {
--            break;
-+            break; /* Terminator record */
-         }
-+
-+        if ((cpu->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask)) {
-+            explicit_match = true;
-+        } else {
-+            if (ppc_check_compat(cpu, pvr, best_compat, max_compat)) {
-+                best_compat = pvr;
-+            }
-+        }
-+    }
-+
-+    if ((best_compat == 0) && (!explicit_match || max_compat)) {
-+        /* We couldn't find a suitable compatibility mode, and either
-+         * the guest doesn't support "raw" mode for this CPU, or raw
-+         * mode is disabled because a maximum compat mode is set */
-+        return H_HARDWARE;
-     }
- 
-     /* Parsing finished */
--    trace_spapr_cas_pvr(cpu_->compat_pvr, cpu_match,
--                        compat_pvr, pcc->pcr_mask);
-+    trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
- 
-     /* Update CPUs */
--    if (old_compat_pvr != compat_pvr) {
-+    if (cpu->compat_pvr != best_compat) {
-         CPU_FOREACH(cs) {
-             SetCompatState s = {
--                .compat_pvr = compat_pvr,
-+                .compat_pvr = best_compat,
-                 .err = NULL,
-             };
- 
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index 42b8ec0..f46995c 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -15,7 +15,7 @@ spapr_cas_continue(unsigned long n) "Copy changes to the guest: %ld bytes"
- 
- # hw/ppc/spapr_hcall.c
- spapr_cas_pvr_try(uint32_t pvr) "%x"
--spapr_cas_pvr(uint32_t cur_pvr, bool cpu_match, uint32_t new_pvr, uint64_t pcr) "current=%x, cpu_match=%u, new=%x, compat flags=%"PRIx64
-+spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=%x, explicit_match=%u, new=%x"
- 
- # hw/ppc/spapr_iommu.c
- spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
 -- 
-2.9.3
+Sincerely,
+Cao jin
+
+On 12/29/2016 05:16 PM, Chao Fan wrote:
+> This RFC PATCH is my demo about the new feature, here is my POC mail:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00646.html
+> 
+> When migration_bitmap_sync executed, get the time and read bitmap to
+> calculate how many dirty pages born between two sync.
+> Use inst_dirty_pages / (time_now - time_prev) / ram_size to get
+> inst_dirty_pages_rate. Then map from the inst_dirty_pages_rate
+> to cpu throttle value. I have no idea how to map it. So I just do
+> that in a simple way. The mapping way is just a guess and should
+> be improved.
+> 
+> This is just a demo. There are more methods.
+> 1.In another file, calculate the inst_dirty_pages_rate every second
+>   or two seconds or another fixed time. Then set the cpu throttle
+>   value according to the inst_dirty_pages_rate
+> 2.When inst_dirty_pages_rate gets a threshold, begin cpu throttle
+>   and set the throttle value.
+> 
+> Any comments will be welcome.
+> 
+> Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+> ---
+>  include/qemu/bitmap.h | 17 +++++++++++++++++
+>  migration/ram.c       | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 66 insertions(+)
+> 
+> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+> index 63ea2d0..dc99f9b 100644
+> --- a/include/qemu/bitmap.h
+> +++ b/include/qemu/bitmap.h
+> @@ -235,4 +235,21 @@ static inline unsigned long *bitmap_zero_extend(unsigned long *old,
+>      return new;
+>  }
+>  
+> +static inline unsigned long bitmap_weight(const unsigned long *src, long nbits)
+> +{
+> +    unsigned long i, count = 0, nlong = nbits / BITS_PER_LONG;
+> +
+> +    if (small_nbits(nbits)) {
+> +        return hweight_long(*src & BITMAP_LAST_WORD_MASK(nbits));
+> +    }
+> +    for (i = 0; i < nlong; i++) {
+> +        count += hweight_long(src[i]);
+> +    }
+> +    if (nbits % BITS_PER_LONG) {
+> +        count += hweight_long(src[i] & BITMAP_LAST_WORD_MASK(nbits));
+> +    }
+> +
+> +    return count;
+> +}
+> +
+>  #endif /* BITMAP_H */
+> diff --git a/migration/ram.c b/migration/ram.c
+> index a1c8089..f96e3e3 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -44,6 +44,7 @@
+>  #include "exec/ram_addr.h"
+>  #include "qemu/rcu_queue.h"
+>  #include "migration/colo.h"
+> +#include "hw/boards.h"
+>  
+>  #ifdef DEBUG_MIGRATION_RAM
+>  #define DPRINTF(fmt, ...) \
+> @@ -599,6 +600,9 @@ static int64_t num_dirty_pages_period;
+>  static uint64_t xbzrle_cache_miss_prev;
+>  static uint64_t iterations_prev;
+>  
+> +static int64_t dirty_pages_time_prev;
+> +static int64_t dirty_pages_time_now;
+> +
+>  static void migration_bitmap_sync_init(void)
+>  {
+>      start_time = 0;
+> @@ -606,6 +610,49 @@ static void migration_bitmap_sync_init(void)
+>      num_dirty_pages_period = 0;
+>      xbzrle_cache_miss_prev = 0;
+>      iterations_prev = 0;
+> +
+> +    dirty_pages_time_prev = 0;
+> +    dirty_pages_time_now = 0;
+> +}
+> +
+> +static void migration_inst_rate(void)
+> +{
+> +    RAMBlock *block;
+> +    MigrationState *s = migrate_get_current();
+> +    int64_t inst_dirty_pages_rate, inst_dirty_pages = 0;
+> +    int64_t i;
+> +    unsigned long *num;
+> +    unsigned long len = 0;
+> +
+> +    dirty_pages_time_now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    if (dirty_pages_time_prev != 0) {
+> +        rcu_read_lock();
+> +        DirtyMemoryBlocks *blocks = atomic_rcu_read(
+> +                         &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
+> +        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +            if (len == 0) {
+> +                len = block->offset;
+> +            }
+> +            len += block->used_length;
+> +        }
+> +        ram_addr_t idx = (len >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
+> +        if (((len >> TARGET_PAGE_BITS) % DIRTY_MEMORY_BLOCK_SIZE) != 0) {
+> +            idx++;
+> +        }
+> +        for (i = 0; i < idx; i++) {
+> +            num = blocks->blocks[i];
+> +            inst_dirty_pages += bitmap_weight(num, DIRTY_MEMORY_BLOCK_SIZE);
+> +        }
+> +        rcu_read_unlock();
+> +
+> +        inst_dirty_pages_rate = inst_dirty_pages * TARGET_PAGE_SIZE *
+> +                            1024 * 1024 * 1000 /
+> +                            (dirty_pages_time_now - dirty_pages_time_prev) /
+> +                            current_machine->ram_size;
+> +        s->parameters.cpu_throttle_initial = inst_dirty_pages_rate / 200;
+> +        s->parameters.cpu_throttle_increment = inst_dirty_pages_rate / 200;
+> +    }
+> +    dirty_pages_time_prev = dirty_pages_time_now;
+>  }
+>  
+>  static void migration_bitmap_sync(void)
+> @@ -629,6 +676,8 @@ static void migration_bitmap_sync(void)
+>      trace_migration_bitmap_sync_start();
+>      memory_global_dirty_log_sync();
+>  
+> +    migration_inst_rate();
+> +
+>      qemu_mutex_lock(&migration_bitmap_mutex);
+>      rcu_read_lock();
+>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> 
