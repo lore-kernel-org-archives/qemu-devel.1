@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cRVeH-0005ce-FF
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:01:58 -0500
+	(envelope-from <peterx@redhat.com>) id 1cRVsO-0003lE-Ux
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:16:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cRVeD-0000Ca-Jn
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:01:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32792)
+	(envelope-from <peterx@redhat.com>) id 1cRVsL-00058M-Ou
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:16:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cRVeD-0000CH-DS
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:01:53 -0500
-Date: Thu, 12 Jan 2017 11:01:48 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170112030148.GC26504@lemon>
-References: <20170111182455.15160-1-nirsof@gmail.com>
-	<750c2d41-dac2-61f7-29c3-82d8d13a0de6@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRVsL-000582-JA
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:16:29 -0500
+Date: Thu, 12 Jan 2017 11:16:21 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170112031621.GH4450@pxdev.xzpeter.org>
+References: <1484112575-13194-1-git-send-email-peterx@redhat.com>
+	<1484112575-13194-2-git-send-email-peterx@redhat.com>
+	<20170111090607.crlxskbvhx6seyvl@kamzik.brq.redhat.com>
+	<20170111095112.opwd5sy6et4qdcrl@kamzik.brq.redhat.com>
+	<20170111101244.GG4450@pxdev.xzpeter.org>
+	<20170111104638.die63k7v72uhgufx@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <750c2d41-dac2-61f7-29c3-82d8d13a0de6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-io: Return non-zero exit code on
- failure
+In-Reply-To: <20170111104638.die63k7v72uhgufx@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v5 1/2] run_tests: put logs
+ into per-test file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Nir Soffer <nsoffer@redhat.com>
-Cc: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-On Wed, 01/11 15:51, Eric Blake wrote:
-> On 01/11/2017 12:24 PM, Nir Soffer wrote:
-> > From: Nir Soffer <nsoffer@redhat.com>
+On Wed, Jan 11, 2017 at 11:46:38AM +0100, Andrew Jones wrote:
+
+[...]
+
+> > So, how about this:
 > > 
-> > The result of openfile was not checked, leading to failure deep in the
-> > actual command with confusing error message, and exiting with exit code 0.
-> > 
-> > Here is one example - trying to read a pattern from an invalid chain:
-> > 
-> >     $ qemu-io -c 'read -P 1 0 1024' top.qcow2; echo $?
+> >     rm -rf $unittest_log_dir.old || err "Failed remove old logs"
+> >     if [[ -d $unittest_log_dir ]]; then
 > 
-> As written, you have to guess some context about how top.qcow2 was
-> created.  The example can be made a bit more reproducible with:
-> 
-> $ : > file
-> $ qemu-io -f qcow2 -c ... file
+> Only [ ... ] for tests like these
 
-Nir, thank you for the fix. Could you also add a regression test in
-tests/qemu-iotests?
+I thought [[ ... ]] would be superior to [ ... ] if we are not
+considering the POSIX compatibility issue?
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Hmm, after a quick grep, I see that kvm-unit-tests repo is using [[
+... ]] only if doing any kind of pattern/regex matching, right? If so,
+I'll just follow. ;-)
 
 > 
-> >     can't open device top.qcow2: Could not open backing file: Image is not in qcow2 format
-> >     no file open, try 'help open'
-> >     0
+> >         mv $unittest_log_dir $unittest_log_dir.old ||
+> >             err "Failed backup logs"
+> >     fi
+> >     mkdir $unittest_log_dir || err "Failed to create log dir"
 > > 
-> > With this patch, we fail earlier with exit code 1:
+> > And define err() in common.bash:
 > > 
-> >     $ ./qemu-io -c 'read -P 1 0 1024' top.qcow2; echo $?
-> >     can't open device top.qcow2: Could not open backing file: Image is not
-> >     in qcow2 format
-> >     1
-> > 
-> > Signed-off-by: Nir Soffer <nirsof@gmail.com>
-> > ---
-> >  qemu-io.c | 8 ++++++--
-> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> >     function err()
+> >     {
+> >         echo "$@"
+> >         exit 1
+> >     }
 > 
-> Whether or not the commit message is improved,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> The above is mostly just translating rm/mv/mkdir stderr messages to
+> new messages. We can do it much more simply like
+> 
+>  rm -rf logs.old
+>  [ -d logs ] && mv logs logs.old
+>  mkdir logs || exit 2
+
+Okay I'll use this. Thanks!
+
+-- peterx
