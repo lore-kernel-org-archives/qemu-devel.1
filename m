@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <h158309@126.com>) id 1cRYq6-0002eb-Ge
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 01:26:24 -0500
+	(envelope-from <wei@redhat.com>) id 1cRZQy-0001Uj-JZ
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:04:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <h158309@126.com>) id 1cRYq1-0003rX-FW
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 01:26:22 -0500
-Received: from m15-38.126.com ([220.181.15.38]:45533)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <h158309@126.com>) id 1cRYq0-0003rL-78
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 01:26:17 -0500
-Date: Thu, 12 Jan 2017 13:55:37 +0800 (CST)
-From: =?GBK?B?u8a7tA==?= <h158309@126.com>
-In-Reply-To: <CAJ+F1CK8PwREJRVdBwFdt-nK-X1yE69Lg6Bzz4ouKjsVCnhcCA@mail.gmail.com>
-References: <32da9f1f.9022.1598ccf96ce.Coremail.h158309@126.com>
-	<CAJ+F1CK8PwREJRVdBwFdt-nK-X1yE69Lg6Bzz4ouKjsVCnhcCA@mail.gmail.com>
-MIME-Version: 1.0
-Message-ID: <215f62a9.521a.159913eedbc.Coremail.h158309@126.com>
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] vhost-user: fix crash when chardev-remove
+	(envelope-from <wei@redhat.com>) id 1cRZQx-00063d-RD
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:04:28 -0500
+From: Wei Huang <wei@redhat.com>
+Date: Thu, 12 Jan 2017 02:04:16 -0500
+Message-Id: <1484204658-28058-3-git-send-email-wei@redhat.com>
+In-Reply-To: <1484204658-28058-1-git-send-email-wei@redhat.com>
+References: <1484204658-28058-1-git-send-email-wei@redhat.com>
+Subject: [Qemu-devel] [PATCH V1 2/4] target-arm: Add support for AArch64 PMU
+ register PMXEVTYPER_EL0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,119 +20,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?GBK?Q?Marc-Andr=A8=A6_Lureau?= <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-SGkgCkkgdGVzdGVkICBvbiBxZW11LTIuNy4xIHJlbGVhc2UgdmVyc2lvbi4KCgp0ZXN0IGNhc2U6
-CjEuIGhvc3QgcnVuIG92cy1kcGRrLiAgc3RhcnQgIHZob3N0LXVzZXIgbW9kZSB2bQoyLiBjaGFy
-ZGV2LWFkZCBzb2NrZXQsaWQ9Y2hhci1jbGllbnQtMDAyLTIscGF0aD0vdXNyL2xvY2FsL3Zhci9y
-dW4vb3BlbnZzd2l0Y2gvY2xpZW50LTAwMi0yLHNlcnZlcj1vbgoKICAgIG5ldGRldl9hZGQgdmhv
-c3QtdXNlcixpZD1jbGllbnQtMDAyLTIsICxjaGFyZGV2PWNoYXItY2xpZW50LTAwMi0yLHZob3N0
-Zm9yY2U9b24KCiAgICBkZXZpY2VfYWRkIHZpcnRpby1uZXQtcGNpLG5ldGRldj1jbGllbnQtMDAy
-LTIsbWFjPTAwOjIyOjc5OjI5OmQyOjZjLGlkPW5ldGRldi1jbGllbnQtMDAyLTIgCiAgIC4uLiB3
-YWl0IDEwIHMKICAgIGRldmljZV9kZWwgIG5ldGRldi1jbGllbnQtMDAyLTIKICAgIG5ldGRldl9k
-ZWwgIGNsaWVudC0wMDItMgogICAgY2hhcmRldi1yZW1vdmUgY2hhci1jbGllbnQtMDAyLTIKICAg
-CiAgICBvdnMtdnNjdGwgZGVsLXBvcnQgIGNsaWVudC0wMDItMgooZ2RiKSBidAojMCAgMHgwMDAw
-N2Y4MDQ4MzI2NWY3IGluIHJhaXNlICgpIGZyb20gL2xpYjY0L2xpYmMuc28uNgojMSAgMHgwMDAw
-N2Y4MDQ4MzI3Y2U4IGluIGFib3J0ICgpIGZyb20gL2xpYjY0L2xpYmMuc28uNgojMiAgMHgwMDAw
-N2Y4MDQ4MzFmNTY2IGluIF9fYXNzZXJ0X2ZhaWxfYmFzZSAoKSBmcm9tIC9saWI2NC9saWJjLnNv
-LjYKIzMgIDB4MDAwMDdmODA0ODMxZjYxMiBpbiBfX2Fzc2VydF9mYWlsICgpIGZyb20gL2xpYjY0
-L2xpYmMuc28uNgojNCAgMHgwMDAwN2Y4MDRiNzI5YmVjIGluIGdldF92aG9zdF9uZXQgKG5jPTxv
-cHRpbWl6ZWQgb3V0PikgYXQgL29wdC9jbG91ZC9jb250cmliL3FlbXUtMi43LjEvaHcvbmV0L3Zo
-b3N0X25ldC5jOjQxNQojNSAgMHgwMDAwN2Y4MDRiNzI2ZjMxIGluIHZpcnRpb19uZXRfdmhvc3Rf
-c3RhdHVzIChzdGF0dXM9MCAnXDAwMCcsIG49MHg3ZjgwNGRiODQxYzApIGF0IC9vcHQvY2xvdWQv
-Y29udHJpYi9xZW11LTIuNy4xL2h3L25ldC92aXJ0aW8tbmV0LmM6MTIxCiM2ICB2aXJ0aW9fbmV0
-X3NldF9zdGF0dXMgKHZkZXY9PG9wdGltaXplZCBvdXQ+LCBzdGF0dXM9PG9wdGltaXplZCBvdXQ+
-KSBhdCAvb3B0L2Nsb3VkL2NvbnRyaWIvcWVtdS0yLjcuMS9ody9uZXQvdmlydGlvLW5ldC5jOjIy
-NAojNyAgMHgwMDAwN2Y4MDRiNzNlYWQ2IGluIHZpcnRpb19zZXRfc3RhdHVzICh2ZGV2PXZkZXZA
-ZW50cnk9MHg3ZjgwNGRiODQxYzAsIHZhbD12YWxAZW50cnk9MCAnXDAwMCcpIGF0IC9vcHQvY2xv
-dWQvY29udHJpYi9xZW11LTIuNy4xL2h3L3ZpcnRpby92aXJ0aW8uYzo3NjAKIzggIDB4MDAwMDdm
-ODA0YjhmODY5YyBpbiB2aXJ0aW9faW9wb3J0X3dyaXRlICh2YWw9MCwgYWRkcj0xOCwgb3BhcXVl
-PTB4N2Y4MDRkYjdiZTgwKSBhdCBody92aXJ0aW8vdmlydGlvLXBjaS5jOjQwMAojOSAgdmlydGlv
-X3BjaV9jb25maWdfd3JpdGUgKG9wYXF1ZT0weDdmODA0ZGI3YmU4MCwgYWRkcj0xOCwgdmFsPTAs
-IHNpemU9PG9wdGltaXplZCBvdXQ+KSBhdCBody92aXJ0aW8vdmlydGlvLXBjaS5jOjUyNQojMTAg
-MHgwMDAwN2Y4MDRiNmZhMGRiIGluIG1lbW9yeV9yZWdpb25fd3JpdGVfYWNjZXNzb3IgKG1yPTB4
-N2Y4MDRkYjdjNzEwLCBhZGRyPTE4LCB2YWx1ZT08b3B0aW1pemVkIG91dD4sIHNpemU9MSwgc2hp
-ZnQ9PG9wdGltaXplZCBvdXQ+LCBtYXNrPTxvcHRpbWl6ZWQgb3V0PiwgYXR0cnM9Li4uKQogICAg
-YXQgL29wdC9jbG91ZC9jb250cmliL3FlbXUtMi43LjEvbWVtb3J5LmM6NTI1CiMxMSAweDAwMDA3
-ZjgwNGI2ZjgwNzkgaW4gYWNjZXNzX3dpdGhfYWRqdXN0ZWRfc2l6ZSAoYWRkcj1hZGRyQGVudHJ5
-PTE4LCB2YWx1ZT12YWx1ZUBlbnRyeT0weDdmN2ZmZWZmYzk1OCwgc2l6ZT1zaXplQGVudHJ5PTEs
-IGFjY2Vzc19zaXplX21pbj08b3B0aW1pemVkIG91dD4sCiAgICBhY2Nlc3Nfc2l6ZV9tYXg9PG9w
-dGltaXplZCBvdXQ+LCBhY2Nlc3M9YWNjZXNzQGVudHJ5PTB4N2Y4MDRiNmZhMDYwIDxtZW1vcnlf
-cmVnaW9uX3dyaXRlX2FjY2Vzc29yPiwgbXI9bXJAZW50cnk9MHg3ZjgwNGRiN2M3MTAsIGF0dHJz
-PWF0dHJzQGVudHJ5PS4uLikKICAgIGF0IC9vcHQvY2xvdWQvY29udHJpYi9xZW11LTIuNy4xL21l
-bW9yeS5jOjU5MQojMTIgMHgwMDAwN2Y4MDRiNmZjNmY1IGluIG1lbW9yeV9yZWdpb25fZGlzcGF0
-Y2hfd3JpdGUgKG1yPW1yQGVudHJ5PTB4N2Y4MDRkYjdjNzEwLCBhZGRyPWFkZHJAZW50cnk9MTgs
-IGRhdGE9MCwgc2l6ZT1zaXplQGVudHJ5PTEsIGF0dHJzPWF0dHJzQGVudHJ5PS4uLikKICAgIGF0
-IC9vcHQvY2xvdWQvY29udHJpYi9xZW11LTIuNy4xL21lbW9yeS5jOjEzMjcKIzEzIDB4MDAwMDdm
-ODA0YjZiOTNiYiBpbiBhZGRyZXNzX3NwYWNlX3dyaXRlX2NvbnRpbnVlIChtcj0weDdmODA0ZGI3
-YzcxMCwgbD0xLCBhZGRyMT0xOCwgbGVuPTEsIGJ1Zj0weDdmODA0YjRiYzAwMCA8QWRkcmVzcyAw
-eDdmODA0YjRiYzAwMCBvdXQgb2YgYm91bmRzPiwgYXR0cnM9Li4uLCBhZGRyPTQxMTQsCiAgICBh
-cz0weDdmODA0YmZhYTNlMCA8YWRkcmVzc19zcGFjZV9pbz4pIGF0IC9vcHQvY2xvdWQvY29udHJp
-Yi9xZW11LTIuNy4xL2V4ZWMuYzoyNTU2CiMxNCBhZGRyZXNzX3NwYWNlX3dyaXRlIChhcz08b3B0
-aW1pemVkIG91dD4sIGFkZHI9PG9wdGltaXplZCBvdXQ+LCBhdHRycz0uLi4sIGJ1Zj08b3B0aW1p
-emVkIG91dD4sIGxlbj08b3B0aW1pemVkIG91dD4pIGF0IC9vcHQvY2xvdWQvY29udHJpYi9xZW11
-LTIuNy4xL2V4ZWMuYzoyNjAxCiMxNSAweDAwMDA3ZjgwNGI2YjlhM2QgaW4gYWRkcmVzc19zcGFj
-ZV9ydyAoYXM9PG9wdGltaXplZCBvdXQ+LCBhZGRyPWFkZHJAZW50cnk9NDExNCwgYXR0cnM9Li4u
-LCBhdHRyc0BlbnRyeT0uLi4sIGJ1Zj08b3B0aW1pemVkIG91dD4sIGxlbj1sZW5AZW50cnk9MSwg
-aXNfd3JpdGU9aXNfd3JpdGVAZW50cnk9dHJ1ZSkKICAgIGF0IC9vcHQvY2xvdWQvY29udHJpYi9x
-ZW11LTIuNy4xL2V4ZWMuYzoyNzAzCiMxNiAweDAwMDA3ZjgwNGI2ZjZmZDUgaW4ga3ZtX2hhbmRs
-ZV9pbyAoY291bnQ9MSwgc2l6ZT0xLCBkaXJlY3Rpb249PG9wdGltaXplZCBvdXQ+LCBkYXRhPTxv
-cHRpbWl6ZWQgb3V0PiwgYXR0cnM9Li4uLCBwb3J0PTQxMTQpIGF0IC9vcHQvY2xvdWQvY29udHJp
-Yi9xZW11LTIuNy4xL2t2bS1hbGwuYzoxNzkxCiMxNyBrdm1fY3B1X2V4ZWMgKGNwdT1jcHVAZW50
-cnk9MHg3ZjgwNGQ4ZDFkZTApIGF0IC9vcHQvY2xvdWQvY29udHJpYi9xZW11LTIuNy4xL2t2bS1h
-bGwuYzoxOTU1CiMxOCAweDAwMDA3ZjgwNGI2ZTRlNzYgaW4gcWVtdV9rdm1fY3B1X3RocmVhZF9m
-biAoYXJnPTB4N2Y4MDRkOGQxZGUwKSBhdCAvb3B0L2Nsb3VkL2NvbnRyaWIvcWVtdS0yLjcuMS9j
-cHVzLmM6MTA3OAojMTkgMHgwMDAwN2Y4MDQ4NmI5ZGM1IGluIHN0YXJ0X3RocmVhZCAoKSBmcm9t
-IC9saWI2NC9saWJwdGhyZWFkLnNvLjAKIzIwIDB4MDAwMDdmODA0ODNlNzI4ZCBpbiBjbG9uZSAo
-KSBmcm9tIC9saWI2NC9saWJjLnNvLjYKCgpBZnRlciBmaXggdGhpczoKZGlmZiAtLWdpdCBhL2h3
-L25ldC92aG9zdF9uZXQuYyBiL2h3L25ldC92aG9zdF9uZXQuYwppbmRleCBmMmQ0OWFkLi40MDM3
-Y2Y0IDEwMDY0NAotLS0gYS9ody9uZXQvdmhvc3RfbmV0LmMKKysrIGIvaHcvbmV0L3Zob3N0X25l
-dC5jCkBAIC00MTIsNyArNDEyLDYgQEAgVkhvc3ROZXRTdGF0ZSAqZ2V0X3Zob3N0X25ldChOZXRD
-bGllbnRTdGF0ZSAqbmMpCiAgICAgICAgIGJyZWFrOwogICAgIGNhc2UgTkVUX0NMSUVOVF9EUklW
-RVJfVkhPU1RfVVNFUjoKICAgICAgICAgdmhvc3RfbmV0ID0gdmhvc3RfdXNlcl9nZXRfdmhvc3Rf
-bmV0KG5jKTsKLSAgICAgICAgYXNzZXJ0KHZob3N0X25ldCk7CgoKKGdkYikgYnQKIzAgIHFlbXVf
-Y2hyX2Rpc2Nvbm5lY3QgKGNocj0weDApIGF0IHFlbXUtY2hhci5jOjQwODEKIzEgIDB4MDAwMDdm
-ZGI0ZjUzOGNmMCBpbiBuZXRfdmhvc3RfdXNlcl93YXRjaCAoY2hhbj08b3B0aW1pemVkIG91dD4s
-IGNvbmQ9PG9wdGltaXplZCBvdXQ+LCBvcGFxdWU9PG9wdGltaXplZCBvdXQ+KSBhdCBuZXQvdmhv
-c3QtdXNlci5jOjE5NQojMiAgMHgwMDAwN2ZkYjRjZDYxN2FhIGluIGdfbWFpbl9jb250ZXh0X2Rp
-c3BhdGNoICgpIGZyb20gL2xpYjY0L2xpYmdsaWItMi4wLnNvLjAKIzMgIDB4MDAwMDdmZGI0ZjU3
-OThmMCBpbiBnbGliX3BvbGxmZHNfcG9sbCAoKSBhdCBtYWluLWxvb3AuYzoyMTMKIzQgIG9zX2hv
-c3RfbWFpbl9sb29wX3dhaXQgKHRpbWVvdXQ9PG9wdGltaXplZCBvdXQ+KSBhdCBtYWluLWxvb3Au
-YzoyNTgKIzUgIG1haW5fbG9vcF93YWl0IChub25ibG9ja2luZz08b3B0aW1pemVkIG91dD4pIGF0
-IG1haW4tbG9vcC5jOjUwNgojNiAgMHgwMDAwN2ZkYjRmMmRiZmE3IGluIG1haW5fbG9vcCAoKSBh
-dCB2bC5jOjE5MDkKIzcgIG1haW4gKGFyZ2M9PG9wdGltaXplZCBvdXQ+LCBhcmd2PTxvcHRpbWl6
-ZWQgb3V0PiwgZW52cD08b3B0aW1pemVkIG91dD4pIGF0IHZsLmM6NDYxOAoKCgoKSSB0aGluayBp
-dGBzIGJlY2F1c2Ugdmhvc3QtdXNlciBjbGllbnQgbW9kZSAsICAyLjcrIHZlcnNpb24gbmV3IGZ1
-bmN0aW9uKHJlY29ubmVjdCkuICAgQWZ0ZXIgcWVtdSBjaGFyLXJlbW92ZSwgdGhlIHdhdGNoIGZk
-IHByb2Nlc3MgZGlkbmB0IHN0b3AuIFdoZW4gb3ZzLWRwZGsgcmVtb3ZlIHBvcnQgIGFuZCBjbG9z
-ZSB3YXRjaCBmZCwgIHFlbXUgY3Jhc2hlZC4KCgpUaGFua3MKSHVhbmdodWFpICAKCgoKQXQgMjAx
-Ny0wMS0xMSAyMzowMjoyNiwgIk1hcmMtQW5kcqimIEx1cmVhdSIgPG1hcmNhbmRyZS5sdXJlYXVA
-Z21haWwuY29tPiB3cm90ZToKCkhpCgoKCk9uIFdlZCwgSmFuIDExLCAyMDE3IGF0IDM6MzIgUE0g
-u8a7tCA8aDE1ODMwOUAxMjYuY29tPiB3cm90ZToKCkZyb206IEh1YWkgSHVhbmc8aDE1ODMwOUAx
-MjYuY29tPgoKCgoKCkNvdWxkIHlvdSBkZXNjcmliZSBhIGJpdCBtb3JlIHRoZSBjcmFzaCBhbmQg
-cHJvdmlkZSBhIGJhY2t0cmFjZT8KCiAKZGlmZiAtLWdpdCBhL2h3L25ldC92aG9zdF9uZXQuYyBi
-L2h3L25ldC92aG9zdF9uZXQuYwppbmRleCBmMmQ0OWFkLi40MDM3Y2Y0IDEwMDY0NAotLS0gYS9o
-dy9uZXQvdmhvc3RfbmV0LmMKKysrIGIvaHcvbmV0L3Zob3N0X25ldC5jCkBAIC00MTIsNyArNDEy
-LDYgQEAgVkhvc3ROZXRTdGF0ZSAqZ2V0X3Zob3N0X25ldChOZXRDbGllbnRTdGF0ZSAqbmMpCiAg
-ICAgICAgIGJyZWFrOwogICAgIGNhc2UgTkVUX0NMSUVOVF9EUklWRVJfVkhPU1RfVVNFUjoKICAg
-ICAgICAgdmhvc3RfbmV0ID0gdmhvc3RfdXNlcl9nZXRfdmhvc3RfbmV0KG5jKTsKLSAgICAgICAg
-YXNzZXJ0KHZob3N0X25ldCk7CgoKClRoaXMgd2FzIHJlY2VudGx5IGFkZGVkLCBpbiBjb21taXQg
-MWE1YjY4Y2VlOGEyYjE2NWZmZDYxYjJlMDY0MWE0ZGEzOTkwZjI0Mi4KCgpIb3cgaXMgaXQgcmVs
-YXRlZD8KCgpJIHJlbWVtYmVyIHRoZSByZXN0IG9mIHRoZSB2aG9zdC11c2VyIGNvZGUgZXhwZWN0
-ZWQgZ2V0X3Zob3N0X25ldCgpIHRvIGJlIG5vbi1udWxsLCBkaWQgdGhhdCBjaGFuZ2U/CgoKCiAg
-ICAgICAgIGJyZWFrOwogICAgIGRlZmF1bHQ6CiAgICAgICAgIGJyZWFrOwpkaWZmIC0tZ2l0IGEv
-bmV0L3Zob3N0LXVzZXIuYyBiL25ldC92aG9zdC11c2VyLmMKaW5kZXggYjA1OTVmOC4uNGU1NDQ3
-OCAxMDA2NDQKLS0tIGEvbmV0L3Zob3N0LXVzZXIuYworKysgYi9uZXQvdmhvc3QtdXNlci5jCkBA
-IC0xNjAsNyArMTYwLDEwIEBAIHN0YXRpYyB2b2lkIHZob3N0X3VzZXJfY2xlYW51cChOZXRDbGll
-bnRTdGF0ZSAqbmMpCiAgICAgICAgIHFlbXVfY2hyX2ZlX3JlbGVhc2Uocy0+Y2hyKTsKICAgICAg
-ICAgcy0+Y2hyID0gTlVMTDsKICAgICB9Ci0KKyAgICBpZiAocy0+d2F0Y2gpIHsKKyAgICAgICAg
-Z19zb3VyY2VfcmVtb3ZlKHMtPndhdGNoKTsKKyAgICAgICAgcy0+d2F0Y2ggPSAwOworICAgIH0K
-CgoKSG1tLCB0aGUgc29ja2V0IGRpZG4ndCBzZW5kIGEgQ0xPU0VEIGV2ZW50IG9uIHJlbW92ZT8K
-IAoKICAgICBxZW11X3B1cmdlX3F1ZXVlZF9wYWNrZXRzKG5jKTsKIH0KCgpAQCAtMTkyLDcgKzE5
-NSw4IEBAIHN0YXRpYyBnYm9vbGVhbiBuZXRfdmhvc3RfdXNlcl93YXRjaChHSU9DaGFubmVsICpj
-aGFuLCBHSU9Db25kaXRpb24gY29uZCwKIHsKICAgICBWaG9zdFVzZXJTdGF0ZSAqcyA9IG9wYXF1
-ZTsKCgotICAgIHFlbXVfY2hyX2Rpc2Nvbm5lY3Qocy0+Y2hyKTsKKyAgICBpZiAocy0+Y2hyKQor
-ICAgICAgICBxZW11X2Nocl9kaXNjb25uZWN0KHMtPmNocik7CgoKCnRoYXQgbG9va3Mgb3V0ZGF0
-ZWQsCgoKd2hpY2ggdmVyc2lvbiBvZiBxZW11IGRpZCB5b3UgdGVzdGVkIGFuZCBwYXRjaGVkPwoK
-CnRoYW5rcwoKCgogICAgIHJldHVybiBGQUxTRTsKIH0KLS0KCk1hcmMtQW5kcqimIEx1cmVhdQo=
+In order to support Linux perf, which uses PMXEVTYPER register,
+this patch adds access support for PMXEVTYPER_EL0.
+
+Signed-off-by: Wei Huang <wei@redhat.com>
+---
+ target/arm/helper.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 71adb0f..9044a33 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1233,10 +1233,17 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .fieldoffset = offsetof(CPUARMState, cp15.pmccfiltr_el0),
+       .resetvalue = 0, },
+     { .name = "PMXEVTYPER", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 1,
+-      .access = PL0_RW,
++      .access = PL0_RW, .type = ARM_CP_ALIAS,
+       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmxevtyper),
+       .accessfn = pmreg_access, .writefn = pmxevtyper_write,
+       .raw_writefn = raw_write },
++    { .name = "PMXEVTYPER_EL0", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 13, .opc2 = 1,
++      .access = PL0_RW, .accessfn = pmreg_access,
++      .type = ARM_CP_IO,
++      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmxevtyper),
++      .writefn = pmxevtyper_write, .raw_writefn = raw_write,
++      .resetvalue = 0x0 },
+     /* Unimplemented, RAZ/WI. */
+     { .name = "PMXEVCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 2,
+       .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
+-- 
+1.8.3.1
