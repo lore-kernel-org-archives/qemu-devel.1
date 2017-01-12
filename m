@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRb9R-0000Mr-4t
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:54:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1cRbV5-0007mI-Gu
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:16:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRb9N-0001nd-Si
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:54:29 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36019)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cRb9N-0001nE-Ln
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:54:25 -0500
-Received: by mail-wm0-x244.google.com with SMTP id r126so2158230wmr.3
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 00:54:25 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1482307137-5106-1-git-send-email-peterx@redhat.com>
-	<1482307137-5106-2-git-send-email-peterx@redhat.com>
-	<f6e71117-81ce-db81-d469-d0b48b7cc794@redhat.com>
-	<20170112055027.GK4450@pxdev.xzpeter.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <37865480-14d1-3a13-c083-013e834de1fc@redhat.com>
-Date: Thu, 12 Jan 2017 09:54:24 +0100
+	(envelope-from <bounces@canonical.com>) id 1cRbV0-0005KG-4y
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:16:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45344)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cRbUz-0005Jp-VD
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:16:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cRbUy-000384-FP
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 09:16:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 732522E80C8
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 09:16:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170112055027.GK4450@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory: provide common macros for
- mtree_print_mr()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Jan 2017 08:56:59 -0000
+From: Paolo Bonzini <bonzini@gnu.org>
+Reply-To: Bug 1268671 <1268671@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140113174654.7725.99941.malonedeb@soybean.canonical.com>
+Message-Id: <20170112085659.20600.47075.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1268671] Re: CentOS guest crashing due to
+ assertion failure in qemu-char.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +37,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1212722
 
+-- =
 
-On 12/01/2017 06:50, Peter Xu wrote:
-> On Wed, Jan 11, 2017 at 06:21:46PM +0100, Paolo Bonzini wrote:
->>
->>
->> On 21/12/2016 08:58, Peter Xu wrote:
->>> -                   mr->romd_mode ? 'R' : '-',
->>> -                   !mr->readonly && !(mr->rom_device && mr->romd_mode) ? 'W'
->>> -                                                                       : '-',
->>> +                   MR_CHAR_RD(mr),
->>> +                   MR_CHAR_WR(mr),
->>
->> An alternative definition could be
->>
->> 	memory_access_is_direct(mr, false) ? 'R' : '-'
->> 	memory_access_is_direct(mr, true) ? 'W' : '-'
->>
->> for MR_CHAR_RD and MR_CHAR_WR.  With this change, I think the small code
->> duplication in the "? :" operator is tolerable and the code is clearer.
-> 
-> memory_access_is_direct() will check against whether mr is RAM, is
-> that what we want here? In that case we'll get most of the regions as
-> "--" as long as they are not RAM, while in fact IMHO we should want to
-> know the rw permission for all cases.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1268671
 
-Indeed.  My idea was that the RW permission is not well defined for
-non-RAM memory regions, and ROMD regions in MMIO mode shows as "--"
-while MMIO regions show as "RW".  But perhaps it's confusing.
+Title:
+  CentOS guest crashing due to assertion failure in qemu-char.c
 
-What about writing one of "ram", "rom", "ramd", "romd", "i/o" (with I/O
-also covering rom_device && !romd_mode)?
+Status in QEMU:
+  Invalid
 
-If you disagree, the below patch looks good.
+Bug description:
+  Here is the log in /var/log/libvirt/qemu/centos_heavy.log
 
-Paolo
+  qemu-kvm: /builddir/build/BUILD/qemu-kvm-0.12.1.2/qemu-char.c:630: io_wat=
+ch_poll_finalize: Assertion `iwp->src =3D=3D ((void *)0)' failed.
+  2014-01-13 16:50:31.576+0000: shutting down
 
-> --------8<--------
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index bec9756..50974c8 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -1619,14 +1619,27 @@ MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
->                                      MemTxAttrs attrs, uint8_t *buf, int len);
->  void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
-> 
-> +static inline bool memory_region_is_readable(MemoryRegion *mr)
-> +{
-> +    return mr->rom_device ? mr->romd_mode : true;
-> +}
-> +
-> +static inline bool memory_region_is_writable(MemoryRegion *mr)
-> +{
-> +    return !mr->rom_device && !mr->readonly;
-> +}
-> +
-> +static inline bool memory_region_is_direct(MemoryRegion *mr)
-> +{
-> +    return memory_region_is_ram(mr) && !memory_region_is_ram_device(mr);
-> +}
-> +
->  static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
->  {
->      if (is_write) {
-> -        return memory_region_is_ram(mr) &&
-> -               !mr->readonly && !memory_region_is_ram_device(mr);
-> +        return memory_region_is_direct(mr) && memory_region_is_writable(mr);
->      } else {
-> -        return (memory_region_is_ram(mr) && !memory_region_is_ram_device(mr)) ||
-> -               memory_region_is_romd(mr);
-> +        return memory_region_is_direct(mr) && memory_region_is_readable(mr);
->      }
->  }
-> -------->8--------
-> 
-> Then, I can throw away MR_CHAR_* macros and use:
-> 
->     memory_access_is_readable(mr, false) ? 'R' : '-'
->     memory_access_is_writable(mr, true) ? 'W' : '-'
-> 
-> Do you like this approach?
-> 
-> -- peterx
-> 
-> 
+  The code it's failing the assertion on has an interesting comment:
+
+  =C2=A0=C2=A0=C2=A0=C2=A0static void io_watch_poll_finalize(GSource *sourc=
+e)
+  =C2=A0=C2=A0=C2=A0=C2=A0{
+  =C2=A0=C2=A0=C2=A0=C2=A0/* Due to a glib bug, removing the last reference=
+ to a source
+  =C2=A0=C2=A0=C2=A0=C2=A0* inside a finalize callback causes recursive loc=
+king (and a
+  =C2=A0=C2=A0=C2=A0=C2=A0* deadlock). This is not a problem inside other c=
+allbacks,
+  =C2=A0=C2=A0=C2=A0=C2=A0* including dispatch callbacks, so we call io_rem=
+ove_watch_poll
+  =C2=A0=C2=A0=C2=A0=C2=A0* to remove this source. A t this point, iwp->src=
+ must
+  =C2=A0=C2=A0=C2=A0=C2=A0* be NULL, or we would leak it.
+  =C2=A0=C2=A0=C2=A0=C2=A0*
+  =C2=A0=C2=A0=C2=A0=C2=A0* This would be solved much more elegantly by chi=
+ld sources,
+  =C2=A0=C2=A0=C2=A0=C2=A0* but we support older glib versions that do not =
+have them.
+  =C2=A0=C2=A0=C2=A0=C2=A0*/
+  =C2=A0=C2=A0=C2=A0=C2=A0IOWatchPoll *iwp =3D io_watch_poll_from_source(so=
+urce);
+  =C2=A0=C2=A0=C2=A0=C2=A0assert(iwp->src =3D=3D NULL);
+  =C2=A0=C2=A0=C2=A0=C2=A0}
+
+  ------
+  CPU Info:
+
+  http://pastebin.com/U7MrzFxK
+
+  --------
+
+  Relevant RPM versions:
+
+  qemu-kvm-0.12.1.2-2.415.el6_5.3.x86_64
+  libvirt-0.10.2-29.el6_5.2.x86_64
+
+  --------
+
+  Domain config:
+
+  http://pastebin.com/Nf2VsER8
+
+  (Note the use of the vmchannels; I believe this is playing a part in
+  this crash)
+
+  ---------
+
+  uname -a:
+
+  Linux blizzard 2.6.32-431.3.1.el6.x86_64 #1 SMP Fri Jan 3 21:39:27 UTC
+  2014 x86_64 x86_64 x86_64 GNU/Linux
+
+  ---------
+
+  CLI to start guest (included in attached dump):
+
+  http://pastebin.com/W01Xzyb0
+
+  ---------
+
+  thread apply all bt:
+
+  http://pastebin.com/FTpUDU7A
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1268671/+subscriptions
