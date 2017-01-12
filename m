@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cRfAf-0007Ei-6J
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:12:05 -0500
+	(envelope-from <alex@alex.org.uk>) id 1cRfFA-00061R-Bq
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cRfAd-0001FR-ES
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:12:01 -0500
-Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:49868)
+	(envelope-from <alex@alex.org.uk>) id 1cRfF5-0003OA-So
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:16:40 -0500
+Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:50100)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cRfAd-0001FI-7z
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:11:59 -0500
-Content-Type: text/plain; charset=windows-1252
+	(envelope-from <alex@alex.org.uk>) id 1cRfF5-0003NA-N2
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:16:35 -0500
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <dcaf043a-9e76-3be2-1740-e90085928f6a@virtuozzo.com>
-Date: Thu, 12 Jan 2017 13:11:57 +0000
+In-Reply-To: <ac0cc1e5-dea5-ba2d-2789-7dd0672ad561@virtuozzo.com>
+Date: Thu, 12 Jan 2017 13:16:35 +0000
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <5CBA6C86-A5CD-4F88-B8B2-29224BF1223D@alex.org.uk>
+Message-Id: <C834A65C-57A2-4863-ACE7-2009BD3C4B02@alex.org.uk>
 References: <20161214150840.10899-1-alex@alex.org.uk>
-	<e3c30f7c-8d5b-5cfc-1cc0-5e673a30cd8a@virtuozzo.com>
-	<6986E12E-AE0A-4502-BB43-77C4E83C9DC4@alex.org.uk>
-	<dcaf043a-9e76-3be2-1740-e90085928f6a@virtuozzo.com>
+	<ac0cc1e5-dea5-ba2d-2789-7dd0672ad561@virtuozzo.com>
 Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,23 +28,20 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>
+Cc: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V . Lunev" <den@openvz.org>
 
 
-> On 12 Jan 2017, at 07:05, Vladimir Sementsov-Ogievskiy =
+> On 12 Jan 2017, at 11:43, Vladimir Sementsov-Ogievskiy =
 <vsementsov@virtuozzo.com> wrote:
 >=20
-> Yes this is better. But is it actually needed to force contexts have =
-some safe default? If context wants it may define such default without =
-this requirement.. So, should it be requirement at all?
+> =46rom "NBD_OPT_LIST_META_CONTEXT (9)":
+>> The server MUST either reply with an error (for instance EINVAL if =
+the option is not supported), or reply with a list of =
+NBD_REP_META_CONTEXT replies followed by NBD_REP_ACK.:
+> NBD_REP_ERR_UNSUP for the case in braces? Should it be normal option =
+reply packet?
 
-I've changed this to:
-
-    of the file), a server MAY reply with a single block status
-    descriptor with *length* matching the requested length, rather than
-    reporting the error; in this case the context MAY mandate the
-    status returned.
-
+Thanks, fixed.
 
 --=20
 Alex Bligh
