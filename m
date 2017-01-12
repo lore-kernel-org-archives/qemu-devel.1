@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cRgLr-0006vs-HF
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:41 -0500
+	(envelope-from <mst@redhat.com>) id 1cRgLn-0006tV-OM
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cRgLo-0005i7-Br
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:39 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33617)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cRgLo-0005hJ-4u
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:36 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r144so4083074wme.0
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 06:27:36 -0800 (PST)
-Date: Thu, 12 Jan 2017 14:27:22 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170112142722.GD14042@stefanha-x1.localdomain>
-References: <CAP8dc_acqeqpio7fVK4XSAxoH8QaGp9L=S1h2OCCWgrj=Q7VCw@mail.gmail.com>
-	<e57c4b44-ac0c-a937-e088-1f4e086080d8@redhat.com>
-	<20170104144458.GC8194@stefanha-x1.localdomain>
-	<e1a9afaf-74c0-77f1-72e9-c61cf225122e@gmail.com>
-	<20170112022212.GA26504@lemon>
+	(envelope-from <mst@redhat.com>) id 1cRgLk-0005g3-HL
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cRgLk-0005fL-8O
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:32 -0500
+Date: Thu, 12 Jan 2017 16:27:30 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170112162441-mutt-send-email-mst@kernel.org>
+References: <1483428594-28880-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wLAMOaPNJ0fu1fTG"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170112022212.GA26504@lemon>
-Subject: Re: [Qemu-devel] [RFC]virtio-blk: add disk-name device property
+In-Reply-To: <1483428594-28880-1-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 00/17] VT-d: vfio enablement and
+ misc enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,88 +27,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhang <yang.zhang.wz@gmail.com>
-Cc: Junkang Fu <fujunkang@gmail.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+
+On Tue, Jan 03, 2017 at 03:29:37PM +0800, Peter Xu wrote:
+> (I renamed the title for this RFC v2, since starting from this version
+>  the series will be based on master, also I picked up some more fixes
+>  for vt-d into this series)
+> 
+> v2:
+> - change comment for "end" parameter in vtd_page_walk() [Tianyu]
+> - change comment for "a iova" to "an iova" [Yi]
+> - fix fault printed val for GPA address in vtd_page_walk_level (debug
+>   only)
+> - rebased to master (rather than Aviv's v6 series) and merged Aviv's
+>   series v6: picked patch 1 (as patch 1 in this series), dropped patch
+>   2, re-wrote patch 3 (as patch 17 of this series).
+> - picked up two more bugfix patches from Jason's DMAR series
+> - picked up the following patch as well:
+>   "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
+> 
+> This RFC series is a re-work for Aviv B.D.'s vfio enablement series
+> with vt-d:
+> 
+>   https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
+> 
+> Aviv has done a great job there, and what we still lack there are
+> mostly the following:
+> 
+> (1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
+>     memory region.
+> 
+> (2) VT-d still haven't provide a correct replay() mechanism (e.g.,
+>     when IOMMU domain switches, things will broke).
+> 
+> This series should have solved the above two issues.
+> 
+> Online repo:
+> 
+>   https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement-v2
+> 
+> I would be glad to hear about any review comments for above patches.
+
+This all looks good to me. The series needs to be
+rebased on top of latest bits.
+In particular, Jason made changes which conflict
+with this.
 
 
---wLAMOaPNJ0fu1fTG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jan 12, 2017 at 10:22:12AM +0800, Fam Zheng wrote:
-> On Thu, 01/12 09:22, Yang Zhang wrote:
-> > On 2017/1/4 22:44, Stefan Hajnoczi wrote:
-> > > On Tue, Jan 03, 2017 at 10:53:06AM -0600, Eric Blake wrote:
-> > > > On 12/29/2016 08:41 PM, Junkang Fu wrote:
-> > > > > >From 74e913fc41ea98d1dde692175f1e3fb6729342aa Mon Sep 17 00:00:0=
-0 2001
-> > > > > From: "junkang.fjk" <junkang.fjk@alibaba-inc.com>
-> > > > > Date: Wed, 24 Aug 2016 19:36:53 +0800
-> > > > > Subject: [PATCH] virtio-blk: add disk-name device property
-> > > > >=20
-> > > > > Current virtio-blk disk name(ex. /dev/vdb) has nothing to do with=
- the
-> > > > > target dev
-> > > > > name specified in libvirt xml file. For example, we may get disk =
-name
-> > > > > /dev/vdb in
-> > > > > VM while target dev specified in libvirt xml is vdc.
-> > > >=20
-> > > > It's not really libvirt's fault.  The libvirt XML names are for
-> > > > convenience, but nothing on the host side requires the guest to pic=
-k the
-> > > > same naming scheme as the host.
-> > > >=20
-> > > > I guess your proposal is to enhance the virtio spec such that clien=
-ts
-> > > > that are new enough to honor the new addition to the virtio spec wi=
-ll
-> > > > change their name-picking algorithm to use the name provided by the
-> > > > host, rather than their current approach of picking whatever name t=
-hey
-> > > > feel like, and then enhance libvirt to pass the XML name on down to=
- the
-> > > > guest?  It might work, but as others have pointed out, it will requ=
-ire a
-> > > > virtio spec change first.
-> > >=20
-> > > This change is unnecessary.  The -device virtio-blk-pci,serial=3D pro=
-perty
-> > > already exists for this purpose.
-> >=20
-> > how about the /dev/vdabc? I guess lots of people prefer to use it inste=
-ad of
-> > /dev/disk/by-id/xxx?
->=20
-> I disagree. Using /dev/sdX has exactly the same issue and that's why fsta=
-b and
-> boot loader etc almost always use UUID or disk label by default because t=
-hey are
-> more stable.
-
-Right, /dev/sdX shouldn't be used in configuration files or other
-persistent state.
-
-Try cat /etc/fstab on your own system.
-
-On my system there are no /dev/sdX paths in /etc/fstab, only UUIDs and
-LVM logical volume paths.
-
-Stefan
-
---wLAMOaPNJ0fu1fTG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYd5JKAAoJEJykq7OBq3PIZz4H/1y1wcyY4nRAjVQAY8u/vtgF
-vFXatdKyuRl7gFziH6qXG1uZ4IJWWM2+e0MTqFfwLiLGXzP2YNhCw3EJmpWQNvto
-UY/WxZPIZJeQzMaKOURLSbS7F5YBhpPw0DG9P3nUaVOXxynX+oAZ3uv7vV4tOIYW
-EU1Oxr6uiQwOLEddDYdX5E6Wo9DKdA6Fe0/8UNF56xMC7cFvBg1lG6uJ1YJNdsYy
-bg/JQdcT4mC8rFqu+0AUHnDyWHg6hsfqFcnirWMZmjOpBxe4WGHbcCItQ/GskatX
-yQbDz8To0/gFx3MU62yM5oyoo5igKQl9bHaVv8gsfNaOwbWWx/ZWHO0EZa1y4NY=
-=b9zK
------END PGP SIGNATURE-----
-
---wLAMOaPNJ0fu1fTG--
+> =========
+> Test Done
+> =========
+> 
+> Build test passed for x86_64/arm/ppc64.
+> 
+> Simply tested with x86_64, assigning two PCI devices to a single VM,
+> boot the VM using:
+> 
+> bin=x86_64-softmmu/qemu-system-x86_64
+> $bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
+>      -device intel-iommu,intremap=on,eim=off,cache-mode=on \
+>      -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+>      -device virtio-net-pci,netdev=net0 \
+>      -device vfio-pci,host=03:00.0 \
+>      -device vfio-pci,host=02:00.0 \
+>      -trace events=".trace.vfio" \
+>      /var/lib/libvirt/images/vm1.qcow2
+> 
+> pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
+> vtd_page_walk*
+> vtd_replay*
+> vtd_inv_desc*
+> 
+> Then, in the guest, run the following tool:
+> 
+>   https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
+> 
+> With parameter:
+> 
+>   ./vfio-bind-group 00:03.0 00:04.0
+> 
+> Check host side trace log, I can see pages are replayed and mapped in
+> 00:04.0 device address space, like:
+> 
+> ...
+> vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
+> vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
+> vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
+> vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
+> vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
+> ...
+> 
+> =========
+> Todo List
+> =========
+> 
+> - error reporting for the assigned devices (as Tianyu has mentioned)
+> 
+> - per-domain address-space: A better solution in the future may be -
+>   we maintain one address space per IOMMU domain in the guest (so
+>   multiple devices can share a same address space if they are sharing
+>   the same IOMMU domains in the guest), rather than one address space
+>   per device (which is current implementation of vt-d). However that's
+>   a step further than this series, and let's see whether we can first
+>   provide a workable version of device assignment with vt-d
+>   protection.
+> 
+> - more to come...
+> 
+> Thanks,
+> 
+> Aviv Ben-David (1):
+>   IOMMU: add option to enable VTD_CAP_CM to vIOMMU capility exposoed to
+>     guest
+> 
+> Jason Wang (3):
+>   memory: handle alias for iommu notifier
+>   memory: handle alias in memory_region_is_iommu()
+>   intel_iommu: allocate new key when creating new address space
+> 
+> Peter Xu (13):
+>   intel_iommu: simplify irq region translation
+>   intel_iommu: renaming gpa to iova where proper
+>   intel_iommu: fix trace for inv desc handling
+>   intel_iommu: fix trace for addr translation
+>   intel_iommu: vtd_slpt_level_shift check level
+>   memory: add section range info for IOMMU notifier
+>   memory: provide iommu_replay_all()
+>   memory: introduce memory_region_notify_one()
+>   memory: add MemoryRegionIOMMUOps.replay() callback
+>   intel_iommu: provide its own replay() callback
+>   intel_iommu: do replay when context invalidate
+>   intel_iommu: allow dynamic switch of IOMMU region
+>   intel_iommu: enable vfio devices
+> 
+>  hw/i386/intel_iommu.c          | 597 +++++++++++++++++++++++++++++++----------
+>  hw/i386/intel_iommu_internal.h |   1 +
+>  hw/i386/trace-events           |  28 ++
+>  hw/vfio/common.c               |   7 +-
+>  include/exec/memory.h          |  33 +++
+>  include/hw/i386/intel_iommu.h  |  12 +
+>  memory.c                       |  51 +++-
+>  7 files changed, 572 insertions(+), 157 deletions(-)
+> 
+> -- 
+> 2.7.4
