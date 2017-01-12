@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUkB-0003Bg-5I
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:01 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUkD-0003F0-Nz
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUk8-0006i0-8t
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:59 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUkB-0006ml-Eo
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:01 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:03:03 +1100
-Message-Id: <20170112020327.24882-44-david@gibson.dropbear.id.au>
+Date: Thu, 12 Jan 2017 13:03:27 +1100
+Message-Id: <20170112020327.24882-68-david@gibson.dropbear.id.au>
 In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
 References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 43/67] hw/ppc: QOM'ify e500.c
+Subject: [Qemu-devel] [PULL 67/67] ppc: Fix a warning in bcdcfz code and
+ improve BCD_DIG_BYTE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,53 +21,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, xiaoqiang zhao <zxq_yx_007@163.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: xiaoqiang zhao <zxq_yx_007@163.com>
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-Drop the old SysBus init function and use instance_init
+This commit fixes a warning in the code "(i * 2) ? .. : ..", which
+should be better as "i ? .. : ..", and improves the BCD_DIG_BYTE
+macro by placing parentheses around its argument to avoid possible
+expansion issues like: BCD_DIG_BYTE(i + j).
 
-Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/e500.c | 17 ++++-------------
- 1 file changed, 4 insertions(+), 13 deletions(-)
+ target/ppc/int_helper.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index cf8b122..792bd79 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -1049,27 +1049,18 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     boot_info->dt_size = dt_size;
- }
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 24e5964..bd8282c 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -2583,9 +2583,9 @@ void helper_vsubecuq(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
+ #define NATIONAL_NEG    0x2D
  
--static int e500_ccsr_initfn(SysBusDevice *dev)
-+static void e500_ccsr_initfn(Object *obj)
- {
--    PPCE500CCSRState *ccsr;
--
--    ccsr = CCSR(dev);
--    memory_region_init(&ccsr->ccsr_space, OBJECT(ccsr), "e500-ccsr",
-+    PPCE500CCSRState *ccsr = CCSR(obj);
-+    memory_region_init(&ccsr->ccsr_space, obj, "e500-ccsr",
-                        MPC8544_CCSRBAR_SIZE);
--    return 0;
--}
--
--static void e500_ccsr_class_init(ObjectClass *klass, void *data)
--{
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
--    k->init = e500_ccsr_initfn;
- }
+ #if defined(HOST_WORDS_BIGENDIAN)
+-#define BCD_DIG_BYTE(n) (15 - (n/2))
++#define BCD_DIG_BYTE(n) (15 - ((n) / 2))
+ #else
+-#define BCD_DIG_BYTE(n) (n/2)
++#define BCD_DIG_BYTE(n) ((n) / 2)
+ #endif
  
- static const TypeInfo e500_ccsr_info = {
-     .name          = TYPE_CCSR,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(PPCE500CCSRState),
--    .class_init    = e500_ccsr_class_init,
-+    .instance_init = e500_ccsr_initfn,
- };
+ static int bcd_get_sgn(ppc_avr_t *bcd)
+@@ -2908,7 +2908,7 @@ uint32_t helper_bcdcfz(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
+     }
  
- static void e500_register_types(void)
+     for (i = 0; i < 16; i++) {
+-        zone_digit = (i * 2) ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_lead;
++        zone_digit = i ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_lead;
+         digit = b->u8[BCD_DIG_BYTE(i * 2)] & 0xF;
+         if (unlikely(zone_digit != zone_lead || digit > 0x9)) {
+             invalid = 1;
 -- 
 2.9.3
