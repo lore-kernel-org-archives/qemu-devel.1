@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRTC4-0004V7-UP
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 19:24:41 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cRTkG-0001kc-VY
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 20:00:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRTC1-0005CW-QI
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 19:24:40 -0500
-Date: Thu, 12 Jan 2017 10:22:07 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170111232207.GC14026@umbus.fritz.box>
-References: <1484169085-2962-1-git-send-email-joserz@linux.vnet.ibm.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1cRTkD-0000Ie-VO
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 20:00:01 -0500
+Received: from roura.ac.upc.edu ([147.83.33.10]:57865 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cRTkD-0000IN-L4
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 19:59:57 -0500
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <20170106155543.12827-1-berrange@redhat.com>
+	<20170106155543.12827-3-berrange@redhat.com>
+	<20170110163713.GA19869@stefanha-x1.localdomain>
+	<eabc1ecd-439c-69cc-facb-281699a4d26e@redhat.com>
+	<20170111171202.GG9269@stefanha-x1.localdomain>
+	<20170111171646.GR12072@redhat.com>
+	<6d64c194-bb64-9ac2-3281-9a9329f6a52b@redhat.com>
+	<20170111174045.GT12072@redhat.com>
+Date: Thu, 12 Jan 2017 01:59:52 +0100
+In-Reply-To: <20170111174045.GT12072@redhat.com> (Daniel P. Berrange's message
+	of "Wed, 11 Jan 2017 17:40:45 +0000")
+Message-ID: <87mvexf5yv.fsf@ac.upc.edu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="32u276st3Jlj2kUU"
-Content-Disposition: inline
-In-Reply-To: <1484169085-2962-1-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCHi v2] ppc: Fix a warning in bcdcfz code and
- improve BCD_DIG_BYTE macro
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 02/47] trace: switch io/ directory to
+ modular trace.h file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +34,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, nikunj@linux.vnet.ibm.com, eblake@redhat.com, 655708@bugs.launchpad.net, thuth@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+
+Daniel P Berrange writes:
+
+> On Wed, Jan 11, 2017 at 06:34:40PM +0100, Paolo Bonzini wrote:
+[...]
+>> > and we can't
+>> > use relative includes for that, since the relative include gets
+>> > resolved wrt the source file doing the #include, but the trace.h
+>> > file is in $BUILD_DIR.
+>> 
+>> Why would #include "../foo/trace.h" be resolved against the source
+>> file's path only, and not against all -I directories?
+
+> If we have a plain "../trace.h", then it can end up hitting the
+> wrong file, because there are many -I dirs listed and most of
+> them contain a trace.h file, so if it matches on the 2nd -I
+> dir and you need the one from the 3rd -I dir it gets "fun".
+
+> Having all the trace.h files included with path from the root
+> is alot simpler to understand IMHO than just plain "trace.h"
+> and hoping the -I order is going to ensure the right one is
+> found
+
+I'm with Daniel and and Eric on this one, for whatever it matters. It's clearer
+to *me* to have includes starting on the project's root.
 
 
---32u276st3Jlj2kUU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jan 11, 2017 at 07:11:25PM -0200, Jose Ricardo Ziviani wrote:
-> This commit fixes a warning in the code "(i * 2) ? .. : ..", which
-> should be better as "i ? .. : ..", and improves the BCD_DIG_BYTE
-> macro by placing parentheses around its argument to avoid possible
-> expansion issues like: BCD_DIG_BYTE(i + j).
->=20
-> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Applied to ppc-for-2.9.
-
-> ---
->  target/ppc/int_helper.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index 24e5964..bd8282c 100644
-> --- a/target/ppc/int_helper.c
-> +++ b/target/ppc/int_helper.c
-> @@ -2583,9 +2583,9 @@ void helper_vsubecuq(ppc_avr_t *r, ppc_avr_t *a, pp=
-c_avr_t *b, ppc_avr_t *c)
->  #define NATIONAL_NEG    0x2D
-> =20
->  #if defined(HOST_WORDS_BIGENDIAN)
-> -#define BCD_DIG_BYTE(n) (15 - (n/2))
-> +#define BCD_DIG_BYTE(n) (15 - ((n) / 2))
->  #else
-> -#define BCD_DIG_BYTE(n) (n/2)
-> +#define BCD_DIG_BYTE(n) ((n) / 2)
->  #endif
-> =20
->  static int bcd_get_sgn(ppc_avr_t *bcd)
-> @@ -2908,7 +2908,7 @@ uint32_t helper_bcdcfz(ppc_avr_t *r, ppc_avr_t *b, =
-uint32_t ps)
->      }
-> =20
->      for (i =3D 0; i < 16; i++) {
-> -        zone_digit =3D (i * 2) ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_=
-lead;
-> +        zone_digit =3D i ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_lead;
->          digit =3D b->u8[BCD_DIG_BYTE(i * 2)] & 0xF;
->          if (unlikely(zone_digit !=3D zone_lead || digit > 0x9)) {
->              invalid =3D 1;
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---32u276st3Jlj2kUU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYdr4eAAoJEGw4ysog2bOS/FIP/0f06YsSu0+LfRFdtqQzsaqA
-5MpfFr18lP+PBExuvQ0en+YqC+l+K9PTepTr8sdjQS4imvybD0iMxW5f6ByMu4LL
-VRg1jUxAumZDyWtjXtgZmzSIMTGNzU4qS2HnCSkJisOWk+wQLy+9mL8FGIJ/bE97
-zGKY29piBoW1dI2I1kTt/yN1PVaAuq7bPvae3H6rLRSmUEaLoNKf3lNbRzDAR9m0
-bNaW3/0eOx4MGEz3MJAkJ0QNSUGuxRoJ7GU4kZ0MaLoiFKdaS5Rhj2tEBPEvgZ2u
-GOkNn9My9QxZBP06FUR+h3uW6u/XdjipVLdShdeiOPvcLtGsIauzUpW7/6rpPH3k
-Q8ChRlSIoNCo9jAdcASuN5RHIGq3BLV46q3SPLBzqKfziMNgwPdCk+ezgt33Qj3I
-B6ThvwqCM3zTGJNBxT0kanz1+DiGCkrCBgB3lTsPSsUTwVEYDWUsBG7zkZ2lPN/W
-0Bd3gDEjJyzUKUnDTvuVZmB3QbqN/bTiuRDDEvsa9x33OA2eELIyvtI4ZNvRDy2k
-eOyE53sC9gSHPANsCCun8xhTKar0BQf/prE4SEwuflYcuArm4vca5kdn9fISOT5Q
-BFe6w3IiPeOaSH67Xxa9kAs56kMCs0tkP1JYnYy2c4hHYLpiSt6bpJrxKtFi2Q4R
-OP77lD4wttbKPiEiik9Q
-=JCUL
------END PGP SIGNATURE-----
-
---32u276st3Jlj2kUU--
+Cheers,
+  Lluis
