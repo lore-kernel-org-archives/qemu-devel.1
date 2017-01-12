@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cRgHj-0003il-G6
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:23:28 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cRgLr-0006vs-HF
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cRgHe-00041N-Qt
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:23:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:17977)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cRgHe-00040y-LD
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:23:18 -0500
-Date: Thu, 12 Jan 2017 16:23:16 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170112161729-mutt-send-email-mst@kernel.org>
-References: <1481767396-187748-1-git-send-email-arei.gonglei@huawei.com>
-	<1481767396-187748-2-git-send-email-arei.gonglei@huawei.com>
-	<e235caf4-f51c-dccf-4eb7-548d3fa71644@de.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA182B83@DGGEMA505-MBX.china.huawei.com>
-	<c4282723-2afb-1764-2431-ef41f7126371@de.ibm.com>
-	<a8384ff8-ff65-c578-c338-e6d8ebf498c4@de.ibm.com>
+	(envelope-from <stefanha@gmail.com>) id 1cRgLo-0005i7-Br
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:39 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33617)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cRgLo-0005hJ-4u
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:27:36 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r144so4083074wme.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 06:27:36 -0800 (PST)
+Date: Thu, 12 Jan 2017 14:27:22 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170112142722.GD14042@stefanha-x1.localdomain>
+References: <CAP8dc_acqeqpio7fVK4XSAxoH8QaGp9L=S1h2OCCWgrj=Q7VCw@mail.gmail.com>
+	<e57c4b44-ac0c-a937-e088-1f4e086080d8@redhat.com>
+	<20170104144458.GC8194@stefanha-x1.localdomain>
+	<e1a9afaf-74c0-77f1-72e9-c61cf225122e@gmail.com>
+	<20170112022212.GA26504@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wLAMOaPNJ0fu1fTG"
 Content-Disposition: inline
-In-Reply-To: <a8384ff8-ff65-c578-c338-e6d8ebf498c4@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v8 1/1] crypto: add virtio-crypto driver
+In-Reply-To: <20170112022212.GA26504@lemon>
+Subject: Re: [Qemu-devel] [RFC]virtio-blk: add disk-name device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +33,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "Huangweidong (C)" <weidong.huang@huawei.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, Luonengjun <luonengjun@huawei.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, longpeng <longpeng2@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: Yang Zhang <yang.zhang.wz@gmail.com>
+Cc: Junkang Fu <fujunkang@gmail.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On Thu, Jan 12, 2017 at 03:10:25PM +0100, Christian Borntraeger wrote:
-> On 01/10/2017 01:56 PM, Christian Borntraeger wrote:
-> > On 01/10/2017 01:36 PM, Gonglei (Arei) wrote:
-> >> Hi,
-> >>
-> >>>
-> >>> On 12/15/2016 03:03 AM, Gonglei wrote:
-> >>> [...]
-> >>>> +
-> >>>> +static struct crypto_alg virtio_crypto_algs[] = { {
-> >>>> +	.cra_name = "cbc(aes)",
-> >>>> +	.cra_driver_name = "virtio_crypto_aes_cbc",
-> >>>> +	.cra_priority = 501,
-> >>>
-> >>>
-> >>> This is still higher than the hardware-accelerators (like intel aesni or the
-> >>> s390 cpacf functions or the arm hw). aesni and s390/cpacf are supported by the
-> >>> hardware virtualization and available to the guests. I do not see a way how
-> >>> virtio
-> >>> crypto can be faster than that (in the end it might be cpacf/aesni + overhead)
-> >>> instead it will very likely be slower.
-> >>> So we should use a number that is higher than software implementations but
-> >>> lower than the hw ones.
-> >>>
-> >>> Just grepping around, the software ones seem be be around 100 and the
-> >>> hardware
-> >>> ones around 200-400. So why was 150 not enough?
-> >>>
-> >> I didn't find a documentation about how we use the priority, and I assumed
-> >> people use virtio-crypto will configure hardware accelerators in the
-> >> host. So I choosed the number which bigger than aesni's priority.
-> > 
-> > Yes, but the aesni driver will only bind if there is HW support in the guest.
-> > And if aesni is available in the guest (or the s390 aes function from cpacf)
-> > it will always be faster than the same in the host via virtio.So your priority
-> > should be smaller.
-> 
-> 
-> any opinion on this? 
 
-Going forward, we might add an emulated aesni device and that might
-become slower than virtio. OTOH if or when this happens, we can solve it
-by adding a priority or a feature flag to virtio to raise its priority.
+--wLAMOaPNJ0fu1fTG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-So I think I agree with Christian here, let's lower the priority.
-Gonglei, could you send a patch like this?
+On Thu, Jan 12, 2017 at 10:22:12AM +0800, Fam Zheng wrote:
+> On Thu, 01/12 09:22, Yang Zhang wrote:
+> > On 2017/1/4 22:44, Stefan Hajnoczi wrote:
+> > > On Tue, Jan 03, 2017 at 10:53:06AM -0600, Eric Blake wrote:
+> > > > On 12/29/2016 08:41 PM, Junkang Fu wrote:
+> > > > > >From 74e913fc41ea98d1dde692175f1e3fb6729342aa Mon Sep 17 00:00:0=
+0 2001
+> > > > > From: "junkang.fjk" <junkang.fjk@alibaba-inc.com>
+> > > > > Date: Wed, 24 Aug 2016 19:36:53 +0800
+> > > > > Subject: [PATCH] virtio-blk: add disk-name device property
+> > > > >=20
+> > > > > Current virtio-blk disk name(ex. /dev/vdb) has nothing to do with=
+ the
+> > > > > target dev
+> > > > > name specified in libvirt xml file. For example, we may get disk =
+name
+> > > > > /dev/vdb in
+> > > > > VM while target dev specified in libvirt xml is vdc.
+> > > >=20
+> > > > It's not really libvirt's fault.  The libvirt XML names are for
+> > > > convenience, but nothing on the host side requires the guest to pic=
+k the
+> > > > same naming scheme as the host.
+> > > >=20
+> > > > I guess your proposal is to enhance the virtio spec such that clien=
+ts
+> > > > that are new enough to honor the new addition to the virtio spec wi=
+ll
+> > > > change their name-picking algorithm to use the name provided by the
+> > > > host, rather than their current approach of picking whatever name t=
+hey
+> > > > feel like, and then enhance libvirt to pass the XML name on down to=
+ the
+> > > > guest?  It might work, but as others have pointed out, it will requ=
+ire a
+> > > > virtio spec change first.
+> > >=20
+> > > This change is unnecessary.  The -device virtio-blk-pci,serial=3D pro=
+perty
+> > > already exists for this purpose.
+> >=20
+> > how about the /dev/vdabc? I guess lots of people prefer to use it inste=
+ad of
+> > /dev/disk/by-id/xxx?
+>=20
+> I disagree. Using /dev/sdX has exactly the same issue and that's why fsta=
+b and
+> boot loader etc almost always use UUID or disk label by default because t=
+hey are
+> more stable.
 
--- 
-MST
+Right, /dev/sdX shouldn't be used in configuration files or other
+persistent state.
+
+Try cat /etc/fstab on your own system.
+
+On my system there are no /dev/sdX paths in /etc/fstab, only UUIDs and
+LVM logical volume paths.
+
+Stefan
+
+--wLAMOaPNJ0fu1fTG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYd5JKAAoJEJykq7OBq3PIZz4H/1y1wcyY4nRAjVQAY8u/vtgF
+vFXatdKyuRl7gFziH6qXG1uZ4IJWWM2+e0MTqFfwLiLGXzP2YNhCw3EJmpWQNvto
+UY/WxZPIZJeQzMaKOURLSbS7F5YBhpPw0DG9P3nUaVOXxynX+oAZ3uv7vV4tOIYW
+EU1Oxr6uiQwOLEddDYdX5E6Wo9DKdA6Fe0/8UNF56xMC7cFvBg1lG6uJ1YJNdsYy
+bg/JQdcT4mC8rFqu+0AUHnDyWHg6hsfqFcnirWMZmjOpBxe4WGHbcCItQ/GskatX
+yQbDz8To0/gFx3MU62yM5oyoo5igKQl9bHaVv8gsfNaOwbWWx/ZWHO0EZa1y4NY=
+=b9zK
+-----END PGP SIGNATURE-----
+
+--wLAMOaPNJ0fu1fTG--
