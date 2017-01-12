@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUjx-0002sQ-7W
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUjx-0002t7-M7
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUjv-0006RU-Qp
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUjv-0006Ri-Sz
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:45 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:02:32 +1100
-Message-Id: <20170112020327.24882-13-david@gibson.dropbear.id.au>
+Date: Thu, 12 Jan 2017 13:02:31 +1100
+Message-Id: <20170112020327.24882-12-david@gibson.dropbear.id.au>
 In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
 References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/67] target-ppc: Implement bcdcpsgn.
- instruction
+Subject: [Qemu-devel] [PULL 11/67] target-ppc: Implement bcdctsq. instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +24,109 @@ Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com,
 
 From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-bcdcpsgn.: Decimal copy sign. Given two registers vra and vrb, it
-copies the vra value with vrb sign to the result register vrt.
+bcdctsq.: Decimal convert to signed quadword. It is possible to
+convert packed decimal values to signed quadwords.
 
 Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
  target/ppc/helper.h                 |  1 +
- target/ppc/int_helper.c             | 23 +++++++++++++++++++++++
- target/ppc/translate/vmx-impl.inc.c |  3 +++
- target/ppc/translate/vmx-ops.inc.c  |  2 +-
- 4 files changed, 28 insertions(+), 1 deletion(-)
+ target/ppc/int_helper.c             | 40 +++++++++++++++++++++++++++++++++++++
+ target/ppc/translate/vmx-impl.inc.c |  7 +++++++
+ 3 files changed, 48 insertions(+)
 
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index d404e0b..2974101 100644
+index efb384a..d404e0b 100644
 --- a/target/ppc/helper.h
 +++ b/target/ppc/helper.h
-@@ -384,6 +384,7 @@ DEF_HELPER_3(bcdcfz, i32, avr, avr, i32)
+@@ -383,6 +383,7 @@ DEF_HELPER_3(bcdctn, i32, avr, avr, i32)
+ DEF_HELPER_3(bcdcfz, i32, avr, avr, i32)
  DEF_HELPER_3(bcdctz, i32, avr, avr, i32)
  DEF_HELPER_3(bcdcfsq, i32, avr, avr, i32)
- DEF_HELPER_3(bcdctsq, i32, avr, avr, i32)
-+DEF_HELPER_4(bcdcpsgn, i32, avr, avr, avr, i32)
++DEF_HELPER_3(bcdctsq, i32, avr, avr, i32)
  
  DEF_HELPER_2(xsadddp, void, env, i32)
  DEF_HELPER_2(xssubdp, void, env, i32)
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 5a7ceb8..8021c48 100644
+index e077251..5a7ceb8 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -2952,6 +2952,29 @@ uint32_t helper_bcdctsq(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
+@@ -2912,6 +2912,46 @@ uint32_t helper_bcdcfsq(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
      return cr;
  }
  
-+uint32_t helper_bcdcpsgn(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
++uint32_t helper_bcdctsq(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
 +{
-+    int i;
-+    int invalid = 0;
++    uint8_t i;
++    int cr;
++    uint64_t carry;
++    uint64_t unused;
++    uint64_t lo_value;
++    uint64_t hi_value = 0;
++    int sgnb = bcd_get_sgn(b);
++    int invalid = (sgnb == 0);
 +
-+    if (bcd_get_sgn(a) == 0 || bcd_get_sgn(b) == 0) {
-+        return CRF_SO;
-+    }
++    lo_value = bcd_get_digit(b, 31, &invalid);
++    for (i = 30; i > 0; i--) {
++        mulu64(&lo_value, &carry, lo_value, 10ULL);
++        mulu64(&hi_value, &unused, hi_value, 10ULL);
++        lo_value += bcd_get_digit(b, i, &invalid);
++        hi_value += carry;
 +
-+    *r = *a;
-+    bcd_put_digit(r, b->u8[BCD_DIG_BYTE(0)] & 0xF, 0);
-+
-+    for (i = 1; i < 32; i++) {
-+        bcd_get_digit(a, i, &invalid);
-+        bcd_get_digit(b, i, &invalid);
 +        if (unlikely(invalid)) {
-+            return CRF_SO;
++            break;
 +        }
 +    }
 +
-+    return bcd_cmp_zero(r);
++    if (sgnb == -1) {
++        r->s64[LO_IDX] = -lo_value;
++        r->s64[HI_IDX] = ~hi_value + !r->s64[LO_IDX];
++    } else {
++        r->s64[LO_IDX] = lo_value;
++        r->s64[HI_IDX] = hi_value;
++    }
++
++    cr = bcd_cmp_zero(b);
++
++    if (unlikely(invalid)) {
++        cr = CRF_SO;
++    }
++
++    return cr;
 +}
 +
  void helper_vsbox(ppc_avr_t *r, ppc_avr_t *a)
  {
      int i;
 diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 1579b58..c14b666 100644
+index 36141e5..1579b58 100644
 --- a/target/ppc/translate/vmx-impl.inc.c
 +++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -991,6 +991,7 @@ GEN_BCD2(bcdcfz)
+@@ -990,10 +990,14 @@ GEN_BCD2(bcdctn)
+ GEN_BCD2(bcdcfz)
  GEN_BCD2(bcdctz)
  GEN_BCD2(bcdcfsq)
- GEN_BCD2(bcdctsq)
-+GEN_BCD(bcdcpsgn);
++GEN_BCD2(bcdctsq)
  
  static void gen_xpnd04_1(DisasContext *ctx)
  {
-@@ -1056,6 +1057,8 @@ GEN_VXFORM_DUAL(vsubuhm, PPC_ALTIVEC, PPC_NONE, \
-                 bcdsub, PPC_NONE, PPC2_ALTIVEC_207)
- GEN_VXFORM_DUAL(vsubuhs, PPC_ALTIVEC, PPC_NONE, \
-                 bcdsub, PPC_NONE, PPC2_ALTIVEC_207)
-+GEN_VXFORM_DUAL(vaddshs, PPC_ALTIVEC, PPC_NONE, \
-+                bcdcpsgn, PPC_NONE, PPC2_ISA300)
- 
- static void gen_vsbox(DisasContext *ctx)
+     switch (opc4(ctx->opcode)) {
++    case 0:
++        gen_bcdctsq(ctx);
++        break;
+     case 2:
+         gen_bcdcfsq(ctx);
+         break;
+@@ -1018,6 +1022,9 @@ static void gen_xpnd04_1(DisasContext *ctx)
+ static void gen_xpnd04_2(DisasContext *ctx)
  {
-diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
-index f02b3be..70d7d2b 100644
---- a/target/ppc/translate/vmx-ops.inc.c
-+++ b/target/ppc/translate/vmx-ops.inc.c
-@@ -131,7 +131,7 @@ GEN_VXFORM_DUAL(vaddubs, vmul10uq, 0, 8, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM_DUAL(vadduhs, vmul10euq, 0, 9, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM(vadduws, 0, 10),
- GEN_VXFORM(vaddsbs, 0, 12),
--GEN_VXFORM(vaddshs, 0, 13),
-+GEN_VXFORM_DUAL(vaddshs, bcdcpsgn, 0, 13, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM(vaddsws, 0, 14),
- GEN_VXFORM_DUAL(vsububs, bcdadd, 0, 24, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM_DUAL(vsubuhs, bcdsub, 0, 25, PPC_ALTIVEC, PPC_NONE),
+     switch (opc4(ctx->opcode)) {
++    case 0:
++        gen_bcdctsq(ctx);
++        break;
+     case 2:
+         gen_bcdcfsq(ctx);
+         break;
 -- 
 2.9.3
