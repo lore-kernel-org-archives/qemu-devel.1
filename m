@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cRVYl-0007hj-Ep
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:16 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cRVYm-0007iw-Nc
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cRVYk-0006ha-It
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:15 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34715)
+	(envelope-from <rth7680@gmail.com>) id 1cRVYl-0006ho-MI
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:16 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33533)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cRVYk-0006hR-EK
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:14 -0500
-Received: by mail-qt0-x242.google.com with SMTP id a29so841119qtb.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 18:56:14 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cRVYl-0006hg-Ia
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:56:15 -0500
+Received: by mail-qt0-x243.google.com with SMTP id n13so849333qtc.0
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 18:56:15 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 11 Jan 2017 18:55:38 -0800
-Message-Id: <20170112025606.27332-3-rth@twiddle.net>
+Date: Wed, 11 Jan 2017 18:55:39 -0800
+Message-Id: <20170112025606.27332-4-rth@twiddle.net>
 In-Reply-To: <20170112025606.27332-1-rth@twiddle.net>
 References: <20170112025606.27332-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 02/30] target-sparc: store cpu super- and
- hypervisor flags in TB
+Subject: [Qemu-devel] [PULL 03/30] target-sparc: use explicit mmu register
+ pointers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,111 +32,142 @@ Cc: atar4qemu@gmail.com, mark.cave-ayland@ilande.co.uk, peter.maydell@linaro.org
 
 From: Artyom Tarasenko <atar4qemu@gmail.com>
 
-Suggested-by: Richard Henderson <rth@twiddle.net>
+Use explicit register pointers while accessing D/I-MMU registers.
+Call cpu_unassigned_access on access to missing registers.
+
 Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Message-Id: <f03daff3e16d6ab6a9a0610f1006de7b506a5f58.1484165352.git.atar4qemu@gmail.com>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Message-Id: <5ed7a0c7bb8c269e2bea4b196c08ca66702d5102.1484165352.git.atar4qemu@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/sparc/cpu.h       | 17 +++++++++++++++++
- target/sparc/translate.c | 24 +++++++++++++++++++-----
- 2 files changed, 36 insertions(+), 5 deletions(-)
+ target/sparc/cpu.h         |  4 +++
+ target/sparc/ldst_helper.c | 66 +++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 58 insertions(+), 12 deletions(-)
 
 diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index e0b2806..68e39bc 100644
+index 68e39bc..687e158 100644
 --- a/target/sparc/cpu.h
 +++ b/target/sparc/cpu.h
-@@ -667,6 +667,11 @@ static inline int cpu_supervisor_mode(CPUSPARCState *env1)
- {
-     return env1->pstate & PS_PRIV;
- }
-+#else
-+static inline int cpu_supervisor_mode(CPUSPARCState *env1)
-+{
-+    return env1->psrs;
-+}
- #endif
+@@ -443,6 +443,8 @@ struct CPUSPARCState {
+             uint64_t sfar;
+             uint64_t tsb;
+             uint64_t tag_access;
++            uint64_t virtual_watchpoint;
++            uint64_t physical_watchpoint;
+         } immu;
+     };
+     union {
+@@ -455,6 +457,8 @@ struct CPUSPARCState {
+             uint64_t sfar;
+             uint64_t tsb;
+             uint64_t tag_access;
++            uint64_t virtual_watchpoint;
++            uint64_t physical_watchpoint;
+         } dmmu;
+     };
+     SparcTLBEntry itlb[64];
+diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
+index fdca87f..043cbf8 100644
+--- a/target/sparc/ldst_helper.c
++++ b/target/sparc/ldst_helper.c
+@@ -1220,14 +1220,25 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
+     case ASI_IMMU: /* I-MMU regs */
+         {
+             int reg = (addr >> 3) & 0xf;
+-
+-            if (reg == 0) {
+-                /* I-TSB Tag Target register */
++            switch (reg) {
++            case 0:
++                /* 0x00 I-TSB Tag Target register */
+                 ret = ultrasparc_tag_target(env->immu.tag_access);
+-            } else {
+-                ret = env->immuregs[reg];
++                break;
++            case 3: /* SFSR */
++                ret = env->immu.sfsr;
++                break;
++            case 5: /* TSB access */
++                ret = env->immu.tsb;
++                break;
++            case 6:
++                /* 0x30 I-TSB Tag Access register */
++                ret = env->immu.tag_access;
++                break;
++            default:
++                cpu_unassigned_access(cs, addr, false, false, 1, size);
++                ret = 0;
+             }
+-
+             break;
+         }
+     case ASI_IMMU_TSB_8KB_PTR: /* I-MMU 8k TSB pointer */
+@@ -1263,12 +1274,38 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
+     case ASI_DMMU: /* D-MMU regs */
+         {
+             int reg = (addr >> 3) & 0xf;
+-
+-            if (reg == 0) {
+-                /* D-TSB Tag Target register */
++            switch (reg) {
++            case 0:
++                /* 0x00 D-TSB Tag Target register */
+                 ret = ultrasparc_tag_target(env->dmmu.tag_access);
+-            } else {
+-                ret = env->dmmuregs[reg];
++                break;
++            case 1: /* 0x08 Primary Context */
++                ret = env->dmmu.mmu_primary_context;
++                break;
++            case 2: /* 0x10 Secondary Context */
++                ret = env->dmmu.mmu_secondary_context;
++                break;
++            case 3: /* SFSR */
++                ret = env->dmmu.sfsr;
++                break;
++            case 4: /* 0x20 SFAR */
++                ret = env->dmmu.sfar;
++                break;
++            case 5: /* 0x28 TSB access */
++                ret = env->dmmu.tsb;
++                break;
++            case 6: /* 0x30 D-TSB Tag Access register */
++                ret = env->dmmu.tag_access;
++                break;
++            case 7:
++                ret = env->dmmu.virtual_watchpoint;
++                break;
++            case 8:
++                ret = env->dmmu.physical_watchpoint;
++                break;
++            default:
++                cpu_unassigned_access(cs, addr, false, false, 1, size);
++                ret = 0;
+             }
+             break;
+         }
+@@ -1456,6 +1493,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
+             case 8:
+                 return;
+             default:
++                cpu_unassigned_access(cs, addr, true, false, 1, size);
+                 break;
+             }
  
- static inline int cpu_mmu_index(CPUSPARCState *env, bool ifetch)
-@@ -733,6 +738,8 @@ trap_state* cpu_tsptr(CPUSPARCState* env);
- #define TB_FLAG_MMU_MASK     7
- #define TB_FLAG_FPU_ENABLED  (1 << 4)
- #define TB_FLAG_AM_ENABLED   (1 << 5)
-+#define TB_FLAG_SUPER        (1 << 6)
-+#define TB_FLAG_HYPER        (1 << 7)
- #define TB_FLAG_ASI_SHIFT    24
+@@ -1526,9 +1564,13 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
+                 env->dmmu.tag_access = val;
+                 break;
+             case 7: /* Virtual Watchpoint */
++                env->dmmu.virtual_watchpoint = val;
++                break;
+             case 8: /* Physical Watchpoint */
++                env->dmmu.physical_watchpoint = val;
++                break;
+             default:
+-                env->dmmuregs[reg] = val;
++                cpu_unassigned_access(cs, addr, true, false, 1, size);
+                 break;
+             }
  
- static inline void cpu_get_tb_cpu_state(CPUSPARCState *env, target_ulong *pc,
-@@ -742,7 +749,17 @@ static inline void cpu_get_tb_cpu_state(CPUSPARCState *env, target_ulong *pc,
-     *pc = env->pc;
-     *cs_base = env->npc;
-     flags = cpu_mmu_index(env, false);
-+#ifndef CONFIG_USER_ONLY
-+    if (cpu_supervisor_mode(env)) {
-+        flags |= TB_FLAG_SUPER;
-+    }
-+#endif
- #ifdef TARGET_SPARC64
-+#ifndef CONFIG_USER_ONLY
-+    if (cpu_hypervisor_mode(env)) {
-+        flags |= TB_FLAG_HYPER;
-+    }
-+#endif
-     if (env->pstate & PS_AM) {
-         flags |= TB_FLAG_AM_ENABLED;
-     }
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 2205f89..0b0cde1 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -72,9 +72,16 @@ typedef struct DisasContext {
-     target_ulong jump_pc[2]; /* used when JUMP_PC pc value is used */
-     int is_br;
-     int mem_idx;
--    int fpu_enabled;
--    int address_mask_32bit;
--    int singlestep;
-+    bool fpu_enabled;
-+    bool address_mask_32bit;
-+    bool singlestep;
-+#ifndef CONFIG_USER_ONLY
-+    bool supervisor;
-+#ifdef TARGET_SPARC64
-+    bool hypervisor;
-+#endif
-+#endif
-+
-     uint32_t cc_op;  /* current CC operation */
-     struct TranslationBlock *tb;
-     sparc_def_t *def;
-@@ -283,10 +290,11 @@ static void gen_move_Q(DisasContext *dc, unsigned int rd, unsigned int rs)
- #define hypervisor(dc) 0
- #endif
- #else
--#define supervisor(dc) (dc->mem_idx >= MMU_KERNEL_IDX)
- #ifdef TARGET_SPARC64
--#define hypervisor(dc) (dc->mem_idx == MMU_HYPV_IDX)
-+#define hypervisor(dc) (dc->hypervisor)
-+#define supervisor(dc) (dc->supervisor | dc->hypervisor)
- #else
-+#define supervisor(dc) (dc->supervisor)
- #endif
- #endif
- 
-@@ -5710,9 +5718,15 @@ void gen_intermediate_code(CPUSPARCState * env, TranslationBlock * tb)
-     dc->fpu_enabled = tb_fpu_enabled(tb->flags);
-     dc->address_mask_32bit = tb_am_enabled(tb->flags);
-     dc->singlestep = (cs->singlestep_enabled || singlestep);
-+#ifndef CONFIG_USER_ONLY
-+    dc->supervisor = (tb->flags & TB_FLAG_SUPER) != 0;
-+#endif
- #ifdef TARGET_SPARC64
-     dc->fprs_dirty = 0;
-     dc->asi = (tb->flags >> TB_FLAG_ASI_SHIFT) & 0xff;
-+#ifndef CONFIG_USER_ONLY
-+    dc->hypervisor = (tb->flags & TB_FLAG_HYPER) != 0;
-+#endif
- #endif
- 
-     num_insns = 0;
 -- 
 2.9.3
