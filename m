@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cRaJn-0001E2-K9
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:01:09 -0500
+	(envelope-from <famz@redhat.com>) id 1cRaN6-0003h9-CP
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:04:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cRaJk-0001Wl-Co
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:01:07 -0500
-Resent-Message-Id: <E1cRaJk-0001Wl-Co@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21444)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cRaJk-0001WQ-5J
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:01:04 -0500
-In-Reply-To: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148420805350.208.7373464568560171452@790289a7ca88>
+	(envelope-from <famz@redhat.com>) id 1cRaN1-0002w7-NX
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:04:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53672)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cRaN1-0002vh-II
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:04:27 -0500
+Date: Thu, 12 Jan 2017 16:04:21 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170112080421.GB6997@lemon>
+References: <CAP8dc_acqeqpio7fVK4XSAxoH8QaGp9L=S1h2OCCWgrj=Q7VCw@mail.gmail.com>
+	<e57c4b44-ac0c-a937-e088-1f4e086080d8@redhat.com>
+	<20170104144458.GC8194@stefanha-x1.localdomain>
+	<e1a9afaf-74c0-77f1-72e9-c61cf225122e@gmail.com>
+	<20170112022212.GA26504@lemon>
+	<a762122c-edbf-0ec7-b195-656c494610c5@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 12 Jan 2017 00:00:55 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH RFC v2 00/12] basic channel IO passthrough
- infrastructure based on vfio
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a762122c-edbf-0ec7-b195-656c494610c5@gmail.com>
+Subject: Re: [Qemu-devel] [RFC]virtio-blk: add disk-name device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bjsdjshi@linux.vnet.ibm.com
-Cc: famz@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, renxiaof@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, agraf@suse.com
+To: Yang Zhang <yang.zhang.wz@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, Junkang Fu <fujunkang@gmail.com>, qemu-devel@nongnu.org
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwMTEyMDcyNTEzLjk4NDExLTEtYmpzZGpzaGlAbGludXgudm5ldC5pYm0u
-Y29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggUkZDIHYyIDAwLzEyXSBiYXNpYyBjaGFu
-bmVsIElPIHBhc3N0aHJvdWdoIGluZnJhc3RydWN0dXJlIGJhc2VkIG9uIHZmaW8KCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
-bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0
-aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAg
-ICAgICBwYXRjaGV3LzIwMTcwMTEyMDcyNTEzLjk4NDExLTEtYmpzZGpzaGlAbGludXgudm5ldC5p
-Ym0uY29tIC0+IHBhdGNoZXcvMjAxNzAxMTIwNzI1MTMuOTg0MTEtMS1ianNkanNoaUBsaW51eC52
-bmV0LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2OTRiMGVlIHZmaW8v
-Y2N3OiB1cGRhdGUgc2Vuc2UgZGF0YSBpZiBhIHVuaXQgY2hlY2sgaXMgcGVuZGluZwo0YWZjZmIy
-IHMzOTB4L2NzczogY2N3cyB0cmFuc2xhdGlvbiBpbmZyYXN0cnVjdHVyZQpjYmE5MDk1IHMzOTB4
-L2NzczogaW50cm9kdWNlIGFuZCByZWFsaXplIGNjdy1yZXF1ZXN0IGNhbGxiYWNrCjRmOGQ2NGEg
-dmZpby9jY3c6IGdldCBpcnFzIGluZm8gYW5kIHNldCB0aGUgZXZlbnRmZCBmZAo5NmJjMWI1IHZm
-aW8vY2N3OiBnZXQgaW8gcmVnaW9uIGluZm8KOTA2OTFlYyB2ZmlvL2NjdzogdmZpbyBiYXNlZCBz
-dWJjaGFubmVsIHBhc3N0aHJvdWdoIGRyaXZlcgpiNDBhNTY3IHMzOTB4L2NzczogZGV2aWNlIHN1
-cHBvcnQgZm9yIHMzOTAtY2N3IHBhc3N0aHJvdWdoCjBkNjhmMjEgczM5MHgvY3NzOiByZWFsaXpl
-IGNzc19jcmVhdGVfc2NoCjAxMTc5ZTUgczM5MHgvY3NzOiByZWFsaXplIGNzc19zY2hfYnVpbGRf
-c2NoaWIKMTU2NGY4OCBzMzkweC9jc3M6IGFkZCBzMzkwLW1hcC1jc3MgbWFjaGluZSBvcHRpb24K
-NzliNWU4MSB2ZmlvOiBsaW51eC1oZWFkZXJzIHVwZGF0ZSBmb3IgdmZpby1jY3cKNTJiNTJhZCB1
-cGRhdGUtbGludXgtaGVhZGVyczogYWRkIGFzbS1zMzkwL3ZmaW9fY2N3LmgKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTI6IHVwZGF0ZS1saW51eC1oZWFkZXJzOiBhZGQg
-YXNtLXMzOTAvdmZpb19jY3cuaC4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE5
-OiBGSUxFOiBzY3JpcHRzL3VwZGF0ZS1saW51eC1oZWFkZXJzLnNoOjk0OgorICAgICAgICBjcF9w
-b3J0YWJsZSAiJHRtcGRpci9pbmNsdWRlL2FzbS92ZmlvX2Njdy5oIiAiJG91dHB1dC9pbmNsdWRl
-L3N0YW5kYXJkLWhlYWRlcnMvYXNtLXMzOTAvIgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCA3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CkNoZWNraW5nIFBBVENIIDIvMTI6IHZmaW86IGxpbnV4LWhlYWRlcnMgdXBkYXRlIGZvciB2Zmlv
-LWNjdy4uLgpDaGVja2luZyBQQVRDSCAzLzEyOiBzMzkweC9jc3M6IGFkZCBzMzkwLW1hcC1jc3Mg
-bWFjaGluZSBvcHRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMjogczM5MHgvY3NzOiByZWFsaXpl
-IGNzc19zY2hfYnVpbGRfc2NoaWIuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzEyOTogRklMRTogaHcvczM5MHgvY3NzLmM6MTk4MDoKK3N0YXRpYyBpbnQgY3NzX3NjaF9nZXRf
-Y2hwaWRfdHlwZSh1aW50OF90IGNocGlkLCB1aW50MzJfdCAqdHlwZSwgQ3NzRGV2SWQgKmRldl9p
-ZCkKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjMzIGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNS8xMjogczM5
-MHgvY3NzOiByZWFsaXplIGNzc19jcmVhdGVfc2NoLi4uCkNoZWNraW5nIFBBVENIIDYvMTI6IHMz
-OTB4L2NzczogZGV2aWNlIHN1cHBvcnQgZm9yIHMzOTAtY2N3IHBhc3N0aHJvdWdoLi4uCkNoZWNr
-aW5nIFBBVENIIDcvMTI6IHZmaW8vY2N3OiB2ZmlvIGJhc2VkIHN1YmNoYW5uZWwgcGFzc3Rocm91
-Z2ggZHJpdmVyLi4uCkNoZWNraW5nIFBBVENIIDgvMTI6IHZmaW8vY2N3OiBnZXQgaW8gcmVnaW9u
-IGluZm8uLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMjogdmZpby9jY3c6IGdldCBpcnFzIGluZm8gYW5k
-IHNldCB0aGUgZXZlbnRmZCBmZC4uLgpDaGVja2luZyBQQVRDSCAxMC8xMjogczM5MHgvY3NzOiBp
-bnRyb2R1Y2UgYW5kIHJlYWxpemUgY2N3LXJlcXVlc3QgY2FsbGJhY2suLi4KRVJST1I6IHNwYWNl
-IHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojODE6IEZJTEU6IGh3L3ZmaW8vY2N3
-LmM6NzM6CisgICAgICAgIGVycm9yX3JlcG9ydCgidmZpby1jY3c6IHdpcnRlIEkvTyByZWdpb24g
-ZmFpbGVkIHdpdGggZXJybm89JWQiLGVycm5vKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBl
-cnJvcnMsIDAgd2FybmluZ3MsIDEyNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMS8xMjogczM5MHgvY3NzOiBjY3dz
-IHRyYW5zbGF0aW9uIGluZnJhc3RydWN0dXJlLi4uCkNoZWNraW5nIFBBVENIIDEyLzEyOiB2Zmlv
-L2NjdzogdXBkYXRlIHNlbnNlIGRhdGEgaWYgYSB1bml0IGNoZWNrIGlzIHBlbmRpbmcuLi4KPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
-cy5vcmc=
+On Thu, 01/12 15:39, Yang Zhang wrote:
+> On 2017/1/12 10:22, Fam Zheng wrote:
+> > On Thu, 01/12 09:22, Yang Zhang wrote:
+> > > On 2017/1/4 22:44, Stefan Hajnoczi wrote:
+> > > > On Tue, Jan 03, 2017 at 10:53:06AM -0600, Eric Blake wrote:
+> > > > > On 12/29/2016 08:41 PM, Junkang Fu wrote:
+> > > > > > >From 74e913fc41ea98d1dde692175f1e3fb6729342aa Mon Sep 17 00:00:00 2001
+> > > > > > From: "junkang.fjk" <junkang.fjk@alibaba-inc.com>
+> > > > > > Date: Wed, 24 Aug 2016 19:36:53 +0800
+> > > > > > Subject: [PATCH] virtio-blk: add disk-name device property
+> > > > > > 
+> > > > > > Current virtio-blk disk name(ex. /dev/vdb) has nothing to do with the
+> > > > > > target dev
+> > > > > > name specified in libvirt xml file. For example, we may get disk name
+> > > > > > /dev/vdb in
+> > > > > > VM while target dev specified in libvirt xml is vdc.
+> > > > > 
+> > > > > It's not really libvirt's fault.  The libvirt XML names are for
+> > > > > convenience, but nothing on the host side requires the guest to pick the
+> > > > > same naming scheme as the host.
+> > > > > 
+> > > > > I guess your proposal is to enhance the virtio spec such that clients
+> > > > > that are new enough to honor the new addition to the virtio spec will
+> > > > > change their name-picking algorithm to use the name provided by the
+> > > > > host, rather than their current approach of picking whatever name they
+> > > > > feel like, and then enhance libvirt to pass the XML name on down to the
+> > > > > guest?  It might work, but as others have pointed out, it will require a
+> > > > > virtio spec change first.
+> > > > 
+> > > > This change is unnecessary.  The -device virtio-blk-pci,serial= property
+> > > > already exists for this purpose.
+> > > 
+> > > how about the /dev/vdabc? I guess lots of people prefer to use it instead of
+> > > /dev/disk/by-id/xxx?
+> > 
+> > I disagree. Using /dev/sdX has exactly the same issue and that's why fstab and
+> > boot loader etc almost always use UUID or disk label by default because they are
+> > more stable.
+> 
+> I mean does it also change the /dev/sdX to the name specified in serial=sdX
+> or it just show the name under /dev/disk/by-id/
+
+I was saying on real hardware, sata disks can have unstable /dev/sdX naming
+across reboots if you add or remove disks on the controller, or add or remove
+HBA.
+
+Fam
