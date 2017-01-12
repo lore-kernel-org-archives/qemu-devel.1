@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cRV1w-0005BX-By
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:22:21 -0500
+	(envelope-from <somlo@cmu.edu>) id 1cRV5T-00089N-O8
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cRV1t-0004S3-8m
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:22:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cRV1t-0004RC-2p
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:22:17 -0500
-Date: Thu, 12 Jan 2017 10:22:12 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170112022212.GA26504@lemon>
-References: <CAP8dc_acqeqpio7fVK4XSAxoH8QaGp9L=S1h2OCCWgrj=Q7VCw@mail.gmail.com>
-	<e57c4b44-ac0c-a937-e088-1f4e086080d8@redhat.com>
-	<20170104144458.GC8194@stefanha-x1.localdomain>
-	<e1a9afaf-74c0-77f1-72e9-c61cf225122e@gmail.com>
+	(envelope-from <somlo@cmu.edu>) id 1cRV5S-00055J-GS
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:25:59 -0500
+Date: Wed, 11 Jan 2017 21:25:10 -0500
+From: "Gabriel L. Somlo" <somlo@cmu.edu>
+Message-ID: <20170112022510.GA14378@foober.ini.cmu.edu>
+References: <20170111173457.30455-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e1a9afaf-74c0-77f1-72e9-c61cf225122e@gmail.com>
-Subject: Re: [Qemu-devel] [RFC]virtio-blk: add disk-name device property
+In-Reply-To: <20170111173457.30455-1-lersek@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 wave 1 0/4] fw-cfg: support writeable
+ blobs and more files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +23,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhang <yang.zhang.wz@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, Junkang Fu <fujunkang@gmail.com>, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Anthony Perard <anthony.perard@citrix.com>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Michael Walle <michael@walle.cc>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-arm@nongnu.org
 
-On Thu, 01/12 09:22, Yang Zhang wrote:
-> On 2017/1/4 22:44, Stefan Hajnoczi wrote:
-> > On Tue, Jan 03, 2017 at 10:53:06AM -0600, Eric Blake wrote:
-> > > On 12/29/2016 08:41 PM, Junkang Fu wrote:
-> > > > >From 74e913fc41ea98d1dde692175f1e3fb6729342aa Mon Sep 17 00:00:00 2001
-> > > > From: "junkang.fjk" <junkang.fjk@alibaba-inc.com>
-> > > > Date: Wed, 24 Aug 2016 19:36:53 +0800
-> > > > Subject: [PATCH] virtio-blk: add disk-name device property
-> > > > 
-> > > > Current virtio-blk disk name(ex. /dev/vdb) has nothing to do with the
-> > > > target dev
-> > > > name specified in libvirt xml file. For example, we may get disk name
-> > > > /dev/vdb in
-> > > > VM while target dev specified in libvirt xml is vdc.
-> > > 
-> > > It's not really libvirt's fault.  The libvirt XML names are for
-> > > convenience, but nothing on the host side requires the guest to pick the
-> > > same naming scheme as the host.
-> > > 
-> > > I guess your proposal is to enhance the virtio spec such that clients
-> > > that are new enough to honor the new addition to the virtio spec will
-> > > change their name-picking algorithm to use the name provided by the
-> > > host, rather than their current approach of picking whatever name they
-> > > feel like, and then enhance libvirt to pass the XML name on down to the
-> > > guest?  It might work, but as others have pointed out, it will require a
-> > > virtio spec change first.
-> > 
-> > This change is unnecessary.  The -device virtio-blk-pci,serial= property
-> > already exists for this purpose.
+On Wed, Jan 11, 2017 at 06:34:53PM +0100, Laszlo Ersek wrote:
+> This is the first (fw_cfg) half of the v5 iteration of the series posted
+> here:
+> <http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00129.html>.
 > 
-> how about the /dev/vdabc? I guess lots of people prefer to use it instead of
-> /dev/disk/by-id/xxx?
+> In this version, the fw_cfg patches have been separated into a
+> standalone "wave", for helping review / maintenance, and also for
+> enabling independent features on top of writeable blobs. More
+> importantly, I've addressed Igor's v4 feedback. See the individual
+> patches for the details.
+> 
+> Patch #3 is included verbatim from Eduardo's pending series (see the
+> patch notes for the archive URL), as a dependency for patch #4. If
+> Eduardo's series is merged first, patch #3 can be dropped (in fact
+> git-rebase should do it automatically).
+> 
+> Please excuse the surprisingly long list of CC's, it's due to the fact
+> that fw_cfg is quite widely used (see patch #4).
+> 
+> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
 
-I disagree. Using /dev/sdX has exactly the same issue and that's why fstab and
-boot loader etc almost always use UUID or disk label by default because they are
-more stable.
+Whole series:
 
-Fam
+Acked-by: Gabriel Somlo <somlo@cmu.edu>
+
+Data passed in via the "-fw_cfg" qemu command still shows up fine in
+/sys/firmware/qemu-fw-cfg on the guest, so also:
+
+Tested-by: Gabriel Somlo <somlo@cmu.edu>
+
+Thanks,
+--Gabriel
+
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Michael Walle <michael@walle.cc>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Shannon Zhao <zhaoshenglong@huawei.com>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: qemu-arm@nongnu.org
+> 
+> Thanks
+> Laszlo
+> 
+> 
+> Eduardo Habkost (1):
+>   pc: Add 2.9 machine-types
+> 
+> Laszlo Ersek (2):
+>   fw-cfg: turn FW_CFG_FILE_SLOTS into a device property
+>   fw-cfg: bump "file_slots" to 0x20 for 2.9+ machine types
+> 
+> Michael S. Tsirkin (1):
+>   fw-cfg: support writeable blobs
+> 
+>  docs/specs/fw_cfg.txt          |  36 ++++++++++----
+>  hw/lm32/lm32_hwsetup.h         |   2 +-
+>  include/hw/compat.h            |  10 +++-
+>  include/hw/i386/pc.h           |   2 +
+>  include/hw/loader.h            |   7 +--
+>  include/hw/nvram/fw_cfg.h      |   3 +-
+>  include/hw/nvram/fw_cfg_keys.h |   3 +-
+>  hw/arm/virt-acpi-build.c       |   2 +-
+>  hw/core/loader.c               |  18 ++++---
+>  hw/i386/acpi-build.c           |   4 +-
+>  hw/i386/pc_piix.c              |  15 ++++--
+>  hw/i386/pc_q35.c               |  13 ++++-
+>  hw/nvram/fw_cfg.c              | 110 +++++++++++++++++++++++++++++++++++------
+>  13 files changed, 177 insertions(+), 48 deletions(-)
+> 
+> -- 
+> 2.9.3
+> 
