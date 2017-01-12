@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cRiOc-0001SL-JO
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:38:40 -0500
+	(envelope-from <lersek@redhat.com>) id 1cRiQi-0004Mq-A0
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:40:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cRiOV-0006Yo-Rn
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:38:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45964)
+	(envelope-from <lersek@redhat.com>) id 1cRiQe-0007Vl-92
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:40:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cRiOV-0006Yf-MB
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:38:31 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cRiQe-0007VI-0d
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:40:44 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C5AA3C04B95A
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 16:38:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1F627C0C189C
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 16:40:44 +0000 (UTC)
 References: <20170111173528.30510-1-lersek@redhat.com>
-	<20170112175657-mutt-send-email-mst@kernel.org>
+	<20170111173528.30510-4-lersek@redhat.com>
+	<20170112124049.GJ3565@thinpad.lan.raisama.net>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <2f3915c4-c27d-f50d-2c6e-c79fe5bf8430@redhat.com>
-Date: Thu, 12 Jan 2017 17:38:28 +0100
+Message-ID: <3c7d0bf4-08d9-c643-697d-c2597bd3780a@redhat.com>
+Date: Thu, 12 Jan 2017 17:40:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170112175657-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170112124049.GJ3565@thinpad.lan.raisama.net>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 wave 2 0/3] q35: add negotiable
- broadcast SMI
+Subject: Re: [Qemu-devel] [PATCH v5 wave 2 3/3] hw/isa/lpc_ich9: negotiate
+ SMI broadcast on pc-q35-2.9+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +35,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 01/12/17 16:57, Michael S. Tsirkin wrote:
-> On Wed, Jan 11, 2017 at 06:35:25PM +0100, Laszlo Ersek wrote:
->> This is the second (ICH9-LPC) half of the v5 iteration of the series
->> posted here:
->> <http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00129.html>.
->>
->> In this version, the ICH9-LPC patches have been separated into a
->> standalone "wave", for helping review / maintenance. More importantly,
->> I've addressed Igor's v4 feedback (which happens to address Eduardo's
->> feedback as well). See the individual patches for the details.
->>
+On 01/12/17 13:40, Eduardo Habkost wrote:
+> On Wed, Jan 11, 2017 at 06:35:28PM +0100, Laszlo Ersek wrote:
 >> Cc: "Michael S. Tsirkin" <mst@redhat.com>
 >> Cc: Eduardo Habkost <ehabkost@redhat.com>
 >> Cc: Gerd Hoffmann <kraxel@redhat.com>
 >> Cc: Igor Mammedov <imammedo@redhat.com>
 >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+>> ---
 >>
->> Thanks
->> Laszlo
+>> Notes:
+>>     v5:
+>>     - replace the v4 patch "hw/i386/pc_q35: advertise broadcast SMI if VCPU
+>>       hotplug is turned off" with a simple device property and compat
+>>       setting [Igor]
+>>
+>>  include/hw/i386/pc.h | 5 +++++
+>>  hw/isa/lpc_ich9.c    | 2 ++
+>>  2 files changed, 7 insertions(+)
+>>
+>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>> index 230e9e70c504..fb8ca7c907f6 100644
+>> --- a/include/hw/i386/pc.h
+>> +++ b/include/hw/i386/pc.h
+>> @@ -376,6 +376,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>>  
+>>  #define PC_COMPAT_2_8 \
+>>      HW_COMPAT_2_8 \
+>> +    {\
+>> +        .driver   = "ICH9-LPC",\
+>> +        .property = "smi_broadcast",\
+>> +        .value    = "off",\
+>> +    },\
+>>  
+>>  
+>>  #define PC_COMPAT_2_7 \
+>> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+>> index ced6f803a4f2..27fae5144744 100644
+>> --- a/hw/isa/lpc_ich9.c
+>> +++ b/hw/isa/lpc_ich9.c
+>> @@ -776,6 +776,8 @@ static const VMStateDescription vmstate_ich9_lpc = {
+>>  
+>>  static Property ich9_lpc_properties[] = {
+>>      DEFINE_PROP_BOOL("noreboot", ICH9LPCState, pin_strap.spkr_hi, true),
+>> +    DEFINE_PROP_BIT64("smi_broadcast", ICH9LPCState, smi_host_features,
+>> +                      ICH9_LPC_SMI_F_BROADCAST_BIT, true),
 > 
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Please use hyphens instead of underscores on QOM property names.
 
-Awesome, thanks!
+Will do, thank you.
 
-I'll send out v6 soon, addressing Eduardo's feedback.
+> 
+> Also, if this is not supposed to be configured directly by the
+> user, please use a "x-" prefix.
 
+Hmm, for "normal use", the user is not supposed to mess with it,
+correct. However, at least for testing OVMF's behavior when the
+negotiation is available vs. unavailable, the flag is useful on the
+command line too (although the same effect can be achieved with
+selecting pc-q35-2.8 vs. pc-q35-2.9). What does this imply?...
+
+Okay, I think I convinced myself that this should be called
+x-smi-broadcast. Ultimately I don't think libvirt should ever try to set
+this property, for example.
+
+> With that fixed:
+> 
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+
+Many thanks!
 Laszlo
-
-> 
->> Laszlo Ersek (3):
->>   hw/isa/lpc_ich9: add SMI feature negotiation via fw_cfg
->>   hw/isa/lpc_ich9: add broadcast SMI feature
->>   hw/isa/lpc_ich9: negotiate SMI broadcast on pc-q35-2.9+ machine types
->>
->>  include/hw/i386/ich9.h | 13 ++++++++
->>  include/hw/i386/pc.h   |  5 +++
->>  hw/isa/lpc_ich9.c      | 91 +++++++++++++++++++++++++++++++++++++++++++++++++-
->>  3 files changed, 108 insertions(+), 1 deletion(-)
->>
->> -- 
->> 2.9.3
