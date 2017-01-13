@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cS1be-00037w-VD
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:09:24 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1je-0007Tr-Kh
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cS1ba-0008BQ-SN
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:09:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cS1ba-0008B7-JW
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:09:18 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AFA638535A
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 13:09:18 +0000 (UTC)
-Date: Fri, 13 Jan 2017 14:09:14 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170113140914.62af8755@nial.brq.redhat.com>
-In-Reply-To: <20170112182446.9600-3-lersek@redhat.com>
-References: <20170112182446.9600-1-lersek@redhat.com>
-	<20170112182446.9600-3-lersek@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 wave 2 2/3] hw/isa/lpc_ich9: add
- broadcast SMI feature
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1jc-0002SF-3s
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:38 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36292)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cS1jb-0002RZ-TX
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:36 -0500
+Received: by mail-wm0-x244.google.com with SMTP id r126so11632497wmr.3
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 05:17:35 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 13 Jan 2017 14:17:17 +0100
+Message-Id: <20170113131731.1246-3-pbonzini@redhat.com>
+In-Reply-To: <20170113131731.1246-1-pbonzini@redhat.com>
+References: <20170113131731.1246-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/16] block-backend: allow blk_prw from
+ coroutine context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,106 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, stefanha@redhat.com
 
-On Thu, 12 Jan 2017 19:24:45 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
+qcow2_create2 calls this.  Do not run a nested event loop, as that
+breaks when aio_co_wake tries to queue the coroutine on the co_queue_wakeup
+list of the currently running one.
 
-> The generic edk2 SMM infrastructure prefers
-> EFI_SMM_CONTROL2_PROTOCOL.Trigger() to inject an SMI on each processor. If
-> Trigger() only brings the current processor into SMM, then edk2 handles it
-> in the following ways:
-> 
-> (1) If Trigger() is executed by the BSP (which is guaranteed before
->     ExitBootServices(), but is not necessarily true at runtime), then:
-> 
->     (a) If edk2 has been configured for "traditional" SMM synchronization,
->         then the BSP sends directed SMIs to the APs with APIC delivery,
->         bringing them into SMM individually. Then the BSP runs the SMI
->         handler / dispatcher.
-> 
->     (b) If edk2 has been configured for "relaxed" SMM synchronization,
->         then the APs that are not already in SMM are not brought in, and
->         the BSP runs the SMI handler / dispatcher.
-> 
-> (2) If Trigger() is executed by an AP (which is possible after
->     ExitBootServices(), and can be forced e.g. by "taskset -c 1
->     efibootmgr"), then the AP in question brings in the BSP with a
->     directed SMI, and the BSP runs the SMI handler / dispatcher.
-> 
-> The smaller problem with (1a) and (2) is that the BSP and AP
-> synchronization is slow. For example, the "taskset -c 1 efibootmgr"
-> command from (2) can take more than 3 seconds to complete, because
-> efibootmgr accesses non-volatile UEFI variables intensively.
-> 
-> The larger problem is that QEMU's current behavior diverges from the
-> behavior usually seen on physical hardware, and that keeps exposing
-> obscure corner cases, race conditions and other instabilities in edk2,
-> which generally expects / prefers a software SMI to affect all CPUs at
-> once.
-> 
-> Therefore introduce the "broadcast SMI" feature that causes QEMU to inject
-> the SMI on all VCPUs.
-> 
-> While the original posting of this patch
-> <http://lists.nongnu.org/archive/html/qemu-devel/2015-10/msg05658.html>
-> only intended to speed up (2), based on our recent "stress testing" of SMM
-> this patch actually provides functional improvements.
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
-> 
-> Notes:
->     v6:
->     - no changes, pick up Michael's R-b
->     
->     v5:
->     - replace the ICH9_LPC_SMI_F_BROADCAST bit value with the
->       ICH9_LPC_SMI_F_BROADCAST_BIT bit position (necessary for
->       DEFINE_PROP_BIT() in the next patch)
-> 
->  include/hw/i386/ich9.h |  3 +++
->  hw/isa/lpc_ich9.c      | 10 +++++++++-
->  2 files changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-> index da1118727146..18dcca7ebcbf 100644
-> --- a/include/hw/i386/ich9.h
-> +++ b/include/hw/i386/ich9.h
-> @@ -250,4 +250,7 @@ Object *ich9_lpc_find(void);
->  #define ICH9_SMB_HST_D1                         0x06
->  #define ICH9_SMB_HOST_BLOCK_DB                  0x07
->  
-> +/* bit positions used in fw_cfg SMI feature negotiation */
-> +#define ICH9_LPC_SMI_F_BROADCAST_BIT            0
-> +
->  #endif /* HW_ICH9_H */
-> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-> index 376b7801a42c..ced6f803a4f2 100644
-> --- a/hw/isa/lpc_ich9.c
-> +++ b/hw/isa/lpc_ich9.c
-> @@ -437,7 +437,15 @@ static void ich9_apm_ctrl_changed(uint32_t val, void *arg)
->  
->      /* SMI_EN = PMBASE + 30. SMI control and enable register */
->      if (lpc->pm.smi_en & ICH9_PMIO_SMI_EN_APMC_EN) {
-> -        cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
-> +        if (lpc->smi_negotiated_features &
-> +            (UINT64_C(1) << ICH9_LPC_SMI_F_BROADCAST_BIT)) {
-> +            CPUState *cs;
-> +            CPU_FOREACH(cs) {
-> +                cpu_interrupt(cs, CPU_INTERRUPT_SMI);
-> +            }
-Shouldn't CPUs with default SMI base be excluded from broadcast?
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/block-backend.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-> +        } else {
-> +            cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
-> +        }
->      }
->  }
->  
+diff --git a/block/block-backend.c b/block/block-backend.c
+index efbf398..1177598 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -880,7 +880,6 @@ static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
+ {
+     QEMUIOVector qiov;
+     struct iovec iov;
+-    Coroutine *co;
+     BlkRwCo rwco;
+ 
+     iov = (struct iovec) {
+@@ -897,9 +896,14 @@ static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
+         .ret    = NOT_DONE,
+     };
+ 
+-    co = qemu_coroutine_create(co_entry, &rwco);
+-    qemu_coroutine_enter(co);
+-    BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
++    if (qemu_in_coroutine()) {
++        /* Fast-path if already in coroutine context */
++        co_entry(&rwco);
++    } else {
++        Coroutine *co = qemu_coroutine_create(co_entry, &rwco);
++        qemu_coroutine_enter(co);
++        BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
++    }
+ 
+     return rwco.ret;
+ }
+-- 
+2.9.3
