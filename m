@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cS1Ku-0005ba-5L
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:04 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cS1LA-00060w-D8
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cS1Kq-0002Mp-W2
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55740)
+	(envelope-from <laurent@vivier.eu>) id 1cS1L8-0002Nt-2M
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:20 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:61105)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cS1Kq-0002Mk-Q7
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:00 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1481822644-617-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Date: Fri, 13 Jan 2017 13:51:57 +0100
-In-Reply-To: <1481822644-617-1-git-send-email-mdroth@linux.vnet.ibm.com>
-	(Michael Roth's message of "Thu, 15 Dec 2016 11:24:02 -0600")
-Message-ID: <87fuknruky.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 0/2] Fixes/tests for hmp_object_del()
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cS1L7-0002NO-OP
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:18 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Fri, 13 Jan 2017 13:51:59 +0100
+Message-Id: <1484311923-28637-2-git-send-email-laurent@vivier.eu>
+In-Reply-To: <1484311923-28637-1-git-send-email-laurent@vivier.eu>
+References: <1484311923-28637-1-git-send-email-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v2 1/5] target-m68k: fix bit operation with
+ immediate value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>, rth@twiddle.net, Laurent Vivier <laurent@vivier.eu>
 
-Andreas, please have a look.  Feel free to ask me to take it through my
-tree.
+M680x0 bit operations with an immediate value use 9 bits of the 16bit
+value, while coldfire ones use only 8 bits.
 
-Michael Roth <mdroth@linux.vnet.ibm.com> writes:
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/m68k/translate.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-> hmp_object_del() followed by a subsequent hmp_object_add() can trigger a
-> duplicate ID error if the previous object shared the same ID and was added
-> via the command-line. Please see patch 2/2 for more details.
->
-> This patchset fixes the issue in question and adds some general unit tests
-> for object created via -object, which we later extend to verify the fix in
-> question.
->
-> Changes since v3:
->
->   - Fixed up comment formating (Markus)
->   - Instead of segfaulting, use &error_abort if assumptions about
->     'object' property group existence change (Markus)
->   - Use g_assert_null in place of g_assert(... == NULL) (Markus)
->
-> Changes since v2:
->
->   - Moved the generic unit tests ahead of the fix patch, with a FIXME
->     in place of the actual check for the failure addressed in patch
->     2/2 (Daniel/Markus)
->   - Dropped check for existence of objects' QemuOptsList (Markus)
->   - Dropped unintended whitespace removal in PATCH 1/2
->   - Slight rewording of commit messages to reflect the changes and fix
->     minor grammar errors.
->
-> Changes since v1:
->
->   - Moved QemuOpt cleanup out of {qmp,hmp}_object_del() and into common
->     user_creatable_del() path (Daniel, David)
->   - Added corresponding test case in check-qom-proplist
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 5f7357e..410f56a 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -1801,9 +1801,16 @@ DISAS_INSN(bitop_im)
+     op = (insn >> 6) & 3;
+ 
+     bitnum = read_im16(env, s);
+-    if (bitnum & 0xff00) {
+-        disas_undef(env, s, insn);
+-        return;
++    if (m68k_feature(s->env, M68K_FEATURE_M68000)) {
++        if (bitnum & 0xfe00) {
++            disas_undef(env, s, insn);
++            return;
++        }
++    } else {
++        if (bitnum & 0xff00) {
++            disas_undef(env, s, insn);
++            return;
++        }
+     }
+ 
+     SRC_EA(env, src1, opsize, 0, op ? &addr: NULL);
+-- 
+2.7.4
