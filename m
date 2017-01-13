@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cS8ll-0007Dj-V6
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:48:19 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cS8lo-0007Dp-Fa
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:48:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cS8li-0005oU-QC
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:48:18 -0500
-Received: from roura.ac.upc.es ([147.83.33.10]:49702)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cS8lm-0005qO-Vr
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:48:20 -0500
+Received: from roura.ac.upc.es ([147.83.33.10]:49706)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cS8li-0005nA-8t
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:48:14 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cS8lm-0005q0-JY
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:48:18 -0500
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri, 13 Jan 2017 21:48:09 +0100
-Message-Id: <148434048970.31446.17153056211582691244.stgit@frigg.lan>
+Date: Fri, 13 Jan 2017 21:48:16 +0100
+Message-Id: <148434049602.31446.1147440453975767839.stgit@frigg.lan>
+In-Reply-To: <148434048970.31446.17153056211582691244.stgit@frigg.lan>
+References: <148434048970.31446.17153056211582691244.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 0/7] trace: [tcg] Optimize per-vCPU tracing
- states with separate TB caches
+Subject: [Qemu-devel] [PATCH v7 1/7] exec: [tcg] Refactor flush of per-CPU
+ virtual TB cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,181 +28,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Optimizes tracing of events with the 'tcg' and 'vcpu' properties (e.g., m=
-emory
-accesses), making it feasible to statically enable them by default on all=
- QEMU
-builds.
-
-Some quick'n'dirty numbers with 400.perlbench (SPECcpu2006) on the train =
-input
-(medium size - suns.pl) and the guest_mem_before event:
-
-* vanilla, statically disabled
-real	0m2,259s
-user	0m2,252s
-sys	0m0,004s
-
-* vanilla, statically enabled (overhead: 2.18x)
-real	0m4,921s
-user	0m4,912s
-sys	0m0,008s
-
-* multi-tb, statically disabled (overhead: 0.99x) [within noise range]
-real	0m2,228s
-user	0m2,216s
-sys	0m0,008s
-
-* multi-tb, statically enabled (overhead: 0.99x) [within noise range]
-real	0m2,229s
-user	0m2,224s
-sys	0m0,004s
-
-
-Right now, events with the 'tcg' property always generate TCG code to tra=
-ce that
-event at guest code execution time, where the event's dynamic state is ch=
-ecked.
-
-This series adds a performance optimization where TCG code for events wit=
-h the
-'tcg' and 'vcpu' properties is not generated if the event is dynamically
-disabled. This optimization raises two issues:
-
-* An event can be dynamically disabled/enabled after the corresponding TC=
-G code
-  has been generated (i.e., a new TB with the corresponding code should b=
-e
-  used).
-
-* Each vCPU can have a different dynamic state for the same event (i.e., =
-tracing
-  the memory accesses of only one process pinned to a vCPU).
-
-To handle both issues, this series integrates the dynamic tracing event s=
-tate
-into the TB hashing function, so that vCPUs tracing different events will=
- use
-separate TBs. Note that only events with the 'vcpu' property are used for
-hashing (as stored in the bitmap of CPUState->trace_dstate).
-
-This makes dynamic event state changes on vCPUs very efficient, since the=
-y can
-use TBs produced by other vCPUs while on the same event state combination=
- (or
-produced by the same vCPU, earlier).
-
-Discarded alternatives:
-
-* Emitting TCG code to check if an event needs tracing, where we should s=
-till
-  move the tracing call code to either a cold path (making tracing perfor=
-mance
-  worse), or leave it inlined (making non-tracing performance worse).
-
-* Eliding TCG code only when *zero* vCPUs are tracing an event, since ena=
-bling
-  it on a single vCPU will impact the performance of all other vCPUs that=
- are
-  not tracing that event.
+The function is reused in later patches.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
+ cputlb.c                |    2 +-
+ include/exec/exec-all.h |    6 ++++++
+ translate-all.c         |   14 +++++++++-----
+ 3 files changed, 16 insertions(+), 6 deletions(-)
 
-Changes in v7
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Fix delayed dstate changes (now uses async_run_on_cpu() as suggested by=
- Paolo
-  Bonzini).
-
-* Note to Richard: patch 4 has been adapted to the new patch 3 async call=
-back,
-  but is essentially the same.
-
-
-Changes in v6
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Check hashing size error with QEMU_BUILD_BUG_ON [Richard Henderson].
-
-
-Changes in v5
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Move define into "qemu-common.h" to allow compilation of tests.
-
-
-Changes in v4
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Incorporate trace_dstate into the TB hashing function instead of using
-  multiple physical TB caches [suggested by Richard Henderson].
-
-
-Changes in v3
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Rebase on 0737f32daf.
-* Do not use reserved symbol prefixes ("__") [Stefan Hajnoczi].
-* Refactor trace_get_vcpu_event_count() to be inlinable.
-* Optimize cpu_tb_cache_set_requested() (hottest path).
-
-
-Changes in v2
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Fix bitmap copy in cpu_tb_cache_set_apply().
-* Split generated code re-alignment into a separate patch [Daniel P. Berr=
-ange].
-
-
-Llu=C3=ADs Vilanova (7):
-      exec: [tcg] Refactor flush of per-CPU virtual TB cache
-      trace: Make trace_get_vcpu_event_count() inlinable
-      trace: [tcg] Delay changes to dynamic state when translating
-      exec: [tcg] Use different TBs according to the vCPU's dynamic traci=
-ng state
-      trace: [tcg] Do not generate TCG code to trace dinamically-disabled=
- events
-      trace: [tcg,trivial] Re-align generated code
-      trace: [trivial] Statically enable all guest events
-
-
- cpu-exec.c                               |   22 +++++++++++++++++-----
- cputlb.c                                 |    2 +-
- include/exec/exec-all.h                  |   11 +++++++++++
- include/exec/tb-hash-xx.h                |    8 +++++++-
- include/exec/tb-hash.h                   |    5 +++--
- include/qemu-common.h                    |    3 +++
- include/qom/cpu.h                        |    3 +++
- qom/cpu.c                                |    2 ++
- scripts/tracetool/__init__.py            |    3 ++-
- scripts/tracetool/backend/dtrace.py      |    4 ++--
- scripts/tracetool/backend/ftrace.py      |   20 ++++++++++----------
- scripts/tracetool/backend/log.py         |   19 ++++++++++---------
- scripts/tracetool/backend/simple.py      |    4 ++--
- scripts/tracetool/backend/syslog.py      |    6 +++---
- scripts/tracetool/backend/ust.py         |    4 ++--
- scripts/tracetool/format/h.py            |   26 +++++++++++++++++++-----=
---
- scripts/tracetool/format/tcg_h.py        |   21 +++++++++++++++++----
- scripts/tracetool/format/tcg_helper_c.py |    5 +++--
- tests/qht-bench.c                        |    2 +-
- trace-events                             |    6 +++---
- trace/control-internal.h                 |    7 ++++++-
- trace/control-target.c                   |   22 +++++++++++++++++++---
- trace/control.c                          |   11 +++--------
- trace/control.h                          |    7 +++++--
- translate-all.c                          |   30 +++++++++++++++++++++++-=
-------
- 25 files changed, 177 insertions(+), 76 deletions(-)
-
-
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
+diff --git a/cputlb.c b/cputlb.c
+index 813279f3bc..9bf9960e1b 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -80,7 +80,7 @@ void tlb_flush(CPUState *cpu, int flush_global)
+=20
+     memset(env->tlb_table, -1, sizeof(env->tlb_table));
+     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
+-    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
++    tb_flush_jmp_cache_all(cpu);
+=20
+     env->vtlb_index =3D 0;
+     env->tlb_flush_addr =3D -1;
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index a8c13cee66..57cd978578 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -256,6 +256,12 @@ struct TranslationBlock {
+ };
+=20
+ void tb_free(TranslationBlock *tb);
++/**
++ * tb_flush_jmp_cache_all:
++ *
++ * Flush the virtual translation block cache.
++ */
++void tb_flush_jmp_cache_all(CPUState *env);
+ void tb_flush(CPUState *cpu);
+ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
+=20
+diff --git a/translate-all.c b/translate-all.c
+index 3dd9214904..29ccb9e546 100644
+--- a/translate-all.c
++++ b/translate-all.c
+@@ -941,11 +941,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_da=
+ta tb_flush_count)
+     }
+=20
+     CPU_FOREACH(cpu) {
+-        int i;
+-
+-        for (i =3D 0; i < TB_JMP_CACHE_SIZE; ++i) {
+-            atomic_set(&cpu->tb_jmp_cache[i], NULL);
+-        }
++        tb_flush_jmp_cache_all(cpu);
+     }
+=20
+     tcg_ctx.tb_ctx.nb_tbs =3D 0;
+@@ -1741,6 +1737,14 @@ void tb_check_watchpoint(CPUState *cpu)
+     }
+ }
+=20
++void tb_flush_jmp_cache_all(CPUState *cpu)
++{
++    int i;
++    for (i =3D 0; i < TB_JMP_CACHE_SIZE; ++i) {
++        atomic_set(&cpu->tb_jmp_cache[i], NULL);
++    }
++}
++
+ #ifndef CONFIG_USER_ONLY
+ /* in deterministic execution mode, instructions doing device I/Os
+    must be at the end of the TB */
