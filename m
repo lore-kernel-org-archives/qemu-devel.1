@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cS4JK-00055D-5v
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:02:39 -0500
+	(envelope-from <armbru@redhat.com>) id 1cS4Ke-0006EN-R2
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:04:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cS4JF-0001pm-UK
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:02:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58306)
+	(envelope-from <armbru@redhat.com>) id 1cS4Kb-0002IB-BK
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:04:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cS4JF-0001pg-Lk
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:02:33 -0500
-Date: Fri, 13 Jan 2017 18:02:28 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170113175828-mutt-send-email-mst@kernel.org>
-References: <1483524185-9036-1-git-send-email-arei.gonglei@huawei.com>
-	<33183CC9F5247A488A2544077AF19020DA174989@DGGEMA505-MBX.china.huawei.com>
-	<63cd3678-4044-365d-d396-1040f5755e2c@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA18DE85@DGGEMA505-MBX.china.huawei.com>
-	<20170112214414-mutt-send-email-mst@kernel.org>
-	<33183CC9F5247A488A2544077AF19020DA18F9A0@DGGEMA505-MBX.china.huawei.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cS4Kb-0002HF-57
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:03:57 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 31D9983F38
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 16:03:57 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170113144135.5150-1-marcandre.lureau@redhat.com>
+	<20170113144135.5150-4-marcandre.lureau@redhat.com>
+Date: Fri, 13 Jan 2017 17:03:54 +0100
+In-Reply-To: <20170113144135.5150-4-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 13 Jan 2017 15:41:17 +0100")
+Message-ID: <877f5zj6ad.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA18F9A0@DGGEMA505-MBX.china.huawei.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v15 0/2] virtio-crypto:
- virtio crypto device specification
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 03/21] qapi: make TODOs named-sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,178 +35,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Shiqing Fan <Shiqing.Fan@huawei.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, Jan 13, 2017 at 02:54:29AM +0000, Gonglei (Arei) wrote:
-> 
-> > 
-> > On Thu, Jan 12, 2017 at 12:26:24PM +0000, Gonglei (Arei) wrote:
-> > > Hi,
-> > >
-> > >
-> > > >
-> > > > On 01/04/2017 11:10 AM, Gonglei (Arei) wrote:
-> > > > > Hi all,
-> > > > >
-> > > > > I attach the diff files between v14 and v15 for better review.
-> > > > >
-> > > > Hi,
-> > > >
-> > > > only had a quick look. Will try to come back to this later.
-> > > >
-> > > That's cool.
-> > >
-> > > > > diff --git a/virtio-crypto.tex b/virtio-crypto.tex
-> > > > > index 9f7faf0..884ee95 100644
-> > > > > --- a/virtio-crypto.tex
-> > > > > +++ b/virtio-crypto.tex
-> > > > > @@ -2,8 +2,8 @@
-> > > > >
-> > > > >  The virtio crypto device is a virtual cryptography device as well as a kind
-> > of
-> > > > >  virtual hardware accelerator for virtual machines. The encryption and
-> > > > > -decryption requests are placed in the data queue and are ultimately
-> > handled
-> > > > by the
-> > > > > -backend crypto accelerators. The second queue is the control queue used
-> > to
-> > > > create
-> > > > > +decryption requests are placed in any of the data active queues and are
-> > > > ultimately handled by the
-> > > > s/data active/active data/
-> > > > > +backend crypto accelerators. The second kind of queue is the control
-> > queue
-> > > > used to create
-> > > > >  or destroy sessions for symmetric algorithms and will control some
-> > > > advanced
-> > > > >  features in the future. The virtio crypto device provides the following
-> > crypto
-> > > > >  services: CIPHER, MAC, HASH, and AEAD.
-> > > >
-> > > > [..]
-> > > >
-> > > > > ===============The below diff shows the changes of add non-session
-> > mode
-> > > > support:
-> > > > >
-> > > > > diff --git a/virtio-crypto.tex b/virtio-crypto.tex
-> > > > > index 884ee95..44819f9 100644
-> > > > > --- a/virtio-crypto.tex
-> > > > > +++ b/virtio-crypto.tex
-> > > > > @@ -26,7 +26,10 @@ N is set by \field{max_dataqueues}.
-> > > > >
-> > > > >  \subsection{Feature bits}\label{sec:Device Types / Crypto Device /
-> > Feature
-> > > > bits}
-> > > > >
-> > > > > -None currently defined.
-> > > > > +VIRTIO_CRYPTO_F_CIPHER_SESSION_MODE (1) Session mode is
-> > available
-> > > > for CIPHER service.
-> > > > > +VIRTIO_CRYPTO_F_HASH_SESSION_MODE (2) Session mode is available
-> > for
-> > > > HASH service.
-> > > > > +VIRTIO_CRYPTO_F_MAC_SESSION_MODE (3) Session mode is available
-> > for
-> > > > MAC service.
-> > > > > +VIRTIO_CRYPTO_F_AEAD_SESSION_MODE (4) Session mode is available
-> > for
-> > > > AEAD service.
-> > > > >
-> > > > >  \subsection{Device configuration layout}\label{sec:Device Types /
-> > Crypto
-> > > > Device / Device configuration layout}
-> > > > >
-> > > > > @@ -208,6 +211,9 @@ Operation parameters are algorithm-specific
-> > > > parameters, output data is the
-> > > > >  data that should be utilized in operations, and input data is equal to
-> > > > >  "operation result + result data".
-> > > > >
-> > > > > +The device can support both session mode (See \ref{sec:Device Types /
-> > > > Crypto Device / Device Operation / Control Virtqueue / Session operation})
-> > and
-> > > > non-session mode, for example,
-> > > > > +As VIRTIO_CRYPTO_F_CIPHER_SESSION feature bit is negotiated, the
-> > driver
-> > > > can use session mode for CIPHER service, otherwise it can only use
-> > non-session
-> > > > mode.
-> > > > > +
-> > > >
-> > > > As far as I understand you are adding non-session mode to the mix but
-> > > > providing feature bits for session mode. Would this render the the current
-> > > > implementation non-compliant?
-> > > >
-> > > You are right, shall we use feature bits for non-session mode for compliancy?
-> > > Or because the spec is on the fly, and some structures in the virtio_crypto.h
-> > need to
-> > > be modified, can we keep the compliancy completely?
-> > >
-> > > Thanks,
-> > > -Gonglei
-> > 
-> > Since there's a linux driver upstream you must at least
-> > keep compatibility with that.
-> > 
-> Sure. We use feature bits for non-session mode then.
-> For structures modification, do we need to do some specific
-> actions for compatibility?  Take CIPHER service as an example:
-> 
-> The present structure:
-> 
-> struct virtio_crypto_cipher_para {
->     /*
->      * Byte Length of valid IV/Counter data pointed to by the below iv data.
->      *
->      * For block ciphers in CBC or F8 mode, or for Kasumi in F8 mode, or for
->      *   SNOW3G in UEA2 mode, this is the length of the IV (which
->      *   must be the same as the block length of the cipher).
->      * For block ciphers in CTR mode, this is the length of the counter
->      *   (which must be the same as the block length of the cipher).
->      */
->     le32 iv_len;
->     /* length of source data */
->     le32 src_data_len;
->     /* length of destination data */
->     le32 dst_data_len;
-> };
-> 
-> The future structure if supporting non-session based operations:
-> 
-> struct virtio_crypto_cipher_para {
->     struct {
->         /* See VIRTIO_CRYPTO_CIPHER* above */
->         le32 algo;
->         /* length of key */
->         le32 keylen;
-> 
->         /* See VIRTIO_CRYPTO_OP_* above */
->         le32 op;
->     } sess_para;
-> 
->     /*
->      * Byte Length of valid IV/Counter data pointed to by the below iv data.
->      *
->      * For block ciphers in CBC or F8 mode, or for Kasumi in F8 mode, or for
->      *   SNOW3G in UEA2 mode, this is the length of the IV (which
->      *   must be the same as the block length of the cipher).
->      * For block ciphers in CTR mode, this is the length of the counter
->      *   (which must be the same as the block length of the cipher).
->      */
->     le32 iv_len;
->     /* length of source data */
->     le32 src_data_len;
->     /* length of destination data */
->     le32 dst_data_len;
-> };
-> 
-> Thanks,
-> -Gonglei
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-So you will have to maintain both structures for when non-session based
-feature is and aren't present. You will have to give them different
-names, too.
+> Have the TODO in the TAG: format, so they will stand out in the
+> generated documentation.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
--- 
-MST
+As proposed in review of v7, I'm replacing commit message by
+
+  qapi: Format TODO comments more consistently
+
+  Consistently put a colon after TODO.  This will make the TODOs stand
+  out in the documentation we're going to generate.
+
+if that's okay with you.
