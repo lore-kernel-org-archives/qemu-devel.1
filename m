@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cS765-0004aY-5G
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:01:10 -0500
+	(envelope-from <lprosek@redhat.com>) id 1cS76L-0004jL-1U
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:01:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cS760-00080d-7y
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:01:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cS75z-00080V-Vq
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:01:04 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E4BF33D945
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 19:01:03 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 13 Jan 2017 17:00:57 -0200
-Message-Id: <20170113190057.6327-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] target-i386: Remove AMD feature flag aliases
- from Opteron models
+	(envelope-from <lprosek@redhat.com>) id 1cS76G-00084I-Cj
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:01:25 -0500
+Received: from mail-vk0-f47.google.com ([209.85.213.47]:34459)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cS76G-00083z-7I
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:01:20 -0500
+Received: by mail-vk0-f47.google.com with SMTP id r136so39354733vke.1
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 11:01:20 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <9d544d44-f41f-e691-ee73-54f9383a13e3@redhat.com>
+References: <1484305370-6220-1-git-send-email-lprosek@redhat.com>
+	<0343b5cd-f2b9-b439-7652-44ab5f05f0c4@redhat.com>
+	<CABdb734ESPhd=354YHCs2AV_jiCj=NwiR-AU0TcWuv0XMDcCaQ@mail.gmail.com>
+	<9d544d44-f41f-e691-ee73-54f9383a13e3@redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Fri, 13 Jan 2017 20:01:18 +0100
+Message-ID: <CABdb735JeFpoXqE1A-V1ih7F3Tbg3KFgs69_ijeyeYf_bo+jBw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] ahci: advertise HOST_CAP_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,118 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-When CPU vendor is set to AMD, the AMD feature alias bits on
-CPUID[0x80000001].EDX are already automatically copied from CPUID[1].EDX
-on x86_cpu_realizefn(). When CPU vendor is Intel, those bits are
-reserved and should be zero. On either case, those bits shouldn't be set
-in the CPU model table.
+On Fri, Jan 13, 2017 at 7:31 PM, John Snow <jsnow@redhat.com> wrote:
+>
+>
+> On 01/13/2017 01:12 PM, Ladi Prosek wrote:
+>> On Fri, Jan 13, 2017 at 6:23 PM, John Snow <jsnow@redhat.com> wrote:
+>>> On 01/13/2017 06:02 AM, Ladi Prosek wrote:
+>>>> The AHCI emulation code supports 64-bit addressing and should advertise this
+>>>> fact in the Host Capabilities register. Both Linux and Windows drivers test
+>>>> this bit to decide if the upper 32 bits of various registers may be written
+>>>> to, and at least some versions of Windows have a bug where DMA is attempted
+>>>> with an address above 4GB but, in the absence of HOST_CAP_64, the upper 32
+>>>> bits are left unititialized which leads to a memory corruption.
+>>>>
+>>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+>>>> ---
+>>>>  hw/ide/ahci.c | 2 +-
+>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>>>> index 3c19bda..6a17acf 100644
+>>>> --- a/hw/ide/ahci.c
+>>>> +++ b/hw/ide/ahci.c
+>>>> @@ -488,7 +488,7 @@ static void ahci_reg_init(AHCIState *s)
+>>>>      s->control_regs.cap = (s->ports - 1) |
+>>>>                            (AHCI_NUM_COMMAND_SLOTS << 8) |
+>>>>                            (AHCI_SUPPORTED_SPEED_GEN1 << AHCI_SUPPORTED_SPEED) |
+>>>> -                          HOST_CAP_NCQ | HOST_CAP_AHCI;
+>>>> +                          HOST_CAP_NCQ | HOST_CAP_AHCI | HOST_CAP_64;
+>>>>
+>>>>      s->control_regs.impl = (1 << s->ports) - 1;
+>>>>
+>>>>
+>>>
+>>> Was this tested? What was the use case that prompted this patch, and do
+>>> you have a public bugzilla to point to?
+>>
+>> Sorry, I thought you were aware. Here's the BZ with details:
+>> https://bugzilla.redhat.com/show_bug.cgi?id=1411105
+>>
+>
+> It's for the public record :)
+>
+> I'm going to amend your commit message, OK?
+>
+> https://github.com/jnsnow/qemu/commit/f037be92fc0c4580b846134e0355a69d0eccd0d9
 
-Commit 726a8ff68677d8d5fba17eb0ffb85076bfb598dc removed those
-bits from most CPU models, but the Opteron_* entries still have
-them. Remove the alias bits from Opteron_* too.
+Minor nit: the OS we know for sure is affected is Windows Server 2008,
+without the "R2". Thanks!
 
-Add an assert() to x86_register_cpudef_type() to ensure we don't
-make the same mistake again.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu.c | 46 ++++++++++++----------------------------------
- 1 file changed, 12 insertions(+), 34 deletions(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index a149c8dc42..af726a8fd0 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1339,12 +1339,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .features[FEAT_1_ECX] =
-             CPUID_EXT_SSE3,
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
--            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
--            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
--            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
--            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
--            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-         .xlevel = 0x80000008,
-         .model_id = "AMD Opteron 240 (Gen 1 Class Opteron)",
-     },
-@@ -1365,13 +1360,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_CX16 | CPUID_EXT_SSE3,
-         /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM | CPUID_EXT2_FXSR |
--            CPUID_EXT2_MMX | CPUID_EXT2_NX | CPUID_EXT2_PSE36 |
--            CPUID_EXT2_PAT | CPUID_EXT2_CMOV | CPUID_EXT2_MCA |
--            CPUID_EXT2_PGE | CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL |
--            CPUID_EXT2_APIC | CPUID_EXT2_CX8 | CPUID_EXT2_MCE |
--            CPUID_EXT2_PAE | CPUID_EXT2_MSR | CPUID_EXT2_TSC | CPUID_EXT2_PSE |
--            CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-         .xlevel = 0x80000008,
-@@ -1395,13 +1384,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_SSE3,
-         /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM | CPUID_EXT2_FXSR |
--            CPUID_EXT2_MMX | CPUID_EXT2_NX | CPUID_EXT2_PSE36 |
--            CPUID_EXT2_PAT | CPUID_EXT2_CMOV | CPUID_EXT2_MCA |
--            CPUID_EXT2_PGE | CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL |
--            CPUID_EXT2_APIC | CPUID_EXT2_CX8 | CPUID_EXT2_MCE |
--            CPUID_EXT2_PAE | CPUID_EXT2_MSR | CPUID_EXT2_TSC | CPUID_EXT2_PSE |
--            CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
-             CPUID_EXT3_ABM | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-@@ -1428,13 +1411,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_SSE3,
-         /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM |
--            CPUID_EXT2_PDPE1GB | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
--            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
--            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
--            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
--            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
--            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
-             CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
-@@ -1464,13 +1442,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
-         /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM |
--            CPUID_EXT2_PDPE1GB | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
--            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
--            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
--            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
--            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
--            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_TBM | CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
-             CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
-@@ -2395,6 +2368,11 @@ static void x86_register_cpudef_type(X86CPUDefinition *def)
-         .class_data = def,
-     };
- 
-+    /* AMD aliases are handled at runtime based on CPUID vendor, so
-+     * they shouldn't be set on the CPU model table.
-+     */
-+    assert(!(def->features[FEAT_8000_0001_EDX] & CPUID_EXT2_AMD_ALIASES));
-+
-     type_register(&ti);
-     g_free(typename);
- }
--- 
-2.11.0.259.g40922b1
+>> In short, Windows guests run into issues in certain virtual HW
+>> configurations if the bit is not set. I have tested the patch and
+>> verified that it fixes the failing cases.
+>>
+>
+> Great. I'm CCing qemu-stable as this should probably be included in
+> 2.7.2 / 2.8.1 / etc.
+>
+>>> It looks correct via the spec, thank you for finding this oversight. It
+>>> looks like everywhere this bit would make a difference we already do the
+>>> correct thing for having this bit set.
+>>>
+>>> From what I can gather from the spec, it looks as if even 32bit guests
+>>> must ensure that the upper 32bit registers are cleared, so I think we're
+>>> all set here.
+>>>
+>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>
+> Thanks, applied to my IDE tree:
+>
+> https://github.com/jnsnow/qemu/commits/ide
+> https://github.com/jnsnow/qemu.git
+>
+> --js
