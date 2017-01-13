@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cRyOx-0005pG-Ub
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:44:04 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cRyTj-0008Nu-BG
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:49:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cRyOx-0002lf-1o
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:44:03 -0500
-Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:34774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cRyOw-0002lb-UO
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:44:02 -0500
-Received: by mail-ua0-x22b.google.com with SMTP id 35so33256710uak.1
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 01:44:02 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cRyTf-0004JL-DI
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:48:59 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:39409 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cRyTe-0004Ic-WF
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:48:55 -0500
+References: <20161214150840.10899-1-alex@alex.org.uk>
+	<e3c30f7c-8d5b-5cfc-1cc0-5e673a30cd8a@virtuozzo.com>
+	<6986E12E-AE0A-4502-BB43-77C4E83C9DC4@alex.org.uk>
+	<dcaf043a-9e76-3be2-1740-e90085928f6a@virtuozzo.com>
+	<5CBA6C86-A5CD-4F88-B8B2-29224BF1223D@alex.org.uk>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <c0608208-de6c-fd41-95d7-e73877f8cdba@virtuozzo.com>
+Date: Fri, 13 Jan 2017 12:48:38 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170113033701.GA1955@amit-lp.rh>
-References: <1483633930-7103-1-git-send-email-amit.shah@redhat.com>
-	<CAFEAcA8nZmDsQvfX+=W3jDJU0rUThsn93fFNYgzxhEyWTx_kHQ@mail.gmail.com>
-	<20170113033701.GA1955@amit-lp.rh>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Jan 2017 09:43:41 +0000
-Message-ID: <CAFEAcA880jLaLFBtmphjV6LEmzvMGNajTbgitzKDnpiPRHpB_g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/4] migration: QTAILQ migration
+In-Reply-To: <5CBA6C86-A5CD-4F88-B8B2-29224BF1223D@alex.org.uk>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amit Shah <amit.shah@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu list <qemu-devel@nongnu.org>, Jianjun Duan <duanj@linux.vnet.ibm.com>
+To: Alex Bligh <alex@alex.org.uk>
+Cc: Wouter Verhelst <w@uter.be>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 13 January 2017 at 03:37, Amit Shah <amit.shah@redhat.com> wrote:
-> On (Fri) 06 Jan 2017 [12:10:22], Peter Maydell wrote:
->> On 5 January 2017 at 16:32, Amit Shah <amit.shah@redhat.com> wrote:
->> > The following changes since commit dbe2b65566e76d3c3a0c3358285c0336ac61e757:
->> >
->> >   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.9-pull-request' into staging (2016-12-28 17:11:11 +0000)
->> >
->> > are available in the git repository at:
->> >
->> >   https://git.kernel.org/pub/scm/virt/qemu/amit/migration.git tags/migration-for-2.9-1
->> >
->> > for you to fetch changes up to 8d0c57697abcc57166e918064d9a7f6c7316d01b:
->> >
->> >   migration: add error_report (2017-01-04 19:21:26 +0530)
->> >
->> > ----------------------------------------------------------------
->> > Migration: migrate QTAILQ infrastructure for vmstate
->> >
->> > ----------------------------------------------------------------
+12.01.2017 16:11, Alex Bligh wrote:
+>> On 12 Jan 2017, at 07:05, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 >>
->> Hi. I'm afraid this fails 'make check' for ppc64be:
+>> Yes this is better. But is it actually needed to force contexts have some safe default? If context wants it may define such default without this requirement.. So, should it be requirement at all?
+> I've changed this to:
 >
-> Hi Peter, since this was due to something else, will you try to pull
-> this in again?  Or should I re-send the series?
+>      of the file), a server MAY reply with a single block status
+>      descriptor with *length* matching the requested length, rather than
+>      reporting the error; in this case the context MAY mandate the
+>      status returned.
+>
+>
 
-I've put it back on my list to process.
+Hmm, I don't understand. So, it MAY mandate and therefore MAY NOT do it? 
+And what client should think, if server replies with one chunk matching 
+the request length and not mandate the status?
 
-thanks
--- PMM
+
+-- 
+Best regards,
+Vladimir
