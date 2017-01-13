@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cS7KU-0004sD-Ki
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:16:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1cS7Vy-0002Fq-W5
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:27:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cS7KT-0004oU-7n
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:16:02 -0500
-References: <1484305370-6220-1-git-send-email-lprosek@redhat.com>
-	<0343b5cd-f2b9-b439-7652-44ab5f05f0c4@redhat.com>
-	<CABdb734ESPhd=354YHCs2AV_jiCj=NwiR-AU0TcWuv0XMDcCaQ@mail.gmail.com>
-	<9d544d44-f41f-e691-ee73-54f9383a13e3@redhat.com>
-	<CABdb735JeFpoXqE1A-V1ih7F3Tbg3KFgs69_ijeyeYf_bo+jBw@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <74186249-fee1-9917-2bf4-50aa240eb114@redhat.com>
-Date: Fri, 13 Jan 2017 14:15:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1cS7Vv-0000jO-PT
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:27:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36842)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cS7Vv-0000jH-Gb
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 14:27:51 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CAF636A6C3
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 19:27:50 +0000 (UTC)
+References: <1484325849-18314-1-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0423b2d9-fa4f-86d5-ae08-b5851301120c@redhat.com>
+Date: Fri, 13 Jan 2017 13:27:48 -0600
 MIME-Version: 1.0
-In-Reply-To: <CABdb735JeFpoXqE1A-V1ih7F3Tbg3KFgs69_ijeyeYf_bo+jBw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ahci: advertise HOST_CAP_64
+In-Reply-To: <1484325849-18314-1-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="b3pJEG9QScmJWjT143L6nJ1xAFuL2Vp4w"
+Subject: Re: [Qemu-devel] [PULL 000/180] QAPI patches for 2017-01-13
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +33,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--b3pJEG9QScmJWjT143L6nJ1xAFuL2Vp4w
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <0423b2d9-fa4f-86d5-ae08-b5851301120c@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 000/180] QAPI patches for 2017-01-13
+References: <1484325849-18314-1-git-send-email-armbru@redhat.com>
+In-Reply-To: <1484325849-18314-1-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/13/2017 10:44 AM, Markus Armbruster wrote:
+> This is Marc-Andr=C3=A9's "[PATCH v8 00/21] qapi doc generation (whole
+> version, squashed)" with a few commit messages tweaked, and "[PATCH v8
+> 14/21] (SQUASHED) move doc to schema" unsquashed into 161 patches.
+>=20
+> We did all the respins with in this squashed form to reduce noise.
+> However, since the unsquashed form is better suited for review, and
+> probably nicer if we have to revisit this part of the work down the
+> road, I'm proposing to merge this unsquashed.
+>=20
+> If you want me to post the unsquashed patches, I'm happy to redo this
+> pull request.
+>=20
+> If you'd rather pull the squashed version, likewise.
+>=20
+> I'm afraid this is a bit of a doc conflict magnet.  The sooner we can
+> get it in, the easier for Marc-Andr=C3=A9 and me.
+
+Indeed - there's already a merge conflict with commit e1ff3c6, which
+landed between the time you created the pull request and now.
+
+Also, in trying to merge your branch locally, I get a rejection message
+from my git hooks:
+
+$ git commit
+tests/qapi-schema/comments.out:7: new blank line at EOF.
+tests/qapi-schema/event-case.out:8: new blank line at EOF.
+tests/qapi-schema/ident-with-escape.out:10: new blank line at EOF.
+tests/qapi-schema/include-relpath.out:7: new blank line at EOF.
+tests/qapi-schema/include-repetition.out:7: new blank line at EOF.
+tests/qapi-schema/include-simple.out:7: new blank line at EOF.
+tests/qapi-schema/indented-expr.out:13: new blank line at EOF.
+tests/qapi-schema/qapi-schema-test.out:446: new blank line at EOF.
+
+Worth respinning to fix those issues?
+
+>       qmp-commands: move 'query-memdev' doc to schema
+
+This one is the conflict with current master.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
+--b3pJEG9QScmJWjT143L6nJ1xAFuL2Vp4w
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 01/13/2017 02:01 PM, Ladi Prosek wrote:
-> On Fri, Jan 13, 2017 at 7:31 PM, John Snow <jsnow@redhat.com> wrote:
->>
->>
->> On 01/13/2017 01:12 PM, Ladi Prosek wrote:
->>> On Fri, Jan 13, 2017 at 6:23 PM, John Snow <jsnow@redhat.com> wrote:
->>>> On 01/13/2017 06:02 AM, Ladi Prosek wrote:
->>>>> The AHCI emulation code supports 64-bit addressing and should advertise this
->>>>> fact in the Host Capabilities register. Both Linux and Windows drivers test
->>>>> this bit to decide if the upper 32 bits of various registers may be written
->>>>> to, and at least some versions of Windows have a bug where DMA is attempted
->>>>> with an address above 4GB but, in the absence of HOST_CAP_64, the upper 32
->>>>> bits are left unititialized which leads to a memory corruption.
->>>>>
->>>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
->>>>> ---
->>>>>  hw/ide/ahci.c | 2 +-
->>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
->>>>> index 3c19bda..6a17acf 100644
->>>>> --- a/hw/ide/ahci.c
->>>>> +++ b/hw/ide/ahci.c
->>>>> @@ -488,7 +488,7 @@ static void ahci_reg_init(AHCIState *s)
->>>>>      s->control_regs.cap = (s->ports - 1) |
->>>>>                            (AHCI_NUM_COMMAND_SLOTS << 8) |
->>>>>                            (AHCI_SUPPORTED_SPEED_GEN1 << AHCI_SUPPORTED_SPEED) |
->>>>> -                          HOST_CAP_NCQ | HOST_CAP_AHCI;
->>>>> +                          HOST_CAP_NCQ | HOST_CAP_AHCI | HOST_CAP_64;
->>>>>
->>>>>      s->control_regs.impl = (1 << s->ports) - 1;
->>>>>
->>>>>
->>>>
->>>> Was this tested? What was the use case that prompted this patch, and do
->>>> you have a public bugzilla to point to?
->>>
->>> Sorry, I thought you were aware. Here's the BZ with details:
->>> https://bugzilla.redhat.com/show_bug.cgi?id=1411105
->>>
->>
->> It's for the public record :)
->>
->> I'm going to amend your commit message, OK?
->>
->> https://github.com/jnsnow/qemu/commit/f037be92fc0c4580b846134e0355a69d0eccd0d9
-> 
-> Minor nit: the OS we know for sure is affected is Windows Server 2008,
-> without the "R2". Thanks!
-> 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-I misunderstood. It looked like the initial report was for "SP2," though
-I see you saying that the R2 version actually worked okay, but by
-coincidence.
+iQEcBAEBCAAGBQJYeSo0AAoJEKeha0olJ0NqnZ4H/2mbOeNjoasy8R84zieduK43
+sy1hiTSuJ5gGxU2TO/xngF9focS0OYAjwGa/I152e5pS5AAP7rqaB0ewyFyXHv6k
+UsUT4P4oiErCvX3mDswb+zsPOPXB/lObWltkMPkDDTf59Q42DhyEq5arsFbhkdLq
++CyQTiYLyiCTuxaTizC0bvVSW5CHZJVSb5pLid5YV2pTFOvqHla/M7csNv14OGIa
+xvguzaB6L2X9fN6MiTnfXVvubSGhXZfwZkbDeOISymu8rOiEHDv2Aq2WJsZMwKNY
+MXeNFi6EHsPzx1Y/UYhiT1eSfKjGpWza6lROENTXorcPBmyfQH8LZA4AHCucNyM=
+=xj5r
+-----END PGP SIGNATURE-----
 
-I didn't think there *was* an "SP2," for Windows Server, so I
-interpreted that to mean R2.
-
-So this only manifests with vanilla 2008?
-
->>> In short, Windows guests run into issues in certain virtual HW
->>> configurations if the bit is not set. I have tested the patch and
->>> verified that it fixes the failing cases.
->>>
->>
->> Great. I'm CCing qemu-stable as this should probably be included in
->> 2.7.2 / 2.8.1 / etc.
->>
->>>> It looks correct via the spec, thank you for finding this oversight. It
->>>> looks like everywhere this bit would make a difference we already do the
->>>> correct thing for having this bit set.
->>>>
->>>> From what I can gather from the spec, it looks as if even 32bit guests
->>>> must ensure that the upper 32bit registers are cleared, so I think we're
->>>> all set here.
->>>>
->>>> Reviewed-by: John Snow <jsnow@redhat.com>
->>
->> Thanks, applied to my IDE tree:
->>
->> https://github.com/jnsnow/qemu/commits/ide
->> https://github.com/jnsnow/qemu.git
->>
->> --js
+--b3pJEG9QScmJWjT143L6nJ1xAFuL2Vp4w--
