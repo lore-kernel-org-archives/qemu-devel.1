@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cRx8a-0004MP-5Y
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:23:05 -0500
+	(envelope-from <bounces@canonical.com>) id 1cRxBO-0005l7-0s
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cRx8W-0003T1-6p
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:23:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60730)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cRx8W-0003Sq-0d
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:23:00 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1484291524-1261-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-Date: Fri, 13 Jan 2017 09:22:56 +0100
-In-Reply-To: <1484291524-1261-1-git-send-email-caoj.fnst@cn.fujitsu.com> (Cao
-	jin's message of "Fri, 13 Jan 2017 15:11:54 +0800")
-Message-ID: <87a8av4bdr.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1cRxBK-000642-2X
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:25:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48334)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cRxBJ-00062o-SH
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:25:53 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cRxBH-0002D5-Aa
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 08:25:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 45B752E80BF
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 08:25:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v8 00/10] Convert msix_init() to error
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 13 Jan 2017 08:10:14 -0000
+From: Thomas Huth <893068@bugs.launchpad.net>
+Reply-To: Bug 893068 <893068@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20111121114443.4682.78512.malonedeb@soybean.canonical.com>
+Message-Id: <20170113081014.14126.17791.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 893068] Re: Spanish keys { and [ did not work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, Jiri Pirko <jiri@resnulli.us>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Hannes Reinecke <hare@suse.de>, Dmitry Fleytman <dmitry@daynix.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
 
-Cao jin <caoj.fnst@cn.fujitsu.com> writes:
+Triaging old bug tickets ... can you still reproduce this problem with
+the latest version of QEMU (currently version 2.8)?
 
-> Only a tiny modification in patch "megasas: remove unnecessary
-> megasas_use_msix()" to fix a megasas issue.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Please have a look at Michael's review in
-Message-ID: <20170112163519-mutt-send-email-mst@kernel.org>
+-- =
 
-> v8 changelog:
-> 1. reorder: place the "megasas: remove unnecessary megasas_use_msix()"
->    as the last one. and fix the bug in it, detailed description in it,
->    also removed the R-b of it.
-> 2. Add the Acked-by from Marcel for first 9 patches; add the R-b from Markus
->    to "hcd-xhci: check & correct param before using it".
->
-> Test:
-> 1. make check ok
-> 2. command line test for all affected device, make sure their realization
->    is ok.
-> 3. detailed test for megasas, hcd-xhci, vmxnet3.
->    megasas: install a linux distro is ok
->    ./qemu-system-x86_64 --enable-kvm -m 1024
->    -device megasas,id=scsi0,bus=pci.0
->    -drive file=/xx/scsi-disk.img,if=none,id=drive-scsi0
->    -device scsi-disk,bus=scsi0.0,channel=0,scsi-id=4,lun=0,drive=drive-scsi0,id=scsi0-4
->    -cdrom /xx/Fedora-Server-DVD-x86_64-23.iso --monitor stdio
->
->    hcd-xhci: partition the usbstick.img, mkfs, write to file, is ok
->    ./qemu-system-x86_64 -M q35 -m 1024 --enable-kvm
->    -drive if=none,id=usbstick,file=/xx/usbstick.img
->    -device nec-usb-xhci,id=usb,p2=8,p3=8,bus=pcie.0
->    -device usb-storage,bus=usb.0,drive=usbstick --monitor stdio
->    /xx/FedoraWorkStatsion23-x86_64.img
->
->    vmxnet3: ping another destination belongs to host's network is ok.
->    But no migration test, because I don't have a spare machine for now.
->    ./qemu-system-x86_64 -M q35 -m 1024 --enable-kvm
->    -netdev tap,id=mynet0 -device vmxnet3,netdev=mynet0
->    --monitor stdio /home/pino/vm/FedoraWorkStatsion23-x86_64.img
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/893068
 
-You could migrate to a new QEMU on the same machine.
+Title:
+  Spanish keys { and [ did not work
 
-Or, if you don't want to deal with two instances of QEMU running at the
-same time, migrate to file:
+Status in QEMU:
+  Incomplete
 
-    (qemu) migrate "exec:cat >zzz"
+Bug description:
+  The keys { and [ did not work inside the virtualized enviorment
+  (widnows 7).  The problems happens ussing aqemu as a front end as well
+  as invoking qemu-kvm from command line:
 
-Start the target with -incoming "exec:cat zzz".  Better than nothing.
+  qemu-kvm -m 8096 eclipse.img -smp cores=3D4,threads=3D2 -hdb ander.img -k
+  es
+
+  We have also notices this warning in the console:
+
+  Warning: no scancode found for keysym 314
+
+  The host system is gentoo stable with some exceptions (mainly qemu-
+  kvm-0.15.1-r1, gcc-4.6.2 and kernel-3.2_rc2)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/893068/+subscriptions
