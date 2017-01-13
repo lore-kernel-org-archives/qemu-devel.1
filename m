@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cardoe@cardoe.com>) id 1cS3aA-0003Zu-ON
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:15:59 -0500
+	(envelope-from <mlureau@redhat.com>) id 1cS3hw-0000tv-2V
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:24:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cardoe@cardoe.com>) id 1cS3a7-0002ct-Hh
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:15:58 -0500
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:34144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cardoe@cardoe.com>) id 1cS3a7-0002cG-DW
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:15:55 -0500
-Received: by mail-io0-x241.google.com with SMTP id c80so5859441iod.1
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 07:15:55 -0800 (PST)
-References: <20170112114612.14520-1-stefanha@redhat.com>
-	<fc5de032-a64b-b072-6e52-441b6a685ee3@cardoe.com>
-	<20170113120240.GB9142@stefanha-x1.localdomain>
-From: Doug Goldstein <cardoe@cardoe.com>
-Message-ID: <75cb767b-2850-4a87-50fc-d957e3a793ac@cardoe.com>
-Date: Fri, 13 Jan 2017 09:15:49 -0600
+	(envelope-from <mlureau@redhat.com>) id 1cS3hr-0006t3-6U
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:24:00 -0500
+Received: from mx4-phx2.redhat.com ([209.132.183.25]:42539)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cS3hq-0006sG-To
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:23:55 -0500
+Date: Fri, 13 Jan 2017 10:23:54 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
+Message-ID: <724848068.2316978.1484321034557.JavaMail.zimbra@redhat.com>
+In-Reply-To: <fc5e4f20-9ea2-fe8b-eafc-3b35aa4e9aa4@redhat.com>
+References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
+	<20170111172956.11255-19-marcandre.lureau@redhat.com>
+	<fc5e4f20-9ea2-fe8b-eafc-3b35aa4e9aa4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170113120240.GB9142@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="FhIwJuh8H9BVhvvWHwpnxHkNun68DTGfA"
-Subject: Re: [Qemu-devel] [PATCH 0/2] virtio: revert
- virtio_queue_set_notification() nesting
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 18/40] char: remove class kind field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,92 +28,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FhIwJuh8H9BVhvvWHwpnxHkNun68DTGfA
-From: Doug Goldstein <cardoe@cardoe.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <75cb767b-2850-4a87-50fc-d957e3a793ac@cardoe.com>
-Subject: Re: [PATCH 0/2] virtio: revert virtio_queue_set_notification()
- nesting
-References: <20170112114612.14520-1-stefanha@redhat.com>
- <fc5de032-a64b-b072-6e52-441b6a685ee3@cardoe.com>
- <20170113120240.GB9142@stefanha-x1.localdomain>
-In-Reply-To: <20170113120240.GB9142@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 1/13/17 6:02 AM, Stefan Hajnoczi wrote:
-> On Thu, Jan 12, 2017 at 10:57:53AM -0600, Doug Goldstein wrote:
->> On 1/12/17 5:46 AM, Stefan Hajnoczi wrote:
->>> The virtio_queue_set_notification() nesting introduced for AioContext=
- polling
->>> raised an assertion with virtio-net (even in non-polling mode).  Conv=
-erting
->>> virtio-net and virtio-crypto to use virtio_queue_set_notification() i=
-n a
->>> nesting fashion would be invasive and isn't worth it.
->>>
->>> Patch 1 contains the revert to resolve the bug that Doug noticed.
->>>
->>> Patch 2 is a less efficient but safe alternative.
->>>
->>> Stefan Hajnoczi (2):
->>>   Revert "virtio: turn vq->notification into a nested counter"
->>>   virtio: disable notifications again after poll succeeded
->>>
->>>  hw/virtio/virtio.c | 21 +++++++++------------
->>>  1 file changed, 9 insertions(+), 12 deletions(-)
->>>
->>
->> So I just gave this series a whirl and it fixes the assert but causes
->> another issue for me. While iPXE is getting a DHCP address the screen
->> immediately flashes over to the UEFI shell. Its like a timeout is
->> getting hit and just dropping me to the shell.
+----- Original Message -----
+> On 01/11/2017 11:29 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > The class kind is necessary to lookup the chardev name in
+> > qmp_chardev_add() after calling qemu_chr_new_from_opts() and to set
+> > the appropriate ChardevBackend (mainly to free the right
+> > fields).
+> >=20
+> > qemu_chr_new_from_opts() can be changed to use a non-qmp function
+> > using the chardev class typename. Introduce qemu_chardev_add() to be
+> > called from qemu_chr_new_from_opts() and remove the class chardev kind
+> > field. Set the backend->type in the parse callback (when non-common
+> > fields are added).
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
 >=20
-> Sounds like an separate problem.
+> > =20
+> > +static Chardev *qemu_chardev_add(const char *id, const char *typename,
+> > +                                 ChardevBackend *backend, Error **errp=
+)
+> > +{
+> > +    Chardev *chr;
+> > +
+> > +    chr =3D qemu_chr_find(id);
+> > +    if (chr) {
+> > +        error_setg(errp, "Chardev '%s' already exists", id);
+> > +        return NULL;
+> > +    }
+> > +
+> > +    chr =3D qemu_chardev_new(id, typename, backend, errp);
+> > +    if (!chr) {
+> > +        return NULL;
+> > +    }
+> > +
+> > +    QTAILQ_INSERT_TAIL(&chardevs, chr, next);
+> > +    return chr;
+> > +}
+> > +
 >=20
-> Stefan
+> This part seems okay.
 >=20
+> > @@ -4222,22 +4235,22 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+> > =20
+> >      cc =3D char_get_class(name, errp);
+> >      if (cc =3D=3D NULL) {
+> > -        goto err;
+> > +        return NULL;
+> >      }
+> > =20
+> >      backend =3D g_new0(ChardevBackend, 1);
+> > +    backend->type =3D CHARDEV_BACKEND_KIND_NULL;
+> > =20
+> >      if (qemu_opt_get_bool(opts, "mux", 0)) {
+> >          bid =3D g_strdup_printf("%s-base", id);
+> >      }
+> > =20
+> >      chr =3D NULL;
+> > -    backend->type =3D cc->kind;
+>=20
+> I'm not sure I follow this hunk - we used to set backend->type
+> dynamically and now it is forced to KIND_NULL.  Is the point that we
+> don't need to set backend->type here because the later call to
+> qemu_chardev_add()...
 
-Is there any debug output that I can provide to help troubleshoot it?
-I've built 23425cc and UEFI via OVMF is able to get an IP address via
-DHCP inside of iPXE. I've also taken master and only applied the first
-patch in this series (the revert) and it too works. Its only when I add
-the 2nd patch into the mix or don't revert out the "virtio: turn
-vq->notification into a nested counter" patch that it fails.
+I tried to explain some of the reasons in the commit message.
 
---=20
-Doug Goldstein
+We need backend->type to be set correctly for the qapi_free_ChardevBackend(=
+) to work. The kind field used to be on a class member, but we try to get r=
+id of it. So we move that information to _parse(), and change the backend t=
+ype appropriately there.
 
+KIND_NULL is the common backend (sharing ChardevCommon).
 
---FhIwJuh8H9BVhvvWHwpnxHkNun68DTGfA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>=20
+> > @@ -4245,37 +4258,33 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+> >          backend->u.null.data =3D ccom; /* Any ChardevCommon member wou=
+ld
+> >          work */
+> >      }
+> > =20
+> > -    ret =3D qmp_chardev_add(bid ? bid : id, backend, errp);
+> > -    if (!ret) {
+> > -        goto qapi_out;
+> > +    chr =3D qemu_chardev_add(bid ? bid : id,
+> > +                           object_class_get_name(OBJECT_CLASS(cc)),
+> > +                           backend, errp);
+>=20
+> ...now passes the Object type which can be used to derive the same same
+> information?  In that case, was the assignment to backend->type =3D
+> KIND_NULL dead?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG/MacGPG2 v2.0
+0 is KIND_FILE, which would lead to invalid free.
+=20
+> > +    if (chr =3D=3D NULL) {
+> > +        goto out;
+> >      }
+> > =20
+> >      if (bid) {
+> > +        Chardev *mux;
+> >          qapi_free_ChardevBackend(backend);
+> > -        qapi_free_ChardevReturn(ret);
+> >          backend =3D g_new0(ChardevBackend, 1);
+> > -        backend->u.mux.data =3D g_new0(ChardevMux, 1);
+> >          backend->type =3D CHARDEV_BACKEND_KIND_MUX;
+> > +        backend->u.mux.data =3D g_new0(ChardevMux, 1);
+>=20
+> Why the churn on the assignment to backend->u.mux.data?
 
-iQJ8BAEBCgBmBQJYeO8oXxSAAAAAAC4AKGlzc3Vlci1mcHJAbm90YXRpb25zLm9w
-ZW5wZ3AuZmlmdGhob3JzZW1hbi5uZXRBNTM5MEQ2RTNFMTkyNzlCNzVDMzIwOTVB
-MkJDMDNEQzg3RUQxQkQ0AAoJEKK8A9yH7RvUDgMP+wSCXYrUePTvXApn9cYH72dl
-1TEKY6WZ9XIggvhXEY5Bs8vVuUC8UzZMYooQASwKtGJuS/UG2eSvsBy906G5/I35
-wxF7dKyT7u1JeDSu0xpnqV/w+4Tp2Zu9leez12XYvu1Wi3ZQfnregKl0fnEBOgDI
-2x4HZtIiiI+3jmGSWchU/qEXNiX25NoHvizD9jFwcedG/Ymbi0NkKPi2V+GPhgI4
-Xv4OeaaGwuDU7W8JjnkXEJ11MM/aU5JzT9qVj8scSeyiputf4pJfkp2lP7ybvIi2
-Og9M3CvPSGL08wX3o8sZrmyEQZj5VVdRtSHZnYGyJCPW8mr4i01UJo4Ldd5dfbPS
-0nAw92xY6+Cjn1udvPPmJUoIE94EeryHxUdV9VLQ23ohEyAc1Lvcq7tL9ulpZKoU
-1vlF81/V0rxIbfaiplw4ZeMacj7MFkBeFirzB/yDKiCvOa80D5fOQ38QdVLLIddb
-0kl0EmB3rGTeVWMwyFdnjW+TmMGZ3pVQGWzM1sVZIQcg6vrTWOteh9aHaFXmQ5d3
-hBxSBgynftsOoDQxQHL72SGvmw9aWBbb+1r38GIeKoCCKXw785polLc8Y6aCbdUB
-9F21b0H2rTS7He7mmTkNuBE6nlqKSv4hf1wzFAkd5o0ohILD9fQrjXHJlI+gDjlT
-MdZy4gm6M9q/AwogV+8d
-=FhkZ
------END PGP SIGNATURE-----
+fixed
 
---FhIwJuh8H9BVhvvWHwpnxHkNun68DTGfA--
+>=20
+> >          backend->u.mux.data->chardev =3D g_strdup(bid);
+> > -        ret =3D qmp_chardev_add(id, backend, errp);
+> > -        if (!ret) {
+> > -            chr =3D qemu_chr_find(bid);
+> > +        mux =3D qemu_chardev_add(id, TYPE_CHARDEV_MUX, backend, errp);
+> > +        if (mux =3D=3D NULL) {
+> >              qemu_chr_delete(chr);
+> >              chr =3D NULL;
+> > -            goto qapi_out;
+> > +            goto out;
+> >          }
+> > +        chr =3D mux;
+> >      }
+> > =20
+> > -    chr =3D qemu_chr_find(id);
+> > -
+> > -qapi_out:
+> > +out:
+> >      qapi_free_ChardevBackend(backend);
+> > -    qapi_free_ChardevReturn(ret);
+> >      g_free(bid);
+> >      return chr;
+> > -
+> > -err:
+> > -    return NULL;
+> >  }
+> > =20
+>=20
+> > @@ -5010,24 +5014,18 @@ Chardev *qemu_chardev_new(const char *id, const
+> > char *typename,
+> >  ChardevReturn *qmp_chardev_add(const char *id, ChardevBackend *backend=
+,
+> >                                 Error **errp)
+> >  {
+> > -    const ChardevClass *cc;
+> >      ChardevReturn *ret;
+> > +    const ChardevClass *cc;
+>=20
+> Why the churn on this declaration?
+
+sorry, too many rebases, conflicts.. fixed
+
+>=20
+> >      Chardev *chr;
+> > =20
+> > -    chr =3D qemu_chr_find(id);
+> > -    if (chr) {
+> > -        error_setg(errp, "Chardev '%s' already exists", id);
+> > -        return NULL;
+> > -    }
+> > -
+> >      cc =3D char_get_class(ChardevBackendKind_lookup[backend->type], er=
+rp);
+> > -    if (!cc) {
+> > +    if (cc =3D=3D NULL) {
+>=20
+> Why the churn on this conditional?
+>=20
+> >          return NULL;
+> >      }
+> > =20
+> > -    chr =3D qemu_chardev_new(id, object_class_get_name(OBJECT_CLASS(cc=
+)),
+> > +    chr =3D qemu_chardev_add(id, object_class_get_name(OBJECT_CLASS(cc=
+)),
+> >                             backend, errp);
+> > -    if (!chr) {
+> > +    if (chr =3D=3D NULL) {
+>=20
+> and again
+>=20
+>=20
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+>=20
+>=20
