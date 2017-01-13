@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1jp-0007da-6o
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1jp-0007dJ-0t
 	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1jm-0002bN-Uh
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1jm-0002bE-4F
 	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:49 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33804)
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36312)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cS1jm-0002b5-Kp
+	id 1cS1jl-0002Ze-Qd
 	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:46 -0500
-Received: by mail-wm0-x243.google.com with SMTP id c85so11552019wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 05:17:46 -0800 (PST)
+Received: by mail-wm0-x244.google.com with SMTP id r126so11633605wmr.3
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 05:17:45 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 13 Jan 2017 14:17:27 +0100
-Message-Id: <20170113131731.1246-13-pbonzini@redhat.com>
+Date: Fri, 13 Jan 2017 14:17:26 +0100
+Message-Id: <20170113131731.1246-12-pbonzini@redhat.com>
 In-Reply-To: <20170113131731.1246-1-pbonzini@redhat.com>
 References: <20170113131731.1246-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/16] block: explicitly acquire aiocontext in
- bottom halves that need it
+Subject: [Qemu-devel] [PATCH 11/16] block: explicitly acquire aiocontext in
+ callbacks that need it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,527 +31,486 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, stefanha@redhat.com
 
+This covers both file descriptor callbacks and polling callbacks,
+since they execute related code.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- async.c               |  4 ++--
- block/archipelago.c   |  3 +++
- block/blkdebug.c      |  9 +--------
- block/blkreplay.c     |  2 +-
- block/block-backend.c |  6 ++++++
- block/curl.c          | 26 ++++++++++++++++++--------
- block/gluster.c       |  9 +--------
- block/io.c            |  6 +++++-
- block/iscsi.c         |  6 +++++-
- block/linux-aio.c     | 15 +++++++++------
- block/nfs.c           |  3 ++-
- block/null.c          |  4 ++++
- block/qed.c           |  3 +++
- block/rbd.c           |  4 ++++
- dma-helpers.c         |  2 ++
- hw/block/virtio-blk.c |  2 ++
- hw/scsi/scsi-bus.c    |  2 ++
- thread-pool.c         |  2 ++
- 18 files changed, 72 insertions(+), 36 deletions(-)
+ aio-posix.c           |  7 -------
+ aio-win32.c           |  6 ------
+ block/curl.c          | 16 +++++++++++++---
+ block/iscsi.c         |  4 ++++
+ block/linux-aio.c     |  4 ++++
+ block/nfs.c           |  6 ++++++
+ block/sheepdog.c      | 29 +++++++++++++++--------------
+ block/ssh.c           | 29 +++++++++--------------------
+ block/win32-aio.c     | 10 ++++++----
+ hw/block/virtio-blk.c |  5 ++++-
+ hw/scsi/virtio-scsi.c |  6 ++++++
+ nbd/server.c          |  4 ++++
+ 12 files changed, 71 insertions(+), 55 deletions(-)
 
-diff --git a/async.c b/async.c
-index ccb70e7..0243ca9 100644
---- a/async.c
-+++ b/async.c
-@@ -113,9 +113,7 @@ int aio_bh_poll(AioContext *ctx)
-                 ret = 1;
-             }
-             bh->idle = 0;
+diff --git a/aio-posix.c b/aio-posix.c
+index 8d79cf3..6beebcd 100644
+--- a/aio-posix.c
++++ b/aio-posix.c
+@@ -402,9 +402,7 @@ static bool aio_dispatch_handlers(AioContext *ctx)
+             (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) &&
+             aio_node_check(ctx, node->is_external) &&
+             node->io_read) {
 -            aio_context_acquire(ctx);
-             aio_bh_call(bh);
+             node->io_read(node->opaque);
 -            aio_context_release(ctx);
+ 
+             /* aio_notify() does not count as progress */
+             if (node->opaque != &ctx->notifier) {
+@@ -415,9 +413,7 @@ static bool aio_dispatch_handlers(AioContext *ctx)
+             (revents & (G_IO_OUT | G_IO_ERR)) &&
+             aio_node_check(ctx, node->is_external) &&
+             node->io_write) {
+-            aio_context_acquire(ctx);
+             node->io_write(node->opaque);
+-            aio_context_release(ctx);
+             progress = true;
          }
-         if (bh->deleted) {
-             deleted = true;
-@@ -388,7 +386,9 @@ static void co_schedule_bh_cb(void *opaque)
-         Coroutine *co = QSLIST_FIRST(&straight);
-         QSLIST_REMOVE_HEAD(&straight, co_scheduled_next);
-         trace_aio_co_schedule_bh_cb(ctx, co);
-+        aio_context_acquire(ctx);
-         qemu_coroutine_enter(co);
-+        aio_context_release(ctx);
+ 
+@@ -617,10 +613,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
+         start = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+     }
+ 
+-    aio_context_acquire(ctx);
+     progress = try_poll_mode(ctx, blocking);
+-    aio_context_release(ctx);
+-
+     if (!progress) {
+         assert(npfd == 0);
+ 
+diff --git a/aio-win32.c b/aio-win32.c
+index 810e1c6..20b63ce 100644
+--- a/aio-win32.c
++++ b/aio-win32.c
+@@ -266,9 +266,7 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
+             (revents || event_notifier_get_handle(node->e) == event) &&
+             node->io_notify) {
+             node->pfd.revents = 0;
+-            aio_context_acquire(ctx);
+             node->io_notify(node->e);
+-            aio_context_release(ctx);
+ 
+             /* aio_notify() does not count as progress */
+             if (node->e != &ctx->notifier) {
+@@ -280,15 +278,11 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
+             (node->io_read || node->io_write)) {
+             node->pfd.revents = 0;
+             if ((revents & G_IO_IN) && node->io_read) {
+-                aio_context_acquire(ctx);
+                 node->io_read(node->opaque);
+-                aio_context_release(ctx);
+                 progress = true;
+             }
+             if ((revents & G_IO_OUT) && node->io_write) {
+-                aio_context_acquire(ctx);
+                 node->io_write(node->opaque);
+-                aio_context_release(ctx);
+                 progress = true;
+             }
+ 
+diff --git a/block/curl.c b/block/curl.c
+index 65e6da1..05b9ca3 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -386,9 +386,8 @@ static void curl_multi_check_completion(BDRVCURLState *s)
      }
  }
  
-diff --git a/block/archipelago.c b/block/archipelago.c
-index 2449cfc..a624390 100644
---- a/block/archipelago.c
-+++ b/block/archipelago.c
-@@ -310,8 +310,11 @@ static void qemu_archipelago_complete_aio(void *opaque)
+-static void curl_multi_do(void *arg)
++static void curl_multi_do_locked(CURLState *s)
  {
-     AIORequestData *reqdata = (AIORequestData *) opaque;
-     ArchipelagoAIOCB *aio_cb = (ArchipelagoAIOCB *) reqdata->aio_cb;
-+    AioContext *ctx = bdrv_get_aio_context(aio_cb->common.bs);
+-    CURLState *s = (CURLState *)arg;
+     CURLSocket *socket, *next_socket;
+     int running;
+     int r;
+@@ -406,12 +405,23 @@ static void curl_multi_do(void *arg)
+     }
+ }
  
-+    aio_context_acquire(ctx);
-     aio_cb->common.cb(aio_cb->common.opaque, aio_cb->ret);
-+    aio_context_release(ctx);
-     aio_cb->status = 0;
++static void curl_multi_do(void *arg)
++{
++    CURLState *s = (CURLState *)arg;
++
++    aio_context_acquire(s->s->aio_context);
++    curl_multi_do_locked(s);
++    aio_context_release(s->s->aio_context);
++}
++
+ static void curl_multi_read(void *arg)
+ {
+     CURLState *s = (CURLState *)arg;
  
-     qemu_aio_unref(aio_cb);
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index acccf85..259369d 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -405,12 +405,6 @@ out:
+-    curl_multi_do(arg);
++    aio_context_acquire(s->s->aio_context);
++    curl_multi_do_locked(s);
+     curl_multi_check_completion(s->s);
++    aio_context_release(s->s->aio_context);
+ }
+ 
+ static void curl_multi_timeout_do(void *arg)
+diff --git a/block/iscsi.c b/block/iscsi.c
+index e1f10d6..54d1381 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -394,8 +394,10 @@ iscsi_process_read(void *arg)
+     IscsiLun *iscsilun = arg;
+     struct iscsi_context *iscsi = iscsilun->iscsi;
+ 
++    aio_context_acquire(iscsilun->aio_context);
+     iscsi_service(iscsi, POLLIN);
+     iscsi_set_events(iscsilun);
++    aio_context_release(iscsilun->aio_context);
+ }
+ 
+ static void
+@@ -404,8 +406,10 @@ iscsi_process_write(void *arg)
+     IscsiLun *iscsilun = arg;
+     struct iscsi_context *iscsi = iscsilun->iscsi;
+ 
++    aio_context_acquire(iscsilun->aio_context);
+     iscsi_service(iscsi, POLLOUT);
+     iscsi_set_events(iscsilun);
++    aio_context_release(iscsilun->aio_context);
+ }
+ 
+ static int64_t sector_lun2qemu(int64_t sector, IscsiLun *iscsilun)
+diff --git a/block/linux-aio.c b/block/linux-aio.c
+index 03ab741..277c016 100644
+--- a/block/linux-aio.c
++++ b/block/linux-aio.c
+@@ -251,7 +251,9 @@ static void qemu_laio_completion_cb(EventNotifier *e)
+     LinuxAioState *s = container_of(e, LinuxAioState, e);
+ 
+     if (event_notifier_test_and_clear(&s->e)) {
++        aio_context_acquire(s->aio_context);
+         qemu_laio_process_completions_and_submit(s);
++        aio_context_release(s->aio_context);
+     }
+ }
+ 
+@@ -265,7 +267,9 @@ static bool qemu_laio_poll_cb(void *opaque)
+         return false;
+     }
+ 
++    aio_context_acquire(s->aio_context);
+     qemu_laio_process_completions_and_submit(s);
++    aio_context_release(s->aio_context);
+     return true;
+ }
+ 
+diff --git a/block/nfs.c b/block/nfs.c
+index a564340..803faf9 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -207,15 +207,21 @@ static void nfs_set_events(NFSClient *client)
+ static void nfs_process_read(void *arg)
+ {
+     NFSClient *client = arg;
++
++    aio_context_acquire(client->aio_context);
+     nfs_service(client->context, POLLIN);
+     nfs_set_events(client);
++    aio_context_release(client->aio_context);
+ }
+ 
+ static void nfs_process_write(void *arg)
+ {
+     NFSClient *client = arg;
++
++    aio_context_acquire(client->aio_context);
+     nfs_service(client->context, POLLOUT);
+     nfs_set_events(client);
++    aio_context_release(client->aio_context);
+ }
+ 
+ static void nfs_co_init_task(BlockDriverState *bs, NFSRPC *task)
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index f757157..32c4e4c 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -575,13 +575,6 @@ static coroutine_fn int send_co_req(int sockfd, SheepdogReq *hdr, void *data,
      return ret;
  }
  
--static void error_callback_bh(void *opaque)
+-static void restart_co_req(void *opaque)
 -{
 -    Coroutine *co = opaque;
+-
 -    qemu_coroutine_enter(co);
 -}
 -
- static int inject_error(BlockDriverState *bs, BlkdebugRule *rule)
- {
-     BDRVBlkdebugState *s = bs->opaque;
-@@ -423,8 +417,7 @@ static int inject_error(BlockDriverState *bs, BlkdebugRule *rule)
-     }
+ typedef struct SheepdogReqCo {
+     int sockfd;
+     BlockDriverState *bs;
+@@ -592,12 +585,19 @@ typedef struct SheepdogReqCo {
+     unsigned int *rlen;
+     int ret;
+     bool finished;
++    Coroutine *co;
+ } SheepdogReqCo;
  
-     if (!immediately) {
--        aio_bh_schedule_oneshot(bdrv_get_aio_context(bs), error_callback_bh,
--                                qemu_coroutine_self());
-+        aio_co_schedule(bdrv_get_aio_context(bs), qemu_coroutine_self());
-         qemu_coroutine_yield();
-     }
- 
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index a741654..cfc8c5b 100755
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -60,7 +60,7 @@ static int64_t blkreplay_getlength(BlockDriverState *bs)
- static void blkreplay_bh_cb(void *opaque)
- {
-     Request *req = opaque;
--    qemu_coroutine_enter(req->co);
-+    aio_co_wake(req->co);
-     qemu_bh_delete(req->bh);
-     g_free(req);
- }
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 1177598..bfc0e6b 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -939,9 +939,12 @@ int blk_make_zero(BlockBackend *blk, BdrvRequestFlags flags)
- static void error_callback_bh(void *opaque)
- {
-     struct BlockBackendAIOCB *acb = opaque;
-+    AioContext *ctx = bdrv_get_aio_context(acb->common.bs);
- 
-     bdrv_dec_in_flight(acb->common.bs);
-+    aio_context_acquire(ctx);
-     acb->common.cb(acb->common.opaque, acb->ret);
-+    aio_context_release(ctx);
-     qemu_aio_unref(acb);
- }
- 
-@@ -983,9 +986,12 @@ static void blk_aio_complete(BlkAioEmAIOCB *acb)
- static void blk_aio_complete_bh(void *opaque)
- {
-     BlkAioEmAIOCB *acb = opaque;
-+    AioContext *ctx = bdrv_get_aio_context(acb->common.bs);
- 
-     assert(acb->has_returned);
-+    aio_context_acquire(ctx);
-     blk_aio_complete(acb);
-+    aio_context_release(ctx);
- }
- 
- static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
-diff --git a/block/curl.c b/block/curl.c
-index 05b9ca3..f3f063b 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -796,13 +796,18 @@ static void curl_readv_bh_cb(void *p)
- {
-     CURLState *state;
-     int running;
-+    int ret = -EINPROGRESS;
- 
-     CURLAIOCB *acb = p;
--    BDRVCURLState *s = acb->common.bs->opaque;
-+    BlockDriverState *bs = acb->common.bs;
-+    BDRVCURLState *s = bs->opaque;
-+    AioContext *ctx = bdrv_get_aio_context(bs);
- 
-     size_t start = acb->sector_num * BDRV_SECTOR_SIZE;
-     size_t end;
- 
-+    aio_context_acquire(ctx);
++static void restart_co_req(void *opaque)
++{
++    SheepdogReqCo *srco = opaque;
 +
-     // In case we have the requested data already (e.g. read-ahead),
-     // we can just call the callback and be done.
-     switch (curl_find_buf(s, start, acb->nb_sectors * BDRV_SECTOR_SIZE, acb)) {
-@@ -810,7 +815,7 @@ static void curl_readv_bh_cb(void *p)
-             qemu_aio_unref(acb);
-             // fall through
-         case FIND_RET_WAIT:
--            return;
-+            goto out;
-         default:
-             break;
-     }
-@@ -818,9 +823,8 @@ static void curl_readv_bh_cb(void *p)
-     // No cache found, so let's start a new request
-     state = curl_init_state(acb->common.bs, s);
-     if (!state) {
--        acb->common.cb(acb->common.opaque, -EIO);
--        qemu_aio_unref(acb);
--        return;
-+        ret = -EIO;
-+        goto out;
-     }
- 
-     acb->start = 0;
-@@ -834,9 +838,8 @@ static void curl_readv_bh_cb(void *p)
-     state->orig_buf = g_try_malloc(state->buf_len);
-     if (state->buf_len && state->orig_buf == NULL) {
-         curl_clean_state(state);
--        acb->common.cb(acb->common.opaque, -ENOMEM);
--        qemu_aio_unref(acb);
--        return;
-+        ret = -ENOMEM;
-+        goto out;
-     }
-     state->acb[0] = acb;
- 
-@@ -849,6 +852,13 @@ static void curl_readv_bh_cb(void *p)
- 
-     /* Tell curl it needs to kick things off */
-     curl_multi_socket_action(s->multi, CURL_SOCKET_TIMEOUT, 0, &running);
++    aio_co_wake(srco->co);
++}
 +
-+out:
-+    if (ret != -EINPROGRESS) {
-+        acb->common.cb(acb->common.opaque, ret);
-+        qemu_aio_unref(acb);
-+    }
-+    aio_context_release(ctx);
+ static coroutine_fn void do_co_req(void *opaque)
+ {
+     int ret;
+-    Coroutine *co;
+     SheepdogReqCo *srco = opaque;
+     int sockfd = srco->sockfd;
+     SheepdogReq *hdr = srco->hdr;
+@@ -605,9 +605,9 @@ static coroutine_fn void do_co_req(void *opaque)
+     unsigned int *wlen = srco->wlen;
+     unsigned int *rlen = srco->rlen;
+ 
+-    co = qemu_coroutine_self();
++    srco->co = qemu_coroutine_self();
+     aio_set_fd_handler(srco->aio_context, sockfd, false,
+-                       NULL, restart_co_req, NULL, co);
++                       NULL, restart_co_req, NULL, srco);
+ 
+     ret = send_co_req(sockfd, hdr, data, wlen);
+     if (ret < 0) {
+@@ -615,7 +615,7 @@ static coroutine_fn void do_co_req(void *opaque)
+     }
+ 
+     aio_set_fd_handler(srco->aio_context, sockfd, false,
+-                       restart_co_req, NULL, NULL, co);
++                       restart_co_req, NULL, NULL, srco);
+ 
+     ret = qemu_co_recv(sockfd, hdr, sizeof(*hdr));
+     if (ret != sizeof(*hdr)) {
+@@ -643,6 +643,7 @@ out:
+     aio_set_fd_handler(srco->aio_context, sockfd, false,
+                        NULL, NULL, NULL, NULL);
+ 
++    srco->co = NULL;
+     srco->ret = ret;
+     srco->finished = true;
+     if (srco->bs) {
+@@ -866,7 +867,7 @@ static void coroutine_fn aio_read_response(void *opaque)
+          * We've finished all requests which belong to the AIOCB, so
+          * we can switch back to sd_co_readv/writev now.
+          */
+-        qemu_coroutine_enter(acb->coroutine);
++        aio_co_wake(acb->coroutine);
+     }
+ 
+     return;
+@@ -883,14 +884,14 @@ static void co_read_response(void *opaque)
+         s->co_recv = qemu_coroutine_create(aio_read_response, opaque);
+     }
+ 
+-    qemu_coroutine_enter(s->co_recv);
++    aio_co_wake(s->co_recv);
  }
  
- static BlockAIOCB *curl_aio_readv(BlockDriverState *bs,
-diff --git a/block/gluster.c b/block/gluster.c
-index 1a22f29..56b4abe 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -698,13 +698,6 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
-     return qemu_gluster_glfs_init(gconf, errp);
+ static void co_write_request(void *opaque)
+ {
+     BDRVSheepdogState *s = opaque;
+ 
+-    qemu_coroutine_enter(s->co_send);
++    aio_co_wake(s->co_send);
  }
  
--static void qemu_gluster_complete_aio(void *opaque)
--{
--    GlusterAIOCB *acb = (GlusterAIOCB *)opaque;
--
--    qemu_coroutine_enter(acb->coroutine);
--}
--
  /*
-  * AIO callback routine called from GlusterFS thread.
-  */
-@@ -720,7 +713,7 @@ static void gluster_finish_aiocb(struct glfs_fd *fd, ssize_t ret, void *arg)
-         acb->ret = -EIO; /* Partial read/write - fail it */
-     }
+diff --git a/block/ssh.c b/block/ssh.c
+index e0edf20..835932e 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -889,10 +889,14 @@ static void restart_coroutine(void *opaque)
  
--    aio_bh_schedule_oneshot(acb->aio_context, qemu_gluster_complete_aio, acb);
-+    aio_co_schedule(acb->aio_context, acb->coroutine);
- }
+     DPRINTF("co=%p", co);
  
- static void qemu_gluster_parse_flags(int bdrv_flags, int *open_flags)
-diff --git a/block/io.c b/block/io.c
-index c42b34a..800fcf8 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -189,7 +189,7 @@ static void bdrv_co_drain_bh_cb(void *opaque)
-     bdrv_dec_in_flight(bs);
-     bdrv_drained_begin(bs);
-     data->done = true;
 -    qemu_coroutine_enter(co);
 +    aio_co_wake(co);
  }
  
- static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs)
-@@ -2147,9 +2147,13 @@ static void bdrv_co_complete(BlockAIOCBCoroutine *acb)
- static void bdrv_co_em_bh(void *opaque)
+-static coroutine_fn void set_fd_handler(BDRVSSHState *s, BlockDriverState *bs)
++/* A non-blocking call returned EAGAIN, so yield, ensuring the
++ * handlers are set up so that we'll be rescheduled when there is an
++ * interesting event on the socket.
++ */
++static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
  {
-     BlockAIOCBCoroutine *acb = opaque;
-+    BlockDriverState *bs = acb->common.bs;
-+    AioContext *ctx = bdrv_get_aio_context(bs);
+     int r;
+     IOHandler *rd_handler = NULL, *wr_handler = NULL;
+@@ -912,25 +916,10 @@ static coroutine_fn void set_fd_handler(BDRVSSHState *s, BlockDriverState *bs)
  
-     assert(!acb->need_bh);
-+    aio_context_acquire(ctx);
-     bdrv_co_complete(acb);
-+    aio_context_release(ctx);
+     aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock,
+                        false, rd_handler, wr_handler, NULL, co);
+-}
+-
+-static coroutine_fn void clear_fd_handler(BDRVSSHState *s,
+-                                          BlockDriverState *bs)
+-{
+-    DPRINTF("s->sock=%d", s->sock);
+-    aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock,
+-                       false, NULL, NULL, NULL, NULL);
+-}
+-
+-/* A non-blocking call returned EAGAIN, so yield, ensuring the
+- * handlers are set up so that we'll be rescheduled when there is an
+- * interesting event on the socket.
+- */
+-static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
+-{
+-    set_fd_handler(s, bs);
+     qemu_coroutine_yield();
+-    clear_fd_handler(s, bs);
++    DPRINTF("s->sock=%d - back", s->sock);
++    aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock, false,
++                       NULL, NULL, NULL, NULL);
  }
  
- static void bdrv_co_maybe_schedule_bh(BlockAIOCBCoroutine *acb)
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 54d1381..5de5d93 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -136,13 +136,16 @@ static void
- iscsi_bh_cb(void *p)
- {
-     IscsiAIOCB *acb = p;
-+    AioContext *ctx = bdrv_get_aio_context(acb->common.bs);
- 
-     qemu_bh_delete(acb->bh);
- 
-     g_free(acb->buf);
-     acb->buf = NULL;
- 
-+    aio_context_acquire(ctx);
-     acb->common.cb(acb->common.opaque, acb->status);
-+    aio_context_release(ctx);
- 
-     if (acb->task != NULL) {
-         scsi_free_scsi_task(acb->task);
-@@ -165,8 +168,9 @@ iscsi_schedule_bh(IscsiAIOCB *acb)
- static void iscsi_co_generic_bh_cb(void *opaque)
- {
-     struct IscsiTask *iTask = opaque;
-+
-     iTask->complete = 1;
--    qemu_coroutine_enter(iTask->co);
-+    aio_co_wake(iTask->co);
- }
- 
- static void iscsi_retry_timer_expired(void *opaque)
-diff --git a/block/linux-aio.c b/block/linux-aio.c
-index 277c016..f7ae38a 100644
---- a/block/linux-aio.c
-+++ b/block/linux-aio.c
-@@ -54,10 +54,10 @@ struct LinuxAioState {
-     io_context_t ctx;
+ /* SFTP has a function `libssh2_sftp_seek64' which seeks to a position
+diff --git a/block/win32-aio.c b/block/win32-aio.c
+index 8cdf73b..c3f8f1a 100644
+--- a/block/win32-aio.c
++++ b/block/win32-aio.c
+@@ -41,7 +41,7 @@ struct QEMUWin32AIOState {
+     HANDLE hIOCP;
      EventNotifier e;
+     int count;
+-    bool is_aio_context_attached;
++    AioContext *aio_ctx;
+ };
  
--    /* io queue for submit at batch */
-+    /* io queue for submit at batch.  Protected by AioContext lock. */
-     LaioQueue io_q;
- 
--    /* I/O completion processing */
-+    /* I/O completion processing.  Only runs in I/O thread.  */
-     QEMUBH *completion_bh;
-     int event_idx;
-     int event_max;
-@@ -75,6 +75,7 @@ static inline ssize_t io_event_ret(struct io_event *ev)
-  */
- static void qemu_laio_process_completion(struct qemu_laiocb *laiocb)
- {
-+    LinuxAioState *s = laiocb->ctx;
-     int ret;
- 
-     ret = laiocb->ret;
-@@ -93,6 +94,7 @@ static void qemu_laio_process_completion(struct qemu_laiocb *laiocb)
+ typedef struct QEMUWin32AIOCB {
+@@ -88,7 +88,9 @@ static void win32_aio_process_completion(QEMUWin32AIOState *s,
      }
  
-     laiocb->ret = ret;
-+    aio_context_acquire(s->aio_context);
-     if (laiocb->co) {
-         /* If the coroutine is already entered it must be in ioq_submit() and
-          * will notice laio->ret has been filled in when it eventually runs
-@@ -106,6 +108,7 @@ static void qemu_laio_process_completion(struct qemu_laiocb *laiocb)
-         laiocb->common.cb(laiocb->common.opaque, ret);
-         qemu_aio_unref(laiocb);
-     }
-+    aio_context_release(s->aio_context);
+ 
++    aio_context_acquire(s->aio_ctx);
+     waiocb->common.cb(waiocb->common.opaque, ret);
++    aio_context_release(s->aio_ctx);
+     qemu_aio_unref(waiocb);
  }
  
- /**
-@@ -234,9 +237,12 @@ static void qemu_laio_process_completions(LinuxAioState *s)
- static void qemu_laio_process_completions_and_submit(LinuxAioState *s)
+@@ -176,13 +178,13 @@ void win32_aio_detach_aio_context(QEMUWin32AIOState *aio,
+                                   AioContext *old_context)
  {
-     qemu_laio_process_completions(s);
-+
-+    aio_context_acquire(s->aio_context);
-     if (!s->io_q.plugged && !QSIMPLEQ_EMPTY(&s->io_q.pending)) {
-         ioq_submit(s);
-     }
-+    aio_context_release(s->aio_context);
+     aio_set_event_notifier(old_context, &aio->e, false, NULL, NULL);
+-    aio->is_aio_context_attached = false;
++    aio->aio_ctx = NULL;
  }
  
- static void qemu_laio_completion_bh(void *opaque)
-@@ -251,9 +257,7 @@ static void qemu_laio_completion_cb(EventNotifier *e)
-     LinuxAioState *s = container_of(e, LinuxAioState, e);
- 
-     if (event_notifier_test_and_clear(&s->e)) {
--        aio_context_acquire(s->aio_context);
-         qemu_laio_process_completions_and_submit(s);
--        aio_context_release(s->aio_context);
-     }
- }
- 
-@@ -267,9 +271,7 @@ static bool qemu_laio_poll_cb(void *opaque)
-         return false;
-     }
- 
--    aio_context_acquire(s->aio_context);
-     qemu_laio_process_completions_and_submit(s);
--    aio_context_release(s->aio_context);
-     return true;
- }
- 
-@@ -459,6 +461,7 @@ void laio_detach_aio_context(LinuxAioState *s, AioContext *old_context)
+ void win32_aio_attach_aio_context(QEMUWin32AIOState *aio,
+                                   AioContext *new_context)
  {
-     aio_set_event_notifier(old_context, &s->e, false, NULL, NULL);
-     qemu_bh_delete(s->completion_bh);
-+    s->aio_context = NULL;
+-    aio->is_aio_context_attached = true;
++    aio->aio_ctx = new_context;
+     aio_set_event_notifier(new_context, &aio->e, false,
+                            win32_aio_completion_cb, NULL);
  }
+@@ -212,7 +214,7 @@ out_free_state:
  
- void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context)
-diff --git a/block/nfs.c b/block/nfs.c
-index 803faf9..32631bb 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -236,8 +236,9 @@ static void nfs_co_init_task(BlockDriverState *bs, NFSRPC *task)
- static void nfs_co_generic_bh_cb(void *opaque)
+ void win32_aio_cleanup(QEMUWin32AIOState *aio)
  {
-     NFSRPC *task = opaque;
-+
-     task->complete = 1;
--    qemu_coroutine_enter(task->co);
-+    aio_co_wake(task->co);
- }
- 
- static void
-diff --git a/block/null.c b/block/null.c
-index 356209a..5eb2038 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -134,7 +134,11 @@ static const AIOCBInfo null_aiocb_info = {
- static void null_bh_cb(void *opaque)
- {
-     NullAIOCB *acb = opaque;
-+    AioContext *ctx = bdrv_get_aio_context(acb->common.bs);
-+
-+    aio_context_acquire(ctx);
-     acb->common.cb(acb->common.opaque, 0);
-+    aio_context_release(ctx);
-     qemu_aio_unref(acb);
- }
- 
-diff --git a/block/qed.c b/block/qed.c
-index a21d025..db8295d 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -942,6 +942,7 @@ static void qed_update_l2_table(BDRVQEDState *s, QEDTable *table, int index,
- static void qed_aio_complete_bh(void *opaque)
- {
-     QEDAIOCB *acb = opaque;
-+    BDRVQEDState *s = acb_to_s(acb);
-     BlockCompletionFunc *cb = acb->common.cb;
-     void *user_opaque = acb->common.opaque;
-     int ret = acb->bh_ret;
-@@ -949,7 +950,9 @@ static void qed_aio_complete_bh(void *opaque)
-     qemu_aio_unref(acb);
- 
-     /* Invoke callback */
-+    qed_acquire(s);
-     cb(user_opaque, ret);
-+    qed_release(s);
- }
- 
- static void qed_aio_complete(QEDAIOCB *acb, int ret)
-diff --git a/block/rbd.c b/block/rbd.c
-index a57b3e3..2cb2cb4 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -413,6 +413,7 @@ shutdown:
- static void qemu_rbd_complete_aio(RADOSCB *rcb)
- {
-     RBDAIOCB *acb = rcb->acb;
-+    AioContext *ctx = bdrv_get_aio_context(acb->common.bs);
-     int64_t r;
- 
-     r = rcb->ret;
-@@ -445,7 +446,10 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
-         qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
-     }
-     qemu_vfree(acb->bounce);
-+
-+    aio_context_acquire(ctx);
-     acb->common.cb(acb->common.opaque, (acb->ret > 0 ? 0 : acb->ret));
-+    aio_context_release(ctx);
- 
-     qemu_aio_unref(acb);
- }
-diff --git a/dma-helpers.c b/dma-helpers.c
-index 6f9d47c..39d4802 100644
---- a/dma-helpers.c
-+++ b/dma-helpers.c
-@@ -166,8 +166,10 @@ static void dma_blk_cb(void *opaque, int ret)
-                                 QEMU_ALIGN_DOWN(dbs->iov.size, dbs->align));
-     }
- 
-+    aio_context_acquire(dbs->ctx);
-     dbs->acb = dbs->io_func(dbs->offset, &dbs->iov,
-                             dma_blk_cb, dbs, dbs->io_func_opaque);
-+    aio_context_release(dbs->ctx);
-     assert(dbs->acb);
- }
- 
+-    assert(!aio->is_aio_context_attached);
++    assert(!aio->aio_ctx);
+     CloseHandle(aio->hIOCP);
+     event_notifier_cleanup(&aio->e);
+     g_free(aio);
 diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index a00ee38..af652f3 100644
+index 702eda8..a00ee38 100644
 --- a/hw/block/virtio-blk.c
 +++ b/hw/block/virtio-blk.c
-@@ -639,6 +639,7 @@ static void virtio_blk_dma_restart_bh(void *opaque)
+@@ -150,7 +150,8 @@ static void virtio_blk_ioctl_complete(void *opaque, int status)
+ {
+     VirtIOBlockIoctlReq *ioctl_req = opaque;
+     VirtIOBlockReq *req = ioctl_req->req;
+-    VirtIODevice *vdev = VIRTIO_DEVICE(req->dev);
++    VirtIOBlock *s = req->dev;
++    VirtIODevice *vdev = VIRTIO_DEVICE(s);
+     struct virtio_scsi_inhdr *scsi;
+     struct sg_io_hdr *hdr;
  
-     s->rq = NULL;
+@@ -586,6 +587,7 @@ void virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq)
+     VirtIOBlockReq *req;
+     MultiReqBuffer mrb = {};
  
-+    aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
-     while (req) {
-         VirtIOBlockReq *next = req->next;
-         if (virtio_blk_handle_request(req, &mrb)) {
-@@ -659,6 +660,7 @@ static void virtio_blk_dma_restart_bh(void *opaque)
-     if (mrb.num_reqs) {
-         virtio_blk_submit_multireq(s->blk, &mrb);
++    aio_context_acquire(blk_get_aio_context(s->blk));
+     blk_io_plug(s->blk);
+ 
+     do {
+@@ -607,6 +609,7 @@ void virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq)
      }
-+    aio_context_release(blk_get_aio_context(s->conf.conf.blk));
+ 
+     blk_io_unplug(s->blk);
++    aio_context_release(blk_get_aio_context(s->blk));
  }
  
- static void virtio_blk_dma_restart_cb(void *opaque, int running,
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 297216d..dddeee3 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -105,6 +105,7 @@ static void scsi_dma_restart_bh(void *opaque)
-     qemu_bh_delete(s->bh);
-     s->bh = NULL;
+ static void virtio_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index ce19eff..5d9718a 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -440,9 +440,11 @@ void virtio_scsi_handle_ctrl_vq(VirtIOSCSI *s, VirtQueue *vq)
+ {
+     VirtIOSCSIReq *req;
  
-+    aio_context_acquire(blk_get_aio_context(s->conf.blk));
-     QTAILQ_FOREACH_SAFE(req, &s->requests, next, next) {
-         scsi_req_ref(req);
-         if (req->retry) {
-@@ -122,6 +123,7 @@ static void scsi_dma_restart_bh(void *opaque)
-         }
-         scsi_req_unref(req);
++    virtio_scsi_acquire(s);
+     while ((req = virtio_scsi_pop_req(s, vq))) {
+         virtio_scsi_handle_ctrl_req(s, req);
      }
-+    aio_context_release(blk_get_aio_context(s->conf.blk));
++    virtio_scsi_release(s);
  }
  
- void scsi_req_retry(SCSIRequest *req)
-diff --git a/thread-pool.c b/thread-pool.c
-index 6fba913..7c9cec5 100644
---- a/thread-pool.c
-+++ b/thread-pool.c
-@@ -165,6 +165,7 @@ static void thread_pool_completion_bh(void *opaque)
-     ThreadPool *pool = opaque;
-     ThreadPoolElement *elem, *next;
+ static void virtio_scsi_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
+@@ -598,6 +600,7 @@ void virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq)
  
-+    aio_context_acquire(pool->ctx);
- restart:
-     QLIST_FOREACH_SAFE(elem, &pool->head, all, next) {
-         if (elem->state != THREAD_DONE) {
-@@ -191,6 +192,7 @@ restart:
-             qemu_aio_unref(elem);
-         }
+     QTAILQ_HEAD(, VirtIOSCSIReq) reqs = QTAILQ_HEAD_INITIALIZER(reqs);
+ 
++    virtio_scsi_acquire(s);
+     do {
+         virtio_queue_set_notification(vq, 0);
+ 
+@@ -624,6 +627,7 @@ void virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq)
+     QTAILQ_FOREACH_SAFE(req, &reqs, next, next) {
+         virtio_scsi_handle_cmd_req_submit(s, req);
      }
-+    aio_context_release(pool->ctx);
++    virtio_scsi_release(s);
  }
  
- static void thread_pool_cancel(BlockAIOCB *acb)
+ static void virtio_scsi_handle_cmd(VirtIODevice *vdev, VirtQueue *vq)
+@@ -754,9 +758,11 @@ out:
+ 
+ void virtio_scsi_handle_event_vq(VirtIOSCSI *s, VirtQueue *vq)
+ {
++    virtio_scsi_acquire(s);
+     if (s->events_dropped) {
+         virtio_scsi_push_event(s, NULL, VIRTIO_SCSI_T_NO_EVENT, 0);
+     }
++    virtio_scsi_release(s);
+ }
+ 
+ static void virtio_scsi_handle_event(VirtIODevice *vdev, VirtQueue *vq)
+diff --git a/nbd/server.c b/nbd/server.c
+index efe5cb8..08fb720 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1366,6 +1366,10 @@ static void nbd_restart_write(void *opaque)
+ static void nbd_set_handlers(NBDClient *client)
+ {
+     if (client->exp && client->exp->ctx) {
++        /* Note that the handlers do not expect any concurrency; qemu-nbd
++         * does not instantiate multiple AioContexts yet, nor does it call
++         * aio_poll/aio_dispatch from multiple threads.
++         */
+         aio_set_fd_handler(client->exp->ctx, client->sioc->fd, true,
+                            client->can_read ? nbd_read : NULL,
+                            client->send_coroutine ? nbd_restart_write : NULL,
 -- 
 2.9.3
