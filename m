@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cS6dG-0004Tz-KP
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:31:24 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cS6iW-0008FF-DL
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:36:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cS6dF-0006Vi-Al
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:31:22 -0500
-References: <1484305370-6220-1-git-send-email-lprosek@redhat.com>
-	<0343b5cd-f2b9-b439-7652-44ab5f05f0c4@redhat.com>
-	<CABdb734ESPhd=354YHCs2AV_jiCj=NwiR-AU0TcWuv0XMDcCaQ@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <9d544d44-f41f-e691-ee73-54f9383a13e3@redhat.com>
-Date: Fri, 13 Jan 2017 13:31:14 -0500
-MIME-Version: 1.0
-In-Reply-To: <CABdb734ESPhd=354YHCs2AV_jiCj=NwiR-AU0TcWuv0XMDcCaQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ahci: advertise HOST_CAP_64
+	(envelope-from <laurent@vivier.eu>) id 1cS6iS-0008FK-Ad
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:36:48 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:59525)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cS6iR-0008Ez-WB
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:36:44 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Fri, 13 Jan 2017 19:36:28 +0100
+Message-Id: <1484332593-16782-1-git-send-email-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v3 0/5] Fixes for target/m68k
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +21,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>, rth@twiddle.net, Laurent Vivier <laurent@vivier.eu>
 
+This is a series of fixes for target/m68k found:
+- with RISU (bit operation with immediate)
+- while debugging package build under chroot
+  (gen_flush_flags() and CAS address modes)
+- while I was working on the softmmu mode
+  (CAS alignment and SP address modes)
 
+v2:
+- Don't align stack access on coldfire.
 
-On 01/13/2017 01:12 PM, Ladi Prosek wrote:
-> On Fri, Jan 13, 2017 at 6:23 PM, John Snow <jsnow@redhat.com> wrote:
->> On 01/13/2017 06:02 AM, Ladi Prosek wrote:
->>> The AHCI emulation code supports 64-bit addressing and should advertise this
->>> fact in the Host Capabilities register. Both Linux and Windows drivers test
->>> this bit to decide if the upper 32 bits of various registers may be written
->>> to, and at least some versions of Windows have a bug where DMA is attempted
->>> with an address above 4GB but, in the absence of HOST_CAP_64, the upper 32
->>> bits are left unititialized which leads to a memory corruption.
->>>
->>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
->>> ---
->>>  hw/ide/ahci.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
->>> index 3c19bda..6a17acf 100644
->>> --- a/hw/ide/ahci.c
->>> +++ b/hw/ide/ahci.c
->>> @@ -488,7 +488,7 @@ static void ahci_reg_init(AHCIState *s)
->>>      s->control_regs.cap = (s->ports - 1) |
->>>                            (AHCI_NUM_COMMAND_SLOTS << 8) |
->>>                            (AHCI_SUPPORTED_SPEED_GEN1 << AHCI_SUPPORTED_SPEED) |
->>> -                          HOST_CAP_NCQ | HOST_CAP_AHCI;
->>> +                          HOST_CAP_NCQ | HOST_CAP_AHCI | HOST_CAP_64;
->>>
->>>      s->control_regs.impl = (1 << s->ports) - 1;
->>>
->>>
->>
->> Was this tested? What was the use case that prompted this patch, and do
->> you have a public bugzilla to point to?
-> 
-> Sorry, I thought you were aware. Here's the BZ with details:
-> https://bugzilla.redhat.com/show_bug.cgi?id=1411105
-> 
+v3:
+- Fix v2 :( that has introduced a subi instead of
+  an addi
 
-It's for the public record :)
+Laurent Vivier (5):
+  target-m68k: fix bit operation with immediate value
+  target-m68k: fix gen_flush_flags()
+  target-m68k: manage pre-dec et post-inc in CAS
+  target-m68k: CAS doesn't need aligned access
+  target-m68k: increment/decrement with SP
 
-I'm going to amend your commit message, OK?
+ target/m68k/translate.c | 40 +++++++++++++++++++++++++++++++++-------
+ 1 file changed, 33 insertions(+), 7 deletions(-)
 
-https://github.com/jnsnow/qemu/commit/f037be92fc0c4580b846134e0355a69d0eccd0d9
-
-> In short, Windows guests run into issues in certain virtual HW
-> configurations if the bit is not set. I have tested the patch and
-> verified that it fixes the failing cases.
-> 
-
-Great. I'm CCing qemu-stable as this should probably be included in
-2.7.2 / 2.8.1 / etc.
-
->> It looks correct via the spec, thank you for finding this oversight. It
->> looks like everywhere this bit would make a difference we already do the
->> correct thing for having this bit set.
->>
->> From what I can gather from the spec, it looks as if even 32bit guests
->> must ensure that the upper 32bit registers are cleared, so I think we're
->> all set here.
->>
->> Reviewed-by: John Snow <jsnow@redhat.com>
-
-Thanks, applied to my IDE tree:
-
-https://github.com/jnsnow/qemu/commits/ide
-https://github.com/jnsnow/qemu.git
-
---js
+-- 
+2.7.4
