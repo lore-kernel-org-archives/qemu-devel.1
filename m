@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cS6iW-0008FF-DL
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:36:49 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cS6iX-0008Id-RR
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:36:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cS6iS-0008FK-Ad
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:36:48 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:59525)
+	(envelope-from <laurent@vivier.eu>) id 1cS6iT-0008Fp-VF
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:36:49 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:64060)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cS6iR-0008Ez-WB
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:36:44 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cS6iT-0008FS-KW
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 13:36:45 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 13 Jan 2017 19:36:28 +0100
-Message-Id: <1484332593-16782-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v3 0/5] Fixes for target/m68k
+Date: Fri, 13 Jan 2017 19:36:29 +0100
+Message-Id: <1484332593-16782-2-git-send-email-laurent@vivier.eu>
+In-Reply-To: <1484332593-16782-1-git-send-email-laurent@vivier.eu>
+References: <1484332593-16782-1-git-send-email-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v3 1/5] target-m68k: fix bit operation with
+ immediate value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +27,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <huth@tuxfamily.org>, rth@twiddle.net, Laurent Vivier <laurent@vivier.eu>
 
-This is a series of fixes for target/m68k found:
-- with RISU (bit operation with immediate)
-- while debugging package build under chroot
-  (gen_flush_flags() and CAS address modes)
-- while I was working on the softmmu mode
-  (CAS alignment and SP address modes)
+M680x0 bit operations with an immediate value use 9 bits of the 16bit
+value, while coldfire ones use only 8 bits.
 
-v2:
-- Don't align stack access on coldfire.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ target/m68k/translate.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-v3:
-- Fix v2 :( that has introduced a subi instead of
-  an addi
-
-Laurent Vivier (5):
-  target-m68k: fix bit operation with immediate value
-  target-m68k: fix gen_flush_flags()
-  target-m68k: manage pre-dec et post-inc in CAS
-  target-m68k: CAS doesn't need aligned access
-  target-m68k: increment/decrement with SP
-
- target/m68k/translate.c | 40 +++++++++++++++++++++++++++++++++-------
- 1 file changed, 33 insertions(+), 7 deletions(-)
-
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 5f7357e..410f56a 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -1801,9 +1801,16 @@ DISAS_INSN(bitop_im)
+     op = (insn >> 6) & 3;
+ 
+     bitnum = read_im16(env, s);
+-    if (bitnum & 0xff00) {
+-        disas_undef(env, s, insn);
+-        return;
++    if (m68k_feature(s->env, M68K_FEATURE_M68000)) {
++        if (bitnum & 0xfe00) {
++            disas_undef(env, s, insn);
++            return;
++        }
++    } else {
++        if (bitnum & 0xff00) {
++            disas_undef(env, s, insn);
++            return;
++        }
+     }
+ 
+     SRC_EA(env, src1, opsize, 0, op ? &addr: NULL);
 -- 
 2.7.4
