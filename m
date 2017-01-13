@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRswt-0005U4-Og
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:54:46 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRsx0-0005YI-CH
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:54:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRswq-0003u1-L4
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:54:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59412)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRswx-0003xu-9l
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:54:50 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37594)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cRswq-0003tq-BW
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:54:40 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1cRswx-0003wr-0B
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:54:47 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v0D3s44w048179
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 22:54:39 -0500
-Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27xpvm0ug5-1
+	v0D3s1oR136621
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 22:54:45 -0500
+Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27xnfwkey5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 22:54:39 -0500
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 22:54:45 -0500
 Received: from localhost
-	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 13 Jan 2017 13:54:36 +1000
+	Fri, 13 Jan 2017 13:54:43 +1000
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Fri, 13 Jan 2017 09:24:08 +0530
+Date: Fri, 13 Jan 2017 09:24:09 +0530
 In-Reply-To: <1484279649-22286-1-git-send-email-nikunj@linux.vnet.ibm.com>
 References: <1484279649-22286-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1484279649-22286-2-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 1/2] target-ppc: Add xvtstdc[sp,
- dp] instructions
+Message-Id: <1484279649-22286-3-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 2/2] target-ppc: Add xststdc[sp, dp,
+ qp] instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,139 +41,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-xvtstdcsp: VSX Vector Test Data Class Single-Precision
-xvtstdcdp: VSX Vector Test Data Class Double-Precision
+xststdcsp: VSX Scalar Test Data Class Single-Precision
+xststdcdp: VSX Scalar Test Data Class Double-Precision
+xststdcqp: VSX Scalar Test Data Class Quad-Precision
 
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 ---
- target/ppc/fpu_helper.c             | 39 +++++++++++++++++++++++++++++++++++++
- target/ppc/helper.h                 |  2 ++
- target/ppc/internal.h               |  5 +++--
- target/ppc/translate/vsx-impl.inc.c |  2 ++
- target/ppc/translate/vsx-ops.inc.c  |  8 ++++++++
- 5 files changed, 54 insertions(+), 2 deletions(-)
+ target/ppc/fpu_helper.c             | 66 ++++++++++++++++++++++++++++++++-----
+ target/ppc/helper.h                 |  3 ++
+ target/ppc/internal.h               |  1 +
+ target/ppc/translate/vsx-impl.inc.c |  3 ++
+ target/ppc/translate/vsx-ops.inc.c  |  4 +++
+ 5 files changed, 69 insertions(+), 8 deletions(-)
 
 diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index ffcf9ca..75c70e4 100644
+index 75c70e4..5d5a5f7 100644
 --- a/target/ppc/fpu_helper.c
 +++ b/target/ppc/fpu_helper.c
-@@ -3187,3 +3187,42 @@ void helper_xvxsigsp(CPUPPCState *env, uint32_t opcode)
-     }
-     putVSR(xT(opcode), &xt, env);
- }
-+
-+/* VSX_TEST_DC - VSX floating point test data class
-+ *   op    - instruction mnemonic
-+ *   nels  - number of elements (1, 2 or 4)
-+ *   xbn   - VSR register number
-+ *   tp    - type (float32 or float64)
-+ *   fld   - vsr_t field (VsrD(*) or VsrW(*))
-+ *   tfld   - target vsr_t field (VsrD(*) or VsrW(*))
-+ *   fld_max - target field max
-+ */
-+#define VSX_TEST_DC(op, nels, xbn, tp, fld, tfld, fld_max)  \
-+void helper_##op(CPUPPCState *env, uint32_t opcode)         \
-+{                                                           \
-+    ppc_vsr_t xt, xb;                                       \
-+    uint32_t i, sign, dcmx;                                 \
-+    uint32_t match = 0;                                     \
-+                                                            \
-+    getVSR(xbn, &xb, env);                                  \
-+    memset(&xt, 0, sizeof(xt));                             \
-+    dcmx = DCMX_XV(opcode);                                 \
-+                                                            \
-+    for (i = 0; i < nels; i++) {                            \
-+        sign = tp##_is_neg(xb.fld);                         \
-+        if (tp##_is_any_nan(xb.fld)) {                      \
-+            match = extract32(dcmx, 6, 1);                  \
-+        } else if (tp##_is_infinity(xb.fld)) {              \
-+            match = extract32(dcmx, 4 + !sign, 1);          \
-+        } else if (tp##_is_zero(xb.fld)) {                  \
-+            match = extract32(dcmx, 2 + !sign, 1);          \
-+        } else if (tp##_is_zero_or_denormal(xb.fld)) {      \
-+            match = extract32(dcmx, 0 + !sign, 1);          \
-+        }                                                   \
-+        xt.tfld = match ? fld_max : 0;                      \
+@@ -3196,17 +3196,22 @@ void helper_xvxsigsp(CPUPPCState *env, uint32_t opcode)
+  *   fld   - vsr_t field (VsrD(*) or VsrW(*))
+  *   tfld   - target vsr_t field (VsrD(*) or VsrW(*))
+  *   fld_max - target field max
++ *   scrf - set result in CR and FPCC
+  */
+-#define VSX_TEST_DC(op, nels, xbn, tp, fld, tfld, fld_max)  \
++#define VSX_TEST_DC(op, nels, xbn, tp, fld, tfld, fld_max, scrf)  \
+ void helper_##op(CPUPPCState *env, uint32_t opcode)         \
+ {                                                           \
+     ppc_vsr_t xt, xb;                                       \
+     uint32_t i, sign, dcmx;                                 \
+-    uint32_t match = 0;                                     \
++    uint32_t cc, match = 0;                                 \
+                                                             \
+     getVSR(xbn, &xb, env);                                  \
+-    memset(&xt, 0, sizeof(xt));                             \
+-    dcmx = DCMX_XV(opcode);                                 \
++    if (!scrf) {                                            \
++        memset(&xt, 0, sizeof(xt));                         \
++        dcmx = DCMX_XV(opcode);                             \
++    } else {                                                \
++        dcmx = DCMX(opcode);                                \
 +    }                                                       \
-+    putVSR(xT(opcode), &xt, env);                           \
-+}
+                                                             \
+     for (i = 0; i < nels; i++) {                            \
+         sign = tp##_is_neg(xb.fld);                         \
+@@ -3219,10 +3224,55 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)         \
+         } else if (tp##_is_zero_or_denormal(xb.fld)) {      \
+             match = extract32(dcmx, 0 + !sign, 1);          \
+         }                                                   \
+-        xt.tfld = match ? fld_max : 0;                      \
++                                                            \
++        if (scrf) {                                         \
++            cc = sign << CRF_LT_BIT | match << CRF_EQ_BIT;  \
++            env->fpscr &= ~(0x0F << FPSCR_FPRF);            \
++            env->fpscr |= cc << FPSCR_FPRF;                 \
++            env->crf[BF(opcode)] = cc;                      \
++        } else {                                             \
++            xt.tfld = match ? fld_max : 0;                   \
++        }                                                   \
++    }                                                       \
++    if (!scrf) {                                            \
++        putVSR(xT(opcode), &xt, env);                       \
+     }                                                       \
+-    putVSR(xT(opcode), &xt, env);                           \
+ }
+ 
+-VSX_TEST_DC(xvtstdcdp, 2, xB(opcode), float64, VsrD(i), VsrD(i), UINT64_MAX)
+-VSX_TEST_DC(xvtstdcsp, 4, xB(opcode), float32, VsrW(i), VsrW(i), UINT32_MAX)
++VSX_TEST_DC(xvtstdcdp, 2, xB(opcode), float64, VsrD(i), VsrD(i), UINT64_MAX, 0)
++VSX_TEST_DC(xvtstdcsp, 4, xB(opcode), float32, VsrW(i), VsrW(i), UINT32_MAX, 0)
++VSX_TEST_DC(xststdcdp, 1, xB(opcode), float64, VsrD(0), VsrD(0), 0, 1)
++VSX_TEST_DC(xststdcqp, 1, (rB(opcode) + 32), float128, f128, VsrD(0), 0, 1)
 +
-+VSX_TEST_DC(xvtstdcdp, 2, xB(opcode), float64, VsrD(i), VsrD(i), UINT64_MAX)
-+VSX_TEST_DC(xvtstdcsp, 4, xB(opcode), float32, VsrW(i), VsrW(i), UINT32_MAX)
++void helper_xststdcsp(CPUPPCState *env, uint32_t opcode)
++{
++    ppc_vsr_t xb;
++    uint32_t dcmx, sign, exp;
++    uint32_t cc, match = 0, not_sp = 0;
++
++    getVSR(xB(opcode), &xb, env);
++    dcmx = DCMX(opcode);
++    exp = (xb.VsrD(0) >> 52) & 0x7FF;
++
++    sign = float64_is_neg(xb.VsrD(0));
++    if (float64_is_any_nan(xb.VsrD(0))) {
++        match = extract32(dcmx, 6, 1);
++    } else if (float64_is_infinity(xb.VsrD(0))) {
++        match = extract32(dcmx, 4 + !sign, 1);
++    } else if (float64_is_zero(xb.VsrD(0))) {
++        match = extract32(dcmx, 2 + !sign, 1);
++    } else if (float64_is_zero_or_denormal(xb.VsrD(0)) ||
++               (exp > 0 && exp < 0x381)) {
++        match = extract32(dcmx, 0 + !sign, 1);
++    }
++
++    not_sp = !float64_eq(xb.VsrD(0),
++                         float32_to_float64(
++                             float64_to_float32(xb.VsrD(0), &env->fp_status),
++                             &env->fp_status), &env->fp_status);
++
++    cc = sign << CRF_LT_BIT | match << CRF_EQ_BIT | not_sp << CRF_SO_BIT;
++    env->fpscr &= ~(0x0F << FPSCR_FPRF);
++    env->fpscr |= cc << FPSCR_FPRF;
++    env->crf[BF(opcode)] = cc;
++}
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 9d4ed08..165e4a5 100644
+index 165e4a5..85af9df 100644
 --- a/target/ppc/helper.h
 +++ b/target/ppc/helper.h
-@@ -546,6 +546,8 @@ DEF_HELPER_2(xvcvsxdsp, void, env, i32)
- DEF_HELPER_2(xvcvuxdsp, void, env, i32)
- DEF_HELPER_2(xvcvsxwsp, void, env, i32)
- DEF_HELPER_2(xvcvuxwsp, void, env, i32)
-+DEF_HELPER_2(xvtstdcsp, void, env, i32)
-+DEF_HELPER_2(xvtstdcdp, void, env, i32)
- DEF_HELPER_2(xvrspi, void, env, i32)
- DEF_HELPER_2(xvrspic, void, env, i32)
- DEF_HELPER_2(xvrspim, void, env, i32)
+@@ -451,6 +451,9 @@ DEF_HELPER_2(xscvuxdsp, void, env, i32)
+ DEF_HELPER_2(xscvsxdsp, void, env, i32)
+ DEF_HELPER_2(xscvudqp, void, env, i32)
+ DEF_HELPER_2(xscvuxddp, void, env, i32)
++DEF_HELPER_2(xststdcsp, void, env, i32)
++DEF_HELPER_2(xststdcdp, void, env, i32)
++DEF_HELPER_2(xststdcqp, void, env, i32)
+ DEF_HELPER_2(xsrdpi, void, env, i32)
+ DEF_HELPER_2(xsrdpic, void, env, i32)
+ DEF_HELPER_2(xsrdpim, void, env, i32)
 diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index c22d74e..4c3811a 100644
+index 4c3811a..5a2fd68 100644
 --- a/target/ppc/internal.h
 +++ b/target/ppc/internal.h
-@@ -68,7 +68,7 @@ static inline uint32_t name(uint32_t opcode)                                  \
-             ((opcode >> (shift2)) & ((1 << (nb2)) - 1));                      \
- }
- 
--#define EXTRACT_HELPER_DXFORM(name,                                           \
-+#define EXTRACT_HELPER_SPLIT_3(name,                                          \
-                               d0_bits, shift_op_d0, shift_d0,                 \
-                               d1_bits, shift_op_d1, shift_d1,                 \
-                               d2_bits, shift_op_d2, shift_d2)                 \
-@@ -156,7 +156,7 @@ EXTRACT_HELPER(FPFLM, 17, 8);
- EXTRACT_HELPER(FPW, 16, 1);
- 
- /* addpcis */
--EXTRACT_HELPER_DXFORM(DX, 10, 6, 6, 5, 16, 1, 1, 0, 0)
-+EXTRACT_HELPER_SPLIT_3(DX, 10, 6, 6, 5, 16, 1, 1, 0, 0)
- #if defined(TARGET_PPC64)
- /* darn */
- EXTRACT_HELPER(L, 16, 2);
 @@ -198,6 +198,7 @@ EXTRACT_HELPER(UIM, 16, 2);
  EXTRACT_HELPER(SHW, 8, 2);
  EXTRACT_HELPER(SP, 19, 2);
  EXTRACT_HELPER(IMM8, 11, 8);
-+EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
++EXTRACT_HELPER(DCMX, 16, 7);
+ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
  
  typedef union _ppc_vsr_t {
-     uint8_t u8[16];
 diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 9bcc5af..adb6fc7 100644
+index adb6fc7..a44c003 100644
 --- a/target/ppc/translate/vsx-impl.inc.c
 +++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -928,6 +928,8 @@ GEN_VSX_HELPER_2(xvrspic, 0x16, 0x0A, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xvrspim, 0x12, 0x0B, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xvrspip, 0x12, 0x0A, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xvrspiz, 0x12, 0x09, 0, PPC2_VSX)
-+GEN_VSX_HELPER_2(xvtstdcsp, 0x14, 0x1A, 0, PPC2_VSX)
-+GEN_VSX_HELPER_2(xvtstdcdp, 0x14, 0x1E, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xxperm, 0x08, 0x03, 0, PPC2_ISA300)
- GEN_VSX_HELPER_2(xxpermr, 0x08, 0x07, 0, PPC2_ISA300)
+@@ -850,6 +850,9 @@ GEN_VSX_HELPER_2(xsnmsubasp, 0x04, 0x12, 0, PPC2_VSX207)
+ GEN_VSX_HELPER_2(xsnmsubmsp, 0x04, 0x13, 0, PPC2_VSX207)
+ GEN_VSX_HELPER_2(xscvsxdsp, 0x10, 0x13, 0, PPC2_VSX207)
+ GEN_VSX_HELPER_2(xscvuxdsp, 0x10, 0x12, 0, PPC2_VSX207)
++GEN_VSX_HELPER_2(xststdcsp, 0x14, 0x12, 0, PPC2_ISA300)
++GEN_VSX_HELPER_2(xststdcdp, 0x14, 0x16, 0, PPC2_ISA300)
++GEN_VSX_HELPER_2(xststdcqp, 0x04, 0x16, 0, PPC2_ISA300)
  
+ GEN_VSX_HELPER_2(xvadddp, 0x00, 0x0C, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvsubdp, 0x00, 0x0D, 0, PPC2_VSX)
 diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index ee74312..6dd5d72 100644
+index 6dd5d72..7dc9f6f 100644
 --- a/target/ppc/translate/vsx-ops.inc.c
 +++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -133,6 +133,14 @@ GEN_XX2FORM_EO(xvxsigdp, 0x16, 0x1D, 0x01, PPC2_ISA300),
- GEN_XX2FORM_EO(xvxexpsp, 0x16, 0x1D, 0x08, PPC2_ISA300),
- GEN_XX2FORM_EO(xvxsigsp, 0x16, 0x1D, 0x09, PPC2_ISA300),
+@@ -126,6 +126,10 @@ GEN_HANDLER_E(xsiexpdp, 0x3C, 0x16, 0x1C, 0, PPC_NONE, PPC2_ISA300),
+ GEN_VSX_XFORM_300(xsiexpqp, 0x4, 0x1B, 0x00000001),
+ #endif
  
-+/* DCMX  =  bit[25] << 6 | bit[29] << 5 | bit[11:15] */
-+#define GEN_XX2FORM_DCMX(name, opc2, opc3, fl2) \
-+GEN_XX3FORM(name, opc2, opc3 | 0, fl2),         \
-+GEN_XX3FORM(name, opc2, opc3 | 1, fl2)
++GEN_XX2FORM(xststdcdp, 0x14, 0x16, PPC2_ISA300),
++GEN_XX2FORM(xststdcsp, 0x14, 0x12, PPC2_ISA300),
++GEN_VSX_XFORM_300(xststdcqp, 0x04, 0x16, 0x00000001),
 +
-+GEN_XX2FORM_DCMX(xvtstdcdp, 0x14, 0x1E, PPC2_ISA300),
-+GEN_XX2FORM_DCMX(xvtstdcsp, 0x14, 0x1A, PPC2_ISA300),
-+
- GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
- GEN_XX2FORM(xvnabsdp, 0x12, 0x1E, PPC2_VSX),
- GEN_XX2FORM(xvnegdp, 0x12, 0x1F, PPC2_VSX),
+ GEN_XX3FORM(xviexpsp, 0x00, 0x1B, PPC2_ISA300),
+ GEN_XX3FORM(xviexpdp, 0x00, 0x1F, PPC2_ISA300),
+ GEN_XX2FORM_EO(xvxexpdp, 0x16, 0x1D, 0x00, PPC2_ISA300),
 -- 
 2.7.4
