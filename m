@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRy5X-0007e8-SN
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:24:01 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRy5j-0007k5-CG
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:24:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRy5U-0003Qn-IV
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:23:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44764)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRy5U-0003Qf-9b
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:23:56 -0500
-Date: Fri, 13 Jan 2017 17:23:45 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170113092345.GX4450@pxdev.xzpeter.org>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-8-git-send-email-peterx@redhat.com>
-	<eb0051ab-b555-4df0-c2d6-4230e395fa15@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <eb0051ab-b555-4df0-c2d6-4230e395fa15@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v3 07/14] memory: add section range
- info for IOMMU notifier
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRy5i-0003V9-GZ
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:24:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40566
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cRy5i-0003UJ-AZ
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:24:10 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	v0D9O8Hn114787
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 04:24:09 -0500
+Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27xqsdgsam-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 04:24:05 -0500
+Received: from localhost
+	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 13 Jan 2017 19:23:57 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Fri, 13 Jan 2017 14:53:38 +0530
+Message-Id: <1484299420-23031-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] POWER9 TCG enablements - part12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +36,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-On Fri, Jan 13, 2017 at 03:55:22PM +0800, Jason Wang wrote:
->=20
->=20
-> On 2017=E5=B9=B401=E6=9C=8813=E6=97=A5 11:06, Peter Xu wrote:
-> >In this patch, IOMMUNotifier.{start|end} are introduced to store secti=
-on
-> >information for a specific notifier. When notification occurs, we not
-> >only check the notification type (MAP|UNMAP), but also check whether t=
-he
-> >notified iova is in the range of specific IOMMU notifier, and skip tho=
-se
-> >notifiers if not in the listened range.
-> >
-> >When removing an region, we need to make sure we removed the correct
-> >VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
-> >
-> >Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-> >Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> >Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> >Signed-off-by: Peter Xu <peterx@redhat.com>
-> >---
-> >  hw/vfio/common.c      | 7 ++++++-
-> >  include/exec/memory.h | 3 +++
-> >  memory.c              | 4 +++-
-> >  3 files changed, 12 insertions(+), 2 deletions(-)
-> >
-> >diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> >index 801578b..6f648da 100644
-> >--- a/hw/vfio/common.c
-> >+++ b/hw/vfio/common.c
-> >@@ -455,6 +455,10 @@ static void vfio_listener_region_add(MemoryListen=
-er *listener,
-> >          giommu->container =3D container;
-> >          giommu->n.notify =3D vfio_iommu_map_notify;
-> >          giommu->n.notifier_flags =3D IOMMU_NOTIFIER_ALL;
-> >+        giommu->n.start =3D section->offset_within_region;
-> >+        llend =3D int128_add(int128_make64(giommu->n.start), section-=
->size);
-> >+        llend =3D int128_sub(llend, int128_one());
-> >+        giommu->n.end =3D int128_get64(llend);
-> >          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_ne=
-xt);
-> >          memory_region_register_iommu_notifier(giommu->iommu, &giommu=
-->n);
-> >@@ -525,7 +529,8 @@ static void vfio_listener_region_del(MemoryListene=
-r *listener,
-> >          VFIOGuestIOMMU *giommu;
-> >          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) =
-{
-> >-            if (giommu->iommu =3D=3D section->mr) {
-> >+            if (giommu->iommu =3D=3D section->mr &&
-> >+                giommu->n.start =3D=3D section->offset_within_region)=
- {
-> >                  memory_region_unregister_iommu_notifier(giommu->iomm=
-u,
-> >                                                          &giommu->n);
-> >                  QLIST_REMOVE(giommu, giommu_next);
-> >diff --git a/include/exec/memory.h b/include/exec/memory.h
-> >index bec9756..7649e74 100644
-> >--- a/include/exec/memory.h
-> >+++ b/include/exec/memory.h
-> >@@ -84,6 +84,9 @@ typedef enum {
-> >  struct IOMMUNotifier {
-> >      void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *da=
-ta);
-> >      IOMMUNotifierFlag notifier_flags;
-> >+    /* Notify for address space range start <=3D addr <=3D end */
-> >+    hwaddr start;
-> >+    hwaddr end;
-> >      QLIST_ENTRY(IOMMUNotifier) node;
-> >  };
-> >  typedef struct IOMMUNotifier IOMMUNotifier;
-> >diff --git a/memory.c b/memory.c
-> >index 2bfc37f..e88bb54 100644
-> >--- a/memory.c
-> >+++ b/memory.c
-> >@@ -1671,7 +1671,9 @@ void memory_region_notify_iommu(MemoryRegion *mr=
-,
-> >      }
-> >      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
-> >-        if (iommu_notifier->notifier_flags & request_flags) {
-> >+        if (iommu_notifier->notifier_flags & request_flags &&
-> >+            iommu_notifier->start <=3D entry.iova &&
-> >+            iommu_notifier->end >=3D entry.iova) {
-> >              iommu_notifier->notify(iommu_notifier, &entry);
-> >          }
-> >      }
->=20
-> This seems breaks vhost device IOTLB. How about keep the the behavior
-> somehow?
+This series contains 5 new instructions for POWER9 ISA3.0
+    VSX Scalar Test Data Class
+    VSX Vector Test Data Class
 
-Thanks to point out. How about I squash this into this patch?
+Changelog:
+v1:
+* Zero the match variable in the element loops
 
---------8<--------
-diff --git a/memory.c b/memory.c
-index e88bb54..6de02dd 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1608,8 +1608,14 @@ void memory_region_register_iommu_notifier(MemoryR=
-egion *mr,
-         return;
-     }
-=20
-+    if (n->start =3D=3D 0 && n->end =3D=3D 0) {
-+        /* If these are not specified, we listen to the whole range */
-+        n->end =3D (hwaddr)(-1);
-+    }
-+
-     /* We need to register for at least one bitfield */
-     assert(n->notifier_flags !=3D IOMMU_NOTIFIER_NONE);
-+    assert(n->start <=3D n->end);
-     QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
-     memory_region_update_iommu_notify_flags(mr);
- }
--------->8--------
+v0:
+* Concise logic for identifying data class in Scalar/Vector 
+  test data class instructions
 
--- peterx
+Nikunj A Dadhania (2):
+  target-ppc: Add xvtstdc[sp,dp] instructions
+  target-ppc: Add xststdc[sp, dp, qp] instructions
+
+ target/ppc/fpu_helper.c             | 90 +++++++++++++++++++++++++++++++++++++
+ target/ppc/helper.h                 |  5 +++
+ target/ppc/internal.h               |  6 ++-
+ target/ppc/translate/vsx-impl.inc.c |  5 +++
+ target/ppc/translate/vsx-ops.inc.c  | 12 +++++
+ 5 files changed, 116 insertions(+), 2 deletions(-)
+
+-- 
+2.7.4
