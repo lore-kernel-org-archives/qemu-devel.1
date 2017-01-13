@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cRvMD-0006BW-3O
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 01:29:02 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cRvMD-0006Bo-EF
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 01:29:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cRvMC-0001z6-3E
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cRvMC-0001zB-CD
 	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 01:29:01 -0500
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 13 Jan 2017 17:28:14 +1100
-Message-Id: <1484288903-18807-9-git-send-email-sjitindarsingh@gmail.com>
+Date: Fri, 13 Jan 2017 17:28:13 +1100
+Message-Id: <1484288903-18807-8-git-send-email-sjitindarsingh@gmail.com>
 In-Reply-To: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
 References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [RFC PATCH 08/17] target/ppc/POWER9: Add external
- partition table pointer to cpu state
+Subject: [Qemu-devel] [RFC PATCH 07/17] target/ppc/POWER9: Add partition
+ table pointer to sPAPRMachineState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,112 +23,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Similarly to how we have an external hpt pointer in the cpu state, add
-an external partition table pointer and update it to point to the
-partition table entry in the machine state struct on cpu reset.
+POWER9 uses a partition table to store information relating to how
+address translation is performed on a per partition basis.
+
+Add a data area for this to the sPAPRMachineState struct and (re)allocate
+it on machine reset.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- hw/ppc/spapr_cpu_core.c | 12 ++++++++++--
- target/ppc/cpu.h        |  3 +++
- target/ppc/mmu.h        |  6 ++++++
- target/ppc/mmu_helper.c | 12 ++++++++++++
- 4 files changed, 31 insertions(+), 2 deletions(-)
+ hw/ppc/spapr.c         | 38 ++++++++++++++++++++++++++++++++------
+ include/hw/ppc/spapr.h |  1 +
+ target/ppc/mmu.h       | 13 +++++++++++++
+ 3 files changed, 46 insertions(+), 6 deletions(-)
+ create mode 100644 target/ppc/mmu.h
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 8cc7058..72a7f90 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -17,6 +17,7 @@
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 208ef7b..45bd2de 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -41,6 +41,7 @@
+ #include "migration/migration.h"
+ #include "mmu-hash64.h"
+ #include "qom/cpu.h"
++#include "mmu.h"
+ 
+ #include "hw/boards.h"
  #include "hw/ppc/ppc.h"
- #include "target/ppc/mmu-hash64.h"
- #include "sysemu/numa.h"
-+#include "mmu.h"
- 
- static void spapr_cpu_reset(void *opaque)
- {
-@@ -34,8 +35,15 @@ static void spapr_cpu_reset(void *opaque)
- 
-     env->spr[SPR_HIOR] = 0;
- 
--    ppc_hash64_set_external_hpt(cpu, spapr->htab, spapr->htab_shift,
--                                &error_fatal);
-+    switch (env->mmu_model) {
-+    case POWERPC_MMU_3_00:
-+        ppc64_set_external_patb(cpu, spapr->patb, &error_fatal);
-+    default:
-+        /* We assume legacy until told otherwise, thus set HPT irrespective */
-+        ppc_hash64_set_external_hpt(cpu, spapr->htab, spapr->htab_shift,
-+                                    &error_fatal);
-+        break;
-+    }
- }
- 
- static void spapr_cpu_destroy(PowerPCCPU *cpu)
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 0ab49b3..e8b7c06 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -77,6 +77,7 @@
- #include "exec/cpu-defs.h"
- #include "cpu-qom.h"
- #include "fpu/softfloat.h"
-+#include "mmu.h"
- 
- #if defined (TARGET_PPC64)
- #define PPC_ELF_MACHINE     EM_PPC64
-@@ -1009,6 +1010,8 @@ struct CPUPPCState {
-     target_ulong sr[32];
-     /* externally stored hash table */
-     uint8_t *external_htab;
-+    /* externally stored partition table entry */
-+    struct patb_entry *external_patbe;
-     /* BATs */
-     uint32_t nb_BATs;
-     target_ulong DBAT[2][8];
-diff --git a/target/ppc/mmu.h b/target/ppc/mmu.h
-index 67b9707..c7967c3 100644
---- a/target/ppc/mmu.h
-+++ b/target/ppc/mmu.h
-@@ -8,6 +8,12 @@ struct patb_entry {
-     uint64_t patbe0, patbe1;
- };
- 
-+#ifdef TARGET_PPC64
-+
-+void ppc64_set_external_patb(PowerPCCPU *cpu, void *patb, Error **errp);
-+
-+#endif /* TARGET_PPC64 */
-+
- #endif /* CONFIG_USER_ONLY */
- 
- #endif /* MMU_H */
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index 2ab4562..bc6c117 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -28,6 +28,7 @@
- #include "exec/cpu_ldst.h"
- #include "exec/log.h"
- #include "helper_regs.h"
-+#include "mmu.h"
- 
- //#define DEBUG_MMU
- //#define DEBUG_BATS
-@@ -2907,3 +2908,14 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-                                retaddr);
+@@ -1115,6 +1116,26 @@ static void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
      }
  }
-+
-+/******************************************************************************/
-+
-+/* ISA v3.00 (POWER9) Generic MMU Helpers */
-+
-+void ppc64_set_external_patb(PowerPCCPU *cpu, void *patb, Error **errp)
+ 
++static void spapr_reallocate_patb(sPAPRMachineState *spapr, Error **errp)
 +{
-+    CPUPPCState *env = &cpu->env;
++    g_free(spapr->patb);
++    spapr->patb = NULL;
 +
-+    env->external_patbe = (struct patb_entry *) patb;
++    if (!kvm_enabled()) {
++        /* We need to allocate a partition table entry */
++        size_t size = sizeof(struct patb_entry);
++
++        spapr->patb = qemu_memalign(size, size);
++        if (!spapr->patb) {
++            error_setg_errno(errp, errno, "Could not allocate memory for "
++                                          "partition table entry");
++            return;
++        }
++
++        memset(spapr->patb, 0, size);
++    }
 +}
++
+ static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
+ {
+     bool matched = false;
+@@ -1134,7 +1155,7 @@ static void ppc_spapr_reset(void)
+ {
+     MachineState *machine = MACHINE(qdev_get_machine());
+     sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
+-    PowerPCCPU *first_ppc_cpu;
++    PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
+     uint32_t rtas_limit;
+     hwaddr rtas_addr, fdt_addr;
+     void *fdt;
+@@ -1143,10 +1164,16 @@ static void ppc_spapr_reset(void)
+     /* Check for unknown sysbus devices */
+     foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
+ 
+-    /* Allocate and/or reset the hash page table */
+-    spapr_reallocate_hpt(spapr,
+-                         spapr_hpt_shift_for_ramsize(machine->maxram_size),
+-                         &error_fatal);
++    switch (first_ppc_cpu->env.mmu_model) {
++    case POWERPC_MMU_3_00:
++        /* Allocate the partition table */
++        spapr_reallocate_patb(spapr, &error_fatal);
++    default:
++        /* Allocate and/or reset the hash page table */
++        spapr_reallocate_hpt(spapr,
++                             spapr_hpt_shift_for_ramsize(machine->maxram_size),
++                             &error_fatal);
++    }
+ 
+     /* Update the RMA size if necessary */
+     if (spapr->vrma_adjust) {
+@@ -1193,7 +1220,6 @@ static void ppc_spapr_reset(void)
+     g_free(fdt);
+ 
+     /* Set up the entry state */
+-    first_ppc_cpu = POWERPC_CPU(first_cpu);
+     first_ppc_cpu->env.gpr[3] = fdt_addr;
+     first_ppc_cpu->env.gpr[5] = 0;
+     first_cpu->halted = 0;
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index bd5bcf7..b654773 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -63,6 +63,7 @@ struct sPAPRMachineState {
+ 
+     void *htab;
+     uint32_t htab_shift;
++    void *patb;
+     hwaddr rma_size;
+     int vrma_adjust;
+     ssize_t rtas_size;
+diff --git a/target/ppc/mmu.h b/target/ppc/mmu.h
+new file mode 100644
+index 0000000..67b9707
+--- /dev/null
++++ b/target/ppc/mmu.h
+@@ -0,0 +1,13 @@
++#ifndef MMU_H
++#define MMU_H
++
++#ifndef CONFIG_USER_ONLY
++
++/* Partition Table Entry */
++struct patb_entry {
++    uint64_t patbe0, patbe1;
++};
++
++#endif /* CONFIG_USER_ONLY */
++
++#endif /* MMU_H */
 -- 
 2.5.5
