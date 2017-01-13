@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cRqRj-0008UK-JP
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:14:24 -0500
+	(envelope-from <he.chen@linux.intel.com>) id 1cRr3q-0004Bv-7t
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:53:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cRqRf-0002vh-Fq
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:14:23 -0500
-Received: from 206-15-90-246.static.twtelecom.net ([206.15.90.246]:46032
-	helo=felipe-franciosi.localdomain)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cRqRf-0002vU-8B
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:14:19 -0500
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Thu, 12 Jan 2017 17:14:07 -0800
-Message-Id: <1484270047-24579-1-git-send-email-felipe@nutanix.com>
-Subject: [Qemu-devel] [PATCH] libvhost-user: Start VQs on SET_VRING_CALL
+	(envelope-from <he.chen@linux.intel.com>) id 1cRr3l-0001Xb-D2
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:53:46 -0500
+Received: from mga04.intel.com ([192.55.52.120]:22470)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <he.chen@linux.intel.com>)
+	id 1cRr3l-0001Va-3X
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:53:41 -0500
+From: He Chen <he.chen@linux.intel.com>
+Date: Fri, 13 Jan 2017 09:53:31 +0800
+Message-Id: <1484272411-28073-1-git-send-email-he.chen@linux.intel.com>
+Subject: [Qemu-devel] [PATCH v2] x86: add AVX512_VPOPCNTDQ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,63 +22,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, He Chen <he.chen@intel.com>
 
-Currently, VQs are started as soon as a SET_VRING_KICK is received. That
-is too early in the VQ setup process, as the backend might not yet have
-a callfd to notify in case it received a kick and fully processed the
-request/command. This patch only starts a VQ when a SET_VRING_CALL is
-received.
+AVX512_VPOPCNTDQ: Vector POPCNT instructions for word and qwords.
+variable precision.
 
-Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+Signed-off-by: He Chen <he.chen@linux.intel.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+Changes from v1:
+* Rename vpopcntdq to avx512-vpopcntdq.
+---
+ target/i386/cpu.c | 2 +-
+ target/i386/cpu.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index af4faad..a46ef90 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -607,19 +607,6 @@ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *vmsg)
-         DPRINT("Got kick_fd: %d for vq: %d\n", vmsg->fds[0], index);
-     }
- 
--    dev->vq[index].started = true;
--    if (dev->iface->queue_set_started) {
--        dev->iface->queue_set_started(dev, index, true);
--    }
--
--    if (dev->vq[index].kick_fd != -1 && dev->vq[index].handler) {
--        dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
--                       vu_kick_cb, (void *)(long)index);
--
--        DPRINT("Waiting for kicks on fd: %d for vq: %d\n",
--               dev->vq[index].kick_fd, index);
--    }
--
-     return false;
- }
- 
-@@ -661,6 +648,19 @@ vu_set_vring_call_exec(VuDev *dev, VhostUserMsg *vmsg)
- 
-     DPRINT("Got call_fd: %d for vq: %d\n", vmsg->fds[0], index);
- 
-+    dev->vq[index].started = true;
-+    if (dev->iface->queue_set_started) {
-+        dev->iface->queue_set_started(dev, index, true);
-+    }
-+
-+    if (dev->vq[index].kick_fd != -1 && dev->vq[index].handler) {
-+        dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
-+                       vu_kick_cb, (void *)(long)index);
-+
-+        DPRINT("Waiting for kicks on fd: %d for vq: %d\n",
-+               dev->vq[index].kick_fd, index);
-+    }
-+
-     return false;
- }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index b0640f1..1a4b164 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -435,7 +435,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, "avx512vbmi", "umip", "pku",
+             "ospke", NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+-            NULL, NULL, NULL, NULL,
++            NULL, NULL, "avx512-vpopcntdq", NULL,
+             "la57", NULL, NULL, NULL,
+             NULL, NULL, "rdpid", NULL,
+             NULL, NULL, NULL, NULL,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index a04e46b..37b209e 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -630,6 +630,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_ECX_UMIP     (1U << 2)
+ #define CPUID_7_0_ECX_PKU      (1U << 3)
+ #define CPUID_7_0_ECX_OSPKE    (1U << 4)
++#define CPUID_7_0_ECX_AVX512_VPOPCNTDQ (1U << 14) /* POPCNT for vectors of DW/QW */
+ #define CPUID_7_0_ECX_LA57     (1U << 16)
+ #define CPUID_7_0_ECX_RDPID    (1U << 22)
  
 -- 
-1.9.4
+2.7.4
