@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cRy65-0008PV-VG
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:24:35 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRy6q-0000cs-1d
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:25:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cRy62-0003Za-MG
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:24:33 -0500
-Received: from mga07.intel.com ([134.134.136.100]:25367)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
-	id 1cRy62-0003YK-Al
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:24:30 -0500
-From: "Li, Liang Z" <liang.z.li@intel.com>
-Date: Fri, 13 Jan 2017 09:24:22 +0000
-Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C351AE8@shsmsx102.ccr.corp.intel.com>
-References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
-	<1482303148-22059-3-git-send-email-liang.z.li@intel.com>
-	<20170112185719-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170112185719-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v6 kernel 2/5]
- virtio-balloon: define new feature bit and head struct
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRy6m-0003p6-HZ
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:25:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44918)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cRy6m-0003oX-7w
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:25:16 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	v0D9PBOb075908
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 04:25:14 -0500
+Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27xrs46xmj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 04:25:13 -0500
+Received: from localhost
+	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 13 Jan 2017 19:24:02 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Fri, 13 Jan 2017 14:53:39 +0530
+In-Reply-To: <1484299420-23031-1-git-send-email-nikunj@linux.vnet.ibm.com>
+References: <1484299420-23031-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-Id: <1484299420-23031-2-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] target-ppc: Add xvtstdc[sp,
+ dp] instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +38,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "david@redhat.com" <david@redhat.com>, "aarcange@redhat.com" <aarcange@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-> On Wed, Dec 21, 2016 at 02:52:25PM +0800, Liang Li wrote:
-> > Add a new feature which supports sending the page information with
-> > range array. The current implementation uses PFNs array, which is not
-> > very efficient. Using ranges can improve the performance of
-> > inflating/deflating significantly.
-> >
-> > Signed-off-by: Liang Li <liang.z.li@intel.com>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-> > Cc: Amit Shah <amit.shah@redhat.com>
-> > Cc: Dave Hansen <dave.hansen@intel.com>
-> > Cc: Andrea Arcangeli <aarcange@redhat.com>
-> > Cc: David Hildenbrand <david@redhat.com>
-> > ---
-> >  include/uapi/linux/virtio_balloon.h | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> >
-> > diff --git a/include/uapi/linux/virtio_balloon.h
-> > b/include/uapi/linux/virtio_balloon.h
-> > index 343d7dd..2f850bf 100644
-> > --- a/include/uapi/linux/virtio_balloon.h
-> > +++ b/include/uapi/linux/virtio_balloon.h
-> > @@ -34,10 +34,14 @@
-> >  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before
-> reclaiming pages */
-> >  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue
-> */
-> >  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon
-> on OOM */
-> > +#define VIRTIO_BALLOON_F_PAGE_RANGE	3 /* Send page info
-> with ranges */
-> >
-> >  /* Size of a PFN in the balloon interface. */  #define
-> > VIRTIO_BALLOON_PFN_SHIFT 12
-> >
-> > +/* Bits width for the length of the pfn range */
->=20
-> What does this mean? Couldn't figure it out.
->=20
-> > +#define VIRTIO_BALLOON_NR_PFN_BITS 12
-> > +
-> >  struct virtio_balloon_config {
-> >  	/* Number of pages host wants Guest to give up. */
-> >  	__u32 num_pages;
-> > @@ -82,4 +86,12 @@ struct virtio_balloon_stat {
-> >  	__virtio64 val;
-> >  } __attribute__((packed));
-> >
-> > +/* Response header structure */
-> > +struct virtio_balloon_resp_hdr {
-> > +	__le64 cmd : 8; /* Distinguish different requests type */
-> > +	__le64 flag: 8; /* Mark status for a specific request type */
-> > +	__le64 id : 16; /* Distinguish requests of a specific type */
-> > +	__le64 data_len: 32; /* Length of the following data, in bytes */
->=20
-> This use of __le64 makes no sense.  Just use u8/le16/le32 pls.
->=20
+xvtstdcsp: VSX Vector Test Data Class Single-Precision
+xvtstdcdp: VSX Vector Test Data Class Double-Precision
 
-Got it, will change in the next version.=20
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+---
+ target/ppc/fpu_helper.c             | 40 +++++++++++++++++++++++++++++++++++++
+ target/ppc/helper.h                 |  2 ++
+ target/ppc/internal.h               |  5 +++--
+ target/ppc/translate/vsx-impl.inc.c |  2 ++
+ target/ppc/translate/vsx-ops.inc.c  |  8 ++++++++
+ 5 files changed, 55 insertions(+), 2 deletions(-)
 
-And could help take a look at other parts? as well as the QEMU part.
-
-Thanks!
-Liang
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index ffcf9ca..45bc93c 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -3187,3 +3187,43 @@ void helper_xvxsigsp(CPUPPCState *env, uint32_t opcode)
+     }
+     putVSR(xT(opcode), &xt, env);
+ }
++
++/* VSX_TEST_DC - VSX floating point test data class
++ *   op    - instruction mnemonic
++ *   nels  - number of elements (1, 2 or 4)
++ *   xbn   - VSR register number
++ *   tp    - type (float32 or float64)
++ *   fld   - vsr_t field (VsrD(*) or VsrW(*))
++ *   tfld   - target vsr_t field (VsrD(*) or VsrW(*))
++ *   fld_max - target field max
++ */
++#define VSX_TEST_DC(op, nels, xbn, tp, fld, tfld, fld_max)  \
++void helper_##op(CPUPPCState *env, uint32_t opcode)         \
++{                                                           \
++    ppc_vsr_t xt, xb;                                       \
++    uint32_t i, sign, dcmx;                                 \
++    uint32_t match = 0;                                     \
++                                                            \
++    getVSR(xbn, &xb, env);                                  \
++    memset(&xt, 0, sizeof(xt));                             \
++    dcmx = DCMX_XV(opcode);                                 \
++                                                            \
++    for (i = 0; i < nels; i++) {                            \
++        sign = tp##_is_neg(xb.fld);                         \
++        if (tp##_is_any_nan(xb.fld)) {                      \
++            match = extract32(dcmx, 6, 1);                  \
++        } else if (tp##_is_infinity(xb.fld)) {              \
++            match = extract32(dcmx, 4 + !sign, 1);          \
++        } else if (tp##_is_zero(xb.fld)) {                  \
++            match = extract32(dcmx, 2 + !sign, 1);          \
++        } else if (tp##_is_zero_or_denormal(xb.fld)) {      \
++            match = extract32(dcmx, 0 + !sign, 1);          \
++        }                                                   \
++        xt.tfld = match ? fld_max : 0;                      \
++        match = 0;                                          \
++    }                                                       \
++    putVSR(xT(opcode), &xt, env);                           \
++}
++
++VSX_TEST_DC(xvtstdcdp, 2, xB(opcode), float64, VsrD(i), VsrD(i), UINT64_MAX)
++VSX_TEST_DC(xvtstdcsp, 4, xB(opcode), float32, VsrW(i), VsrW(i), UINT32_MAX)
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 9d4ed08..165e4a5 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -546,6 +546,8 @@ DEF_HELPER_2(xvcvsxdsp, void, env, i32)
+ DEF_HELPER_2(xvcvuxdsp, void, env, i32)
+ DEF_HELPER_2(xvcvsxwsp, void, env, i32)
+ DEF_HELPER_2(xvcvuxwsp, void, env, i32)
++DEF_HELPER_2(xvtstdcsp, void, env, i32)
++DEF_HELPER_2(xvtstdcdp, void, env, i32)
+ DEF_HELPER_2(xvrspi, void, env, i32)
+ DEF_HELPER_2(xvrspic, void, env, i32)
+ DEF_HELPER_2(xvrspim, void, env, i32)
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index c22d74e..4c3811a 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -68,7 +68,7 @@ static inline uint32_t name(uint32_t opcode)                                  \
+             ((opcode >> (shift2)) & ((1 << (nb2)) - 1));                      \
+ }
+ 
+-#define EXTRACT_HELPER_DXFORM(name,                                           \
++#define EXTRACT_HELPER_SPLIT_3(name,                                          \
+                               d0_bits, shift_op_d0, shift_d0,                 \
+                               d1_bits, shift_op_d1, shift_d1,                 \
+                               d2_bits, shift_op_d2, shift_d2)                 \
+@@ -156,7 +156,7 @@ EXTRACT_HELPER(FPFLM, 17, 8);
+ EXTRACT_HELPER(FPW, 16, 1);
+ 
+ /* addpcis */
+-EXTRACT_HELPER_DXFORM(DX, 10, 6, 6, 5, 16, 1, 1, 0, 0)
++EXTRACT_HELPER_SPLIT_3(DX, 10, 6, 6, 5, 16, 1, 1, 0, 0)
+ #if defined(TARGET_PPC64)
+ /* darn */
+ EXTRACT_HELPER(L, 16, 2);
+@@ -198,6 +198,7 @@ EXTRACT_HELPER(UIM, 16, 2);
+ EXTRACT_HELPER(SHW, 8, 2);
+ EXTRACT_HELPER(SP, 19, 2);
+ EXTRACT_HELPER(IMM8, 11, 8);
++EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
+ 
+ typedef union _ppc_vsr_t {
+     uint8_t u8[16];
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index 9bcc5af..adb6fc7 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -928,6 +928,8 @@ GEN_VSX_HELPER_2(xvrspic, 0x16, 0x0A, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvrspim, 0x12, 0x0B, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvrspip, 0x12, 0x0A, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvrspiz, 0x12, 0x09, 0, PPC2_VSX)
++GEN_VSX_HELPER_2(xvtstdcsp, 0x14, 0x1A, 0, PPC2_VSX)
++GEN_VSX_HELPER_2(xvtstdcdp, 0x14, 0x1E, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xxperm, 0x08, 0x03, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xxpermr, 0x08, 0x07, 0, PPC2_ISA300)
+ 
+diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
+index ee74312..6dd5d72 100644
+--- a/target/ppc/translate/vsx-ops.inc.c
++++ b/target/ppc/translate/vsx-ops.inc.c
+@@ -133,6 +133,14 @@ GEN_XX2FORM_EO(xvxsigdp, 0x16, 0x1D, 0x01, PPC2_ISA300),
+ GEN_XX2FORM_EO(xvxexpsp, 0x16, 0x1D, 0x08, PPC2_ISA300),
+ GEN_XX2FORM_EO(xvxsigsp, 0x16, 0x1D, 0x09, PPC2_ISA300),
+ 
++/* DCMX  =  bit[25] << 6 | bit[29] << 5 | bit[11:15] */
++#define GEN_XX2FORM_DCMX(name, opc2, opc3, fl2) \
++GEN_XX3FORM(name, opc2, opc3 | 0, fl2),         \
++GEN_XX3FORM(name, opc2, opc3 | 1, fl2)
++
++GEN_XX2FORM_DCMX(xvtstdcdp, 0x14, 0x1E, PPC2_ISA300),
++GEN_XX2FORM_DCMX(xvtstdcsp, 0x14, 0x1A, PPC2_ISA300),
++
+ GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
+ GEN_XX2FORM(xvnabsdp, 0x12, 0x1E, PPC2_VSX),
+ GEN_XX2FORM(xvnegdp, 0x12, 0x1F, PPC2_VSX),
+-- 
+2.7.4
