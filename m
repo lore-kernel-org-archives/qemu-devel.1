@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRsCh-0001U0-An
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:00 -0500
+	(envelope-from <peterx@redhat.com>) id 1cRsCj-0001UL-P8
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRsCe-00079G-6I
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:06:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38480)
+	(envelope-from <peterx@redhat.com>) id 1cRsCi-0007Bj-RS
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51820)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRsCd-000793-Tl
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:06:56 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRsCi-0007BS-MJ
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:00 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 13 Jan 2017 11:06:26 +0800
-Message-Id: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC v3 00/14] VT-d: vfio enablement and misc
- enhances
+Date: Fri, 13 Jan 2017 11:06:27 +0800
+Message-Id: <1484276800-26814-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC v3 01/14] IOMMU: add option to enable
+ VTD_CAP_CM to vIOMMU capility exposoed to guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,150 +27,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-v3:
-- fix style error reported by patchew
-- fix comment in domain switch patch: use "IOMMU address space" rather
-  than "IOMMU region" [Kevin]
-- add ack-by for Paolo in patch:
-  "memory: add section range info for IOMMU notifier"
-  (this is seperately collected besides this thread)
-- remove 3 patches which are merged already (from Jason)
-- rebase to master b6c0897
+From: Aviv Ben-David <bd.aviv@gmail.com>
 
-v2:
-- change comment for "end" parameter in vtd_page_walk() [Tianyu]
-- change comment for "a iova" to "an iova" [Yi]
-- fix fault printed val for GPA address in vtd_page_walk_level (debug
-  only)
-- rebased to master (rather than Aviv's v6 series) and merged Aviv's
-  series v6: picked patch 1 (as patch 1 in this series), dropped patch
-  2, re-wrote patch 3 (as patch 17 of this series).
-- picked up two more bugfix patches from Jason's DMAR series
-- picked up the following patch as well:
-  "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
+This capability asks the guest to invalidate cache before each map operation.
+We can use this invalidation to trap map operations in the hypervisor.
 
-This RFC series is a re-work for Aviv B.D.'s vfio enablement series
-with vt-d:
+Signed-off-by: Aviv Ben-David <bd.aviv@gmail.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/i386/intel_iommu.c          | 5 +++++
+ hw/i386/intel_iommu_internal.h | 1 +
+ include/hw/i386/intel_iommu.h  | 2 ++
+ 3 files changed, 8 insertions(+)
 
-  https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
-
-Aviv has done a great job there, and what we still lack there are
-mostly the following:
-
-(1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
-    memory region.
-
-(2) VT-d still haven't provide a correct replay() mechanism (e.g.,
-    when IOMMU domain switches, things will broke).
-
-This series should have solved the above two issues.
-
-Online repo:
-
-  https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement-v2
-
-I would be glad to hear about any review comments for above patches.
-
-=========
-Test Done
-=========
-
-Build test passed for x86_64/arm/ppc64.
-
-Simply tested with x86_64, assigning two PCI devices to a single VM,
-boot the VM using:
-
-bin=x86_64-softmmu/qemu-system-x86_64
-$bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
-     -device intel-iommu,intremap=on,eim=off,cache-mode=on \
-     -netdev user,id=net0,hostfwd=tcp::5555-:22 \
-     -device virtio-net-pci,netdev=net0 \
-     -device vfio-pci,host=03:00.0 \
-     -device vfio-pci,host=02:00.0 \
-     -trace events=".trace.vfio" \
-     /var/lib/libvirt/images/vm1.qcow2
-
-pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
-vtd_page_walk*
-vtd_replay*
-vtd_inv_desc*
-
-Then, in the guest, run the following tool:
-
-  https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
-
-With parameter:
-
-  ./vfio-bind-group 00:03.0 00:04.0
-
-Check host side trace log, I can see pages are replayed and mapped in
-00:04.0 device address space, like:
-
-...
-vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
-vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
-vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
-vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
-vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
-...
-
-=========
-Todo List
-=========
-
-- error reporting for the assigned devices (as Tianyu has mentioned)
-
-- per-domain address-space: A better solution in the future may be -
-  we maintain one address space per IOMMU domain in the guest (so
-  multiple devices can share a same address space if they are sharing
-  the same IOMMU domains in the guest), rather than one address space
-  per device (which is current implementation of vt-d). However that's
-  a step further than this series, and let's see whether we can first
-  provide a workable version of device assignment with vt-d
-  protection.
-
-- more to come...
-
-Thanks,
-
-Aviv Ben-David (1):
-  IOMMU: add option to enable VTD_CAP_CM to vIOMMU capility exposoed to
-    guest
-
-Peter Xu (13):
-  intel_iommu: simplify irq region translation
-  intel_iommu: renaming gpa to iova where proper
-  intel_iommu: fix trace for inv desc handling
-  intel_iommu: fix trace for addr translation
-  intel_iommu: vtd_slpt_level_shift check level
-  memory: add section range info for IOMMU notifier
-  memory: provide iommu_replay_all()
-  memory: introduce memory_region_notify_one()
-  memory: add MemoryRegionIOMMUOps.replay() callback
-  intel_iommu: provide its own replay() callback
-  intel_iommu: do replay when context invalidate
-  intel_iommu: allow dynamic switch of IOMMU region
-  intel_iommu: enable vfio devices
-
- hw/i386/intel_iommu.c          | 589 +++++++++++++++++++++++++++++++----------
- hw/i386/intel_iommu_internal.h |   1 +
- hw/i386/trace-events           |  28 ++
- hw/vfio/common.c               |   7 +-
- include/exec/memory.h          |  30 +++
- include/hw/i386/intel_iommu.h  |  12 +
- memory.c                       |  42 ++-
- 7 files changed, 557 insertions(+), 152 deletions(-)
-
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index ec62239..2868e37 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2107,6 +2107,7 @@ static Property vtd_properties[] = {
+     DEFINE_PROP_ON_OFF_AUTO("eim", IntelIOMMUState, intr_eim,
+                             ON_OFF_AUTO_AUTO),
+     DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
++    DEFINE_PROP_BOOL("cache-mode", IntelIOMMUState, cache_mode_enabled, FALSE),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -2488,6 +2489,10 @@ static void vtd_init(IntelIOMMUState *s)
+         s->ecap |= VTD_ECAP_DT;
+     }
+ 
++    if (s->cache_mode_enabled) {
++        s->cap |= VTD_CAP_CM;
++    }
++
+     vtd_reset_context_cache(s);
+     vtd_reset_iotlb(s);
+ 
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 356f188..4104121 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -202,6 +202,7 @@
+ #define VTD_CAP_MAMV                (VTD_MAMV << 48)
+ #define VTD_CAP_PSI                 (1ULL << 39)
+ #define VTD_CAP_SLLPS               ((1ULL << 34) | (1ULL << 35))
++#define VTD_CAP_CM                  (1ULL << 7)
+ 
+ /* Supported Adjusted Guest Address Widths */
+ #define VTD_CAP_SAGAW_SHIFT         8
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 405c9d1..749eef9 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -257,6 +257,8 @@ struct IntelIOMMUState {
+     uint8_t womask[DMAR_REG_SIZE];  /* WO (write only - read returns 0) */
+     uint32_t version;
+ 
++    bool cache_mode_enabled;        /* RO - is cap CM enabled? */
++
+     dma_addr_t root;                /* Current root table pointer */
+     bool root_extended;             /* Type of root table (extended or not) */
+     bool dmar_enabled;              /* Set if DMA remapping is enabled */
 -- 
 2.7.4
