@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cS86v-0001j2-OV
+	(envelope-from <rth7680@gmail.com>) id 1cS86w-0001jr-SH
 	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:06:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cS86u-0005B8-Is
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:06:05 -0500
-Received: from mail-yb0-x242.google.com ([2607:f8b0:4002:c09::242]:33480)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cS86u-0005Ae-Fv
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:06:04 -0500
-Received: by mail-yb0-x242.google.com with SMTP id 123so2170962ybe.0
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 12:06:04 -0800 (PST)
+	(envelope-from <rth7680@gmail.com>) id 1cS86v-0005D6-MB
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 15:06:06 -0500
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 13 Jan 2017 12:05:54 -0800
-Message-Id: <20170113200556.2574-3-rth@twiddle.net>
+Date: Fri, 13 Jan 2017 12:05:55 -0800
+Message-Id: <20170113200556.2574-4-rth@twiddle.net>
 In-Reply-To: <20170113200556.2574-1-rth@twiddle.net>
 References: <20170113200556.2574-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 2/4] target/arm: Fix ubfx et al for aarch64
+Subject: [Qemu-devel] [PULL 3/4] tcg/aarch64: Fix addsub2 for 0+C
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +21,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, qemu-stable@nongnu.org
 
-The patch in 59a71b4c5b4e suffered from a merge failure
-when compared to the original patch in
+When al == xzr, we cannot use addi/subi because that encodes xsp.
+Force a zero into the temp register for that (rare) case.
 
-  http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00137.html
-
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Richard Henderson <rth@twiddle.net>
+Message-Id: <20161207180727.6286-2-rth@twiddle.net>
 ---
- target/arm/translate-a64.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tcg/aarch64/tcg-target.inc.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 4f09dfb..d0352e2 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -3217,7 +3217,7 @@ static void disas_bitfield(DisasContext *s, uint32_t insn)
-     tcg_tmp = read_cpu_reg(s, rn, 1);
- 
-     /* Recognize simple(r) extractions.  */
--    if (si <= ri) {
-+    if (si >= ri) {
-         /* Wd<s-r:0> = Wn<s:r> */
-         len = (si - ri) + 1;
-         if (opc == 0) { /* SBFM: ASR, SBFX, SXTB, SXTH, SXTW */
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 585b0d6..deb5967 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -964,6 +964,15 @@ static inline void tcg_out_addsub2(TCGContext *s, int ext, TCGReg rl,
+             insn = I3401_SUBSI;
+             bl = -bl;
+         }
++        if (unlikely(al == TCG_REG_XZR)) {
++            /* ??? We want to allow al to be zero for the benefit of
++               negation via subtraction.  However, that leaves open the
++               possibility of adding 0+const in the low part, and the
++               immediate add instructions encode XSP not XZR.  Don't try
++               anything more elaborate here than loading another zero.  */
++            al = TCG_REG_TMP;
++            tcg_out_movi(s, ext, al, 0);
++        }
+         tcg_out_insn_3401(s, insn, ext, rl, al, bl);
+     } else {
+         tcg_out_insn_3502(s, sub ? I3502_SUBS : I3502_ADDS, ext, rl, al, bl);
 -- 
 2.9.3
