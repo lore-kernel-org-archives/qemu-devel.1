@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cS4zS-0002rT-Qo
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:46:11 -0500
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1cS5FR-0003Cq-8h
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 12:02:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cS4zO-0000KP-Ut
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:46:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59512)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cS4zO-0000KF-Os
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:46:06 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DEC5F4A543
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 16:46:06 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170113144135.5150-1-marcandre.lureau@redhat.com>
-	<20170113144135.5150-13-marcandre.lureau@redhat.com>
-	<87pojrhr7d.fsf@dusky.pond.sub.org>
-	<871234022.2428064.1484324797286.JavaMail.zimbra@redhat.com>
-Date: Fri, 13 Jan 2017 17:46:04 +0100
-In-Reply-To: <871234022.2428064.1484324797286.JavaMail.zimbra@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 13 Jan 2017
-	11:26:37 -0500 (EST)")
-Message-ID: <87fukmgb77.fsf@dusky.pond.sub.org>
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1cS5FQ-0007lA-FE
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 12:02:41 -0500
+Received: from mail-io0-x22d.google.com ([2607:f8b0:4001:c06::22d]:32835)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1cS5FQ-0007l4-AJ
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 12:02:40 -0500
+Received: by mail-io0-x22d.google.com with SMTP id v96so48021756ioi.0
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 09:02:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 12/21] qapi.py: fix line break before
- binary operator pep8
+In-Reply-To: <1484325378-28402-1-git-send-email-ard.biesheuvel@linaro.org>
+References: <1484325378-28402-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 13 Jan 2017 17:02:38 +0000
+Message-ID: <CAKv+Gu-fhHX8L1AenHdtvz=19THPePka3i+K7LO9FTtgiH2W7g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt-acpi - reserve ECAM space as
+ PNP0C02 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,29 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Marc-Andr=C3=A9 Lureau <mlureau@redhat.com> writes:
-
-> Hi
+On 13 January 2017 at 16:36, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> Linux for arm64 v4.10 and later will complain if the ECAM config space is
+> not reserved in the ACPI namespace:
 >
-> ----- Original Message -----
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>=20
->> > Python code style accepts both form, but pep8 complains. Better to cle=
-an
->> > up the single warning for now, so new errors stand out more easily.
->> >
->> > Fix scripts/qapi.py:1539:21: W503 line break before binary operator
->> >
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>=20
->> I'm dropping this patch, as per review of v7.
+>   acpi PNP0A08:00: [Firmware Bug]: ECAM area [mem 0x3f000000-0x3fffffff] not reserved in ACPI namespace
 >
-> Sorry, I thought I dropped it. I think I screwed up with my two branches =
-(maintaining both split/squash series was quite a pain, I am relieved we ar=
-e nearing the end)
+> The rationale is that OSes that don't consume the MCFG table should still
+> be able to infer that the PCI config space MMIO region is occupied.
+>
+> So update the ACPI table generation routine to add this reservation.
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Don't worry, you did all the non-trivial changes correctly, so I'm happy
-to do a few trivial ones :)
+Please disregard -- I failed to add the PNP0C02 HID
+
+> ---
+>  hw/arm/virt-acpi-build.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 085a61117378..e8769dc6288f 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -310,6 +310,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>      Aml *dev_rp0 = aml_device("%s", "RP0");
+>      aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+>      aml_append(dev, dev_rp0);
+> +
+> +    Aml *dev_res0 = aml_device("%s", "RES0");
+> +    crs = aml_resource_template();
+> +    aml_append(crs, aml_memory32_fixed(base_ecam, size_ecam, AML_READ_WRITE));
+> +    aml_append(dev_res0, aml_name_decl("_CRS", crs));
+> +    aml_append(dev, dev_res0);
+>      aml_append(scope, dev);
+>  }
+>
+> --
+> 2.7.4
+>
