@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRxvQ-0003Rc-4t
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:13:33 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1cRy0N-0005mY-UG
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:18:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRxvM-0000NL-2I
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:13:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRxvL-0000Mv-SF
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:13:27 -0500
-Date: Fri, 13 Jan 2017 17:13:16 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170113091316.GW4450@pxdev.xzpeter.org>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-5-git-send-email-peterx@redhat.com>
-	<1e4ed054-d933-6e73-e1a1-cdf898f05ba8@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1cRy0J-00025N-SE
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:18:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59375
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1cRy0J-00025F-KW
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:18:35 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	v0D9DWv3087500
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 04:18:34 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27xqsdgkad-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 04:18:34 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 13 Jan 2017 02:18:34 -0700
+References: <20170111021820.24416-1-rth@twiddle.net>
+	<20170111021820.24416-11-rth@twiddle.net>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 13 Jan 2017 10:18:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1e4ed054-d933-6e73-e1a1-cdf898f05ba8@redhat.com>
+In-Reply-To: <20170111021820.24416-11-rth@twiddle.net>
+Content-Type: text/plain; charset=windows-1252
+Message-Id: <e426028a-0763-e9bb-1508-a3dfd26395e9@de.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v3 04/14] intel_iommu: fix trace for
- inv desc handling
+Subject: Re: [Qemu-devel] [PULL 10/65] tcg/s390: Expose host facilities to
+ tcg-target.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +43,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Fri, Jan 13, 2017 at 03:46:31PM +0800, Jason Wang wrote:
+On 01/11/2017 03:17 AM, Richard Henderson wrote:
+> This lets us expose facilities to TCG_TARGET_HAS_* defines
+> directly, rather than hiding behind function calls.
 >=20
->=20
-> On 2017=E5=B9=B401=E6=9C=8813=E6=97=A5 11:06, Peter Xu wrote:
-> >VT-d codes are still using static DEBUG_INTEL_IOMMU macro. That's not
-> >good, and we should end the day when we need to recompile the code
-> >before getting useful debugging information for vt-d. Time to switch t=
-o
-> >the trace system.
-> >
-> >This is the first patch to do it.
-> >
-> >Generally, the rule of mine is:
-> >
-> >- for the old GENERAL typed message, I use error_report() directly if
-> >   apply. Those are something shouldn't happen, and we should print th=
-ose
-> >   errors in all cases, even without enabling debug and tracing.
->=20
-> Looks like some were guest trigger-able. If yes, let's try not use
-> error_report() for not being flooded.
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  tcg/s390/tcg-target.h     | 126 ++++++++++++++++++++++++--------------=
+--------
+>  tcg/s390/tcg-target.inc.c |  74 +++++++++++----------------
+>  2 files changed, 96 insertions(+), 104 deletions(-)
 
-Yes, it's intended. Most of the error_report()s in this patch can be
-triggered by guest, but only by illegal guest behaviors (e.g.,
-non-zero reserved fields, or illegal descriptors, etc.). In that
-sense, shall we keep them even guest can trigger them? Since people
-will never see them if they are running generic and good kernels. More
-importantly, these error_report()s can be good hints when guest
-encounters issues, for better debugging and triaging.
+This broke compilation.Seems that you forgot one replacement:
 
-Actually we have such usage in existing QEMU as well. For example,
-when we maintain the DMA mapping in vfio-pci, it's possible that the
-shadow page table is mapped illegally due to some reason (that depends
-on the guest as well, may not be guest kernel, but DPDK applications
-inside guest), and the map() can fail. Here we have:
-
-    ret =3D vfio_dma_map(container, iova,
-                        iotlb->addr_mask + 1, vaddr,
-                        !(iotlb->perm & IOMMU_WO) || mr->readonly);
-    if (ret) {
-        error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-                        "0x%"HWADDR_PRIx", %p) =3D %d (%m)",
-                        container, iova,
-                        iotlb->addr_mask + 1, vaddr, ret);
-    }
-
-Which I think is playing the same role here - we will never see these
-lines if the guest is normal, and these lines will be useful when bad
-things happen.
-
-So I would slightly prefer that we keep these error_reports() for now,
-as long as they won't flush the screen for most of the users. (during
-the time I played with this series, none of them jumped out :)
-
-Thanks,
-
--- peterx
+In file included from /home/cborntra/REPOS/qemu/tcg/tcg.c:253:0:
+/home/cborntra/REPOS/qemu/tcg/s390/tcg-target.inc.c: In function =91tgen_=
+cmp=92:
+/home/cborntra/REPOS/qemu/tcg/s390/tcg-target.inc.c:1096:19: error: =91fa=
+cilities=92 undeclared (first use in this function)
+             if (!(facilities & FACILITY_EXT_IMM)) {
+                   ^~~~~~~~~~
+/home/cborntra/REPOS/qemu/tcg/s390/tcg-target.inc.c:1096:19: note: each u=
+ndeclared identifier is reported only once for each function it appears i=
+n
+/home/cborntra/REPOS/qemu/rules.mak:64: recipe for target 'tcg/tcg.o' fai=
+led
+make[1]: *** [tcg/tcg.o] Error 1
+Makefile:203: recipe for target 'subdir-s390x-softmmu' failed
+make: *** [subdir-s390x-softmmu] Error 2
+make: Leaving directory '/home/cborntra/REPOS/qemu/build'
