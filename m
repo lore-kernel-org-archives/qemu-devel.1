@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cS1s6-0006E2-9y
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:26:23 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cS1wT-0003QF-3c
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:30:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cS1s3-000524-4V
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:26:22 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cS1wR-0006XM-PK
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:30:53 -0500
+MIME-Version: 1.0
+In-Reply-To: <8b07aa89-92fe-1f2d-d392-e1a7e63d75ca@ilande.co.uk>
 References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
 	<CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
 	<733cba29-58b7-e43f-0d50-3774ee8bf3b2@reactos.org>
 	<8b07aa89-92fe-1f2d-d392-e1a7e63d75ca@ilande.co.uk>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <71f12e01-079a-8c83-1198-c92b3f042604@redhat.com>
-Date: Fri, 13 Jan 2017 14:26:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <8b07aa89-92fe-1f2d-d392-e1a7e63d75ca@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Fri, 13 Jan 2017 14:30:28 +0100
+Message-ID: <CACXAS8Ds=oGd193gEraHmg6SCA4veUmr1rpwx-1ihy91eNNx3A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 0/6] ppc: add a IBM 40p machine (RS/6000,
  PReP)
@@ -26,12 +26,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: Giancarlo Teodori <gteodori@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, Giancarlo Teodori <gteodori@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 13.01.2017 13:23, Mark Cave-Ayland wrote:
+On Fri, Jan 13, 2017 at 1:23 PM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
 > On 12/01/17 12:57, Herv=C3=A9 Poussineau wrote:
->=20
+>
 >> Le 11/01/2017 =C3=A0 17:58, Artyom Tarasenko a =C3=A9crit :
 >>> Hi Herv=C3=A9,
 >>>
@@ -50,12 +51,11 @@ On 13.01.2017 13:23, Mark Cave-Ayland wrote:
 >>>> I've tested current emulation with Open Hack'Ware, OpenBIOS and
 >>>> official firmware.
 >>>>
->>>> Linux kernel starts, and freezes during boot (like with 'prep' machi=
-ne).
+>>>> Linux kernel starts, and freezes during boot (like with 'prep' machine=
+).
 >>
 >> I already saw a regression during 2.7.0 cycle with 603 CPU. However, I
->> was unable to provide kernel source, so Benjamin was unable to find th=
-e
+>> was unable to provide kernel source, so Benjamin was unable to find the
 >> problem.
 >> http://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03760.html
 >>
@@ -64,37 +64,32 @@ e
 >>> remember seen a sitting penguin and a login prompt ~ 2 years ago. At
 >>> least with OFW.
 >>>
->>>> Windows NT starts up to the point where it wants to change endiannes=
-s.
+>>>> Windows NT starts up to the point where it wants to change endianness.
 >>>
 >>> I hit that with Solaris/PPC a few years back as you published your
 >>> previous attempt. Do you know what is missing? I guess CPU endianness
 >>> switch emulation is working because it is used in the newer POWER
->>> CPUs. Is it just the systemIO which has to be improved, or is it more=
-?
+>>> CPUs. Is it just the systemIO which has to be improved, or is it more?
 >>
 >> Yes, PReP System I/O has LE flag which is not implemented.
 >> You may be interested by
 >> ftp://ftp.software.ibm.com/rs6000/technology/spec/endian.ps
->> which deals about endianness switching, with some code from Windows NT=
-/PPC
+>> which deals about endianness switching, with some code from Windows NT/P=
+PC
 >>
 >>>
 >>>> Other OSes have not been tested.
 >>>>
->>>> This machine is a superset of the 'prep' one, because we know exactl=
-y
+>>>> This machine is a superset of the 'prep' one, because we know exactly
 >>>> what is/should
->>>> emulated, and that operating system list running on it is quite wide=
-.
+>>>> emulated, and that operating system list running on it is quite wide.
 >>>> I hope that 'prep' machine can be deprecated soon and then later
 >>>> removed.
 >>>
 >>> Would be nice to keep 'prep' until the 40p can boot Linux and NetBSD
 >>> 6.1.3 (this version used to work with -M prep last time I checked).
 >>
->> Some Linux kernels seem to work, some other ones seem to not work (han=
-g
+>> Some Linux kernels seem to work, some other ones seem to not work (hang
 >> while booting)
 >> I've not searched why.
 >>
@@ -108,8 +103,8 @@ g
 =3D=3D=3D
 >> prep:
 >>
->> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 20=
-05,
+>> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005=
+,
 >>     2006, 2007, 2008, 2009, 2010, 2011, 2012
 >>     The NetBSD Foundation, Inc.  All rights reserved.
 >> Copyright (c) 1982, 1986, 1989, 1991, 1993
@@ -129,8 +124,8 @@ g
 =3D=3D=3D
 >> 40p/Open Hack'Ware:
 >>
->> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 20=
-05,
+>> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005=
+,
 >>     2006, 2007, 2008, 2009, 2010, 2011, 2012
 >>     The NetBSD Foundation, Inc.  All rights reserved.
 >> Copyright (c) 1982, 1986, 1989, 1991, 1993
@@ -151,15 +146,14 @@ g
 >> pchb0: vendor 0x1057 product 0x4801 (rev. 0x00)
 >> siop0 at pci0 dev 1 function 0: Symbios Logic 53c810 (fast scsi)
 >> siop0: couldn't map interrupt
->> vga0 at pci0 dev 2 function 0: vendor 0x1234 product 0x1111 (rev. 0x02=
-)
+>> vga0 at pci0 dev 2 function 0: vendor 0x1234 product 0x1111 (rev. 0x02)
 >> wsdisplay0 at vga0 (kbdmux ignored)
 >> drm at vga0 not configured
 >> pcn0 at pci0 dev 3 function 0: AMD PCnet-PCI Ethernet
 >> pcn0: Am79c970A PCnet-PCI II rev 0, Ethernet address 52:54:00:12:34:56
 >> pcn0: unable to map interrupt
->> pcib0 at pci0 dev 11 function 0: vendor 0x8086 product 0x0484 (rev. 0x=
-03)
+>> pcib0 at pci0 dev 11 function 0: vendor 0x8086 product 0x0484 (rev. 0x03=
+)
 >> isa0 at pcib0
 >> com0 at isa0 port 0x3f8-0x3ff irq 4: ns16550a, working fifo
 >> com0: console
@@ -183,8 +177,8 @@ g
 =3D=3D=3D
 >> 40p/official firmware with cdrom boot:
 >>
->> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 20=
-05,
+>> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005=
+,
 >>     2006, 2007, 2008, 2009, 2010, 2011, 2012
 >>     The NetBSD Foundation, Inc.  All rights reserved.
 >> Copyright (c) 1982, 1986, 1989, 1991, 1993
@@ -206,17 +200,22 @@ g
 >>
 >> OpenBIOS doesn't support PReP boot partitions (type 0x41) nor PReP
 >> kernels so this is a no-go yet.
->=20
-> Just out of interest, is it just the PReP boot partition support that i=
-s
-> missing from OpenBIOS? If so, that should be fairly easy to implement i=
-f
+>
+> Just out of interest, is it just the PReP boot partition support that is
+> missing from OpenBIOS? If so, that should be fairly easy to implement if
 > there's a spec lying around somewhere.
+>
+> It would be great if we could finally remove OHW from QEMU :)
 
-Not much magic required here - look for a partition with ID 0x41 and if
-it's there, load its contents and treat it as an ELF file.
+I think it can be easily replaced with OFW. I was not able to find any
+image where OHW would perform better than OFW.
 
-It's at least mentioned in the LoPAPR spec, see chapter B.11.1
-("disk-label" support package).
+Artyom
 
- Thomas
+
+--=20
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
+emu
