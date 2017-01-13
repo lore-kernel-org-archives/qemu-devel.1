@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx3-0008Ju-6O
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:07 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx3-0008Jz-Du
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx0-0001Sa-Th
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx2-0001VC-Aq
 	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:05 -0500
-Received: from [59.151.112.132] (port=47847 helo=heian.cn.fujitsu.com)
+Received: from [59.151.112.132] (port=54421 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvwz-0001QE-OP
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:02 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx0-0001HH-2n
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:04 -0500
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Fri, 13 Jan 2017 15:11:57 +0800
-Message-ID: <1484291524-1261-4-git-send-email-caoj.fnst@cn.fujitsu.com>
+Date: Fri, 13 Jan 2017 15:11:58 +0800
+Message-ID: <1484291524-1261-5-git-send-email-caoj.fnst@cn.fujitsu.com>
 In-Reply-To: <1484291524-1261-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 References: <1484291524-1261-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 03/10] pci: Convert msix_init() to Error and
- fix callers to check it
+Subject: [Qemu-devel] [PATCH v8 04/10] megasas: change behaviour of msix
+ switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +27,15 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jiri Pirko <jiri@resnulli.us>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, "Michael S.
-	Tsirkin" <mst@redhat.com>, Hannes Reinecke <hare@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Hannes Reinecke <hare@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-msix_init() reports errors with error_report(), which is wrong when
-it's used in realize().  The same issue was fixed for msi_init() in
-commit 1108b2f.
+Resolve the TODO, msix=auto means msix on; if user specify msix=on,
+then device creation fail on msix_init failure.
+Also undo the overwrites of user configuration of msix.
 
-For some devices(like e1000e, vmxnet3) who won't fail because of
-msix_init's failure, suppress the error report by passing NULL error object.
-
-Bonus: add comment for msix_init.
-
-CC: Jiri Pirko <jiri@resnulli.us>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Dmitry Fleytman <dmitry@daynix.com>
-CC: Jason Wang <jasowang@redhat.com>
 CC: Michael S. Tsirkin <mst@redhat.com>
 CC: Hannes Reinecke <hare@suse.de>
 CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Alex Williamson <alex.williamson@redhat.com>
 CC: Markus Armbruster <armbru@redhat.com>
 CC: Marcel Apfelbaum <marcel@redhat.com>
 
@@ -55,337 +44,52 @@ Reviewed-by: Hannes Reinecke <hare@suse.com>
 Acked-by: Marcel Apfelbaum <marcel@redhat.com>
 Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 ---
- hw/block/nvme.c        |  5 ++++-
- hw/misc/ivshmem.c      |  8 ++++----
- hw/net/e1000e.c        |  6 +++++-
- hw/net/rocker/rocker.c |  7 ++++++-
- hw/net/vmxnet3.c       |  8 ++++++--
- hw/pci/msix.c          | 34 +++++++++++++++++++++++++++++-----
- hw/scsi/megasas.c      |  5 ++++-
- hw/usb/hcd-xhci.c      | 13 ++++++++-----
- hw/vfio/pci.c          |  8 ++++++--
- hw/virtio/virtio-pci.c | 11 +++++------
- include/hw/pci/msix.h  |  5 +++--
- 11 files changed, 80 insertions(+), 30 deletions(-)
+ hw/scsi/megasas.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index d479fd22f573..2d703c8a712a 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -831,6 +831,7 @@ static int nvme_init(PCIDevice *pci_dev)
- {
-     NvmeCtrl *n = NVME(pci_dev);
-     NvmeIdCtrl *id = &n->id_ctrl;
-+    Error *err = NULL;
- 
-     int i;
-     int64_t bs_size;
-@@ -872,7 +873,9 @@ static int nvme_init(PCIDevice *pci_dev)
-     pci_register_bar(&n->parent_obj, 0,
-         PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
-         &n->iomem);
--    msix_init_exclusive_bar(&n->parent_obj, n->num_queues, 4);
-+    if (msix_init_exclusive_bar(&n->parent_obj, n->num_queues, 4, &err)) {
-+        error_report_err(err);
-+    }
- 
-     id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
-     id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index abeaf3da0800..70e71a597b9c 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -749,13 +749,13 @@ static void ivshmem_reset(DeviceState *d)
-     }
- }
- 
--static int ivshmem_setup_interrupts(IVShmemState *s)
-+static int ivshmem_setup_interrupts(IVShmemState *s, Error **errp)
- {
-     /* allocate QEMU callback data for receiving interrupts */
-     s->msi_vectors = g_malloc0(s->vectors * sizeof(MSIVector));
- 
-     if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
--        if (msix_init_exclusive_bar(PCI_DEVICE(s), s->vectors, 1)) {
-+        if (msix_init_exclusive_bar(PCI_DEVICE(s), s->vectors, 1, errp)) {
-             return -1;
-         }
- 
-@@ -897,8 +897,8 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-         qemu_chr_fe_set_handlers(&s->server_chr, ivshmem_can_receive,
-                                  ivshmem_read, NULL, s, NULL, true);
- 
--        if (ivshmem_setup_interrupts(s) < 0) {
--            error_setg(errp, "failed to initialize interrupts");
-+        if (ivshmem_setup_interrupts(s, errp) < 0) {
-+            error_prepend(errp, "Failed to initialize interrupts: ");
-             return;
-         }
-     }
-diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-index 4994e1ca0062..74cbbef30366 100644
---- a/hw/net/e1000e.c
-+++ b/hw/net/e1000e.c
-@@ -292,7 +292,11 @@ e1000e_init_msix(E1000EState *s)
-                         E1000E_MSIX_IDX, E1000E_MSIX_TABLE,
-                         &s->msix,
-                         E1000E_MSIX_IDX, E1000E_MSIX_PBA,
--                        0xA0);
-+                        0xA0, NULL);
-+
-+    /* Any error other than -ENOTSUP(board's MSI support is broken)
-+     * is a programming error. Fall back to INTx silently on -ENOTSUP */
-+    assert(!res || res == -ENOTSUP);
- 
-     if (res < 0) {
-         trace_e1000e_msix_init_fail(res);
-diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
-index e9d215aa4df1..8f829f2946d8 100644
---- a/hw/net/rocker/rocker.c
-+++ b/hw/net/rocker/rocker.c
-@@ -1256,14 +1256,19 @@ static int rocker_msix_init(Rocker *r)
- {
-     PCIDevice *dev = PCI_DEVICE(r);
-     int err;
-+    Error *local_err = NULL;
- 
-     err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
-                     &r->msix_bar,
-                     ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OFFSET,
-                     &r->msix_bar,
-                     ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
--                    0);
-+                    0, &local_err);
-+    /* Any error other than -ENOTSUP(board's MSI support is broken)
-+     * is a programming error. */
-+    assert(!err || err == -ENOTSUP);
-     if (err) {
-+        error_report_err(local_err);
-         return err;
-     }
- 
-diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-index 92f6af9620f1..a433cc017cb1 100644
---- a/hw/net/vmxnet3.c
-+++ b/hw/net/vmxnet3.c
-@@ -2191,10 +2191,14 @@ vmxnet3_init_msix(VMXNET3State *s)
-                         VMXNET3_MSIX_BAR_IDX, VMXNET3_OFF_MSIX_TABLE,
-                         &s->msix_bar,
-                         VMXNET3_MSIX_BAR_IDX, VMXNET3_OFF_MSIX_PBA(s),
--                        VMXNET3_MSIX_OFFSET(s));
-+                        VMXNET3_MSIX_OFFSET(s), NULL);
-+
-+    /* Any error other than -ENOTSUP(board's MSI support is broken)
-+     * is a programming error. Fall back to INTx on -ENOTSUP */
-+    assert(!res || res == -ENOTSUP);
- 
-     if (0 > res) {
--        VMW_WRPRN("Failed to initialize MSI-X, error %d", res);
-+        VMW_WRPRN("Failed to initialize MSI-X, board's MSI support is broken");
-         s->msix_used = false;
-     } else {
-         if (!vmxnet3_use_msix_vectors(s, VMXNET3_MAX_INTRS)) {
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index 0cee631ecc55..d03016f124a9 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -21,6 +21,7 @@
- #include "hw/pci/pci.h"
- #include "hw/xen/xen.h"
- #include "qemu/range.h"
-+#include "qapi/error.h"
- 
- #define MSIX_CAP_LENGTH 12
- 
-@@ -238,11 +239,29 @@ static void msix_mask_all(struct PCIDevice *dev, unsigned nentries)
-     }
- }
- 
--/* Initialize the MSI-X structures */
-+/* Make PCI device @dev MSI-X capable
-+ * @nentries is the max number of MSI-X vectors that the device support.
-+ * @table_bar is the MemoryRegion that MSI-X table structure resides.
-+ * @table_bar_nr is number of base address register corresponding to @table_bar.
-+ * @table_offset indicates the offset that the MSI-X table structure starts with
-+ * in @table_bar.
-+ * @pba_bar is the MemoryRegion that the Pending Bit Array structure resides.
-+ * @pba_bar_nr is number of base address register corresponding to @pba_bar.
-+ * @pba_offset indicates the offset that the Pending Bit Array structure
-+ * starts with in @pba_bar.
-+ * Non-zero @cap_pos puts capability MSI-X at that offset in PCI config space.
-+ * @errp is for returning errors.
-+ *
-+ * Return 0 on success; set @errp and return -errno on error:
-+ * -ENOTSUP means lacking msi support for a msi-capable platform.
-+ * -EINVAL means capability overlap, happens when @cap_pos is non-zero,
-+ * also means a programming error, except device assignment, which can check
-+ * if a real HW is broken.*/
- int msix_init(struct PCIDevice *dev, unsigned short nentries,
-               MemoryRegion *table_bar, uint8_t table_bar_nr,
-               unsigned table_offset, MemoryRegion *pba_bar,
--              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos)
-+              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
-+              Error **errp)
- {
-     int cap;
-     unsigned table_size, pba_size;
-@@ -250,10 +269,12 @@ int msix_init(struct PCIDevice *dev, unsigned short nentries,
- 
-     /* Nothing to do if MSI is not supported by interrupt controller */
-     if (!msi_nonbroken) {
-+        error_setg(errp, "MSI-X is not supported by interrupt controller");
-         return -ENOTSUP;
-     }
- 
-     if (nentries < 1 || nentries > PCI_MSIX_FLAGS_QSIZE + 1) {
-+        error_setg(errp, "The number of MSI-X vectors is invalid");
-         return -EINVAL;
-     }
- 
-@@ -266,10 +287,13 @@ int msix_init(struct PCIDevice *dev, unsigned short nentries,
-         table_offset + table_size > memory_region_size(table_bar) ||
-         pba_offset + pba_size > memory_region_size(pba_bar) ||
-         (table_offset | pba_offset) & PCI_MSIX_FLAGS_BIRMASK) {
-+        error_setg(errp, "table & pba overlap, or they don't fit in BARs,"
-+                   " or don't align");
-         return -EINVAL;
-     }
- 
--    cap = pci_add_capability(dev, PCI_CAP_ID_MSIX, cap_pos, MSIX_CAP_LENGTH);
-+    cap = pci_add_capability2(dev, PCI_CAP_ID_MSIX,
-+                              cap_pos, MSIX_CAP_LENGTH, errp);
-     if (cap < 0) {
-         return cap;
-     }
-@@ -306,7 +330,7 @@ int msix_init(struct PCIDevice *dev, unsigned short nentries,
- }
- 
- int msix_init_exclusive_bar(PCIDevice *dev, unsigned short nentries,
--                            uint8_t bar_nr)
-+                            uint8_t bar_nr, Error **errp)
- {
-     int ret;
-     char *name;
-@@ -338,7 +362,7 @@ int msix_init_exclusive_bar(PCIDevice *dev, unsigned short nentries,
-     ret = msix_init(dev, nentries, &dev->msix_exclusive_bar, bar_nr,
-                     0, &dev->msix_exclusive_bar,
-                     bar_nr, bar_pba_offset,
--                    0);
-+                    0, errp);
-     if (ret) {
-         return ret;
-     }
 diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index 67fc1e7893f8..a946424ab234 100644
+index a946424ab234..14d6e0c6d565 100644
 --- a/hw/scsi/megasas.c
 +++ b/hw/scsi/megasas.c
-@@ -2366,9 +2366,12 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+@@ -2359,19 +2359,31 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
  
-     if (megasas_use_msix(s) &&
-         msix_init(dev, 15, &s->mmio_io, b->mmio_bar, 0x2000,
--                  &s->mmio_io, b->mmio_bar, 0x3800, 0x68)) {
-+                  &s->mmio_io, b->mmio_bar, 0x3800, 0x68, &err)) {
-+        /*TODO: check msix_init's error, and should fail on msix=on */
-+        error_report_err(err);
-         s->msix = ON_OFF_AUTO_OFF;
-     }
+     memory_region_init_io(&s->mmio_io, OBJECT(s), &megasas_mmio_ops, s,
+                           "megasas-mmio", 0x4000);
++    if (megasas_use_msix(s)) {
++        ret = msix_init(dev, 15, &s->mmio_io, b->mmio_bar, 0x2000,
++                        &s->mmio_io, b->mmio_bar, 0x3800, 0x68, &err);
++        /* Any error other than -ENOTSUP(board's MSI support is broken)
++         * is a programming error */
++        assert(!ret || ret == -ENOTSUP);
++        if (ret && s->msix == ON_OFF_AUTO_ON) {
++            /* Can't satisfy user's explicit msix=on request, fail */
++            error_append_hint(&err, "You have to use msix=auto (default) or "
++                    "msix=off with this machine type.\n");
++            /* No instance_finalize method, need to free the resource here */
++            object_unref(OBJECT(&s->mmio_io));
++            error_propagate(errp, err);
++            return;
++        }
++        assert(!err || s->msix == ON_OFF_AUTO_AUTO);
++        /* With msix=auto, we fall back to MSI off silently */
++        error_free(err);
++    }
 +
+     memory_region_init_io(&s->port_io, OBJECT(s), &megasas_port_ops, s,
+                           "megasas-io", 256);
+     memory_region_init_io(&s->queue_io, OBJECT(s), &megasas_queue_ops, s,
+                           "megasas-queue", 0x40000);
+ 
+-    if (megasas_use_msix(s) &&
+-        msix_init(dev, 15, &s->mmio_io, b->mmio_bar, 0x2000,
+-                  &s->mmio_io, b->mmio_bar, 0x3800, 0x68, &err)) {
+-        /*TODO: check msix_init's error, and should fail on msix=on */
+-        error_report_err(err);
+-        s->msix = ON_OFF_AUTO_OFF;
+-    }
+-
      if (pci_is_express(dev)) {
          pcie_endpoint_cap_init(dev, 0xa0);
      }
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 0ace273da472..153b006ca01b 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -3703,11 +3703,14 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-     }
- 
-     if (xhci->msix != ON_OFF_AUTO_OFF) {
--        /* TODO check for errors */
--        msix_init(dev, xhci->numintrs,
--                  &xhci->mem, 0, OFF_MSIX_TABLE,
--                  &xhci->mem, 0, OFF_MSIX_PBA,
--                  0x90);
-+        /* TODO check for errors, and should fail when msix=on */
-+        ret = msix_init(dev, xhci->numintrs,
-+                        &xhci->mem, 0, OFF_MSIX_TABLE,
-+                        &xhci->mem, 0, OFF_MSIX_PBA,
-+                        0x90, &err);
-+        if (ret) {
-+            error_report_err(err);
-+        }
-     }
- }
- 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index d7dbe0e3e04e..0bcfaad0a095 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1432,6 +1432,7 @@ static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
- static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
- {
-     int ret;
-+    Error *local_err = NULL;
- 
-     vdev->msix->pending = g_malloc0(BITS_TO_LONGS(vdev->msix->entries) *
-                                     sizeof(unsigned long));
-@@ -1439,12 +1440,15 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
-                     vdev->bars[vdev->msix->table_bar].region.mem,
-                     vdev->msix->table_bar, vdev->msix->table_offset,
-                     vdev->bars[vdev->msix->pba_bar].region.mem,
--                    vdev->msix->pba_bar, vdev->msix->pba_offset, pos);
-+                    vdev->msix->pba_bar, vdev->msix->pba_offset, pos,
-+                    &local_err);
-     if (ret < 0) {
-         if (ret == -ENOTSUP) {
-+            error_report_err(local_err);
-             return 0;
-         }
--        error_setg(errp, "msix_init failed");
-+
-+        error_propagate(errp, local_err);
-         return ret;
-     }
- 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 21c2b9dbfc97..9562c265aa26 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1670,13 +1670,12 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
- 
-     if (proxy->nvectors) {
-         int err = msix_init_exclusive_bar(&proxy->pci_dev, proxy->nvectors,
--                                          proxy->msix_bar_idx);
-+                                          proxy->msix_bar_idx, errp);
-+        /* Any error other than -ENOTSUP(board's MSI support is broken)
-+         * is a programming error. */
-+        assert(!err || err == -ENOTSUP);
-         if (err) {
--            /* Notice when a system that supports MSIx can't initialize it.  */
--            if (err != -ENOTSUP) {
--                error_report("unable to init msix vectors to %" PRIu32,
--                             proxy->nvectors);
--            }
-+            error_report_err(*errp);
-             proxy->nvectors = 0;
-         }
-     }
-diff --git a/include/hw/pci/msix.h b/include/hw/pci/msix.h
-index 048a29dd2f65..1f27658d352f 100644
---- a/include/hw/pci/msix.h
-+++ b/include/hw/pci/msix.h
-@@ -9,9 +9,10 @@ MSIMessage msix_get_message(PCIDevice *dev, unsigned int vector);
- int msix_init(PCIDevice *dev, unsigned short nentries,
-               MemoryRegion *table_bar, uint8_t table_bar_nr,
-               unsigned table_offset, MemoryRegion *pba_bar,
--              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos);
-+              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
-+              Error **errp);
- int msix_init_exclusive_bar(PCIDevice *dev, unsigned short nentries,
--                            uint8_t bar_nr);
-+                            uint8_t bar_nr, Error **errp);
- 
- void msix_write_config(PCIDevice *dev, uint32_t address, uint32_t val, int len);
- 
 -- 
 2.1.0
