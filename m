@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cRzdS-0001Co-Hj
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 06:03:07 -0500
+	(envelope-from <lvivier@redhat.com>) id 1cRzk8-0004vp-T4
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 06:10:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cRzdO-0001S0-P5
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 06:03:06 -0500
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Fri, 13 Jan 2017 12:02:50 +0100
-Message-Id: <1484305370-6220-1-git-send-email-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH] ahci: advertise HOST_CAP_64
+	(envelope-from <lvivier@redhat.com>) id 1cRzk5-0004K3-OQ
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 06:10:00 -0500
+References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
+	<CAFEAcA9fENz1=__4-upW=HLZJ50pAYkA4H2T13wDs62PNDXK3A@mail.gmail.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <8a20edcf-67dc-eb57-42b3-78494dd5c738@redhat.com>
+Date: Fri, 13 Jan 2017 12:09:52 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9fENz1=__4-upW=HLZJ50pAYkA4H2T13wDs62PNDXK3A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/67] ppc-for-2.9 queue 20170112
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,33 +23,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: jsnow@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-The AHCI emulation code supports 64-bit addressing and should advertise this
-fact in the Host Capabilities register. Both Linux and Windows drivers test
-this bit to decide if the upper 32 bits of various registers may be written
-to, and at least some versions of Windows have a bug where DMA is attempted
-with an address above 4GB but, in the absence of HOST_CAP_64, the upper 32
-bits are left unititialized which leads to a memory corruption.
+On 13/01/2017 11:54, Peter Maydell wrote:
+> Q: can we just enable these tests for PCI with
+> check-qtest-ppc64-y += $(check-qtest-pci-y)
+> gcov-files-ppc64-y += $(gcov-files-pci-y)
+> 
+> the way we do for i386/x86_64 ? Or is that doing too much
+> unwanted extra testing?
 
-Signed-off-by: Ladi Prosek <lprosek@redhat.com>
----
- hw/ide/ahci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+For most of the devices tested in check-qtest-pci-y, the test has not
+been ported to ppc64 and fails (or hangs).
 
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 3c19bda..6a17acf 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -488,7 +488,7 @@ static void ahci_reg_init(AHCIState *s)
-     s->control_regs.cap = (s->ports - 1) |
-                           (AHCI_NUM_COMMAND_SLOTS << 8) |
-                           (AHCI_SUPPORTED_SPEED_GEN1 << AHCI_SUPPORTED_SPEED) |
--                          HOST_CAP_NCQ | HOST_CAP_AHCI;
-+                          HOST_CAP_NCQ | HOST_CAP_AHCI | HOST_CAP_64;
- 
-     s->control_regs.impl = (1 << s->ports) - 1;
- 
--- 
-2.7.4
+This is why we don't add the full list in check-qtest-ppc64-y.
+
+Laurent
