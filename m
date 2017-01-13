@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx4-0008Ke-Eb
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:07 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx5-0008LE-19
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx3-0001Xy-Ej
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:06 -0500
-Received: from [59.151.112.132] (port=57230 helo=heian.cn.fujitsu.com)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx4-0001a4-3T
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:07 -0500
+Received: from [59.151.112.132] (port=54421 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx2-0001Tl-PC
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:05 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRvx3-0001HH-8y
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:07:06 -0500
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Fri, 13 Jan 2017 15:11:59 +0800
-Message-ID: <1484291524-1261-6-git-send-email-caoj.fnst@cn.fujitsu.com>
+Date: Fri, 13 Jan 2017 15:12:00 +0800
+Message-ID: <1484291524-1261-7-git-send-email-caoj.fnst@cn.fujitsu.com>
 In-Reply-To: <1484291524-1261-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 References: <1484291524-1261-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 05/10] hcd-xhci: change behaviour of msix
- switch
+Subject: [Qemu-devel] [PATCH v8 06/10] megasas: undo the overwrites of msi
+ user configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +27,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Resolve the TODO, msix=auto means msix on; if user specify msix=on,
-then device creation fail on msix_init failure.
+Commit afea4e14 seems forgetting to undo the overwrites, which is
+unsuitable.
 
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
+CC: Hannes Reinecke <hare@suse.de>
+CC: Paolo Bonzini <pbonzini@redhat.com>
 CC: Markus Armbruster <armbru@redhat.com>
 CC: Marcel Apfelbaum <marcel@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 Acked-by: Marcel Apfelbaum <marcel@redhat.com>
 Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 ---
- hw/usb/hcd-xhci.c | 35 ++++++++++++++++++++++++-----------
- 1 file changed, 24 insertions(+), 11 deletions(-)
+ hw/scsi/megasas.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 153b006ca01b..aaca57cb5f1f 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -3636,12 +3636,14 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-     if (xhci->numintrs < 1) {
-         xhci->numintrs = 1;
-     }
-+
-     if (xhci->numslots > MAXSLOTS) {
-         xhci->numslots = MAXSLOTS;
-     }
-     if (xhci->numslots < 1) {
-         xhci->numslots = 1;
-     }
-+
-     if (xhci_get_flag(xhci, XHCI_FLAG_ENABLE_STREAMS)) {
-         xhci->max_pstreams_mask = 7; /* == 256 primary streams */
-     } else {
-@@ -3669,6 +3671,28 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
- 
-     memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
-+    if (xhci->msix != ON_OFF_AUTO_OFF) {
-+        ret = msix_init(dev, xhci->numintrs,
-+                        &xhci->mem, 0, OFF_MSIX_TABLE,
-+                        &xhci->mem, 0, OFF_MSIX_PBA,
-+                        0x90, &err);
-+        /* Any error other than -ENOTSUP(board's MSI support is broken)
-+         * is a programming error */
-+        assert(!ret || ret == -ENOTSUP);
-+        if (ret && xhci->msix == ON_OFF_AUTO_ON) {
-+            /* Can't satisfy user's explicit msix=on request, fail */
-+            error_append_hint(&err, "You have to use msix=auto (default) or "
-+                    "msix=off with this machine type.\n");
-+            /* No instance_finalize method, need to free the resource here */
-+            object_unref(OBJECT(&xhci->mem));
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        assert(!err || xhci->msix == ON_OFF_AUTO_AUTO);
-+        /* With msix=auto, we fall back to MSI off silently */
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 14d6e0c6d565..c208d520c4df 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -2350,11 +2350,10 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+                     "msi=off with this machine type.\n");
+             error_propagate(errp, err);
+             return;
+-        } else if (ret) {
+-            /* With msi=auto, we fall back to MSI off silently */
+-            s->msi = ON_OFF_AUTO_OFF;
+-            error_free(err);
+         }
++        assert(!err || s->msix == ON_OFF_AUTO_AUTO);
++        /* With msi=auto, we fall back to MSI off silently */
 +        error_free(err);
-+    }
-+
-     memory_region_init_io(&xhci->mem_cap, OBJECT(xhci), &xhci_cap_ops, xhci,
-                           "capabilities", LEN_CAP);
-     memory_region_init_io(&xhci->mem_oper, OBJECT(xhci), &xhci_oper_ops, xhci,
-@@ -3701,17 +3725,6 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-         ret = pcie_endpoint_cap_init(dev, 0xa0);
-         assert(ret >= 0);
      }
--
--    if (xhci->msix != ON_OFF_AUTO_OFF) {
--        /* TODO check for errors, and should fail when msix=on */
--        ret = msix_init(dev, xhci->numintrs,
--                        &xhci->mem, 0, OFF_MSIX_TABLE,
--                        &xhci->mem, 0, OFF_MSIX_PBA,
--                        0x90, &err);
--        if (ret) {
--            error_report_err(err);
--        }
--    }
- }
  
- static void usb_xhci_exit(PCIDevice *dev)
+     memory_region_init_io(&s->mmio_io, OBJECT(s), &megasas_mmio_ops, s,
 -- 
 2.1.0
