@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cS10C-00039d-I3
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:30:41 -0500
+	(envelope-from <jhanley@dgtlrift.com>) id 1cS14e-000607-U0
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:35:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cS108-0004UX-BT
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:30:40 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38003)
+	(envelope-from <jhanley@dgtlrift.com>) id 1cS14e-0006QP-76
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:35:16 -0500
+Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:35224)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cS107-0004UI-VC
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:30:36 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id r144so68685227wme.1
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 04:30:35 -0800 (PST)
-References: <20170112154731.1028-1-alex.bennee@linaro.org>
-	<20170112154731.1028-4-alex.bennee@linaro.org>
-	<87inpk2rkl.fsf@linaro.org>
-	<aaaa75a1-7c42-6263-fee6-790cde5e8730@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <aaaa75a1-7c42-6263-fee6-790cde5e8730@twiddle.net>
-Date: Fri, 13 Jan 2017 12:30:32 +0000
-Message-ID: <87d1fr2lcn.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <jhanley@dgtlrift.com>)
+	id 1cS14e-0006Q0-1A
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:35:16 -0500
+Received: by mail-vk0-x230.google.com with SMTP id x75so32350832vke.2
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 04:35:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] cputlb: drop flush_global flag from
- tlb_flush
+From: James Hanley <jhanley@dgtlrift.com>
+Date: Fri, 13 Jan 2017 07:35:14 -0500
+Message-ID: <CAF++6AOnuOzwiiPRJEGatzX7LuoJKU5ij2xWRLkKbxhytJscqA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] system_clock_scale unset in hw/intc/armv7m_nvic.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+To: qemu-discuss@nongnu.org, qemu-arm <qemu-arm@nongnu.org>, qemu-devel@nongnu.org
 
+How should system_clock_scale be set in hw/intc/armv7m_nvic.c - there is no
+API for the global, and I've defaulted the global to SYSTICK_SCALE which
+seems to work, but is not obvious.  This was needed as this value was set
+to zero and the arm firmware was selecting the external clock source
+causing zero to be returned from systick_scale() and the interrupt to run
+continuously.
 
-Richard Henderson <rth@twiddle.net> writes:
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 06d8db6..c15841e 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -70,7 +70,7 @@ static const uint8_t nvic_id[] = {
+ #define SYSTICK_CLKSOURCE (1 << 2)
+ #define SYSTICK_COUNTFLAG (1 << 16)
 
-> On 01/12/2017 08:03 AM, Alex Bennée wrote:
->> And I immediately realise I missed out:
->>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> Reviewed-by: Richard Henderson <rth@twiddle.net>
->> [DG: ppc portions]
->> Acked-by: David Gibson <david@gibson.dropbear.id.au>
->>
->> Do you want me to re-post or can you apply when you take the patches?
->>
->
-> I also don't mind if you send the pull request.
+-int system_clock_scale;
++int system_clock_scale = SYSTICK_SCALE;
 
-If Peter is OK with that?
-
-In that case I now have a few more tags to add and I can roll a PULL REQ.
-
---
-Alex Bennée
+ /* Conversion factor from qemu timer to SysTick frequencies.  */
+ static inline int64_t systick_scale(nvic_state *s)
