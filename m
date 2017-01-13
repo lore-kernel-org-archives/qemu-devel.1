@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amit.shah@redhat.com>) id 1cRsfu-0007UU-Ea
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:37:11 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRswo-0005RK-6V
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:54:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amit.shah@redhat.com>) id 1cRsfq-0000TG-Ix
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:37:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44052)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amit.shah@redhat.com>)
-	id 1cRsfq-0000Sz-Cr
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:37:06 -0500
-Date: Fri, 13 Jan 2017 09:07:01 +0530
-From: Amit Shah <amit.shah@redhat.com>
-Message-ID: <20170113033701.GA1955@amit-lp.rh>
-References: <1483633930-7103-1-git-send-email-amit.shah@redhat.com>
-	<CAFEAcA8nZmDsQvfX+=W3jDJU0rUThsn93fFNYgzxhEyWTx_kHQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8nZmDsQvfX+=W3jDJU0rUThsn93fFNYgzxhEyWTx_kHQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/4] migration: QTAILQ migration
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cRswk-0003rA-RL
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:54:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35310
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cRswk-0003qt-M0
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:54:34 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	v0D3s6Ya112897
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 22:54:33 -0500
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27xmfawdvb-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 22:54:33 -0500
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 13 Jan 2017 13:54:30 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Fri, 13 Jan 2017 09:24:07 +0530
+Message-Id: <1484279649-22286-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 0/2] POWER9 TCG enablements - part12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +36,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu list <qemu-devel@nongnu.org>, Jianjun Duan <duanj@linux.vnet.ibm.com>
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-On (Fri) 06 Jan 2017 [12:10:22], Peter Maydell wrote:
-> On 5 January 2017 at 16:32, Amit Shah <amit.shah@redhat.com> wrote:
-> > The following changes since commit dbe2b65566e76d3c3a0c3358285c0336ac61e757:
-> >
-> >   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.9-pull-request' into staging (2016-12-28 17:11:11 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   https://git.kernel.org/pub/scm/virt/qemu/amit/migration.git tags/migration-for-2.9-1
-> >
-> > for you to fetch changes up to 8d0c57697abcc57166e918064d9a7f6c7316d01b:
-> >
-> >   migration: add error_report (2017-01-04 19:21:26 +0530)
-> >
-> > ----------------------------------------------------------------
-> > Migration: migrate QTAILQ infrastructure for vmstate
-> >
-> > ----------------------------------------------------------------
-> 
-> Hi. I'm afraid this fails 'make check' for ppc64be:
+This series contains 5 new instructions for POWER9 ISA3.0
+    VSX Scalar Test Data Class
+    VSX Vector Test Data Class
 
-Hi Peter, since this was due to something else, will you try to pull
-this in again?  Or should I re-send the series?
+Changelog:
+v0:
+* Concise logic for identifying data class in Scalar/Vector 
+  test data class instructions
 
-Thanks,
+Nikunj A Dadhania (2):
+  target-ppc: Add xvtstdc[sp,dp] instructions
+  target-ppc: Add xststdc[sp, dp, qp] instructions
 
-		Amit
+ target/ppc/fpu_helper.c             | 89 +++++++++++++++++++++++++++++++++++++
+ target/ppc/helper.h                 |  5 +++
+ target/ppc/internal.h               |  6 ++-
+ target/ppc/translate/vsx-impl.inc.c |  5 +++
+ target/ppc/translate/vsx-ops.inc.c  | 12 +++++
+ 5 files changed, 115 insertions(+), 2 deletions(-)
+
+-- 
+2.7.4
