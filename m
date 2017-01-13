@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRsD6-00020d-PF
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:26 -0500
+	(envelope-from <peterx@redhat.com>) id 1cRsDB-00024C-P3
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRsD3-0007MJ-Jw
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47888)
+	(envelope-from <peterx@redhat.com>) id 1cRsDA-0007Qo-1L
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52420)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRsD3-0007Kp-AC
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:21 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRsD9-0007PK-OT
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 22:07:27 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 13 Jan 2017 11:06:30 +0800
-Message-Id: <1484276800-26814-5-git-send-email-peterx@redhat.com>
+Date: Fri, 13 Jan 2017 11:06:31 +0800
+Message-Id: <1484276800-26814-6-git-send-email-peterx@redhat.com>
 In-Reply-To: <1484276800-26814-1-git-send-email-peterx@redhat.com>
 References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC v3 04/14] intel_iommu: fix trace for inv
- desc handling
+Subject: [Qemu-devel] [PATCH RFC v3 05/14] intel_iommu: fix trace for addr
+ translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,322 +27,242 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-VT-d codes are still using static DEBUG_INTEL_IOMMU macro. That's not
-good, and we should end the day when we need to recompile the code
-before getting useful debugging information for vt-d. Time to switch to
-the trace system.
-
-This is the first patch to do it.
-
-Generally, the rule of mine is:
-
-- for the old GENERAL typed message, I use error_report() directly if
-  apply. Those are something shouldn't happen, and we should print those
-  errors in all cases, even without enabling debug and tracing.
-
-- for the non-GENERAL typed messages, remove those VTD_PRINTF()s that
-  looks hardly used, and convert the rest lines into trace_*().
-
-- for useless DPRINTFs, I removed them.
+Another patch to convert the DPRINTF() stuffs. This patch focuses on the
+address translation path and caching.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/i386/intel_iommu.c | 98 ++++++++++++++++++++++++---------------------------
- hw/i386/trace-events  | 13 +++++++
- 2 files changed, 59 insertions(+), 52 deletions(-)
+ hw/i386/intel_iommu.c | 84 +++++++++++++++++++++++++--------------------------
+ hw/i386/trace-events  |  7 +++++
+ 2 files changed, 48 insertions(+), 43 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 275c3db..459e575 100644
+index 459e575..b4166e0 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -35,6 +35,7 @@
- #include "sysemu/kvm.h"
- #include "hw/i386/apic_internal.h"
- #include "kvm_i386.h"
-+#include "trace.h"
+@@ -260,11 +260,9 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
+     uint64_t *key = g_malloc(sizeof(*key));
+     uint64_t gfn = vtd_get_iotlb_gfn(addr, level);
  
- /*#define DEBUG_INTEL_IOMMU*/
- #ifdef DEBUG_INTEL_IOMMU
-@@ -474,22 +475,19 @@ static void vtd_handle_inv_queue_error(IntelIOMMUState *s)
- /* Set the IWC field and try to generate an invalidation completion interrupt */
- static void vtd_generate_completion_event(IntelIOMMUState *s)
- {
--    VTD_DPRINTF(INV, "completes an invalidation wait command with "
--                "Interrupt Flag");
-     if (vtd_get_long_raw(s, DMAR_ICS_REG) & VTD_ICS_IWC) {
--        VTD_DPRINTF(INV, "there is a previous interrupt condition to be "
--                    "serviced by software, "
--                    "new invalidation event is not generated");
-+        trace_vtd_inv_desc_wait_irq("One pending, skip current");
-         return;
+-    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
+-                " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr, slpte,
+-                domain_id);
++    trace_vtd_iotlb_page_update(source_id, addr, slpte, domain_id);
+     if (g_hash_table_size(s->iotlb) >= VTD_IOTLB_MAX_SIZE) {
+-        VTD_DPRINTF(CACHE, "iotlb exceeds size limit, forced to reset");
++        trace_vtd_iotlb_reset("iotlb exceeds size limit");
+         vtd_reset_iotlb(s);
      }
-     vtd_set_clear_mask_long(s, DMAR_ICS_REG, 0, VTD_ICS_IWC);
-     vtd_set_clear_mask_long(s, DMAR_IECTL_REG, 0, VTD_IECTL_IP);
-     if (vtd_get_long_raw(s, DMAR_IECTL_REG) & VTD_IECTL_IM) {
--        VTD_DPRINTF(INV, "IM filed in IECTL_REG is set, new invalidation "
--                    "event is not generated");
-+        trace_vtd_inv_desc_wait_irq("IM in IECTL_REG is set, "
-+                                    "new event not generated");
-         return;
-     } else {
-         /* Generate the interrupt event */
-+        trace_vtd_inv_desc_wait_irq("Generating complete event");
-         vtd_generate_interrupt(s, DMAR_IEADDR_REG, DMAR_IEDATA_REG);
-         vtd_set_clear_mask_long(s, DMAR_IECTL_REG, VTD_IECTL_IP, 0);
-     }
-@@ -923,6 +921,7 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
  
- static void vtd_context_global_invalidate(IntelIOMMUState *s)
- {
-+    trace_vtd_inv_desc_cc_global();
-     s->context_cache_gen++;
-     if (s->context_cache_gen == VTD_CONTEXT_CACHE_GEN_MAX) {
-         vtd_reset_context_cache(s);
-@@ -962,9 +961,11 @@ static void vtd_context_device_invalidate(IntelIOMMUState *s,
-     uint16_t mask;
-     VTDBus *vtd_bus;
-     VTDAddressSpace *vtd_as;
--    uint16_t devfn;
-+    uint8_t bus_n, devfn;
-     uint16_t devfn_it;
+@@ -505,8 +503,8 @@ static int vtd_get_root_entry(IntelIOMMUState *s, uint8_t index,
  
-+    trace_vtd_inv_desc_cc_devices(source_id, func_mask);
-+
-     switch (func_mask & 3) {
-     case 0:
-         mask = 0;   /* No bits in the SID field masked */
-@@ -980,16 +981,16 @@ static void vtd_context_device_invalidate(IntelIOMMUState *s,
-         break;
+     addr = s->root + index * sizeof(*re);
+     if (dma_memory_read(&address_space_memory, addr, re, sizeof(*re))) {
+-        VTD_DPRINTF(GENERAL, "error: fail to access root-entry at 0x%"PRIx64
+-                    " + %"PRIu8, s->root, index);
++        error_report("Fail to access root-entry at 0x%"PRIx64
++                     " index %"PRIu8, s->root, index);
+         re->val = 0;
+         return -VTD_FR_ROOT_TABLE_INV;
      }
-     mask = ~mask;
--    VTD_DPRINTF(INV, "device-selective invalidation source 0x%"PRIx16
--                    " mask %"PRIu16, source_id, mask);
--    vtd_bus = vtd_find_as_from_bus_num(s, VTD_SID_TO_BUS(source_id));
-+
-+    bus_n = VTD_SID_TO_BUS(source_id);
-+    vtd_bus = vtd_find_as_from_bus_num(s, bus_n);
-     if (vtd_bus) {
-         devfn = VTD_SID_TO_DEVFN(source_id);
-         for (devfn_it = 0; devfn_it < X86_IOMMU_PCI_DEVFN_MAX; ++devfn_it) {
-             vtd_as = vtd_bus->dev_as[devfn_it];
-             if (vtd_as && ((devfn_it & mask) == (devfn & mask))) {
--                VTD_DPRINTF(INV, "invalidate context-cahce of devfn 0x%"PRIx16,
--                            devfn_it);
-+                trace_vtd_inv_desc_cc_device(bus_n, (devfn_it >> 3) & 0x1f,
-+                                             devfn_it & 3);
-                 vtd_as->context_cache_entry.context_cache_gen = 0;
-             }
+@@ -525,13 +523,12 @@ static int vtd_get_context_entry_from_root(VTDRootEntry *root, uint8_t index,
+     dma_addr_t addr;
+ 
+     if (!vtd_root_entry_present(root)) {
+-        VTD_DPRINTF(GENERAL, "error: root-entry is not present");
++        error_report("Root-entry is not present");
+         return -VTD_FR_ROOT_ENTRY_P;
+     }
+     addr = (root->val & VTD_ROOT_ENTRY_CTP) + index * sizeof(*ce);
+     if (dma_memory_read(&address_space_memory, addr, ce, sizeof(*ce))) {
+-        VTD_DPRINTF(GENERAL, "error: fail to access context-entry at 0x%"PRIx64
+-                    " + %"PRIu8,
++        error_report("Fail to access context-entry at 0x%"PRIx64" ind %"PRIu8,
+                     (uint64_t)(root->val & VTD_ROOT_ENTRY_CTP), index);
+         return -VTD_FR_CONTEXT_TABLE_INV;
+     }
+@@ -644,7 +641,7 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+      * in CAP_REG and AW in context-entry.
+      */
+     if (iova & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
+-        VTD_DPRINTF(GENERAL, "error: iova 0x%"PRIx64 " exceeds limits", iova);
++        error_report("IOVA 0x%"PRIx64 " exceeds limits", iova);
+         return -VTD_FR_ADDR_BEYOND_MGAW;
+     }
+ 
+@@ -656,7 +653,7 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+         slpte = vtd_get_slpte(addr, offset);
+ 
+         if (slpte == (uint64_t)-1) {
+-            VTD_DPRINTF(GENERAL, "error: fail to access second-level paging "
++            error_report("Fail to access second-level paging "
+                         "entry at level %"PRIu32 " for iova 0x%"PRIx64,
+                         level, iova);
+             if (level == vtd_get_level_from_context_entry(ce)) {
+@@ -669,13 +666,13 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+         *reads = (*reads) && (slpte & VTD_SL_R);
+         *writes = (*writes) && (slpte & VTD_SL_W);
+         if (!(slpte & access_right_check)) {
+-            VTD_DPRINTF(GENERAL, "error: lack of %s permission for "
+-                        "iova 0x%"PRIx64 " slpte 0x%"PRIx64,
+-                        (is_write ? "write" : "read"), iova, slpte);
++            error_report("Lack of %s permission for iova 0x%"PRIx64
++                         " slpte 0x%"PRIx64,
++                         (is_write ? "write" : "read"), iova, slpte);
+             return is_write ? -VTD_FR_WRITE : -VTD_FR_READ;
          }
-@@ -1302,7 +1303,7 @@ static bool vtd_process_wait_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
- {
-     if ((inv_desc->hi & VTD_INV_DESC_WAIT_RSVD_HI) ||
-         (inv_desc->lo & VTD_INV_DESC_WAIT_RSVD_LO)) {
--        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in Invalidation "
-+        error_report("Non-zero reserved field in Invalidation "
-                     "Wait Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
-                     inv_desc->hi, inv_desc->lo);
-         return false;
-@@ -1316,21 +1317,20 @@ static bool vtd_process_wait_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
+         if (vtd_slpte_nonzero_rsvd(slpte, level)) {
+-            VTD_DPRINTF(GENERAL, "error: non-zero reserved field in second "
++            error_report("Non-zero reserved field in second "
+                         "level paging entry level %"PRIu32 " slpte 0x%"PRIx64,
+                         level, slpte);
+             return -VTD_FR_PAGING_ENTRY_RSVD;
+@@ -704,12 +701,13 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+     }
  
-         /* FIXME: need to be masked with HAW? */
-         dma_addr_t status_addr = inv_desc->hi;
--        VTD_DPRINTF(INV, "status data 0x%x, status addr 0x%"PRIx64,
--                    status_data, status_addr);
-+        trace_vtd_inv_desc_wait_sw(status_addr, status_data);
-         status_data = cpu_to_le32(status_data);
-         if (dma_memory_write(&address_space_memory, status_addr, &status_data,
-                              sizeof(status_data))) {
--            VTD_DPRINTF(GENERAL, "error: fail to perform a coherent write");
-+            error_report("Invalidate Desc Wait status write failed");
-             return false;
-         }
-     } else if (inv_desc->lo & VTD_INV_DESC_WAIT_IF) {
-         /* Interrupt flag */
--        VTD_DPRINTF(INV, "Invalidation Wait Descriptor interrupt completion");
-         vtd_generate_completion_event(s);
-     } else {
--        VTD_DPRINTF(GENERAL, "error: invalid Invalidation Wait Descriptor: "
--                    "hi 0x%"PRIx64 " lo 0x%"PRIx64, inv_desc->hi, inv_desc->lo);
-+        error_report("invalid Invalidation Wait Descriptor: "
+     if (!vtd_root_entry_present(&re)) {
+-        VTD_DPRINTF(GENERAL, "error: root-entry #%"PRIu8 " is not present",
+-                    bus_num);
++        /* Not error - it's okay we don't have root entry. */
++        trace_vtd_re_not_present(bus_num);
+         return -VTD_FR_ROOT_ENTRY_P;
+     } else if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)) {
+-        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in root-entry "
+-                    "hi 0x%"PRIx64 " lo 0x%"PRIx64, re.rsvd, re.val);
++        error_report("Non-zero reserved field in root-entry bus_num %d "
 +                     "hi 0x%"PRIx64 " lo 0x%"PRIx64,
-+                     inv_desc->hi, inv_desc->lo);
-         return false;
++                     bus_num, re.rsvd, re.val);
+         return -VTD_FR_ROOT_ENTRY_RSVD;
      }
-     return true;
-@@ -1339,30 +1339,32 @@ static bool vtd_process_wait_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
- static bool vtd_process_context_cache_desc(IntelIOMMUState *s,
-                                            VTDInvDesc *inv_desc)
+ 
+@@ -719,22 +717,20 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+     }
+ 
+     if (!vtd_context_entry_present(ce)) {
+-        VTD_DPRINTF(GENERAL,
+-                    "error: context-entry #%"PRIu8 "(bus #%"PRIu8 ") "
+-                    "is not present", devfn, bus_num);
++        /* Not error - it's okay we don't have context entry. */
++        trace_vtd_ce_not_present(bus_num, devfn);
+         return -VTD_FR_CONTEXT_ENTRY_P;
+     } else if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
+                (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO)) {
+-        VTD_DPRINTF(GENERAL,
+-                    "error: non-zero reserved field in context-entry "
++        error_report("Non-zero reserved field in context-entry"
+                     "hi 0x%"PRIx64 " lo 0x%"PRIx64, ce->hi, ce->lo);
+         return -VTD_FR_CONTEXT_ENTRY_RSVD;
+     }
+     /* Check if the programming of context-entry is valid */
+     if (!vtd_is_level_supported(s, vtd_get_level_from_context_entry(ce))) {
+-        VTD_DPRINTF(GENERAL, "error: unsupported Address Width value in "
+-                    "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+-                    ce->hi, ce->lo);
++        error_report("Unsupported Address Width value in "
++                     "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
++                     ce->hi, ce->lo);
+         return -VTD_FR_CONTEXT_ENTRY_INV;
+     } else {
+         switch (ce->lo & VTD_CONTEXT_ENTRY_TT) {
+@@ -746,6 +742,9 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+             VTD_DPRINTF(GENERAL, "error: unsupported Translation Type in "
+                         "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+                         ce->hi, ce->lo);
++            error_report("Unsupported Translation Type in "
++                         "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
++                         ce->hi, ce->lo);
+             return -VTD_FR_CONTEXT_ENTRY_INV;
+         }
+     }
+@@ -825,9 +824,8 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     /* Try to fetch slpte form IOTLB */
+     iotlb_entry = vtd_lookup_iotlb(s, source_id, addr);
+     if (iotlb_entry) {
+-        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
+-                    " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr,
+-                    iotlb_entry->slpte, iotlb_entry->domain_id);
++        trace_vtd_iotlb_page_hit(source_id, addr, iotlb_entry->slpte,
++                                 iotlb_entry->domain_id);
+         slpte = iotlb_entry->slpte;
+         reads = iotlb_entry->read_flags;
+         writes = iotlb_entry->write_flags;
+@@ -836,10 +834,9 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     }
+     /* Try to fetch context-entry from cache first */
+     if (cc_entry->context_cache_gen == s->context_cache_gen) {
+-        VTD_DPRINTF(CACHE, "hit context-cache bus %d devfn %d "
+-                    "(hi %"PRIx64 " lo %"PRIx64 " gen %"PRIu32 ")",
+-                    bus_num, devfn, cc_entry->context_entry.hi,
+-                    cc_entry->context_entry.lo, cc_entry->context_cache_gen);
++        trace_vtd_iotlb_cc_hit(bus_num, devfn, cc_entry->context_entry.hi,
++                               cc_entry->context_entry.lo,
++                               cc_entry->context_cache_gen);
+         ce = cc_entry->context_entry;
+         is_fpd_set = ce.lo & VTD_CONTEXT_ENTRY_FPD;
+     } else {
+@@ -848,19 +845,18 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+         if (ret_fr) {
+             ret_fr = -ret_fr;
+             if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
+-                VTD_DPRINTF(FLOG, "fault processing is disabled for DMA "
+-                            "requests through this context-entry "
+-                            "(with FPD Set)");
++                error_report("Fault processing is disabled for DMA "
++                             "requests through this context-entry "
++                             "(with FPD Set)");
+             } else {
+                 vtd_report_dmar_fault(s, source_id, addr, ret_fr, is_write);
+             }
+             return;
+         }
+         /* Update context-cache */
+-        VTD_DPRINTF(CACHE, "update context-cache bus %d devfn %d "
+-                    "(hi %"PRIx64 " lo %"PRIx64 " gen %"PRIu32 "->%"PRIu32 ")",
+-                    bus_num, devfn, ce.hi, ce.lo,
+-                    cc_entry->context_cache_gen, s->context_cache_gen);
++        trace_vtd_iotlb_cc_update(bus_num, devfn, ce.hi, ce.lo,
++                                  cc_entry->context_cache_gen,
++                                  s->context_cache_gen);
+         cc_entry->context_entry = ce;
+         cc_entry->context_cache_gen = s->context_cache_gen;
+     }
+@@ -870,8 +866,9 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     if (ret_fr) {
+         ret_fr = -ret_fr;
+         if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
+-            VTD_DPRINTF(FLOG, "fault processing is disabled for DMA requests "
+-                        "through this context-entry (with FPD Set)");
++            error_report("Fault processing is disabled for DMA "
++                         "requests through this context-entry "
++                         "(with FPD Set)");
+         } else {
+             vtd_report_dmar_fault(s, source_id, addr, ret_fr, is_write);
+         }
+@@ -1031,6 +1028,7 @@ static uint64_t vtd_context_cache_invalidate(IntelIOMMUState *s, uint64_t val)
+ 
+ static void vtd_iotlb_global_invalidate(IntelIOMMUState *s)
  {
-+    uint16_t sid, fmask;
-+
-     if ((inv_desc->lo & VTD_INV_DESC_CC_RSVD) || inv_desc->hi) {
--        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in Context-cache "
--                    "Invalidate Descriptor");
-+        error_report("non-zero reserved field in Context-cache "
-+                     "Invalidate Descriptor");
-         return false;
-     }
-     switch (inv_desc->lo & VTD_INV_DESC_CC_G) {
-     case VTD_INV_DESC_CC_DOMAIN:
--        VTD_DPRINTF(INV, "domain-selective invalidation domain 0x%"PRIx16,
--                    (uint16_t)VTD_INV_DESC_CC_DID(inv_desc->lo));
-+        trace_vtd_inv_desc_cc_domain(
-+            (uint16_t)VTD_INV_DESC_CC_DID(inv_desc->lo));
-         /* Fall through */
-     case VTD_INV_DESC_CC_GLOBAL:
--        VTD_DPRINTF(INV, "global invalidation");
-         vtd_context_global_invalidate(s);
-         break;
++    trace_vtd_iotlb_reset("global invalidation recved");
+     vtd_reset_iotlb(s);
+ }
  
-     case VTD_INV_DESC_CC_DEVICE:
--        vtd_context_device_invalidate(s, VTD_INV_DESC_CC_SID(inv_desc->lo),
--                                      VTD_INV_DESC_CC_FM(inv_desc->lo));
-+        sid = VTD_INV_DESC_CC_SID(inv_desc->lo);
-+        fmask = VTD_INV_DESC_CC_FM(inv_desc->lo);
-+        vtd_context_device_invalidate(s, sid, fmask);
-         break;
- 
-     default:
--        VTD_DPRINTF(GENERAL, "error: invalid granularity in Context-cache "
--                    "Invalidate Descriptor hi 0x%"PRIx64  " lo 0x%"PRIx64,
--                    inv_desc->hi, inv_desc->lo);
-+        error_report("invalid granularity in Context-cache "
-+                     "Invalidate Descriptor hi 0x%"PRIx64" lo 0x%"PRIx64,
-+                     inv_desc->hi, inv_desc->lo);
-         return false;
-     }
-     return true;
-@@ -1376,7 +1378,7 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
- 
-     if ((inv_desc->lo & VTD_INV_DESC_IOTLB_RSVD_LO) ||
-         (inv_desc->hi & VTD_INV_DESC_IOTLB_RSVD_HI)) {
--        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in IOTLB "
-+        error_report("non-zero reserved field in IOTLB "
-                     "Invalidate Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
-                     inv_desc->hi, inv_desc->lo);
-         return false;
-@@ -1384,14 +1386,13 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
- 
-     switch (inv_desc->lo & VTD_INV_DESC_IOTLB_G) {
-     case VTD_INV_DESC_IOTLB_GLOBAL:
--        VTD_DPRINTF(INV, "global invalidation");
-+        trace_vtd_inv_desc_iotlb_global();
-         vtd_iotlb_global_invalidate(s);
-         break;
- 
-     case VTD_INV_DESC_IOTLB_DOMAIN:
-         domain_id = VTD_INV_DESC_IOTLB_DID(inv_desc->lo);
--        VTD_DPRINTF(INV, "domain-selective invalidation domain 0x%"PRIx16,
--                    domain_id);
-+        trace_vtd_inv_desc_iotlb_domain(domain_id);
-         vtd_iotlb_domain_invalidate(s, domain_id);
-         break;
- 
-@@ -1399,18 +1400,17 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
-         domain_id = VTD_INV_DESC_IOTLB_DID(inv_desc->lo);
-         addr = VTD_INV_DESC_IOTLB_ADDR(inv_desc->hi);
-         am = VTD_INV_DESC_IOTLB_AM(inv_desc->hi);
--        VTD_DPRINTF(INV, "page-selective invalidation domain 0x%"PRIx16
--                    " addr 0x%"PRIx64 " mask %"PRIu8, domain_id, addr, am);
-+        trace_vtd_inv_desc_iotlb_pages(domain_id, addr, am);
-         if (am > VTD_MAMV) {
--            VTD_DPRINTF(GENERAL, "error: supported max address mask value is "
--                        "%"PRIu8, (uint8_t)VTD_MAMV);
-+            error_report("supported max address mask value is %"PRIu8,
-+                         (uint8_t)VTD_MAMV);
-             return false;
-         }
-         vtd_iotlb_page_invalidate(s, domain_id, addr, am);
-         break;
- 
-     default:
--        VTD_DPRINTF(GENERAL, "error: invalid granularity in IOTLB Invalidate "
-+        error_report("invalid granularity in IOTLB Invalidate "
-                     "Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
-                     inv_desc->hi, inv_desc->lo);
-         return false;
-@@ -1492,7 +1492,6 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
-     VTDInvDesc inv_desc;
-     uint8_t desc_type;
- 
--    VTD_DPRINTF(INV, "iq head %"PRIu16, s->iq_head);
-     if (!vtd_get_inv_desc(s->iq, s->iq_head, &inv_desc)) {
-         s->iq_last_desc_type = VTD_INV_DESC_NONE;
-         return false;
-@@ -1503,33 +1502,28 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
- 
-     switch (desc_type) {
-     case VTD_INV_DESC_CC:
--        VTD_DPRINTF(INV, "Context-cache Invalidate Descriptor hi 0x%"PRIx64
--                    " lo 0x%"PRIx64, inv_desc.hi, inv_desc.lo);
-+        trace_vtd_inv_desc("context-cache", inv_desc.hi, inv_desc.lo);
-         if (!vtd_process_context_cache_desc(s, &inv_desc)) {
-             return false;
-         }
-         break;
- 
-     case VTD_INV_DESC_IOTLB:
--        VTD_DPRINTF(INV, "IOTLB Invalidate Descriptor hi 0x%"PRIx64
--                    " lo 0x%"PRIx64, inv_desc.hi, inv_desc.lo);
-+        trace_vtd_inv_desc("iotlb", inv_desc.hi, inv_desc.lo);
-         if (!vtd_process_iotlb_desc(s, &inv_desc)) {
-             return false;
-         }
-         break;
- 
-     case VTD_INV_DESC_WAIT:
--        VTD_DPRINTF(INV, "Invalidation Wait Descriptor hi 0x%"PRIx64
--                    " lo 0x%"PRIx64, inv_desc.hi, inv_desc.lo);
-+        trace_vtd_inv_desc("wait", inv_desc.hi, inv_desc.lo);
-         if (!vtd_process_wait_desc(s, &inv_desc)) {
-             return false;
-         }
-         break;
- 
-     case VTD_INV_DESC_IEC:
--        VTD_DPRINTF(INV, "Invalidation Interrupt Entry Cache "
--                    "Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
--                    inv_desc.hi, inv_desc.lo);
-+        trace_vtd_inv_desc("iec", inv_desc.hi, inv_desc.lo);
-         if (!vtd_process_inv_iec_desc(s, &inv_desc)) {
-             return false;
-         }
-@@ -1544,9 +1538,9 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
-         break;
- 
-     default:
--        VTD_DPRINTF(GENERAL, "error: unkonw Invalidation Descriptor type "
--                    "hi 0x%"PRIx64 " lo 0x%"PRIx64 " type %"PRIu8,
--                    inv_desc.hi, inv_desc.lo, desc_type);
-+        error_report("Unkonw Invalidation Descriptor type "
-+                     "hi 0x%"PRIx64" lo 0x%"PRIx64" type %"PRIu8,
-+                     inv_desc.hi, inv_desc.lo, desc_type);
-         return false;
-     }
-     s->iq_head++;
 diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index d2b4973..fba81f4 100644
+index fba81f4..eba9bf2 100644
 --- a/hw/i386/trace-events
 +++ b/hw/i386/trace-events
-@@ -10,6 +10,19 @@ xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (ad
- # hw/i386/x86-iommu.c
- x86_iommu_iec_notify(bool global, uint32_t index, uint32_t mask) "Notify IEC invalidation: global=%d index=%" PRIu32 " mask=%" PRIu32
+@@ -22,6 +22,13 @@ vtd_inv_desc_iotlb_domain(uint16_t domain) "iotlb invalidate whole domain 0x%"PR
+ vtd_inv_desc_iotlb_pages(uint16_t domain, uint64_t addr, uint8_t mask) "iotlb invalidate domain 0x%"PRIx16" addr 0x%"PRIx64" mask 0x%"PRIx8
+ vtd_inv_desc_wait_sw(uint64_t addr, uint32_t data) "wait invalidate status write addr 0x%"PRIx64" data 0x%"PRIx32
+ vtd_inv_desc_wait_irq(const char *msg) "%s"
++vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
++vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu8" devfn %"PRIu8" not present"
++vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
++vtd_iotlb_page_update(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page update sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
++vtd_iotlb_cc_hit(uint8_t bus, uint8_t devfn, uint64_t high, uint64_t low, uint32_t gen) "IOTLB context hit bus 0x%"PRIx8" devfn 0x%"PRIx8" high 0x%"PRIx64" low 0x%"PRIx64" gen %"PRIu32
++vtd_iotlb_cc_update(uint8_t bus, uint8_t devfn, uint64_t high, uint64_t low, uint32_t gen1, uint32_t gen2) "IOTLB context update bus 0x%"PRIx8" devfn 0x%"PRIx8" high 0x%"PRIx64" low 0x%"PRIx64" gen %"PRIu32" -> gen %"PRIu32
++vtd_iotlb_reset(const char *reason) "IOTLB reset (reason: %s)"
  
-+# hw/i386/intel_iommu.c
-+vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on) "Device %02x:%02x.%x switching address space (iommu enabled=%d)"
-+vtd_inv_desc(const char *type, uint64_t hi, uint64_t lo) "invalidate desc type %s high 0x%"PRIx64" low 0x%"PRIx64
-+vtd_inv_desc_cc_domain(uint16_t domain) "context invalidate domain 0x%"PRIx16
-+vtd_inv_desc_cc_global(void) "context invalidate globally"
-+vtd_inv_desc_cc_device(uint8_t bus, uint8_t dev, uint8_t fn) "context invalidate device %02"PRIx8":%02"PRIx8".%02"PRIx8
-+vtd_inv_desc_cc_devices(uint16_t sid, uint16_t fmask) "context invalidate devices sid 0x%"PRIx16" fmask 0x%"PRIx16
-+vtd_inv_desc_iotlb_global(void) "iotlb invalidate global"
-+vtd_inv_desc_iotlb_domain(uint16_t domain) "iotlb invalidate whole domain 0x%"PRIx16
-+vtd_inv_desc_iotlb_pages(uint16_t domain, uint64_t addr, uint8_t mask) "iotlb invalidate domain 0x%"PRIx16" addr 0x%"PRIx64" mask 0x%"PRIx8
-+vtd_inv_desc_wait_sw(uint64_t addr, uint32_t data) "wait invalidate status write addr 0x%"PRIx64" data 0x%"PRIx32
-+vtd_inv_desc_wait_irq(const char *msg) "%s"
-+
  # hw/i386/amd_iommu.c
  amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to write at addr 0x%"PRIx64" +  offset 0x%"PRIx32
- amdvi_cache_update(uint16_t domid, uint8_t bus, uint8_t slot, uint8_t func, uint64_t gpa, uint64_t txaddr) " update iotlb domid 0x%"PRIx16" devid: %02x:%02x.%x gpa 0x%"PRIx64" hpa 0x%"PRIx64
 -- 
 2.7.4
