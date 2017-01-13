@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cS3ON-0001uE-Ao
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:03:51 -0500
+	(envelope-from <felipe@nutanix.com>) id 1cS3UG-0006XG-9y
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:09:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cS3OH-0005yt-JT
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:03:47 -0500
-Received: from mx5-phx2.redhat.com ([209.132.183.37]:43824)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cS3OH-0005yj-A5
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:03:41 -0500
-Date: Fri, 13 Jan 2017 10:03:39 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <1587720065.2308546.1484319819288.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1484270047-24579-1-git-send-email-felipe@nutanix.com>
+	(envelope-from <felipe@nutanix.com>) id 1cS3UD-0008Qm-29
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:09:52 -0500
+Received: from mail-bl2nam02on0096.outbound.protection.outlook.com
+	([104.47.38.96]:41520
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1cS3UC-0008QO-Oc
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:09:49 -0500
+From: Felipe Franciosi <felipe@nutanix.com>
+Date: Fri, 13 Jan 2017 15:09:46 +0000
+Message-ID: <AF473AD9-3343-4C5F-8DE1-B0870DC65327@nutanix.com>
 References: <1484270047-24579-1-git-send-email-felipe@nutanix.com>
+	<1587720065.2308546.1484319819288.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1587720065.2308546.1484319819288.JavaMail.zimbra@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <426E7E31D31E08478CE76BE3F14A086E@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] libvhost-user: Start VQs on SET_VRING_CALL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,77 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <mlureau@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre
+	Lureau <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Hi
-
------ Original Message -----
-> Currently, VQs are started as soon as a SET_VRING_KICK is received. That
-> is too early in the VQ setup process, as the backend might not yet have
-
-I think we may want to reconsider queue_set_started(), move it elsewhere, since kick/call fds aren't mandatory to process the rings.
-
-> a callfd to notify in case it received a kick and fully processed the
-> request/command. This patch only starts a VQ when a SET_VRING_CALL is
-> received.
-
-I don't like that much, as soon as the kick fd is received, it should start polling it imho. callfd is optional, it may have one and not the other.
-
-Perhaps it's best for now to delay the callfd notification with a flag until it is received?
-
-
-> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-> ---
->  contrib/libvhost-user/libvhost-user.c | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/contrib/libvhost-user/libvhost-user.c
-> b/contrib/libvhost-user/libvhost-user.c
-> index af4faad..a46ef90 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -607,19 +607,6 @@ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *vmsg)
->          DPRINT("Got kick_fd: %d for vq: %d\n", vmsg->fds[0], index);
->      }
->  
-> -    dev->vq[index].started = true;
-> -    if (dev->iface->queue_set_started) {
-> -        dev->iface->queue_set_started(dev, index, true);
-> -    }
-> -
-> -    if (dev->vq[index].kick_fd != -1 && dev->vq[index].handler) {
-> -        dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
-> -                       vu_kick_cb, (void *)(long)index);
-> -
-> -        DPRINT("Waiting for kicks on fd: %d for vq: %d\n",
-> -               dev->vq[index].kick_fd, index);
-> -    }
-> -
->      return false;
->  }
->  
-> @@ -661,6 +648,19 @@ vu_set_vring_call_exec(VuDev *dev, VhostUserMsg *vmsg)
->  
->      DPRINT("Got call_fd: %d for vq: %d\n", vmsg->fds[0], index);
->  
-> +    dev->vq[index].started = true;
-> +    if (dev->iface->queue_set_started) {
-> +        dev->iface->queue_set_started(dev, index, true);
-> +    }
-> +
-> +    if (dev->vq[index].kick_fd != -1 && dev->vq[index].handler) {
-> +        dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
-> +                       vu_kick_cb, (void *)(long)index);
-> +
-> +        DPRINT("Waiting for kicks on fd: %d for vq: %d\n",
-> +               dev->vq[index].kick_fd, index);
-> +    }
-> +
->      return false;
->  }
->  
-> --
-> 1.9.4
-> 
-> 
+SGkgTWFyYy1BbmRyZSwNCg0KPiBPbiAxMyBKYW4gMjAxNywgYXQgMDc6MDMsIE1hcmMtQW5kcsOp
+IEx1cmVhdSA8bWx1cmVhdUByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IEhpDQo+IA0KPiAtLS0t
+LSBPcmlnaW5hbCBNZXNzYWdlIC0tLS0tDQo+PiBDdXJyZW50bHksIFZRcyBhcmUgc3RhcnRlZCBh
+cyBzb29uIGFzIGEgU0VUX1ZSSU5HX0tJQ0sgaXMgcmVjZWl2ZWQuIFRoYXQNCj4+IGlzIHRvbyBl
+YXJseSBpbiB0aGUgVlEgc2V0dXAgcHJvY2VzcywgYXMgdGhlIGJhY2tlbmQgbWlnaHQgbm90IHll
+dCBoYXZlDQo+IA0KPiBJIHRoaW5rIHdlIG1heSB3YW50IHRvIHJlY29uc2lkZXIgcXVldWVfc2V0
+X3N0YXJ0ZWQoKSwgbW92ZSBpdCBlbHNld2hlcmUsIHNpbmNlIGtpY2svY2FsbCBmZHMgYXJlbid0
+IG1hbmRhdG9yeSB0byBwcm9jZXNzIHRoZSByaW5ncy4NCg0KSG1tLiBUaGUgZmRzIGFyZW4ndCBt
+YW5kYXRvcnksIGJ1dCBJIGltYWdpbmUgaW4gdGhhdCBjYXNlIHdlIHNob3VsZCBzdGlsbCByZWNl
+aXZlIFNFVF9WUklOR19LSUNLL0NBTEwgbWVzc2FnZXMgd2l0aG91dCBhbiBmZCAoaWUuIHdpdGgg
+dGhlIFZIT1NUX01TR19WUV9OT0ZEX01BU0sgZmxhZyBzZXQpLiBXb3VsZG4ndCB0aGF0IGJlIHRo
+ZSBjYXNlPw0KDQo+IA0KPj4gYSBjYWxsZmQgdG8gbm90aWZ5IGluIGNhc2UgaXQgcmVjZWl2ZWQg
+YSBraWNrIGFuZCBmdWxseSBwcm9jZXNzZWQgdGhlDQo+PiByZXF1ZXN0L2NvbW1hbmQuIFRoaXMg
+cGF0Y2ggb25seSBzdGFydHMgYSBWUSB3aGVuIGEgU0VUX1ZSSU5HX0NBTEwgaXMNCj4+IHJlY2Vp
+dmVkLg0KPiANCj4gSSBkb24ndCBsaWtlIHRoYXQgbXVjaCwgYXMgc29vbiBhcyB0aGUga2ljayBm
+ZCBpcyByZWNlaXZlZCwgaXQgc2hvdWxkIHN0YXJ0IHBvbGxpbmcgaXQgaW1oby4gY2FsbGZkIGlz
+IG9wdGlvbmFsLCBpdCBtYXkgaGF2ZSBvbmUgYW5kIG5vdCB0aGUgb3RoZXIuDQoNClNvIHRoZSBx
+dWVzdGlvbiBpcyB3aGV0aGVyIHdlIHNob3VsZCBiZSByZWNlaXZpbmcgYSBTRVRfVlJJTkdfQ0FM
+TCBhbnl3YXkgb3Igbm90LCByZWdhcmRsZXNzIG9mIGFuIGZkIGJlaW5nIHNlbnQuIChJIHRoaW5r
+IHdlIGRvLCBidXQgSSBoYXZlbid0IGRvbmUgZXh0ZW5zaXZlIHRlc3Rpbmcgd2l0aCBvdGhlciBk
+ZXZpY2UgdHlwZXMuKQ0KDQo+IA0KPiBQZXJoYXBzIGl0J3MgYmVzdCBmb3Igbm93IHRvIGRlbGF5
+IHRoZSBjYWxsZmQgbm90aWZpY2F0aW9uIHdpdGggYSBmbGFnIHVudGlsIGl0IGlzIHJlY2VpdmVk
+Pw0KDQpUaGUgb3RoZXIgaWRlYSBpcyB0byBhbHdheXMga2ljayB3aGVuIHdlIHJlY2VpdmUgdGhl
+IGNhbGxmZC4gSSByZW1lbWJlciBkaXNjdXNzaW5nIHRoYXQgYWx0ZXJuYXRpdmUgd2l0aCB5b3Ug
+YmVmb3JlIGxpYnZob3N0LXVzZXIgd2VudCBpbi4gVGhlIHByb3RvY29sIHNheXMgYm90aCB0aGUg
+ZHJpdmVyIGFuZCB0aGUgYmFja2VuZCBtdXN0IGhhbmRsZSBzcHVyaW91cyBraWNrcy4gVGhpcyBh
+cHByb2FjaCBhbHNvIGZpeGVzIHRoZSBidWcuDQoNCkknbSBoYXBweSB3aXRoIHdoYXRldmVyIGFs
+dGVybmF0aXZlIHlvdSB3YW50LCBhcyBsb25nIGl0IG1ha2VzIGxpYnZob3N0LXVzZXIgdXNhYmxl
+IGZvciBzdG9yYWdlIGRldmljZXMuDQoNClRoYW5rcywNCkZlbGlwZQ0KDQoNCj4gDQo+IA0KPj4g
+U2lnbmVkLW9mZi1ieTogRmVsaXBlIEZyYW5jaW9zaSA8ZmVsaXBlQG51dGFuaXguY29tPg0KPj4g
+LS0tDQo+PiBjb250cmliL2xpYnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5jIHwgMjYgKysrKysr
+KysrKysrKy0tLS0tLS0tLS0tLS0NCj4+IDEgZmlsZSBjaGFuZ2VkLCAxMyBpbnNlcnRpb25zKCsp
+LCAxMyBkZWxldGlvbnMoLSkNCj4+IA0KPj4gZGlmZiAtLWdpdCBhL2NvbnRyaWIvbGlidmhvc3Qt
+dXNlci9saWJ2aG9zdC11c2VyLmMNCj4+IGIvY29udHJpYi9saWJ2aG9zdC11c2VyL2xpYnZob3N0
+LXVzZXIuYw0KPj4gaW5kZXggYWY0ZmFhZC4uYTQ2ZWY5MCAxMDA2NDQNCj4+IC0tLSBhL2NvbnRy
+aWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmMNCj4+ICsrKyBiL2NvbnRyaWIvbGlidmhv
+c3QtdXNlci9saWJ2aG9zdC11c2VyLmMNCj4+IEBAIC02MDcsMTkgKzYwNyw2IEBAIHZ1X3NldF92
+cmluZ19raWNrX2V4ZWMoVnVEZXYgKmRldiwgVmhvc3RVc2VyTXNnICp2bXNnKQ0KPj4gICAgICAg
+ICBEUFJJTlQoIkdvdCBraWNrX2ZkOiAlZCBmb3IgdnE6ICVkXG4iLCB2bXNnLT5mZHNbMF0sIGlu
+ZGV4KTsNCj4+ICAgICB9DQo+PiANCj4+IC0gICAgZGV2LT52cVtpbmRleF0uc3RhcnRlZCA9IHRy
+dWU7DQo+PiAtICAgIGlmIChkZXYtPmlmYWNlLT5xdWV1ZV9zZXRfc3RhcnRlZCkgew0KPj4gLSAg
+ICAgICAgZGV2LT5pZmFjZS0+cXVldWVfc2V0X3N0YXJ0ZWQoZGV2LCBpbmRleCwgdHJ1ZSk7DQo+
+PiAtICAgIH0NCj4+IC0NCj4+IC0gICAgaWYgKGRldi0+dnFbaW5kZXhdLmtpY2tfZmQgIT0gLTEg
+JiYgZGV2LT52cVtpbmRleF0uaGFuZGxlcikgew0KPj4gLSAgICAgICAgZGV2LT5zZXRfd2F0Y2go
+ZGV2LCBkZXYtPnZxW2luZGV4XS5raWNrX2ZkLCBWVV9XQVRDSF9JTiwNCj4+IC0gICAgICAgICAg
+ICAgICAgICAgICAgIHZ1X2tpY2tfY2IsICh2b2lkICopKGxvbmcpaW5kZXgpOw0KPj4gLQ0KPj4g
+LSAgICAgICAgRFBSSU5UKCJXYWl0aW5nIGZvciBraWNrcyBvbiBmZDogJWQgZm9yIHZxOiAlZFxu
+IiwNCj4+IC0gICAgICAgICAgICAgICBkZXYtPnZxW2luZGV4XS5raWNrX2ZkLCBpbmRleCk7DQo+
+PiAtICAgIH0NCj4+IC0NCj4+ICAgICByZXR1cm4gZmFsc2U7DQo+PiB9DQo+PiANCj4+IEBAIC02
+NjEsNiArNjQ4LDE5IEBAIHZ1X3NldF92cmluZ19jYWxsX2V4ZWMoVnVEZXYgKmRldiwgVmhvc3RV
+c2VyTXNnICp2bXNnKQ0KPj4gDQo+PiAgICAgRFBSSU5UKCJHb3QgY2FsbF9mZDogJWQgZm9yIHZx
+OiAlZFxuIiwgdm1zZy0+ZmRzWzBdLCBpbmRleCk7DQo+PiANCj4+ICsgICAgZGV2LT52cVtpbmRl
+eF0uc3RhcnRlZCA9IHRydWU7DQo+PiArICAgIGlmIChkZXYtPmlmYWNlLT5xdWV1ZV9zZXRfc3Rh
+cnRlZCkgew0KPj4gKyAgICAgICAgZGV2LT5pZmFjZS0+cXVldWVfc2V0X3N0YXJ0ZWQoZGV2LCBp
+bmRleCwgdHJ1ZSk7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAgaWYgKGRldi0+dnFbaW5kZXhd
+LmtpY2tfZmQgIT0gLTEgJiYgZGV2LT52cVtpbmRleF0uaGFuZGxlcikgew0KPj4gKyAgICAgICAg
+ZGV2LT5zZXRfd2F0Y2goZGV2LCBkZXYtPnZxW2luZGV4XS5raWNrX2ZkLCBWVV9XQVRDSF9JTiwN
+Cj4+ICsgICAgICAgICAgICAgICAgICAgICAgIHZ1X2tpY2tfY2IsICh2b2lkICopKGxvbmcpaW5k
+ZXgpOw0KPj4gKw0KPj4gKyAgICAgICAgRFBSSU5UKCJXYWl0aW5nIGZvciBraWNrcyBvbiBmZDog
+JWQgZm9yIHZxOiAlZFxuIiwNCj4+ICsgICAgICAgICAgICAgICBkZXYtPnZxW2luZGV4XS5raWNr
+X2ZkLCBpbmRleCk7DQo+PiArICAgIH0NCj4+ICsNCj4+ICAgICByZXR1cm4gZmFsc2U7DQo+PiB9
+DQo+PiANCj4+IC0tDQo+PiAxLjkuNA0KPj4gDQo+PiANCg0K
