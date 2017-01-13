@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1cS238-00022v-2H
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:37:47 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cS27M-0006OA-Qg
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:42:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1cS235-0000vS-02
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:37:46 -0500
-Received: from mga02.intel.com ([134.134.136.20]:61174)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1cS234-0000vA-Mn
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:37:42 -0500
-Date: Fri, 13 Jan 2017 21:37:38 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20170113133738.k3vyvysehcz2gppc@hz-desktop>
-References: <20170113115651.17607-1-haozhong.zhang@intel.com>
-	<20170113131727.GA10706@stefanha-x1.localdomain>
+	(envelope-from <stefanha@redhat.com>) id 1cS27L-0002Ll-UT
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:42:08 -0500
+Date: Fri, 13 Jan 2017 13:41:48 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170113134148.GC10706@stefanha-x1.localdomain>
+References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1480926904-17596-2-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="CblX+4bnyfN0pR09"
 Content-Disposition: inline
-In-Reply-To: <20170113131727.GA10706@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: check if nvdimm is enabled before
- plugging
+In-Reply-To: <1480926904-17596-2-git-send-email-zhang.zhanghailiang@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 1/6] docs/block-replication: Add
+ description for shared-disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, imammedo@redhat.com
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-On 01/13/17 13:17 +0000, Stefan Hajnoczi wrote:
->On Fri, Jan 13, 2017 at 07:56:51PM +0800, Haozhong Zhang wrote:
->> The missing of 'nvdimm' in the machine type option '-M' means NVDIMM
->> is disabled. QEMU should refuse to plug any NVDIMM device in this case
->> and report the misconfiguration.
->>
->> Reported-by: Stefan Hajnoczi <stefanha@redhat.com>
->> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
->> Message-Id: 20170112110928.GF4621@stefanha-x1.localdomain
->> Message-Id: 20170111093630.2088-1-stefanha@redhat.com
->> ---
->>  hw/i386/pc.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 25e8586..3907609 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1715,6 +1715,11 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
->>      }
->>
->>      if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
->> +        if (!pcms->acpi_nvdimm_state.is_enabled) {
->> +            error_setg(&local_err,
->> +                       "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->> +            goto out;
->> +        }
->
->A warning is definitely useful to notify users of a possible
->configuration error.
 
-If NVDIMM is plugged at boot time, QEMU with this patch will stop and report a
-message like
-    qemu-system-x86_64: -device nvdimm,...: nvdimm is not enabled: missing 'nvdimm' in '-M'
+--CblX+4bnyfN0pR09
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-If NVDIMM is plugged via 'device_add' command, QEMU with this patch will report a warning message
-    nvdimm is not enabled: missing 'nvdimm' in '-M'
-and continue to run w/o plugging this device.
+On Mon, Dec 05, 2016 at 04:34:59PM +0800, zhanghailiang wrote:
+> +Issue qmp command:
+> +  { 'execute': 'blockdev-add',
+> +    'arguments': {
+> +        'driver': 'replication',
+> +        'node-name': 'rep',
+> +        'mode': 'primary',
+> +        'shared-disk-id': 'primary_disk0',
+> +        'shared-disk': true,
+> +        'file': {
+> +            'driver': 'nbd',
+> +            'export': 'hidden_disk0',
+> +            'server': {
+> +                'type': 'inet',
+> +                'data': {
+> +                    'host': 'xxx.xxx.xxx.xxx',
+> +                    'port': 'yyy'
+> +                }
+> +            }
 
->
->I wonder what happens when you plug an NVDIMM into a motherboard where
->the firmware lacks support.  Does it:
-> * Refuse to boot?
-> * Treat the DIMM as regular RAM?
-> * Boot but the DIMM will not be used by firmware and kernel?
+block/nbd.c does have good error handling and recovery in case there is
+a network issue.  There are no reconnection attempts or timeouts that
+deal with a temporary loss of network connectivity.
 
-Good question. Guangrong, any idea?
+This is a general problem with block/nbd.c and not something to solve in
+this patch series.  I'm just mentioning it because it may affect COLO
+replication.
 
-Thanks,
-Haozhong
+I'm sure these limitations in block/nbd.c can be fixed but it will take
+some effort.  Maybe block/sheepdog.c, net/socket.c, and other network
+code could also benefit from generic network connection recovery.
 
->
->QEMU should act the same way as real hardware.
->
->Stefan
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--CblX+4bnyfN0pR09
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYeNkcAAoJEJykq7OBq3PIQcIIAKKltIomBGBGW0B0+nPoGC5d
+6YSy35octsRRUwESE81ZlUVEQl4Nw6xj/EsA7Di/ivgikLUDS7jXEUFjHPFRjgXV
+LYpxqd7qpMjEFC/Lk/+efYpW82154544nnLCuzWUDt0PuB7GTYEBsZ0t4kUtZxwW
+xREKatugPGngf5cFTraLuEaueNqagu69ZcN5y8Ka00xrg4EiqldE1UsSQh+Df/M0
+FKUyeGpSDk9mAVu7s/gq3igz456WWAlz9535eCd0cc5GKL1h+AG8luagMVsUxJnH
+uT/vmRaMdylN+6cyb/MDNIJZaUB6TY/EbsGFx7Qgu1ER86CM7eFBtHIF9c67UpY=
+=8iMB
+-----END PGP SIGNATURE-----
+
+--CblX+4bnyfN0pR09--
