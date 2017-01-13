@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cRyNA-0004FU-VZ
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:42:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cRyOx-0005pG-Ub
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:44:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cRyN9-0001rU-Uo
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:42:13 -0500
-Received: from mail-ua0-x22f.google.com ([2607:f8b0:400c:c08::22f]:34401)
+	(envelope-from <peter.maydell@linaro.org>) id 1cRyOx-0002lf-1o
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:44:03 -0500
+Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:34774)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cRyN9-0001qt-Gw
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:42:11 -0500
-Received: by mail-ua0-x22f.google.com with SMTP id 35so33230183uak.1
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 01:42:11 -0800 (PST)
+	id 1cRyOw-0002lb-UO
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 04:44:02 -0500
+Received: by mail-ua0-x22b.google.com with SMTP id 35so33256710uak.1
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 01:44:02 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <20170113033701.GA1955@amit-lp.rh>
+References: <1483633930-7103-1-git-send-email-amit.shah@redhat.com>
+	<CAFEAcA8nZmDsQvfX+=W3jDJU0rUThsn93fFNYgzxhEyWTx_kHQ@mail.gmail.com>
+	<20170113033701.GA1955@amit-lp.rh>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Jan 2017 09:41:50 +0000
-Message-ID: <CAFEAcA8pgXG5SjQJG+p=1xwN+fmyS+i=pwuDHcFYfKtwjq_O-g@mail.gmail.com>
+Date: Fri, 13 Jan 2017 09:43:41 +0000
+Message-ID: <CAFEAcA880jLaLFBtmphjV6LEmzvMGNajTbgitzKDnpiPRHpB_g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/33] Misc patches for 2017-01-11
+Subject: Re: [Qemu-devel] [PULL 0/4] migration: QTAILQ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Amit Shah <amit.shah@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu list <qemu-devel@nongnu.org>, Jianjun Duan <duanj@linux.vnet.ibm.com>
 
-On 11 January 2017 at 19:34, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit 41a0e54756a9ae6b60be34bb33302a7e085fdb=
-07:
+On 13 January 2017 at 03:37, Amit Shah <amit.shah@redhat.com> wrote:
+> On (Fri) 06 Jan 2017 [12:10:22], Peter Maydell wrote:
+>> On 5 January 2017 at 16:32, Amit Shah <amit.shah@redhat.com> wrote:
+>> > The following changes since commit dbe2b65566e76d3c3a0c3358285c0336ac61e757:
+>> >
+>> >   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.9-pull-request' into staging (2016-12-28 17:11:11 +0000)
+>> >
+>> > are available in the git repository at:
+>> >
+>> >   https://git.kernel.org/pub/scm/virt/qemu/amit/migration.git tags/migration-for-2.9-1
+>> >
+>> > for you to fetch changes up to 8d0c57697abcc57166e918064d9a7f6c7316d01b:
+>> >
+>> >   migration: add error_report (2017-01-04 19:21:26 +0530)
+>> >
+>> > ----------------------------------------------------------------
+>> > Migration: migrate QTAILQ infrastructure for vmstate
+>> >
+>> > ----------------------------------------------------------------
+>>
+>> Hi. I'm afraid this fails 'make check' for ppc64be:
 >
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
-ng (2017-01-10 10:46:21 +0000)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to af89d1b204f03e10ade3b61365c7e5c06805caee:
->
->   Revert "win32: don't run subprocess tests on Mingw32 platform" (2017-01=
--11 20:13:12 +0100)
->
-> ----------------------------------------------------------------
-> * QOM interface fix (Eduardo)
-> * RTC fixes (Gaohuai, Igor)
-> * Memory leak fixes (Li Qiang, me)
-> * Ctrl-a b regression (Marc-Andr=C3=A9)
-> * Stubs cleanups and fixes (Leif, me)
-> * hxtool tweak (me)
-> * HAX support (Vincent)
-> * QemuThread, exec.c, target-i386 and SCSI fixes (Roman, Xinhua, me)
->
-> ----------------------------------------------------------------
+> Hi Peter, since this was due to something else, will you try to pull
+> this in again?  Or should I re-send the series?
 
-This failed to build on ppc64be:
-
-/home/pm215/qemu/target/ppc/kvm.c: In function =E2=80=98kvm_handle_debug=E2=
-=80=99:
-/home/pm215/qemu/target/ppc/kvm.c:1724:9: error: implicit declaration
-of function =E2=80=98cpu_synchronize_s
-tate=E2=80=99 [-Werror=3Dimplicit-function-declaration]
-         cpu_synchronize_state(cs);
-         ^
-
-In file included from /home/pm215/qemu/linux-headers/linux/kvm.h:13:0,
-                 from /home/pm215/qemu/include/sysemu/kvm.h:23,
-                 from /home/pm215/qemu/include/sysemu/hw_accel.h:16,
-                 from /home/pm215/qemu/target/ppc/translate_init.c:27,
-                 from /home/pm215/qemu/target/ppc/translate.c:6786:
-/home/pm215/qemu/build/all/linux-headers/asm/kvm.h:320:0: error:
-"KVM_INTERRUPT_SET" redefined [-Wer
-ror]
- #define KVM_INTERRUPT_SET -1U
- ^
-In file included from /home/pm215/qemu/target/ppc/translate_init.c:24:0,
-                 from /home/pm215/qemu/target/ppc/translate.c:6786:
-/home/pm215/qemu/target/ppc/kvm_ppc.h:319:0: note: this is the
-location of the previous definition
- #define KVM_INTERRUPT_SET -1
- ^
-In file included from /home/pm215/qemu/linux-headers/linux/kvm.h:13:0,
-                 from /home/pm215/qemu/include/sysemu/kvm.h:23,
-                 from /home/pm215/qemu/include/sysemu/hw_accel.h:16,
-                 from /home/pm215/qemu/target/ppc/translate_init.c:27,
-                 from /home/pm215/qemu/target/ppc/translate.c:6786:
-/home/pm215/qemu/build/all/linux-headers/asm/kvm.h:321:0: error:
-"KVM_INTERRUPT_UNSET" redefined [-Werror]
- #define KVM_INTERRUPT_UNSET -2U
- ^
-In file included from /home/pm215/qemu/target/ppc/translate_init.c:24:0,
-                 from /home/pm215/qemu/target/ppc/translate.c:6786:
-/home/pm215/qemu/target/ppc/kvm_ppc.h:323:0: note: this is the
-location of the previous definition
- #define KVM_INTERRUPT_UNSET -2
- ^
-In file included from /home/pm215/qemu/linux-headers/linux/kvm.h:13:0,
-                 from /home/pm215/qemu/include/sysemu/kvm.h:23,
-                 from /home/pm215/qemu/include/sysemu/hw_accel.h:16,
-                 from /home/pm215/qemu/target/ppc/translate_init.c:27,
-                 from /home/pm215/qemu/target/ppc/translate.c:6786:
-/home/pm215/qemu/build/all/linux-headers/asm/kvm.h:322:0: error:
-"KVM_INTERRUPT_SET_LEVEL" redefined [-Werror]
- #define KVM_INTERRUPT_SET_LEVEL -3U
- ^
-In file included from /home/pm215/qemu/target/ppc/translate_init.c:24:0,
-                 from /home/pm215/qemu/target/ppc/translate.c:6786:
-/home/pm215/qemu/target/ppc/kvm_ppc.h:327:0: note: this is the
-location of the previous definition
- #define KVM_INTERRUPT_SET_LEVEL -3
- ^
-
+I've put it back on my list to process.
 
 thanks
 -- PMM
