@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1je-0007Ts-Kf
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:41 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1jh-0007Vm-Tl
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1jb-0002S6-Ml
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:38 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34921)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cS1jg-0002UJ-8l
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:41 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33795)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cS1jb-0002R2-Bb
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:35 -0500
-Received: by mail-wm0-x243.google.com with SMTP id l2so11688431wml.2
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 05:17:35 -0800 (PST)
+	id 1cS1jf-0002Tw-W1
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:17:40 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so11551234wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 05:17:39 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 13 Jan 2017 14:17:16 +0100
-Message-Id: <20170113131731.1246-2-pbonzini@redhat.com>
+Date: Fri, 13 Jan 2017 14:17:21 +0100
+Message-Id: <20170113131731.1246-7-pbonzini@redhat.com>
 In-Reply-To: <20170113131731.1246-1-pbonzini@redhat.com>
 References: <20170113131731.1246-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 01/16] aio: introduce aio_co_schedule and
- aio_co_wake
+Subject: [Qemu-devel] [PATCH 06/16] nbd: do not block on partial reply
+ header reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,679 +31,310 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, stefanha@redhat.com
 
-aio_co_wake provides the infrastructure to start a coroutine on a "home"
-AioContext.  It will be used by CoMutex and CoQueue, so that coroutines
-don't jump from one context to another when they go to sleep on a
-mutex or waitqueue.  However, it can also be used as a more efficient
-alternative to one-shot bottom halves, and saves the effort of tracking
-which AioContext a coroutine is running on.
+Read the replies from a coroutine, switching the read side between the
+"read header" coroutine and the I/O coroutine that reads the body of
+the reply.
 
-aio_co_schedule is the part of aio_co_wake that starts a coroutine
-on a remove AioContext, but it is also useful to implement e.g.
-bdrv_set_aio_context callbacks.
-
-The implementation of aio_co_schedule is based on a lock-free
-multiple-producer, single-consumer queue.  The multiple producers use
-cmpxchg to add to a LIFO stack.  The consumer (a per-AioContext bottom
-half) grabs all items added so far, inverts the list to make it FIFO,
-and goes through it one item at a time until it's empty.  The data
-structure was inspired by OSv, which uses it in the very code we'll
-"port" to QEMU for the thread-safe CoMutex.
-
-Most of the new code is really tests.
+qio_channel_yield is used so that the right coroutine is restarted
+automatically, eliminating the need for send_coroutine in
+NBDClientSession.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- async.c                      |  65 +++++++++++++
- include/block/aio.h          |  32 +++++++
- include/qemu/coroutine_int.h |  10 +-
- tests/Makefile.include       |  13 ++-
- tests/iothread.c             |  91 ++++++++++++++++++
- tests/iothread.h             |  25 +++++
- tests/test-aio-multithread.c | 213 +++++++++++++++++++++++++++++++++++++++++++
- tests/test-vmstate.c         |  11 ---
- trace-events                 |   4 +
- util/qemu-coroutine.c        |   8 ++
- 10 files changed, 456 insertions(+), 16 deletions(-)
- create mode 100644 tests/iothread.c
- create mode 100644 tests/iothread.h
- create mode 100644 tests/test-aio-multithread.c
+ block/nbd-client.c | 108 +++++++++++++++++++++--------------------------------
+ block/nbd-client.h |   2 +-
+ nbd/client.c       |   2 +-
+ nbd/common.c       |   9 +----
+ 4 files changed, 45 insertions(+), 76 deletions(-)
 
-diff --git a/async.c b/async.c
-index 0d218ab..1338682 100644
---- a/async.c
-+++ b/async.c
-@@ -30,6 +30,8 @@
- #include "qemu/main-loop.h"
- #include "qemu/atomic.h"
- #include "block/raw-aio.h"
-+#include "trace/generated-tracers.h"
-+#include "qemu/coroutine_int.h"
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 06f1532..eacc7a5 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -33,8 +33,9 @@
+ #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ ((uint64_t)(intptr_t)bs))
+ #define INDEX_TO_HANDLE(bs, index)  ((index)  ^ ((uint64_t)(intptr_t)bs))
  
- /***********************************************************/
- /* bottom halves (can be seen as timers which expire ASAP) */
-@@ -274,6 +276,9 @@ aio_ctx_finalize(GSource     *source)
+-static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
++static void nbd_recv_coroutines_enter_all(BlockDriverState *bs)
+ {
++    NBDClientSession *s = nbd_get_client_session(bs);
+     int i;
+ 
+     for (i = 0; i < MAX_NBD_REQUESTS; i++) {
+@@ -42,6 +43,7 @@ static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
+             qemu_coroutine_enter(s->recv_coroutine[i]);
+         }
      }
- #endif
- 
-+    assert(QSLIST_EMPTY(&ctx->scheduled_coroutines));
-+    qemu_bh_delete(ctx->co_schedule_bh);
-+
-     qemu_lockcnt_lock(&ctx->list_lock);
-     assert(!qemu_lockcnt_count(&ctx->list_lock));
-     while (ctx->first_bh) {
-@@ -363,6 +368,28 @@ static bool event_notifier_poll(void *opaque)
-     return atomic_read(&ctx->notified);
++    BDRV_POLL_WHILE(bs, s->read_reply_co);
  }
  
-+static void co_schedule_bh_cb(void *opaque)
-+{
-+    AioContext *ctx = opaque;
-+    QSLIST_HEAD(, Coroutine) straight, reversed;
-+
-+    QSLIST_MOVE_ATOMIC(&reversed, &ctx->scheduled_coroutines);
-+    QSLIST_INIT(&straight);
-+
-+    while (!QSLIST_EMPTY(&reversed)) {
-+        Coroutine *co = QSLIST_FIRST(&reversed);
-+        QSLIST_REMOVE_HEAD(&reversed, co_scheduled_next);
-+        QSLIST_INSERT_HEAD(&straight, co, co_scheduled_next);
+ static void nbd_teardown_connection(BlockDriverState *bs)
+@@ -56,7 +58,7 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     qio_channel_shutdown(client->ioc,
+                          QIO_CHANNEL_SHUTDOWN_BOTH,
+                          NULL);
+-    nbd_recv_coroutines_enter_all(client);
++    nbd_recv_coroutines_enter_all(bs);
+ 
+     nbd_client_detach_aio_context(bs);
+     object_unref(OBJECT(client->sioc));
+@@ -65,54 +67,34 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     client->ioc = NULL;
+ }
+ 
+-static void nbd_reply_ready(void *opaque)
++static void nbd_read_reply_entry(void *opaque)
+ {
+-    BlockDriverState *bs = opaque;
+-    NBDClientSession *s = nbd_get_client_session(bs);
++    NBDClientSession *s = opaque;
+     uint64_t i;
+     int ret;
+ 
+-    if (!s->ioc) { /* Already closed */
+-        return;
+-    }
+-
+-    if (s->reply.handle == 0) {
+-        /* No reply already in flight.  Fetch a header.  It is possible
+-         * that another thread has done the same thing in parallel, so
+-         * the socket is not readable anymore.
+-         */
++    for (;;) {
++        assert(s->reply.handle == 0);
+         ret = nbd_receive_reply(s->ioc, &s->reply);
+-        if (ret == -EAGAIN) {
+-            return;
+-        }
+         if (ret < 0) {
+-            s->reply.handle = 0;
+-            goto fail;
++            break;
+         }
+-    }
+-
+-    /* There's no need for a mutex on the receive side, because the
+-     * handler acts as a synchronization point and ensures that only
+-     * one coroutine is called until the reply finishes.  */
+-    i = HANDLE_TO_INDEX(s, s->reply.handle);
+-    if (i >= MAX_NBD_REQUESTS) {
+-        goto fail;
+-    }
+ 
+-    if (s->recv_coroutine[i]) {
+-        qemu_coroutine_enter(s->recv_coroutine[i]);
+-        return;
+-    }
+-
+-fail:
+-    nbd_teardown_connection(bs);
+-}
++        /* There's no need for a mutex on the receive side, because the
++         * handler acts as a synchronization point and ensures that only
++         * one coroutine is called until the reply finishes.
++         */
++        i = HANDLE_TO_INDEX(s, s->reply.handle);
++        if (i >= MAX_NBD_REQUESTS || !s->recv_coroutine[i]) {
++            break;
++        }
+ 
+-static void nbd_restart_write(void *opaque)
+-{
+-    BlockDriverState *bs = opaque;
++        aio_co_wake(s->recv_coroutine[i]);
+ 
+-    qemu_coroutine_enter(nbd_get_client_session(bs)->send_coroutine);
++        /* We're woken up by the recv_coroutine itself.  */
++        qemu_coroutine_yield();
 +    }
-+
-+    while (!QSLIST_EMPTY(&straight)) {
-+        Coroutine *co = QSLIST_FIRST(&straight);
-+        QSLIST_REMOVE_HEAD(&straight, co_scheduled_next);
-+        trace_aio_co_schedule_bh_cb(ctx, co);
-+        qemu_coroutine_enter(co);
-+    }
-+}
-+
- AioContext *aio_context_new(Error **errp)
++    s->read_reply_co = NULL;
+ }
+ 
+ static int nbd_co_send_request(BlockDriverState *bs,
+@@ -120,7 +102,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
+                                QEMUIOVector *qiov)
+ {
+     NBDClientSession *s = nbd_get_client_session(bs);
+-    AioContext *aio_context;
+     int rc, ret, i;
+ 
+     qemu_co_mutex_lock(&s->send_mutex);
+@@ -141,11 +122,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
+         return -EPIPE;
+     }
+ 
+-    s->send_coroutine = qemu_coroutine_self();
+-    aio_context = bdrv_get_aio_context(bs);
+-
+-    aio_set_fd_handler(aio_context, s->sioc->fd, false,
+-                       nbd_reply_ready, nbd_restart_write, NULL, bs);
+     if (qiov) {
+         qio_channel_set_cork(s->ioc, true);
+         rc = nbd_send_request(s->ioc, request);
+@@ -160,9 +136,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
+     } else {
+         rc = nbd_send_request(s->ioc, request);
+     }
+-    aio_set_fd_handler(aio_context, s->sioc->fd, false,
+-                       nbd_reply_ready, NULL, NULL, bs);
+-    s->send_coroutine = NULL;
+     qemu_co_mutex_unlock(&s->send_mutex);
+     return rc;
+ }
+@@ -174,8 +147,7 @@ static void nbd_co_receive_reply(NBDClientSession *s,
  {
      int ret;
-@@ -378,6 +405,10 @@ AioContext *aio_context_new(Error **errp)
-     }
-     g_source_set_can_recurse(&ctx->source, true);
-     qemu_lockcnt_init(&ctx->list_lock);
-+
-+    ctx->co_schedule_bh = aio_bh_new(ctx, co_schedule_bh_cb, ctx);
-+    QSLIST_INIT(&ctx->scheduled_coroutines);
-+
-     aio_set_event_notifier(ctx, &ctx->notifier,
-                            false,
-                            (EventNotifierHandler *)
-@@ -401,6 +432,40 @@ fail:
-     return NULL;
+ 
+-    /* Wait until we're woken up by the read handler.  TODO: perhaps
+-     * peek at the next reply and avoid yielding if it's ours?  */
++    /* Wait until we're woken up by nbd_read_reply_entry.  */
+     qemu_coroutine_yield();
+     *reply = s->reply;
+     if (reply->handle != request->handle ||
+@@ -209,14 +181,18 @@ static void nbd_coroutine_start(NBDClientSession *s,
+     /* s->recv_coroutine[i] is set as soon as we get the send_lock.  */
  }
  
-+void aio_co_schedule(AioContext *ctx, Coroutine *co)
-+{
-+    trace_aio_co_schedule(ctx, co);
-+    QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
-+                              co, co_scheduled_next);
-+    qemu_bh_schedule(ctx->co_schedule_bh);
-+}
-+
-+void aio_co_wake(struct Coroutine *co)
-+{
-+    AioContext *ctx;
-+
-+    /* Read coroutine before co->ctx.  Matches smp_wmb in
-+     * qemu_coroutine_enter.
-+     */
-+    smp_read_barrier_depends();
-+    ctx = atomic_read(&co->ctx);
-+
-+    if (ctx != qemu_get_current_aio_context()) {
-+        aio_co_schedule(ctx, co);
-+        return;
-+    }
-+
-+    if (qemu_in_coroutine()) {
-+        Coroutine *self = qemu_coroutine_self();
-+        assert(self != co);
-+        QSIMPLEQ_INSERT_TAIL(&self->co_queue_wakeup, co, co_queue_next);
-+    } else {
-+        aio_context_acquire(ctx);
-+        qemu_coroutine_enter(co);
-+        aio_context_release(ctx);
-+    }
-+}
-+
- void aio_context_ref(AioContext *ctx)
+-static void nbd_coroutine_end(NBDClientSession *s,
++static void nbd_coroutine_end(BlockDriverState *bs,
+                               NBDRequest *request)
  {
-     g_source_ref(&ctx->source);
-diff --git a/include/block/aio.h b/include/block/aio.h
-index 7df271d..614cbc6 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -47,6 +47,7 @@ typedef void QEMUBHFunc(void *opaque);
- typedef bool AioPollFn(void *opaque);
- typedef void IOHandler(void *opaque);
- 
-+struct Coroutine;
- struct ThreadPool;
- struct LinuxAioState;
- 
-@@ -108,6 +109,9 @@ struct AioContext {
-     bool notified;
-     EventNotifier notifier;
- 
-+    QSLIST_HEAD(, Coroutine) scheduled_coroutines;
-+    QEMUBH *co_schedule_bh;
++    NBDClientSession *s = nbd_get_client_session(bs);
+     int i = HANDLE_TO_INDEX(s, request->handle);
 +
-     /* Thread pool for performing work and receiving completion callbacks.
-      * Has its own locking.
-      */
-@@ -483,6 +487,34 @@ static inline bool aio_node_check(AioContext *ctx, bool is_external)
+     s->recv_coroutine[i] = NULL;
+-    if (s->in_flight-- == MAX_NBD_REQUESTS) {
+-        qemu_co_queue_next(&s->free_sema);
+-    }
++    s->in_flight--;
++    qemu_co_queue_next(&s->free_sema);
++
++    /* Kick the read_reply_co to get the next reply.  */
++    aio_co_wake(s->read_reply_co);
  }
  
- /**
-+ * aio_co_schedule:
-+ * @ctx: the aio context
-+ * @co: the coroutine
-+ *
-+ * Start a coroutine on a remote AioContext.
-+ *
-+ * The coroutine must not be entered by anyone else while aio_co_schedule()
-+ * is active.  In addition the coroutine must have yielded unless ctx
-+ * is the context in which the coroutine is running (i.e. the value of
-+ * qemu_get_current_aio_context() from the coroutine itself).
-+ */
-+void aio_co_schedule(AioContext *ctx, struct Coroutine *co);
-+
-+/**
-+ * aio_co_wake:
-+ * @co: the coroutine
-+ *
-+ * Restart a coroutine on the AioContext where it was running last, thus
-+ * preventing coroutines from jumping from one context to another when they
-+ * go to sleep.
-+ *
-+ * aio_co_wake may be executed either in coroutine or non-coroutine
-+ * context.  The coroutine must not be entered by anyone else while
-+ * aio_co_wake() is active.
-+ */
-+void aio_co_wake(struct Coroutine *co);
-+
-+/**
-  * Return the AioContext whose event loop runs in the current thread.
-  *
-  * If called from an IOThread this will be the IOThread's AioContext.  If
-diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
-index 14d4f1d..1efa356 100644
---- a/include/qemu/coroutine_int.h
-+++ b/include/qemu/coroutine_int.h
-@@ -40,12 +40,20 @@ struct Coroutine {
-     CoroutineEntry *entry;
-     void *entry_arg;
-     Coroutine *caller;
-+
-+    /* Only used when the coroutine has terminated.  */
-     QSLIST_ENTRY(Coroutine) pool_next;
-     size_t locks_held;
+ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+@@ -241,7 +217,7 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, qiov);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
  
--    /* Coroutines that should be woken up when we yield or terminate */
-+    /* Coroutines that should be woken up when we yield or terminate.
-+     * Only used when the coroutine is running.
-+     */
-     QSIMPLEQ_HEAD(, Coroutine) co_queue_wakeup;
-+
-+    /* Only used when the coroutine is sleeping.  */
-+    AioContext *ctx;
-     QSIMPLEQ_ENTRY(Coroutine) co_queue_next;
-+    QSLIST_ENTRY(Coroutine) co_scheduled_next;
- };
+@@ -271,7 +247,7 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
  
- Coroutine *qemu_coroutine_new(void);
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f776404..3b8ed9d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -45,9 +45,13 @@ check-unit-y += tests/test-visitor-serialization$(EXESUF)
- check-unit-y += tests/test-iov$(EXESUF)
- gcov-files-test-iov-y = util/iov.c
- check-unit-y += tests/test-aio$(EXESUF)
-+gcov-files-test-aio-y = async-posix.c
-+gcov-files-test-aio-$(CONFIG_WIN32) += aio-win32.c
-+gcov-files-test-aio-$(CONFIG_POSIX) += aio-posix.c
-+check-unit-y += tests/test-aio-multithread$(EXESUF)
-+gcov-files-test-aio-multithread-y = $(gcov-files-test-aio-y)
-+gcov-files-test-aio-multithread-y += util/qemu-coroutine.c tests/iothread.c
- check-unit-y += tests/test-throttle$(EXESUF)
--gcov-files-test-aio-$(CONFIG_WIN32) = aio-win32.c
--gcov-files-test-aio-$(CONFIG_POSIX) = aio-posix.c
- check-unit-y += tests/test-thread-pool$(EXESUF)
- gcov-files-test-thread-pool-y = thread-pool.c
- gcov-files-test-hbitmap-y = util/hbitmap.c
-@@ -476,8 +480,8 @@ test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
- 	tests/test-qapi-event.o tests/test-qmp-introspect.o \
- 	$(test-qom-obj-y)
- test-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
--test-io-obj-y = $(io-obj-y) $(test-crypto-obj-y)
--test-block-obj-y = $(block-obj-y) $(test-io-obj-y)
-+test-io-obj-y = $(io-obj-y) $(test-crypto-obj-y) $(block-obj-y) tests/iothread.o
-+test-block-obj-y = $(test-io-obj-y)
+@@ -306,7 +282,7 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
  
- tests/check-qint$(EXESUF): tests/check-qint.o $(test-util-obj-y)
- tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
-@@ -492,6 +496,7 @@ tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-qom-obj-y)
- tests/test-char$(EXESUF): tests/test-char.o qemu-char.o qemu-timer.o $(test-util-obj-y) $(qtest-obj-y) $(test-io-obj-y)
- tests/test-coroutine$(EXESUF): tests/test-coroutine.o $(test-block-obj-y)
- tests/test-aio$(EXESUF): tests/test-aio.o $(test-block-obj-y)
-+tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-obj-y)
- tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
- tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
-diff --git a/tests/iothread.c b/tests/iothread.c
-new file mode 100644
-index 0000000..777d9ee
---- /dev/null
-+++ b/tests/iothread.c
-@@ -0,0 +1,91 @@
-+/*
-+ * Event loop thread implementation for unit tests
-+ *
-+ * Copyright Red Hat Inc., 2013, 2016
-+ *
-+ * Authors:
-+ *  Stefan Hajnoczi   <stefanha@redhat.com>
-+ *  Paolo Bonzini     <pbonzini@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "block/aio.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/rcu.h"
-+#include "iothread.h"
-+
-+struct IOThread {
-+    AioContext *ctx;
-+
-+    QemuThread thread;
-+    QemuMutex init_done_lock;
-+    QemuCond init_done_cond;    /* is thread initialization done? */
-+    bool stopping;
-+};
-+
-+static __thread IOThread *my_iothread;
-+
-+AioContext *qemu_get_current_aio_context(void)
-+{
-+    return my_iothread ? my_iothread->ctx : qemu_get_aio_context();
-+}
-+
-+static void *iothread_run(void *opaque)
-+{
-+    IOThread *iothread = opaque;
-+
-+    rcu_register_thread();
-+
-+    my_iothread = iothread;
-+    qemu_mutex_lock(&iothread->init_done_lock);
-+    iothread->ctx = aio_context_new(&error_abort);
-+    qemu_cond_signal(&iothread->init_done_cond);
-+    qemu_mutex_unlock(&iothread->init_done_lock);
-+
-+    while (!atomic_read(&iothread->stopping)) {
-+        aio_poll(iothread->ctx, true);
-+    }
-+
-+    rcu_unregister_thread();
-+    return NULL;
-+}
-+
-+void iothread_join(IOThread *iothread)
-+{
-+    iothread->stopping = true;
-+    aio_notify(iothread->ctx);
-+    qemu_thread_join(&iothread->thread);
-+    qemu_cond_destroy(&iothread->init_done_cond);
-+    qemu_mutex_destroy(&iothread->init_done_lock);
-+    aio_context_unref(iothread->ctx);
-+    g_free(iothread);
-+}
-+
-+IOThread *iothread_new(void)
-+{
-+    IOThread *iothread = g_new0(IOThread, 1);
-+
-+    qemu_mutex_init(&iothread->init_done_lock);
-+    qemu_cond_init(&iothread->init_done_cond);
-+    qemu_thread_create(&iothread->thread, NULL, iothread_run,
-+                       iothread, QEMU_THREAD_JOINABLE);
-+
-+    /* Wait for initialization to complete */
-+    qemu_mutex_lock(&iothread->init_done_lock);
-+    while (iothread->ctx == NULL) {
-+        qemu_cond_wait(&iothread->init_done_cond,
-+                       &iothread->init_done_lock);
-+    }
-+    qemu_mutex_unlock(&iothread->init_done_lock);
-+    return iothread;
-+}
-+
-+AioContext *iothread_get_aio_context(IOThread *iothread)
-+{
-+    return iothread->ctx;
-+}
-diff --git a/tests/iothread.h b/tests/iothread.h
-new file mode 100644
-index 0000000..4877cea
---- /dev/null
-+++ b/tests/iothread.h
-@@ -0,0 +1,25 @@
-+/*
-+ * Event loop thread implementation for unit tests
-+ *
-+ * Copyright Red Hat Inc., 2013, 2016
-+ *
-+ * Authors:
-+ *  Stefan Hajnoczi   <stefanha@redhat.com>
-+ *  Paolo Bonzini     <pbonzini@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#ifndef TEST_IOTHREAD_H
-+#define TEST_IOTHREAD_H
-+
-+#include "block/aio.h"
-+#include "qemu/thread.h"
-+
-+typedef struct IOThread IOThread;
-+
-+IOThread *iothread_new(void);
-+void iothread_join(IOThread *iothread);
-+AioContext *iothread_get_aio_context(IOThread *iothread);
-+
-+#endif
-diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
-new file mode 100644
-index 0000000..17e81f9
---- /dev/null
-+++ b/tests/test-aio-multithread.c
-@@ -0,0 +1,213 @@
-+/*
-+ * AioContext multithreading tests
-+ *
-+ * Copyright Red Hat, Inc. 2016
-+ *
-+ * Authors:
-+ *  Paolo Bonzini    <pbonzini@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <glib.h>
-+#include "block/aio.h"
-+#include "qapi/error.h"
-+#include "qemu/coroutine.h"
-+#include "qemu/thread.h"
-+#include "qemu/error-report.h"
-+#include "iothread.h"
-+
-+/* AioContext management */
-+
-+#define NUM_CONTEXTS 5
-+
-+static IOThread *threads[NUM_CONTEXTS];
-+static AioContext *ctx[NUM_CONTEXTS];
-+static __thread int id = -1;
-+
-+static QemuEvent done_event;
-+
-+/* Run a function synchronously on a remote iothread. */
-+
-+typedef struct CtxRunData {
-+    QEMUBHFunc *cb;
-+    void *arg;
-+} CtxRunData;
-+
-+static void ctx_run_bh_cb(void *opaque)
-+{
-+    CtxRunData *data = opaque;
-+
-+    data->cb(data->arg);
-+    qemu_event_set(&done_event);
-+}
-+
-+static void ctx_run(int i, QEMUBHFunc *cb, void *opaque)
-+{
-+    CtxRunData data = {
-+        .cb = cb,
-+        .arg = opaque
-+    };
-+
-+    qemu_event_reset(&done_event);
-+    aio_bh_schedule_oneshot(ctx[i], ctx_run_bh_cb, &data);
-+    qemu_event_wait(&done_event);
-+}
-+
-+/* Starting the iothreads. */
-+
-+static void set_id_cb(void *opaque)
-+{
-+    int *i = opaque;
-+
-+    id = *i;
-+}
-+
-+static void create_aio_contexts(void)
-+{
-+    int i;
-+
-+    for (i = 0; i < NUM_CONTEXTS; i++) {
-+        threads[i] = iothread_new();
-+        ctx[i] = iothread_get_aio_context(threads[i]);
-+    }
-+
-+    qemu_event_init(&done_event, false);
-+    for (i = 0; i < NUM_CONTEXTS; i++) {
-+        ctx_run(i, set_id_cb, &i);
-+    }
-+}
-+
-+/* Stopping the iothreads. */
-+
-+static void join_aio_contexts(void)
-+{
-+    int i;
-+
-+    for (i = 0; i < NUM_CONTEXTS; i++) {
-+        aio_context_ref(ctx[i]);
-+    }
-+    for (i = 0; i < NUM_CONTEXTS; i++) {
-+        iothread_join(threads[i]);
-+    }
-+    for (i = 0; i < NUM_CONTEXTS; i++) {
-+        aio_context_unref(ctx[i]);
-+    }
-+    qemu_event_destroy(&done_event);
-+}
-+
-+/* Basic test for the stuff above. */
-+
-+static void test_lifecycle(void)
-+{
-+    create_aio_contexts();
-+    join_aio_contexts();
-+}
-+
-+/* aio_co_schedule test.  */
-+
-+static Coroutine *to_schedule[NUM_CONTEXTS];
-+
-+static bool now_stopping;
-+
-+static int count_retry;
-+static int count_here;
-+static int count_other;
-+
-+static bool schedule_next(int n)
-+{
-+    Coroutine *co;
-+
-+    co = atomic_xchg(&to_schedule[n], NULL);
-+    if (!co) {
-+        atomic_inc(&count_retry);
-+        return false;
-+    }
-+
-+    if (n == id) {
-+        atomic_inc(&count_here);
-+    } else {
-+        atomic_inc(&count_other);
-+    }
-+
-+    aio_co_schedule(ctx[n], co);
-+    return true;
-+}
-+
-+static void finish_cb(void *opaque)
-+{
-+    schedule_next(id);
-+}
-+
-+static void test_multi_co_schedule_entry(void *opaque)
-+{
-+    g_assert(to_schedule[id] == NULL);
-+    atomic_mb_set(&to_schedule[id], qemu_coroutine_self());
-+
-+    while (!atomic_mb_read(&now_stopping)) {
-+        int n;
-+
-+        n = g_test_rand_int_range(0, NUM_CONTEXTS);
-+        schedule_next(n);
-+        qemu_coroutine_yield();
-+
-+        g_assert(to_schedule[id] == NULL);
-+        atomic_mb_set(&to_schedule[id], qemu_coroutine_self());
-+    }
-+}
-+
-+
-+static void test_multi_co_schedule(int seconds)
-+{
-+    int i;
-+
-+    count_here = count_other = count_retry = 0;
-+    now_stopping = false;
-+
-+    create_aio_contexts();
-+    for (i = 0; i < NUM_CONTEXTS; i++) {
-+        Coroutine *co1 = qemu_coroutine_create(test_multi_co_schedule_entry, NULL);
-+        aio_co_schedule(ctx[i], co1);
-+    }
-+
-+    g_usleep(seconds * 1000000);
-+
-+    atomic_mb_set(&now_stopping, true);
-+    for (i = 0; i < NUM_CONTEXTS; i++) {
-+        ctx_run(i, finish_cb, NULL);
-+        to_schedule[i] = NULL;
-+    }
-+
-+    join_aio_contexts();
-+    g_test_message("scheduled %d, queued %d, retry %d, total %d\n",
-+                  count_other, count_here, count_retry,
-+                  count_here + count_other + count_retry);
-+}
-+
-+static void test_multi_co_schedule_1(void)
-+{
-+    test_multi_co_schedule(1);
-+}
-+
-+static void test_multi_co_schedule_10(void)
-+{
-+    test_multi_co_schedule(10);
-+}
-+
-+/* End of tests.  */
-+
-+int main(int argc, char **argv)
-+{
-+    init_clocks();
-+
-+    g_test_init(&argc, &argv, NULL);
-+    g_test_add_func("/aio/multi/lifecycle", test_lifecycle);
-+    if (g_test_quick()) {
-+        g_test_add_func("/aio/multi/schedule", test_multi_co_schedule_1);
-+    } else {
-+        g_test_add_func("/aio/multi/schedule", test_multi_co_schedule_10);
-+    }
-+    return g_test_run();
-+}
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index d2f529b..cb87997 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -33,17 +33,6 @@
- static char temp_file[] = "/tmp/vmst.test.XXXXXX";
- static int temp_fd;
+@@ -331,7 +307,7 @@ int nbd_client_co_flush(BlockDriverState *bs)
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
  
--/* Fake yield_until_fd_readable() implementation so we don't have to pull the
-- * coroutine code as dependency.
-- */
--void yield_until_fd_readable(int fd)
--{
--    fd_set fds;
--    FD_ZERO(&fds);
--    FD_SET(fd, &fds);
--    select(fd + 1, &fds, NULL, NULL, NULL);
--}
+@@ -357,23 +333,23 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int count)
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ 
+ }
+ 
+ void nbd_client_detach_aio_context(BlockDriverState *bs)
+ {
+-    aio_set_fd_handler(bdrv_get_aio_context(bs),
+-                       nbd_get_client_session(bs)->sioc->fd,
+-                       false, NULL, NULL, NULL, NULL);
++    NBDClientSession *client = nbd_get_client_session(bs);
++    qio_channel_detach_aio_context(QIO_CHANNEL(client->sioc));
+ }
+ 
+ void nbd_client_attach_aio_context(BlockDriverState *bs,
+                                    AioContext *new_context)
+ {
+-    aio_set_fd_handler(new_context, nbd_get_client_session(bs)->sioc->fd,
+-                       false, nbd_reply_ready, NULL, NULL, bs);
++    NBDClientSession *client = nbd_get_client_session(bs);
++    qio_channel_set_aio_context(QIO_CHANNEL(client->sioc), new_context);
++    aio_co_schedule(new_context, client->read_reply_co);
+ }
+ 
+ void nbd_client_close(BlockDriverState *bs)
+@@ -434,7 +410,7 @@ int nbd_client_init(BlockDriverState *bs,
+     /* Now that we're connected, set the socket to be non-blocking and
+      * kick the reply mechanism.  */
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
 -
++    client->read_reply_co = qemu_coroutine_create(nbd_read_reply_entry, client);
+     nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
  
- /* Duplicate temp_fd and seek to the beginning of the file */
- static QEMUFile *open_test_file(bool write)
-diff --git a/trace-events b/trace-events
-index 1181486..e9e31e9 100644
---- a/trace-events
-+++ b/trace-events
-@@ -85,6 +85,10 @@ xen_map_cache(uint64_t phys_addr) "want %#"PRIx64
- xen_remap_bucket(uint64_t index) "index %#"PRIx64
- xen_map_cache_return(void* ptr) "%p"
+     logout("Established connection with NBD server\n");
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index f8d6006..8cdfc92 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -25,7 +25,7 @@ typedef struct NBDClientSession {
  
-+# async.c
-+aio_co_schedule(void *ctx, void *co) "ctx %p co %p"
-+aio_co_schedule_bh_cb(void *ctx, void *co) "ctx %p co %p"
-+
- # monitor.c
- handle_qmp_command(void *mon, const char *cmd_name) "mon %p cmd_name \"%s\""
- monitor_protocol_event_handler(uint32_t event, void *qdict) "event=%d data=%p"
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index a5d2f6c..415600d 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -19,6 +19,7 @@
- #include "qemu/atomic.h"
- #include "qemu/coroutine.h"
- #include "qemu/coroutine_int.h"
-+#include "block/aio.h"
+     CoMutex send_mutex;
+     CoQueue free_sema;
+-    Coroutine *send_coroutine;
++    Coroutine *read_reply_co;
+     int in_flight;
  
- enum {
-     POOL_BATCH_SIZE = 64,
-@@ -114,6 +115,13 @@ void qemu_coroutine_enter(Coroutine *co)
+     Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
+diff --git a/nbd/client.c b/nbd/client.c
+index ffb0743..5c9dee3 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -778,7 +778,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
+     ssize_t ret;
+ 
+     ret = read_sync(ioc, buf, sizeof(buf));
+-    if (ret < 0) {
++    if (ret <= 0) {
+         return ret;
      }
  
-     co->caller = self;
-+    co->ctx = qemu_get_current_aio_context();
-+
-+    /* Store co->ctx before anything that stores co.  Matches
-+     * barrier in aio_co_wake.
-+     */
-+    smp_wmb();
-+
-     ret = qemu_coroutine_switch(self, co, COROUTINE_ENTER);
- 
-     qemu_co_queue_run_restart(co);
+diff --git a/nbd/common.c b/nbd/common.c
+index b583a4f..805dbdc 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -43,14 +43,7 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+         }
+         if (len == QIO_CHANNEL_ERR_BLOCK) {
+             if (qemu_in_coroutine()) {
+-                /* XXX figure out if we can create a variant on
+-                 * qio_channel_yield() that works with AIO contexts
+-                 * and consider using that in this branch */
+-                qemu_coroutine_yield();
+-            } else if (done) {
+-                /* XXX this is needed by nbd_reply_ready.  */
+-                qio_channel_wait(ioc,
+-                                 do_read ? G_IO_IN : G_IO_OUT);
++                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+             } else {
+                 return -EAGAIN;
+             }
 -- 
 2.9.3
