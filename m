@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cRr99-0006TZ-B8
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:59:20 -0500
+	(envelope-from <peterx@redhat.com>) id 1cRrSw-0006Nf-2j
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:19:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cRr98-0004nq-5l
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:59:15 -0500
-Received: from [45.249.212.189] (port=2377 helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cRr97-0004iw-E3
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:59:14 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Fri, 13 Jan 2017 01:56:03 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA18F954@DGGEMA505-MBX.china.huawei.com>
-References: <1481767396-187748-1-git-send-email-arei.gonglei@huawei.com>
-	<1481767396-187748-2-git-send-email-arei.gonglei@huawei.com>
-	<e235caf4-f51c-dccf-4eb7-548d3fa71644@de.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA182B83@DGGEMA505-MBX.china.huawei.com>
-	<c4282723-2afb-1764-2431-ef41f7126371@de.ibm.com>
-	<a8384ff8-ff65-c578-c338-e6d8ebf498c4@de.ibm.com>
-	<20170112161729-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170112161729-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peterx@redhat.com>) id 1cRrSs-0005KQ-4C
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:19:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55454)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRrSr-0005Jb-Uc
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:19:38 -0500
+Date: Fri, 13 Jan 2017 10:19:27 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170113021927.GT4450@pxdev.xzpeter.org>
+References: <1483428594-28880-1-git-send-email-peterx@redhat.com>
+	<20170112162441-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 1/1] crypto: add virtio-crypto driver
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170112162441-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 00/17] VT-d: vfio enablement and
+ misc enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "Huangweidong
-	(C)" <weidong.huang@huawei.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, Luonengjun <luonengjun@huawei.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, longpeng <longpeng2@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
->=20
-> On Thu, Jan 12, 2017 at 03:10:25PM +0100, Christian Borntraeger wrote:
-> > On 01/10/2017 01:56 PM, Christian Borntraeger wrote:
-> > > On 01/10/2017 01:36 PM, Gonglei (Arei) wrote:
-> > >> Hi,
-> > >>
-> > >>>
-> > >>> On 12/15/2016 03:03 AM, Gonglei wrote:
-> > >>> [...]
-> > >>>> +
-> > >>>> +static struct crypto_alg virtio_crypto_algs[] =3D { {
-> > >>>> +	.cra_name =3D "cbc(aes)",
-> > >>>> +	.cra_driver_name =3D "virtio_crypto_aes_cbc",
-> > >>>> +	.cra_priority =3D 501,
-> > >>>
-> > >>>
-> > >>> This is still higher than the hardware-accelerators (like intel aes=
-ni or the
-> > >>> s390 cpacf functions or the arm hw). aesni and s390/cpacf are suppo=
-rted
-> by the
-> > >>> hardware virtualization and available to the guests. I do not see a=
- way
-> how
-> > >>> virtio
-> > >>> crypto can be faster than that (in the end it might be cpacf/aesni =
-+
-> overhead)
-> > >>> instead it will very likely be slower.
-> > >>> So we should use a number that is higher than software implementati=
-ons
-> but
-> > >>> lower than the hw ones.
-> > >>>
-> > >>> Just grepping around, the software ones seem be be around 100 and t=
-he
-> > >>> hardware
-> > >>> ones around 200-400. So why was 150 not enough?
-> > >>>
-> > >> I didn't find a documentation about how we use the priority, and I a=
-ssumed
-> > >> people use virtio-crypto will configure hardware accelerators in the
-> > >> host. So I choosed the number which bigger than aesni's priority.
-> > >
-> > > Yes, but the aesni driver will only bind if there is HW support in th=
-e guest.
-> > > And if aesni is available in the guest (or the s390 aes function from=
- cpacf)
-> > > it will always be faster than the same in the host via virtio.So your=
- priority
-> > > should be smaller.
-> >
-> >
-> > any opinion on this?
->=20
-> Going forward, we might add an emulated aesni device and that might
-> become slower than virtio. OTOH if or when this happens, we can solve it
-> by adding a priority or a feature flag to virtio to raise its priority.
->=20
-> So I think I agree with Christian here, let's lower the priority.
-> Gonglei, could you send a patch like this?
->=20
-OK, will do.
+On Thu, Jan 12, 2017 at 04:27:30PM +0200, Michael S. Tsirkin wrote:
+> On Tue, Jan 03, 2017 at 03:29:37PM +0800, Peter Xu wrote:
+> > (I renamed the title for this RFC v2, since starting from this version
+> >  the series will be based on master, also I picked up some more fixes
+> >  for vt-d into this series)
+> > 
+> > v2:
+> > - change comment for "end" parameter in vtd_page_walk() [Tianyu]
+> > - change comment for "a iova" to "an iova" [Yi]
+> > - fix fault printed val for GPA address in vtd_page_walk_level (debug
+> >   only)
+> > - rebased to master (rather than Aviv's v6 series) and merged Aviv's
+> >   series v6: picked patch 1 (as patch 1 in this series), dropped patch
+> >   2, re-wrote patch 3 (as patch 17 of this series).
+> > - picked up two more bugfix patches from Jason's DMAR series
+> > - picked up the following patch as well:
+> >   "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
+> > 
+> > This RFC series is a re-work for Aviv B.D.'s vfio enablement series
+> > with vt-d:
+> > 
+> >   https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
+> > 
+> > Aviv has done a great job there, and what we still lack there are
+> > mostly the following:
+> > 
+> > (1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
+> >     memory region.
+> > 
+> > (2) VT-d still haven't provide a correct replay() mechanism (e.g.,
+> >     when IOMMU domain switches, things will broke).
+> > 
+> > This series should have solved the above two issues.
+> > 
+> > Online repo:
+> > 
+> >   https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement-v2
+> > 
+> > I would be glad to hear about any review comments for above patches.
+> 
+> This all looks good to me. The series needs to be
+> rebased on top of latest bits.
+> In particular, Jason made changes which conflict
+> with this.
 
-Thanks,
--Gonglei
+Michael,
+
+Thanks for your positive feedback.
+
+Could you provide me a branch so that I can rebase this work on? I was
+trying to find a good base point in your repo here:
+
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git
+
+but failed to find a suitable branch. Thanks,
+
+-- peterx
