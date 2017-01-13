@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cRwlV-0004B4-Cl
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:59:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1cRwlw-0004NJ-PV
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:59:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cRwlS-0001bd-Aw
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:59:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42750)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cRwlS-0001bD-3K
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:59:10 -0500
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-10-git-send-email-peterx@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <11241cc6-139e-ee8f-ff54-e1ab83ecf45d@redhat.com>
-Date: Fri, 13 Jan 2017 15:58:59 +0800
+	(envelope-from <armbru@redhat.com>) id 1cRwlt-0001rW-LX
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 02:59:40 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1484224732-1345-1-git-send-email-thuth@redhat.com>
+	<877f609rkd.fsf@dusky.pond.sub.org>
+	<03307c8a-b802-861a-fa8c-0af78df41c8a@redhat.com>
+Date: Fri, 13 Jan 2017 08:59:34 +0100
+In-Reply-To: <03307c8a-b802-861a-fa8c-0af78df41c8a@redhat.com> (Thomas Huth's
+	message of "Thu, 12 Jan 2017 18:34:45 +0100")
+Message-ID: <87k29z4cgp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1484276800-26814-10-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v3 09/14] memory: introduce
- memory_region_notify_one()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3] monitor: Fix crashes when using HMP
+ commands without CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +25,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+Thomas Huth <thuth@redhat.com> writes:
 
-
-On 2017=E5=B9=B401=E6=9C=8813=E6=97=A5 11:06, Peter Xu wrote:
-> Generalizing the notify logic in memory_region_notify_iommu() into a
-> single function. This can be further used in customized replay()
-> functions for IOMMUs.
+> On 12.01.2017 17:22, Markus Armbruster wrote:
+>> Thomas Huth <thuth@redhat.com> writes:
+>> 
+>>> When running certain HMP commands ("info registers", "info cpustats",
+>>> "nmi", "memsave" or dumping virtual memory) with the "none" machine,
+>>> QEMU crashes with a segmentation fault. This happens because the "none"
+>>> machine does not have any CPUs by default, but these HMP commands did
+>>> not check for a valid CPU pointer yet. Add such checks now, so we get
+>>> an error message about the missing CPU instead.
+>>>
+>>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  v3:
+>>>  - Use UNASSIGNED_CPU_INDEX instead of hard-coded -1
+>>>  v2:
+>>>  - Added more checks to cover "nmi" and "memsave", too
+>>>
+>>>  hmp.c     |  8 +++++++-
+>>>  monitor.c | 37 +++++++++++++++++++++++++++++++------
+>>>  2 files changed, 38 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/hmp.c b/hmp.c
+>>> index b869617..b1c503a 100644
+>>> --- a/hmp.c
+>>> +++ b/hmp.c
+>>> @@ -1013,8 +1013,14 @@ void hmp_memsave(Monitor *mon, const QDict *qdict)
+>>>      const char *filename = qdict_get_str(qdict, "filename");
+>>>      uint64_t addr = qdict_get_int(qdict, "val");
+>>>      Error *err = NULL;
+>>> +    int cpu_index = monitor_get_cpu_index();
+>>>  
+>>> -    qmp_memsave(addr, size, filename, true, monitor_get_cpu_index(), &err);
+>>> +    if (cpu_index < 0) {
+>>> +        monitor_printf(mon, "No CPU available\n");
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    qmp_memsave(addr, size, filename, true, cpu_index, &err);
+>>>      hmp_handle_error(mon, &err);
+>>>  }
+>>>  
+>>> diff --git a/monitor.c b/monitor.c
+>>> index 0841d43..17121ff 100644
+>>> --- a/monitor.c
+>>> +++ b/monitor.c
+>>> @@ -1025,6 +1025,9 @@ int monitor_set_cpu(int cpu_index)
+>>>  CPUState *mon_get_cpu(void)
+>>>  {
+>>>      if (!cur_mon->mon_cpu) {
+>>> +        if (!first_cpu) {
+>>> +            return NULL;
+>>> +        }
+>>>          monitor_set_cpu(first_cpu->cpu_index);
+>>>      }
+>>>      cpu_synchronize_state(cur_mon->mon_cpu);
+>>> @@ -1033,17 +1036,27 @@ CPUState *mon_get_cpu(void)
+>>>  
+>>>  CPUArchState *mon_get_cpu_env(void)
+>>>  {
+>>> -    return mon_get_cpu()->env_ptr;
+>>> +    CPUState *cs = mon_get_cpu();
+>>> +
+>>> +    return cs ? cs->env_ptr : NULL;
+>>>  }
+>>>  
+>>>  int monitor_get_cpu_index(void)
+>>>  {
+>>> -    return mon_get_cpu()->cpu_index;
+>>> +    CPUState *cs = mon_get_cpu();
+>>> +
+>>> +    return cs ? cs->cpu_index : UNASSIGNED_CPU_INDEX;
+>>>  }
+>>>  
+>>>  static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+>>>  {
+>>> -    cpu_dump_state(mon_get_cpu(), (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
+>>> +    CPUState *cs = mon_get_cpu();
+>>> +
+>>> +    if (!cs) {
+>>> +        monitor_printf(mon, "No CPU available\n");
+>>> +        return;
+>>> +    }
+>>> +    cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
+>>>  }
+>>>  
+>>>  static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+>>> @@ -1076,7 +1089,13 @@ static void hmp_info_history(Monitor *mon, const QDict *qdict)
+>>>  
+>>>  static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+>>>  {
+>>> -    cpu_dump_statistics(mon_get_cpu(), (FILE *)mon, &monitor_fprintf, 0);
+>>> +    CPUState *cs = mon_get_cpu();
+>>> +
+>>> +    if (!cs) {
+>>> +        monitor_printf(mon, "No CPU available\n");
+>>> +        return;
+>>> +    }
+>>> +    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
+>>>  }
+>>>  
+>>>  static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+>>> @@ -1235,6 +1254,12 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+>>>      int l, line_size, i, max_digits, len;
+>>>      uint8_t buf[16];
+>>>      uint64_t v;
+>>> +    CPUState *cs = mon_get_cpu();
+>>> +
+>>> +    if (!cs && (format == 'i' || !is_physical)) {
+>>> +        monitor_printf(mon, "Can not dump without CPU\n");
+>>> +        return;
+>>> +    }
+>> 
+>> This is basically "if (we're going to dereference cs)".  Not so nice, in
+>> particular since the dereferences are hidden inside mon_get_cpu_env()
+>> calls.  I guess it'll do.
+>> 
+>>>  
+>>>      if (format == 'i') {
+>>>          int flags = 0;
+>>> @@ -1264,7 +1289,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+>>>          flags = msr_le << 16;
+>>>          flags |= env->bfd_mach;
+>>>  #endif
+>>> -        monitor_disas(mon, mon_get_cpu(), addr, count, is_physical, flags);
+>>> +        monitor_disas(mon, cs, addr, count, is_physical, flags);
+>>>          return;
+>>>      }
+>>>  
+>>> @@ -1303,7 +1328,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+>>>          if (is_physical) {
+>>>              cpu_physical_memory_read(addr, buf, l);
+>>>          } else {
+>>> -            if (cpu_memory_rw_debug(mon_get_cpu(), addr, buf, l, 0) < 0) {
+>>> +            if (cpu_memory_rw_debug(cs, addr, buf, l, 0) < 0) {
+>>>                  monitor_printf(mon, " Cannot access memory\n");
+>>>                  break;
+>>>              }
+>> 
+>> What about get_monitor_def()?
+>> 
+>>     $ qemu-system-x86_64 --nodefaults -S -display none -M none -monitor stdio
+>>     QEMU 2.8.50 monitor - type 'help' for more information
+>>     (qemu) p $pc
+>>     Segmentation fault (core dumped)
 >
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->   include/exec/memory.h | 15 +++++++++++++++
->   memory.c              | 29 ++++++++++++++++++-----------
->   2 files changed, 33 insertions(+), 11 deletions(-)
+> Oh, I saw that get_monitor_def() uses mon_get_cpu_env(), but I only
+> checked with qemu-system-m68k where "p $pc" simply prints "unknown
+> register" when you run it with the "none" machine ... that's why I
+> assumed that no fixes would be needed here.
 >
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 2233f99..f367e54 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -669,6 +669,21 @@ void memory_region_notify_iommu(MemoryRegion *mr,
->                                   IOMMUTLBEntry entry);
->  =20
->   /**
-> + * memory_region_notify_one: notify a change in an IOMMU translation
-> + *                           entry to a single notifier
-> + *
-> + * This works just like memory_region_notify_iommu(), but it only
-> + * notifies a specific notifier, not all of them.
-> + *
-> + * @notifier: the notifier to be notified
-> + * @entry: the new entry in the IOMMU translation table.  The entry
-> + *         replaces all old entries for the same virtual I/O address r=
-ange.
-> + *         Deleted entries have .@perm =3D=3D 0.
-> + */
-> +void memory_region_notify_one(IOMMUNotifier *notifier,
-> +                              IOMMUTLBEntry *entry);
-> +
-> +/**
->    * memory_region_register_iommu_notifier: register a notifier for cha=
-nges to
->    * IOMMU translation entries.
->    *
-> diff --git a/memory.c b/memory.c
-> index df62bd1..6e4c872 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1665,26 +1665,33 @@ void memory_region_unregister_iommu_notifier(Me=
-moryRegion *mr,
->       memory_region_update_iommu_notify_flags(mr);
->   }
->  =20
-> -void memory_region_notify_iommu(MemoryRegion *mr,
-> -                                IOMMUTLBEntry entry)
-> +void memory_region_notify_one(IOMMUNotifier *notifier,
-> +                              IOMMUTLBEntry *entry)
->   {
-> -    IOMMUNotifier *iommu_notifier;
->       IOMMUNotifierFlag request_flags;
->  =20
-> -    assert(memory_region_is_iommu(mr));
-> -
-> -    if (entry.perm & IOMMU_RW) {
-> +    if (entry->perm & IOMMU_RW) {
->           request_flags =3D IOMMU_NOTIFIER_MAP;
->       } else {
->           request_flags =3D IOMMU_NOTIFIER_UNMAP;
->       }
+>> Likewise, info tlb, info mem, ... 
+>
+> These seem to be target specific, too, so I think they could go into a
+> separate patch instead. If it's OK for you, I'd like to keep my current
+> patch as it is, and add these items to
+> http://qemu-project.org/BiteSizedTasks instead - since these are all
+> non-urgent problems that should be easy to fix for newcomers, too.
 
-Nit: you can keep this outside the loop.
-
-Thanks
-
->  =20
-> +    if (notifier->notifier_flags & request_flags &&
-> +        notifier->start <=3D entry->iova &&
-> +        notifier->end >=3D entry->iova) {
-> +        notifier->notify(notifier, entry);
-> +    }
-> +}
-> +
-> +void memory_region_notify_iommu(MemoryRegion *mr,
-> +                                IOMMUTLBEntry entry)
-> +{
-> +    IOMMUNotifier *iommu_notifier;
-> +
-> +    assert(memory_region_is_iommu(mr));
-> +
->       QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
-> -        if (iommu_notifier->notifier_flags & request_flags &&
-> -            iommu_notifier->start <=3D entry.iova &&
-> -            iommu_notifier->end >=3D entry.iova) {
-> -            iommu_notifier->notify(iommu_notifier, &entry);
-> -        }
-> +        memory_region_notify_one(iommu_notifier, &entry);
->       }
->   }
->  =20
+I'm not into rejecting partial fixes to blackmail for more complete
+fixes.  But let's add a FIXME comment next to mon_get_cpu(), to record
+the issue in the source code, and not just the web site.
