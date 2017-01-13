@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cS1LE-00063l-5z
+	(envelope-from <laurent@vivier.eu>) id 1cS1LF-00063n-Il
 	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cS1LB-0002P6-2O
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:24 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:59845)
+	(envelope-from <laurent@vivier.eu>) id 1cS1LC-0002Pd-FR
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:25 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:51908)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cS1LA-0002On-OW
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:21 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cS1LC-0002PA-5C
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 07:52:22 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 13 Jan 2017 13:51:58 +0100
-Message-Id: <1484311923-28637-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v2 0/5] Fixes for target/m68k
+Date: Fri, 13 Jan 2017 13:52:03 +0100
+Message-Id: <1484311923-28637-6-git-send-email-laurent@vivier.eu>
+In-Reply-To: <1484311923-28637-1-git-send-email-laurent@vivier.eu>
+References: <1484311923-28637-1-git-send-email-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v2 5/5] target-m68k: increment/decrement with SP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,25 +26,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <huth@tuxfamily.org>, rth@twiddle.net, Laurent Vivier <laurent@vivier.eu>
 
-This is a series of fixes for target/m68k found:
-- with RISU (bit operation with immediate)
-- while debugging package build under chroot
-  (gen_flush_flags() and CAS address modes)
-- while I was working on the softmmu mode
-  (CAS alignment and SP address modes)
+On 680x0 family only.
 
-v2:
-- Don't align stack access on coldfire.
+Address Register indirect With postincrement:
 
-Laurent Vivier (5):
-  target-m68k: fix bit operation with immediate value
-  target-m68k: fix gen_flush_flags()
-  target-m68k: manage pre-dec et post-inc in CAS
-  target-m68k: CAS doesn't need aligned access
-  target-m68k: increment/decrement with SP
+When using the stack pointer (A7) with byte size data, the register
+is incremented by two.
 
- target/m68k/translate.c | 40 +++++++++++++++++++++++++++++++++-------
- 1 file changed, 33 insertions(+), 7 deletions(-)
+Address Register indirect With predecrement:
 
+When using the stack pointer (A7) with byte size data, the register
+is decremented by two.
+
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/m68k/translate.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index cf5d8dd..727c189 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -725,7 +725,12 @@ static TCGv gen_lea_mode(CPUM68KState *env, DisasContext *s,
+         }
+         reg = get_areg(s, reg0);
+         tmp = tcg_temp_new();
+-        tcg_gen_subi_i32(tmp, reg, opsize_bytes(opsize));
++        if (reg0 == 7 && opsize == OS_BYTE &&
++            m68k_feature(s->env, M68K_FEATURE_M68000)) {
++            tcg_gen_subi_i32(tmp, reg, 2);
++        } else {
++            tcg_gen_subi_i32(tmp, reg, opsize_bytes(opsize));
++        }
+         return tmp;
+     case 5: /* Indirect displacement.  */
+         reg = get_areg(s, reg0);
+@@ -801,7 +806,12 @@ static TCGv gen_ea_mode(CPUM68KState *env, DisasContext *s, int mode, int reg0,
+         result = gen_ldst(s, opsize, reg, val, what);
+         if (what == EA_STORE || !addrp) {
+             TCGv tmp = tcg_temp_new();
+-            tcg_gen_addi_i32(tmp, reg, opsize_bytes(opsize));
++            if (reg0 == 7 && opsize == OS_BYTE &&
++                m68k_feature(s->env, M68K_FEATURE_M68000)) {
++                tcg_gen_subi_i32(tmp, reg, 2);
++            } else {
++                tcg_gen_addi_i32(tmp, reg, opsize_bytes(opsize));
++            }
+             delay_set_areg(s, reg0, tmp, true);
+         }
+         return result;
 -- 
 2.7.4
