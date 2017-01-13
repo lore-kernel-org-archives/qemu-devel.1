@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cS2BN-00027p-K8
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:46:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cS2QJ-0008Gd-6K
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 09:01:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cS2BM-00048d-QI
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:46:17 -0500
-Received: from mail-vk0-x231.google.com ([2607:f8b0:400c:c05::231]:34012)
+	(envelope-from <peter.maydell@linaro.org>) id 1cS2QI-0000vj-Bt
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 09:01:43 -0500
+Received: from mail-ua0-x232.google.com ([2607:f8b0:400c:c08::232]:35735)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cS2BM-00048E-8W
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:46:16 -0500
-Received: by mail-vk0-x231.google.com with SMTP id r136so33489848vke.1
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 05:46:16 -0800 (PST)
+	id 1cS2QI-0000vP-97
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 09:01:42 -0500
+Received: by mail-ua0-x232.google.com with SMTP id y9so37434681uae.2
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 06:01:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <24cb80e0-93bb-d4fb-0ba9-9f99397ec121@weilnetz.de>
-References: <1484295285-8809-1-git-send-email-kraxel@redhat.com>
-	<24cb80e0-93bb-d4fb-0ba9-9f99397ec121@weilnetz.de>
+In-Reply-To: <20170112025606.27332-1-rth@twiddle.net>
+References: <20170112025606.27332-1-rth@twiddle.net>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Jan 2017 13:45:54 +0000
-Message-ID: <CAFEAcA-zJucSaL+euDS=7e3W3ROgJ1MN2Pe8N+gA9YiAWhVK_w@mail.gmail.com>
+Date: Fri, 13 Jan 2017 14:01:20 +0000
+Message-ID: <CAFEAcA9WvZbup0AkuUDBPqaA3_xoUncKTKWj-ZHx5F0NBaOwXA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] sdl2: fix build failure on windows
+Subject: Re: [Qemu-devel] [PULL 00/30] target-sparc sun4v support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@gnu.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 13 January 2017 at 08:27, Stefan Weil <sw@weilnetz.de> wrote:
-> Am 13.01.2017 um 09:14 schrieb Gerd Hoffmann:
->> Cc: Stefan Weil <sw@weilnetz.de>
->> Cc: Samuel Thibault <samuel.thibault@gnu.org>
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> ---
->>  ui/sdl2.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/ui/sdl2.c b/ui/sdl2.c
->> index 9a79b17..91fb111 100644
->> --- a/ui/sdl2.c
->> +++ b/ui/sdl2.c
->> @@ -817,9 +817,15 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
->>          sdl2_console[i].dcl.con = con;
->>          register_displaychangelistener(&sdl2_console[i].dcl);
->>
->> +#if defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11)
->>          if (SDL_GetWindowWMInfo(sdl2_console[i].real_window, &info)) {
->> +#if defined(SDL_VIDEO_DRIVER_WINDOWS)
->> +            qemu_console_set_window_id(con, (uintptr_t)info.info.win.window);
->> +#elif defined(SDL_VIDEO_DRIVER_X11)
->>              qemu_console_set_window_id(con, info.info.x11.window);
->> +#endif
->>          }
->> +#endif
->>      }
->>
->>      /* Load a 32x32x4 image. White pixels are transparent. */
+On 12 January 2017 at 02:55, Richard Henderson <rth@twiddle.net> wrote:
+> Mark Cave-Ayland asked me to handle the merge of this patch set
+> while he is traveling.
+>
+> This is the v2 that Artyom posted today.  I had reviewed the majority
+> of v1 earlier.  I re-read through the rebase and saw nothing amiss.
+> It passes my tests for sparc32, and does run the OpenSolaris image
+> to which Artyom links.
 >
 >
-> Thanks.
+> r~
 >
-> Reviewed-by: Stefan Weil <sw@weilnetz.de>
+>
+> The following changes since commit 41a0e54756a9ae6b60be34bb33302a7e085fdb07:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-01-10 10:46:21 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-sparc-20170111
+>
+> for you to fetch changes up to 224be7cc93a37ccd38342811a8925de889de1a49:
+>
+>   target-sparc: fix up niagara machine (2017-01-11 12:23:58 -0800)
+>
+> ----------------------------------------------------------------
+> Sun4v support
 
-Thanks; applied to master as a buildfix.
+This hits clang's unused-function error;
 
+/home/petmay01/linaro/qemu-for-merges/target/sparc/ldst_helper.c:346:20:
+error: unused function 'do_check_asi' [-Werror,-Wunused-function]
+static inline void do_check_asi(CPUSPARCState *env, int asi, uintptr_t ra)
+                   ^
+1 error generated.
+
+thanks
 -- PMM
