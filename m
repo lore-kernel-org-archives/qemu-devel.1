@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRrSw-0006Nf-2j
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:19:43 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cRrrn-0005np-5H
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:45:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRrSs-0005KQ-4C
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:19:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55454)
+	(envelope-from <jasowang@redhat.com>) id 1cRrrk-0003Xh-2Y
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:45:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55028)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRrSr-0005Jb-Uc
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:19:38 -0500
-Date: Fri, 13 Jan 2017 10:19:27 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170113021927.GT4450@pxdev.xzpeter.org>
-References: <1483428594-28880-1-git-send-email-peterx@redhat.com>
-	<20170112162441-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cRrrj-0003XZ-T8
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:45:20 -0500
+References: <1484109132-3331-1-git-send-email-jasowang@redhat.com>
+	<20170112161056-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <f4528c3e-4648-e9ef-0e01-b5cce3ede31b@redhat.com>
+Date: Fri, 13 Jan 2017 10:45:09 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170112162441-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 00/17] VT-d: vfio enablement and
- misc enhances
+In-Reply-To: <20170112161056-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V4 net-next] vhost_net: device IOTLB support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +28,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+Cc: qemu-devel@nongnu.org, peterx@redhat.com, cornelia.huck@de.ibm.com, wexu@redhat.com, vkaplans@redhat.com, pbonzini@redhat.com
 
-On Thu, Jan 12, 2017 at 04:27:30PM +0200, Michael S. Tsirkin wrote:
-> On Tue, Jan 03, 2017 at 03:29:37PM +0800, Peter Xu wrote:
-> > (I renamed the title for this RFC v2, since starting from this version
-> >  the series will be based on master, also I picked up some more fixes
-> >  for vt-d into this series)
-> > 
-> > v2:
-> > - change comment for "end" parameter in vtd_page_walk() [Tianyu]
-> > - change comment for "a iova" to "an iova" [Yi]
-> > - fix fault printed val for GPA address in vtd_page_walk_level (debug
-> >   only)
-> > - rebased to master (rather than Aviv's v6 series) and merged Aviv's
-> >   series v6: picked patch 1 (as patch 1 in this series), dropped patch
-> >   2, re-wrote patch 3 (as patch 17 of this series).
-> > - picked up two more bugfix patches from Jason's DMAR series
-> > - picked up the following patch as well:
-> >   "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
-> > 
-> > This RFC series is a re-work for Aviv B.D.'s vfio enablement series
-> > with vt-d:
-> > 
-> >   https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
-> > 
-> > Aviv has done a great job there, and what we still lack there are
-> > mostly the following:
-> > 
-> > (1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
-> >     memory region.
-> > 
-> > (2) VT-d still haven't provide a correct replay() mechanism (e.g.,
-> >     when IOMMU domain switches, things will broke).
-> > 
-> > This series should have solved the above two issues.
-> > 
-> > Online repo:
-> > 
-> >   https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement-v2
-> > 
-> > I would be glad to hear about any review comments for above patches.
-> 
-> This all looks good to me. The series needs to be
-> rebased on top of latest bits.
-> In particular, Jason made changes which conflict
-> with this.
 
-Michael,
 
-Thanks for your positive feedback.
+On 2017=E5=B9=B401=E6=9C=8812=E6=97=A5 22:17, Michael S. Tsirkin wrote:
+> On Wed, Jan 11, 2017 at 12:32:12PM +0800, Jason Wang wrote:
+>> This patches implements Device IOTLB support for vhost kernel. This is
+>> done through:
+>>
+>> 1) switch to use dma helpers when map/unmap vrings from vhost codes
+>> 2) introduce a set of VhostOps to:
+>>     - setting up device IOTLB request callback
+>>     - processing device IOTLB request
+>>     - processing device IOTLB invalidation
+>> 2) kernel support for Device IOTLB API:
+>>
+>> - allow vhost-net to query the IOMMU IOTLB entry through eventfd
+>> - enable the ability for qemu to update a specified mapping of vhost
+>> - through ioctl.
+>> - enable the ability to invalidate a specified range of iova for the
+>>    device IOTLB of vhost through ioctl. In x86/intel_iommu case this i=
+s
+>>    triggered through iommu memory region notifier from device IOTLB
+>>    invalidation descriptor processing routine.
+>>
+>> With all the above, kernel vhost_net can co-operate with userspace
+>> IOMMU. For vhost-user, the support could be easily done on top by
+>> implementing the VhostOps.
+>>
+>> Cc: Michael S. Tsirkin<mst@redhat.com>
+>> Signed-off-by: Jason Wang<jasowang@redhat.com>
+> Applied, thanks!
+>
+>> ---
+>> Changes from V4:
+>> - set iotlb callback only when IOMMU_PLATFORM is negotiated (fix
+>>    vhost-user qtest failure)
+> In fact this only checks virtio_host_has_feature - which is
+> the right thing to do, we can't trust the guest.
+>
+>> - whitelist VIRTIO_F_IOMMU_PLATFORM instead of manually add it
+>> - keep cpu_physical_memory_map() in vhost_memory_map()
+> One further enhancement might be to detect that guest disabled
+> iommu (e.g. globally, or using iommu=3Dpt) and disable
+> the iotlb to avoid overhead for guests which use DPDK
+> for assigned devices but not for vhost.
+>
+>
 
-Could you provide me a branch so that I can rebase this work on? I was
-trying to find a good base point in your repo here:
+Yes, it's in my todo list.
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git
-
-but failed to find a suitable branch. Thanks,
-
--- peterx
+Thanks
