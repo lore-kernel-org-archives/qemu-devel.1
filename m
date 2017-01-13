@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRxBO-0005l7-0s
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:25:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1cRxC4-0006ET-Tr
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:26:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRxBK-000642-2X
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:25:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48334)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRxBJ-00062o-SH
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:25:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRxBH-0002D5-Aa
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 08:25:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 45B752E80BF
-	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 08:25:51 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1cRxC1-0006OA-0p
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:26:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cRxC0-0006Ms-Qs
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 03:26:36 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1484291524-1261-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<1484291524-1261-11-git-send-email-caoj.fnst@cn.fujitsu.com>
+Date: Fri, 13 Jan 2017 09:26:33 +0100
+In-Reply-To: <1484291524-1261-11-git-send-email-caoj.fnst@cn.fujitsu.com> (Cao
+	jin's message of "Fri, 13 Jan 2017 15:12:04 +0800")
+Message-ID: <8760lj2wna.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Jan 2017 08:10:14 -0000
-From: Thomas Huth <893068@bugs.launchpad.net>
-Reply-To: Bug 893068 <893068@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111121114443.4682.78512.malonedeb@soybean.canonical.com>
-Message-Id: <20170113081014.14126.17791.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 893068] Re: Spanish keys { and [ did not work
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v8 10/10] megasas: remove unnecessary
+ megasas_use_msix()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,40 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Hannes Reinecke <hare@suse.de>
 
-Triaging old bug tickets ... can you still reproduce this problem with
-the latest version of QEMU (currently version 2.8)?
+Cao jin <caoj.fnst@cn.fujitsu.com> writes:
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+> Also move certain hunk above, to place msix init related code together.
+>
+> CC: Hannes Reinecke <hare@suse.de>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> CC: Marcel Apfelbaum <marcel@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+>
+> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> ---
+>  hw/scsi/megasas.c | 19 ++++++-------------
+>  1 file changed, 6 insertions(+), 13 deletions(-)
+>
+> msix_init() doesn't set the MSI-X enable bit, so use msix_enabled()
+> is not right here, restore the old check without the
+> megasas_use_msix() wrapper.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/893068
-
-Title:
-  Spanish keys { and [ did not work
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  The keys { and [ did not work inside the virtualized enviorment
-  (widnows 7).  The problems happens ussing aqemu as a front end as well
-  as invoking qemu-kvm from command line:
-
-  qemu-kvm -m 8096 eclipse.img -smp cores=3D4,threads=3D2 -hdb ander.img -k
-  es
-
-  We have also notices this warning in the console:
-
-  Warning: no scancode found for keysym 314
-
-  The host system is gentoo stable with some exceptions (mainly qemu-
-  kvm-0.15.1-r1, gcc-4.6.2 and kernel-3.2_rc2)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/893068/+subscriptions
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
