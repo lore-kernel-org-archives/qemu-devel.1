@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cS4Ex-0002Qo-02
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:58:08 -0500
+	(envelope-from <mst@redhat.com>) id 1cS4JK-00055D-5v
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:02:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cS4Et-0000Rq-P2
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:58:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36696)
+	(envelope-from <mst@redhat.com>) id 1cS4JF-0001pm-UK
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:02:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cS4Et-0000Rk-Gw
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 10:58:03 -0500
-Date: Fri, 13 Jan 2017 17:58:02 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cS4JF-0001pg-Lk
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 11:02:33 -0500
+Date: Fri, 13 Jan 2017 18:02:28 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170113175646-mutt-send-email-mst@kernel.org>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+Message-ID: <20170113175828-mutt-send-email-mst@kernel.org>
+References: <1483524185-9036-1-git-send-email-arei.gonglei@huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA174989@DGGEMA505-MBX.china.huawei.com>
+	<63cd3678-4044-365d-d396-1040f5755e2c@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA18DE85@DGGEMA505-MBX.china.huawei.com>
+	<20170112214414-mutt-send-email-mst@kernel.org>
+	<33183CC9F5247A488A2544077AF19020DA18F9A0@DGGEMA505-MBX.china.huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 00/14] VT-d: vfio enablement and
- misc enhances
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA18F9A0@DGGEMA505-MBX.china.huawei.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v15 0/2] virtio-crypto:
+ virtio crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,156 +32,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Shiqing Fan <Shiqing.Fan@huawei.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
-On Fri, Jan 13, 2017 at 11:06:26AM +0800, Peter Xu wrote:
-> v3:
-> - fix style error reported by patchew
-> - fix comment in domain switch patch: use "IOMMU address space" rather
->   than "IOMMU region" [Kevin]
-> - add ack-by for Paolo in patch:
->   "memory: add section range info for IOMMU notifier"
->   (this is seperately collected besides this thread)
-> - remove 3 patches which are merged already (from Jason)
-> - rebase to master b6c0897
-
-So 1-6 look like nice cleanups to me. Should I merge them now?
-
-> v2:
-> - change comment for "end" parameter in vtd_page_walk() [Tianyu]
-> - change comment for "a iova" to "an iova" [Yi]
-> - fix fault printed val for GPA address in vtd_page_walk_level (debug
->   only)
-> - rebased to master (rather than Aviv's v6 series) and merged Aviv's
->   series v6: picked patch 1 (as patch 1 in this series), dropped patch
->   2, re-wrote patch 3 (as patch 17 of this series).
-> - picked up two more bugfix patches from Jason's DMAR series
-> - picked up the following patch as well:
->   "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
+On Fri, Jan 13, 2017 at 02:54:29AM +0000, Gonglei (Arei) wrote:
 > 
-> This RFC series is a re-work for Aviv B.D.'s vfio enablement series
-> with vt-d:
+> > 
+> > On Thu, Jan 12, 2017 at 12:26:24PM +0000, Gonglei (Arei) wrote:
+> > > Hi,
+> > >
+> > >
+> > > >
+> > > > On 01/04/2017 11:10 AM, Gonglei (Arei) wrote:
+> > > > > Hi all,
+> > > > >
+> > > > > I attach the diff files between v14 and v15 for better review.
+> > > > >
+> > > > Hi,
+> > > >
+> > > > only had a quick look. Will try to come back to this later.
+> > > >
+> > > That's cool.
+> > >
+> > > > > diff --git a/virtio-crypto.tex b/virtio-crypto.tex
+> > > > > index 9f7faf0..884ee95 100644
+> > > > > --- a/virtio-crypto.tex
+> > > > > +++ b/virtio-crypto.tex
+> > > > > @@ -2,8 +2,8 @@
+> > > > >
+> > > > >  The virtio crypto device is a virtual cryptography device as well as a kind
+> > of
+> > > > >  virtual hardware accelerator for virtual machines. The encryption and
+> > > > > -decryption requests are placed in the data queue and are ultimately
+> > handled
+> > > > by the
+> > > > > -backend crypto accelerators. The second queue is the control queue used
+> > to
+> > > > create
+> > > > > +decryption requests are placed in any of the data active queues and are
+> > > > ultimately handled by the
+> > > > s/data active/active data/
+> > > > > +backend crypto accelerators. The second kind of queue is the control
+> > queue
+> > > > used to create
+> > > > >  or destroy sessions for symmetric algorithms and will control some
+> > > > advanced
+> > > > >  features in the future. The virtio crypto device provides the following
+> > crypto
+> > > > >  services: CIPHER, MAC, HASH, and AEAD.
+> > > >
+> > > > [..]
+> > > >
+> > > > > ===============The below diff shows the changes of add non-session
+> > mode
+> > > > support:
+> > > > >
+> > > > > diff --git a/virtio-crypto.tex b/virtio-crypto.tex
+> > > > > index 884ee95..44819f9 100644
+> > > > > --- a/virtio-crypto.tex
+> > > > > +++ b/virtio-crypto.tex
+> > > > > @@ -26,7 +26,10 @@ N is set by \field{max_dataqueues}.
+> > > > >
+> > > > >  \subsection{Feature bits}\label{sec:Device Types / Crypto Device /
+> > Feature
+> > > > bits}
+> > > > >
+> > > > > -None currently defined.
+> > > > > +VIRTIO_CRYPTO_F_CIPHER_SESSION_MODE (1) Session mode is
+> > available
+> > > > for CIPHER service.
+> > > > > +VIRTIO_CRYPTO_F_HASH_SESSION_MODE (2) Session mode is available
+> > for
+> > > > HASH service.
+> > > > > +VIRTIO_CRYPTO_F_MAC_SESSION_MODE (3) Session mode is available
+> > for
+> > > > MAC service.
+> > > > > +VIRTIO_CRYPTO_F_AEAD_SESSION_MODE (4) Session mode is available
+> > for
+> > > > AEAD service.
+> > > > >
+> > > > >  \subsection{Device configuration layout}\label{sec:Device Types /
+> > Crypto
+> > > > Device / Device configuration layout}
+> > > > >
+> > > > > @@ -208,6 +211,9 @@ Operation parameters are algorithm-specific
+> > > > parameters, output data is the
+> > > > >  data that should be utilized in operations, and input data is equal to
+> > > > >  "operation result + result data".
+> > > > >
+> > > > > +The device can support both session mode (See \ref{sec:Device Types /
+> > > > Crypto Device / Device Operation / Control Virtqueue / Session operation})
+> > and
+> > > > non-session mode, for example,
+> > > > > +As VIRTIO_CRYPTO_F_CIPHER_SESSION feature bit is negotiated, the
+> > driver
+> > > > can use session mode for CIPHER service, otherwise it can only use
+> > non-session
+> > > > mode.
+> > > > > +
+> > > >
+> > > > As far as I understand you are adding non-session mode to the mix but
+> > > > providing feature bits for session mode. Would this render the the current
+> > > > implementation non-compliant?
+> > > >
+> > > You are right, shall we use feature bits for non-session mode for compliancy?
+> > > Or because the spec is on the fly, and some structures in the virtio_crypto.h
+> > need to
+> > > be modified, can we keep the compliancy completely?
+> > >
+> > > Thanks,
+> > > -Gonglei
+> > 
+> > Since there's a linux driver upstream you must at least
+> > keep compatibility with that.
+> > 
+> Sure. We use feature bits for non-session mode then.
+> For structures modification, do we need to do some specific
+> actions for compatibility?  Take CIPHER service as an example:
 > 
->   https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
+> The present structure:
 > 
-> Aviv has done a great job there, and what we still lack there are
-> mostly the following:
+> struct virtio_crypto_cipher_para {
+>     /*
+>      * Byte Length of valid IV/Counter data pointed to by the below iv data.
+>      *
+>      * For block ciphers in CBC or F8 mode, or for Kasumi in F8 mode, or for
+>      *   SNOW3G in UEA2 mode, this is the length of the IV (which
+>      *   must be the same as the block length of the cipher).
+>      * For block ciphers in CTR mode, this is the length of the counter
+>      *   (which must be the same as the block length of the cipher).
+>      */
+>     le32 iv_len;
+>     /* length of source data */
+>     le32 src_data_len;
+>     /* length of destination data */
+>     le32 dst_data_len;
+> };
 > 
-> (1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
->     memory region.
+> The future structure if supporting non-session based operations:
 > 
-> (2) VT-d still haven't provide a correct replay() mechanism (e.g.,
->     when IOMMU domain switches, things will broke).
+> struct virtio_crypto_cipher_para {
+>     struct {
+>         /* See VIRTIO_CRYPTO_CIPHER* above */
+>         le32 algo;
+>         /* length of key */
+>         le32 keylen;
 > 
-> This series should have solved the above two issues.
+>         /* See VIRTIO_CRYPTO_OP_* above */
+>         le32 op;
+>     } sess_para;
 > 
-> Online repo:
-> 
->   https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement-v2
-> 
-> I would be glad to hear about any review comments for above patches.
-> 
-> =========
-> Test Done
-> =========
-> 
-> Build test passed for x86_64/arm/ppc64.
-> 
-> Simply tested with x86_64, assigning two PCI devices to a single VM,
-> boot the VM using:
-> 
-> bin=x86_64-softmmu/qemu-system-x86_64
-> $bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
->      -device intel-iommu,intremap=on,eim=off,cache-mode=on \
->      -netdev user,id=net0,hostfwd=tcp::5555-:22 \
->      -device virtio-net-pci,netdev=net0 \
->      -device vfio-pci,host=03:00.0 \
->      -device vfio-pci,host=02:00.0 \
->      -trace events=".trace.vfio" \
->      /var/lib/libvirt/images/vm1.qcow2
-> 
-> pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
-> vtd_page_walk*
-> vtd_replay*
-> vtd_inv_desc*
-> 
-> Then, in the guest, run the following tool:
-> 
->   https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
-> 
-> With parameter:
-> 
->   ./vfio-bind-group 00:03.0 00:04.0
-> 
-> Check host side trace log, I can see pages are replayed and mapped in
-> 00:04.0 device address space, like:
-> 
-> ...
-> vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
-> vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
-> vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
-> vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
-> vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
-> ...
-> 
-> =========
-> Todo List
-> =========
-> 
-> - error reporting for the assigned devices (as Tianyu has mentioned)
-> 
-> - per-domain address-space: A better solution in the future may be -
->   we maintain one address space per IOMMU domain in the guest (so
->   multiple devices can share a same address space if they are sharing
->   the same IOMMU domains in the guest), rather than one address space
->   per device (which is current implementation of vt-d). However that's
->   a step further than this series, and let's see whether we can first
->   provide a workable version of device assignment with vt-d
->   protection.
-> 
-> - more to come...
+>     /*
+>      * Byte Length of valid IV/Counter data pointed to by the below iv data.
+>      *
+>      * For block ciphers in CBC or F8 mode, or for Kasumi in F8 mode, or for
+>      *   SNOW3G in UEA2 mode, this is the length of the IV (which
+>      *   must be the same as the block length of the cipher).
+>      * For block ciphers in CTR mode, this is the length of the counter
+>      *   (which must be the same as the block length of the cipher).
+>      */
+>     le32 iv_len;
+>     /* length of source data */
+>     le32 src_data_len;
+>     /* length of destination data */
+>     le32 dst_data_len;
+> };
 > 
 > Thanks,
-> 
-> Aviv Ben-David (1):
->   IOMMU: add option to enable VTD_CAP_CM to vIOMMU capility exposoed to
->     guest
-> 
-> Peter Xu (13):
->   intel_iommu: simplify irq region translation
->   intel_iommu: renaming gpa to iova where proper
->   intel_iommu: fix trace for inv desc handling
->   intel_iommu: fix trace for addr translation
->   intel_iommu: vtd_slpt_level_shift check level
->   memory: add section range info for IOMMU notifier
->   memory: provide iommu_replay_all()
->   memory: introduce memory_region_notify_one()
->   memory: add MemoryRegionIOMMUOps.replay() callback
->   intel_iommu: provide its own replay() callback
->   intel_iommu: do replay when context invalidate
->   intel_iommu: allow dynamic switch of IOMMU region
->   intel_iommu: enable vfio devices
-> 
->  hw/i386/intel_iommu.c          | 589 +++++++++++++++++++++++++++++++----------
->  hw/i386/intel_iommu_internal.h |   1 +
->  hw/i386/trace-events           |  28 ++
->  hw/vfio/common.c               |   7 +-
->  include/exec/memory.h          |  30 +++
->  include/hw/i386/intel_iommu.h  |  12 +
->  memory.c                       |  42 ++-
->  7 files changed, 557 insertions(+), 152 deletions(-)
-> 
-> -- 
-> 2.7.4
+> -Gonglei
+
+So you will have to maintain both structures for when non-session based
+feature is and aren't present. You will have to give them different
+names, too.
+
+-- 
+MST
