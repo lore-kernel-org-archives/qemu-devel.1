@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <he.chen@linux.intel.com>) id 1cRr3q-0004Bv-7t
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:53:47 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cRr99-0006TZ-B8
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:59:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <he.chen@linux.intel.com>) id 1cRr3l-0001Xb-D2
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:53:46 -0500
-Received: from mga04.intel.com ([192.55.52.120]:22470)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <he.chen@linux.intel.com>)
-	id 1cRr3l-0001Va-3X
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:53:41 -0500
-From: He Chen <he.chen@linux.intel.com>
-Date: Fri, 13 Jan 2017 09:53:31 +0800
-Message-Id: <1484272411-28073-1-git-send-email-he.chen@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v2] x86: add AVX512_VPOPCNTDQ features
+	(envelope-from <arei.gonglei@huawei.com>) id 1cRr98-0004nq-5l
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:59:15 -0500
+Received: from [45.249.212.189] (port=2377 helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cRr97-0004iw-E3
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 20:59:14 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 13 Jan 2017 01:56:03 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA18F954@DGGEMA505-MBX.china.huawei.com>
+References: <1481767396-187748-1-git-send-email-arei.gonglei@huawei.com>
+	<1481767396-187748-2-git-send-email-arei.gonglei@huawei.com>
+	<e235caf4-f51c-dccf-4eb7-548d3fa71644@de.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA182B83@DGGEMA505-MBX.china.huawei.com>
+	<c4282723-2afb-1764-2431-ef41f7126371@de.ibm.com>
+	<a8384ff8-ff65-c578-c338-e6d8ebf498c4@de.ibm.com>
+	<20170112161729-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170112161729-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v8 1/1] crypto: add virtio-crypto driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,45 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, He Chen <he.chen@intel.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "Huangweidong
+	(C)" <weidong.huang@huawei.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, Luonengjun <luonengjun@huawei.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, longpeng <longpeng2@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
-AVX512_VPOPCNTDQ: Vector POPCNT instructions for word and qwords.
-variable precision.
+>=20
+> On Thu, Jan 12, 2017 at 03:10:25PM +0100, Christian Borntraeger wrote:
+> > On 01/10/2017 01:56 PM, Christian Borntraeger wrote:
+> > > On 01/10/2017 01:36 PM, Gonglei (Arei) wrote:
+> > >> Hi,
+> > >>
+> > >>>
+> > >>> On 12/15/2016 03:03 AM, Gonglei wrote:
+> > >>> [...]
+> > >>>> +
+> > >>>> +static struct crypto_alg virtio_crypto_algs[] =3D { {
+> > >>>> +	.cra_name =3D "cbc(aes)",
+> > >>>> +	.cra_driver_name =3D "virtio_crypto_aes_cbc",
+> > >>>> +	.cra_priority =3D 501,
+> > >>>
+> > >>>
+> > >>> This is still higher than the hardware-accelerators (like intel aes=
+ni or the
+> > >>> s390 cpacf functions or the arm hw). aesni and s390/cpacf are suppo=
+rted
+> by the
+> > >>> hardware virtualization and available to the guests. I do not see a=
+ way
+> how
+> > >>> virtio
+> > >>> crypto can be faster than that (in the end it might be cpacf/aesni =
++
+> overhead)
+> > >>> instead it will very likely be slower.
+> > >>> So we should use a number that is higher than software implementati=
+ons
+> but
+> > >>> lower than the hw ones.
+> > >>>
+> > >>> Just grepping around, the software ones seem be be around 100 and t=
+he
+> > >>> hardware
+> > >>> ones around 200-400. So why was 150 not enough?
+> > >>>
+> > >> I didn't find a documentation about how we use the priority, and I a=
+ssumed
+> > >> people use virtio-crypto will configure hardware accelerators in the
+> > >> host. So I choosed the number which bigger than aesni's priority.
+> > >
+> > > Yes, but the aesni driver will only bind if there is HW support in th=
+e guest.
+> > > And if aesni is available in the guest (or the s390 aes function from=
+ cpacf)
+> > > it will always be faster than the same in the host via virtio.So your=
+ priority
+> > > should be smaller.
+> >
+> >
+> > any opinion on this?
+>=20
+> Going forward, we might add an emulated aesni device and that might
+> become slower than virtio. OTOH if or when this happens, we can solve it
+> by adding a priority or a feature flag to virtio to raise its priority.
+>=20
+> So I think I agree with Christian here, let's lower the priority.
+> Gonglei, could you send a patch like this?
+>=20
+OK, will do.
 
-Signed-off-by: He Chen <he.chen@linux.intel.com>
----
-Changes from v1:
-* Rename vpopcntdq to avx512-vpopcntdq.
----
- target/i386/cpu.c | 2 +-
- target/i386/cpu.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b0640f1..1a4b164 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -435,7 +435,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, "avx512vbmi", "umip", "pku",
-             "ospke", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
--            NULL, NULL, NULL, NULL,
-+            NULL, NULL, "avx512-vpopcntdq", NULL,
-             "la57", NULL, NULL, NULL,
-             NULL, NULL, "rdpid", NULL,
-             NULL, NULL, NULL, NULL,
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index a04e46b..37b209e 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -630,6 +630,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_ECX_UMIP     (1U << 2)
- #define CPUID_7_0_ECX_PKU      (1U << 3)
- #define CPUID_7_0_ECX_OSPKE    (1U << 4)
-+#define CPUID_7_0_ECX_AVX512_VPOPCNTDQ (1U << 14) /* POPCNT for vectors of DW/QW */
- #define CPUID_7_0_ECX_LA57     (1U << 16)
- #define CPUID_7_0_ECX_RDPID    (1U << 22)
- 
--- 
-2.7.4
+Thanks,
+-Gonglei
