@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cRrrn-0005np-5H
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:45:24 -0500
+	(envelope-from <famz@redhat.com>) id 1cRs0J-0001ul-2n
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:54:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cRrrk-0003Xh-2Y
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:45:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55028)
+	(envelope-from <famz@redhat.com>) id 1cRs0F-0000E8-Ot
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:54:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49650)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cRrrj-0003XZ-T8
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:45:20 -0500
-References: <1484109132-3331-1-git-send-email-jasowang@redhat.com>
-	<20170112161056-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f4528c3e-4648-e9ef-0e01-b5cce3ede31b@redhat.com>
-Date: Fri, 13 Jan 2017 10:45:09 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cRs0F-0000Dd-JJ
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 21:54:07 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1C766C056791
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 02:54:07 +0000 (UTC)
+Date: Fri, 13 Jan 2017 10:54:00 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170113025315.GA23020@lemon>
+References: <20170112180800.21085-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170112161056-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V4 net-next] vhost_net: device IOTLB support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170112180800.21085-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 00/10] aio_context_acquire/release
+ pushdown, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, cornelia.huck@de.ibm.com, wexu@redhat.com, vkaplans@redhat.com, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
+On Thu, 01/12 19:07, Paolo Bonzini wrote:
+> This is the first step of pushing down the AioContext lock.  Bottom halves
+> are already protected by their own lock, use it also for walking_bh
+> and for the handlers list (including walking_handlers).  The (lock,
+> walking_foo) pair is wrapped into the QemuLockCnt primitive.
+> 
+> The only difference from v3 is a smattering of tiny nice improvements
+> to QemuLockCnt.
+> 
+> Paolo
+> 
+> v4->v5:
+>         remove stray tabs [patchew]
+> 
+> v3->v4:
+>         Avoid useless atomic_mb_read in non-futex lockcnt [Stefan]
+>         Use atomic_read in qemu_lockcnt_count [Stefan]
+>         Tweak comment for qemu_lockcnt_cmpxchg_or_wait [Fam]
+>         Use if/else in qemu_lockcnt_dec_and_lock [Fam]
+>         Comment QEMU_LOCKCNT_STATE_* definitions [Fam]
 
+Perfect!
 
-On 2017=E5=B9=B401=E6=9C=8812=E6=97=A5 22:17, Michael S. Tsirkin wrote:
-> On Wed, Jan 11, 2017 at 12:32:12PM +0800, Jason Wang wrote:
->> This patches implements Device IOTLB support for vhost kernel. This is
->> done through:
->>
->> 1) switch to use dma helpers when map/unmap vrings from vhost codes
->> 2) introduce a set of VhostOps to:
->>     - setting up device IOTLB request callback
->>     - processing device IOTLB request
->>     - processing device IOTLB invalidation
->> 2) kernel support for Device IOTLB API:
->>
->> - allow vhost-net to query the IOMMU IOTLB entry through eventfd
->> - enable the ability for qemu to update a specified mapping of vhost
->> - through ioctl.
->> - enable the ability to invalidate a specified range of iova for the
->>    device IOTLB of vhost through ioctl. In x86/intel_iommu case this i=
-s
->>    triggered through iommu memory region notifier from device IOTLB
->>    invalidation descriptor processing routine.
->>
->> With all the above, kernel vhost_net can co-operate with userspace
->> IOMMU. For vhost-user, the support could be easily done on top by
->> implementing the VhostOps.
->>
->> Cc: Michael S. Tsirkin<mst@redhat.com>
->> Signed-off-by: Jason Wang<jasowang@redhat.com>
-> Applied, thanks!
->
->> ---
->> Changes from V4:
->> - set iotlb callback only when IOMMU_PLATFORM is negotiated (fix
->>    vhost-user qtest failure)
-> In fact this only checks virtio_host_has_feature - which is
-> the right thing to do, we can't trust the guest.
->
->> - whitelist VIRTIO_F_IOMMU_PLATFORM instead of manually add it
->> - keep cpu_physical_memory_map() in vhost_memory_map()
-> One further enhancement might be to detect that guest disabled
-> iommu (e.g. globally, or using iommu=3Dpt) and disable
-> the iotlb to avoid overhead for guests which use DPDK
-> for assigned devices but not for vhost.
->
->
-
-Yes, it's in my todo list.
-
-Thanks
+Reviewed-by: Fam Zheng <famz@redhat.com>
