@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cS1wT-0003QF-3c
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:30:54 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cS209-0007Ui-Dl
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cS1wR-0006XM-PK
-	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:30:53 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cS206-0008Nu-AX
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:34:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cS206-0008NR-4N
+	for qemu-devel@nongnu.org; Fri, 13 Jan 2017 08:34:38 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4586A4E4CF
+	for <qemu-devel@nongnu.org>; Fri, 13 Jan 2017 13:34:37 +0000 (UTC)
+Date: Fri, 13 Jan 2017 14:34:33 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170113143433.282c9a81@nial.brq.redhat.com>
+In-Reply-To: <20170112182446.9600-2-lersek@redhat.com>
+References: <20170112182446.9600-1-lersek@redhat.com>
+	<20170112182446.9600-2-lersek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8b07aa89-92fe-1f2d-d392-e1a7e63d75ca@ilande.co.uk>
-References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
-	<CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
-	<733cba29-58b7-e43f-0d50-3774ee8bf3b2@reactos.org>
-	<8b07aa89-92fe-1f2d-d392-e1a7e63d75ca@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Fri, 13 Jan 2017 14:30:28 +0100
-Message-ID: <CACXAS8Ds=oGd193gEraHmg6SCA4veUmr1rpwx-1ihy91eNNx3A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/6] ppc: add a IBM 40p machine (RS/6000,
- PReP)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 wave 2 1/3] hw/isa/lpc_ich9: add SMI
+ feature negotiation via fw_cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,196 +34,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, Giancarlo Teodori <gteodori@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
-On Fri, Jan 13, 2017 at 1:23 PM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> On 12/01/17 12:57, Herv=C3=A9 Poussineau wrote:
->
->> Le 11/01/2017 =C3=A0 17:58, Artyom Tarasenko a =C3=A9crit :
->>> Hi Herv=C3=A9,
->>>
->>> nice work!
->>>
->>> On Thu, Dec 29, 2016 at 11:12 PM, Herv=C3=A9 Poussineau
->>> <hpoussin@reactos.org> wrote:
->>>> Hi,
->>>>
->>>> This patchset adds the emulation of the IBM RS/6000 7020 (40p). The
->>>> real machine is
->>>> able to run AIX (up to 4.3.3), Windows NT (up to 4.0 SP1), the beta
->>>> of OS/2 PowerPC,
->>>> Solaris, Linux, NetBSD/PReP ...
->>>>
->>>> I've tested current emulation with Open Hack'Ware, OpenBIOS and
->>>> official firmware.
->>>>
->>>> Linux kernel starts, and freezes during boot (like with 'prep' machine=
-).
->>
->> I already saw a regression during 2.7.0 cycle with 603 CPU. However, I
->> was unable to provide kernel source, so Benjamin was unable to find the
->> problem.
->> http://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03760.html
->>
->>>
->>> If prep can't do it anymore, it looks like a regression. I definitely
->>> remember seen a sitting penguin and a login prompt ~ 2 years ago. At
->>> least with OFW.
->>>
->>>> Windows NT starts up to the point where it wants to change endianness.
->>>
->>> I hit that with Solaris/PPC a few years back as you published your
->>> previous attempt. Do you know what is missing? I guess CPU endianness
->>> switch emulation is working because it is used in the newer POWER
->>> CPUs. Is it just the systemIO which has to be improved, or is it more?
->>
->> Yes, PReP System I/O has LE flag which is not implemented.
->> You may be interested by
->> ftp://ftp.software.ibm.com/rs6000/technology/spec/endian.ps
->> which deals about endianness switching, with some code from Windows NT/P=
-PC
->>
->>>
->>>> Other OSes have not been tested.
->>>>
->>>> This machine is a superset of the 'prep' one, because we know exactly
->>>> what is/should
->>>> emulated, and that operating system list running on it is quite wide.
->>>> I hope that 'prep' machine can be deprecated soon and then later
->>>> removed.
->>>
->>> Would be nice to keep 'prep' until the 40p can boot Linux and NetBSD
->>> 6.1.3 (this version used to work with -M prep last time I checked).
->>
->> Some Linux kernels seem to work, some other ones seem to not work (hang
->> while booting)
->> I've not searched why.
->>
->> I tried NetBSD 6.1.3/PReP.
->> cdroms/harddisks don't boot anymore with Open Hack'Ware since some
->> changes in IDE core
->> Kernel boots better with 40p than with prep
->>
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
->> prep:
->>
->> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005=
-,
->>     2006, 2007, 2008, 2009, 2010, 2011, 2012
->>     The NetBSD Foundation, Inc.  All rights reserved.
->> Copyright (c) 1982, 1986, 1989, 1991, 1993
->>     The Regents of the University of California.  All rights reserved.
->>
->> NetBSD 6.1.3 (INSTALL)
->> Model: Qemu
->> total memory =3D 128 MB
->> avail memory =3D 119 MB
->> panic: call to null-ptr from 0x0
->>
->> The operating system has halted.
->> Please press any key to reboot.
->>
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
->> 40p/Open Hack'Ware:
->>
->> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005=
-,
->>     2006, 2007, 2008, 2009, 2010, 2011, 2012
->>     The NetBSD Foundation, Inc.  All rights reserved.
->> Copyright (c) 1982, 1986, 1989, 1991, 1993
->>     The Regents of the University of California.  All rights reserved.
->>
->> NetBSD 6.1.3 (INSTALL)
->> Model: Qemu
->> total memory =3D 128 MB
->> avail memory =3D 119 MB
->> mainbus0 (root)
->> cpu0 at mainbus0: 604 (Revision 1.3), ID 0 (primary)
->> cpu0: HID0 0xc084<ICE,DCE,SGE,BHT>, powersave: 1
->> cpu0: 0.00 MHz
->> Couldn't find PNP data for bus 0 devfunc 0x0
->> pnpbus0 at mainbus0
->> pci0 at mainbus0 bus 0: indirect configuration space access
->> pchb0 at pci0 dev 0 function 0
->> pchb0: vendor 0x1057 product 0x4801 (rev. 0x00)
->> siop0 at pci0 dev 1 function 0: Symbios Logic 53c810 (fast scsi)
->> siop0: couldn't map interrupt
->> vga0 at pci0 dev 2 function 0: vendor 0x1234 product 0x1111 (rev. 0x02)
->> wsdisplay0 at vga0 (kbdmux ignored)
->> drm at vga0 not configured
->> pcn0 at pci0 dev 3 function 0: AMD PCnet-PCI Ethernet
->> pcn0: Am79c970A PCnet-PCI II rev 0, Ethernet address 52:54:00:12:34:56
->> pcn0: unable to map interrupt
->> pcib0 at pci0 dev 11 function 0: vendor 0x8086 product 0x0484 (rev. 0x03=
-)
->> isa0 at pcib0
->> com0 at isa0 port 0x3f8-0x3ff irq 4: ns16550a, working fifo
->> com0: console
->> com1 at isa0 port 0x2f8-0x2ff irq 3: ns16550a, working fifo
->> pckbc0 at isa0 port 0x60-0x64
->> pckbd0 at pckbc0 (kbd slot)
->> pckbc0: using irq 1 for kbd slot
->> wskbd0 at pckbd0 (mux ignored)
->> vmmask 10000000 schedmask 10000000 highmask 70000000
->> boot device: mainbus0
->> root on md0a dumps on md0b
->> root file system type: ffs
->> WARNING: no TOD clock present
->> WARNING: using filesystem time
->> WARNING: CHECK AND RESET THE DATE!
->> erase ^H, werase ^W, kill ^U, intr ^C, status ^T
->> Terminal type? [vt100]
->>
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
->> 40p/official firmware with cdrom boot:
->>
->> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005=
-,
->>     2006, 2007, 2008, 2009, 2010, 2011, 2012
->>     The NetBSD Foundation, Inc.  All rights reserved.
->> Copyright (c) 1982, 1986, 1989, 1991, 1993
->>     The Regents of the University of California.  All rights reserved.
->>
->> NetBSD 6.1.3 (INSTALL)
->> Model: IBM PPS Model 6015
->> total memory =3D 128 MB
->> avail memory =3D 119 MB
->> trap: kernel read DSI trap @ 0x481b4cae by 0x2a4f50 (DSISR 0x40000000,
->> err=3D14), lr 0x140e84
->> panic: trap
->>
->> The operating system has halted.
->> Please press any key to reboot.
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
->>
->> OpenBIOS doesn't support PReP boot partitions (type 0x41) nor PReP
->> kernels so this is a no-go yet.
->
-> Just out of interest, is it just the PReP boot partition support that is
-> missing from OpenBIOS? If so, that should be fairly easy to implement if
-> there's a spec lying around somewhere.
->
-> It would be great if we could finally remove OHW from QEMU :)
+On Thu, 12 Jan 2017 19:24:44 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-I think it can be easily replaced with OFW. I was not able to find any
-image where OHW would perform better than OFW.
+[...]
+> +static void smi_features_ok_callback(void *opaque)
+> +{
+> +    ICH9LPCState *lpc = opaque;
+> +    uint64_t guest_features;
+> +
+> +    if (lpc->smi_features_ok) {
+> +        /* negotiation already complete, features locked */
+> +        return;
+> +    }
+> +
+> +    memcpy(&guest_features, lpc->smi_guest_features_le, sizeof guest_features);
+> +    le64_to_cpus(&guest_features);
+> +    if (guest_features & ~lpc->smi_host_features) {
+> +        /* guest requests invalid features, leave @features_ok at zero */
+> +        return;
+> +    }
+> +
+> +    /* valid feature subset requested, lock it down, report success */
+> +    lpc->smi_negotiated_features = guest_features;
+> +    lpc->smi_features_ok = 1;
+> +}
+[...]
 
-Artyom
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8_ARRAY(smi_guest_features_le, ICH9LPCState,
+> +                            sizeof(uint64_t)),
+> +        VMSTATE_UINT8(smi_features_ok, ICH9LPCState),
+> +        VMSTATE_UINT64(smi_negotiated_features, ICH9LPCState),
+
+Couldn't smi_negotiated_features be derived from
+smi_guest_features_le on target side?
 
 
---=20
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_ich9_lpc = {
+>      .name = "ICH9LPC",
+>      .version_id = 1,
+> @@ -683,6 +761,7 @@ static const VMStateDescription vmstate_ich9_lpc = {
+>      },
+>      .subsections = (const VMStateDescription*[]) {
+>          &vmstate_ich9_rst_cnt,
+> +        &vmstate_ich9_smi_feat,
+>          NULL
+>      }
+>  };
