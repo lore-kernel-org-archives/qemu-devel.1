@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cSM7x-0001s2-5f
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 06:04:06 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cSMPn-0001zT-CM
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 06:22:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cSM7u-00038g-1X
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 06:04:05 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:57307)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cSM7t-00038Q-PS
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 06:04:01 -0500
-References: <1484376662-32063-1-git-send-email-thuth@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <2296ffa3-8bb9-4652-ebd6-4da5b09596ca@vivier.eu>
-Date: Sat, 14 Jan 2017 12:03:48 +0100
+	(envelope-from <liq3ea@gmail.com>) id 1cSMPm-0001TP-9T
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 06:22:31 -0500
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:34750)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cSMPm-0001S2-3x
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 06:22:30 -0500
+Received: by mail-io0-x244.google.com with SMTP id c80so8078343iod.1
+	for <qemu-devel@nongnu.org>; Sat, 14 Jan 2017 03:22:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1484376662-32063-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/core/null-machine: Add the possibility
- to instantiate a CPU, RAM and kernel
+In-Reply-To: <011014c2-1129-cd48-f13d-66d7951d3e3c@linux.intel.com>
+References: <5878435d.54b31c0a.39a7b.4e93@mx.google.com>
+	<011014c2-1129-cd48-f13d-66d7951d3e3c@linux.intel.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Sat, 14 Jan 2017 19:22:28 +0800
+Message-ID: <CAKXe6SJXWzu2pTZz_vRGic4ZomPcVGVOfOvig43=8ZoZet0cRQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] nvdimm: allow read/write zero-size
+ namespace label
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: Xiao Guangrong <guangrong.xiao@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Li Qiang <liqiang6-s@360.cn>
 
-Le 14/01/2017 à 07:51, Thomas Huth a écrit :
-> Sometimes it is useful to have just a machine with CPU and RAM, without
-> any further hardware in it, e.g. if you just want to do some instruction
-> debugging for TCG with a remote GDB attached to QEMU, or run some embedded
-> code with the "-semihosting" QEMU parameter. qemu-system-m68k already
-> features a "dummy" machine, and xtensa a "sim" machine for exactly this
-> purpose.
-> All target architectures have nowadays also a "none" machine, which would
-> be a perfect match for this, too - but it currently does not allow to add
-> CPU, RAM or a kernel yet. Thus let's add these possibilities in a generic
-> way to the "none" machine, too, so that we hopefully do not need additional
-> "dummy" machines in the future anymore (and maybe can also get rid of the
-> already existing "dummy"/"sim" machines one day).
-> Note that the default behaviour of the "none" machine is not changed, i.e.
-> no CPU and no RAM is instantiated by default. You've explicitely got to
-> specify the CPU model with "-cpu" and the amount of RAM with "-m" to get
-> these new features.
+Hello Guangrong,
 
-Did you try to use the generic-loader to load the kernel?
 
-Something like "-device loader,file=vmlinux" instead of adding this part
-in the none machine?
+2017-01-13 17:00 GMT+08:00 Xiao Guangrong <guangrong.xiao@linux.intel.com>:
 
-Perhaps we could also add a cpu this way, as they are already available
-in the device list for the machine that allows hotplug.
+>
+>
+> On 01/13/2017 11:02 AM, Li Qiang wrote:
+>
+>> From: Li Qiang <liqiang6-s@360.cn>
+>>
+>> The spec doesn't say the namespace label can't be zero
+>> when read/write it. As this is no harmful, just allow
+>> it.
+>>
+>>
+> WHY?
+>
+> The spec said that the label should be at least 128K.
+>
 
-With the same idea, we could also have a "-device ram,size=XXX" to add
-ram (not DIMM).
+Yes, the label size has a limit, but in NVDIMM_DSM_Interface_Example.pdf
+section 4.5.1
+When the guest get namespace label data, the 'Length' is not limited, if it
+is 0, it will trigger
+this assert.
 
-I think is is the idea behind the none machine:
+static void nvdimm_validate_rw_label_data(NVDIMMDevice *nvdimm, uint64_t
+size,
+                                        uint64_t offset)
+{
+    assert((nvdimm->label_size >= size + offset) && (offset + size >
+offset));
+}
 
-commit b4a738bf93c3137b92d532e59d60edccc4e1ea96
-Author: Anthony Liguori <aliguori@us.ibm.com>
-Date:   Wed Aug 22 15:22:05 2012 -0500
+Though I don't know what the exact behavior of this action in real
+hardware. I just think it should not
+trigger assert and exit when the guest get 0-size label data.
 
-    boards: add a 'none' machine type to all platforms
+Anyway, this is just a suggestion, If my understand is wrong, just ignore
+this.
 
-    This allows any QEMU binary to be executed with:
-
-      $QEMU_BINARY -M none -qmp stdio
-
-    Without errors from missing options that are required by various
-boards.  This
-    also provides a mode that we can use in the future to construct machines
-    entirely through QMP commands.
-
-Laurent
+Thanks.
