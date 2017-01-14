@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cSMPn-0001zT-CM
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 06:22:32 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1cSO7y-0004S5-Qu
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 08:12:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cSMPm-0001TP-9T
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 06:22:31 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:34750)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cSMPm-0001S2-3x
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 06:22:30 -0500
-Received: by mail-io0-x244.google.com with SMTP id c80so8078343iod.1
-	for <qemu-devel@nongnu.org>; Sat, 14 Jan 2017 03:22:29 -0800 (PST)
+	(envelope-from <hpoussin@reactos.org>) id 1cSO7x-0000s7-VT
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 08:12:14 -0500
+References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
+	<CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
+	<733cba29-58b7-e43f-0d50-3774ee8bf3b2@reactos.org>
+	<8b07aa89-92fe-1f2d-d392-e1a7e63d75ca@ilande.co.uk>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <24009368-afce-92dd-2cd7-cd4b6629fc05@reactos.org>
+Date: Sat, 14 Jan 2017 14:11:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <011014c2-1129-cd48-f13d-66d7951d3e3c@linux.intel.com>
-References: <5878435d.54b31c0a.39a7b.4e93@mx.google.com>
-	<011014c2-1129-cd48-f13d-66d7951d3e3c@linux.intel.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Sat, 14 Jan 2017 19:22:28 +0800
-Message-ID: <CAKXe6SJXWzu2pTZz_vRGic4ZomPcVGVOfOvig43=8ZoZet0cRQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] nvdimm: allow read/write zero-size
- namespace label
+In-Reply-To: <8b07aa89-92fe-1f2d-d392-e1a7e63d75ca@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/6] ppc: add a IBM 40p machine (RS/6000,
+ PReP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +26,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Li Qiang <liqiang6-s@360.cn>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Giancarlo Teodori <gteodori@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hello Guangrong,
-
-
-2017-01-13 17:00 GMT+08:00 Xiao Guangrong <guangrong.xiao@linux.intel.com>:
-
->
->
-> On 01/13/2017 11:02 AM, Li Qiang wrote:
->
->> From: Li Qiang <liqiang6-s@360.cn>
+Le 13/01/2017 =C3=A0 13:23, Mark Cave-Ayland a =C3=A9crit :
 >>
->> The spec doesn't say the namespace label can't be zero
->> when read/write it. As this is no harmful, just allow
->> it.
->>
->>
-> WHY?
+>> OpenBIOS doesn't support PReP boot partitions (type 0x41) nor PReP
+>> kernels so this is a no-go yet.
 >
-> The spec said that the label should be at least 128K.
->
+> Just out of interest, is it just the PReP boot partition support that i=
+s
+> missing from OpenBIOS? If so, that should be fairly easy to implement i=
+f
+> there's a spec lying around somewhere.
 
-Yes, the label size has a limit, but in NVDIMM_DSM_Interface_Example.pdf
-section 4.5.1
-When the guest get namespace label data, the 'Length' is not limited, if it
-is 0, it will trigger
-this assert.
+2 things are missing to boot from hard disk/cdrom:
+- support for LSI SCSI adapter
+- support for PReP boot partition support
 
-static void nvdimm_validate_rw_label_data(NVDIMMDevice *nvdimm, uint64_t
-size,
-                                        uint64_t offset)
-{
-    assert((nvdimm->label_size >= size + offset) && (offset + size >
-offset));
-}
+However, if you want to boot with -kernel, you only need to have support =
+for PReP boot partition.
+Partial specification is available at:
+ftp://ftp.software.ibm.com/rs6000/technology/spec/srp1_1.exe
+section 5.3 (Loading the Load Image)
+and
+section 5.4 (Transferring System Control to Load Image)
 
-Though I don't know what the exact behavior of this action in real
-hardware. I just think it should not
-trigger assert and exit when the guest get 0-size label data.
 
-Anyway, this is just a suggestion, If my understand is wrong, just ignore
-this.
+> It would be great if we could finally remove OHW from QEMU :)
 
-Thanks.
+I fully agree on that!
+
+Herv=C3=A9
