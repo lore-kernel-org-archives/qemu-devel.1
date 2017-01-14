@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cSO7y-0004S5-Qu
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 08:12:15 -0500
+	(envelope-from <wouter@grep.be>) id 1cSPa8-00011p-V4
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 09:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cSO7x-0000s7-VT
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 08:12:14 -0500
-References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
-	<CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
-	<733cba29-58b7-e43f-0d50-3774ee8bf3b2@reactos.org>
-	<8b07aa89-92fe-1f2d-d392-e1a7e63d75ca@ilande.co.uk>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <24009368-afce-92dd-2cd7-cd4b6629fc05@reactos.org>
-Date: Sat, 14 Jan 2017 14:11:50 +0100
+	(envelope-from <wouter@grep.be>) id 1cSPa5-0006Ya-TX
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 09:45:25 -0500
+Date: Sat, 14 Jan 2017 15:45:00 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20170114144500.oxoqvrn5x4sdfo74@grep.be>
+References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
+	<e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
+	<2EAE3C4F-58AF-4594-A284-A69D8BC3EA8F@alex.org.uk>
+	<CAJSP0QWXF2tS5q-BpmxR9ti0osjzZCFiRxdRDho4pDBLkD3UUQ@mail.gmail.com>
+	<CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
+	<90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8b07aa89-92fe-1f2d-d392-e1a7e63d75ca@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/6] ppc: add a IBM 40p machine (RS/6000,
- PReP)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
+Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] How to online resize qemu disk
+ with nbd protocol?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: Giancarlo Teodori <gteodori@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Eric Blake <eblake@redhat.com>
+Cc: Bob Chen <a175818323@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-Le 13/01/2017 =C3=A0 13:23, Mark Cave-Ayland a =C3=A9crit :
->>
->> OpenBIOS doesn't support PReP boot partitions (type 0x41) nor PReP
->> kernels so this is a no-go yet.
->
-> Just out of interest, is it just the PReP boot partition support that i=
-s
-> missing from OpenBIOS? If so, that should be fairly easy to implement i=
-f
-> there's a spec lying around somewhere.
+Hi Eric,
 
-2 things are missing to boot from hard disk/cdrom:
-- support for LSI SCSI adapter
-- support for PReP boot partition support
+(side note: my mutt tells me that the signature on your message does not
+validate. Not sure what's going on, but something you might want to look
+into...)
 
-However, if you want to boot with -kernel, you only need to have support =
-for PReP boot partition.
-Partial specification is available at:
-ftp://ftp.software.ibm.com/rs6000/technology/spec/srp1_1.exe
-section 5.3 (Loading the Load Image)
-and
-section 5.4 (Transferring System Control to Load Image)
+On Thu, Jan 12, 2017 at 12:45:56PM -0600, Eric Blake wrote:
+> For resize smaller, things are a lot trickier - how do you block access
+> to a portion of a file that the client still thinks exist, but which the
+> server has truncated away?  Maybe the easy way out is to state that the
+> server MUST NOT resize smaller.
 
+I would prefer something along the lines of "the server MUST NOT
+activate the 'resize smaller' command (which it received out of band
+from whereever) until the client asked for and was told the new size of
+the device."
 
-> It would be great if we could finally remove OHW from QEMU :)
+That is (with A & X being offsets, and B & Y being sizes, A+B < X):
 
-I fully agree on that!
+client        			server			server mgmt
+READ A,B        		no error
+        						resize to X
+READ X,Y        		no error
+reread sizes
+READ X,Y        		ENOSPC
+READ A,B        		no error
 
-Herv=C3=A9
+In that scenario, it should be the responsibility of the server to
+ensure there are no more readers; servers could implement that (if they
+don't want to do the required bookkeeping and keep such requests as
+pending) by simply sending ESHUTDOWN or some such.
+
+> > What about an active `resize` request from the client? Considering some NBD
+> > servers might have the capability to do instant resizing, not applying to
+> > LVM or host block device, of course...
+> 
+> And perhaps the 're-read size' command can serve a dual purpose.  Since
+> all NBD commands already include space for size and offset parameters,
+> we could define that if the client passes 0/0 for size and offset, it
+> wants to read the server's current size; if it passes 0/non-zero, it is
+> asking the server to resize to the new non-zero size (and the server's
+> success or error response tells whether the resize happened).
+
+I agree with Alex that adding an active resize command to the NBD
+protocol feels like a layering violation. We should probably not do
+that.
+
+> Should I spend time turning this idea into a more formal spec, along the
+> lines of other NBD extension proposals?
+
+Feel free.
+
+-- 
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
