@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cSKJp-00033c-VZ
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:14 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cSKJq-00034L-Te
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cSKJm-00035L-1x
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:13 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:62932)
+	(envelope-from <laurent@vivier.eu>) id 1cSKJm-000363-Vh
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:14 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:58629)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cSKJl-00033S-Oh
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:09 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cSKJm-00035G-MZ
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:10 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sat, 14 Jan 2017 10:07:57 +0100
-Message-Id: <1484384878-29179-9-git-send-email-laurent@vivier.eu>
+Date: Sat, 14 Jan 2017 10:07:53 +0100
+Message-Id: <1484384878-29179-5-git-send-email-laurent@vivier.eu>
 In-Reply-To: <1484384878-29179-1-git-send-email-laurent@vivier.eu>
 References: <1484384878-29179-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 8/9] target-m68k: CAS doesn't need aligned
- access
+Subject: [Qemu-devel] [PULL v2 4/9] m68k: Remove PCI and USB from config file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,26 +24,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
+From: Thomas Huth <huth@tuxfamily.org>
+
+None of the ColdFire boards that we currently support has a PCI or
+USB bus (and AFAIK the upcoming q800 machine does not support PCI
+and USB either), so we do not need these settings the config file.
+
+Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+Message-Id: <20170106083956.53d08923@thl530>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <1484332593-16782-5-git-send-email-laurent@vivier.eu>
 ---
- target/m68k/translate.c | 1 -
- 1 file changed, 1 deletion(-)
+ default-configs/m68k-softmmu.mak | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 23e2b06..cf5d8dd 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -1934,7 +1934,6 @@ DISAS_INSN(cas)
-     default:
-         g_assert_not_reached();
-     }
--    opc |= MO_ALIGN;
+diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
+index d9552df..60f7cdf 100644
+--- a/default-configs/m68k-softmmu.mak
++++ b/default-configs/m68k-softmmu.mak
+@@ -1,6 +1,4 @@
+ # Default configuration for m68k-softmmu
  
-     ext = read_im16(env, s);
- 
+-include pci.mak
+-include usb.mak
+ CONFIG_COLDFIRE=y
+ CONFIG_PTIMER=y
 -- 
 2.7.4
