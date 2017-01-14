@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cSKJl-00032V-3h
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:09 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cSKJp-00033I-CA
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cSKJh-000314-3s
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:09 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:54074)
+	(envelope-from <laurent@vivier.eu>) id 1cSKJl-00034T-GK
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:13 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:49566)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cSKJg-0002zK-Qr
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:05 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cSKJl-00032c-6n
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:09 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sat, 14 Jan 2017 10:07:49 +0100
-Message-Id: <1484384878-29179-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 0/9] M68k for 2.9 patches
+Date: Sat, 14 Jan 2017 10:07:56 +0100
+Message-Id: <1484384878-29179-8-git-send-email-laurent@vivier.eu>
+In-Reply-To: <1484384878-29179-1-git-send-email-laurent@vivier.eu>
+References: <1484384878-29179-1-git-send-email-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL v2 7/9] target-m68k: manage pre-dec et post-inc
+ in CAS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +27,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-The following changes since commit b6af8ea60282df514f87d32e36afd1c9aeee28c8:
+In these cases we must update the address register after
+the operation.
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pull-request' into staging (2017-01-13 14:38:21 +0000)
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Message-Id: <1484332593-16782-4-git-send-email-laurent@vivier.eu>
+---
+ target/m68k/translate.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-are available in the git repository at:
-
-  git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.9-pull-request
-
-for you to fetch changes up to 727d937b59f1f722f983e20f9cd23b0e7ef60165:
-
-  target-m68k: increment/decrement with SP (2017-01-14 10:06:21 +0100)
-
-----------------------------------------------------------------
-This is the list of the remaining patches that was part of series 
-reviewed during the freeze period. They use the new new deposit
-and extract ops.
-There is also a cleanup patch from Thomas.
-
-The v2 includes various fixes I've sent and that have been reviewed
-since the first pull request.
-----------------------------------------------------------------
-
-Laurent Vivier (5):
-  target-m68k: fix bit operation with immediate value
-  target-m68k: fix gen_flush_flags()
-  target-m68k: manage pre-dec et post-inc in CAS
-  target-m68k: CAS doesn't need aligned access
-  target-m68k: increment/decrement with SP
-
-Richard Henderson (3):
-  target-m68k: Implement bitfield ops for registers
-  target-m68k: Implement bitfield ops for memory
-  target-m68k: Implement bfffo
-
-Thomas Huth (1):
-  m68k: Remove PCI and USB from config file
-
- default-configs/m68k-softmmu.mak |   2 -
- target/m68k/cpu.h                |   1 +
- target/m68k/helper.h             |  10 +
- target/m68k/op_helper.c          | 206 +++++++++++++++++++
- target/m68k/translate.c          | 427 ++++++++++++++++++++++++++++++++++++++-
- 5 files changed, 636 insertions(+), 10 deletions(-)
-
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 0e97900..23e2b06 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -1963,6 +1963,15 @@ DISAS_INSN(cas)
+     gen_partset_reg(opsize, DREG(ext, 0), load);
+ 
+     tcg_temp_free(load);
++
++    switch (extract32(insn, 3, 3)) {
++    case 3: /* Indirect postincrement.  */
++        tcg_gen_addi_i32(AREG(insn, 0), addr, opsize_bytes(opsize));
++        break;
++    case 4: /* Indirect predecrememnt.  */
++        tcg_gen_mov_i32(AREG(insn, 0), addr);
++        break;
++    }
+ }
+ 
+ DISAS_INSN(cas2w)
 -- 
 2.7.4
