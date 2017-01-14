@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cSKJp-00033P-IS
+	(envelope-from <laurent@vivier.eu>) id 1cSKJp-00033J-CK
 	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cSKJl-00034s-KY
+	(envelope-from <laurent@vivier.eu>) id 1cSKJl-00034L-F6
 	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:13 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:61983)
+Received: from mout.kundenserver.de ([212.227.17.24]:53551)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cSKJl-00032l-BJ
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cSKJl-00032O-68
 	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 04:08:09 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sat, 14 Jan 2017 10:07:54 +0100
-Message-Id: <1484384878-29179-6-git-send-email-laurent@vivier.eu>
+Date: Sat, 14 Jan 2017 10:07:55 +0100
+Message-Id: <1484384878-29179-7-git-send-email-laurent@vivier.eu>
 In-Reply-To: <1484384878-29179-1-git-send-email-laurent@vivier.eu>
 References: <1484384878-29179-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 5/9] target-m68k: fix bit operation with
- immediate value
+Subject: [Qemu-devel] [PULL v2 6/9] target-m68k: fix gen_flush_flags()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +26,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-M680x0 bit operations with an immediate value use 9 bits of the 16bit
-value, while coldfire ones use only 8 bits.
+gen_flush_flags() is setting unconditionally cc_op_synced to 1
+and s->cc_op to CC_OP_FLAGS, whereas env->cc_op can be set
+to something else by a previous tcg fragment.
+
+We fix that by not setting cc_op_synced to 1
+(except for gen_helper_flush_flags() that updates env->cc_op)
+
+FIX: https://github.com/vivier/qemu-m68k/issues/19
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <1484332593-16782-2-git-send-email-laurent@vivier.eu>
+Message-Id: <1484332593-16782-3-git-send-email-laurent@vivier.eu>
 ---
- target/m68k/translate.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ target/m68k/translate.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 5f7357e..410f56a 100644
+index 410f56a..0e97900 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -1801,9 +1801,16 @@ DISAS_INSN(bitop_im)
-     op = (insn >> 6) & 3;
+@@ -595,18 +595,19 @@ static void gen_flush_flags(DisasContext *s)
  
-     bitnum = read_im16(env, s);
--    if (bitnum & 0xff00) {
--        disas_undef(env, s, insn);
--        return;
-+    if (m68k_feature(s->env, M68K_FEATURE_M68000)) {
-+        if (bitnum & 0xfe00) {
-+            disas_undef(env, s, insn);
-+            return;
-+        }
-+    } else {
-+        if (bitnum & 0xff00) {
-+            disas_undef(env, s, insn);
-+            return;
-+        }
+     case CC_OP_DYNAMIC:
+         gen_helper_flush_flags(cpu_env, QREG_CC_OP);
++        s->cc_op_synced = 1;
+         break;
+ 
+     default:
+         t0 = tcg_const_i32(s->cc_op);
+         gen_helper_flush_flags(cpu_env, t0);
+         tcg_temp_free(t0);
++        s->cc_op_synced = 1;
+         break;
      }
  
-     SRC_EA(env, src1, opsize, 0, op ? &addr: NULL);
+     /* Note that flush_flags also assigned to env->cc_op.  */
+     s->cc_op = CC_OP_FLAGS;
+-    s->cc_op_synced = 1;
+ }
+ 
+ static inline TCGv gen_extend(TCGv val, int opsize, int sign)
 -- 
 2.7.4
