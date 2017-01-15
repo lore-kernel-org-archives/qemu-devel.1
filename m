@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cSu6R-0007qO-N3
+	(envelope-from <bounces@canonical.com>) id 1cSu6R-0007qN-MX
 	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 18:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cSu6M-0004Sa-Tb
+	(envelope-from <bounces@canonical.com>) id 1cSu6M-0004SU-PJ
 	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 18:20:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38250)
+Received: from indium.canonical.com ([91.189.90.7]:38238)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cSu6M-0004SP-Ny
+	id 1cSu6M-0004SN-GK
 	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 18:20:42 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cSu6L-0007NI-Tt
+	id 1cSu6L-0007NM-9W
 	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 23:20:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CC7012E80C0
+	by loganberry.canonical.com (Postfix) with ESMTP id 38A152E80C0
 	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 23:20:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 15 Jan 2017 23:13:59 -0000
+Date: Sun, 15 Jan 2017 23:15:00 -0000
 From: Josh Triplett <josh@joshtriplett.org>
-Reply-To: Bug 1656710 <1656710@bugs.launchpad.net>
+Reply-To: Bug 1656711 <1656711@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <20170115231359.21186.42325.malonedeb@gac.canonical.com>
+Message-Id: <20170115231500.27272.80762.malonedeb@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1656710] [NEW] Please support Ctrl-Alt-= to zoom
- in
+Subject: [Qemu-devel] [Bug 1656711] [NEW] GTK3 interface doesn't zoom-to-fit
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,13 +40,17 @@ To: qemu-devel@nongnu.org
 
 Public bug reported:
 
-With the GTK3 interface, qemu-system supports pressing Ctrl-Alt-plus
-to zoom in and Ctrl-Alt-minus to zoom out.  However, unlike many
-programs that support similar zoom hotkeys, qemu-system actually
-requires using '+', making the hotkey Ctrl-Alt-Shift-=3D .  Most programs
-with similar zoom hotkeys allow Ctrl-Alt-=3D as a synonym.
+The SDL interface automatically scales the video output to
+match the window size.  The GTK3 interface has an off-by-default option
+"Zoom To Fit" for that.  As far as I can tell, no command-line option
+exists to turn that option on.  That makes it harder to quickly zoom a
+freshly launched VM; instead of just hitting a maximize-window hotkey, I
+also have to navigate through the menu to select "Zoom To Fit".
 
-Please consider accepting Ctrl-Alt-=3D as an additional zoom-in hotkey.
+Given that VMs typically start out running in a much lower-resolution
+video mode than the host (and VMs not running a full graphical
+environment often stay that way), this seriously impacts the usability
+of qemu-system.
 
 (Observed in QEMU 2.8)
 
@@ -58,24 +62,28 @@ Please consider accepting Ctrl-Alt-=3D as an additional zoom-in hotkey.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1656710
+https://bugs.launchpad.net/bugs/1656711
 
 Title:
-  Please support Ctrl-Alt-=3D to zoom in
+  GTK3 interface doesn't zoom-to-fit by default
 
 Status in QEMU:
   New
 
 Bug description:
-  With the GTK3 interface, qemu-system supports pressing Ctrl-Alt-plus
-  to zoom in and Ctrl-Alt-minus to zoom out.  However, unlike many
-  programs that support similar zoom hotkeys, qemu-system actually
-  requires using '+', making the hotkey Ctrl-Alt-Shift-=3D .  Most programs
-  with similar zoom hotkeys allow Ctrl-Alt-=3D as a synonym.
+  The SDL interface automatically scales the video output to
+  match the window size.  The GTK3 interface has an off-by-default option
+  "Zoom To Fit" for that.  As far as I can tell, no command-line option
+  exists to turn that option on.  That makes it harder to quickly zoom a
+  freshly launched VM; instead of just hitting a maximize-window hotkey, I
+  also have to navigate through the menu to select "Zoom To Fit".
 
-  Please consider accepting Ctrl-Alt-=3D as an additional zoom-in hotkey.
+  Given that VMs typically start out running in a much lower-resolution
+  video mode than the host (and VMs not running a full graphical
+  environment often stay that way), this seriously impacts the usability
+  of qemu-system.
 
   (Observed in QEMU 2.8)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1656710/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1656711/+subscriptions
