@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cSaGy-0000fa-7p
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 21:10:21 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cSdfT-0007hZ-At
+	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 00:47:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cSaGv-0002C1-2a
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 21:10:20 -0500
-Received: from roura.ac.upc.es ([147.83.33.10]:44136)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cSdfP-0004Hf-Vh
+	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 00:47:51 -0500
+Received: from [59.151.112.132] (port=10268 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cSaGu-0002BS-M8
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 21:10:16 -0500
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <148278447806.8988.12706825771606357198.stgit@fimbulvetr.bsc.es>
-	<148278451049.8988.5349519787388002909.stgit@fimbulvetr.bsc.es>
-	<20170109161702.GH30228@stefanha-x1.localdomain>
-Date: Sun, 15 Jan 2017 03:10:13 +0100
-In-Reply-To: <20170109161702.GH30228@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Mon, 9 Jan 2017 16:17:02 +0000")
-Message-ID: <878tqdysxm.fsf@ac.upc.edu>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cSdfP-00047B-K1
+	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 00:47:47 -0500
+References: <1483513091-30661-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<1483513091-30661-2-git-send-email-douly.fnst@cn.fujitsu.com>
+	<5e0a6a79-cb60-b1f0-06ab-2362f63afb78@redhat.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <f62aad48-31f1-d367-55bd-687b5fe0c881@cn.fujitsu.com>
+Date: Sun, 15 Jan 2017 13:47:20 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 6/6] hypertrace: Add guest-side Linux
- module
+In-Reply-To: <5e0a6a79-cb60-b1f0-06ab-2362f63afb78@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v3 1/2] block/qapi: reduce the coupling
+ between the bdrv_query_stats and bdrv_query_bds_stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Luiz Capitulino <lcapitulino@redhat.com>
+To: Eric Blake <eblake@redhat.com>, stefanha@redhat.com, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, famz@redhat.com
+Cc: qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com
 
-Stefan Hajnoczi writes:
+Hi Eric,
 
-> On Mon, Dec 26, 2016 at 09:35:10PM +0100, Llu=C3=ADs Vilanova wrote:
->> Provides guest Linux kernel module "qemu-hypertrace.ko" to abstract
->> access to the hypertrace channel.
->>=20
->> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->> ---
->> Makefile                                           |    4 -
->> configure                                          |    4 +
->> hypertrace/guest/linux-module/Kbuild.in            |    7 +
->> hypertrace/guest/linux-module/Makefile             |   23 +++
->> .../include/linux/qemu-hypertrace-internal.h       |   46 ++++++
->> .../linux-module/include/linux/qemu-hypertrace.h   |   73 ++++++++++
->> hypertrace/guest/linux-module/qemu-hypertrace.c    |  149 ++++++++++++++=
-++++++
->> 7 files changed, 305 insertions(+), 1 deletion(-)
->> create mode 100644 hypertrace/guest/linux-module/Kbuild.in
->> create mode 100644 hypertrace/guest/linux-module/Makefile
->> create mode 100644 hypertrace/guest/linux-module/include/linux/qemu-hype=
-rtrace-internal.h
->> create mode 100644 hypertrace/guest/linux-module/include/linux/qemu-hype=
-rtrace.h
->> create mode 100644 hypertrace/guest/linux-module/qemu-hypertrace.c
+At 01/13/2017 11:00 PM, Eric Blake wrote:
+> On 01/04/2017 12:58 AM, Dou Liyang wrote:
+>> the bdrv_query_stats and bdrv_query_bds_stats functions need to call
+>> each other, that increases the coupling. it also makes the program
+>> complicated and makes some unnecessary judgements.
+>
+> s/judgements/judgments/ - although I wonder if 'tests' would be a
+> simpler word.
+>
 
-> This should be submitted to Linux, the module cannot live in the QEMU
-> tree (we don't carry out-of-tree kernel modules).
+Yes, it is.
+I will modify it.
 
-I thought it made sense to have it here, the same way we have the user-mode
-guest library. If not, I will split it into a separate repo and point at it=
- from
-the documentation file. Once the rest is merged into QEMU, I can post the k=
-ernel
-module repo to the linux list.
+>>
+>> remove the call from bdrv_query_bds_stats to bdrv_query_stats, just
+>> take some recursion to make it clearly.
+>>
+>> avoid judging whether the blk is NULL during querying the bds stats.
+>
+> Again, 'testing' might read nicer than 'judging'.
+
+Yes, it is.
+
 
 Thanks,
-  LLuis
+	Liyang
