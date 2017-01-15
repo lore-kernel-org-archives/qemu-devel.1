@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cSYmG-00070n-VM
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 19:34:34 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cSaGy-0000fa-7p
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 21:10:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cSYmD-0001r8-Pn
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 19:34:32 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59177)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cSYmD-0001qP-Jd
-	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 19:34:29 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cSYmB-0005up-Fn
-	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 00:34:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 612E42E80C2
-	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 00:34:27 +0000 (UTC)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cSaGv-0002C1-2a
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 21:10:20 -0500
+Received: from roura.ac.upc.es ([147.83.33.10]:44136)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cSaGu-0002BS-M8
+	for qemu-devel@nongnu.org; Sat, 14 Jan 2017 21:10:16 -0500
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <148278447806.8988.12706825771606357198.stgit@fimbulvetr.bsc.es>
+	<148278451049.8988.5349519787388002909.stgit@fimbulvetr.bsc.es>
+	<20170109161702.GH30228@stefanha-x1.localdomain>
+Date: Sun, 15 Jan 2017 03:10:13 +0100
+In-Reply-To: <20170109161702.GH30228@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Mon, 9 Jan 2017 16:17:02 +0000")
+Message-ID: <878tqdysxm.fsf@ac.upc.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 15 Jan 2017 00:23:17 -0000
-From: dhead <myfoolishgames@gmail.com>
-Reply-To: Bug 1578192 <1578192@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160504123823.5625.5258.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170115002317.27164.21916.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1578192] Re: GTK+ interface doesn't translate
- keycodes properly with Wayland backend
+Subject: Re: [Qemu-devel] [PATCH v4 6/6] hypertrace: Add guest-side Linux
+ module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,115 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Luiz Capitulino <lcapitulino@redhat.com>
 
-thanks wyzu for the patch, I can confirm it also affecting my system.
+Stefan Hajnoczi writes:
 
-qemu 2.8.0
-gnome-shell 3.22.2
-gtk3 3.22
-wayland 1.12
-libinput 1.5.3
+> On Mon, Dec 26, 2016 at 09:35:10PM +0100, Llu=C3=ADs Vilanova wrote:
+>> Provides guest Linux kernel module "qemu-hypertrace.ko" to abstract
+>> access to the hypertrace channel.
+>>=20
+>> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+>> ---
+>> Makefile                                           |    4 -
+>> configure                                          |    4 +
+>> hypertrace/guest/linux-module/Kbuild.in            |    7 +
+>> hypertrace/guest/linux-module/Makefile             |   23 +++
+>> .../include/linux/qemu-hypertrace-internal.h       |   46 ++++++
+>> .../linux-module/include/linux/qemu-hypertrace.h   |   73 ++++++++++
+>> hypertrace/guest/linux-module/qemu-hypertrace.c    |  149 ++++++++++++++=
+++++++
+>> 7 files changed, 305 insertions(+), 1 deletion(-)
+>> create mode 100644 hypertrace/guest/linux-module/Kbuild.in
+>> create mode 100644 hypertrace/guest/linux-module/Makefile
+>> create mode 100644 hypertrace/guest/linux-module/include/linux/qemu-hype=
+rtrace-internal.h
+>> create mode 100644 hypertrace/guest/linux-module/include/linux/qemu-hype=
+rtrace.h
+>> create mode 100644 hypertrace/guest/linux-module/qemu-hypertrace.c
 
-I attached an updated patch based on wyzu's one that seems to work for
-me.
+> This should be submitted to Linux, the module cannot live in the QEMU
+> tree (we don't carry out-of-tree kernel modules).
 
-** Patch added: "wayland-keymap.patch"
-   https://bugs.launchpad.net/qemu/+bug/1578192/+attachment/4804463/+files/=
-wayland-keymap.patch
+I thought it made sense to have it here, the same way we have the user-mode
+guest library. If not, I will split it into a separate repo and point at it=
+ from
+the documentation file. Once the rest is merged into QEMU, I can post the k=
+ernel
+module repo to the linux list.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1578192
-
-Title:
-  GTK+ interface doesn't translate keycodes properly with Wayland
-  backend
-
-Status in QEMU:
-  New
-
-Bug description:
-  I already posted this on the mailing list
-  (https://lists.nongnu.org/archive/html/qemu-
-  devel/2016-05/msg00119.html) but I decided to do a formal bug report
-  so it can be tracked and doesn't get lost.
-
-  ... I'm no expert, but it looks like GTK+ key events come in at the
-  ui/gtk.c:gd_key_event callback function, which calls
-  ui/gtk.c:gd_map_keycode to translate the GTK+ keycode into the Qemu
-  keycode before sending it on using qemu_input_event_send_key_number.
-  The problem is that gd_map_keycode is incomplete when GTK+ is running
-  on a backend other than X11.
-
-  static int gd_map_keycode(GtkDisplayState *s, GdkDisplay *dpy, int gdk_ke=
-ycode)
-  {
-      int qemu_keycode;
-
-  #ifdef GDK_WINDOWING_WIN32
-      if (GDK_IS_WIN32_DISPLAY(dpy)) {
-          qemu_keycode =3D MapVirtualKey(gdk_keycode, MAPVK_VK_TO_VSC);
-          switch (qemu_keycode) {
-          case 103:   /* alt gr */
-              qemu_keycode =3D 56 | SCANCODE_GREY;
-              break;
-          }
-          return qemu_keycode;
-      }
-  #endif
-
-      if (gdk_keycode < 9) {
-          qemu_keycode =3D 0;
-      } else if (gdk_keycode < 97) {
-          qemu_keycode =3D gdk_keycode - 8;
-  #ifdef GDK_WINDOWING_X11
-      } else if (GDK_IS_X11_DISPLAY(dpy) && gdk_keycode < 158) {
-          if (s->has_evdev) {
-              qemu_keycode =3D translate_evdev_keycode(gdk_keycode - 97);
-          } else {
-              qemu_keycode =3D translate_xfree86_keycode(gdk_keycode - 97);
-          }
-  #endif
-      } else if (gdk_keycode =3D=3D 208) { /* Hiragana_Katakana */
-          qemu_keycode =3D 0x70;
-      } else if (gdk_keycode =3D=3D 211) { /* backslash */
-          qemu_keycode =3D 0x73;
-      } else {
-          qemu_keycode =3D 0;
-      }
-
-      return qemu_keycode;
-  }
-
-  In my case, I'm using GTK+'s Wayland backend, so keycodes 97 through
-  157 (this includes KEY_HOME(102), KEY_PAGEUP(104), KEY_PAGEDOWN(109),
-  KEY_END(107), etc.) are never translated into a qemu_keycode, and the
-  final 'else' block is hit, causing gd_map_keycode to return 0, which
-  is an invalid keycode and thus cannot be handled by xen-kbdfront. At
-  least that's my best guess as to what is happening.
-
-  The solution that comes to mind is provide an alternative to
-  translate_{evdev,xfree86}_keycode that is compatable with
-  Wayland/libinput, but I don't know exactly which API would provide
-  this functionality, much less do I have a patch. Intuition tells me
-  that translate_evdev_keycode would probably work under Wayland because
-  Weston uses libinput which uses evdev as its backend, but I don't know
-  this for a fact, and I don't know if it would be the Right Way (i.e.
-  Wayland or libinput might provide an API for this purpose, but I don't
-  know).
-
-  I may try to do some testing with translate_evdev_keycode on Wayland
-  and also look into any possible APIs for keycode translation, but I
-  just wanted to put it out there and get some feedback awhile.
-
-  Qemu 2.2.1 from Xen 4.6.1 (relevant code appears unchanged in Qemu master)
-  GTK+ 3.18.7
-  Wayland 1.9.0
-  Weston 1.9.0
-  libinput 1.2.3
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1578192/+subscriptions
+Thanks,
+  LLuis
