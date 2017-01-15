@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cSs4r-0006EX-84
-	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:11:01 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cSs5u-0007ok-GY
+	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:12:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cSs4o-0002rJ-2r
-	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:11:01 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33108)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cSs5r-00030f-BU
+	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:12:06 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33074)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cSs4n-0002rD-Tj
-	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:10:58 -0500
-Received: by mail-pf0-x244.google.com with SMTP id e4so2469944pfg.0
-	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 13:10:57 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cSs5r-00030U-5k
+	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:12:03 -0500
+Received: by mail-pg0-x242.google.com with SMTP id 194so3587309pgd.0
+	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 13:12:03 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sun, 15 Jan 2017 13:10:17 -0800
-Message-Id: <1484514617-11726-8-git-send-email-jcmvbkbc@gmail.com>
-In-Reply-To: <1484514617-11726-1-git-send-email-jcmvbkbc@gmail.com>
-References: <1484514617-11726-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 7/7] target/xtensa: tests: add ccount write
- tests
+Date: Sun, 15 Jan 2017 13:11:47 -0800
+Message-Id: <1484514707-11781-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] target/xtensa: fix ICACHE/DCACHE options
+ detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +27,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Check that CCOUNT SR is writable and that CCOMPARE timers are updated
-when CCOUNT is written to.
+Configuration overlay does not explicitly say whether there are ICACHE
+and DCACHE in the core. Current code uses XCHAL_[ID]CACHE_WAYS to detect
+if corresponding cache option is enabled, but that's not correct: on
+cores without cache these macros are defined as 1, not as 0.
+Check XCHAL_[ID]CACHE_SIZE instead.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- tests/tcg/xtensa/test_timer.S | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ target/xtensa/overlay_tool.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/tcg/xtensa/test_timer.S b/tests/tcg/xtensa/test_timer.S
-index 844c032..6cda71a 100644
---- a/tests/tcg/xtensa/test_timer.S
-+++ b/tests/tcg/xtensa/test_timer.S
-@@ -19,6 +19,40 @@ test ccount
-     assert  ne, a3, a4
- test_end
- 
-+test ccount_write
-+    rsr     a3, ccount
-+    rsr     a4, ccount
-+    sub     a4, a4, a3
-+    movi    a2, 0x12345678
-+    wsr     a2, ccount
-+    esync
-+    rsr     a3, ccount
-+    sub     a3, a3, a2
-+    slli    a4, a4, 2
-+    assert  ltu, a3, a4
-+test_end
-+
-+test ccount_update_deadline
-+    movi    a2, 0
-+    wsr     a2, intenable
-+    rsr     a2, interrupt
-+    wsr     a2, intclear
-+    movi    a2, 0
-+    wsr     a2, ccompare1
-+    wsr     a2, ccompare2
-+    movi    a2, 0x12345678
-+    wsr     a2, ccompare0
-+    rsr     a3, interrupt
-+    assert  eqi, a3, 0
-+    movi    a2, 0x12345677
-+    wsr     a2, ccount
-+    esync
-+    nop
-+    rsr     a2, interrupt
-+    movi    a3, 1 << XCHAL_TIMER0_INTERRUPT
-+    assert  eq, a2, a3
-+test_end
-+
- test ccompare
-     movi    a2, 0
-     wsr     a2, intenable
+diff --git a/target/xtensa/overlay_tool.h b/target/xtensa/overlay_tool.h
+index 5357142..b73fd14 100644
+--- a/target/xtensa/overlay_tool.h
++++ b/target/xtensa/overlay_tool.h
+@@ -92,10 +92,10 @@
+         XTENSA_OPTION_HIGH_PRIORITY_INTERRUPT) | \
+     XCHAL_OPTION(XCHAL_HAVE_CCOUNT, XTENSA_OPTION_TIMER_INTERRUPT) | \
+     /* Local memory, TODO */ \
+-    XCHAL_OPTION(XCHAL_ICACHE_WAYS, XTENSA_OPTION_ICACHE) | \
++    XCHAL_OPTION(XCHAL_ICACHE_SIZE, XTENSA_OPTION_ICACHE) | \
+     XCHAL_OPTION(XCHAL_ICACHE_LINE_LOCKABLE, \
+             XTENSA_OPTION_ICACHE_INDEX_LOCK) | \
+-    XCHAL_OPTION(XCHAL_DCACHE_WAYS, XTENSA_OPTION_DCACHE) | \
++    XCHAL_OPTION(XCHAL_DCACHE_SIZE, XTENSA_OPTION_DCACHE) | \
+     XCHAL_OPTION(XCHAL_DCACHE_LINE_LOCKABLE, \
+             XTENSA_OPTION_DCACHE_INDEX_LOCK) | \
+     XCHAL_OPTION(XCHAL_UNALIGNED_LOAD_HW, XTENSA_OPTION_HW_ALIGNMENT) | \
 -- 
 2.1.4
