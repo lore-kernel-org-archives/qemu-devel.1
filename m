@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cSs5u-0007ok-GY
-	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:12:07 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cSs8d-0001mj-LJ
+	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:14:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cSs5r-00030f-BU
-	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:12:06 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33074)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cSs8a-0003p6-H0
+	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:14:55 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36318)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cSs5r-00030U-5k
-	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:12:03 -0500
-Received: by mail-pg0-x242.google.com with SMTP id 194so3587309pgd.0
-	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 13:12:03 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cSs8a-0003ow-BV
+	for qemu-devel@nongnu.org; Sun, 15 Jan 2017 16:14:52 -0500
+Received: by mail-pg0-x241.google.com with SMTP id 75so3591428pgf.3
+	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 13:14:52 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sun, 15 Jan 2017 13:11:47 -0800
-Message-Id: <1484514707-11781-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH] target/xtensa: fix ICACHE/DCACHE options
- detection
+Date: Sun, 15 Jan 2017 13:14:36 -0800
+Message-Id: <1484514878-11828-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/2] target/xtensa: implement MEMCTL SR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +26,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Configuration overlay does not explicitly say whether there are ICACHE
-and DCACHE in the core. Current code uses XCHAL_[ID]CACHE_WAYS to detect
-if corresponding cache option is enabled, but that's not correct: on
-cores without cache these macros are defined as 1, not as 0.
-Check XCHAL_[ID]CACHE_SIZE instead.
+Hello,
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- target/xtensa/overlay_tool.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+this series implements MEMCTL special register and adds a test for it.
 
-diff --git a/target/xtensa/overlay_tool.h b/target/xtensa/overlay_tool.h
-index 5357142..b73fd14 100644
---- a/target/xtensa/overlay_tool.h
-+++ b/target/xtensa/overlay_tool.h
-@@ -92,10 +92,10 @@
-         XTENSA_OPTION_HIGH_PRIORITY_INTERRUPT) | \
-     XCHAL_OPTION(XCHAL_HAVE_CCOUNT, XTENSA_OPTION_TIMER_INTERRUPT) | \
-     /* Local memory, TODO */ \
--    XCHAL_OPTION(XCHAL_ICACHE_WAYS, XTENSA_OPTION_ICACHE) | \
-+    XCHAL_OPTION(XCHAL_ICACHE_SIZE, XTENSA_OPTION_ICACHE) | \
-     XCHAL_OPTION(XCHAL_ICACHE_LINE_LOCKABLE, \
-             XTENSA_OPTION_ICACHE_INDEX_LOCK) | \
--    XCHAL_OPTION(XCHAL_DCACHE_WAYS, XTENSA_OPTION_DCACHE) | \
-+    XCHAL_OPTION(XCHAL_DCACHE_SIZE, XTENSA_OPTION_DCACHE) | \
-     XCHAL_OPTION(XCHAL_DCACHE_LINE_LOCKABLE, \
-             XTENSA_OPTION_DCACHE_INDEX_LOCK) | \
-     XCHAL_OPTION(XCHAL_UNALIGNED_LOAD_HW, XTENSA_OPTION_HW_ALIGNMENT) | \
+Max Filippov (2):
+  target/xtensa: implement MEMCTL SR
+  target/xtensa: tests: add memctl test
+
+ target/xtensa/cpu.c          |  1 +
+ target/xtensa/cpu.h          | 19 +++++++++++++++++++
+ target/xtensa/helper.h       |  1 +
+ target/xtensa/op_helper.c    | 24 ++++++++++++++++++++++++
+ target/xtensa/overlay_tool.h | 15 +++++++++++++++
+ target/xtensa/translate.c    |  8 ++++++++
+ tests/tcg/xtensa/test_sr.S   |  1 +
+ 7 files changed, 69 insertions(+)
+
 -- 
 2.1.4
