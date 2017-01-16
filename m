@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1cT3cm-0003z3-LZ
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:30:50 -0500
+	(envelope-from <berrange@redhat.com>) id 1cT3dP-0004Td-FO
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:31:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1cT3ch-0002Wa-Rr
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:30:48 -0500
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Date: Mon, 16 Jan 2017 17:26:58 +0800
-Message-ID: <1484558821-15512-4-git-send-email-zhaoshenglong@huawei.com>
-In-Reply-To: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
-References: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
+	(envelope-from <berrange@redhat.com>) id 1cT3dL-0002cK-MT
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:31:27 -0500
+Date: Mon, 16 Jan 2017 09:31:16 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170116093116.GD13096@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1483967385-12891-1-git-send-email-kraxel@redhat.com>
+	<1483967385-12891-3-git-send-email-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RFC 3/6] arm: kvm64: Check if kvm supports
- cross type vCPU
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1483967385-12891-3-git-send-email-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PULL v2 02/11] ui: use evdev keymap when running
+ under wayland
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,233 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, wei@redhat.com, drjones@redhat.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, zhaoshenglong@huawei.com, wu.wubin@huawei.com
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-From: Shannon Zhao <shannon.zhao@linaro.org>
+CC qemu-stable
 
-If user requests a specific type vCPU which is not same with the
-physical ones and if kvm supports cross type vCPU, we set the
-KVM_ARM_VCPU_CROSS bit and set the CPU ID registers.
+This patch should go into active stable branches given that wayland is
+now the default on some OS distro....
 
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
----
- target/arm/kvm64.c | 182 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 182 insertions(+)
+On Mon, Jan 09, 2017 at 02:09:36PM +0100, Gerd Hoffmann wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+> 
+> Wayland always uses evdev as its input source, so QEMU
+> can use the existing evdev keymap data
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Message-id: 20161201094117.16407-1-berrange@redhat.com
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/ui/gtk.h | 4 ++++
+>  ui/gtk.c         | 7 +++++++
+>  2 files changed, 11 insertions(+)
+> 
+> diff --git a/include/ui/gtk.h b/include/ui/gtk.h
+> index 42ca0fe..b3b5005 100644
+> --- a/include/ui/gtk.h
+> +++ b/include/ui/gtk.h
+> @@ -18,6 +18,10 @@
+>  #include <X11/XKBlib.h>
+>  #endif
+>  
+> +#ifdef GDK_WINDOWING_WAYLAND
+> +#include <gdk/gdkwayland.h>
+> +#endif
+> +
+>  #if defined(CONFIG_OPENGL)
+>  #include "ui/egl-helpers.h"
+>  #include "ui/egl-context.h"
+> diff --git a/ui/gtk.c b/ui/gtk.c
+> index 406de4f..356f400 100644
+> --- a/ui/gtk.c
+> +++ b/ui/gtk.c
+> @@ -90,6 +90,9 @@
+>  #ifndef GDK_IS_X11_DISPLAY
+>  #define GDK_IS_X11_DISPLAY(dpy) (dpy == dpy)
+>  #endif
+> +#ifndef GDK_IS_WAYLAND_DISPLAY
+> +#define GDK_IS_WAYLAND_DISPLAY(dpy) (dpy == dpy)
+> +#endif
+>  #ifndef GDK_IS_WIN32_DISPLAY
+>  #define GDK_IS_WIN32_DISPLAY(dpy) (dpy == dpy)
+>  #endif
+> @@ -1054,6 +1057,10 @@ static int gd_map_keycode(GtkDisplayState *s, GdkDisplay *dpy, int gdk_keycode)
+>              qemu_keycode = translate_xfree86_keycode(gdk_keycode - 97);
+>          }
+>  #endif
+> +#ifdef GDK_WINDOWING_WAYLAND
+> +    } else if (GDK_IS_WAYLAND_DISPLAY(dpy) && gdk_keycode < 158) {
+> +        qemu_keycode = translate_evdev_keycode(gdk_keycode - 97);
+> +#endif
+>      } else if (gdk_keycode == 208) { /* Hiragana_Katakana */
+>          qemu_keycode = 0x70;
+>      } else if (gdk_keycode == 211) { /* backslash */
+> -- 
+> 1.8.3.1
+> 
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 6111109..70442ea 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -481,7 +481,151 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUClass *ahcc)
-     return true;
- }
- 
-+#define ARM_CPU_ID_MIDR        3, 0, 0, 0, 0
- #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
-+/* ID group 1 registers */
-+#define ARM_CPU_ID_REVIDR      3, 0, 0, 0, 6
-+#define ARM_CPU_ID_AIDR        3, 1, 0, 0, 7
-+
-+/* ID group 2 registers */
-+#define ARM_CPU_ID_CCSIDR      3, 1, 0, 0, 0
-+#define ARM_CPU_ID_CLIDR       3, 1, 0, 0, 1
-+#define ARM_CPU_ID_CSSELR      3, 2, 0, 0, 0
-+#define ARM_CPU_ID_CTR         3, 3, 0, 0, 1
-+
-+/* ID group 3 registers */
-+#define ARM_CPU_ID_PFR0        3, 0, 0, 1, 0
-+#define ARM_CPU_ID_PFR1        3, 0, 0, 1, 1
-+#define ARM_CPU_ID_DFR0        3, 0, 0, 1, 2
-+#define ARM_CPU_ID_AFR0        3, 0, 0, 1, 3
-+#define ARM_CPU_ID_MMFR0       3, 0, 0, 1, 4
-+#define ARM_CPU_ID_MMFR1       3, 0, 0, 1, 5
-+#define ARM_CPU_ID_MMFR2       3, 0, 0, 1, 6
-+#define ARM_CPU_ID_MMFR3       3, 0, 0, 1, 7
-+#define ARM_CPU_ID_ISAR0       3, 0, 0, 2, 0
-+#define ARM_CPU_ID_ISAR1       3, 0, 0, 2, 1
-+#define ARM_CPU_ID_ISAR2       3, 0, 0, 2, 2
-+#define ARM_CPU_ID_ISAR3       3, 0, 0, 2, 3
-+#define ARM_CPU_ID_ISAR4       3, 0, 0, 2, 4
-+#define ARM_CPU_ID_ISAR5       3, 0, 0, 2, 5
-+#define ARM_CPU_ID_MMFR4       3, 0, 0, 2, 6
-+#define ARM_CPU_ID_MVFR0       3, 0, 0, 3, 0
-+#define ARM_CPU_ID_MVFR1       3, 0, 0, 3, 1
-+#define ARM_CPU_ID_MVFR2       3, 0, 0, 3, 2
-+#define ARM_CPU_ID_AA64PFR0    3, 0, 0, 4, 0
-+#define ARM_CPU_ID_AA64PFR1    3, 0, 0, 4, 1
-+#define ARM_CPU_ID_AA64DFR0    3, 0, 0, 5, 0
-+#define ARM_CPU_ID_AA64DFR1    3, 0, 0, 5, 1
-+#define ARM_CPU_ID_AA64AFR0    3, 0, 0, 5, 4
-+#define ARM_CPU_ID_AA64AFR1    3, 0, 0, 5, 5
-+#define ARM_CPU_ID_AA64ISAR0   3, 0, 0, 6, 0
-+#define ARM_CPU_ID_AA64ISAR1   3, 0, 0, 6, 1
-+#define ARM_CPU_ID_AA64MMFR0   3, 0, 0, 7, 0
-+#define ARM_CPU_ID_AA64MMFR1   3, 0, 0, 7, 1
-+#define ARM_CPU_ID_MAX         36
-+
-+static int kvm_arm_set_id_registers(CPUState *cs)
-+{
-+    int ret = 0;
-+    uint32_t i;
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    struct kvm_one_reg id_regitsers[ARM_CPU_ID_MAX];
-+
-+    memset(id_regitsers, 0, ARM_CPU_ID_MAX * sizeof(struct kvm_one_reg));
-+
-+    id_regitsers[0].id = ARM64_SYS_REG(ARM_CPU_ID_MIDR);
-+    id_regitsers[0].addr = (uintptr_t)&cpu->midr;
-+
-+    id_regitsers[1].id = ARM64_SYS_REG(ARM_CPU_ID_REVIDR);
-+    id_regitsers[1].addr = (uintptr_t)&cpu->revidr;
-+
-+    id_regitsers[2].id = ARM64_SYS_REG(ARM_CPU_ID_MVFR0);
-+    id_regitsers[2].addr = (uintptr_t)&cpu->mvfr0;
-+
-+    id_regitsers[3].id = ARM64_SYS_REG(ARM_CPU_ID_MVFR1);
-+    id_regitsers[3].addr = (uintptr_t)&cpu->mvfr1;
-+
-+    id_regitsers[4].id = ARM64_SYS_REG(ARM_CPU_ID_MVFR2);
-+    id_regitsers[4].addr = (uintptr_t)&cpu->mvfr2;
-+
-+    id_regitsers[5].id = ARM64_SYS_REG(ARM_CPU_ID_PFR0);
-+    id_regitsers[5].addr = (uintptr_t)&cpu->id_pfr0;
-+
-+    id_regitsers[6].id = ARM64_SYS_REG(ARM_CPU_ID_PFR1);
-+    id_regitsers[6].addr = (uintptr_t)&cpu->id_pfr1;
-+
-+    id_regitsers[7].id = ARM64_SYS_REG(ARM_CPU_ID_DFR0);
-+    id_regitsers[7].addr = (uintptr_t)&cpu->id_dfr0;
-+
-+    id_regitsers[8].id = ARM64_SYS_REG(ARM_CPU_ID_AFR0);
-+    id_regitsers[8].addr = (uintptr_t)&cpu->id_afr0;
-+
-+    id_regitsers[9].id = ARM64_SYS_REG(ARM_CPU_ID_MMFR0);
-+    id_regitsers[9].addr = (uintptr_t)&cpu->id_mmfr0;
-+
-+    id_regitsers[10].id = ARM64_SYS_REG(ARM_CPU_ID_MMFR1);
-+    id_regitsers[10].addr = (uintptr_t)&cpu->id_mmfr1;
-+
-+    id_regitsers[11].id = ARM64_SYS_REG(ARM_CPU_ID_MMFR2);
-+    id_regitsers[11].addr = (uintptr_t)&cpu->id_mmfr2;
-+
-+    id_regitsers[12].id = ARM64_SYS_REG(ARM_CPU_ID_MMFR3);
-+    id_regitsers[12].addr = (uintptr_t)&cpu->id_mmfr3;
-+
-+    id_regitsers[13].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR0);
-+    id_regitsers[13].addr = (uintptr_t)&cpu->id_isar0;
-+
-+    id_regitsers[14].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR1);
-+    id_regitsers[14].addr = (uintptr_t)&cpu->id_isar1;
-+
-+    id_regitsers[15].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR2);
-+    id_regitsers[15].addr = (uintptr_t)&cpu->id_isar2;
-+
-+    id_regitsers[16].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR3);
-+    id_regitsers[16].addr = (uintptr_t)&cpu->id_isar3;
-+
-+    id_regitsers[17].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR4);
-+    id_regitsers[17].addr = (uintptr_t)&cpu->id_isar4;
-+
-+    id_regitsers[18].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR5);
-+    id_regitsers[18].addr = (uintptr_t)&cpu->id_isar5;
-+
-+    id_regitsers[19].id = ARM64_SYS_REG(ARM_CPU_ID_AA64PFR0);
-+    id_regitsers[19].addr = (uintptr_t)&cpu->id_aa64pfr0;
-+
-+    id_regitsers[20].id = ARM64_SYS_REG(ARM_CPU_ID_AA64DFR0);
-+    id_regitsers[20].addr = (uintptr_t)&cpu->id_aa64dfr0;
-+
-+    id_regitsers[21].id = ARM64_SYS_REG(ARM_CPU_ID_AA64ISAR0);
-+    id_regitsers[21].addr = (uintptr_t)&cpu->id_aa64isar0;
-+
-+    id_regitsers[22].id = ARM64_SYS_REG(ARM_CPU_ID_AA64MMFR0);
-+    id_regitsers[22].addr = (uintptr_t)&cpu->id_aa64mmfr0;
-+
-+    id_regitsers[23].id = ARM64_SYS_REG(ARM_CPU_ID_CLIDR);
-+    id_regitsers[23].addr = (uintptr_t)&cpu->clidr;
-+
-+    id_regitsers[24].id = ARM64_SYS_REG(ARM_CPU_ID_CTR);
-+    id_regitsers[24].addr = (uintptr_t)&cpu->ctr;
-+
-+
-+    for (i = 0; i < ARM_CPU_ID_MAX; i++) {
-+        if(id_regitsers[i].id != 0) {
-+            ret = kvm_set_one_reg(cs, id_regitsers[i].id,
-+                                  (void *)id_regitsers[i].addr);
-+            if (ret) {
-+                fprintf(stderr, "set ID register 0x%llx failed\n",
-+                        id_regitsers[i].id);
-+                return ret;
-+            }
-+        } else {
-+            break;
-+        }
-+    }
-+
-+    /* TODO: Set CCSIDR */
-+    return ret;
-+}
- 
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-@@ -489,6 +633,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     uint64_t mpidr;
-     ARMCPU *cpu = ARM_CPU(cs);
-     CPUARMState *env = &cpu->env;
-+    bool heterogeneous = false, cross = false;
-+    struct kvm_vcpu_init init;
- 
-     if (cpu->kvm_target == QEMU_KVM_ARM_TARGET_NONE ||
-         !object_dynamic_cast(OBJECT(cpu), TYPE_AARCH64_CPU)) {
-@@ -518,12 +664,48 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         unset_feature(&env->features, ARM_FEATURE_PMU);
-     }
- 
-+    /*
-+     * Check if host is a heterogeneous system. It doesn't support -cpu host on
-+     * heterogeneous system. If user requests a specific type VCPU, it should
-+     * set the KVM_ARM_VCPU_CROSS bit to tell KVM that userspace want a specific
-+     * vCPU. If KVM supports cross type vCPU, then set the ID registers.
-+     */
-+    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_HETEROGENEOUS)) {
-+        heterogeneous = true;
-+    }
-+
-+    if (strcmp(object_get_typename(OBJECT(cpu)), TYPE_ARM_HOST_CPU) == 0) {
-+        if (heterogeneous) {
-+            fprintf(stderr, "heterogeneous system can't support host guest CPU type\n");
-+            return -EINVAL;
-+        }
-+    } else if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_CROSS_VCPU)) {
-+        init.features[0] = 1 << KVM_ARM_VCPU_CROSS;
-+        if (kvm_vm_ioctl(cs->kvm_state, KVM_ARM_PREFERRED_TARGET, &init) < 0) {
-+            return -EINVAL;
-+        }
-+
-+        if (init.target != (cpu->midr & 0xFF00FFF0) || heterogeneous) {
-+            cpu->kvm_target = QEMU_KVM_ARM_TARGET_GENERIC_V8;
-+            cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_CROSS;
-+            cross = true;
-+       }
-+    }
-+
-     /* Do KVM_ARM_VCPU_INIT ioctl */
-     ret = kvm_arm_vcpu_init(cs);
-     if (ret) {
-         return ret;
-     }
- 
-+    if (cross) {
-+        ret = kvm_arm_set_id_registers(cs);
-+        if (ret) {
-+            fprintf(stderr, "set vcpu ID registers failed\n");
-+            return ret;
-+        }
-+    }
-+
-     /*
-      * When KVM is in use, PSCI is emulated in-kernel and not by qemu.
-      * Currently KVM has its own idea about MPIDR assignment, so we
+Regards,
+Daniel
 -- 
-2.0.4
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
