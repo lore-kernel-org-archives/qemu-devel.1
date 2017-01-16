@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cT2Cd-00053R-Tc
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:59:45 -0500
+	(envelope-from <peterx@redhat.com>) id 1cT2Cp-000592-40
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:59:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cT2Ca-0006uU-SE
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:59:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35906)
+	(envelope-from <peterx@redhat.com>) id 1cT2Cm-0006vq-1A
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:59:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57590)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cT2Ca-0006uH-JQ
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:59:40 -0500
-References: <1484376662-32063-1-git-send-email-thuth@redhat.com>
-	<2296ffa3-8bb9-4652-ebd6-4da5b09596ca@vivier.eu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1ed4fded-4468-16cd-96e2-f70c1b85ab7d@redhat.com>
-Date: Mon, 16 Jan 2017 08:59:33 +0100
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cT2Cl-0006vf-Ot
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:59:51 -0500
+Date: Mon, 16 Jan 2017 15:59:47 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170116075947.GF30108@pxdev.xzpeter.org>
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+	<1484276800-26814-12-git-send-email-peterx@redhat.com>
+	<c5b536a1-1f7b-965d-04b6-4f6bde19733f@redhat.com>
+	<20170116073116.GC30108@pxdev.xzpeter.org>
+	<97339915-c8fb-cfd5-aa06-b795eab21428@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2296ffa3-8bb9-4652-ebd6-4da5b09596ca@vivier.eu>
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <97339915-c8fb-cfd5-aa06-b795eab21428@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/core/null-machine: Add the possibility
- to instantiate a CPU, RAM and kernel
+Subject: Re: [Qemu-devel] [PATCH RFC v3 11/14] intel_iommu: provide its own
+ replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-On 14.01.2017 12:03, Laurent Vivier wrote:
-> Le 14/01/2017 =C3=A0 07:51, Thomas Huth a =C3=A9crit :
->> Sometimes it is useful to have just a machine with CPU and RAM, withou=
-t
->> any further hardware in it, e.g. if you just want to do some instructi=
-on
->> debugging for TCG with a remote GDB attached to QEMU, or run some embe=
-dded
->> code with the "-semihosting" QEMU parameter. qemu-system-m68k already
->> features a "dummy" machine, and xtensa a "sim" machine for exactly thi=
-s
->> purpose.
->> All target architectures have nowadays also a "none" machine, which wo=
-uld
->> be a perfect match for this, too - but it currently does not allow to =
-add
->> CPU, RAM or a kernel yet. Thus let's add these possibilities in a gene=
-ric
->> way to the "none" machine, too, so that we hopefully do not need addit=
-ional
->> "dummy" machines in the future anymore (and maybe can also get rid of =
-the
->> already existing "dummy"/"sim" machines one day).
->> Note that the default behaviour of the "none" machine is not changed, =
-i.e.
->> no CPU and no RAM is instantiated by default. You've explicitely got t=
-o
->> specify the CPU model with "-cpu" and the amount of RAM with "-m" to g=
-et
->> these new features.
+On Mon, Jan 16, 2017 at 03:47:08PM +0800, Jason Wang wrote:
 >=20
-> Did you try to use the generic-loader to load the kernel?
 >=20
-> Something like "-device loader,file=3Dvmlinux" instead of adding this p=
-art
-> in the none machine?
+> On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 15:31, Peter Xu wrote:
+> >On Fri, Jan 13, 2017 at 05:26:06PM +0800, Jason Wang wrote:
+> >>
+> >>On 2017=E5=B9=B401=E6=9C=8813=E6=97=A5 11:06, Peter Xu wrote:
+> >>>The default replay() don't work for VT-d since vt-d will have a huge
+> >>>default memory region which covers address range 0-(2^64-1). This wi=
+ll
+> >>>normally bring a dead loop when guest starts.
+> >>I think it just takes too much time instead of dead loop?
+> >Hmm, I can touch the commit message above to make it more precise.
+> >
+> >>>The solution is simple - we don't walk over all the regions. Instead=
+, we
+> >>>jump over the regions when we found that the page directories are em=
+pty.
+> >>>It'll greatly reduce the time to walk the whole region.
+> >>Yes, the problem is memory_region_is_iommu_reply() not smart because:
+> >>
+> >>- It doesn't understand large page
+> >>- try go over all possible iova
+> >>
+> >>So I'm thinking to introduce something like iommu_ops->iova_iterate()=
+ which
+> >>
+> >>1) accept an start iova and return the next exist map
+> >>2) understand large page
+> >>3) skip unmapped iova
+> >Though I haven't tested with huge pages yet, but this patch should
+> >both solve above issue? I don't know whether you went over the page
+> >walk logic - it should both support huge page, and it will skip
+> >unmapped iova range (at least that's my goal to have this patch). In
+> >that case, looks like this patch is solving the same problem? :)
+> >(though without introducing iova_iterate() interface)
+> >
+> >Please correct me if I misunderstood it.
+>=20
+> Kind of :) I'm fine with this patch, but just want:
+>=20
+> - reuse most of the codes in the patch
+> - current memory_region_iommu_replay() logic
+>=20
+> So what I'm suggesting is a just slight change of API which can let cal=
+ler
+> decide it need to do with each range of iova. So it could be reused for
+> other things except for replaying.
+>=20
+> But if you like to keep this patch as is, I don't object it.
 
-It does not work by default - because we need a way to set the CPU's
-program counter to the entry point of the ELF file.
-But I think the users also expect the "-kernel" parameter to be working,
-so I think we should add the loader code in null-machine.c anyway.
+I see. Then I can understand your mean here. I had the same thought
+before, that's why I exposed the vtd_page_walk with a hook. If you
+check the page_walk function comment:
 
-> Perhaps we could also add a cpu this way, as they are already available
-> in the device list for the machine that allows hotplug.
+/**
+ * vtd_page_walk - walk specific IOVA range, and call the hook
+ *
+ * @ce: context entry to walk upon
+ * @start: IOVA address to start the walk
+ * @end: IOVA range end address (start <=3D addr < end)
+ * @hook_fn: the hook that to be called for each detected area
+ * @private: private data for the hook function
+ */
 
-The only machine that allows hot-plugging of CPUs with the device
-interface is ppc64 spapr, as far as I know. So this does not help with
-embedded boards like m68k or xtensa. Also I think you need some
-additional magic like a bus where the CPUs could be attached, and maybe
-firmware interfaces, so this does not fit the idea of an embedded board
-very well.
+So I didn't implement the notification in page_walk at all - but in
+the hook_fn. If any caller that is interested in doing something else
+rather than the notification, we can just simply export the page walk
+interface and provide his/her own "hook_fn", then it'll be triggered
+for each valid page (no matter a huge/small one).
 
-> With the same idea, we could also have a "-device ram,size=3DXXX" to ad=
-d
-> ram (not DIMM).
+If we can have a more general interface in the future - no matter
+whether we call it iova_iterate() or something else (I'll prefer the
+hooker way to do it, so maybe a common page walker with a hook
+function), we can do it simply (at least for Intel platform) based on
+this vtd_page_walk thing.
 
-That might be useful indeed, but mainly because some embedded boards
-expect some additinal RAM at a higher, non-zero addresses, too.
+Thanks,
 
-> I think is is the idea behind the none machine:
-[...]
->     This
->     also provides a mode that we can use in the future to construct mac=
-hines
->     entirely through QMP commands.
-
-We're still very far away from the possibility that everything could be
-constructed on the fly. (Embedded) CPUs, RAM, buses ... all that is not
-really pluggable yet. So I think my patch is a good first step into this
-direction to get at least an initial playground for a machine that can
-be defined by the user.
-
- Thomas
+-- peterx
