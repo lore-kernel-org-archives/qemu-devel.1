@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cTGkd-0000IK-2z
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:49 -0500
+	(envelope-from <marex@denx.de>) id 1cTHUv-0004My-VY
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:19:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cTGkZ-0000zM-Vs
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:47 -0500
-Date: Tue, 17 Jan 2017 08:36:17 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170116213617.GF15853@umbus>
-References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
-	<1484288903-18807-5-git-send-email-sjitindarsingh@gmail.com>
+	(envelope-from <marex@denx.de>) id 1cTHUs-000522-OT
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:19:37 -0500
+Received: from mail-out.m-online.net ([212.18.0.9]:41557)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cTHUs-00051q-Eq
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:19:34 -0500
+References: <20161231132226.9595-1-marex@denx.de>
+	<20161231132226.9595-5-marex@denx.de>
+	<e3bb53cc-e0d6-9eb7-33d8-ad23b4f70d3c@suse.de>
+From: Marek Vasut <marex@denx.de>
+Message-ID: <90d759c5-2dbe-f14e-6b4a-a91bdd9e5df1@denx.de>
+Date: Tue, 17 Jan 2017 00:18:34 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qp4W5+cUSnZs0RIF"
-Content-Disposition: inline
-In-Reply-To: <1484288903-18807-5-git-send-email-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 04/17] target/ppc/POWER9: Add ISAv3.00
- MMU definition
+In-Reply-To: <e3bb53cc-e0d6-9eb7-33d8-ad23b4f70d3c@suse.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V4 5/7] nios2: Add periodic timer emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,118 +28,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
+To: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
+Cc: Jeff Da Silva <jdasilva@altera.com>, Chris Wulff <crwulff@gmail.com>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>, Ley Foon Tan <lftan@altera.com>
+
+On 01/16/2017 11:36 PM, Alexander Graf wrote:
+> 
+> 
+> On 31/12/2016 14:22, Marek Vasut wrote:
+>> From: Chris Wulff <crwulff@gmail.com>
+>>
+>> Add the Altera timer model.
+>>
+>> Signed-off-by: Marek Vasut <marex@denx.de>
+>> Cc: Chris Wulff <crwulff@gmail.com>
+>> Cc: Jeff Da Silva <jdasilva@altera.com>
+>> Cc: Ley Foon Tan <lftan@altera.com>
+>> Cc: Sandra Loosemore <sandra@codesourcery.com>
+>> Cc: Yves Vandervennet <yvanderv@altera.com>
+>> ---
+>> V3: Checkpatch cleanup
+>> V4: Rebase on top of qemu/master
+>> ---
+>>  hw/timer/Makefile.objs  |   1 +
+>>  hw/timer/altera_timer.c | 237
+>> ++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 238 insertions(+)
+>>  create mode 100644 hw/timer/altera_timer.c
+>>
+>> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+>> index 7ba8c23..0867a64 100644
+>> --- a/hw/timer/Makefile.objs
+>> +++ b/hw/timer/Makefile.objs
+>> @@ -18,6 +18,7 @@ common-obj-$(CONFIG_IMX) += imx_gpt.o
+>>  common-obj-$(CONFIG_LM32) += lm32_timer.o
+>>  common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
+>>
+>> +obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
+>>  obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
+>>  obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
+>>  obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
+>> diff --git a/hw/timer/altera_timer.c b/hw/timer/altera_timer.c
+>> new file mode 100644
+>> index 0000000..885242b
+>> --- /dev/null
+>> +++ b/hw/timer/altera_timer.c
+>> @@ -0,0 +1,237 @@
+>> +/*
+>> + * QEMU model of the Altera timer.
+>> + *
+>> + * Copyright (c) 2012 Chris Wulff <crwulff@gmail.com>
+>> + *
+>> + * This library is free software; you can redistribute it and/or
+>> + * modify it under the terms of the GNU Lesser General Public
+>> + * License as published by the Free Software Foundation; either
+>> + * version 2.1 of the License, or (at your option) any later version.
+>> + *
+>> + * This library is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>> + * Lesser General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU Lesser General Public
+>> + * License along with this library; if not, see
+>> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qemu-common.h"
+>> +#include "qapi/error.h"
+>> +
+>> +#include "hw/sysbus.h"
+>> +#include "sysemu/sysemu.h"
+>> +#include "hw/ptimer.h"
+>> +
+>> +#define R_STATUS      0
+>> +#define R_CONTROL     1
+>> +#define R_PERIODL     2
+>> +#define R_PERIODH     3
+>> +#define R_SNAPL       4
+>> +#define R_SNAPH       5
+>> +#define R_MAX         6
+>> +
+>> +#define STATUS_TO     0x0001
+>> +#define STATUS_RUN    0x0002
+>> +
+>> +#define CONTROL_ITO   0x0001
+>> +#define CONTROL_CONT  0x0002
+>> +#define CONTROL_START 0x0004
+>> +#define CONTROL_STOP  0x0008
+>> +
+>> +#define TYPE_ALTERA_TIMER "ALTR.timer"
+>> +#define ALTERA_TIMER(obj) \
+>> +    OBJECT_CHECK(AlteraTimer, (obj), TYPE_ALTERA_TIMER)
+>> +
+>> +typedef struct AlteraTimer {
+>> +    SysBusDevice  busdev;
+>> +    MemoryRegion  mmio;
+>> +    qemu_irq      irq;
+>> +    uint32_t      freq_hz;
+>> +    QEMUBH       *bh;
+>> +    ptimer_state *ptimer;
+>> +    uint32_t      regs[R_MAX];
+>> +} AlteraTimer;
+>> +
+>> +static int timer_irq_state(AlteraTimer *t)
+>> +{
+>> +    bool irq = (t->regs[R_STATUS] & STATUS_TO) &&
+>> +               (t->regs[R_CONTROL] & CONTROL_ITO);
+>> +    return irq;
+>> +}
+>> +
+>> +static uint64_t timer_read(void *opaque, hwaddr addr,
+>> +                           unsigned int size)
+>> +{
+>> +    AlteraTimer *t = opaque;
+>> +    uint64_t r = 0;
+>> +
+>> +    addr >>= 2;
+>> +    addr &= 0x7;
+> 
+> You don't need that & here (and below). The ANDing of addresses stems
+> from pre-memregion days where you would get the physical address as
+> "addr" argument rather than the offset in your region.
+> 
+>> +    switch (addr) {
+>> +    case R_CONTROL:
+>> +        r = t->regs[R_CONTROL] & (CONTROL_ITO | CONTROL_CONT);
+>> +        break;
+>> +
+>> +    default:
+>> +        if (addr < ARRAY_SIZE(t->regs)) {
+>> +            r = t->regs[addr];
+>> +        }
+>> +        break;
+>> +    }
+>> +
+>> +    return r;
+>> +}
+>> +
+>> +static void timer_write(void *opaque, hwaddr addr,
+>> +                        uint64_t value, unsigned int size)
+>> +{
+>> +    AlteraTimer *t = opaque;
+>> +    uint64_t tvalue;
+>> +    uint32_t count = 0;
+>> +    int irqState = timer_irq_state(t);
+>> +
+>> +    addr >>= 2;
+>> +    addr &= 0x7;
+> 
+> ^
+> 
+> Other than that, lgtm.
+> 
+> Reviewed-by: Alexander Graf <agraf@suse.de>
+
+Fixed, thanks.
 
 
---qp4W5+cUSnZs0RIF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jan 13, 2017 at 05:28:10PM +1100, Suraj Jitindar Singh wrote:
-> POWER9 processors implement the mmu as defined in version 3.00 of the ISA.
->=20
-> Add a definition for this mmu model and set the POWER9 cpu model to use
-> this mmu model.
->=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> ---
->  target/ppc/cpu-qom.h        | 5 ++++-
->  target/ppc/mmu_helper.c     | 2 ++
->  target/ppc/translate_init.c | 3 +--
->  3 files changed, 7 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> index d46c31a..1577cc8 100644
-> --- a/target/ppc/cpu-qom.h
-> +++ b/target/ppc/cpu-qom.h
-> @@ -86,10 +86,13 @@ enum powerpc_mmu_t {
->      POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
->                               | POWERPC_MMU_64K
->                               | POWERPC_MMU_AMR | 0x00000004,
-> -    /* FIXME Add POWERPC_MMU_3_OO defines */
->      /* Architecture 2.07 "degraded" (no 1T segments)           */
->      POWERPC_MMU_2_07a      =3D POWERPC_MMU_64 | POWERPC_MMU_AMR
->                               | 0x00000004,
-> +    /* Architecture 3.00 variant                               */
-> +    POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> +                             | POWERPC_MMU_64K
-> +                             | POWERPC_MMU_AMR | 0x00000005,
-
-Hmm.  I guess it works for now, but I'm not really sure that having
-this include POWERPC_MMU_64 is a great idea.  The name is kind of
-misleading, but I'm pretty sure a number of places assume that the
-POWERPC_MMU_64 bitindicates a 64-bit *hash* MMU, which is no longer
-really the case.
-
->  };
-> =20
->  /***********************************************************************=
-******/
-> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> index d09fc0a..2ab4562 100644
-> --- a/target/ppc/mmu_helper.c
-> +++ b/target/ppc/mmu_helper.c
-> @@ -1935,6 +1935,7 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
->      case POWERPC_MMU_2_06a:
->      case POWERPC_MMU_2_07:
->      case POWERPC_MMU_2_07a:
-> +    case POWERPC_MMU_3_00:
->  #endif /* defined(TARGET_PPC64) */
->          env->tlb_need_flush =3D 0;
->          tlb_flush(CPU(cpu), 1);
-> @@ -1974,6 +1975,7 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, targe=
-t_ulong addr)
->      case POWERPC_MMU_2_06a:
->      case POWERPC_MMU_2_07:
->      case POWERPC_MMU_2_07a:
-> +    case POWERPC_MMU_3_00:
->          /* tlbie invalidate TLBs for all segments */
->          /* XXX: given the fact that there are too many segments to inval=
-idate,
->           *      and we still don't have a tlb_flush_mask(env, n, mask) i=
-n QEMU,
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index bfc1f24..2402eef 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8838,8 +8838,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->                      (1ull << MSR_PMM) |
->                      (1ull << MSR_RI) |
->                      (1ull << MSR_LE);
-> -    /* Using 2.07 defines until new radix model is added. */
-> -    pcc->mmu_model =3D POWERPC_MMU_2_07;
-> +    pcc->mmu_model =3D POWERPC_MMU_3_00;
->  #if defined(CONFIG_SOFTMMU)
->      pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
->      /* segment page size remain the same */
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---qp4W5+cUSnZs0RIF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYfTzRAAoJEGw4ysog2bOS3Z4QANEVxviCdQhzkNfsLpH74Iog
-Tjo1I8y84hkcvQTuLSeIyj8MUCqK0+NfAPBO8Sdxp5twxyHVkJlupY+Wnjd0EcuT
-bIokOK7k0plGDDA+nCIkxYtSh5HGutJtLpa4t/2Zk+aKRdZdLSsMHvnDgkAZxtAM
-ttCJidR2oVrYyw9z59+bDORO3D8RRg1b1BlX7zGQZ8+E0SK5T64nqdSyirsKV0XQ
-4tnxqBsr+JpG+wYRfe7SwEcUHGP9QvM0abSF88Opoj9kaM9gPgSPN2w+VzsF0OlS
-U6S5vYMunmJ5TbEGBwfOnlVGbxuHIQXe+ff+3+3HFO/qr/L51jyrKD89ftk/Tq2J
-s7WHuCRAJ2D5HbU/NvTpJ6vAYmdUikSWuDn/bqa7Byl/bgfQR2FqpfpyDUuJFBOG
-zBQy2YMWmJ8OqzIqnWRXNeVgTagq37Fosp5TW8lg4L8MAoIQBPDdAxgYkSO2DJ00
-3okk5GEeSCPw3gZys+uOmNCTKOHyl0uctLMfBzZR+7JF+mzwot0tDfc5U8IT8mBY
-QfEX7GcRxmQoyE4aPm7HDFmeKomIk121ec5g1BSps2xA65zxV7jMx8Xg56vVYyHC
-B7o8z50qrzwElNGhoX6+ixQyI0D9pd3cl2Gf38l5ElaltxKhsZp82qsXyV0xTZjG
-l/NvFBDuhTY8LbLkjaS/
-=w9t+
------END PGP SIGNATURE-----
-
---qp4W5+cUSnZs0RIF--
+-- 
+Best regards,
+Marek Vasut
