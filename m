@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTAtY-0007tv-PP
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:16:37 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cTAwi-0002GH-0n
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:19:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTAtX-0005LF-V0
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:16:36 -0500
-References: <20161201020508.24417-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9b2b5e83-a875-745e-4f19-6f9e53f3b9a0@redhat.com>
-Date: Mon, 16 Jan 2017 18:16:22 +0100
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cTAwc-0006bL-Er
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:19:51 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:35551)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cTAwc-0006bB-74
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:19:46 -0500
+Received: by mail-lf0-x243.google.com with SMTP id v186so13474737lfa.2
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 09:19:46 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
+	<001201d26b1b$e5a8ce20$b0fa6a60$@ru>
+	<CAMo8BfJKXOhiPQz8GT6hXNNBXKsz-67iKx9ct9tEwukVLWR3QA@mail.gmail.com>
+	<001201d26cc6$f023ad00$d06b0700$@ru>
+	<CAFEAcA-AMJ33g9hO2k9oGJfDr-Fatk7TY+Sbs_wRC-OfCjWhmQ@mail.gmail.com>
+	<001301d26cce$21ad3d30$6507b790$@ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f2f54dce-0e3f-2718-4b35-1321f5c2ae11@redhat.com>
+Date: Mon, 16 Jan 2017 18:19:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <20161201020508.24417-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SmQGTjDxe5haAXotj2PwdcvJUaxLSdCbi"
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Improve commit invalid base
- message
+In-Reply-To: <001301d26cce$21ad3d30$6507b790$@ru>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SmQGTjDxe5haAXotj2PwdcvJUaxLSdCbi
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <9b2b5e83-a875-745e-4f19-6f9e53f3b9a0@redhat.com>
-Subject: Re: [PATCH] qemu-img: Improve commit invalid base message
-References: <20161201020508.24417-1-mreitz@redhat.com>
-In-Reply-To: <20161201020508.24417-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
-
-On 01.12.2016 03:05, Max Reitz wrote:
-> When trying to invoke qemu-img commit with a base image file name that
-> is not part of the top image's backing chain, the user receives a rathe=
-r
-> plain "Base not found" error message. This is not really helpful becaus=
-e
-> it does not explain what "not found" means, potentially leaving the use=
-r
-> wondering why qemu cannot find a file despite it clearly existing in th=
-e
-> file system.
->=20
-> Improve the error message by clarifying that "not found" means "not
-> found in the top image's backing chain".
->=20
-> Reported-by: Ala Hino <ahino@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> Reported in: https://bugzilla.redhat.com/show_bug.cgi?id=3D1390991
-> ---
->  qemu-img.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-
-Applied to my block tree.
-
-Max
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>
+Cc: 'Alex Bligh' <alex@alex.org.uk>, 'Max Filippov' <jcmvbkbc@gmail.com>, 'qemu-devel' <qemu-devel@nongnu.org>, 'Pavel Dovgaluk' <Pavel.Dovgaluk@ispras.ru>, 'Richard Henderson' <rth@twiddle.net>
 
 
---SmQGTjDxe5haAXotj2PwdcvJUaxLSdCbi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+On 12/01/2017 13:19, Pavel Dovgalyuk wrote:
+>> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+>> On 12 January 2017 at 11:28, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+>>>> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
+>>>> Ok, looks like what happens in my case is that instruction that
+>>>> sets CCOMPARE and thus changes remaining icount does not
+>>>> cause exit from the cpu_exec. So merely ending TB on
+>>>> QEMU_CLOCK_VIRTUAL timer update is not enough, I need to
+>>>> throw an exception of some kind? Or does the timer code need
+>>>> to take care of that?
+>>>
+>>> Yes, it seems that you should end the block with an exception,
+>>> to allow icount loop recalculate the timeouts.
+>>
+>> Really? The ARM translate.c doesn't generate an exception.
+>> It just does
+>>  gen_io_end();
+>>  gen_lookup_tb();
+>>
+>> (so we force a lookup of the next TB, but don't throw an
+>> exception of any kind).
+> 
+> Maybe I missing something. As far as I understand, changing the virtual timer 
+> notifies the iothread and os_host_main_loop_wait kicks the CPU thread.
+> 
+> But within that period of time before changing the timer and kicking the thread
+> CPU may proceed some instructions and the timer will be expired if it was set
+> to one of the soonest instructions.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh8/+cSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AUToIAKlA8GPdrkL4aOnXT7tpgM70zrU8vAcJ
-diJBlEOGE91WXXGXY8zizYo/5MaWMFZAqYE6G0SDFRyJlMANt4rPQftMJqMu6qal
-JCGSCKdDf3KCZKoZK70u0lXt00yPiadJqUi5pgaR+d8MCU1ikHv3fNkIgWyqvEFS
-wQmHrQsFGEEcKmcIYXxcNfsGsflzp+cFvEurOsEw/yLJyrQdCRL0YUpH7KpOwPo2
-YWwODzLAbBAqFVVz7m01Pn5pUkij5d28ylMFPyAj3Sre74xczS7PfjORuhxYTuS8
-fG+c/iqHdMezD0NOyEwdqq1U284p16DLFHYEwR7iICxDm88HpAiwZYY=
-=2zXb
------END PGP SIGNATURE-----
+My understanding (which may be wrong!) was that after gen_io_end you 
+would exit with TB_EXIT_ICOUNT_EXPIRED and cpu->icount_decr.u16.high = 
+-1, but indeed I don't see anything that calls cpu_interrupt in that 
+path.
 
---SmQGTjDxe5haAXotj2PwdcvJUaxLSdCbi--
+Maybe something like this:
+
+diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+index 050de59..c20d193 100644
+--- a/include/exec/gen-icount.h
++++ b/include/exec/gen-icount.h
+@@ -73,6 +73,9 @@ static inline void gen_io_end(void)
+ {
+     TCGv_i32 tmp = tcg_const_i32(0);
+     tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
++    /* Make the next TB exit immediately with TB_EXIT_ICOUNT_EXPIRED.  */
++    tcg_gen_st16_i32(-1, cpu_env,
++                     -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.high));
+     tcg_temp_free_i32(tmp);
+ }
+ 
+
+?
+
+Paolo
