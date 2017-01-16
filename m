@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cT242-0000BN-VW
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:50:52 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cT25W-0001Lf-5s
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:52:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cT23z-0004Gz-SI
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:50:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35996)
+	(envelope-from <jasowang@redhat.com>) id 1cT25T-0004Om-PA
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:52:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55736)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cT23z-0004Go-JU
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:50:47 -0500
-Date: Mon, 16 Jan 2017 15:50:43 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170116075043.GE30108@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cT25T-0004Nx-J6
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:52:19 -0500
 References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-14-git-send-email-peterx@redhat.com>
-	<7a8c721d-8a12-9727-feae-58103942fd55@redhat.com>
+	<1484276800-26814-13-git-send-email-peterx@redhat.com>
+	<397afe71-b4cd-ba48-6d76-a7b27e1128f9@redhat.com>
+	<20170116074359.GD30108@pxdev.xzpeter.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <8efe289b-e26a-60bc-51ae-582beff069fb@redhat.com>
+Date: Mon, 16 Jan 2017 15:52:10 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7a8c721d-8a12-9727-feae-58103942fd55@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 13/14] intel_iommu: allow dynamic
- switch of IOMMU region
+In-Reply-To: <20170116074359.GD30108@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC v3 12/14] intel_iommu: do replay when
+ context invalidate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Peter Xu <peterx@redhat.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
 
-On Mon, Jan 16, 2017 at 02:20:31PM +0800, Jason Wang wrote:
 
-[...]
 
-> >diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> >index fd75112..2596f11 100644
-> >--- a/hw/i386/intel_iommu.c
-> >+++ b/hw/i386/intel_iommu.c
-> >@@ -1343,9 +1343,49 @@ static void vtd_handle_gcmd_sirtp(IntelIOMMUState *s)
-> >      vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_IRTPS);
-> >  }
-> >+static void vtd_switch_address_space(VTDAddressSpace *as, bool iommu_enabled)
-> 
-> Looks like you can check s->dmar_enabled here?
+On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 15:43, Peter Xu wrote:
+> On Mon, Jan 16, 2017 at 01:53:54PM +0800, Jason Wang wrote:
+>>
+>> On 2017=E5=B9=B401=E6=9C=8813=E6=97=A5 11:06, Peter Xu wrote:
+>>> Before this one we only invalidate context cache when we receive cont=
+ext
+>>> entry invalidations. However it's possible that the invalidation also
+>>> contains a domain switch (only if cache-mode is enabled for vIOMMU).
+>> So let's check for CM before replaying?
+> When CM is not set, there should have no device needs
+> IOMMU_NOTIFIER_MAP notifies. So IMHO it won't hurt if we replay here
+> (so the notifier_list will only contain UNMAP notifiers at most, and
+> sending UNMAP to those devices should not affect them at all).
+>
+> If we check CM before replay, it'll be faster when guest change iommu
+> domain for a specific device. But after all this kind of operation is
+> extremely rare, while if we check CM bit, we have a "assumption" in
+> the code that MAP is depending on CM. In that case, to make the codes
+> cleaner, I'd slightly prefer not check it here. How do you think?
 
-Yes, we need to check old state in case we don't need a switch at all.
-Actually I checked it...
+Ok, I think maybe it's better to add a comment here.
 
-> 
-> >+{
-> >+    assert(as);
-> >+
-> >+    trace_vtd_switch_address_space(pci_bus_num(as->bus),
-> >+                                   VTD_PCI_SLOT(as->devfn),
-> >+                                   VTD_PCI_FUNC(as->devfn),
-> >+                                   iommu_enabled);
-> >+
-> >+    /* Turn off first then on the other */
-> >+    if (iommu_enabled) {
-> >+        memory_region_set_enabled(&as->sys_alias, false);
-> >+        memory_region_set_enabled(&as->iommu, true);
-> >+    } else {
-> >+        memory_region_set_enabled(&as->iommu, false);
-> >+        memory_region_set_enabled(&as->sys_alias, true);
-> >+    }
-> >+}
+Thanks
 
-[...]
-
-> >  /* Handle Translation Enable/Disable */
-> >  static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
-> >  {
-> >+    if (s->dmar_enabled == en) {
-> >+        return;
-> >+    }
-> >+
-
-... here :) ... and ...
-
-[...]
-
-> >+        memory_region_init_alias(&vtd_dev_as->sys_alias, OBJECT(s),
-> >+                                 "vtd_sys_alias", get_system_memory(),
-> >+                                 0, memory_region_size(get_system_memory()));
-> >          memory_region_init_io(&vtd_dev_as->iommu_ir, OBJECT(s),
-> >                                &vtd_mem_ir_ops, s, "intel_iommu_ir",
-> >                                VTD_INTERRUPT_ADDR_SIZE);
-> >-        memory_region_add_subregion(&vtd_dev_as->iommu, VTD_INTERRUPT_ADDR_FIRST,
-> >-                                    &vtd_dev_as->iommu_ir);
-> >-        address_space_init(&vtd_dev_as->as,
-> >-                           &vtd_dev_as->iommu, name);
-> >+        memory_region_init(&vtd_dev_as->root, OBJECT(s),
-> >+                           "vtd_root", UINT64_MAX);
-> >+        memory_region_add_subregion_overlap(&vtd_dev_as->root,
-> >+                                            VTD_INTERRUPT_ADDR_FIRST,
-> >+                                            &vtd_dev_as->iommu_ir, 64);
-> >+        address_space_init(&vtd_dev_as->as, &vtd_dev_as->root, name);
-> >+        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-> >+                                            &vtd_dev_as->sys_alias, 1);
-> >+        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-> >+                                            &vtd_dev_as->iommu, 1);
-> >+        vtd_switch_address_space(vtd_dev_as, s->dmar_enabled);
-
-... here I also used vtd_switch_address_space() to setup the init
-state of the regions (in order to share the codes). So how about I
-rename vtd_switch_address_space() into something like
-vtd_setup_address_space(), to avoid misunderstanding?
-
-Thanks,
-
--- peterx
+>
+> Thanks,
+>
+> -- peterx
+>
