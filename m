@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEFM-0002FT-MQ
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:21 -0500
+	(envelope-from <lersek@redhat.com>) id 1cTEFh-0002gP-35
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEFL-0004I9-Me
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:20 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 16 Jan 2017 21:51:04 +0100
-Message-Id: <20170116205110.32105-2-mreitz@redhat.com>
-In-Reply-To: <20170111181432.18868-1-mreitz@redhat.com>
-References: <20170111181432.18868-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 19/25] block: Add
- BlockDriver.bdrv_gather_child_options
+	(envelope-from <lersek@redhat.com>) id 1cTEFe-0004Jx-3U
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54854)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cTEFd-0004Jq-TO
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:38 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 00FDE8553D
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 20:51:38 +0000 (UTC)
+References: <20170112182446.9600-1-lersek@redhat.com>
+	<20170112182446.9600-2-lersek@redhat.com>
+	<20170113143433.282c9a81@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <9de0640d-fc7f-eb52-9410-77494f29077e@redhat.com>
+Date: Mon, 16 Jan 2017 21:51:34 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170113143433.282c9a81@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 wave 2 1/3] hw/isa/lpc_ich9: add SMI
+ feature negotiation via fw_cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,125 +35,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Some follow-up patches will rework the way bs->full_open_options is
-refreshed in bdrv_refresh_filename(). The new implementation will remove
-the need for the block drivers' bdrv_refresh_filename() implementations
-to set bs->full_open_options; instead, it will be generic and use static
-information from each block driver.
+On 01/13/17 14:34, Igor Mammedov wrote:
+> On Thu, 12 Jan 2017 19:24:44 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+> [...]
+>> +static void smi_features_ok_callback(void *opaque)
+>> +{
+>> +    ICH9LPCState *lpc = opaque;
+>> +    uint64_t guest_features;
+>> +
+>> +    if (lpc->smi_features_ok) {
+>> +        /* negotiation already complete, features locked */
+>> +        return;
+>> +    }
+>> +
+>> +    memcpy(&guest_features, lpc->smi_guest_features_le, sizeof guest_features);
+>> +    le64_to_cpus(&guest_features);
+>> +    if (guest_features & ~lpc->smi_host_features) {
+>> +        /* guest requests invalid features, leave @features_ok at zero */
+>> +        return;
+>> +    }
+>> +
+>> +    /* valid feature subset requested, lock it down, report success */
+>> +    lpc->smi_negotiated_features = guest_features;
+>> +    lpc->smi_features_ok = 1;
+>> +}
+> [...]
+> 
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT8_ARRAY(smi_guest_features_le, ICH9LPCState,
+>> +                            sizeof(uint64_t)),
+>> +        VMSTATE_UINT8(smi_features_ok, ICH9LPCState),
+>> +        VMSTATE_UINT64(smi_negotiated_features, ICH9LPCState),
+> 
+> Couldn't smi_negotiated_features be derived from
+> smi_guest_features_le on target side?
 
-However, by implementing bdrv_gather_child_options(), block drivers will
-still be able to override the way the full_open_options of their
-children are incorporated into their own.
+No, that's something we must expressly not do.
 
-We need to implement this function for VMDK because we have to prevent
-the generic implementation from gathering the options of all children:
-It is not possible to specify options for the extents through the
-runtime options.
+The "guest-features" file remains writeable (and back-readable) to the
+guest after feature validation/lockdown (i.e., after selecting
+"features-ok"), it just has no effect on QEMU.
 
-For quorum, the child names that would be used by the generic
-implementation and the ones that we actually want to use differ. See
-quorum_gather_child_options() for more information.
+And, if the guest rewrites "guest-features" between feature lockdown and
+migration, that must have no effect on the target host either. Hence we
+must carry forward the negotiated features originally computed on the
+source host.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- include/block/block_int.h |  1 +
- block/quorum.c            | 30 ++++++++++++++++++++++++++++++
- block/vmdk.c              | 13 +++++++++++++
- 3 files changed, 44 insertions(+)
+Thanks
+Laszlo
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 799c892558..77f4121358 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -130,6 +130,7 @@ struct BlockDriver {
-     int (*bdrv_make_empty)(BlockDriverState *bs);
- 
-     void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
-+    void (*bdrv_gather_child_options)(BlockDriverState *bs, QDict *target);
-     char *(*bdrv_dirname)(BlockDriverState *bs, Error **errp);
- 
-     /* aio */
-diff --git a/block/quorum.c b/block/quorum.c
-index 878b8cfa9a..0a77ed44fd 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1105,6 +1105,35 @@ static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
-     bs->full_open_options = opts;
- }
- 
-+static void quorum_gather_child_options(BlockDriverState *bs, QDict *target)
-+{
-+    BDRVQuorumState *s = bs->opaque;
-+    QList *children_list;
-+    int i;
-+
-+    /* The generic implementation for gathering child options in
-+     * bdrv_refresh_filename() would use the names of the children as specified
-+     * for bdrv_open_child() or bdrv_attach_child(), which is "children.%u" with
-+     * %u being a value (s->next_child_index) that is incremented each time a
-+     * new child is added (and never decremented). Since children can be deleted
-+     * at runtime, there may be gaps in that enumeration. When creating a new
-+     * quorum BDS and specifying the children for it through runtime options,
-+     * the enumeration used there may not have any gaps, though.
-+     *
-+     * Therefore, we have to create a new gap-less enumeration here (which we
-+     * can achieve by simply putting all of the children's full_open_options
-+     * into a QList).
-+     */
-+
-+    children_list = qlist_new();
-+    qdict_put(target, "children", children_list);
-+
-+    for (i = 0; i < s->num_children; i++) {
-+        QINCREF(s->children[i]->bs->full_open_options);
-+        qlist_append(children_list, s->children[i]->bs->full_open_options);
-+    }
-+}
-+
- static char *quorum_dirname(BlockDriverState *bs, Error **errp)
- {
-     /* In general, there are multiple BDSs with different dirnames below this
-@@ -1124,6 +1153,7 @@ static BlockDriver bdrv_quorum = {
-     .bdrv_file_open                     = quorum_open,
-     .bdrv_close                         = quorum_close,
-     .bdrv_refresh_filename              = quorum_refresh_filename,
-+    .bdrv_gather_child_options          = quorum_gather_child_options,
-     .bdrv_dirname                       = quorum_dirname,
- 
-     .bdrv_co_flush_to_disk              = quorum_co_flush,
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 6f6932aa3f..87ac4f0e68 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2287,6 +2287,18 @@ static int vmdk_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-     return 0;
- }
- 
-+static void vmdk_gather_child_options(BlockDriverState *bs, QDict *target)
-+{
-+    /* No children but file and backing can be explicitly specified */
-+    QINCREF(bs->file->bs->full_open_options);
-+    qdict_put(target, "file", bs->file->bs->full_open_options);
-+
-+    if (bs->backing_overridden) {
-+        QINCREF(bs->backing->bs->full_open_options);
-+        qdict_put(target, "backing", bs->backing->bs->full_open_options);
-+    }
-+}
-+
- static QemuOptsList vmdk_create_opts = {
-     .name = "vmdk-create-opts",
-     .head = QTAILQ_HEAD_INITIALIZER(vmdk_create_opts.head),
-@@ -2356,6 +2368,7 @@ static BlockDriver bdrv_vmdk = {
-     .bdrv_get_specific_info       = vmdk_get_specific_info,
-     .bdrv_refresh_limits          = vmdk_refresh_limits,
-     .bdrv_get_info                = vmdk_get_info,
-+    .bdrv_gather_child_options    = vmdk_gather_child_options,
- 
-     .supports_backing             = true,
-     .create_opts                  = &vmdk_create_opts,
--- 
-2.11.0
+> 
+> 
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>> +
+>>  static const VMStateDescription vmstate_ich9_lpc = {
+>>      .name = "ICH9LPC",
+>>      .version_id = 1,
+>> @@ -683,6 +761,7 @@ static const VMStateDescription vmstate_ich9_lpc = {
+>>      },
+>>      .subsections = (const VMStateDescription*[]) {
+>>          &vmstate_ich9_rst_cnt,
+>> +        &vmstate_ich9_smi_feat,
+>>          NULL
+>>      }
+>>  };
+> 
