@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cTCTr-000466-7A
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:58:12 -0500
+	(envelope-from <ilg@livius.net>) id 1cTCVE-000510-Jg
+	for Qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:59:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cTCTn-0001Ex-5W
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:58:11 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:35068)
+	(envelope-from <ilg@livius.net>) id 1cTCVA-0001nF-Ot
+	for Qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:59:36 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34771)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
-	id 1cTCTm-0001Eh-VS
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:58:07 -0500
-Received: by mail-lf0-x243.google.com with SMTP id v186so13771698lfa.2
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 10:58:06 -0800 (PST)
-References: <1483979087-32663-1-git-send-email-clg@kaod.org>
-	<1483979087-32663-12-git-send-email-clg@kaod.org>
-	<b5660d74-0c16-871b-bec0-31a5a6e19f04@gmail.com>
-	<9b1c1700-04cc-9b1e-6fdc-5ac84e5cd42e@kaod.org>
-	<e6c78999-f851-eb32-6244-80e85e0b5190@gmail.com>
-	<64b13418-337d-d3a6-2c65-0add542c9ba8@kaod.org>
-From: "mar.krzeminski" <mar.krzeminski@gmail.com>
-Message-ID: <f36efc32-d25b-0948-6302-0b84ccc3bdda@gmail.com>
-Date: Mon, 16 Jan 2017 19:58:03 +0100
-MIME-Version: 1.0
-In-Reply-To: <64b13418-337d-d3a6-2c65-0add542c9ba8@kaod.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/11] aspeed/smc: handle dummy bytes
- when doing fast reads in command mode
+	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1cTCVA-0001lg-G7
+	for Qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:59:32 -0500
+Received: by mail-wm0-x244.google.com with SMTP id c85so381684wmi.1
+	for <Qemu-devel@nongnu.org>; Mon, 16 Jan 2017 10:59:29 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+From: Liviu Ionescu <ilg@livius.net>
+In-Reply-To: <CAFEAcA-AB98qtJcrLQ=T4PDvg=VM2tTqxALVpZYoYQcd9fySFg@mail.gmail.com>
+Date: Mon, 16 Jan 2017 20:59:25 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <22DFAEB4-7409-4ACC-93A3-901537CC1427@livius.net>
+References: <6205DF8A-7643-432F-88FF-12B1E9DEF5D8@livius.net>
+	<CAFEAcA_CDpXqAAJNdSQpk4MKOorDXqUi_AwsevrHk=pnbrS0NQ@mail.gmail.com>
+	<277E72EB-288A-498F-9208-99EBF09218A6@livius.net>
+	<CAFEAcA_54fL9YHVJLqAZS8p3OftGd-yq7C7k4jSfVGeCzwMPmA@mail.gmail.com>
+	<D1505166-849A-439D-8E78-579F708D53BB@livius.net>
+	<CAFEAcA-AB98qtJcrLQ=T4PDvg=VM2tTqxALVpZYoYQcd9fySFg@mail.gmail.com>
+Subject: Re: [Qemu-devel] CMSIS SVD based peripheral definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,40 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developer <Qemu-devel@nongnu.org>
 
 
+> On 16 Jan 2017, at 20:17, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>=20
+> "reading data that shipped with QEMU
+> and where QEMU won't work at all without it" (the data files
+> are clearly part of the program as a whole and the GPL
+> applies to them even if they don't happen to be binaries);
 
-W dniu 16.01.2017 o 09:18, Cédric Le Goater pisze:
->> I did not notice that this function is also called in writes, isn't it?
->> If yes, dummy cycles are used only during reads so probably CTRL_FREADMODE
->> needs to be tested.
-> yes. I can take care of that in a follow up patchset for
-> dummy support.
->   
-> Dummies in user mode is a bit painful to implement, as I had
-> to snoop into the command flow to catch the fast read op.
-> Not sure this is the right approach so I kept it for later.
-Definitelly wrong, controller should not be aware of tha, fix is still 
-on me :(
+I'm not a lawyer either, but isn't this case similar to packing binary =
+modules with the Linux kernel?=20
 
->
->
-> Did you have time to take look at the other patches adding
-> Command mode and extending the tests ? I should have addressed
-> your comments there.
-Yes, there is one more thing that could be important. It popped out in 
-Sabrelite
-SPI model. The question is does SCM support different CS active (so device
-is active at CS high). Your code assume that SMC will always use CS LOW 
-to activate
-device. If this is not true you might be interested in update this too.
+Regards,
 
-Thanks,
-Marcin
->
-> Thanks,
->
-> C.
->
+Liviu
