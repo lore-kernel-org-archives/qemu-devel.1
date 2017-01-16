@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTEFh-0002gP-35
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:42 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEFq-0002wV-1z
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTEFe-0004Jx-3U
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cTEFd-0004Jq-TO
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:38 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 00FDE8553D
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 20:51:38 +0000 (UTC)
-References: <20170112182446.9600-1-lersek@redhat.com>
-	<20170112182446.9600-2-lersek@redhat.com>
-	<20170113143433.282c9a81@nial.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9de0640d-fc7f-eb52-9410-77494f29077e@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cTEFm-0004LN-VT
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:51:50 -0500
+From: Max Reitz <mreitz@redhat.com>
 Date: Mon, 16 Jan 2017 21:51:34 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170113143433.282c9a81@nial.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 wave 2 1/3] hw/isa/lpc_ich9: add SMI
- feature negotiation via fw_cfg
+Message-Id: <20170116205139.32344-1-mreitz@redhat.com>
+In-Reply-To: <20170111181432.18868-1-mreitz@redhat.com>
+References: <20170111181432.18868-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 20/25] block: Generically refresh runtime
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,75 +20,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 01/13/17 14:34, Igor Mammedov wrote:
-> On Thu, 12 Jan 2017 19:24:44 +0100
-> Laszlo Ersek <lersek@redhat.com> wrote:
-> 
-> [...]
->> +static void smi_features_ok_callback(void *opaque)
->> +{
->> +    ICH9LPCState *lpc = opaque;
->> +    uint64_t guest_features;
->> +
->> +    if (lpc->smi_features_ok) {
->> +        /* negotiation already complete, features locked */
->> +        return;
->> +    }
->> +
->> +    memcpy(&guest_features, lpc->smi_guest_features_le, sizeof guest_features);
->> +    le64_to_cpus(&guest_features);
->> +    if (guest_features & ~lpc->smi_host_features) {
->> +        /* guest requests invalid features, leave @features_ok at zero */
->> +        return;
->> +    }
->> +
->> +    /* valid feature subset requested, lock it down, report success */
->> +    lpc->smi_negotiated_features = guest_features;
->> +    lpc->smi_features_ok = 1;
->> +}
-> [...]
-> 
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_UINT8_ARRAY(smi_guest_features_le, ICH9LPCState,
->> +                            sizeof(uint64_t)),
->> +        VMSTATE_UINT8(smi_features_ok, ICH9LPCState),
->> +        VMSTATE_UINT64(smi_negotiated_features, ICH9LPCState),
-> 
-> Couldn't smi_negotiated_features be derived from
-> smi_guest_features_le on target side?
+Instead of having every block driver which implements
+bdrv_refresh_filename() copy all of the significant runtime options over
+to bs->full_open_options, implement this process generically in
+bdrv_refresh_filename().
 
-No, that's something we must expressly not do.
+This patch only adds this new generic implementation, it does not remove
+the old functionality. This is done in a follow-up patch.
 
-The "guest-features" file remains writeable (and back-readable) to the
-guest after feature validation/lockdown (i.e., after selecting
-"features-ok"), it just has no effect on QEMU.
+With this patch, some superfluous information (that should never have
+been there) may be removed from some JSON filenames, as can be seen in
+the change to iotest 110's reference output.
 
-And, if the guest rewrites "guest-features" between feature lockdown and
-migration, that must have no effect on the target host either. Hence we
-must carry forward the negotiated features originally computed on the
-source host.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block.c                    | 116 ++++++++++++++++++++++++++++++++++++++++++++-
+ tests/qemu-iotests/110.out |   4 +-
+ 2 files changed, 117 insertions(+), 3 deletions(-)
 
-Thanks
-Laszlo
-
-> 
-> 
->> +        VMSTATE_END_OF_LIST()
->> +    }
->> +};
->> +
->>  static const VMStateDescription vmstate_ich9_lpc = {
->>      .name = "ICH9LPC",
->>      .version_id = 1,
->> @@ -683,6 +761,7 @@ static const VMStateDescription vmstate_ich9_lpc = {
->>      },
->>      .subsections = (const VMStateDescription*[]) {
->>          &vmstate_ich9_rst_cnt,
->> +        &vmstate_ich9_smi_feat,
->>          NULL
->>      }
->>  };
-> 
+diff --git a/block.c b/block.c
+index a10ba111bc..a87eb631bc 100644
+--- a/block.c
++++ b/block.c
+@@ -3935,6 +3935,92 @@ out:
+     return to_replace_bs;
+ }
+ 
++/**
++ * Iterates through the list of runtime option keys that are said to be
++ * "significant" for a BDS. An option is called "significant" if it changes a
++ * BDS's data. For example, the null block driver's "size" and "read-zeroes"
++ * options are significant, but its "latency-ns" option is not.
++ *
++ * If a key returned by this function ends with a dot, all options starting with
++ * that prefix are significant.
++ */
++static const char *const *significant_options(BlockDriverState *bs,
++                                              const char *const *curopt)
++{
++    static const char *const global_options[] = {
++        "driver", "filename", "base-directory", NULL
++    };
++
++    if (!curopt) {
++        return &global_options[0];
++    }
++
++    curopt++;
++    if (curopt == &global_options[ARRAY_SIZE(global_options) - 1] && bs->drv) {
++        curopt = bs->drv->sgfnt_runtime_opts;
++    }
++
++    return (curopt && *curopt) ? curopt : NULL;
++}
++
++/**
++ * Copies all significant runtime options from bs->options to the given QDict.
++ * The set of significant option keys is determined by invoking
++ * significant_options().
++ *
++ * Returns true iff any significant option was present in bs->options (and thus
++ * copied to the target QDict) with the exception of "filename" and "driver".
++ * The caller is expected to use this value to decide whether the existence of
++ * significant options prevents the generation of a plain filename.
++ */
++static bool append_significant_runtime_options(QDict *d, BlockDriverState *bs)
++{
++    bool found_any = false;
++    const char *const *option_name = NULL;
++
++    if (!bs->drv) {
++        return false;
++    }
++
++    while ((option_name = significant_options(bs, option_name))) {
++        bool option_given = false;
++
++        assert(strlen(*option_name) > 0);
++        if ((*option_name)[strlen(*option_name) - 1] != '.') {
++            QObject *entry = qdict_get(bs->options, *option_name);
++            if (!entry) {
++                continue;
++            }
++
++            qobject_incref(entry);
++            qdict_put_obj(d, *option_name, entry);
++            option_given = true;
++        } else {
++            const QDictEntry *entry;
++            for (entry = qdict_first(bs->options); entry;
++                 entry = qdict_next(bs->options, entry))
++            {
++                if (strstart(qdict_entry_key(entry), *option_name, NULL)) {
++                    qobject_incref(qdict_entry_value(entry));
++                    qdict_put_obj(d, qdict_entry_key(entry),
++                                  qdict_entry_value(entry));
++                    option_given = true;
++                }
++            }
++        }
++
++        /* While "driver" and "filename" need to be included in a JSON filename,
++         * their existence does not prohibit generation of a plain filename. */
++        if (!found_any && option_given &&
++            strcmp(*option_name, "driver") && strcmp(*option_name, "filename"))
++        {
++            found_any = true;
++        }
++    }
++
++    return found_any;
++}
++
+ static bool append_open_options(QDict *d, BlockDriverState *bs)
+ {
+     const QDictEntry *entry;
+@@ -4093,9 +4179,37 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+         bs->full_open_options = opts;
+     }
+ 
++    /* Gather the options QDict */
++    opts = qdict_new();
++    append_significant_runtime_options(opts, bs);
++
++    if (drv->bdrv_gather_child_options) {
++        /* Some block drivers may not want to present all of their children's
++         * options, or name them differently from BdrvChild.name */
++        drv->bdrv_gather_child_options(bs, opts);
++    } else {
++        QLIST_FOREACH(child, &bs->children, next) {
++            if (child->role == &child_backing && !bs->backing_overridden) {
++                /* We can skip the backing BDS if it has not been overridden */
++                continue;
++            }
++
++            QINCREF(child->bs->full_open_options);
++            qdict_put(opts, child->name, child->bs->full_open_options);
++        }
++
++        if (bs->backing_overridden && !bs->backing) {
++            /* Force no backing file */
++            qdict_put(opts, "backing", qstring_new());
++        }
++    }
++
++    QDECREF(bs->full_open_options);
++    bs->full_open_options = opts;
++
+     if (bs->exact_filename[0]) {
+         pstrcpy(bs->filename, sizeof(bs->filename), bs->exact_filename);
+-    } else if (bs->full_open_options) {
++    } else {
+         QString *json = qobject_to_json(QOBJECT(bs->full_open_options));
+         snprintf(bs->filename, sizeof(bs->filename), "json:%s",
+                  qstring_get_str(json));
+diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
+index e1845d8026..7eb199dd5c 100644
+--- a/tests/qemu-iotests/110.out
++++ b/tests/qemu-iotests/110.out
+@@ -22,12 +22,12 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=t.IMGFMT.b
+ 
+ === Nodes without a common directory ===
+ 
+-image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
++image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "vote-threshold": 1}}
+ file format: IMGFMT
+ virtual size: 64M (67108864 bytes)
+ backing file: t.IMGFMT.base (cannot determine actual path)
+ 
+-image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
++image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "base-directory": "TEST_DIR/", "vote-threshold": 1}}
+ file format: IMGFMT
+ virtual size: 64M (67108864 bytes)
+ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
+-- 
+2.11.0
