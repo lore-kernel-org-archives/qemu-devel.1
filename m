@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTEb1-0005Vz-Su
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:13:45 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEdc-00083F-IX
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:16:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTEay-0001h3-K2
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:13:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50044)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cTEay-0001gL-CB
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:13:40 -0500
-References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
-	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
-	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
-	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
-	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <b6362d69-a544-1b78-fc48-1020e5d0efef@redhat.com>
-Date: Mon, 16 Jan 2017 22:13:36 +0100
+	(envelope-from <mreitz@redhat.com>) id 1cTEdb-00033V-Nr
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:16:24 -0500
+References: <20170103182801.9638-1-berrange@redhat.com>
+	<20170103182801.9638-10-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6c2ac3f6-8321-e744-dacd-213b2b3f53a2@redhat.com>
+Date: Mon, 16 Jan 2017 22:16:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
- as PNP0C02 device
+In-Reply-To: <20170103182801.9638-10-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="S6O7aDEHgeSJf4NTbxgcjda8PUrJGxFq4"
+Subject: Re: [Qemu-devel] [PATCH v1 09/15] qcow: convert QCow to use
+ QCryptoBlock for encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,97 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Leif Lindholm <leif.lindholm@linaro.org>, Andrew Jones <drjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On 01/16/17 20:31, Ard Biesheuvel wrote:
-> On 16 January 2017 at 18:20, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 16 January 2017 at 17:30, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>> On 16 January 2017 at 17:25, Peter Maydell <peter.maydell@linaro.org> wrote:
->>>> On 13 January 2017 at 17:32, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>>>> Linux for arm64 v4.10 and later will complain if the ECAM config space is
->>>>> not reserved in the ACPI namespace:
->>>>>
->>>>>   acpi PNP0A08:00: [Firmware Bug]: ECAM area [mem 0x3f000000-0x3fffffff] not reserved in ACPI namespace
->>>>>
->>>>> The rationale is that OSes that don't consume the MCFG table should still
->>>>> be able to infer that the PCI config space MMIO region is occupied.
->>>>>
->>>>> So update the ACPI table generation routine to add this reservation.
->>>>>
->>>>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>>>> ---
->>>>>  hw/arm/virt-acpi-build.c | 7 +++++++
->>>>>  1 file changed, 7 insertions(+)
->>>>>
->>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>>>> index 085a61117378..50d52f685f68 100644
->>>>> --- a/hw/arm/virt-acpi-build.c
->>>>> +++ b/hw/arm/virt-acpi-build.c
->>>>> @@ -310,6 +310,13 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->>>>>      Aml *dev_rp0 = aml_device("%s", "RP0");
->>>>>      aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
->>>>>      aml_append(dev, dev_rp0);
->>>>> +
->>>>> +    Aml *dev_res0 = aml_device("%s", "RES0");
->>>>> +    aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
->>>>> +    crs = aml_resource_template();
->>>>> +    aml_append(crs, aml_memory32_fixed(base_ecam, size_ecam, AML_READ_WRITE));
->>>>> +    aml_append(dev_res0, aml_name_decl("_CRS", crs));
->>>>> +    aml_append(dev, dev_res0);
->>>>>      aml_append(scope, dev);
->>>>>  }
->>>>
->>>> This needs to be controlled via the machine class back-compat
->>>> machinery in hw/arm/virt.c so that it only happens for virt-2.9
->>>> and later.
->>>>
->>>
->>> Why exactly?
->>
->> Because the "virt-2.8" machine has to present to the guest
->> exactly what "virt" did as of the QEMU 2.8 release, including
->> any bugs or missing things we happened to have in our ACPI
->> tables. This allows cross-version compatibility (including
->> VM migration). Drew will have a more detailed explanation
->> if you need it.
->>
-> 
-> I suspected as much.
-> 
-> But in this case, I am not sure if it is worth the trouble: the
-> generated data is only consumed at boot time by the firmware, and I
-> suppose migration involves freezing a VM, including whatever resident
-> firmware image was used to boot the OS, and so this is unlikely to
-> affect migration.
-> 
-> But I will let Drew explain ...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--S6O7aDEHgeSJf4NTbxgcjda8PUrJGxFq4
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <6c2ac3f6-8321-e744-dacd-213b2b3f53a2@redhat.com>
+Subject: Re: [PATCH v1 09/15] qcow: convert QCow to use QCryptoBlock for
+ encryption
+References: <20170103182801.9638-1-berrange@redhat.com>
+ <20170103182801.9638-10-berrange@redhat.com>
+In-Reply-To: <20170103182801.9638-10-berrange@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-The PCI Firmware Specification (rev 3.1) says in 4.1.2. "MCFG Table
-Description": "The resources can *optionally* be returned in [...]
-EFIGetMemoryMap as reserved memory [...]". (Emphasis mine.) Linux seems
-to *insist* on this kind of reservation however.
+On 03.01.2017 19:27, Daniel P. Berrange wrote:
+> This converts the qcow2 driver to make use of the QCryptoBlock
+> APIs for encrypting image content. This is only wired up to
+> permit use of the legacy QCow encryption format. Users who wish
+> to have the strong LUKS format should switch to qcow2 instead.
+>=20
+> With this change it is now required to use the QCryptoSecret
+> object for providing passwords, instead of the current block
+> password APIs / interactive prompting.
+>=20
+>   $QEMU \
+>     -object secret,id=3Dsec0,filename=3D/home/berrange/encrypted.pw \
+>     -drive file=3D/home/berrange/encrypted.qcow,aes-key-secret=3Dsec0
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/crypto.c       |  10 +++
+>  block/crypto.h       |   9 +++
+>  block/qcow.c         | 184 +++++++++++++++++++++++--------------------=
+--------
+>  qapi/block-core.json |  17 ++++-
+>  4 files changed, 117 insertions(+), 103 deletions(-)
 
-PNP0C02 is "General ID for reserving resources required by PnP
-motherboard registers. (Not device specific.)", according to
-<http://www.plasma-online.de/english/identify/serial/pnp_id_pnp.html>.
-So what this patch does is reserve a memory area through ACPI,
-practically as an unspecified "platform resource".
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-There's an alternative that's contained entirely in the firmware. You
-can cover the MMCONFIG area in ArmVirtQemu with an EfiReservedMemoryType
-memory map entry (by producing an appropriate memalloc HOB in PEI, or by
-calling the appropriate gDS memory space map functions in DXE). OVMF
-does the former (memalloc HOB).
 
-In ArmVirtQemu, we grab the MMCONFIG range from "pci-host-ecam-generic",
-from QEMU's DTB. If you don't dislike the idea, we could cover the range
-as well, right in "ArmVirtPkg/Library/FdtPciPcdProducerLib". That lib
-instance already sets the base address PCD, and makes sure that the
-relevant code is executed only once (in whatever driver module the
-library instance was built into). You could call the gDS functions
-mentioned above from that spot. (The library instance is already
-restricted to DXE_DRIVER and UEFI_DRIVER modules.)
+--S6O7aDEHgeSJf4NTbxgcjda8PUrJGxFq4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks!
-Laszlo
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh9OB8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A0wAH/0fPN9oqsFM1TLaQISoc0C9EpV39d90q
+BUZJdz07b8WtWHm6qmj5vAPDv59ZHT0L5So2aVm7HhXBfmnQmayyFX123j81Z1Vx
+kGQrHedIhE+6I5emaBTNXg4I98b26EvcSZ4XsyMjp/thD19yWHmgW8/u2aFc0y9k
+4xpoJnPthHA/t/2Y7chOzqFSB1ViZhA9+JGJ81coCApvxasrsNftYsFtxS0qzi4N
+8AveASoYtT7vTyMM/sMm1eA8KweBsTUPORKLxzeSPrQzqGCiaOh4Oq1Z7L43JgjW
+3Uwf4q3rxS2DmyH7EdPgG88JEdzgJc756+7BGASbGNw64400Pv0clLE=
+=KjRq
+-----END PGP SIGNATURE-----
+
+--S6O7aDEHgeSJf4NTbxgcjda8PUrJGxFq4--
