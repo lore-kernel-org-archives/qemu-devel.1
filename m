@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTDYl-0002Ou-MX
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:07:21 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cTDaJ-0003NC-AM
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:08:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTDYi-0003L6-RD
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:07:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44018)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTDYi-0003L1-IA
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:07:16 -0500
-Date: Mon, 16 Jan 2017 18:07:13 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170116200713.GE3491@thinpad.lan.raisama.net>
-References: <1484376662-32063-1-git-send-email-thuth@redhat.com>
-	<20170116172503.GA3491@thinpad.lan.raisama.net>
-	<fc0f7df0-f1b3-1e03-6d64-8c234d8b33d9@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc0f7df0-f1b3-1e03-6d64-8c234d8b33d9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/core/null-machine: Add the possibility
- to instantiate a CPU, RAM and kernel
+	(envelope-from <ben@skyportsystems.com>) id 1cTDaG-0004AX-KK
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:08:55 -0500
+Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:34414)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1cTDaG-0004AA-86
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:08:52 -0500
+Received: by mail-pg0-x22b.google.com with SMTP id 14so17913839pgg.1
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 12:08:52 -0800 (PST)
+From: Ben Warren <ben@skyportsystems.com>
+Message-Id: <EE421B2A-48D8-40AE-B6A2-0261F4B1524E@skyportsystems.com>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_C477E2FC-B043-45D0-8904-465406DC0CCF";
+	protocol="application/pkcs7-signature"; micalg=sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Mon, 16 Jan 2017 12:08:49 -0800
+In-Reply-To: <a4fa1114-56b0-e996-2756-d9f2e96ca7c7@redhat.com>
+References: <cover.1484593565.git.ben@skyportsystems.com>
+	<d8737523bcb760c29d8d5ca9bd86800fca9cb3c1.1484594095.git.ben@skyportsystems.com>
+	<a4fa1114-56b0-e996-2756-d9f2e96ca7c7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] docs: vm generation id device's
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,235 +33,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Gal Hammer <ghammer@redhat.com>
 
-On Mon, Jan 16, 2017 at 08:52:28PM +0100, Thomas Huth wrote:
-> On 16.01.2017 18:25, Eduardo Habkost wrote:
-> > On Sat, Jan 14, 2017 at 07:51:02AM +0100, Thomas Huth wrote:
-> >> Sometimes it is useful to have just a machine with CPU and RAM, without
-> >> any further hardware in it, e.g. if you just want to do some instruction
-> >> debugging for TCG with a remote GDB attached to QEMU, or run some embedded
-> >> code with the "-semihosting" QEMU parameter. qemu-system-m68k already
-> >> features a "dummy" machine, and xtensa a "sim" machine for exactly this
-> >> purpose.
-> >> All target architectures have nowadays also a "none" machine, which would
-> >> be a perfect match for this, too - but it currently does not allow to add
-> >> CPU, RAM or a kernel yet. Thus let's add these possibilities in a generic
-> >> way to the "none" machine, too, so that we hopefully do not need additional
-> >> "dummy" machines in the future anymore (and maybe can also get rid of the
-> >> already existing "dummy"/"sim" machines one day).
-> >> Note that the default behaviour of the "none" machine is not changed, i.e.
-> >> no CPU and no RAM is instantiated by default. You've explicitely got to
-> >> specify the CPU model with "-cpu" and the amount of RAM with "-m" to get
-> >> these new features.
-> >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > 
-> > This sounds nice, but I would like initialization code used by
-> > "-machine none" to be generic code usable by other machines,
-> > whenever possible.
-> > 
-> > The CPU and RAM creation probably is simple enough to not deserve
-> > a generic wrapper by now. But the kernel loader probably could be
-> > made reusable in the first version, so existing machines that
-> > already have similar logic could reuse it.
-> > 
-> > I would love to make all machines automatically use new generic
-> > code to create CPUs, allocate RAM, and load a kernel. But
-> > probably this would be hard to do in a single step due to subtle
-> > initialization ordering requirements in each machine init
-> > function.
-> > 
-> > More specific comments below:
-> > 
-> >> ---
-> >>  hw/core/Makefile.objs  |  2 +-
-> >>  hw/core/null-machine.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++++-
-> >>  2 files changed, 81 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> >> index a4c94e5..0b6c0f1 100644
-> >> --- a/hw/core/Makefile.objs
-> >> +++ b/hw/core/Makefile.objs
-> >> @@ -12,7 +12,6 @@ common-obj-$(CONFIG_XILINX_AXI) += stream.o
-> >>  common-obj-$(CONFIG_PTIMER) += ptimer.o
-> >>  common-obj-$(CONFIG_SOFTMMU) += sysbus.o
-> >>  common-obj-$(CONFIG_SOFTMMU) += machine.o
-> >> -common-obj-$(CONFIG_SOFTMMU) += null-machine.o
-> >>  common-obj-$(CONFIG_SOFTMMU) += loader.o
-> >>  common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
-> >>  common-obj-$(CONFIG_SOFTMMU) += register.o
-> >> @@ -20,3 +19,4 @@ common-obj-$(CONFIG_SOFTMMU) += or-irq.o
-> >>  common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
-> >>  
-> >>  obj-$(CONFIG_SOFTMMU) += generic-loader.o
-> >> +obj-$(CONFIG_SOFTMMU) += null-machine.o
-> > 
-> > I'd like to keep null-machine.o in common-obj-y, if possible. We
-> > already have an arch_type variable provided by arch_init.c, maybe
-> > it could also provide arch_endianness?
-> 
-> Yes, that sounds like an idea. Or maybe it's feasible to tweak
-> load_elf(), so it can also be called with the endianess parameter set to
-> "-1", meaning the caller does not care whether the endianess is big or
-> little?
-> 
-> >> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> >> index 0351ba7..b2468ed 100644
-> >> --- a/hw/core/null-machine.c
-> >> +++ b/hw/core/null-machine.c
-> >> @@ -13,18 +13,97 @@
-> >>  
-> >>  #include "qemu/osdep.h"
-> >>  #include "qemu-common.h"
-> >> +#include "qemu/error-report.h"
-> >>  #include "hw/hw.h"
-> >>  #include "hw/boards.h"
-> >> +#include "hw/loader.h"
-> >> +#include "sysemu/sysemu.h"
-> >> +#include "exec/address-spaces.h"
-> >> +#include "cpu.h"
-> >> +#include "elf.h"
-> >> +
-> >> +#ifdef TARGET_WORDS_BIGENDIAN
-> >> +#define LOAD_ELF_ENDIAN_FLAG 1
-> >> +#else
-> >> +#define LOAD_ELF_ENDIAN_FLAG 0
-> >> +#endif
-> >> +
-> >> +static hwaddr cpu_initial_pc;
-> > 
-> > Other architectures and machines probably have something similar
-> > to cpu_initial_pc, so this could be probably be moved to an
-> > existing generic struct. But I am not sure if this would be a
-> > MachineState field or CPUState field.
-> 
-> I'm also not sure whether this makes sense right from the start ... the
-> intial PC handling seems to be slightly different for each board, so
-> trying to generalize this variable sounds quite complicated ... so
-> that's maybe rather something for a later clean-up patch instead.
 
-Yeah. I would love to avoid adding another static variable to
-QEMU, but maybe this is good enough to avoid making the changes
-too intrusive.
+--Apple-Mail=_C477E2FC-B043-45D0-8904-465406DC0CCF
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Anyway, I believe it will be possible to replace
-machine_none_load_kernel() with a simple instantiation of
-TYPE_GENERIC_LOADER, which already takes care of CPU reset.
 
-> 
-> >> +static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
-> >> +{
-> >> +    return cpu_get_phys_page_debug(CPU(opaque), addr);
-> >> +}
-> >> +
-> >> +static void machine_none_load_kernel(CPUState *cpu, const char *kernel_fname,
-> >> +                                     ram_addr_t ram_size)
-> >> +{
-> >> +    uint64_t elf_entry;
-> >> +    int kernel_size;
-> >> +
-> >> +    if (!ram_size) {
-> >> +        error_report("You need RAM for loading a kernel");
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    kernel_size = load_elf(kernel_fname, translate_phys_addr, cpu, &elf_entry,
-> >> +                           NULL, NULL, LOAD_ELF_ENDIAN_FLAG, EM_NONqE, 0, 0);
-> >> +    cpu_initial_pc = elf_entry;
-> >> +    if (kernel_size < 0) {
-> >> +        kernel_size = load_uimage(kernel_fname, &cpu_initial_pc, NULL, NULL,
-> >> +                                  NULL, NULL);
-> >> +    }
-> >> +    if (kernel_size < 0) {
-> >> +        kernel_size = load_image_targphys(kernel_fname, 0, ram_size);
-> >> +    }
-> >> +    if (kernel_size < 0) {
-> >> +        error_report("Could not load kernel '%s'", kernel_fname);
-> >> +        return;
-> >> +    }
-> >> +}
-> > 
-> > Do you know how many different architectures will be able to use
-> > this generic ELF loading logic as-is?
-> 
-> I've only tried m68k and xtensa so far, and it worked there. OpenRISC
-> "or32-sim" machine looks very similar, too. Most other board look
-> slightly different, either lacking the "load_uimage" or
-> "load_image_targphys" (but the generic code might still work there), or
-> having some other magic code inbetween...
+> On Jan 16, 2017, at 11:51 AM, Eric Blake <eblake@redhat.com> wrote:
+>=20
+> On 01/16/2017 01:20 PM, ben@skyportsystems.com =
+<mailto:ben@skyportsystems.com> wrote:
+>> From: Ben Warren <ben@skyportsystems.com =
+<mailto:ben@skyportsystems.com>>
+>=20
+> meta-comment: This message was sent with headers:
+>> Message-Id: =
+<d8737523bcb760c29d8d5ca9bd86800fca9cb3c1.1484594095.git.ben@skyportsystem=
+s.com =
+<mailto:d8737523bcb760c29d8d5ca9bd86800fca9cb3c1.1484594095.git.ben@skypor=
+tsystems.com>>
+>> In-Reply-To: <cover.1484593565.git.ben@skyportsystems.com =
+<mailto:cover.1484593565.git.ben@skyportsystems.com>>
+>> References: <cover.1484593565.git.ben@skyportsystems.com =
+<mailto:cover.1484593565.git.ben@skyportsystems.com>>
+>> In-Reply-To: <cover.1484594095.git.ben@skyportsystems.com =
+<mailto:cover.1484594095.git.ben@skyportsystems.com>>
+>> References: <cover.1484594095.git.ben@skyportsystems.com =
+<mailto:cover.1484594095.git.ben@skyportsystems.com>>
+>=20
+> while your cover letter's actual headers included:
+>> Message-Id: <cover.1484593565.git.ben@skyportsystems.com =
+<mailto:cover.1484593565.git.ben@skyportsystems.com>>
+>=20
+> I don't know how you got your sending side to use two different sets =
+of
+> In-Reply-To, but it breaks at least Thunderbird's abilities to =
+rethread
+> the messages (thunderbird apparently only pays attention to the last
+> header, while only the first one would cause correct threading).
+>=20
+Hmm, I created the patches using =E2=80=9Cgit format-patch=E2=80=9D with =
+the =E2=80=94thread switch, then =E2=80=98git send-email=E2=80=99, which =
+is usually a solid combination.  I=E2=80=99ll dry-run it next time to =
+make sure things are threaded properly.  Sorry.
+>=20
+>>=20
+>> Signed-off-by: Ben Warren <ben@skyportsystems.com =
+<mailto:ben@skyportsystems.com>>
+>> Cc: Gal Hammer <ghammer@redhat.com <mailto:ghammer@redhat.com>>
+>=20
+> If you are basing this patch off of earlier work (for example, you
+> mentioned Igor's work), you may need additional S-o-b lines for work =
+you
+> copied from the earlier versions.
+>=20
+yes, I used a previous patch set as a baseline and want to make sure =
+credit goes to whoever did the real work.  In this case, Gal Hammer was =
+the original author, so I CC=E2=80=99d Him (or her) hoping to get an =
+SOB.  Should that be handled out-of-band?
+>> ---
+>> docs/specs/vmgenid.txt | 38 ++++++++++++++++++++++++++++++++++++++
+>> 1 file changed, 38 insertions(+)
+>> create mode 100644 docs/specs/vmgenid.txt
+>>=20
+>> diff --git a/docs/specs/vmgenid.txt b/docs/specs/vmgenid.txt
+>> new file mode 100644
+>> index 0000000..afc1717
+>> --- /dev/null
+>> +++ b/docs/specs/vmgenid.txt
+>> @@ -0,0 +1,38 @@
+>> +VIRTUAL MACHINE GENERATION ID
+>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+>> +
+>> +Copyright (C) 2016 Red Hat, Inc.
+>=20
+> Claiming Red Hat copyright makes it sound like you are basing this off
+> an earlier version.  That is the correct thing to do if you indeed
+> copied something with Red Hat copyright, but seems weird if you wrote =
+it
+> from scratch.
+Same as above, I reworked much of this document, but a great deal is not =
+my original.  Guidance on the right way to do this is appreciated.
+>=20
+>> +Copyright (C) 2016 Skyport Systems, Inc.
+>=20
+> Do you want to claim 2017 as well?
+>=20
+Good catch, I haven=E2=80=99t touched the file this year, but that makes =
+sense.
+>=20
+>> +
+>> +The vmgenid device is a sysbus device with the ACPI ID =
+"QEMU_Gen_Counter_V1".
+>> +
+>> +The device has one properties, which can be set using the command =
+line
+>=20
+> s/properties/property/
+Will fix.
+>=20
+>> +argument or the QMP interface:
+>> + guid - sets the value of the GUID
+>> +For example:
+>> +QEMU  -device vmgenid,guid=3D"324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+>> +
+>=20
+> --=20
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org =
+<http://libvirt.org/>
 
-I assume we will want to make "-machine none -kernel ..." work on
-those other architectures too, eventually.
+--Apple-Mail=_C477E2FC-B043-45D0-8904-465406DC0CCF
+Content-Disposition: attachment;
+	filename=smime.p7s
+Content-Type: application/pkcs7-signature;
+	name=smime.p7s
+Content-Transfer-Encoding: base64
 
-In this case, we need to keep in mind that this implementation is
-just a generic default implementation, but that may be overridden
-by arch-specific implementations in the future. (Probably through
-a CPUClass::load_kernel hook?)
-
-> 
-> > Probably other machines already have very similar logic, so it
-> > would be nice if we could make this reusable so other machines
-> > don't need to duplicate it.
-> 
-> I can have a try...
-> 
-> >> +static void machine_none_cpu_reset(void *opaque)
-> >> +{
-> >> +    CPUState *cpu = CPU(opaque);
-> >> +
-> >> +    cpu_reset(cpu);
-> >> +    cpu_set_pc(cpu, cpu_initial_pc);
-> >> +}
-> >>  
-> >>  static void machine_none_init(MachineState *machine)
-> >>  {
-> >> +    ram_addr_t ram_size = machine->ram_size;
-> >> +    MemoryRegion *ram;
-> >> +    CPUState *cpu = NULL;
-> >> +
-> >> +    /* Initialize CPU (if a model has been specified) */
-> >> +    if (machine->cpu_model) {
-> >> +        cpu = cpu_init(machine->cpu_model);
-> >> +        if (!cpu) {
-> >> +            error_report("Unable to initialize CPU");
-> >> +            exit(1);
-> >> +        }
-> >> +        qemu_register_reset(machine_none_cpu_reset, cpu);
-> >> +        cpu_reset(cpu);
-> >> +    }
-> > 
-> > This looks like a sign that we need a generic wrapper to create
-> > CPUs. Probably lots of other machines do something very similar.
-> > But I think this is something for later.
-> 
-> I don't think that this sequence can be generalized in a wrapper
-> function so easily: Most other machines apparently do some additional
-> magic between cpu_init() and qemu_register_reset() ... so if we really
-> want to generalize this, this is certainly a task for a separate clean
-> up patch later.
-
-Agreed.
-
-> 
-> >>  static void machine_none_machine_init(MachineClass *mc)
-> >>  {
-> >>      mc->desc = "empty machine";
-> >>      mc->init = machine_none_init;
-> >> -    mc->max_cpus = 0;
-> > 
-> > Does this line removal has any visible effect? vl.c already
-> > interprets max_cpus==0 as the same as max_cpus==1.
-> > 
-> > Maybe we should set max_cpus=1 explicitly to make it clear that
-> > this new code doesn't work if smp_cpus > 1.
-> 
-> You're right, max_cpus = 1 would make more sense here ... I'll change my
-> patch accordingly.
-> 
->  Thomas
-> 
-
--- 
-Eduardo
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
+ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
+MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
+dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
+WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
+c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
+BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
+IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
+51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
+FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
+kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
+aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
+P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
+VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
+AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
+RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
+YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
+cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
+am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
+BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
+nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
+2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
+mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
+VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
+GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
+IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
+NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
+A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
+R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
+gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
+ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
+AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
+uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
+MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
+BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
+UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
+Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
+gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
+dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
+Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
+SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
+iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
+dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
+7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
+TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
+gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
+bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
+NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
+8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMTcwMTE2MjAwODUwWjAjBgkqhkiG9w0BCQQxFgQUcQ0Zox3OvUj//ZLVpPHC+/hE6HUw
+gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
+Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
+BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
+YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
+QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
+KoZIhvcNAQEBBQAEggEArlpQxm5246DHhg4TdJ9+fwoAEafjUWjM52vxn8WHOPkC/Zvbih1wfYat
+NcAHYMPIuypU/r7GAvwDy+nScG/hHO0RkQAy7le31++8jI1HGgQc7dMdYf9pqC2U6OEAbYsTlaY2
+VoT22mwIRHgBdQpXW8nw07YIjET/YK8PnjIvoq5CWHNUu1miDq4QxPaO5SuxRk31NVO/0vL5bHG6
+YOyufo57dqHju1BLvb1cS1aIc3/uQwZsmnm8L45Uztd7KxcqZqmAF2UI4ckBVLb2YUfrneUZccy3
+ut8Te7LO4XMDclDayyGvMD8/jPblXupKHUfcOVrxjEqTLhZVouPWEn0nYgAAAAAAAA==
+--Apple-Mail=_C477E2FC-B043-45D0-8904-465406DC0CCF--
