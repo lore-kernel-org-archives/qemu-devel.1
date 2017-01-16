@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cT6NW-0002cg-Sb
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:27:15 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cT6Tw-00061N-9J
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:33:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cT6NS-0003wr-0p
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:27:14 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:32040 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cT6NR-0003wJ-K6
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:27:09 -0500
-References: <20161214150840.10899-1-alex@alex.org.uk>
-	<e3c30f7c-8d5b-5cfc-1cc0-5e673a30cd8a@virtuozzo.com>
-	<6986E12E-AE0A-4502-BB43-77C4E83C9DC4@alex.org.uk>
-	<dcaf043a-9e76-3be2-1740-e90085928f6a@virtuozzo.com>
-	<5CBA6C86-A5CD-4F88-B8B2-29224BF1223D@alex.org.uk>
-	<c0608208-de6c-fd41-95d7-e73877f8cdba@virtuozzo.com>
-	<D72ADFAF-BCC6-4CF6-AD42-FECFABA9C575@alex.org.uk>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <ef221913-2136-fbcd-e604-8fb1bbbcccdc@virtuozzo.com>
-Date: Mon, 16 Jan 2017 15:26:51 +0300
+	(envelope-from <dgibson@ozlabs.org>) id 1cT6Ts-0006Ro-48
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:33:52 -0500
+Date: Mon, 16 Jan 2017 23:11:04 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170116121104.GC15853@umbus>
+References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
+	<1484288903-18807-3-git-send-email-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <D72ADFAF-BCC6-4CF6-AD42-FECFABA9C575@alex.org.uk>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4jXrM3lyYWu4nBt5"
+Content-Disposition: inline
+In-Reply-To: <1484288903-18807-3-git-send-email-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 02/17] hw/ppc/spapr: Add POWER9 to
+ pseries cpu models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Bligh <alex@alex.org.uk>
-Cc: Wouter Verhelst <w@uter.be>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>
-
-13.01.2017 13:29, Alex Bligh wrote:
->> On 13 Jan 2017, at 09:48, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
->>
->> 12.01.2017 16:11, Alex Bligh wrote:
->>>> On 12 Jan 2017, at 07:05, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
->>>>
->>>> Yes this is better. But is it actually needed to force contexts have some safe default? If context wants it may define such default without this requirement.. So, should it be requirement at all?
->>> I've changed this to:
->>>
->>>      of the file), a server MAY reply with a single block status
->>>      descriptor with *length* matching the requested length, rather than
->>>      reporting the error; in this case the context MAY mandate the
->>>      status returned.
->>>
->>>
->> Hmm, I don't understand. So, it MAY mandate and therefore MAY NOT do it? And what client should think, if server replies with one chunk matching the request length and not mandate the status?
-> Some contexts may mandate a particular value (so for instance the allocation context might mandate 0).
->
-> Some contexts may not mandate a particular value, in which case the interpretation is dependent upon the context (just like any other status value). EG a context which returned an status of 7 if the range contained a prime number, and else 3, could carry on doing that.
->
-> As it doesn't make sense to interpret status returns without an understanding of the particular context, we might as well simply extend this to 'beyond the range' returns - as I think you pointed out!
->
-
- >>> The status flags are intentionally defined so that a server MAY 
-always safely report a status of 0 for any block
-
-- Actually, status flags are _not_ defined. (each context defines it's 
-own status flags)
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
 
 
--- 
-Best regards,
-Vladimir
+--4jXrM3lyYWu4nBt5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 13, 2017 at 05:28:08PM +1100, Suraj Jitindar Singh wrote:
+> Add POWER9 cpu to list of spapr core models which allows it to be specifi=
+ed
+> as the cpu model for a pseries guest (e.g. -machine pseries -cpu POWER9).
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
+I realize you need this first for development, but for submission,
+please move it to the end of the series.  The idea is if you're
+bisecting or iterating through commits, then when the POWER9 option
+appears, it will actually work.  That won't be the case without the
+rest of the patches in the series.
+
+> ---
+>  hw/ppc/spapr_cpu_core.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index c18632b..8cc7058 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -358,6 +358,9 @@ static const char *spapr_core_models[] =3D {
+> =20
+>      /* POWER8NVL */
+>      "POWER8NVL_v1.0",
+> +
+> +    /* POWER9 */
+> +    "POWER9_v1.0",
+>  };
+> =20
+>  void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--4jXrM3lyYWu4nBt5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYfLhWAAoJEGw4ysog2bOSE2YP/iYLnroafVn6NzQKt/xEkpZ4
+VrqkRA7iHQyU33GNJ2ou6Fz4zKURTRKW1wfGvfGwxnMhTXKUXngTBefBtUDaHOcd
+1morMaQxANxLnnxxDiq0zxS6XrTfnbiBEGGolVW5jf6G9CEtKsMxz0XVlZSb2gE5
+aIsPqxM+QpFbc+xRhZAOhyh8+jnFZjNDY46nv8axb2ABGWWJ7rPH7fEwHLBmuZ8Y
+A6BLZ1V9xXlpr3To43ESh7d7PH62w6wG+fC5iUGauY/+EoRkTYMdcA91aPt0qE9Q
+X6SKTAhVSLOX42tY1OjtUX2BfNsi/Fu9QZVPN3M6na5suthF2GIPYsffdbE381JY
+Paqa20yuGB9At1B21I/3pnBiT0mFxfEm9ecESOVmBDmrQyf+wmB1Nzq6WzILrMim
+JBRMOCPCfK7cROEc+k2lfUIwpfyheAy1Mplo20+8lftKd2FP7jKCfuIpbS6TavkR
+lBLbD4PNGLqmZQ4CiAR1NUOi0ylO94TDLcoX0chv1cBbrPmXACb5Z/mG2xmlMTEi
+uB9W92Yy1BFy+ZEhPSE5cXHh0vNfm3x43lABSCackErJsN5ib1Bx6sE9Fm2/JIgQ
+p8EJSEycQQ7y2eXNw8F6XEJNZD9L28qCnWSER7XnKVe3ESkqMo9B9X4Lb0z/v/KR
+NyxwXxUkCyRWUM1OtSx4
+=U3qm
+-----END PGP SIGNATURE-----
+
+--4jXrM3lyYWu4nBt5--
