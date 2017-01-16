@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cTCq4-0002Tg-PY
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:21:09 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cTCq6-0002Uk-AC
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:21:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cTCq2-0007HV-KJ
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:21:08 -0500
-Received: from mail-pf0-x232.google.com ([2607:f8b0:400e:c00::232]:35840)
+	(envelope-from <ben@skyportsystems.com>) id 1cTCq5-0007IV-8p
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:21:10 -0500
+Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:34074)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cTCq2-0007HJ-ET
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:21:06 -0500
-Received: by mail-pf0-x232.google.com with SMTP id 189so55491758pfu.3
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 11:21:06 -0800 (PST)
+	id 1cTCq5-0007I8-3w
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:21:09 -0500
+Received: by mail-pg0-x22c.google.com with SMTP id 14so17666984pgg.1
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 11:21:09 -0800 (PST)
 From: ben@skyportsystems.com
-Date: Mon, 16 Jan 2017 11:20:53 -0800
-Message-Id: <d8737523bcb760c29d8d5ca9bd86800fca9cb3c1.1484594095.git.ben@skyportsystems.com>
+Date: Mon, 16 Jan 2017 11:20:57 -0800
+Message-Id: <625a11ec95fc51d4aae4811a06eab586454e1135.1484594095.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1484593565.git.ben@skyportsystems.com>
 References: <cover.1484593565.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1484594095.git.ben@skyportsystems.com>
 References: <cover.1484594095.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v2 1/6] docs: vm generation id device's
- description
+Subject: [Qemu-devel] [PATCH v2 5/6] qmp/hmp: add set-vm-generation-id
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +30,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ben Warren <ben@skyportsystems.com>, Gal Hammer <ghammer@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>, Eric Blake <eblake@redhat.com>
 
-From: Ben Warren <ben@skyportsystems.com>
+From: Igor Mammedov <imammedo@redhat.com>
+
+Add set-vm-generation-id command to set Virtual Machine
+Generation ID counter.
+
+QMP command example:
+    { "execute": "set-vm-generation-id",
+          "arguments": {
+              "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+          }
+    }
+
+HMP command example:
+    set-vm-generation-id guid=324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
 
 Signed-off-by: Ben Warren <ben@skyportsystems.com>
-Cc: Gal Hammer <ghammer@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
 ---
- docs/specs/vmgenid.txt | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
- create mode 100644 docs/specs/vmgenid.txt
+ hmp-commands.hx  | 13 +++++++++++++
+ hmp.c            | 12 ++++++++++++
+ hmp.h            |  1 +
+ qapi-schema.json | 12 ++++++++++++
+ stubs/vmgenid.c  |  6 ++++++
+ 5 files changed, 44 insertions(+)
 
-diff --git a/docs/specs/vmgenid.txt b/docs/specs/vmgenid.txt
-new file mode 100644
-index 0000000..afc1717
---- /dev/null
-+++ b/docs/specs/vmgenid.txt
-@@ -0,0 +1,38 @@
-+VIRTUAL MACHINE GENERATION ID
-+=============================
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 8819281..56744aa 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1775,5 +1775,18 @@ ETEXI
+     },
+ 
+ STEXI
++@item set-vm-generation-id @var{uuid}
++Set Virtual Machine Generation ID counter to @var{guid}
++ETEXI
 +
-+Copyright (C) 2016 Red Hat, Inc.
-+Copyright (C) 2016 Skyport Systems, Inc.
++    {
++        .name       = "set-vm-generation-id",
++        .args_type  = "guid:s",
++        .params     = "guid",
++        .help       = "Set Virtual Machine Generation ID counter",
++        .cmd = hmp_set_vm_generation_id,
++    },
 +
-+This work is licensed under the terms of the GNU GPL, version 2 or later.
-+See the COPYING file in the top-level directory.
++STEXI
+ @end table
+ ETEXI
+diff --git a/hmp.c b/hmp.c
+index 9ec27ae..a54a312 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2579,3 +2579,15 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
+     }
+     qapi_free_GuidInfo(info);
+ }
 +
-+===
++void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
++{
++    Error *errp = NULL;
++    const char *guid = qdict_get_str(qdict, "guid");
 +
-+The VM generation ID (vmgenid) device is an emulated device which
-+exposes a 128-bit, cryptographically random, integer value identifier.
-+This allows management applications (e.g. libvirt) to notify the guest
-+operating system when the virtual machine is executed with a different
-+configuration (e.g. snapshot execution or creation from a template).
++    qmp_set_vm_generation_id(guid, &errp);
++    if (errp) {
++        hmp_handle_error(mon, &errp);
++        return;
++    }
++}
+diff --git a/hmp.h b/hmp.h
+index 799fd37..e0ac1e8 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -138,5 +138,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
+ void hmp_info_dump(Monitor *mon, const QDict *qdict);
+ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
++void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
+ 
+ #endif
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 2348391..c5ebea4 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4796,3 +4796,15 @@
+ # Since 2.9
+ ##
+ { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
 +
-+This is specified on the web at: http://go.microsoft.com/fwlink/?LinkId=260709
++##
++# @set-vm-generation-id
++#
++# Set Virtual Machine Generation ID
++#
++# @changed: Is the Virtual Machine Generation ID a new value?
++# @guid: new GUID to set as Virtual Machine Generation ID
++#
++# Since 2.9
++##
++{ 'command': 'set-vm-generation-id', 'data': {'guid': 'str'} }
+diff --git a/stubs/vmgenid.c b/stubs/vmgenid.c
+index 8c448ac..d25d41b 100644
+--- a/stubs/vmgenid.c
++++ b/stubs/vmgenid.c
+@@ -6,3 +6,9 @@ GuidInfo *qmp_query_vm_generation_id(Error **errp)
+     error_setg(errp, "this command is not currently supported");
+     return NULL;
+ }
 +
-+---
-+
-+The vmgenid device is a sysbus device with the ACPI ID "QEMU_Gen_Counter_V1".
-+
-+The device has one properties, which can be set using the command line
-+argument or the QMP interface:
-+ guid - sets the value of the GUID
-+For example:
-+QEMU  -device vmgenid,guid="324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-+
-+Or to change guid in runtime use:
-+ set-vm-generation-id guid="124e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-+
-+According to the specification, any change to the GUID executes an
-+ACPI notification. The vmgenid device triggers the \_GPE._E00 handler
-+which executes the ACPI Notify operation.
-+
-+Although not specified in Microsoft's document, it is assumed that the
-+device is expected to use the little-endian system.
++void qmp_set_vm_generation_id(const char *guid, Error **errp)
++{
++    error_setg(errp, "this command is not currently supported");
++    return;
++}
 -- 
 2.7.4
