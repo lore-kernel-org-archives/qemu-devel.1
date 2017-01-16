@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cT2Jb-0002B0-18
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 03:06:55 -0500
+	(envelope-from <armbru@redhat.com>) id 1cT2Lo-0003Wd-6S
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 03:09:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cT2JX-0008Jn-SP
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 03:06:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59602)
+	(envelope-from <armbru@redhat.com>) id 1cT2Ll-0000em-21
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 03:09:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cT2JX-0008Ji-Jf
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 03:06:51 -0500
-Date: Mon, 16 Jan 2017 16:06:47 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170116080647.GH30108@pxdev.xzpeter.org>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-12-git-send-email-peterx@redhat.com>
-	<c5b536a1-1f7b-965d-04b6-4f6bde19733f@redhat.com>
-	<20170116073116.GC30108@pxdev.xzpeter.org>
-	<97339915-c8fb-cfd5-aa06-b795eab21428@redhat.com>
-	<20170116075947.GF30108@pxdev.xzpeter.org>
-	<c86d9658-ca21-dc63-3a99-5d86472f2dc0@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cT2Lk-0000eh-SC
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 03:09:08 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7950EC05680F
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 08:09:08 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1484325849-18314-1-git-send-email-armbru@redhat.com>
+	<0423b2d9-fa4f-86d5-ae08-b5851301120c@redhat.com>
+Date: Mon, 16 Jan 2017 09:09:05 +0100
+In-Reply-To: <0423b2d9-fa4f-86d5-ae08-b5851301120c@redhat.com> (Eric Blake's
+	message of "Fri, 13 Jan 2017 13:27:48 -0600")
+Message-ID: <87o9z7ctpa.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c86d9658-ca21-dc63-3a99-5d86472f2dc0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 11/14] intel_iommu: provide its own
- replay() callback
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 000/180] QAPI patches for 2017-01-13
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, Jan 16, 2017 at 04:03:22PM +0800, Jason Wang wrote:
+Eric Blake <eblake@redhat.com> writes:
 
-[...]
+> On 01/13/2017 10:44 AM, Markus Armbruster wrote:
+>> This is Marc-Andr=C3=A9's "[PATCH v8 00/21] qapi doc generation (whole
+>> version, squashed)" with a few commit messages tweaked, and "[PATCH v8
+>> 14/21] (SQUASHED) move doc to schema" unsquashed into 161 patches.
+>>=20
+>> We did all the respins with in this squashed form to reduce noise.
+>> However, since the unsquashed form is better suited for review, and
+>> probably nicer if we have to revisit this part of the work down the
+>> road, I'm proposing to merge this unsquashed.
+>>=20
+>> If you want me to post the unsquashed patches, I'm happy to redo this
+>> pull request.
+>>=20
+>> If you'd rather pull the squashed version, likewise.
+>>=20
+>> I'm afraid this is a bit of a doc conflict magnet.  The sooner we can
+>> get it in, the easier for Marc-Andr=C3=A9 and me.
+>
+> Indeed - there's already a merge conflict with commit e1ff3c6, which
+> landed between the time you created the pull request and now.
+>
+> Also, in trying to merge your branch locally, I get a rejection message
+> from my git hooks:
+>
+> $ git commit
+> tests/qapi-schema/comments.out:7: new blank line at EOF.
+> tests/qapi-schema/event-case.out:8: new blank line at EOF.
+> tests/qapi-schema/ident-with-escape.out:10: new blank line at EOF.
+> tests/qapi-schema/include-relpath.out:7: new blank line at EOF.
+> tests/qapi-schema/include-repetition.out:7: new blank line at EOF.
+> tests/qapi-schema/include-simple.out:7: new blank line at EOF.
+> tests/qapi-schema/indented-expr.out:13: new blank line at EOF.
+> tests/qapi-schema/qapi-schema-test.out:446: new blank line at EOF.
+>
+> Worth respinning to fix those issues?
 
-> >>>Though I haven't tested with huge pages yet, but this patch should
-> >>>both solve above issue? I don't know whether you went over the page
-> >>>walk logic - it should both support huge page, and it will skip
-> >>>unmapped iova range (at least that's my goal to have this patch). In
-> >>>that case, looks like this patch is solving the same problem? :)
-> >>>(though without introducing iova_iterate() interface)
-> >>>
-> >>>Please correct me if I misunderstood it.
-> >>Kind of :) I'm fine with this patch, but just want:
-> >>
-> >>- reuse most of the codes in the patch
-> >>- current memory_region_iommu_replay() logic
-> >>
-> >>So what I'm suggesting is a just slight change of API which can let caller
-> >>decide it need to do with each range of iova. So it could be reused for
-> >>other things except for replaying.
-> >>
-> >>But if you like to keep this patch as is, I don't object it.
-> >I see. Then I can understand your mean here. I had the same thought
-> >before, that's why I exposed the vtd_page_walk with a hook. If you
-> >check the page_walk function comment:
-> >
-> >/**
-> >  * vtd_page_walk - walk specific IOVA range, and call the hook
-> >  *
-> >  * @ce: context entry to walk upon
-> >  * @start: IOVA address to start the walk
-> >  * @end: IOVA range end address (start <= addr < end)
-> >  * @hook_fn: the hook that to be called for each detected area
-> >  * @private: private data for the hook function
-> >  */
-> >
-> >So I didn't implement the notification in page_walk at all - but in
-> >the hook_fn. If any caller that is interested in doing something else
-> >rather than the notification, we can just simply export the page walk
-> >interface and provide his/her own "hook_fn", then it'll be triggered
-> >for each valid page (no matter a huge/small one).
-> >
-> >If we can have a more general interface in the future - no matter
-> >whether we call it iova_iterate() or something else (I'll prefer the
-> >hooker way to do it, so maybe a common page walker with a hook
-> >function), we can do it simply (at least for Intel platform) based on
-> >this vtd_page_walk thing.
-> >
-> >Thanks,
-> >
-> >-- peterx
-> 
-> Yes but the problem is hook_fn is only visible inside intel iommu code.
+Since I have to respin anyway, why not.
 
-Right.
+>>       qmp-commands: move 'query-memdev' doc to schema
+>
+> This one is the conflict with current master.
 
-Btw, do we have existing issue that can leverage this interface
-besides replay?
-
--- peterx
+Thanks for the heads-up, v2 coming.
