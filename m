@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTBr4-0003Rl-8n
-	for Qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:18:07 -0500
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cTBs4-0003yz-Ph
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTBr0-0006XG-42
-	for Qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:18:06 -0500
-Received: from mail-vk0-x22d.google.com ([2607:f8b0:400c:c05::22d]:34657)
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cTBrz-00077y-S9
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:19:08 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33799)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cTBqz-0006Vm-NI
-	for Qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:18:02 -0500
-Received: by mail-vk0-x22d.google.com with SMTP id r136so78132551vke.1
-	for <Qemu-devel@nongnu.org>; Mon, 16 Jan 2017 10:18:01 -0800 (PST)
+	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
+	id 1cTBrz-00077q-Jt
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:19:03 -0500
+Received: by mail-lf0-x244.google.com with SMTP id q89so13673952lfi.1
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 10:19:03 -0800 (PST)
+References: <1483979087-32663-1-git-send-email-clg@kaod.org>
+	<1483979087-32663-9-git-send-email-clg@kaod.org>
+	<7df52dde-e4b2-23de-47e7-2e97d5eab4e4@gmail.com>
+	<f4be1b72-eb3e-b91a-16c7-1f7a82fdfb91@kaod.org>
+From: "mar.krzeminski" <mar.krzeminski@gmail.com>
+Message-ID: <919659f4-2c6a-1f55-7ed3-5c4658da2353@gmail.com>
+Date: Mon, 16 Jan 2017 19:19:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <D1505166-849A-439D-8E78-579F708D53BB@livius.net>
-References: <6205DF8A-7643-432F-88FF-12B1E9DEF5D8@livius.net>
-	<CAFEAcA_CDpXqAAJNdSQpk4MKOorDXqUi_AwsevrHk=pnbrS0NQ@mail.gmail.com>
-	<277E72EB-288A-498F-9208-99EBF09218A6@livius.net>
-	<CAFEAcA_54fL9YHVJLqAZS8p3OftGd-yq7C7k4jSfVGeCzwMPmA@mail.gmail.com>
-	<D1505166-849A-439D-8E78-579F708D53BB@livius.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jan 2017 18:17:40 +0000
-Message-ID: <CAFEAcA-AB98qtJcrLQ=T4PDvg=VM2tTqxALVpZYoYQcd9fySFg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] CMSIS SVD based peripheral definitions
+In-Reply-To: <f4be1b72-eb3e-b91a-16c7-1f7a82fdfb91@kaod.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/11] aspeed/smc: reset flash after
+ each test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +33,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liviu Ionescu <ilg@livius.net>
-Cc: QEMU Developer <Qemu-devel@nongnu.org>
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Marcin Krzeminski <marcin.krzeminski@nokia.com>
 
-On 9 January 2017 at 17:47, Liviu Ionescu <ilg@livius.net> wrote:
-> I can't dispute this, but does't the GPLv2 requirements apply to
-> the qemu executable only? my JSON files are not compiled into the
-> binary, but are data files, read by the executable when required.
-> and anyway, the original license covers the original XML files,
-> mine are not only JSON, but are also slightly different.
 
-I'm not a lawyer, and this isn't legal advice, but merely
-my own opinion:
- (1) if you're reading in the data files at runtime then there's
-a spectrum between "just reading data provided by the user which
-didn't ship with QEMU, and QEMU works OK without this particular
-data" (clearly OK) and "reading data that shipped with QEMU
-and where QEMU won't work at all without it" (the data files
-are clearly part of the program as a whole and the GPL
-applies to them even if they don't happen to be binaries);
-where you stand legally probably depends on where on the
-spectrum you are.
 
- (2) your JSON files are a derived work from the original
-XML, so the license of those XML files (whatever it is) still
-applies to them. Making modifications or a mechanical
-transformation of the original files is not sufficient to
-allow you to discard the license...
+W dniu 16.01.2017 o 19:10, Cédric Le Goater pisze:
+> On 01/16/2017 06:37 PM, mar.krzeminski wrote:
+>>
+>> W dniu 09.01.2017 o 17:24, Cédric Le Goater pisze:
+>>> Let's make sure when each test is run that the flash object is in an
+>>> initial state and did not keep configuration from the previous tests.
+>> Is there any particukar reason why you do that (bug/side effect/whatever) or you
+>> just want to be sure what the flash state is?
+> I want to be sure it is not in 4BYTE mode.
+There is a command for that (EX_4BYTE_ADDR = 0xE9), but reset also make 
+sense here.
 
-With my project maintainer hat on, I prefer to avoid
-grey areas, because it avoids potential trouble later on.
-
-thanks
--- PMM
+Thanks,
+Marcin
+>
+> C.
+>
+>> Thanks,
+>> Marcin
+>>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+>>> ---
+>>>    tests/m25p80-test.c | 31 +++++++++++++++++++++++++++++++
+>>>    1 file changed, 31 insertions(+)
+>>>
+>>> diff --git a/tests/m25p80-test.c b/tests/m25p80-test.c
+>>> index cb7ec81f1a6d..8dd550deb95e 100644
+>>> --- a/tests/m25p80-test.c
+>>> +++ b/tests/m25p80-test.c
+>>> @@ -50,6 +50,8 @@ enum {
+>>>        READ = 0x03,
+>>>        PP = 0x02,
+>>>        WREN = 0x6,
+>>> +    RESET_ENABLE = 0x66,
+>>> +    RESET_MEMORY = 0x99,
+>>>        EN_4BYTE_ADDR = 0xB7,
+>>>        ERASE_SECTOR = 0xd8,
+>>>    };
+>>> @@ -76,6 +78,14 @@ static void spi_conf(uint32_t value)
+>>>        writel(ASPEED_FMC_BASE + R_CONF, conf);
+>>>    }
+>>>    +static void spi_conf_remove(uint32_t value)
+>>> +{
+>>> +    uint32_t conf = readl(ASPEED_FMC_BASE + R_CONF);
+>>> +
+>>> +    conf &= ~value;
+>>> +    writel(ASPEED_FMC_BASE + R_CONF, conf);
+>>> +}
+>>> +
+>>>    static void spi_ctrl_start_user(void)
+>>>    {
+>>>        uint32_t ctrl = readl(ASPEED_FMC_BASE + R_CTRL0);
+>>> @@ -95,6 +105,18 @@ static void spi_ctrl_stop_user(void)
+>>>        writel(ASPEED_FMC_BASE + R_CTRL0, ctrl);
+>>>    }
+>>>    +static void flash_reset(void)
+>>> +{
+>>> +    spi_conf(CONF_ENABLE_W0);
+>>> +
+>>> +    spi_ctrl_start_user();
+>>> +    writeb(ASPEED_FLASH_BASE, RESET_ENABLE);
+>>> +    writeb(ASPEED_FLASH_BASE, RESET_MEMORY);
+>>> +    spi_ctrl_stop_user();
+>>> +
+>>> +    spi_conf_remove(CONF_ENABLE_W0);
+>>> +}
+>>> +
+>>>    static void test_read_jedec(void)
+>>>    {
+>>>        uint32_t jedec = 0x0;
+>>> @@ -108,6 +130,8 @@ static void test_read_jedec(void)
+>>>        jedec |= readb(ASPEED_FLASH_BASE);
+>>>        spi_ctrl_stop_user();
+>>>    +    flash_reset();
+>>> +
+>>>        g_assert_cmphex(jedec, ==, FLASH_JEDEC);
+>>>    }
+>>>    @@ -155,6 +179,8 @@ static void test_erase_sector(void)
+>>>        for (i = 0; i < PAGE_SIZE / 4; i++) {
+>>>            g_assert_cmphex(page[i], ==, 0xffffffff);
+>>>        }
+>>> +
+>>> +    flash_reset();
+>>>    }
+>>>      static void test_erase_all(void)
+>>> @@ -182,6 +208,8 @@ static void test_erase_all(void)
+>>>        for (i = 0; i < PAGE_SIZE / 4; i++) {
+>>>            g_assert_cmphex(page[i], ==, 0xffffffff);
+>>>        }
+>>> +
+>>> +    flash_reset();
+>>>    }
+>>>      static void test_write_page(void)
+>>> @@ -195,6 +223,7 @@ static void test_write_page(void)
+>>>          spi_ctrl_start_user();
+>>>        writeb(ASPEED_FLASH_BASE, EN_4BYTE_ADDR);
+>>> +    writeb(ASPEED_FLASH_BASE, WREN);
+>>>        writeb(ASPEED_FLASH_BASE, PP);
+>>>        writel(ASPEED_FLASH_BASE, make_be32(my_page_addr));
+>>>    @@ -215,6 +244,8 @@ static void test_write_page(void)
+>>>        for (i = 0; i < PAGE_SIZE / 4; i++) {
+>>>            g_assert_cmphex(page[i], ==, 0xffffffff);
+>>>        }
+>>> +
+>>> +    flash_reset();
+>>>    }
+>>>      static char tmp_path[] = "/tmp/qtest.m25p80.XXXXXX";
+>
