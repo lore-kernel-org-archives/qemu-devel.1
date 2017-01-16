@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cTGkc-0000IH-3i
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:47 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cTGkd-0000IJ-2z
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cTGka-0000zY-4K
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:46 -0500
-Date: Tue, 17 Jan 2017 08:21:25 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cTGkZ-0000zP-Vy
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:47 -0500
+Date: Tue, 17 Jan 2017 08:33:22 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170116212125.GD15853@umbus>
-References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
-	<1484288903-18807-4-git-send-email-sjitindarsingh@gmail.com>
+Message-ID: <20170116213322.GE15853@umbus>
+References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
+	<CAFEAcA9fENz1=__4-upW=HLZJ50pAYkA4H2T13wDs62PNDXK3A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3Gf/FFewwPeBMqCJ"
+	protocol="application/pgp-signature"; boundary="GxcwvYAGnODwn7V8"
 Content-Disposition: inline
-In-Reply-To: <1484288903-18807-4-git-send-email-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 03/17] target/ppc: Add pcr_supported to
- POWER9 cpu class definition
+In-Reply-To: <CAFEAcA9fENz1=__4-upW=HLZJ50pAYkA4H2T13wDs62PNDXK3A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/67] ppc-for-2.9 queue 20170112
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alexander Graf <agraf@suse.de>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 
---3Gf/FFewwPeBMqCJ
+--GxcwvYAGnODwn7V8
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 13, 2017 at 05:28:09PM +1100, Suraj Jitindar Singh wrote:
-> pcr_supported is used to define the supported PCR values for a given
-> processor. A POWER9 processor can support 3.00, 2.07, 2.06 and 2.05
-> compatibility modes, thus we set this accordingly.
+On Fri, Jan 13, 2017 at 10:54:33AM +0000, Peter Maydell wrote:
+> On 12 January 2017 at 02:02, David Gibson <david@gibson.dropbear.id.au> w=
+rote:
+> > The following changes since commit b44486dfb9447c88e4b216e730adcc780190=
+852c:
+> >
+> >   Merge remote-tracking branch 'remotes/kraxel/tags/pull-ui-20170110-1'=
+ into staging (2017-01-10 14:52:34 +0000)
+> >
+> > are available in the git repository at:
+> >
+> >   git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170112
+> >
+> > for you to fetch changes up to 229b5b6b56db9c3e6b8f44b4b55a62fa32979f47:
+> >
+> >   ppc: Fix a warning in bcdcfz code and improve BCD_DIG_BYTE macro (201=
+7-01-12 10:21:49 +1100)
+> >
+> > ----------------------------------------------------------------
+> > ppc patch queue 2017-01-12
+> >
+> > This is the first ppc pull request for qemu-2.9.  It's been a while
+> > coming, partly due to dealing with some problems running my usual set
+> > of tests.  So, there's quite a lot in here.
+> >
+> >     * More POWER9 instruction implementations for TCG
+> >     * The simpler parts of my CPU compatibility mode cleanup
+> >         * This changes behaviour to prefer compatibility modes over
+> >           "raW" mode for new machine type versions
+> >     * New "40p" machine type which is essentially a modernized and
+> >       cleaned up "prep".  The intention is that it will replace "prep"
+> >       once it has some more testing and polish.
+> >     * Add pseries-2.9 machine type
+> >     * Implement H_SIGNAL_SYS_RESET hypercall
+> >     * Consolidate the two alternate CPU init paths in pseries by
+> >       making it always go through CPU core objects to initialize CPU
+> >     * A handful of bugfixes and cleanups
+> >
+> > There are also some changes not strictly related to ppc code, but for
+> > its benefit:
+> >
+> >     * Limit the pxi-expander-bridge (PXB) device to x86 guests only
+> >       (it's essentially a hack to work around historical x86
+> >       limitations)
+> >     * Revise a number of qtests and enable them for ppc
 >=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Hi -- this fails "make check" on OSX host:
 
-This looks fine to go ahead now, so I've merged it to ppc-for-2.9.
+Bother.  I saw the failure on Travis, but I was misled by all the SASL
+warnings, and assumed it was an upstream / library problem, not
+something with my patches.
 
-> ---
->  target/ppc/cpu.h            | 1 +
->  target/ppc/translate_init.c | 2 ++
->  2 files changed, 3 insertions(+)
+>   GTESTER check-qtest-ppc64
+> qemu-system-ppc64: -object
+> memory-backend-file,id=3Dmb1,size=3D1M,share,mem-path=3D/dev/shm/qtest-68=
+237-4247260626:
+> invalid object type: memory-backend-file
+> Broken pipe
+> GTester: last random seed: R02Sc13bf53b8b3055a3c30552f67d7c263b
+> **
+> ERROR:/Users/pm215/src/qemu-for-merges/tests/libqos/pci.c:412:void
+> qpci_plug_device_test(const char *, const char *, uint8_t, const char
+> *): assertion failed: (!qdict_haskey(response, "error"))
+> GTester: last random seed: R02Sf3594a21c711ec941d5f4c89724ce12d
+> qemu-system-ppc64: -device ivshmem-plain,memdev=3Dmb1: 'ivshmem-plain'
+> is not a valid device model name
+> Broken pipe
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 2a50c43..afb7ddb 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -2250,6 +2250,7 @@ enum {
->      PCR_COMPAT_2_05     =3D 1ull << (63-62),
->      PCR_COMPAT_2_06     =3D 1ull << (63-61),
->      PCR_COMPAT_2_07     =3D 1ull << (63-60),
-> +    PCR_COMPAT_3_00     =3D 1ull << (63-59),
->      PCR_VEC_DIS         =3D 1ull << (63-0), /* Vec. disable (bit NA sinc=
-e POWER8) */
->      PCR_VSX_DIS         =3D 1ull << (63-1), /* VSX disable (bit NA since=
- POWER8) */
->      PCR_TM_DIS          =3D 1ull << (63-2), /* Trans. memory disable (PO=
-WER8) */
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 626e031..bfc1f24 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8797,6 +8797,8 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->      dc->props =3D powerpc_servercpu_properties;
->      pcc->pvr_match =3D ppc_pvr_match_power9;
->      pcc->pcr_mask =3D PCR_COMPAT_2_05 | PCR_COMPAT_2_06 | PCR_COMPAT_2_0=
-7;
-> +    pcc->pcr_supported =3D PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPA=
-T_2_06 |
-> +                         PCR_COMPAT_2_05;
->      pcc->init_proc =3D init_proc_POWER9;
->      pcc->check_pow =3D check_pow_nocheck;
->      pcc->insns_flags =3D PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MF=
-TB |
+> It looks like you've enabled the ivshmem test unconditionally,
+> but it should only be turned on if CONFIG_EVENTFD is true, see
+> how we do this for x86:
+>=20
+> check-qtest-pci-$(CONFIG_EVENTFD) +=3D tests/ivshmem-test$(EXESUF)
+> gcov-files-pci-y +=3D hw/misc/ivshmem.c
+
+Ah, right, thanks.
+
+> Q: can we just enable these tests for PCI with
+> check-qtest-ppc64-y +=3D $(check-qtest-pci-y)
+> gcov-files-ppc64-y +=3D $(gcov-files-pci-y)
+>=20
+> the way we do for i386/x86_64 ? Or is that doing too much
+> unwanted extra testing?
+
+As Laurent says, that doesn't quite work, but we can still put the
+test on CONFIG_EVENTFD in.  I've put a draft fix into my tree, but I
+probably won't get a chance to properly test and resend until after
+I'm back from LCA and holidays, around the end of Jan.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -86,25 +128,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---3Gf/FFewwPeBMqCJ
+--GxcwvYAGnODwn7V8
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYfTlTAAoJEGw4ysog2bOS/jUP/2yvfHzA310V5siADlZFGHpL
-vhaD6raS0qHH+BvYz3cdb/D/zwgoZzotjU+9NYe/54Jm5+0/h3022/6VsnBTsAKt
-mUISrCsD4U9cNUKSTDREgZy/2Ls0SmqXZUNDg85cYeHtadjaNVqm5oIWmNTX01os
-fe8NSI5u02dG1vX4q1zu4j496LjOhPdH4IrqxhgwixbEVknUt7RQSOxjpTM6dpyy
-xsCO4/rMRHpxB1vYPCbWCU4eqxu8qi7HXizd859h0z1wWhNmgtgzjDZmvroUZuMO
-TxWk250fa8US0kUrMlnKjzzHfw4Z6JCEVLE6rWJ2jXPYug6AnacI7U8JAe/8MzYL
-drIguWtLBNRC3KDyeLaw+zWOXVMkTi5Gzn2oeyYv1U+6JOhOkT+Ls/tYO/rrww1F
-P4LDPLNfsbHyyX7kZsRA5/yq4t5BO0ZxtvVouyKHlwi+kDLG/HYmDv8R/FgVaUtf
-hRVUT4G2+8Z4VlPEDdh5DVrpBohfNHajlBO6iqy/QrzAQ6Q7BUPi6sEH0XPk1sIT
-DpS5/IpCiZ5g8ucwD5tcniEiXOB3kAsHLtF9AhiwqmoavWok/T3aweakqzW/Y5Ey
-T8+J+1TynucMwDuzJqgdpztvNdckMm809fzZFKRsWM8Y9g1XvVcSUyi7dTaYk1b/
-Vt5uJU4R2nkJuywOXEp6
-=TNYs
+iQIcBAEBCAAGBQJYfTwcAAoJEGw4ysog2bOShMwP/3XWqK/G7+jYjjC0TZb65b0t
+yQSFMXDzuqF/UbZlm+SRJaZyQTGe+4QtotUWKNB7cUKEMHfe+YuWP1Ch3dqQRkZ0
+RWks4bNb2iE85CwlLbCKduWuBTrb+QqVd060f9RX9p3Yk8cLwNH/WM9gWr8orPmr
+sIRrtjS/8ZMwwi/MzKTs8y7GNBb4OP9CZIkI0cn31aeLQGpn13ij4nbEEnW1b0nU
+SLLouIjC0IMlu6D6NDXeaBNyayRORvGmNm+q5frQOanJmjCUmKnSvaT2BYIblKQJ
+n9mjHnBH94AH03jhBGVgHoAtmX8J6FFid4sE1TgQhdbb642plRrIGvqWodEwCWVU
+cQgp7GAFcvT/UAofifFGCiyW1N99cKhKsGpgbJU5vzRS+DGkWLLGUuwprPaGnbn6
+hjZd1CsQIqtAO5r9piT9YhE8LKSqlrbtX4F67GWhrVnyd3+QtTRgG0dDXhX1/1ow
+gpSX3W5dgomKNS07fI/Jaw0n3inLih2rU4Pwvv1YOSs/PrVSWms8B6mSrpwye6eX
+3zPi58he/uwnJqBFH6HHOoYhKgunEEjRD7zRRcwG5boNNq0+2fm/pFtbuc7NJYF/
+2tCn9U+I2LG8OoYnNwXtsasEwyXwLItGi1ES7YwUOrXUSBe52DnR88O7GGaOnY9P
+aDIjgGQkkILIk5AVNN1N
+=yr/S
 -----END PGP SIGNATURE-----
 
---3Gf/FFewwPeBMqCJ--
+--GxcwvYAGnODwn7V8--
