@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cT8kH-0000Ys-AS
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 09:58:54 -0500
+	(envelope-from <krister@redhat.com>) id 1cT8lj-0001v0-OC
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:00:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cT8kG-0003Ab-BK
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 09:58:53 -0500
-Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:36715)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cT8kG-0003AO-6t
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 09:58:52 -0500
-Received: by mail-ua0-x22b.google.com with SMTP id 96so82680336uaq.3
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 06:58:52 -0800 (PST)
+	(envelope-from <krister@redhat.com>) id 1cT8ld-0003Y4-KQ
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:00:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <krister@redhat.com>) id 1cT8ld-0003Xx-BD
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:00:17 -0500
+Reply-To: krister@redhat.com
+References: <CA+scX6=rRiGHsOj8oxjTe4KqEF7S_GUao3k=TUQeE7FpyT_K8w@mail.gmail.com>
+	<20170103155047.GE14707@stefanha-x1.localdomain>
+	<CA+scX6mCDjnZdEMemuDerPxR2L4w12PyyvH==tW_PdW6Kqe7+A@mail.gmail.com>
+	<20170116131500.GA14681@stefanha-x1.localdomain>
+From: Karl Rister <krister@redhat.com>
+Message-ID: <0de557f6-8912-6a94-d8f5-009637e921fe@redhat.com>
+Date: Mon, 16 Jan 2017 09:00:14 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170105043430.3176-2-alastair@au1.ibm.com>
-References: <20170105043430.3176-1-alastair@au1.ibm.com>
-	<20170105043430.3176-2-alastair@au1.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jan 2017 14:58:31 +0000
-Message-ID: <CAFEAcA-8XvxRtfd=r3gmmsCgNQEQz5LEmN2J6KS5+=iNt0UZrg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v5 1/7] arm: Uniquely name imx25 I2C buses.
+In-Reply-To: <20170116131500.GA14681@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Performance about x-data-plane
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alastair D'Silva <alastair@au1.ibm.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Weiwei Jia <harrynjit@gmail.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, libvir-list <libvir-list@redhat.com>
 
-On 5 January 2017 at 04:34, Alastair D'Silva <alastair@au1.ibm.com> wrote:
-> From: Alastair D'Silva <alastair@d-silva.org>
->
-> The imx25 chip provides 3 i2c buses, but they have all been named
-> "i2c", which makes it difficult to predict which bus a device will
-> be connected to when specified on the command line.
->
-> This patch addresses the issue by naming the buses uniquely:
->   i2c-bus.0 i2c-bus.1 i2c-bus.2
->
-> Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
-> ---
->  hw/arm/imx25_pdk.c | 2 +-
->  hw/i2c/imx_i2c.c   | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
-> index 025b608..44e741f 100644
-> --- a/hw/arm/imx25_pdk.c
-> +++ b/hw/arm/imx25_pdk.c
-> @@ -139,7 +139,7 @@ static void imx25_pdk_init(MachineState *machine)
->           * of simple qtest. See "make check" for details.
->           */
->          i2c_create_slave((I2CBus *)qdev_get_child_bus(DEVICE(&s->soc.i2c[0]),
-> -                                                      "i2c"),
-> +                                                      "i2c-bus.0"),
->                           "ds1338", 0x68);
->      }
->  }
-> diff --git a/hw/i2c/imx_i2c.c b/hw/i2c/imx_i2c.c
-> index 37e5a62..6c81b98 100644
-> --- a/hw/i2c/imx_i2c.c
-> +++ b/hw/i2c/imx_i2c.c
-> @@ -310,7 +310,7 @@ static void imx_i2c_realize(DeviceState *dev, Error **errp)
->                            IMX_I2C_MEM_SIZE);
->      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
->      sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
-> -    s->bus = i2c_init_bus(DEVICE(dev), "i2c");
-> +    s->bus = i2c_init_bus(DEVICE(dev), NULL);
->  }
->
->  static void imx_i2c_class_init(ObjectClass *klass, void *data)
+On 01/16/2017 07:15 AM, Stefan Hajnoczi wrote:
+> On Tue, Jan 03, 2017 at 12:02:14PM -0500, Weiwei Jia wrote:
+>>> The expensive part is the virtqueue kick.  Recently we tried polling the
+>>> virtqueue instead of waiting for the ioeventfd file descriptor and got
+>>> double-digit performance improvements:
+>>> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00148.html
+>>>
+>>> If you want to understand the performance of your benchmark you'll have
+>>> compare host/guest disk stats (e.g. request lifetime, disk utilization,
+>>> queue depth, average request size) to check that the bare metal and
+>>> guest workloads are really sending comparable I/O patterns to the
+>>> physical disk.
+>>>
+>>> Then you using Linux and/or QEMU tracing to analyze the request latency
+>>> by looking at interesting points in the request lifecycle like virtqueue
+>>> kick, host Linux AIO io_submit(2), etc.
+>>>
+>>
+>> Thank you. I will look into "polling the virtqueue" as you said above.
+>> Currently, I just use blktrace to see disk stats and add logs in the
+>> I/O workload to see the time latency for each request. What kind of
+>> tools are you using to analyze request lifecycle like virtqueue kick,
+>> host Linux AIO iosubmit, etc.
+>>
+>> Do you trace the lifecycle like this
+>> (http://www.linux-kvm.org/page/Virtio/Block/Latency#Performance_data)
+>> but it seems to be out of date. Does it
+>> (http://repo.or.cz/qemu-kvm/stefanha.git/shortlog/refs/heads/tracing-dev-0.12.4)
+>> still work on QEMU 2.4.1?
+> 
+> The details are out of date but the general approach to tracing the I/O
+> request lifecycle still apply.
+> 
+> There are multiple tracing tools that can do what you need.  I've CCed
+> Karl Rister who did the latest virtio-blk dataplane tracing.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+I roughly followed this guide by Luiz Capitulino:
 
-and applied to target-arm.next.
+https://lists.nongnu.org/archive/html/qemu-devel/2016-03/msg00887.html
 
-thanks
--- PMM
+I tweaked his trace-host-and-guest script to avoid doing IO while
+tracing is enabled, my version is available here:
+
+http://people.redhat.com/~krister/tracing/trace-host-and-guest
+
+I built QEMU with --enable-trace-backends=ftrace and then turned on the
+QEMU trace events I was interested in with this bit of bash:
+
+for event in $(/usr/libexec/qemu-kvm -trace help 2>&1|grep virtio|grep
+-v "gpu\|console\|serial\|rng\|balloon\|ccw"); do virsh
+qemu-monitor-command master --hmp trace-event ${event} on; done
+
+At this point, the QEMU trace events are automatically inserted into the
+ftrace buffers and the methodology outlined by Luiz gets the guest
+kernel, host kernel, and QEMU events properly interleaved.
+
+> 
+> "perf record -a -e kvm:\*" is a good start.  You can use "perf probe" to
+> trace QEMU's trace events (recent versions have sdt support, which means
+> SystemTap tracepoints work) and also trace any function in QEMU:
+> http://blog.vmsplice.net/2011/03/how-to-use-perf-probe.html
+> 
+> Stefan
+> 
+
+
+-- 
+Karl Rister <krister@redhat.com>
