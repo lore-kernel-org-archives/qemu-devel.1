@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cTAwi-0002GH-0n
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:19:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cTAzH-0004UZ-1J
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:22:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cTAwc-0006bL-Er
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:19:51 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:35551)
+	(envelope-from <peter.maydell@linaro.org>) id 1cTAzF-0007Bx-LG
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:22:31 -0500
+Received: from mail-vk0-x234.google.com ([2607:f8b0:400c:c05::234]:36422)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cTAwc-0006bB-74
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:19:46 -0500
-Received: by mail-lf0-x243.google.com with SMTP id v186so13474737lfa.2
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 09:19:46 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
-	<001201d26b1b$e5a8ce20$b0fa6a60$@ru>
-	<CAMo8BfJKXOhiPQz8GT6hXNNBXKsz-67iKx9ct9tEwukVLWR3QA@mail.gmail.com>
-	<001201d26cc6$f023ad00$d06b0700$@ru>
-	<CAFEAcA-AMJ33g9hO2k9oGJfDr-Fatk7TY+Sbs_wRC-OfCjWhmQ@mail.gmail.com>
-	<001301d26cce$21ad3d30$6507b790$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f2f54dce-0e3f-2718-4b35-1321f5c2ae11@redhat.com>
-Date: Mon, 16 Jan 2017 18:19:42 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cTAzF-0007Bq-8I
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:22:29 -0500
+Received: by mail-vk0-x234.google.com with SMTP id t8so77060316vke.3
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 09:22:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <001301d26cce$21ad3d30$6507b790$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
+In-Reply-To: <20170111200019.31314-1-jcd@tribudubois.net>
+References: <20170111200019.31314-1-jcd@tribudubois.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Jan 2017 17:22:08 +0000
+Message-ID: <CAFEAcA8nRyp2CmbXKkf7HnRHZp=xxFEhRBt6r67FJ1KOukP9gw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6] hw/ssi/imx_spi.c: fix CS handling
+ during SPI access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,62 +30,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>
-Cc: 'Alex Bligh' <alex@alex.org.uk>, 'Max Filippov' <jcmvbkbc@gmail.com>, 'qemu-devel' <qemu-devel@nongnu.org>, 'Pavel Dovgaluk' <Pavel.Dovgaluk@ispras.ru>, 'Richard Henderson' <rth@twiddle.net>
+To: Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>
 
+On 11 January 2017 at 20:00, Jean-Christophe Dubois <jcd@tribudubois.net> w=
+rote:
+> The i.MX SPI device was not de-asserting the CS line at the end of
+> memory access.
+>
+> This triggered a SIGSEGV in Qemu when the sabrelite emulator was acessing
+> a SPI flash memory.
+>
+> Whith this path the CS signal is correctly asserted and deasserted arroun=
+d
+> memory access.
+>
+> Assertion level is now based on SPI device configuration.
+>
+> This was tested by:
+> * booting linux on Sabrelite Qemu emulator.
+> * booting xvisor on Sabrelite Qemu emultor.
+>
+> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+> Acked-by: Marcin Krzemi=C5=84ski <mar.krzeminski@gmail.com>
 
+>  hw/ssi/imx_spi.c         | 148 ++++++++++++++++++++++++++++++++++++-----=
+------
+>  include/hw/ssi/imx_spi.h |   4 ++
+>  2 files changed, 117 insertions(+), 35 deletions(-)
+>
+> diff --git a/hw/ssi/imx_spi.c b/hw/ssi/imx_spi.c
+> index e4e395f..d54c145 100644
+> --- a/hw/ssi/imx_spi.c
+> +++ b/hw/ssi/imx_spi.c
+> @@ -56,19 +56,6 @@ static const char *imx_spi_reg_name(uint32_t reg)
+>      }
+>  }
+>
+> -static const VMStateDescription vmstate_imx_spi =3D {
+> -    .name =3D TYPE_IMX_SPI,
+> -    .version_id =3D 1,
+> -    .minimum_version_id =3D 1,
+> -    .fields =3D (VMStateField[]) {
+> -        VMSTATE_FIFO32(tx_fifo, IMXSPIState),
+> -        VMSTATE_FIFO32(rx_fifo, IMXSPIState),
+> -        VMSTATE_INT16(burst_length, IMXSPIState),
+> -        VMSTATE_UINT32_ARRAY(regs, IMXSPIState, ECSPI_MAX),
+> -        VMSTATE_END_OF_LIST()
+> -    },
+> -};
+> -
+>  static void imx_spi_txfifo_reset(IMXSPIState *s)
+>  {
+>      fifo32_reset(&s->tx_fifo);
+> @@ -119,6 +106,32 @@ static void imx_spi_update_irq(IMXSPIState *s)
+>      DPRINTF("IRQ level is %d\n", level);
+>  }
+>
+> +static int imx_spi_post_load(void *opaque, int version_id)
+> +{
+> +    IMXSPIState *s =3D (IMXSPIState *)opaque;
+> +
+> +    imx_spi_update_irq(s);
+> +
+> +    /* TODO: We should also restore the CS line level */
 
-On 12/01/2017 13:19, Pavel Dovgalyuk wrote:
->> From: Peter Maydell [mailto:peter.maydell@linaro.org]
->> On 12 January 2017 at 11:28, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
->>>> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
->>>> Ok, looks like what happens in my case is that instruction that
->>>> sets CCOMPARE and thus changes remaining icount does not
->>>> cause exit from the cpu_exec. So merely ending TB on
->>>> QEMU_CLOCK_VIRTUAL timer update is not enough, I need to
->>>> throw an exception of some kind? Or does the timer code need
->>>> to take care of that?
->>>
->>> Yes, it seems that you should end the block with an exception,
->>> to allow icount loop recalculate the timeouts.
->>
->> Really? The ARM translate.c doesn't generate an exception.
->> It just does
->>  gen_io_end();
->>  gen_lookup_tb();
->>
->> (so we force a lookup of the next TB, but don't throw an
->> exception of any kind).
-> 
-> Maybe I missing something. As far as I understand, changing the virtual timer 
-> notifies the iothread and os_host_main_loop_wait kicks the CPU thread.
-> 
-> But within that period of time before changing the timer and kicking the thread
-> CPU may proceed some instructions and the timer will be expired if it was set
-> to one of the soonest instructions.
+I don't think you should need to do anything here -- if
+this device's state has been restored and the state at
+the other end of the line has been restored, there's nothing
+else to do. It's like reset, you don't want to be asserting
+irq lines in post_load.
 
-My understanding (which may be wrong!) was that after gen_io_end you 
-would exit with TB_EXIT_ICOUNT_EXPIRED and cpu->icount_decr.u16.high = 
--1, but indeed I don't see anything that calls cpu_interrupt in that 
-path.
+> +    if (imx_spi_is_multiple_master_burst(s)) {
+> +        /*
+> +         * If we are in multi master burst mode we need to call this
+> +         * function at least 2 times before deselecting the CS line.
+> +         * In practice the transfert ends (and the CS is deselected)
+> +         * when the guest write 0 to the INT reg (according to linux
+> +         * driver code).
+> +         */
+> +        s->txfifo_burst_count++;
+> +    }
 
-Maybe something like this:
+> @@ -380,6 +433,30 @@ static void imx_spi_write(void *opaque, hwaddr offse=
+t, uint64_t value,
+>          }
+>
+>          break;
+> +    case ECSPI_INTREG:
+> +        s->regs[index] =3D value;
+> +
+> +        /* Disable CS lines */
+> +        if ((value =3D=3D 0) && (s->txfifo_burst_count > 1)) {
+> +            /*
+> +             * When 0 is writen to the INT register (disabling all
+> +             * interrupts) we need to deselect the device CS line.
+> +             * But only if the txfifo function has been called at
+> +             * least twice.
+> +             * Note: This seems a bit hacky and I would preffer to
+> +             * rely on something else to deselect the CS line. But it
+> +             * works correctly with the linux driver.
+> +             */
+> +
+> +            /* Deactivate the current CS line */
+> +            qemu_set_irq(s->cs_lines[imx_spi_selected_channel(s)],
+> +                         !imx_spi_current_channel_pol(s));
+> +
+> +            /* reset the txfifo count to 0 */
+> +            s->txfifo_burst_count =3D 0;
+> +        }
 
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index 050de59..c20d193 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -73,6 +73,9 @@ static inline void gen_io_end(void)
- {
-     TCGv_i32 tmp = tcg_const_i32(0);
-     tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
-+    /* Make the next TB exit immediately with TB_EXIT_ICOUNT_EXPIRED.  */
-+    tcg_gen_st16_i32(-1, cpu_env,
-+                     -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.high));
-     tcg_temp_free_i32(tmp);
- }
- 
+I think this is a bad idea. We have one or two devices which have
+similar kinds of hacky code in them that knows what the Linux
+driver does. The problem is then twofold:
+ (1) if the Linux driver changes then the hacks break
+ (2) it's almost impossible to remove the hacks later, because
+     the reasoning behind them (which guest kernels are affected,
+     etc) gets lost and you don't know whether you're going to
+     break previously-working setups if you try to remove the
+     hack code
 
-?
+I think we really should try to get this right from the start
+(ie "behave like the hardware does").
 
-Paolo
+thanks
+-- PMM
