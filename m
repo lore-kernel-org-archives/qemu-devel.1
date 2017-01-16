@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cT5W8-0008RG-6q
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:07 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cT5WB-0008TS-HH
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cT5W2-0002at-Fg
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:04 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:33331)
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cT5W8-0002bb-9j
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:07 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:32904)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1cT5W2-0002ai-AI
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:31:58 -0500
-Received: by mail-pf0-x241.google.com with SMTP id e4so3692133pfg.0
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 03:31:58 -0800 (PST)
+	id 1cT5W8-0002bS-3s
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:04 -0500
+Received: by mail-pg0-x242.google.com with SMTP id 194so5219078pgd.0
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 03:32:04 -0800 (PST)
 From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Mon, 16 Jan 2017 17:01:50 +0530
-Message-Id: <1484566314-3987-2-git-send-email-ashijeetacharya@gmail.com>
+Date: Mon, 16 Jan 2017 17:01:51 +0530
+Message-Id: <1484566314-3987-3-git-send-email-ashijeetacharya@gmail.com>
 In-Reply-To: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
 References: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v6 1/5] block/vvfat: Remove the undesirable
- comment
+Subject: [Qemu-devel] [PATCH v6 2/5] migration: Add a new option to enable
+ only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +30,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com
 Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Remove the "// assert(is_consistent(s))" comment in block/vvfat.c
+Add a new option "--only-migratable" in qemu which will allow to add
+only those devices which will not fail qemu after migration. Devices
+set with the flag 'unmigratable' cannot be added when this option will
+be used.
 
 Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 ---
- block/vvfat.c | 1 -
- 1 file changed, 1 deletion(-)
+ include/migration/migration.h | 3 +++
+ qemu-options.hx               | 9 +++++++++
+ vl.c                          | 4 ++++
+ 3 files changed, 16 insertions(+)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index ded2109..7b706dc 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1189,7 +1189,6 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-         init_mbr(s, cyls, heads, secs);
-     }
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index c309d23..40b3697 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -38,6 +38,9 @@
+ #define QEMU_VM_COMMAND              0x08
+ #define QEMU_VM_SECTION_FOOTER       0x7e
  
--    //    assert(is_consistent(s));
-     qemu_co_mutex_init(&s->lock);
++/* for vl.c */
++extern int only_migratable;
++
+ struct MigrationParams {
+     bool blk;
+     bool shared;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c534a2f..1e16ae8 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3574,6 +3574,15 @@ be used to change settings (such as migration parameters) prior to issuing
+ the migrate_incoming to allow the migration to begin.
+ ETEXI
  
-     /* Disable migration when vvfat is used rw */
++DEF("only-migratable", 0, QEMU_OPTION_only_migratable, \
++    "-only-migratable     allow only migratable devices\n", QEMU_ARCH_ALL)
++STEXI
++@item -only-migratable
++@findex -only-migratable
++Only allow migratable devices. Devices will not be allowed to enter an
++unmigratable state.
++ETEXI
++
+ DEF("nodefaults", 0, QEMU_OPTION_nodefaults, \
+     "-nodefaults     don't create default devices\n", QEMU_ARCH_ALL)
+ STEXI
+diff --git a/vl.c b/vl.c
+index c643d3f..cbcb459 100644
+--- a/vl.c
++++ b/vl.c
+@@ -180,6 +180,7 @@ bool boot_strict;
+ uint8_t *boot_splash_filedata;
+ size_t boot_splash_filedata_size;
+ uint8_t qemu_extra_params_fw[2];
++int only_migratable; /* turn it off unless user states otherwise */
+ 
+ int icount_align_option;
+ 
+@@ -3910,6 +3911,9 @@ int main(int argc, char **argv, char **envp)
+                 }
+                 incoming = optarg;
+                 break;
++            case QEMU_OPTION_only_migratable:
++                only_migratable = 1;
++                break;
+             case QEMU_OPTION_nodefaults:
+                 has_defaults = 0;
+                 break;
 -- 
 2.6.2
