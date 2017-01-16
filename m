@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTAd7-0000tQ-1I
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:38 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cTAdC-0000yl-0j
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTAd5-00006Y-Sx
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42314)
+	(envelope-from <pbonzini@redhat.com>) id 1cTAdB-00007g-4d
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45058)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cTAd5-00006H-K7
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:35 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B04FA3B70C
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:59:35 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-116-100.ams2.redhat.com
-	[10.36.116.100])
-	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v0GGxGV3001760
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 11:59:34 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cTAdA-00007X-S0
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:41 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 16 Jan 2017 17:59:00 +0100
-Message-Id: <20170116165916.8575-17-pbonzini@redhat.com>
+Date: Mon, 16 Jan 2017 17:59:04 +0100
+Message-Id: <20170116165916.8575-21-pbonzini@redhat.com>
 In-Reply-To: <20170116165916.8575-1-pbonzini@redhat.com>
 References: <20170116165916.8575-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 16/32] acpi: filter based on CONFIG_ACPI_X86
- rather than TARGET
+Subject: [Qemu-devel] [PULL 20/32] qemu-thread: fix qemu_thread_set_name()
+ race in qemu_thread_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,148 +25,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Caoxinhua <caoxinhua@huawei.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Copy the mechanism of hw/smbios/smbios-stub.c to implement an ACPI-stub
-instead, so that -acpitable can be later extended to ARM.
+From: Caoxinhua <caoxinhua@huawei.com>
 
+QEMU will crash with the follow backtrace if the new created thread exited before
+we call qemu_thread_set_name() for it.
+
+  (gdb) bt
+  #0 0x00007f9a68b095d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
+  #1 0x00007f9a68b0acc8 in __GI_abort () at abort.c:90
+  #2 0x00007f9a69cda389 in PAT_abort () from /usr/lib64/libuvpuserhotfix.so
+  #3 0x00007f9a69cdda0d in patchIllInsHandler () from /usr/lib64/libuvpuserhotfix.so
+  #4 <signal handler called>
+  #5 pthread_setname_np (th=140298470549248, name=name@entry=0x8cc74a "io-task-worker") at ../nptl/sysdeps/unix/sysv/linux/pthread_setname.c:49
+  #6 0x00000000007f5f20 in qemu_thread_set_name (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker") at util/qemu_thread_posix.c:459
+  #7 0x00000000007f679e in qemu_thread_create (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker",start_routine=start_routine@entry=0x7c1300 <qio_task_thread_worker>, arg=arg@entry=0x7f99b8001720, mode=mode@entry=1) at util/qemu_thread_posix.c:498
+  #8 0x00000000007c15b6 in qio_task_run_in_thread (task=task@entry=0x7f99b80033d0, worker=worker@entry=0x7bd920 <qio_channel_socket_connect_worker>, opaque=0x7f99b8003370, destroy=0x7c6220 <qapi_free_SocketAddress>) at io/task.c:133
+  #9 0x00000000007bda04 in qio_channel_socket_connect_async (ioc=0x7f99b80014c0, addr=0x37235d0, callback=callback@entry=0x54ad00 <qemu_chr_socket_connected>, opaque=opaque@entry=0x38118b0, destroy=destroy@entry=0x0) at io/channel_socket.c:191
+  #10 0x00000000005487f6 in socket_reconnect_timeout (opaque=0x38118b0) at qemu_char.c:4402
+  #11 0x00007f9a6a1533b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
+  #12 0x00007f9a6a15299a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
+  #13 0x0000000000747386 in glib_pollfds_poll () at main_loop.c:227
+  #14 0x0000000000747424 in os_host_main_loop_wait (timeout=404000000) at main_loop.c:272
+  #15 0x0000000000747575 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:520
+  #16 0x0000000000557d31 in main_loop () at vl.c:2170
+  #17 0x000000000041c8b7 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:5083
+
+Let's detach the new thread after calling qemu_thread_set_name().
+
+Signed-off-by: Caoxinhua <caoxinhua@huawei.com>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Message-Id: <1483493521-9604-1-git-send-email-zhang.zhanghailiang@huawei.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch_init.c                | 13 -------------
- hw/Makefile.objs           |  2 +-
- hw/acpi/Makefile.objs      |  7 ++++++-
- hw/acpi/acpi-stub.c        | 29 +++++++++++++++++++++++++++++
- include/sysemu/arch_init.h |  1 -
- vl.c                       |  3 ++-
- 6 files changed, 38 insertions(+), 17 deletions(-)
- create mode 100644 hw/acpi/acpi-stub.c
+ util/qemu-thread-posix.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch_init.c b/arch_init.c
-index 34e7694..6c4e287 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -234,19 +234,6 @@ void audio_init(void)
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index d20cdde..d31793d 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -481,12 +481,6 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+     if (err) {
+         error_exit(err, __func__);
      }
- }
- 
--void do_acpitable_option(const QemuOpts *opts)
--{
--#ifdef TARGET_I386
--    Error *err = NULL;
--
--    acpi_table_add(opts, &err);
--    if (err) {
--        error_reportf_err(err, "Wrong acpi table provided: ");
--        exit(1);
+-    if (mode == QEMU_THREAD_DETACHED) {
+-        err = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+-        if (err) {
+-            error_exit(err, __func__);
+-        }
 -    }
--#endif
--}
--
- int kvm_available(void)
- {
- #ifdef CONFIG_KVM
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 7be399e..a2c61f6 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -1,5 +1,5 @@
- devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
--devices-dirs-$(CONFIG_ACPI) += acpi/
-+devices-dirs-$(CONFIG_SOFTMMU) += acpi/
- devices-dirs-$(CONFIG_SOFTMMU) += adc/
- devices-dirs-$(CONFIG_SOFTMMU) += audio/
- devices-dirs-$(CONFIG_SOFTMMU) += block/
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index dfc8229..6acf798 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -1,9 +1,11 @@
-+ifeq ($(CONFIG_ACPI),y)
- common-obj-$(CONFIG_ACPI_X86) += core.o piix4.o pcihp.o
- common-obj-$(CONFIG_ACPI_X86_ICH) += ich9.o tco.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
- common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
-+common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
  
- common-obj-y += acpi_interface.o
- common-obj-y += bios-linker-loader.o
-@@ -11,4 +13,7 @@ common-obj-y += aml-build.o
+     /* Leave signal handling to the iothread.  */
+     sigfillset(&set);
+@@ -499,6 +493,12 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+         qemu_thread_set_name(thread, name);
+     }
  
- common-obj-$(CONFIG_IPMI) += ipmi.o
- common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
--common-obj-$(CONFIG_ALL) += ipmi-stub.o
-+else
-+common-obj-y += acpi-stub.o
-+endif
-+common-obj-$(CONFIG_ALL) += acpi-stub.o ipmi-stub.o
-diff --git a/hw/acpi/acpi-stub.c b/hw/acpi/acpi-stub.c
-new file mode 100644
-index 0000000..26bd22f
---- /dev/null
-+++ b/hw/acpi/acpi-stub.c
-@@ -0,0 +1,29 @@
-+/*
-+ * ACPI stubs for platforms that don't support ACPI.
-+ *
-+ * Copyright (c) 2006 Fabrice Bellard
-+ * Copyright (c) 2016 Red Hat, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qmp-commands.h"
-+#include "hw/acpi/acpi.h"
-+
-+void acpi_table_add(const QemuOpts *opts, Error **errp)
-+{
-+    error_setg(errp, QERR_UNSUPPORTED);
-+}
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 88dcf77..20b01e3 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -28,7 +28,6 @@ enum {
- extern const uint32_t arch_type;
++    if (mode == QEMU_THREAD_DETACHED) {
++        err = pthread_detach(thread->thread);
++        if (err) {
++            error_exit(err, __func__);
++        }
++    }
+     pthread_sigmask(SIG_SETMASK, &oldset, NULL);
  
- void select_soundhw(const char *optarg);
--void do_acpitable_option(const QemuOpts *opts);
- void audio_init(void);
- int kvm_available(void);
- int xen_available(void);
-diff --git a/vl.c b/vl.c
-index a2aff23..a52c5f2 100644
---- a/vl.c
-+++ b/vl.c
-@@ -65,6 +65,7 @@ int main(int argc, char **argv)
- #include "hw/bt.h"
- #include "sysemu/watchdog.h"
- #include "hw/smbios/smbios.h"
-+#include "hw/acpi/acpi.h"
- #include "hw/xen/xen.h"
- #include "hw/qdev.h"
- #include "hw/loader.h"
-@@ -3657,7 +3658,7 @@ int main(int argc, char **argv, char **envp)
-                 if (!opts) {
-                     exit(1);
-                 }
--                do_acpitable_option(opts);
-+                acpi_table_add(opts, &error_fatal);
-                 break;
-             case QEMU_OPTION_smbios:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("smbios"),
+     pthread_attr_destroy(&attr);
 -- 
 2.9.3
