@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cT3qV-0007Kt-Hr
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:45:00 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cT40L-0004Pe-7K
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:55:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cT3qR-0007pk-9P
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:44:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39418)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cT3qR-0007p2-34
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:44:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cT3qO-0001CN-6T
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 09:44:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1F5D42E80C2
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 09:44:52 +0000 (UTC)
+	(envelope-from <jasowang@redhat.com>) id 1cT40I-0002Ks-68
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:55:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35164)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cT40I-0002Kf-0P
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:55:06 -0500
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+	<1484276800-26814-15-git-send-email-peterx@redhat.com>
+	<fad506bc-2398-fef9-b720-7720569ac0a6@redhat.com>
+	<20170116091801.GL30108@pxdev.xzpeter.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <0eedf780-16b2-ca5c-8eea-5d41e6837f23@redhat.com>
+Date: Mon, 16 Jan 2017 17:54:55 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170116091801.GL30108@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Jan 2017 09:30:03 -0000
-From: Daniel Berrange <1578192@bugs.launchpad.net>
-Reply-To: Bug 1578192 <1578192@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160504123823.5625.5258.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170116093004.27129.9561.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1578192] Re: GTK+ interface doesn't translate
- keycodes properly with Wayland backend
+Subject: Re: [Qemu-devel] [PATCH RFC v3 14/14] intel_iommu: enable vfio
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,122 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-This issue was fixed already in git master with:
-
-commit a8ffb372a2202c65f42fdb69891ea68a2f274b55
-Author: Daniel P. Berrange <berrange@redhat.com>
-Date:   Thu Dec 1 09:41:17 2016 +0000
-
-    ui: use evdev keymap when running under wayland
-    =
-
-    Wayland always uses evdev as its input source, so QEMU
-    can use the existing evdev keymap data
-    =
-
-    Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-    Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
-    Message-id: 20161201094117.16407-1-berrange@redhat.com
-    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
 
--- =
+On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 17:18, Peter Xu wrote:
+>>>   static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t =
+domain_id,
+>>>                                         hwaddr addr, uint8_t am)
+>>>   {
+>>> @@ -1222,6 +1251,7 @@ static void vtd_iotlb_page_invalidate(IntelIOMM=
+UState *s, uint16_t domain_id,
+>>>       info.addr =3D addr;
+>>>       info.mask =3D ~((1 << am) - 1);
+>>>       g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page, =
+&info);
+>>> +    vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
+>> Is the case of GLOBAL or DSI flush missed, or we don't care it at all?
+> IMHO we don't. For device assignment, since we are having CM=3D1 here,
+> we should have explicit page invalidations even if guest sends
+> global/domain invalidations.
+>
+> Thanks,
+>
+> -- peterx
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1578192
+Is this spec required? Btw, it looks to me that both DSI and GLOBAL are=20
+indeed explicit flush.
 
-Title:
-  GTK+ interface doesn't translate keycodes properly with Wayland
-  backend
+Just have a quick go through on driver codes and find this something=20
+interesting in intel_iommu_flush_iotlb_psi():
 
-Status in QEMU:
-  Fix Committed
+...
+     /*
+      * Fallback to domain selective flush if no PSI support or the size =
+is
+      * too big.
+      * PSI requires page size to be 2 ^ x, and the base address is=20
+naturally
+      * aligned to the size
+      */
+     if (!cap_pgsel_inv(iommu->cap) || mask > cap_max_amask_val(iommu->ca=
+p))
+         iommu->flush.flush_iotlb(iommu, did, 0, 0,
+                         DMA_TLB_DSI_FLUSH);
+     else
+         iommu->flush.flush_iotlb(iommu, did, addr | ih, mask,
+                         DMA_TLB_PSI_FLUSH);
+...
 
-Bug description:
-  I already posted this on the mailing list
-  (https://lists.nongnu.org/archive/html/qemu-
-  devel/2016-05/msg00119.html) but I decided to do a formal bug report
-  so it can be tracked and doesn't get lost.
+It looks like DSI_FLUSH is possible even for CM on.
 
-  ... I'm no expert, but it looks like GTK+ key events come in at the
-  ui/gtk.c:gd_key_event callback function, which calls
-  ui/gtk.c:gd_map_keycode to translate the GTK+ keycode into the Qemu
-  keycode before sending it on using qemu_input_event_send_key_number.
-  The problem is that gd_map_keycode is incomplete when GTK+ is running
-  on a backend other than X11.
+And in flush_unmaps():
 
-  static int gd_map_keycode(GtkDisplayState *s, GdkDisplay *dpy, int gdk_ke=
-ycode)
-  {
-      int qemu_keycode;
+...
+         /* In caching mode, global flushes turn emulation expensive */
+         if (!cap_caching_mode(iommu->cap))
+             iommu->flush.flush_iotlb(iommu, 0, 0, 0,
+                      DMA_TLB_GLOBAL_FLUSH);
+...
 
-  #ifdef GDK_WINDOWING_WIN32
-      if (GDK_IS_WIN32_DISPLAY(dpy)) {
-          qemu_keycode =3D MapVirtualKey(gdk_keycode, MAPVK_VK_TO_VSC);
-          switch (qemu_keycode) {
-          case 103:   /* alt gr */
-              qemu_keycode =3D 56 | SCANCODE_GREY;
-              break;
-          }
-          return qemu_keycode;
-      }
-  #endif
+If I understand the comments correctly, GLOBAL is ok for CM too (though=20
+the code did not do it for performance reason).
 
-      if (gdk_keycode < 9) {
-          qemu_keycode =3D 0;
-      } else if (gdk_keycode < 97) {
-          qemu_keycode =3D gdk_keycode - 8;
-  #ifdef GDK_WINDOWING_X11
-      } else if (GDK_IS_X11_DISPLAY(dpy) && gdk_keycode < 158) {
-          if (s->has_evdev) {
-              qemu_keycode =3D translate_evdev_keycode(gdk_keycode - 97);
-          } else {
-              qemu_keycode =3D translate_xfree86_keycode(gdk_keycode - 97);
-          }
-  #endif
-      } else if (gdk_keycode =3D=3D 208) { /* Hiragana_Katakana */
-          qemu_keycode =3D 0x70;
-      } else if (gdk_keycode =3D=3D 211) { /* backslash */
-          qemu_keycode =3D 0x73;
-      } else {
-          qemu_keycode =3D 0;
-      }
-
-      return qemu_keycode;
-  }
-
-  In my case, I'm using GTK+'s Wayland backend, so keycodes 97 through
-  157 (this includes KEY_HOME(102), KEY_PAGEUP(104), KEY_PAGEDOWN(109),
-  KEY_END(107), etc.) are never translated into a qemu_keycode, and the
-  final 'else' block is hit, causing gd_map_keycode to return 0, which
-  is an invalid keycode and thus cannot be handled by xen-kbdfront. At
-  least that's my best guess as to what is happening.
-
-  The solution that comes to mind is provide an alternative to
-  translate_{evdev,xfree86}_keycode that is compatable with
-  Wayland/libinput, but I don't know exactly which API would provide
-  this functionality, much less do I have a patch. Intuition tells me
-  that translate_evdev_keycode would probably work under Wayland because
-  Weston uses libinput which uses evdev as its backend, but I don't know
-  this for a fact, and I don't know if it would be the Right Way (i.e.
-  Wayland or libinput might provide an API for this purpose, but I don't
-  know).
-
-  I may try to do some testing with translate_evdev_keycode on Wayland
-  and also look into any possible APIs for keycode translation, but I
-  just wanted to put it out there and get some feedback awhile.
-
-  Qemu 2.2.1 from Xen 4.6.1 (relevant code appears unchanged in Qemu master)
-  GTK+ 3.18.7
-  Wayland 1.9.0
-  Weston 1.9.0
-  libinput 1.2.3
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1578192/+subscriptions
+Thanks
