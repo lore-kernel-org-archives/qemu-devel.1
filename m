@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cT0oK-0000o4-RW
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 01:30:34 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cT0r1-0002JU-00
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 01:33:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cT0oH-0000fY-N3
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 01:30:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cT0oH-0000fM-Du
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 01:30:29 -0500
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-15-git-send-email-peterx@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <fad506bc-2398-fef9-b720-7720569ac0a6@redhat.com>
-Date: Mon, 16 Jan 2017 14:30:20 +0800
-MIME-Version: 1.0
-In-Reply-To: <1484276800-26814-15-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+	(envelope-from <arei.gonglei@huawei.com>) id 1cT0qx-0001kt-Tv
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 01:33:19 -0500
+Received: from [45.249.212.189] (port=2379 helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cT0qs-0001Mi-K8
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 01:33:15 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Mon, 16 Jan 2017 06:32:16 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA192515@DGGEMA505-MBX.china.huawei.com>
+References: <1484375301-159804-1-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1484375301-159804-1-git-send-email-longpeng2@huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v3 14/14] intel_iommu: enable vfio
- devices
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] cryptodev: setiv only when really need
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,210 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: longpeng <longpeng2@huawei.com>
+Cc: "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-
-
-On 2017=E5=B9=B401=E6=9C=8813=E6=97=A5 11:06, Peter Xu wrote:
-> This patch is based on Aviv Ben-David (<bd.aviv@gmail.com>)'s patch
-> upstream:
 >
->    "IOMMU: enable intel_iommu map and unmap notifiers"
->    https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01453.html
->
-> However I removed/fixed some content, and added my own codes.
->
-> Instead of translate() every page for iotlb invalidations (which is
-> slower), we walk the pages when needed and notify in a hook function.
->
-> This patch enables vfio devices for VT-d emulation.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> From: longpeng
+> Sent: Saturday, January 14, 2017 2:28 PM
+> To: Gonglei (Arei)
+> Cc: Wubin (H); Zhoujian (jay, Euler); qemu-devel@nongnu.org; longpeng
+> Subject: [PATCH] cryptodev: setiv only when really need
+>=20
+> ECB mode cipher doesn't need IV, if we setiv for it then qemu
+> crypto API would report "Expected IV size 0 not **", so we should
+> setiv only when the cipher algos really need.
+>=20
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 > ---
->   hw/i386/intel_iommu.c         | 68 ++++++++++++++++++++++++++++++++++=
-+++------
->   include/hw/i386/intel_iommu.h |  8 +++++
->   2 files changed, 67 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 2596f11..104200b 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -839,7 +839,8 @@ next:
->    * @private: private data for the hook function
->    */
->   static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_=
-t end,
-> -                         vtd_page_walk_hook hook_fn, void *private)
-> +                         vtd_page_walk_hook hook_fn, void *private,
-> +                         bool notify_unmap)
->   {
->       dma_addr_t addr =3D vtd_get_slpt_base_from_context(ce);
->       uint32_t level =3D vtd_get_level_from_context_entry(ce);
-> @@ -858,7 +859,7 @@ static int vtd_page_walk(VTDContextEntry *ce, uint6=
-4_t start, uint64_t end,
->       trace_vtd_page_walk(ce->hi, ce->lo, start, end);
->  =20
->       return vtd_page_walk_level(addr, start, end, hook_fn, private,
-> -                               level, true, true, NULL, false);
-> +                               level, true, true, NULL, notify_unmap);
->   }
->  =20
->   /* Map a device to its corresponding domain (context-entry) */
-> @@ -1212,6 +1213,34 @@ static void vtd_iotlb_domain_invalidate(IntelIOM=
-MUState *s, uint16_t domain_id)
->                                   &domain_id);
->   }
->  =20
-> +static int vtd_page_invalidate_notify_hook(IOMMUTLBEntry *entry,
-> +                                           void *private)
-> +{
-> +    memory_region_notify_iommu((MemoryRegion *)private, *entry);
-> +    return 0;
-> +}
-> +
-> +static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-> +                                           uint16_t domain_id, hwaddr =
-addr,
-> +                                           uint8_t am)
-> +{
-> +    IntelIOMMUNotifierNode *node;
-> +    VTDContextEntry ce;
-> +    int ret;
-> +
-> +    QLIST_FOREACH(node, &(s->notifiers_list), next) {
-> +        VTDAddressSpace *vtd_as =3D node->vtd_as;
-> +        ret =3D vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-> +                                       vtd_as->devfn, &ce);
-> +        if (!ret && domain_id =3D=3D VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-> +            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SIZE,
-> +                          vtd_page_invalidate_notify_hook,
-> +                          (void *)&vtd_as->iommu, true);
-> +        }
-> +    }
-> +}
-> +
-> +
->   static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t do=
-main_id,
->                                         hwaddr addr, uint8_t am)
->   {
-> @@ -1222,6 +1251,7 @@ static void vtd_iotlb_page_invalidate(IntelIOMMUS=
-tate *s, uint16_t domain_id,
->       info.addr =3D addr;
->       info.mask =3D ~((1 << am) - 1);
->       g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page, &i=
-nfo);
-> +    vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
+>  backends/cryptodev-builtin.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>=20
+Queued.
 
-Is the case of GLOBAL or DSI flush missed, or we don't care it at all?
-
-Thanks
-
->   }
->  =20
->   /* Flush IOTLB
-> @@ -2244,15 +2274,34 @@ static void vtd_iommu_notify_flag_changed(Memor=
-yRegion *iommu,
->                                             IOMMUNotifierFlag new)
->   {
->       VTDAddressSpace *vtd_as =3D container_of(iommu, VTDAddressSpace, =
-iommu);
-> +    IntelIOMMUState *s =3D vtd_as->iommu_state;
-> +    IntelIOMMUNotifierNode *node =3D NULL;
-> +    IntelIOMMUNotifierNode *next_node =3D NULL;
->  =20
-> -    if (new & IOMMU_NOTIFIER_MAP) {
-> -        error_report("Device at bus %s addr %02x.%d requires iommu "
-> -                     "notifier which is currently not supported by "
-> -                     "intel-iommu emulation",
-> -                     vtd_as->bus->qbus.name, PCI_SLOT(vtd_as->devfn),
-> -                     PCI_FUNC(vtd_as->devfn));
-> +    if (!s->cache_mode_enabled && new & IOMMU_NOTIFIER_MAP) {
-> +        error_report("We need to set cache_mode=3D1 for intel-iommu to=
- enable "
-> +                     "device assignment with IOMMU protection.");
->           exit(1);
->       }
-> +
-> +    /* Add new ndoe if no mapping was exising before this call */
-
-"node"?
-
-> +    if (old =3D=3D IOMMU_NOTIFIER_NONE) {
-> +        node =3D g_malloc0(sizeof(*node));
-> +        node->vtd_as =3D vtd_as;
-> +        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-> +        return;
-> +    }
-> +
-> +    /* update notifier node with new flags */
-> +    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-> +        if (node->vtd_as =3D=3D vtd_as) {
-> +            if (new =3D=3D IOMMU_NOTIFIER_NONE) {
-> +                QLIST_REMOVE(node, next);
-> +                g_free(node);
-> +            }
-> +            return;
-> +        }
-> +    }
->   }
->  =20
->   static const VMStateDescription vtd_vmstate =3D {
-> @@ -2689,7 +2738,7 @@ static void vtd_iommu_replay(MemoryRegion *mr, IO=
-MMUNotifier *n)
->            */
->           trace_vtd_replay_ce_valid(bus_n, PCI_SLOT(vtd_as->devfn),
->                                     PCI_FUNC(vtd_as->devfn), ce.hi, ce.=
-lo);
-> -        vtd_page_walk(&ce, 0, ~0, vtd_replay_hook, (void *)n);
-> +        vtd_page_walk(&ce, 0, ~0, vtd_replay_hook, (void *)n, false);
->       } else {
->           trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
->                                       PCI_FUNC(vtd_as->devfn));
-> @@ -2871,6 +2920,7 @@ static void vtd_realize(DeviceState *dev, Error *=
-*errp)
->           return;
->       }
->  =20
-> +    QLIST_INIT(&s->notifiers_list);
->       memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
->       memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
->                             "intel_iommu", DMAR_REG_SIZE);
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iomm=
-u.h
-> index 9c3f6c0..832cfc9 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -63,6 +63,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
->   typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
->   typedef struct VTDIrq VTDIrq;
->   typedef struct VTD_MSIMessage VTD_MSIMessage;
-> +typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
->  =20
->   /* Context-Entry */
->   struct VTDContextEntry {
-> @@ -249,6 +250,11 @@ struct VTD_MSIMessage {
->   /* When IR is enabled, all MSI/MSI-X data bits should be zero */
->   #define VTD_IR_MSI_DATA          (0)
->  =20
-> +struct IntelIOMMUNotifierNode {
-> +    VTDAddressSpace *vtd_as;
-> +    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
-> +};
-> +
->   /* The iommu (DMAR) device state struct */
->   struct IntelIOMMUState {
->       X86IOMMUState x86_iommu;
-> @@ -286,6 +292,8 @@ struct IntelIOMMUState {
->       MemoryRegionIOMMUOps iommu_ops;
->       GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIB=
-us* reference */
->       VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects ind=
-exed by bus number */
-> +    /* list of registered notifiers */
-> +    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
->  =20
->       /* interrupt remapping */
->       bool intr_enabled;              /* Whether guest enabled IR */
+Thanks,
+-Gonglei
