@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cT6mV-0006iv-2f
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:53:04 -0500
+	(envelope-from <berrange@redhat.com>) id 1cT6nn-0007OP-H0
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:54:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cT6mR-00065Y-Vh
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:53:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48488)
+	(envelope-from <berrange@redhat.com>) id 1cT6nk-0006Wv-Dl
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:54:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60522)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cT6mR-00065K-PR
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:52:59 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cT6nk-0006Wm-88
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:54:20 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CA39BC0467F5
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 12:52:59 +0000 (UTC)
-Date: Mon, 16 Jan 2017 12:52:53 +0000
+	by mx1.redhat.com (Postfix) with ESMTPS id 5BC1C8553D
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 12:54:20 +0000 (UTC)
+Date: Mon, 16 Jan 2017 12:54:14 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170116125253.GF13096@redhat.com>
+Message-ID: <20170116125414.GG13096@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170113131731.1246-1-pbonzini@redhat.com>
 	<20170113131731.1246-5-pbonzini@redhat.com>
@@ -43,24 +43,31 @@ On Fri, Jan 13, 2017 at 02:17:19PM +0100, Paolo Bonzini wrote:
 > AioContexts other than the main one.
 > 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/io/channel.h | 30 ++++++++++++++++++++++++++++++
+>  io/channel-command.c | 13 +++++++++++++
+>  io/channel-file.c    | 11 +++++++++++
+>  io/channel-socket.c  | 16 +++++++++++-----
+>  io/channel-tls.c     | 12 ++++++++++++
+>  io/channel-watch.c   |  6 ++++++
+>  io/channel.c         | 11 +++++++++++
+>  7 files changed, 94 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/io/channel.h b/include/io/channel.h
+> index 32a9470..665edd7 100644
+> --- a/include/io/channel.h
+> +++ b/include/io/channel.h
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+> @@ -80,6 +83,9 @@ struct QIOChannel {
+>      Object parent;
+>      unsigned int features; /* bitmask of QIOChannelFeatures */
+>      char *name;
+> +    AioContext *ctx;
+> +    QIOChannelRestart *read_coroutine;
+> +    QIOChannelRestart *write_coroutine;
 
-> diff --git a/io/channel-command.c b/io/channel-command.c
-> index ad25313..4000b61 100644
-> --- a/io/channel-command.c
-> +++ b/io/channel-command.c
-> @@ -328,6 +328,18 @@ static int qio_channel_command_close(QIOChannel *ioc,
->  }
->  
->  
-> +static void qio_channel_command_set_aio_fd_handler(QIOChannel *ioc,
-> +                                                AioContext *ctx,
-> +                                                IOHandler *io_read,
-> +                                                IOHandler *io_write,
-> +                                                void *opaque)
-
-nitpick alignment
+This hunk belongs in the next patch since its not used here and you also
+change the data types in the next patch.
 
 
 Regards,
