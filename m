@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTA6F-0004j4-Qm
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:25:40 -0500
+	(envelope-from <famz@redhat.com>) id 1cTA7n-0005WH-TP
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:27:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTA6B-0006az-Ja
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:25:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58172)
+	(envelope-from <famz@redhat.com>) id 1cTA7j-0006vG-UF
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:27:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43020)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTA6B-0006ac-3A
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:25:35 -0500
-Date: Mon, 16 Jan 2017 18:25:32 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170116182522-mutt-send-email-mst@kernel.org>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-14-git-send-email-peterx@redhat.com>
-	<7a8c721d-8a12-9727-feae-58103942fd55@redhat.com>
-	<20170116075043.GE30108@pxdev.xzpeter.org>
-	<ae7765c7-7101-357e-3e7f-8ca94d8ad5b5@redhat.com>
-	<20170116081252.GI30108@pxdev.xzpeter.org>
-	<bcfed61e-d086-0df5-849c-6d2aaa25757c@redhat.com>
-	<20170116083224.GK30108@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cTA7j-0006v4-OA
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:27:11 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E2BBB635DA
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:27:11 +0000 (UTC)
+Date: Tue, 17 Jan 2017 00:26:50 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170116162650.GA11780@lemon>
+References: <20170113131731.1246-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170116083224.GK30108@pxdev.xzpeter.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v3 13/14] intel_iommu: allow dynamic
- switch of IOMMU region
+In-Reply-To: <20170113131731.1246-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/16] aio_context_acquire/release pushdown, part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
-On Mon, Jan 16, 2017 at 04:32:24PM +0800, Peter Xu wrote:
-> On Mon, Jan 16, 2017 at 04:25:35PM +0800, Jason Wang wrote:
-> >=20
-> >=20
-> > On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 16:12, Peter Xu wrote:
-> > >On Mon, Jan 16, 2017 at 04:01:00PM +0800, Jason Wang wrote:
-> > >>
-> > >>On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 15:50, Peter Xu wrote:
-> > >>>On Mon, Jan 16, 2017 at 02:20:31PM +0800, Jason Wang wrote:
-> > >>>
-> > >>>[...]
-> > >>>
-> > >>>>>diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > >>>>>index fd75112..2596f11 100644
-> > >>>>>--- a/hw/i386/intel_iommu.c
-> > >>>>>+++ b/hw/i386/intel_iommu.c
-> > >>>>>@@ -1343,9 +1343,49 @@ static void vtd_handle_gcmd_sirtp(IntelIO=
-MMUState *s)
-> > >>>>>      vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_IRTP=
-S);
-> > >>>>>  }
-> > >>>>>+static void vtd_switch_address_space(VTDAddressSpace *as, bool =
-iommu_enabled)
-> > >>>>Looks like you can check s->dmar_enabled here?
-> > >>>Yes, we need to check old state in case we don't need a switch at =
-all.
-> > >>>Actually I checked it...
-> > >>>
-> > >>I mean is there a chance that iommu_enabled( better name should be
-> > >>dmar_enabled) is not equal to s->dmar_enabled? Looks not.
-> > >>
-> > >>vtd_handle_gcmd_te() did:
-> > >>
-> > >>     ...
-> > >>     if (en) {
-> > >>         s->dmar_enabled =3D true;
-> > >>         /* Ok - report back to driver */
-> > >>         vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_TES)=
-;
-> > >>     } else {
-> > >>         s->dmar_enabled =3D false;
-> > >>     ...
-> > >>
-> > >>You can vtd_switch_address_space_all(s, en) after this which will c=
-all this
-> > >>function. And another caller like you've pointed out has already ca=
-ll this
-> > >>through s->dmar_enabled. So en here is always s->dmar_enalbed?
-> > >Hmm, yes...
-> > >
-> > >(I would still prefer keeping this parameter for readablility.
-> > >  Though, I prefer your suggestion to rename it to dmar_enabled)
-> > >
-> > >-- peterx
-> >=20
-> > I think this does not give more readability :) May I was wrong, let l=
-eave
-> > this for maintainer.
-> >=20
-> > Thanks :)
->=20
-> Thanks for reviewing this series so fast!
->=20
-> I have no strong opinion as well. Maybe you are right. :-)
->=20
-> Michael, please let me know if you dislike this, so I can remove this
-> parameter (it equals to as->iommu_state->dmar_enabled).
->=20
-> Thanks,
->=20
-> -- peterx
+On Fri, 01/13 14:17, Paolo Bonzini wrote:
+> Paolo Bonzini (16):
+>   aio: introduce aio_co_schedule and aio_co_wake
+>   block-backend: allow blk_prw from coroutine context
+>   test-thread-pool: use generic AioContext infrastructure
+>   io: add methods to set I/O handlers on AioContext
+>   io: make qio_channel_yield aware of AioContexts
+>   nbd: do not block on partial reply header reads
+>   coroutine-lock: reschedule coroutine on the AioContext it was running
+>     on
+>   qed: introduce qed_aio_start_io and qed_aio_next_io_cb
+>   aio: push aio_context_acquire/release down to dispatching
+>   block: explicitly acquire aiocontext in timers that need it
+>   block: explicitly acquire aiocontext in callbacks that need it
+>   block: explicitly acquire aiocontext in bottom halves that need it
+>   block: explicitly acquire aiocontext in aio callbacks that need it
+>   aio-posix: partially inline aio_dispatch into aio_poll
+>   async: remove unnecessary inc/dec pairs
+>   block: document fields protected by AioContext lock
 
-I prefer not to duplicate data, yes.
+I could only spot a few minor issues as noted in individual replies, otherwise
+looks sane!
+
+Fam
