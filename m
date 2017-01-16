@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTDMy-0003X0-3C
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:55:09 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTDWG-0000cI-FF
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:04:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTDMu-0008Nv-Rv
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:55:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48150)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTDMu-0008Mw-Jh
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:55:04 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 16 Jan 2017 17:54:52 -0200
-Message-Id: <20170116195452.23532-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
+	(envelope-from <mreitz@redhat.com>) id 1cTDWF-0002ws-Lv
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:04:44 -0500
+References: <20170103182801.9638-1-berrange@redhat.com>
+	<20170103182801.9638-8-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d3f1e931-cecf-71b2-db82-f43c51361599@redhat.com>
+Date: Mon, 16 Jan 2017 21:04:31 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170103182801.9638-8-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FCU90s5XdWTTp006GdTkBRTvHmHicRdLx"
+Subject: Re: [Qemu-devel] [PATCH v1 07/15] iotests: fix 097 when run with
+ qcow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,117 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jiri Denemark <jdenemar@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-Change the meaning of "-cpu host" to "enable all features
-supported by the accelerator in the current host", so that it can
-be used to enable/query all features supported by TCG.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FCU90s5XdWTTp006GdTkBRTvHmHicRdLx
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <d3f1e931-cecf-71b2-db82-f43c51361599@redhat.com>
+Subject: Re: [PATCH v1 07/15] iotests: fix 097 when run with qcow
+References: <20170103182801.9638-1-berrange@redhat.com>
+ <20170103182801.9638-8-berrange@redhat.com>
+In-Reply-To: <20170103182801.9638-8-berrange@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-To make sure "host" is still at the end of the list in "-cpu
-help", add a "ordering" field that will be used when sorting the
-CPU model list.
+On 03.01.2017 19:27, Daniel P. Berrange wrote:
+> The previous commit:
+>=20
+>   commit a3e1505daec31ef56f0489f8c8fff1b8e4ca92bd
+>   Author: Eric Blake <eblake@redhat.com>
+>   Date:   Mon Dec 5 09:49:34 2016 -0600
+>=20
+>     qcow2: Don't strand clusters near 2G intervals during commit
+>=20
+> extended the 097 test case so that it did two passes, once
+> with an internal snapshot, once without.
+>=20
+> qcow (v1) does not support internal snapshots, so this change
+> broke test 097 when run against qcow.
+>=20
+> This splits 097 in two, creating a new 173 that tests the
+> internal snapshot codepath, effectively putting 097 back
+> to its content before the above commit.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  tests/qemu-iotests/097     |  10 +---
+>  tests/qemu-iotests/097.out | 125 ++-----------------------------------=
+-------
+>  tests/qemu-iotests/173     | 126 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/173.out | 119 +++++++++++++++++++++++++++++++++++++=
++++++
+>  tests/qemu-iotests/group   |   1 +
+>  5 files changed, 251 insertions(+), 130 deletions(-)
+>  create mode 100755 tests/qemu-iotests/173
+>  create mode 100644 tests/qemu-iotests/173.out
 
-Cc: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu-qom.h |  4 ++--
- target/i386/cpu.c     | 26 +++++---------------------
- 2 files changed, 7 insertions(+), 23 deletions(-)
+I don't think the effort is worth it, considering that probably
+literally nobody is still using qcow -- or so I hope, at least.
 
-diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-index 8cd607e9a2..75618919e3 100644
---- a/target/i386/cpu-qom.h
-+++ b/target/i386/cpu-qom.h
-@@ -47,7 +47,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
- /**
-  * X86CPUClass:
-  * @cpu_def: CPU model definition
-- * @kvm_required: Whether CPU model requires KVM to be enabled.
-+ * @ordering: Ordering on the "-cpu help" CPU model list.
-  * @migration_safe: See CpuDefinitionInfo::migration_safe
-  * @parent_realize: The parent class' realize handler.
-  * @parent_reset: The parent class' reset handler.
-@@ -62,7 +62,7 @@ typedef struct X86CPUClass {
-     /* Should be eventually replaced by subclass-specific property defaults. */
-     X86CPUDefinition *cpu_def;
- 
--    bool kvm_required;
-+    int ordering;
-     bool migration_safe;
- 
-     /* Optional description of CPU model.
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ec6eaf215c..e0ca8c0288 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1549,7 +1549,7 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
-     X86CPUClass *xcc = X86_CPU_CLASS(oc);
-     uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
- 
--    xcc->kvm_required = true;
-+    xcc->ordering = 9; /* Show it last on "-cpu help" */
- 
-     host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
-     x86_cpu_vendor_words2str(host_cpudef.vendor, ebx, edx, ecx);
-@@ -1563,8 +1563,7 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
- 
-     xcc->cpu_def = &host_cpudef;
-     xcc->model_description =
--        "KVM processor with all supported host features "
--        "(only available in KVM mode)";
-+        "Enables all features supported by the accelerator in the current host";
- 
-     /* level, xlevel, xlevel2, and the feature words are initialized on
-      * instance_init, because they require KVM to be initialized.
-@@ -2075,13 +2074,6 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
-     Error *err = NULL;
-     strList **next = missing_feats;
- 
--    if (xcc->kvm_required && !kvm_enabled()) {
--        strList *new = g_new0(strList, 1);
--        new->value = g_strdup("kvm");;
--        *missing_feats = new;
--        return;
--    }
--
-     xc = X86_CPU(object_new(object_class_get_name(OBJECT_CLASS(xcc))));
- 
-     x86_cpu_load_features(xc, &err);
-@@ -2129,7 +2121,7 @@ static void listflags(FILE *f, fprintf_function print, const char **featureset)
-     }
- }
- 
--/* Sort alphabetically by type name, listing kvm_required models last. */
-+/* Sort alphabetically by type name, respecting X86CPUClass::ordering. */
- static gint x86_cpu_list_compare(gconstpointer a, gconstpointer b)
- {
-     ObjectClass *class_a = (ObjectClass *)a;
-@@ -2138,9 +2130,8 @@ static gint x86_cpu_list_compare(gconstpointer a, gconstpointer b)
-     X86CPUClass *cc_b = X86_CPU_CLASS(class_b);
-     const char *name_a, *name_b;
- 
--    if (cc_a->kvm_required != cc_b->kvm_required) {
--        /* kvm_required items go last */
--        return cc_a->kvm_required ? 1 : -1;
-+    if (cc_a->ordering != cc_b->ordering) {
-+        return cc_a->ordering - cc_b->ordering;
-     } else {
-         name_a = object_class_get_name(class_a);
-         name_b = object_class_get_name(class_b);
-@@ -3191,13 +3182,6 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-     Error *local_err = NULL;
-     static bool ht_warned;
- 
--    if (xcc->kvm_required && !kvm_enabled()) {
--        char *name = x86_cpu_class_get_model_name(xcc);
--        error_setg(&local_err, "CPU model '%s' requires KVM", name);
--        g_free(name);
--        goto out;
--    }
--
-     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
-         error_setg(errp, "apic-id property was not initialized properly");
-         return;
--- 
-2.11.0.259.g40922b1
+Anyway:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--FCU90s5XdWTTp006GdTkBRTvHmHicRdLx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh9J1ASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AdMIIAI1lnD3EPTaO9pysKMlG+T8S4vXJHjG0
+aWgLmiaVv/LztRwM/gAjt5co0Yz8WdAKhlstmd9xy87d2CQKfuf/siUBtDgIBXKv
+g4SWc8+mcDMXfHkzZKulmREV6XrGzQIHnSwKRyPHSFCbDPQwig3DJVQ9OSCjO0lo
+7n5Wi58WUBNCLmvtad70ULVViNe/wlfVaTlbNGCsHFMiKRy7L6LkskV16WITzDC+
+QTmacQurENKBm4M6qKQzf8MRJ4gAVLHeFhyZiR2KDC+KDBphugtmnRTaqKbjiwAe
+4mYvLUZKwWeQlGs9ocFWbTtREKnIzawVJDEnHuDhWx5xi4YDot1/0dU=
+=nRNo
+-----END PGP SIGNATURE-----
+
+--FCU90s5XdWTTp006GdTkBRTvHmHicRdLx--
