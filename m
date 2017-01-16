@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1cTEZc-0004Hy-7Z
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:12:17 -0500
+	(envelope-from <lersek@redhat.com>) id 1cTEb1-0005Vz-Su
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:13:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1cTEZZ-0001Am-7Y
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:12:16 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40587)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
-	id 1cTEZY-0001AV-V7
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:12:13 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0GL8wEM096996
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:12:11 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28126f81hw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:12:11 -0500
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
-	Mon, 16 Jan 2017 21:12:08 -0000
-From: Eric Farman <farman@linux.vnet.ibm.com>
-Date: Mon, 16 Jan 2017 22:11:58 +0100
-Message-Id: <20170116211201.46601-1-farman@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH 0/3] scsi-generic and BLKSECTGET
+	(envelope-from <lersek@redhat.com>) id 1cTEay-0001h3-K2
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:13:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cTEay-0001gL-CB
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:13:40 -0500
+References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
+	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
+	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
+	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
+	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <b6362d69-a544-1b78-fc48-1020e5d0efef@redhat.com>
+Date: Mon, 16 Jan 2017 22:13:36 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
+ as PNP0C02 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,84 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, Eric Farman <farman@linux.vnet.ibm.com>, linux-scsi@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Leif Lindholm <leif.lindholm@linaro.org>, Andrew Jones <drjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>
 
-(cc'ing linux-scsi for the cover-letter; patches only to QEMU lists.)
+On 01/16/17 20:31, Ard Biesheuvel wrote:
+> On 16 January 2017 at 18:20, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 16 January 2017 at 17:30, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>>> On 16 January 2017 at 17:25, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>> On 13 January 2017 at 17:32, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>>>>> Linux for arm64 v4.10 and later will complain if the ECAM config space is
+>>>>> not reserved in the ACPI namespace:
+>>>>>
+>>>>>   acpi PNP0A08:00: [Firmware Bug]: ECAM area [mem 0x3f000000-0x3fffffff] not reserved in ACPI namespace
+>>>>>
+>>>>> The rationale is that OSes that don't consume the MCFG table should still
+>>>>> be able to infer that the PCI config space MMIO region is occupied.
+>>>>>
+>>>>> So update the ACPI table generation routine to add this reservation.
+>>>>>
+>>>>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>>>>> ---
+>>>>>  hw/arm/virt-acpi-build.c | 7 +++++++
+>>>>>  1 file changed, 7 insertions(+)
+>>>>>
+>>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>>>>> index 085a61117378..50d52f685f68 100644
+>>>>> --- a/hw/arm/virt-acpi-build.c
+>>>>> +++ b/hw/arm/virt-acpi-build.c
+>>>>> @@ -310,6 +310,13 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>>>>>      Aml *dev_rp0 = aml_device("%s", "RP0");
+>>>>>      aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+>>>>>      aml_append(dev, dev_rp0);
+>>>>> +
+>>>>> +    Aml *dev_res0 = aml_device("%s", "RES0");
+>>>>> +    aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+>>>>> +    crs = aml_resource_template();
+>>>>> +    aml_append(crs, aml_memory32_fixed(base_ecam, size_ecam, AML_READ_WRITE));
+>>>>> +    aml_append(dev_res0, aml_name_decl("_CRS", crs));
+>>>>> +    aml_append(dev, dev_res0);
+>>>>>      aml_append(scope, dev);
+>>>>>  }
+>>>>
+>>>> This needs to be controlled via the machine class back-compat
+>>>> machinery in hw/arm/virt.c so that it only happens for virt-2.9
+>>>> and later.
+>>>>
+>>>
+>>> Why exactly?
+>>
+>> Because the "virt-2.8" machine has to present to the guest
+>> exactly what "virt" did as of the QEMU 2.8 release, including
+>> any bugs or missing things we happened to have in our ACPI
+>> tables. This allows cross-version compatibility (including
+>> VM migration). Drew will have a more detailed explanation
+>> if you need it.
+>>
+> 
+> I suspected as much.
+> 
+> But in this case, I am not sure if it is worth the trouble: the
+> generated data is only consumed at boot time by the firmware, and I
+> suppose migration involves freezing a VM, including whatever resident
+> firmware image was used to boot the OS, and so this is unlikely to
+> affect migration.
+> 
+> But I will let Drew explain ...
 
-In the Linux kernel, I see two (three) places where the BLKSECTGET ioctl is
-handled:
+The PCI Firmware Specification (rev 3.1) says in 4.1.2. "MCFG Table
+Description": "The resources can *optionally* be returned in [...]
+EFIGetMemoryMap as reserved memory [...]". (Emphasis mine.) Linux seems
+to *insist* on this kind of reservation however.
 
-(1) block/(compat_)ioctl.c -- (compat_)blkdev_ioctl
-(2) drivers/scsi/sg.c -- sg_ioctl
+PNP0C02 is "General ID for reserving resources required by PnP
+motherboard registers. (Not device specific.)", according to
+<http://www.plasma-online.de/english/identify/serial/pnp_id_pnp.html>.
+So what this patch does is reserve a memory area through ACPI,
+practically as an unspecified "platform resource".
 
-The former has been around forever[1], and returns a short value measured in
-sectors.  A sector is generally assumed to be 512 bytes.
+There's an alternative that's contained entirely in the firmware. You
+can cover the MMCONFIG area in ArmVirtQemu with an EfiReservedMemoryType
+memory map entry (by producing an appropriate memalloc HOB in PEI, or by
+calling the appropriate gDS memory space map functions in DXE). OVMF
+does the former (memalloc HOB).
 
-The latter has been around for slightly less than forever[2], and returns an
-int that measures the value in bytes.  A change to return the block count
-was brought up a few years ago[3] and nacked.
+In ArmVirtQemu, we grab the MMCONFIG range from "pci-host-ecam-generic",
+from QEMU's DTB. If you don't dislike the idea, we could cover the range
+as well, right in "ArmVirtPkg/Library/FdtPciPcdProducerLib". That lib
+instance already sets the base address PCD, and makes sure that the
+relevant code is executed only once (in whatever driver module the
+library instance was built into). You could call the gDS functions
+mentioned above from that spot. (The library instance is already
+restricted to DXE_DRIVER and UEFI_DRIVER modules.)
 
-As a convenient example, if I use the blockdev tool to drive the ioctl to a
-SCSI disk and its scsi-generic equivalent, I get different results:
-
-  # lsscsi -g
-  [0:0:8:1077166114]disk    IBM      2107900          .217  /dev/sda /dev/sg0
-  # blockdev --getmaxsect /dev/sda
-  2560
-  # blockdev --getmaxsect /dev/sg0
-  20
-
-Now, the value for /dev/sda looks "correct" to me.
-
-  # cd /sys/devices/css0/0.0.0125/0.0.1f69/host0/rport-0\:0-8/
-  # cd target0\:0\:8/0\:0\:8\:1077166114/
-  # cat block/sda/queue/max_sectors_kb
-  1280
-  # cat block/sda/queue/hw_sector_size
-  512
-
-And the math checks out:
-
-  max_sectors_kb * 1024 / hw_sector_size == getmaxsect
-  -OR-
-  1280 * 1024 / 512 = 2560
-
-For /dev/sg0, it appears the answer is coming from the sg_ioctl result
-which is already multiplied by the block size, and then looking at only the
-upper half (short) of the returned big-endian fullword:
-
-  (1280 * 1024 / 512) * 512 = 1310720 = x00140000 => x0014 = 20
-
-The reason for all this?  Well, QEMU recently added a BLKSECTGET ioctl
-call[4] which we see during guest boot.  This code presumes the value is in
-blocks/sectors, and converts it to bytes[5].  Not that this matters, because
-the short/int discrepancy gives us "zero" on s390x.
-
-Also, that code doesn't execute for scsi-generic devices, so the conversion
-to bytes is correct, but I'd like to extend this code to interrogate
-scsi-generic devices as well.  This is important because libvirt converts
-a specified virtio-scsi device to its /dev/sgX address for the QEMU
-commandline.
-
-So, do I have to code around the different field sizes (int vs short) as
-well as scaling (bytes vs blocks)?  Obviously doable, but looking at the
-resulting commits, I find myself feeling a little ill.
-
-[1] The initial kernel git commit
-[2] kernel commit 44ec95425c1d9dce6e4638c29e4362cfb44814e7
-[3] https://lkml.org/lkml/2012/6/27/78
-[4] qemu commit 6f6071745bd0366221f5a0160ed7d18d0e38b9f7
-[5] qemu commit 5def6b80e1eca696c1fc6099e7f4d36729686402
-
-Eric Farman (3):
-  hw/scsi: Fix debug message of cdb structure in scsi-generic
-  block: Fix target variable of BLKSECTGET ioctl
-  block: get max_transfer limit for char (scsi-generic) devices
-
- block/file-posix.c     | 16 +++++++++++++---
- hw/scsi/scsi-generic.c |  5 +++--
- 2 files changed, 16 insertions(+), 5 deletions(-)
-
--- 
-2.8.4
+Thanks!
+Laszlo
