@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cT7OH-0002jc-Hf
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:32:06 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cT7QI-00045K-IV
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:34:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cT7OD-0001cW-Fc
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:32:05 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34920)
+	(envelope-from <stefanha@gmail.com>) id 1cT7QE-00027l-IS
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:34:10 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36600)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cT7OD-0001cK-7G
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:32:01 -0500
-Received: by mail-lf0-x241.google.com with SMTP id v186so12647037lfa.2
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 05:32:01 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170113131731.1246-1-pbonzini@redhat.com>
-	<20170113131731.1246-11-pbonzini@redhat.com>
-	<20170116130702.GG14226@lemon.Home>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <609935a2-9a35-ac2f-f484-a0936d0fd642@redhat.com>
-Date: Mon, 16 Jan 2017 14:32:00 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cT7QE-000273-BZ
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:34:06 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r126so30889276wmr.3
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 05:34:06 -0800 (PST)
+Date: Mon, 16 Jan 2017 13:34:01 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170116133401.GE14681@stefanha-x1.localdomain>
+References: <5878435d.54b31c0a.39a7b.4e93@mx.google.com>
+	<011014c2-1129-cd48-f13d-66d7951d3e3c@linux.intel.com>
+	<CAKXe6SJXWzu2pTZz_vRGic4ZomPcVGVOfOvig43=8ZoZet0cRQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170116130702.GG14226@lemon.Home>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/16] block: explicitly acquire aiocontext
- in timers that need it
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="JBi0ZxuS5uaEhkUZ"
+Content-Disposition: inline
+In-Reply-To: <CAKXe6SJXWzu2pTZz_vRGic4ZomPcVGVOfOvig43=8ZoZet0cRQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] nvdimm: allow read/write zero-size
+ namespace label
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+To: Li Qiang <liq3ea@gmail.com>
+Cc: Xiao Guangrong <guangrong.xiao@linux.intel.com>, Li Qiang <liqiang6-s@360.cn>, qemu-devel@nongnu.org
 
 
+--JBi0ZxuS5uaEhkUZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 16/01/2017 14:07, Fam Zheng wrote:
-> On Fri, 01/13 14:17, Paolo Bonzini wrote:
->> diff --git a/block/qed.c b/block/qed.c
->> index 7f1c508..a21d025 100644
->> --- a/block/qed.c
->> +++ b/block/qed.c
->> @@ -345,10 +345,22 @@ static void qed_need_check_timer_cb(void *opaque)
->>  
->>      trace_qed_need_check_timer_cb(s);
->>  
->> +    qed_acquire(s);
->>      qed_plug_allocating_write_reqs(s);
->>  
->>      /* Ensure writes are on disk before clearing flag */
->>      bdrv_aio_flush(s->bs->file->bs, qed_clear_need_check, s);
->> +    qed_release(s);
->> +}
->> +
->> +void qed_acquire(BDRVQEDState *s)
->> +{
->> +    aio_context_acquire(bdrv_get_aio_context(s->bs));
->> +}
->> +
->> +void qed_release(BDRVQEDState *s)
->> +{
->> +    aio_context_release(bdrv_get_aio_context(s->bs));
->>  }
->>  
->>  static void qed_start_need_check_timer(BDRVQEDState *s)
->> diff --git a/block/qed.h b/block/qed.h
->> index 9676ab9..ce8c314 100644
->> --- a/block/qed.h
->> +++ b/block/qed.h
->> @@ -198,6 +198,9 @@ enum {
->>   */
->>  typedef void QEDFindClusterFunc(void *opaque, int ret, uint64_t offset, size_t len);
->>  
->> +void qed_acquire(BDRVQEDState *s);
->> +void qed_release(BDRVQEDState *s);
->> +
-> 
-> Why cannot these be local (static) functions, in block/qed.c?
+On Sat, Jan 14, 2017 at 07:22:28PM +0800, Li Qiang wrote:
+> Hello Guangrong,
+>=20
+>=20
+> 2017-01-13 17:00 GMT+08:00 Xiao Guangrong <guangrong.xiao@linux.intel.com=
+>:
+>=20
+> >
+> >
+> > On 01/13/2017 11:02 AM, Li Qiang wrote:
+> >
+> >> From: Li Qiang <liqiang6-s@360.cn>
+> >>
+> >> The spec doesn't say the namespace label can't be zero
+> >> when read/write it. As this is no harmful, just allow
+> >> it.
+> >>
+> >>
+> > WHY?
+> >
+> > The spec said that the label should be at least 128K.
+> >
+>=20
+> Yes, the label size has a limit, but in NVDIMM_DSM_Interface_Example.pdf
+> section 4.5.1
+> When the guest get namespace label data, the 'Length' is not limited, if =
+it
+> is 0, it will trigger
+> this assert.
+>=20
+> static void nvdimm_validate_rw_label_data(NVDIMMDevice *nvdimm, uint64_t
+> size,
+>                                         uint64_t offset)
+> {
+>     assert((nvdimm->label_size >=3D size + offset) && (offset + size >
+> offset));
+> }
+>=20
+> Though I don't know what the exact behavior of this action in real
+> hardware. I just think it should not
+> trigger assert and exit when the guest get 0-size label data.
+>=20
+> Anyway, this is just a suggestion, If my understand is wrong, just ignore
+> this.
 
-Patch 13 uses them elsewhere.  Should I put them in a separate patch?
+QEMU must prevent guests from triggering assertions.  If the assertion
+causes a core dump then host resources are consumed and this could be a
+denial-of-service.  An assertion failure in nested virtualization can
+kill sibling VMs and is therefore also a denial-of-service.
 
-Paolo
+The size=3D0 case must be handled in some way (either an error or a nop).
 
->>  /**
->>   * Generic callback for chaining async callbacks
->>   */
-> 
-> Fam
-> 
-> 
+Stefan
+
+--JBi0ZxuS5uaEhkUZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYfMvJAAoJEJykq7OBq3PI1L4IAIbXP3vNbh+B5R3DdkiSocuN
+HTAKtRaFnKSIEEBp9pBWxsMiKUlZ25hmKYJus8IksPiGxQYeQT+CHxtxwACKiDke
+GdFqLP9N0yio8jXvjk2XWKaZaf88KJuY0pNO3LXFMmFhsreRJF3P7hsAo4dpIVST
+Rs1aHHN4rr+E1Xmkh/WrLg5iBHJKHoi7VVbABvi50qdEQWkYXDAR5Kjt6Zkv2bEF
+Rnu74JEkdBtrx5ucdbz6WAnfNtDR7IWIVYB66lmZ4NZnEoG2a1nhEMA20jMfEuk2
+Hj39K9TZPs6cfqBLlhfygkMwUwjvIq7cwDnSahxXPDvvsDVA7k+WZ8Ox676o8Rk=
+=SABe
+-----END PGP SIGNATURE-----
+
+--JBi0ZxuS5uaEhkUZ--
