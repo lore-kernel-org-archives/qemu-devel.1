@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cT7Su-0005tM-C9
+	(envelope-from <stefanha@gmail.com>) id 1cT7Su-0005tc-Oi
 	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:36:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cT7Sr-0002tw-4i
+	(envelope-from <stefanha@gmail.com>) id 1cT7Sr-0002u3-Hl
 	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:36:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36794)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cT7Sq-0002tm-V5
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35940)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cT7Sr-0002tr-Ae
 	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:36:49 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 119BDC03BD55
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 13:36:49 +0000 (UTC)
-Date: Mon, 16 Jan 2017 21:36:43 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170116133643.GH14226@lemon.Home>
-References: <20170113131731.1246-1-pbonzini@redhat.com>
-	<20170113131731.1246-12-pbonzini@redhat.com>
+Received: by mail-wm0-x242.google.com with SMTP id r126so30906368wmr.3
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 05:36:49 -0800 (PST)
+Date: Mon, 16 Jan 2017 13:36:41 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170116133641.GF14681@stefanha-x1.localdomain>
+References: <20170113084022.20152.24498.malonedeb@wampee.canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="MZf7D3rAEoQgPanC"
 Content-Disposition: inline
-In-Reply-To: <20170113131731.1246-12-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 11/16] block: explicitly acquire aiocontext
- in callbacks that need it
+In-Reply-To: <20170113084022.20152.24498.malonedeb@wampee.canonical.com>
+Subject: Re: [Qemu-devel] [Bug 1656234] [NEW] Qemu core dumped if using
+ virtio-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+To: Bug 1656234 <1656234@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
-On Fri, 01/13 14:17, Paolo Bonzini wrote:
-> diff --git a/nbd/server.c b/nbd/server.c
-> index efe5cb8..08fb720 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -1366,6 +1366,10 @@ static void nbd_restart_write(void *opaque)
->  static void nbd_set_handlers(NBDClient *client)
->  {
->      if (client->exp && client->exp->ctx) {
-> +        /* Note that the handlers do not expect any concurrency; qemu-nbd
-> +         * does not instantiate multiple AioContexts yet, nor does it call
-> +         * aio_poll/aio_dispatch from multiple threads.
-> +         */
->          aio_set_fd_handler(client->exp->ctx, client->sioc->fd, true,
->                             client->can_read ? nbd_read : NULL,
->                             client->send_coroutine ? nbd_restart_write : NULL,
 
-What about the built-in server (QMP nbd_server_start)?
+--MZf7D3rAEoQgPanC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> -- 
-> 2.9.3
-> 
-> 
+On Fri, Jan 13, 2017 at 08:40:22AM -0000, Robert Hu wrote:
+> Public bug reported:
+>=20
+> System Environment
+> =3D=3D=3D=3D=3D=3D=3D
+> Qemu commit/branch: e92fbc75
+> Host OS: RHEL7.2 ia32e
+> Host Kernel: 4.9.0
+> Guest OS: RHEL7.2 ia32e
+> Guest Kernel: 4.9.0
+>=20
+> Bug detailed description
+> =3D=3D=3D=3D=3D=3D=3D
+> While create a kvm guest using virtio-net, the qemu will core dump with s=
+howing "Aborted (core dumped)".
+> Reproduce Steps
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> create a guest:
+> qemu-system-x86_64 -enable-kvm -m 4096 -smp 4 -device virtio-net-pci,netd=
+ev=3Dnic0,mac=3D00:16:3e:49:be:24 -netdev tap,id=3Dnic0,script=3D/etc/kvm/q=
+emu-ifup -drive file=3D/ia32e_rhel7u2_kvm.qcow2,if=3Dnone,id=3Dvirtio-disk0=
+ -device virtio-blk-pci,drive=3Dvirtio-disk0 -serial file:serial.log
+>=20
+> Current Result:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> qemu-system-x86_64: /workspace/ia32e/nightly/kvm-next-20170105-ef85b6-e92=
+fbc/kvm/qemu/hw/virtio/virtio.c:214: virtio_queue_set_notification: Asserti=
+on `vq->notification_disabled > 0' failed.
+> Aborted (core dumped)
+
+Thanks for reporting this assertion failure.  A patch is queued and will
+be merged soon:
+https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg02277.html
+
+Stefan
+
+--MZf7D3rAEoQgPanC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYfMxpAAoJEJykq7OBq3PIMiQIAKn0rTpSefnD4rO4CJhMDuzm
+HDTdtAjbaVgSc1b7KoRSwyiChmPdG70lPjG62Z4GHtXuh0SAuYBCTYZg2aXmHrEw
+okHdSP559HmHF8cLk5jvCyI4KzdWXT9PyZqkot0ofNXDNJeGgH3LCsFR+GMBpaZx
+uHRrg49sp/1ugs6NHc1I4obSlWtBrTBkv3Jiv2E+CTNQpNMoPAp0WnwUjcb6b68s
+CvgO6G6FeR8sIva5EfVGTlUV0LQ3vbNu4qGD+pgil6s9Z5SJLgywaA12kP5Sf5X8
+Lj6YkCb2tS0HGdxe4aOLT4wfrx7uP0JF2IG2AVrOI+iSJWYkcCcd321x8b3iU+c=
+=H8R7
+-----END PGP SIGNATURE-----
+
+--MZf7D3rAEoQgPanC--
