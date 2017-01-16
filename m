@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEDr-0000xw-Bl
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEDs-0000zY-KH
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEDq-0003qL-Ei
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:47 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEDr-0003r8-OE
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:48 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 16 Jan 2017 21:49:11 +0100
-Message-Id: <20170116204921.31578-8-mreitz@redhat.com>
+Date: Mon, 16 Jan 2017 21:49:12 +0100
+Message-Id: <20170116204921.31578-9-mreitz@redhat.com>
 In-Reply-To: <20170111181432.18868-1-mreitz@redhat.com>
 References: <20170111181432.18868-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 15/25] block: Use bdrv_dirname() for
- relative filenames
+Subject: [Qemu-devel] [PATCH v4 16/25] block: Add 'base-directory' BDS option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +22,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-bdrv_get_full_backing_filename_from_filename() breaks down when it comes
-to JSON filenames. Using bdrv_dirname() as the basis is better because
-since we have BDS, we can descend through the BDS tree to the protocol
-layer, which gives us a greater probability of finding a non-JSON name;
-also, bdrv_dirname() is more correct as it allows block drivers to
-override the generation of that directory name in a protocol-specific
-way.
-
-We still need to keep bdrv_get_full_backing_filename_from_filename(),
-though, because it has valid callers which need it during image creation
-when no BDS is available yet.
-
-This makes a test case in qemu-iotest 110, which was supposed to fail,
-work. That is actually good, but we need to change the reference output
-(and the comment in 110) accordingly.
+Using this option, one can directly override what bdrv_dirname() will
+return. This is useful if one uses e.g. qcow2 on top of quorum (with
+only protocol BDSs under the quorum BDS) and wants to be able to use
+relative backing filenames.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c                    | 20 +++++++++++++++-----
- tests/qemu-iotests/110     |  3 ++-
- tests/qemu-iotests/110.out |  2 +-
- 3 files changed, 18 insertions(+), 7 deletions(-)
+ qapi/block-core.json      |  9 +++++++++
+ include/block/block_int.h |  2 ++
+ block.c                   | 14 ++++++++++++++
+ 3 files changed, 25 insertions(+)
 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 6b42216960..b4bd941696 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2367,6 +2367,14 @@
+ #                 (default: false)
+ # @detect-zeroes: #optional detect and optimize zero writes (Since 2.1)
+ #                 (default: off)
++# @base-directory #optional May be specified for any node. Normally, whenever a
++#                 filename is specified which is supposed to be relative to this
++#                 node (such as relative backing filenames), the base directory
++#                 to be used is the directory the image file of this node is in,
++#                 which is simply prepended to the relative filename. Using this
++#                 option, the string which is prepended (i.e. the base
++#                 directory) can be overridden.
++#                 (Since 2.9)
+ #
+ # Remaining options are determined by the block driver.
+ #
+@@ -2375,6 +2383,7 @@
+ { 'union': 'BlockdevOptions',
+   'base': { 'driver': 'BlockdevDriver',
+             '*node-name': 'str',
++            '*base-directory': 'str',
+             '*discard': 'BlockdevDiscardOptions',
+             '*cache': 'BlockdevCacheOptions',
+             '*read-only': 'bool',
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index fb916a7890..30fc1def4a 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -467,6 +467,8 @@ struct BlockDriverState {
+     QDict *full_open_options;
+     char exact_filename[PATH_MAX];
+ 
++    char *dirname;
++
+     BdrvChild *backing;
+     BdrvChild *file;
+ 
 diff --git a/block.c b/block.c
-index e591e326c5..f3d4436c9e 100644
+index f3d4436c9e..a10ba111bc 100644
 --- a/block.c
 +++ b/block.c
-@@ -214,12 +214,22 @@ char *bdrv_get_full_backing_filename_from_filename(const char *backed,
- static char *bdrv_make_absolute_filename(BlockDriverState *relative_to,
-                                          const char *filename, Error **errp)
+@@ -984,6 +984,12 @@ QemuOptsList bdrv_runtime_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "discard operation (ignore/off, unmap/on)",
+         },
++        {
++            .name = "base-directory",
++            .type = QEMU_OPT_STRING,
++            .help = "String to prepend to filenames relative to this BDS for "
++                    "making them absolute",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -1047,6 +1053,8 @@ static int bdrv_open_common(BlockDriverState *bs, BdrvChild *file,
+         goto fail_opts;
+     }
+ 
++    bs->dirname = g_strdup(qemu_opt_get(opts, "base-directory"));
++
+     bs->read_only = !(bs->open_flags & BDRV_O_RDWR);
+ 
+     if (use_bdrv_whitelist && !bdrv_is_whitelisted(drv, bs->read_only)) {
+@@ -2490,6 +2498,8 @@ static void bdrv_delete(BlockDriverState *bs)
+ 
+     bdrv_close(bs);
+ 
++    g_free(bs->dirname);
++
+     /* remove from list, if necessary */
+     if (bs->node_name[0] != '\0') {
+         QTAILQ_REMOVE(&graph_bdrv_states, bs, node_list);
+@@ -4097,6 +4107,10 @@ char *bdrv_dirname(BlockDriverState *bs, Error **errp)
  {
--    char *bs_filename = relative_to->exact_filename[0]
--                        ? relative_to->exact_filename
--                        : relative_to->filename;
-+    char *dir, *full_name;
+     BlockDriver *drv = bs->drv;
  
--    return bdrv_get_full_backing_filename_from_filename(bs_filename, filename,
--                                                        errp);
-+    if (filename[0] == '\0' || path_has_protocol(filename) ||
-+        path_is_absolute(filename))
-+    {
-+        return g_strdup(filename);
++    if (bs->dirname) {
++        return g_strdup(bs->dirname);
 +    }
 +
-+    dir = bdrv_dirname(relative_to, errp);
-+    if (!dir) {
-+        return NULL;
-+    }
-+
-+    full_name = g_strconcat(dir, filename, NULL);
-+    g_free(dir);
-+    return full_name;
- }
- 
- char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp)
-diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index 9de7369f3a..ba1b3c6c7d 100755
---- a/tests/qemu-iotests/110
-+++ b/tests/qemu-iotests/110
-@@ -61,7 +61,8 @@ echo '=== Non-reconstructable filename ==='
- echo
- 
- # Across blkdebug without a config file, you cannot reconstruct filenames, so
--# qemu is incapable of knowing the directory of the top image
-+# qemu is incapable of knowing the directory of the top image from the filename
-+# alone. However, using bdrv_dirname(), it should still work.
- TEST_IMG="json:{
-     'driver': '$IMGFMT',
-     'file': {
-diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index b3584ff87f..5370bc1d26 100644
---- a/tests/qemu-iotests/110.out
-+++ b/tests/qemu-iotests/110.out
-@@ -14,7 +14,7 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
- image: json:{"driver": "IMGFMT", "file": {"set-state.0.event": "read_aio", "image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "driver": "blkdebug", "set-state.0.new_state": 42}}
- file format: IMGFMT
- virtual size: 64M (67108864 bytes)
--backing file: t.IMGFMT.base (cannot determine actual path)
-+backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
- 
- === Backing name is always relative to the backed image ===
- 
+     if (!drv) {
+         error_setg(errp, "Node '%s' is ejected", bs->node_name);
+         return NULL;
 -- 
 2.11.0
