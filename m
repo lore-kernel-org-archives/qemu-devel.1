@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cT22M-0007SY-51
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:49:07 -0500
+	(envelope-from <bounces@canonical.com>) id 1cT242-0000B1-Fy
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:50:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cT22I-0003qt-UO
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:49:06 -0500
-Received: from mail-ua0-f169.google.com ([209.85.217.169]:34917)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cT22I-0003qR-Pe
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:49:02 -0500
-Received: by mail-ua0-f169.google.com with SMTP id y9so76302927uae.2
-	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 23:49:01 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cT23z-0004Gt-Da
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:50:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36930)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cT23z-0004Gj-7a
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:50:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cT23v-0004lQ-Py
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 07:50:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A65AC2E80D2
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 07:50:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <74186249-fee1-9917-2bf4-50aa240eb114@redhat.com>
-References: <1484305370-6220-1-git-send-email-lprosek@redhat.com>
-	<0343b5cd-f2b9-b439-7652-44ab5f05f0c4@redhat.com>
-	<CABdb734ESPhd=354YHCs2AV_jiCj=NwiR-AU0TcWuv0XMDcCaQ@mail.gmail.com>
-	<9d544d44-f41f-e691-ee73-54f9383a13e3@redhat.com>
-	<CABdb735JeFpoXqE1A-V1ih7F3Tbg3KFgs69_ijeyeYf_bo+jBw@mail.gmail.com>
-	<74186249-fee1-9917-2bf4-50aa240eb114@redhat.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon, 16 Jan 2017 08:49:00 +0100
-Message-ID: <CABdb736fzG4u6-tS_LeGAmsWMuao1pP2Z83qYazQQkeFrSxwoA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] ahci: advertise HOST_CAP_64
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Jan 2017 07:38:37 -0000
+From: Thomas Huth <1656710@bugs.launchpad.net>
+Reply-To: Bug 1656710 <1656710@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170115231359.21186.42325.malonedeb@gac.canonical.com>
+Message-Id: <20170116073838.20557.81262.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1656710] Re: Please support Ctrl-Alt-= to zoom in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,99 +36,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Fri, Jan 13, 2017 at 8:15 PM, John Snow <jsnow@redhat.com> wrote:
->
->
-> On 01/13/2017 02:01 PM, Ladi Prosek wrote:
->> On Fri, Jan 13, 2017 at 7:31 PM, John Snow <jsnow@redhat.com> wrote:
->>>
->>>
->>> On 01/13/2017 01:12 PM, Ladi Prosek wrote:
->>>> On Fri, Jan 13, 2017 at 6:23 PM, John Snow <jsnow@redhat.com> wrote:
->>>>> On 01/13/2017 06:02 AM, Ladi Prosek wrote:
->>>>>> The AHCI emulation code supports 64-bit addressing and should advertise this
->>>>>> fact in the Host Capabilities register. Both Linux and Windows drivers test
->>>>>> this bit to decide if the upper 32 bits of various registers may be written
->>>>>> to, and at least some versions of Windows have a bug where DMA is attempted
->>>>>> with an address above 4GB but, in the absence of HOST_CAP_64, the upper 32
->>>>>> bits are left unititialized which leads to a memory corruption.
->>>>>>
->>>>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
->>>>>> ---
->>>>>>  hw/ide/ahci.c | 2 +-
->>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
->>>>>> index 3c19bda..6a17acf 100644
->>>>>> --- a/hw/ide/ahci.c
->>>>>> +++ b/hw/ide/ahci.c
->>>>>> @@ -488,7 +488,7 @@ static void ahci_reg_init(AHCIState *s)
->>>>>>      s->control_regs.cap = (s->ports - 1) |
->>>>>>                            (AHCI_NUM_COMMAND_SLOTS << 8) |
->>>>>>                            (AHCI_SUPPORTED_SPEED_GEN1 << AHCI_SUPPORTED_SPEED) |
->>>>>> -                          HOST_CAP_NCQ | HOST_CAP_AHCI;
->>>>>> +                          HOST_CAP_NCQ | HOST_CAP_AHCI | HOST_CAP_64;
->>>>>>
->>>>>>      s->control_regs.impl = (1 << s->ports) - 1;
->>>>>>
->>>>>>
->>>>>
->>>>> Was this tested? What was the use case that prompted this patch, and do
->>>>> you have a public bugzilla to point to?
->>>>
->>>> Sorry, I thought you were aware. Here's the BZ with details:
->>>> https://bugzilla.redhat.com/show_bug.cgi?id=1411105
->>>>
->>>
->>> It's for the public record :)
->>>
->>> I'm going to amend your commit message, OK?
->>>
->>> https://github.com/jnsnow/qemu/commit/f037be92fc0c4580b846134e0355a69d0eccd0d9
->>
->> Minor nit: the OS we know for sure is affected is Windows Server 2008,
->> without the "R2". Thanks!
->>
->
-> I misunderstood. It looked like the initial report was for "SP2," though
-> I see you saying that the R2 version actually worked okay, but by
-> coincidence.
->
-> I didn't think there *was* an "SP2," for Windows Server, so I
-> interpreted that to mean R2.
->
-> So this only manifests with vanilla 2008?
+** Changed in: qemu
+   Importance: Undecided =3D> Wishlist
 
-We know it manifests on 2008 SP2, which is very different from 2008
-R2. 2008 is the server variant of Vista, 2008 R2 is the server variant
-of Win7 (yay for marketing names!)
+-- =
 
-I believe that 2008 SP2 32-bit is the only OS where it's been confirmed so far.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1656710
 
->>>> In short, Windows guests run into issues in certain virtual HW
->>>> configurations if the bit is not set. I have tested the patch and
->>>> verified that it fixes the failing cases.
->>>>
->>>
->>> Great. I'm CCing qemu-stable as this should probably be included in
->>> 2.7.2 / 2.8.1 / etc.
->>>
->>>>> It looks correct via the spec, thank you for finding this oversight. It
->>>>> looks like everywhere this bit would make a difference we already do the
->>>>> correct thing for having this bit set.
->>>>>
->>>>> From what I can gather from the spec, it looks as if even 32bit guests
->>>>> must ensure that the upper 32bit registers are cleared, so I think we're
->>>>> all set here.
->>>>>
->>>>> Reviewed-by: John Snow <jsnow@redhat.com>
->>>
->>> Thanks, applied to my IDE tree:
->>>
->>> https://github.com/jnsnow/qemu/commits/ide
->>> https://github.com/jnsnow/qemu.git
->>>
->>> --js
+Title:
+  Please support Ctrl-Alt-=3D to zoom in
+
+Status in QEMU:
+  New
+
+Bug description:
+  With the GTK3 interface, qemu-system supports pressing Ctrl-Alt-plus
+  to zoom in and Ctrl-Alt-minus to zoom out.  However, unlike many
+  programs that support similar zoom hotkeys, qemu-system actually
+  requires using '+', making the hotkey Ctrl-Alt-Shift-=3D .  Most programs
+  with similar zoom hotkeys allow Ctrl-Alt-=3D as a synonym.
+
+  Please consider accepting Ctrl-Alt-=3D as an additional zoom-in hotkey.
+
+  (Observed in QEMU 2.8)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1656710/+subscriptions
