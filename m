@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cT5WB-0008TS-HH
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:08 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cT5WF-00004s-38
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cT5W8-0002bb-9j
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:07 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:32904)
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cT5WE-0002cK-66
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:11 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:34750)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1cT5W8-0002bS-3s
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:04 -0500
-Received: by mail-pg0-x242.google.com with SMTP id 194so5219078pgd.0
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 03:32:04 -0800 (PST)
+	id 1cT5WE-0002cG-12
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:32:10 -0500
+Received: by mail-pg0-x241.google.com with SMTP id t6so1111028pgt.1
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 03:32:09 -0800 (PST)
 From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Mon, 16 Jan 2017 17:01:51 +0530
-Message-Id: <1484566314-3987-3-git-send-email-ashijeetacharya@gmail.com>
+Date: Mon, 16 Jan 2017 17:01:52 +0530
+Message-Id: <1484566314-3987-4-git-send-email-ashijeetacharya@gmail.com>
 In-Reply-To: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
 References: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v6 2/5] migration: Add a new option to enable
- only-migratable
+Subject: [Qemu-devel] [PATCH v6 3/5] migration: Allow "device add" options
+ to only add migratable devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +30,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com
 Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Add a new option "--only-migratable" in qemu which will allow to add
-only those devices which will not fail qemu after migration. Devices
-set with the flag 'unmigratable' cannot be added when this option will
-be used.
+Introduce checks for the unmigratable flag in the VMStateDescription
+structs of respective devices when user attempts to add them. If the
+"--only-migratable" was specified, all unmigratable devices will
+rightly fail to add. This feature is made compatible for both "-device"
+and "-usbdevice" command line options and covers their hmp and qmp
+counterparts as well.
 
 Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 ---
- include/migration/migration.h | 3 +++
- qemu-options.hx               | 9 +++++++++
- vl.c                          | 4 ++++
- 3 files changed, 16 insertions(+)
+ hw/usb/bus.c   | 19 +++++++++++++++++++
+ qdev-monitor.c |  9 +++++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index c309d23..40b3697 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -38,6 +38,9 @@
- #define QEMU_VM_COMMAND              0x08
- #define QEMU_VM_SECTION_FOOTER       0x7e
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index 25913ad..1dcc35c 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -8,6 +8,7 @@
+ #include "monitor/monitor.h"
+ #include "trace.h"
+ #include "qemu/cutils.h"
++#include "migration/migration.h"
  
-+/* for vl.c */
-+extern int only_migratable;
+ static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
+ 
+@@ -686,6 +687,8 @@ USBDevice *usbdevice_create(const char *cmdline)
+     const char *params;
+     int len;
+     USBDevice *dev;
++    ObjectClass *klass;
++    DeviceClass *dc;
+ 
+     params = strchr(cmdline,':');
+     if (params) {
+@@ -720,6 +723,22 @@ USBDevice *usbdevice_create(const char *cmdline)
+         return NULL;
+     }
+ 
++    klass = object_class_by_name(f->name);
++    if (klass == NULL) {
++        error_report("Device '%s' not found", f->name);
++        return NULL;
++    }
 +
- struct MigrationParams {
-     bool blk;
-     bool shared;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index c534a2f..1e16ae8 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3574,6 +3574,15 @@ be used to change settings (such as migration parameters) prior to issuing
- the migrate_incoming to allow the migration to begin.
- ETEXI
- 
-+DEF("only-migratable", 0, QEMU_OPTION_only_migratable, \
-+    "-only-migratable     allow only migratable devices\n", QEMU_ARCH_ALL)
-+STEXI
-+@item -only-migratable
-+@findex -only-migratable
-+Only allow migratable devices. Devices will not be allowed to enter an
-+unmigratable state.
-+ETEXI
++    dc = DEVICE_CLASS(klass);
 +
- DEF("nodefaults", 0, QEMU_OPTION_nodefaults, \
-     "-nodefaults     don't create default devices\n", QEMU_ARCH_ALL)
- STEXI
-diff --git a/vl.c b/vl.c
-index c643d3f..cbcb459 100644
---- a/vl.c
-+++ b/vl.c
-@@ -180,6 +180,7 @@ bool boot_strict;
- uint8_t *boot_splash_filedata;
- size_t boot_splash_filedata_size;
- uint8_t qemu_extra_params_fw[2];
-+int only_migratable; /* turn it off unless user states otherwise */
++    if (only_migratable) {
++        if (dc->vmsd->unmigratable) {
++            error_report("Device %s is not migratable, but --only-migratable "
++                         "was specified", f->name);
++            return NULL;
++        }
++    }
++
+     if (f->usbdevice_init) {
+         dev = f->usbdevice_init(bus, params);
+     } else {
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index c73410c..81d01df 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -29,6 +29,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/help_option.h"
+ #include "sysemu/block-backend.h"
++#include "migration/migration.h"
  
- int icount_align_option;
+ /*
+  * Aliases were a bad idea from the start.  Let's keep them
+@@ -577,6 +578,14 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+         return NULL;
+     }
  
-@@ -3910,6 +3911,9 @@ int main(int argc, char **argv, char **envp)
-                 }
-                 incoming = optarg;
-                 break;
-+            case QEMU_OPTION_only_migratable:
-+                only_migratable = 1;
-+                break;
-             case QEMU_OPTION_nodefaults:
-                 has_defaults = 0;
-                 break;
++    if (only_migratable) {
++        if (dc->vmsd->unmigratable) {
++            error_setg(errp, "Device %s is not migratable, but "
++                       "--only-migratable was specified", driver);
++            return NULL;
++        }
++    }
++
+     /* find bus */
+     path = qemu_opt_get(opts, "bus");
+     if (path != NULL) {
 -- 
 2.6.2
