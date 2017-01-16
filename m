@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cT7Mz-0001pS-5S
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:30:45 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cT7Nq-0002Ko-LF
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:31:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cT7Mu-0001Oz-U8
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:30:45 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33324)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cT7Nm-0001Y3-Lw
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:31:38 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33425)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cT7Mu-0001Og-Mf
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:30:40 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r144so30860810wme.0
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 05:30:40 -0800 (PST)
-Date: Mon, 16 Jan 2017 13:30:36 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170116133036.GD14681@stefanha-x1.localdomain>
-References: <1484256713-10902-1-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cT7Nm-0001Xl-F7
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:31:34 -0500
+Received: by mail-lf0-x244.google.com with SMTP id x1so7310048lff.0
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 05:31:34 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170113131731.1246-1-pbonzini@redhat.com>
+	<20170113131731.1246-7-pbonzini@redhat.com>
+	<20170116125208.GF14226@lemon.Home>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <67f59827-f7a7-2df1-3cb9-cc066603ba59@redhat.com>
+Date: Mon, 16 Jan 2017 14:31:08 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="a2FkP9tdjPU2nyhF"
-Content-Disposition: inline
-In-Reply-To: <1484256713-10902-1-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: drop an obsolete comment
+In-Reply-To: <20170116125208.GF14226@lemon.Home>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 06/16] nbd: do not block on partial reply
+ header reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +33,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
 
---a2FkP9tdjPU2nyhF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 12, 2017 at 11:31:56PM +0200, Michael S. Tsirkin wrote:
-> virtio core has code to revert queue number
-> to maximum on reset. Drop TODO to add that.
->=20
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  hw/virtio/virtio-pci.c | 1 -
->  1 file changed, 1 deletion(-)
+On 16/01/2017 13:52, Fam Zheng wrote:
+> +    /* Kick the read_reply_co to get the next reply.  */
+> +    aio_co_wake(s->read_reply_co);
+> 
+> Can't s->read_reply_co be NULL? nbd_read_reply_entry unsets it. (Surprisingly
+> this file is rather unfamiliar to me, it's possible I'm missing something.)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Yes, that can happen depending on how the coroutines are scheduled when
+the server goes down.
 
---a2FkP9tdjPU2nyhF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYfMr8AAoJEJykq7OBq3PIPd0IAIL/z2aeNIvssMvLhwMQI5bw
-Eht9L77cVHZpzZDnxMdB/yw7CdqFIs1HddlBqKw7I57xbOL42RKm63HN0zyl+0Gw
-ecxXsK7I9qgzjBAvoUh0BZtFGSzVziPSBatSnkc3/IAF1euxsmqpfNrFI4hv/zHL
-rnaXKg6W6JDwgyzPHIOUbC4bH+E2935lTodKvrJyzO/qplfp3afy/P/V1Dt9I3NA
-coSSb+j0F5KAl4w5lyw9ytQJkjIuwLk72WjKRor177Si1AbckHVdfqTDRe9DgZXn
-9G0brZbS3GbcV92fFk9KnnwWyaxVhcF24p/xJ6kVJSFJD1ofeH5+iYYCHrAfPJ0=
-=6Nv/
------END PGP SIGNATURE-----
-
---a2FkP9tdjPU2nyhF--
+Paolo
