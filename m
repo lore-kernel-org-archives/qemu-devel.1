@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cTD50-0006bk-76
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:36:35 -0500
+	(envelope-from <harrynjit@gmail.com>) id 1cTD6L-0007gV-6k
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:37:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cTD4z-0003X9-0t
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:36:34 -0500
-References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
-	<e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
-	<2EAE3C4F-58AF-4594-A284-A69D8BC3EA8F@alex.org.uk>
-	<CAJSP0QWXF2tS5q-BpmxR9ti0osjzZCFiRxdRDho4pDBLkD3UUQ@mail.gmail.com>
-	<CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
-	<90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
-	<20170114144500.oxoqvrn5x4sdfo74@grep.be>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1ef924f8-1e58-fe54-dabc-06873a531412@redhat.com>
-Date: Mon, 16 Jan 2017 13:36:21 -0600
+	(envelope-from <harrynjit@gmail.com>) id 1cTD6K-0004Km-1L
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:37:57 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:32977)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <harrynjit@gmail.com>) id 1cTD6J-0004I7-Rz
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:37:55 -0500
+Received: by mail-qt0-x244.google.com with SMTP id n13so16232416qtc.0
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 11:37:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170114144500.oxoqvrn5x4sdfo74@grep.be>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xipmLk3hWtUKBDcubsqoUvIj1Itgp1LCa"
-Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] How to online resize qemu disk
- with nbd protocol?
+In-Reply-To: <20170116131500.GA14681@stefanha-x1.localdomain>
+References: <CA+scX6=rRiGHsOj8oxjTe4KqEF7S_GUao3k=TUQeE7FpyT_K8w@mail.gmail.com>
+	<20170103155047.GE14707@stefanha-x1.localdomain>
+	<CA+scX6mCDjnZdEMemuDerPxR2L4w12PyyvH==tW_PdW6Kqe7+A@mail.gmail.com>
+	<20170116131500.GA14681@stefanha-x1.localdomain>
+From: Weiwei Jia <harrynjit@gmail.com>
+Date: Mon, 16 Jan 2017 14:37:53 -0500
+Message-ID: <CA+scX6ka+8sgt5DaKqmJbcyQ1LS=Me=wR7T41VNat=Wc-nTbvA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Performance about x-data-plane
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,142 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wouter Verhelst <w@uter.be>
-Cc: Bob Chen <a175818323@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, libvir-list <libvir-list@redhat.com>, krister@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xipmLk3hWtUKBDcubsqoUvIj1Itgp1LCa
-From: Eric Blake <eblake@redhat.com>
-To: Wouter Verhelst <w@uter.be>
-Cc: Bob Chen <a175818323@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- qemu block <qemu-block@nongnu.org>
-Message-ID: <1ef924f8-1e58-fe54-dabc-06873a531412@redhat.com>
-Subject: Re: [Nbd] [Qemu-devel] [Qemu-block] How to online resize qemu disk
- with nbd protocol?
-References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
- <e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
- <2EAE3C4F-58AF-4594-A284-A69D8BC3EA8F@alex.org.uk>
- <CAJSP0QWXF2tS5q-BpmxR9ti0osjzZCFiRxdRDho4pDBLkD3UUQ@mail.gmail.com>
- <CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
- <90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
- <20170114144500.oxoqvrn5x4sdfo74@grep.be>
-In-Reply-To: <20170114144500.oxoqvrn5x4sdfo74@grep.be>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jan 16, 2017 at 8:15 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Tue, Jan 03, 2017 at 12:02:14PM -0500, Weiwei Jia wrote:
+>> > The expensive part is the virtqueue kick.  Recently we tried polling the
+>> > virtqueue instead of waiting for the ioeventfd file descriptor and got
+>> > double-digit performance improvements:
+>> > https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00148.html
+>> >
+>> > If you want to understand the performance of your benchmark you'll have
+>> > compare host/guest disk stats (e.g. request lifetime, disk utilization,
+>> > queue depth, average request size) to check that the bare metal and
+>> > guest workloads are really sending comparable I/O patterns to the
+>> > physical disk.
+>> >
+>> > Then you using Linux and/or QEMU tracing to analyze the request latency
+>> > by looking at interesting points in the request lifecycle like virtqueue
+>> > kick, host Linux AIO io_submit(2), etc.
+>> >
+>>
+>> Thank you. I will look into "polling the virtqueue" as you said above.
+>> Currently, I just use blktrace to see disk stats and add logs in the
+>> I/O workload to see the time latency for each request. What kind of
+>> tools are you using to analyze request lifecycle like virtqueue kick,
+>> host Linux AIO iosubmit, etc.
+>>
+>> Do you trace the lifecycle like this
+>> (http://www.linux-kvm.org/page/Virtio/Block/Latency#Performance_data)
+>> but it seems to be out of date. Does it
+>> (http://repo.or.cz/qemu-kvm/stefanha.git/shortlog/refs/heads/tracing-dev-0.12.4)
+>> still work on QEMU 2.4.1?
+>
+> The details are out of date but the general approach to tracing the I/O
+> request lifecycle still apply.
+>
+> There are multiple tracing tools that can do what you need.  I've CCed
+> Karl Rister who did the latest virtio-blk dataplane tracing.
+>
+> "perf record -a -e kvm:\*" is a good start.  You can use "perf probe" to
+> trace QEMU's trace events (recent versions have sdt support, which means
+> SystemTap tracepoints work) and also trace any function in QEMU:
+> http://blog.vmsplice.net/2011/03/how-to-use-perf-probe.html
 
-On 01/14/2017 08:45 AM, Wouter Verhelst wrote:
-> Hi Eric,
->=20
-> (side note: my mutt tells me that the signature on your message does no=
-t
-> validate. Not sure what's going on, but something you might want to loo=
-k
-> into...)
-
-Not my fault, but a well-known issue with mailman. It rewrites portions
-of message bodies that look like headers, yet GPG signatures
-intentionally include a portion of the body that includes a repeat of
-the original headers in order to authenticate the original sender. Thus,
-the rewritten message no longer has a valid signature :(
-
-In the past I've compared a broken and pristine copy of my messages, and
-it's fairly annoying that the difference is sometimes as subtle as a
-space vs. a tab, due to the way the header line was rewritten.
-
-
->=20
-> On Thu, Jan 12, 2017 at 12:45:56PM -0600, Eric Blake wrote:
->> For resize smaller, things are a lot trickier - how do you block acces=
-s
->> to a portion of a file that the client still thinks exist, but which t=
-he
->> server has truncated away?  Maybe the easy way out is to state that th=
-e
->> server MUST NOT resize smaller.
->=20
-> I would prefer something along the lines of "the server MUST NOT
-> activate the 'resize smaller' command (which it received out of band
-> from whereever) until the client asked for and was told the new size of=
-
-> the device."
->=20
-> That is (with A & X being offsets, and B & Y being sizes, A+B < X):
->=20
-> client        			server			server mgmt
-> READ A,B        		no error
->         						resize to X
-> READ X,Y        		no error
-> reread sizes
-> READ X,Y        		ENOSPC
-> READ A,B        		no error
->=20
-> In that scenario, it should be the responsibility of the server to
-> ensure there are no more readers; servers could implement that (if they=
-
-> don't want to do the required bookkeeping and keep such requests as
-> pending) by simply sending ESHUTDOWN or some such.
-
-In other words, a resize-smaller request (outside of the NBD protocol)
-can either force the server to tell the clients to disconnect, or else
-is merely a hint that is at the mercy of the client actually being smart
-enough to request the information.  I don't know how we'd specify that,
-but the idea seems reasonable enough.
-
-The sad part is that the NBD protocol (currently) lacks any way for the
-server to send an unsolicited hint to the client.  I've seen other
-protocols (such as libvirt) that include a hint mechanism; intentionally
-designed where a client that ignores the hints is no worse for the wear,
-but where the hints can allow the server to pass information to the
-client faster than what is possible if the client never asks the right
-question.
-
-Maybe the structured reply proposal can be extended into this (reserve a
-"reply" header that can be issued as many times as desired by the server
-without the client ever having issued the request first, and where the
-reply never uses the end-of-reply marker), but I'm not sure I want to go
-that direction just yet.
-
->=20
-> I agree with Alex that adding an active resize command to the NBD
-> protocol feels like a layering violation. We should probably not do
-> that.
-
-Fair enough; for now it will just be a passive re-query command.
-
->=20
->> Should I spend time turning this idea into a more formal spec, along t=
-he
->> lines of other NBD extension proposals?
->=20
-> Feel free.
-
-I'll see what I can come up with in the next day or so, at least into an
-RFC-quality spec change.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Thank you. I will try it.
 
 
---xipmLk3hWtUKBDcubsqoUvIj1Itgp1LCa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYfSC1AAoJEKeha0olJ0Nqq9sH/2VUTWyh1fiigLYHV10X3pTF
-R+2483FZL06mETMnhmXSL3M0uRlanmz8a6CxDJSD+BI6qXcyznJrMg0W2Y6y0cFa
-OSpPJH9D8OdaaPg8YOWCvF7huwAHWaLr8FtupB4t9dcmd5XiG00Stqo0jga5G1Tq
-Kjsy+xeJZ5iAhEOGimhrF8kyFCnl9PybFEbSslXsYGWgyfVi0WrodFxmAwcD7gB0
-Qk38DDD4E153ep8AeoMxPZdNr5FfaSeLFmtKAGOpwAqF6V3HSxN/3tcezIb5KlmH
-wCO3Uq8faet1F7DAgSxbGYQzSJOOHEPSRUZUV0ed+jKK1iqsnGI8anlv6DVLkcg=
-=cecx
------END PGP SIGNATURE-----
-
---xipmLk3hWtUKBDcubsqoUvIj1Itgp1LCa--
+Best,
+Weiwei Jia
