@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cT4tQ-0005Tx-Bi
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 05:52:05 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cT51W-0007vA-Ao
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:00:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cT4tL-0001Kw-Df
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 05:52:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59816)
+	(envelope-from <stefanha@redhat.com>) id 1cT51R-0003Uf-DV
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:00:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cT4tL-0001Kn-5B
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 05:51:59 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3047D4D68E
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 10:51:59 +0000 (UTC)
-Date: Mon, 16 Jan 2017 11:51:55 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170116115155.35c72378@nial.brq.redhat.com>
-In-Reply-To: <20170113190057.6327-1-ehabkost@redhat.com>
-References: <20170113190057.6327-1-ehabkost@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cT51R-0003UG-4T
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 06:00:21 -0500
+Date: Mon, 16 Jan 2017 11:00:17 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170116110017.GC12351@stefanha-x1.localdomain>
+References: <20170113115651.17607-1-haozhong.zhang@intel.com>
+	<20170113131727.GA10706@stefanha-x1.localdomain>
+	<20170113180243.GA3565@thinpad.lan.raisama.net>
+	<4ee4b67a-f00b-b2fd-f87b-4f0a74734412@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-i386: Remove AMD feature flag
- aliases from Opteron models
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="bKyqfOwhbdpXa4YI"
+Content-Disposition: inline
+In-Reply-To: <4ee4b67a-f00b-b2fd-f87b-4f0a74734412@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: check if nvdimm is enabled before
+ plugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,121 +31,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Xiao Guangrong <guangrong.xiao@linux.intel.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, imammedo@redhat.com, Richard Henderson <rth@twiddle.net>
 
-On Fri, 13 Jan 2017 17:00:57 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> When CPU vendor is set to AMD, the AMD feature alias bits on
-> CPUID[0x80000001].EDX are already automatically copied from CPUID[1].EDX
-> on x86_cpu_realizefn(). When CPU vendor is Intel, those bits are
-> reserved and should be zero. On either case, those bits shouldn't be set
-> in the CPU model table.
-> 
-> Commit 726a8ff68677d8d5fba17eb0ffb85076bfb598dc removed those
-> bits from most CPU models, but the Opteron_* entries still have
-> them. Remove the alias bits from Opteron_* too.
-> 
-> Add an assert() to x86_register_cpudef_type() to ensure we don't
-> make the same mistake again.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+--bKyqfOwhbdpXa4YI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->  target/i386/cpu.c | 46 ++++++++++++----------------------------------
->  1 file changed, 12 insertions(+), 34 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index a149c8dc42..af726a8fd0 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1339,12 +1339,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->          .features[FEAT_1_ECX] =
->              CPUID_EXT_SSE3,
->          .features[FEAT_8000_0001_EDX] =
-> -            CPUID_EXT2_LM | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
-> -            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
-> -            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
-> -            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
-> -            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
-> -            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
-> +            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
->          .xlevel = 0x80000008,
->          .model_id = "AMD Opteron 240 (Gen 1 Class Opteron)",
->      },
-> @@ -1365,13 +1360,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->              CPUID_EXT_CX16 | CPUID_EXT_SSE3,
->          /* Missing: CPUID_EXT2_RDTSCP */
->          .features[FEAT_8000_0001_EDX] =
-> -            CPUID_EXT2_LM | CPUID_EXT2_FXSR |
-> -            CPUID_EXT2_MMX | CPUID_EXT2_NX | CPUID_EXT2_PSE36 |
-> -            CPUID_EXT2_PAT | CPUID_EXT2_CMOV | CPUID_EXT2_MCA |
-> -            CPUID_EXT2_PGE | CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL |
-> -            CPUID_EXT2_APIC | CPUID_EXT2_CX8 | CPUID_EXT2_MCE |
-> -            CPUID_EXT2_PAE | CPUID_EXT2_MSR | CPUID_EXT2_TSC | CPUID_EXT2_PSE |
-> -            CPUID_EXT2_DE | CPUID_EXT2_FPU,
-> +            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
->          .features[FEAT_8000_0001_ECX] =
->              CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
->          .xlevel = 0x80000008,
-> @@ -1395,13 +1384,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->              CPUID_EXT_SSE3,
->          /* Missing: CPUID_EXT2_RDTSCP */
->          .features[FEAT_8000_0001_EDX] =
-> -            CPUID_EXT2_LM | CPUID_EXT2_FXSR |
-> -            CPUID_EXT2_MMX | CPUID_EXT2_NX | CPUID_EXT2_PSE36 |
-> -            CPUID_EXT2_PAT | CPUID_EXT2_CMOV | CPUID_EXT2_MCA |
-> -            CPUID_EXT2_PGE | CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL |
-> -            CPUID_EXT2_APIC | CPUID_EXT2_CX8 | CPUID_EXT2_MCE |
-> -            CPUID_EXT2_PAE | CPUID_EXT2_MSR | CPUID_EXT2_TSC | CPUID_EXT2_PSE |
-> -            CPUID_EXT2_DE | CPUID_EXT2_FPU,
-> +            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
->          .features[FEAT_8000_0001_ECX] =
->              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
->              CPUID_EXT3_ABM | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-> @@ -1428,13 +1411,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
->              CPUID_EXT_SSE3,
->          /* Missing: CPUID_EXT2_RDTSCP */
->          .features[FEAT_8000_0001_EDX] =
-> -            CPUID_EXT2_LM |
-> -            CPUID_EXT2_PDPE1GB | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
-> -            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
-> -            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
-> -            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
-> -            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
-> -            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
-> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
-> +            CPUID_EXT2_SYSCALL,
->          .features[FEAT_8000_0001_ECX] =
->              CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
->              CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
-> @@ -1464,13 +1442,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
->              CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
->          /* Missing: CPUID_EXT2_RDTSCP */
->          .features[FEAT_8000_0001_EDX] =
-> -            CPUID_EXT2_LM |
-> -            CPUID_EXT2_PDPE1GB | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
-> -            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
-> -            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
-> -            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
-> -            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
-> -            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
-> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
-> +            CPUID_EXT2_SYSCALL,
->          .features[FEAT_8000_0001_ECX] =
->              CPUID_EXT3_TBM | CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
->              CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
-> @@ -2395,6 +2368,11 @@ static void x86_register_cpudef_type(X86CPUDefinition *def)
->          .class_data = def,
->      };
->  
-> +    /* AMD aliases are handled at runtime based on CPUID vendor, so
-> +     * they shouldn't be set on the CPU model table.
-> +     */
-> +    assert(!(def->features[FEAT_8000_0001_EDX] & CPUID_EXT2_AMD_ALIASES));
-> +
->      type_register(&ti);
->      g_free(typename);
->  }
+On Mon, Jan 16, 2017 at 01:55:34PM +0800, Xiao Guangrong wrote:
+>=20
+>=20
+> On 01/14/2017 02:02 AM, Eduardo Habkost wrote:
+> > On Fri, Jan 13, 2017 at 01:17:27PM +0000, Stefan Hajnoczi wrote:
+> > > On Fri, Jan 13, 2017 at 07:56:51PM +0800, Haozhong Zhang wrote:
+> > > > The missing of 'nvdimm' in the machine type option '-M' means NVDIMM
+> > > > is disabled. QEMU should refuse to plug any NVDIMM device in this c=
+ase
+> > > > and report the misconfiguration.
+> > > >=20
+> > > > Reported-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > > > Message-Id: 20170112110928.GF4621@stefanha-x1.localdomain
+> > > > Message-Id: 20170111093630.2088-1-stefanha@redhat.com
+> > > > ---
+> > > >  hw/i386/pc.c | 5 +++++
+> > > >  1 file changed, 5 insertions(+)
+> > > >=20
+> > > > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > > > index 25e8586..3907609 100644
+> > > > --- a/hw/i386/pc.c
+> > > > +++ b/hw/i386/pc.c
+> > > > @@ -1715,6 +1715,11 @@ static void pc_dimm_plug(HotplugHandler *hot=
+plug_dev,
+> > > >      }
+> > > >=20
+> > > >      if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+> > > > +        if (!pcms->acpi_nvdimm_state.is_enabled) {
+> > > > +            error_setg(&local_err,
+> > > > +                       "nvdimm is not enabled: missing 'nvdimm' in=
+ '-M'");
+> > > > +            goto out;
+> > > > +        }
+> > >=20
+> > > A warning is definitely useful to notify users of a possible
+> > > configuration error.
+> > >=20
+> > > I wonder what happens when you plug an NVDIMM into a motherboard where
+> > > the firmware lacks support.  Does it:
+> > >  * Refuse to boot?
+> > >  * Treat the DIMM as regular RAM?
+> > >  * Boot but the DIMM will not be used by firmware and kernel?
+> > >=20
+> > > QEMU should act the same way as real hardware.
+> >=20
+> > If real hardware behavior is not useful in any way (e.g. first
+> > and third options above), is there a good reason for QEMU to not
+> > implement an additional safety mechanism preventing NVDIMM from
+> > being connected to a machine that doesn't support it?
+> >=20
+>=20
+> Yes. i agree with Eduardo.
+>=20
+> For the real hardware the behavior may be different between vendors, we
+> are asking our HW people to check what will happen on Intel's hardware
+> under this case.
+
+Let's find out what real hardware/firmware does.  I guess it's the Intel
+MRC component that handles memory initialization.
+
+Stefan
+
+--bKyqfOwhbdpXa4YI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYfKfBAAoJEJykq7OBq3PIt5wH+QGrw6tCQvWosjHelytI3va1
+Sj2EpHmppL5k9yG+6LHMy6nYezikjqNxsxxF2uTBUWB2iMwKO1Vgn7l1ITLqt1WD
+TFoW1CVvMtdxsKqOGnyB7GrXjBsJAq/z+ItCRzV5udqbKLJ0vQ1UbALXQxi/3+Wl
+z0VHFFgoepZQzao54Q5+HDC0FcTzUMbf20x/xItVYs3Fv6CtoA9Nquc7p1ZObFN6
+9XoiYCNyOKZPZkSssBuVN69o8OaFZNoQR9cM9ksPznLnzmZked0L7I0N3zo8ed9a
+0fnjjbyU7SaatSipBT++pNs22LdYXa8aqfSrGwmqMKnaUhBBmR+zURx5SqEhAJg=
+=tyhG
+-----END PGP SIGNATURE-----
+
+--bKyqfOwhbdpXa4YI--
