@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEDs-0000zY-KH
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:49 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEDu-00011N-9y
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEDr-0003r8-OE
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEDt-0003rR-Cv
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:50 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 16 Jan 2017 21:49:12 +0100
-Message-Id: <20170116204921.31578-9-mreitz@redhat.com>
+Date: Mon, 16 Jan 2017 21:49:13 +0100
+Message-Id: <20170116204921.31578-10-mreitz@redhat.com>
 In-Reply-To: <20170111181432.18868-1-mreitz@redhat.com>
 References: <20170111181432.18868-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 16/25] block: Add 'base-directory' BDS option
+Subject: [Qemu-devel] [PATCH v4 17/25] iotests: Add quorum case to test 110
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,103 +22,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Using this option, one can directly override what bdrv_dirname() will
-return. This is useful if one uses e.g. qcow2 on top of quorum (with
-only protocol BDSs under the quorum BDS) and wants to be able to use
-relative backing filenames.
+Test 110 tests relative backing filenames for complex BDS trees. Add
+quorum as an example that can never work automatically (without
+special-casing if all child nodes have the same base directory), and an
+example on how to make it work manually (using the base-directory
+option).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json      |  9 +++++++++
- include/block/block_int.h |  2 ++
- block.c                   | 14 ++++++++++++++
- 3 files changed, 25 insertions(+)
+ tests/qemu-iotests/110     | 48 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/110.out | 12 ++++++++++++
+ 2 files changed, 60 insertions(+)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 6b42216960..b4bd941696 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2367,6 +2367,14 @@
- #                 (default: false)
- # @detect-zeroes: #optional detect and optimize zero writes (Since 2.1)
- #                 (default: off)
-+# @base-directory #optional May be specified for any node. Normally, whenever a
-+#                 filename is specified which is supposed to be relative to this
-+#                 node (such as relative backing filenames), the base directory
-+#                 to be used is the directory the image file of this node is in,
-+#                 which is simply prepended to the relative filename. Using this
-+#                 option, the string which is prepended (i.e. the base
-+#                 directory) can be overridden.
-+#                 (Since 2.9)
- #
- # Remaining options are determined by the block driver.
- #
-@@ -2375,6 +2383,7 @@
- { 'union': 'BlockdevOptions',
-   'base': { 'driver': 'BlockdevDriver',
-             '*node-name': 'str',
-+            '*base-directory': 'str',
-             '*discard': 'BlockdevDiscardOptions',
-             '*cache': 'BlockdevCacheOptions',
-             '*read-only': 'bool',
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index fb916a7890..30fc1def4a 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -467,6 +467,8 @@ struct BlockDriverState {
-     QDict *full_open_options;
-     char exact_filename[PATH_MAX];
- 
-+    char *dirname;
-+
-     BdrvChild *backing;
-     BdrvChild *file;
- 
-diff --git a/block.c b/block.c
-index f3d4436c9e..a10ba111bc 100644
---- a/block.c
-+++ b/block.c
-@@ -984,6 +984,12 @@ QemuOptsList bdrv_runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "discard operation (ignore/off, unmap/on)",
-         },
-+        {
-+            .name = "base-directory",
-+            .type = QEMU_OPT_STRING,
-+            .help = "String to prepend to filenames relative to this BDS for "
-+                    "making them absolute",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -1047,6 +1053,8 @@ static int bdrv_open_common(BlockDriverState *bs, BdrvChild *file,
-         goto fail_opts;
-     }
- 
-+    bs->dirname = g_strdup(qemu_opt_get(opts, "base-directory"));
-+
-     bs->read_only = !(bs->open_flags & BDRV_O_RDWR);
- 
-     if (use_bdrv_whitelist && !bdrv_is_whitelisted(drv, bs->read_only)) {
-@@ -2490,6 +2498,8 @@ static void bdrv_delete(BlockDriverState *bs)
- 
-     bdrv_close(bs);
- 
-+    g_free(bs->dirname);
-+
-     /* remove from list, if necessary */
-     if (bs->node_name[0] != '\0') {
-         QTAILQ_REMOVE(&graph_bdrv_states, bs, node_list);
-@@ -4097,6 +4107,10 @@ char *bdrv_dirname(BlockDriverState *bs, Error **errp)
+diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
+index ba1b3c6c7d..d96b656b6b 100755
+--- a/tests/qemu-iotests/110
++++ b/tests/qemu-iotests/110
+@@ -30,6 +30,7 @@ status=1	# failure is the default!
+ _cleanup()
  {
-     BlockDriver *drv = bs->drv;
+ 	_cleanup_test_img
++        rm -f "$TEST_IMG.copy"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
-+    if (bs->dirname) {
-+        return g_strdup(bs->dirname);
-+    }
+@@ -87,6 +88,53 @@ echo
+ # omit the image size; it should work anyway
+ _make_test_img -b "$TEST_IMG_REL.base"
+ 
++echo
++echo '=== Nodes without a common directory ==='
++echo
 +
-     if (!drv) {
-         error_setg(errp, "Node '%s' is ejected", bs->node_name);
-         return NULL;
++cp "$TEST_IMG" "$TEST_IMG.copy"
++
++# Should inform us that the actual path of the backing file cannot be determined
++TEST_IMG="json:{
++    'driver': '$IMGFMT',
++    'file': {
++        'driver': 'quorum',
++        'vote-threshold': 1,
++        'children': [
++            {
++                'driver': 'file',
++                'filename': '$TEST_IMG'
++            },
++            {
++                'driver': 'file',
++                'filename': '$TEST_IMG.copy'
++            }
++        ]
++    }
++}" _img_info | _filter_img_info
++
++echo
++
++# Should work fine
++TEST_IMG="json:{
++    'driver': '$IMGFMT',
++    'file': {
++        'driver': 'quorum',
++        'base-directory': '$TEST_DIR/',
++        'vote-threshold': 1,
++        'children': [
++            {
++                'driver': 'file',
++                'filename': '$TEST_IMG'
++            },
++            {
++                'driver': 'file',
++                'filename': '$TEST_IMG.copy'
++            }
++        ]
++    }
++}" _img_info | _filter_img_info
++
+ 
+ # success, all done
+ echo '*** done'
+diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
+index 5370bc1d26..e1845d8026 100644
+--- a/tests/qemu-iotests/110.out
++++ b/tests/qemu-iotests/110.out
+@@ -19,4 +19,16 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
+ === Backing name is always relative to the backed image ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=t.IMGFMT.base
++
++=== Nodes without a common directory ===
++
++image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++backing file: t.IMGFMT.base (cannot determine actual path)
++
++image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
+ *** done
 -- 
 2.11.0
