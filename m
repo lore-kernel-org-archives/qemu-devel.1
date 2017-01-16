@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTBln-0007lk-RO
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:12:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cTBr4-0003Rl-8n
+	for Qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:18:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTBli-0004ip-UJ
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:12:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45836)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTBli-0004iW-Nu
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:12:34 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 16 Jan 2017 16:12:12 -0200
-Message-Id: <20170116181212.31565-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] i386: Return migration-safe field on
- query-cpu-definitions
+	(envelope-from <peter.maydell@linaro.org>) id 1cTBr0-0006XG-42
+	for Qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:18:06 -0500
+Received: from mail-vk0-x22d.google.com ([2607:f8b0:400c:c05::22d]:34657)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cTBqz-0006Vm-NI
+	for Qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:18:02 -0500
+Received: by mail-vk0-x22d.google.com with SMTP id r136so78132551vke.1
+	for <Qemu-devel@nongnu.org>; Mon, 16 Jan 2017 10:18:01 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <D1505166-849A-439D-8E78-579F708D53BB@livius.net>
+References: <6205DF8A-7643-432F-88FF-12B1E9DEF5D8@livius.net>
+	<CAFEAcA_CDpXqAAJNdSQpk4MKOorDXqUi_AwsevrHk=pnbrS0NQ@mail.gmail.com>
+	<277E72EB-288A-498F-9208-99EBF09218A6@livius.net>
+	<CAFEAcA_54fL9YHVJLqAZS8p3OftGd-yq7C7k4jSfVGeCzwMPmA@mail.gmail.com>
+	<D1505166-849A-439D-8E78-579F708D53BB@livius.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Jan 2017 18:17:40 +0000
+Message-ID: <CAFEAcA-AB98qtJcrLQ=T4PDvg=VM2tTqxALVpZYoYQcd9fySFg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] CMSIS SVD based peripheral definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,58 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jiri Denemark <jdenemar@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>
+To: Liviu Ionescu <ilg@livius.net>
+Cc: QEMU Developer <Qemu-devel@nongnu.org>
 
-Return the migration-safe field on query-cpu-definitions. All CPU
-models in x86 are migration-safe except "host".
+On 9 January 2017 at 17:47, Liviu Ionescu <ilg@livius.net> wrote:
+> I can't dispute this, but does't the GPLv2 requirements apply to
+> the qemu executable only? my JSON files are not compiled into the
+> binary, but are data files, read by the executable when required.
+> and anyway, the original license covers the original XML files,
+> mine are not only JSON, but are also slightly different.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu-qom.h | 2 ++
- target/i386/cpu.c     | 3 +++
- 2 files changed, 5 insertions(+)
+I'm not a lawyer, and this isn't legal advice, but merely
+my own opinion:
+ (1) if you're reading in the data files at runtime then there's
+a spectrum between "just reading data provided by the user which
+didn't ship with QEMU, and QEMU works OK without this particular
+data" (clearly OK) and "reading data that shipped with QEMU
+and where QEMU won't work at all without it" (the data files
+are clearly part of the program as a whole and the GPL
+applies to them even if they don't happen to be binaries);
+where you stand legally probably depends on where on the
+spectrum you are.
 
-diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-index 7c9a07ae65..8cd607e9a2 100644
---- a/target/i386/cpu-qom.h
-+++ b/target/i386/cpu-qom.h
-@@ -48,6 +48,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
-  * X86CPUClass:
-  * @cpu_def: CPU model definition
-  * @kvm_required: Whether CPU model requires KVM to be enabled.
-+ * @migration_safe: See CpuDefinitionInfo::migration_safe
-  * @parent_realize: The parent class' realize handler.
-  * @parent_reset: The parent class' reset handler.
-  *
-@@ -62,6 +63,7 @@ typedef struct X86CPUClass {
-     X86CPUDefinition *cpu_def;
- 
-     bool kvm_required;
-+    bool migration_safe;
- 
-     /* Optional description of CPU model.
-      * If unavailable, cpu_def->model_id is used */
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 337636a96a..ec6eaf215c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2209,6 +2209,8 @@ static void x86_cpu_definition_entry(gpointer data, gpointer user_data)
-     x86_cpu_class_check_missing_features(cc, &info->unavailable_features);
-     info->has_unavailable_features = true;
-     info->q_typename = g_strdup(object_class_get_name(oc));
-+    info->migration_safe = cc->migration_safe;
-+    info->has_migration_safe = true;
- 
-     entry = g_malloc0(sizeof(*entry));
-     entry->value = info;
-@@ -2356,6 +2358,7 @@ static void x86_cpu_cpudef_class_init(ObjectClass *oc, void *data)
-     X86CPUClass *xcc = X86_CPU_CLASS(oc);
- 
-     xcc->cpu_def = cpudef;
-+    xcc->migration_safe = true;
- }
- 
- static void x86_register_cpudef_type(X86CPUDefinition *def)
--- 
-2.11.0.259.g40922b1
+ (2) your JSON files are a derived work from the original
+XML, so the license of those XML files (whatever it is) still
+applies to them. Making modifications or a mechanical
+transformation of the original files is not sufficient to
+allow you to discard the license...
+
+With my project maintainer hat on, I prefer to avoid
+grey areas, because it avoids potential trouble later on.
+
+thanks
+-- PMM
