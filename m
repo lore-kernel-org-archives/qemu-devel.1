@@ -1,43 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cTBEW-0002Vo-Ox
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:38:18 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cTBPP-0004Hp-5a
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:49:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cTBET-0003Tw-IY
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:38:16 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48570
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <no-reply@patchew.org>) id 1cTBPL-0006ne-8K
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:49:31 -0500
+Resent-Message-Id: <E1cTBPL-0006ne-8K@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21317)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <duanj@linux.vnet.ibm.com>)
-	id 1cTBET-0003Tj-Cb
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:38:13 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0GHYWS1045116
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 12:38:11 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 280xquu9eu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 12:38:11 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <duanj@linux.vnet.ibm.com>;
-	Mon, 16 Jan 2017 10:38:10 -0700
-References: <1470744604-80857-1-git-send-email-jiangshanlai@gmail.com>
-	<87bn11ov1p.fsf@emacs.mitica>
-	<CAJhGHyA=n1exdiP03OWctrCpD0wKxz1jH5i=fLsaoEO44NBUEg@mail.gmail.com>
-	<bc3c8207-f788-7f23-8f8a-1663bc5a9e8a@linux.vnet.ibm.com>
-	<CAJhGHyC0Jfjd8yzVc3qCoafX_yPFT3+pNkQrgvms3eKfCVGefA@mail.gmail.com>
-From: Jianjun Duan <duanj@linux.vnet.ibm.com>
-Date: Mon, 16 Jan 2017 09:38:04 -0800
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cTBPK-0006n5-Vd
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:49:27 -0500
+In-Reply-To: <20170116165916.8575-1-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148458896353.214.6545034449130911340@790289a7ca88>
 MIME-Version: 1.0
-In-Reply-To: <CAJhGHyC0Jfjd8yzVc3qCoafX_yPFT3+pNkQrgvms3eKfCVGefA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Message-Id: <199ab4e3-9c30-6275-41e6-c7eab77d5e31@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] add migration capability to bypass the
- shared memory
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 16 Jan 2017 09:49:24 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL v2 00/32] Misc patches for 2017-01-11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,195 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lai Jiangshan <jiangshanlai@gmail.com>
-Cc: Juan Quintela <quintela@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Amit Shah <amit.shah@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-
-
-On 01/12/2017 08:44 PM, Lai Jiangshan wrote:
-> On Fri, Jan 13, 2017 at 3:19 AM, Jianjun Duan <duanj@linux.vnet.ibm.com> wrote:
->> I have a question related to interplay of bypassing the shared memory in
->> migration and memory hotplugging. If on the source guest a big chunk of
->> memory is plugged in, will the shared memory still be mapped the same
->> way on the guest? i.e, the mapping from guest physical address to the
->> host virtual address be the same?
-> 
-> I don't understand the question, the patch doesn't change
-> the memory hotplugging nor the way how the pages are mapped
-> in the guest physical.
-> 
-Let me try to rephrase it. Is there a scenario in which the mapping
-could change? If the mapping could change, will bypassing shared memory
-still work?
-
-Thanks,
-Jianjun
-
->>
->> Thanks,
->> Jianjun
->>
->>
->> On 08/29/2016 09:11 PM, Lai Jiangshan wrote:
->>> On Wed, Aug 10, 2016 at 5:03 PM, Juan Quintela <quintela@redhat.com> wrote:
->>>> Lai Jiangshan <jiangshanlai@gmail.com> wrote:
->>>>
->>>> Hi
->>>>
->>>> First of all, I like a lot the patchset, but I would preffer to split it
->>>> to find "possible" bugs along the lines, especially in postcopy, but not only.
->>>
->>> Hello, thanks for review and comments
->>>
->>> I tried to make the patch be sane and tight.
->>> I don't see any strong reason to split it without complicating the patch.
->>>
->>>>
->>>> [very nice description of the patch]
->>>>
->>>> Nothing to say about the QMP and shared memory detection, looks correct
->>>> to me.
->>>>
->>>>> diff --git a/migration/ram.c b/migration/ram.c
->>>>> index 815bc0e..880972d 100644
->>>>> --- a/migration/ram.c
->>>>> +++ b/migration/ram.c
->>>>> @@ -605,6 +605,28 @@ static void migration_bitmap_sync_init(void)
->>>>>      num_dirty_pages_period = 0;
->>>>>      xbzrle_cache_miss_prev = 0;
->>>>>      iterations_prev = 0;
->>>>> +    migration_dirty_pages = 0;
->>>>> +}
->>>>> +
->>>>> +static void migration_bitmap_init(unsigned long *bitmap)
->>>>> +{
->>>>> +    RAMBlock *block;
->>>>> +
->>>>> +    bitmap_clear(bitmap, 0, last_ram_offset() >> TARGET_PAGE_BITS);
->>>>> +    rcu_read_lock();
->>>>> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
->>>>> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
->>>>> +            bitmap_set(bitmap, block->offset >> TARGET_PAGE_BITS,
->>>>> +                       block->used_length >> TARGET_PAGE_BITS);
->>>>> +
->>>>> +            /*
->>>>> +             * Count the total number of pages used by ram blocks not including
->>>>> +             * any gaps due to alignment or unplugs.
->>>>> +             */
->>>>> +         migration_dirty_pages += block->used_length >> TARGET_PAGE_BITS;
->>>>> +     }
->>>>> +    }
->>>>> +    rcu_read_unlock();
->>>>>  }
->>>>
->>>> We can split this function in a different patch.
->>>
->>> it calls the new function migrate_bypass_shared_memory().
->>> it is no a good idea to split it out.
->>>
->>>> I haven't fully search
->>>> if we care about taking the rcu lock here.  The thing that I am more
->>>> interested is in knowing what happens when we don't set
->>>> migration_dirty_pages as the full "possible" memory pages.
->>>
->>> I hadn't tested it with postcopy, I don't know how to use postcopy.
->>> From my review I can't find obvious bugs about it.
->>>
->>> I don't think there is any good reason to use migrate_bypass
->>> and postcopy together,  I can disable the migrate_bypass
->>> when postcopy==true if you want.
->>>
->>>>
->>>> Once here, should we check for ROM regions?
->>>>
->>>> BTW, could'nt we use:
->>>>
->>>> int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
->>>> {
->>>>     RAMBlock *block;
->>>>     int ret = 0;
->>>>
->>>>     rcu_read_lock();
->>>>     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
->>>>         ret = func(block->idstr, block->host, block->offset,
->>>>                    block->used_length, opaque);
->>>>         if (ret) {
->>>>             break;
->>>>         }
->>>>     }
->>>>     rcu_read_unlock();
->>>>     return ret;
->>>> }
->>>>
->>>
->>> the patch only introduces only one "QLIST_FOREACH_RCU(ram_list.blocks)"
->>> but
->>> # git grep 'QLIST_FOREACH_RCU.*ram_list'  | wc -l
->>> #       16
->>>
->>> I don't want to introduce qemu_ram_foreach_block()
->>> and touch another 15 places.
->>> I hope someone do it after merged.
->>>
->>>
->>>>
->>>>
->>>>>
->>>>>  static void migration_bitmap_sync(void)
->>>>> @@ -631,7 +653,9 @@ static void migration_bitmap_sync(void)
->>>>>      qemu_mutex_lock(&migration_bitmap_mutex);
->>>>>      rcu_read_lock();
->>>>>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
->>>>> -        migration_bitmap_sync_range(block->offset, block->used_length);
->>>>> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
->>>>> +            migration_bitmap_sync_range(block->offset, block->used_length);
->>>>> +        }
->>>>>      }
->>>>>      rcu_read_unlock();
->>>>>      qemu_mutex_unlock(&migration_bitmap_mutex);
->>>>
->>>> Oops, another place where we were not using qemu_ram_foreach_block :p
->>>>
->>>>
->>>>> @@ -1926,19 +1950,14 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->>>>>      ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
->>>>>      migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
->>>>>      migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
->>>>> -    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
->>>>> +    migration_bitmap_init(migration_bitmap_rcu->bmap);
->>>>>
->>>>>      if (migrate_postcopy_ram()) {
->>>>>          migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
->>>>> -        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
->>>>> +        bitmap_copy(migration_bitmap_rcu->unsentmap,
->>>>> +                 migration_bitmap_rcu->bmap, ram_bitmap_pages);
->>>>>      }
->>>>
->>>> I think that if we go this route, we should move the whole if inside the
->>>> migration_bitmap_init?
->>>
->>> good! I will do it when I update the patch.
->>>
->>> Thanks,
->>> Lai
->>>
->>>>
->>>>>
->>>>> -    /*
->>>>> -     * Count the total number of pages used by ram blocks not including any
->>>>> -     * gaps due to alignment or unplugs.
->>>>> -     */
->>>>> -    migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
->>>>> -
->>>>>      memory_global_dirty_log_start();
->>>>>      migration_bitmap_sync();
->>>>>      qemu_mutex_unlock_ramlist();
->>>>
->>>>
->>>> As said, very happy with the patch.  And it got much simpler that I
->>>> would have expected.
->>>>
->>>> Thanks, Juan.
->>>
->>
-> 
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQVUxMIHYyIDAwLzMyXSBNaXNjIHBhdGNoZXMgZm9yIDIwMTctMDEtMTEKTWVzc2Fn
+ZS1pZDogMjAxNzAxMTYxNjU5MTYuODU3NS0xLXBib256aW5pQHJlZGhhdC5jb20KVHlwZTogc2Vy
+aWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBV
+c2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5ZmE2ZmVlIFJldmVydCAi
+d2luMzI6IGRvbid0IHJ1biBzdWJwcm9jZXNzIHRlc3RzIG9uIE1pbmd3MzIgcGxhdGZvcm0iCjU3
+Y2IxZTggaGF4OiBhZGQgRGFyd2luIHN1cHBvcnQKODU0MzE4ZSBQbHVtYiB0aGUgSEFYTS1iYXNl
+ZCBoYXJkd2FyZSBhY2NlbGVyYXRpb24gc3VwcG9ydAo4YjVkMDYxIHRhcmdldC9pMzg2OiBBZGQg
+SW50ZWwgSEFYIGZpbGVzCmMwZjAzZDUga3ZtOiBtb3ZlIGNwdSBzeW5jaHJvbml6YXRpb24gY29k
+ZQpkZDVhOTRlIHJhbWJsb2NrLW5vdGlmaWVyOiBuZXcKMzFkZjk1OSBjaGFyOiBmaXggY3RybC1h
+IGIgbm90IHdvcmtpbmcKYTZlZGI2ZSBleGVjOiBBZGQgbWlzc2luZyByY3VfcmVhZF91bmxvY2sK
+OWQ1ZjU3NCB4ODY6IGlvYXBpYzogZml4IGZhaWwgbWlncmF0aW9uIHdoZW4gaXJxY2hpcD1zcGxp
+dAo5ZjMyYjlkIHg4NjogaW9hcGljOiBkdW1wIHZlcnNpb24gZm9yICJpbmZvIGlvYXBpYyIKMDYy
+OTJlZiB4ODY6IGlvYXBpYzogYWRkIHRyYWNlcyBmb3IgaW9hcGljCjQ4MjQ2M2UgaHh0b29sOiBl
+bWl0IFRleGluZm8gaGVhZGluZ3MgYXMgQHN1YnNlY3Rpb24KNzQ2Y2FiYyBxZW11LXRocmVhZDog
+Zml4IHFlbXVfdGhyZWFkX3NldF9uYW1lKCkgcmFjZSBpbiBxZW11X3RocmVhZF9jcmVhdGUoKQo5
+MzE2ZmNkIHNlcmlhbDogZml4IG1lbW9yeSBsZWFrIGluIHNlcmlhbCBleGl0CmFmMmE0NDMgc2Nz
+aS1ibG9jazogZml4IGRpcmVjdGlvbiBvZiBCWVRDSEsgdGVzdCBmb3IgVkVSSUZZIGNvbW1hbmRz
+CjU2OTdjNzggcGM6IGZpeCBjcmFzaCBpbiBydGNfc2V0X21lbW9yeSgpIGlmIGluaXRpYWwgY3B1
+IGlzIG1hcmtlZCBhcyBob3RwbHVnZ2VkCjk2OGM3MDYgYWNwaTogZmlsdGVyIGJhc2VkIG9uIENP
+TkZJR19BQ1BJX1g4NiByYXRoZXIgdGhhbiBUQVJHRVQKNWNmMWMxYiBzdHViczogcmVtb3ZlIHN0
+dWJzL2t2bS5jCmY0MTA2NjYgYnVpbGQ6IHJlbW92ZSAtLWVuYWJsZS1jb2xvLy0tZGlzYWJsZS1j
+b2xvCmUyYjgxNTQgZXZlbnRfbm90aWZpZXI6IGNsZWFudXBzIGFyb3VuZCBldmVudF9ub3RpZmll
+cl9zZXRfaGFuZGxlcgphYWQzYjdiIHN0dWJzOiBtb3ZlIHZob3N0IHN0dWJzIHRvIHN0dWJzL3Zo
+b3N0Lm8KMTBlOWE3NSBzdHViczogZ3JvdXAgYWxsIG1vbml0b3JfZmRzZXRfKiBmdW5jdGlvbnMg
+aW4gYSBzaW5nbGUgZmlsZQplMjRmN2Y1IHN0dWJzOiBncm91cCBzdHVicyBmb3IgdXNlci1tb2Rl
+IGVtdWxhdGlvbgpkYTRlNmM1IGh3OiBtb3ZlIHJlc2V0IGhhbmRsZXJzIGZyb20gdmwuYyB0byBo
+dy9jb3JlCjIyZDFhNjQgc3R1YnM6IHJlbW92ZSB1bnVzZWQgc3R1YiBmb3Igc2VyaWFsX2hkCjIx
+YjNhZTYgc3R1YnM6IG1vdmUgYWNwaSBzdHVicyB0byBody9hY3BpCjNiNTFiMTAgc3R1YnM6IG1v
+dmUgc21iaW9zIHN0dWJzIHRvIGh3L3NtYmlvcwo2ZjBhZjNhIHN0dWJzOiBtZXJnZSBhbGwgbW9u
+aXRvciBzdHVicyBpbiBvbmUgZmlsZSwgcmVtb3ZlIG1vbml0b3JfY3VyX2lzX3FtcCBzdHViCjJm
+ZDIzODUgc21iaW9zOiBmaWx0ZXIgYmFzZWQgb24gQ09ORklHX1NNQklPUyByYXRoZXIgdGhhbiBU
+QVJHRVQKY2FmOWJlYyBxb206IE1ha2UgYWxsIGludGVyZmFjZSB0eXBlcyBhYnN0cmFjdApjZjkx
+MDU4IG1lZ2FzYXM6IGZpeCBndWVzdC10cmlnZ2VyZWQgbWVtb3J5IGxlYWsKYjY2NzExMiBidWdm
+aXg6IHZtIGhhbHQgd2hlbiBpbiByZXNldCBsb29waW5nCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
+aGVja2luZyBQQVRDSCAxLzMyOiBidWdmaXg6IHZtIGhhbHQgd2hlbiBpbiByZXNldCBsb29waW5n
+Li4uCkNoZWNraW5nIFBBVENIIDIvMzI6IG1lZ2FzYXM6IGZpeCBndWVzdC10cmlnZ2VyZWQgbWVt
+b3J5IGxlYWsuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8zMjogcW9tOiBNYWtlIGFsbCBpbnRlcmZhY2Ug
+dHlwZXMgYWJzdHJhY3QuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEzMjog
+RklMRTogdGVzdHMvZGV2aWNlLWludHJvc3BlY3QtdGVzdC5jOjE3NDoKKyAgICBxdGVzdF9hZGRf
+ZnVuYygiZGV2aWNlL2ludHJvc3BlY3QvYWJzdHJhY3QtaW50ZXJmYWNlcyIsIHRlc3RfYWJzdHJh
+Y3RfaW50ZXJmYWNlcyk7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwNSBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBB
+VENIIDQvMzI6IHNtYmlvczogZmlsdGVyIGJhc2VkIG9uIENPTkZJR19TTUJJT1MgcmF0aGVyIHRo
+YW4gVEFSR0VULi4uCkNoZWNraW5nIFBBVENIIDUvMzI6IHN0dWJzOiBtZXJnZSBhbGwgbW9uaXRv
+ciBzdHVicyBpbiBvbmUgZmlsZSwgcmVtb3ZlIG1vbml0b3JfY3VyX2lzX3FtcCBzdHViLi4uCkVS
+Uk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojNzY6IEZJTEU6IHN0
+dWJzL21vbml0b3IuYzo2OgorTW9uaXRvciAqY3VyX21vbiA9IE5VTEw7Cgp0b3RhbDogMSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDMwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvMzI6IHN0dWJzOiBtb3ZlIHNtYmlvcyBz
+dHVicyB0byBody9zbWJpb3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8zMjogc3R1YnM6IG1vdmUgYWNw
+aSBzdHVicyB0byBody9hY3BpLi4uCkNoZWNraW5nIFBBVENIIDgvMzI6IHN0dWJzOiByZW1vdmUg
+dW51c2VkIHN0dWIgZm9yIHNlcmlhbF9oZC4uLgpDaGVja2luZyBQQVRDSCA5LzMyOiBodzogbW92
+ZSByZXNldCBoYW5kbGVycyBmcm9tIHZsLmMgdG8gaHcvY29yZS4uLgpDaGVja2luZyBQQVRDSCAx
+MC8zMjogc3R1YnM6IGdyb3VwIHN0dWJzIGZvciB1c2VyLW1vZGUgZW11bGF0aW9uLi4uCkNoZWNr
+aW5nIFBBVENIIDExLzMyOiBzdHViczogZ3JvdXAgYWxsIG1vbml0b3JfZmRzZXRfKiBmdW5jdGlv
+bnMgaW4gYSBzaW5nbGUgZmlsZS4uLgpDaGVja2luZyBQQVRDSCAxMi8zMjogc3R1YnM6IG1vdmUg
+dmhvc3Qgc3R1YnMgdG8gc3R1YnMvdmhvc3Quby4uLgpDaGVja2luZyBQQVRDSCAxMy8zMjogZXZl
+bnRfbm90aWZpZXI6IGNsZWFudXBzIGFyb3VuZCBldmVudF9ub3RpZmllcl9zZXRfaGFuZGxlci4u
+LgpDaGVja2luZyBQQVRDSCAxNC8zMjogYnVpbGQ6IHJlbW92ZSAtLWVuYWJsZS1jb2xvLy0tZGlz
+YWJsZS1jb2xvLi4uCkNoZWNraW5nIFBBVENIIDE1LzMyOiBzdHViczogcmVtb3ZlIHN0dWJzL2t2
+bS5jLi4uCkNoZWNraW5nIFBBVENIIDE2LzMyOiBhY3BpOiBmaWx0ZXIgYmFzZWQgb24gQ09ORklH
+X0FDUElfWDg2IHJhdGhlciB0aGFuIFRBUkdFVC4uLgpDaGVja2luZyBQQVRDSCAxNy8zMjogcGM6
+IGZpeCBjcmFzaCBpbiBydGNfc2V0X21lbW9yeSgpIGlmIGluaXRpYWwgY3B1IGlzIG1hcmtlZCBh
+cyBob3RwbHVnZ2VkLi4uCkNoZWNraW5nIFBBVENIIDE4LzMyOiBzY3NpLWJsb2NrOiBmaXggZGly
+ZWN0aW9uIG9mIEJZVENISyB0ZXN0IGZvciBWRVJJRlkgY29tbWFuZHMuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMTkvMzI6IHNlcmlhbDogZml4IG1lbW9yeSBsZWFrIGluIHNlcmlhbCBleGl0Li4uCkNoZWNr
+aW5nIFBBVENIIDIwLzMyOiBxZW11LXRocmVhZDogZml4IHFlbXVfdGhyZWFkX3NldF9uYW1lKCkg
+cmFjZSBpbiBxZW11X3RocmVhZF9jcmVhdGUoKS4uLgpDaGVja2luZyBQQVRDSCAyMS8zMjogaHh0
+b29sOiBlbWl0IFRleGluZm8gaGVhZGluZ3MgYXMgQHN1YnNlY3Rpb24uLi4KQ2hlY2tpbmcgUEFU
+Q0ggMjIvMzI6IHg4NjogaW9hcGljOiBhZGQgdHJhY2VzIGZvciBpb2FwaWMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMjMvMzI6IHg4NjogaW9hcGljOiBkdW1wIHZlcnNpb24gZm9yICJpbmZvIGlvYXBpYyIu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMjQvMzI6IHg4NjogaW9hcGljOiBmaXggZmFpbCBtaWdyYXRpb24g
+d2hlbiBpcnFjaGlwPXNwbGl0Li4uCkNoZWNraW5nIFBBVENIIDI1LzMyOiBleGVjOiBBZGQgbWlz
+c2luZyByY3VfcmVhZF91bmxvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMjYvMzI6IGNoYXI6IGZpeCBj
+dHJsLWEgYiBub3Qgd29ya2luZy4uLgpDaGVja2luZyBQQVRDSCAyNy8zMjogcmFtYmxvY2stbm90
+aWZpZXI6IG5ldy4uLgpDaGVja2luZyBQQVRDSCAyOC8zMjoga3ZtOiBtb3ZlIGNwdSBzeW5jaHJv
+bml6YXRpb24gY29kZS4uLgpDaGVja2luZyBQQVRDSCAyOS8zMjogdGFyZ2V0L2kzODY6IEFkZCBJ
+bnRlbCBIQVggZmlsZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzAvMzI6IFBsdW1iIHRoZSBIQVhNLWJh
+c2VkIGhhcmR3YXJlIGFjY2VsZXJhdGlvbiBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDMxLzMy
+OiBoYXg6IGFkZCBEYXJ3aW4gc3VwcG9ydC4uLgpDaGVja2luZyBQQVRDSCAzMi8zMjogUmV2ZXJ0
+ICJ3aW4zMjogZG9uJ3QgcnVuIHN1YnByb2Nlc3MgdGVzdHMgb24gTWluZ3czMiBwbGF0Zm9ybSIu
+Li4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZy
+ZWVsaXN0cy5vcmc=
