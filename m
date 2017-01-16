@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTAT8-0005Pf-SN
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:49:19 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cTAct-0000gR-Ap
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTAT8-0005bi-6i
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:49:18 -0500
-Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:34776)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cTAT8-0005bU-1u
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:49:18 -0500
-Received: by mail-vk0-x233.google.com with SMTP id r136so76627884vke.1
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 08:49:17 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170108083854.5006-1-mar.krzeminski@gmail.com>
-References: <20170108083854.5006-1-mar.krzeminski@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jan 2017 16:48:56 +0000
-Message-ID: <CAFEAcA_QZ2k=V5MC_=ny++8VebFyq9dFDJsohOGVjjuChVrEyQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] block: m25p80: Improve mt25qu01g
- chip model
+	(envelope-from <pbonzini@redhat.com>) id 1cTAcq-0008TM-An
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59262)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cTAcq-0008TD-4a
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:20 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 16 Jan 2017 17:58:45 +0100
+Message-Id: <20170116165916.8575-2-pbonzini@redhat.com>
+In-Reply-To: <20170116165916.8575-1-pbonzini@redhat.com>
+References: <20170116165916.8575-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 01/32] bugfix: vm halt when in reset looping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcin Krzeminski <mar.krzeminski@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: hangaohuai <hangaohuai@huawei.com>
 
-On 8 January 2017 at 08:38, Marcin Krzeminski <mar.krzeminski@gmail.com> wrote:
-> This series introduce some improvememnt targeting mt25qu01g and adds
-> support for n25q00 device.
->
-> v3:
-> * Removed debug printf
-> v2:
-> * Rework die erase command functionality. Since the number of dies
-> is constant per chip, new field to flash description structure has
-> been added (instead of dynamic code from v1).
-> * Add definition for n25q00.
+From: hangaohuai <hangaohuai@huawei.com>
 
-Thanks, applied to target-arm.next (with some tweaks to the patch 2
-commit message).
+reset mc146818rtc device when RESET event happens.
 
--- PMM
+Fix the problem:
+  1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect selfboot;
+  2. VM being reset by others, hmp_system_reset;
+  3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
+     resume execution by jump via 40h:0067h;
+  4. Guest halt;
+
+Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+Message-Id: <20161219060336.10176-1-hangaohuai@huawei.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/timer/mc146818rtc.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index da209d0..637f872 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -946,11 +946,23 @@ static Property mc146818rtc_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static void rtc_resetdev(DeviceState *d)
++{
++    RTCState *s = MC146818_RTC(d);
++
++    /* Reason: VM do suspend self will set 0xfe
++     * Reset any values other than 0xfe(Guest suspend case) */
++    if (s->cmos_data[0x0f] != 0xfe) {
++        s->cmos_data[0x0f] = 0x00;
++    }
++}
++
+ static void rtc_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->realize = rtc_realizefn;
++    dc->reset = rtc_resetdev;
+     dc->vmsd = &vmstate_rtc;
+     dc->props = mc146818rtc_properties;
+     /* Reason: needs to be wired up by rtc_init() */
+-- 
+2.9.3
