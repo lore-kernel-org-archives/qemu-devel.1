@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1cTEZc-0004IB-Cv
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1cTEZc-0004Hy-7Z
 	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:12:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1cTEZa-0001BD-55
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1cTEZZ-0001Am-7Y
 	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:12:16 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38263)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40587)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
-	id 1cTEZZ-0001Ak-RC
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:12:14 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1cTEZY-0001AV-V7
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 16:12:13 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0GL9Ccb039348
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:12:13 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28129cfqvt-1
+	v0GL8wEM096996
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:12:11 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28126f81hw-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:12:12 -0500
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:12:11 -0500
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
 	Mon, 16 Jan 2017 21:12:08 -0000
 From: Eric Farman <farman@linux.vnet.ibm.com>
-Date: Mon, 16 Jan 2017 22:12:01 +0100
-In-Reply-To: <20170116211201.46601-1-farman@linux.vnet.ibm.com>
-References: <20170116211201.46601-1-farman@linux.vnet.ibm.com>
-Message-Id: <20170116211201.46601-4-farman@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 3/3] block: get max_transfer limit for char
- (scsi-generic) devices
+Date: Mon, 16 Jan 2017 22:11:58 +0100
+Message-Id: <20170116211201.46601-1-farman@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH 0/3] scsi-generic and BLKSECTGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,37 +36,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, Eric Farman <farman@linux.vnet.ibm.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, Eric Farman <farman@linux.vnet.ibm.com>, linux-scsi@vger.kernel.org
 
-Commit 6f607174 introduced a routine to get the maximum number
-of bytes for a single I/O transfer for block devices, however
-scsi generic devices are character devices, not block.  Add
-a condition for this, with slightly different logic because
-the value is already in bytes, and need not be converted from
-blocks as happens for block devices.
+(cc'ing linux-scsi for the cover-letter; patches only to QEMU lists.)
 
-Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
----
- block/file-posix.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+In the Linux kernel, I see two (three) places where the BLKSECTGET ioctl is
+handled:
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 2115155..c0843c2 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -679,6 +679,13 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-             if (ret > 0 && ret <= BDRV_REQUEST_MAX_SECTORS) {
-                 bs->bl.max_transfer = pow2floor(ret << BDRV_SECTOR_BITS);
-             }
-+        } else if (S_ISCHR(st.st_mode)) {
-+            /* sg returns transfer length in bytes already */
-+            int ret = hdev_get_max_transfer_length(bs, s->fd);
-+            if (ret > 0 &&
-+                (ret >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS) {
-+                bs->bl.max_transfer = pow2floor(ret);
-+            }
-         }
-     }
- 
+(1) block/(compat_)ioctl.c -- (compat_)blkdev_ioctl
+(2) drivers/scsi/sg.c -- sg_ioctl
+
+The former has been around forever[1], and returns a short value measured in
+sectors.  A sector is generally assumed to be 512 bytes.
+
+The latter has been around for slightly less than forever[2], and returns an
+int that measures the value in bytes.  A change to return the block count
+was brought up a few years ago[3] and nacked.
+
+As a convenient example, if I use the blockdev tool to drive the ioctl to a
+SCSI disk and its scsi-generic equivalent, I get different results:
+
+  # lsscsi -g
+  [0:0:8:1077166114]disk    IBM      2107900          .217  /dev/sda /dev/sg0
+  # blockdev --getmaxsect /dev/sda
+  2560
+  # blockdev --getmaxsect /dev/sg0
+  20
+
+Now, the value for /dev/sda looks "correct" to me.
+
+  # cd /sys/devices/css0/0.0.0125/0.0.1f69/host0/rport-0\:0-8/
+  # cd target0\:0\:8/0\:0\:8\:1077166114/
+  # cat block/sda/queue/max_sectors_kb
+  1280
+  # cat block/sda/queue/hw_sector_size
+  512
+
+And the math checks out:
+
+  max_sectors_kb * 1024 / hw_sector_size == getmaxsect
+  -OR-
+  1280 * 1024 / 512 = 2560
+
+For /dev/sg0, it appears the answer is coming from the sg_ioctl result
+which is already multiplied by the block size, and then looking at only the
+upper half (short) of the returned big-endian fullword:
+
+  (1280 * 1024 / 512) * 512 = 1310720 = x00140000 => x0014 = 20
+
+The reason for all this?  Well, QEMU recently added a BLKSECTGET ioctl
+call[4] which we see during guest boot.  This code presumes the value is in
+blocks/sectors, and converts it to bytes[5].  Not that this matters, because
+the short/int discrepancy gives us "zero" on s390x.
+
+Also, that code doesn't execute for scsi-generic devices, so the conversion
+to bytes is correct, but I'd like to extend this code to interrogate
+scsi-generic devices as well.  This is important because libvirt converts
+a specified virtio-scsi device to its /dev/sgX address for the QEMU
+commandline.
+
+So, do I have to code around the different field sizes (int vs short) as
+well as scaling (bytes vs blocks)?  Obviously doable, but looking at the
+resulting commits, I find myself feeling a little ill.
+
+[1] The initial kernel git commit
+[2] kernel commit 44ec95425c1d9dce6e4638c29e4362cfb44814e7
+[3] https://lkml.org/lkml/2012/6/27/78
+[4] qemu commit 6f6071745bd0366221f5a0160ed7d18d0e38b9f7
+[5] qemu commit 5def6b80e1eca696c1fc6099e7f4d36729686402
+
+Eric Farman (3):
+  hw/scsi: Fix debug message of cdb structure in scsi-generic
+  block: Fix target variable of BLKSECTGET ioctl
+  block: get max_transfer limit for char (scsi-generic) devices
+
+ block/file-posix.c     | 16 +++++++++++++---
+ hw/scsi/scsi-generic.c |  5 +++--
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
 -- 
 2.8.4
