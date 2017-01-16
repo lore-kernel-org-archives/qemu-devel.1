@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTK92-0003HA-8C
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 22:09:13 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cTKPg-0005yK-Pu
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 22:26:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTK8z-0002WX-31
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 22:09:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46192)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTK8y-0002WJ-R0
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 22:09:09 -0500
-Date: Tue, 17 Jan 2017 05:09:06 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170117050852-mutt-send-email-mst@kernel.org>
-References: <20170112114612.14520-1-stefanha@redhat.com>
-	<fc5de032-a64b-b072-6e52-441b6a685ee3@cardoe.com>
-	<20170113120240.GB9142@stefanha-x1.localdomain>
-	<75cb767b-2850-4a87-50fc-d957e3a793ac@cardoe.com>
-	<20170116104613.GB12351@stefanha-x1.localdomain>
-	<f8b3d861-09a3-a4c8-dca7-e4fb384c2a73@cardoe.com>
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cTKPd-0001BV-Hp
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 22:26:24 -0500
+Received: from mail-db5eur01on0102.outbound.protection.outlook.com
+	([104.47.2.102]:58294
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
+	id 1cTKPc-0001B9-Ob
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 22:26:21 -0500
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Mon, 16 Jan 2017 18:51:12 +0300
+Message-ID: <20170116155113.21034-2-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170116155113.21034-1-pbutsykin@virtuozzo.com>
+References: <20170116155113.21034-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f8b3d861-09a3-a4c8-dca7-e4fb384c2a73@cardoe.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] virtio: revert
- virtio_queue_set_notification() nesting
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 1/2] add 'discard-ram' migrate capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +28,305 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Goldstein <cardoe@cardoe.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, amit.shah@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-On Mon, Jan 16, 2017 at 04:03:28PM -0500, Doug Goldstein wrote:
-> On 1/16/17 5:46 AM, Stefan Hajnoczi wrote:
-> > On Fri, Jan 13, 2017 at 09:15:49AM -0600, Doug Goldstein wrote:
-> >> On 1/13/17 6:02 AM, Stefan Hajnoczi wrote:
-> >>> On Thu, Jan 12, 2017 at 10:57:53AM -0600, Doug Goldstein wrote:
-> >>>> On 1/12/17 5:46 AM, Stefan Hajnoczi wrote:
-> >>>>> The virtio_queue_set_notification() nesting introduced for AioContext polling
-> >>>>> raised an assertion with virtio-net (even in non-polling mode).  Converting
-> >>>>> virtio-net and virtio-crypto to use virtio_queue_set_notification() in a
-> >>>>> nesting fashion would be invasive and isn't worth it.
-> >>>>>
-> >>>>> Patch 1 contains the revert to resolve the bug that Doug noticed.
-> >>>>>
-> >>>>> Patch 2 is a less efficient but safe alternative.
-> >>>>>
-> >>>>> Stefan Hajnoczi (2):
-> >>>>>   Revert "virtio: turn vq->notification into a nested counter"
-> >>>>>   virtio: disable notifications again after poll succeeded
-> >>>>>
-> >>>>>  hw/virtio/virtio.c | 21 +++++++++------------
-> >>>>>  1 file changed, 9 insertions(+), 12 deletions(-)
-> >>>>>
-> >>>>
-> >>>> So I just gave this series a whirl and it fixes the assert but causes
-> >>>> another issue for me. While iPXE is getting a DHCP address the screen
-> >>>> immediately flashes over to the UEFI shell. Its like a timeout is
-> >>>> getting hit and just dropping me to the shell.
-> >>>
-> >>> Sounds like an separate problem.
-> >>>
-> >>> Stefan
-> >>>
-> >>
-> >> Is there any debug output that I can provide to help troubleshoot it?
-> >> I've built 23425cc and UEFI via OVMF is able to get an IP address via
-> >> DHCP inside of iPXE. I've also taken master and only applied the first
-> >> patch in this series (the revert) and it too works. Its only when I add
-> >> the 2nd patch into the mix or don't revert out the "virtio: turn
-> >> vq->notification into a nested counter" patch that it fails.
-> > 
-> > The code in Patch 2 should not be executed in your QEMU configuration,
-> > so I wonder how Patch 2 can cause the DHCP failure.
-> > 
-> > Please verify as follows:
-> > 
-> >   $ gdb --args path/to/qemu-system-x86_64 ...
-> >   (gdb) handle SIGUSR1 noprint nostop pass
-> >   (gdb) handle SIGPIPE noprint nostop pass
-> >   (gdb) b virtio_queue_host_notifier_aio_poll_begin
-> >   (gdb) r
-> > 
-> > I predict the breakpoint will not be hit.
-> > 
-> > Stefan
-> > 
-> 
-> 
-> Correct. That did not hit. I reapplied both patches to my current master
-> and it did not hit but it still dropped me to the EFI shell while iPXE
-> was negotiating DHCP.
-> 
-> I then rebased on top of the latest master
-> (2ccede18bd24fce5db83fef3674563a1f256717b) and applied both patches. The
-> iPXE issue went away and the assert issue went away.
-> 
-> So I will concur with you, the issue was not in either of these patches
-> and is now resolved.
-> 
-> -- 
-> Doug Goldstein
-> 
+This feature frees the migrated memory on the source during postcopy-ram
+migration. In the second step of postcopy-ram migration when the source vm
+is put on pause we can free unnecessary memory. It will allow, in particular,
+to start relaxing the memory stress on the source host in a load-balancing
+scenario.
 
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+---
+ include/migration/migration.h |  1 +
+ include/migration/qemu-file.h |  3 ++-
+ migration/migration.c         |  9 +++++++
+ migration/qemu-file.c         | 59 ++++++++++++++++++++++++++++++++++++++-----
+ migration/ram.c               | 24 +++++++++++++++++-
+ qapi-schema.json              |  5 +++-
+ 6 files changed, 91 insertions(+), 10 deletions(-)
 
-
-
-Thanks for the testing, will merge these shortly!
-
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index c309d23370..d7bd404365 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -294,6 +294,7 @@ void migrate_add_blocker(Error *reason);
+  */
+ void migrate_del_blocker(Error *reason);
+ 
++bool migrate_discard_ram(void);
+ bool migrate_postcopy_ram(void);
+ bool migrate_zero_blocks(void);
+ 
+diff --git a/include/migration/qemu-file.h b/include/migration/qemu-file.h
+index abedd466c9..0cd648a733 100644
+--- a/include/migration/qemu-file.h
++++ b/include/migration/qemu-file.h
+@@ -132,7 +132,8 @@ void qemu_put_byte(QEMUFile *f, int v);
+  * put_buffer without copying the buffer.
+  * The buffer should be available till it is sent asynchronously.
+  */
+-void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size);
++void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size,
++                           bool may_free);
+ bool qemu_file_mode_is_not_valid(const char *mode);
+ bool qemu_file_is_writable(QEMUFile *f);
+ 
+diff --git a/migration/migration.c b/migration/migration.c
+index f498ab84f2..391db6f28b 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1251,6 +1251,15 @@ void qmp_migrate_set_downtime(double value, Error **errp)
+     qmp_migrate_set_parameters(&p, errp);
+ }
+ 
++bool migrate_discard_ram(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_DISCARD_RAM];
++}
++
+ bool migrate_postcopy_ram(void)
+ {
+     MigrationState *s;
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index e9fae31158..f85a0ecd9e 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -30,6 +30,7 @@
+ #include "qemu/coroutine.h"
+ #include "migration/migration.h"
+ #include "migration/qemu-file.h"
++#include "sysemu/sysemu.h"
+ #include "trace.h"
+ 
+ #define IO_BUF_SIZE 32768
+@@ -49,6 +50,7 @@ struct QEMUFile {
+     int buf_size; /* 0 when writing */
+     uint8_t buf[IO_BUF_SIZE];
+ 
++    DECLARE_BITMAP(may_free, MAX_IOV_SIZE);
+     struct iovec iov[MAX_IOV_SIZE];
+     unsigned int iovcnt;
+ 
+@@ -132,6 +134,40 @@ bool qemu_file_is_writable(QEMUFile *f)
+     return f->ops->writev_buffer;
+ }
+ 
++static void qemu_iovec_discard_ram(QEMUFile *f)
++{
++    struct iovec iov;
++    unsigned long idx;
++
++    if (!migrate_discard_ram() || !runstate_check(RUN_STATE_FINISH_MIGRATE)) {
++        return;
++    }
++
++    idx = find_next_bit(f->may_free, f->iovcnt, 0);
++    if (idx >= f->iovcnt) {
++        return;
++    }
++    iov = f->iov[idx];
++
++    while ((idx = find_next_bit(f->may_free, f->iovcnt, idx + 1)) < f->iovcnt) {
++        /* check for adjacent buffer and coalesce them */
++        if (iov.iov_base + iov.iov_len == f->iov[idx].iov_base) {
++            iov.iov_len += f->iov[idx].iov_len;
++            continue;
++        }
++        if (qemu_madvise(iov.iov_base, iov.iov_len, QEMU_MADV_DONTNEED) < 0) {
++            error_report("migrate: madvise DONTNEED failed %p %ld: %s",
++                         iov.iov_base, iov.iov_len, strerror(errno));
++        }
++        iov = f->iov[idx];
++    }
++    if (qemu_madvise(iov.iov_base, iov.iov_len, QEMU_MADV_DONTNEED) < 0) {
++            error_report("migrate: madvise DONTNEED failed %p %ld: %s",
++                         iov.iov_base, iov.iov_len, strerror(errno));
++    }
++    memset(f->may_free, 0, sizeof(f->may_free));
++}
++
+ /**
+  * Flushes QEMUFile buffer
+  *
+@@ -151,6 +187,8 @@ void qemu_fflush(QEMUFile *f)
+     if (f->iovcnt > 0) {
+         expect = iov_size(f->iov, f->iovcnt);
+         ret = f->ops->writev_buffer(f->opaque, f->iov, f->iovcnt, f->pos);
++
++        qemu_iovec_discard_ram(f);
+     }
+ 
+     if (ret >= 0) {
+@@ -304,13 +342,19 @@ int qemu_fclose(QEMUFile *f)
+     return ret;
+ }
+ 
+-static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size)
++static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size,
++                         bool may_free)
+ {
+     /* check for adjacent buffer and coalesce them */
+     if (f->iovcnt > 0 && buf == f->iov[f->iovcnt - 1].iov_base +
+-        f->iov[f->iovcnt - 1].iov_len) {
++        f->iov[f->iovcnt - 1].iov_len &&
++        may_free == test_bit(f->iovcnt - 1, f->may_free))
++    {
+         f->iov[f->iovcnt - 1].iov_len += size;
+     } else {
++        if (may_free) {
++            set_bit(f->iovcnt, f->may_free);
++        }
+         f->iov[f->iovcnt].iov_base = (uint8_t *)buf;
+         f->iov[f->iovcnt++].iov_len = size;
+     }
+@@ -320,14 +364,15 @@ static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size)
+     }
+ }
+ 
+-void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size)
++void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size,
++                           bool may_free)
+ {
+     if (f->last_error) {
+         return;
+     }
+ 
+     f->bytes_xfer += size;
+-    add_to_iovec(f, buf, size);
++    add_to_iovec(f, buf, size, may_free);
+ }
+ 
+ void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size)
+@@ -345,7 +390,7 @@ void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size)
+         }
+         memcpy(f->buf + f->buf_index, buf, l);
+         f->bytes_xfer += l;
+-        add_to_iovec(f, f->buf + f->buf_index, l);
++        add_to_iovec(f, f->buf + f->buf_index, l, false);
+         f->buf_index += l;
+         if (f->buf_index == IO_BUF_SIZE) {
+             qemu_fflush(f);
+@@ -366,7 +411,7 @@ void qemu_put_byte(QEMUFile *f, int v)
+ 
+     f->buf[f->buf_index] = v;
+     f->bytes_xfer++;
+-    add_to_iovec(f, f->buf + f->buf_index, 1);
++    add_to_iovec(f, f->buf + f->buf_index, 1, false);
+     f->buf_index++;
+     if (f->buf_index == IO_BUF_SIZE) {
+         qemu_fflush(f);
+@@ -647,7 +692,7 @@ ssize_t qemu_put_compression_data(QEMUFile *f, const uint8_t *p, size_t size,
+     }
+     qemu_put_be32(f, blen);
+     if (f->ops->writev_buffer) {
+-        add_to_iovec(f, f->buf + f->buf_index, blen);
++        add_to_iovec(f, f->buf + f->buf_index, blen, false);
+     }
+     f->buf_index += blen;
+     if (f->buf_index == IO_BUF_SIZE) {
+diff --git a/migration/ram.c b/migration/ram.c
+index a1c8089010..b0322a0b5c 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -27,6 +27,7 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++#include "sysemu/sysemu.h"
+ #include "cpu.h"
+ #include <zlib.h>
+ #include "qapi-event.h"
+@@ -713,6 +714,18 @@ static int save_zero_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset,
+     return pages;
+ }
+ 
++static void ram_discard_page(uint8_t *addr, int pages)
++{
++    if (!migrate_discard_ram() || !runstate_check(RUN_STATE_FINISH_MIGRATE)) {
++        return;
++    }
++
++    if (qemu_madvise(addr, pages << TARGET_PAGE_BITS, QEMU_MADV_DONTNEED) < 0) {
++        error_report("migrate: madvise DONTNEED failed %p %d: %s",
++                     addr, pages << TARGET_PAGE_BITS, strerror(errno));
++    }
++}
++
+ /**
+  * ram_save_page: Send the given page to the stream
+  *
+@@ -772,6 +785,7 @@ static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
+              * page would be stale
+              */
+             xbzrle_cache_zero_page(current_addr);
++            ram_discard_page(p, pages);
+         } else if (!ram_bulk_stage &&
+                    !migration_in_postcopy(migrate_get_current()) &&
+                    migrate_use_xbzrle()) {
+@@ -791,9 +805,11 @@ static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
+         *bytes_transferred += save_page_header(f, block,
+                                                offset | RAM_SAVE_FLAG_PAGE);
+         if (send_async) {
+-            qemu_put_buffer_async(f, p, TARGET_PAGE_SIZE);
++            qemu_put_buffer_async(
++                f, p, TARGET_PAGE_SIZE, migrate_discard_ram());
+         } else {
+             qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
++            ram_discard_page(p, 1);
+         }
+         *bytes_transferred += TARGET_PAGE_SIZE;
+         pages = 1;
+@@ -821,6 +837,7 @@ static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+         error_report("compressed data failed!");
+     } else {
+         bytes_sent += blen;
++        ram_discard_page(p, 1);
+     }
+ 
+     return bytes_sent;
+@@ -959,12 +976,17 @@ static int ram_save_compressed_page(QEMUFile *f, PageSearchStatus *pss,
+                     error_report("compressed data failed!");
+                 }
+             }
++            if (pages > 0) {
++                ram_discard_page(p, pages);
++            }
+         } else {
+             offset |= RAM_SAVE_FLAG_CONTINUE;
+             pages = save_zero_page(f, block, offset, p, bytes_transferred);
+             if (pages == -1) {
+                 pages = compress_page_with_multi_thread(f, block, offset,
+                                                         bytes_transferred);
++            } else {
++                ram_discard_page(p, pages);
+             }
+         }
+     }
+diff --git a/qapi-schema.json b/qapi-schema.json
+index ce20f16757..f02b434765 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -588,11 +588,14 @@
+ #        side, this process is called COarse-Grain LOck Stepping (COLO) for
+ #        Non-stop Service. (since 2.8)
+ #
++# @discard-ram: if enabled, qemu will free the migrated ram pages on the source
++#        during postcopy-ram migration. (since 2.9)
++#
+ # Since: 1.2
+ ##
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+-           'compress', 'events', 'postcopy-ram', 'x-colo'] }
++           'compress', 'events', 'postcopy-ram', 'x-colo', 'discard-ram'] }
+ 
+ ##
+ # @MigrationCapabilityStatus:
 -- 
-MST
+2.11.0
