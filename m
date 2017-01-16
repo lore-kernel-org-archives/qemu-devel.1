@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTAdF-00012H-1T
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:45 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cTAdK-00018A-Cg
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTAdE-00009D-GA
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cTAdE-00008y-9b
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:44 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 619984E4D0
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:59:44 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1cTAdH-00009u-CR
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:50 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 16 Jan 2017 17:59:07 +0100
-Message-Id: <20170116165916.8575-24-pbonzini@redhat.com>
+Date: Mon, 16 Jan 2017 17:59:09 +0100
+Message-Id: <20170116165916.8575-26-pbonzini@redhat.com>
 In-Reply-To: <20170116165916.8575-1-pbonzini@redhat.com>
 References: <20170116165916.8575-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 23/32] x86: ioapic: dump version for "info
- ioapic"
+Subject: [Qemu-devel] [PULL 25/32] exec: Add missing rcu_read_unlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +20,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>
+Cc: Roman Kapl <rka@sysgo.com>, qemu-stable@nongnu.org
 
-From: Peter Xu <peterx@redhat.com>
+From: Roman Kapl <rka@sysgo.com>
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1483952153-7221-3-git-send-email-peterx@redhat.com>
+rcu_read_unlock was not called if the address_space_access_valid result is
+negative.
+
+This caused (at least) a problem when qemu on PPC/E500+TAP failed to terminate
+properly and instead got stuck in a deadlock.
+
+Signed-off-by: Roman Kapl <rka@sysgo.com>
+Message-Id: <20170109110921.4931-1-rka@sysgo.com>
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/intc/ioapic_common.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ exec.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/intc/ioapic_common.c b/hw/intc/ioapic_common.c
-index 1b7ec5e..97c4f9c 100644
---- a/hw/intc/ioapic_common.c
-+++ b/hw/intc/ioapic_common.c
-@@ -58,7 +58,8 @@ void ioapic_print_redtbl(Monitor *mon, IOAPICCommonState *s)
-     uint32_t remote_irr = 0;
-     int i;
- 
--    monitor_printf(mon, "ioapic id=0x%02x sel=0x%02x", s->id, s->ioregsel);
-+    monitor_printf(mon, "ioapic ver=0x%x id=0x%02x sel=0x%02x",
-+                   s->version, s->id, s->ioregsel);
-     if (s->ioregsel) {
-         monitor_printf(mon, " (redir[%u])\n",
-                        (s->ioregsel - IOAPIC_REG_REDTBL_BASE) >> 1);
+diff --git a/exec.c b/exec.c
+index 47835c1..c95ae33 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2960,6 +2960,7 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_
+         if (!memory_access_is_direct(mr, is_write)) {
+             l = memory_access_size(mr, l, addr);
+             if (!memory_region_access_valid(mr, xlat, l, is_write)) {
++                rcu_read_unlock();
+                 return false;
+             }
+         }
 -- 
 2.9.3
