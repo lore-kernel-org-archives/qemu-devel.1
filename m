@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTAdL-00018l-3T
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:53 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cTAdN-0001BZ-Iu
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTAdJ-0000AY-PN
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60852)
+	(envelope-from <pbonzini@redhat.com>) id 1cTAdL-0000BW-Pk
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cTAdJ-0000AK-GP
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:49 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8FCC161BA4
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 16:59:49 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-116-100.ams2.redhat.com
-	[10.36.116.100])
-	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v0GGxGVE001760
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 11:59:48 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cTAdL-0000B6-HU
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:59:51 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 16 Jan 2017 17:59:11 +0100
-Message-Id: <20170116165916.8575-28-pbonzini@redhat.com>
+Date: Mon, 16 Jan 2017 17:59:12 +0100
+Message-Id: <20170116165916.8575-29-pbonzini@redhat.com>
 In-Reply-To: <20170116165916.8575-1-pbonzini@redhat.com>
 References: <20170116165916.8575-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 27/32] ramblock-notifier: new
+Subject: [Qemu-devel] [PULL 28/32] kvm: move cpu synchronization code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,286 +24,371 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Vincent Palatin <vpalatin@chromium.org>, Stefan Weil <sw@weilnetz.de>
 
-This adds a notify interface of ram block additions and removals.
+From: Vincent Palatin <vpalatin@chromium.org>
 
+Move the generic cpu_synchronize_ functions to the common hw_accel.h header,
+in order to prepare for the addition of a second hardware accelerator.
+
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+Signed-off-by: Vincent Palatin <vpalatin@chromium.org>
+Message-Id: <f5c3cffe8d520011df1c2e5437bb814989b48332.1484045952.git.vpalatin@chromium.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- exec.c                  |  5 ++++
- include/exec/memory.h   |  6 +----
- include/exec/ram_addr.h | 46 ++-----------------------------
- include/exec/ramlist.h  | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
- numa.c                  | 29 ++++++++++++++++++++
- xen-mapcache.c          |  3 +++
- 6 files changed, 112 insertions(+), 49 deletions(-)
- create mode 100644 include/exec/ramlist.h
+ cpus.c                      |  1 +
+ gdbstub.c                   |  1 +
+ hw/i386/kvm/apic.c          |  1 +
+ hw/i386/kvmvapic.c          |  1 +
+ hw/misc/vmport.c            |  2 +-
+ hw/ppc/pnv_xscom.c          |  2 +-
+ hw/ppc/ppce500_spin.c       |  4 ++--
+ hw/ppc/spapr.c              |  2 +-
+ hw/ppc/spapr_hcall.c        |  2 +-
+ hw/s390x/s390-pci-inst.c    |  1 +
+ include/sysemu/hw_accel.h   | 39 +++++++++++++++++++++++++++++++++++++++
+ include/sysemu/kvm.h        | 23 -----------------------
+ monitor.c                   |  2 +-
+ qom/cpu.c                   |  2 +-
+ target/arm/cpu.c            |  2 +-
+ target/i386/helper.c        |  1 +
+ target/i386/kvm.c           |  1 +
+ target/ppc/kvm.c            |  2 +-
+ target/ppc/mmu-hash64.c     |  2 +-
+ target/ppc/translate_init.c |  2 +-
+ target/s390x/gdbstub.c      |  1 +
+ 21 files changed, 59 insertions(+), 35 deletions(-)
+ create mode 100644 include/sysemu/hw_accel.h
 
-diff --git a/exec.c b/exec.c
-index c95ae33..067c51b 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1687,6 +1687,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
-         qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_HUGEPAGE);
-         /* MADV_DONTFORK is also needed by KVM in absence of synchronous MMU */
-         qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_DONTFORK);
-+        ram_block_notify_add(new_block->host, new_block->max_length);
-     }
- }
+diff --git a/cpus.c b/cpus.c
+index 5213351..fc78502 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -33,6 +33,7 @@
+ #include "sysemu/block-backend.h"
+ #include "exec/gdbstub.h"
+ #include "sysemu/dma.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "qmp-commands.h"
+ #include "exec/exec-all.h"
+diff --git a/gdbstub.c b/gdbstub.c
+index de62d26..de9b62b 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -32,6 +32,7 @@
+ #define MAX_PACKET_LENGTH 4096
  
-@@ -1817,6 +1818,10 @@ void qemu_ram_free(RAMBlock *block)
-         return;
-     }
+ #include "qemu/sockets.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "exec/semihost.h"
+ #include "exec/exec-all.h"
+diff --git a/hw/i386/kvm/apic.c b/hw/i386/kvm/apic.c
+index df5180b..1df6d26 100644
+--- a/hw/i386/kvm/apic.c
++++ b/hw/i386/kvm/apic.c
+@@ -14,6 +14,7 @@
+ #include "cpu.h"
+ #include "hw/i386/apic_internal.h"
+ #include "hw/pci/msi.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "target/i386/kvm_i386.h"
  
-+    if (block->host) {
-+        ram_block_notify_remove(block->host, block->max_length);
-+    }
-+
-     qemu_mutex_lock_ramlist();
-     QLIST_REMOVE_RCU(block, next);
-     ram_list.mru_block = NULL;
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index bec9756..a10044f 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -16,16 +16,12 @@
+diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+index b30d1b9..2f767b6 100644
+--- a/hw/i386/kvmvapic.c
++++ b/hw/i386/kvmvapic.c
+@@ -14,6 +14,7 @@
+ #include "exec/exec-all.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/cpus.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "hw/i386/apic_internal.h"
+ #include "hw/sysbus.h"
+diff --git a/hw/misc/vmport.c b/hw/misc/vmport.c
+index c763811..be40930 100644
+--- a/hw/misc/vmport.c
++++ b/hw/misc/vmport.c
+@@ -25,7 +25,7 @@
+ #include "hw/hw.h"
+ #include "hw/isa/isa.h"
+ #include "hw/i386/pc.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "hw/qdev.h"
  
- #ifndef CONFIG_USER_ONLY
+ //#define VMPORT_DEBUG
+diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+index b82af4f..38bc85f 100644
+--- a/hw/ppc/pnv_xscom.c
++++ b/hw/ppc/pnv_xscom.c
+@@ -20,7 +20,7 @@
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+ #include "qemu/log.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "target/ppc/cpu.h"
+ #include "hw/sysbus.h"
  
--#define DIRTY_MEMORY_VGA       0
--#define DIRTY_MEMORY_CODE      1
--#define DIRTY_MEMORY_MIGRATION 2
--#define DIRTY_MEMORY_NUM       3        /* num of dirty bits */
--
- #include "exec/cpu-common.h"
- #ifndef CONFIG_USER_ONLY
- #include "exec/hwaddr.h"
- #endif
- #include "exec/memattrs.h"
-+#include "exec/ramlist.h"
- #include "qemu/queue.h"
- #include "qemu/int128.h"
- #include "qemu/notify.h"
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 54d7108..3e79466 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -21,6 +21,7 @@
+diff --git a/hw/ppc/ppce500_spin.c b/hw/ppc/ppce500_spin.c
+index cf958a9..eb219ab 100644
+--- a/hw/ppc/ppce500_spin.c
++++ b/hw/ppc/ppce500_spin.c
+@@ -29,9 +29,9 @@
  
- #ifndef CONFIG_USER_ONLY
- #include "hw/xen/xen.h"
-+#include "exec/ramlist.h"
- 
- struct RAMBlock {
-     struct rcu_head rcu;
-@@ -35,6 +36,7 @@ struct RAMBlock {
-     char idstr[256];
-     /* RCU-enabled, writes protected by the ramlist lock */
-     QLIST_ENTRY(RAMBlock) next;
-+    QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
-     int fd;
-     size_t page_size;
- };
-@@ -50,51 +52,7 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
-     return (char *)block->host + offset;
- }
- 
--/* The dirty memory bitmap is split into fixed-size blocks to allow growth
-- * under RCU.  The bitmap for a block can be accessed as follows:
-- *
-- *   rcu_read_lock();
-- *
-- *   DirtyMemoryBlocks *blocks =
-- *       atomic_rcu_read(&ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
-- *
-- *   ram_addr_t idx = (addr >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
-- *   unsigned long *block = blocks.blocks[idx];
-- *   ...access block bitmap...
-- *
-- *   rcu_read_unlock();
-- *
-- * Remember to check for the end of the block when accessing a range of
-- * addresses.  Move on to the next block if you reach the end.
-- *
-- * Organization into blocks allows dirty memory to grow (but not shrink) under
-- * RCU.  When adding new RAMBlocks requires the dirty memory to grow, a new
-- * DirtyMemoryBlocks array is allocated with pointers to existing blocks kept
-- * the same.  Other threads can safely access existing blocks while dirty
-- * memory is being grown.  When no threads are using the old DirtyMemoryBlocks
-- * anymore it is freed by RCU (but the underlying blocks stay because they are
-- * pointed to from the new DirtyMemoryBlocks).
-- */
--#define DIRTY_MEMORY_BLOCK_SIZE ((ram_addr_t)256 * 1024 * 8)
--typedef struct {
--    struct rcu_head rcu;
--    unsigned long *blocks[];
--} DirtyMemoryBlocks;
--
--typedef struct RAMList {
--    QemuMutex mutex;
--    RAMBlock *mru_block;
--    /* RCU-enabled, writes protected by the ramlist lock. */
--    QLIST_HEAD(, RAMBlock) blocks;
--    DirtyMemoryBlocks *dirty_memory[DIRTY_MEMORY_NUM];
--    uint32_t version;
--} RAMList;
--extern RAMList ram_list;
--
- ram_addr_t last_ram_offset(void);
--void qemu_mutex_lock_ramlist(void);
--void qemu_mutex_unlock_ramlist(void);
--
- RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-                                    bool share, const char *mem_path,
-                                    Error **errp);
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-new file mode 100644
-index 0000000..c59880d
---- /dev/null
-+++ b/include/exec/ramlist.h
-@@ -0,0 +1,72 @@
-+#ifndef RAMLIST_H
-+#define RAMLIST_H
-+
-+#include "qemu/queue.h"
-+#include "qemu/thread.h"
-+#include "qemu/rcu.h"
-+
-+typedef struct RAMBlockNotifier RAMBlockNotifier;
-+
-+#define DIRTY_MEMORY_VGA       0
-+#define DIRTY_MEMORY_CODE      1
-+#define DIRTY_MEMORY_MIGRATION 2
-+#define DIRTY_MEMORY_NUM       3        /* num of dirty bits */
-+
-+/* The dirty memory bitmap is split into fixed-size blocks to allow growth
-+ * under RCU.  The bitmap for a block can be accessed as follows:
-+ *
-+ *   rcu_read_lock();
-+ *
-+ *   DirtyMemoryBlocks *blocks =
-+ *       atomic_rcu_read(&ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
-+ *
-+ *   ram_addr_t idx = (addr >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
-+ *   unsigned long *block = blocks.blocks[idx];
-+ *   ...access block bitmap...
-+ *
-+ *   rcu_read_unlock();
-+ *
-+ * Remember to check for the end of the block when accessing a range of
-+ * addresses.  Move on to the next block if you reach the end.
-+ *
-+ * Organization into blocks allows dirty memory to grow (but not shrink) under
-+ * RCU.  When adding new RAMBlocks requires the dirty memory to grow, a new
-+ * DirtyMemoryBlocks array is allocated with pointers to existing blocks kept
-+ * the same.  Other threads can safely access existing blocks while dirty
-+ * memory is being grown.  When no threads are using the old DirtyMemoryBlocks
-+ * anymore it is freed by RCU (but the underlying blocks stay because they are
-+ * pointed to from the new DirtyMemoryBlocks).
-+ */
-+#define DIRTY_MEMORY_BLOCK_SIZE ((ram_addr_t)256 * 1024 * 8)
-+typedef struct {
-+    struct rcu_head rcu;
-+    unsigned long *blocks[];
-+} DirtyMemoryBlocks;
-+
-+typedef struct RAMList {
-+    QemuMutex mutex;
-+    RAMBlock *mru_block;
-+    /* RCU-enabled, writes protected by the ramlist lock. */
-+    QLIST_HEAD(, RAMBlock) blocks;
-+    DirtyMemoryBlocks *dirty_memory[DIRTY_MEMORY_NUM];
-+    uint32_t version;
-+    QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
-+} RAMList;
-+extern RAMList ram_list;
-+
-+void qemu_mutex_lock_ramlist(void);
-+void qemu_mutex_unlock_ramlist(void);
-+
-+struct RAMBlockNotifier {
-+    void (*ram_block_added)(RAMBlockNotifier *n, void *host, size_t size);
-+    void (*ram_block_removed)(RAMBlockNotifier *n, void *host, size_t size);
-+    QLIST_ENTRY(RAMBlockNotifier) next;
-+};
-+
-+void ram_block_notifier_add(RAMBlockNotifier *n);
-+void ram_block_notifier_remove(RAMBlockNotifier *n);
-+void ram_block_notify_add(void *host, size_t size);
-+void ram_block_notify_remove(void *host, size_t size);
-+
-+
-+#endif /* RAMLIST_H */
-diff --git a/numa.c b/numa.c
-index 379bc8a..9f56be9 100644
---- a/numa.c
-+++ b/numa.c
-@@ -25,6 +25,7 @@
  #include "qemu/osdep.h"
- #include "sysemu/numa.h"
- #include "exec/cpu-common.h"
-+#include "exec/ramlist.h"
- #include "qemu/bitmap.h"
- #include "qom/cpu.h"
+ #include "hw/hw.h"
+-#include "sysemu/sysemu.h"
+ #include "hw/sysbus.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
++#include "sysemu/sysemu.h"
+ #include "e500.h"
+ 
+ #define MAX_CPUS 32
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 208ef7b..a642e66 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -36,7 +36,7 @@
+ #include "sysemu/device_tree.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/cpus.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "kvm_ppc.h"
+ #include "migration/migration.h"
+ #include "mmu-hash64.h"
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 9a9bedf..b2a8e48 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1,5 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/log.h"
+ #include "cpu.h"
+@@ -9,7 +10,6 @@
+ #include "mmu-hash64.h"
+ #include "cpu-models.h"
+ #include "trace.h"
+-#include "sysemu/kvm.h"
+ #include "kvm_ppc.h"
+ #include "hw/ppc/spapr_ovec.h"
+ 
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 0864d9b..4d0775c 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -18,6 +18,7 @@
+ #include "s390-pci-bus.h"
+ #include "exec/memory-internal.h"
  #include "qemu/error-report.h"
-@@ -572,3 +573,31 @@ int numa_get_node_for_cpu(int idx)
-     }
-     return i;
- }
++#include "sysemu/hw_accel.h"
+ 
+ /* #define DEBUG_S390PCI_INST */
+ #ifdef DEBUG_S390PCI_INST
+diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+new file mode 100644
+index 0000000..03812cf
+--- /dev/null
++++ b/include/sysemu/hw_accel.h
+@@ -0,0 +1,39 @@
++/*
++ * QEMU Hardware accelertors support
++ *
++ * Copyright 2016 Google, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
 +
-+void ram_block_notifier_add(RAMBlockNotifier *n)
++#ifndef QEMU_HW_ACCEL_H
++#define QEMU_HW_ACCEL_H
++
++#include "qom/cpu.h"
++#include "sysemu/hax.h"
++#include "sysemu/kvm.h"
++
++static inline void cpu_synchronize_state(CPUState *cpu)
 +{
-+    QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
-+}
-+
-+void ram_block_notifier_remove(RAMBlockNotifier *n)
-+{
-+    QLIST_REMOVE(n, next);
-+}
-+
-+void ram_block_notify_add(void *host, size_t size)
-+{
-+    RAMBlockNotifier *notifier;
-+
-+    QLIST_FOREACH(notifier, &ram_list.ramblock_notifiers, next) {
-+        notifier->ram_block_added(notifier, host, size);
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_state(cpu);
 +    }
 +}
 +
-+void ram_block_notify_remove(void *host, size_t size)
++static inline void cpu_synchronize_post_reset(CPUState *cpu)
 +{
-+    RAMBlockNotifier *notifier;
-+
-+    QLIST_FOREACH(notifier, &ram_list.ramblock_notifiers, next) {
-+        notifier->ram_block_removed(notifier, host, size);
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_post_reset(cpu);
 +    }
 +}
-diff --git a/xen-mapcache.c b/xen-mapcache.c
-index 8f3a592..31debdf 100644
---- a/xen-mapcache.c
-+++ b/xen-mapcache.c
-@@ -163,6 +163,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
-     err = g_malloc0(nb_pfn * sizeof (int));
++
++static inline void cpu_synchronize_post_init(CPUState *cpu)
++{
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_post_init(cpu);
++    }
++}
++
++#endif /* QEMU_HW_ACCEL_H */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index df67cc0..3045ee7 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -461,29 +461,6 @@ void kvm_cpu_synchronize_state(CPUState *cpu);
+ void kvm_cpu_synchronize_post_reset(CPUState *cpu);
+ void kvm_cpu_synchronize_post_init(CPUState *cpu);
  
-     if (entry->vaddr_base != NULL) {
-+        ram_block_notify_remove(entry->vaddr_base, entry->size);
-         if (munmap(entry->vaddr_base, entry->size) != 0) {
-             perror("unmap fails");
-             exit(-1);
-@@ -188,6 +189,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
-     entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long) *
-             BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
+-/* generic hooks - to be moved/refactored once there are more users */
+-
+-static inline void cpu_synchronize_state(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_state(cpu);
+-    }
+-}
+-
+-static inline void cpu_synchronize_post_reset(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_post_reset(cpu);
+-    }
+-}
+-
+-static inline void cpu_synchronize_post_init(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_post_init(cpu);
+-    }
+-}
+-
+ /**
+  * kvm_irqchip_add_msi_route - Add MSI route for specific vector
+  * @s:      KVM state
+diff --git a/monitor.c b/monitor.c
+index 0841d43..d38956f 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -50,7 +50,7 @@
+ #include "sysemu/balloon.h"
+ #include "qemu/timer.h"
+ #include "migration/migration.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "qemu/acl.h"
+ #include "sysemu/tpm.h"
+ #include "qapi/qmp/qerror.h"
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 03d9190..2c5274f 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -22,7 +22,7 @@
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qom/cpu.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "qemu/notify.h"
+ #include "qemu/log.h"
+ #include "exec/log.h"
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index f5cb30a..f7f20d3 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -31,7 +31,7 @@
+ #endif
+ #include "hw/arm/arm.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "kvm_arm.h"
  
-+    ram_block_notify_add(entry->vaddr_base, entry->size);
-     bitmap_zero(entry->valid_mapping, nb_pfn);
-     for (i = 0; i < nb_pfn; i++) {
-         if (!err[i]) {
-@@ -397,6 +399,7 @@ static void xen_invalidate_map_cache_entry_unlocked(uint8_t *buffer)
-     }
+ static void arm_cpu_set_pc(CPUState *cs, vaddr value)
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 43e87dd..19b2656 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -24,6 +24,7 @@
+ #include "kvm_i386.h"
+ #ifndef CONFIG_USER_ONLY
+ #include "sysemu/sysemu.h"
++#include "sysemu/hw_accel.h"
+ #include "monitor/monitor.h"
+ #include "hw/i386/apic_internal.h"
+ #endif
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 10a9cd8..e6c4f75 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -23,6 +23,7 @@
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm_int.h"
+ #include "kvm_i386.h"
+ #include "hyperv.h"
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 6c53a6d..ec92c64 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -26,7 +26,7 @@
+ #include "cpu.h"
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/numa.h"
+ #include "kvm_ppc.h"
+ #include "sysemu/cpus.h"
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index fdb7a78..0efc8c6 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -23,7 +23,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+ #include "qemu/error-report.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "kvm_ppc.h"
+ #include "mmu-hash64.h"
+ #include "exec/log.h"
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 19ef250..b0c65b9 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -21,10 +21,10 @@
+ #include "qemu/osdep.h"
+ #include "disas/bfd.h"
+ #include "exec/gdbstub.h"
+-#include "sysemu/kvm.h"
+ #include "kvm_ppc.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/cpus.h"
++#include "sysemu/hw_accel.h"
+ #include "cpu-models.h"
+ #include "mmu-hash32.h"
+ #include "mmu-hash64.h"
+diff --git a/target/s390x/gdbstub.c b/target/s390x/gdbstub.c
+index 3d223de..3c652fb 100644
+--- a/target/s390x/gdbstub.c
++++ b/target/s390x/gdbstub.c
+@@ -23,6 +23,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/gdbstub.h"
+ #include "qemu/bitops.h"
++#include "sysemu/hw_accel.h"
  
-     pentry->next = entry->next;
-+    ram_block_notify_remove(entry->vaddr_base, entry->size);
-     if (munmap(entry->vaddr_base, entry->size) != 0) {
-         perror("unmap fails");
-         exit(-1);
+ int s390_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+ {
 -- 
 2.9.3
