@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTGk2-0008BW-78
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:12 -0500
+	(envelope-from <Sandra_Loosemore@mentor.com>) id 1cTGkJ-0008JZ-2S
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTGjz-0000rG-3W
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36442)
+	(envelope-from <Sandra_Loosemore@mentor.com>) id 1cTGkF-0000td-QM
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:27 -0500
+Received: from relay1.mentorg.com ([192.94.38.131]:59592)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cTGjy-0000qt-TT
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:07 -0500
-References: <20170112114612.14520-1-stefanha@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <47c3dbde-9ac2-31e1-4c06-a99d382a2160@redhat.com>
-Date: Tue, 17 Jan 2017 00:31:03 +0100
+	(Exim 4.71) (envelope-from <Sandra_Loosemore@mentor.com>)
+	id 1cTGkF-0000t4-Gu
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 18:31:23 -0500
+References: <20161231132226.9595-1-marex@denx.de>
+	<20161231132226.9595-2-marex@denx.de>
+	<37102228-c1e5-e8e5-c4a5-5c9ae186202b@suse.de>
+From: Sandra Loosemore <sandra@codesourcery.com>
+Message-ID: <587D57C1.2090005@codesourcery.com>
+Date: Mon, 16 Jan 2017 16:31:13 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170112114612.14520-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <37102228-c1e5-e8e5-c4a5-5c9ae186202b@suse.de>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] virtio: revert
- virtio_queue_set_notification() nesting
+Subject: Re: [Qemu-devel] [PATCH V8 2/7] nios2: Add architecture emulation
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Doug Goldstein <cardoe@cardoe.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Alexander Graf <agraf@suse.de>, Marek Vasut <marex@denx.de>, qemu-devel@nongnu.org
+Cc: Jeff Da Silva <jdasilva@altera.com>, Chris Wulff <crwulff@gmail.com>, Yves Vandervennet <yvanderv@altera.com>, Ley Foon Tan <lftan@altera.com>
 
-On 01/12/17 12:46, Stefan Hajnoczi wrote:
-> The virtio_queue_set_notification() nesting introduced for AioContext polling
-> raised an assertion with virtio-net (even in non-polling mode).  Converting
-> virtio-net and virtio-crypto to use virtio_queue_set_notification() in a
-> nesting fashion would be invasive and isn't worth it.
-> 
-> Patch 1 contains the revert to resolve the bug that Doug noticed.
-> 
-> Patch 2 is a less efficient but safe alternative.
-> 
-> Stefan Hajnoczi (2):
->   Revert "virtio: turn vq->notification into a nested counter"
->   virtio: disable notifications again after poll succeeded
-> 
->  hw/virtio/virtio.c | 21 +++++++++------------
->  1 file changed, 9 insertions(+), 12 deletions(-)
-> 
+On 01/16/2017 03:21 PM, Alexander Graf wrote:
 
-I confirm that with current master
-(2ccede18bd24fce5db83fef3674563a1f256717b), my TCG aarch64 guest,
-running ArmVirtQemu UEFI firmware, crashes with the following assertion
-failure:
+>> +static void nios2_cpu_disas_set_info(CPUState *cpu, disassemble_info
+>> *info)
+>> +{
+>> +    /* NOTE: NiosII R2 is not supported yet. */
+>> +    info->mach = bfd_arch_nios2;
+>> +#ifdef TARGET_WORDS_BIGENDIAN
+>> +    info->print_insn = print_insn_big_nios2;
+>> +#else
+>> +    info->print_insn = print_insn_little_nios2;
+>> +#endif
+>
+> I take it there is no runtime switch for endianness? Most architectures
+> eventually got one and moved to a single default endianness for softmmu
+> with swizzling for the "other" one (LE for ARM, BE for ppc).
 
-qemu-system-aarch64: .../hw/virtio/virtio.c:215:
-virtio_queue_set_notification: Assertion `vq->notification_disabled > 0'
-failed.
+Maybe QEMU should just error out if configured for big-endianness on 
+this target.  Per the published Nios II Processor Reference Handbook, 
+"The Nios II architecture uses little-endian byte ordering."  When I was 
+working on preparing the nios2 binutils patches for submission, Altera 
+asked me to retain the big-endian hooks because they didn't want to rule 
+out officially supporting that feature.  I had no way to test anything 
+big-endian, of course.
 
-This guest does not use iPXE's UEFI SNP driver for virtio-net, instead
-it uses OVMF's own, built-in VirtioNetDxe driver.
-
-With both patches applied, everything works fine. The assertion failure
-is gone, and I could ping a public host from the UEFI shell command line.
-
-Tested-by: Laszlo Ersek <lersek@redhat.com>
-
-I'm unsure if my use case covers polling mode, so it might be prudent to
-add the tag to patch #1 only. I set the breakpoint that you gave Doug
-(using "virsh start --paused" + attaching GDB to the running QEMU
-process, before the firmware got any chance to execute), and the
-breakpoint (virtio_queue_host_notifier_aio_poll_begin) didn't fire
-during the test.
-
-Thanks!
-Laszlo
+-Sandra
