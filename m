@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTD6S-0007kT-RB
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:38:05 -0500
+	(envelope-from <harrynjit@gmail.com>) id 1cTD72-00088G-TJ
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:38:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTD6R-0004OU-IL
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:38:04 -0500
-References: <20170103182801.9638-1-berrange@redhat.com>
-	<20170103182801.9638-4-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3d01b4f0-c641-43ce-2359-9a0ab9c360d5@redhat.com>
-Date: Mon, 16 Jan 2017 20:37:57 +0100
+	(envelope-from <harrynjit@gmail.com>) id 1cTD71-0004VY-PJ
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:38:40 -0500
+Received: from mail-yb0-x242.google.com ([2607:f8b0:4002:c09::242]:36126)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <harrynjit@gmail.com>) id 1cTD71-0004VT-Kp
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:38:39 -0500
+Received: by mail-yb0-x242.google.com with SMTP id l23so4716911ybj.3
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 11:38:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170103182801.9638-4-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Okg2fVmJR98k4E0kCtE8F9CpvWJiGAXHT"
-Subject: Re: [Qemu-devel] [PATCH v1 03/15] qcow: document another weakness
- of qcow AES encryption
+In-Reply-To: <0de557f6-8912-6a94-d8f5-009637e921fe@redhat.com>
+References: <CA+scX6=rRiGHsOj8oxjTe4KqEF7S_GUao3k=TUQeE7FpyT_K8w@mail.gmail.com>
+	<20170103155047.GE14707@stefanha-x1.localdomain>
+	<CA+scX6mCDjnZdEMemuDerPxR2L4w12PyyvH==tW_PdW6Kqe7+A@mail.gmail.com>
+	<20170116131500.GA14681@stefanha-x1.localdomain>
+	<0de557f6-8912-6a94-d8f5-009637e921fe@redhat.com>
+From: Weiwei Jia <harrynjit@gmail.com>
+Date: Mon, 16 Jan 2017 14:38:38 -0500
+Message-ID: <CA+scX6=hdF2pc22ct9vwb2HELBXc2dFbMDuu6HVEexDpXQaWww@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Performance about x-data-plane
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: krister@redhat.com
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, eblake@redhat.com, libvir-list <libvir-list@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Okg2fVmJR98k4E0kCtE8F9CpvWJiGAXHT
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <3d01b4f0-c641-43ce-2359-9a0ab9c360d5@redhat.com>
-Subject: Re: [PATCH v1 03/15] qcow: document another weakness of qcow AES
- encryption
-References: <20170103182801.9638-1-berrange@redhat.com>
- <20170103182801.9638-4-berrange@redhat.com>
-In-Reply-To: <20170103182801.9638-4-berrange@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
-
-On 03.01.2017 19:27, Daniel P. Berrange wrote:
-> Document that use of guest virtual sector numbers as the basis for
-> the initialization vectors is a potential weakness, when combined
-> with internal snapshots or multiple images using the same passphrase.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-img.texi | 9 +++++++++
->  1 file changed, 9 insertions(+)
->=20
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index 174aae3..8efcf89 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -554,6 +554,15 @@ change the passphrase to protect data in any qcow =
-images. The files must
->  be cloned, using a different encryption passphrase in the new file. Th=
-e
->  original file must then be securely erased using a program like shred,=
-
->  though even this is ineffective with many modern storage technologies.=
-
-> +@item Initialization vectors used to encrypt sectors are based on the
-> +guest virtual sector number, instead of the host physical sector. When=
-
-> +a disk image has multiple internal snapshots this means that data in
-> +multiple physical sectors is encrypted with the same initialization
-> +vector. With the CBC mode, this opens the possibility of watermarking
-> +attacks if the attack can collect multiple sectors encrypted with the
-> +same IV and some predictable data. Having multiple qcow2 images with
-> +the same passphrase also exposes this weakness since the passphrase
-> +is directly used as the key.
->  @end itemize
-
-In the output manpage, this itemize looks pretty broken to me:
-
-@item foo
-bar baz
-
-is formatted as:
-
--<foo>
-    bar baz
-
-Which may be used intentionally, but it certainly isn't here.
-
-It should probably be written as:
-
-@item
-foo bar baz
-
-which becomes
-
--    foo bar baz
-
-(which is what the other itemize in qemu-img.texi does)
-
-Do you want to fix that in this series?
-
-Max
-
-> =20
->  Use of qcow / qcow2 encryption is thus strongly discouraged. Users are=
-
->=20
+On Mon, Jan 16, 2017 at 10:00 AM, Karl Rister <krister@redhat.com> wrote:
+> On 01/16/2017 07:15 AM, Stefan Hajnoczi wrote:
+>> On Tue, Jan 03, 2017 at 12:02:14PM -0500, Weiwei Jia wrote:
+>>>> The expensive part is the virtqueue kick.  Recently we tried polling the
+>>>> virtqueue instead of waiting for the ioeventfd file descriptor and got
+>>>> double-digit performance improvements:
+>>>> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00148.html
+>>>>
+>>>> If you want to understand the performance of your benchmark you'll have
+>>>> compare host/guest disk stats (e.g. request lifetime, disk utilization,
+>>>> queue depth, average request size) to check that the bare metal and
+>>>> guest workloads are really sending comparable I/O patterns to the
+>>>> physical disk.
+>>>>
+>>>> Then you using Linux and/or QEMU tracing to analyze the request latency
+>>>> by looking at interesting points in the request lifecycle like virtqueue
+>>>> kick, host Linux AIO io_submit(2), etc.
+>>>>
+>>>
+>>> Thank you. I will look into "polling the virtqueue" as you said above.
+>>> Currently, I just use blktrace to see disk stats and add logs in the
+>>> I/O workload to see the time latency for each request. What kind of
+>>> tools are you using to analyze request lifecycle like virtqueue kick,
+>>> host Linux AIO iosubmit, etc.
+>>>
+>>> Do you trace the lifecycle like this
+>>> (http://www.linux-kvm.org/page/Virtio/Block/Latency#Performance_data)
+>>> but it seems to be out of date. Does it
+>>> (http://repo.or.cz/qemu-kvm/stefanha.git/shortlog/refs/heads/tracing-dev-0.12.4)
+>>> still work on QEMU 2.4.1?
+>>
+>> The details are out of date but the general approach to tracing the I/O
+>> request lifecycle still apply.
+>>
+>> There are multiple tracing tools that can do what you need.  I've CCed
+>> Karl Rister who did the latest virtio-blk dataplane tracing.
+>
+> I roughly followed this guide by Luiz Capitulino:
+>
+> https://lists.nongnu.org/archive/html/qemu-devel/2016-03/msg00887.html
+>
+> I tweaked his trace-host-and-guest script to avoid doing IO while
+> tracing is enabled, my version is available here:
+>
+> http://people.redhat.com/~krister/tracing/trace-host-and-guest
+>
+> I built QEMU with --enable-trace-backends=ftrace and then turned on the
+> QEMU trace events I was interested in with this bit of bash:
+>
+> for event in $(/usr/libexec/qemu-kvm -trace help 2>&1|grep virtio|grep
+> -v "gpu\|console\|serial\|rng\|balloon\|ccw"); do virsh
+> qemu-monitor-command master --hmp trace-event ${event} on; done
+>
+> At this point, the QEMU trace events are automatically inserted into the
+> ftrace buffers and the methodology outlined by Luiz gets the guest
+> kernel, host kernel, and QEMU events properly interleaved.
 
 
+Thank you. I will try it.
 
---Okg2fVmJR98k4E0kCtE8F9CpvWJiGAXHT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh9IRUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ABn0IAImQR0PiyaOUsEyEACGOqzVD8IK7xwMl
-tPRzwSED8bsG57TZS66+n/lCYMYfUfMteTQePzUwNiskjrmQGjhn0Xxkq28Q/pqT
-YoyVqKi3UqT4xm2xEp0ajmt0f9avZbxhvBs+IzqoKYlq9fCaP3kU8Gp1S3mwfEl4
-cO2QdSYlOWvikyG4Xaww35VFenFrAl3vUuLSsUYj8eDn9xjO2Pew80dkY1oRURok
-SLuvEPyEEXIMDJGdtQSkUETscc18JVkX+ntRhP0uD84GM5pd0hcVVgJ7Po216wq/
-x7um0Ex3Al3yR4Zg01/xsw52ngBmoy6YESI6sl9p0EhWU4IisSAEjTA=
-=WTwv
------END PGP SIGNATURE-----
-
---Okg2fVmJR98k4E0kCtE8F9CpvWJiGAXHT--
+Best,
+Weiwei Jia
