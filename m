@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cT828-0008Nt-Ez
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 09:13:17 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cT87P-0001lm-Cp
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 09:18:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cT824-0005so-A7
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 09:13:16 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34891)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cT87L-0007jK-4s
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 09:18:43 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33683)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cT824-0005rV-2x
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 09:13:12 -0500
-Received: by mail-wm0-x242.google.com with SMTP id d140so14708066wmd.2
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 06:13:12 -0800 (PST)
-Date: Mon, 16 Jan 2017 14:13:07 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170116141307.GG14681@stefanha-x1.localdomain>
-References: <1484387976-167704-1-git-send-email-longpeng2@huawei.com>
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cT87K-0007jD-U9
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 09:18:39 -0500
+Received: by mail-lf0-x244.google.com with SMTP id x1so7479452lff.0
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 06:18:38 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170113131731.1246-1-pbonzini@redhat.com>
+	<20170113131731.1246-6-pbonzini@redhat.com>
+	<20170116125847.GI13096@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d2399b53-b28f-9877-6112-b02a361bf6e4@redhat.com>
+Date: Mon, 16 Jan 2017 15:18:36 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MiFvc8Vo6wRSORdP"
-Content-Disposition: inline
-In-Reply-To: <1484387976-167704-1-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] qtest: virtio: zeroed last VRingDesc after
- allocate
+In-Reply-To: <20170116125847.GI13096@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/16] io: make qio_channel_yield aware of
+ AioContexts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +33,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: stefanha@redhat.com, lvivier@redhat.com, eblake@redhat.com, peter.maydell@linaro.org, groug@kaod.org, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 
 
---MiFvc8Vo6wRSORdP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 14, 2017 at 05:59:36PM +0800, Longpeng(Mike) wrote:
-> As qvring_indirect_desc_setup() wouldn't initialize last VRingDesc,
-> so it's filled with dirty data, this might cause virtio backend broken.
->=20
-> For example, the last bit of this VRingDesc's flags might be 1, so
-> virtqueue_read_next_desc() would report "Desc next is ***".
->=20
-> This patch zeored the last VRingDesc in qvring_indirect_desc_setup().
->=20
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
->  tests/libqos/virtio.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->=20
-> diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
-> index ec30cb9..b29c69e 100644
-> --- a/tests/libqos/virtio.c
-> +++ b/tests/libqos/virtio.c
-> @@ -171,12 +171,20 @@ QVRingIndirectDesc *qvring_indirect_desc_setup(QVir=
-tioDevice *d,
->      for (i =3D 0; i < elem - 1; ++i) {
->          /* indirect->desc[i].addr */
->          writeq(indirect->desc + (16 * i), 0);
-> +        /* indirect->desc[i].len */
-> +        writeq(indirect->desc + (16 * i) + 8, 0);
+On 16/01/2017 13:58, Daniel P. Berrange wrote:
+>> + * Request that qio_channel_yield() sets I/O handlers on
+>> + * the given #AioContext.  If @ctx is %NULL, qio_channel_yield()
+>> + * uses QEMU's main thread event loop.
+>> + */
+> Can you note that it is explicitly permitted to call this while
+> inside a qio_channel_yield().
 
-The len field is 32 bits long.  Please use writel().
+Yes:
 
->          /* indirect->desc[i].flags */
->          writew(indirect->desc + (16 * i) + 12, VRING_DESC_F_NEXT);
->          /* indirect->desc[i].next */
->          writew(indirect->desc + (16 * i) + 14, i + 1);
->      }
-> =20
-> +    /* zeroed last element */
-> +    writeq(indirect->desc + (16 * i), 0); /* addr */
-> +    writeq(indirect->desc + (16 * i) + 8, 0); /*len*/
+ * You can move a #QIOChannel from an #AioContext to another even if
+ * I/O handlers are set for a coroutine.  However, #QIOChannel provides
+ * no synchronization between the calls to qio_channel_yield() and
+ * qio_channel_set_aio_context().
+ *
+ * Therefore you should first call qio_channel_detach_aio_context()
+ * to ensure that the coroutine is not entered concurrently.  Then,
+ * while the coroutine has yielded, call qio_channel_set_aio_context(),
+ * and then aio_co_schedule() to place the coroutine on the new
+ * #AioContext.  The calls to qio_channel_detach_aio_context()
+ * and qio_channel_set_aio_context() should be protected with
+ * aio_context_acquire() and aio_context_release().
 
-Same here.
-
---MiFvc8Vo6wRSORdP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYfNTzAAoJEJykq7OBq3PIwFIIAMco9kTAAlrDK5XVBX04xEhm
-aKb+3M+TBPJq/LHSsu6CMhjLM0IgCIBlj0hoXhsBrCEUyCmNvTjsrVNiSEnZmAM8
-oIx3uE1l0vLiQEiZlemkSlGNvjXCHANNnfgo5l4uHvaspBW5a5260cdteyacOEco
-0Qc0C40/2kDqygLYASX2gRxcDtwYEi5mWBQj/vP53oddin3YpGV9/TTe+MFQLJya
-Nu3XTGjUcBXoLsXe7DoSNRd/P09iFkvZmn9kyYoag32Zvb/sqYuhjayTfz5D0Lgn
-RoqqkGyuAdHgi3TSAidx74uhdwuwz6m/0oTHb4M+hGUq6saJgwxDaymfK1xHMBA=
-=NbBW
------END PGP SIGNATURE-----
-
---MiFvc8Vo6wRSORdP--
+Paolo
