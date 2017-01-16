@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTEBF-00071X-N7
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:47:08 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEC0-0007zl-H1
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:47:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTEBE-0002tJ-I3
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:47:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39764)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cTEBE-0002se-AW
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:47:04 -0500
-References: <20170112182446.9600-1-lersek@redhat.com>
-	<20170112182446.9600-3-lersek@redhat.com>
-	<20170113140914.62af8755@nial.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <32d3f5cf-9428-29db-45bb-d3a35c6cbd04@redhat.com>
-Date: Mon, 16 Jan 2017 21:46:55 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170113140914.62af8755@nial.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 wave 2 2/3] hw/isa/lpc_ich9: add
- broadcast SMI feature
+	(envelope-from <mreitz@redhat.com>) id 1cTEBz-0003K5-GZ
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:47:52 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon, 16 Jan 2017 21:47:22 +0100
+Message-Id: <20170116204742.30527-1-mreitz@redhat.com>
+In-Reply-To: <20170111181432.18868-1-mreitz@redhat.com>
+References: <20170111181432.18868-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 05/25] block: Make path_combine() return the
+ path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,119 +20,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Michael Kinney <michael.d.kinney@intel.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 01/13/17 14:09, Igor Mammedov wrote:
-> On Thu, 12 Jan 2017 19:24:45 +0100
-> Laszlo Ersek <lersek@redhat.com> wrote:
-> 
->> The generic edk2 SMM infrastructure prefers
->> EFI_SMM_CONTROL2_PROTOCOL.Trigger() to inject an SMI on each processor. If
->> Trigger() only brings the current processor into SMM, then edk2 handles it
->> in the following ways:
->>
->> (1) If Trigger() is executed by the BSP (which is guaranteed before
->>     ExitBootServices(), but is not necessarily true at runtime), then:
->>
->>     (a) If edk2 has been configured for "traditional" SMM synchronization,
->>         then the BSP sends directed SMIs to the APs with APIC delivery,
->>         bringing them into SMM individually. Then the BSP runs the SMI
->>         handler / dispatcher.
->>
->>     (b) If edk2 has been configured for "relaxed" SMM synchronization,
->>         then the APs that are not already in SMM are not brought in, and
->>         the BSP runs the SMI handler / dispatcher.
->>
->> (2) If Trigger() is executed by an AP (which is possible after
->>     ExitBootServices(), and can be forced e.g. by "taskset -c 1
->>     efibootmgr"), then the AP in question brings in the BSP with a
->>     directed SMI, and the BSP runs the SMI handler / dispatcher.
->>
->> The smaller problem with (1a) and (2) is that the BSP and AP
->> synchronization is slow. For example, the "taskset -c 1 efibootmgr"
->> command from (2) can take more than 3 seconds to complete, because
->> efibootmgr accesses non-volatile UEFI variables intensively.
->>
->> The larger problem is that QEMU's current behavior diverges from the
->> behavior usually seen on physical hardware, and that keeps exposing
->> obscure corner cases, race conditions and other instabilities in edk2,
->> which generally expects / prefers a software SMI to affect all CPUs at
->> once.
->>
->> Therefore introduce the "broadcast SMI" feature that causes QEMU to inject
->> the SMI on all VCPUs.
->>
->> While the original posting of this patch
->> <http://lists.nongnu.org/archive/html/qemu-devel/2015-10/msg05658.html>
->> only intended to speed up (2), based on our recent "stress testing" of SMM
->> this patch actually provides functional improvements.
->>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Gerd Hoffmann <kraxel@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
->>
->> Notes:
->>     v6:
->>     - no changes, pick up Michael's R-b
->>     
->>     v5:
->>     - replace the ICH9_LPC_SMI_F_BROADCAST bit value with the
->>       ICH9_LPC_SMI_F_BROADCAST_BIT bit position (necessary for
->>       DEFINE_PROP_BIT() in the next patch)
->>
->>  include/hw/i386/ich9.h |  3 +++
->>  hw/isa/lpc_ich9.c      | 10 +++++++++-
->>  2 files changed, 12 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
->> index da1118727146..18dcca7ebcbf 100644
->> --- a/include/hw/i386/ich9.h
->> +++ b/include/hw/i386/ich9.h
->> @@ -250,4 +250,7 @@ Object *ich9_lpc_find(void);
->>  #define ICH9_SMB_HST_D1                         0x06
->>  #define ICH9_SMB_HOST_BLOCK_DB                  0x07
->>  
->> +/* bit positions used in fw_cfg SMI feature negotiation */
->> +#define ICH9_LPC_SMI_F_BROADCAST_BIT            0
->> +
->>  #endif /* HW_ICH9_H */
->> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
->> index 376b7801a42c..ced6f803a4f2 100644
->> --- a/hw/isa/lpc_ich9.c
->> +++ b/hw/isa/lpc_ich9.c
->> @@ -437,7 +437,15 @@ static void ich9_apm_ctrl_changed(uint32_t val, void *arg)
->>  
->>      /* SMI_EN = PMBASE + 30. SMI control and enable register */
->>      if (lpc->pm.smi_en & ICH9_PMIO_SMI_EN_APMC_EN) {
->> -        cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
->> +        if (lpc->smi_negotiated_features &
->> +            (UINT64_C(1) << ICH9_LPC_SMI_F_BROADCAST_BIT)) {
->> +            CPUState *cs;
->> +            CPU_FOREACH(cs) {
->> +                cpu_interrupt(cs, CPU_INTERRUPT_SMI);
->> +            }
-> Shouldn't CPUs with default SMI base be excluded from broadcast?
+Besides being safe for arbitrary path lengths, after some follow-up
+patches all callers will want a freshly allocated buffer anyway.
 
-I don't think so; as far as I recall, in edk2 the initial SMM entry code
--- before SMBASE relocation -- accommodates all VCPUs entering the same
-code area for execution. The VCPUs are told apart from each other by
-Initial APIC ID (that is, "who am I"), which is used as an index or
-search criterion into a global shared array. Once they find their
-respective private data blocks, the VCPUs don't step on each other's toes.
+In the meantime, path_combine_deprecated() is added which has the same
+interface as path_combine() had before this patch. All callers to that
+function will be converted in follow-up patches.
 
-Thanks
-Laszlo
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ include/block/block.h |  4 +--
+ block.c               | 81 +++++++++++++++++++++++++++++----------------------
+ block/vmdk.c          |  3 +-
+ 3 files changed, 48 insertions(+), 40 deletions(-)
 
-> 
->> +        } else {
->> +            cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
->> +        }
->>      }
->>  }
->>  
-> 
+diff --git a/include/block/block.h b/include/block/block.h
+index 49bb0b239a..6e5d4b25a4 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -444,9 +444,7 @@ void bdrv_get_full_backing_filename_from_filename(const char *backed,
+ 
+ int path_has_protocol(const char *path);
+ int path_is_absolute(const char *path);
+-void path_combine(char *dest, int dest_size,
+-                  const char *base_path,
+-                  const char *filename);
++char *path_combine(const char *base_path, const char *filename);
+ 
+ int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
+ int bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
+diff --git a/block.c b/block.c
+index f7a287a60d..28ce42c8a3 100644
+--- a/block.c
++++ b/block.c
+@@ -148,48 +148,59 @@ int path_is_absolute(const char *path)
+ #endif
+ }
+ 
+-/* if filename is absolute, just copy it to dest. Otherwise, build a
++/* if filename is absolute, just return its duplicate. Otherwise, build a
+    path to it by considering it is relative to base_path. URL are
+    supported. */
+-void path_combine(char *dest, int dest_size,
+-                  const char *base_path,
+-                  const char *filename)
++char *path_combine(const char *base_path, const char *filename)
+ {
+     const char *p, *p1;
++    char *result;
+     int len;
+ 
+-    if (dest_size <= 0)
+-        return;
+     if (path_is_absolute(filename)) {
+-        pstrcpy(dest, dest_size, filename);
++        return g_strdup(filename);
++    }
++
++    p = strchr(base_path, ':');
++    if (p) {
++        p++;
+     } else {
+-        p = strchr(base_path, ':');
+-        if (p)
+-            p++;
+-        else
+-            p = base_path;
+-        p1 = strrchr(base_path, '/');
++        p = base_path;
++    }
++    p1 = strrchr(base_path, '/');
+ #ifdef _WIN32
+-        {
+-            const char *p2;
+-            p2 = strrchr(base_path, '\\');
+-            if (!p1 || p2 > p1)
+-                p1 = p2;
++    {
++        const char *p2;
++        p2 = strrchr(base_path, '\\');
++        if (!p1 || p2 > p1) {
++            p1 = p2;
+         }
++    }
+ #endif
+-        if (p1)
+-            p1++;
+-        else
+-            p1 = base_path;
+-        if (p1 > p)
+-            p = p1;
+-        len = p - base_path;
+-        if (len > dest_size - 1)
+-            len = dest_size - 1;
+-        memcpy(dest, base_path, len);
+-        dest[len] = '\0';
+-        pstrcat(dest, dest_size, filename);
++    if (p1) {
++        p1++;
++    } else {
++        p1 = base_path;
++    }
++    if (p1 > p) {
++        p = p1;
+     }
++    len = p - base_path;
++
++    result = g_malloc(len + strlen(filename) + 1);
++    memcpy(result, base_path, len);
++    strcpy(result + len, filename);
++
++    return result;
++}
++
++static void path_combine_deprecated(char *dest, int dest_size,
++                                    const char *base_path,
++                                    const char *filename)
++{
++    char *combined = path_combine(base_path, filename);
++    pstrcpy(dest, dest_size, combined);
++    g_free(combined);
+ }
+ 
+ void bdrv_get_full_backing_filename_from_filename(const char *backed,
+@@ -205,7 +216,7 @@ void bdrv_get_full_backing_filename_from_filename(const char *backed,
+         error_setg(errp, "Cannot use relative backing file names for '%s'",
+                    backed);
+     } else {
+-        path_combine(dest, sz, backed, backing);
++        path_combine_deprecated(dest, sz, backed, backing);
+     }
+ }
+ 
+@@ -3177,8 +3188,8 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+         } else {
+             /* If not an absolute filename path, make it relative to the current
+              * image's filename path */
+-            path_combine(filename_tmp, PATH_MAX, curr_bs->filename,
+-                         backing_file);
++            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
++                                    backing_file);
+ 
+             /* We are going to compare absolute pathnames */
+             if (!realpath(filename_tmp, filename_full)) {
+@@ -3187,8 +3198,8 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+ 
+             /* We need to make sure the backing filename we are comparing against
+              * is relative to the current image filename (or absolute) */
+-            path_combine(filename_tmp, PATH_MAX, curr_bs->filename,
+-                         curr_bs->backing_file);
++            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
++                                    curr_bs->backing_file);
+ 
+             if (!realpath(filename_tmp, backing_file_full)) {
+                 continue;
+diff --git a/block/vmdk.c b/block/vmdk.c
+index a11c27a1c4..aad2d7de01 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -846,8 +846,7 @@ static int vmdk_parse_extents(const char *desc, BlockDriverState *bs,
+             return -EINVAL;
+         }
+ 
+-        extent_path = g_malloc0(PATH_MAX);
+-        path_combine(extent_path, PATH_MAX, desc_file_path, fname);
++        extent_path = path_combine(desc_file_path, fname);
+ 
+         ret = snprintf(extent_opt_prefix, 32, "extents.%d", s->num_extents);
+         assert(ret < 32);
+-- 
+2.11.0
