@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cT20e-0006NW-Ix
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:47:21 -0500
+	(envelope-from <lprosek@redhat.com>) id 1cT22M-0007SY-51
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:49:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cT20b-00033v-Gk
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:47:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cT20b-00033h-7M
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:47:17 -0500
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-12-git-send-email-peterx@redhat.com>
-	<c5b536a1-1f7b-965d-04b6-4f6bde19733f@redhat.com>
-	<20170116073116.GC30108@pxdev.xzpeter.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <97339915-c8fb-cfd5-aa06-b795eab21428@redhat.com>
-Date: Mon, 16 Jan 2017 15:47:08 +0800
+	(envelope-from <lprosek@redhat.com>) id 1cT22I-0003qt-UO
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:49:06 -0500
+Received: from mail-ua0-f169.google.com ([209.85.217.169]:34917)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cT22I-0003qR-Pe
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 02:49:02 -0500
+Received: by mail-ua0-f169.google.com with SMTP id y9so76302927uae.2
+	for <qemu-devel@nongnu.org>; Sun, 15 Jan 2017 23:49:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170116073116.GC30108@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v3 11/14] intel_iommu: provide its own
- replay() callback
+In-Reply-To: <74186249-fee1-9917-2bf4-50aa240eb114@redhat.com>
+References: <1484305370-6220-1-git-send-email-lprosek@redhat.com>
+	<0343b5cd-f2b9-b439-7652-44ab5f05f0c4@redhat.com>
+	<CABdb734ESPhd=354YHCs2AV_jiCj=NwiR-AU0TcWuv0XMDcCaQ@mail.gmail.com>
+	<9d544d44-f41f-e691-ee73-54f9383a13e3@redhat.com>
+	<CABdb735JeFpoXqE1A-V1ih7F3Tbg3KFgs69_ijeyeYf_bo+jBw@mail.gmail.com>
+	<74186249-fee1-9917-2bf4-50aa240eb114@redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Mon, 16 Jan 2017 08:49:00 +0100
+Message-ID: <CABdb736fzG4u6-tS_LeGAmsWMuao1pP2Z83qYazQQkeFrSxwoA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] ahci: advertise HOST_CAP_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +32,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-
-
-On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 15:31, Peter Xu wrote:
-> On Fri, Jan 13, 2017 at 05:26:06PM +0800, Jason Wang wrote:
->>
->> On 2017=E5=B9=B401=E6=9C=8813=E6=97=A5 11:06, Peter Xu wrote:
->>> The default replay() don't work for VT-d since vt-d will have a huge
->>> default memory region which covers address range 0-(2^64-1). This wil=
-l
->>> normally bring a dead loop when guest starts.
->> I think it just takes too much time instead of dead loop?
-> Hmm, I can touch the commit message above to make it more precise.
+On Fri, Jan 13, 2017 at 8:15 PM, John Snow <jsnow@redhat.com> wrote:
 >
->>> The solution is simple - we don't walk over all the regions. Instead,=
- we
->>> jump over the regions when we found that the page directories are emp=
-ty.
->>> It'll greatly reduce the time to walk the whole region.
->> Yes, the problem is memory_region_is_iommu_reply() not smart because:
->>
->> - It doesn't understand large page
->> - try go over all possible iova
->>
->> So I'm thinking to introduce something like iommu_ops->iova_iterate() =
-which
->>
->> 1) accept an start iova and return the next exist map
->> 2) understand large page
->> 3) skip unmapped iova
-> Though I haven't tested with huge pages yet, but this patch should
-> both solve above issue? I don't know whether you went over the page
-> walk logic - it should both support huge page, and it will skip
-> unmapped iova range (at least that's my goal to have this patch). In
-> that case, looks like this patch is solving the same problem? :)
-> (though without introducing iova_iterate() interface)
 >
-> Please correct me if I misunderstood it.
-
-Kind of :) I'm fine with this patch, but just want:
-
-- reuse most of the codes in the patch
-- current memory_region_iommu_replay() logic
-
-So what I'm suggesting is a just slight change of API which can let=20
-caller decide it need to do with each range of iova. So it could be=20
-reused for other things except for replaying.
-
-But if you like to keep this patch as is, I don't object it.
-
->
->>> To achieve this, we provided a page walk helper to do that, invoking
->>> corresponding hook function when we found an page we are interested i=
-n.
->>> vtd_page_walk_level() is the core logic for the page walking. It's
->>> interface is designed to suite further use case, e.g., to invalidate =
-a
->>> range of addresses.
+> On 01/13/2017 02:01 PM, Ladi Prosek wrote:
+>> On Fri, Jan 13, 2017 at 7:31 PM, John Snow <jsnow@redhat.com> wrote:
 >>>
->>> Signed-off-by: Peter Xu<peterx@redhat.com>
->> For intel iommu, since we intercept all map and unmap, a more tricky i=
-eda is
->> to we can record the mappings internally in something like a rbtree wh=
-ich
->> could be iterated during replay. This saves possible guest io page tab=
-le
->> traversal, but drawback is it may not survive from OOM attacker.
-> I think the problem is that we need this rbtree per guest-iommu-domain
-> (because mapping can be different per domain). In that case, I failed
-> to understand how the tree can help here. :(
-
-Right, I see.
-
-Thanks
-
+>>>
+>>> On 01/13/2017 01:12 PM, Ladi Prosek wrote:
+>>>> On Fri, Jan 13, 2017 at 6:23 PM, John Snow <jsnow@redhat.com> wrote:
+>>>>> On 01/13/2017 06:02 AM, Ladi Prosek wrote:
+>>>>>> The AHCI emulation code supports 64-bit addressing and should advertise this
+>>>>>> fact in the Host Capabilities register. Both Linux and Windows drivers test
+>>>>>> this bit to decide if the upper 32 bits of various registers may be written
+>>>>>> to, and at least some versions of Windows have a bug where DMA is attempted
+>>>>>> with an address above 4GB but, in the absence of HOST_CAP_64, the upper 32
+>>>>>> bits are left unititialized which leads to a memory corruption.
+>>>>>>
+>>>>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+>>>>>> ---
+>>>>>>  hw/ide/ahci.c | 2 +-
+>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>>>>>> index 3c19bda..6a17acf 100644
+>>>>>> --- a/hw/ide/ahci.c
+>>>>>> +++ b/hw/ide/ahci.c
+>>>>>> @@ -488,7 +488,7 @@ static void ahci_reg_init(AHCIState *s)
+>>>>>>      s->control_regs.cap = (s->ports - 1) |
+>>>>>>                            (AHCI_NUM_COMMAND_SLOTS << 8) |
+>>>>>>                            (AHCI_SUPPORTED_SPEED_GEN1 << AHCI_SUPPORTED_SPEED) |
+>>>>>> -                          HOST_CAP_NCQ | HOST_CAP_AHCI;
+>>>>>> +                          HOST_CAP_NCQ | HOST_CAP_AHCI | HOST_CAP_64;
+>>>>>>
+>>>>>>      s->control_regs.impl = (1 << s->ports) - 1;
+>>>>>>
+>>>>>>
+>>>>>
+>>>>> Was this tested? What was the use case that prompted this patch, and do
+>>>>> you have a public bugzilla to point to?
+>>>>
+>>>> Sorry, I thought you were aware. Here's the BZ with details:
+>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1411105
+>>>>
+>>>
+>>> It's for the public record :)
+>>>
+>>> I'm going to amend your commit message, OK?
+>>>
+>>> https://github.com/jnsnow/qemu/commit/f037be92fc0c4580b846134e0355a69d0eccd0d9
+>>
+>> Minor nit: the OS we know for sure is affected is Windows Server 2008,
+>> without the "R2". Thanks!
+>>
 >
-> Thanks,
+> I misunderstood. It looked like the initial report was for "SP2," though
+> I see you saying that the R2 version actually worked okay, but by
+> coincidence.
 >
-> -- peterx
+> I didn't think there *was* an "SP2," for Windows Server, so I
+> interpreted that to mean R2.
+>
+> So this only manifests with vanilla 2008?
+
+We know it manifests on 2008 SP2, which is very different from 2008
+R2. 2008 is the server variant of Vista, 2008 R2 is the server variant
+of Win7 (yay for marketing names!)
+
+I believe that 2008 SP2 32-bit is the only OS where it's been confirmed so far.
+
+>>>> In short, Windows guests run into issues in certain virtual HW
+>>>> configurations if the bit is not set. I have tested the patch and
+>>>> verified that it fixes the failing cases.
+>>>>
+>>>
+>>> Great. I'm CCing qemu-stable as this should probably be included in
+>>> 2.7.2 / 2.8.1 / etc.
+>>>
+>>>>> It looks correct via the spec, thank you for finding this oversight. It
+>>>>> looks like everywhere this bit would make a difference we already do the
+>>>>> correct thing for having this bit set.
+>>>>>
+>>>>> From what I can gather from the spec, it looks as if even 32bit guests
+>>>>> must ensure that the upper 32bit registers are cleared, so I think we're
+>>>>> all set here.
+>>>>>
+>>>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>>
+>>> Thanks, applied to my IDE tree:
+>>>
+>>> https://github.com/jnsnow/qemu/commits/ide
+>>> https://github.com/jnsnow/qemu.git
+>>>
+>>> --js
