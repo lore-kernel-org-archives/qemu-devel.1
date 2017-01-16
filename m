@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cT9gY-00079A-Fa
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:59:07 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cT9nE-0001C7-NA
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:06:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cT9gU-0004yh-F3
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:59:06 -0500
-Received: from mail-ua0-x235.google.com ([2607:f8b0:400c:c08::235]:36737)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cT9gU-0004yd-3O
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:59:02 -0500
-Received: by mail-ua0-x235.google.com with SMTP id 96so83925745uaq.3
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 07:59:01 -0800 (PST)
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cT9n9-0007Mu-3t
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:06:00 -0500
+Received: from mail-db5eur01on0096.outbound.protection.outlook.com
+	([104.47.2.96]:19763
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
+	id 1cT9n8-0007M6-9Z
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 11:05:55 -0500
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Mon, 16 Jan 2017 18:51:13 +0300
+Message-ID: <20170116155113.21034-3-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170116155113.21034-1-pbutsykin@virtuozzo.com>
+References: <20170116155113.21034-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1484559200-2301-1-git-send-email-armbru@redhat.com>
-References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jan 2017 15:58:41 +0000
-Message-ID: <CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 2/2] migration: discard non-dirty ram pages
+ after the start of postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, amit.shah@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-On 16 January 2017 at 09:33, Markus Armbruster <armbru@redhat.com> wrote:
-> This is Marc-Andr=C3=A9's "[PATCH v8 00/21] qapi doc generation (whole
-> version, squashed)" with a few commit messages tweaked, and "[PATCH v8
-> 14/21] (SQUASHED) move doc to schema" unsquashed into 161 patches.
->
-> We did all the respins with in this squashed form to reduce noise.
-> However, since the unsquashed form is better suited for review, and
-> probably nicer if we have to revisit this part of the work down the
-> road, I'm proposing to merge this unsquashed.
->
-> If you want me to post the unsquashed patches, I'm happy to redo this
-> pull request.
->
-> If you'd rather pull the squashed version, likewise.
->
-> I'm afraid this is a bit of a doc conflict magnet.  The sooner we can
-> get it in, the easier for Marc-Andr=C3=A9 and me.
->
-> v2:
-> * Rebased (v1 conflicts with commit e1ff3c6)
-> * test-qapi.py tweaked to avoid trailing empty lines in .out
->
-> The following changes since commit b6af8ea60282df514f87d32e36afd1c9aeee28=
-c8:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pul=
-l-request' into staging (2017-01-13 14:38:21 +0000)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-01-16
->
-> for you to fetch changes up to 56e8bdd46a8a42d89b0afea9da83ae7679cc0439:
->
->   build-sys: add qapi doc generation targets (2017-01-16 10:11:43 +0100)
->
-> ----------------------------------------------------------------
-> QAPI patches for 2017-01-16
+After the start of postcopy migration there are some non-dirty pages which have
+already been migrated. These pages are no longer needed on the source vm so that
+we can free them and it doen't hurt to complete the migration.
 
-This seems to trigger some warnings from older makeinfo versions:
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+---
+ include/migration/migration.h |  1 +
+ migration/migration.c         |  2 ++
+ migration/ram.c               | 25 +++++++++++++++++++++++++
+ 3 files changed, 28 insertions(+)
 
-On the Fedora 20 ppc64be box and Ubuntu 14.04.5 LTS aarch64 box
-(Ubuntu: makeinfo (GNU texinfo) 5.2;
- Fedora: makeinfo (GNU texinfo) 5.1)
-
-/home/pm215/qemu/docs/qemu-ga-ref.texi:41: warning: undefined flag: VERSION
-/home/pm215/qemu/docs/qemu-ga-ref.texi:41: warning: undefined flag: VERSION
-/home/pm215/qemu/docs/qemu-qmp-ref.texi:41: warning: undefined flag: VERSIO=
-N
-/home/pm215/qemu/docs/qemu-qmp-ref.texi:41: warning: undefined flag: VERSIO=
-N
-
-On OSX (makeinfo (GNU texinfo) 4.8):
-./qemu-options.texi:60: warning: unlikely character [ in @var.
-./qemu-options.texi:60: warning: unlikely character ] in @var.
-./qemu-options.texi:61: warning: unlikely character [ in @var.
-./qemu-options.texi:61: warning: unlikely character ] in @var.
-
-(OSX also has the long standing warning
-/Users/pm215/src/qemu-for-merges/qemu-doc.texi:7: warning:
-unrecognized encoding name `UTF-8'.
-but you can ignore that since it's been that way for years
-and is because osx's makeinfo is ancient.)
-
-thanks
--- PMM
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index d7bd404365..0d9b81545c 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -279,6 +279,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms);
+ int ram_discard_range(MigrationIncomingState *mis, const char *block_name,
+                       uint64_t start, size_t length);
+ int ram_postcopy_incoming_init(MigrationIncomingState *mis);
++void ram_postcopy_migrated_memory_discard(MigrationState *ms);
+ 
+ /**
+  * @migrate_add_blocker - prevent migration from proceeding
+diff --git a/migration/migration.c b/migration/migration.c
+index 391db6f28b..20490ed020 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1662,6 +1662,8 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+      */
+     qemu_savevm_send_ping(ms->to_dst_file, 4);
+ 
++    ram_postcopy_migrated_memory_discard(ms);
++
+     ret = qemu_file_get_error(ms->to_dst_file);
+     if (ret) {
+         error_report("postcopy_start: Migration stream errored");
+diff --git a/migration/ram.c b/migration/ram.c
+index b0322a0b5c..8a6b614b0d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1546,6 +1546,31 @@ void ram_debug_dump_bitmap(unsigned long *todump, bool expected)
+ 
+ /* **** functions for postcopy ***** */
+ 
++void ram_postcopy_migrated_memory_discard(MigrationState *ms)
++{
++    struct RAMBlock *block;
++    unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
++
++    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        unsigned long first = block->offset >> TARGET_PAGE_BITS;
++        unsigned long range = first + (block->used_length >> TARGET_PAGE_BITS);
++        unsigned long run_start = find_next_zero_bit(bitmap, range, first);
++
++        while (run_start < range) {
++            unsigned long run_end = find_next_bit(bitmap, range, run_start + 1);
++            uint8_t *addr = block->host + (run_start << TARGET_PAGE_BITS);
++            size_t chunk_size = (run_end - run_start) << TARGET_PAGE_BITS;
++
++            if (qemu_madvise(addr, chunk_size, QEMU_MADV_DONTNEED) < 0) {
++                error_report("migrate: madvise DONTNEED failed %p %ld: %s",
++                             addr, chunk_size, strerror(errno));
++            }
++
++            run_start = find_next_zero_bit(bitmap, range, run_end + 1);
++        }
++    }
++}
++
+ /*
+  * Callback from postcopy_each_ram_send_discard for each RAMBlock
+  * Note: At this point the 'unsentmap' is the processed bitmap combined
+-- 
+2.11.0
