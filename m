@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cT4ns-0002xv-FK
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 05:46:21 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cT4tQ-0005Tx-Bi
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 05:52:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cT4np-0000AR-6O
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 05:46:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49494)
+	(envelope-from <imammedo@redhat.com>) id 1cT4tL-0001Kw-Df
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 05:52:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59816)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cT4no-0000AM-UI
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 05:46:17 -0500
-Date: Mon, 16 Jan 2017 10:46:13 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170116104613.GB12351@stefanha-x1.localdomain>
-References: <20170112114612.14520-1-stefanha@redhat.com>
-	<fc5de032-a64b-b072-6e52-441b6a685ee3@cardoe.com>
-	<20170113120240.GB9142@stefanha-x1.localdomain>
-	<75cb767b-2850-4a87-50fc-d957e3a793ac@cardoe.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cT4tL-0001Kn-5B
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 05:51:59 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3047D4D68E
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 10:51:59 +0000 (UTC)
+Date: Mon, 16 Jan 2017 11:51:55 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170116115155.35c72378@nial.brq.redhat.com>
+In-Reply-To: <20170113190057.6327-1-ehabkost@redhat.com>
+References: <20170113190057.6327-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DKU6Jbt7q3WqK7+M"
-Content-Disposition: inline
-In-Reply-To: <75cb767b-2850-4a87-50fc-d957e3a793ac@cardoe.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] virtio: revert
- virtio_queue_set_notification() nesting
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-i386: Remove AMD feature flag
+ aliases from Opteron models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +33,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Goldstein <cardoe@cardoe.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
+On Fri, 13 Jan 2017 17:00:57 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
---DKU6Jbt7q3WqK7+M
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> When CPU vendor is set to AMD, the AMD feature alias bits on
+> CPUID[0x80000001].EDX are already automatically copied from CPUID[1].EDX
+> on x86_cpu_realizefn(). When CPU vendor is Intel, those bits are
+> reserved and should be zero. On either case, those bits shouldn't be set
+> in the CPU model table.
+> 
+> Commit 726a8ff68677d8d5fba17eb0ffb85076bfb598dc removed those
+> bits from most CPU models, but the Opteron_* entries still have
+> them. Remove the alias bits from Opteron_* too.
+> 
+> Add an assert() to x86_register_cpudef_type() to ensure we don't
+> make the same mistake again.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-On Fri, Jan 13, 2017 at 09:15:49AM -0600, Doug Goldstein wrote:
-> On 1/13/17 6:02 AM, Stefan Hajnoczi wrote:
-> > On Thu, Jan 12, 2017 at 10:57:53AM -0600, Doug Goldstein wrote:
-> >> On 1/12/17 5:46 AM, Stefan Hajnoczi wrote:
-> >>> The virtio_queue_set_notification() nesting introduced for AioContext=
- polling
-> >>> raised an assertion with virtio-net (even in non-polling mode).  Conv=
-erting
-> >>> virtio-net and virtio-crypto to use virtio_queue_set_notification() i=
-n a
-> >>> nesting fashion would be invasive and isn't worth it.
-> >>>
-> >>> Patch 1 contains the revert to resolve the bug that Doug noticed.
-> >>>
-> >>> Patch 2 is a less efficient but safe alternative.
-> >>>
-> >>> Stefan Hajnoczi (2):
-> >>>   Revert "virtio: turn vq->notification into a nested counter"
-> >>>   virtio: disable notifications again after poll succeeded
-> >>>
-> >>>  hw/virtio/virtio.c | 21 +++++++++------------
-> >>>  1 file changed, 9 insertions(+), 12 deletions(-)
-> >>>
-> >>
-> >> So I just gave this series a whirl and it fixes the assert but causes
-> >> another issue for me. While iPXE is getting a DHCP address the screen
-> >> immediately flashes over to the UEFI shell. Its like a timeout is
-> >> getting hit and just dropping me to the shell.
-> >=20
-> > Sounds like an separate problem.
-> >=20
-> > Stefan
-> >=20
->=20
-> Is there any debug output that I can provide to help troubleshoot it?
-> I've built 23425cc and UEFI via OVMF is able to get an IP address via
-> DHCP inside of iPXE. I've also taken master and only applied the first
-> patch in this series (the revert) and it too works. Its only when I add
-> the 2nd patch into the mix or don't revert out the "virtio: turn
-> vq->notification into a nested counter" patch that it fails.
-
-The code in Patch 2 should not be executed in your QEMU configuration,
-so I wonder how Patch 2 can cause the DHCP failure.
-
-Please verify as follows:
-
-  $ gdb --args path/to/qemu-system-x86_64 ...
-  (gdb) handle SIGUSR1 noprint nostop pass
-  (gdb) handle SIGPIPE noprint nostop pass
-  (gdb) b virtio_queue_host_notifier_aio_poll_begin
-  (gdb) r
-
-I predict the breakpoint will not be hit.
-
-Stefan
-
---DKU6Jbt7q3WqK7+M
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYfKR1AAoJEJykq7OBq3PIc38IAJy55Fea1L0gaaJTofpKp906
-yLMIUnU+SbH02Kql2m7AZVIceTmX9AvCnshEsli7qKodYF4EIeR9P3Lef6EynDXW
-eF4b8WTIv8wy1JBWTmwPVJ69XoPAK6KOYpVXW6a2mSTQC6eGJ524ZpKSU6wfdWdH
-c5Rh0IDpsP5gMzD2fJXQ/Evtcv3ed8XjJcL5H2ZLRinGDqMqC1RjnK+OBVA7R97t
-cYQVrLlneln8CDjeIpf7qOEfozc+U6O8N0pRkIjZ/43FdSaHTZzqQ0aM1TmoR4xv
-MHrfEM0Ux5H1UdrfpvEqdpT+4TJmA505FOF4eHIv2m/t/KZZCUZl5MW/bwaWykg=
-=ViDw
------END PGP SIGNATURE-----
-
---DKU6Jbt7q3WqK7+M--
+> ---
+>  target/i386/cpu.c | 46 ++++++++++++----------------------------------
+>  1 file changed, 12 insertions(+), 34 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index a149c8dc42..af726a8fd0 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1339,12 +1339,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>          .features[FEAT_1_ECX] =
+>              CPUID_EXT_SSE3,
+>          .features[FEAT_8000_0001_EDX] =
+> -            CPUID_EXT2_LM | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
+> -            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
+> -            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
+> -            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
+> -            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
+> -            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
+> +            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+>          .xlevel = 0x80000008,
+>          .model_id = "AMD Opteron 240 (Gen 1 Class Opteron)",
+>      },
+> @@ -1365,13 +1360,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>              CPUID_EXT_CX16 | CPUID_EXT_SSE3,
+>          /* Missing: CPUID_EXT2_RDTSCP */
+>          .features[FEAT_8000_0001_EDX] =
+> -            CPUID_EXT2_LM | CPUID_EXT2_FXSR |
+> -            CPUID_EXT2_MMX | CPUID_EXT2_NX | CPUID_EXT2_PSE36 |
+> -            CPUID_EXT2_PAT | CPUID_EXT2_CMOV | CPUID_EXT2_MCA |
+> -            CPUID_EXT2_PGE | CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL |
+> -            CPUID_EXT2_APIC | CPUID_EXT2_CX8 | CPUID_EXT2_MCE |
+> -            CPUID_EXT2_PAE | CPUID_EXT2_MSR | CPUID_EXT2_TSC | CPUID_EXT2_PSE |
+> -            CPUID_EXT2_DE | CPUID_EXT2_FPU,
+> +            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+>          .features[FEAT_8000_0001_ECX] =
+>              CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+>          .xlevel = 0x80000008,
+> @@ -1395,13 +1384,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>              CPUID_EXT_SSE3,
+>          /* Missing: CPUID_EXT2_RDTSCP */
+>          .features[FEAT_8000_0001_EDX] =
+> -            CPUID_EXT2_LM | CPUID_EXT2_FXSR |
+> -            CPUID_EXT2_MMX | CPUID_EXT2_NX | CPUID_EXT2_PSE36 |
+> -            CPUID_EXT2_PAT | CPUID_EXT2_CMOV | CPUID_EXT2_MCA |
+> -            CPUID_EXT2_PGE | CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL |
+> -            CPUID_EXT2_APIC | CPUID_EXT2_CX8 | CPUID_EXT2_MCE |
+> -            CPUID_EXT2_PAE | CPUID_EXT2_MSR | CPUID_EXT2_TSC | CPUID_EXT2_PSE |
+> -            CPUID_EXT2_DE | CPUID_EXT2_FPU,
+> +            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+>          .features[FEAT_8000_0001_ECX] =
+>              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
+>              CPUID_EXT3_ABM | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+> @@ -1428,13 +1411,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>              CPUID_EXT_SSE3,
+>          /* Missing: CPUID_EXT2_RDTSCP */
+>          .features[FEAT_8000_0001_EDX] =
+> -            CPUID_EXT2_LM |
+> -            CPUID_EXT2_PDPE1GB | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
+> -            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
+> -            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
+> -            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
+> -            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
+> -            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
+> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
+> +            CPUID_EXT2_SYSCALL,
+>          .features[FEAT_8000_0001_ECX] =
+>              CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
+>              CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+> @@ -1464,13 +1442,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>              CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+>          /* Missing: CPUID_EXT2_RDTSCP */
+>          .features[FEAT_8000_0001_EDX] =
+> -            CPUID_EXT2_LM |
+> -            CPUID_EXT2_PDPE1GB | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
+> -            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
+> -            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
+> -            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
+> -            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
+> -            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
+> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
+> +            CPUID_EXT2_SYSCALL,
+>          .features[FEAT_8000_0001_ECX] =
+>              CPUID_EXT3_TBM | CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
+>              CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+> @@ -2395,6 +2368,11 @@ static void x86_register_cpudef_type(X86CPUDefinition *def)
+>          .class_data = def,
+>      };
+>  
+> +    /* AMD aliases are handled at runtime based on CPUID vendor, so
+> +     * they shouldn't be set on the CPU model table.
+> +     */
+> +    assert(!(def->features[FEAT_8000_0001_EDX] & CPUID_EXT2_AMD_ALIASES));
+> +
+>      type_register(&ti);
+>      g_free(typename);
+>  }
