@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cTDLw-0002gl-JG
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:54:06 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTDMy-0003X0-3C
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:55:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cTDLt-00084A-93
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:54:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55680)
+	(envelope-from <ehabkost@redhat.com>) id 1cTDMu-0008Nv-Rv
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:55:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cTDLt-00083g-18
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:54:01 -0500
-Date: Mon, 16 Jan 2017 12:53:57 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170116125357.31b7ef82@t450s.home>
-In-Reply-To: <1484276800-26814-14-git-send-email-peterx@redhat.com>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-14-git-send-email-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v3 13/14] intel_iommu: allow dynamic
- switch of IOMMU region
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTDMu-0008Mw-Jh
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 14:55:04 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 16 Jan 2017 17:54:52 -0200
+Message-Id: <20170116195452.23532-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,222 +21,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com
+To: qemu-devel@nongnu.org
+Cc: Jiri Denemark <jdenemar@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>
 
-On Fri, 13 Jan 2017 11:06:39 +0800
-Peter Xu <peterx@redhat.com> wrote:
+Change the meaning of "-cpu host" to "enable all features
+supported by the accelerator in the current host", so that it can
+be used to enable/query all features supported by TCG.
 
-> This is preparation work to finally enabled dynamic switching ON/OFF for
-> VT-d protection. The old VT-d codes is using static IOMMU address space,
-> and that won't satisfy vfio-pci device listeners.
-> 
-> Let me explain.
-> 
-> vfio-pci devices depend on the memory region listener and IOMMU replay
-> mechanism to make sure the device mapping is coherent with the guest
-> even if there are domain switches. And there are two kinds of domain
-> switches:
-> 
->   (1) switch from domain A -> B
->   (2) switch from domain A -> no domain (e.g., turn DMAR off)
-> 
-> Case (1) is handled by the context entry invalidation handling by the
-> VT-d replay logic. What the replay function should do here is to replay
-> the existing page mappings in domain B.
+To make sure "host" is still at the end of the list in "-cpu
+help", add a "ordering" field that will be used when sorting the
+CPU model list.
 
-There's really 2 steps here, right?  Invalidate A, replay B.  I think
-the code handles this, but I want to make sure.  We don't want to end
-up with a superset of both A & B.
+Cc: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu-qom.h |  4 ++--
+ target/i386/cpu.c     | 26 +++++---------------------
+ 2 files changed, 7 insertions(+), 23 deletions(-)
 
-On the invalidation, a future optimization when disabling an entire
-memory region might also be to invalidate the entire range at once
-rather than each individual mapping within the range, which I think is
-what happens now, right?
-
-> However for case (2), we don't want to replay any domain mappings - we
-> just need the default GPA->HPA mappings (the address_space_memory
-> mapping). And this patch helps on case (2) to build up the mapping
-> automatically by leveraging the vfio-pci memory listeners.
-
-Have you thought about using this address space switching to emulate
-ecap.PT?  ie. advertise hardware based passthrough so that the guest
-doesn't need to waste pagetable entries for a direct mapped, static
-identity domain.
-
-Otherwise the series looks pretty good to me.  Thanks,
-
-Alex
-
-> Another important thing that this patch does is to seperate
-> IR (Interrupt Remapping) from DMAR (DMA Remapping). IR region should not
-> depend on the DMAR region (like before this patch). It should be a
-> standalone region, and it should be able to be activated without
-> DMAR (which is a common behavior of Linux kernel - by default it enables
-> IR while disabled DMAR).
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
-> v3:
-> - fix another trivial style issue patchew reported but I missed in v2
-> 
-> v2:
-> - fix issues reported by patchew
-> - switch domain by enable/disable memory regions [David]
-> - provide vtd_switch_address_space{_all}()
-> - provide a better comment on the memory regions
-> 
-> test done: with intel_iommu device, boot vm with/without
-> "intel_iommu=on" parameter.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/i386/intel_iommu.c         | 78 ++++++++++++++++++++++++++++++++++++++++---
->  hw/i386/trace-events          |  2 +-
->  include/hw/i386/intel_iommu.h |  2 ++
->  3 files changed, 77 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index fd75112..2596f11 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -1343,9 +1343,49 @@ static void vtd_handle_gcmd_sirtp(IntelIOMMUState *s)
->      vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_IRTPS);
->  }
->  
-> +static void vtd_switch_address_space(VTDAddressSpace *as, bool iommu_enabled)
-> +{
-> +    assert(as);
-> +
-> +    trace_vtd_switch_address_space(pci_bus_num(as->bus),
-> +                                   VTD_PCI_SLOT(as->devfn),
-> +                                   VTD_PCI_FUNC(as->devfn),
-> +                                   iommu_enabled);
-> +
-> +    /* Turn off first then on the other */
-> +    if (iommu_enabled) {
-> +        memory_region_set_enabled(&as->sys_alias, false);
-> +        memory_region_set_enabled(&as->iommu, true);
-> +    } else {
-> +        memory_region_set_enabled(&as->iommu, false);
-> +        memory_region_set_enabled(&as->sys_alias, true);
-> +    }
-> +}
-> +
-> +static void vtd_switch_address_space_all(IntelIOMMUState *s, bool enabled)
-> +{
-> +    GHashTableIter iter;
-> +    VTDBus *vtd_bus;
-> +    int i;
-> +
-> +    g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
-> +    while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
-> +        for (i = 0; i < X86_IOMMU_PCI_DEVFN_MAX; i++) {
-> +            if (!vtd_bus->dev_as[i]) {
-> +                continue;
-> +            }
-> +            vtd_switch_address_space(vtd_bus->dev_as[i], enabled);
-> +        }
-> +    }
-> +}
-> +
->  /* Handle Translation Enable/Disable */
->  static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
->  {
-> +    if (s->dmar_enabled == en) {
-> +        return;
-> +    }
-> +
->      VTD_DPRINTF(CSR, "Translation Enable %s", (en ? "on" : "off"));
->  
->      if (en) {
-> @@ -1360,6 +1400,8 @@ static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
->          /* Ok - report back to driver */
->          vtd_set_clear_mask_long(s, DMAR_GSTS_REG, VTD_GSTS_TES, 0);
->      }
-> +
-> +    vtd_switch_address_space_all(s, en);
->  }
->  
->  /* Handle Interrupt Remap Enable/Disable */
-> @@ -2586,15 +2628,43 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
->          vtd_dev_as->devfn = (uint8_t)devfn;
->          vtd_dev_as->iommu_state = s;
->          vtd_dev_as->context_cache_entry.context_cache_gen = 0;
-> +
-> +        /*
-> +         * Memory region relationships looks like (Address range shows
-> +         * only lower 32 bits to make it short in length...):
-> +         *
-> +         * |-----------------+-------------------+----------|
-> +         * | Name            | Address range     | Priority |
-> +         * |-----------------+-------------------+----------+
-> +         * | vtd_root        | 00000000-ffffffff |        0 |
-> +         * |  intel_iommu    | 00000000-ffffffff |        1 |
-> +         * |  vtd_sys_alias  | 00000000-ffffffff |        1 |
-> +         * |  intel_iommu_ir | fee00000-feefffff |       64 |
-> +         * |-----------------+-------------------+----------|
-> +         *
-> +         * We enable/disable DMAR by switching enablement for
-> +         * vtd_sys_alias and intel_iommu regions. IR region is always
-> +         * enabled.
-> +         */
->          memory_region_init_iommu(&vtd_dev_as->iommu, OBJECT(s),
->                                   &s->iommu_ops, "intel_iommu", UINT64_MAX);
-> +        memory_region_init_alias(&vtd_dev_as->sys_alias, OBJECT(s),
-> +                                 "vtd_sys_alias", get_system_memory(),
-> +                                 0, memory_region_size(get_system_memory()));
->          memory_region_init_io(&vtd_dev_as->iommu_ir, OBJECT(s),
->                                &vtd_mem_ir_ops, s, "intel_iommu_ir",
->                                VTD_INTERRUPT_ADDR_SIZE);
-> -        memory_region_add_subregion(&vtd_dev_as->iommu, VTD_INTERRUPT_ADDR_FIRST,
-> -                                    &vtd_dev_as->iommu_ir);
-> -        address_space_init(&vtd_dev_as->as,
-> -                           &vtd_dev_as->iommu, name);
-> +        memory_region_init(&vtd_dev_as->root, OBJECT(s),
-> +                           "vtd_root", UINT64_MAX);
-> +        memory_region_add_subregion_overlap(&vtd_dev_as->root,
-> +                                            VTD_INTERRUPT_ADDR_FIRST,
-> +                                            &vtd_dev_as->iommu_ir, 64);
-> +        address_space_init(&vtd_dev_as->as, &vtd_dev_as->root, name);
-> +        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-> +                                            &vtd_dev_as->sys_alias, 1);
-> +        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-> +                                            &vtd_dev_as->iommu, 1);
-> +        vtd_switch_address_space(vtd_dev_as, s->dmar_enabled);
->      }
->      return vtd_dev_as;
->  }
-> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-> index 92d210d..beaef61 100644
-> --- a/hw/i386/trace-events
-> +++ b/hw/i386/trace-events
-> @@ -11,7 +11,6 @@ xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (ad
->  x86_iommu_iec_notify(bool global, uint32_t index, uint32_t mask) "Notify IEC invalidation: global=%d index=%" PRIu32 " mask=%" PRIu32
->  
->  # hw/i386/intel_iommu.c
-> -vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on) "Device %02x:%02x.%x switching address space (iommu enabled=%d)"
->  vtd_inv_desc(const char *type, uint64_t hi, uint64_t lo) "invalidate desc type %s high 0x%"PRIx64" low 0x%"PRIx64
->  vtd_inv_desc_cc_domain(uint16_t domain) "context invalidate domain 0x%"PRIx16
->  vtd_inv_desc_cc_global(void) "context invalidate globally"
-> @@ -37,6 +36,7 @@ vtd_page_walk_one(uint32_t level, uint64_t iova, uint64_t gpa, uint64_t mask, in
->  vtd_page_walk_skip_read(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to unable to read"
->  vtd_page_walk_skip_perm(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to perm empty"
->  vtd_page_walk_skip_reserve(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to rsrv set"
-> +vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on) "Device %02x:%02x.%x switching address space (iommu enabled=%d)"
->  
->  # hw/i386/amd_iommu.c
->  amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to write at addr 0x%"PRIx64" +  offset 0x%"PRIx32
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> index 749eef9..9c3f6c0 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -83,6 +83,8 @@ struct VTDAddressSpace {
->      uint8_t devfn;
->      AddressSpace as;
->      MemoryRegion iommu;
-> +    MemoryRegion root;
-> +    MemoryRegion sys_alias;
->      MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
->      IntelIOMMUState *iommu_state;
->      VTDContextCacheEntry context_cache_entry;
+diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+index 8cd607e9a2..75618919e3 100644
+--- a/target/i386/cpu-qom.h
++++ b/target/i386/cpu-qom.h
+@@ -47,7 +47,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
+ /**
+  * X86CPUClass:
+  * @cpu_def: CPU model definition
+- * @kvm_required: Whether CPU model requires KVM to be enabled.
++ * @ordering: Ordering on the "-cpu help" CPU model list.
+  * @migration_safe: See CpuDefinitionInfo::migration_safe
+  * @parent_realize: The parent class' realize handler.
+  * @parent_reset: The parent class' reset handler.
+@@ -62,7 +62,7 @@ typedef struct X86CPUClass {
+     /* Should be eventually replaced by subclass-specific property defaults. */
+     X86CPUDefinition *cpu_def;
+ 
+-    bool kvm_required;
++    int ordering;
+     bool migration_safe;
+ 
+     /* Optional description of CPU model.
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ec6eaf215c..e0ca8c0288 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1549,7 +1549,7 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
+     X86CPUClass *xcc = X86_CPU_CLASS(oc);
+     uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
+ 
+-    xcc->kvm_required = true;
++    xcc->ordering = 9; /* Show it last on "-cpu help" */
+ 
+     host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
+     x86_cpu_vendor_words2str(host_cpudef.vendor, ebx, edx, ecx);
+@@ -1563,8 +1563,7 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
+ 
+     xcc->cpu_def = &host_cpudef;
+     xcc->model_description =
+-        "KVM processor with all supported host features "
+-        "(only available in KVM mode)";
++        "Enables all features supported by the accelerator in the current host";
+ 
+     /* level, xlevel, xlevel2, and the feature words are initialized on
+      * instance_init, because they require KVM to be initialized.
+@@ -2075,13 +2074,6 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+     Error *err = NULL;
+     strList **next = missing_feats;
+ 
+-    if (xcc->kvm_required && !kvm_enabled()) {
+-        strList *new = g_new0(strList, 1);
+-        new->value = g_strdup("kvm");;
+-        *missing_feats = new;
+-        return;
+-    }
+-
+     xc = X86_CPU(object_new(object_class_get_name(OBJECT_CLASS(xcc))));
+ 
+     x86_cpu_load_features(xc, &err);
+@@ -2129,7 +2121,7 @@ static void listflags(FILE *f, fprintf_function print, const char **featureset)
+     }
+ }
+ 
+-/* Sort alphabetically by type name, listing kvm_required models last. */
++/* Sort alphabetically by type name, respecting X86CPUClass::ordering. */
+ static gint x86_cpu_list_compare(gconstpointer a, gconstpointer b)
+ {
+     ObjectClass *class_a = (ObjectClass *)a;
+@@ -2138,9 +2130,8 @@ static gint x86_cpu_list_compare(gconstpointer a, gconstpointer b)
+     X86CPUClass *cc_b = X86_CPU_CLASS(class_b);
+     const char *name_a, *name_b;
+ 
+-    if (cc_a->kvm_required != cc_b->kvm_required) {
+-        /* kvm_required items go last */
+-        return cc_a->kvm_required ? 1 : -1;
++    if (cc_a->ordering != cc_b->ordering) {
++        return cc_a->ordering - cc_b->ordering;
+     } else {
+         name_a = object_class_get_name(class_a);
+         name_b = object_class_get_name(class_b);
+@@ -3191,13 +3182,6 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+     Error *local_err = NULL;
+     static bool ht_warned;
+ 
+-    if (xcc->kvm_required && !kvm_enabled()) {
+-        char *name = x86_cpu_class_get_model_name(xcc);
+-        error_setg(&local_err, "CPU model '%s' requires KVM", name);
+-        g_free(name);
+-        goto out;
+-    }
+-
+     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+         error_setg(errp, "apic-id property was not initialized properly");
+         return;
+-- 
+2.11.0.259.g40922b1
