@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cT6t8-0002mo-Jl
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:59:55 -0500
+	(envelope-from <famz@redhat.com>) id 1cT70D-0006Az-Bm
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:07:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cT6t7-0007w5-KU
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:59:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34094)
+	(envelope-from <famz@redhat.com>) id 1cT708-0002NB-9w
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:07:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40154)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cT6t7-0007vv-Er
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 07:59:53 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cT708-0002Mx-4K
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 08:07:08 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 763E58553D
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 12:59:53 +0000 (UTC)
-Date: Mon, 16 Jan 2017 12:59:47 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170116125947.GJ13096@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 1E4864E4D0
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 13:07:08 +0000 (UTC)
+Date: Mon, 16 Jan 2017 21:07:02 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170116130702.GG14226@lemon.Home>
 References: <20170113131731.1246-1-pbonzini@redhat.com>
-	<20170113131731.1246-6-pbonzini@redhat.com>
-	<20170116113824.GD14226@lemon.Home>
-	<b9183a4e-8e45-ec47-afcf-187cb5e81411@redhat.com>
-	<20170116124728.GB10221@lemon.Home>
+	<20170113131731.1246-11-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170116124728.GB10221@lemon.Home>
-Subject: Re: [Qemu-devel] [PATCH 05/16] io: make qio_channel_yield aware of
- AioContexts
+In-Reply-To: <20170113131731.1246-11-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 10/16] block: explicitly acquire aiocontext
+ in timers that need it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,48 +34,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
-On Mon, Jan 16, 2017 at 08:47:28PM +0800, Fam Zheng wrote:
-> On Mon, 01/16 13:24, Paolo Bonzini wrote:
-> > 
-> > 
-> > On 16/01/2017 12:38, Fam Zheng wrote:
-> > >> +void qio_channel_detach_aio_context(QIOChannel *ioc)
-> > >> +{
-> > >> +    ioc->read_coroutine = NULL;
-> > >> +    ioc->write_coroutine = NULL;
-> > >> +    qio_channel_set_aio_fd_handlers(ioc);
-> > >> +    ioc->ctx = NULL;
-> > >
-> > > Why is qio_channel_set_aio_fd_handler not needed here?
-> > 
-> > Because there are no read_coroutine and write_coroutine anymore.  The
-> > caller needs to schedule them on the right AioContext after calling
-> > qio_channel_set_aio_context.  See nbd_client_attach_aio_context in the
-> > next patch for an example.
-> > 
-> > >> -tests/test-char$(EXESUF): tests/test-char.o qemu-char.o qemu-timer.o $(test-util-obj-y) $(qtest-obj-y) $(test-io-obj-y)
-> > >> +tests/test-char$(EXESUF): tests/test-char.o qemu-char.o qemu-timer.o $(test-util-obj-y) $(qtest-obj-y) $(test-io-obj-y) $(test-block-obj-y)
-> > > 
-> > > I guess this is a hint for moving coroutine code into a lower level library like
-> > > util.
-> > 
-> > Coroutine, or AioContext?  The reason for this is that io/ now uses
-> > aio_co_wake.
-> 
-> Or both. It just feels a bit odd to see *char* depend on *block*, maybe there're
-> more such dependencies to come even outside tests/?
-> 
-> Not necessarily for this series, of course.
+On Fri, 01/13 14:17, Paolo Bonzini wrote:
+> diff --git a/block/qed.c b/block/qed.c
+> index 7f1c508..a21d025 100644
+> --- a/block/qed.c
+> +++ b/block/qed.c
+> @@ -345,10 +345,22 @@ static void qed_need_check_timer_cb(void *opaque)
+>  
+>      trace_qed_need_check_timer_cb(s);
+>  
+> +    qed_acquire(s);
+>      qed_plug_allocating_write_reqs(s);
+>  
+>      /* Ensure writes are on disk before clearing flag */
+>      bdrv_aio_flush(s->bs->file->bs, qed_clear_need_check, s);
+> +    qed_release(s);
+> +}
+> +
+> +void qed_acquire(BDRVQEDState *s)
+> +{
+> +    aio_context_acquire(bdrv_get_aio_context(s->bs));
+> +}
+> +
+> +void qed_release(BDRVQEDState *s)
+> +{
+> +    aio_context_release(bdrv_get_aio_context(s->bs));
+>  }
+>  
+>  static void qed_start_need_check_timer(BDRVQEDState *s)
+> diff --git a/block/qed.h b/block/qed.h
+> index 9676ab9..ce8c314 100644
+> --- a/block/qed.h
+> +++ b/block/qed.h
+> @@ -198,6 +198,9 @@ enum {
+>   */
+>  typedef void QEDFindClusterFunc(void *opaque, int ret, uint64_t offset, size_t len);
+>  
+> +void qed_acquire(BDRVQEDState *s);
+> +void qed_release(BDRVQEDState *s);
+> +
 
-On the contrary, I think it should be in this series - we shouldn't
-introduce a dependancy on the block layer from io layer.
+Why cannot these be local (static) functions, in block/qed.c?
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+>  /**
+>   * Generic callback for chaining async callbacks
+>   */
+
+Fam
