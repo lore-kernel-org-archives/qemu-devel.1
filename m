@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cT3j6-0001a0-0i
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:37:21 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cT3oN-00063M-1p
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:42:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cT3j2-0004jL-1Z
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:37:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45290)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cT3j1-0004j0-PG
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:37:15 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9511DB8926
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 09:37:15 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170113144135.5150-1-marcandre.lureau@redhat.com>
-	<20170113144135.5150-16-marcandre.lureau@redhat.com>
-Date: Mon, 16 Jan 2017 10:37:12 +0100
-In-Reply-To: <20170113144135.5150-16-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Fri, 13 Jan 2017 15:41:29 +0100")
-Message-ID: <87wpdvxs53.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1cT3oL-0006ny-HG
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 04:42:47 -0500
+Resent-Message-Id: <E1cT3oL-0006ny-HG@eggs.gnu.org>
+In-Reply-To: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148455974738.214.1147183737428542202@790289a7ca88>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 15/21] qapi: add qapi2texi script
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 16 Jan 2017 01:42:29 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH RFC 0/6] target-arm: KVM64: Cross type vCPU
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,109 +24,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: zhaoshenglong@huawei.com
+Cc: famz@redhat.com, qemu-arm@nongnu.org, wei@redhat.com, peter.maydell@linaro.org, drjones@redhat.com, qemu-devel@nongnu.org, wu.wubin@huawei.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> As the name suggests, the qapi2texi script converts JSON QAPI
-> description into a texi file suitable for different target
-> formats (info/man/txt/pdf/html...).
->
-> It parses the following kind of blocks:
->
-> Free-form:
->
->   ##
->   # =3D Section
->   # =3D=3D Subsection
->   #
->   # Some text foo with *emphasis*
->   # 1. with a list
->   # 2. like that
->   #
->   # And some code:
->   # | $ echo foo
->   # | -> do this
->   # | <- get that
->   #
->   ##
->
-> Symbol description:
->
->   ##
->   # @symbol:
->   #
->   # Symbol body ditto ergo sum. Foo bar
->   # baz ding.
->   #
->   # @param1: the frob to frobnicate
->   # @param2: #optional how hard to frobnicate
->   #
->   # Returns: the frobnicated frob.
->   #          If frob isn't frobnicatable, GenericError.
->   #
->   # Since: version
->   # Notes: notes, comments can have
->   #        - itemized list
->   #        - like this
->   #
->   # Example:
->   #
->   # -> { "execute": "quit" }
->   # <- { "return": {} }
->   #
->   ##
->
-> That's roughly following the following EBNF grammar:
->
-> api_comment =3D "##\n" comment "##\n"
-> comment =3D freeform_comment | symbol_comment
-> freeform_comment =3D { "# " text "\n" | "#\n" }
-> symbol_comment =3D "# @" name ":\n" { member | tag_section | freeform_com=
-ment }
-> member =3D "# @" name ':' [ text ] "\n" freeform_comment
-> tag_section =3D "# " ( "Returns:", "Since:", "Note:", "Notes:", "Example:=
-", "Examples:" ) [ text ]  "\n" freeform_comment
-> text =3D free text with markup
->
-> Note that the grammar is ambiguous: a line "# @foo:\n" can be parsed
-> both as freeform_comment and as symbol_comment.  The actual parser
-> recognizes symbol_comment.
->
-> See docs/qapi-code-gen.txt for more details.
->
-> Deficiencies and limitations:
-> - the generated QMP documentation includes internal types
-> - union type support is lacking
-> - type information is lacking in generated documentation
-> - doc comment error message positions are imprecise, they point
->   to the beginning of the comment.
-> - a few minor issues, all marked TODO/FIXME in the code
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Squashing in the appended patch along with updates to expected output to
-avoid git complaining about trailing blank lines like this:
-
-tests/qapi-schema/comments.out:7: new blank line at EOF.
-tests/qapi-schema/event-case.out:8: new blank line at EOF.
-tests/qapi-schema/ident-with-escape.out:10: new blank line at EOF.
-tests/qapi-schema/include-relpath.out:7: new blank line at EOF.
-tests/qapi-schema/include-repetition.out:7: new blank line at EOF.
-tests/qapi-schema/include-simple.out:7: new blank line at EOF.
-tests/qapi-schema/indented-expr.out:13: new blank line at EOF.
-tests/qapi-schema/qapi-schema-test.out:446: new blank line at EOF.
-
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-index 39b55b9..b4cde4f 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -66,4 +66,6 @@ for doc in schema.docs:
-         print '    arg=3D%s\n%s' % (arg, section)
-     for section in doc.sections:
-         print '    section=3D%s\n%s' % (section.name, section)
--    print '    body=3D\n%s' % doc.body
-+    body =3D str(doc.body)
-+    if body:
-+        print '    body=3D\n%s' % body
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE0ODQ1NTg4MjEtMTU1MTItMS1naXQtc2VuZC1lbWFpbC16aGFvc2hlbmdsb25n
+QGh1YXdlaS5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBSRkMgMC82XSB0YXJnZXQt
+YXJtOiBLVk02NDogQ3Jvc3MgdHlwZSB2Q1BVIHN1cHBvcnQKCj09PSBURVNUIFNDUklQVCBCRUdJ
+TiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGlu
+ZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
+RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
+dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
+b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
+MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
+M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3
+LzE0ODQ1NTg4MjEtMTU1MTItMS1naXQtc2VuZC1lbWFpbC16aGFvc2hlbmdsb25nQGh1YXdlaS5j
+b20gLT4gcGF0Y2hldy8xNDg0NTU4ODIxLTE1NTEyLTEtZ2l0LXNlbmQtZW1haWwtemhhb3NoZW5n
+bG9uZ0BodWF3ZWkuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYWQ1ZTg3YiB0
+YXJnZXQtYXJtOiBjcHU2NDogQWRkIHN1cHBvcnQgZm9yIENvcnRleC1BNzIKZDRmNmM4NiBhcm06
+IHZpcnQ6IEVuYWJsZSBnZW5lcmljIHR5cGUgQ1BVIGluIHZpcnQgbWFjaGluZQpkYjI0MjZlIHRh
+cmdldDogYXJtOiBBZGQgYSBnZW5lcmljIHR5cGUgY3B1CjA0MmRmZjggYXJtOiBrdm02NDogQ2hl
+Y2sgaWYga3ZtIHN1cHBvcnRzIGNyb3NzIHR5cGUgdkNQVQpkOGI4ZGIxIHRhcmdldDogYXJtOiBB
+ZGQgdGhlIHFlbXUgdGFyZ2V0IGZvciBLVk1fQVJNX1RBUkdFVF9HRU5FUklDX1Y4CjcxZWIwN2Qg
+aGVhZGVyczogdXBkYXRlIGxpbnV4IGhlYWRlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvNjogaGVhZGVyczogdXBkYXRlIGxpbnV4IGhlYWRlcnMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMi82OiB0YXJnZXQ6IGFybTogQWRkIHRoZSBxZW11IHRhcmdldCBmb3IgS1ZNX0FSTV9U
+QVJHRVRfR0VORVJJQ19WOC4uLgpDaGVja2luZyBQQVRDSCAzLzY6IGFybToga3ZtNjQ6IENoZWNr
+IGlmIGt2bSBzdXBwb3J0cyBjcm9zcyB0eXBlIHZDUFUuLi4KRVJST1I6IE1hY3JvcyB3aXRoIGNv
+bXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMjE6IEZJTEU6
+IHRhcmdldC9hcm0va3ZtNjQuYzo0ODQ6CisjZGVmaW5lIEFSTV9DUFVfSURfTUlEUiAgICAgICAg
+MywgMCwgMCwgMCwgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBi
+ZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMjQ6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0
+ODc6CisjZGVmaW5lIEFSTV9DUFVfSURfUkVWSURSICAgICAgMywgMCwgMCwgMCwgNgoKRVJST1I6
+IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRo
+ZXNpcwojMjU6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0ODg6CisjZGVmaW5lIEFSTV9DUFVf
+SURfQUlEUiAgICAgICAgMywgMSwgMCwgMCwgNwoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXgg
+dmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMjg6IEZJTEU6IHRhcmdl
+dC9hcm0va3ZtNjQuYzo0OTE6CisjZGVmaW5lIEFSTV9DUFVfSURfQ0NTSURSICAgICAgMywgMSwg
+MCwgMCwgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNs
+b3NlZCBpbiBwYXJlbnRoZXNpcwojMjk6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0OTI6Cisj
+ZGVmaW5lIEFSTV9DUFVfSURfQ0xJRFIgICAgICAgMywgMSwgMCwgMCwgMQoKRVJST1I6IE1hY3Jv
+cyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwoj
+MzA6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0OTM6CisjZGVmaW5lIEFSTV9DUFVfSURfQ1NT
+RUxSICAgICAgMywgMiwgMCwgMCwgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVz
+IHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzE6IEZJTEU6IHRhcmdldC9hcm0v
+a3ZtNjQuYzo0OTQ6CisjZGVmaW5lIEFSTV9DUFVfSURfQ1RSICAgICAgICAgMywgMywgMCwgMCwg
+MQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBp
+biBwYXJlbnRoZXNpcwojMzQ6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0OTc6CisjZGVmaW5l
+IEFSTV9DUFVfSURfUEZSMCAgICAgICAgMywgMCwgMCwgMSwgMAoKRVJST1I6IE1hY3JvcyB3aXRo
+IGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzU6IEZJ
+TEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0OTg6CisjZGVmaW5lIEFSTV9DUFVfSURfUEZSMSAgICAg
+ICAgMywgMCwgMCwgMSwgMQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3Vs
+ZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzY6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQu
+Yzo0OTk6CisjZGVmaW5lIEFSTV9DUFVfSURfREZSMCAgICAgICAgMywgMCwgMCwgMSwgMgoKRVJS
+T1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJl
+bnRoZXNpcwojMzc6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDA6CisjZGVmaW5lIEFSTV9D
+UFVfSURfQUZSMCAgICAgICAgMywgMCwgMCwgMSwgMwoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBs
+ZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzg6IEZJTEU6IHRh
+cmdldC9hcm0va3ZtNjQuYzo1MDE6CisjZGVmaW5lIEFSTV9DUFVfSURfTU1GUjAgICAgICAgMywg
+MCwgMCwgMSwgNAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBl
+bmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzk6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDI6
+CisjZGVmaW5lIEFSTV9DUFVfSURfTU1GUjEgICAgICAgMywgMCwgMCwgMSwgNQoKRVJST1I6IE1h
+Y3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNp
+cwojNDA6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDM6CisjZGVmaW5lIEFSTV9DUFVfSURf
+TU1GUjIgICAgICAgMywgMCwgMCwgMSwgNgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFs
+dWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDE6IEZJTEU6IHRhcmdldC9h
+cm0va3ZtNjQuYzo1MDQ6CisjZGVmaW5lIEFSTV9DUFVfSURfTU1GUjMgICAgICAgMywgMCwgMCwg
+MSwgNwoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3Nl
+ZCBpbiBwYXJlbnRoZXNpcwojNDI6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDU6CisjZGVm
+aW5lIEFSTV9DUFVfSURfSVNBUjAgICAgICAgMywgMCwgMCwgMiwgMAoKRVJST1I6IE1hY3JvcyB3
+aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDM6
+IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDY6CisjZGVmaW5lIEFSTV9DUFVfSURfSVNBUjEg
+ICAgICAgMywgMCwgMCwgMiwgMQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNo
+b3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDQ6IEZJTEU6IHRhcmdldC9hcm0va3Zt
+NjQuYzo1MDc6CisjZGVmaW5lIEFSTV9DUFVfSURfSVNBUjIgICAgICAgMywgMCwgMCwgMiwgMgoK
+RVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBw
+YXJlbnRoZXNpcwojNDU6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDg6CisjZGVmaW5lIEFS
+TV9DUFVfSURfSVNBUjMgICAgICAgMywgMCwgMCwgMiwgMwoKRVJST1I6IE1hY3JvcyB3aXRoIGNv
+bXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDY6IEZJTEU6
+IHRhcmdldC9hcm0va3ZtNjQuYzo1MDk6CisjZGVmaW5lIEFSTV9DUFVfSURfSVNBUjQgICAgICAg
+MywgMCwgMCwgMiwgNAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBi
+ZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDc6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1
+MTA6CisjZGVmaW5lIEFSTV9DUFVfSURfSVNBUjUgICAgICAgMywgMCwgMCwgMiwgNQoKRVJST1I6
+IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRo
+ZXNpcwojNDg6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTE6CisjZGVmaW5lIEFSTV9DUFVf
+SURfTU1GUjQgICAgICAgMywgMCwgMCwgMiwgNgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXgg
+dmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDk6IEZJTEU6IHRhcmdl
+dC9hcm0va3ZtNjQuYzo1MTI6CisjZGVmaW5lIEFSTV9DUFVfSURfTVZGUjAgICAgICAgMywgMCwg
+MCwgMywgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNs
+b3NlZCBpbiBwYXJlbnRoZXNpcwojNTA6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTM6Cisj
+ZGVmaW5lIEFSTV9DUFVfSURfTVZGUjEgICAgICAgMywgMCwgMCwgMywgMQoKRVJST1I6IE1hY3Jv
+cyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwoj
+NTE6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTQ6CisjZGVmaW5lIEFSTV9DUFVfSURfTVZG
+UjIgICAgICAgMywgMCwgMCwgMywgMgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVz
+IHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTI6IEZJTEU6IHRhcmdldC9hcm0v
+a3ZtNjQuYzo1MTU6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NFBGUjAgICAgMywgMCwgMCwgNCwg
+MAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBp
+biBwYXJlbnRoZXNpcwojNTM6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTY6CisjZGVmaW5l
+IEFSTV9DUFVfSURfQUE2NFBGUjEgICAgMywgMCwgMCwgNCwgMQoKRVJST1I6IE1hY3JvcyB3aXRo
+IGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTQ6IEZJ
+TEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTc6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NERGUjAg
+ICAgMywgMCwgMCwgNSwgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3Vs
+ZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTU6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQu
+Yzo1MTg6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NERGUjEgICAgMywgMCwgMCwgNSwgMQoKRVJS
+T1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJl
+bnRoZXNpcwojNTY6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTk6CisjZGVmaW5lIEFSTV9D
+UFVfSURfQUE2NEFGUjAgICAgMywgMCwgMCwgNSwgNAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBs
+ZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTc6IEZJTEU6IHRh
+cmdldC9hcm0va3ZtNjQuYzo1MjA6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NEFGUjEgICAgMywg
+MCwgMCwgNSwgNQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBl
+bmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTg6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MjE6
+CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NElTQVIwICAgMywgMCwgMCwgNiwgMAoKRVJST1I6IE1h
+Y3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNp
+cwojNTk6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MjI6CisjZGVmaW5lIEFSTV9DUFVfSURf
+QUE2NElTQVIxICAgMywgMCwgMCwgNiwgMQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFs
+dWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNjA6IEZJTEU6IHRhcmdldC9h
+cm0va3ZtNjQuYzo1MjM6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NE1NRlIwICAgMywgMCwgMCwg
+NywgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3Nl
+ZCBpbiBwYXJlbnRoZXNpcwojNjE6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MjQ6CisjZGVm
+aW5lIEFSTV9DUFVfSURfQUE2NE1NRlIxICAgMywgMCwgMCwgNywgMQoKRVJST1I6IHNwYWNlIHJl
+cXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzE1MDogRklMRTogdGFyZ2V0
+L2FybS9rdm02NC5jOjYxMzoKKyAgICAgICAgaWYoaWRfcmVnaXRzZXJzW2ldLmlkICE9IDApIHsK
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxOTQ6IEZJTEU6IHRhcmdldC9hcm0v
+a3ZtNjQuYzo2Nzk6CisgICAgICAgICAgICBmcHJpbnRmKHN0ZGVyciwgImhldGVyb2dlbmVvdXMg
+c3lzdGVtIGNhbid0IHN1cHBvcnQgaG9zdCBndWVzdCBDUFUgdHlwZVxuIik7Cgp0b3RhbDogMzYg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAyMDcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC82OiB0YXJnZXQ6IGFybTogQWRk
+IGEgZ2VuZXJpYyB0eXBlIGNwdS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+NjM6IEZJTEU6IHRhcmdldC9hcm0vY3B1NjQuYzoyNTA6CisgICAgY3B1LT5pZF9hYTY0bW1mcjAg
+PSAweDBmMDAxMTAxOyAvKiBvbmx5IHN1cHBvcnQgNGsgcGFnZSwgMzYgYml0IHBoeXNpY2FsIGFk
+ZHIgKi8KCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjYgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA1LzY6IGFy
+bTogdmlydDogRW5hYmxlIGdlbmVyaWMgdHlwZSBDUFUgaW4gdmlydCBtYWNoaW5lLi4uCkNoZWNr
+aW5nIFBBVENIIDYvNjogdGFyZ2V0LWFybTogY3B1NjQ6IEFkZCBzdXBwb3J0IGZvciBDb3J0ZXgt
+QTcyLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
+IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEBmcmVlbGlzdHMub3Jn
