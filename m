@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEDd-0000l7-NR
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEDh-0000oR-J5
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEDc-0003lf-Q9
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:33 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEDe-0003m6-JT
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:37 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 16 Jan 2017 21:49:06 +0100
-Message-Id: <20170116204921.31578-3-mreitz@redhat.com>
+Date: Mon, 16 Jan 2017 21:49:07 +0100
+Message-Id: <20170116204921.31578-4-mreitz@redhat.com>
 In-Reply-To: <20170111181432.18868-1-mreitz@redhat.com>
 References: <20170111181432.18868-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 10/25] block: Add bdrv_dirname()
+Subject: [Qemu-devel] [PATCH v4 11/25] blkverify: Make bdrv_dirname() return
+ NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,83 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This function may be implemented by block drivers to derive a directory
-name from a BDS. Concatenating this g_free()-able string with a relative
-filename must result in a valid (not necessarily existing) filename, so
-this is a function that should generally be not implemented by format
-drivers, because this is protocol-specific.
-
-If a BDS's driver does not implement this function, bdrv_dirname() will
-fall through to the BDS's file if it exists. If it does not, the
-exact_filename field will be used to generate a directory name.
+blkverify's BDSs have a file BDS, but we do not want this to be
+preferred over the raw node. There is no way to decide between the two
+(and not really a reason to, either), so just return NULL in blkverify's
+implementation of bdrv_dirname().
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h     |  1 +
- include/block/block_int.h |  1 +
- block.c                   | 26 ++++++++++++++++++++++++++
- 3 files changed, 28 insertions(+)
+ block/blkverify.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index eb41956bf1..7bcbd05338 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -439,6 +439,7 @@ char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp);
- char *bdrv_get_full_backing_filename_from_filename(const char *backed,
-                                                    const char *backing,
-                                                    Error **errp);
-+char *bdrv_dirname(BlockDriverState *bs, Error **errp);
- 
- int path_has_protocol(const char *path);
- int path_is_absolute(const char *path);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index c1f057ab47..fb916a7890 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -130,6 +130,7 @@ struct BlockDriver {
-     int (*bdrv_make_empty)(BlockDriverState *bs);
- 
-     void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
-+    char *(*bdrv_dirname)(BlockDriverState *bs, Error **errp);
- 
-     /* aio */
-     BlockAIOCB *(*bdrv_aio_readv)(BlockDriverState *bs,
-diff --git a/block.c b/block.c
-index 2735ec4bcc..e591e326c5 100644
---- a/block.c
-+++ b/block.c
-@@ -4083,6 +4083,32 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 38a8c68029..c72a1fba64 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -309,6 +309,15 @@ static void blkverify_refresh_filename(BlockDriverState *bs, QDict *options)
      }
  }
  
-+char *bdrv_dirname(BlockDriverState *bs, Error **errp)
++static char *blkverify_dirname(BlockDriverState *bs, Error **errp)
 +{
-+    BlockDriver *drv = bs->drv;
-+
-+    if (!drv) {
-+        error_setg(errp, "Node '%s' is ejected", bs->node_name);
-+        return NULL;
-+    }
-+
-+    if (drv->bdrv_dirname) {
-+        return drv->bdrv_dirname(bs, errp);
-+    }
-+
-+    if (bs->file) {
-+        return bdrv_dirname(bs->file->bs, errp);
-+    }
-+
-+    if (bs->exact_filename[0] != '\0') {
-+        return path_combine(bs->exact_filename, "");
-+    }
-+
-+    error_setg(errp, "Cannot generate a base directory for %s nodes",
-+               drv->format_name);
++    /* In general, there are two BDSs with different dirnames below this one;
++     * so there is no unique dirname we could return (unless both are equal by
++     * chance). Therefore, to be consistent, just always return NULL. */
++    error_setg(errp, "Cannot generate a base directory for blkverify nodes");
 +    return NULL;
 +}
 +
- /*
-  * Hot add/remove a BDS's child. So the user can take a child offline when
-  * it is broken and take a new child online
+ static BlockDriver bdrv_blkverify = {
+     .format_name                      = "blkverify",
+     .protocol_name                    = "blkverify",
+@@ -319,6 +328,7 @@ static BlockDriver bdrv_blkverify = {
+     .bdrv_close                       = blkverify_close,
+     .bdrv_getlength                   = blkverify_getlength,
+     .bdrv_refresh_filename            = blkverify_refresh_filename,
++    .bdrv_dirname                     = blkverify_dirname,
+ 
+     .bdrv_co_preadv                   = blkverify_co_preadv,
+     .bdrv_co_pwritev                  = blkverify_co_pwritev,
 -- 
 2.11.0
