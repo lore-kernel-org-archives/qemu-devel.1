@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cTBs4-0003yz-Ph
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:19:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cTBtW-0004na-DV
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cTBrz-00077y-S9
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:19:08 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33799)
+	(envelope-from <peter.maydell@linaro.org>) id 1cTBtV-0007Nj-DD
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:20:38 -0500
+Received: from mail-ua0-x22f.google.com ([2607:f8b0:400c:c08::22f]:34124)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
-	id 1cTBrz-00077q-Jt
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:19:03 -0500
-Received: by mail-lf0-x244.google.com with SMTP id q89so13673952lfi.1
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 10:19:03 -0800 (PST)
-References: <1483979087-32663-1-git-send-email-clg@kaod.org>
-	<1483979087-32663-9-git-send-email-clg@kaod.org>
-	<7df52dde-e4b2-23de-47e7-2e97d5eab4e4@gmail.com>
-	<f4be1b72-eb3e-b91a-16c7-1f7a82fdfb91@kaod.org>
-From: "mar.krzeminski" <mar.krzeminski@gmail.com>
-Message-ID: <919659f4-2c6a-1f55-7ed3-5c4658da2353@gmail.com>
-Date: Mon, 16 Jan 2017 19:19:00 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cTBtV-0007Nf-8m
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 13:20:37 -0500
+Received: by mail-ua0-x22f.google.com with SMTP id 35so86853000uak.1
+	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 10:20:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <f4be1b72-eb3e-b91a-16c7-1f7a82fdfb91@kaod.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/11] aspeed/smc: reset flash after
- each test
+In-Reply-To: <CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
+References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
+	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
+	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Jan 2017 18:20:16 +0000
+Message-ID: <CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
+ as PNP0C02 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,115 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Marcin Krzeminski <marcin.krzeminski@nokia.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Andrew Jones <drjones@redhat.com>
 
-
-
-W dniu 16.01.2017 o 19:10, Cédric Le Goater pisze:
-> On 01/16/2017 06:37 PM, mar.krzeminski wrote:
->>
->> W dniu 09.01.2017 o 17:24, Cédric Le Goater pisze:
->>> Let's make sure when each test is run that the flash object is in an
->>> initial state and did not keep configuration from the previous tests.
->> Is there any particukar reason why you do that (bug/side effect/whatever) or you
->> just want to be sure what the flash state is?
-> I want to be sure it is not in 4BYTE mode.
-There is a command for that (EX_4BYTE_ADDR = 0xE9), but reset also make 
-sense here.
-
-Thanks,
-Marcin
->
-> C.
->
->> Thanks,
->> Marcin
->>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->>> ---
->>>    tests/m25p80-test.c | 31 +++++++++++++++++++++++++++++++
->>>    1 file changed, 31 insertions(+)
+On 16 January 2017 at 17:30, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> On 16 January 2017 at 17:25, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 13 January 2017 at 17:32, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>>> Linux for arm64 v4.10 and later will complain if the ECAM config space is
+>>> not reserved in the ACPI namespace:
 >>>
->>> diff --git a/tests/m25p80-test.c b/tests/m25p80-test.c
->>> index cb7ec81f1a6d..8dd550deb95e 100644
->>> --- a/tests/m25p80-test.c
->>> +++ b/tests/m25p80-test.c
->>> @@ -50,6 +50,8 @@ enum {
->>>        READ = 0x03,
->>>        PP = 0x02,
->>>        WREN = 0x6,
->>> +    RESET_ENABLE = 0x66,
->>> +    RESET_MEMORY = 0x99,
->>>        EN_4BYTE_ADDR = 0xB7,
->>>        ERASE_SECTOR = 0xd8,
->>>    };
->>> @@ -76,6 +78,14 @@ static void spi_conf(uint32_t value)
->>>        writel(ASPEED_FMC_BASE + R_CONF, conf);
->>>    }
->>>    +static void spi_conf_remove(uint32_t value)
->>> +{
->>> +    uint32_t conf = readl(ASPEED_FMC_BASE + R_CONF);
+>>>   acpi PNP0A08:00: [Firmware Bug]: ECAM area [mem 0x3f000000-0x3fffffff] not reserved in ACPI namespace
+>>>
+>>> The rationale is that OSes that don't consume the MCFG table should still
+>>> be able to infer that the PCI config space MMIO region is occupied.
+>>>
+>>> So update the ACPI table generation routine to add this reservation.
+>>>
+>>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>>> ---
+>>>  hw/arm/virt-acpi-build.c | 7 +++++++
+>>>  1 file changed, 7 insertions(+)
+>>>
+>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>>> index 085a61117378..50d52f685f68 100644
+>>> --- a/hw/arm/virt-acpi-build.c
+>>> +++ b/hw/arm/virt-acpi-build.c
+>>> @@ -310,6 +310,13 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>>>      Aml *dev_rp0 = aml_device("%s", "RP0");
+>>>      aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+>>>      aml_append(dev, dev_rp0);
 >>> +
->>> +    conf &= ~value;
->>> +    writel(ASPEED_FMC_BASE + R_CONF, conf);
->>> +}
->>> +
->>>    static void spi_ctrl_start_user(void)
->>>    {
->>>        uint32_t ctrl = readl(ASPEED_FMC_BASE + R_CTRL0);
->>> @@ -95,6 +105,18 @@ static void spi_ctrl_stop_user(void)
->>>        writel(ASPEED_FMC_BASE + R_CTRL0, ctrl);
->>>    }
->>>    +static void flash_reset(void)
->>> +{
->>> +    spi_conf(CONF_ENABLE_W0);
->>> +
->>> +    spi_ctrl_start_user();
->>> +    writeb(ASPEED_FLASH_BASE, RESET_ENABLE);
->>> +    writeb(ASPEED_FLASH_BASE, RESET_MEMORY);
->>> +    spi_ctrl_stop_user();
->>> +
->>> +    spi_conf_remove(CONF_ENABLE_W0);
->>> +}
->>> +
->>>    static void test_read_jedec(void)
->>>    {
->>>        uint32_t jedec = 0x0;
->>> @@ -108,6 +130,8 @@ static void test_read_jedec(void)
->>>        jedec |= readb(ASPEED_FLASH_BASE);
->>>        spi_ctrl_stop_user();
->>>    +    flash_reset();
->>> +
->>>        g_assert_cmphex(jedec, ==, FLASH_JEDEC);
->>>    }
->>>    @@ -155,6 +179,8 @@ static void test_erase_sector(void)
->>>        for (i = 0; i < PAGE_SIZE / 4; i++) {
->>>            g_assert_cmphex(page[i], ==, 0xffffffff);
->>>        }
->>> +
->>> +    flash_reset();
->>>    }
->>>      static void test_erase_all(void)
->>> @@ -182,6 +208,8 @@ static void test_erase_all(void)
->>>        for (i = 0; i < PAGE_SIZE / 4; i++) {
->>>            g_assert_cmphex(page[i], ==, 0xffffffff);
->>>        }
->>> +
->>> +    flash_reset();
->>>    }
->>>      static void test_write_page(void)
->>> @@ -195,6 +223,7 @@ static void test_write_page(void)
->>>          spi_ctrl_start_user();
->>>        writeb(ASPEED_FLASH_BASE, EN_4BYTE_ADDR);
->>> +    writeb(ASPEED_FLASH_BASE, WREN);
->>>        writeb(ASPEED_FLASH_BASE, PP);
->>>        writel(ASPEED_FLASH_BASE, make_be32(my_page_addr));
->>>    @@ -215,6 +244,8 @@ static void test_write_page(void)
->>>        for (i = 0; i < PAGE_SIZE / 4; i++) {
->>>            g_assert_cmphex(page[i], ==, 0xffffffff);
->>>        }
->>> +
->>> +    flash_reset();
->>>    }
->>>      static char tmp_path[] = "/tmp/qtest.m25p80.XXXXXX";
+>>> +    Aml *dev_res0 = aml_device("%s", "RES0");
+>>> +    aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+>>> +    crs = aml_resource_template();
+>>> +    aml_append(crs, aml_memory32_fixed(base_ecam, size_ecam, AML_READ_WRITE));
+>>> +    aml_append(dev_res0, aml_name_decl("_CRS", crs));
+>>> +    aml_append(dev, dev_res0);
+>>>      aml_append(scope, dev);
+>>>  }
+>>
+>> This needs to be controlled via the machine class back-compat
+>> machinery in hw/arm/virt.c so that it only happens for virt-2.9
+>> and later.
+>>
 >
+> Why exactly?
+
+Because the "virt-2.8" machine has to present to the guest
+exactly what "virt" did as of the QEMU 2.8 release, including
+any bugs or missing things we happened to have in our ACPI
+tables. This allows cross-version compatibility (including
+VM migration). Drew will have a more detailed explanation
+if you need it.
+
+thanks
+-- PMM
