@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEDu-00011N-9y
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:51 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTEEW-0001b5-Kx
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:50:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTEDt-0003rR-Cv
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:49:50 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 16 Jan 2017 21:49:13 +0100
-Message-Id: <20170116204921.31578-10-mreitz@redhat.com>
-In-Reply-To: <20170111181432.18868-1-mreitz@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cTEEV-00046B-Tz
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 15:50:28 -0500
 References: <20170111181432.18868-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 17/25] iotests: Add quorum case to test 110
+	<20170111181432.18868-5-mreitz@redhat.com>
+	<ee5ed185-f4d7-be4e-868d-07091fa6fad8@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d7ee0118-dd56-43a3-2c75-681ad64acd83@redhat.com>
+Date: Mon, 16 Jan 2017 21:50:19 +0100
+MIME-Version: 1.0
+In-Reply-To: <ee5ed185-f4d7-be4e-868d-07091fa6fad8@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="49q6IXJ8ofoV3uR5Nfkt35S27wcM52jIv"
+Subject: Re: [Qemu-devel] [PATCH v4 04/25] block: Respect backing bs in
+ bdrv_refresh_filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,107 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-Test 110 tests relative backing filenames for complex BDS trees. Add
-quorum as an example that can never work automatically (without
-special-casing if all child nodes have the same base directory), and an
-example on how to make it work manually (using the base-directory
-option).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--49q6IXJ8ofoV3uR5Nfkt35S27wcM52jIv
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <d7ee0118-dd56-43a3-2c75-681ad64acd83@redhat.com>
+Subject: Re: [PATCH v4 04/25] block: Respect backing bs in
+ bdrv_refresh_filename
+References: <20170111181432.18868-1-mreitz@redhat.com>
+ <20170111181432.18868-5-mreitz@redhat.com>
+ <ee5ed185-f4d7-be4e-868d-07091fa6fad8@redhat.com>
+In-Reply-To: <ee5ed185-f4d7-be4e-868d-07091fa6fad8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/110     | 48 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/110.out | 12 ++++++++++++
- 2 files changed, 60 insertions(+)
+On 16.01.2017 21:43, Eric Blake wrote:
+> On 01/11/2017 12:14 PM, Max Reitz wrote:
+>=20
+> The mail archives show this series stopping at 4/25; what happened to 5=
+-25?
+> https://lists.gnu.org/archive/html/qemu-devel/2017-01/threads.html#0191=
+2
 
-diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index ba1b3c6c7d..d96b656b6b 100755
---- a/tests/qemu-iotests/110
-+++ b/tests/qemu-iotests/110
-@@ -30,6 +30,7 @@ status=1	# failure is the default!
- _cleanup()
- {
- 	_cleanup_test_img
-+        rm -f "$TEST_IMG.copy"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
-@@ -87,6 +88,53 @@ echo
- # omit the image size; it should work anyway
- _make_test_img -b "$TEST_IMG_REL.base"
- 
-+echo
-+echo '=== Nodes without a common directory ==='
-+echo
-+
-+cp "$TEST_IMG" "$TEST_IMG.copy"
-+
-+# Should inform us that the actual path of the backing file cannot be determined
-+TEST_IMG="json:{
-+    'driver': '$IMGFMT',
-+    'file': {
-+        'driver': 'quorum',
-+        'vote-threshold': 1,
-+        'children': [
-+            {
-+                'driver': 'file',
-+                'filename': '$TEST_IMG'
-+            },
-+            {
-+                'driver': 'file',
-+                'filename': '$TEST_IMG.copy'
-+            }
-+        ]
-+    }
-+}" _img_info | _filter_img_info
-+
-+echo
-+
-+# Should work fine
-+TEST_IMG="json:{
-+    'driver': '$IMGFMT',
-+    'file': {
-+        'driver': 'quorum',
-+        'base-directory': '$TEST_DIR/',
-+        'vote-threshold': 1,
-+        'children': [
-+            {
-+                'driver': 'file',
-+                'filename': '$TEST_IMG'
-+            },
-+            {
-+                'driver': 'file',
-+                'filename': '$TEST_IMG.copy'
-+            }
-+        ]
-+    }
-+}" _img_info | _filter_img_info
-+
- 
- # success, all done
- echo '*** done'
-diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index 5370bc1d26..e1845d8026 100644
---- a/tests/qemu-iotests/110.out
-+++ b/tests/qemu-iotests/110.out
-@@ -19,4 +19,16 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
- === Backing name is always relative to the backed image ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=t.IMGFMT.base
-+
-+=== Nodes without a common directory ===
-+
-+image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+backing file: t.IMGFMT.base (cannot determine actual path)
-+
-+image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
- *** done
--- 
-2.11.0
+Oops. Somehow, the Red Hat mail server really hates me recently... I'll
+try to get them out.
+
+Max
+
+
+--49q6IXJ8ofoV3uR5Nfkt35S27wcM52jIv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh9MgsSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ASzcH/1M/06e8AZsOC6PZrc5o/95yKWGwZVhI
+h5Bo/S753V+1CkO4oMm1knhLUjTA4cuII69GQDC97mCuzCsjx2BdcwRvPIlrtia9
+PtvYnJJgXWlrcf7M2HwwjyyAAiSwiOE2hDtzzo+nm1CO119NLRMfyZSgY7DoaDQ0
+DsUYX2Dd3jbqKEmbtKOHPOGwYdWsYMEb7DgTlBq7FOT1HiqiaAm800gQB/5Wzx6C
+ovv0Lf/yRzUPnvwRjVLK050wtv0e6PtphRSFa5ZQXthb46fLoN61Yxgf3tigDEFc
+Rbxg49C7dc0A/lA8Tel/Hp0emXgLOYjOjWLXlkIEpKvXQ7mVQTvxwT8=
+=vMMX
+-----END PGP SIGNATURE-----
+
+--49q6IXJ8ofoV3uR5Nfkt35S27wcM52jIv--
