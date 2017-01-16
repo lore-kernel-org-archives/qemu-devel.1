@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cTArM-0005sg-9S
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:14:21 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTAtY-0007tv-PP
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:16:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cTArH-000506-C7
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:14:20 -0500
-Received: from 16.mo5.mail-out.ovh.net ([87.98.174.144]:42634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cTArH-0004zs-5J
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:14:15 -0500
-Received: from player760.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C5F286CD5E
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 18:14:13 +0100 (CET)
-References: <1480434248-27138-1-git-send-email-clg@kaod.org>
-	<1480434248-27138-28-git-send-email-clg@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <16bf90e2-8538-ac01-bd62-1333f80854ee@kaod.org>
-Date: Mon, 16 Jan 2017 18:14:04 +0100
+	(envelope-from <mreitz@redhat.com>) id 1cTAtX-0005LF-V0
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:16:36 -0500
+References: <20161201020508.24417-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9b2b5e83-a875-745e-4f19-6f9e53f3b9a0@redhat.com>
+Date: Mon, 16 Jan 2017 18:16:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <1480434248-27138-28-git-send-email-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 27/30] wdt: Add Aspeed watchdog
- device model
+In-Reply-To: <20161201020508.24417-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SmQGTjDxe5haAXotj2PwdcvJUaxLSdCbi"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Improve commit invalid base
+ message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Marcin Krzeminski <marcin.krzeminski@nokia.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Joel Stanley <joel@jms.id.au>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On 11/29/2016 04:44 PM, C=C3=A9dric Le Goater wrote:
-> From: Joel Stanley <joel@jms.id.au>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SmQGTjDxe5haAXotj2PwdcvJUaxLSdCbi
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <9b2b5e83-a875-745e-4f19-6f9e53f3b9a0@redhat.com>
+Subject: Re: [PATCH] qemu-img: Improve commit invalid base message
+References: <20161201020508.24417-1-mreitz@redhat.com>
+In-Reply-To: <20161201020508.24417-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 01.12.2016 03:05, Max Reitz wrote:
+> When trying to invoke qemu-img commit with a base image file name that
+> is not part of the top image's backing chain, the user receives a rathe=
+r
+> plain "Base not found" error message. This is not really helpful becaus=
+e
+> it does not explain what "not found" means, potentially leaving the use=
+r
+> wondering why qemu cannot find a file despite it clearly existing in th=
+e
+> file system.
 >=20
-> The Aspeed SoC includes a set of watchdog timers using 32-bit
-> decrement counters, which can be based either on the APB clock or
-> a 1 MHz clock.
+> Improve the error message by clarifying that "not found" means "not
+> found in the top image's backing chain".
 >=20
-> The watchdog timer is designed to prevent system deadlock and, in
-> general, it should be restarted before timeout. When a timeout occurs,
-> different types of signals can be generated, ARM reset, SOC reset,
-> System reset, CPU Interrupt, external signal or boot from alternate
-> block. The current model only performs the system reset function as
-> this is used by U-Boot and Linux.
->=20
+> Reported-by: Ala Hino <ahino@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> Reported in: https://bugzilla.redhat.com/show_bug.cgi?id=3D1390991
+> ---
+>  qemu-img.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-Shall I resend the 3/4 patches related to the watchdog in a separate
-patchset ?=20
+Applied to my block tree.
 
-Thanks,
+Max
 
-C.=20
+
+--SmQGTjDxe5haAXotj2PwdcvJUaxLSdCbi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh8/+cSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AUToIAKlA8GPdrkL4aOnXT7tpgM70zrU8vAcJ
+diJBlEOGE91WXXGXY8zizYo/5MaWMFZAqYE6G0SDFRyJlMANt4rPQftMJqMu6qal
+JCGSCKdDf3KCZKoZK70u0lXt00yPiadJqUi5pgaR+d8MCU1ikHv3fNkIgWyqvEFS
+wQmHrQsFGEEcKmcIYXxcNfsGsflzp+cFvEurOsEw/yLJyrQdCRL0YUpH7KpOwPo2
+YWwODzLAbBAqFVVz7m01Pn5pUkij5d28ylMFPyAj3Sre74xczS7PfjORuhxYTuS8
+fG+c/iqHdMezD0NOyEwdqq1U284p16DLFHYEwR7iICxDm88HpAiwZYY=
+=2zXb
+-----END PGP SIGNATURE-----
+
+--SmQGTjDxe5haAXotj2PwdcvJUaxLSdCbi--
