@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cTBVU-0001D9-Jr
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:55:49 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cTBYO-0003sk-6A
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:58:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cTBVR-0008DD-ID
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:55:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59225)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cTBVR-0008D2-CJ
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:55:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cTBVO-0005YD-QL
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 17:55:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9171B2E80CB
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 17:55:42 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Jan 2017 17:46:44 -0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cTBYN-0000e5-98
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 12:58:48 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1655700 <1655700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170111160632.21721.91751.malonedeb@gac.canonical.com>
-Message-Id: <20170116174645.20059.33991.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1655700] Re: disas/libvixl/vixl/invalset.h:
- possible dodgy code in binary search ?
+Date: Mon, 16 Jan 2017 17:58:35 +0000
+Message-Id: <1484589515-26353-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] hw/char/exynos4210_uart: Drop unused local
+ variable frame_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +18,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-That doesn't look like a bounds check to me, so I think your checker is
-producing false positives.
+The frame_size local variable in exynos4210_uart_update_parameters()
+is calculated but never used (and has been this way since the
+device was introduced in commit e5a4914efc7). The qemu_chr_fe_ioctl()
+doesn't need this information (if it really wanted it it could
+calculate it from the parity/data_bits/stop_bits), so just drop
+the variable entirely.
 
-libvixl is third-party code in any case, so stylistic questions are
-better directed to them upstream. But I think the difference between
-this code and a standard binary search is (as the comment says) that it
-ignores invalid elements in the array.
+Fixes: https://bugs.launchpad.net/bugs/1655702
 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/char/exynos4210_uart.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1655700
-
-Title:
-  disas/libvixl/vixl/invalset.h: possible dodgy code in binary search ?
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  =
-
-  [qemu/disas/libvixl/vixl/invalset.h:442]: (style) Array index 'low' is us=
-ed before limits check.
-
-  Source code is
-
-      while (!IsValid(elements[low]) && (low < high)) ++low;
-
-  Also:
-
-  qemu/disas/libvixl/vixl/invalset.h:450]: (style) Array index 'middle'
-  is used before limits check.
-
-  The source code is
-
-     while (!IsValid(elements[high]) && (low < high)) --high;
-
-  Mind you, these lines of code look similar but didn't get reported:
-
-      while (!IsValid(elements[middle]) && (middle < high - 1)) ++middle;
-      while (!IsValid(elements[middle]) && (low + 1 < middle)) --middle;
-
-  Given that binary search is notoriously tricky to get correct and a stand=
-ard C library routine
-  I am puzzled as to why the standard library routine didn't get used, with=
- of course a custom
-  comparison function.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1655700/+subscriptions
+diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
+index 820d1ab..0cd3dd3 100644
+--- a/hw/char/exynos4210_uart.c
++++ b/hw/char/exynos4210_uart.c
+@@ -306,7 +306,7 @@ static void exynos4210_uart_update_irq(Exynos4210UartState *s)
+ 
+ static void exynos4210_uart_update_parameters(Exynos4210UartState *s)
+ {
+-    int speed, parity, data_bits, stop_bits, frame_size;
++    int speed, parity, data_bits, stop_bits;
+     QEMUSerialSetParams ssp;
+     uint64_t uclk_rate;
+ 
+@@ -314,9 +314,7 @@ static void exynos4210_uart_update_parameters(Exynos4210UartState *s)
+         return;
+     }
+ 
+-    frame_size = 1; /* start bit */
+     if (s->reg[I_(ULCON)] & 0x20) {
+-        frame_size++; /* parity bit */
+         if (s->reg[I_(ULCON)] & 0x28) {
+             parity = 'E';
+         } else {
+@@ -334,8 +332,6 @@ static void exynos4210_uart_update_parameters(Exynos4210UartState *s)
+ 
+     data_bits = (s->reg[I_(ULCON)] & 0x3) + 5;
+ 
+-    frame_size += data_bits + stop_bits;
+-
+     uclk_rate = 24000000;
+ 
+     speed = uclk_rate / ((16 * (s->reg[I_(UBRDIV)]) & 0xffff) +
+-- 
+2.7.4
