@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33144)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cT8mZ-0002Xk-2q
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:01:16 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37138)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1cT92I-0003T6-Sy
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:17:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cT8mY-0003k2-FE
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:01:15 -0500
-Received: from mail-ua0-x236.google.com ([2607:f8b0:400c:c08::236]:33924)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cT8mY-0003ji-BG
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:01:14 -0500
-Received: by mail-ua0-x236.google.com with SMTP id 35so82933634uak.1
-	for <qemu-devel@nongnu.org>; Mon, 16 Jan 2017 07:01:14 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170105043430.3176-5-alastair@au1.ibm.com>
-References: <20170105043430.3176-1-alastair@au1.ibm.com>
-	<20170105043430.3176-5-alastair@au1.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jan 2017 15:00:53 +0000
-Message-ID: <CAFEAcA-M27cxOkJd8VJubAtjRwjsT0Lnt3Ybh+3Raw8eh2jdpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v5 4/7] qtest: Fix whitespace
+	(envelope-from <pl@kamp.de>) id 1cT92G-0007m3-CA
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:17:30 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:49908 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cT92G-0007kt-30
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 10:17:28 -0500
+From: Peter Lieven <pl@kamp.de>
+Date: Mon, 16 Jan 2017 16:17:12 +0100
+Message-Id: <1484579832-18589-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH] block/iscsi: avoid data corruption with
+ cache=writeback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +22,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alastair D'Silva <alastair@au1.ibm.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
 
-On 5 January 2017 at 04:34, Alastair D'Silva <alastair@au1.ibm.com> wrote:
-> From: Alastair D'Silva <alastair@d-silva.org>
->
-> Fix 2 cases of incorrect indentation
->
-> Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
-> ---
->  qtest.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/qtest.c b/qtest.c
-> index a947892..143077e 100644
-> --- a/qtest.c
-> +++ b/qtest.c
-> @@ -309,7 +309,7 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->          if (!dev) {
->              qtest_send_prefix(chr);
->              qtest_send(chr, "FAIL Unknown device\n");
-> -           return;
-> +            return;
->          }
->
->          if (irq_intercept_dev) {
-> @@ -319,7 +319,7 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->              } else {
->                  qtest_send(chr, "OK\n");
->              }
-> -           return;
-> +            return;
->          }
->
->          QLIST_FOREACH(ngl, &dev->gpios, node) {
+nb_cls_shrunk in iscsi_allocmap_update can become -1 if the
+request starts and ends within the same cluster. This results
+in passing -1 to bitmap_set and bitmap_clear and they don't
+handle negative values properly. In the end this leads to data
+corruption.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Fixes: e1123a3b40a1a9a625a29c8ed4debb7e206ea690
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+ block/iscsi.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-thanks
--- PMM
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 6aeeb9e..1860f1b 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -499,14 +499,18 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+     if (allocated) {
+         bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
+     } else {
+-        bitmap_clear(iscsilun->allocmap, cl_num_shrunk, nb_cls_shrunk);
++        if (nb_cls_shrunk > 0) {
++            bitmap_clear(iscsilun->allocmap, cl_num_shrunk, nb_cls_shrunk);
++        }
+     }
+ 
+     if (iscsilun->allocmap_valid == NULL) {
+         return;
+     }
+     if (valid) {
+-        bitmap_set(iscsilun->allocmap_valid, cl_num_shrunk, nb_cls_shrunk);
++        if (nb_cls_shrunk > 0) {
++            bitmap_set(iscsilun->allocmap_valid, cl_num_shrunk, nb_cls_shrunk);
++        }
+     } else {
+         bitmap_clear(iscsilun->allocmap_valid, cl_num_expanded,
+                      nb_cls_expanded);
+-- 
+1.9.1
