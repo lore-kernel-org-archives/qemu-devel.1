@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTRGA-0007su-Fw
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:45:06 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cTRP8-0002Eo-Hm
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:54:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTRG9-0000VT-Lf
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:45:02 -0500
-Received: from mail-ua0-x234.google.com ([2607:f8b0:400c:c08::234]:35179)
+	(envelope-from <stefanha@gmail.com>) id 1cTRP3-0003Cz-Li
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:54:18 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34359)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cTRG9-0000VI-Gk
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:45:01 -0500
-Received: by mail-ua0-x234.google.com with SMTP id y9so100211383uae.2
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 02:45:01 -0800 (PST)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cTRP3-0003Cq-Ec
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:54:13 -0500
+Received: by mail-wm0-x244.google.com with SMTP id c85so5018379wmi.1
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 02:54:13 -0800 (PST)
+Date: Tue, 17 Jan 2017 10:54:05 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170117105405.GE4265@stefanha-x1.localdomain>
+References: <20170116160730.4696-1-famz@redhat.com>
+	<20170116160730.4696-3-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1484641214.31968.26.camel@redhat.com>
-References: <1484132292-21458-1-git-send-email-kraxel@redhat.com>
-	<CAFEAcA-X3mXPR5GX0_Xqs6uXiv3ur6rimb4Yoeixop87ZuMaWg@mail.gmail.com>
-	<1484641214.31968.26.camel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jan 2017 10:44:40 +0000
-Message-ID: <CAFEAcA9F3UzZkM=qX=aNe2_x9mW6dt3gQsgYUbhaXRVB2FdVhw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] cocoa: stop using MOUSE_EVENT_*
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="RpqchZ26BWispMcB"
+Content-Disposition: inline
+In-Reply-To: <20170116160730.4696-3-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi: Implement fc_host feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 17 January 2017 at 08:20, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> On Mo, 2017-01-16 at 18:35 +0000, Peter Maydell wrote:
->> On 11 January 2017 at 10:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
->> > No need to go the indirect route with a bitfield and mapping the bits to
->> > INPUT_BUTTON_*.  We can use a bool array and INPUT_BUTTON_* directly
->> > instead.
->> >
->> > Untested, not even compiled, due to lack of a osx^Wmacos machine.
->> > Test results are very welcome.
->>
->> So what does the patch gain us?
->
-> I can drop MOUSE_EVENT_WHEEL* without breaking the osx build.
 
-Why do you want to drop it, though? It's a valid mouse event
-type, and you're not going to drop the whole MOUSE_EVENT_* set
-of defines, I assume, because they're used in lots of devices.
+--RpqchZ26BWispMcB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->> We'll now loop round
->> that button array for every event rather than only
->> the ones where the button state changed,
->
-> Well, we loop round anyway, you just don't see it directly b/c it is
-> hidden in the qemu_input_update_buttons() helper function.
+On Tue, Jan 17, 2017 at 12:07:30AM +0800, Fam Zheng wrote:
+>  static void virtio_scsi_device_realize(DeviceState *dev, Error **errp)
+>  {
+>      VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+>      VirtIOSCSI *s =3D VIRTIO_SCSI(dev);
+> +    VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(dev);
+>      Error *err =3D NULL;
+> =20
+> +    if (vs->conf.fc_host) {
+> +        if (!strcmp(vs->conf.fc_host, "off")) {
+> +            vs->conf.primary_wwpn =3D 0;
+> +            vs->conf.primary_wwnn =3D 0;
+> +            vs->conf.secondary_wwpn =3D 0;
+> +            vs->conf.secondary_wwnn =3D 0;
+> +        } else if (!strcmp(vs->conf.fc_host, "primary") ||
+> +                   !strcmp(vs->conf.fc_host, "secondary")) {
+> +            virtio_add_feature(&vdev->host_features, VIRTIO_SCSI_F_FC_HO=
+ST);
+> +            vs->conf.primary_active =3D !strcmp(vs->conf.fc_host, "prima=
+ry");
+> +            if (!vs->conf.primary_wwpn) {
+> +                error_setg(errp, "fc_host enabled but primary_wwpn not s=
+et");
+> +                return;
+> +            }
+> +            if (!vs->conf.primary_wwnn) {
+> +                error_setg(errp, "fc_host enabled but primary_wwnn not s=
+et");
+> +                return;
+> +            }
+> +            if (!vs->conf.secondary_wwpn) {
+> +                error_setg(errp, "fc_host enabled but secondary_wwpn not=
+ set");
+> +                return;
+> +            }
+> +            if (!vs->conf.secondary_wwnn) {
+> +                error_setg(errp, "fc_host enabled but secondary_wwnn not=
+ set");
+> +                return;
+> +            }
+> +            s->vm_state_change =3D
+> +                qemu_add_vm_change_state_handler(virtio_scsi_vm_state_ch=
+ange, s);
 
-No, we only call qemu_input_update_buttons() if last_buttons != buttons.
+Missing qemu_del_vm_change_state_handler() in .unrealize() and in error
+code paths in this function.
 
-thanks
--- PMM
+--RpqchZ26BWispMcB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYfffNAAoJEJykq7OBq3PIdOIIALrjAyxKE6NMRcgnV6qAd3jK
+L1Ikwxa517bgdEPbGXNUcZDPb3IRmS15ZkOKKmPYYwPIC2oOGJxECLCF4EYKxFqR
+zjI9+Ch5rJnxjgQwGsj25mDGJcA0igEJu5iMu259++v6xOmdCkfTzZ9OqU+vhfk8
+OIdNCgRAm85bTRdY3rm1CtFz/esP0EWwvWLlV3BJ/G0zajERGxrCln7mJMjzenTv
++mCYNmah2+DMpp8UzSUb+WGKdCp+wJpsaUuxWczJ7iM4R/Fj4XYCO7hBWukElGxT
+veD1ckvsKgwXI2L4Afh4Wau2PEV8vhBXuhjvKcNMeiF3VMAQfbYoVmdxhG24PR0=
+=aISq
+-----END PGP SIGNATURE-----
+
+--RpqchZ26BWispMcB--
