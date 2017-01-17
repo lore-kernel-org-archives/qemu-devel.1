@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cTbei-0000Dc-3j
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:51:05 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cTbfQ-0000tT-3H
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:51:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cTbeh-0006GH-4m
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:51:04 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cTbfN-0006dT-Gb
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:51:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52328)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cTbfN-0006d2-84
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:51:45 -0500
+Date: Tue, 17 Jan 2017 14:51:42 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170117145142.4954666f@t450s.home>
+In-Reply-To: <20170112072513.98411-3-bjsdjshi@linux.vnet.ibm.com>
+References: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170112072513.98411-3-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <1483977924-14522-4-git-send-email-peter.maydell@linaro.org>
-References: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
-	<1483977924-14522-4-git-send-email-peter.maydell@linaro.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 17 Jan 2017 13:50:29 -0800
-Message-ID: <CAKmqyKMwZkstNyKe32N=a0eZrrj6W_14t2meeOdmHHpnDovD8A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 03/18] target-arm: Expose output GPIO
- line for VCPU maintenance interrupt
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v2 02/12] vfio: linux-headers update
+ for vfio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrew Jones <drjones@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Christoffer Dall <christoffer.dall@linaro.org>, Patch Tracking <patches@linaro.org>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-On Mon, Jan 9, 2017 at 8:05 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> The GICv3 support for virtualization includes an outbound
-> maintenance interrupt signal which is asserted when the
-> CPU interface wants to signal to the hypervisor that it
-> needs attention. Expose this as an outbound GPIO line from
-> the CPU object which can be wired up as a physical interrupt
-> line by the board code (as we do already for the CPU timers).
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On Thu, 12 Jan 2017 08:25:03 +0100
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Thanks,
-
-Alistair
-
+> From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> 
+> This is a placeholder for a linux-headers update.
+> 
+> Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 > ---
->  target/arm/cpu.h | 2 ++
->  target/arm/cpu.c | 3 +++
->  2 files changed, 5 insertions(+)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index ab119e6..764b511 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -555,6 +555,8 @@ struct ARMCPU {
->      QEMUTimer *gt_timer[NUM_GTIMERS];
->      /* GPIO outputs for generic timer */
->      qemu_irq gt_timer_outputs[NUM_GTIMERS];
-> +    /* GPIO output for GICv3 maintenance interrupt signal */
-> +    qemu_irq gicv3_maintenance_interrupt;
->
->      /* MemoryRegion to use for secure physical accesses */
->      MemoryRegion *secure_memory;
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index f5cb30a..8932086 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -466,6 +466,9 @@ static void arm_cpu_initfn(Object *obj)
->                                                  arm_gt_stimer_cb, cpu);
->      qdev_init_gpio_out(DEVICE(cpu), cpu->gt_timer_outputs,
->                         ARRAY_SIZE(cpu->gt_timer_outputs));
+>  include/standard-headers/asm-s390/vfio_ccw.h | 28 ++++++++++++++++++++++++++++
+>  linux-headers/linux/vfio.h                   | 17 +++++++++++++++++
+>  2 files changed, 45 insertions(+)
+>  create mode 100644 include/standard-headers/asm-s390/vfio_ccw.h
+> 
+> diff --git a/include/standard-headers/asm-s390/vfio_ccw.h b/include/standard-headers/asm-s390/vfio_ccw.h
+> new file mode 100644
+> index 0000000..cddc09b
+> --- /dev/null
+> +++ b/include/standard-headers/asm-s390/vfio_ccw.h
+> @@ -0,0 +1,28 @@
+> +/*
+> + * Interfaces for vfio-ccw
+> + *
+> + * Copyright IBM Corp. 2017
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License (version 2 only)
+> + * as published by the Free Software Foundation.
+> + *
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + */
 > +
-> +    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->gicv3_maintenance_interrupt,
-> +                             "gicv3-maintenance-interrupt", 1);
->  #endif
->
->      /* DTB consumers generally don't in fact care what the 'compatible'
-> --
-> 2.7.4
->
->
+> +#ifndef _VFIO_CCW_H_
+> +#define _VFIO_CCW_H_
+> +
+> +#include "standard-headers/linux/types.h"
+> +
+> +struct ccw_io_region {
+> +#define ORB_AREA_SIZE 12
+> +	uint8_t  orb_area[ORB_AREA_SIZE];
+> +#define SCSW_AREA_SIZE 12
+> +	uint8_t  scsw_area[SCSW_AREA_SIZE];
+> +#define IRB_AREA_SIZE 96
+> +	uint8_t  irb_area[IRB_AREA_SIZE];
+> +	uint32_t ret_code;
+> +} QEMU_PACKED;
+> +
+> +#endif
+
+This is really part of the uapi for the vfio-ccw mdev device, isn't it?
+Should it really be buried in asm-s390 in the kernel?
+
+> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> index 759b850..b09d247 100644
+> --- a/linux-headers/linux/vfio.h
+> +++ b/linux-headers/linux/vfio.h
+> @@ -198,6 +198,7 @@ struct vfio_device_info {
+>  #define VFIO_DEVICE_FLAGS_PCI	(1 << 1)	/* vfio-pci device */
+>  #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
+>  #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
+> +#define VFIO_DEVICE_FLAGS_CCW   (1 << 4)	/* vfio-ccw device */
+>  	__u32	num_regions;	/* Max region index + 1 */
+>  	__u32	num_irqs;	/* Max IRQ index + 1 */
+>  };
+> @@ -436,6 +437,22 @@ enum {
+>  	VFIO_PCI_NUM_IRQS
+>  };
+>  
+> +/*
+> + * The VFIO-CCW bus driver makes use of the following fixed region and
+> + * IRQ index mapping.  Unimplemented regions return a size of zero.
+> + * Unimplemented IRQ types return a count of zero.
+> + */
+> +
+> +enum {
+> +        VFIO_CCW_CONFIG_REGION_INDEX,
+> +        VFIO_CCW_NUM_REGIONS
+> +};
+> +
+> +enum {
+> +        VFIO_CCW_IO_IRQ_INDEX,
+> +        VFIO_CCW_NUM_IRQS
+> +};
+> +
+>  /**
+>   * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
+>   *					      struct vfio_pci_hot_reset_info)
