@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cTKxM-0003XO-TK
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 23:01:13 -0500
+	(envelope-from <lma@suse.com>) id 1cTLTR-00084B-P7
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 23:34:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cTKxJ-0003sN-Jo
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 23:01:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44426)
+	(envelope-from <lma@suse.com>) id 1cTLTM-0003Jh-RK
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 23:34:21 -0500
+Received: from prv3-mh.provo.novell.com ([137.65.250.26]:43885)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cTKxJ-0003s0-Ea
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 23:01:09 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8304183F46
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 04:01:08 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 17 Jan 2017 12:01:00 +0800
-Message-Id: <1484625660-3312-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH] virtio: force VIRTIO_F_IOMMU_PLATFORM
+	(Exim 4.71) (envelope-from <lma@suse.com>) id 1cTLTM-0003J5-Gz
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 23:34:16 -0500
+From: Lin Ma <lma@suse.com>
+Date: Tue, 17 Jan 2017 12:33:48 +0800
+Message-Id: <20170117043348.21314-1-lma@suse.com>
+Subject: [Qemu-devel] [PATCH] Makefile: Fix owner and group for
+ qemu-version.h.tmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, famz@redhat.com
 
-We allow vhost to clear VIRITO_F_IOMMU_PLATFORM which is wrong since
-VIRTIO_F_IOMMU_PLATFORM is mandatory for security. Fixing this by
-enforce it after vdc->get_features().
+By commit 67a1de0d, When we perform 'git pull && make && sudo make install',
+In 'make' stage a qemu-version.h.tmp will be generated. If the content of
+qemu-version.h.tmp and qemu-version.h aren't consistent, The qemu-version.h.tmp
+will be renamed to qemu-version.h. Because of the target FORCE, The same action
+will be do again in 'make install' stage.
 
-Signed-off-by: Jason Wang <jasowang@redhat.com>
+In 'make install' stage, If there is no qemu-version.h.tmp exists and we run
+'make install' with sudo, The owner and group of new qemu-version.h.tmp will be
+privileged user/group. When we run 'make' next time, qemu-version.h.tmp can't
+be overwritten because of permission issue.
+
+This patch uses 'cp' instead of 'mv' to keep the qemu-version.h.tmp file, So
+during the 'sudo make install' stage, new qemu-version.h.tmp's owner and group
+wont be set to privileged user/group.
+
+Signed-off-by: Lin Ma <lma@suse.com>
 ---
- hw/virtio/virtio-bus.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-index d31cc00..a886011 100644
---- a/hw/virtio/virtio-bus.c
-+++ b/hw/virtio/virtio-bus.c
-@@ -47,6 +47,7 @@ void virtio_bus_device_plugged(VirtIODevice *vdev, Error **errp)
-     VirtioBusState *bus = VIRTIO_BUS(qbus);
-     VirtioBusClass *klass = VIRTIO_BUS_GET_CLASS(bus);
-     VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(vdev);
-+    bool has_iommu = virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
+diff --git a/Makefile b/Makefile
+index 1a8bfb2..1ca45b2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -184,7 +184,7 @@ qemu-version.h: FORCE
+ 				printf '""\n'; \
+ 			fi; \
+ 		fi) > $@.tmp)
+-	$(call quiet-command, cmp -s $@ $@.tmp || mv $@.tmp $@)
++	$(call quiet-command, cmp -s $@ $@.tmp || cp $@.tmp $@)
  
-     DPRINTF("%s: plug device.\n", qbus->name);
- 
-@@ -63,8 +64,8 @@ void virtio_bus_device_plugged(VirtIODevice *vdev, Error **errp)
-         klass->device_plugged(qbus->parent, errp);
-     }
- 
--    if (klass->get_dma_as != NULL &&
--        virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
-+    if (klass->get_dma_as != NULL && has_iommu) {
-+        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATFORM);
-         vdev->dma_as = klass->get_dma_as(qbus->parent);
-     } else {
-         vdev->dma_as = &address_space_memory;
+ config-host.h: config-host.h-timestamp
+ config-host.h-timestamp: config-host.mak
 -- 
-2.7.4
+2.9.2
