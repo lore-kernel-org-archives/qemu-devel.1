@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cTV5J-0006sW-RR
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:50:06 -0500
+	(envelope-from <peterx@redhat.com>) id 1cTV8v-000175-42
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:53:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cTV5F-0004tD-5O
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:50:05 -0500
-Date: Tue, 17 Jan 2017 15:49:54 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170117144954.rgw53vmavygrctlo@kamzik.brq.redhat.com>
-References: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA9N_YXFCPo8ja-Nan3roL=gdNpFQHoLk_aw6tDixwoT3w@mail.gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1cTV8r-0006tF-4U
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:53:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cTV8q-0006sp-Uj
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:53:45 -0500
+Date: Tue, 17 Jan 2017 22:53:36 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170117145336.GP30108@pxdev.xzpeter.org>
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+	<1484276800-26814-14-git-send-email-peterx@redhat.com>
+	<7a8c721d-8a12-9727-feae-58103942fd55@redhat.com>
+	<20170116075043.GE30108@pxdev.xzpeter.org>
+	<ae7765c7-7101-357e-3e7f-8ca94d8ad5b5@redhat.com>
+	<20170116081252.GI30108@pxdev.xzpeter.org>
+	<bcfed61e-d086-0df5-849c-6d2aaa25757c@redhat.com>
+	<20170116083224.GK30108@pxdev.xzpeter.org>
+	<20170116182522-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9N_YXFCPo8ja-Nan3roL=gdNpFQHoLk_aw6tDixwoT3w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 00/18] arm: Add
- virtualization to GICv3, and enable EL2 on 64-bit CPUs
+In-Reply-To: <20170116182522-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 13/14] intel_iommu: allow dynamic
+ switch of IOMMU region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +35,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, "patches@linaro.org" <patches@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
 
-On Tue, Jan 17, 2017 at 02:07:31PM +0000, Peter Maydell wrote:
-> On 9 January 2017 at 16:05, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > This patchset adds support for the Virtualization extensions to QEMU's
-> > GICv3 emulation. This was the last missing piece that was stopping
-> > us from turning on the EL2 support in the CPU model, so the patchset
-> > also adds support for enabling it all on the virt board via the
-> > '-machine virtualization=on' option.
-> 
-> > Patches 1, 4-13, 15, 16 still need review.
-> 
-> So is anybody interested in reviewing the complicated
-> bits in the middle of this patchset (5-13) or shall I
-> just throw it into target-arm.next? :-)
+On Mon, Jan 16, 2017 at 06:25:32PM +0200, Michael S. Tsirkin wrote:
 
-Unfortunately I don't have time right now to give them the justice
-they deserve. FWIW, I've done light testing and light reviewing and
-I don't have any complaints.
+[...]
 
-Thanks,
-drew
+> > > I think this does not give more readability :) May I was wrong, let leave
+> > > this for maintainer.
+> > > 
+> > > Thanks :)
+> > 
+> > Thanks for reviewing this series so fast!
+> > 
+> > I have no strong opinion as well. Maybe you are right. :-)
+> > 
+> > Michael, please let me know if you dislike this, so I can remove this
+> > parameter (it equals to as->iommu_state->dmar_enabled).
+> > 
+> > Thanks,
+> > 
+> > -- peterx
+> 
+> I prefer not to duplicate data, yes.
 
-> 
-> thanks
-> -- PMM
-> 
+Let me remove it then. Thanks,
+
+-- peterx
