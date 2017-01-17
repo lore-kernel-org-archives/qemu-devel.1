@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <f.gruenbichler@proxmox.com>) id 1cTOr2-0004ok-EF
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:10:57 -0500
+	(envelope-from <agraf@suse.de>) id 1cTOxQ-0006ZY-HR
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:17:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <f.gruenbichler@proxmox.com>) id 1cTOqx-0003oh-GW
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:10:56 -0500
-Date: Tue, 17 Jan 2017 09:03:26 +0100
-From: Fabian =?iso-8859-1?Q?Gr=FCnbichler?= <f.gruenbichler@proxmox.com>
-Message-ID: <20170117080326.dfjqzwstfxusuhgc@nora.maurer-it.com>
-References: <5878AF90.8020709@kamp.de>
-	<260873230.6154791.1484638426777.JavaMail.zimbra@oxygem.tv>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <260873230.6154791.1484638426777.JavaMail.zimbra@oxygem.tv>
-Subject: Re: [Qemu-devel] [Qemu-stable]  Data corruption in Qemu 2.7.1
+	(envelope-from <agraf@suse.de>) id 1cTOxL-000634-QD
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:17:32 -0500
+Received: from mx2.suse.de ([195.135.220.15]:46256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1cTOxL-00062M-Fz
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:17:27 -0500
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (1.0)
+From: Alexander Graf <agraf@suse.de>
+In-Reply-To: <15b12846-b83b-6495-af1f-1fd3e41c15bb@denx.de>
+Date: Tue, 17 Jan 2017 09:16:25 +0100
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A8DB00FA-CF30-4C61-B914-3E809AE104B6@suse.de>
+References: <20161231132226.9595-1-marex@denx.de>
+	<20161231132226.9595-2-marex@denx.de>
+	<37102228-c1e5-e8e5-c4a5-5c9ae186202b@suse.de>
+	<15b12846-b83b-6495-af1f-1fd3e41c15bb@denx.de>
+Subject: Re: [Qemu-devel] [PATCH V8 2/7] nios2: Add architecture emulation
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +31,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexandre DERUMIER <aderumier@odiso.com>
-Cc: Peter Lieven <pl@kamp.de>, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Marek Vasut <marex@denx.de>
+Cc: qemu-devel@nongnu.org, Jeff Da Silva <jdasilva@altera.com>, Chris Wulff <crwulff@gmail.com>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>, Ley Foon Tan <lftan@altera.com>
 
-On Tue, Jan 17, 2017 at 08:33:46AM +0100, Alexandre DERUMIER wrote:
-> Hi,
-> 
-> proxmox users have reported recently corruption with qemu 2.7 and scsi-block (with passing physical /dev/sdX to virtio-scsi).
-> 
-> working fine with qemu 2.6.
-> 
-> qemu 2.7 + scsi-hd works fine
-> 
-> https://forum.proxmox.com/threads/proxmox-4-4-virtio_scsi-regression.31471/page-2
-> 
 
-I am fairly sure this is a separate issue.
 
-Commit 8fdc7839e40f43a426bc7e858cf1dbfe315a3804 (first included in
-2.7.0)[1] changed the behaviour of scsi-block passthrough. Previously
-this worked with SATA disks, now it doesn't anymore. A bisect run
-confirmed this, scsi-block with a SATA disk passed through via
-virtio-scsi-single corrupts on writes since that commit, scsi-hd and
-scsi-disk work fine (scsi-generic corrupts as well).
+> Am 17.01.2017 um 01:18 schrieb Marek Vasut <marex@denx.de>:
+>=20
+>> On 01/16/2017 11:21 PM, Alexander Graf wrote:
+>>=20
+>>=20
+>>> On 31/12/2016 14:22, Marek Vasut wrote:
+>>> From: Chris Wulff <crwulff@gmail.com>
+>>>=20
+>>> Add support for emulating Altera NiosII R1 architecture into qemu.
+>>> This patch is based on previous work by Chris Wulff from 2012 and
+>>> updated to latest mainline QEMU.
+>>>=20
+>>> Signed-off-by: Marek Vasut <marex@denx.de>
+>>> Cc: Chris Wulff <crwulff@gmail.com>
+>>> Cc: Jeff Da Silva <jdasilva@altera.com>
+>>> Cc: Ley Foon Tan <lftan@altera.com>
+>>> Cc: Sandra Loosemore <sandra@codesourcery.com>
+>>> Cc: Yves Vandervennet <yvanderv@altera.com>
+>>> ---
+>>> V3: Thorough cleanup, deal with the review comments all over the place
+>>> V4: - Use extract32()
+>>>    - Fix gen_goto_tb() , suppress tcg_gen_goto_tb()
+>>>    - Clean up gen_check_supervisor() helper
+>>>    - Use TCGMemOp type for flags
+>>>    - Drop jump labels from wrctl/rdctl
+>>>    - More TCG cleanup
+>>> V5: - Simplify load/store handling
+>>>    - Handle loads into R_ZERO from protected page, add comment
+>>> V6: - Fix division opcode handling
+>>>    - Add missing disas handling
+>>>    - V5 review comments cleanup
+>>> V7: - Drop newline at the end of file
+>>> V8: - Rebase on top of qemu/master
+>>>    - Move the target-nios2 to target/nios2
+>>> ---
+>>> target/nios2/Makefile.objs |   4 +
+>>> target/nios2/cpu.c         | 232 +++++++++++
+>>> target/nios2/cpu.h         | 269 +++++++++++++
+>>> target/nios2/helper.c      | 313 +++++++++++++++
+>>> target/nios2/helper.h      |  27 ++
+>>> target/nios2/mmu.c         | 292 ++++++++++++++
+>>> target/nios2/mmu.h         |  54 +++
+>>> target/nios2/monitor.c     |  35 ++
+>>> target/nios2/op_helper.c   |  47 +++
+>>> target/nios2/translate.c   | 953
+>>> +++++++++++++++++++++++++++++++++++++++++++++
+>>> 10 files changed, 2226 insertions(+)
+>>> create mode 100644 target/nios2/Makefile.objs
+>>> create mode 100644 target/nios2/cpu.c
+>>> create mode 100644 target/nios2/cpu.h
+>>> create mode 100644 target/nios2/helper.c
+>>> create mode 100644 target/nios2/helper.h
+>>> create mode 100644 target/nios2/mmu.c
+>>> create mode 100644 target/nios2/mmu.h
+>>> create mode 100644 target/nios2/monitor.c
+>>> create mode 100644 target/nios2/op_helper.c
+>>> create mode 100644 target/nios2/translate.c
+>>>=20
+>>> diff --git a/target/nios2/Makefile.objs b/target/nios2/Makefile.objs
+>>> new file mode 100644
+>>> index 0000000..2a11c5c
+>>> --- /dev/null
+>>> +++ b/target/nios2/Makefile.objs
+>>> @@ -0,0 +1,4 @@
+>>> +obj-y +=3D translate.o op_helper.o helper.o cpu.o mmu.o
+>>> +obj-$(CONFIG_SOFTMMU) +=3D monitor.o
+>>> +
+>>> +$(obj)/op_helper.o: QEMU_CFLAGS +=3D $(HELPER_CFLAGS)
+>>> diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
+>>> new file mode 100644
+>>> index 0000000..658d684
+>>> --- /dev/null
+>>> +++ b/target/nios2/cpu.c
+>>> @@ -0,0 +1,232 @@
+>>> +/*
+>>> + * QEMU Nios II CPU
+>>> + *
+>>> + * Copyright (c) 2012 Chris Wulff <crwulff@gmail.com>
+>>> + *
+>>> + * This library is free software; you can redistribute it and/or
+>>> + * modify it under the terms of the GNU Lesser General Public
+>>> + * License as published by the Free Software Foundation; either
+>>> + * version 2.1 of the License, or (at your option) any later version.
+>>> + *
+>>> + * This library is distributed in the hope that it will be useful,
+>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>>> + * Lesser General Public License for more details.
+>>> + *
+>>> + * You should have received a copy of the GNU Lesser General Public
+>>> + * License along with this library; if not, see
+>>> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+>>> + */
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "qemu-common.h"
+>>> +#include "qapi/error.h"
+>>> +#include "cpu.h"
+>>> +#include "exec/log.h"
+>>> +#include "exec/gdbstub.h"
+>>> +#include "hw/qdev-properties.h"
+>>> +
+>>> +static void nios2_cpu_set_pc(CPUState *cs, vaddr value)
+>>> +{
+>>> +    Nios2CPU *cpu =3D NIOS2_CPU(cs);
+>>> +    CPUNios2State *env =3D &cpu->env;
+>>> +
+>>> +    env->regs[R_PC] =3D value;
+>>> +}
+>>> +
+>>> +static bool nios2_cpu_has_work(CPUState *cs)
+>>> +{
+>>> +    return cs->interrupt_request & (CPU_INTERRUPT_HARD |
+>>> CPU_INTERRUPT_NMI);
+>>> +}
+>>> +
+>>> +/* CPUClass::reset() */
+>>> +static void nios2_cpu_reset(CPUState *cs)
+>>> +{
+>>> +    Nios2CPU *cpu =3D NIOS2_CPU(cs);
+>>> +    Nios2CPUClass *ncc =3D NIOS2_CPU_GET_CLASS(cpu);
+>>> +    CPUNios2State *env =3D &cpu->env;
+>>> +
+>>> +    if (qemu_loglevel_mask(CPU_LOG_RESET)) {
+>>> +        qemu_log("CPU Reset (CPU %d)\n", cs->cpu_index);
+>>> +        log_cpu_state(cs, 0);
+>>> +    }
+>>> +
+>>> +    ncc->parent_reset(cs);
+>>> +
+>>> +    tlb_flush(cs, 1);
+>>> +
+>>> +    memset(env->regs, 0, sizeof(uint32_t) * NUM_CORE_REGS);
+>>> +    env->regs[R_PC] =3D cpu->reset_addr;
+>>> +
+>>> +#if defined(CONFIG_USER_ONLY)
+>>> +    /* Start in user mode with interrupts enabled. */
+>>> +    env->regs[CR_STATUS] =3D CR_STATUS_U | CR_STATUS_PIE;
+>>=20
+>> So what is the value of CR_STATUS after reset in softmmu land then?
+>> Random value from before reset? Probably not what you want :).
+>=20
+> Dropped, yeah.
 
-PVE's detection logic for passthrough just differentiated between disks
-and tape drives, and unfortunately the SG_IO ioctl says SATA disks are
-disks as well.. we probably need to default to scsi-hd or scsi-disk
-instead of scsi-block, and only when we explicitly detect a "real" SCSI
-disk we are allowed to use scsi-block?
+Dropped? That wasn't my intention :).
 
-@Paolo: was the old behaviour just an accident and the new bevaviour
-intentional? documentation is quite sparse, or maybe I am looking in the
-wrong places..
+I was just too tired to grasp the code. CR_STATUS is 0 for softmmu thanks to=
+ the memset, so irqs are disabled. For linux-user, applications expect irqs t=
+o work, so it needs to be explicitly set to on.
 
-1: scsi-block: always use SG_IO
+The code above is perfectly correct I think.
 
-Using pread/pwrite or io_submit has the advantage of eliminating the
-bounce buffer, but drops the SCSI status.  This keeps the guest from
-seeing unit attention codes, as well as statuses such as RESERVATION
-CONFLICT.  Because we know scsi-block operates on an SBC device we can
-still use the DMA helpers with SG_IO; just remember to patch the CDBs
-if the transfer is split into multiple segments.
 
-This means that scsi-block will always use the thread-pool unfortunately,
-instead of respecting aio=native.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Alex
