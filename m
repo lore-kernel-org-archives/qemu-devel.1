@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1X-00079x-1D
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:39 -0500
+	(envelope-from <famz@redhat.com>) id 1cTNRh-0003cA-NG
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1W-0007cr-8b
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:38 -0500
-Received: from [59.151.112.132] (port=27872 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1V-0007aA-S8
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:38 -0500
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Tue, 17 Jan 2017 14:18:53 +0800
-Message-ID: <1484633936-25344-9-git-send-email-caoj.fnst@cn.fujitsu.com>
-In-Reply-To: <1484633936-25344-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-References: <1484633936-25344-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	(envelope-from <famz@redhat.com>) id 1cTNRd-0007Bb-Ou
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:40:41 -0500
+Date: Tue, 17 Jan 2017 14:40:28 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170117064028.GC21563@lemon.Home>
+References: <5878AF90.8020709@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 08/11] vmxnet3: fix reference leak issue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5878AF90.8020709@kamp.de>
+Subject: Re: [Qemu-devel] Data corruption in Qemu 2.7.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +22,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-stable@nongnu.org
 
-On migration target, msix_vector_use() will be called in vmxnet3_post_load()
-in second time, without a matching second call to msi_vector_unuse(),
-which results in vector reference leak.
+On Fri, 01/13 11:44, Peter Lieven wrote:
+> Hi,
+> 
+> i currently facing a problem in our testing environment where I see file
+> system corruption with 2.7.1 on iSCSI and Local Storage (LVM).
+> Trying to bisect, but has anyone observed this before?
 
-CC: Dmitry Fleytman <dmitry@daynix.com>
-CC: Jason Wang <jasowang@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
+The information here is too scarce to tell but a file corruption is more often a
+result of two writers modifying the disk concurrently. Have you ruled that out?
+Is the corruption reproducible?
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
-Acked-by: Marcel Apfelbaum <marcel@redhat.com>
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
----
- hw/net/vmxnet3.c | 10 ----------
- 1 file changed, 10 deletions(-)
-
-diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-index a433cc017cb1..45e125e92c8a 100644
---- a/hw/net/vmxnet3.c
-+++ b/hw/net/vmxnet3.c
-@@ -2552,21 +2552,11 @@ static void vmxnet3_put_rxq_descr(QEMUFile *f, void *pv, size_t size)
- static int vmxnet3_post_load(void *opaque, int version_id)
- {
-     VMXNET3State *s = opaque;
--    PCIDevice *d = PCI_DEVICE(s);
- 
-     net_tx_pkt_init(&s->tx_pkt, PCI_DEVICE(s),
-                     s->max_tx_frags, s->peer_has_vhdr);
-     net_rx_pkt_init(&s->rx_pkt, s->peer_has_vhdr);
- 
--    if (s->msix_used) {
--        if  (!vmxnet3_use_msix_vectors(s, VMXNET3_MAX_INTRS)) {
--            VMW_WRPRN("Failed to re-use MSI-X vectors");
--            msix_uninit(d, &s->msix_bar, &s->msix_bar);
--            s->msix_used = false;
--            return -1;
--        }
--    }
--
-     vmxnet3_validate_queues(s);
-     vmxnet3_validate_interrupts(s);
- 
--- 
-2.1.0
+Fam
