@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cTQOu-0000fO-1v
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:01 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cTQOz-0000k0-T7
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cTQOr-0003jP-Oe
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cTQOr-0003iB-G5
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:49:57 -0500
-Date: Tue, 17 Jan 2017 17:49:53 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170117094953.GA6199@lemon>
-References: <20161213132205.9114-1-alex.bennee@linaro.org>
+	(envelope-from <stefanha@gmail.com>) id 1cTQOw-0003ob-0u
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:05 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33850)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cTQOv-0003nc-R1
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:01 -0500
+Received: by mail-wm0-x241.google.com with SMTP id c85so4618642wmi.1
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 01:50:01 -0800 (PST)
+Date: Tue, 17 Jan 2017 09:49:56 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170117094956.GB4265@stefanha-x1.localdomain>
+References: <20170112114612.14520-1-stefanha@redhat.com>
+	<fc5de032-a64b-b072-6e52-441b6a685ee3@cardoe.com>
+	<20170113120240.GB9142@stefanha-x1.localdomain>
+	<75cb767b-2850-4a87-50fc-d957e3a793ac@cardoe.com>
+	<20170116104613.GB12351@stefanha-x1.localdomain>
+	<f8b3d861-09a3-a4c8-dca7-e4fb384c2a73@cardoe.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="K8nIJk4ghYZn606h"
 Content-Disposition: inline
-In-Reply-To: <20161213132205.9114-1-alex.bennee@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] tests/docker: add basic user mapping
- support
+In-Reply-To: <f8b3d861-09a3-a4c8-dca7-e4fb384c2a73@cardoe.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] virtio: revert
+ virtio_queue_set_notification() nesting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,123 +35,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: bobby.prani@gmail.com, qemu-devel@nongnu.org
+To: Doug Goldstein <cardoe@cardoe.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Tue, 12/13 13:22, Alex Benn=E9e wrote:
-> Currently all docker builds are done by exporting a tarball to the
-> docker container and running the build as the containers root user.
-> Other use cases are possible however and it is possible to map a part
-> of users file-system to the container. This is useful for example for
-> doing cross-builds of arbitrary source trees. For this to work
-> smoothly the container needs to have a user created that maps cleanly
-> to the host system.
->=20
-> This adds a -u option to the docker script so that:
->=20
->   DEB_ARCH=3Darmhf DEB_TYPE=3Dstable ./tests/docker/docker.py build \
->     -u --include-executable=3Darm-linux-user/qemu-arm \
->     debian:armhf ./tests/docker/dockerfiles/debian-bootstrap.docker
->=20
-> Will build a container that can then be run like:
->=20
->   docker run --rm -it -v /home/alex/lsrc/qemu/risu.git/:/src \
->     --user=3Dalex:alex -w /src/ debian:armhf \
->     sh -c "make clean && ./configure -s && make"
 
-Sorry for the late reply!
+--K8nIJk4ghYZn606h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> ---
->  tests/docker/docker.py                           | 19 ++++++++++++++++=
-+++
->  tests/docker/dockerfiles/debian-bootstrap.docker |  3 +++
->  2 files changed, 22 insertions(+)
->=20
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 37d83199e7..59baac6bae 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -12,6 +12,7 @@
->  # the top-level directory.
-> =20
->  import os
-> +import stat
->  import sys
->  import subprocess
->  import json
-> @@ -25,6 +26,7 @@ import signal
->  from tarfile import TarFile, TarInfo
->  from StringIO import StringIO
->  from shutil import copy, rmtree
-> +from pwd import getpwuid
-> =20
-> =20
->  DEVNULL =3D open(os.devnull, 'wb')
-> @@ -225,6 +227,8 @@ class BuildCommand(SubCommand):
->                              help=3D"""Specify a binary that will be co=
-pied to the
->                              container together with all its dependent
->                              libraries""")
-> +        parser.add_argument("--user", "-u", action=3D"store_true",
-> +                            help=3D"Add the current user to images pas=
-swd")
-
-Maybe use --add-current-user for the full argument name?
-
->          parser.add_argument("tag",
->                              help=3D"Image Tag")
->          parser.add_argument("dockerfile",
-> @@ -260,6 +264,21 @@ class BuildCommand(SubCommand):
->                  _copy_binary_with_libs(args.include_executable,
->                                         docker_dir)
-> =20
-> +            if args.user:
-> +                uid =3D os.getuid()
-> +                uname =3D getpwuid(uid).pw_name
-> +                scriptlet =3D docker_dir+"/setup_user.sh"
-> +
-> +                # write scriptlet
-> +                setup =3D open(scriptlet, "w")
-> +                setup.write("#!/bin/sh\n")
-> +                setup.write("useradd -u %d -U %s" % (uid, uname))
-> +                setup.close()
-> +
-> +                st =3D os.stat(scriptlet)
-> +                os.chmod(scriptlet,
-> +                         st.st_mode | stat.S_IXUSR | stat.S_IXGRP | st=
-at.S_IXOTH)
-
-Is it cleaner we inject commands into the docker file directly?
-
-> +
->              dkr.build_image(tag, docker_dir, dockerfile,
->                              quiet=3Dargs.quiet, argv=3Dargv)
-> =20
-> diff --git a/tests/docker/dockerfiles/debian-bootstrap.docker b/tests/d=
-ocker/dockerfiles/debian-bootstrap.docker
-> index 3a9125e497..127782eedf 100644
-> --- a/tests/docker/dockerfiles/debian-bootstrap.docker
-> +++ b/tests/docker/dockerfiles/debian-bootstrap.docker
-> @@ -14,6 +14,9 @@ RUN sed -i 's/in_target mount/echo not for docker in_=
-target mount/g' /debootstra
->  # Run stage 2
->  RUN /debootstrap/debootstrap --second-stage
-> =20
-> +# Do we want to tweak the user?
-> +RUN if test -e /setup_user.sh; then /setup_user.sh; fi
-
-If we do above, there is no need to manually add this in dockerfile.
-
-> +
->  # At this point we can install additional packages if we want
->  # Duplicate deb line as deb-src
->  RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sourc=
-es.list
-> --=20
-> 2.11.0
+On Mon, Jan 16, 2017 at 04:03:28PM -0500, Doug Goldstein wrote:
+> On 1/16/17 5:46 AM, Stefan Hajnoczi wrote:
+> > On Fri, Jan 13, 2017 at 09:15:49AM -0600, Doug Goldstein wrote:
+> >> On 1/13/17 6:02 AM, Stefan Hajnoczi wrote:
+> >>> On Thu, Jan 12, 2017 at 10:57:53AM -0600, Doug Goldstein wrote:
+> >>>> On 1/12/17 5:46 AM, Stefan Hajnoczi wrote:
+> >>>>> The virtio_queue_set_notification() nesting introduced for AioConte=
+xt polling
+> >>>>> raised an assertion with virtio-net (even in non-polling mode).  Co=
+nverting
+> >>>>> virtio-net and virtio-crypto to use virtio_queue_set_notification()=
+ in a
+> >>>>> nesting fashion would be invasive and isn't worth it.
+> >>>>>
+> >>>>> Patch 1 contains the revert to resolve the bug that Doug noticed.
+> >>>>>
+> >>>>> Patch 2 is a less efficient but safe alternative.
+> >>>>>
+> >>>>> Stefan Hajnoczi (2):
+> >>>>>   Revert "virtio: turn vq->notification into a nested counter"
+> >>>>>   virtio: disable notifications again after poll succeeded
+> >>>>>
+> >>>>>  hw/virtio/virtio.c | 21 +++++++++------------
+> >>>>>  1 file changed, 9 insertions(+), 12 deletions(-)
+> >>>>>
+> >>>>
+> >>>> So I just gave this series a whirl and it fixes the assert but causes
+> >>>> another issue for me. While iPXE is getting a DHCP address the screen
+> >>>> immediately flashes over to the UEFI shell. Its like a timeout is
+> >>>> getting hit and just dropping me to the shell.
+> >>>
+> >>> Sounds like an separate problem.
+> >>>
+> >>> Stefan
+> >>>
+> >>
+> >> Is there any debug output that I can provide to help troubleshoot it?
+> >> I've built 23425cc and UEFI via OVMF is able to get an IP address via
+> >> DHCP inside of iPXE. I've also taken master and only applied the first
+> >> patch in this series (the revert) and it too works. Its only when I add
+> >> the 2nd patch into the mix or don't revert out the "virtio: turn
+> >> vq->notification into a nested counter" patch that it fails.
+> >=20
+> > The code in Patch 2 should not be executed in your QEMU configuration,
+> > so I wonder how Patch 2 can cause the DHCP failure.
+> >=20
+> > Please verify as follows:
+> >=20
+> >   $ gdb --args path/to/qemu-system-x86_64 ...
+> >   (gdb) handle SIGUSR1 noprint nostop pass
+> >   (gdb) handle SIGPIPE noprint nostop pass
+> >   (gdb) b virtio_queue_host_notifier_aio_poll_begin
+> >   (gdb) r
+> >=20
+> > I predict the breakpoint will not be hit.
+> >=20
+> > Stefan
+> >=20
 >=20
 >=20
+> Correct. That did not hit. I reapplied both patches to my current master
+> and it did not hit but it still dropped me to the EFI shell while iPXE
+> was negotiating DHCP.
+>=20
+> I then rebased on top of the latest master
+> (2ccede18bd24fce5db83fef3674563a1f256717b) and applied both patches. The
+> iPXE issue went away and the assert issue went away.
+>=20
+> So I will concur with you, the issue was not in either of these patches
+> and is now resolved.
 
-Fam
+Great, thanks for confirming!
+
+Stefan
+
+--K8nIJk4ghYZn606h
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYfejEAAoJEJykq7OBq3PIXYAIAIwNK+Xd9OsrBRkbc/KQixoU
+UBZcisSLoQueBjhECCLM3RhR59Tb6hRK5ETjtvxnY2dsend0wR2mPL8wgftT+959
+kkNfHoo1vBTXYBb17rui3nPC+L807sNEAheGp1T9qDmfrCnFBOc4dm4tRzhXlSK9
+DD30meAgSCYqa5XX9TB2U96nqCe036t2gq3kR1ksVFz6+tLpL1pAWwPt59A06FCS
+Ic3OZhm/0hEUWVkQ1T7USc1bZgjTMsVd7LRsZDP48hafNTvGoc5VNaRM9y3XMadg
+gxb62EdZYz5oUFz9Yduhf9e+mbqJg+NqDz5VrXAbNXBja2NkvhkuVh6MAXo7vSo=
+=9Stm
+-----END PGP SIGNATURE-----
+
+--K8nIJk4ghYZn606h--
