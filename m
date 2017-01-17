@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cTPkg-00038e-Ac
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:27 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cTPkh-00039i-5M
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cTPkf-0003tL-6l
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:26 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:50140 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cTPkg-0003tu-5E
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:27 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:50116 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cTPke-0003ss-PU
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:25 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cTPkf-0003sL-NF
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:26 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Tue, 17 Jan 2017 12:07:46 +0300
-Message-Id: <1484644078-21312-7-git-send-email-batuzovk@ispras.ru>
+Date: Tue, 17 Jan 2017 12:07:48 +0300
+Message-Id: <1484644078-21312-9-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
 References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH 06/18] tcg: allow globals to overlap
+Subject: [Qemu-devel] [PATCH 08/18] target/arm: support access to vector
+ guest registers as globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,149 +27,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Kirill Batuzov <batuzovk@ispras.ru>
 
-Sometimes the target architecture may allow some parts of a register to be
-accessed as a different register. If both of these registers are
-implemented as globals in QEMU, then their content will overlap and the
-change to one global will also change the value of the other. To handle
-such situation properly, some fixes are needed in the register allocator
-and liveness analysis.
+To support vector guest registers as globals we need to do two things:
+
+1) create corresponding globals,
+2) mark which globals can overlap,
 
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- tcg/tcg.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg.h | 18 ++++++++++++++++++
- 2 files changed, 67 insertions(+)
 
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 2f97c13..330a1c0 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -572,6 +572,8 @@ int tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
-         ts->mem_offset = offset;
-         ts->name = name;
-     }
-+    ts->sub_temps = NULL;
-+    ts->overlap_temps = NULL;
-     return temp_idx(s, ts);
- }
+I've declared regnames for new globals the same way they used to be declared for
+scalar regs. checkpatch complains about it. Should I move '{' to the same line
+for all 3 arrays?
+
+---
+ target/arm/translate.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 43 insertions(+), 2 deletions(-)
+
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 0ad9070..2b81b5d 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -65,6 +65,12 @@ static TCGv_i32 cpu_R[16];
+ TCGv_i32 cpu_CF, cpu_NF, cpu_VF, cpu_ZF;
+ TCGv_i64 cpu_exclusive_addr;
+ TCGv_i64 cpu_exclusive_val;
++static TCGv_v128 cpu_Q[16];
++static TCGv_v64 cpu_D[32];
++#ifdef CONFIG_USER_ONLY
++TCGv_i64 cpu_exclusive_test;
++TCGv_i32 cpu_exclusive_info;
++#endif
  
-@@ -1500,6 +1502,35 @@ static int tcg_temp_overlap(TCGContext *s, const TCGTemp *tmp,
-     }
- }
+ /* FIXME:  These should be removed.  */
+ static TCGv_i32 cpu_F0s, cpu_F1s;
+@@ -72,14 +78,26 @@ static TCGv_i64 cpu_F0d, cpu_F1d;
  
-+static void tcg_temp_arr_apply(const TCGArg *arr, uint8_t *temp_state,
-+                               uint8_t temp_val)
-+{
-+    TCGArg i;
-+    if (!arr) {
-+        return ;
+ #include "exec/gen-icount.h"
+ 
+-static const char *regnames[] =
++static const char *regnames_r[] =
+     { "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
+       "r8", "r9", "r10", "r11", "r12", "r13", "r14", "pc" };
+ 
++static const char *regnames_q[] =
++    { "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7",
++      "q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15" };
++
++static const char *regnames_d[] =
++    { "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7",
++      "d8", "d9", "d10", "d11", "d12", "d13", "d14", "d15",
++      "d16", "d17", "d18", "d19", "d20", "d21", "d22", "d23",
++      "d24", "d25", "d26", "d27", "d28", "d29", "d30", "d31" };
++
+ /* initialize TCG globals.  */
+ void arm_translate_init(void)
+ {
+     int i;
++    static TCGArg overlap_temps[16][2];
++    static TCGArg sub_temps[16][3];
+ 
+     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
+     tcg_ctx.tcg_env = cpu_env;
+@@ -87,7 +105,30 @@ void arm_translate_init(void)
+     for (i = 0; i < 16; i++) {
+         cpu_R[i] = tcg_global_mem_new_i32(cpu_env,
+                                           offsetof(CPUARMState, regs[i]),
+-                                          regnames[i]);
++                                          regnames_r[i]);
 +    }
-+    for (i = 0; arr[i] != (TCGArg)-1; i++) {
-+        temp_state[arr[i]] = temp_val;
++    for (i = 0; i < 16; i++) {
++        cpu_Q[i] = tcg_global_mem_new_v128(cpu_env,
++                                           offsetof(CPUARMState,
++                                                    vfp.regs[2 * i]),
++                                           regnames_q[i]);
 +    }
-+}
-+
-+static void tcg_sub_temps_dead(TCGContext *s, TCGArg tmp, uint8_t *temp_state)
-+{
-+    tcg_temp_arr_apply(s->temps[tmp].sub_temps, temp_state, TS_DEAD);
-+}
-+
-+static void tcg_sub_temps_sync(TCGContext *s, TCGArg tmp, uint8_t *temp_state)
-+{
-+    tcg_temp_arr_apply(s->temps[tmp].sub_temps, temp_state, TS_MEM | TS_DEAD);
-+}
-+
-+static void tcg_overlap_temps_sync(TCGContext *s, TCGArg tmp,
-+                                   uint8_t *temp_state)
-+{
-+    tcg_temp_arr_apply(s->temps[tmp].overlap_temps, temp_state,
-+                       TS_MEM | TS_DEAD);
-+}
-+
- /* Liveness analysis : update the opc_arg_life array to tell if a
-    given input arguments is dead. Instructions updating dead
-    temporaries are removed. */
-@@ -1554,6 +1585,11 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
-                         if (temp_state[arg] & TS_MEM) {
-                             arg_life |= SYNC_ARG << i;
-                         }
-+                        /* sub_temps are also dead */
-+                        tcg_sub_temps_dead(&tcg_ctx, arg, temp_state);
-+                        /* overlap_temps need to go to memory */
-+                        tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
-+
-                         temp_state[arg] = TS_DEAD;
-                     }
- 
-@@ -1581,6 +1617,11 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
-                     for (i = nb_oargs; i < nb_iargs + nb_oargs; i++) {
-                         arg = args[i];
-                         if (arg != TCG_CALL_DUMMY_ARG) {
-+                            /* both sub_temps and overlap_temps need to go
-+                               to memory */
-+                            tcg_sub_temps_sync(&tcg_ctx, arg, temp_state);
-+                            tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
-+
-                             temp_state[arg] &= ~TS_DEAD;
-                         }
-                     }
-@@ -1699,6 +1740,11 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
-                     if (temp_state[arg] & TS_MEM) {
-                         arg_life |= SYNC_ARG << i;
-                     }
-+                    /* sub_temps are also dead */
-+                    tcg_sub_temps_dead(&tcg_ctx, arg, temp_state);
-+                    /* overlap_temps need to go to memory */
-+                    tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
-+
-                     temp_state[arg] = TS_DEAD;
-                 }
- 
-@@ -1739,6 +1785,9 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
-                 /* input arguments are live for preceding opcodes */
-                 for (i = nb_oargs; i < nb_oargs + nb_iargs; i++) {
-                     temp_state[args[i]] &= ~TS_DEAD;
-+                    /* both sub_temps and overlap_temps need to go to memory */
-+                    tcg_sub_temps_sync(&tcg_ctx, arg, temp_state);
-+                    tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
-                 }
-             }
-             break;
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 921892f..6473228 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -623,6 +623,14 @@ typedef struct TCGTemp {
-     struct TCGTemp *mem_base;
-     intptr_t mem_offset;
-     const char *name;
-+
-+    /* -1 terminated array of temps that are parts of this temp.
-+       All bits of them are part of this temp. */
-+    const TCGArg *sub_temps;
-+    /* -1 terminated array of temps that overlap with this temp.
-+       Some bits of them are part of this temp, but some are not. sub_temps
-+       are not included here. */
-+    const TCGArg *overlap_temps;
- } TCGTemp;
- 
- typedef struct TCGContext TCGContext;
-@@ -826,6 +834,16 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb);
- 
- void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size);
- 
-+static inline void tcg_temp_set_sub_temps(TCGArg temp, const TCGArg *arr)
-+{
-+    tcg_ctx.temps[temp].sub_temps = arr;
-+}
-+
-+static inline void tcg_temp_set_overlap_temps(TCGArg temp, const TCGArg *arr)
-+{
-+    tcg_ctx.temps[temp].overlap_temps = arr;
-+}
-+
- int tcg_global_mem_new_internal(TCGType, TCGv_ptr, intptr_t, const char *);
- 
- TCGv_i32 tcg_global_reg_new_i32(TCGReg reg, const char *name);
++    for (i = 0; i < 32; i++) {
++        cpu_D[i] = tcg_global_mem_new_v64(cpu_env,
++                                          offsetof(CPUARMState, vfp.regs[i]),
++                                          regnames_d[i]);
++    }
++    for (i = 0; i < 16; i++) {
++        overlap_temps[i][0] = GET_TCGV_V128(cpu_Q[i]);
++        overlap_temps[i][1] = (TCGArg)-1;
++        sub_temps[i][0] = GET_TCGV_V64(cpu_D[i * 2]);
++        sub_temps[i][1] = GET_TCGV_V64(cpu_D[i * 2 + 1]);
++        sub_temps[i][2] = (TCGArg)-1;
++        tcg_temp_set_overlap_temps(GET_TCGV_V64(cpu_D[i * 2]),
++                                   overlap_temps[i]);
++        tcg_temp_set_overlap_temps(GET_TCGV_V64(cpu_D[i * 2 + 1]),
++                                   overlap_temps[i]);
++        tcg_temp_set_sub_temps(GET_TCGV_V128(cpu_Q[i]), sub_temps[i]);
+     }
+     cpu_CF = tcg_global_mem_new_i32(cpu_env, offsetof(CPUARMState, CF), "CF");
+     cpu_NF = tcg_global_mem_new_i32(cpu_env, offsetof(CPUARMState, NF), "NF");
 -- 
 2.1.4
