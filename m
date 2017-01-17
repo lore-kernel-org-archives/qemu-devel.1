@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cTPke-00037H-L3
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:28 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cTPkg-00038e-Ac
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cTPkd-0003rh-9W
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:24 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:50079 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cTPkf-0003tL-6l
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:26 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:50140 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cTPkc-0003rB-Sd
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:23 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cTPke-0003ss-PU
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:25 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Tue, 17 Jan 2017 12:07:42 +0300
-Message-Id: <1484644078-21312-3-git-send-email-batuzovk@ispras.ru>
+Date: Tue, 17 Jan 2017 12:07:46 +0300
+Message-Id: <1484644078-21312-7-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
 References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH 02/18] tcg: add support for 64bit vector type
+Subject: [Qemu-devel] [PATCH 06/18] tcg: allow globals to overlap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,189 +26,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Kirill Batuzov <batuzovk@ispras.ru>
 
-Introduce TCG_TYPE_V64 and corresponding TCGv_v64 for TCG temps. Add hepler
-functions that work with temps of this new type.
+Sometimes the target architecture may allow some parts of a register to be
+accessed as a different register. If both of these registers are
+implemented as globals in QEMU, then their content will overlap and the
+change to one global will also change the value of the other. To handle
+such situation properly, some fixes are needed in the register allocator
+and liveness analysis.
 
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- tcg/tcg-op.h | 23 +++++++++++++++++++++++
- tcg/tcg.c    | 13 +++++++++++++
- tcg/tcg.h    | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 70 insertions(+)
+ tcg/tcg.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.h | 18 ++++++++++++++++++
+ 2 files changed, 67 insertions(+)
 
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index df077d6..173fb24 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -266,6 +266,24 @@ static inline void tcg_gen_op3_v128(TCGOpcode opc, TCGv_v128 a1,
-                 GET_TCGV_V128(a3));
- }
- 
-+static inline void tcg_gen_op1_v64(TCGOpcode opc, TCGv_v64 a1)
-+{
-+    tcg_gen_op1(&tcg_ctx, opc, GET_TCGV_V64(a1));
-+}
-+
-+static inline void tcg_gen_op2_v64(TCGOpcode opc, TCGv_v64 a1,
-+                                    TCGv_v64 a2)
-+{
-+    tcg_gen_op2(&tcg_ctx, opc, GET_TCGV_V64(a1), GET_TCGV_V64(a2));
-+}
-+
-+static inline void tcg_gen_op3_v64(TCGOpcode opc, TCGv_v64 a1,
-+                                    TCGv_v64 a2, TCGv_v64 a3)
-+{
-+    tcg_gen_op3(&tcg_ctx, opc, GET_TCGV_V64(a1), GET_TCGV_V64(a2),
-+                GET_TCGV_V64(a3));
-+}
-+
- /* Generic ops.  */
- 
- static inline void gen_set_label(TCGLabel *l)
-@@ -466,6 +484,11 @@ static inline void tcg_gen_discard_v128(TCGv_v128 arg)
-     tcg_gen_op1_v128(INDEX_op_discard, arg);
- }
- 
-+static inline void tcg_gen_discard_v64(TCGv_v64 arg)
-+{
-+    tcg_gen_op1_v64(INDEX_op_discard, arg);
-+}
-+
- /* 64 bit ops */
- 
- void tcg_gen_addi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index b20a044..e81d1c4 100644
+index 2f97c13..330a1c0 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -637,6 +637,14 @@ TCGv_i64 tcg_temp_new_internal_i64(int temp_local)
-     return MAKE_TCGV_I64(idx);
+@@ -572,6 +572,8 @@ int tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
+         ts->mem_offset = offset;
+         ts->name = name;
+     }
++    ts->sub_temps = NULL;
++    ts->overlap_temps = NULL;
+     return temp_idx(s, ts);
  }
  
-+TCGv_v64 tcg_temp_new_internal_v64(int temp_local)
-+{
-+    int idx;
-+
-+    idx = tcg_temp_new_internal(TCG_TYPE_V64, temp_local);
-+    return MAKE_TCGV_V64(idx);
-+}
-+
- TCGv_v128 tcg_temp_new_internal_v128(int temp_local)
- {
-     int idx;
-@@ -677,6 +685,11 @@ void tcg_temp_free_i64(TCGv_i64 arg)
-     tcg_temp_free_internal(GET_TCGV_I64(arg));
+@@ -1500,6 +1502,35 @@ static int tcg_temp_overlap(TCGContext *s, const TCGTemp *tmp,
+     }
  }
  
-+void tcg_temp_free_v64(TCGv_v64 arg)
++static void tcg_temp_arr_apply(const TCGArg *arr, uint8_t *temp_state,
++                               uint8_t temp_val)
 +{
-+    tcg_temp_free_internal(GET_TCGV_V64(arg));
++    TCGArg i;
++    if (!arr) {
++        return ;
++    }
++    for (i = 0; arr[i] != (TCGArg)-1; i++) {
++        temp_state[arr[i]] = temp_val;
++    }
 +}
 +
- void tcg_temp_free_v128(TCGv_v128 arg)
- {
-     tcg_temp_free_internal(GET_TCGV_V128(arg));
++static void tcg_sub_temps_dead(TCGContext *s, TCGArg tmp, uint8_t *temp_state)
++{
++    tcg_temp_arr_apply(s->temps[tmp].sub_temps, temp_state, TS_DEAD);
++}
++
++static void tcg_sub_temps_sync(TCGContext *s, TCGArg tmp, uint8_t *temp_state)
++{
++    tcg_temp_arr_apply(s->temps[tmp].sub_temps, temp_state, TS_MEM | TS_DEAD);
++}
++
++static void tcg_overlap_temps_sync(TCGContext *s, TCGArg tmp,
++                                   uint8_t *temp_state)
++{
++    tcg_temp_arr_apply(s->temps[tmp].overlap_temps, temp_state,
++                       TS_MEM | TS_DEAD);
++}
++
+ /* Liveness analysis : update the opc_arg_life array to tell if a
+    given input arguments is dead. Instructions updating dead
+    temporaries are removed. */
+@@ -1554,6 +1585,11 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
+                         if (temp_state[arg] & TS_MEM) {
+                             arg_life |= SYNC_ARG << i;
+                         }
++                        /* sub_temps are also dead */
++                        tcg_sub_temps_dead(&tcg_ctx, arg, temp_state);
++                        /* overlap_temps need to go to memory */
++                        tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
++
+                         temp_state[arg] = TS_DEAD;
+                     }
+ 
+@@ -1581,6 +1617,11 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
+                     for (i = nb_oargs; i < nb_iargs + nb_oargs; i++) {
+                         arg = args[i];
+                         if (arg != TCG_CALL_DUMMY_ARG) {
++                            /* both sub_temps and overlap_temps need to go
++                               to memory */
++                            tcg_sub_temps_sync(&tcg_ctx, arg, temp_state);
++                            tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
++
+                             temp_state[arg] &= ~TS_DEAD;
+                         }
+                     }
+@@ -1699,6 +1740,11 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
+                     if (temp_state[arg] & TS_MEM) {
+                         arg_life |= SYNC_ARG << i;
+                     }
++                    /* sub_temps are also dead */
++                    tcg_sub_temps_dead(&tcg_ctx, arg, temp_state);
++                    /* overlap_temps need to go to memory */
++                    tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
++
+                     temp_state[arg] = TS_DEAD;
+                 }
+ 
+@@ -1739,6 +1785,9 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
+                 /* input arguments are live for preceding opcodes */
+                 for (i = nb_oargs; i < nb_oargs + nb_iargs; i++) {
+                     temp_state[args[i]] &= ~TS_DEAD;
++                    /* both sub_temps and overlap_temps need to go to memory */
++                    tcg_sub_temps_sync(&tcg_ctx, arg, temp_state);
++                    tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
+                 }
+             }
+             break;
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index b9aa56b..397ba86 100644
+index 921892f..6473228 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
-@@ -235,6 +235,7 @@ typedef struct TCGPool {
- typedef enum TCGType {
-     TCG_TYPE_I32,
-     TCG_TYPE_I64,
-+    TCG_TYPE_V64,
-     TCG_TYPE_V128,
-     TCG_TYPE_COUNT, /* number of different types */
+@@ -623,6 +623,14 @@ typedef struct TCGTemp {
+     struct TCGTemp *mem_base;
+     intptr_t mem_offset;
+     const char *name;
++
++    /* -1 terminated array of temps that are parts of this temp.
++       All bits of them are part of this temp. */
++    const TCGArg *sub_temps;
++    /* -1 terminated array of temps that overlap with this temp.
++       Some bits of them are part of this temp, but some are not. sub_temps
++       are not included here. */
++    const TCGArg *overlap_temps;
+ } TCGTemp;
  
-@@ -411,6 +412,7 @@ typedef tcg_target_ulong TCGArg;
- typedef struct TCGv_i32_d *TCGv_i32;
- typedef struct TCGv_i64_d *TCGv_i64;
- typedef struct TCGv_ptr_d *TCGv_ptr;
-+typedef struct TCGv_v64_d *TCGv_v64;
- typedef struct TCGv_v128_d *TCGv_v128;
- typedef TCGv_ptr TCGv_env;
- #if TARGET_LONG_BITS == 32
-@@ -436,6 +438,11 @@ static inline TCGv_ptr QEMU_ARTIFICIAL MAKE_TCGV_PTR(intptr_t i)
-     return (TCGv_ptr)i;
- }
+ typedef struct TCGContext TCGContext;
+@@ -826,6 +834,16 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb);
  
-+static inline TCGv_v64 QEMU_ARTIFICIAL MAKE_TCGV_V64(intptr_t i)
+ void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size);
+ 
++static inline void tcg_temp_set_sub_temps(TCGArg temp, const TCGArg *arr)
 +{
-+    return (TCGv_v64)i;
++    tcg_ctx.temps[temp].sub_temps = arr;
 +}
 +
- static inline TCGv_v128 QEMU_ARTIFICIAL MAKE_TCGV_V128(intptr_t i)
- {
-     return (TCGv_v128)i;
-@@ -456,6 +463,11 @@ static inline intptr_t QEMU_ARTIFICIAL GET_TCGV_PTR(TCGv_ptr t)
-     return (intptr_t)t;
- }
- 
-+static inline intptr_t QEMU_ARTIFICIAL GET_TCGV_V64(TCGv_v64 t)
++static inline void tcg_temp_set_overlap_temps(TCGArg temp, const TCGArg *arr)
 +{
-+    return (intptr_t)t;
++    tcg_ctx.temps[temp].overlap_temps = arr;
 +}
 +
- static inline intptr_t QEMU_ARTIFICIAL GET_TCGV_V128(TCGv_v128 t)
- {
-     return (intptr_t)t;
-@@ -468,17 +480,20 @@ static inline intptr_t QEMU_ARTIFICIAL GET_TCGV_V128(TCGv_v128 t)
+ int tcg_global_mem_new_internal(TCGType, TCGv_ptr, intptr_t, const char *);
  
- #define TCGV_EQUAL_I32(a, b) (GET_TCGV_I32(a) == GET_TCGV_I32(b))
- #define TCGV_EQUAL_I64(a, b) (GET_TCGV_I64(a) == GET_TCGV_I64(b))
-+#define TCGV_EQUAL_V64(a, b) (GET_TCGV_V64(a) == GET_TCGV_V64(b))
- #define TCGV_EQUAL_V128(a, b) (GET_TCGV_V128(a) == GET_TCGV_V128(b))
- #define TCGV_EQUAL_PTR(a, b) (GET_TCGV_PTR(a) == GET_TCGV_PTR(b))
- 
- /* Dummy definition to avoid compiler warnings.  */
- #define TCGV_UNUSED_I32(x) x = MAKE_TCGV_I32(-1)
- #define TCGV_UNUSED_I64(x) x = MAKE_TCGV_I64(-1)
-+#define TCGV_UNUSED_V64(x) x = MAKE_TCGV_V64(-1)
- #define TCGV_UNUSED_V128(x) x = MAKE_TCGV_V128(-1)
- #define TCGV_UNUSED_PTR(x) x = MAKE_TCGV_PTR(-1)
- 
- #define TCGV_IS_UNUSED_I32(x) (GET_TCGV_I32(x) == -1)
- #define TCGV_IS_UNUSED_I64(x) (GET_TCGV_I64(x) == -1)
-+#define TCGV_IS_UNUSED_V64(x) (GET_TCGV_V64(x) == -1)
- #define TCGV_IS_UNUSED_V128(x) (GET_TCGV_V128(x) == -1)
- #define TCGV_IS_UNUSED_PTR(x) (GET_TCGV_PTR(x) == -1)
- 
-@@ -802,10 +817,12 @@ TCGv_i64 tcg_global_reg_new_i64(TCGReg reg, const char *name);
- 
- TCGv_i32 tcg_temp_new_internal_i32(int temp_local);
- TCGv_i64 tcg_temp_new_internal_i64(int temp_local);
-+TCGv_v64 tcg_temp_new_internal_v64(int temp_local);
- TCGv_v128 tcg_temp_new_internal_v128(int temp_local);
- 
- void tcg_temp_free_i32(TCGv_i32 arg);
- void tcg_temp_free_i64(TCGv_i64 arg);
-+void tcg_temp_free_v64(TCGv_v64 arg);
- void tcg_temp_free_v128(TCGv_v128 arg);
- 
- static inline TCGv_i32 tcg_global_mem_new_i32(TCGv_ptr reg, intptr_t offset,
-@@ -842,6 +859,23 @@ static inline TCGv_i64 tcg_temp_local_new_i64(void)
-     return tcg_temp_new_internal_i64(1);
- }
- 
-+static inline TCGv_v64 tcg_global_mem_new_v64(TCGv_ptr reg, intptr_t offset,
-+                                              const char *name)
-+{
-+    int idx = tcg_global_mem_new_internal(TCG_TYPE_V64, reg, offset, name);
-+    return MAKE_TCGV_V64(idx);
-+}
-+
-+static inline TCGv_v64 tcg_temp_new_v64(void)
-+{
-+    return tcg_temp_new_internal_v64(0);
-+}
-+
-+static inline TCGv_v64 tcg_temp_local_new_v64(void)
-+{
-+    return tcg_temp_new_internal_v64(1);
-+}
-+
- static inline TCGv_v128 tcg_global_mem_new_v128(TCGv_ptr reg, intptr_t offset,
-                                                 const char *name)
- {
+ TCGv_i32 tcg_global_reg_new_i32(TCGReg reg, const char *name);
 -- 
 2.1.4
