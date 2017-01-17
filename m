@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cTbdq-0007wN-Mj
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:50:11 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cTbei-0000Dc-3j
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:51:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cTbdq-0005rG-2A
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:50:10 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cTbeh-0006GH-4m
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:51:04 -0500
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <1483977924-14522-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1483977924-14522-4-git-send-email-peter.maydell@linaro.org>
 References: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
-	<1483977924-14522-2-git-send-email-peter.maydell@linaro.org>
+	<1483977924-14522-4-git-send-email-peter.maydell@linaro.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 17 Jan 2017 13:49:35 -0800
-Message-ID: <CAKmqyKMBpvETvPGEG+amBBaubA7GDban8fc+iDMexVNdm6BC5g@mail.gmail.com>
+Date: Tue, 17 Jan 2017 13:50:29 -0800
+Message-ID: <CAKmqyKMwZkstNyKe32N=a0eZrrj6W_14t2meeOdmHHpnDovD8A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 01/18] hw/intc/arm_gicv3: Add external
- IRQ lines for VIRQ and VFIQ
+Subject: Re: [Qemu-devel] [PATCH v2 03/18] target-arm: Expose output GPIO
+ line for VCPU maintenance interrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,11 +28,15 @@ To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrew Jones <drjones@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Christoffer Dall <christoffer.dall@linaro.org>, Patch Tracking <patches@linaro.org>
 
 On Mon, Jan 9, 2017 at 8:05 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Augment the GICv3's QOM device interface by adding two
-> new sets of sysbus IRQ lines, to signal VIRQ and VFIQ to
-> each CPU.
+> The GICv3 support for virtualization includes an outbound
+> maintenance interrupt signal which is asserted when the
+> CPU interface wants to signal to the hypervisor that it
+> needs attention. Expose this as an outbound GPIO line from
+> the CPU object which can be wired up as a physical interrupt
+> line by the board code (as we do already for the CPU timers).
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -41,40 +45,37 @@ Thanks,
 Alistair
 
 > ---
->  include/hw/intc/arm_gicv3_common.h | 2 ++
->  hw/intc/arm_gicv3_common.c         | 6 ++++++
->  2 files changed, 8 insertions(+)
+>  target/arm/cpu.h | 2 ++
+>  target/arm/cpu.c | 3 +++
+>  2 files changed, 5 insertions(+)
 >
-> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-> index 341a311..beb2c77 100644
-> --- a/include/hw/intc/arm_gicv3_common.h
-> +++ b/include/hw/intc/arm_gicv3_common.h
-> @@ -145,6 +145,8 @@ struct GICv3CPUState {
->      CPUState *cpu;
->      qemu_irq parent_irq;
->      qemu_irq parent_fiq;
-> +    qemu_irq parent_virq;
-> +    qemu_irq parent_vfiq;
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index ab119e6..764b511 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -555,6 +555,8 @@ struct ARMCPU {
+>      QEMUTimer *gt_timer[NUM_GTIMERS];
+>      /* GPIO outputs for generic timer */
+>      qemu_irq gt_timer_outputs[NUM_GTIMERS];
+> +    /* GPIO output for GICv3 maintenance interrupt signal */
+> +    qemu_irq gicv3_maintenance_interrupt;
 >
->      /* Redistributor */
->      uint32_t level;                  /* Current IRQ level */
-> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-> index 0aa9b9c..0ee67a4 100644
-> --- a/hw/intc/arm_gicv3_common.c
-> +++ b/hw/intc/arm_gicv3_common.c
-> @@ -126,6 +126,12 @@ void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
->      for (i = 0; i < s->num_cpu; i++) {
->          sysbus_init_irq(sbd, &s->cpu[i].parent_fiq);
->      }
-> +    for (i = 0; i < s->num_cpu; i++) {
-> +        sysbus_init_irq(sbd, &s->cpu[i].parent_virq);
-> +    }
-> +    for (i = 0; i < s->num_cpu; i++) {
-> +        sysbus_init_irq(sbd, &s->cpu[i].parent_vfiq);
-> +    }
+>      /* MemoryRegion to use for secure physical accesses */
+>      MemoryRegion *secure_memory;
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index f5cb30a..8932086 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -466,6 +466,9 @@ static void arm_cpu_initfn(Object *obj)
+>                                                  arm_gt_stimer_cb, cpu);
+>      qdev_init_gpio_out(DEVICE(cpu), cpu->gt_timer_outputs,
+>                         ARRAY_SIZE(cpu->gt_timer_outputs));
+> +
+> +    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->gicv3_maintenance_interrupt,
+> +                             "gicv3-maintenance-interrupt", 1);
+>  #endif
 >
->      memory_region_init_io(&s->iomem_dist, OBJECT(s), ops, s,
->                            "gicv3_dist", 0x10000);
+>      /* DTB consumers generally don't in fact care what the 'compatible'
 > --
 > 2.7.4
 >
