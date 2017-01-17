@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTSok-0007Da-Vc
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:24:51 -0500
+	(envelope-from <bounces@canonical.com>) id 1cTSp8-0007T5-3S
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:25:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTSoh-0007cD-4c
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:24:50 -0500
-Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:34585)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cTSog-0007c6-Vh
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:24:47 -0500
-Received: by mail-ua0-x231.google.com with SMTP id 35so101369836uak.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 04:24:46 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cTSp5-0007rp-Jp
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:25:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46813)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cTSp5-0007q7-Df
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:25:11 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cTSp4-0008AU-Lm
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 12:25:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8FB852E80BF
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 12:25:10 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87h94x99e4.fsf@dusky.pond.sub.org>
-References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
-	<87pojmjdep.fsf@dusky.pond.sub.org>
-	<CAFEAcA9nhd6x+PT5bG0=YqvmUdxJVFPZ6ACiv-2OKrDFJhrqzg@mail.gmail.com>
-	<87h94x99e4.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jan 2017 12:24:25 +0000
-Message-ID: <CAFEAcA8vRw=13Lj_98A+3NovSeTg6e0xBopdz9EcdEeUMjjZow@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Jan 2017 12:09:12 -0000
+From: Thomas Huth <723460@bugs.launchpad.net>
+Reply-To: Bug 723460 <723460@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110222234911.23392.3517.malonedeb@palladium.canonical.com>
+Message-Id: <20170117120913.20288.48152.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 723460] Re: qemu on linux doesn't boot for winxp
+ install via usb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <mlureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 17 January 2017 at 12:08, Markus Armbruster <armbru@redhat.com> wrote:
-> Right now, that'll make no difference whatsoever, because the programs
-> that choke on -D generate no output for the commands using the variable
-> defined with -D.  All they do is gripe.
->
-> Three possible solutions, in increasing order of complexity:
->
-> 1. Live with the warning from old versions.  If a new version comes
-> around that does something with @subtitle, it'll just work.
->
-> 2. Suppress the warning with @iftex-hammer.  No change in output now.
-> If a new version comes around that does something with @subtitle, we
-> won't profit unless we take out the @iftex.
->
-> 3. Replace -D by @set, either by preprocessing .texi, or by including a
-> generated snippet.  No change in output now.  If a new version comes
-> around that does something with @subtitle, it'll just work.
->
-> My order of preference is aligned with decreasing complexity, i.e. first
-> 1., then 2., then 3.
->
-> Please tell me what you want.
->
-> If you want 3., I can certainly live with it, but I'd rather do 1. or
-> 2. now, to get my rather conflict-prone pull request in, then do 3. as a
-> follow-up patch.
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-Yeah, I think it's reasonable to apply this now and then
-fix up the warnings afterwards, since they don't break the
-build. I'll do that.
+-- =
 
-In terms of what I'd like for the VERSION issue:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/723460
 
-(1) if it doesn't actually cause a change in the output, we
-should either just delete the use of VERSION entirely, or move
-it to somewhere outside of @subtitle which does actually
-appear somewhere. There's no point in putting in the version
-info if it doesn't get into the final output, whether
-it generates a warning or not.
+Title:
+  qemu on linux doesn't boot for winxp install via usb
 
-(2) If we want to display VERSION then we need to use @set,
-it looks like.
+Status in QEMU:
+  Invalid
 
-thanks
--- PMM
+Bug description:
+  hi guys,
+  I try to install windows xp via qemu. I can only boot from usb and someho=
+w it is my problem.
+  I run a Winxp/xubuntu10.04 Dualboot-system with some virtual drives in wi=
+ndows ( till letter f:? ).
+  at qemu I created an image from 30Gigabytes and entered this command from=
+ the imagefile's directory :
+
+  "sudo qemu-system-x86_64 -localtime -usbdevice -hda /dev/sdb -m 384
+  -boot d winxp.img"
+
+  the answer is :
+
+  "qemu-system-x86_64: -boot d: drive with bus=3D0, unit=3D0 (index=3D0)
+  exists"
+
+  I had to set the usb-stick in the fstab file with this command :
+
+  "UUID=3DX /media/usb      vfat    rw,users,noauto,umask=3D000       0
+  0"
+
+  anybody experienced the same problem?
+
+  I would appreciate any kind of help
+
+  greetz
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/723460/+subscriptions
