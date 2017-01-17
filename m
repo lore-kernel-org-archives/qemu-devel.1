@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1U-00079N-Vu
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:37 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1W-00079V-0E
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1R-0007Z1-OX
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:36 -0500
-Received: from [59.151.112.132] (port=54479 helo=heian.cn.fujitsu.com)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1V-0007c7-47
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:37 -0500
+Received: from [59.151.112.132] (port=27872 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1R-0007T8-DJ
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:33 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1U-0007aA-OF
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:37 -0500
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Tue, 17 Jan 2017 14:18:46 +0800
-Message-ID: <1484633936-25344-2-git-send-email-caoj.fnst@cn.fujitsu.com>
+Date: Tue, 17 Jan 2017 14:18:55 +0800
+Message-ID: <1484633936-25344-11-git-send-email-caoj.fnst@cn.fujitsu.com>
 In-Reply-To: <1484633936-25344-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 References: <1484633936-25344-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 01/11] msix: Follow CODING_STYLE
+Subject: [Qemu-devel] [PATCH v9 10/11] msi_init: convert assert to return
+ -errno
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +27,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
+According to the disscussion:
+http://lists.nongnu.org/archive/html/qemu-devel/2016-09/msg08215.html
+
+Let leaf function returns reasonable -errno, let caller decide how to
+handle the return value.
+
+Suggested-by: Markus Armbruster <armbru@redhat.com>
 CC: Markus Armbruster <armbru@redhat.com>
-CC: Marcel Apfelbaum <marcel@redhat.com>
 CC: Michael S. Tsirkin <mst@redhat.com>
+CC: Marcel Apfelbaum <marcel@redhat.com>
 
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Marcel Apfelbaum <marcel@redhat.com>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 ---
- hw/pci/msix.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ hw/pci/msi.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index 0ec1cb14fc60..0cee631ecc55 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -447,8 +447,10 @@ void msix_notify(PCIDevice *dev, unsigned vector)
- {
-     MSIMessage msg;
+diff --git a/hw/pci/msi.c b/hw/pci/msi.c
+index a87b2278a373..af3efbe525ce 100644
+--- a/hw/pci/msi.c
++++ b/hw/pci/msi.c
+@@ -201,9 +201,12 @@ int msi_init(struct PCIDevice *dev, uint8_t offset,
+                    " 64bit %d mask %d\n",
+                    offset, nr_vectors, msi64bit, msi_per_vector_mask);
  
--    if (vector >= dev->msix_entries_nr || !dev->msix_entry_used[vector])
-+    if (vector >= dev->msix_entries_nr || !dev->msix_entry_used[vector]) {
-         return;
+-    assert(!(nr_vectors & (nr_vectors - 1)));   /* power of 2 */
+-    assert(nr_vectors > 0);
+-    assert(nr_vectors <= PCI_MSI_VECTORS_MAX);
++    /* vector sanity test: should in range 1 - 32, should be power of 2 */
++    if (!is_power_of_2(nr_vectors) || nr_vectors > PCI_MSI_VECTORS_MAX) {
++        error_setg(errp, "Invalid vector number: %d", nr_vectors);
++        return -EINVAL;
 +    }
 +
-     if (msix_is_masked(dev, vector)) {
-         msix_set_pending(dev, vector);
-         return;
-@@ -483,8 +485,10 @@ void msix_reset(PCIDevice *dev)
- /* Mark vector as used. */
- int msix_vector_use(PCIDevice *dev, unsigned vector)
- {
--    if (vector >= dev->msix_entries_nr)
-+    if (vector >= dev->msix_entries_nr) {
-         return -EINVAL;
-+    }
-+
-     dev->msix_entry_used[vector]++;
-     return 0;
- }
+     /* the nr of MSI vectors is up to 32 */
+     vectors_order = ctz32(nr_vectors);
+ 
 -- 
 2.1.0
