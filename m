@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTQOz-0000k0-T7
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:10 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cTQTZ-0004eX-Tc
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:54:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTQOw-0003ob-0u
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:05 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33850)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cTQTY-0000xS-5p
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:54:50 -0500
+Received: from mail-yw0-x233.google.com ([2607:f8b0:4002:c05::233]:33316)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cTQOv-0003nc-R1
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:01 -0500
-Received: by mail-wm0-x241.google.com with SMTP id c85so4618642wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 01:50:01 -0800 (PST)
-Date: Tue, 17 Jan 2017 09:49:56 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170117094956.GB4265@stefanha-x1.localdomain>
-References: <20170112114612.14520-1-stefanha@redhat.com>
-	<fc5de032-a64b-b072-6e52-441b6a685ee3@cardoe.com>
-	<20170113120240.GB9142@stefanha-x1.localdomain>
-	<75cb767b-2850-4a87-50fc-d957e3a793ac@cardoe.com>
-	<20170116104613.GB12351@stefanha-x1.localdomain>
-	<f8b3d861-09a3-a4c8-dca7-e4fb384c2a73@cardoe.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cTQTX-0000wq-Vk
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:54:48 -0500
+Received: by mail-yw0-x233.google.com with SMTP id l75so83707294ywb.0
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 01:54:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="K8nIJk4ghYZn606h"
-Content-Disposition: inline
-In-Reply-To: <f8b3d861-09a3-a4c8-dca7-e4fb384c2a73@cardoe.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] virtio: revert
- virtio_queue_set_notification() nesting
+References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
+	<CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
+	<87pojmjdep.fsf@dusky.pond.sub.org>
+In-Reply-To: <87pojmjdep.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 17 Jan 2017 09:54:36 +0000
+Message-ID: <CAJ+F1C+okVYu7pvZzGVdC-Y5CeA0OLhCO5jU7TDLK8nUtm6R=w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,102 +31,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Goldstein <cardoe@cardoe.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+Hi
 
---K8nIJk4ghYZn606h
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 17, 2017 at 12:34 PM Markus Armbruster <armbru@redhat.com>
+wrote:
 
-On Mon, Jan 16, 2017 at 04:03:28PM -0500, Doug Goldstein wrote:
-> On 1/16/17 5:46 AM, Stefan Hajnoczi wrote:
-> > On Fri, Jan 13, 2017 at 09:15:49AM -0600, Doug Goldstein wrote:
-> >> On 1/13/17 6:02 AM, Stefan Hajnoczi wrote:
-> >>> On Thu, Jan 12, 2017 at 10:57:53AM -0600, Doug Goldstein wrote:
-> >>>> On 1/12/17 5:46 AM, Stefan Hajnoczi wrote:
-> >>>>> The virtio_queue_set_notification() nesting introduced for AioConte=
-xt polling
-> >>>>> raised an assertion with virtio-net (even in non-polling mode).  Co=
-nverting
-> >>>>> virtio-net and virtio-crypto to use virtio_queue_set_notification()=
- in a
-> >>>>> nesting fashion would be invasive and isn't worth it.
-> >>>>>
-> >>>>> Patch 1 contains the revert to resolve the bug that Doug noticed.
-> >>>>>
-> >>>>> Patch 2 is a less efficient but safe alternative.
-> >>>>>
-> >>>>> Stefan Hajnoczi (2):
-> >>>>>   Revert "virtio: turn vq->notification into a nested counter"
-> >>>>>   virtio: disable notifications again after poll succeeded
-> >>>>>
-> >>>>>  hw/virtio/virtio.c | 21 +++++++++------------
-> >>>>>  1 file changed, 9 insertions(+), 12 deletions(-)
-> >>>>>
-> >>>>
-> >>>> So I just gave this series a whirl and it fixes the assert but causes
-> >>>> another issue for me. While iPXE is getting a DHCP address the screen
-> >>>> immediately flashes over to the UEFI shell. Its like a timeout is
-> >>>> getting hit and just dropping me to the shell.
-> >>>
-> >>> Sounds like an separate problem.
-> >>>
-> >>> Stefan
-> >>>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+> > On 16 January 2017 at 09:33, Markus Armbruster <armbru@redhat.com>
+> wrote:
+> >> This is Marc-Andr=C3=A9's "[PATCH v8 00/21] qapi doc generation (whole
+> >> version, squashed)" with a few commit messages tweaked, and "[PATCH v8
+> >> 14/21] (SQUASHED) move doc to schema" unsquashed into 161 patches.
 > >>
-> >> Is there any debug output that I can provide to help troubleshoot it?
-> >> I've built 23425cc and UEFI via OVMF is able to get an IP address via
-> >> DHCP inside of iPXE. I've also taken master and only applied the first
-> >> patch in this series (the revert) and it too works. Its only when I add
-> >> the 2nd patch into the mix or don't revert out the "virtio: turn
-> >> vq->notification into a nested counter" patch that it fails.
-> >=20
-> > The code in Patch 2 should not be executed in your QEMU configuration,
-> > so I wonder how Patch 2 can cause the DHCP failure.
-> >=20
-> > Please verify as follows:
-> >=20
-> >   $ gdb --args path/to/qemu-system-x86_64 ...
-> >   (gdb) handle SIGUSR1 noprint nostop pass
-> >   (gdb) handle SIGPIPE noprint nostop pass
-> >   (gdb) b virtio_queue_host_notifier_aio_poll_begin
-> >   (gdb) r
-> >=20
-> > I predict the breakpoint will not be hit.
-> >=20
-> > Stefan
-> >=20
->=20
->=20
-> Correct. That did not hit. I reapplied both patches to my current master
-> and it did not hit but it still dropped me to the EFI shell while iPXE
-> was negotiating DHCP.
->=20
-> I then rebased on top of the latest master
-> (2ccede18bd24fce5db83fef3674563a1f256717b) and applied both patches. The
-> iPXE issue went away and the assert issue went away.
->=20
-> So I will concur with you, the issue was not in either of these patches
-> and is now resolved.
+> >> We did all the respins with in this squashed form to reduce noise.
+> >> However, since the unsquashed form is better suited for review, and
+> >> probably nicer if we have to revisit this part of the work down the
+> >> road, I'm proposing to merge this unsquashed.
+> >>
+> >> If you want me to post the unsquashed patches, I'm happy to redo this
+> >> pull request.
+> >>
+> >> If you'd rather pull the squashed version, likewise.
+> >>
+> >> I'm afraid this is a bit of a doc conflict magnet.  The sooner we can
+> >> get it in, the easier for Marc-Andr=C3=A9 and me.
+> >>
+> >> v2:
+> >> * Rebased (v1 conflicts with commit e1ff3c6)
+> >> * test-qapi.py tweaked to avoid trailing empty lines in .out
+> >>
+> >> The following changes since commit
+> b6af8ea60282df514f87d32e36afd1c9aeee28c8:
+> >>
+> >>   Merge remote-tracking branch
+> 'remotes/ehabkost/tags/x86-and-machine-pull-request' into staging
+> (2017-01-13 14:38:21 +0000)
+> >>
+> >> are available in the git repository at:
+> >>
+> >>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-01-16
+> >>
+> >> for you to fetch changes up to 56e8bdd46a8a42d89b0afea9da83ae7679cc043=
+9:
+> >>
+> >>   build-sys: add qapi doc generation targets (2017-01-16 10:11:43 +010=
+0)
+> >>
+> >> ----------------------------------------------------------------
+> >> QAPI patches for 2017-01-16
+> >
+> > This seems to trigger some warnings from older makeinfo versions:
+> >
+> > On the Fedora 20 ppc64be box and Ubuntu 14.04.5 LTS aarch64 box
+> > (Ubuntu: makeinfo (GNU texinfo) 5.2;
+> >  Fedora: makeinfo (GNU texinfo) 5.1)
+>
+> Nobody should be using F20 by now, but the Ubuntu LTS is still legit.
+>
+> > /home/pm215/qemu/docs/qemu-ga-ref.texi:41: warning: undefined flag:
+> VERSION
+> > /home/pm215/qemu/docs/qemu-ga-ref.texi:41: warning: undefined flag:
+> VERSION
+> > /home/pm215/qemu/docs/qemu-qmp-ref.texi:41: warning: undefined flag:
+> VERSION
+> > /home/pm215/qemu/docs/qemu-qmp-ref.texi:41: warning: undefined flag:
+> VERSION
+>
+> This is supposed to be defined in Makefile:
+>
+>     MAKEINFO=3Dmakeinfo -D 'VERSION $(VERSION)'
+>
+> Hrrm, Texinfo's NEWS file has for 6.0:
+>
+> * texi2any:
+>   [...]
+>   . -D'var val' on the command line works as intended again.
+>
+> I tried to find out more about this fix, but the Texinfo repository's
+> commit log is useless.
+>
+> I can reproduce the warning with 6.2 by running makeinfo without -D.
+> Curiously, output isn't affected.  Looks like @subtitle is ignored by
+> makeinfo.
+>
+> Possible work-around I could squash in:
+>
+> diff --git a/docs/qemu-qmp-ref.texi b/docs/qemu-qmp-ref.texi
+> index 818e525..e0f2454 100644
+> --- a/docs/qemu-qmp-ref.texi
+> +++ b/docs/qemu-qmp-ref.texi
+> @@ -38,7 +38,9 @@ along with this manual.  If not, see
+> http://www.gnu.org/licens
+> es/ <http://www.gnu.org/licenses/>.
+>
+>  @titlepage
+>  @title QMP Reference Manual
+> +@iftex @c Work around bug in Texinfo prior to 6.0
+>  @subtitle QEMU version @value{VERSION}
+> +@end iftex
+>  @page
+>  @vskip 0pt plus 1filll
+>  @insertcopying
+>
+> Marc-Andr=C3=A9, what do you think?
+>
 
-Great, thanks for confirming!
+Since title @subtitle is being ignored by makeinfo, that looks fine.
+However, I think I would prefer rather have the warning since it's a
+makeinfo bug on old versions and it can be ignored. Hopefully, this thread
+can easily be found for reference (update commit message too?). Either way,
+I don't mind. Thanks
 
-Stefan
 
---K8nIJk4ghYZn606h
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYfejEAAoJEJykq7OBq3PIXYAIAIwNK+Xd9OsrBRkbc/KQixoU
-UBZcisSLoQueBjhECCLM3RhR59Tb6hRK5ETjtvxnY2dsend0wR2mPL8wgftT+959
-kkNfHoo1vBTXYBb17rui3nPC+L807sNEAheGp1T9qDmfrCnFBOc4dm4tRzhXlSK9
-DD30meAgSCYqa5XX9TB2U96nqCe036t2gq3kR1ksVFz6+tLpL1pAWwPt59A06FCS
-Ic3OZhm/0hEUWVkQ1T7USc1bZgjTMsVd7LRsZDP48hafNTvGoc5VNaRM9y3XMadg
-gxb62EdZYz5oUFz9Yduhf9e+mbqJg+NqDz5VrXAbNXBja2NkvhkuVh6MAXo7vSo=
-=9Stm
------END PGP SIGNATURE-----
-
---K8nIJk4ghYZn606h--
+> > On OSX (makeinfo (GNU texinfo) 4.8):
+>
+> That's from 2004.  Just sayin'.
+>
+> > ./qemu-options.texi:60: warning: unlikely character [ in @var.
+> > ./qemu-options.texi:60: warning: unlikely character ] in @var.
+> > ./qemu-options.texi:61: warning: unlikely character [ in @var.
+> > ./qemu-options.texi:61: warning: unlikely character ] in @var.
+>
+> Generated qemu-options.texi did not change (I checked).
+>
+> The offending lines are
+>
+>     @item -numa
+> node[,mem=3D@var{size}][,cpus=3D@var{cpu[-cpu]}][,nodeid=3D@var{node}]
+>     @itemx -numa
+> node[,memdev=3D@var{id}][,cpus=3D@var{cpu[-cpu]}][,nodeid=3D@var{node}]
+>
+> which are generated from qemu-options.hx's
+>
+>     DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+>         "-numa node[,mem=3Dsize][,cpus=3Dcpu[-cpu]][,nodeid=3Dnode]\n"
+>         "-numa node[,memdev=3Did][,cpus=3Dcpu[-cpu]][,nodeid=3Dnode]\n",
+> QEMU_ARCH_ALL)
+>
+> by scripts/hxtool.
+>
+> This use of @var{} is perhaps questionable, but nothing changed around
+> here for many moons.  Are you sure this is new in my pull request?
+>
+> > (OSX also has the long standing warning
+> > /Users/pm215/src/qemu-for-merges/qemu-doc.texi:7: warning:
+> > unrecognized encoding name `UTF-8'.
+> > but you can ignore that since it's been that way for years
+> > and is because osx's makeinfo is ancient.)
+> >
+> > thanks
+> > -- PMM
+>
+> --
+Marc-Andr=C3=A9 Lureau
