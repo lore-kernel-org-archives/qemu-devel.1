@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cTa2m-00039j-96
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 15:07:49 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTa4F-0003qu-Un
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 15:09:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cTa2i-0007XT-Ea
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 15:07:48 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34477)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cTa2i-0007XE-AZ
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 15:07:44 -0500
-Received: by mail-qt0-x241.google.com with SMTP id a29so24019315qtb.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 12:07:44 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
-	<1484644078-21312-9-git-send-email-batuzovk@ispras.ru>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <f0064823-5190-c3ab-444c-8e8229b36fdb@twiddle.net>
-Date: Tue, 17 Jan 2017 12:07:40 -0800
+	(envelope-from <ehabkost@redhat.com>) id 1cTa4C-0000D6-MP
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 15:09:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37620)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTa4C-0000Cj-Gk
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 15:09:16 -0500
+Date: Tue, 17 Jan 2017 18:09:13 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170117200913.GO3491@thinpad.lan.raisama.net>
+References: <1484664152-24446-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<1484664152-24446-2-git-send-email-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <1484644078-21312-9-git-send-email-batuzovk@ispras.ru>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/18] target/arm: support access to vector
- guest registers as globals
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484664152-24446-2-git-send-email-douly.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Ensure the numa_post_machine_init
+ func in the appropriate location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirill Batuzov <batuzovk@ispras.ru>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: stefanha@redhat.com, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com
 
-On 01/17/2017 01:07 AM, Kirill Batuzov wrote:
-> +    for (i = 0; i < 16; i++) {
-> +        overlap_temps[i][0] = GET_TCGV_V128(cpu_Q[i]);
-> +        overlap_temps[i][1] = (TCGArg)-1;
-> +        sub_temps[i][0] = GET_TCGV_V64(cpu_D[i * 2]);
-> +        sub_temps[i][1] = GET_TCGV_V64(cpu_D[i * 2 + 1]);
-> +        sub_temps[i][2] = (TCGArg)-1;
-> +        tcg_temp_set_overlap_temps(GET_TCGV_V64(cpu_D[i * 2]),
-> +                                   overlap_temps[i]);
-> +        tcg_temp_set_overlap_temps(GET_TCGV_V64(cpu_D[i * 2 + 1]),
-> +                                   overlap_temps[i]);
-> +        tcg_temp_set_sub_temps(GET_TCGV_V128(cpu_Q[i]), sub_temps[i]);
+On Tue, Jan 17, 2017 at 10:42:31PM +0800, Dou Liyang wrote:
+> In the numa_post_machine_init(), we use CPU_FOREACH macro to set all
+> CPUs' namu_node. So, we should make sure that we call it after Qemu
+> has already initialied all the CPUs.
+> 
+> As we all know, the CPUs can be created by "-smp"(pc_new_cpu) or
+> "-device"(qdev_device_add) command. But, before the device init,
+> Qemu execute the numa_post_machine_init earlier. It makes the mapping
+> of NUMA nodes and CPUs incorrect.
+> 
+> The patch move the numa_post_machine_init func in the appropriate
+> location.
+> 
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+
+I would like to move cpu_index initialization to
+qom/cpu.c:cpu_common_realizefn(), and remove
+numa_post_machine_init() completely. But this fixes the bug while
+we don't do that.
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Queued on numa-next. Thanks!
+
+> ---
+>  vl.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index c643d3f..f38b0e2 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4549,8 +4549,6 @@ int main(int argc, char **argv, char **envp)
+>  
+>      cpu_synchronize_all_post_init();
+>  
+> -    numa_post_machine_init();
+> -
+>      if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
+>                            parse_fw_cfg, fw_cfg_find(), NULL) != 0) {
+>          exit(1);
+> @@ -4571,6 +4569,9 @@ int main(int argc, char **argv, char **envp)
+>                            device_init_func, NULL, NULL)) {
+>          exit(1);
 >      }
+> +
+> +    numa_post_machine_init();
+> +
+>      rom_reset_order_override();
+>  
+>      /* Did we create any drives that we failed to create a device for? */
+> -- 
+> 2.5.5
+> 
+> 
+> 
 
-Should we simply detect this generically as the registers are declared?  This 
-seems tedious to do for each target.
-
-
-r~
+-- 
+Eduardo
