@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cTWZG-0003kv-Lj
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 11:25:11 -0500
+	(envelope-from <lersek@redhat.com>) id 1cTWlE-0007Uo-JH
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 11:37:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cTWZF-0004g3-Jy
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 11:25:06 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <5878AF90.8020709@kamp.de>
-	<260873230.6154791.1484638426777.JavaMail.zimbra@oxygem.tv>
-	<20170117080326.dfjqzwstfxusuhgc@nora.maurer-it.com>
-	<b7f5dc23-6d72-4897-e9ca-6482acfb4c72@redhat.com>
-	<20170117112224.2st4wuivcbwuif2m@nora.maurer-it.com>
-	<196ac8f5-2fd7-37e9-d577-8177802d0fb4@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <40cbdb51-3dcc-35bc-bb99-6c85a47d20d0@redhat.com>
-Date: Tue, 17 Jan 2017 17:24:55 +0100
+	(envelope-from <lersek@redhat.com>) id 1cTWl9-0002sE-O2
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 11:37:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cTWl9-0002rk-Hl
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 11:37:23 -0500
+References: <cover.1484593565.git.ben@skyportsystems.com>
+	<ac2ea4262e8e64d010b152493ce3a3e1cc85e225.1484594095.git.ben@skyportsystems.com>
+	<20170117140058.166de8c2@nial.brq.redhat.com>
+	<20170117163848-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6bbd752d-d354-808e-81c6-2aa270997538@redhat.com>
+Date: Tue, 17 Jan 2017 17:37:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <196ac8f5-2fd7-37e9-d577-8177802d0fb4@redhat.com>
+In-Reply-To: <20170117163848-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-stable] Data corruption in Qemu 2.7.1
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>
-Cc: Peter Lieven <pl@kamp.de>, qemu-devel <qemu-devel@nongnu.org>, Alexandre DERUMIER <aderumier@odiso.com>, qemu-stable <qemu-stable@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: ben@skyportsystems.com, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
+On 01/17/17 15:41, Michael S. Tsirkin wrote:
+> On Tue, Jan 17, 2017 at 02:00:58PM +0100, Igor Mammedov wrote:
+>> Question is how you'd get address of it and I think that's where
+>> writable fwcfg files come in play.
+>> I'd prefer fwcfg_loader in firmware to write it back after buffer
+>> allocation is done as it's already has utilities for fw_cfg,
+>> but that probably would mean extending loader protocol to support
+>> new writeback command.
+> 
+> Right. It's quite easy to do as at least seabios was written to
+> ignore commands it does not recognize. So with old bios you
+> just don't get a write. Not sure about UEFI, worth checking.
 
+Same; OVMF skips (and logs) unknown commands.
 
-On 17/01/2017 16:03, Paolo Bonzini wrote:
 > 
+>> PS, address one would get from guest should be migrated as well
 > 
-> On 17/01/2017 12:22, Fabian Grünbichler wrote:
->> 6) repeat 3-5 until md5sum does not match, kernel spews error
->> messages, or you are convinced that everything is OK
->>
->> sample kernel message (for ext3):
->> Jan 17 11:39:32 ubuntu kernel: sd 2:0:0:0: [sda] tag#32 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
->> Jan 17 11:39:32 ubuntu kernel: sd 2:0:0:0: [sda] tag#32 Sense Key : Illegal Request [current]
->> Jan 17 11:39:32 ubuntu kernel: sd 2:0:0:0: [sda] tag#32 Add. Sense: Invalid field in cdb
->> Jan 17 11:39:32 ubuntu kernel: sd 2:0:0:0: [sda] tag#32 CDB: Write(10) 2a 00 0f 3a 90 00 00 07 d8 00
->> Jan 17 11:39:32 ubuntu kernel: blk_update_request: critical target error, dev sda, sector 255496192
+> IIRC writeable fw cfg blobs are migrated automatically.
 > 
-> Can you reproduce it if QEMU runs under "strace -e ioctl -ff" in the 
-> host?  Or also using this systemtap script.
-> 
-> The important bit would be the lines with a nonzero status, but the
-> others can be useful to see what the surroundings look like.
-> 
-> # example output for "sudo stap -v strace.stp -c 'sg_opcodes /dev/sda'"
-> # | sg_opcodes[3444] 00000000 12 00 00 00 24 00 00 00 be 91
-> # | sg_opcodes[3444] 08100002 a3 0c 00 00 00 00 00 00 20 00
-> 
-> global cdbs%
-> global reqs%
-> global names%
-> 
-> function check_pid() {
->     return target() == 0 || pid() == target();
-> }
-> 
-> probe kernel.function("blk_fill_sghdr_rq") {
->     if (!check_pid()) next;
-> 
->     names[$rq]=sprintf("%s[%d]", execname(), tid())
->     cdbs[$rq]=sprintf("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
-> 		    $hdr->cmdp[0],$hdr->cmdp[1],$hdr->cmdp[2],$hdr->cmdp[3],$hdr->cmdp[4],
-> 		    $hdr->cmdp[6],$hdr->cmdp[5],$hdr->cmdp[7],$hdr->cmdp[8],$hdr->cmdp[9])
-> }
-> 
-> probe kernel.function("scsi_setup_cmnd") {
->     if (!($req in cdbs)) next;
->     reqs[$req->special] = $req;
-> }
-> 
-> probe kernel.function("scsi_finish_command") {
->     if (!($cmd in reqs)) next;
->     rq = reqs[$cmd];
->     printf("%s %08x %s\n", names[rq], $cmd->result, cdbs[rq]);
->     delete reqs[$cmd]
->     delete cdbs[rq]
 
-Please add a "delete names[rq]" here too!
+When added with rom_add_blob() or derivative functions / function-like
+macros, they are.
 
-Paolo
-
-> }
-> 
-> 
+Thanks
+Laszlo
