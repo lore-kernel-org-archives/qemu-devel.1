@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1cTHtA-0002QW-7H
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:41 -0500
+	(envelope-from <marex@denx.de>) id 1cTHtA-0002QZ-U0
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1cTHt7-0005a1-53
+	(envelope-from <marex@denx.de>) id 1cTHt9-0005b6-Od
 	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:40 -0500
-Received: from mail-out.m-online.net ([212.18.0.10]:38511)
+Received: from mail-out.m-online.net ([2001:a60:0:28:0:1:25:1]:36500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cTHt6-0005ZT-QP
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:37 -0500
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cTHt9-0005ag-Dx
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:39 -0500
 From: Marek Vasut <marex@denx.de>
-Date: Tue, 17 Jan 2017 01:44:02 +0100
-Message-Id: <20170117004409.28532-1-marex@denx.de>
-Subject: [Qemu-devel] [PATCH 0/7] Nios2 architecture support
+Date: Tue, 17 Jan 2017 01:44:09 +0100
+Message-Id: <20170117004409.28532-8-marex@denx.de>
+In-Reply-To: <20170117004409.28532-1-marex@denx.de>
+References: <20170117004409.28532-1-marex@denx.de>
+Subject: [Qemu-devel] [PATCH V5 7/7] nios2: Add support for Nios-II R1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,90 +24,135 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Marek Vasut <marex@denx.de>
+Cc: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>, Jeff Da Silva <jdasilva@altera.com>, Ley Foon Tan <lftan@altera.com>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>
 
-This patchset adds support for new Nios2 architecture as well as
-the initial set of models for hardware blocks and emulation of
-the Altera 10M50 GHRD devkit.
+Add remaining bits of the Altera NiosII R1 support into qemu, which
+is documentation, MAINTAINERS file entry, configure bits, arch_init
+and configuration files for both linux-user (userland binaries) and
+softmmu (hardware emulation).
 
-Chris Wulff (3):
-  nios2: Add architecture emulation support
-  nios2: Add IIC interrupt controller emulation
-  nios2: Add periodic timer emulation
-
-Marek Vasut (4):
-  nios2: Add disas entries
-  nios2: Add usermode binaries emulation
-  nios2: Add Altera 10M50 GHRD emulation
-  nios2: Add support for Nios-II R1
-
- MAINTAINERS                          |    8 +
- arch_init.c                          |    2 +
- configure                            |    5 +
- default-configs/nios2-linux-user.mak |    1 +
- default-configs/nios2-softmmu.mak    |    6 +
- disas/Makefile.objs                  |    1 +
- disas/nios2.c                        | 3534 ++++++++++++++++++++++++++++++++++
- hw/intc/Makefile.objs                |    1 +
- hw/intc/nios2_iic.c                  |  103 +
- hw/nios2/10m50_devboard.c            |  126 ++
- hw/nios2/Makefile.objs               |    1 +
- hw/nios2/boot.c                      |  223 +++
- hw/nios2/boot.h                      |   11 +
- hw/nios2/cpu_pic.c                   |   70 +
- hw/timer/Makefile.objs               |    1 +
- hw/timer/altera_timer.c              |  237 +++
- include/disas/bfd.h                  |    6 +
- include/elf.h                        |    2 +
- include/sysemu/arch_init.h           |    1 +
- linux-user/elfload.c                 |   57 +
- linux-user/main.c                    |  140 +-
- linux-user/nios2/syscall_nr.h        |  329 ++++
- linux-user/nios2/target_cpu.h        |   39 +
- linux-user/nios2/target_signal.h     |   26 +
- linux-user/nios2/target_structs.h    |   58 +
- linux-user/nios2/target_syscall.h    |   37 +
- linux-user/nios2/termbits.h          |  220 +++
- linux-user/signal.c                  |  238 ++-
- linux-user/syscall_defs.h            |    8 +-
- qemu-doc.texi                        |    3 +
- target/nios2/Makefile.objs           |    4 +
- target/nios2/cpu.c                   |  239 +++
- target/nios2/cpu.h                   |  272 +++
- target/nios2/helper.c                |  313 +++
- target/nios2/helper.h                |   27 +
- target/nios2/mmu.c                   |  296 +++
- target/nios2/mmu.h                   |   50 +
- target/nios2/monitor.c               |   35 +
- target/nios2/op_helper.c             |   47 +
- target/nios2/translate.c             |  956 +++++++++
- 40 files changed, 7726 insertions(+), 7 deletions(-)
+Signed-off-by: Marek Vasut <marex@denx.de>
+Cc: Chris Wulff <crwulff@gmail.com>
+Cc: Jeff Da Silva <jdasilva@altera.com>
+Cc: Ley Foon Tan <lftan@altera.com>
+Cc: Sandra Loosemore <sandra@codesourcery.com>
+Cc: Yves Vandervennet <yvanderv@altera.com>
+Reviewed-by: Alexander Graf <agraf@suse.de>
+---
+V3: Checkpatch cleanup
+V4: Rebase on top of qemu/master
+V5: Rebase on top of qemu/master
+---
+ MAINTAINERS                          | 8 ++++++++
+ arch_init.c                          | 2 ++
+ configure                            | 5 +++++
+ default-configs/nios2-linux-user.mak | 1 +
+ default-configs/nios2-softmmu.mak    | 6 ++++++
+ include/sysemu/arch_init.h           | 1 +
+ qemu-doc.texi                        | 3 +++
+ 7 files changed, 26 insertions(+)
  create mode 100644 default-configs/nios2-linux-user.mak
  create mode 100644 default-configs/nios2-softmmu.mak
- create mode 100644 disas/nios2.c
- create mode 100644 hw/intc/nios2_iic.c
- create mode 100644 hw/nios2/10m50_devboard.c
- create mode 100644 hw/nios2/Makefile.objs
- create mode 100644 hw/nios2/boot.c
- create mode 100644 hw/nios2/boot.h
- create mode 100644 hw/nios2/cpu_pic.c
- create mode 100644 hw/timer/altera_timer.c
- create mode 100644 linux-user/nios2/syscall_nr.h
- create mode 100644 linux-user/nios2/target_cpu.h
- create mode 100644 linux-user/nios2/target_signal.h
- create mode 100644 linux-user/nios2/target_structs.h
- create mode 100644 linux-user/nios2/target_syscall.h
- create mode 100644 linux-user/nios2/termbits.h
- create mode 100644 target/nios2/Makefile.objs
- create mode 100644 target/nios2/cpu.c
- create mode 100644 target/nios2/cpu.h
- create mode 100644 target/nios2/helper.c
- create mode 100644 target/nios2/helper.h
- create mode 100644 target/nios2/mmu.c
- create mode 100644 target/nios2/mmu.h
- create mode 100644 target/nios2/monitor.c
- create mode 100644 target/nios2/op_helper.c
- create mode 100644 target/nios2/translate.c
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1444b26dc0..7fcb310e7b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -181,6 +181,14 @@ F: disas/moxie.c
+ F: hw/moxie/
+ F: default-configs/moxie-softmmu.mak
+ 
++NiosII
++M: Chris Wulff <crwulff@gmail.com>
++M: Marek Vasut <marex@denx.de>
++S: Maintained
++F: target-nios2/
++F: hw/nios2/
++F: disas/nios2.c
++
+ OpenRISC
+ M: Jia Liu <proljc@gmail.com>
+ S: Maintained
+diff --git a/arch_init.c b/arch_init.c
+index 5cc58b2c35..20d83ff5c0 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -64,6 +64,8 @@ int graphic_depth = 32;
+ #define QEMU_ARCH QEMU_ARCH_MIPS
+ #elif defined(TARGET_MOXIE)
+ #define QEMU_ARCH QEMU_ARCH_MOXIE
++#elif defined(TARGET_NIOS2)
++#define QEMU_ARCH QEMU_ARCH_NIOS2
+ #elif defined(TARGET_OPENRISC)
+ #define QEMU_ARCH QEMU_ARCH_OPENRISC
+ #elif defined(TARGET_PPC)
+diff --git a/configure b/configure
+index 86f5214dd0..48e7088948 100755
+--- a/configure
++++ b/configure
+@@ -5935,6 +5935,8 @@ case "$target_name" in
+   ;;
+   moxie)
+   ;;
++  nios2)
++  ;;
+   or32)
+     TARGET_ARCH=openrisc
+     TARGET_BASE_ARCH=openrisc
+@@ -6128,6 +6130,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   moxie*)
+     disas_config "MOXIE"
+   ;;
++  nios2)
++    disas_config "NIOS2"
++  ;;
+   or32)
+     disas_config "OPENRISC"
+   ;;
+diff --git a/default-configs/nios2-linux-user.mak b/default-configs/nios2-linux-user.mak
+new file mode 100644
+index 0000000000..5be3eb795d
+--- /dev/null
++++ b/default-configs/nios2-linux-user.mak
+@@ -0,0 +1 @@
++# Default configuration for nios2-linux-user
+diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
+new file mode 100644
+index 0000000000..74dc70caae
+--- /dev/null
++++ b/default-configs/nios2-softmmu.mak
+@@ -0,0 +1,6 @@
++# Default configuration for nios2-softmmu
++
++CONFIG_NIOS2=y
++CONFIG_SERIAL=y
++CONFIG_PTIMER=y
++CONFIG_ALTERA_TIMER=y
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 1c9dad1b72..fe60e114b3 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -23,6 +23,7 @@ enum {
+     QEMU_ARCH_UNICORE32 = (1 << 14),
+     QEMU_ARCH_MOXIE = (1 << 15),
+     QEMU_ARCH_TRICORE = (1 << 16),
++    QEMU_ARCH_NIOS2 = (1 << 17),
+ };
+ 
+ extern const uint32_t arch_type;
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 02cb39d430..672ed3a1dd 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2891,6 +2891,9 @@ The binary format is detected automatically.
+ @command{qemu-mips} TODO.
+ @command{qemu-mipsel} TODO.
+ 
++@cindex user mode (NiosII)
++@command{qemu-nios2} TODO.
++
+ @cindex user mode (PowerPC)
+ @command{qemu-ppc64abi32} TODO.
+ @command{qemu-ppc64} TODO.
 -- 
 2.11.0
