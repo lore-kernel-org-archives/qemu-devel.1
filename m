@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nutarojj@ornl.gov>) id 1cTcFM-0006u7-E3
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:28:57 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cTcZN-0003Fu-Ut
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:49:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nutarojj@ornl.gov>) id 1cTcFJ-0005XM-8i
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:28:56 -0500
-Received: from mta02.ornl.gov ([128.219.177.136]:35407)
+	(envelope-from <alex.williamson@redhat.com>) id 1cTcZM-00039k-Uh
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:49:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33734)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nutarojj@ornl.gov>) id 1cTcFJ-0005WB-2N
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:28:53 -0500
-From: "Nutaro, James J." <nutarojj@ornl.gov>
-Date: Tue, 17 Jan 2017 22:28:51 +0000
-Message-ID: <6cc6c5187f3d453887c0f8f3ca8da616@EXCHCS32.ornl.gov>
-References: <1483628868-10496-1-git-send-email-nutarojj@ornl.gov>
-	<0f3d6652-e633-c02e-7234-0d5b885d31ea@redhat.com>
-	<283fd6b709734ccdbeb6d217f8b32043@EXCHCS32.ornl.gov>
-	<33a6f57d-4563-ec4a-f77f-1a15ca57c19d@redhat.com>
-In-Reply-To: <33a6f57d-4563-ec4a-f77f-1a15ca57c19d@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cTcZM-00039I-LO
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:49:36 -0500
+Date: Tue, 17 Jan 2017 15:49:34 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170117154934.568c6ea3@t450s.home>
+In-Reply-To: <20170112072513.98411-9-bjsdjshi@linux.vnet.ibm.com>
+References: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170112072513.98411-9-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6] qqq: module for synchronizing with a
- simulation
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v2 08/12] vfio/ccw: get io region info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-UGFvbG8sDQoNClRoZXJlIGFyZSBzZXZlcmFsIHN3aXRjaGVzIHRoYXQgbmVlZCB0byBiZSBzZXQg
-Zm9yIHRoaXMgbW9kdWxlIHRvIHdvcmssIGFuZCBzbyAtIGluc3BpcmVkIGJ5IHlvdXIgY29tbWVu
-dCAtIEkgZGVjaWRlZCB0byBhZGQgYSBjaGVjayBmb3IgdGhlIG5lY2Vzc2FyeSBzdXBwb3J0aW5n
-IHN3aXRjaGVzIGJlZm9yZSBlbmFibGluZyB0aGUgbW9kdWxlLiBBbiBlcnJvciBtZXNzYWdlIGlz
-IHByaW50ZWQgaWYgZXZlcnl0aGluZyBpcyBub3QgYXMgaXQgc2hvdWxkLiBJIHN1Ym1pdHRlZCB0
-aGUgcGF0Y2ggYXMgdjcuDQoNClRoYW5rcyBmb3IgdGFraW5nIHRoZSB0aW1lIHRvIHJldmlldyB0
-aGlzLg0KDQpKaW0NCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IFBhb2xvIEJv
-bnppbmkgW21haWx0bzpwYm9uemluaUByZWRoYXQuY29tXSANClNlbnQ6IE1vbmRheSwgSmFudWFy
-eSAwOSwgMjAxNyAxMjoxMCBQTQ0KVG86IE51dGFybywgSmFtZXMgSi47IHFlbXUtZGV2ZWxAbm9u
-Z251Lm9yZw0KU3ViamVjdDogUmU6IFtQQVRDSCB2Nl0gcXFxOiBtb2R1bGUgZm9yIHN5bmNocm9u
-aXppbmcgd2l0aCBhIHNpbXVsYXRpb24NCg0KDQoNCk9uIDA5LzAxLzIwMTcgMTg6MDQsIE51dGFy
-bywgSmFtZXMgSi4gd3JvdGU6DQo+IFRoYW5rcyBhZ2FpbiBQYW9sby4gV2hlbiBJIGNoYW5nZSB0
-aGUgY29tbWFuZCBsaW5lIHN3aXRjaGVzLCBpcyBpdCBiZXN0IHRvIHN1Ym1pdCBhIHdob2xlIG5l
-dyB2ZXJzaW9uIG9mIHRoZSBwYXRjaD8gT3IgaXMgdGhlcmUgYW5vdGhlciBtZXRob2QgZm9yIG1h
-bmFnaW5nIHBhdGNoIHJldmlzaW9ucz8NCg0KWWVzLCBzdWJtaXQgYSBuZXcgdmVyc2lvbiwgdGhl
-biBwdXQNCg0KdjYtPnY3OiBkaWQgdGhpcyBhbmQgdGhhdCBbUGFvbG9dDQoNCmF0IHRoZSBlbmQg
-b2YgdGhlIGNvbW1pdCBtZXNzYWdlLCB3aGVyZSB0aGUgc3F1YXJlIGJyYWNrZXRzIG1lYW4NCiJz
-dWdnZXN0ZWQgYnkuLi4iLg0KDQpUaGFua3MsDQoNClBhb2xvDQoNCj4gDQo+IC0tLS0tT3JpZ2lu
-YWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBhb2xvIEJvbnppbmkgW21haWx0bzpwYm9uemluaUBy
-ZWRoYXQuY29tXSANCj4gU2VudDogVGh1cnNkYXksIEphbnVhcnkgMDUsIDIwMTcgMTA6MjcgQU0N
-Cj4gVG86IE51dGFybywgSmFtZXMgSi47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBTdWJqZWN0
-OiBSZTogW1BBVENIIHY2XSBxcXE6IG1vZHVsZSBmb3Igc3luY2hyb25pemluZyB3aXRoIGEgc2lt
-dWxhdGlvbg0KPiANCj4gDQo+IA0KPiBPbiAwNS8wMS8yMDE3IDE2OjA3LCBKYW1lcyBKLiBOdXRh
-cm8gd3JvdGU6DQo+PiBUaGlzIHBhdGNoIGFkZHMgYW4gaW50ZXJmYWNlIGZvciBwYWNpbmcgdGhl
-IGV4ZWN1dGlvbiBvZiBRRU1VIHRvIG1hdGNoIGFuIGV4dGVybmFsDQo+PiBzaW11bGF0aW9uIGNs
-b2NrLiBJdHMgYWltIGlzIHRvIHBlcm1pdCBRRU1VIHRvIGJlIHVzZWQgYXMgYSBtb2R1bGUgd2l0
-aGluIGENCj4+IGxhcmdlciBzaW11bGF0aW9uIHN5c3RlbS4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5
-OiBKYW1lcyBKLiBOdXRhcm8gPG51dGFyb2pqQG9ybmwuZ292Pg0KPiANCj4gV2hhdCdzIHRoZSBk
-aWZmZXJlbmNlIGJldHdlZW4gdjUgYW5kIHY2Pw0KPiANCj4+ICsoMikgRm9yayBRRU1VIHdpdGgg
-dGhlIGFwcHJvcHJpYXRlIGNvbW1hbmQgbGluZSBhcmd1bWVudHMuDQo+PiArICAgIFRoZSAtcXFx
-IHBhcnQgb2YgdGhlIGFyZ3VtZW50IHdpbGwgbG9vayBzb21ldGhpbmcgbGlrZQ0KPj4gKw0KPj4g
-KyAgICAgICAtcXFxIHNvY2s9c29ja3NbMV0NCj4gDQo+IE5vIG5lZWQgZm9yIC1xcXEsIGp1c3Qg
-bWFrZSBpdCAiLWljb3VudCBleHRjbG9jaz1GRCIuDQo+IA0KPiBQYW9sbw0KPiANCg0K
+On Thu, 12 Jan 2017 08:25:09 +0100
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+
+> vfio-ccw provides an MMIO region for I/O operations. We fetch its
+> information via ioctls here, then we can use it performing I/O
+> instructions and retrieving I/O results later on.
+> 
+> Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> ---
+>  hw/vfio/ccw.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 52 insertions(+)
+> 
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 881010b..93394c2 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -21,11 +21,15 @@
+>  #include "hw/vfio/vfio-common.h"
+>  #include "hw/s390x/s390-ccw.h"
+>  #include "hw/s390x/ccw-device.h"
+> +#include "standard-headers/asm-s390/vfio_ccw.h"
+>  
+>  #define TYPE_VFIO_CCW "vfio-ccw"
+>  typedef struct VFIOCCWDevice {
+>      S390CCWDevice cdev;
+>      VFIODevice vdev;
+> +    uint64_t io_region_size;
+> +    uint64_t io_region_offset;
+> +    struct ccw_io_region *io_region;
+>  } VFIOCCWDevice;
+>  
+>  static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
+> @@ -50,6 +54,46 @@ static void vfio_ccw_reset(DeviceState *dev)
+>      ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
+>  }
+>  
+> +static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
+> +{
+> +    VFIODevice *vdev = &vcdev->vdev;
+> +    struct vfio_region_info *info;
+> +    int ret;
+> +
+> +    /* Sanity check device */
+> +    if (!(vdev->flags & VFIO_DEVICE_FLAGS_CCW)) {
+> +        error_setg(errp, "vfio: Um, this isn't a vfio-ccw device");
+> +        return;
+> +    }
+> +
+> +    if (vdev->num_regions != VFIO_CCW_NUM_REGIONS) {
+> +        error_setg(errp, "vfio: Unexpected number of the I/O region %u",
+> +                   vdev->num_regions);
+> +        return;
+> +    }
+
+I think you want < here, not !=, otherwise you we can never add another
+region to describe something new on a vfio-ccw device without breaking
+this code.  You've defined in the uapi that region index zero is always
+VFIO_CCW_CONFIG_REGION_INDEX and this code only depends on that, no
+matter what additional regions might be added.  That's done below.
+
+> +
+> +    ret = vfio_get_region_info(vdev, VFIO_CCW_CONFIG_REGION_INDEX, &info);
+> +    if (ret) {
+> +        error_setg(errp, "vfio: Error getting config info: %d", ret);
+> +        return;
+> +    }
+> +
+> +    vcdev->io_region_size = info->size;
+> +    if (sizeof(*vcdev->io_region) != vcdev->io_region_size) {
+> +        error_setg(errp, "vfio: Unexpected size of the I/O region");
+> +        return;
+> +    }
+> +    vcdev->io_region_offset = info->offset;
+> +    vcdev->io_region = g_malloc0(info->size);
+> +
+> +    g_free(info);
+> +}
+> +
+> +static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
+> +{
+> +    g_free(vcdev->io_region);
+> +}
+> +
+>  static void vfio_put_device(VFIOCCWDevice *vcdev)
+>  {
+>      g_free(vcdev->vdev.name);
+> @@ -144,8 +188,15 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+>          goto out_device_err;
+>      }
+>  
+> +    vfio_ccw_get_region(vcdev, errp);
+> +    if (*errp) {
+> +        goto out_region_err;
+> +    }
+> +
+>      return;
+>  
+> +out_region_err:
+> +    vfio_put_device(vcdev);
+>  out_device_err:
+>      vfio_ccw_put_group(group, path);
+>  out_group_err:
+> @@ -166,6 +217,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
+>          cdc->unrealize(cdev, errp);
+>      }
+>  
+> +    vfio_ccw_put_region(vcdev);
+>      vfio_put_device(vcdev);
+>      vfio_put_group(group);
+>  }
