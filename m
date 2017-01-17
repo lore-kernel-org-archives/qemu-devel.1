@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1cTHtA-0002QY-H6
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:42 -0500
+	(envelope-from <marex@denx.de>) id 1cTHtC-0002Qn-Jo
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1cTHt8-0005ac-Nv
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:40 -0500
-Received: from mail-out.m-online.net ([212.18.0.10]:51917)
+	(envelope-from <marex@denx.de>) id 1cTHtA-0005bY-DD
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:42 -0500
+Received: from mail-out.m-online.net ([212.18.0.9]:37245)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cTHt8-0005aH-EX
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:38 -0500
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cTHtA-0005av-0s
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:40 -0500
 From: Marek Vasut <marex@denx.de>
-Date: Tue, 17 Jan 2017 01:44:07 +0100
-Message-Id: <20170117004409.28532-6-marex@denx.de>
+Date: Tue, 17 Jan 2017 01:44:08 +0100
+Message-Id: <20170117004409.28532-7-marex@denx.de>
 In-Reply-To: <20170117004409.28532-1-marex@denx.de>
 References: <20170117004409.28532-1-marex@denx.de>
-Subject: [Qemu-devel] [PATCH V5 5/7] nios2: Add periodic timer emulation
+Subject: [Qemu-devel] [PATCH V6 6/7] nios2: Add Altera 10M50 GHRD emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,11 +24,12 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Jeff Da Silva <jdasilva@altera.com>, Ley Foon Tan <lftan@altera.com>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>
+Cc: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>, Jeff Da Silva <jdasilva@altera.com>, Ley Foon Tan <lftan@altera.com>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>
 
-From: Chris Wulff <crwulff@gmail.com>
-
-Add the Altera timer model.
+Add the Altera 10M50 Nios2 GHRD model. This allows emulating the
+10M50 development kit with the Nios2 GHRD loaded in the FPGA. It
+is possible to boot Linux kernel and run userspace, thus far only
+from initrd as storage support is not yet implemented.
 
 Signed-off-by: Marek Vasut <marex@denx.de>
 Cc: Chris Wulff <crwulff@gmail.com>
@@ -38,36 +39,35 @@ Cc: Sandra Loosemore <sandra@codesourcery.com>
 Cc: Yves Vandervennet <yvanderv@altera.com>
 Reviewed-by: Alexander Graf <agraf@suse.de>
 ---
-V3: Checkpatch cleanup
-V4: Rebase on top of qemu/master
-V5: - Rebase on top of qemu/master
-    - Drop the addr &= 0x7 , which is now deemed obsolete.
+V3: Checkpatch cleanup, move cpu_pic.c here
+V4: Add initrd DT address translation (thanks Guenter)
+V5: Rebase on top of qemu/master
+V6: Rebase on top of qemu/master
 ---
- hw/timer/Makefile.objs  |   1 +
- hw/timer/altera_timer.c | 237 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 238 insertions(+)
- create mode 100644 hw/timer/altera_timer.c
+ hw/nios2/10m50_devboard.c | 126 ++++++++++++++++++++++++++
+ hw/nios2/Makefile.objs    |   1 +
+ hw/nios2/boot.c           | 223 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/nios2/boot.h           |  11 +++
+ hw/nios2/cpu_pic.c        |  70 +++++++++++++++
+ 5 files changed, 431 insertions(+)
+ create mode 100644 hw/nios2/10m50_devboard.c
+ create mode 100644 hw/nios2/Makefile.objs
+ create mode 100644 hw/nios2/boot.c
+ create mode 100644 hw/nios2/boot.h
+ create mode 100644 hw/nios2/cpu_pic.c
 
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 7ba8c23c75..0867a64754 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -18,6 +18,7 @@ common-obj-$(CONFIG_IMX) += imx_gpt.o
- common-obj-$(CONFIG_LM32) += lm32_timer.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
- 
-+obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
- obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
- obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
- obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
-diff --git a/hw/timer/altera_timer.c b/hw/timer/altera_timer.c
+diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
 new file mode 100644
-index 0000000000..6d4862661d
+index 0000000000..62e5738b65
 --- /dev/null
-+++ b/hw/timer/altera_timer.c
-@@ -0,0 +1,237 @@
++++ b/hw/nios2/10m50_devboard.c
+@@ -0,0 +1,126 @@
 +/*
-+ * QEMU model of the Altera timer.
++ * Altera 10M50 Nios2 GHRD
++ *
++ * Copyright (c) 2016 Marek Vasut <marek.vasut@gmail.com>
++ *
++ * Based on LabX device code
 + *
 + * Copyright (c) 2012 Chris Wulff <crwulff@gmail.com>
 + *
@@ -87,221 +87,435 @@ index 0000000000..6d4862661d
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu-common.h"
 +#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
 +
 +#include "hw/sysbus.h"
++#include "hw/hw.h"
++#include "hw/char/serial.h"
 +#include "sysemu/sysemu.h"
-+#include "hw/ptimer.h"
++#include "hw/boards.h"
++#include "exec/memory.h"
++#include "exec/address-spaces.h"
++#include "qemu/config-file.h"
 +
-+#define R_STATUS      0
-+#define R_CONTROL     1
-+#define R_PERIODL     2
-+#define R_PERIODH     3
-+#define R_SNAPL       4
-+#define R_SNAPH       5
-+#define R_MAX         6
++#include "boot.h"
 +
-+#define STATUS_TO     0x0001
-+#define STATUS_RUN    0x0002
++#define BINARY_DEVICE_TREE_FILE    "10m50-devboard.dtb"
 +
-+#define CONTROL_ITO   0x0001
-+#define CONTROL_CONT  0x0002
-+#define CONTROL_START 0x0004
-+#define CONTROL_STOP  0x0008
-+
-+#define TYPE_ALTERA_TIMER "ALTR.timer"
-+#define ALTERA_TIMER(obj) \
-+    OBJECT_CHECK(AlteraTimer, (obj), TYPE_ALTERA_TIMER)
-+
-+typedef struct AlteraTimer {
-+    SysBusDevice  busdev;
-+    MemoryRegion  mmio;
-+    qemu_irq      irq;
-+    uint32_t      freq_hz;
-+    QEMUBH       *bh;
-+    ptimer_state *ptimer;
-+    uint32_t      regs[R_MAX];
-+} AlteraTimer;
-+
-+static int timer_irq_state(AlteraTimer *t)
++static void nios2_10m50_ghrd_init(MachineState *machine)
 +{
-+    bool irq = (t->regs[R_STATUS] & STATUS_TO) &&
-+               (t->regs[R_CONTROL] & CONTROL_ITO);
-+    return irq;
++    Nios2CPU *cpu;
++    DeviceState *dev;
++    MemoryRegion *address_space_mem = get_system_memory();
++    MemoryRegion *phys_tcm = g_new(MemoryRegion, 1);
++    MemoryRegion *phys_tcm_alias = g_new(MemoryRegion, 1);
++    MemoryRegion *phys_ram = g_new(MemoryRegion, 1);
++    MemoryRegion *phys_ram_alias = g_new(MemoryRegion, 1);
++    ram_addr_t tcm_base = 0x0;
++    ram_addr_t tcm_size = 0x1000;    /* 1 kiB, but QEMU limit is 4 kiB */
++    ram_addr_t ram_base = 0x08000000;
++    ram_addr_t ram_size = 0x08000000;
++    qemu_irq *cpu_irq, irq[32];
++    int i;
++
++    /* Physical TCM (tb_ram_1k) with alias at 0xc0000000 */
++    memory_region_init_ram(phys_tcm, NULL, "nios2.tcm", tcm_size, &error_abort);
++    memory_region_init_alias(phys_tcm_alias, NULL, "nios2.tcm.alias",
++                             phys_tcm, 0, tcm_size);
++    vmstate_register_ram_global(phys_tcm);
++    memory_region_add_subregion(address_space_mem, tcm_base, phys_tcm);
++    memory_region_add_subregion(address_space_mem, 0xc0000000 + tcm_base,
++                                phys_tcm_alias);
++
++    /* Physical DRAM with alias at 0xc0000000 */
++    memory_region_init_ram(phys_ram, NULL, "nios2.ram", ram_size, &error_abort);
++    memory_region_init_alias(phys_ram_alias, NULL, "nios2.ram.alias",
++                             phys_ram, 0, ram_size);
++    vmstate_register_ram_global(phys_ram);
++    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
++    memory_region_add_subregion(address_space_mem, 0xc0000000 + ram_base,
++                                phys_ram_alias);
++
++    /* Create CPU -- FIXME */
++    cpu = cpu_nios2_init("nios2");
++
++    /* Register: CPU interrupt controller (PIC) */
++    cpu_irq = nios2_cpu_pic_init(cpu);
++
++    /* Register: Internal Interrupt Controller (IIC) */
++    dev = qdev_create(NULL, "altera,iic");
++    qdev_prop_set_ptr(dev, "cpu", cpu);
++    qdev_init_nofail(dev);
++    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irq[0]);
++    for (i = 0; i < 32; i++) {
++        irq[i] = qdev_get_gpio_in(dev, i);
++    }
++
++    /* Register: Altera 16550 UART */
++    serial_mm_init(address_space_mem, 0xf8001600, 2, irq[1], 115200,
++                   serial_hds[0], DEVICE_NATIVE_ENDIAN);
++
++    /* Register: Timer sys_clk_timer  */
++    dev = qdev_create(NULL, "ALTR.timer");
++    qdev_prop_set_uint32(dev, "clock-frequency", 75 * 1000000);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xf8001440);
++    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq[0]);
++
++    /* Register: Timer sys_clk_timer_1  */
++    dev = qdev_create(NULL, "ALTR.timer");
++    qdev_prop_set_uint32(dev, "clock-frequency", 75 * 1000000);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xe0000880);
++    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq[5]);
++
++    /* Configure new exception vectors and reset CPU for it to take effect. */
++    cpu->reset_addr = 0xd4000000;
++    cpu->exception_addr = 0xc8000120;
++    cpu->fast_tlb_miss_addr = 0xc0000100;
++
++    nios2_load_kernel(cpu, ram_base, ram_size, machine->initrd_filename,
++                      BINARY_DEVICE_TREE_FILE, NULL);
 +}
 +
-+static uint64_t timer_read(void *opaque, hwaddr addr,
-+                           unsigned int size)
++static void nios2_10m50_ghrd_machine_init(struct MachineClass *mc)
 +{
-+    AlteraTimer *t = opaque;
-+    uint64_t r = 0;
-+
-+    addr >>= 2;
-+
-+    switch (addr) {
-+    case R_CONTROL:
-+        r = t->regs[R_CONTROL] & (CONTROL_ITO | CONTROL_CONT);
-+        break;
-+
-+    default:
-+        if (addr < ARRAY_SIZE(t->regs)) {
-+            r = t->regs[addr];
-+        }
-+        break;
-+    }
-+
-+    return r;
++    mc->desc = "Altera 10M50 GHRD Nios II design";
++    mc->init = nios2_10m50_ghrd_init;
++    mc->is_default = 1;
 +}
 +
-+static void timer_write(void *opaque, hwaddr addr,
-+                        uint64_t value, unsigned int size)
++DEFINE_MACHINE("10m50-ghrd", nios2_10m50_ghrd_machine_init);
+diff --git a/hw/nios2/Makefile.objs b/hw/nios2/Makefile.objs
+new file mode 100644
+index 0000000000..6b5c421760
+--- /dev/null
++++ b/hw/nios2/Makefile.objs
+@@ -0,0 +1 @@
++obj-y = boot.o cpu_pic.o 10m50_devboard.o
+diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
+new file mode 100644
+index 0000000000..e0a9aff2f4
+--- /dev/null
++++ b/hw/nios2/boot.c
+@@ -0,0 +1,223 @@
++/*
++ * Nios2 kernel loader
++ *
++ * Copyright (c) 2016 Marek Vasut <marek.vasut@gmail.com>
++ *
++ * Based on microblaze kernel loader
++ *
++ * Copyright (c) 2012 Peter Crosthwaite <peter.crosthwaite@petalogix.com>
++ * Copyright (c) 2012 PetaLogix
++ * Copyright (c) 2009 Edgar E. Iglesias.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "qemu/option.h"
++#include "qemu/config-file.h"
++#include "qemu/error-report.h"
++#include "qemu-common.h"
++#include "sysemu/device_tree.h"
++#include "sysemu/sysemu.h"
++#include "hw/loader.h"
++#include "elf.h"
++#include "qemu/cutils.h"
++
++#include "boot.h"
++
++#define NIOS2_MAGIC    0x534f494e
++
++static struct nios2_boot_info {
++    void (*machine_cpu_reset)(Nios2CPU *);
++    uint32_t bootstrap_pc;
++    uint32_t cmdline;
++    uint32_t initrd_start;
++    uint32_t initrd_end;
++    uint32_t fdt;
++} boot_info;
++
++static void main_cpu_reset(void *opaque)
 +{
-+    AlteraTimer *t = opaque;
-+    uint64_t tvalue;
-+    uint32_t count = 0;
-+    int irqState = timer_irq_state(t);
++    Nios2CPU *cpu = opaque;
++    CPUState *cs = CPU(cpu);
++    CPUNios2State *env = &cpu->env;
 +
-+    addr >>= 2;
++    cpu_reset(CPU(cpu));
 +
-+    switch (addr) {
-+    case R_STATUS:
-+        /* The timeout bit is cleared by writing the status register. */
-+        t->regs[R_STATUS] &= ~STATUS_TO;
-+        break;
++    env->regs[R_ARG0] = NIOS2_MAGIC;
++    env->regs[R_ARG1] = boot_info.initrd_start;
++    env->regs[R_ARG2] = boot_info.fdt;
++    env->regs[R_ARG3] = boot_info.cmdline;
 +
-+    case R_CONTROL:
-+        t->regs[R_CONTROL] = value & (CONTROL_ITO | CONTROL_CONT);
-+        if ((value & CONTROL_START) &&
-+            !(t->regs[R_STATUS] & STATUS_RUN)) {
-+            ptimer_run(t->ptimer, 1);
-+            t->regs[R_STATUS] |= STATUS_RUN;
-+        }
-+        if ((value & CONTROL_STOP) && (t->regs[R_STATUS] & STATUS_RUN)) {
-+            ptimer_stop(t->ptimer);
-+            t->regs[R_STATUS] &= ~STATUS_RUN;
-+        }
-+        break;
-+
-+    case R_PERIODL:
-+    case R_PERIODH:
-+        t->regs[addr] = value & 0xFFFF;
-+        if (t->regs[R_STATUS] & STATUS_RUN) {
-+            ptimer_stop(t->ptimer);
-+            t->regs[R_STATUS] &= ~STATUS_RUN;
-+        }
-+        tvalue = (t->regs[R_PERIODH] << 16) | t->regs[R_PERIODL];
-+        ptimer_set_limit(t->ptimer, tvalue + 1, 1);
-+        break;
-+
-+    case R_SNAPL:
-+    case R_SNAPH:
-+        count = ptimer_get_count(t->ptimer);
-+        t->regs[R_SNAPL] = count & 0xFFFF;
-+        t->regs[R_SNAPH] = count >> 16;
-+        break;
-+
-+    default:
-+        break;
-+    }
-+
-+    if (irqState != timer_irq_state(t)) {
-+        qemu_set_irq(t->irq, timer_irq_state(t));
++    cpu_set_pc(cs, boot_info.bootstrap_pc);
++    if (boot_info.machine_cpu_reset) {
++        boot_info.machine_cpu_reset(cpu);
 +    }
 +}
 +
-+static const MemoryRegionOps timer_ops = {
-+    .read = timer_read,
-+    .write = timer_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static void timer_hit(void *opaque)
++static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
 +{
-+    AlteraTimer *t = opaque;
-+    const uint64_t tvalue = (t->regs[R_PERIODH] << 16) | t->regs[R_PERIODL];
++    return addr - 0xc0000000LL;
++}
 +
-+    t->regs[R_STATUS] |= STATUS_TO;
++static int nios2_load_dtb(struct nios2_boot_info bi, const uint32_t ramsize,
++                          const char *kernel_cmdline, const char *dtb_filename)
++{
++    int fdt_size;
++    void *fdt = NULL;
++    int r;
 +
-+    ptimer_set_limit(t->ptimer, tvalue + 1, 1);
++    if (dtb_filename) {
++        fdt = load_device_tree(dtb_filename, &fdt_size);
++    }
++    if (!fdt) {
++        return 0;
++    }
 +
-+    if (!(t->regs[R_CONTROL] & CONTROL_CONT)) {
-+        t->regs[R_STATUS] &= ~STATUS_RUN;
-+        ptimer_set_count(t->ptimer, tvalue);
++    if (kernel_cmdline) {
++        r = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
++                                    kernel_cmdline);
++        if (r < 0) {
++            fprintf(stderr, "couldn't set /chosen/bootargs\n");
++        }
++    }
++
++    if (bi.initrd_start) {
++        qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-start",
++                              translate_kernel_address(NULL, bi.initrd_start));
++
++        qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
++                              translate_kernel_address(NULL, bi.initrd_end));
++    }
++
++    cpu_physical_memory_write(bi.fdt, fdt, fdt_size);
++    return fdt_size;
++}
++
++void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
++                            uint32_t ramsize,
++                            const char *initrd_filename,
++                            const char *dtb_filename,
++                            void (*machine_cpu_reset)(Nios2CPU *))
++{
++    QemuOpts *machine_opts;
++    const char *kernel_filename;
++    const char *kernel_cmdline;
++    const char *dtb_arg;
++    char *filename = NULL;
++
++    machine_opts = qemu_get_machine_opts();
++    kernel_filename = qemu_opt_get(machine_opts, "kernel");
++    kernel_cmdline = qemu_opt_get(machine_opts, "append");
++    dtb_arg = qemu_opt_get(machine_opts, "dtb");
++    /* default to pcbios dtb as passed by machine_init */
++    if (!dtb_arg) {
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, dtb_filename);
++    }
++
++    boot_info.machine_cpu_reset = machine_cpu_reset;
++    qemu_register_reset(main_cpu_reset, cpu);
++
++    if (kernel_filename) {
++        int kernel_size, fdt_size;
++        uint64_t entry, low, high;
++        uint32_t base32;
++        int big_endian = 0;
++
++#ifdef TARGET_WORDS_BIGENDIAN
++        big_endian = 1;
++#endif
++
++        /* Boots a kernel elf binary. */
++        kernel_size = load_elf(kernel_filename, NULL, NULL,
++                               &entry, &low, &high,
++                               big_endian, EM_ALTERA_NIOS2, 0, 0);
++        base32 = entry;
++        if (base32 == 0xc0000000) {
++            kernel_size = load_elf(kernel_filename, translate_kernel_address,
++                                   NULL, &entry, NULL, NULL,
++                                   big_endian, EM_ALTERA_NIOS2, 0, 0);
++        }
++
++        /* Always boot into physical ram. */
++        boot_info.bootstrap_pc = ddr_base + 0xc0000000 + (entry & 0x07ffffff);
++
++        /* If it wasn't an ELF image, try an u-boot image. */
++        if (kernel_size < 0) {
++            hwaddr uentry, loadaddr;
++
++            kernel_size = load_uimage(kernel_filename, &uentry, &loadaddr, 0,
++                                      NULL, NULL);
++            boot_info.bootstrap_pc = uentry;
++            high = loadaddr + kernel_size;
++        }
++
++        /* Not an ELF image nor an u-boot image, try a RAW image. */
++        if (kernel_size < 0) {
++            kernel_size = load_image_targphys(kernel_filename, ddr_base,
++                                              ram_size);
++            boot_info.bootstrap_pc = ddr_base;
++            high = ddr_base + kernel_size;
++        }
++
++        high = ROUND_UP(high, 1024 * 1024);
++
++        /* If initrd is available, it goes after the kernel, aligned to 1M. */
++        if (initrd_filename) {
++            int initrd_size;
++            uint32_t initrd_offset;
++
++            boot_info.initrd_start = high;
++            initrd_offset = boot_info.initrd_start - ddr_base;
++
++            initrd_size = load_ramdisk(initrd_filename,
++                                       boot_info.initrd_start,
++                                       ram_size - initrd_offset);
++            if (initrd_size < 0) {
++                initrd_size = load_image_targphys(initrd_filename,
++                                                  boot_info.initrd_start,
++                                                  ram_size - initrd_offset);
++            }
++            if (initrd_size < 0) {
++                error_report("qemu: could not load initrd '%s'",
++                             initrd_filename);
++                exit(EXIT_FAILURE);
++            }
++            high += initrd_size;
++        }
++        high = ROUND_UP(high, 4);
++        boot_info.initrd_end = high;
++
++        /* Device tree must be placed right after initrd (if available) */
++        boot_info.fdt = high;
++        fdt_size = nios2_load_dtb(boot_info, ram_size, kernel_cmdline,
++                                  /* Preference a -dtb argument */
++                                  dtb_arg ? dtb_arg : filename);
++        high += fdt_size;
++
++        /* Kernel command is at the end, 4k aligned. */
++        boot_info.cmdline = ROUND_UP(high, 4096);
++        if (kernel_cmdline && strlen(kernel_cmdline)) {
++            pstrcpy_targphys("cmdline", boot_info.cmdline, 256, kernel_cmdline);
++        }
++    }
++    g_free(filename);
++}
+diff --git a/hw/nios2/boot.h b/hw/nios2/boot.h
+new file mode 100644
+index 0000000000..3116753818
+--- /dev/null
++++ b/hw/nios2/boot.h
+@@ -0,0 +1,11 @@
++#ifndef NIOS2_BOOT_H
++#define NIOS2_BOOT_H
++
++#include "hw/hw.h"
++#include "cpu.h"
++
++void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base, uint32_t ramsize,
++                       const char *initrd_filename, const char *dtb_filename,
++                       void (*machine_cpu_reset)(Nios2CPU *));
++
++#endif /* NIOS2_BOOT_H */
+diff --git a/hw/nios2/cpu_pic.c b/hw/nios2/cpu_pic.c
+new file mode 100644
+index 0000000000..0f95987ef3
+--- /dev/null
++++ b/hw/nios2/cpu_pic.c
+@@ -0,0 +1,70 @@
++/*
++ * Altera Nios2 CPU PIC
++ *
++ * Copyright (c) 2016 Marek Vasut <marek.vasut@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++
++#include "qemu/config-file.h"
++
++#include "boot.h"
++
++static void nios2_pic_cpu_handler(void *opaque, int irq, int level)
++{
++    Nios2CPU *cpu = opaque;
++    CPUNios2State *env = &cpu->env;
++    CPUState *cs = CPU(cpu);
++    int type = irq ? CPU_INTERRUPT_NMI : CPU_INTERRUPT_HARD;
++
++    if (type == CPU_INTERRUPT_HARD) {
++        env->irq_pending = level;
++
++        if (level && (env->regs[CR_STATUS] & CR_STATUS_PIE)) {
++            env->irq_pending = 0;
++            cpu_interrupt(cs, type);
++        } else if (!level) {
++            env->irq_pending = 0;
++            cpu_reset_interrupt(cs, type);
++        }
 +    } else {
-+        ptimer_run(t->ptimer, 1);
++        if (level) {
++            cpu_interrupt(cs, type);
++        } else {
++            cpu_reset_interrupt(cs, type);
++        }
 +    }
-+
-+    qemu_set_irq(t->irq, timer_irq_state(t));
 +}
 +
-+static void altera_timer_realize(DeviceState *dev, Error **errp)
++void nios2_check_interrupts(CPUNios2State *env)
 +{
-+    AlteraTimer *t = ALTERA_TIMER(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    Nios2CPU *cpu = nios2_env_get_cpu(env);
++    CPUState *cs = CPU(cpu);
 +
-+    if (t->freq_hz == 0) {
-+        error_setg(errp, "\"clock-frequency\" property must be provided.");
-+        return;
++    if (env->irq_pending) {
++        env->irq_pending = 0;
++        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
 +    }
-+
-+    t->bh = qemu_bh_new(timer_hit, t);
-+    t->ptimer = ptimer_init(t->bh, PTIMER_POLICY_DEFAULT);
-+    ptimer_set_freq(t->ptimer, t->freq_hz);
-+
-+    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t,
-+                          TYPE_ALTERA_TIMER, R_MAX * sizeof(uint32_t));
-+    sysbus_init_mmio(sbd, &t->mmio);
 +}
 +
-+static void altera_timer_init(Object *obj)
++qemu_irq *nios2_cpu_pic_init(Nios2CPU *cpu)
 +{
-+    AlteraTimer *t = ALTERA_TIMER(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    sysbus_init_irq(sbd, &t->irq);
++    return qemu_allocate_irqs(nios2_pic_cpu_handler, cpu, 2);
 +}
-+
-+static void altera_timer_reset(DeviceState *dev)
-+{
-+    AlteraTimer *t = ALTERA_TIMER(dev);
-+
-+    ptimer_stop(t->ptimer);
-+    ptimer_set_limit(t->ptimer, 0xffffffff, 1);
-+    memset(t->regs, 0, ARRAY_SIZE(t->regs));
-+}
-+
-+static Property altera_timer_properties[] = {
-+    DEFINE_PROP_UINT32("clock-frequency", AlteraTimer, freq_hz, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void altera_timer_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = altera_timer_realize;
-+    dc->props = altera_timer_properties;
-+    dc->reset = altera_timer_reset;
-+}
-+
-+static const TypeInfo altera_timer_info = {
-+    .name          = TYPE_ALTERA_TIMER,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(AlteraTimer),
-+    .instance_init = altera_timer_init,
-+    .class_init    = altera_timer_class_init,
-+};
-+
-+static void altera_timer_register(void)
-+{
-+    type_register_static(&altera_timer_info);
-+}
-+
-+type_init(altera_timer_register)
 -- 
 2.11.0
