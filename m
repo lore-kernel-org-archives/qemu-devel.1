@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cTPGo-0004YL-Ch
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:37:35 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cTPLr-00069D-Mi
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:42:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cTPGk-0000wS-5S
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:37:34 -0500
-Received: from 11.mo5.mail-out.ovh.net ([46.105.47.167]:51674)
+	(envelope-from <imammedo@redhat.com>) id 1cTPLo-0003Kl-Dr
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:42:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cTPGj-0000w8-VE
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:37:30 -0500
-Received: from player760.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7D7156D335
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 09:37:28 +0100 (CET)
-References: <1483979087-32663-1-git-send-email-clg@kaod.org>
-	<1483979087-32663-12-git-send-email-clg@kaod.org>
-	<b5660d74-0c16-871b-bec0-31a5a6e19f04@gmail.com>
-	<9b1c1700-04cc-9b1e-6fdc-5ac84e5cd42e@kaod.org>
-	<e6c78999-f851-eb32-6244-80e85e0b5190@gmail.com>
-	<64b13418-337d-d3a6-2c65-0add542c9ba8@kaod.org>
-	<f36efc32-d25b-0948-6302-0b84ccc3bdda@gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <1585f3eb-c387-d3c5-c11a-0426bd236a17@kaod.org>
-Date: Tue, 17 Jan 2017 09:37:23 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cTPLo-0003KW-5i
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:42:44 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F2F0183F43
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 08:42:43 +0000 (UTC)
+Date: Tue, 17 Jan 2017 09:42:39 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170117094239.0e55996e@nial.brq.redhat.com>
+In-Reply-To: <9de0640d-fc7f-eb52-9410-77494f29077e@redhat.com>
+References: <20170112182446.9600-1-lersek@redhat.com>
+	<20170112182446.9600-2-lersek@redhat.com>
+	<20170113143433.282c9a81@nial.brq.redhat.com>
+	<9de0640d-fc7f-eb52-9410-77494f29077e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f36efc32-d25b-0948-6302-0b84ccc3bdda@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 11/11] aspeed/smc: handle dummy bytes
- when doing fast reads in command mode
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 wave 2 1/3] hw/isa/lpc_ich9: add SMI
+ feature negotiation via fw_cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "mar.krzeminski" <mar.krzeminski@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 01/16/2017 07:58 PM, mar.krzeminski wrote:
->=20
->=20
-> W dniu 16.01.2017 o 09:18, C=C3=A9dric Le Goater pisze:
->>> I did not notice that this function is also called in writes, isn't i=
-t?
->>> If yes, dummy cycles are used only during reads so probably CTRL_FREA=
-DMODE
->>> needs to be tested.
->> yes. I can take care of that in a follow up patchset for
->> dummy support.
->>   Dummies in user mode is a bit painful to implement, as I had
->> to snoop into the command flow to catch the fast read op.
->> Not sure this is the right approach so I kept it for later.
-> Definitelly wrong, controller should not be aware of tha, fix is still =
-on me :(
+On Mon, 16 Jan 2017 21:51:34 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-ok. np. I will send the support for command mode though,=20
-as this is a must have for booting.
+> On 01/13/17 14:34, Igor Mammedov wrote:
+> > On Thu, 12 Jan 2017 19:24:44 +0100
+> > Laszlo Ersek <lersek@redhat.com> wrote:
+> > 
+> > [...]  
+> >> +static void smi_features_ok_callback(void *opaque)
+> >> +{
+> >> +    ICH9LPCState *lpc = opaque;
+> >> +    uint64_t guest_features;
+> >> +
+> >> +    if (lpc->smi_features_ok) {
+> >> +        /* negotiation already complete, features locked */
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    memcpy(&guest_features, lpc->smi_guest_features_le, sizeof guest_features);
+> >> +    le64_to_cpus(&guest_features);
+> >> +    if (guest_features & ~lpc->smi_host_features) {
+> >> +        /* guest requests invalid features, leave @features_ok at zero */
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    /* valid feature subset requested, lock it down, report success */
+> >> +    lpc->smi_negotiated_features = guest_features;
+> >> +    lpc->smi_features_ok = 1;
+> >> +}  
+> > [...]
+> >   
+> >> +    .fields = (VMStateField[]) {
+> >> +        VMSTATE_UINT8_ARRAY(smi_guest_features_le, ICH9LPCState,
+> >> +                            sizeof(uint64_t)),
+> >> +        VMSTATE_UINT8(smi_features_ok, ICH9LPCState),
+> >> +        VMSTATE_UINT64(smi_negotiated_features, ICH9LPCState),  
+> > 
+> > Couldn't smi_negotiated_features be derived from
+> > smi_guest_features_le on target side?  
+> 
+> No, that's something we must expressly not do.
+> 
+> The "guest-features" file remains writeable (and back-readable) to the
+> guest after feature validation/lockdown (i.e., after selecting
+> "features-ok"), it just has no effect on QEMU.
+> 
+> And, if the guest rewrites "guest-features" between feature lockdown and
+> migration, that must have no effect on the target host either. Hence we
+> must carry forward the negotiated features originally computed on the
+> source host.
+ok,
+patch looks good to me, so
 
->>
->>
->> Did you have time to take look at the other patches adding
->> Command mode and extending the tests ? I should have addressed
->> your comments there.
-> Yes, there is one more thing that could be important. It popped out in =
-Sabrelite
-> SPI model. The question is does SCM support different CS active (so dev=
-ice
-> is active at CS high). Your code assume that SMC will always use CS LOW=
- to activate
-> device. If this is not true you might be interested in update this too.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Aspeed SoC does not let you configure the chip select polarity=20
-(nor the clock phase ) So it is active low only.
-
-Thanks,
-
-C.
+> Thanks
+> Laszlo
+> 
+> > 
+> >   
+> >> +        VMSTATE_END_OF_LIST()
+> >> +    }
+> >> +};
+> >> +
+> >>  static const VMStateDescription vmstate_ich9_lpc = {
+> >>      .name = "ICH9LPC",
+> >>      .version_id = 1,
+> >> @@ -683,6 +761,7 @@ static const VMStateDescription vmstate_ich9_lpc = {
+> >>      },
+> >>      .subsections = (const VMStateDescription*[]) {
+> >>          &vmstate_ich9_rst_cnt,
+> >> +        &vmstate_ich9_smi_feat,
+> >>          NULL
+> >>      }
+> >>  };  
+> >   
+> 
+> 
