@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTY5G-00073l-8a
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:02:15 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cTYNJ-0002e1-GO
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:20:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTY5C-00047o-El
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:02:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTY5C-00047h-9A
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:02:10 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46712C056790
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 18:02:09 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 17 Jan 2017 16:00:51 -0200
-Message-Id: <20170117180051.11958-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] arch_init: Remove unnecessary
- default_config_files table
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cTYNH-0004go-SD
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:20:53 -0500
+Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:33434)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cTYNH-0004ge-4t
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:20:51 -0500
+Received: by mail-it0-x230.google.com with SMTP id d9so28827962itc.0
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 10:20:51 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <f2f54dce-0e3f-2718-4b35-1321f5c2ae11@redhat.com>
+References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
+	<001201d26b1b$e5a8ce20$b0fa6a60$@ru>
+	<CAMo8BfJKXOhiPQz8GT6hXNNBXKsz-67iKx9ct9tEwukVLWR3QA@mail.gmail.com>
+	<001201d26cc6$f023ad00$d06b0700$@ru>
+	<CAFEAcA-AMJ33g9hO2k9oGJfDr-Fatk7TY+Sbs_wRC-OfCjWhmQ@mail.gmail.com>
+	<001301d26cce$21ad3d30$6507b790$@ru>
+	<f2f54dce-0e3f-2718-4b35-1321f5c2ae11@redhat.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 17 Jan 2017 10:20:49 -0800
+Message-ID: <CAMo8Bf+RGjXNXoZpptu6u+Kc5y8j2a0RabxP0ODztRECBFpn-Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>, Peter Maydell <peter.maydell@linaro.org>, Alex Bligh <alex@alex.org.uk>, qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, Richard Henderson <rth@twiddle.net>
 
-The existing default_config_files table in arch_init.c has a
-single entry, making it completely unnecessary. The whole code
-can be replaced by a single qemu_read_config_file() call in vl.c.
+On Mon, Jan 16, 2017 at 9:19 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 12/01/2017 13:19, Pavel Dovgalyuk wrote:
+>>> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+>>> On 12 January 2017 at 11:28, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+>>>>> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
+>>>>> Ok, looks like what happens in my case is that instruction that
+>>>>> sets CCOMPARE and thus changes remaining icount does not
+>>>>> cause exit from the cpu_exec. So merely ending TB on
+>>>>> QEMU_CLOCK_VIRTUAL timer update is not enough, I need to
+>>>>> throw an exception of some kind? Or does the timer code need
+>>>>> to take care of that?
+>>>>
+>>>> Yes, it seems that you should end the block with an exception,
+>>>> to allow icount loop recalculate the timeouts.
+>>>
+>>> Really? The ARM translate.c doesn't generate an exception.
+>>> It just does
+>>>  gen_io_end();
+>>>  gen_lookup_tb();
+>>>
+>>> (so we force a lookup of the next TB, but don't throw an
+>>> exception of any kind).
+>>
+>> Maybe I missing something. As far as I understand, changing the virtual timer
+>> notifies the iothread and os_host_main_loop_wait kicks the CPU thread.
+>>
+>> But within that period of time before changing the timer and kicking the thread
+>> CPU may proceed some instructions and the timer will be expired if it was set
+>> to one of the soonest instructions.
+>
+> My understanding (which may be wrong!) was that after gen_io_end you
+> would exit with TB_EXIT_ICOUNT_EXPIRED and cpu->icount_decr.u16.high =
+> -1, but indeed I don't see anything that calls cpu_interrupt in that
+> path.
+>
+> Maybe something like this:
+>
+> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+> index 050de59..c20d193 100644
+> --- a/include/exec/gen-icount.h
+> +++ b/include/exec/gen-icount.h
+> @@ -73,6 +73,9 @@ static inline void gen_io_end(void)
+>  {
+>      TCGv_i32 tmp = tcg_const_i32(0);
+>      tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
+> +    /* Make the next TB exit immediately with TB_EXIT_ICOUNT_EXPIRED.  */
+> +    tcg_gen_st16_i32(-1, cpu_env,
+> +                     -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.high));
+>      tcg_temp_free_i32(tmp);
+>  }
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/qemu/config-file.h |  4 ----
- arch_init.c                | 27 ---------------------------
- vl.c                       | 18 ++++++++++++++----
- 3 files changed, 14 insertions(+), 35 deletions(-)
+With -1 moved into TCG temporary that works for me as well.
 
-diff --git a/include/qemu/config-file.h b/include/qemu/config-file.h
-index 8d4b2b6d94..c80d5c8a33 100644
---- a/include/qemu/config-file.h
-+++ b/include/qemu/config-file.h
-@@ -23,8 +23,4 @@ int qemu_read_config_file(const char *filename);
- void qemu_config_parse_qdict(QDict *options, QemuOptsList **lists,
-                              Error **errp);
- 
--/* Read default QEMU config files
-- */
--int qemu_read_default_config_files(bool userconfig);
--
- #endif /* QEMU_CONFIG_FILE_H */
-diff --git a/arch_init.c b/arch_init.c
-index 5cc58b2c35..e9b6d62d18 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -84,33 +84,6 @@ int graphic_depth = 32;
- 
- const uint32_t arch_type = QEMU_ARCH;
- 
--static struct defconfig_file {
--    const char *filename;
--    /* Indicates it is an user config file (disabled by -no-user-config) */
--    bool userconfig;
--} default_config_files[] = {
--    { CONFIG_QEMU_CONFDIR "/qemu.conf",                   true },
--    { NULL }, /* end of list */
--};
--
--int qemu_read_default_config_files(bool userconfig)
--{
--    int ret;
--    struct defconfig_file *f;
--
--    for (f = default_config_files; f->filename; f++) {
--        if (!userconfig && f->userconfig) {
--            continue;
--        }
--        ret = qemu_read_config_file(f->filename);
--        if (ret < 0 && ret != -ENOENT) {
--            return ret;
--        }
--    }
--
--    return 0;
--}
--
- struct soundhw {
-     const char *name;
-     const char *descr;
-diff --git a/vl.c b/vl.c
-index c643d3ff3a..b563f9b924 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2990,6 +2990,18 @@ static int global_init_func(void *opaque, QemuOpts *opts, Error **errp)
-     return 0;
- }
- 
-+static int qemu_read_default_config_file(void)
-+{
-+    int ret;
-+
-+    ret = qemu_read_config_file(CONFIG_QEMU_CONFDIR "/qemu.conf");
-+    if (ret < 0 && ret != -ENOENT) {
-+        return ret;
-+    }
-+
-+    return 0;
-+}
-+
- int main(int argc, char **argv, char **envp)
- {
-     int i;
-@@ -3117,10 +3129,8 @@ int main(int argc, char **argv, char **envp)
-         }
-     }
- 
--    if (defconfig) {
--        int ret;
--        ret = qemu_read_default_config_files(userconfig);
--        if (ret < 0) {
-+    if (defconfig && userconfig) {
-+        if (qemu_read_default_config_file() < 0) {
-             exit(1);
-         }
-     }
 -- 
-2.11.0.259.g40922b1
+Thanks.
+-- Max
