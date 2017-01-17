@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cTbPX-00010U-1R
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:35:24 -0500
+	(envelope-from <bounces@canonical.com>) id 1cTbZY-0004q7-Kd
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:45:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cTbPV-0005FT-Q8
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:35:23 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60027)
+	(envelope-from <bounces@canonical.com>) id 1cTbZW-00036r-1A
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:45:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34720)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cTbPV-0005EB-KM
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:35:21 -0500
+	id 1cTbZV-00036a-O6
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:45:41 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cTbPU-0004Kk-CU
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 21:35:20 +0000
+	id 1cTbZT-0006Bz-Kd
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 21:45:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4C68F2E80CF
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 21:35:20 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 831C22E808D
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 21:45:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Jan 2017 21:19:14 -0000
-From: Thomas Huth <741887@bugs.launchpad.net>
-Reply-To: Bug 741887 <741887@bugs.launchpad.net>
+Date: Tue, 17 Jan 2017 21:28:43 -0000
+From: Thomas Huth <638806@bugs.launchpad.net>
+Reply-To: Bug 638806 <638806@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20110324165753.17739.21728.malonedeb@soybean.canonical.com>
-Message-Id: <20170117211916.21676.70286.launchpad@gac.canonical.com>
+References: <20100915095407.8638.3288.malonedeb@wampee.canonical.com>
+Message-Id: <20170117212843.27020.46491.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 741887] Re: virsh snapshot-create too slow (kvm,
- qcow2, savevm)
+Subject: [Qemu-devel] [Bug 638806] Re: Crashes with kfreebsd guest when
+ using KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,124 +39,188 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+Triaging old bug tickets ... can you still reproduce this problem with
+the latest version of QEMU?
+
 ** Changed in: qemu
-       Status: New =3D> Won't Fix
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/741887
+https://bugs.launchpad.net/bugs/638806
 
 Title:
-  virsh snapshot-create too slow (kvm, qcow2, savevm)
+  Crashes with kfreebsd guest when using KVM
 
 Status in QEMU:
-  Won't Fix
-Status in qemu-kvm package in Ubuntu:
-  Won't Fix
+  Incomplete
 
 Bug description:
-  Action
-  =3D=3D=3D=3D=3D=3D
-  # time virsh snapshot-create 1
+  commit 46411f863c26ff85c48b97939502007610c95398
 
-  * Taking snapshot of a running KVM virtual machine
+  Linux host
+  Kfreebsd guest
+  qemu -boot c -hda qemu_kfreebsd_i386.img -enable-kvm
 
-  Result
-  =3D=3D=3D=3D=3D=3D
-  Domain snapshot 1300983161 created
-  real    4m46.994s
-  user    0m0.000s
-  sys     0m0.010s
+  QEMU crashes with free on invalid pointer:
 
-  Expected result
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  * Snapshot taken after few seconds instead of minutes.
+  *** glibc detected *** qemu: free(): invalid pointer: 0x000000000253cf60 =
+***
+  =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
+  /lib/libc.so.6(+0x71ad6)[0x7f0844fa5ad6]
+  qemu[0x494283]
+  qemu[0x4951ca]
+  qemu[0x49aa01]
+  qemu[0x495d15]
+  qemu[0x5197f4]
+  qemu[0x51a297]
+  /lib/libc.so.6(__libc_start_main+0xfd)[0x7f0844f52c4d]
+  qemu[0x408799]
+  =3D=3D=3D=3D=3D=3D=3D Memory map: =3D=3D=3D=3D=3D=3D=3D=3D
+  00400000-00625000 r-xp 00000000 08:06 4186599                            =
+/usr/local/bin/qemu
+  00825000-00847000 rw-p 00225000 08:06 4186599                            =
+/usr/local/bin/qemu
+  00847000-00fed000 rw-p 00000000 00:00 0 =
 
-  Environment
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  * Ubuntu Natty Narwhal upgraded from Lucid and Meerkat, fully updated.
+  00fed000-00fee000 rwxp 00000000 00:00 0 =
 
-  * Stock natty packages of libvirt and qemu installed (libvirt-bin
-  0.8.8-1ubuntu5; libvirt0 0.8.8-1ubuntu5; qemu-common 0.14.0+noroms-
-  0ubuntu3; qemu-kvm 0.14.0+noroms-0ubuntu3).
+  00fee000-0104b000 rw-p 00000000 00:00 0 =
 
-  * Virtual machine disk format is qcow2 (debian 5 installed)
-  image: /storage/debian.qcow2
-  file format: qcow2
-  virtual size: 10G (10737418240 bytes)
-  disk size: 1.2G
-  cluster_size: 65536
-  Snapshot list:
-  ID        TAG                 VM SIZE                DATE       VM CLOCK
-  1         snap01                  48M 2011-03-24 09:46:33   00:00:58.899
-  2         1300979368              58M 2011-03-24 11:09:28   00:01:03.589
-  3         1300983161              57M 2011-03-24 12:12:41   00:00:51.905
+  022fe000-023ff000 rw-p 00000000 00:00 0 =
 
-  * qcow2 disk is stored on ext4 filesystem, without RAID or LVM or any
-  special setup.
+  023ff000-0240f000 rw-p 00000000 00:00 0 =
 
-  * running guest VM takes about 40M RAM from inside, from outside 576M
-  are given to that machine
+  0240f000-0255d000 rw-p 00000000 00:00 0 =
 
-  * host has fast dual-core pentium cpu with virtualization support,
-  around 8G of RAM and 7200rpm harddrive (dd from urandom to file gives
-  about 20M/s)
+  41cd2000-43cd2000 rwxp 00000000 00:00 0 =
 
-  * running processes: sshd, atd (empty), crond (empty), libvirtd, tmux,
-  bash, rsyslogd, upstart-socket-bridge, udevd, dnsmasq, iotop (python)
+  7f0835c22000-7f0835c38000 r-xp 00000000 08:06 3407959                    =
+/lib/libgcc_s.so.1
+  7f0835c38000-7f0835e37000 ---p 00016000 08:06 3407959                    =
+/lib/libgcc_s.so.1
+  7f0835e37000-7f0835e38000 rw-p 00015000 08:06 3407959                    =
+/lib/libgcc_s.so.1
+  7f0835e38000-7f0835e3d000 r-xp 00000000 08:06 4185228                    =
+/usr/lib/libXfixes.so.3.1.0
+  7f0835e3d000-7f083603c000 ---p 00005000 08:06 4185228                    =
+/usr/lib/libXfixes.so.3.1.0
+  7f083603c000-7f083603d000 rw-p 00004000 08:06 4185228                    =
+/usr/lib/libXfixes.so.3.1.0
+  7f083603d000-7f0836046000 r-xp 00000000 08:06 4178659                    =
+/usr/lib/libXcursor.so.1.0.2
+  7f0836046000-7f0836246000 ---p 00009000 08:06 4178659                    =
+/usr/lib/libXcursor.so.1.0.2
+  7f0836246000-7f0836247000 rw-p 00009000 08:06 4178659                    =
+/usr/lib/libXcursor.so.1.0.2
+  7f0836247000-7f0836294000 rw-p 00000000 00:00 0 =
 
-  * networking is done by bridging and bonding
+  7f083631c000-7f0836491000 r--p 00000000 08:06 3670017                    =
+/usr/lib/locale/locale-archive
+  7f0836491000-7f0836499000 r-xp 00000000 08:06 516333                     =
+/usr/lib/libXrandr.so.2.2.0
+  7f0836499000-7f0836698000 ---p 00008000 08:06 516333                     =
+/usr/lib/libXrandr.so.2.2.0
+  7f0836698000-7f0836699000 rw-p 00007000 08:06 516333                     =
+/usr/lib/libXrandr.so.2.2.0
+  7f0836699000-7f08366a2000 r-xp 00000000 08:06 4180666                    =
+/usr/lib/libXrender.so.1.3.0
+  7f08366a2000-7f08368a2000 ---p 00009000 08:06 4180666                    =
+/usr/lib/libXrender.so.1.3.0
+  7f08368a2000-7f08368a3000 rw-p 00009000 08:06 4180666                    =
+/usr/lib/libXrender.so.1.3.0
+  7f08368a3000-7f08368b4000 r-xp 00000000 08:06 4181769                    =
+/usr/lib/libXext.so.6.4.0
+  7f08368b4000-7f0836ab4000 ---p 00011000 08:06 4181769                    =
+/usr/lib/libXext.so.6.4.0
+  7f0836ab4000-7f0836ab5000 rw-p 00011000 08:06 4181769                    =
+/usr/lib/libXext.so.6.4.0
+  7f0836ad6000-7f0836ad7000 ---p 00000000 00:00 0 =
 
-  =
+  7f0836ad7000-7f0836f5b000 rw-p 00000000 00:00 0 =
 
-  Detail description
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  7f0836f6e000-7f0837088000 rw-s 00000000 00:04 1900557                    =
+/SYSV00000000 (deleted)
+  7f0837088000-7f0837089000 rw-p 00000000 00:00 0 =
 
-  * Under root, command 'virsh create-snapshot 1' is issued on booted
-  and running KVM machine with debian inside.
+  7f0837089000-7f0837889000 rw-p 00000000 00:00 0 =
 
-  * After about four minutes, the process is done.
+  7f0837889000-7f083788b000 rw-p 00000000 00:00 0 =
 
-  * 'iotop' shows two 'kvm' processes reading/writing to disk. First one
-  has IO around 1500 K/s, second one has around 400 K/s. That takes
-  about three minutes. Then first process grabs about 3 M/s of IO and
-  suddenly dissapears (1-2 sec). Then second process does about 7.5 M/s
-  of IO for around a 1-2 minutes.
+  7f083788b000-7f083f88b000 rw-p 00000000 00:00 0 =
 
-  * Snapshot is successfuly created and is usable for reverting or
-  extracting.
+  7f083f88b000-7f083f88c000 rw-p 00000000 00:00 0 =
 
-  * Pretty much the same behaviour occurs when command 'savevm' is
-  issued directly from qemu monitor, without using libvirt at all
-  (actually, virsh snapshot-create just calls 'savevm' to the monitor
-  socket).
+  7f083f88c000-7f083f88d000 ---p 00000000 00:00 0 =
 
-  * This behaviour was observed on lucid, meerkat, natty and even with
-  git version of libvirt (f44bfb7fb978c9313ce050a1c4149bf04aa0a670).
-  Also slowsave packages from
-  https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/524447 gave
-  this issue.
+  7f083f88d000-7f0841a8f000 rw-p 00000000 00:00 0 =
 
-  =
+  7f0841a8f000-7f0841a94000 r-xp 00000000 08:06 4183916                    =
+/usr/lib/libXdmcp.so.6.0.0
+  7f0841a94000-7f0841c93000 ---p 00005000 08:06 4183916                    =
+/usr/lib/libXdmcp.so.6.0.0
+  7f0841c93000-7f0841c94000 rw-p 00004000 08:06 4183916                    =
+/usr/lib/libXdmcp.so.6.0.0
+  7f0841c94000-7f0841c96000 r-xp 00000000 08:06 4183879                    =
+/usr/lib/libXau.so.6.0.0
+  7f0841c96000-7f0841e96000 ---p 00002000 08:06 4183879                    =
+/usr/lib/libXau.so.6.0.0
+  7f0841e96000-7f0841e97000 rw-p 00002000 08:06 4183879                    =
+/usr/lib/libXau.so.6.0.0
+  7f0841e97000-7f0841eb6000 r-xp 00000000 08:06 3407929                    =
+/lib/libx86.so.1
+  7f0841eb6000-7f08420b6000 ---p 0001f000 08:06 3407929                    =
+/lib/libx86.so.1
+  7f08420b6000-7f08420b8000 rw-p 0001f000 08:06 3407929                    =
+/lib/libx86.so.1
+  7f08420b8000-7f08420b9000 rw-p 00000000 00:00 0 =
 
-  Thank you for helping to solve this issue!
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 11.04
-  Package: libvirt-bin 0.8.8-1ubuntu5
-  ProcVersionSignature: Ubuntu 2.6.38-7.38-server 2.6.38
-  Uname: Linux 2.6.38-7-server x86_64
-  Architecture: amd64
-  Date: Thu Mar 24 12:19:41 2011
-  InstallationMedia: Ubuntu-Server 10.04.2 LTS "Lucid Lynx" - Release amd64=
- (20110211.1)
-  ProcEnviron:
-   LANG=3Den_US.UTF-8
-   SHELL=3D/bin/bash
-  SourcePackage: libvirt
-  UpgradeStatus: No upgrade log present (probably fresh install)
+  7f08420b9000-7f08420bc000 r-xp 00000000 08:06 4181768                    =
+/usr/lib/libgpg-error.so.0.4.0
+  7f08420bc000-7f08422bb000 ---p 00003000 08:06 4181768                    =
+/usr/lib/libgpg-error.so.0.4.0
+  7f08422bb000-7f08422bc000 rw-p 00002000 08:06 4181768                    =
+/usr/lib/libgpg-error.so.0.4.0
+  7f08422bc000-7f08422be000 r-xp 00000000 08:06 3407931                    =
+/lib/libkeyutils.so.1.3
+  7f08422be000-7f08424bd000 ---p 00002000 08:06 3407931                    =
+/lib/libkeyutils.so.1.3
+  7f08424bd000-7f08424be000 rw-p 00001000 08:06 3407931                    =
+/lib/libkeyutils.so.1.3
+  7f08424be000-7f08424c5000 r-xp 00000000 08:06 516340                     =
+/usr/lib/libkrb5support.so.0.1
+  7f08424c5000-7f08426c5000 ---p 00007000 08:06 516340                     =
+/usr/lib/libkrb5support.so.0.1
+  7f08426c5000-7f08426c6000 rw-p 00007000 08:06 516340                     =
+/usr/lib/libkrb5support.so.0.1
+  7f08426c6000-7f08426c9000 r-xp 00000000 08:06 3407916                    =
+/lib/libcom_err.so.2.1
+  7f08426c9000-7f08428c8000 ---p 00003000 08:06 3407916                    =
+/lib/libcom_err.so.2.1
+  7f08428c8000-7f08428c9000 rw-p 00002000 08:06 3407916                    =
+/lib/libcom_err.so.2.1
+  7f08428c9000-7f08428ee000 r-xp 00000000 08:06 4178134                    =
+/usr/lib/libk5crypto.so.3.1
+  7f08428ee000-7f0842aed000 ---p 00025000 08:06 4178134                    =
+/usr/lib/libk5crypto.so.3.1
+  7f0842aed000-7f0842aef000 rw-p 00024000 08:06 4178134                    =
+/usr/lib/libk5crypto.so.3.1
+  7f0842aef000-7f0842bad000 r-xp 00000000 08:06 516332                     =
+/usr/lib/libkrb5.so.3.3
+  7f0842bad000-7f0842dac000 ---p 000be000 08:06 516332                     =
+/usr/lib/libkrb5.so.3.3
+  7f0842dac000-7f0842db7000 rw-p 000bd000 08:06 516332                     =
+/usr/lib/libkrb5.so.3.3
+  7f0842db7000-7f0842dd0000 r-xp 00000000 08:06 516360                     =
+/usr/lib/libsasl2.so.2.0.23
+  7f0842dd0000-7f0842fcf000 ---p 00019000 08:06 516360                     =
+/usr/lib/libsasl2.so.2.0.23
+  7f0842fcf000-7f0842fd0000 rw-p 00018000 08:06 516360                     =
+/usr/lib/libsasl2.so.2.0.23
+  7f0842fd0000-7f0842fe3000 r-xp 00000000 08:06 3408041                    =
+/lib/libresolv-2.11.2.so
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/741887/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/638806/+subscriptions
