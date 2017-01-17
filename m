@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTQLk-0006o2-1e
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:46:45 -0500
+	(envelope-from <drjones@redhat.com>) id 1cTQOu-0000fR-3V
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTQLg-0002kf-7B
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:46:44 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35735)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cTQLg-0002ka-11
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:46:40 -0500
-Received: by mail-wm0-x242.google.com with SMTP id d140so20708921wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 01:46:39 -0800 (PST)
-Date: Tue, 17 Jan 2017 09:46:31 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170117094631.GA4265@stefanha-x1.localdomain>
-References: <148278447806.8988.12706825771606357198.stgit@fimbulvetr.bsc.es>
-	<148278449426.8988.2219094135462471980.stgit@fimbulvetr.bsc.es>
-	<20170109154439.GF30228@stefanha-x1.localdomain>
-	<87a8ardjft.fsf@ac.upc.edu>
+	(envelope-from <drjones@redhat.com>) id 1cTQOq-0003hU-6r
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:50:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cTQOp-0003fJ-Un
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:49:56 -0500
+Date: Tue, 17 Jan 2017 10:49:50 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170117094950.5dqdpbk6u7p4yhms@kamzik.brq.redhat.com>
+References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
+	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
+	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
+	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
+	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="17pEHd4RhPHOinZp"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87a8ardjft.fsf@ac.upc.edu>
-Subject: Re: [Qemu-devel] [PATCH v4 3/6] hypertrace: [*-user] Add QEMU-side
- proxy to "guest_hypertrace" event
+In-Reply-To: <CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
+ as PNP0C02 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,107 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Daniel P Berrange <berrange@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, Eric Blake <eblake@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>, mst@redhat.com, Igor Mammedov <imammedo@redhat.com>
 
+On Mon, Jan 16, 2017 at 07:31:33PM +0000, Ard Biesheuvel wrote:
+> On 16 January 2017 at 18:20, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 16 January 2017 at 17:30, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> >> On 16 January 2017 at 17:25, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >>> On 13 January 2017 at 17:32, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> >>>> Linux for arm64 v4.10 and later will complain if the ECAM config space is
+> >>>> not reserved in the ACPI namespace:
+> >>>>
+> >>>>   acpi PNP0A08:00: [Firmware Bug]: ECAM area [mem 0x3f000000-0x3fffffff] not reserved in ACPI namespace
+> >>>>
+> >>>> The rationale is that OSes that don't consume the MCFG table should still
+> >>>> be able to infer that the PCI config space MMIO region is occupied.
+> >>>>
+> >>>> So update the ACPI table generation routine to add this reservation.
+> >>>>
+> >>>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> >>>> ---
+> >>>>  hw/arm/virt-acpi-build.c | 7 +++++++
+> >>>>  1 file changed, 7 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> >>>> index 085a61117378..50d52f685f68 100644
+> >>>> --- a/hw/arm/virt-acpi-build.c
+> >>>> +++ b/hw/arm/virt-acpi-build.c
+> >>>> @@ -310,6 +310,13 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+> >>>>      Aml *dev_rp0 = aml_device("%s", "RP0");
+> >>>>      aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+> >>>>      aml_append(dev, dev_rp0);
+> >>>> +
+> >>>> +    Aml *dev_res0 = aml_device("%s", "RES0");
+> >>>> +    aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+> >>>> +    crs = aml_resource_template();
+> >>>> +    aml_append(crs, aml_memory32_fixed(base_ecam, size_ecam, AML_READ_WRITE));
+> >>>> +    aml_append(dev_res0, aml_name_decl("_CRS", crs));
+> >>>> +    aml_append(dev, dev_res0);
+> >>>>      aml_append(scope, dev);
+> >>>>  }
+> >>>
+> >>> This needs to be controlled via the machine class back-compat
+> >>> machinery in hw/arm/virt.c so that it only happens for virt-2.9
+> >>> and later.
+> >>>
+> >>
+> >> Why exactly?
+> >
+> > Because the "virt-2.8" machine has to present to the guest
+> > exactly what "virt" did as of the QEMU 2.8 release, including
+> > any bugs or missing things we happened to have in our ACPI
+> > tables. This allows cross-version compatibility (including
+> > VM migration). Drew will have a more detailed explanation
+> > if you need it.
+> >
+> 
+> I suspected as much.
+> 
+> But in this case, I am not sure if it is worth the trouble: the
+> generated data is only consumed at boot time by the firmware, and I
+> suppose migration involves freezing a VM, including whatever resident
+> firmware image was used to boot the OS, and so this is unlikely to
+> affect migration.
+> 
+> But I will let Drew explain ...
+>
 
---17pEHd4RhPHOinZp
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In some cases the problem we're solving with the compat guards is
+a bit hypothetical, but, IMHO, nonetheless a good practice. While
+we may be sure that AAVMF and Linux will be fine with this table
+changing under their feet, we can't be sure there aren't other
+mach-virt users that have more sensitive firmwares/OSes. An ACPI-
+sensitive OS may notice the change on its next reboot after a
+migration, and then simply refuse to continue.
 
-On Mon, Jan 16, 2017 at 06:05:26PM +0100, Llu=EDs Vilanova wrote:
-> Stefan Hajnoczi writes:
-> > On Mon, Dec 26, 2016 at 09:34:54PM +0100, Llu=EDs Vilanova wrote:
-> >> +void hypertrace_init_config(struct hypertrace_config *config,
-> >> +                            unsigned int max_clients)
-> >> +{
-> >> +    config->max_clients =3D max_clients;
-> >> +    config->client_args =3D CONFIG_HYPERTRACE_ARGS;
-> >> +    config->client_data_size =3D config->client_args * sizeof(uint64_=
-t);
-> >> +    config->control_size =3D QEMU_ALIGN_UP(
-> >> +        config->max_clients * sizeof(uint64_t), TARGET_PAGE_SIZE);
->=20
-> > This needs to be host page size aligned, too.  Otherwise protect will
-> > affect bytes beyond the end of the control region.
->=20
-> Ummm, so right. Although I think only host page alignment is required (th=
-ere's
-> no soft TLB in user-mode, right?).
+Now, that said, I just spoke with Igor in order to learn the x86
+practice. He says that the policy has been more lax than what I
+suggest above. Hypothetical, low-risk issues are left unguarded,
+and only when a bug is found during testing is it then managed.
+The idea is to try and reduce the amount of compat variables and
+conditions needed in the ACPI generation code, but, of course, at
+some level of risk to users expecting their versioned machine type
+to always appear the same.
 
-Yes.
+So far we've been strict with mach-virt, guarding all hypothetical
+issues. Perhaps this patch is a good example to get a discussion
+started on whether or not we should be so strict though.
 
-> >> +static void init_channel(const char *base, const char *suffix, size_t=
- size,
-> >> +                         char **path, int *fd, uint64_t **addr)
-> >> +{
-> >> +    *path =3D g_malloc(strlen(base) + strlen(suffix) + 1);
-> >> +    sprintf(*path, "%s%s", base, suffix);
-> >> +
-> >> +    *fd =3D open(*path, O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR);
-> >> +    if (*fd =3D=3D -1) {
-> >> +        error_report("error: open(%s): %s", *path, strerror(errno));
-> >> +        abort();
-> >> +    }
->=20
-> > open() can fail for reasons outside QEMU's control.  This isn't an
-> > internal error.  Please exit cleanly instead of using abort(3).
->=20
-> By cleanly you mean exit with a non-zero code, right? It still is an erro=
-r that
-> cannot be recovered.
-
-Right, it's an error.
-
-> Also, if this goes with exit() what about the abort()s I have added in ot=
-her
-> places? (e.g., on a failed call to sigaction)
-
-abort(3) is useful for internal errors where a core dump and debugging
-are required.
-
-exit(3) is useful for graceful exit (both successful and unsuccessful).
-Over the past few years the codebase has been moving towards using Error
-**errp and letting the top-level functions handle errors instead of
-exiting deep inside QEMU.  This is necessary because lots of things can
-be initialized at runtime (like device hotplug) and shouldn't bring down
-QEMU.  But it's okay to exit in initialization code that will only be
-called once.
-
-> >> +
-> >> +    } else {
-> >> +        /* proxy to next handler */
-> >> +        if (segv_next.sa_sigaction !=3D NULL) {
-> >> +            segv_next.sa_sigaction(signum, siginfo, sigctxt);
-> >> +        } else if (segv_next.sa_handler !=3D NULL) {
-> >> +            segv_next.sa_handler(signum);
-> >> +        }
->=20
-> > Is there a case when no signal handler was installed (i.e. default
-> > action)?
->=20
-> Yes, before calling hypertrace_init() or if it is called without a
-> "hypertrace_base" argument set (i.e., the user has not enabled hypertrace=
- in the
-> command line).
-
-I meant "what happens if !segv_next.sa_action &&
-!segv_next.sa_handler?".  The default signal disposition should take
-effect.  This code is ignoring that case, turning everything into
-SIG_IGN but there is also SIG_DFL.
-
---17pEHd4RhPHOinZp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYfef3AAoJEJykq7OBq3PIY4MIAMAxTDI8tNiq8V2CMygtvLLt
-mkMct0AxqCgTVemWJlISwLvD3hibQj3l57O9I4NVCLf2N+4YWsnT+nXhBinA0odj
-Wm9GH4YbBOzLFUqtfJq8fipl7ids/AZJXa8Wmhp1vV6Onrx2UPYs/0J9nYt/+4Wp
-XywvgVOiw92Do1Xz5XoYlZ4VG6J7TN4zcf1AptwfYrEiOGW0muTTfYQhfpuqt6us
-B2CJvBQ0uuWwkfSlzNzPYB0oqeN+QTvPUzpgICNI9ZO0ozoU27+HSSHUs0S6mu7+
-kuLDz/FYz37PKFrbeIxlN5Vq0SVAUgASvc93ujjh2vcS13uEOyZaw1EsViysw3o=
-=AJf5
------END PGP SIGNATURE-----
-
---17pEHd4RhPHOinZp--
+Thanks,
+drew
