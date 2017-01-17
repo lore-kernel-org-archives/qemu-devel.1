@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cTRD9-0005Qw-3C
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:41:56 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cTREL-0006RG-N1
+	for Qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:43:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cTRD7-0007is-Ri
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:41:55 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <5878AF90.8020709@kamp.de>
-	<260873230.6154791.1484638426777.JavaMail.zimbra@oxygem.tv>
-	<20170117080326.dfjqzwstfxusuhgc@nora.maurer-it.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b7f5dc23-6d72-4897-e9ca-6482acfb4c72@redhat.com>
-Date: Tue, 17 Jan 2017 11:41:44 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1cTREH-0008Ku-0m
+	for Qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:43:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cTREG-0008JA-Rl
+	for Qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:43:04 -0500
+Date: Tue, 17 Jan 2017 10:42:59 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170117104258.GD2053@work-vm>
+References: <6205DF8A-7643-432F-88FF-12B1E9DEF5D8@livius.net>
+	<CAFEAcA_CDpXqAAJNdSQpk4MKOorDXqUi_AwsevrHk=pnbrS0NQ@mail.gmail.com>
+	<277E72EB-288A-498F-9208-99EBF09218A6@livius.net>
+	<CAFEAcA_54fL9YHVJLqAZS8p3OftGd-yq7C7k4jSfVGeCzwMPmA@mail.gmail.com>
+	<D1505166-849A-439D-8E78-579F708D53BB@livius.net>
+	<CAFEAcA-AB98qtJcrLQ=T4PDvg=VM2tTqxALVpZYoYQcd9fySFg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170117080326.dfjqzwstfxusuhgc@nora.maurer-it.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-stable] Data corruption in Qemu 2.7.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFEAcA-AB98qtJcrLQ=T4PDvg=VM2tTqxALVpZYoYQcd9fySFg@mail.gmail.com>
+Subject: Re: [Qemu-devel] CMSIS SVD based peripheral definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>, Alexandre DERUMIER <aderumier@odiso.com>
-Cc: Peter Lieven <pl@kamp.de>, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Liviu Ionescu <ilg@livius.net>, QEMU Developer <Qemu-devel@nongnu.org>
 
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 9 January 2017 at 17:47, Liviu Ionescu <ilg@livius.net> wrote:
+> > I can't dispute this, but does't the GPLv2 requirements apply to
+> > the qemu executable only? my JSON files are not compiled into the
+> > binary, but are data files, read by the executable when required.
+> > and anyway, the original license covers the original XML files,
+> > mine are not only JSON, but are also slightly different.
+>=20
+> I'm not a lawyer, and this isn't legal advice, but merely
+> my own opinion:
+>  (1) if you're reading in the data files at runtime then there's
+> a spectrum between "just reading data provided by the user which
+> didn't ship with QEMU, and QEMU works OK without this particular
+> data" (clearly OK) and "reading data that shipped with QEMU
+> and where QEMU won't work at all without it" (the data files
+> are clearly part of the program as a whole and the GPL
+> applies to them even if they don't happen to be binaries);
+> where you stand legally probably depends on where on the
+> spectrum you are.
+>=20
+>  (2) your JSON files are a derived work from the original
+> XML, so the license of those XML files (whatever it is) still
+> applies to them. Making modifications or a mechanical
+> transformation of the original files is not sufficient to
+> allow you to discard the license...
+>=20
+> With my project maintainer hat on, I prefer to avoid
+> grey areas, because it avoids potential trouble later on.
 
+Being able to read a machine description from a file at run time
+sounds reasonable, as do tools to manipulate those descriptions.
+I don't see why such a description file would be any different
+=66rom a firmware file or config file, especially if you were to think
+of QEMU in this case more like a simulation environment
+which I think is what Liviu is trying to use it as.
 
-On 17/01/2017 09:03, Fabian Grünbichler wrote:
-> Commit 8fdc7839e40f43a426bc7e858cf1dbfe315a3804 (first included in
-> 2.7.0)[1] changed the behaviour of scsi-block passthrough. Previously
-> this worked with SATA disks, now it doesn't anymore. A bisect run
-> confirmed this, scsi-block with a SATA disk passed through via
-> virtio-scsi-single corrupts on writes since that commit, scsi-hd and
-> scsi-disk work fine (scsi-generic corrupts as well).
-> 
-> PVE's detection logic for passthrough just differentiated between disks
-> and tape drives, and unfortunately the SG_IO ioctl says SATA disks are
-> disks as well.. we probably need to default to scsi-hd or scsi-disk
-> instead of scsi-block, and only when we explicitly detect a "real" SCSI
-> disk we are allowed to use scsi-block?
-> 
-> @Paolo: was the old behaviour just an accident and the new bevaviour
-> intentional? documentation is quite sparse, or maybe I am looking in the
-> wrong places..
+I agree actually including/distributing those description files is a comple=
+tely
+different issue if they're derived from someone elses files;
+but that wouldn't stop you creating some simple examples (e.g.
+the existing related machine types) from scratch.
 
-No, it would be a bug (QEMU or kernel).
+Dave
 
-Do you have an easy reproducer with dd, as suggested at
-https://forum.proxmox.com/threads/proxmox-4-4-virtio_scsi-regression.31471/page-2?
-
-Paolo
+> thanks
+> -- PMM
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
