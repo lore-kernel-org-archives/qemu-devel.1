@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cTYkb-0000IH-UJ
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:44:59 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTYme-000234-LS
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:47:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cTYkY-0001Uo-Se
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:44:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cTYkY-0001Tv-NI
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:44:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cTYkV-00070U-Dl
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 18:44:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 54E782E80BF
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 18:44:51 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Jan 2017 18:34:33 -0000
-From: Thomas Huth <1590336@bugs.launchpad.net>
-Reply-To: Bug 1590336 <1590336@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160608091217.11737.9975.malonedeb@wampee.canonical.com>
-Message-Id: <20170117183435.14534.55092.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1590336] Re: qemu-arm does not reject vrintz on
- non-v8 cpu
+	(envelope-from <ehabkost@redhat.com>) id 1cTYmb-0002id-KX
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:47:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39070)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTYmb-0002ht-E8
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:47:01 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B6C637EE1
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 18:47:01 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Tue, 17 Jan 2017 16:46:35 -0200
+Message-Id: <20170117184638.25809-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] arch_init: Move soundhw code to
+ hw/audio/soundhw.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,39 +29,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+This moves the arch_init.c soundhw code to its own file, renames
+audio_init() to soundhw_init(), and renames hw/audio/audio.h to
+hw/audio/soundhw.h.
 
--- =
+Eduardo Habkost (3):
+  audio: Move arch_init audio code to hw/audio/soundhw.c
+  audio: Rename audio_init() to soundhw_init()
+  audio: Rename hw/audio/audio.h to hw/audio/soundhw.h
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1590336
+ include/hw/audio/{audio.h => soundhw.h} |   3 +
+ include/sysemu/arch_init.h              |   2 -
+ arch_init.c                             | 126 +-------------------------
+ hw/audio/ac97.c                         |   2 +-
+ hw/audio/adlib.c                        |   2 +-
+ hw/audio/cs4231a.c                      |   2 +-
+ hw/audio/es1370.c                       |   2 +-
+ hw/audio/gus.c                          |   2 +-
+ hw/audio/intel-hda.c                    |   2 +-
+ hw/audio/pcspk.c                        |   2 +-
+ hw/audio/sb16.c                         |   2 +-
+ hw/audio/soundhw.c                      | 156 ++++++++++++++++++++++++++++++++
+ vl.c                                    |   3 +-
+ hw/audio/Makefile.objs                  |   2 +
+ 14 files changed, 172 insertions(+), 136 deletions(-)
+ rename include/hw/audio/{audio.h => soundhw.h} (81%)
+ create mode 100644 hw/audio/soundhw.c
 
-Title:
-  qemu-arm does not reject vrintz on non-v8 cpu
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Hello,
-
-  It seems that qemu-arm does not reject some v8-only instructions as it
-  should, but executes them "correctly".
-
-  For instance, while compiling/running some of the GCC ARM instrinsics tes=
-ts, we noticed that
-  vrintz should be rejected on cortex-a9 for instance, while it is executed=
- as if the instruction was supported.
-
-  objdump says:
-     1074c:       f3fa05a0        vrintz.f32      d16, d16
-  and qemu -d in_asm says:
-  0x0001074c:  f3fa05a0      vabal.u<illegal width 64>    q8, d26, d16
-
-  The problem is still present in qemu-2.6.0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1590336/+subscriptions
+-- 
+2.11.0.259.g40922b1
