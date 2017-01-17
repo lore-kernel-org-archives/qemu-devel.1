@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cTXCR-0007zg-6G
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:05:36 -0500
+	(envelope-from <thuth@redhat.com>) id 1cTXXL-0002lU-5Q
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:27:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cTXCN-0005pk-18
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:05:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53322)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cTXCM-0005pT-Pa
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:05:30 -0500
-References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
-	<87pojmjdep.fsf@dusky.pond.sub.org>
-	<CAFEAcA9nhd6x+PT5bG0=YqvmUdxJVFPZ6ACiv-2OKrDFJhrqzg@mail.gmail.com>
-	<87h94x99e4.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d8e5834e-c1ee-cfa1-c6dd-1cf5f0dcd027@redhat.com>
-Date: Tue, 17 Jan 2017 11:05:27 -0600
+	(envelope-from <thuth@redhat.com>) id 1cTXXH-000459-Vv
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:27:11 -0500
+References: <1484666391-15089-1-git-send-email-skiver.cloud.yzy@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c1e01bb3-6dd1-dfe1-1659-8b7b9b683d63@redhat.com>
+Date: Tue, 17 Jan 2017 18:27:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <87h94x99e4.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="c4u1X0Sk0tAOAXUnx4RMMfa5uDCk1nKDV"
-Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
+In-Reply-To: <1484666391-15089-1-git-send-email-skiver.cloud.yzy@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] gdbstub.c: fix GDB connection segfault
+ caused by empty machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <mlureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Ziyue Yang <skiver.cloud.yzy@gmail.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Anthony Liguori <aliguori@us.ibm.com>, Ziyue Yang <yzylivezh@hotmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---c4u1X0Sk0tAOAXUnx4RMMfa5uDCk1nKDV
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <mlureau@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <d8e5834e-c1ee-cfa1-c6dd-1cf5f0dcd027@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
-References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
- <CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
- <87pojmjdep.fsf@dusky.pond.sub.org>
- <CAFEAcA9nhd6x+PT5bG0=YqvmUdxJVFPZ6ACiv-2OKrDFJhrqzg@mail.gmail.com>
- <87h94x99e4.fsf@dusky.pond.sub.org>
-In-Reply-To: <87h94x99e4.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 17.01.2017 16:19, Ziyue Yang wrote:
+> From: Ziyue Yang <yzylivezh@hotmail.com>
+> 
+> This patch is to fix the segmentation fault caused by attaching
+> GDB to a QEMU instance initialized with "-M none" option.
+> 
+> The bug can be reproduced by
+> 
+>> ./qemu-system-x86_64 -M none -nographic -S -s
+> 
+> and attach a GDB to it by
+> 
+>> gdb -ex 'target remote :1234
+> 
+> The segmentation fault was originally caused by trying to read
+> the information about CPU when communicating with GDB. However,
+> it's impossible for any control flow to exist on an empty machine,
+> nor can CPU's be hot plugged to an empty machine later by QOM
+> commands. So I think simply disabling GDB connections on empty
+> machines makes sense.
 
-On 01/17/2017 06:08 AM, Markus Armbruster wrote:
+Yes, this sounds like a proper and easy fix for the problem.
 
->=20
-> Three possible solutions, in increasing order of complexity:
->=20
-> 1. Live with the warning from old versions.  If a new version comes
-> around that does something with @subtitle, it'll just work.
->=20
-> 2. Suppress the warning with @iftex-hammer.  No change in output now.
-> If a new version comes around that does something with @subtitle, we
-> won't profit unless we take out the @iftex.
->=20
-> 3. Replace -D by @set, either by preprocessing .texi, or by including a=
+> Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
+> ---
+>  gdbstub.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index de62d26..413e817 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1731,6 +1731,12 @@ int gdbserver_start(const char *device)
+>      CharDriverState *mon_chr;
+>      ChardevCommon common = { 0 };
+>  
+> +    if (!first_cpu) {
+> +        fprintf(stderr, "gdbstub: meaningless to attach gdb to a "
+> +                "machine without any CPU.\n");
+> +        return -1;
+> +    }
 
-> generated snippet.  No change in output now.  If a new version comes
-> around that does something with @subtitle, it'll just work.
+Could you maybe rather use error_report() instead of fprintf()? I think
+that's the preferred way to print out an error in QEMU nowadays.
 
-Automake projects use option 3 - they create version.texi with @set
-commands, then @include that into the main file.  Should be fairly easy
-to crib the makefile magic from an autotooled project if you want to go
-that option.
-
->=20
-> My order of preference is aligned with decreasing complexity, i.e. firs=
-t
-> 1., then 2., then 3.
-
-I'm fine with any of the options (3 is nicest, but also the most work).
-I do agree, however, that if we are going to include version information
-(which I find useful), then we want it in both pdf and html outputs.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---c4u1X0Sk0tAOAXUnx4RMMfa5uDCk1nKDV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYfk7XAAoJEKeha0olJ0NqXQMH/j0obOFbPgD7Rsm1Xlwwwfq4
-6rMixC8J0v+jEDsGODlnM5ABcm+Aj44VMi095DC66pQMf4HFEQjrNky9yRU2tjGl
-fiy+7SAct9i42N09b46+x0soRk0HYQPVUcTKzshK3ng4seR8tfezAeWIWVn/f11d
-ETEm75q/ieGOomFGlUpY8q8xv+pTqGAk/vRM9wMbn+4kz9RGXsG5VMds+wAKt6bA
-wwuhH+vwasVMNb7K8wSdmf/AdXBb23+0WAxg8Z8isXg7VkFz5oAshw8vCf2vtVif
-L1yt1/SSXAxqF3bQ4XErxZCn/K8eV1cTNWY3lNUVPXfA+FQpfdLN0JtH/VImuHk=
-=bk0L
------END PGP SIGNATURE-----
-
---c4u1X0Sk0tAOAXUnx4RMMfa5uDCk1nKDV--
+ Thomas
