@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTRQk-0003Ax-73
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:55:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cTRS4-0004Cw-Dp
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:57:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTRQh-0003al-4D
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:55:58 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34900)
+	(envelope-from <peter.maydell@linaro.org>) id 1cTRRz-0003xn-Bw
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:57:20 -0500
+Received: from mail-vk0-x229.google.com ([2607:f8b0:400c:c05::229]:34172)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cTRQg-0003aL-TN
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:55:55 -0500
-Received: by mail-wm0-x241.google.com with SMTP id d140so21138955wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 02:55:54 -0800 (PST)
-Date: Tue, 17 Jan 2017 10:55:50 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170117105550.GF4265@stefanha-x1.localdomain>
-References: <1484621964-187372-1-git-send-email-longpeng2@huawei.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cTRRz-0003xa-3v
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:57:15 -0500
+Received: by mail-vk0-x229.google.com with SMTP id r136so89927387vke.1
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 02:57:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="UBnjLfzoMQYIXCvq"
-Content-Disposition: inline
-In-Reply-To: <1484621964-187372-1-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qtest: virtio: zeroed last vring_desc
- after allocate
+In-Reply-To: <20170117094950.5dqdpbk6u7p4yhms@kamzik.brq.redhat.com>
+References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
+	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
+	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
+	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
+	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
+	<20170117094950.5dqdpbk6u7p4yhms@kamzik.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Jan 2017 10:56:53 +0000
+Message-ID: <CAFEAcA-Cdyq-dQ0U79TSsjJWQ2TO0R11RCWzAemSRS_1M65meg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
+ as PNP0C02 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: stefanha@redhat.com, lvivier@redhat.com, eblake@redhat.com, peter.maydell@linaro.org, groug@kaod.org, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
+On 17 January 2017 at 09:49, Andrew Jones <drjones@redhat.com> wrote:
+> In some cases the problem we're solving with the compat guards is
+> a bit hypothetical, but, IMHO, nonetheless a good practice. While
+> we may be sure that AAVMF and Linux will be fine with this table
+> changing under their feet, we can't be sure there aren't other
+> mach-virt users that have more sensitive firmwares/OSes. An ACPI-
+> sensitive OS may notice the change on its next reboot after a
+> migration, and then simply refuse to continue.
 
---UBnjLfzoMQYIXCvq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+There's also the case where you do a VM migration midway through
+UEFI booting up, I think, which might cause things to go wrong
+if you catch it just at the wrong moment.
 
-On Tue, Jan 17, 2017 at 10:59:24AM +0800, Longpeng(Mike) wrote:
-> As qvring_indirect_desc_setup() wouldn't initialize last vring_desc,
-> so it's filled with dirty data, this might cause virtio backend broken.
->=20
-> For example, the last bit of this vring_desc's flags might be 1, so
-> virtqueue_read_next_desc() would report "Desc next is ***".
->=20
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
->=20
-> ---
-> Changes since v1:
->     - use writel() for @len as it's 32 bits long. [Stefan]
->=20
-> ---
->  tests/libqos/virtio.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> Now, that said, I just spoke with Igor in order to learn the x86
+> practice. He says that the policy has been more lax than what I
+> suggest above. Hypothetical, low-risk issues are left unguarded,
+> and only when a bug is found during testing is it then managed.
+> The idea is to try and reduce the amount of compat variables and
+> conditions needed in the ACPI generation code, but, of course, at
+> some level of risk to users expecting their versioned machine type
+> to always appear the same.
+>
+> So far we've been strict with mach-virt, guarding all hypothetical
+> issues. Perhaps this patch is a good example to get a discussion
+> started on whether or not we should be so strict though.
 
-Thanks, applied to my block-next tree:
-https://github.com/stefanha/qemu/commits/block-next
+That said, I don't have a very strong opinion here, beyond that
+we should be consistent at least with x86 practice.
 
-Stefan
-
---UBnjLfzoMQYIXCvq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYffg2AAoJEJykq7OBq3PISL4IAImFjU46J1bNZ2gkIXJE5Yrq
-Nxz2MbPyZ1ShzhgZT9caXLBglzA70kjwKwW9l7uVtdP/iCSnupI8hha8TjJ0LOf6
-JcLavBFKDHacKktAHXQ9FiOMUoIaAuMF2XHAyskfzQUeNc6dL0QK3vC9Lfgd8ARH
-HFlUIagT9Bls3I1kpXy0pMwxEQGw1XAaxwcOhriCMo5fuLley2ffY7voexzAbRNE
-ZwYUKYdXVXfm8ZXIDBP6MKeJdMqHTZBkH6rSAg3wRyl7xxbcTMSeB8ZnVH2uP9S5
-JtAGI9WQY5vbQhnJ/u+9OIjo3JhK8XahLG1ps6M/orVm1QS2YJmk0jyVj6pip9s=
-=l8w8
------END PGP SIGNATURE-----
-
---UBnjLfzoMQYIXCvq--
+thanks
+-- PMM
