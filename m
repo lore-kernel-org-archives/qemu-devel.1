@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cTZlz-0004Yn-Cq
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 14:50:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1cTZmH-0004io-0x
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 14:50:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cTZlv-0006Hn-GV
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 14:50:27 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cTZlv-0006Gw-Cn
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 14:50:23 -0500
-Received: by mail-qt0-x241.google.com with SMTP id f4so23945761qte.2
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 11:50:21 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
-	<1484644078-21312-7-git-send-email-batuzovk@ispras.ru>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <0b6d48ae-f5da-5209-14f7-80bcd5895fff@twiddle.net>
-Date: Tue, 17 Jan 2017 11:50:17 -0800
+	(envelope-from <bounces@canonical.com>) id 1cTZmD-0006Mz-0o
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 14:50:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59935)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cTZmC-0006Mq-Lo
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 14:50:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cTZmB-00055r-0o
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 19:50:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 046D92E80C4
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 19:50:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1484644078-21312-7-git-send-email-batuzovk@ispras.ru>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/18] tcg: allow globals to overlap
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Jan 2017 19:40:25 -0000
+From: Thomas Huth <1655764@bugs.launchpad.net>
+Reply-To: Bug 1655764 <1655764@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170111212721.20360.4397.malonedeb@wampee.canonical.com>
+Message-Id: <20170117194025.21721.24740.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1655764] Re: qemu-img convert -c compression
+ can't decompress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +37,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirill Batuzov <batuzovk@ispras.ru>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 01/17/2017 01:07 AM, Kirill Batuzov wrote:
-> Sometimes the target architecture may allow some parts of a register to be
-> accessed as a different register. If both of these registers are
-> implemented as globals in QEMU, then their content will overlap and the
-> change to one global will also change the value of the other. To handle
-> such situation properly, some fixes are needed in the register allocator
-> and liveness analysis.
+Which version of QEMU (or rather qemu-img) are you using?
 
-You need to handle the overlap during optimization as well.  Otherwise you'll 
-propagate values that you shouldn't.
+** Information type changed from Private to Public
 
+-- =
 
-r~
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1655764
+
+Title:
+  qemu-img convert -c compression can't decompress
+
+Status in QEMU:
+  New
+
+Bug description:
+  Used -c compression option of qemu-img convert to compress qcow2,
+  then libvirt mount for compressed image don't work as well as decompressi=
+on also
+  not working, tried zlib-flate to decompress
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1655764/+subscriptions
