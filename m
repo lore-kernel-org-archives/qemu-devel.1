@@ -1,36 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1cTVH0-0006lD-Ip
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:02:12 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cTVII-0007QR-IR
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:03:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1cTVGy-0002iA-Sc
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:02:10 -0500
-Received: from mail-vk0-x235.google.com ([2607:f8b0:400c:c05::235]:34993)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1cTVGy-0002hz-M6
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:02:08 -0500
-Received: by mail-vk0-x235.google.com with SMTP id x75so93911548vke.2
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 07:02:08 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1cTVIC-0003GO-W1
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:03:30 -0500
+References: <5878AF90.8020709@kamp.de>
+	<260873230.6154791.1484638426777.JavaMail.zimbra@oxygem.tv>
+	<20170117080326.dfjqzwstfxusuhgc@nora.maurer-it.com>
+	<b7f5dc23-6d72-4897-e9ca-6482acfb4c72@redhat.com>
+	<20170117112224.2st4wuivcbwuif2m@nora.maurer-it.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <196ac8f5-2fd7-37e9-d577-8177802d0fb4@redhat.com>
+Date: Tue, 17 Jan 2017 16:03:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170117163002-mutt-send-email-mst@kernel.org>
-References: <20160916033402-mutt-send-email-mst@kernel.org>
-	<CAO_EM_mHyC7cywV4KUqH_MWwt2vVkK6GEOuaUX0FHpffdfaAuQ@mail.gmail.com>
-	<20161006041949-mutt-send-email-mst@kernel.org>
-	<D5FCB73B-435E-4423-B21C-BEEF1C1EA2FD@skyportsystems.com>
-	<20161211052355-mutt-send-email-mst@kernel.org>
-	<FBD67273-74C4-4183-8FCF-8260D13B04D4@skyportsystems.com>
-	<20170116161857-mutt-send-email-mst@kernel.org>
-	<85C3D50B-7AFD-41E7-AD1B-634A42D04BB2@skyportsystems.com>
-	<20170117142650.2a2a351f@nial.brq.redhat.com>
-	<CAO_EM_km-04HBOZP2H3UvPPaCKyQx1nZD1QKPVYuawwTJjdYSQ@mail.gmail.com>
-	<20170117163002-mutt-send-email-mst@kernel.org>
-From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Tue, 17 Jan 2017 07:01:27 -0800
-Message-ID: <CAO_EM_kcfhVPye+5vUZPY=mWS3TrcCWYh_ozTy8gPRgkCLMG-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20170117112224.2st4wuivcbwuif2m@nora.maurer-it.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Virtual Machine Generation ID
+Subject: Re: [Qemu-devel] [Qemu-stable] Data corruption in Qemu 2.7.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,215 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-
-You mean what causes the guest to re-read the vmgenid guid? The
-vmgenid ACPI table defines a notify method, and when the guest
-receives the corresponding event, it re-reads the guid. (Also it
-appears that with Windows Server 2012 at least, if no notify method is
-defined, as is the case with Xen, the guest just re-reads it on
-demand.)
-
-Wouldn't it be sufficient for the qmp set-vmgenid command to call
-acpi_ram_update() with the new guid, and acpi_send_event() to notify
-the guest?
-
---Ed
+To: =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>
+Cc: Alexandre DERUMIER <aderumier@odiso.com>, Peter Lieven <pl@kamp.de>, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
 
-On Tue, Jan 17, 2017 at 6:33 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> Because this relies on guest to run code to read out the new fw cfg.
-> Thus guest can not reliably detect that host didn't update the gen id -
-> new one might be there in fw cfg but not yet read.
->
-> RSDP never changes during guest lifetime so the issue does
-> not occur.
->
-> On Tue, Jan 17, 2017 at 06:26:57AM -0800, Ed Swierk wrote:
->> Why is using fw_cfg for vmgenid preferable to the approach used for
->> RSDP: call acpi_add_rom_blob() to allocate a MemoryRegion with the
->> initial vmgenid guid, and call acpi_ram_update() with the new guid
->> whenever the host needs to change it?
->>
->> --Ed
->>
->>
->> On Tue, Jan 17, 2017 at 5:26 AM, Igor Mammedov <imammedo@redhat.com> wro=
-te:
->> > On Mon, 16 Jan 2017 10:57:42 -0800
->> > Ben Warren <ben@skyportsystems.com> wrote:
->> >
->> >> > On Jan 16, 2017, at 6:21 AM, Michael S. Tsirkin <mst@redhat.com> wr=
-ote:
->> >> >
->> >> > On Sat, Jan 14, 2017 at 10:17:53PM -0800, Ben Warren wrote:
->> >> >> Hi Michael,
->> >> >>
->> >> >>
->> >> >>    On Dec 10, 2016, at 7:28 PM, Michael S. Tsirkin <mst@redhat.com=
-> wrote:
->> >> >>
->> >> >>    On Tue, Dec 06, 2016 at 06:15:34PM -0800, Ben Warren wrote:
->> >> >>
->> >> >>        Hi Michael,
->> >> >>
->> >> >>        I=E2=80=99m well on my way to implementing this, but I am r=
-eally new to the
->> >> >>        QEMU code base and am struggling with some concepts.  Pleas=
-e see below:
->> >> >>
->> >> >>            On Oct 5, 2016, at 6:29 PM, Michael S. Tsirkin <mst@red=
-hat.com>
->> >> >>            wrote:
->> >> >>
->> >> >>            On Tue, Oct 04, 2016 at 03:51:40PM -0700, Ed Swierk wro=
-te:
->> >> >>
->> >> >>                On Thu, Sep 15, 2016 at 5:36 PM, Michael S. Tsirkin=
- <
->> >> >>                mst@redhat.com> wrote:
->> >> >>
->> >> >>                    On Thu, Sep 15, 2016 at 05:23:28PM -0700, Ed Sw=
-ierk wrote:
->> >> >>
->> >> >>                        I'm wondering what it will take to finish u=
-p work on
->> >> >>                        vmgenid.
->> >> >>
->> >> >>                        https://lists.gnu.org/archive/html/qemu-dev=
-el/2016-01/
->> >> >>                        msg05599.html
->> >> >>
->> >> >>
->> >> >>                    We have ACPI_BUILD_TPMLOG_FILE in tree now and =
-I think it
->> >> >>                    could be
->> >> >>                    allocated in a similar way.
->> >> >>                    Integrate patch "fw-cfg: support writeable blob=
-s" to
->> >> >>                    communicate the
->> >> >>                    allocated address back to QEMU.
->> >> >>
->> >> >>
->> >> >>                Starting with Igor's last version at
->> >> >>                https://github.com/imammedo/qemu/commits/vmgen_wip =
-, it's not
->> >> >>                clear to
->> >> >>                me which changes need to be ported, which changes a=
-re obsoleted
->> >> >>                by
->> >> >>                your new fw-cfg stuff and/or upstream churn in ACPI=
-, device
->> >> >>                properties, etc. In particular ACPI is still a tota=
-l mystery to
->> >> >>                me,
->> >> >>                though passing a single address from guest to host =
-can't be
->> >> >>                that hard,
->> >> >>                can it?
->> >> >>
->> >> >>                Any clues would be appreciated.
->> >> >>
->> >> >>                --Ed
->> >> >>
->> >> >>
->> >> >>            It might be best to just re-start from the beginning.
->> >> >>            So the idea is that ACPI should be about supplying the =
-address
->> >> >>            to guest. To supply address to host we'll use fw cfg.
->> >> >>            This would be new I think:
->> >> >>
->> >> >>            - add support for writeable fw cfg blobs
->> >> >>
->> >> >>        patch applied
->> >> >>
->> >> >>            - add linker/loader command to write address of a blob =
-into
->> >> >>            such a fw cfg file
->> >> >>            - add a new file used for vm gen id, use loader command=
- above
->> >> >>            to pass the address of a blob allocated for it to host
->> >> >>
->> >> >>        I don=E2=80=99t really understand the meaning of =E2=80=9Cf=
-ile=E2=80=9D in this context.  It
->> >> >>        seems to be a way of specifying individual fw_cfg entries w=
-ithout
->> >> >>        explicitly giving an index, but is not something that is vi=
-sible in
->> >> >>        either the host or guest file system.  Is this about right?=
-  In my code
->> >> >>        I=E2=80=99m using =E2=80=9C/etc/vmgenid=E2=80=9D
->> >> >>
->> >> >>
->> >> >>    yes
->> >> >>
->> >> >>
->> >> >>        As for the blob, I=E2=80=99m thinking this is where my main=
- problem is.  The
->> >> >>        =E2=80=98fw_cfg_add_*()=E2=80=99 functions take a data poin=
-ter but doesn=E2=80=99t seem to copy
->> >> >>        the data anywhere.  We pass essentially a pointer via ACPI =
-to the
->> >> >>        guest, so what it points to needs to be in an accessible re=
-gion.  I
->> >> >>        don=E2=80=99t get how to define the blob contents.  There a=
-re command-line
->> >> >>        =E2=80=98fw-cfg=E2=80=99 options where you can specify a fi=
-le, but it=E2=80=99s not clear to me
->> >> >>        how to use them.  Maybe I reserve some IO memory or somethi=
-ng?
->> >> >>
->> >> >>
->> >> >>    Not sure I understand the question. fw cfg device will make
->> >> >>    memory accessible to guest. Put the guest physical address ther=
-e.
->> >> >>    the address needs to be calculated by linker.
->> >> >>
->> >> >>
->> >> >> I=E2=80=99m almost ready to submit a V2 of the patch set, but ther=
-e=E2=80=99s still one issue
->> >> >> that I can=E2=80=99t figure out.  From the guest, I can read the c=
-ontents of the blob.
->> >> >> If I make a change to the contents of the blob (via QMP) the guest=
- does not
->> >> >> see the changes.  Is there something I need to do on the QEMU side=
- to =E2=80=9Cpush=E2=80=9D
->> >> >> the updated fw_cfg contents to the guest?  I=E2=80=99ve noticed th=
-is both when writing
->> >> >> a qtest for the feature, and also in a Linux kernel module I wrote=
- that reads
->> >> >> the ACPI contents in a guest.
->> >> >>
->> >> >> thanks,
->> >> >> Ben
->> >> >
->> >> > fw cfg entities are assumed to be immutable. This week
->> >> > I'll merge support for writeable fw cfg entries.
->> >> > I don't see why you want to change fw cfg transparently
->> >> > though - I think it should be like this
->> >> > - guest writes GPA into fw cfg
->> >> > - qemu writes gen id at this GPA
->> >> >
->> >> I=E2=80=99ve tried with your patch "fw-cfg-support-writeable-blobs=E2=
-=80=9D, setting the =E2=80=98read-only=E2=80=99 flag on my blob to false:
->> >>
->> >> fw_cfg_add_file_callback(s, VMGENID_FW_CFG_FILE, NULL, NULL, vms->gui=
-d.data, sizeof(vms->guid.data), false);
->> >>
->> >> and it doesn=E2=80=99t seem to make a difference.
->> >>
->> >> I think we have a misunderstanding here.  I=E2=80=99m storing the VM =
-Generation ID __data__ (a GUID) in a fw_cfg blob, not the address.  I=E2=80=
-=99ll submit the patch set ASAP so you will understand.
->> > there  should be another fw_cfg file for address so
->> > that guest would be able to write it back into QEMU
->> >
->> >>
->> >> > --
->> >> > MST
->> >>
->> >> regards,
->> >> Ben
->> >>
->> >
+
+On 17/01/2017 12:22, Fabian Gr=FCnbichler wrote:
+> 6) repeat 3-5 until md5sum does not match, kernel spews error
+> messages, or you are convinced that everything is OK
+>=20
+> sample kernel message (for ext3):
+> Jan 17 11:39:32 ubuntu kernel: sd 2:0:0:0: [sda] tag#32 FAILED Result: =
+hostbyte=3DDID_OK driverbyte=3DDRIVER_SENSE
+> Jan 17 11:39:32 ubuntu kernel: sd 2:0:0:0: [sda] tag#32 Sense Key : Ill=
+egal Request [current]
+> Jan 17 11:39:32 ubuntu kernel: sd 2:0:0:0: [sda] tag#32 Add. Sense: Inv=
+alid field in cdb
+> Jan 17 11:39:32 ubuntu kernel: sd 2:0:0:0: [sda] tag#32 CDB: Write(10) =
+2a 00 0f 3a 90 00 00 07 d8 00
+> Jan 17 11:39:32 ubuntu kernel: blk_update_request: critical target erro=
+r, dev sda, sector 255496192
+
+Can you reproduce it if QEMU runs under "strace -e ioctl -ff" in the=20
+host?  Or also using this systemtap script.
+
+The important bit would be the lines with a nonzero status, but the
+others can be useful to see what the surroundings look like.
+
+# example output for "sudo stap -v strace.stp -c 'sg_opcodes /dev/sda'"
+# | sg_opcodes[3444] 00000000 12 00 00 00 24 00 00 00 be 91
+# | sg_opcodes[3444] 08100002 a3 0c 00 00 00 00 00 00 20 00
+
+global cdbs%
+global reqs%
+global names%
+
+function check_pid() {
+    return target() =3D=3D 0 || pid() =3D=3D target();
+}
+
+probe kernel.function("blk_fill_sghdr_rq") {
+    if (!check_pid()) next;
+
+    names[$rq]=3Dsprintf("%s[%d]", execname(), tid())
+    cdbs[$rq]=3Dsprintf("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02=
+x",
+		    $hdr->cmdp[0],$hdr->cmdp[1],$hdr->cmdp[2],$hdr->cmdp[3],$hdr->cmdp[=
+4],
+		    $hdr->cmdp[6],$hdr->cmdp[5],$hdr->cmdp[7],$hdr->cmdp[8],$hdr->cmdp[=
+9])
+}
+
+probe kernel.function("scsi_setup_cmnd") {
+    if (!($req in cdbs)) next;
+    reqs[$req->special] =3D $req;
+}
+
+probe kernel.function("scsi_finish_command") {
+    if (!($cmd in reqs)) next;
+    rq =3D reqs[$cmd];
+    printf("%s %08x %s\n", names[rq], $cmd->result, cdbs[rq]);
+    delete reqs[$cmd]
+    delete cdbs[rq]
+}
