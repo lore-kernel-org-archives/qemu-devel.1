@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZe-0002A7-KU
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:04 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZg-0002EV-FH
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZb-00084m-G3
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52085
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZd-000869-Ax
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:04 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57603)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cTPZb-00084W-Bj
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:56:59 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0H8tntr138200
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:56:58 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 281eucb1f5-1
+	id 1cTPZd-00085O-2H
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:01 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0H8rVLs024216
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:57:00 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 281880yyys-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:56:58 -0500
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:56:59 -0500
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 17 Jan 2017 08:56:56 -0000
+	Tue, 17 Jan 2017 08:56:57 -0000
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Tue, 17 Jan 2017 09:56:38 +0100
+Date: Tue, 17 Jan 2017 09:56:39 +0100
 In-Reply-To: <20170117085645.4267-1-cornelia.huck@de.ibm.com>
 References: <20170117085645.4267-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170117085645.4267-6-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 05/12] s390x/pci: dynamically allocate iommu
+Message-Id: <20170117085645.4267-7-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 06/12] s390x/pci: change the device array to a
+ list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,188 +39,270 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
 
-When initializing a PCI device, an address space is required during PCI
-core initialization and before the call to the embedding object hotplug
-callback. To provide this AS, we allocate a S390PCIIOMMU object
-containing this AS. Initialization of S390PCIIOMMU object is done
-before the PCI device is completely created. So that we cannot
-associate the IOMMU with the device at the moment. To track the IOMMU
-object, we use g_hash functions with the PCI device's bus address as a
-key to provide an array of pointers indexed by the PCI device's devfn
-to the allocated IOMMU.
+In order to support a greater number of devices we use a QTAILQ
+list of devices instead of a limited array.
 
-Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+This leads us to change:
+- every lookup function s390_pci_find_xxx() for QTAILQ
+- the FH_MASK_INDEX to index up to 65536 devices
+
+Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/s390x/s390-pci-bus.c | 73 +++++++++++++++++++++++++++++++++++++++----------
- hw/s390x/s390-pci-bus.h |  7 ++++-
- 2 files changed, 65 insertions(+), 15 deletions(-)
+ hw/s390x/s390-pci-bus.c | 100 ++++++++++++++++++++++++------------------------
+ hw/s390x/s390-pci-bus.h |   7 +++-
+ 2 files changed, 56 insertions(+), 51 deletions(-)
 
 diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 11244fc93c..04a4c3508e 100644
+index 04a4c3508e..dfca006bde 100644
 --- a/hw/s390x/s390-pci-bus.c
 +++ b/hw/s390x/s390-pci-bus.c
-@@ -432,11 +432,48 @@ static const MemoryRegionIOMMUOps s390_iommu_ops = {
-     .translate = s390_translate_iommu,
- };
+@@ -93,33 +93,24 @@ int chsc_sei_nt2_have_event(void)
  
-+static S390PCIIOMMU *s390_pci_get_iommu(S390pciState *s, PCIBus *bus,
-+                                        int devfn)
-+{
-+    uint64_t key = (unsigned long)bus;
-+    S390PCIIOMMUTable *table = g_hash_table_lookup(s->iommu_table, &key);
-+    S390PCIIOMMU *iommu;
-+
-+    if (!table) {
-+        table = g_malloc0(sizeof(S390PCIIOMMUTable));
-+        table->key = key;
-+        g_hash_table_insert(s->iommu_table, &table->key, table);
-+    }
-+
-+    iommu = table->iommu[PCI_SLOT(devfn)];
-+    if (!iommu) {
-+        iommu = S390_PCI_IOMMU(object_new(TYPE_S390_PCI_IOMMU));
-+
-+        char *mr_name = g_strdup_printf("iommu-root-%02x:%02x.%01x",
-+                                        pci_bus_num(bus),
-+                                        PCI_SLOT(devfn),
-+                                        PCI_FUNC(devfn));
-+        char *as_name = g_strdup_printf("iommu-pci-%02x:%02x.%01x",
-+                                        pci_bus_num(bus),
-+                                        PCI_SLOT(devfn),
-+                                        PCI_FUNC(devfn));
-+        memory_region_init(&iommu->mr, OBJECT(iommu), mr_name, UINT64_MAX);
-+        address_space_init(&iommu->as, &iommu->mr, as_name);
-+        table->iommu[PCI_SLOT(devfn)] = iommu;
-+
-+        g_free(mr_name);
-+        g_free(as_name);
-+    }
-+
-+    return iommu;
-+}
-+
- static AddressSpace *s390_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+ S390PCIBusDevice *s390_pci_find_next_avail_dev(S390PCIBusDevice *pbdev)
  {
-     S390pciState *s = opaque;
-+    S390PCIIOMMU *iommu = s390_pci_get_iommu(s, bus, devfn);
+-    int idx = 0;
+-    S390PCIBusDevice *dev = NULL;
+     S390pciState *s = s390_get_phb();
++    S390PCIBusDevice *ret = pbdev ? QTAILQ_NEXT(pbdev, link) :
++        QTAILQ_FIRST(&s->zpci_devs);
  
--    return &s->iommu[PCI_SLOT(devfn)]->as;
-+    return &iommu->as;
+-    if (pbdev) {
+-        idx = (pbdev->fh & FH_MASK_INDEX) + 1;
++    while (ret && ret->state == ZPCI_FS_RESERVED) {
++        ret = QTAILQ_NEXT(ret, link);
+     }
+ 
+-    for (; idx < PCI_SLOT_MAX; idx++) {
+-        dev = s->pbdev[idx];
+-        if (dev && dev->state != ZPCI_FS_RESERVED) {
+-            return dev;
+-        }
+-    }
+-
+-    return NULL;
++    return ret;
  }
  
- static uint8_t set_ind_atomic(uint64_t ind_loc, uint8_t to_be_set)
-@@ -520,19 +557,22 @@ void s390_pci_iommu_disable(S390PCIIOMMU *iommu)
-     object_unparent(OBJECT(&iommu->iommu_mr));
- }
+ S390PCIBusDevice *s390_pci_find_dev_by_fid(uint32_t fid)
+ {
+     S390PCIBusDevice *pbdev;
+-    int i;
+     S390pciState *s = s390_get_phb();
  
--static void s390_pcihost_init_as(S390pciState *s)
-+static void s390_pci_iommu_free(PCIBus *bus, int32_t devfn)
+-    for (i = 0; i < PCI_SLOT_MAX; i++) {
+-        pbdev = s->pbdev[i];
+-        if (pbdev && pbdev->fid == fid) {
++    QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
++        if (pbdev->fid == fid) {
+             return pbdev;
+         }
+     }
+@@ -203,16 +194,10 @@ out:
+ 
+ static S390PCIBusDevice *s390_pci_find_dev_by_uid(uint16_t uid)
  {
 -    int i;
--    S390PCIIOMMU *iommu;
--
--    for (i = 0; i < PCI_SLOT_MAX; i++) {
--        iommu = g_malloc0(sizeof(S390PCIIOMMU));
--        memory_region_init(&iommu->mr, OBJECT(s),
--                           "iommu-root-s390", UINT64_MAX);
--        address_space_init(&iommu->as, &iommu->mr, "iommu-pci");
-+    uint64_t key = (unsigned long)bus;
-+    S390pciState *s = s390_get_phb();
-+    S390PCIIOMMUTable *table = g_hash_table_lookup(s->iommu_table, &key);
-+    S390PCIIOMMU *iommu = table ? table->iommu[PCI_SLOT(devfn)] : NULL;
+     S390PCIBusDevice *pbdev;
+     S390pciState *s = s390_get_phb();
  
--        s->iommu[i] = iommu;
-+    if (!table || !iommu) {
-+        return;
+-    for (i = 0; i < PCI_SLOT_MAX; i++) {
+-        pbdev = s->pbdev[i];
+-        if (!pbdev) {
+-            continue;
+-        }
+-
++    QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
+         if (pbdev->uid == uid) {
+             return pbdev;
+         }
+@@ -223,7 +208,6 @@ static S390PCIBusDevice *s390_pci_find_dev_by_uid(uint16_t uid)
+ 
+ static S390PCIBusDevice *s390_pci_find_dev_by_target(const char *target)
+ {
+-    int i;
+     S390PCIBusDevice *pbdev;
+     S390pciState *s = s390_get_phb();
+ 
+@@ -231,12 +215,7 @@ static S390PCIBusDevice *s390_pci_find_dev_by_target(const char *target)
+         return NULL;
      }
+ 
+-    for (i = 0; i < PCI_SLOT_MAX; i++) {
+-        pbdev = s->pbdev[i];
+-        if (!pbdev) {
+-            continue;
+-        }
+-
++    QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
+         if (!strcmp(pbdev->target, target)) {
+             return pbdev;
+         }
+@@ -247,9 +226,16 @@ static S390PCIBusDevice *s390_pci_find_dev_by_target(const char *target)
+ 
+ S390PCIBusDevice *s390_pci_find_dev_by_idx(uint32_t idx)
+ {
++    S390PCIBusDevice *pbdev;
+     S390pciState *s = s390_get_phb();
+ 
+-    return s->pbdev[idx & FH_MASK_INDEX];
++    QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
++        if (pbdev->idx == idx) {
++            return pbdev;
++        }
++    }
 +
-+    table->iommu[PCI_SLOT(devfn)] = NULL;
-+    address_space_destroy(&iommu->as);
-+    object_unparent(OBJECT(&iommu->mr));
-+    object_unparent(OBJECT(iommu));
-+    object_unref(OBJECT(iommu));
++    return NULL;
  }
  
- static int s390_pcihost_init(SysBusDevice *dev)
-@@ -548,7 +588,6 @@ static int s390_pcihost_init(SysBusDevice *dev)
-                          s390_pci_set_irq, s390_pci_map_irq, NULL,
-                          get_system_memory(), get_system_io(), 0, 64,
-                          TYPE_PCI_BUS);
--    s390_pcihost_init_as(s);
-     pci_setup_iommu(b, s390_pci_dma_iommu, s);
+ S390PCIBusDevice *s390_pci_find_dev_by_fh(uint32_t fh)
+@@ -257,9 +243,10 @@ S390PCIBusDevice *s390_pci_find_dev_by_fh(uint32_t fh)
+     S390pciState *s = s390_get_phb();
+     S390PCIBusDevice *pbdev;
  
-     bus = BUS(b);
-@@ -558,6 +597,8 @@ static int s390_pcihost_init(SysBusDevice *dev)
-     s->bus = S390_PCI_BUS(qbus_create(TYPE_S390_PCI_BUS, DEVICE(s), NULL));
-     qbus_set_hotplug_handler(BUS(s->bus), DEVICE(s), NULL);
+-    pbdev = s->pbdev[fh & FH_MASK_INDEX];
+-    if (pbdev && pbdev->fh == fh) {
+-        return pbdev;
++    QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
++        if (pbdev->fh == fh) {
++            return pbdev;
++        }
+     }
  
-+    s->iommu_table = g_hash_table_new_full(g_int64_hash, g_int64_equal,
-+                                           NULL, g_free);
+     return NULL;
+@@ -600,6 +587,7 @@ static int s390_pcihost_init(SysBusDevice *dev)
+     s->iommu_table = g_hash_table_new_full(g_int64_hash, g_int64_equal,
+                                            NULL, g_free);
      QTAILQ_INIT(&s->pending_sei);
++    QTAILQ_INIT(&s->zpci_devs);
      return 0;
  }
-@@ -661,7 +702,7 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-         }
  
-         pbdev->pdev = pdev;
--        pbdev->iommu = s->iommu[PCI_SLOT(pdev->devfn)];
-+        pbdev->iommu = s390_pci_get_iommu(s, pdev->bus, pdev->devfn);
-         pbdev->iommu->pbdev = pbdev;
-         pbdev->state = ZPCI_FS_STANDBY;
+@@ -667,6 +655,25 @@ static S390PCIBusDevice *s390_pci_device_new(const char *target)
+     return S390_PCI_DEVICE(dev);
+ }
  
-@@ -708,8 +749,9 @@ static void s390_pcihost_timer_cb(void *opaque)
- static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
-                                     DeviceState *dev, Error **errp)
++static bool s390_pci_alloc_idx(S390PCIBusDevice *pbdev)
++{
++    uint32_t idx;
++    S390pciState *s = s390_get_phb();
++
++    idx = s->next_idx;
++    while (s390_pci_find_dev_by_idx(idx)) {
++        idx = (idx + 1) & FH_MASK_INDEX;
++        if (idx == s->next_idx) {
++            return false;
++        }
++    }
++
++    pbdev->idx = idx;
++    s->next_idx = (idx + 1) & FH_MASK_INDEX;
++
++    return true;
++}
++
+ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
+                                   DeviceState *dev, Error **errp)
  {
--    int i;
+@@ -714,18 +721,14 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
+                                          pbdev->fh, pbdev->fid);
+         }
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
+-        int idx;
+-
+         pbdev = S390_PCI_DEVICE(dev);
+-        for (idx = 0; idx < PCI_SLOT_MAX; idx++) {
+-            if (!s->pbdev[idx]) {
+-                s->pbdev[idx] = pbdev;
+-                pbdev->fh = idx;
+-                return;
+-            }
+-        }
+ 
+-        error_setg(errp, "no slot for plugging zpci device");
++        if (!s390_pci_alloc_idx(pbdev)) {
++            error_setg(errp, "no slot for plugging zpci device");
++            return;
++        }
++        pbdev->fh = pbdev->idx;
++        QTAILQ_INSERT_TAIL(&s->zpci_devs, pbdev, link);
+     }
+ }
+ 
+@@ -751,16 +754,15 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
+ {
      PCIDevice *pci_dev = NULL;
-+    PCIBus *bus;
-+    int32_t devfn, i;
+     PCIBus *bus;
+-    int32_t devfn, i;
++    int32_t devfn;
      S390PCIBusDevice *pbdev = NULL;
      S390pciState *s = s390_get_phb();
  
-@@ -752,8 +794,11 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         pci_dev = PCI_DEVICE(dev);
  
-     s390_pci_generate_plug_event(HP_EVENT_STANDBY_TO_RESERVED,
-                                  pbdev->fh, pbdev->fid);
-+    bus = pci_dev->bus;
-+    devfn = pci_dev->devfn;
-     object_unparent(OBJECT(pci_dev));
-     s390_pci_msix_free(pbdev);
-+    s390_pci_iommu_free(bus, devfn);
-     pbdev->pdev = NULL;
+-        for (i = 0 ; i < PCI_SLOT_MAX; i++) {
+-            if (s->pbdev[i] && s->pbdev[i]->pdev == pci_dev) {
+-                pbdev = s->pbdev[i];
++        QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
++            if (pbdev->pdev == pci_dev) {
+                 break;
+             }
+         }
+@@ -803,7 +805,7 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
      pbdev->state = ZPCI_FS_RESERVED;
  out:
+     pbdev->fid = 0;
+-    s->pbdev[pbdev->fh & FH_MASK_INDEX] = NULL;
++    QTAILQ_REMOVE(&s->zpci_devs, pbdev, link);
+     object_unparent(OBJECT(pbdev));
+ }
+ 
 diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-index 1d05c1a92e..fe108e9330 100644
+index fe108e9330..1bd37ad821 100644
 --- a/hw/s390x/s390-pci-bus.h
 +++ b/hw/s390x/s390-pci-bus.h
-@@ -274,6 +274,11 @@ typedef struct S390PCIIOMMU {
-     uint64_t pal;
- } S390PCIIOMMU;
+@@ -27,7 +27,7 @@
+ #define FH_MASK_ENABLE   0x80000000
+ #define FH_MASK_INSTANCE 0x7f000000
+ #define FH_MASK_SHM      0x00ff0000
+-#define FH_MASK_INDEX    0x0000001f
++#define FH_MASK_INDEX    0x0000ffff
+ #define FH_SHM_VFIO      0x00010000
+ #define FH_SHM_EMUL      0x00020000
+ #define S390_PCIPT_ADAPTER 2
+@@ -285,6 +285,7 @@ typedef struct S390PCIBusDevice {
+     ZpciState state;
+     char *target;
+     uint16_t uid;
++    uint32_t idx;
+     uint32_t fh;
+     uint32_t fid;
+     bool fid_defined;
+@@ -299,6 +300,7 @@ typedef struct S390PCIBusDevice {
+     IndAddr *summary_ind;
+     IndAddr *indicator;
+     QEMUTimer *release_timer;
++    QTAILQ_ENTRY(S390PCIBusDevice) link;
+ } S390PCIBusDevice;
  
-+typedef struct S390PCIIOMMUTable {
-+    uint64_t key;
-+    S390PCIIOMMU *iommu[PCI_SLOT_MAX];
-+} S390PCIIOMMUTable;
-+
- typedef struct S390PCIBusDevice {
-     DeviceState qdev;
-     PCIDevice *pdev;
-@@ -304,7 +309,7 @@ typedef struct S390pciState {
+ typedef struct S390PCIBus {
+@@ -307,10 +309,11 @@ typedef struct S390PCIBus {
+ 
+ typedef struct S390pciState {
      PCIHostState parent_obj;
++    uint32_t next_idx;
      S390PCIBus *bus;
-     S390PCIBusDevice *pbdev[PCI_SLOT_MAX];
--    S390PCIIOMMU *iommu[PCI_SLOT_MAX];
-+    GHashTable *iommu_table;
+-    S390PCIBusDevice *pbdev[PCI_SLOT_MAX];
+     GHashTable *iommu_table;
      QTAILQ_HEAD(, SeiContainer) pending_sei;
++    QTAILQ_HEAD(, S390PCIBusDevice) zpci_devs;
  } S390pciState;
  
+ int chsc_sei_nt2_get_event(void *res);
 -- 
 2.11.0
