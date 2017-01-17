@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTUCc-00072Y-P0
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:53:35 -0500
+	(envelope-from <rjones@redhat.com>) id 1cTUGb-00008O-JD
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:57:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTUCc-0006KL-1N
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:53:34 -0500
-Received: from mail-ua0-x229.google.com ([2607:f8b0:400c:c08::229]:33423)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cTUCb-0006K9-TY
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:53:33 -0500
-Received: by mail-ua0-x229.google.com with SMTP id i68so102982204uad.0
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 05:53:33 -0800 (PST)
+	(envelope-from <rjones@redhat.com>) id 1cTUGX-0007mt-1z
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:57:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cTUGW-0007ma-Rz
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:57:36 -0500
+Date: Tue, 17 Jan 2017 13:57:34 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20170117135734.GD14855@redhat.com>
+References: <20170116195452.23532-1-ehabkost@redhat.com>
+	<20170117134208.GB14855@redhat.com>
+	<20170117134440.GC14855@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170116133911.21684-1-stefanha@redhat.com>
-References: <20170116133911.21684-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jan 2017 13:53:12 +0000
-Message-ID: <CAFEAcA9Dbk+SZUkn=yGn_90YOHLUsRHPHRJfxo1YkgHWQdRJ=Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/11] Block patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170117134440.GC14855@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +28,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 
-On 16 January 2017 at 13:39, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 2ccede18bd24fce5db83fef3674563a1f256717b:
->
->   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.9-pull-request' into staging (2017-01-16 12:41:35 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 7d506c90afa47facdb993bc19c15863eef584f1d:
->
->   async: optimize aio_bh_poll (2017-01-16 13:25:18 +0000)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
 
-Applied, thanks.
+Oh no wait, these errors are just because of the new version of qemu
+that I am using to test your patch, so nothing to do with this patch.
 
--- PMM
+/me fires up git bisect ...
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
