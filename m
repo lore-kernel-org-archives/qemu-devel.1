@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cTc35-0000ou-FH
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:16:16 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cTc3W-0001Ca-9C
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:16:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cTc34-0005DP-Kj
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:16:15 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cTc3V-0005Uh-9c
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 17:16:42 -0500
 MIME-Version: 1.0
-In-Reply-To: <20161228131452.jt37cfqteqkhb6hn@kamzik.brq.redhat.com>
-References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-	<1481625384-15077-24-git-send-email-peter.maydell@linaro.org>
-	<20161228131452.jt37cfqteqkhb6hn@kamzik.brq.redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 17 Jan 2017 14:15:41 -0800
-Message-ID: <CAKmqyKMEVtSBg7GuB1qzexkcSxrxW-xqmBPe=-zXcUkbpuapxg@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <20170117144954.rgw53vmavygrctlo@kamzik.brq.redhat.com>
+References: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA9N_YXFCPo8ja-Nan3roL=gdNpFQHoLk_aw6tDixwoT3w@mail.gmail.com>
+	<20170117144954.rgw53vmavygrctlo@kamzik.brq.redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 17 Jan 2017 14:16:09 -0800
+Message-ID: <CAKmqyKNWnXzs=ZKO94s-tmxCEZva050Cjb14HoYmig9UqBJUrg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 23/23] hw/arm/virt: Add board property to
- enable EL2
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 00/18] arm: Add
+ virtualization to GICv3, and enable EL2 on 64-bit CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +26,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Andrew Jones <drjones@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Patch Tracking <patches@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>
 
-On Wed, Dec 28, 2016 at 5:14 AM, Andrew Jones <drjones@redhat.com> wrote:
-> On Tue, Dec 13, 2016 at 10:36:24AM +0000, Peter Maydell wrote:
->> Add a board level property to the virt board which will
->> enable EL2 on the CPU if the user asks for it. The
->> default is not to provide EL2. If EL2 is enabled then
->> we will use SMC as our PSCI conduit, and report the
->> virtualization support in the GICv3 device tree node.
+On Tue, Jan 17, 2017 at 6:49 AM, Andrew Jones <drjones@redhat.com> wrote:
+> On Tue, Jan 17, 2017 at 02:07:31PM +0000, Peter Maydell wrote:
+>> On 9 January 2017 at 16:05, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> > This patchset adds support for the Virtualization extensions to QEMU's
+>> > GICv3 emulation. This was the last missing piece that was stopping
+>> > us from turning on the EL2 support in the CPU model, so the patchset
+>> > also adds support for enabling it all on the virt board via the
+>> > '-machine virtualization=on' option.
 >>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> > Patches 1, 4-13, 15, 16 still need review.
+>>
+>> So is anybody interested in reviewing the complicated
+>> bits in the middle of this patchset (5-13) or shall I
+>> just throw it into target-arm.next? :-)
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+I have Acked and Reviewed what I can. I don't know much about GICv3 so
+I can't really judge those patches. Overall they look good to me
+though.
 
 Thanks,
 
 Alistair
 
->> ---
->>  hw/arm/virt.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 43 insertions(+), 2 deletions(-)
->>
 >
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Unfortunately I don't have time right now to give them the justice
+> they deserve. FWIW, I've done light testing and light reviewing and
+> I don't have any complaints.
+>
+> Thanks,
+> drew
+>
+>>
+>> thanks
+>> -- PMM
+>>
 >
