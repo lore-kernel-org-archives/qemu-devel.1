@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cTRwh-00018U-2V
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 06:28:59 -0500
+	(envelope-from <ilg@livius.net>) id 1cTRyc-0002J5-W0
+	for Qemu-devel@nongnu.org; Tue, 17 Jan 2017 06:30:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cTRwg-0005yw-B2
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 06:28:59 -0500
-Date: Tue, 17 Jan 2017 19:28:48 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170117112848.GB6199@lemon>
-References: <1484579832-18589-1-git-send-email-pl@kamp.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1484579832-18589-1-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH] block/iscsi: avoid data
- corruption with cache=writeback
+	(envelope-from <ilg@livius.net>) id 1cTRyZ-0006cl-1O
+	for Qemu-devel@nongnu.org; Tue, 17 Jan 2017 06:30:59 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:34879)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1cTRyY-0006cJ-QN
+	for Qemu-devel@nongnu.org; Tue, 17 Jan 2017 06:30:54 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id r126so196636832wmr.0
+	for <Qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:30:54 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+From: Liviu Ionescu <ilg@livius.net>
+In-Reply-To: <CAFEAcA-S6BQnjKQzuKM2SX14qNzt=CV=otOXt_p2usgGS_EHNQ@mail.gmail.com>
+Date: Tue, 17 Jan 2017 13:30:48 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <61EE48F6-CBDB-4A57-8884-034D327B0EF7@livius.net>
+References: <6205DF8A-7643-432F-88FF-12B1E9DEF5D8@livius.net>
+	<CAFEAcA_CDpXqAAJNdSQpk4MKOorDXqUi_AwsevrHk=pnbrS0NQ@mail.gmail.com>
+	<277E72EB-288A-498F-9208-99EBF09218A6@livius.net>
+	<CAFEAcA_54fL9YHVJLqAZS8p3OftGd-yq7C7k4jSfVGeCzwMPmA@mail.gmail.com>
+	<D1505166-849A-439D-8E78-579F708D53BB@livius.net>
+	<CAFEAcA-AB98qtJcrLQ=T4PDvg=VM2tTqxALVpZYoYQcd9fySFg@mail.gmail.com>
+	<20170117104258.GD2053@work-vm>
+	<CAFEAcA-S6BQnjKQzuKM2SX14qNzt=CV=otOXt_p2usgGS_EHNQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] CMSIS SVD based peripheral definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +35,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developer <Qemu-devel@nongnu.org>
 
-On Mon, 01/16 16:17, Peter Lieven wrote:
-> nb_cls_shrunk in iscsi_allocmap_update can become -1 if the
-> request starts and ends within the same cluster. This results
-> in passing -1 to bitmap_set and bitmap_clear and they don't
-> handle negative values properly. In the end this leads to data
-> corruption.
-> 
-> Fixes: e1123a3b40a1a9a625a29c8ed4debb7e206ea690
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> ---
->  block/iscsi.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/iscsi.c b/block/iscsi.c
-> index 6aeeb9e..1860f1b 100644
-> --- a/block/iscsi.c
-> +++ b/block/iscsi.c
-> @@ -499,14 +499,18 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
->      if (allocated) {
->          bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
->      } else {
-> -        bitmap_clear(iscsilun->allocmap, cl_num_shrunk, nb_cls_shrunk);
-> +        if (nb_cls_shrunk > 0) {
-> +            bitmap_clear(iscsilun->allocmap, cl_num_shrunk, nb_cls_shrunk);
-> +        }
->      }
->  
->      if (iscsilun->allocmap_valid == NULL) {
->          return;
->      }
->      if (valid) {
-> -        bitmap_set(iscsilun->allocmap_valid, cl_num_shrunk, nb_cls_shrunk);
-> +        if (nb_cls_shrunk > 0) {
-> +            bitmap_set(iscsilun->allocmap_valid, cl_num_shrunk, nb_cls_shrunk);
-> +        }
->      } else {
->          bitmap_clear(iscsilun->allocmap_valid, cl_num_expanded,
->                       nb_cls_expanded);
-> -- 
-> 1.9.1
-> 
-> 
 
-It's probably a good idea to add assertions parameter in bitmap_*.
+> On 17 Jan 2017, at 13:09, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>=20
+> losing the license info and attribution
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+inside the SVD files there is no license info or attribution.
+
+the files themselves were created by the silicon vendors, but are =
+distributed by ARM, inside the CMSIS Packs.
+
+the original CMSIS license stated:
+
+---
+1.1 CMSIS DELIVERABLES
+ARM hereby grants to you, subject to the terms and conditions of this =
+Licence, a non-exclusive, non-transferable licence, to use and copy the =
+CMSIS Deliverables for the purpose of:
+
+(i) subject to clause 1.5(i), developing, having developed, =
+manufacturing, having manufactured, offering to sell, selling, supplying =
+or otherwise distributing products that comply with the CMSIS =
+Deliverables; ...
+
+1.5 CONDITIONS ON REDISTRIBUTION.
+
+(i) If you distribute (directly or through your customers and authorised =
+distributors) the products you have created pursuant to Clause 1.1 (i) =
+you agree: (a) not to use ARM=E2=80=99s name, logo or trademarks to =
+market any or all of the products created under Clause 1.1 (i); (b) to =
+preserve any copyright notices included in the CMSIS Deliverables; and =
+(c) to ensure your customers and authorised distributors comply with =
+this Clause 1.5(i).
+---
+
+starting with CMSIS 5, ARM switched to Apache 2, exactly to relax =
+licensing. as far as I can tell, there are no "patent, trademark, and =
+attribution notices from the Source form of the Work" related to the SVD =
+files.
+
+if ARM wants these files used largely, but FSF refuses them, I think FSF =
+has a problem.
+
+
+regards,
+
+Liviu
