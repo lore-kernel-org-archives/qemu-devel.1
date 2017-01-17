@@ -1,35 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cTPj5-0001vX-MO
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:06:48 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cTPkd-00036P-Hd
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cTPj4-0003CQ-H8
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:06:47 -0500
-Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:33346)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1cTPj4-0003CC-3L
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:06:46 -0500
-Received: by mail-io0-x22f.google.com with SMTP id v96so109960010ioi.0
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 01:06:46 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <acc3f75b-5df0-de8c-fbfa-2cf29f728031@redhat.com>
-References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
-	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
-	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
-	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
-	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
-	<b6362d69-a544-1b78-fc48-1020e5d0efef@redhat.com>
-	<CAKv+Gu_2srdbQhK4LjjsdoOkm_S4hkEFVdtUHmcvAnVZCVErbA@mail.gmail.com>
-	<5c6571da-34a7-9a23-e229-88883302d4e9@redhat.com>
-	<CAKv+Gu_Rap-_gnXqF6cRYS+CUvm2QMzxKWnSRNyJ7-wqJcdNGA@mail.gmail.com>
-	<acc3f75b-5df0-de8c-fbfa-2cf29f728031@redhat.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Tue, 17 Jan 2017 09:06:44 +0000
-Message-ID: <CAKv+Gu8G8+FGroZ66G_TUnD4X3kDfSuKy7=Ek6X-5bjM-Gd3-Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
- as PNP0C02 device
+	(envelope-from <batuzovk@ispras.ru>) id 1cTPkY-0003pV-Fa
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:23 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:49822 helo=smtp.ispras.ru)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <batuzovk@ispras.ru>) id 1cTPkY-0003n2-1R
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 04:08:18 -0500
+From: Kirill Batuzov <batuzovk@ispras.ru>
+Date: Tue, 17 Jan 2017 12:07:40 +0300
+Message-Id: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
+Subject: [Qemu-devel] [PATCH 00/18] Emulate guest vector operations with
+ host vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,83 +22,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Andrew Jones <drjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Kirill Batuzov <batuzovk@ispras.ru>
 
-On 17 January 2017 at 08:50, Laszlo Ersek <lersek@redhat.com> wrote:
-> (my reply is no longer related to the patch, so maybe I shouldn't send
-> it... I can't resist, sorry :))
->
-> On 01/17/17 08:47, Ard Biesheuvel wrote:
->> On 16 January 2017 at 22:35, Laszlo Ersek <lersek@redhat.com> wrote:
->
->>> The UEFI memory map will reflect allocations from the GCD memory space,
->>> for the Reserved and MMIO types. See "Figure 2. GCD Memory State
->>> Transitions" in "7.2.2 GCD Memory Resources", Vol2 of the PI spec.
->>>
->>> See also "9.7.1 UEFI Boot Services Dependencies" in the same,
->>>
->>>   9.7.1.8 GetMemoryMap()
->>>
->>>   The GetMemoryMap() implementation must include into the UEFI memory
->>>   map all GCD map entries of types EfiGcdMemoryTypeReserved and
->>>   EfiPersistentMemory, and all GCD map entries of type
->>>   EfiGcdMemoryTypeMemoryMappedIo that have EFI_MEMORY_RUNTIME attribute
->>>   set.
->>>
->>> (Note that I wrote Reserved earlier, not MMIO.)
->>>
->>
->> What the PI spec stipulates is irrelevant: the contract between the
->> firmware and the OS is in the UEFI and ACPI specifications, not in the
->> PI spec.
->
-> I disagree that what the PI spec stipulates is irrelevant. For platforms
-> that implement both PI and UEFI, the PI spec expresses additional
-> requirements for the UEFI implementation (in PI terminology). So what it
-> says certainly matters for the ArmVirtQemu firmware specifically.
->
-> End-to-end, if we want to achieve a particular result in a UEFI OS, we
-> can certainly work towards that end in the PEI phase (or in the DXE
-> phase, using the DXE services) in a specific firmware that aims to
-> conform to both PI and UEFI. Because, the effects that those low-level
-> operations will have on the UEFI level (and consequently, on the OS) are
-> well defined in the PI spec.
->
+The goal of these patch series is to set up an infrastructure to emulate
+guest vector operations using host vector operations. Preliminary
+experiments show that simply translating loads and stores increases
+performance of x264 video codec by 10%. The performance of a gcc vectorized
+for loop increased 2x.
 
-PI spec should drive the implementation choices we make at the
-ArmVirtQemu end, and the ACPI generation is tightly coupled with that,
-so in that sense, I agree that the PI spec *is* relevant.
+To be able to emulate guest vector operations using host vector operations,
+several things need to be done.
 
-However, the purpose of the patch (which we are no longer discussing
-:-)), is to ensure that QEMU + ArmVirtQemu adheres to the pertinent
-contracts with the OS, and PI is not one of them.
+1. Corresponding vector types should be added to TCG. These series add
+TCG_v128 and TCG_v64. I've made TCG_v64 a different type than TCG_i64
+because it usually needs to be allocated to different registers and
+supports different operations.
 
->>
->>> However, you are right that *just* the UEFI memmap entry is not
->>> sufficient, according to the PCI firmware spec. (Regardless of the fact
->>> that in practice, just the memmap entry does keep Linux happy. Or is it
->>> about to change?)
->>>
->>
->> The kernel uses the UEFI memory map for two purposes:
->> - finding out where memory is, and which parts are usable (i.e., non-reserved)
->> - setting up page tables to allow UEFI runtime services calls, which
->> may include MMIO mappings
->>
->> This means that MMIO regions in the UEFI memory map are *not*
->> considered reservations. [...]
->
-> Yes, I understand that. Now please understand that my suggestion was
-> never to cover the MMCONFIG area with MMIO type memory; all along I've
-> been saying "reserved memory".
->
-> (Again, this is now independent of the patch.)
->
+2. Load/store operations for these new types need to be implemented.
 
-I know the various specs are vague and slightly contradictory, but I
-would oppose to using EfiReservedMemory to describe an MMIO region,
-given that the wording of the UEFI spec (which is authoritative imo)
-suggests that the memory map should only describe memory (unless we
-are dealing with MMIO regions that require a runtime mapping so that
-the firmware can use the device while running under the OS)
+3. For seamless transition from current model to a new one we need to
+handle cases where memory occupied by global variable can be accessed via
+pointer to the CPUArchState structure. A very simple conservative alias
+analysis has been added to do it. This analysis tracks memory loads and
+stores that overlap with fields of CPUArchState and provides this
+information to the register allocator. The allocator then spills and
+reloads affected globals when needed.
+
+4. Allow overlapping globals. For scalar registers this is a rare case, and
+overlapping registers can ba handled as a single one (ah, al, ax, eax,
+rax). In ARM every Q-register consists of two D-register each consisting of
+two S-registers. Handling 4 S-registers as one because they are parts of
+the same Q-register is way too inefficient.
+
+5. Add new memory addressing mode to MMU code for large accesses and create
+needed helpers. Only 128-bit vectors have been handled for now.
+
+6. Create TCG opcodes for vector operations. Only addition has beed handled
+in these series. Each operation has a wrapper that checks if the backend
+supports the corresponding operation or not. In one case the vector opcode
+is generated, in the other the operation is emulated with scalar
+operations. The emulation code is generated inline for performance reasons
+(there is a huge performance difference between inline generation
+and calling a helper). As a positive side effect this will eventually allow
+ to merge similar emulation code for vector instructions from different
+frontends to target-independent implementation.
+
+7. Use new operations in the frontend (ARM was used in these series).
+
+8. Support new operations in the backend (x86_64 was used in these series).
+
+For experiments I have used ARM guest on x86_64 host. I wanted some pair of
+different architectures with vector extensions both. ARM and x86_64 pair
+fits well.
+
+Kirill Batuzov (18):
+  tcg: add support for 128bit vector type
+  tcg: add support for 64bit vector type
+  tcg: add ld_v128, ld_v64, st_v128 and st_v64 opcodes
+  tcg: add simple alias analysis
+  tcg: use results of alias analysis in liveness analysis
+  tcg: allow globals to overlap
+  tcg: add vector addition operations
+  target/arm: support access to vector guest registers as globals
+  target/arm: use vector opcode to handle vadd.<size> instruction
+  tcg/i386: add support for vector opcodes
+  tcg/i386: support 64-bit vector operations
+  tcg/i386: support remaining vector addition operations
+  tcg: do not relay on exact values of MO_BSWAP or MO_SIGN in backend
+  tcg: introduce new TCGMemOp - MO_128
+  tcg: introduce qemu_ld_v128 and qemu_st_v128 opcodes
+  softmmu: create helpers for vector loads
+  tcg/i386: add support for qemu_ld_v128/qemu_st_v128 ops
+  target/arm: load two consecutive 64-bits vector regs as a 128-bit
+    vector reg
+
+ cputlb.c                     |   4 +
+ softmmu_template_vector.h    | 266 +++++++++++++++++++++++++++++++++++++++++++
+ target/arm/translate.c       |  89 ++++++++++++++-
+ tcg/aarch64/tcg-target.inc.c |   4 +-
+ tcg/arm/tcg-target.inc.c     |   4 +-
+ tcg/i386/tcg-target.h        |  35 +++++-
+ tcg/i386/tcg-target.inc.c    | 245 ++++++++++++++++++++++++++++++++++++---
+ tcg/mips/tcg-target.inc.c    |   4 +-
+ tcg/optimize.c               | 146 ++++++++++++++++++++++++
+ tcg/ppc/tcg-target.inc.c     |   4 +-
+ tcg/s390/tcg-target.inc.c    |   4 +-
+ tcg/sparc/tcg-target.inc.c   |  12 +-
+ tcg/tcg-op.c                 |  20 +++-
+ tcg/tcg-op.h                 | 262 ++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg-opc.h                |  34 ++++++
+ tcg/tcg.c                    | 146 ++++++++++++++++++++++++
+ tcg/tcg.h                    | 147 +++++++++++++++++++++++-
+ 17 files changed, 1385 insertions(+), 41 deletions(-)
+ create mode 100644 softmmu_template_vector.h
+
+-- 
+2.1.4
