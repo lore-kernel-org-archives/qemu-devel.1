@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZj-0002K6-Vv
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:08 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZl-0002OB-Bz
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZg-00088n-Si
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36752
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZi-00089t-7x
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:09 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36804
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cTPZg-00088S-Md
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:04 -0500
+	id 1cTPZi-00089Y-2h
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:57:06 -0500
 Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0H8rUEe105966
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:57:04 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2812q5avuu-1
+	v0H8rU3h105934
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:57:05 -0500
+Received: from e06smtp06.uk.ibm.com (e06smtp06.uk.ibm.com [195.75.94.102])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2812q5avx4-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:57:03 -0500
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:57:05 -0500
 Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp06.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 17 Jan 2017 08:57:00 -0000
+	Tue, 17 Jan 2017 08:57:03 -0000
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Tue, 17 Jan 2017 09:56:41 +0100
+Date: Tue, 17 Jan 2017 09:56:43 +0100
 In-Reply-To: <20170117085645.4267-1-cornelia.huck@de.ibm.com>
 References: <20170117085645.4267-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170117085645.4267-9-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 08/12] s390x/pci: PCI multibus bridge handling
+Message-Id: <20170117085645.4267-11-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 10/12] s390x/pci: handle PCIBridge bus number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,58 +43,131 @@ Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@
 
 From: Pierre Morel <pmorel@linux.vnet.ibm.com>
 
-When the hotplug handler detects a PCI bridge, the secondary bus has
-been initialized by the core PCI code. We give the secondary bus the
-bridge name and associate to it the IOMMU handling and
-hotplug/hotunplug callbacks.
+The PCI bus number is usually set by the host during the enumeration.
+
+In the s390 architecture we neither get a Device Tree nor have an
+enumeration understanding bridge devices.
+
+Let's fake the enumeration on reset and set the PCI_PRIMARY_BUS,
+PCI_SECONDARY_BUS and PCI_SUBORDINATE_BUS config entries for the
+bridges.
+
+Let's add the configuration of these three config entries on bridge hot
+plug.
+
+The bus number is calculated based on a new entry, bus_num of the
+S390pciState device.
+
+This commit is inspired by what spapr pci does.
 
 Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/s390x/s390-pci-bus.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ hw/s390x/s390-pci-bus.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/s390x/s390-pci-bus.h |  1 +
+ 2 files changed, 53 insertions(+)
 
 diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index e1b7649b0c..9ca67b2755 100644
+index 458ea2bdd7..736c0fcce5 100644
 --- a/hw/s390x/s390-pci-bus.c
 +++ b/hw/s390x/s390-pci-bus.c
-@@ -19,6 +19,7 @@
- #include "s390-pci-bus.h"
- #include "s390-pci-inst.h"
- #include "hw/pci/pci_bus.h"
-+#include "hw/pci/pci_bridge.h"
- #include "hw/pci/msi.h"
- #include "qemu/error-report.h"
+@@ -576,6 +576,7 @@ static int s390_pcihost_init(SysBusDevice *dev)
+     s->iommu_table = g_hash_table_new_full(g_int64_hash, g_int64_equal,
+                                            NULL, g_free);
+     s->zpci_table = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, NULL);
++    s->bus_no = 0;
+     QTAILQ_INIT(&s->pending_sei);
+     QTAILQ_INIT(&s->zpci_devs);
+     return 0;
+@@ -673,12 +674,24 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+         BusState *bus;
+         PCIBridge *pb = PCI_BRIDGE(dev);
++        PCIDevice *pdev = PCI_DEVICE(dev);
  
-@@ -677,7 +678,16 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-     S390PCIBusDevice *pbdev = NULL;
-     S390pciState *s = s390_get_phb();
+         pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
+         pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
  
--    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
-+        BusState *bus;
-+        PCIBridge *pb = PCI_BRIDGE(dev);
+         bus = BUS(&pb->sec_bus);
+         qbus_set_hotplug_handler(bus, DEVICE(s), errp);
 +
-+        pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
-+        pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
-+
-+        bus = BUS(&pb->sec_bus);
-+        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
++        if (dev->hotplugged) {
++            pci_default_write_config(pdev, PCI_PRIMARY_BUS, s->bus_no, 1);
++            s->bus_no += 1;
++            pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_no, 1);
++            do {
++                pdev = pdev->bus->parent_dev;
++                pci_default_write_config(pdev, PCI_SUBORDINATE_BUS,
++                                         s->bus_no, 1);
++            } while (pdev->bus && pci_bus_num(pdev->bus));
++        }
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
          pdev = PCI_DEVICE(dev);
  
-         if (!dev->id) {
-@@ -754,7 +764,10 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
-     S390PCIBusDevice *pbdev = NULL;
-     S390pciState *s = s390_get_phb();
+@@ -812,6 +825,44 @@ out:
+     object_unparent(OBJECT(pbdev));
+ }
  
--    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
-+        error_setg(errp, "PCI bridge hot unplug currently not supported");
++static void s390_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
++                                      void *opaque)
++{
++    S390pciState *s = opaque;
++    unsigned int primary = s->bus_no;
++    unsigned int subordinate = 0xff;
++    PCIBus *sec_bus = NULL;
++
++    if ((pci_default_read_config(pdev, PCI_HEADER_TYPE, 1) !=
++         PCI_HEADER_TYPE_BRIDGE)) {
 +        return;
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         pci_dev = PCI_DEVICE(dev);
++    }
++
++    (s->bus_no)++;
++    pci_default_write_config(pdev, PCI_PRIMARY_BUS, primary, 1);
++    pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_no, 1);
++    pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, s->bus_no, 1);
++
++    sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
++    if (!sec_bus) {
++        return;
++    }
++
++    pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, subordinate, 1);
++    pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
++                        s390_pci_enumerate_bridge, s);
++    pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, s->bus_no, 1);
++}
++
++static void s390_pcihost_reset(DeviceState *dev)
++{
++    S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
++    PCIBus *bus = s->parent_obj.bus;
++
++    s->bus_no = 0;
++    pci_for_each_device(bus, pci_bus_num(bus), s390_pci_enumerate_bridge, s);
++}
++
+ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
+ {
+     SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+@@ -819,6 +870,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
  
-         QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
+     dc->cannot_instantiate_with_device_add_yet = true;
++    dc->reset = s390_pcihost_reset;
+     k->init = s390_pcihost_init;
+     hc->plug = s390_pcihost_hot_plug;
+     hc->unplug = s390_pcihost_hot_unplug;
+diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+index b82b18eb07..b0adefa788 100644
+--- a/hw/s390x/s390-pci-bus.h
++++ b/hw/s390x/s390-pci-bus.h
+@@ -310,6 +310,7 @@ typedef struct S390PCIBus {
+ typedef struct S390pciState {
+     PCIHostState parent_obj;
+     uint32_t next_idx;
++    int bus_no;
+     S390PCIBus *bus;
+     GHashTable *iommu_table;
+     GHashTable *zpci_table;
 -- 
 2.11.0
