@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cTV0m-0003sT-U1
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:45:26 -0500
+	(envelope-from <mst@redhat.com>) id 1cTV1v-0004b4-FZ
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:46:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cTV0i-0002vi-39
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:45:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40294)
+	(envelope-from <mst@redhat.com>) id 1cTV1q-00038V-8k
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:46:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60920)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cTV0h-0002vL-QO
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:45:20 -0500
-Date: Tue, 17 Jan 2017 22:45:14 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170117144514.GO30108@pxdev.xzpeter.org>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-15-git-send-email-peterx@redhat.com>
-	<fad506bc-2398-fef9-b720-7720569ac0a6@redhat.com>
-	<20170116091801.GL30108@pxdev.xzpeter.org>
-	<0eedf780-16b2-ca5c-8eea-5d41e6837f23@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTV1q-00038K-0R
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 09:46:30 -0500
+Date: Tue, 17 Jan 2017 16:46:28 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170117164546-mutt-send-email-mst@kernel.org>
+References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
+	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
+	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
+	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
+	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
+	<b6362d69-a544-1b78-fc48-1020e5d0efef@redhat.com>
+	<CAKv+Gu_2srdbQhK4LjjsdoOkm_S4hkEFVdtUHmcvAnVZCVErbA@mail.gmail.com>
+	<5c6571da-34a7-9a23-e229-88883302d4e9@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <0eedf780-16b2-ca5c-8eea-5d41e6837f23@redhat.com>
+In-Reply-To: <5c6571da-34a7-9a23-e229-88883302d4e9@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v3 14/14] intel_iommu: enable vfio
- devices
+Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
+ as PNP0C02 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,119 +35,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Andrew Jones <drjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>
 
-On Mon, Jan 16, 2017 at 05:54:55PM +0800, Jason Wang wrote:
+On Mon, Jan 16, 2017 at 11:35:04PM +0100, Laszlo Ersek wrote:
+> On 01/16/17 22:23, Ard Biesheuvel wrote:
+> > On 16 January 2017 at 21:13, Laszlo Ersek <lersek@redhat.com> wrote:
+> >> On 01/16/17 20:31, Ard Biesheuvel wrote:
+> >>> On 16 January 2017 at 18:20, Peter Maydell <peter.maydell@linaro.or=
+g> wrote:
+> >>>> On 16 January 2017 at 17:30, Ard Biesheuvel <ard.biesheuvel@linaro=
+.org> wrote:
+> >>>>> On 16 January 2017 at 17:25, Peter Maydell <peter.maydell@linaro.=
+org> wrote:
+> >>>>>> On 13 January 2017 at 17:32, Ard Biesheuvel <ard.biesheuvel@lina=
+ro.org> wrote:
+> >>>>>>> Linux for arm64 v4.10 and later will complain if the ECAM confi=
+g space is
+> >>>>>>> not reserved in the ACPI namespace:
+> >>>>>>>
+> >>>>>>>   acpi PNP0A08:00: [Firmware Bug]: ECAM area [mem 0x3f000000-0x=
+3fffffff] not reserved in ACPI namespace
+> >>>>>>>
+> >>>>>>> The rationale is that OSes that don't consume the MCFG table sh=
+ould still
+> >>>>>>> be able to infer that the PCI config space MMIO region is occup=
+ied.
+> >>>>>>>
+> >>>>>>> So update the ACPI table generation routine to add this reserva=
+tion.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> >>>>>>> ---
+> >>>>>>>  hw/arm/virt-acpi-build.c | 7 +++++++
+> >>>>>>>  1 file changed, 7 insertions(+)
+> >>>>>>>
+> >>>>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.=
+c
+> >>>>>>> index 085a61117378..50d52f685f68 100644
+> >>>>>>> --- a/hw/arm/virt-acpi-build.c
+> >>>>>>> +++ b/hw/arm/virt-acpi-build.c
+> >>>>>>> @@ -310,6 +310,13 @@ static void acpi_dsdt_add_pci(Aml *scope, =
+const MemMapEntry *memmap,
+> >>>>>>>      Aml *dev_rp0 =3D aml_device("%s", "RP0");
+> >>>>>>>      aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+> >>>>>>>      aml_append(dev, dev_rp0);
+> >>>>>>> +
+> >>>>>>> +    Aml *dev_res0 =3D aml_device("%s", "RES0");
+> >>>>>>> +    aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP=
+0C02")));
+> >>>>>>> +    crs =3D aml_resource_template();
+> >>>>>>> +    aml_append(crs, aml_memory32_fixed(base_ecam, size_ecam, A=
+ML_READ_WRITE));
+> >>>>>>> +    aml_append(dev_res0, aml_name_decl("_CRS", crs));
+> >>>>>>> +    aml_append(dev, dev_res0);
+> >>>>>>>      aml_append(scope, dev);
+> >>>>>>>  }
+> >>>>>>
+> >>>>>> This needs to be controlled via the machine class back-compat
+> >>>>>> machinery in hw/arm/virt.c so that it only happens for virt-2.9
+> >>>>>> and later.
+> >>>>>>
+> >>>>>
+> >>>>> Why exactly?
+> >>>>
+> >>>> Because the "virt-2.8" machine has to present to the guest
+> >>>> exactly what "virt" did as of the QEMU 2.8 release, including
+> >>>> any bugs or missing things we happened to have in our ACPI
+> >>>> tables. This allows cross-version compatibility (including
+> >>>> VM migration). Drew will have a more detailed explanation
+> >>>> if you need it.
+> >>>>
+> >>>
+> >>> I suspected as much.
+> >>>
+> >>> But in this case, I am not sure if it is worth the trouble: the
+> >>> generated data is only consumed at boot time by the firmware, and I
+> >>> suppose migration involves freezing a VM, including whatever reside=
+nt
+> >>> firmware image was used to boot the OS, and so this is unlikely to
+> >>> affect migration.
+> >>>
+> >>> But I will let Drew explain ...
+> >>
+> >> The PCI Firmware Specification (rev 3.1) says in 4.1.2. "MCFG Table
+> >> Description": "The resources can *optionally* be returned in [...]
+> >> EFIGetMemoryMap as reserved memory [...]". (Emphasis mine.) Linux se=
+ems
+> >> to *insist* on this kind of reservation however.
+> >>
+> >=20
+> > No, not at the UEFI level but at the ACPI level. Reservations in the
+> > UEFI memory map describe memory not MMIO space
+> >=20
+> >> PNP0C02 is "General ID for reserving resources required by PnP
+> >> motherboard registers. (Not device specific.)", according to
+> >> <http://www.plasma-online.de/english/identify/serial/pnp_id_pnp.html=
+>.
+> >> So what this patch does is reserve a memory area through ACPI,
+> >> practically as an unspecified "platform resource".
+> >>
+> >=20
+> > This has been discussed at great length on the linux mailing lists
+> >=20
+> > https://patchwork.kernel.org/patch/9453149/
+> >=20
+> >> There's an alternative that's contained entirely in the firmware. Yo=
+u
+> >> can cover the MMCONFIG area in ArmVirtQemu with an EfiReservedMemory=
+Type
+> >> memory map entry (by producing an appropriate memalloc HOB in PEI, o=
+r by
+> >> calling the appropriate gDS memory space map functions in DXE). OVMF
+> >> does the former (memalloc HOB).
+> >>
+> >> In ArmVirtQemu, we grab the MMCONFIG range from "pci-host-ecam-gener=
+ic",
+> >> from QEMU's DTB. If you don't dislike the idea, we could cover the r=
+ange
+> >> as well, right in "ArmVirtPkg/Library/FdtPciPcdProducerLib". That li=
+b
+> >> instance already sets the base address PCD, and makes sure that the
+> >> relevant code is executed only once (in whatever driver module the
+> >> library instance was built into). You could call the gDS functions
+> >> mentioned above from that spot. (The library instance is already
+> >> restricted to DXE_DRIVER and UEFI_DRIVER modules.)
+> >>
+> >=20
+> > In general, I think describing MMIO in the UEFI memory map is not ver=
+y
+> > useful, and counter to the spec, which mentions that the memory map
+> > describes memory ("however it is used"), not memory *space* (unless
+> > UEFI itself needs to access it to implement runtime services)
+> >=20
 >=20
+> The UEFI memory map will reflect allocations from the GCD memory space,
+> for the Reserved and MMIO types. See "Figure 2. GCD Memory State
+> Transitions" in "7.2.2 GCD Memory Resources", Vol2 of the PI spec.
 >=20
-> On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 17:18, Peter Xu wrote:
-> >>>  static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t=
- domain_id,
-> >>>                                        hwaddr addr, uint8_t am)
-> >>>  {
-> >>>@@ -1222,6 +1251,7 @@ static void vtd_iotlb_page_invalidate(IntelIOM=
-MUState *s, uint16_t domain_id,
-> >>>      info.addr =3D addr;
-> >>>      info.mask =3D ~((1 << am) - 1);
-> >>>      g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page,=
- &info);
-> >>>+    vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
-> >>Is the case of GLOBAL or DSI flush missed, or we don't care it at all=
-?
-> >IMHO we don't. For device assignment, since we are having CM=3D1 here,
-> >we should have explicit page invalidations even if guest sends
-> >global/domain invalidations.
-> >
-> >Thanks,
-> >
-> >-- peterx
+> See also "9.7.1 UEFI Boot Services Dependencies" in the same,
 >=20
-> Is this spec required?
-
-I think not. IMO the spec is very coarse grained on describing cache
-mode...
-
-> Btw, it looks to me that both DSI and GLOBAL are
-> indeed explicit flush.
-
-Actually when cache mode is on, it is unclear to me on how we should
-treat domain/global invalidations, at least from the spec (as
-mentioned earlier). My understanding is that they are not "explicit
-flushes", which IMHO should only mean page selective IOTLB
-invalidations.
-
+>   9.7.1.8 GetMemoryMap()
 >=20
-> Just have a quick go through on driver codes and find this something
-> interesting in intel_iommu_flush_iotlb_psi():
+>   The GetMemoryMap() implementation must include into the UEFI memory
+>   map all GCD map entries of types EfiGcdMemoryTypeReserved and
+>   EfiPersistentMemory, and all GCD map entries of type
+>   EfiGcdMemoryTypeMemoryMappedIo that have EFI_MEMORY_RUNTIME attribute
+>   set.
 >=20
-> ...
->     /*
->      * Fallback to domain selective flush if no PSI support or the size=
- is
->      * too big.
->      * PSI requires page size to be 2 ^ x, and the base address is natu=
-rally
->      * aligned to the size
->      */
->     if (!cap_pgsel_inv(iommu->cap) || mask > cap_max_amask_val(iommu->c=
-ap))
->         iommu->flush.flush_iotlb(iommu, did, 0, 0,
->                         DMA_TLB_DSI_FLUSH);
->     else
->         iommu->flush.flush_iotlb(iommu, did, addr | ih, mask,
->                         DMA_TLB_PSI_FLUSH);
-> ...
-
-I think this is interesting... and I doubt its correctness while with
-cache mode enabled.
-
-If so (sending domain invalidation instead of a big range of page
-invalidations), how should we capture which pages are unmapped in
-emulated IOMMU?
-
+> (Note that I wrote Reserved earlier, not MMIO.)
 >=20
-> It looks like DSI_FLUSH is possible even for CM on.
+> However, you are right that *just* the UEFI memmap entry is not
+> sufficient, according to the PCI firmware spec. (Regardless of the fact
+> that in practice, just the memmap entry does keep Linux happy. Or is it
+> about to change?)
 >=20
-> And in flush_unmaps():
+> Namely, looking again at the spot I quoted above (and it's also quoted
+> in the kernel docs patch that you linked above, under ref [6]), we find
 >=20
-> ...
->         /* In caching mode, global flushes turn emulation expensive */
->         if (!cap_caching_mode(iommu->cap))
->             iommu->flush.flush_iotlb(iommu, 0, 0, 0,
->                      DMA_TLB_GLOBAL_FLUSH);
-> ...
+>     If the operating system does not natively comprehend reserving the
+>     MMCFG region, the MMCFG region must be reserved by firmware. The
+>     address range reported in the MCFG table or by _CBA method (see
+>     Section 4.1.3) must be reserved by declaring a motherboard resource=
+.
+>     For most systems, the motherboard resource would appear at the root
+>     of the ACPI namespace (under \_SB) in a node with a _HID of EISAID
+>     (PNP0C02), and the resources in this case should not be claimed in
+>     the root PCI bus=E2=80=99s _CRS. The resources can optionally be re=
+turned in
+>     Int15 E820 or EFIGetMemoryMap as reserved memory but must always be
+>     reported through ACPI as a motherboard resource.
 >=20
-> If I understand the comments correctly, GLOBAL is ok for CM too (though=
- the
-> code did not do it for performance reason).
+> Therefore I agree that reserving the MMCONFIG area via a PNP0C02 object
+> in QEMU's ACPI payload improves spec conformance.
+>=20
+> (Actually, the argument can be made for x86/Q35 as well. Adding Marcel
+> and MST.)
 
-I think it should be okay to send global flush for CM, but not sure
-whether we should notify anything when we receive it. Hmm, anyway, I
-think I need some more reading to make sure I understand the whole
-thing correctly. :)
+I agree, thanks for pointing this out.
+Patch, anyone?
 
-For example, when I see this commit:
-
-commit 78d5f0f500e6ba8f6cfd0673475ff4d941d705a2
-Author: Nadav Amit <nadav.amit@gmail.com>
-Date:   Thu Apr 8 23:00:41 2010 +0300
-
-    intel-iommu: Avoid global flushes with caching mode.
-   =20
-    While it may be efficient on real hardware, emulation of global
-    invalidations is very expensive as all shadow entries must be examine=
-d.
-    This patch changes the behaviour when caching mode is enabled (which =
-is
-    the case when IOMMU emulation takes place). In this case, page specif=
-ic
-    invalidation is used instead.
-
-Before I ask someone else besides qemu-devel, I am curious about
-whether there is existing VT-d emulation code (outside QEMU, of
-course) so that I can have a reference? Quick search didn't answer me.
-
-Thanks,
-
--- peterx
+> ... Beyond the machine-type dependency raised by Peter (which I gather
+> is still being discussed), I suggest that the commit message of this
+> patch quote the relevant passage from the PCI fw spec in full (see
+> above, or in the kernel docs patch).
+>=20
+> Thanks!
+> Laszlo
