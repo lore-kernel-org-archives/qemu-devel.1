@@ -1,32 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTVZh-0004ue-0v
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:21:30 -0500
+	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1cTVab-0005bX-Tg
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:22:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTVZg-00024R-8t
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:21:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTVZg-00024J-2g
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:21:28 -0500
-Date: Tue, 17 Jan 2017 17:21:27 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170117171155-mutt-send-email-mst@kernel.org>
-References: <20161006041949-mutt-send-email-mst@kernel.org>
-	<D5FCB73B-435E-4423-B21C-BEEF1C1EA2FD@skyportsystems.com>
-	<20161211052355-mutt-send-email-mst@kernel.org>
-	<FBD67273-74C4-4183-8FCF-8260D13B04D4@skyportsystems.com>
-	<20170116161857-mutt-send-email-mst@kernel.org>
-	<85C3D50B-7AFD-41E7-AD1B-634A42D04BB2@skyportsystems.com>
-	<20170117142650.2a2a351f@nial.brq.redhat.com>
-	<CAO_EM_km-04HBOZP2H3UvPPaCKyQx1nZD1QKPVYuawwTJjdYSQ@mail.gmail.com>
-	<20170117163002-mutt-send-email-mst@kernel.org>
-	<CAO_EM_kcfhVPye+5vUZPY=mWS3TrcCWYh_ozTy8gPRgkCLMG-w@mail.gmail.com>
+	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1cTVaX-0002DA-3l
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:22:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57004)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.vnet.ibm.com>)
+	id 1cTVaW-0002CF-R5
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 10:22:21 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0HFJ1wV102472
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 10:22:18 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2812r1uvfj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 10:22:18 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.vnet.ibm.com>;
+	Tue, 17 Jan 2017 08:22:16 -0700
+Reply-To: jjherne@linux.vnet.ibm.com
+References: <20170117010204.4909-1-ehabkost@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+Date: Tue, 17 Jan 2017 10:22:10 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAO_EM_kcfhVPye+5vUZPY=mWS3TrcCWYh_ozTy8gPRgkCLMG-w@mail.gmail.com>
-Subject: Re: [Qemu-devel] Virtual Machine Generation ID
+In-Reply-To: <20170117010204.4909-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <309bd499-204d-df07-aa99-9a999cfecabc@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/9] i386: query-cpu-model-expansion test
+ script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,40 +42,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Swierk <eswierk@skyportsystems.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Let's not top-post anymore pls.
+On 01/16/2017 08:01 PM, Eduardo Habkost wrote:
+> This is a follow-up to the series that implements
+> query-cpu-model-expansion. Before including the test script, the
+> series has some fixes to allow the results of
+> query-cpu-model-expansion to be used in the QEMU command-line.
+>
+> The script probably will work on s390x too, but I couldn't test
+> it yet.
+>
 
-On Tue, Jan 17, 2017 at 07:01:27AM -0800, Ed Swierk wrote:
-> You mean what causes the guest to re-read the vmgenid guid? The
-> vmgenid ACPI table defines a notify method, and when the guest
-> receives the corresponding event, it re-reads the guid. (Also it
-> appears that with Windows Server 2012 at least, if no notify method is
-> defined, as is the case with Xen, the guest just re-reads it on
-> demand.)
-> 
-> Wouldn't it be sufficient for the qmp set-vmgenid command to call
-> acpi_ram_update() with the new guid, and acpi_send_event() to notify
-> the guest?
-> 
-> --Ed
-> 
+Eduardo,
 
-Not if you want to reliably be able to know that gen ID
-did not change.
+This test seems to mostly work on s390. The only issue I ran into is 
+querying host model using tcg only. s390 requires kvm to query the host 
+model. Perhaps we could just skip the tcg host test case on s390?
 
-Consider an application that sends a transaction to
-a database. It should be able to read gen ID and if that
-is unchanged then you know you only sent it once.
-If that is changed you may have sent it twice,
-and may need to recover.
 
-If guest updates gen id in memory after getting a notify,
-there's a window after receiving a notify and before
-updating it.
+hernejj: ['/usr/local/bin/qemu-system-s390x', '-chardev', 
+'socket,id=mon,path=/var/tmp/qom-fetch-monitor.sock', '-mon', 
+'chardev=mon,mode=control', '-display', 'none', '-vga', 'none', 
+'-qtest', 'unix:path=/var/tmp/qom-fetch-qtest.sock', '-qtest-log', 
+'/dev/null', '-machine', 'accel=qtest', '-machine', 'accel=tcg', '-S', 
+'-cpu', 'host']
+qemu-system-s390x: CPU definition requires KVM
+E
+======================================================================
+ERROR: testTCGModels (__main__.CPUModelTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+   File "./query-cpu-model-test.py", line 380, in testTCGModels
+     self.checkAllCPUModels()
+   File "./query-cpu-model-test.py", line 375, in checkAllCPUModels
+     self.checkOneCPUModel(m)
+   File "./query-cpu-model-test.py", line 304, in checkOneCPUModel
+     self.checkExpansions(model, msg)
+   File "./query-cpu-model-test.py", line 221, in checkExpansions
+     '%s.static' % (msg))
+   File "./query-cpu-model-test.py", line 177, in checkOneExpansion
+     type=type, model=model['model'])
+   File "./../scripts/qemu.py", line 185, in command
+     raise Exception(reply["error"]["desc"])
+Exception: The CPU definition 'host' requires KVM
 
+----------------------------------------------------------------------
+Ran 2 tests in 74.622s
 
 
 -- 
-MST
+-- Jason J. Herne (jjherne@linux.vnet.ibm.com)
