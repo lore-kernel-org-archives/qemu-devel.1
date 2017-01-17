@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cTSWc-0006Ih-Sz
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:06:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1cTSWc-0006Ig-ST
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:06:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cTSWZ-0001Na-24
+	(envelope-from <bounces@canonical.com>) id 1cTSWX-0001NA-Pi
 	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:06:06 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43398)
+Received: from indium.canonical.com ([91.189.90.7]:43384)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cTSWY-0001NM-SY
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:06:02 -0500
+	id 1cTSWX-0001My-KH
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 07:06:01 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cTSWY-0001xw-2v
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 12:06:02 +0000
+	id 1cTSWW-0001xw-Ko
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 12:06:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 13A022E80AE
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 12:06:02 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 992CA2E80AE
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 12:06:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Jan 2017 11:50:09 -0000
-From: Thomas Huth <1618431@bugs.launchpad.net>
-Reply-To: Bug 1618431 <1618431@bugs.launchpad.net>
+Date: Tue, 17 Jan 2017 11:45:36 -0000
+From: Thomas Huth <1623276@bugs.launchpad.net>
+Reply-To: Bug 1623276 <1623276@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20160830115830.15931.71622.malonedeb@soybean.canonical.com>
-Message-Id: <20170117115009.27129.11345.malone@chaenomeles.canonical.com>
+References: <20160914004324.1924.17597.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170117114536.14243.42763.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1618431] Re: windows hangs after live migration
- with virtio
+Subject: [Qemu-devel] [Bug 1623276] Re: qemu 2.7 / iPXE crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,7 +38,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The patches should be part of QEMU v2.8 =3D=3D> Fix released
+Commit 423f7cf233fe262 has been released with QEMU v2.8
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -48,87 +47,174 @@ The patches should be part of QEMU v2.8 =3D=3D> Fix released
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1618431
+https://bugs.launchpad.net/bugs/1623276
 
 Title:
-  windows hangs after live migration with virtio
+  qemu 2.7 / iPXE crash
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  Several of our users reported problems with windows machines hanging
-  after live migrations. The common denominator _seems_ to be virtio
-  devices.
-  I've managed to reproduce this reliably on a windows 10 (+
-  virtio-win-0.1.118) guest, always within 1 to 5 migrations, with a
-  virtio-scsi hard drive and a virtio-net network device. (When I
-  replace the virtio-net device with an e1000 it takes 10 or more
-  migrations, and without virtio devices I have not (yet) been able to
-  reproduce this problem. I also could not reproduce this with a linux
-  guest. Also spice seems to improve the situation, but doesn't solve
-  it completely).
+  I am running Arch linux
 
-  I've tested quite a few tags from qemu-git (v2.2.0 through v2.6.1,
-  and 2.6.1 with the patches mentioned on qemu-stable by Peter Lieven)
-  and the behavior is the same everywhere.
+  vanilla 4.7.2 kernel
+  qemu 2.7
+  libvirt 2.2.0
+  virt-manager 1.4.0
 
-  The reproducibility seems to be somewhat dependent on the host
-  hardware, which makes investigating this issue that much harder.
+  =
 
-  Symptoms:
-  After the migration the windows graphics stack just hangs.
-  Background processes are still running (eg. after installing an ssh
-  server I could still login and get a command prompt after the hang was
-  triggered... not that I'd know what to do with that on a windows
-  machine...) - commands which need no GUI access work, the rest just
-  hangs there on the command line, too.
-  It's also capable of responding to an NMI sent via the qemu monitor:
-  it then seems to "recover" and manages to show the blue sad-face
-  screen that something happened, reboots successfully and is usable
-  again without restarting the qemu process in between.
-  From there whole the process can be repeated.
+  Since the upgrade from qemu 2.6.1 to 2.7 a few days ago. I'm no longer
+  able to PXE boot at all. Everything else appears to function normally.
+  Non PXE booting and everything else is perfect. Obviously have
+  restarted everying etc. Have tried the various network drivers also.
 
-  Here's what our command line usually looks like:
+  This occurs on domains created with 2.6.1 or with 2.7
 
-  /usr/bin/qemu -daemonize \
-  	-enable-kvm \
-  	-chardev socket,id=3Dqmp,path=3D/var/run/qemu-server/101.qmp,server,nowa=
-it -mon chardev=3Dqmp,mode=3Dcontrol \
-  	-pidfile /var/run/qemu-server/101.pid \
-  	-smbios type=3D1,uuid=3D07fc916e-24c2-4eef-9827-4ab4026501d4 \
-  	-name win10 \
-  	-smp 6,sockets=3D1,cores=3D6,maxcpus=3D6 \
-  	-nodefaults \
-  	-boot menu=3Don,strict=3Don,reboot-timeout=3D1000 \
-  	-vga std \
-  	-vnc unix:/var/run/qemu-server/101.vnc \
-  	-no-hpet \
-  	-cpu kvm64,hv_spinlocks=3D0x1fff,hv_vapic,hv_time,hv_reset,hv_vpindex,hv=
-_runtime,hv_relaxed,+lahf_lm,+sep,+kvm_pv_unhalt,+kvm_pv_eoi,enforce \
-  	-m 2048 \
-  	-device pci-bridge,id=3Dpci.2,chassis_nr=3D2,bus=3Dpci.0,addr=3D0x1f \
-  	-device pci-bridge,id=3Dpci.1,chassis_nr=3D1,bus=3Dpci.0,addr=3D0x1e \
-  	-device piix3-usb-uhci,id=3Duhci,bus=3Dpci.0,addr=3D0x1.0x2 \
-  	-device usb-tablet,id=3Dtablet,bus=3Duhci.0,port=3D1 \
-  	-device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x3 \
-  	-iscsi initiator-name=3Diqn.1993-08.org.debian:01:1ba48d46fb8 \
-  	-drive if=3Dnone,id=3Ddrive-ide0,media=3Dcdrom,aio=3Dthreads \
-  	-device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive-ide0,id=3Dide0,bootind=
-ex=3D200 \
-  	-device virtio-scsi-pci,id=3Dscsihw0,bus=3Dpci.0,addr=3D0x5 \
-  	-drive file=3D/mnt/pve/data1/images/101/vm-101-disk-1.qcow2,if=3Dnone,id=
-=3Ddrive-scsi0,cache=3Dwriteback,discard=3Don,format=3Dqcow2,aio=3Dthreads,=
-detect-zeroes=3Dunmap \
-  	-device scsi-hd,bus=3Dscsihw0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3D=
-drive-scsi0,id=3Dscsi0,bootindex=3D100 \
-  	-netdev type=3Dtap,id=3Dnet0,ifname=3Dtap101i0,script=3D/var/lib/qemu-se=
-rver/pve-bridge,downscript=3D/var/lib/qemu-server/pve-bridgedown,vhost=3Don=
- \
-  	-device virtio-net-pci,mac=3DF2:2B:20:37:E6:D7,netdev=3Dnet0,bus=3Dpci.0=
-,addr=3D0x12,id=3Dnet0,bootindex=3D300 \
-  	-rtc driftfix=3Dslew,base=3Dlocaltime \
-  	-global kvm-pit.lost_tick_policy=3Ddiscard
+  When I choose PXE boot, the machine moves to a paused state (crashed)
+  immediately after the 'starting PXE rom execution...' message appears.
+
+  Reverting to qemu 2.6.1 package corrects the issue.
+
+  The qemu.log snippet follows below.
+
+  I'm not sure how to troubleshoot this problem to determine if it's a
+  packaging error by the distribution or a problem with qemu/kvm/kernel?
+
+  Any help would be much appreciated - Thanks,
+  Greg
+
+  --- qemu.log:
+
+  =
+
+  2016-09-12 16:36:33.867+0000: starting up libvirt version: 2.2.0, qemu
+  version: 2.7.0, hostname: seneca
+  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+  QEMU_AUDIO_DRV=3Dspice /usr/sbin/qemu-system-x86_64 -name guest=3Dc,debug-
+  threads=3Don -S -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-6-
+  c/master-key.aes -machine pc-i440fx-2.7,accel=3Dkvm,usb=3Doff,vmport=3Doff
+  -cpu Nehalem -m 2048 -realtime mlock=3Doff -smp
+  1,sockets=3D1,cores=3D1,threads=3D1 -uuid 348009be-26d5-4dc7-b515-
+  e8b45f5117ac -no-user-config -nodefaults -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-6-
+  c/monitor.sock,server,nowait -mon
+  chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,driftfi=
+x=3Dslew
+  -global kvm-pit.lost_tick_policy=3Ddiscard -no-hpet -no-shutdown -global
+  PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 -boot
+  menu=3Don,strict=3Don -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D=
+0x6.0x7
+  -device ich9-usb-
+  uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multifunction=3Don,addr=
+=3D0x6
+  -device ich9-usb-
+  uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=3D0x6.0x1 -device =
+ich9-
+  usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=3D0x6.0x2 -dev=
+ice
+  virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 -drive
+  file=3D/var/lib/libvirt/images/c.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddriv=
+e-
+  virtio-disk0 -device virtio-blk-
+  pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-virtio-disk0,id=3Dvir=
+tio-
+  disk0,bootindex=3D1 -netdev tap,fd=3D28,id=3Dhostnet0 -device
+  rtl8139,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:a0:95:7c,bus=3Dpci.0,a=
+ddr=3D0x
+  3 -chardev pty,id=3Dcharserial0 -device isa-
+  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+  socket,id=3Dcharchannel0,path=3D/var/lib/libvirt/qemu/channel/target/doma=
+in
+  -6-c/org.qemu.guest_agent.0,server,nowait -device
+  virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.gue=
+st_age
+  nt.0 -chardev spicevmc,id=3Dcharchannel1,name=3Dvdagent -device
+  virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D2,chardev=3Dcharchannel1,id=3Dchannel1,name=3Dcom.redhat.s=
+pice.0
+  -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -spice
+  port=3D5901,addr=3D127.0.0.1,disable-ticketing,image-
+  compression=3Doff,seamless-migration=3Don -device qxl-
+  vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=
+=3D0,vga
+  mem_mb=3D16,max_outputs=3D1,bus=3Dpci.0,addr=3D0x2 -device intel-
+  hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-duplex,id=3Dsound0-
+  codec0,bus=3Dsound0.0,cad=3D0 -chardev spicevmc,id=3Dcharredir0,name=3Dus=
+bredir
+  -device usb-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D2
+  -chardev spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
+  redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D3 -device virti=
+o-
+  balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 -msg timestamp=3Don
+  char device redirected to /dev/pts/0 (label charserial0)
+  main_channel_link: add main channel client
+  red_dispatcher_set_cursor_peer: =
+
+  inputs_connect: inputs channel client create
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D801a8d00 EBX=3D000000a0 ECX=3D00002e20 EDX=3D0009d5e8
+  ESI=3D7ffa3c00 EDI=3D7fef4000 EBP=3Dffffffff ESP=3D00007b92
+  EIP=3D000006ab EFL=3D00000087 [--S--PC] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
+T=3D0
+  ES =3D0000 00000000 ffffffff 00c09300
+  CS =3D9c4c 0009c4c0 ffffffff 00809b00
+  SS =3D0000 00000000 ffffffff 00809300
+  DS =3D9cd0 0009cd00 ffffffff 00c09300
+  FS =3D0000 00000000 ffffffff 00c09300
+  GS =3D0000 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     00000000 00000000
+  IDT=3D     00000000 000003ff
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
+  DR3=3D0000000000000000 =
+
+  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+  EFER=3D0000000000000000
+  Code=3D00 16 66 9c 66 60 0f a8 0f a0 06 1e 16 0e fa 2e 8e 1e 90 06 <0f>
+  ae 06 d0 1c 0f 01 0e c6 1c 0f 01 06 c0 1c fc 66 b9 38 00 00 00 66 ba 10
+  02 00 00 66 68
+
+  =
+
+  --- /proc/cpuinfo
+  processor       : 0
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 26
+  model name      : Intel(R) Core(TM) i7 CPU         950  @ 3.07GHz
+  stepping        : 5
+  microcode       : 0x11
+  cpu MHz         : 3066.648
+  cache size      : 8192 KB
+  physical id     : 0
+  siblings        : 8
+  core id         : 0
+  cpu cores       : 4
+  apicid          : 0
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 11
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr
+  pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe
+  syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl
+  xtopology nonstop_tsc aperfmperf eagerfpu pni dtes64 monitor ds_cpl vmx
+  est tm2 ssse3 cx16 xtpr pdcm sse4_1 sse4_2 popcnt lahf_lm tpr_shadow
+  vnmi flexpriority ept vpid dtherm
+  bugs            :
+  bogomips        : 6135.85
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 36 bits physical, 48 bits virtual
+  power management:
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1618431/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1623276/+subscriptions
