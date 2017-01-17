@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cTTyq-0005nr-CJ
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:39:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cTU1e-0007Zi-Cj
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:42:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cTTyn-0005QQ-Ga
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:39:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cTTyn-0005Pc-89
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:39:17 -0500
-Date: Tue, 17 Jan 2017 13:39:14 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170117133914.GA14855@redhat.com>
-References: <20170116195452.23532-1-ehabkost@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cTU1d-0006Ov-CJ
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:42:14 -0500
+Received: from mail-ua0-x22f.google.com ([2607:f8b0:400c:c08::22f]:35794)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cTU1c-0006NB-UR
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:42:13 -0500
+Received: by mail-ua0-x22f.google.com with SMTP id y9so103201499uae.2
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 05:42:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170116195452.23532-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
+In-Reply-To: <1484204658-28058-2-git-send-email-wei@redhat.com>
+References: <1484204658-28058-1-git-send-email-wei@redhat.com>
+	<1484204658-28058-2-git-send-email-wei@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Jan 2017 13:41:50 +0000
+Message-ID: <CAFEAcA-XKFXFUnpm2anZ3nG0SqzK3wdqJLgcXX79NEhQDuQSPw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH V1 1/4] target-arm: Add support for PMU
+ register PMSELR_EL0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,128 +30,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: Wei Huang <wei@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Mon, Jan 16, 2017 at 05:54:52PM -0200, Eduardo Habkost wrote:
-> Change the meaning of "-cpu host" to "enable all features
-> supported by the accelerator in the current host", so that it can
-> be used to enable/query all features supported by TCG.
-> 
-> To make sure "host" is still at the end of the list in "-cpu
-> help", add a "ordering" field that will be used when sorting the
-> CPU model list.
-> 
-> Cc: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+On 12 January 2017 at 07:04, Wei Huang <wei@redhat.com> wrote:
+> This patch adds support for AArch64 register PMSELR_EL0. The existing
+> PMSELR definition is revised accordingly.
+>
+> Signed-off-by: Wei Huang <wei@redhat.com>
 > ---
->  target/i386/cpu-qom.h |  4 ++--
->  target/i386/cpu.c     | 26 +++++---------------------
->  2 files changed, 7 insertions(+), 23 deletions(-)
-> 
-> diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-> index 8cd607e9a2..75618919e3 100644
-> --- a/target/i386/cpu-qom.h
-> +++ b/target/i386/cpu-qom.h
-> @@ -47,7 +47,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
->  /**
->   * X86CPUClass:
->   * @cpu_def: CPU model definition
-> - * @kvm_required: Whether CPU model requires KVM to be enabled.
-> + * @ordering: Ordering on the "-cpu help" CPU model list.
->   * @migration_safe: See CpuDefinitionInfo::migration_safe
->   * @parent_realize: The parent class' realize handler.
->   * @parent_reset: The parent class' reset handler.
-> @@ -62,7 +62,7 @@ typedef struct X86CPUClass {
->      /* Should be eventually replaced by subclass-specific property defaults. */
->      X86CPUDefinition *cpu_def;
->  
-> -    bool kvm_required;
-> +    int ordering;
->      bool migration_safe;
->  
->      /* Optional description of CPU model.
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index ec6eaf215c..e0ca8c0288 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1549,7 +1549,7 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
->      X86CPUClass *xcc = X86_CPU_CLASS(oc);
->      uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
->  
-> -    xcc->kvm_required = true;
-> +    xcc->ordering = 9; /* Show it last on "-cpu help" */
->  
->      host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
->      x86_cpu_vendor_words2str(host_cpudef.vendor, ebx, edx, ecx);
-> @@ -1563,8 +1563,7 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
->  
->      xcc->cpu_def = &host_cpudef;
->      xcc->model_description =
-> -        "KVM processor with all supported host features "
-> -        "(only available in KVM mode)";
-> +        "Enables all features supported by the accelerator in the current host";
->  
->      /* level, xlevel, xlevel2, and the feature words are initialized on
->       * instance_init, because they require KVM to be initialized.
-> @@ -2075,13 +2074,6 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
->      Error *err = NULL;
->      strList **next = missing_feats;
->  
-> -    if (xcc->kvm_required && !kvm_enabled()) {
-> -        strList *new = g_new0(strList, 1);
-> -        new->value = g_strdup("kvm");;
-> -        *missing_feats = new;
-> -        return;
-> -    }
-> -
->      xc = X86_CPU(object_new(object_class_get_name(OBJECT_CLASS(xcc))));
->  
->      x86_cpu_load_features(xc, &err);
-> @@ -2129,7 +2121,7 @@ static void listflags(FILE *f, fprintf_function print, const char **featureset)
->      }
+>  target/arm/cpu.h    |  1 +
+>  target/arm/helper.c | 24 +++++++++++++++++++-----
+>  2 files changed, 20 insertions(+), 5 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index ab119e6..bd80658 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -307,6 +307,7 @@ typedef struct CPUARMState {
+>          uint32_t c9_pmovsr; /* perf monitor overflow status */
+>          uint32_t c9_pmxevtyper; /* perf monitor event type */
+>          uint32_t c9_pmuserenr; /* perf monitor user enable */
+> +        uint32_t c9_pmselr; /* perf monitor counter selection register */
+>          uint32_t c9_pminten; /* perf monitor interrupt enables */
+>          union { /* Memory attribute redirection */
+>              struct {
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 8dcabbf..71adb0f 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -975,6 +975,15 @@ static uint64_t pmccntr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+>      return total_ticks - env->cp15.c15_ccnt;
 >  }
->  
-> -/* Sort alphabetically by type name, listing kvm_required models last. */
-> +/* Sort alphabetically by type name, respecting X86CPUClass::ordering. */
->  static gint x86_cpu_list_compare(gconstpointer a, gconstpointer b)
+>
+> +static void pmselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                         uint64_t value)
+> +{
+> +    /* only cycle counter selection is supported */
+> +    if (value == 0x1f) {
+> +        env->cp15.c9_pmselr = value;
+> +    }
+
+This looks like it's trying to add PMUv2 (and ARMv8) semantics
+for PMSELR, but it doesn't quite get them right.
+
+In the old PMUv1 (which is what we currently implement),
+0x1f was reserved and thus effectively writing anything to
+PMSELR in a system with no implemented counters was UNPREDICTABLE.
+>From PMUv2 (and including v8) 0x1f is supported for selecting
+the cycle counter and must cause:
+ * PMXEVTYPER reads and writes to access PMCCFILTR
+ * PMXEVCNTR access to be CONSTRAINED UNPREDICTABLE (we already
+   get this right because 'RAZ/WI' is one of the permitted choices)
+
+The SEL field is 5 bits and the rest is RAZ/WI so we should
+mask value with 0x1f first.
+
+Writing something to PMSELR which isn't 0x1f but is greater than
+or equal to the number of implemented counters (so for QEMU, anything
+but 0x1f) is permitted, but makes PMXEVTYPER/PMXEVCNTR accesses
+CONSTRAINED UNPREDICTABLE. So you need to allow pmselr to read
+back as the non-0x1f value, and have the handling of "is this
+0x1f or not" happen in the read/write functions for PMXEVTYPER,
+I think.
+
+(Also I think it's nice when we're making an UNPREDICTABLE
+or CONSTRAINED UNPREDICTABLE choice of behaviour to note it
+in a comment.)
+
+> +}
+> +
+>  static void pmccntr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                          uint64_t value)
 >  {
->      ObjectClass *class_a = (ObjectClass *)a;
-> @@ -2138,9 +2130,8 @@ static gint x86_cpu_list_compare(gconstpointer a, gconstpointer b)
->      X86CPUClass *cc_b = X86_CPU_CLASS(class_b);
->      const char *name_a, *name_b;
->  
-> -    if (cc_a->kvm_required != cc_b->kvm_required) {
-> -        /* kvm_required items go last */
-> -        return cc_a->kvm_required ? 1 : -1;
-> +    if (cc_a->ordering != cc_b->ordering) {
-> +        return cc_a->ordering - cc_b->ordering;
->      } else {
->          name_a = object_class_get_name(class_a);
->          name_b = object_class_get_name(class_b);
-> @@ -3191,13 +3182,6 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->      Error *local_err = NULL;
->      static bool ht_warned;
->  
-> -    if (xcc->kvm_required && !kvm_enabled()) {
-> -        char *name = x86_cpu_class_get_model_name(xcc);
-> -        error_setg(&local_err, "CPU model '%s' requires KVM", name);
-> -        g_free(name);
-> -        goto out;
-> -    }
-> -
->      if (cpu->apic_id == UNASSIGNED_APIC_ID) {
->          error_setg(errp, "apic-id property was not initialized properly");
->          return;
+> @@ -1194,12 +1203,17 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+>      /* Unimplemented so WI. */
+>      { .name = "PMSWINC", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 4,
+>        .access = PL0_W, .accessfn = pmreg_access, .type = ARM_CP_NOP },
+> -    /* Since we don't implement any events, writing to PMSELR is UNPREDICTABLE.
+> -     * We choose to RAZ/WI.
+> -     */
+>      { .name = "PMSELR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 5,
+> -      .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
+> -      .accessfn = pmreg_access },
+> +      .access = PL0_RW, .type = ARM_CP_ALIAS,
+> +      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmselr),
+> +      .accessfn = pmreg_access, .writefn = pmselr_write,
+> +      .raw_writefn = raw_write},
+> +    { .name = "PMSELR_EL0", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 5,
+> +      .access = PL0_RW, .accessfn = pmreg_access,
+> +      .type = ARM_CP_IO,
+> +      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmselr),
 
-FYI libvirt will also need changing.  Currently it reports:
+For a 64-bit register the field in the CPU struct has to be
+a uint64_t, so you need to change it from the uint32_t it is
+at the moment. The AArch32 regdef struct then needs to change
+to use offsetoflow32() where it currently has offsetof().
 
-  Original error from libvirt: unsupported configuration: CPU mode 'host-passthrough' for x86_64 qemu domain on x86_64 host is not supported by hypervisor [code=67 int1=-1]
+> +      .writefn = pmselr_write, .raw_writefn = raw_write, },
+>  #ifndef CONFIG_USER_ONLY
+>      { .name = "PMCCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 0,
+>        .access = PL0_RW, .resetvalue = 0, .type = ARM_CP_IO,
+> --
+> 1.8.3.1
 
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+thanks
+-- PMM
