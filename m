@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cTTkx-0000r1-CO
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:25:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cTTmr-00023W-Hf
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:26:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cTTku-0006CS-77
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:24:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36826)
+	(envelope-from <imammedo@redhat.com>) id 1cTTmo-00071i-Bl
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:26:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51342)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cTTkt-0006C1-Uw
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:24:56 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
-	<87pojmjdep.fsf@dusky.pond.sub.org>
-	<CAFEAcA9nhd6x+PT5bG0=YqvmUdxJVFPZ6ACiv-2OKrDFJhrqzg@mail.gmail.com>
-	<87h94x99e4.fsf@dusky.pond.sub.org>
-	<CAFEAcA8vRw=13Lj_98A+3NovSeTg6e0xBopdz9EcdEeUMjjZow@mail.gmail.com>
-Date: Tue, 17 Jan 2017 14:24:53 +0100
-In-Reply-To: <CAFEAcA8vRw=13Lj_98A+3NovSeTg6e0xBopdz9EcdEeUMjjZow@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 17 Jan 2017 12:24:25 +0000")
-Message-ID: <874m0x7ra2.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cTTmo-00071I-2q
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:26:54 -0500
+Date: Tue, 17 Jan 2017 14:26:50 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170117142650.2a2a351f@nial.brq.redhat.com>
+In-Reply-To: <85C3D50B-7AFD-41E7-AD1B-634A42D04BB2@skyportsystems.com>
+References: <CAO_EM_kuP9kk55bzxWqNOeuL8yW7gKNnacd1-UVGnJPyx2ZNYw@mail.gmail.com>
+	<20160916033402-mutt-send-email-mst@kernel.org>
+	<CAO_EM_mHyC7cywV4KUqH_MWwt2vVkK6GEOuaUX0FHpffdfaAuQ@mail.gmail.com>
+	<20161006041949-mutt-send-email-mst@kernel.org>
+	<D5FCB73B-435E-4423-B21C-BEEF1C1EA2FD@skyportsystems.com>
+	<20161211052355-mutt-send-email-mst@kernel.org>
+	<FBD67273-74C4-4183-8FCF-8260D13B04D4@skyportsystems.com>
+	<20170116161857-mutt-send-email-mst@kernel.org>
+	<85C3D50B-7AFD-41E7-AD1B-634A42D04BB2@skyportsystems.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Virtual Machine Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +34,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Ben Warren <ben@skyportsystems.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ed Swierk <eswierk@skyportsystems.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Mon, 16 Jan 2017 10:57:42 -0800
+Ben Warren <ben@skyportsystems.com> wrote:
 
-> On 17 January 2017 at 12:08, Markus Armbruster <armbru@redhat.com> wrote:
->> Right now, that'll make no difference whatsoever, because the programs
->> that choke on -D generate no output for the commands using the variable
->> defined with -D.  All they do is gripe.
->>
->> Three possible solutions, in increasing order of complexity:
->>
->> 1. Live with the warning from old versions.  If a new version comes
->> around that does something with @subtitle, it'll just work.
->>
->> 2. Suppress the warning with @iftex-hammer.  No change in output now.
->> If a new version comes around that does something with @subtitle, we
->> won't profit unless we take out the @iftex.
->>
->> 3. Replace -D by @set, either by preprocessing .texi, or by including a
->> generated snippet.  No change in output now.  If a new version comes
->> around that does something with @subtitle, it'll just work.
->>
->> My order of preference is aligned with decreasing complexity, i.e. first
->> 1., then 2., then 3.
->>
->> Please tell me what you want.
->>
->> If you want 3., I can certainly live with it, but I'd rather do 1. or
->> 2. now, to get my rather conflict-prone pull request in, then do 3. as a
->> follow-up patch.
->
-> Yeah, I think it's reasonable to apply this now and then
-> fix up the warnings afterwards, since they don't break the
-> build. I'll do that.
+> > On Jan 16, 2017, at 6:21 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >=20
+> > On Sat, Jan 14, 2017 at 10:17:53PM -0800, Ben Warren wrote: =20
+> >> Hi Michael,
+> >>=20
+> >>=20
+> >>    On Dec 10, 2016, at 7:28 PM, Michael S. Tsirkin <mst@redhat.com> wr=
+ote:
+> >>=20
+> >>    On Tue, Dec 06, 2016 at 06:15:34PM -0800, Ben Warren wrote:
+> >>=20
+> >>        Hi Michael,
+> >>=20
+> >>        I=E2=80=99m well on my way to implementing this, but I am reall=
+y new to the
+> >>        QEMU code base and am struggling with some concepts.  Please se=
+e below:
+> >>=20
+> >>            On Oct 5, 2016, at 6:29 PM, Michael S. Tsirkin <mst@redhat.=
+com>
+> >>            wrote:
+> >>=20
+> >>            On Tue, Oct 04, 2016 at 03:51:40PM -0700, Ed Swierk wrote:
+> >>=20
+> >>                On Thu, Sep 15, 2016 at 5:36 PM, Michael S. Tsirkin < =
+=20
+> >>                mst@redhat.com> wrote: =20
+> >>=20
+> >>                    On Thu, Sep 15, 2016 at 05:23:28PM -0700, Ed Swierk=
+ wrote:
+> >>=20
+> >>                        I'm wondering what it will take to finish up wo=
+rk on
+> >>                        vmgenid.
+> >>=20
+> >>                        https://lists.gnu.org/archive/html/qemu-devel/2=
+016-01/
+> >>                        msg05599.html
+> >>=20
+> >>=20
+> >>                    We have ACPI_BUILD_TPMLOG_FILE in tree now and I th=
+ink it
+> >>                    could be
+> >>                    allocated in a similar way.
+> >>                    Integrate patch "fw-cfg: support writeable blobs" to
+> >>                    communicate the
+> >>                    allocated address back to QEMU.
+> >>=20
+> >>=20
+> >>                Starting with Igor's last version at
+> >>                https://github.com/imammedo/qemu/commits/vmgen_wip , it=
+'s not
+> >>                clear to
+> >>                me which changes need to be ported, which changes are o=
+bsoleted
+> >>                by
+> >>                your new fw-cfg stuff and/or upstream churn in ACPI, de=
+vice
+> >>                properties, etc. In particular ACPI is still a total my=
+stery to
+> >>                me,
+> >>                though passing a single address from guest to host can'=
+t be
+> >>                that hard,
+> >>                can it?
+> >>=20
+> >>                Any clues would be appreciated.
+> >>=20
+> >>                --Ed
+> >>=20
+> >>=20
+> >>            It might be best to just re-start from the beginning.
+> >>            So the idea is that ACPI should be about supplying the addr=
+ess
+> >>            to guest. To supply address to host we'll use fw cfg.
+> >>            This would be new I think:
+> >>=20
+> >>            - add support for writeable fw cfg blobs
+> >>=20
+> >>        patch applied
+> >>=20
+> >>            - add linker/loader command to write address of a blob into
+> >>            such a fw cfg file
+> >>            - add a new file used for vm gen id, use loader command abo=
+ve
+> >>            to pass the address of a blob allocated for it to host
+> >>=20
+> >>        I don=E2=80=99t really understand the meaning of =E2=80=9Cfile=
+=E2=80=9D in this context.  It
+> >>        seems to be a way of specifying individual fw_cfg entries witho=
+ut
+> >>        explicitly giving an index, but is not something that is visibl=
+e in
+> >>        either the host or guest file system.  Is this about right?  In=
+ my code
+> >>        I=E2=80=99m using =E2=80=9C/etc/vmgenid=E2=80=9D
+> >>=20
+> >>=20
+> >>    yes
+> >>=20
+> >>=20
+> >>        As for the blob, I=E2=80=99m thinking this is where my main pro=
+blem is.  The
+> >>        =E2=80=98fw_cfg_add_*()=E2=80=99 functions take a data pointer =
+but doesn=E2=80=99t seem to copy
+> >>        the data anywhere.  We pass essentially a pointer via ACPI to t=
+he
+> >>        guest, so what it points to needs to be in an accessible region=
+.  I
+> >>        don=E2=80=99t get how to define the blob contents.  There are c=
+ommand-line
+> >>        =E2=80=98fw-cfg=E2=80=99 options where you can specify a file, =
+but it=E2=80=99s not clear to me
+> >>        how to use them.  Maybe I reserve some IO memory or something?
+> >>=20
+> >>=20
+> >>    Not sure I understand the question. fw cfg device will make
+> >>    memory accessible to guest. Put the guest physical address there.
+> >>    the address needs to be calculated by linker.
+> >>=20
+> >>=20
+> >> I=E2=80=99m almost ready to submit a V2 of the patch set, but there=E2=
+=80=99s still one issue
+> >> that I can=E2=80=99t figure out.  From the guest, I can read the conte=
+nts of the blob.
+> >> If I make a change to the contents of the blob (via QMP) the guest doe=
+s not
+> >> see the changes.  Is there something I need to do on the QEMU side to =
+=E2=80=9Cpush=E2=80=9D
+> >> the updated fw_cfg contents to the guest?  I=E2=80=99ve noticed this b=
+oth when writing
+> >> a qtest for the feature, and also in a Linux kernel module I wrote tha=
+t reads
+> >> the ACPI contents in a guest.
+> >>=20
+> >> thanks,
+> >> Ben =20
+> >=20
+> > fw cfg entities are assumed to be immutable. This week
+> > I'll merge support for writeable fw cfg entries.
+> > I don't see why you want to change fw cfg transparently
+> > though - I think it should be like this
+> > - guest writes GPA into fw cfg
+> > - qemu writes gen id at this GPA
+> >  =20
+> I=E2=80=99ve tried with your patch "fw-cfg-support-writeable-blobs=E2=80=
+=9D, setting the =E2=80=98read-only=E2=80=99 flag on my blob to false:
+>=20
+> fw_cfg_add_file_callback(s, VMGENID_FW_CFG_FILE, NULL, NULL, vms->guid.da=
+ta, sizeof(vms->guid.data), false);
+>=20
+> and it doesn=E2=80=99t seem to make a difference. =20
+>=20
+> I think we have a misunderstanding here.  I=E2=80=99m storing the VM Gene=
+ration ID __data__ (a GUID) in a fw_cfg blob, not the address.  I=E2=80=99l=
+l submit the patch set ASAP so you will understand.
+there  should be another fw_cfg file for address so
+that guest would be able to write it back into QEMU
 
-Thanks!
-
-> In terms of what I'd like for the VERSION issue:
->
-> (1) if it doesn't actually cause a change in the output, we
-> should either just delete the use of VERSION entirely, or move
-> it to somewhere outside of @subtitle which does actually
-> appear somewhere. There's no point in putting in the version
-> info if it doesn't get into the final output, whether
-> it generates a warning or not.
-
-It does affect PDF output.  PDF is generated by texi2pdf, which uses
-different command line options, and setting VERSION works fine there.
-
-> (2) If we want to display VERSION then we need to use @set,
-> it looks like.
-
-We need to decide whether we want to display the information that is now
-in @subtitle in makeinfo output in addition to PDF output.  If yes, we
-need to put it somewhere else than the subtitle, and find a
-bug-compatible way to set VERSION.  If no, we still might want to
-silence the warning produced by old versions of makeinfo.
+>=20
+> > --=20
+> > MST =20
+>=20
+> regards,
+> Ben
+>=20
