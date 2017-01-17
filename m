@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTPTM-0007y1-NP
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:50:33 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZa-00026J-Ei
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:56:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTPTJ-0005Lv-Fs
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:50:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50732)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cTPTJ-0005LR-6X
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:50:29 -0500
-References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
-	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
-	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
-	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
-	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
-	<b6362d69-a544-1b78-fc48-1020e5d0efef@redhat.com>
-	<CAKv+Gu_2srdbQhK4LjjsdoOkm_S4hkEFVdtUHmcvAnVZCVErbA@mail.gmail.com>
-	<5c6571da-34a7-9a23-e229-88883302d4e9@redhat.com>
-	<CAKv+Gu_Rap-_gnXqF6cRYS+CUvm2QMzxKWnSRNyJ7-wqJcdNGA@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <acc3f75b-5df0-de8c-fbfa-2cf29f728031@redhat.com>
-Date: Tue, 17 Jan 2017 09:50:24 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu_Rap-_gnXqF6cRYS+CUvm2QMzxKWnSRNyJ7-wqJcdNGA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
- as PNP0C02 device
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cTPZX-000824-Co
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:56:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36452
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cTPZX-000818-7W
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 03:56:55 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0H8rUsb105951
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:56:53 -0500
+Received: from e06smtp06.uk.ibm.com (e06smtp06.uk.ibm.com [195.75.94.102])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2812q5avn6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 03:56:52 -0500
+Received: from localhost
+	by e06smtp06.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 17 Jan 2017 08:56:50 -0000
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Tue, 17 Jan 2017 09:56:33 +0100
+Message-Id: <20170117085645.4267-1-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 00/12] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,68 +36,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Andrew Jones <drjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: peter.maydell@linaro.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-(my reply is no longer related to the patch, so maybe I shouldn't send
-it... I can't resist, sorry :))
+The following changes since commit 2ccede18bd24fce5db83fef3674563a1f256717b:
 
-On 01/17/17 08:47, Ard Biesheuvel wrote:
-> On 16 January 2017 at 22:35, Laszlo Ersek <lersek@redhat.com> wrote:
+  Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.9-pull-request' into staging (2017-01-16 12:41:35 +0000)
 
->> The UEFI memory map will reflect allocations from the GCD memory space,
->> for the Reserved and MMIO types. See "Figure 2. GCD Memory State
->> Transitions" in "7.2.2 GCD Memory Resources", Vol2 of the PI spec.
->>
->> See also "9.7.1 UEFI Boot Services Dependencies" in the same,
->>
->>   9.7.1.8 GetMemoryMap()
->>
->>   The GetMemoryMap() implementation must include into the UEFI memory
->>   map all GCD map entries of types EfiGcdMemoryTypeReserved and
->>   EfiPersistentMemory, and all GCD map entries of type
->>   EfiGcdMemoryTypeMemoryMappedIo that have EFI_MEMORY_RUNTIME attribute
->>   set.
->>
->> (Note that I wrote Reserved earlier, not MMIO.)
->>
-> 
-> What the PI spec stipulates is irrelevant: the contract between the
-> firmware and the OS is in the UEFI and ACPI specifications, not in the
-> PI spec.
+are available in the git repository at:
 
-I disagree that what the PI spec stipulates is irrelevant. For platforms
-that implement both PI and UEFI, the PI spec expresses additional
-requirements for the UEFI implementation (in PI terminology). So what it
-says certainly matters for the ArmVirtQemu firmware specifically.
+  git://github.com/cohuck/qemu tags/s390x-20170117
 
-End-to-end, if we want to achieve a particular result in a UEFI OS, we
-can certainly work towards that end in the PEI phase (or in the DXE
-phase, using the DXE services) in a specific firmware that aims to
-conform to both PI and UEFI. Because, the effects that those low-level
-operations will have on the UEFI level (and consequently, on the OS) are
-well defined in the PI spec.
+for you to fetch changes up to 5fd04a2b92bf81f39da63fba9e5ae563a8b929ae:
 
-> 
->> However, you are right that *just* the UEFI memmap entry is not
->> sufficient, according to the PCI firmware spec. (Regardless of the fact
->> that in practice, just the memmap entry does keep Linux happy. Or is it
->> about to change?)
->>
-> 
-> The kernel uses the UEFI memory map for two purposes:
-> - finding out where memory is, and which parts are usable (i.e., non-reserved)
-> - setting up page tables to allow UEFI runtime services calls, which
-> may include MMIO mappings
-> 
-> This means that MMIO regions in the UEFI memory map are *not*
-> considered reservations. [...]
+  virtio-ccw: fix ring sizing (2017-01-16 16:23:27 +0100)
 
-Yes, I understand that. Now please understand that my suggestion was
-never to cover the MMCONFIG area with MMIO type memory; all along I've
-been saying "reserved memory".
+----------------------------------------------------------------
+First set of s390x patches for 2.9:
+- rework of the zpci code, giving us proper multibus support
+- introduction of the 2.9 machine
+- fixes and improvements
 
-(Again, this is now independent of the patch.)
+----------------------------------------------------------------
 
-Thanks,
-Laszlo
+Christian Borntraeger (1):
+  s390x: remove double compat statement
+
+Cornelia Huck (1):
+  s390x: add compat machine for 2.9
+
+Fei Li (1):
+  s390x/kvm: use kvm_gsi_routing_enabled in flic
+
+Michael S. Tsirkin (1):
+  virtio-ccw: fix ring sizing
+
+Pierre Morel (3):
+  s390x/pci: change the device array to a list
+  s390x/pci: PCI multibus bridge handling
+  s390x/pci: handle PCIBridge bus number
+
+Yi Min Zhao (5):
+  s390x/pci: make S390PCIIOMMU inherit Object
+  s390x/pci: dynamically allocate iommu
+  s390x/pci: optimize calling s390_get_phb()
+  s390x/pci: use hashtable to look up zpci via fh
+  s390x/pci: merge msix init functions
+
+ hw/intc/s390_flic_kvm.c    |   4 +-
+ hw/s390x/s390-pci-bus.c    | 361 +++++++++++++++++++++++++++++----------------
+ hw/s390x/s390-pci-bus.h    |  46 ++++--
+ hw/s390x/s390-pci-inst.c   |  74 +++++-----
+ hw/s390x/s390-pci-inst.h   |   2 +-
+ hw/s390x/s390-virtio-ccw.c |  19 ++-
+ hw/s390x/virtio-ccw.c      |   2 +-
+ hw/virtio/virtio.c         |   5 +
+ include/hw/virtio/virtio.h |   1 +
+ target/s390x/kvm.c         |   2 +-
+ 10 files changed, 334 insertions(+), 182 deletions(-)
+
+-- 
+2.11.0
