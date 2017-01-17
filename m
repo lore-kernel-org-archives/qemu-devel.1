@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTQYn-0000Zk-I9
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:00:17 -0500
+	(envelope-from <agraf@suse.de>) id 1cTQiz-0003z8-J4
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTQYk-0006X2-JG
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:00:13 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35543)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cTQYk-0006Wm-DL
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:00:10 -0500
-Received: by mail-wm0-x244.google.com with SMTP id d140so20794405wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 02:00:10 -0800 (PST)
-Date: Tue, 17 Jan 2017 10:00:05 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170117100005.GD4265@stefanha-x1.localdomain>
-References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
-	<20170116141855.GH14681@stefanha-x1.localdomain>
-	<f9501690-7d47-127d-b171-33ac5a199e39@siemens.com>
+	(envelope-from <agraf@suse.de>) id 1cTQiu-0002kC-I0
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:10:45 -0500
+Received: from mx2.suse.de ([195.135.220.15]:36621)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1cTQiu-0002ja-28
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 05:10:40 -0500
+References: <20170117004409.28532-1-marex@denx.de>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <aeaf0df1-01a5-849a-3b02-79be15022043@suse.de>
+Date: Tue, 17 Jan 2017 11:10:36 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ieNMXl1Fr3cevapt"
-Content-Disposition: inline
-In-Reply-To: <f9501690-7d47-127d-b171-33ac5a199e39@siemens.com>
-Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
+In-Reply-To: <20170117004409.28532-1-marex@denx.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/7] Nios2 architecture support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Jailhouse <jailhouse-dev@googlegroups.com>
+To: Marek Vasut <marex@denx.de>, qemu-devel@nongnu.org
+
+On 01/17/2017 01:44 AM, Marek Vasut wrote:
+> This patchset adds support for new Nios2 architecture as well as
+> the initial set of models for hardware blocks and emulation of
+> the Altera 10M50 GHRD devkit.
+
+Thanks :).
+
+Reviewed-by: Alexander Graf <agraf@suse.de>
 
 
---ieNMXl1Fr3cevapt
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Alex
 
-On Mon, Jan 16, 2017 at 03:34:58PM +0100, Jan Kiszka wrote:
-> On 2017-01-16 15:18, Stefan Hajnoczi wrote:
-> > On Mon, Jan 16, 2017 at 09:36:51AM +0100, Jan Kiszka wrote:
-> >> some of you may know that we are using a shared memory device similar =
-to
-> >> ivshmem in the partitioning hypervisor Jailhouse [1].
-> >>
-> >> We started as being compatible to the original ivshmem that QEMU
-> >> implements, but we quickly deviated in some details, and in the recent
-> >> months even more. Some of the deviations are related to making the
-> >> implementation simpler. The new ivshmem takes <500 LoC - Jailhouse is
-> >> aiming at safety critical systems and, therefore, a small code base.
-> >> Other changes address deficits in the original design, like missing
-> >> life-cycle management.
-> >=20
-> > My first thought is "what about virtio?".  Can you share some background
-> > on why ivshmem fits the use case better than virtio?
-> >=20
-> > The reason I ask is because the ivshmem devices you define would have
-> > parallels to existing virtio devices and this could lead to duplication.
->=20
-> virtio was created as an interface between a host and a guest. It has no
-> notion of direct (or even symmetric) connection between guests. With
-> ivshmem, we want to establish only a minimal host-guest interface. We
-> want to keep the host out of the business negotiating protocol details
-> between two connected guests.
->=20
-> So, the trade-off was between reusing existing virtio drivers - in the
-> best case, some changes would have been required definitely - and
-> requiring complex translation of virtio into a vm-to-vm model on the one
-> side and establishing a new driver ecosystem on much simpler host
-> services (500 LoC...). We went for the latter.
-
-Thanks.  I was going in the same direction about vhost-pci as
-Marc-Andr=E9.  Let's switch to his sub-thread.
-
-Stefan
-
---ieNMXl1Fr3cevapt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYfeslAAoJEJykq7OBq3PI0C4H/ROVBoUcShBdFHO5IWjeqhg/
-jghsq5qddF9FYS0Z0FakZOhh/WooXIksfU8OKL0t5yCDr6r23qAkv2P4+9U1bh+i
-1LYdu9jgGdOiqTp+VTkABhcHJH8dUatBBxQcsMh+PCir+MJSBpCkVy90y9BU45Vf
-62zAp6DwKUKCGOoaHqkKzIOrMtqrvwWCw7qtohRvqDZlAL+DiQ5C+Vk8cSVWc0Vb
-5hQdbzXnJRxyWOymGNqpGyI2409rvQcuXPjCHAwXYBuoVyQ2rgFmDMmMraM90wMi
-CuK1nXLOMV+WxzKJl/4pvH7pvb50FsIoFil6PFjaJa/ncvYn/6yHtZPr9CkvziM=
-=OrHw
------END PGP SIGNATURE-----
-
---ieNMXl1Fr3cevapt--
+>
+> Chris Wulff (3):
+>    nios2: Add architecture emulation support
+>    nios2: Add IIC interrupt controller emulation
+>    nios2: Add periodic timer emulation
+>
+> Marek Vasut (4):
+>    nios2: Add disas entries
+>    nios2: Add usermode binaries emulation
+>    nios2: Add Altera 10M50 GHRD emulation
+>    nios2: Add support for Nios-II R1
+>
+>   MAINTAINERS                          |    8 +
+>   arch_init.c                          |    2 +
+>   configure                            |    5 +
+>   default-configs/nios2-linux-user.mak |    1 +
+>   default-configs/nios2-softmmu.mak    |    6 +
+>   disas/Makefile.objs                  |    1 +
+>   disas/nios2.c                        | 3534 ++++++++++++++++++++++++++++++++++
+>   hw/intc/Makefile.objs                |    1 +
+>   hw/intc/nios2_iic.c                  |  103 +
+>   hw/nios2/10m50_devboard.c            |  126 ++
+>   hw/nios2/Makefile.objs               |    1 +
+>   hw/nios2/boot.c                      |  223 +++
+>   hw/nios2/boot.h                      |   11 +
+>   hw/nios2/cpu_pic.c                   |   70 +
+>   hw/timer/Makefile.objs               |    1 +
+>   hw/timer/altera_timer.c              |  237 +++
+>   include/disas/bfd.h                  |    6 +
+>   include/elf.h                        |    2 +
+>   include/sysemu/arch_init.h           |    1 +
+>   linux-user/elfload.c                 |   57 +
+>   linux-user/main.c                    |  140 +-
+>   linux-user/nios2/syscall_nr.h        |  329 ++++
+>   linux-user/nios2/target_cpu.h        |   39 +
+>   linux-user/nios2/target_signal.h     |   26 +
+>   linux-user/nios2/target_structs.h    |   58 +
+>   linux-user/nios2/target_syscall.h    |   37 +
+>   linux-user/nios2/termbits.h          |  220 +++
+>   linux-user/signal.c                  |  238 ++-
+>   linux-user/syscall_defs.h            |    8 +-
+>   qemu-doc.texi                        |    3 +
+>   target/nios2/Makefile.objs           |    4 +
+>   target/nios2/cpu.c                   |  239 +++
+>   target/nios2/cpu.h                   |  272 +++
+>   target/nios2/helper.c                |  313 +++
+>   target/nios2/helper.h                |   27 +
+>   target/nios2/mmu.c                   |  296 +++
+>   target/nios2/mmu.h                   |   50 +
+>   target/nios2/monitor.c               |   35 +
+>   target/nios2/op_helper.c             |   47 +
+>   target/nios2/translate.c             |  956 +++++++++
+>   40 files changed, 7726 insertions(+), 7 deletions(-)
+>   create mode 100644 default-configs/nios2-linux-user.mak
+>   create mode 100644 default-configs/nios2-softmmu.mak
+>   create mode 100644 disas/nios2.c
+>   create mode 100644 hw/intc/nios2_iic.c
+>   create mode 100644 hw/nios2/10m50_devboard.c
+>   create mode 100644 hw/nios2/Makefile.objs
+>   create mode 100644 hw/nios2/boot.c
+>   create mode 100644 hw/nios2/boot.h
+>   create mode 100644 hw/nios2/cpu_pic.c
+>   create mode 100644 hw/timer/altera_timer.c
+>   create mode 100644 linux-user/nios2/syscall_nr.h
+>   create mode 100644 linux-user/nios2/target_cpu.h
+>   create mode 100644 linux-user/nios2/target_signal.h
+>   create mode 100644 linux-user/nios2/target_structs.h
+>   create mode 100644 linux-user/nios2/target_syscall.h
+>   create mode 100644 linux-user/nios2/termbits.h
+>   create mode 100644 target/nios2/Makefile.objs
+>   create mode 100644 target/nios2/cpu.c
+>   create mode 100644 target/nios2/cpu.h
+>   create mode 100644 target/nios2/helper.c
+>   create mode 100644 target/nios2/helper.h
+>   create mode 100644 target/nios2/mmu.c
+>   create mode 100644 target/nios2/mmu.h
+>   create mode 100644 target/nios2/monitor.c
+>   create mode 100644 target/nios2/op_helper.c
+>   create mode 100644 target/nios2/translate.c
+>
