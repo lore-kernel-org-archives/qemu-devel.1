@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTXmO-00013q-03
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:42:46 -0500
+	(envelope-from <david@redhat.com>) id 1cTXnN-0001Yj-Un
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:43:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTXmK-0002Cp-PN
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:42:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46504)
+	(envelope-from <david@redhat.com>) id 1cTXnM-00037e-Kh
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:43:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40378)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTXmK-0002Bb-Gv
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:42:40 -0500
-Date: Tue, 17 Jan 2017 19:42:38 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170117193800-mutt-send-email-mst@kernel.org>
-References: <D5FCB73B-435E-4423-B21C-BEEF1C1EA2FD@skyportsystems.com>
-	<20161211052355-mutt-send-email-mst@kernel.org>
-	<FBD67273-74C4-4183-8FCF-8260D13B04D4@skyportsystems.com>
-	<20170116161857-mutt-send-email-mst@kernel.org>
-	<85C3D50B-7AFD-41E7-AD1B-634A42D04BB2@skyportsystems.com>
-	<20170117142650.2a2a351f@nial.brq.redhat.com>
-	<CAO_EM_km-04HBOZP2H3UvPPaCKyQx1nZD1QKPVYuawwTJjdYSQ@mail.gmail.com>
-	<20170117163002-mutt-send-email-mst@kernel.org>
-	<CAO_EM_kcfhVPye+5vUZPY=mWS3TrcCWYh_ozTy8gPRgkCLMG-w@mail.gmail.com>
-	<20170117172404.779ba6fa@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cTXnM-00037N-C8
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:43:44 -0500
+References: <20170116195452.23532-1-ehabkost@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0503ac26-e660-325c-8257-59227c41021d@redhat.com>
+Date: Tue, 17 Jan 2017 18:43:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170117172404.779ba6fa@nial.brq.redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Virtual Machine Generation ID
+In-Reply-To: <20170116195452.23532-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,263 +26,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Ed Swierk <eswierk@skyportsystems.com>, Ben Warren <ben@skyportsystems.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-On Tue, Jan 17, 2017 at 05:24:04PM +0100, Igor Mammedov wrote:
-> On Tue, 17 Jan 2017 07:01:27 -0800
-> Ed Swierk <eswierk@skyportsystems.com> wrote:
->=20
-> > You mean what causes the guest to re-read the vmgenid guid? The
-> > vmgenid ACPI table defines a notify method, and when the guest
-> > receives the corresponding event, it re-reads the guid. (Also it
-> > appears that with Windows Server 2012 at least, if no notify method i=
-s
-> > defined, as is the case with Xen, the guest just re-reads it on
-> > demand.)
-> >=20
-> > Wouldn't it be sufficient for the qmp set-vmgenid command to call
-> > acpi_ram_update() with the new guid, and acpi_send_event() to notify
-> > the guest?
-> pls note that acpi_ram_update() updates only memory on qemu side and
-> it's not mapped into guest. Updated memory will be re-read by firmware
-> when guest reboots.
->=20
-> But with vmgenid, QEMU might want to update guest RAM which
-> contains GUID without reboot, and for this it needs to know GPA
-> of GUID buffer and only after updating it send ACPI event.
+Am 16.01.2017 um 20:54 schrieb Eduardo Habkost:
+> Change the meaning of "-cpu host" to "enable all features
+> supported by the accelerator in the current host", so that it can
+> be used to enable/query all features supported by TCG.
+>
+> To make sure "host" is still at the end of the list in "-cpu
+> help", add a "ordering" field that will be used when sorting the
+> CPU model list.
+>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-+1 thanks, thanks is what I was trying to say.
+I also had the same thing in mind when working on s390x models but
+decided to do it like x86. Now that x86 changes ...
 
-> BTW in-place update is racy anyways as OS could be reading it
-> at the same time,
+Something like that should work for s390x (and I don't think it will 
+break any concept). Most probably cleaner to handle this the same
+way on all architectures and to not disable tests for s390x.
 
-That would be up to the applications to use correctly.
-E.g.
+Uncompiled and untested.
 
-	check id
-	send transaction
-	---> racy
+@Conny and Christian, feel free to pick up and modify if this makes
+sense
 
-	send transaction
-	check id
-	---> not racy
+ From 4a2af1ca47421b68eb7677cd91af350dd9be4e0e Mon Sep 17 00:00:00 2001
+From: David Hildenbrand <david@redhat.com>
+Date: Tue, 17 Jan 2017 18:34:45 +0100
+Subject: [PATCH] s390x/cpumodel: allow the "host" model also for tcg
 
-I can't of course answer for it that all applications use the id correctl=
-y.
-Some of them might decide to accept the risk of a race condition.
+Let's also allow the host model for tcg, therefore meaning
+"enable all features supported by the selected accelerator in the current
+host".
 
-> but we can't do anything about it as vmgenid
-> spec didn't provide means for atomic update.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+  qapi-schema.json          |  4 ++--
+  target/s390x/cpu-qom.h    |  1 -
+  target/s390x/cpu_models.c | 34 ++++++++--------------------------
+  3 files changed, 10 insertions(+), 29 deletions(-)
 
-I agree it's not up to us to fix.
+diff --git a/qapi-schema.json b/qapi-schema.json
+index ddc8783..f14d343 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4334,8 +4334,8 @@
+  # CPU model has to be created by baselining.
+  #
+  # Usually, a CPU model is compared against the maximum possible CPU model
+-# of a certain configuration (e.g. the "host" model for KVM). If that CPU
+-# model is identical or a subset, it will run in that configuration.
++# of a certain configuration (the "host" model). If that CPU model is
++# identical or a subset, it will run in that configuration.
+  #
+  # The result returned by this command may be affected by:
+  #
+diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
+index 4e936e7..71322a5 100644
+--- a/target/s390x/cpu-qom.h
++++ b/target/s390x/cpu-qom.h
+@@ -47,7 +47,6 @@ typedef struct S390CPUClass {
+      CPUClass parent_class;
+      /*< public >*/
+      const S390CPUDef *cpu_def;
+-    bool kvm_required;
+      bool is_static;
+      bool is_migration_safe;
+      const char *desc;
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 5b66d33..2994a7b 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -331,10 +331,6 @@ static void cpu_model_from_info(S390CPUModel 
+*model, const CpuModelInfo *info,
+          error_setg(errp, "The CPU definition \'%s\' is unknown.", 
+info->name);
+          return;
+      }
+-    if (S390_CPU_CLASS(oc)->kvm_required && !kvm_enabled()) {
+-        error_setg(errp, "The CPU definition '%s' requires KVM", 
+info->name);
+-        return;
+-    }
+      obj = object_new(object_class_get_name(oc));
+      cpu = S390_CPU(obj);
 
->=20
-> > --Ed
-> >=20
-> >=20
-> > On Tue, Jan 17, 2017 at 6:33 AM, Michael S. Tsirkin <mst@redhat.com> =
-wrote:
-> > > Because this relies on guest to run code to read out the new fw cfg=
-.
-> > > Thus guest can not reliably detect that host didn't update the gen =
-id -
-> > > new one might be there in fw cfg but not yet read.
-> > >
-> > > RSDP never changes during guest lifetime so the issue does
-> > > not occur.
-> > >
-> > > On Tue, Jan 17, 2017 at 06:26:57AM -0800, Ed Swierk wrote: =20
-> > >> Why is using fw_cfg for vmgenid preferable to the approach used fo=
-r
-> > >> RSDP: call acpi_add_rom_blob() to allocate a MemoryRegion with the
-> > >> initial vmgenid guid, and call acpi_ram_update() with the new guid
-> > >> whenever the host needs to change it?
-> > >>
-> > >> --Ed
-> > >>
-> > >>
-> > >> On Tue, Jan 17, 2017 at 5:26 AM, Igor Mammedov <imammedo@redhat.co=
-m> wrote: =20
-> > >> > On Mon, 16 Jan 2017 10:57:42 -0800
-> > >> > Ben Warren <ben@skyportsystems.com> wrote:
-> > >> > =20
-> > >> >> > On Jan 16, 2017, at 6:21 AM, Michael S. Tsirkin <mst@redhat.c=
-om> wrote:
-> > >> >> >
-> > >> >> > On Sat, Jan 14, 2017 at 10:17:53PM -0800, Ben Warren wrote: =20
-> > >> >> >> Hi Michael,
-> > >> >> >>
-> > >> >> >>
-> > >> >> >>    On Dec 10, 2016, at 7:28 PM, Michael S. Tsirkin <mst@redh=
-at.com> wrote:
-> > >> >> >>
-> > >> >> >>    On Tue, Dec 06, 2016 at 06:15:34PM -0800, Ben Warren wrot=
-e:
-> > >> >> >>
-> > >> >> >>        Hi Michael,
-> > >> >> >>
-> > >> >> >>        I=E2=80=99m well on my way to implementing this, but =
-I am really new to the
-> > >> >> >>        QEMU code base and am struggling with some concepts. =
- Please see below:
-> > >> >> >>
-> > >> >> >>            On Oct 5, 2016, at 6:29 PM, Michael S. Tsirkin <m=
-st@redhat.com>
-> > >> >> >>            wrote:
-> > >> >> >>
-> > >> >> >>            On Tue, Oct 04, 2016 at 03:51:40PM -0700, Ed Swie=
-rk wrote:
-> > >> >> >>
-> > >> >> >>                On Thu, Sep 15, 2016 at 5:36 PM, Michael S. T=
-sirkin < =20
-> > >> >> >>                mst@redhat.com> wrote: =20
-> > >> >> >>
-> > >> >> >>                    On Thu, Sep 15, 2016 at 05:23:28PM -0700,=
- Ed Swierk wrote:
-> > >> >> >>
-> > >> >> >>                        I'm wondering what it will take to fi=
-nish up work on
-> > >> >> >>                        vmgenid.
-> > >> >> >>
-> > >> >> >>                        https://lists.gnu.org/archive/html/qe=
-mu-devel/2016-01/
-> > >> >> >>                        msg05599.html
-> > >> >> >>
-> > >> >> >>
-> > >> >> >>                    We have ACPI_BUILD_TPMLOG_FILE in tree no=
-w and I think it
-> > >> >> >>                    could be
-> > >> >> >>                    allocated in a similar way.
-> > >> >> >>                    Integrate patch "fw-cfg: support writeabl=
-e blobs" to
-> > >> >> >>                    communicate the
-> > >> >> >>                    allocated address back to QEMU.
-> > >> >> >>
-> > >> >> >>
-> > >> >> >>                Starting with Igor's last version at
-> > >> >> >>                https://github.com/imammedo/qemu/commits/vmge=
-n_wip , it's not
-> > >> >> >>                clear to
-> > >> >> >>                me which changes need to be ported, which cha=
-nges are obsoleted
-> > >> >> >>                by
-> > >> >> >>                your new fw-cfg stuff and/or upstream churn i=
-n ACPI, device
-> > >> >> >>                properties, etc. In particular ACPI is still =
-a total mystery to
-> > >> >> >>                me,
-> > >> >> >>                though passing a single address from guest to=
- host can't be
-> > >> >> >>                that hard,
-> > >> >> >>                can it?
-> > >> >> >>
-> > >> >> >>                Any clues would be appreciated.
-> > >> >> >>
-> > >> >> >>                --Ed
-> > >> >> >>
-> > >> >> >>
-> > >> >> >>            It might be best to just re-start from the beginn=
-ing.
-> > >> >> >>            So the idea is that ACPI should be about supplyin=
-g the address
-> > >> >> >>            to guest. To supply address to host we'll use fw =
-cfg.
-> > >> >> >>            This would be new I think:
-> > >> >> >>
-> > >> >> >>            - add support for writeable fw cfg blobs
-> > >> >> >>
-> > >> >> >>        patch applied
-> > >> >> >>
-> > >> >> >>            - add linker/loader command to write address of a=
- blob into
-> > >> >> >>            such a fw cfg file
-> > >> >> >>            - add a new file used for vm gen id, use loader c=
-ommand above
-> > >> >> >>            to pass the address of a blob allocated for it to=
- host
-> > >> >> >>
-> > >> >> >>        I don=E2=80=99t really understand the meaning of =E2=80=
-=9Cfile=E2=80=9D in this context.  It
-> > >> >> >>        seems to be a way of specifying individual fw_cfg ent=
-ries without
-> > >> >> >>        explicitly giving an index, but is not something that=
- is visible in
-> > >> >> >>        either the host or guest file system.  Is this about =
-right?  In my code
-> > >> >> >>        I=E2=80=99m using =E2=80=9C/etc/vmgenid=E2=80=9D
-> > >> >> >>
-> > >> >> >>
-> > >> >> >>    yes
-> > >> >> >>
-> > >> >> >>
-> > >> >> >>        As for the blob, I=E2=80=99m thinking this is where m=
-y main problem is.  The
-> > >> >> >>        =E2=80=98fw_cfg_add_*()=E2=80=99 functions take a dat=
-a pointer but doesn=E2=80=99t seem to copy
-> > >> >> >>        the data anywhere.  We pass essentially a pointer via=
- ACPI to the
-> > >> >> >>        guest, so what it points to needs to be in an accessi=
-ble region.  I
-> > >> >> >>        don=E2=80=99t get how to define the blob contents.  T=
-here are command-line
-> > >> >> >>        =E2=80=98fw-cfg=E2=80=99 options where you can specif=
-y a file, but it=E2=80=99s not clear to me
-> > >> >> >>        how to use them.  Maybe I reserve some IO memory or s=
-omething?
-> > >> >> >>
-> > >> >> >>
-> > >> >> >>    Not sure I understand the question. fw cfg device will ma=
-ke
-> > >> >> >>    memory accessible to guest. Put the guest physical addres=
-s there.
-> > >> >> >>    the address needs to be calculated by linker.
-> > >> >> >>
-> > >> >> >>
-> > >> >> >> I=E2=80=99m almost ready to submit a V2 of the patch set, bu=
-t there=E2=80=99s still one issue
-> > >> >> >> that I can=E2=80=99t figure out.  From the guest, I can read=
- the contents of the blob.
-> > >> >> >> If I make a change to the contents of the blob (via QMP) the=
- guest does not
-> > >> >> >> see the changes.  Is there something I need to do on the QEM=
-U side to =E2=80=9Cpush=E2=80=9D
-> > >> >> >> the updated fw_cfg contents to the guest?  I=E2=80=99ve noti=
-ced this both when writing
-> > >> >> >> a qtest for the feature, and also in a Linux kernel module I=
- wrote that reads
-> > >> >> >> the ACPI contents in a guest.
-> > >> >> >>
-> > >> >> >> thanks,
-> > >> >> >> Ben =20
-> > >> >> >
-> > >> >> > fw cfg entities are assumed to be immutable. This week
-> > >> >> > I'll merge support for writeable fw cfg entries.
-> > >> >> > I don't see why you want to change fw cfg transparently
-> > >> >> > though - I think it should be like this
-> > >> >> > - guest writes GPA into fw cfg
-> > >> >> > - qemu writes gen id at this GPA
-> > >> >> > =20
-> > >> >> I=E2=80=99ve tried with your patch "fw-cfg-support-writeable-bl=
-obs=E2=80=9D, setting the =E2=80=98read-only=E2=80=99 flag on my blob to =
-false:
-> > >> >>
-> > >> >> fw_cfg_add_file_callback(s, VMGENID_FW_CFG_FILE, NULL, NULL, vm=
-s->guid.data, sizeof(vms->guid.data), false);
-> > >> >>
-> > >> >> and it doesn=E2=80=99t seem to make a difference.
-> > >> >>
-> > >> >> I think we have a misunderstanding here.  I=E2=80=99m storing t=
-he VM Generation ID __data__ (a GUID) in a fw_cfg blob, not the address. =
- I=E2=80=99ll submit the patch set ASAP so you will understand. =20
-> > >> > there  should be another fw_cfg file for address so
-> > >> > that guest would be able to write it back into QEMU
-> > >> > =20
-> > >> >> =20
-> > >> >> > --
-> > >> >> > MST =20
-> > >> >>
-> > >> >> regards,
-> > >> >> Ben
-> > >> >> =20
-> > >> > =20
+@@ -718,15 +714,9 @@ static inline void apply_cpu_model(const 
+S390CPUModel *model, Error **errp)
+
+  void s390_realize_cpu_model(CPUState *cs, Error **errp)
+  {
+-    S390CPUClass *xcc = S390_CPU_GET_CLASS(cs);
+      S390CPU *cpu = S390_CPU(cs);
+      const S390CPUModel *max_model;
+
+-    if (xcc->kvm_required && !kvm_enabled()) {
+-        error_setg(errp, "CPU definition requires KVM");
+-        return;
+-    }
+-
+      if (!cpu->model) {
+          /* no host model support -> perform compatibility stuff */
+          apply_cpu_model(NULL, errp);
+@@ -904,26 +894,25 @@ static void s390_cpu_model_initfn(Object *obj)
+      }
+  }
+
+-#ifdef CONFIG_KVM
+  static void s390_host_cpu_model_initfn(Object *obj)
+  {
++    S390CPUModel *max_model;
+      S390CPU *cpu = S390_CPU(obj);
+      Error *err = NULL;
+
+-    if (!kvm_enabled() || !kvm_s390_cpu_models_supported()) {
++    if (kvm_enabled() && !kvm_s390_cpu_models_supported()) {
+          return;
+      }
+
+-    cpu->model = g_malloc0(sizeof(*cpu->model));
+-    kvm_s390_get_host_cpu_model(cpu->model, &err);
+-    if (err) {
++    max_model = get_max_cpu_model(&err);
++    if (err || !max_model) {
+          error_report_err(err);
+-        g_free(cpu->model);
+          /* fallback to unsupported cpu models */
+-        cpu->model = NULL;
++        return;
+      }
++    /* copy the host model so it can be modified */
++    cpu->model = g_memdup(max_model, sizeof(*cpu->model));
+  }
+-#endif
+
+  static void s390_qemu_cpu_model_initfn(Object *obj)
+  {
+@@ -969,15 +958,12 @@ void 
+s390_cpu_model_class_register_props(ObjectClass *oc)
+                                    NULL);
+  }
+
+-#ifdef CONFIG_KVM
+  static void s390_host_cpu_model_class_init(ObjectClass *oc, void *data)
+  {
+      S390CPUClass *xcc = S390_CPU_CLASS(oc);
+
+-    xcc->kvm_required = true;
+-    xcc->desc = "KVM only: All recognized features";
++    xcc->desc = "All supported and available features";
+  }
+-#endif
+
+  static void s390_base_cpu_model_class_init(ObjectClass *oc, void *data)
+  {
+@@ -1042,7 +1028,6 @@ static const TypeInfo qemu_s390_cpu_type_info = {
+      .class_init = s390_qemu_cpu_model_class_init,
+  };
+
+-#ifdef CONFIG_KVM
+  static const TypeInfo host_s390_cpu_type_info = {
+      .name = S390_CPU_TYPE_NAME("host"),
+      .parent = TYPE_S390_CPU,
+@@ -1050,7 +1035,6 @@ static const TypeInfo host_s390_cpu_type_info = {
+      .instance_finalize = s390_cpu_model_finalize,
+      .class_init = s390_host_cpu_model_class_init,
+  };
+-#endif
+
+  static void register_types(void)
+  {
+@@ -1093,9 +1077,7 @@ static void register_types(void)
+      }
+
+      type_register_static(&qemu_s390_cpu_type_info);
+-#ifdef CONFIG_KVM
+      type_register_static(&host_s390_cpu_type_info);
+-#endif
+  }
+
+  type_init(register_types)
+-- 
+2.9.3
+
+
+-- 
+
+David
