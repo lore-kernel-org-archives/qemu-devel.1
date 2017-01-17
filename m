@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTYiu-0007nH-RY
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:43:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1cTYkb-0000IM-VC
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:44:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTYiq-0000iP-R5
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:43:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTYiq-0000i0-Ig
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:43:08 -0500
-Date: Tue, 17 Jan 2017 20:43:06 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170117204140-mutt-send-email-mst@kernel.org>
-References: <1484270047-24579-1-git-send-email-felipe@nutanix.com>
-	<20170116202220-mutt-send-email-mst@kernel.org>
-	<A2D5F9F5-0EB2-4295-9233-FB1A28E8A2F3@nutanix.com>
+	(envelope-from <bounces@canonical.com>) id 1cTYkY-0001Ue-Sl
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:44:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45722)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cTYkY-0001Tt-MS
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:44:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cTYkW-00070U-4i
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 18:44:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 039C82E80AE
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 18:44:52 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <A2D5F9F5-0EB2-4295-9233-FB1A28E8A2F3@nutanix.com>
-Subject: Re: [Qemu-devel] [PATCH] libvhost-user: Start VQs on SET_VRING_CALL
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Jan 2017 18:30:59 -0000
+From: Thomas Huth <1555076@bugs.launchpad.net>
+Reply-To: Bug 1555076 <1555076@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160309125301.32371.57906.malonedeb@gac.canonical.com>
+Message-Id: <20170117183100.14126.94750.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1555076] Re: Qemu 2.5 dont start with sdl,
+ gl=on or gtk, gl=on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Jan 16, 2017 at 06:27:12PM +0000, Felipe Franciosi wrote:
-> Hi Michael,
-> 
-> > On 16 Jan 2017, at 10:22, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > 
-> > On Thu, Jan 12, 2017 at 05:14:07PM -0800, Felipe Franciosi wrote:
-> >> Currently, VQs are started as soon as a SET_VRING_KICK is received. That
-> >> is too early in the VQ setup process, as the backend might not yet have
-> >> a callfd to notify in case it received a kick and fully processed the
-> >> request/command. This patch only starts a VQ when a SET_VRING_CALL is
-> >> received.
-> >> 
-> >> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-> > 
-> > Doesn't look right to me.
-> > It should happen when the fd supplies becomes readable.
-> 
-> Apologies, but I'm confused now. What should happen when which fd becomes readable? I thought we were discussing this further down in the thread. My last comments are here:
-> 
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg02755.html
-> 
-> I pointed out what appears to be a race and am looking forward to your comments. There is definitely a problem with the current code, so it's a matter of finding out exactly what's happening and what's the correct (and spec-compliant) way to fix it.
-> 
-> Felipe
+Released with version 2.7
+
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1555076
+
+Title:
+  Qemu 2.5 dont start with sdl,gl=3Don or gtk,gl=3Don
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  with this config line =
+
+   qemu-system-i386 -m 2047 -hda /dev/sda3 -display sdl,gl=3Don -sdl -vga v=
+irtio -cdrom xenial-desktop-i386.iso =
 
 
-Pls review "Starting and stopping rings" (pls review all of it not just my
-snippet) which has this text:
-...
+  =
 
-Client must start ring upon receiving a kick (that is, detecting that file
-descriptor is readable) on the descriptor specified by
-VHOST_USER_SET_VRING_KICK, and stop ring upon receiving
-VHOST_USER_GET_VRING_BASE.
+  i have this exit
 
+  ERROR:ui/console-gl.c:95:surface_gl_create_texture: code should not be
+  reached
 
+  same is i use this:
 
-> > 
-> >> ---
-> >> contrib/libvhost-user/libvhost-user.c | 26 +++++++++++++-------------
-> >> 1 file changed, 13 insertions(+), 13 deletions(-)
-> >> 
-> >> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> >> index af4faad..a46ef90 100644
-> >> --- a/contrib/libvhost-user/libvhost-user.c
-> >> +++ b/contrib/libvhost-user/libvhost-user.c
-> >> @@ -607,19 +607,6 @@ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *vmsg)
-> >>         DPRINT("Got kick_fd: %d for vq: %d\n", vmsg->fds[0], index);
-> >>     }
-> >> 
-> >> -    dev->vq[index].started = true;
-> >> -    if (dev->iface->queue_set_started) {
-> >> -        dev->iface->queue_set_started(dev, index, true);
-> >> -    }
-> >> -
-> >> -    if (dev->vq[index].kick_fd != -1 && dev->vq[index].handler) {
-> >> -        dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
-> >> -                       vu_kick_cb, (void *)(long)index);
-> >> -
-> >> -        DPRINT("Waiting for kicks on fd: %d for vq: %d\n",
-> >> -               dev->vq[index].kick_fd, index);
-> >> -    }
-> >> -
-> >>     return false;
-> >> }
-> >> 
-> >> @@ -661,6 +648,19 @@ vu_set_vring_call_exec(VuDev *dev, VhostUserMsg *vmsg)
-> >> 
-> >>     DPRINT("Got call_fd: %d for vq: %d\n", vmsg->fds[0], index);
-> >> 
-> >> +    dev->vq[index].started = true;
-> >> +    if (dev->iface->queue_set_started) {
-> >> +        dev->iface->queue_set_started(dev, index, true);
-> >> +    }
-> >> +
-> >> +    if (dev->vq[index].kick_fd != -1 && dev->vq[index].handler) {
-> >> +        dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
-> >> +                       vu_kick_cb, (void *)(long)index);
-> >> +
-> >> +        DPRINT("Waiting for kicks on fd: %d for vq: %d\n",
-> >> +               dev->vq[index].kick_fd, index);
-> >> +    }
-> >> +
-> >>     return false;
-> >> }
-> >> 
-> >> -- 
-> >> 1.9.4
+  qemu-system-i386 -m 2047 -hda /dev/sda3 -display gtk,gl=3Don -sdl -vga vi=
+rtio -cdrom xenial-desktop-i386.iso =
+
+  ERROR:ui/console-gl.c:95:surface_gl_create_texture: code should not be re=
+ached
+
+  =
+
+  My Os i Debian Jessie  on P5020 PPC64 4GB ram GPU RadeonHD .
+  Configure gave me gl ok, sdl ok , Virtio and Virgl OK .
+
+  My Mesa are the 11.3 dev ... the same issue was found on oldest and
+  stable release of mesa .
+
+  OpenGL vendor string: X.Org
+  OpenGL renderer string: Gallium 0.4 on AMD TURKS (DRM 2.43.0)
+  OpenGL version string: 2.1 Mesa 11.3.0-devel (git-3146014)
+  OpenGL shading language version string: 1.30
+
+  =
+
+  OpenGL ES profile version string: OpenGL ES 2.0 Mesa 11.3.0-devel (git-31=
+46014)
+  OpenGL ES profile shading language version string: OpenGL ES GLSL ES 1.0.=
+16
+
+  =
+
+  Thanks =
+
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1555076/+subscriptions
