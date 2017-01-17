@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anonym@riseup.net>) id 1cTZ0i-0004uK-Q2
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 14:01:37 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cTbd8-0007Ls-6S
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:49:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anonym@riseup.net>) id 1cTZ0f-0002N5-4n
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 14:01:36 -0500
-Received: from mx1.riseup.net ([198.252.153.129]:35972)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anonym@riseup.net>) id 1cTZ0e-0002MD-VP
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 14:01:33 -0500
-Received: from piha.riseup.net (unknown [10.0.1.163])
-	(using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-	(Client CN "*.riseup.net",
-	Issuer "COMODO RSA Domain Validation Secure Server CA" (verified OK))
-	by mx1.riseup.net (Postfix) with ESMTPS id CFC951A247A
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 19:01:31 +0000 (UTC)
-From: anonym@riseup.net
-Date: Tue, 17 Jan 2017 20:00:56 +0100
-Message-Id: <20170117190056.1195-2-anonym@riseup.net>
-In-Reply-To: <20170117190056.1195-1-anonym@riseup.net>
-References: <20170117190056.1195-1-anonym@riseup.net>
-Subject: [Qemu-devel] [PATCH] xhci: bump the link TRB cycle detection limit.
+	(envelope-from <rth7680@gmail.com>) id 1cTbd5-0005Pi-KK
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:49:26 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35206)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cTbd5-0005PJ-FH
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 16:49:23 -0500
+Received: by mail-pg0-x242.google.com with SMTP id 204so8931498pge.2
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 13:49:23 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
+	<1484644078-21312-13-git-send-email-batuzovk@ispras.ru>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <4ade78ea-e9c2-f577-da2c-925bf4c0fdb0@twiddle.net>
+Date: Tue, 17 Jan 2017 13:49:19 -0800
+MIME-Version: 1.0
+In-Reply-To: <1484644078-21312-13-git-send-email-batuzovk@ispras.ru>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 12/18] tcg/i386: support remaining vector
+ addition operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: anonym <anonym@riseup.net>
+To: Kirill Batuzov <batuzovk@ispras.ru>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>
 
-From: anonym <anonym@riseup.net>
+On 01/17/2017 01:07 AM, Kirill Batuzov wrote:
+>  #ifdef TCG_TARGET_HAS_REG128
+> +    case INDEX_op_add_i8x16:
+> +        tcg_out_modrm(s, OPC_PADDB, args[0], args[2]);
+> +        break;
+> +    case INDEX_op_add_i16x8:
+> +        tcg_out_modrm(s, OPC_PADDW, args[0], args[2]);
+> +        break;
+>      case INDEX_op_add_i32x4:
+>          tcg_out_modrm(s, OPC_PADDD, args[0], args[2]);
+>          break;
+> +    case INDEX_op_add_i64x2:
+> +        tcg_out_modrm(s, OPC_PADDQ, args[0], args[2]);
+> +        break;
+> +#endif
+> +
+> +#ifdef TCG_TARGET_HAS_REGV64
+> +    case INDEX_op_add_i8x8:
+> +        tcg_out_modrm(s, OPC_PADDB, args[0], args[2]);
+> +        break;
+> +    case INDEX_op_add_i16x4:
+> +        tcg_out_modrm(s, OPC_PADDW, args[0], args[2]);
+> +        break;
+> +    case INDEX_op_add_i32x2:
+> +        tcg_out_modrm(s, OPC_PADDD, args[0], args[2]);
+> +        break;
+> +    case INDEX_op_add_i64x1:
+> +        tcg_out_modrm(s, OPC_PADDQ, args[0], args[2]);
+> +        break;
+>  #endif
 
-While formatting partitions (on virtual USB drives and the nec-xhci
-virtual USB controller) to EXT4, I have observed errors like these:
+Once you drop the ifdefs, combine the cases.  Also: avx1 vpadd*.
 
-    kernel: sd 8:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_ABORT
-    driverbyte=DRIVER_OK
-    kernel: sd 8:0:0:0: [sda] tag#0 CDB: Write(10) 2a 00 00 66 49 86
-    00 08 00 00
-    kernel: blk_update_request: I/O error, dev sda, sector 6703494
-    kernel: Buffer I/O error on dev dm-0, logical block 1573254, lost
-    async page write
 
-Raising TRB_LINK_LIMIT fixes the limit, but the new value was
-admittedly arbitrarily chosen.
-
-Regarding cycle detection in general, allowing at most 4 levels of
-links seems pretty low. This bump should be safe: a high number only
-means that we get a performance hit when encountering cycles but then
-we should have a fatal error any way; a low number instead means that
-we'll incorrectly identify cycles and abort operations that otherwise
-would succeed, like in the case above.
-
-Signed-off-by: anonym <anonym@riseup.net>
----
- hw/usb/hcd-xhci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 4acf0c6dd8..d14ce126a2 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -53,7 +53,7 @@
-  * to the specs when it gets them */
- #define ER_FULL_HACK
- 
--#define TRB_LINK_LIMIT  4
-+#define TRB_LINK_LIMIT  32
- 
- #define LEN_CAP         0x40
- #define LEN_OPER        (0x400 + 0x10 * MAXPORTS)
--- 
-2.11.0
+r~
