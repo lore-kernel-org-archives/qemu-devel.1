@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cTTX9-0001p7-LC
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:10:46 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cTTXH-0001rh-4X
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:10:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cTTX5-0007su-L7
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:10:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54436)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cTTX5-0007sb-5d
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:10:39 -0500
-References: <1484654591-11108-1-git-send-email-thuth@redhat.com>
-	<20170117123217.GF3491@thinpad.lan.raisama.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1ed26b63-985f-0a68-dd19-e3c2a665b4e0@redhat.com>
-Date: Tue, 17 Jan 2017 14:10:35 +0100
+	(envelope-from <stefanha@redhat.com>) id 1cTTXD-0007wS-E2
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:10:51 -0500
+Date: Tue, 17 Jan 2017 13:10:39 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170117131039.GH4265@stefanha-x1.localdomain>
+References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1480926904-17596-4-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170117123217.GF3491@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] hw/core/null-machine: Add the
- possibility to instantiate a CPU, RAM and kernel
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="WIIRZ1HQ6FgrlPgb"
+Content-Disposition: inline
+In-Reply-To: <1480926904-17596-4-git-send-email-zhang.zhanghailiang@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 3/6] replication: Split out
+ backup_do_checkpoint() from secondary_do_checkpoint()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com
 
-On 17.01.2017 13:32, Eduardo Habkost wrote:
-> On Tue, Jan 17, 2017 at 01:03:11PM +0100, Thomas Huth wrote:
->> Sometimes it is useful to have just a machine with CPU and RAM, withou=
-t
->> any further hardware in it, e.g. if you just want to do some instructi=
-on
->> debugging for TCG with a remote GDB attached to QEMU, or run some embe=
-dded
->> code with the "-semihosting" QEMU parameter. qemu-system-m68k already
->> features a "dummy" machine, and xtensa a "sim" machine for exactly thi=
-s
->> purpose.
->> All target architectures have nowadays also a "none" machine, which wo=
-uld
->> be a perfect match for this, too - but it currently does not allow to =
-add
->> CPU, RAM or a kernel yet. Thus let's add these possibilities in a gene=
-ric
->> way to the "none" machine, too, so that we hopefully do not need addit=
-ional
->> "dummy" machines in the future anymore (and maybe can also get rid of =
-the
->> already existing "dummy"/"sim" machines one day).
->> Note that the default behaviour of the "none" machine is not changed, =
-i.e.
->> no CPU and no RAM is instantiated by default. You've explicitely got t=
-o
->> specify the CPU model with "-cpu" and the amount of RAM with "-m" to g=
-et
->> these new features.
->> We also introduce a wrapper called cpu_init_def() for the target-speci=
-fic
->> macro cpu_init() in cpus.c here, so we can continue to compile the fil=
-e
->> null-machine.c independently from the target.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  v2:
->>  - Use the generic-loader device for providing the functionality of
->>    the "-kernel" parameter
+
+--WIIRZ1HQ6FgrlPgb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Dec 05, 2016 at 04:35:01PM +0800, zhanghailiang wrote:
+> The helper backup_do_checkpoint() will be used for primary related
+> codes. Here we split it out from secondary_do_checkpoint().
 >=20
-> Peter argued in v1 against providing a -kernel option that
-> doesn't have the same capabilities as the other machines in the
-> same architecture (I will continue the discussion there).
-
-I'd prefer to use the generic loader for -kernel, but yes, let's
-continue that discussion in the other thread.
-
->>  - Make sure that null-machine.c can be compiled independent from the
->>    target (by introducing a wrapper function for cpu_init())
+> Besides, it is unnecessary to call backup_do_checkpoint() in
+> replication starting and normally stop replication path.
+> We only need call it while do real checkpointing.
 >=20
-> Most (or all?) architectures should work if you use
-> cpu_generic_init(). I wonder how many architectures don't use
-> cpu_generic_init() to implement cpu_init() yet.
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> ---
+>  block/replication.c | 36 +++++++++++++++++++-----------------
+>  1 file changed, 19 insertions(+), 17 deletions(-)
 
-I wanted to use cpu_generic_init() first, but that does not work for
-machine "none", since that function needs a "typename" parameter beside
-the "cpu_model", and I don't see any way to get hold of the correct
-string for that typename parameter in generic code like null-machine.c.
-Do you see any possibility to do that here?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
->>
->>  cpus.c                 |  5 +++++
->>  hw/core/null-machine.c | 40 ++++++++++++++++++++++++++++++++++++++--
->>  include/qom/cpu.h      | 11 +++++++++++
->>  3 files changed, 54 insertions(+), 2 deletions(-)
->>
->> diff --git a/cpus.c b/cpus.c
->> index 5213351..7c4dc38 100644
->> --- a/cpus.c
->> +++ b/cpus.c
->> @@ -80,6 +80,11 @@ static unsigned int throttle_percentage;
->>  #define CPU_THROTTLE_PCT_MAX 99
->>  #define CPU_THROTTLE_TIMESLICE_NS 10000000
->> =20
->> +CPUState *cpu_init_def(const char *cpu_model)
->> +{
->> +    return cpu_init(cpu_model);
->> +}
->> +
->=20
-> So, now we have two interfaces to do exactly the same thing:
-> cpu_init() and cpu_init_def(). But cpu_init() is a macro and
-> cpu_init_def() is a function. cpu_init() is available only if you
-> include cpu.h, but cpu_init_def() is available elsewhere.
-> Ideally, code should be able to simply call a cpu_init()
-> function, and it should work the same everywhere.
->=20
-> In practice, cleaning this up might take a while, so
-> cpu_init_def() might be a temporary solution. But now I am not
-> sure if having this additional wrapper is better than simply
-> making null-machine.o target-dependent like you did before.
+--WIIRZ1HQ6FgrlPgb
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I don't mind either way ...
-Does anybody else got an opinion on this problem?
+-----BEGIN PGP SIGNATURE-----
 
- Thomas
+iQEcBAEBAgAGBQJYfhfPAAoJEJykq7OBq3PI51cH/2pvIFmamelZt2wsA1eAKl0Y
+F6J9LH2TPUablXyN8rcqB1jeuNIsnlGjZ1kmhiEI1Z374Mh2HJy2I9Y1iKQPQjey
+51x5CMhlb3tL1wYkqvuRIey4nyyxoQJv+y9+mog332g7dzrQyqvX+4Gh2HSRcSfM
+ajGTTFWcH0FMOao4B+rAPCe7lPld7SKPZw2bayqPG9cDZtVpY38qIlzkL+E8nC7Q
+mzCQtX+d/EkPdQvmahBo4u4sgx1AS5Xz78bx0T/CHLBO48Dy08fYjMVNclgGFZhS
+TSqRdhMPxOXpu088hmd9Tz4y4bmqNAWUfQu80TINzq67kK1RF9v86dhSkR0dn+M=
+=mGKg
+-----END PGP SIGNATURE-----
+
+--WIIRZ1HQ6FgrlPgb--
