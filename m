@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1cTHtD-0002Rz-TF
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:48 -0500
+	(envelope-from <marex@denx.de>) id 1cTHtH-0002VE-QM
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1cTHt9-0005ar-4z
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:43 -0500
-Received: from mail-out.m-online.net ([212.18.0.9]:57004)
+	(envelope-from <marex@denx.de>) id 1cTHtA-0005bi-J0
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:47 -0500
+Received: from mail-out.m-online.net ([212.18.0.9]:36465)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cTHt8-0005aK-Kr
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:39 -0500
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cTHtA-0005aw-0v
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:44:40 -0500
 From: Marek Vasut <marex@denx.de>
-Date: Tue, 17 Jan 2017 01:44:05 +0100
-Message-Id: <20170117004409.28532-4-marex@denx.de>
+Date: Tue, 17 Jan 2017 01:44:04 +0100
+Message-Id: <20170117004409.28532-3-marex@denx.de>
 In-Reply-To: <20170117004409.28532-1-marex@denx.de>
 References: <20170117004409.28532-1-marex@denx.de>
-Subject: [Qemu-devel] [PATCH V5 3/7] nios2: Add usermode binaries emulation
+Subject: [Qemu-devel] [PATCH V9 2/7] nios2: Add architecture emulation
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,10 +25,13 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>, Jeff Da Silva <jdasilva@altera.com>, Ley Foon Tan <lftan@altera.com>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>
+Cc: Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Jeff Da Silva <jdasilva@altera.com>, Ley Foon Tan <lftan@altera.com>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>
 
-Add missing bits for qemu-user required for emulating Altera Nios2
-userspace binaries.
+From: Chris Wulff <crwulff@gmail.com>
+
+Add support for emulating Altera NiosII R1 architecture into qemu.
+This patch is based on previous work by Chris Wulff from 2012 and
+updated to latest mainline QEMU.
 
 Signed-off-by: Marek Vasut <marex@denx.de>
 Cc: Chris Wulff <crwulff@gmail.com>
@@ -35,1317 +39,2348 @@ Cc: Jeff Da Silva <jdasilva@altera.com>
 Cc: Ley Foon Tan <lftan@altera.com>
 Cc: Sandra Loosemore <sandra@codesourcery.com>
 Cc: Yves Vandervennet <yvanderv@altera.com>
-Reviewed-by: Alexander Graf <agraf@suse.de>
 ---
-V3: Checkpatch cleanup
-V4: Rebase on top of qemu/master
-V5: Rebase on top of qemu/master
+V3: Thorough cleanup, deal with the review comments all over the place
+V4: - Use extract32()
+    - Fix gen_goto_tb() , suppress tcg_gen_goto_tb()
+    - Clean up gen_check_supervisor() helper
+    - Use TCGMemOp type for flags
+    - Drop jump labels from wrctl/rdctl
+    - More TCG cleanup
+V5: - Simplify load/store handling
+    - Handle loads into R_ZERO from protected page, add comment
+V6: - Fix division opcode handling
+    - Add missing disas handling
+    - V5 review comments cleanup
+V7: - Drop newline at the end of file
+V8: - Rebase on top of qemu/master
+V9: - Rebase on top of qemu/master
+    - Init CR_STATUS in nios2_cpu_reset to 0 for start in kernel mode
+    - Split mmu_read helper into mmu_read_debug helper which produces
+      MMU debug output only if MMU debugging is enabled and standard
+      tcg_gen_mov_tl() which facilitates the MMU register read itself.
+    - Turn MMU settings of the CPU into QoM properties
 ---
- include/elf.h                     |   2 +
- linux-user/elfload.c              |  57 +++++++
- linux-user/main.c                 | 140 +++++++++++++++-
- linux-user/nios2/syscall_nr.h     | 329 ++++++++++++++++++++++++++++++++++++++
- linux-user/nios2/target_cpu.h     |  39 +++++
- linux-user/nios2/target_signal.h  |  26 +++
- linux-user/nios2/target_structs.h |  58 +++++++
- linux-user/nios2/target_syscall.h |  37 +++++
- linux-user/nios2/termbits.h       | 220 +++++++++++++++++++++++++
- linux-user/signal.c               | 238 ++++++++++++++++++++++++++-
- linux-user/syscall_defs.h         |   8 +-
- 11 files changed, 1147 insertions(+), 7 deletions(-)
- create mode 100644 linux-user/nios2/syscall_nr.h
- create mode 100644 linux-user/nios2/target_cpu.h
- create mode 100644 linux-user/nios2/target_signal.h
- create mode 100644 linux-user/nios2/target_structs.h
- create mode 100644 linux-user/nios2/target_syscall.h
- create mode 100644 linux-user/nios2/termbits.h
+ target/nios2/Makefile.objs |   4 +
+ target/nios2/cpu.c         | 239 ++++++++++++
+ target/nios2/cpu.h         | 272 +++++++++++++
+ target/nios2/helper.c      | 313 +++++++++++++++
+ target/nios2/helper.h      |  27 ++
+ target/nios2/mmu.c         | 296 ++++++++++++++
+ target/nios2/mmu.h         |  50 +++
+ target/nios2/monitor.c     |  35 ++
+ target/nios2/op_helper.c   |  47 +++
+ target/nios2/translate.c   | 956 +++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 2239 insertions(+)
+ create mode 100644 target/nios2/Makefile.objs
+ create mode 100644 target/nios2/cpu.c
+ create mode 100644 target/nios2/cpu.h
+ create mode 100644 target/nios2/helper.c
+ create mode 100644 target/nios2/helper.h
+ create mode 100644 target/nios2/mmu.c
+ create mode 100644 target/nios2/mmu.h
+ create mode 100644 target/nios2/monitor.c
+ create mode 100644 target/nios2/op_helper.c
+ create mode 100644 target/nios2/translate.c
 
-diff --git a/include/elf.h b/include/elf.h
-index 1c2975dc82..0dbd3e968b 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -126,6 +126,8 @@ typedef int64_t  Elf64_Sxword;
-  */
- #define EM_S390_OLD     0xA390
- 
-+#define EM_ALTERA_NIOS2 113     /* Altera Nios II soft-core processor */
+diff --git a/target/nios2/Makefile.objs b/target/nios2/Makefile.objs
+new file mode 100644
+index 0000000000..2a11c5ce08
+--- /dev/null
++++ b/target/nios2/Makefile.objs
+@@ -0,0 +1,4 @@
++obj-y += translate.o op_helper.o helper.o cpu.o mmu.o
++obj-$(CONFIG_SOFTMMU) += monitor.o
 +
- #define EM_MICROBLAZE      189
- #define EM_MICROBLAZE_OLD  0xBAAB
- 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 547053c27a..17f7766bff 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -967,6 +967,63 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUMBState *env
- 
- #endif /* TARGET_MICROBLAZE */
- 
-+#ifdef TARGET_NIOS2
++$(obj)/op_helper.o: QEMU_CFLAGS += $(HELPER_CFLAGS)
+diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
+new file mode 100644
+index 0000000000..6ccf4076a3
+--- /dev/null
++++ b/target/nios2/cpu.c
+@@ -0,0 +1,239 @@
++/*
++ * QEMU Nios II CPU
++ *
++ * Copyright (c) 2012 Chris Wulff <crwulff@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
 +
-+#define ELF_START_MMAP 0x80000000
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qapi/error.h"
++#include "cpu.h"
++#include "exec/log.h"
++#include "exec/gdbstub.h"
++#include "hw/qdev-properties.h"
 +
-+#define elf_check_arch(x) ((x) == EM_ALTERA_NIOS2)
-+
-+#define ELF_CLASS   ELFCLASS32
-+#define ELF_ARCH    EM_ALTERA_NIOS2
-+
-+static void init_thread(struct target_pt_regs *regs, struct image_info *infop)
++static void nios2_cpu_set_pc(CPUState *cs, vaddr value)
 +{
-+    regs->ea = infop->entry;
-+    regs->sp = infop->start_stack;
-+    regs->estatus = 0x3;
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++
++    env->regs[R_PC] = value;
 +}
 +
-+#define ELF_EXEC_PAGESIZE        4096
++static bool nios2_cpu_has_work(CPUState *cs)
++{
++    return cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI);
++}
 +
-+#define USE_ELF_CORE_DUMP
-+#define ELF_NREG 49
-+typedef target_elf_greg_t target_elf_gregset_t[ELF_NREG];
++/* CPUClass::reset() */
++static void nios2_cpu_reset(CPUState *cs)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    Nios2CPUClass *ncc = NIOS2_CPU_GET_CLASS(cpu);
++    CPUNios2State *env = &cpu->env;
 +
-+/* See linux kernel: arch/mips/kernel/process.c:elf_dump_regs.  */
-+static void elf_core_copy_regs(target_elf_gregset_t *regs,
-+                               const CPUNios2State *env)
++    if (qemu_loglevel_mask(CPU_LOG_RESET)) {
++        qemu_log("CPU Reset (CPU %d)\n", cs->cpu_index);
++        log_cpu_state(cs, 0);
++    }
++
++    ncc->parent_reset(cs);
++
++    tlb_flush(cs, 1);
++
++    memset(env->regs, 0, sizeof(uint32_t) * NUM_CORE_REGS);
++    env->regs[R_PC] = cpu->reset_addr;
++
++#if defined(CONFIG_USER_ONLY)
++    /* Start in user mode with interrupts enabled. */
++    env->regs[CR_STATUS] = CR_STATUS_U | CR_STATUS_PIE;
++#else
++    env->regs[CR_STATUS] = 0;
++#endif
++}
++
++static void nios2_cpu_initfn(Object *obj)
++{
++    CPUState *cs = CPU(obj);
++    Nios2CPU *cpu = NIOS2_CPU(obj);
++    CPUNios2State *env = &cpu->env;
++    static bool tcg_initialized;
++
++    cs->env_ptr = env;
++
++#if !defined(CONFIG_USER_ONLY)
++    mmu_init(env);
++#endif
++
++    if (tcg_enabled() && !tcg_initialized) {
++        tcg_initialized = true;
++        nios2_tcg_init();
++    }
++}
++
++Nios2CPU *cpu_nios2_init(const char *cpu_model)
++{
++    Nios2CPU *cpu = NIOS2_CPU(object_new(TYPE_NIOS2_CPU));
++
++    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
++
++    return cpu;
++}
++
++static void nios2_cpu_realizefn(DeviceState *dev, Error **errp)
++{
++    CPUState *cs = CPU(dev);
++    Nios2CPUClass *ncc = NIOS2_CPU_GET_CLASS(dev);
++    Error *local_err = NULL;
++
++    cpu_exec_realizefn(cs, &local_err);
++    if (local_err != NULL) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    qemu_init_vcpu(cs);
++    cpu_reset(cs);
++
++    ncc->parent_realize(dev, errp);
++}
++
++static bool nios2_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++
++    if ((interrupt_request & CPU_INTERRUPT_HARD) &&
++        (env->regs[CR_STATUS] & CR_STATUS_PIE)) {
++        cs->exception_index = EXCP_IRQ;
++        nios2_cpu_do_interrupt(cs);
++        return true;
++    }
++    return false;
++}
++
++
++static void nios2_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
++{
++    /* NOTE: NiosII R2 is not supported yet. */
++    info->mach = bfd_arch_nios2;
++#ifdef TARGET_WORDS_BIGENDIAN
++    info->print_insn = print_insn_big_nios2;
++#else
++    info->print_insn = print_insn_little_nios2;
++#endif
++}
++
++static int nios2_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUClass *cc = CPU_GET_CLASS(cs);
++    CPUNios2State *env = &cpu->env;
++
++    if (n > cc->gdb_num_core_regs) {
++        return 0;
++    }
++
++    if (n < 32) {          /* GP regs */
++        return gdb_get_reg32(mem_buf, env->regs[n]);
++    } else if (n == 32) {    /* PC */
++        return gdb_get_reg32(mem_buf, env->regs[R_PC]);
++    } else if (n < 49) {     /* Status regs */
++        return gdb_get_reg32(mem_buf, env->regs[n - 1]);
++    }
++
++    /* Invalid regs */
++    return 0;
++}
++
++static int nios2_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUClass *cc = CPU_GET_CLASS(cs);
++    CPUNios2State *env = &cpu->env;
++
++    if (n > cc->gdb_num_core_regs) {
++        return 0;
++    }
++
++    if (n < 32) {            /* GP regs */
++        env->regs[n] = ldl_p(mem_buf);
++    } else if (n == 32) {    /* PC */
++        env->regs[R_PC] = ldl_p(mem_buf);
++    } else if (n < 49) {     /* Status regs */
++        env->regs[n - 1] = ldl_p(mem_buf);
++    }
++
++    return 4;
++}
++
++static Property nios2_properties[] = {
++    DEFINE_PROP_BOOL("mmu_present", Nios2CPU, mmu_present, true),
++    /* ALTR,pid-num-bits */
++    DEFINE_PROP_UINT32("mmu_pid_num_bits", Nios2CPU, pid_num_bits, 8),
++    /* ALTR,tlb-num-ways */
++    DEFINE_PROP_UINT32("mmu_tlb_num_ways", Nios2CPU, tlb_num_ways, 16),
++    /* ALTR,tlb-num-entries */
++    DEFINE_PROP_UINT32("mmu_pid_num_entries", Nios2CPU, tlb_num_entries, 256),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++
++static void nios2_cpu_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++    CPUClass *cc = CPU_CLASS(oc);
++    Nios2CPUClass *ncc = NIOS2_CPU_CLASS(oc);
++
++    ncc->parent_realize = dc->realize;
++    dc->realize = nios2_cpu_realizefn;
++    dc->props = nios2_properties;
++    ncc->parent_reset = cc->reset;
++    cc->reset = nios2_cpu_reset;
++
++    cc->has_work = nios2_cpu_has_work;
++    cc->do_interrupt = nios2_cpu_do_interrupt;
++    cc->cpu_exec_interrupt = nios2_cpu_exec_interrupt;
++    cc->dump_state = nios2_cpu_dump_state;
++    cc->set_pc = nios2_cpu_set_pc;
++    cc->disas_set_info = nios2_cpu_disas_set_info;
++#ifdef CONFIG_USER_ONLY
++    cc->handle_mmu_fault = nios2_cpu_handle_mmu_fault;
++#else
++    cc->do_unaligned_access = nios2_cpu_do_unaligned_access;
++    cc->get_phys_page_debug = nios2_cpu_get_phys_page_debug;
++#endif
++    cc->gdb_read_register = nios2_cpu_gdb_read_register;
++    cc->gdb_write_register = nios2_cpu_gdb_write_register;
++    cc->gdb_num_core_regs = 49;
++}
++
++static const TypeInfo nios2_cpu_type_info = {
++    .name = TYPE_NIOS2_CPU,
++    .parent = TYPE_CPU,
++    .instance_size = sizeof(Nios2CPU),
++    .instance_init = nios2_cpu_initfn,
++    .class_size = sizeof(Nios2CPUClass),
++    .class_init = nios2_cpu_class_init,
++};
++
++static void nios2_cpu_register_types(void)
++{
++    type_register_static(&nios2_cpu_type_info);
++}
++
++type_init(nios2_cpu_register_types)
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+new file mode 100644
+index 0000000000..13931f3f0b
+--- /dev/null
++++ b/target/nios2/cpu.h
+@@ -0,0 +1,272 @@
++/*
++ * Altera Nios II virtual CPU header
++ *
++ * Copyright (c) 2012 Chris Wulff <crwulff@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++#ifndef CPU_NIOS2_H
++#define CPU_NIOS2_H
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++
++#define TARGET_LONG_BITS 32
++
++#define CPUArchState struct CPUNios2State
++
++#include "exec/cpu-defs.h"
++#include "fpu/softfloat.h"
++#include "qom/cpu.h"
++struct CPUNios2State;
++typedef struct CPUNios2State CPUNios2State;
++#if !defined(CONFIG_USER_ONLY)
++#include "mmu.h"
++#endif
++
++#define TYPE_NIOS2_CPU "nios2-cpu"
++
++#define NIOS2_CPU_CLASS(klass) \
++    OBJECT_CLASS_CHECK(Nios2CPUClass, (klass), TYPE_NIOS2_CPU)
++#define NIOS2_CPU(obj) \
++    OBJECT_CHECK(Nios2CPU, (obj), TYPE_NIOS2_CPU)
++#define NIOS2_CPU_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(Nios2CPUClass, (obj), TYPE_NIOS2_CPU)
++
++/**
++ * Nios2CPUClass:
++ * @parent_reset: The parent class' reset handler.
++ *
++ * A Nios2 CPU model.
++ */
++typedef struct Nios2CPUClass {
++    /*< private >*/
++    CPUClass parent_class;
++    /*< public >*/
++
++    DeviceRealize parent_realize;
++    void (*parent_reset)(CPUState *cpu);
++} Nios2CPUClass;
++
++#define TARGET_HAS_ICE 1
++
++/* Configuration options for Nios II */
++#define RESET_ADDRESS         0x00000000
++#define EXCEPTION_ADDRESS     0x00000004
++#define FAST_TLB_MISS_ADDRESS 0x00000008
++
++
++/* GP regs + CR regs + PC */
++#define NUM_CORE_REGS (32 + 32 + 1)
++
++/* General purpose register aliases */
++#define R_ZERO   0
++#define R_AT     1
++#define R_RET0   2
++#define R_RET1   3
++#define R_ARG0   4
++#define R_ARG1   5
++#define R_ARG2   6
++#define R_ARG3   7
++#define R_ET     24
++#define R_BT     25
++#define R_GP     26
++#define R_SP     27
++#define R_FP     28
++#define R_EA     29
++#define R_BA     30
++#define R_RA     31
++
++/* Control register aliases */
++#define CR_BASE  32
++#define CR_STATUS    (CR_BASE + 0)
++#define   CR_STATUS_PIE  (1 << 0)
++#define   CR_STATUS_U    (1 << 1)
++#define   CR_STATUS_EH   (1 << 2)
++#define   CR_STATUS_IH   (1 << 3)
++#define   CR_STATUS_IL   (63 << 4)
++#define   CR_STATUS_CRS  (63 << 10)
++#define   CR_STATUS_PRS  (63 << 16)
++#define   CR_STATUS_NMI  (1 << 22)
++#define   CR_STATUS_RSIE (1 << 23)
++#define CR_ESTATUS   (CR_BASE + 1)
++#define CR_BSTATUS   (CR_BASE + 2)
++#define CR_IENABLE   (CR_BASE + 3)
++#define CR_IPENDING  (CR_BASE + 4)
++#define CR_CPUID     (CR_BASE + 5)
++#define CR_CTL6      (CR_BASE + 6)
++#define CR_EXCEPTION (CR_BASE + 7)
++#define CR_PTEADDR   (CR_BASE + 8)
++#define   CR_PTEADDR_PTBASE_SHIFT 22
++#define   CR_PTEADDR_PTBASE_MASK  (0x3FF << CR_PTEADDR_PTBASE_SHIFT)
++#define   CR_PTEADDR_VPN_SHIFT    2
++#define   CR_PTEADDR_VPN_MASK     (0xFFFFF << CR_PTEADDR_VPN_SHIFT)
++#define CR_TLBACC    (CR_BASE + 9)
++#define   CR_TLBACC_IGN_SHIFT 25
++#define   CR_TLBACC_IGN_MASK  (0x7F << CR_TLBACC_IGN_SHIFT)
++#define   CR_TLBACC_C         (1 << 24)
++#define   CR_TLBACC_R         (1 << 23)
++#define   CR_TLBACC_W         (1 << 22)
++#define   CR_TLBACC_X         (1 << 21)
++#define   CR_TLBACC_G         (1 << 20)
++#define   CR_TLBACC_PFN_MASK  0x000FFFFF
++#define CR_TLBMISC   (CR_BASE + 10)
++#define   CR_TLBMISC_WAY_SHIFT 20
++#define   CR_TLBMISC_WAY_MASK  (0xF << CR_TLBMISC_WAY_SHIFT)
++#define   CR_TLBMISC_RD        (1 << 19)
++#define   CR_TLBMISC_WR        (1 << 18)
++#define   CR_TLBMISC_PID_SHIFT 4
++#define   CR_TLBMISC_PID_MASK  (0x3FFF << CR_TLBMISC_PID_SHIFT)
++#define   CR_TLBMISC_DBL       (1 << 3)
++#define   CR_TLBMISC_BAD       (1 << 2)
++#define   CR_TLBMISC_PERM      (1 << 1)
++#define   CR_TLBMISC_D         (1 << 0)
++#define CR_ENCINJ    (CR_BASE + 11)
++#define CR_BADADDR   (CR_BASE + 12)
++#define CR_CONFIG    (CR_BASE + 13)
++#define CR_MPUBASE   (CR_BASE + 14)
++#define CR_MPUACC    (CR_BASE + 15)
++
++/* Other registers */
++#define R_PC         64
++
++/* Exceptions */
++#define EXCP_BREAK    -1
++#define EXCP_RESET    0
++#define EXCP_PRESET   1
++#define EXCP_IRQ      2
++#define EXCP_TRAP     3
++#define EXCP_UNIMPL   4
++#define EXCP_ILLEGAL  5
++#define EXCP_UNALIGN  6
++#define EXCP_UNALIGND 7
++#define EXCP_DIV      8
++#define EXCP_SUPERA   9
++#define EXCP_SUPERI   10
++#define EXCP_SUPERD   11
++#define EXCP_TLBD     12
++#define EXCP_TLBX     13
++#define EXCP_TLBR     14
++#define EXCP_TLBW     15
++#define EXCP_MPUI     16
++#define EXCP_MPUD     17
++
++#define CPU_INTERRUPT_NMI       CPU_INTERRUPT_TGT_EXT_3
++
++#define NB_MMU_MODES 2
++
++struct CPUNios2State {
++    uint32_t regs[NUM_CORE_REGS];
++
++#if !defined(CONFIG_USER_ONLY)
++    Nios2MMU mmu;
++
++    uint32_t irq_pending;
++#endif
++
++    CPU_COMMON
++};
++
++/**
++ * Nios2CPU:
++ * @env: #CPUNios2State
++ *
++ * A Nios2 CPU.
++ */
++typedef struct Nios2CPU {
++    /*< private >*/
++    CPUState parent_obj;
++    /*< public >*/
++
++    CPUNios2State env;
++    bool mmu_present;
++    uint32_t pid_num_bits;
++    uint32_t tlb_num_ways;
++    uint32_t tlb_num_entries;
++
++    /* Addresses that are hard-coded in the FPGA build settings */
++    uint32_t reset_addr;
++    uint32_t exception_addr;
++    uint32_t fast_tlb_miss_addr;
++} Nios2CPU;
++
++static inline Nios2CPU *nios2_env_get_cpu(CPUNios2State *env)
++{
++    return NIOS2_CPU(container_of(env, Nios2CPU, env));
++}
++
++#define ENV_GET_CPU(e) CPU(nios2_env_get_cpu(e))
++
++#define ENV_OFFSET offsetof(Nios2CPU, env)
++
++void nios2_tcg_init(void);
++Nios2CPU *cpu_nios2_init(const char *cpu_model);
++void nios2_cpu_do_interrupt(CPUState *cs);
++int cpu_nios2_signal_handler(int host_signum, void *pinfo, void *puc);
++void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUNios2State *env);
++void nios2_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
++                          int flags);
++hwaddr nios2_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
++void nios2_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
++                                   MMUAccessType access_type,
++                                   int mmu_idx, uintptr_t retaddr);
++
++qemu_irq *nios2_cpu_pic_init(Nios2CPU *cpu);
++void nios2_check_interrupts(CPUNios2State *env);
++
++#define TARGET_PHYS_ADDR_SPACE_BITS 32
++#define TARGET_VIRT_ADDR_SPACE_BITS 32
++
++#define cpu_init(cpu_model) CPU(cpu_nios2_init(cpu_model))
++
++#define cpu_gen_code cpu_nios2_gen_code
++#define cpu_signal_handler cpu_nios2_signal_handler
++
++#define CPU_SAVE_VERSION 1
++
++#define TARGET_PAGE_BITS 12
++
++/* MMU modes definitions */
++#define MMU_MODE0_SUFFIX _kernel
++#define MMU_MODE1_SUFFIX _user
++#define MMU_SUPERVISOR_IDX  0
++#define MMU_USER_IDX        1
++
++static inline int cpu_mmu_index(CPUNios2State *env, bool ifetch)
++{
++    return (env->regs[CR_STATUS] & CR_STATUS_U) ? MMU_USER_IDX :
++                                                  MMU_SUPERVISOR_IDX;
++}
++
++int nios2_cpu_handle_mmu_fault(CPUState *env, vaddr address,
++                               int rw, int mmu_idx);
++
++static inline int cpu_interrupts_enabled(CPUNios2State *env)
++{
++    return env->regs[CR_STATUS] & CR_STATUS_PIE;
++}
++
++#include "exec/cpu-all.h"
++#include "exec/exec-all.h"
++
++static inline void cpu_get_tb_cpu_state(CPUNios2State *env, target_ulong *pc,
++                                        target_ulong *cs_base, uint32_t *flags)
++{
++    *pc = env->regs[R_PC];
++    *cs_base = 0;
++    *flags = (env->regs[CR_STATUS] & (CR_STATUS_EH | CR_STATUS_U));
++}
++
++#endif /* CPU_NIOS2_H */
+diff --git a/target/nios2/helper.c b/target/nios2/helper.c
+new file mode 100644
+index 0000000000..cd4f353497
+--- /dev/null
++++ b/target/nios2/helper.c
+@@ -0,0 +1,313 @@
++/*
++ * Altera Nios II helper routines.
++ *
++ * Copyright (c) 2012 Chris Wulff <crwulff@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include <stdio.h>
++#include <string.h>
++#include <assert.h>
++
++#include "cpu.h"
++#include "qemu/osdep.h"
++#include "qemu/host-utils.h"
++#include "qapi/error.h"
++#include "exec/exec-all.h"
++#include "exec/log.h"
++#include "exec/helper-proto.h"
++
++#if defined(CONFIG_USER_ONLY)
++
++void nios2_cpu_do_interrupt(CPUState *cs)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++    cs->exception_index = -1;
++    env->regs[R_EA] = env->regs[R_PC] + 4;
++}
++
++int nios2_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int rw, int mmu_idx)
++{
++    cs->exception_index = 0xaa;
++    /* Page 0x1000 is kuser helper */
++    if (address < 0x1000 || address >= 0x2000) {
++        cpu_dump_state(cs, stderr, fprintf, 0);
++    }
++    return 1;
++}
++
++#else /* !CONFIG_USER_ONLY */
++
++void nios2_cpu_do_interrupt(CPUState *cs)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++
++    switch (cs->exception_index) {
++    case EXCP_IRQ:
++        assert(env->regs[CR_STATUS] & CR_STATUS_PIE);
++
++        qemu_log_mask(CPU_LOG_INT, "interrupt at pc=%x\n", env->regs[R_PC]);
++
++        env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
++        env->regs[CR_STATUS] |= CR_STATUS_IH;
++        env->regs[CR_STATUS] &= ~(CR_STATUS_PIE | CR_STATUS_U);
++
++        env->regs[CR_EXCEPTION] &= ~(0x1F << 2);
++        env->regs[CR_EXCEPTION] |= (cs->exception_index & 0x1F) << 2;
++
++        env->regs[R_EA] = env->regs[R_PC] + 4;
++        env->regs[R_PC] = cpu->exception_addr;
++        break;
++
++    case EXCP_TLBD:
++        if ((env->regs[CR_STATUS] & CR_STATUS_EH) == 0) {
++            qemu_log_mask(CPU_LOG_INT, "TLB MISS (fast) at pc=%x\n",
++                          env->regs[R_PC]);
++
++            /* Fast TLB miss */
++            /* Variation from the spec. Table 3-35 of the cpu reference shows
++             * estatus not being changed for TLB miss but this appears to
++             * be incorrect. */
++            env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
++            env->regs[CR_STATUS] |= CR_STATUS_EH;
++            env->regs[CR_STATUS] &= ~(CR_STATUS_PIE | CR_STATUS_U);
++
++            env->regs[CR_EXCEPTION] &= ~(0x1F << 2);
++            env->regs[CR_EXCEPTION] |= (cs->exception_index & 0x1F) << 2;
++
++            env->regs[CR_TLBMISC] &= ~CR_TLBMISC_DBL;
++            env->regs[CR_TLBMISC] |= CR_TLBMISC_WR;
++
++            env->regs[R_EA] = env->regs[R_PC] + 4;
++            env->regs[R_PC] = cpu->fast_tlb_miss_addr;
++        } else {
++            qemu_log_mask(CPU_LOG_INT, "TLB MISS (double) at pc=%x\n",
++                          env->regs[R_PC]);
++
++            /* Double TLB miss */
++            env->regs[CR_STATUS] |= CR_STATUS_EH;
++            env->regs[CR_STATUS] &= ~(CR_STATUS_PIE | CR_STATUS_U);
++
++            env->regs[CR_EXCEPTION] &= ~(0x1F << 2);
++            env->regs[CR_EXCEPTION] |= (cs->exception_index & 0x1F) << 2;
++
++            env->regs[CR_TLBMISC] |= CR_TLBMISC_DBL;
++
++            env->regs[R_PC] = cpu->exception_addr;
++        }
++        break;
++
++    case EXCP_TLBR:
++    case EXCP_TLBW:
++    case EXCP_TLBX:
++        qemu_log_mask(CPU_LOG_INT, "TLB PERM at pc=%x\n", env->regs[R_PC]);
++
++        env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
++        env->regs[CR_STATUS] |= CR_STATUS_EH;
++        env->regs[CR_STATUS] &= ~(CR_STATUS_PIE | CR_STATUS_U);
++
++        env->regs[CR_EXCEPTION] &= ~(0x1F << 2);
++        env->regs[CR_EXCEPTION] |= (cs->exception_index & 0x1F) << 2;
++
++        if ((env->regs[CR_STATUS] & CR_STATUS_EH) == 0) {
++            env->regs[CR_TLBMISC] |= CR_TLBMISC_WR;
++        }
++
++        env->regs[R_EA] = env->regs[R_PC] + 4;
++        env->regs[R_PC] = cpu->exception_addr;
++        break;
++
++    case EXCP_SUPERA:
++    case EXCP_SUPERI:
++    case EXCP_SUPERD:
++        qemu_log_mask(CPU_LOG_INT, "SUPERVISOR exception at pc=%x\n",
++                      env->regs[R_PC]);
++
++        if ((env->regs[CR_STATUS] & CR_STATUS_EH) == 0) {
++            env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
++            env->regs[R_EA] = env->regs[R_PC] + 4;
++        }
++
++        env->regs[CR_STATUS] |= CR_STATUS_EH;
++        env->regs[CR_STATUS] &= ~(CR_STATUS_PIE | CR_STATUS_U);
++
++        env->regs[CR_EXCEPTION] &= ~(0x1F << 2);
++        env->regs[CR_EXCEPTION] |= (cs->exception_index & 0x1F) << 2;
++
++        env->regs[R_PC] = cpu->exception_addr;
++        break;
++
++    case EXCP_ILLEGAL:
++    case EXCP_TRAP:
++        qemu_log_mask(CPU_LOG_INT, "TRAP exception at pc=%x\n",
++                      env->regs[R_PC]);
++
++        if ((env->regs[CR_STATUS] & CR_STATUS_EH) == 0) {
++            env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
++            env->regs[R_EA] = env->regs[R_PC] + 4;
++        }
++
++        env->regs[CR_STATUS] |= CR_STATUS_EH;
++        env->regs[CR_STATUS] &= ~(CR_STATUS_PIE | CR_STATUS_U);
++
++        env->regs[CR_EXCEPTION] &= ~(0x1F << 2);
++        env->regs[CR_EXCEPTION] |= (cs->exception_index & 0x1F) << 2;
++
++        env->regs[R_PC] = cpu->exception_addr;
++        break;
++
++    case EXCP_BREAK:
++        if ((env->regs[CR_STATUS] & CR_STATUS_EH) == 0) {
++            env->regs[CR_BSTATUS] = env->regs[CR_STATUS];
++            env->regs[R_BA] = env->regs[R_PC] + 4;
++        }
++
++        env->regs[CR_STATUS] |= CR_STATUS_EH;
++        env->regs[CR_STATUS] &= ~(CR_STATUS_PIE | CR_STATUS_U);
++
++        env->regs[CR_EXCEPTION] &= ~(0x1F << 2);
++        env->regs[CR_EXCEPTION] |= (cs->exception_index & 0x1F) << 2;
++
++        env->regs[R_PC] = cpu->exception_addr;
++        break;
++
++    default:
++        cpu_abort(cs, "unhandled exception type=%d\n",
++                  cs->exception_index);
++        break;
++    }
++}
++
++static int cpu_nios2_handle_virtual_page(
++    CPUState *cs, target_ulong address, int rw, int mmu_idx)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++    target_ulong vaddr, paddr;
++    Nios2MMULookup lu;
++    unsigned int hit;
++    hit = mmu_translate(env, &lu, address, rw, mmu_idx);
++    if (hit) {
++        vaddr = address & TARGET_PAGE_MASK;
++        paddr = lu.paddr + vaddr - lu.vaddr;
++
++        if (((rw == 0) && (lu.prot & PAGE_READ)) ||
++            ((rw == 1) && (lu.prot & PAGE_WRITE)) ||
++            ((rw == 2) && (lu.prot & PAGE_EXEC))) {
++
++            tlb_set_page(cs, vaddr, paddr, lu.prot,
++                         mmu_idx, TARGET_PAGE_SIZE);
++            return 0;
++        } else {
++            /* Permission violation */
++            cs->exception_index = (rw == 0) ? EXCP_TLBR :
++                                               ((rw == 1) ? EXCP_TLBW :
++                                                            EXCP_TLBX);
++        }
++    } else {
++        cs->exception_index = EXCP_TLBD;
++    }
++
++    if (rw == 2) {
++        env->regs[CR_TLBMISC] &= ~CR_TLBMISC_D;
++    } else {
++        env->regs[CR_TLBMISC] |= CR_TLBMISC_D;
++    }
++    env->regs[CR_PTEADDR] &= CR_PTEADDR_PTBASE_MASK;
++    env->regs[CR_PTEADDR] |= (address >> 10) & CR_PTEADDR_VPN_MASK;
++    env->mmu.pteaddr_wr = env->regs[CR_PTEADDR];
++    env->regs[CR_BADADDR] = address;
++    return 1;
++}
++
++int nios2_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int rw, int mmu_idx)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++
++    if (cpu->mmu_present) {
++        if (MMU_SUPERVISOR_IDX == mmu_idx) {
++            if (address >= 0xC0000000) {
++                /* Kernel physical page - TLB bypassed */
++                address &= TARGET_PAGE_MASK;
++                tlb_set_page(cs, address, address, PAGE_BITS,
++                             mmu_idx, TARGET_PAGE_SIZE);
++            } else if (address >= 0x80000000) {
++                /* Kernel virtual page */
++                return cpu_nios2_handle_virtual_page(cs, address, rw, mmu_idx);
++            } else {
++                /* User virtual page */
++                return cpu_nios2_handle_virtual_page(cs, address, rw, mmu_idx);
++            }
++        } else {
++            if (address >= 0x80000000) {
++                /* Illegal access from user mode */
++                cs->exception_index = EXCP_SUPERA;
++                env->regs[CR_BADADDR] = address;
++                return 1;
++            } else {
++                /* User virtual page */
++                return cpu_nios2_handle_virtual_page(cs, address, rw, mmu_idx);
++            }
++        }
++    } else {
++        /* No MMU */
++        address &= TARGET_PAGE_MASK;
++        tlb_set_page(cs, address, address, PAGE_BITS,
++                     mmu_idx, TARGET_PAGE_SIZE);
++    }
++
++    return 0;
++}
++
++hwaddr nios2_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++    target_ulong vaddr, paddr = 0;
++    Nios2MMULookup lu;
++    unsigned int hit;
++
++    if (cpu->mmu_present && (addr < 0xC0000000)) {
++        hit = mmu_translate(env, &lu, addr, 0, 0);
++        if (hit) {
++            vaddr = addr & TARGET_PAGE_MASK;
++            paddr = lu.paddr + vaddr - lu.vaddr;
++        } else {
++            paddr = -1;
++            qemu_log("cpu_get_phys_page debug MISS: %08lX\n", addr);
++        }
++    } else {
++        paddr = addr & TARGET_PAGE_MASK;
++    }
++
++    return paddr;
++}
++
++void nios2_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
++                                   MMUAccessType access_type,
++                                   int mmu_idx, uintptr_t retaddr)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++
++    env->regs[CR_BADADDR] = addr;
++    env->regs[CR_EXCEPTION] = EXCP_UNALIGN << 2;
++    helper_raise_exception(env, EXCP_UNALIGN);
++}
++#endif /* !CONFIG_USER_ONLY */
+diff --git a/target/nios2/helper.h b/target/nios2/helper.h
+new file mode 100644
+index 0000000000..b0cb9146a5
+--- /dev/null
++++ b/target/nios2/helper.h
+@@ -0,0 +1,27 @@
++/*
++ * Altera Nios II helper routines header.
++ *
++ * Copyright (c) 2012 Chris Wulff <crwulff@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++DEF_HELPER_2(raise_exception, void, env, i32)
++
++#if !defined(CONFIG_USER_ONLY)
++DEF_HELPER_2(mmu_read_debug, void, env, i32)
++DEF_HELPER_3(mmu_write, void, env, i32, i32)
++DEF_HELPER_1(check_interrupts, void, env)
++#endif
+diff --git a/target/nios2/mmu.c b/target/nios2/mmu.c
+new file mode 100644
+index 0000000000..fe9298af50
+--- /dev/null
++++ b/target/nios2/mmu.c
+@@ -0,0 +1,296 @@
++/*
++ * Altera Nios II MMU emulation for qemu.
++ *
++ * Copyright (C) 2012 Chris Wulff <crwulff@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "mmu.h"
++
++#if !defined(CONFIG_USER_ONLY)
++
++/* Define this to enable MMU debug messages */
++/* #define DEBUG_MMU */
++
++#ifdef DEBUG_MMU
++#define MMU_LOG(x) x
++#else
++#define MMU_LOG(x)
++#endif
++
++void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
++              int mmu_idx, uintptr_t retaddr)
++{
++    int ret;
++
++    ret = nios2_cpu_handle_mmu_fault(cs, addr, access_type, mmu_idx);
++    if (unlikely(ret)) {
++        if (retaddr) {
++            /* now we have a real cpu fault */
++            cpu_restore_state(cs, retaddr);
++        }
++        cpu_loop_exit(cs);
++    }
++}
++
++void mmu_read_debug(CPUNios2State *env, uint32_t rn)
++{
++    switch (rn) {
++    case CR_TLBACC:
++        MMU_LOG(qemu_log("TLBACC READ %08X\n", env->regs[rn]));
++        break;
++
++    case CR_TLBMISC:
++        MMU_LOG(qemu_log("TLBMISC READ %08X\n", env->regs[rn]));
++        break;
++
++    case CR_PTEADDR:
++        MMU_LOG(qemu_log("PTEADDR READ %08X\n", env->regs[rn]));
++        break;
++
++    default:
++        break;
++    }
++}
++
++/* rw - 0 = read, 1 = write, 2 = fetch.  */
++unsigned int mmu_translate(CPUNios2State *env,
++                           Nios2MMULookup *lu,
++                           target_ulong vaddr, int rw, int mmu_idx)
++{
++    Nios2CPU *cpu = nios2_env_get_cpu(env);
++    int pid = (env->mmu.tlbmisc_wr & CR_TLBMISC_PID_MASK) >> 4;
++    int vpn = vaddr >> 12;
++
++    MMU_LOG(qemu_log("mmu_translate vaddr %08X, pid %08X, vpn %08X\n",
++                     vaddr, pid, vpn));
++
++    int way;
++    for (way = 0; way < cpu->tlb_num_ways; way++) {
++
++        Nios2TLBEntry *entry =
++            &env->mmu.tlb[(way * cpu->tlb_num_ways) +
++                          (vpn & env->mmu.tlb_entry_mask)];
++
++        MMU_LOG(qemu_log("TLB[%d] TAG %08X, VPN %08X\n",
++                         (way * cpu->tlb_num_ways) +
++                         (vpn & env->mmu.tlb_entry_mask),
++                         entry->tag, (entry->tag >> 12)));
++
++        if (((entry->tag >> 12) != vpn) ||
++            (((entry->tag & (1 << 11)) == 0) &&
++            ((entry->tag & ((1 << cpu->pid_num_bits) - 1)) != pid))) {
++            continue;
++        }
++        lu->vaddr = vaddr & TARGET_PAGE_MASK;
++        lu->paddr = (entry->data & CR_TLBACC_PFN_MASK) << TARGET_PAGE_BITS;
++        lu->prot = ((entry->data & CR_TLBACC_R) ? PAGE_READ : 0) |
++                   ((entry->data & CR_TLBACC_W) ? PAGE_WRITE : 0) |
++                   ((entry->data & CR_TLBACC_X) ? PAGE_EXEC : 0);
++
++        MMU_LOG(qemu_log("HIT TLB[%d] %08X %08X %08X\n",
++                         (way * cpu->tlb_num_ways) +
++                         (vpn & env->mmu.tlb_entry_mask),
++                         lu->vaddr, lu->paddr, lu->prot));
++        return 1;
++    }
++    return 0;
++}
++
++static void mmu_flush_pid(CPUNios2State *env, uint32_t pid)
++{
++    CPUState *cs = ENV_GET_CPU(env);
++    Nios2CPU *cpu = nios2_env_get_cpu(env);
++    int idx;
++    MMU_LOG(qemu_log("TLB Flush PID %d\n", pid));
++
++    for (idx = 0; idx < cpu->tlb_num_entries; idx++) {
++        Nios2TLBEntry *entry = &env->mmu.tlb[idx];
++
++        MMU_LOG(qemu_log("TLB[%d] => %08X %08X\n",
++                         idx, entry->tag, entry->data));
++
++        if ((entry->tag & (1 << 10)) && (!(entry->tag & (1 << 11))) &&
++            ((entry->tag & ((1 << cpu->pid_num_bits) - 1)) == pid)) {
++            uint32_t vaddr = entry->tag & TARGET_PAGE_MASK;
++
++            MMU_LOG(qemu_log("TLB Flush Page %08X\n", vaddr));
++
++            tlb_flush_page(cs, vaddr);
++        }
++    }
++}
++
++void mmu_write(CPUNios2State *env, uint32_t rn, uint32_t v)
++{
++    CPUState *cs = ENV_GET_CPU(env);
++    Nios2CPU *cpu = nios2_env_get_cpu(env);
++
++    MMU_LOG(qemu_log("mmu_write %08X = %08X\n", rn, v));
++
++    switch (rn) {
++    case CR_TLBACC:
++        MMU_LOG(qemu_log("TLBACC: IG %02X, FLAGS %c%c%c%c%c, PFN %05X\n",
++                         v >> CR_TLBACC_IGN_SHIFT,
++                         (v & CR_TLBACC_C) ? 'C' : '.',
++                         (v & CR_TLBACC_R) ? 'R' : '.',
++                         (v & CR_TLBACC_W) ? 'W' : '.',
++                         (v & CR_TLBACC_X) ? 'X' : '.',
++                         (v & CR_TLBACC_G) ? 'G' : '.',
++                         v & CR_TLBACC_PFN_MASK));
++
++        /* if tlbmisc.WE == 1 then trigger a TLB write on writes to TLBACC */
++        if (env->regs[CR_TLBMISC] & CR_TLBMISC_WR) {
++            int way = (env->regs[CR_TLBMISC] >> CR_TLBMISC_WAY_SHIFT);
++            int vpn = (env->mmu.pteaddr_wr & CR_PTEADDR_VPN_MASK) >> 2;
++            int pid = (env->mmu.tlbmisc_wr & CR_TLBMISC_PID_MASK) >> 4;
++            int g = (v & CR_TLBACC_G) ? 1 : 0;
++            int valid = ((vpn & CR_TLBACC_PFN_MASK) < 0xC0000) ? 1 : 0;
++            Nios2TLBEntry *entry =
++                &env->mmu.tlb[(way * cpu->tlb_num_ways) +
++                              (vpn & env->mmu.tlb_entry_mask)];
++            uint32_t newTag = (vpn << 12) | (g << 11) | (valid << 10) | pid;
++            uint32_t newData = v & (CR_TLBACC_C | CR_TLBACC_R | CR_TLBACC_W |
++                                    CR_TLBACC_X | CR_TLBACC_PFN_MASK);
++
++            if ((entry->tag != newTag) || (entry->data != newData)) {
++                if (entry->tag & (1 << 10)) {
++                    /* Flush existing entry */
++                    MMU_LOG(qemu_log("TLB Flush Page (OLD) %08X\n",
++                                     entry->tag & TARGET_PAGE_MASK));
++                    tlb_flush_page(cs, entry->tag & TARGET_PAGE_MASK);
++                }
++                entry->tag = newTag;
++                entry->data = newData;
++                MMU_LOG(qemu_log("TLB[%d] = %08X %08X\n",
++                                 (way * cpu->tlb_num_ways) +
++                                 (vpn & env->mmu.tlb_entry_mask),
++                                 entry->tag, entry->data));
++            }
++            /* Auto-increment tlbmisc.WAY */
++            env->regs[CR_TLBMISC] =
++                (env->regs[CR_TLBMISC] & ~CR_TLBMISC_WAY_MASK) |
++                (((way + 1) & (cpu->tlb_num_ways - 1)) <<
++                 CR_TLBMISC_WAY_SHIFT);
++        }
++
++        /* Writes to TLBACC don't change the read-back value */
++        env->mmu.tlbacc_wr = v;
++        break;
++
++    case CR_TLBMISC:
++        MMU_LOG(qemu_log("TLBMISC: WAY %X, FLAGS %c%c%c%c%c%c, PID %04X\n",
++                         v >> CR_TLBMISC_WAY_SHIFT,
++                         (v & CR_TLBMISC_RD) ? 'R' : '.',
++                         (v & CR_TLBMISC_WR) ? 'W' : '.',
++                         (v & CR_TLBMISC_DBL) ? '2' : '.',
++                         (v & CR_TLBMISC_BAD) ? 'B' : '.',
++                         (v & CR_TLBMISC_PERM) ? 'P' : '.',
++                         (v & CR_TLBMISC_D) ? 'D' : '.',
++                         (v & CR_TLBMISC_PID_MASK) >> 4));
++
++        if ((v & CR_TLBMISC_PID_MASK) !=
++            (env->mmu.tlbmisc_wr & CR_TLBMISC_PID_MASK)) {
++            mmu_flush_pid(env, (env->mmu.tlbmisc_wr & CR_TLBMISC_PID_MASK) >>
++                               CR_TLBMISC_PID_SHIFT);
++        }
++        /* if tlbmisc.RD == 1 then trigger a TLB read on writes to TLBMISC */
++        if (v & CR_TLBMISC_RD) {
++            int way = (v >> CR_TLBMISC_WAY_SHIFT);
++            int vpn = (env->mmu.pteaddr_wr & CR_PTEADDR_VPN_MASK) >> 2;
++            Nios2TLBEntry *entry =
++                &env->mmu.tlb[(way * cpu->tlb_num_ways) +
++                              (vpn & env->mmu.tlb_entry_mask)];
++
++            env->regs[CR_TLBACC] &= CR_TLBACC_IGN_MASK;
++            env->regs[CR_TLBACC] |= entry->data;
++            env->regs[CR_TLBACC] |= (entry->tag & (1 << 11)) ? CR_TLBACC_G : 0;
++            env->regs[CR_TLBMISC] =
++                (v & ~CR_TLBMISC_PID_MASK) |
++                ((entry->tag & ((1 << cpu->pid_num_bits) - 1)) <<
++                 CR_TLBMISC_PID_SHIFT);
++            env->regs[CR_PTEADDR] &= ~CR_PTEADDR_VPN_MASK;
++            env->regs[CR_PTEADDR] |= (entry->tag >> 12) << CR_PTEADDR_VPN_SHIFT;
++            MMU_LOG(qemu_log("TLB READ way %d, vpn %05X, tag %08X, data %08X, "
++                             "tlbacc %08X, tlbmisc %08X, pteaddr %08X\n",
++                             way, vpn, entry->tag, entry->data,
++                             env->regs[CR_TLBACC], env->regs[CR_TLBMISC],
++                             env->regs[CR_PTEADDR]));
++        } else {
++            env->regs[CR_TLBMISC] = v;
++        }
++
++        env->mmu.tlbmisc_wr = v;
++        break;
++
++    case CR_PTEADDR:
++        MMU_LOG(qemu_log("PTEADDR: PTBASE %03X, VPN %05X\n",
++                         v >> CR_PTEADDR_PTBASE_SHIFT,
++                         (v & CR_PTEADDR_VPN_MASK) >> CR_PTEADDR_VPN_SHIFT));
++
++        /* Writes to PTEADDR don't change the read-back VPN value */
++        env->regs[CR_PTEADDR] = (v & ~CR_PTEADDR_VPN_MASK) |
++                                (env->regs[CR_PTEADDR] & CR_PTEADDR_VPN_MASK);
++        env->mmu.pteaddr_wr = v;
++        break;
++
++    default:
++        break;
++    }
++}
++
++void mmu_init(CPUNios2State *env)
++{
++    Nios2CPU *cpu = nios2_env_get_cpu(env);
++    Nios2MMU *mmu = &env->mmu;
++
++    MMU_LOG(qemu_log("mmu_init\n"));
++
++    mmu->tlb_entry_mask = (cpu->tlb_num_entries / cpu->tlb_num_ways) - 1;
++    mmu->tlb = g_new0(Nios2TLBEntry, cpu->tlb_num_entries);
++}
++
++void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUNios2State *env)
++{
++    Nios2CPU *cpu = nios2_env_get_cpu(env);
++    int i;
++
++    cpu_fprintf(f, "MMU: ways %d, entries %d, pid bits %d\n",
++                cpu->tlb_num_ways, cpu->tlb_num_entries,
++                cpu->pid_num_bits);
++
++    for (i = 0; i < cpu->tlb_num_entries; i++) {
++        Nios2TLBEntry *entry = &env->mmu.tlb[i];
++        cpu_fprintf(f, "TLB[%d] = %08X %08X %c VPN %05X "
++                    "PID %02X %c PFN %05X %c%c%c%c\n",
++                    i, entry->tag, entry->data,
++                    (entry->tag & (1 << 10)) ? 'V' : '-',
++                    entry->tag >> 12,
++                    entry->tag & ((1 << cpu->pid_num_bits) - 1),
++                    (entry->tag & (1 << 11)) ? 'G' : '-',
++                    entry->data & CR_TLBACC_PFN_MASK,
++                    (entry->data & CR_TLBACC_C) ? 'C' : '-',
++                    (entry->data & CR_TLBACC_R) ? 'R' : '-',
++                    (entry->data & CR_TLBACC_W) ? 'W' : '-',
++                    (entry->data & CR_TLBACC_X) ? 'X' : '-');
++    }
++}
++
++#endif /* !CONFIG_USER_ONLY */
+diff --git a/target/nios2/mmu.h b/target/nios2/mmu.h
+new file mode 100644
+index 0000000000..51d3d1f43a
+--- /dev/null
++++ b/target/nios2/mmu.h
+@@ -0,0 +1,50 @@
++/*
++ * Altera Nios II MMU emulation for qemu.
++ *
++ * Copyright (C) 2012 Chris Wulff <crwulff@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++#ifndef MMU_NIOS2_H
++#define MMU_NIOS2_H
++
++typedef struct Nios2TLBEntry {
++    target_ulong tag;
++    target_ulong data;
++} Nios2TLBEntry;
++
++typedef struct Nios2MMU {
++    int tlb_entry_mask;
++    uint32_t pteaddr_wr;
++    uint32_t tlbacc_wr;
++    uint32_t tlbmisc_wr;
++    Nios2TLBEntry *tlb;
++} Nios2MMU;
++
++typedef struct Nios2MMULookup {
++    target_ulong vaddr;
++    target_ulong paddr;
++    int prot;
++} Nios2MMULookup;
++
++void mmu_flip_um(CPUNios2State *env, unsigned int um);
++unsigned int mmu_translate(CPUNios2State *env,
++                           Nios2MMULookup *lu,
++                           target_ulong vaddr, int rw, int mmu_idx);
++void mmu_read_debug(CPUNios2State *env, uint32_t rn);
++void mmu_write(CPUNios2State *env, uint32_t rn, uint32_t v);
++void mmu_init(CPUNios2State *env);
++
++#endif /* MMU_NIOS2_H */
+diff --git a/target/nios2/monitor.c b/target/nios2/monitor.c
+new file mode 100644
+index 0000000000..422c81656a
+--- /dev/null
++++ b/target/nios2/monitor.c
+@@ -0,0 +1,35 @@
++/*
++ * QEMU monitor
++ *
++ * Copyright (c) 2003-2004 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "monitor/monitor.h"
++#include "monitor/hmp-target.h"
++#include "hmp.h"
++
++void hmp_info_tlb(Monitor *mon, const QDict *qdict)
++{
++    CPUArchState *env1 = mon_get_cpu_env();
++
++    dump_mmu((FILE *)mon, (fprintf_function)monitor_printf, env1);
++}
+diff --git a/target/nios2/op_helper.c b/target/nios2/op_helper.c
+new file mode 100644
+index 0000000000..538853cda7
+--- /dev/null
++++ b/target/nios2/op_helper.c
+@@ -0,0 +1,47 @@
++/*
++ * Altera Nios II helper routines.
++ *
++ * Copyright (C) 2012 Chris Wulff <crwulff@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "cpu.h"
++#include "exec/helper-proto.h"
++#include "exec/cpu_ldst.h"
++
++#if !defined(CONFIG_USER_ONLY)
++void helper_mmu_read_debug(CPUNios2State *env, uint32_t rn)
++{
++    mmu_read_debug(env, rn);
++}
++
++void helper_mmu_write(CPUNios2State *env, uint32_t rn, uint32_t v)
++{
++    mmu_write(env, rn, v);
++}
++
++void helper_check_interrupts(CPUNios2State *env)
++{
++    nios2_check_interrupts(env);
++}
++#endif /* !CONFIG_USER_ONLY */
++
++void helper_raise_exception(CPUNios2State *env, uint32_t index)
++{
++    CPUState *cs = ENV_GET_CPU(env);
++    cs->exception_index = index;
++    cpu_loop_exit(cs);
++}
+diff --git a/target/nios2/translate.c b/target/nios2/translate.c
+new file mode 100644
+index 0000000000..f2289d4f94
+--- /dev/null
++++ b/target/nios2/translate.c
+@@ -0,0 +1,956 @@
++/*
++ * Altera Nios II emulation for qemu: main translation routines.
++ *
++ * Copyright (C) 2016 Marek Vasut <marex@denx.de>
++ * Copyright (C) 2012 Chris Wulff <crwulff@gmail.com>
++ * Copyright (C) 2010 Tobias Klauser <tklauser@distanz.ch>
++ *  (Portions of this file that were originally from nios2sim-ng.)
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "cpu.h"
++#include "tcg-op.h"
++#include "exec/exec-all.h"
++#include "disas/disas.h"
++#include "exec/helper-proto.h"
++#include "exec/helper-gen.h"
++#include "exec/log.h"
++#include "exec/cpu_ldst.h"
++
++#define INSTRUCTION_FLG(func, flags) { (func), (flags) }
++#define INSTRUCTION(func)                  \
++        INSTRUCTION_FLG(func, 0)
++#define INSTRUCTION_NOP()                  \
++        INSTRUCTION_FLG(nop, 0)
++#define INSTRUCTION_UNIMPLEMENTED()        \
++        INSTRUCTION_FLG(gen_excp, EXCP_UNIMPL)
++#define INSTRUCTION_ILLEGAL()              \
++        INSTRUCTION_FLG(gen_excp, EXCP_ILLEGAL)
++
++/* Special R-Type instruction opcode */
++#define INSN_R_TYPE 0x3A
++
++/* I-Type instruction parsing */
++#define I_TYPE(instr, code)                \
++    struct {                               \
++        uint8_t op;                        \
++        union {                            \
++            uint16_t imm16;                \
++            int16_t imm16s;                \
++        };                                 \
++        uint8_t b;                         \
++        uint8_t a;                         \
++    } (instr) = {                          \
++        .op    = extract32((code), 0, 6),  \
++        .imm16 = extract32((code), 6, 16), \
++        .b     = extract32((code), 22, 5), \
++        .a     = extract32((code), 27, 5), \
++    }
++
++/* R-Type instruction parsing */
++#define R_TYPE(instr, code)                \
++    struct {                               \
++        uint8_t op;                        \
++        uint8_t imm5;                      \
++        uint8_t opx;                       \
++        uint8_t c;                         \
++        uint8_t b;                         \
++        uint8_t a;                         \
++    } (instr) = {                          \
++        .op    = extract32((code), 0, 6),  \
++        .imm5  = extract32((code), 6, 5),  \
++        .opx   = extract32((code), 11, 6), \
++        .c     = extract32((code), 17, 5), \
++        .b     = extract32((code), 22, 5), \
++        .a     = extract32((code), 27, 5), \
++    }
++
++/* J-Type instruction parsing */
++#define J_TYPE(instr, code)                \
++    struct {                               \
++        uint8_t op;                        \
++        uint32_t imm26;                    \
++    } (instr) = {                          \
++        .op    = extract32((code), 0, 6),  \
++        .imm26 = extract32((code), 6, 26), \
++    }
++
++typedef struct DisasContext {
++    TCGv_ptr          cpu_env;
++    TCGv             *cpu_R;
++    TCGv_i32          zero;
++    int               is_jmp;
++    target_ulong      pc;
++    TranslationBlock *tb;
++    int               mem_idx;
++    bool              singlestep_enabled;
++} DisasContext;
++
++typedef struct Nios2Instruction {
++    void     (*handler)(DisasContext *dc, uint32_t code, uint32_t flags);
++    uint32_t  flags;
++} Nios2Instruction;
++
++static uint8_t get_opcode(uint32_t code)
++{
++    I_TYPE(instr, code);
++    return instr.op;
++}
++
++static uint8_t get_opxcode(uint32_t code)
++{
++    R_TYPE(instr, code);
++    return instr.opx;
++}
++
++static TCGv load_zero(DisasContext *dc)
++{
++    if (TCGV_IS_UNUSED_I32(dc->zero)) {
++        dc->zero = tcg_const_i32(0);
++    }
++    return dc->zero;
++}
++
++static TCGv load_gpr(DisasContext *dc, uint8_t reg)
++{
++    if (likely(reg != R_ZERO)) {
++        return dc->cpu_R[reg];
++    } else {
++        return load_zero(dc);
++    }
++}
++
++static void t_gen_helper_raise_exception(DisasContext *dc,
++                                         uint32_t index)
++{
++    TCGv_i32 tmp = tcg_const_i32(index);
++
++    tcg_gen_movi_tl(dc->cpu_R[R_PC], dc->pc);
++    gen_helper_raise_exception(dc->cpu_env, tmp);
++    tcg_temp_free_i32(tmp);
++    dc->is_jmp = DISAS_UPDATE;
++}
++
++static bool use_goto_tb(DisasContext *dc, uint32_t dest)
++{
++    if (unlikely(dc->singlestep_enabled)) {
++        return false;
++    }
++
++#ifndef CONFIG_USER_ONLY
++    return (dc->tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
++#else
++    return true;
++#endif
++}
++
++static void gen_goto_tb(DisasContext *dc, int n, uint32_t dest)
++{
++    TranslationBlock *tb = dc->tb;
++
++    if (use_goto_tb(dc, dest)) {
++        tcg_gen_goto_tb(n);
++        tcg_gen_movi_tl(dc->cpu_R[R_PC], dest);
++        tcg_gen_exit_tb((tcg_target_long)tb + n);
++    } else {
++        tcg_gen_movi_tl(dc->cpu_R[R_PC], dest);
++        tcg_gen_exit_tb(0);
++    }
++}
++
++static void gen_excp(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    t_gen_helper_raise_exception(dc, flags);
++}
++
++static void gen_check_supervisor(DisasContext *dc)
++{
++    if (dc->tb->flags & CR_STATUS_U) {
++        /* CPU in user mode, privileged instruction called, stop. */
++        t_gen_helper_raise_exception(dc, EXCP_SUPERI);
++    }
++}
++
++/*
++ * Used as a placeholder for all instructions which do not have
++ * an effect on the simulator (e.g. flush, sync)
++ */
++static void nop(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    /* Nothing to do here */
++}
++
++/*
++ * J-Type instructions
++ */
++static void jmpi(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    J_TYPE(instr, code);
++    gen_goto_tb(dc, 0, (dc->pc & 0xF0000000) | (instr.imm26 << 2));
++    dc->is_jmp = DISAS_TB_JUMP;
++}
++
++static void call(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    tcg_gen_movi_tl(dc->cpu_R[R_RA], dc->pc + 4);
++    jmpi(dc, code, flags);
++}
++
++/*
++ * I-Type instructions
++ */
++/* Load instructions */
++static void gen_ldx(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    I_TYPE(instr, code);
++
++    TCGv addr = tcg_temp_new();
++    TCGv data;
++
++    /*
++     * WARNING: Loads into R_ZERO are ignored, but we must generate the
++     *          memory access itself to emulate the CPU precisely. Load
++     *          from a protected page to R_ZERO will cause SIGSEGV on
++     *          the Nios2 CPU.
++     */
++    if (likely(instr.b != R_ZERO)) {
++        data = dc->cpu_R[instr.b];
++    } else {
++        data = tcg_temp_new();
++    }
++
++    tcg_gen_addi_tl(addr, load_gpr(dc, instr.a), instr.imm16s);
++    tcg_gen_qemu_ld_tl(data, addr, dc->mem_idx, flags);
++
++    if (unlikely(instr.b == R_ZERO)) {
++        tcg_temp_free(data);
++    }
++
++    tcg_temp_free(addr);
++}
++
++/* Store instructions */
++static void gen_stx(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    I_TYPE(instr, code);
++    TCGv val = load_gpr(dc, instr.b);
++
++    TCGv addr = tcg_temp_new();
++    tcg_gen_addi_tl(addr, load_gpr(dc, instr.a), instr.imm16s);
++    tcg_gen_qemu_st_tl(val, addr, dc->mem_idx, flags);
++    tcg_temp_free(addr);
++}
++
++/* Branch instructions */
++static void br(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    I_TYPE(instr, code);
++
++    gen_goto_tb(dc, 0, dc->pc + 4 + (instr.imm16s & -4));
++    dc->is_jmp = DISAS_TB_JUMP;
++}
++
++static void gen_bxx(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    I_TYPE(instr, code);
++
++    TCGLabel *l1 = gen_new_label();
++    tcg_gen_brcond_tl(flags, dc->cpu_R[instr.a], dc->cpu_R[instr.b], l1);
++    gen_goto_tb(dc, 0, dc->pc + 4);
++    gen_set_label(l1);
++    gen_goto_tb(dc, 1, dc->pc + 4 + (instr.imm16s & -4));
++    dc->is_jmp = DISAS_TB_JUMP;
++}
++
++/* Comparison instructions */
++#define gen_i_cmpxx(fname, op3)                                              \
++static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)         \
++{                                                                            \
++    I_TYPE(instr, (code));                                                   \
++    tcg_gen_setcondi_tl(flags, (dc)->cpu_R[instr.b], (dc)->cpu_R[instr.a],   \
++                        (op3));                                              \
++}
++
++gen_i_cmpxx(gen_cmpxxsi, instr.imm16s)
++gen_i_cmpxx(gen_cmpxxui, instr.imm16)
++
++/* Math/logic instructions */
++#define gen_i_math_logic(fname, insn, resimm, op3)                          \
++static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)        \
++{                                                                           \
++    I_TYPE(instr, (code));                                                  \
++    if (unlikely(instr.b == R_ZERO)) { /* Store to R_ZERO is ignored */     \
++        return;                                                             \
++    } else if (instr.a == R_ZERO) { /* MOVxI optimizations */               \
++        tcg_gen_movi_tl(dc->cpu_R[instr.b], (resimm) ? (op3) : 0);          \
++    } else {                                                                \
++        tcg_gen_##insn##_tl((dc)->cpu_R[instr.b], (dc)->cpu_R[instr.a],     \
++                            (op3));                                         \
++    }                                                                       \
++}
++
++gen_i_math_logic(addi,  addi, 1, instr.imm16s)
++gen_i_math_logic(muli,  muli, 0, instr.imm16s)
++
++gen_i_math_logic(andi,  andi, 0, instr.imm16)
++gen_i_math_logic(ori,   ori,  1, instr.imm16)
++gen_i_math_logic(xori,  xori, 1, instr.imm16)
++
++gen_i_math_logic(andhi, andi, 0, instr.imm16 << 16)
++gen_i_math_logic(orhi , ori,  1, instr.imm16 << 16)
++gen_i_math_logic(xorhi, xori, 1, instr.imm16 << 16)
++
++/* Prototype only, defined below */
++static void handle_r_type_instr(DisasContext *dc, uint32_t code,
++                                uint32_t flags);
++
++static const Nios2Instruction i_type_instructions[] = {
++    INSTRUCTION(call),                                /* call */
++    INSTRUCTION(jmpi),                                /* jmpi */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_ldx, MO_UB),                  /* ldbu */
++    INSTRUCTION(addi),                                /* addi */
++    INSTRUCTION_FLG(gen_stx, MO_UB),                  /* stb */
++    INSTRUCTION(br),                                  /* br */
++    INSTRUCTION_FLG(gen_ldx, MO_SB),                  /* ldb */
++    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_GE),        /* cmpgei */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_ldx, MO_UW),                  /* ldhu */
++    INSTRUCTION(andi),                                /* andi */
++    INSTRUCTION_FLG(gen_stx, MO_UW),                  /* sth */
++    INSTRUCTION_FLG(gen_bxx, TCG_COND_GE),            /* bge */
++    INSTRUCTION_FLG(gen_ldx, MO_SW),                  /* ldh */
++    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_LT),        /* cmplti */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_NOP(),                                /* initda */
++    INSTRUCTION(ori),                                 /* ori */
++    INSTRUCTION_FLG(gen_stx, MO_UL),                  /* stw */
++    INSTRUCTION_FLG(gen_bxx, TCG_COND_LT),            /* blt */
++    INSTRUCTION_FLG(gen_ldx, MO_UL),                  /* ldw */
++    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_NE),        /* cmpnei */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_NOP(),                                /* flushda */
++    INSTRUCTION(xori),                                /* xori */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_bxx, TCG_COND_NE),            /* bne */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_EQ),        /* cmpeqi */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_ldx, MO_UB),                  /* ldbuio */
++    INSTRUCTION(muli),                                /* muli */
++    INSTRUCTION_FLG(gen_stx, MO_UB),                  /* stbio */
++    INSTRUCTION_FLG(gen_bxx, TCG_COND_EQ),            /* beq */
++    INSTRUCTION_FLG(gen_ldx, MO_SB),                  /* ldbio */
++    INSTRUCTION_FLG(gen_cmpxxui, TCG_COND_GEU),       /* cmpgeui */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_ldx, MO_UW),                  /* ldhuio */
++    INSTRUCTION(andhi),                               /* andhi */
++    INSTRUCTION_FLG(gen_stx, MO_UW),                  /* sthio */
++    INSTRUCTION_FLG(gen_bxx, TCG_COND_GEU),           /* bgeu */
++    INSTRUCTION_FLG(gen_ldx, MO_SW),                  /* ldhio */
++    INSTRUCTION_FLG(gen_cmpxxui, TCG_COND_LTU),       /* cmpltui */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_UNIMPLEMENTED(),                      /* custom */
++    INSTRUCTION_NOP(),                                /* initd */
++    INSTRUCTION(orhi),                                /* orhi */
++    INSTRUCTION_FLG(gen_stx, MO_SL),                  /* stwio */
++    INSTRUCTION_FLG(gen_bxx, TCG_COND_LTU),           /* bltu */
++    INSTRUCTION_FLG(gen_ldx, MO_UL),                  /* ldwio */
++    INSTRUCTION_UNIMPLEMENTED(),                      /* rdprs */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(handle_r_type_instr, 0),          /* R-Type */
++    INSTRUCTION_NOP(),                                /* flushd */
++    INSTRUCTION(xorhi),                               /* xorhi */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++};
++
++/*
++ * R-Type instructions
++ */
++/*
++ * status <- estatus
++ * PC <- ea
++ */
++static void eret(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    tcg_gen_mov_tl(dc->cpu_R[CR_STATUS], dc->cpu_R[CR_ESTATUS]);
++    tcg_gen_mov_tl(dc->cpu_R[R_PC], dc->cpu_R[R_EA]);
++
++    dc->is_jmp = DISAS_JUMP;
++}
++
++/* PC <- ra */
++static void ret(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    tcg_gen_mov_tl(dc->cpu_R[R_PC], dc->cpu_R[R_RA]);
++
++    dc->is_jmp = DISAS_JUMP;
++}
++
++/* PC <- ba */
++static void bret(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    tcg_gen_mov_tl(dc->cpu_R[R_PC], dc->cpu_R[R_BA]);
++
++    dc->is_jmp = DISAS_JUMP;
++}
++
++/* PC <- rA */
++static void jmp(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    R_TYPE(instr, code);
++
++    tcg_gen_mov_tl(dc->cpu_R[R_PC], load_gpr(dc, instr.a));
++
++    dc->is_jmp = DISAS_JUMP;
++}
++
++/* rC <- PC + 4 */
++static void nextpc(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    R_TYPE(instr, code);
++
++    if (likely(instr.c != R_ZERO)) {
++        tcg_gen_movi_tl(dc->cpu_R[instr.c], dc->pc + 4);
++    }
++}
++
++/*
++ * ra <- PC + 4
++ * PC <- rA
++ */
++static void callr(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    R_TYPE(instr, code);
++
++    tcg_gen_mov_tl(dc->cpu_R[R_PC], load_gpr(dc, instr.a));
++    tcg_gen_movi_tl(dc->cpu_R[R_RA], dc->pc + 4);
++
++    dc->is_jmp = DISAS_JUMP;
++}
++
++/* rC <- ctlN */
++static void rdctl(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    R_TYPE(instr, code);
++
++    gen_check_supervisor(dc);
++
++    switch (instr.imm5 + 32) {
++    case CR_PTEADDR:
++    case CR_TLBACC:
++    case CR_TLBMISC:
++    {
++#if !defined(CONFIG_USER_ONLY)
++        if (likely(instr.c != R_ZERO)) {
++            tcg_gen_mov_tl(dc->cpu_R[instr.c], dc->cpu_R[instr.imm5 + 32]);
++#ifdef DEBUG_MMU
++            TCGv_i32 tmp = tcg_const_i32(instr.imm5 + 32);
++            gen_helper_mmu_read_debug(dc->cpu_R[instr.c], dc->cpu_env, tmp);
++            tcg_temp_free_i32(tmp);
++#endif
++        }
++#endif
++        break;
++    }
++
++    default:
++        if (likely(instr.c != R_ZERO)) {
++            tcg_gen_mov_tl(dc->cpu_R[instr.c], dc->cpu_R[instr.imm5 + 32]);
++        }
++        break;
++    }
++}
++
++/* ctlN <- rA */
++static void wrctl(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    R_TYPE(instr, code);
++
++    gen_check_supervisor(dc);
++
++    switch (instr.imm5 + 32) {
++    case CR_PTEADDR:
++    case CR_TLBACC:
++    case CR_TLBMISC:
++    {
++#if !defined(CONFIG_USER_ONLY)
++        TCGv_i32 tmp = tcg_const_i32(instr.imm5 + 32);
++        gen_helper_mmu_write(dc->cpu_env, tmp, load_gpr(dc, instr.a));
++        tcg_temp_free_i32(tmp);
++#endif
++        break;
++    }
++
++    default:
++        tcg_gen_mov_tl(dc->cpu_R[instr.imm5 + 32], load_gpr(dc, instr.a));
++        break;
++    }
++
++    /* If interrupts were enabled using WRCTL, trigger them. */
++#if !defined(CONFIG_USER_ONLY)
++    if ((instr.imm5 + 32) == CR_STATUS) {
++        gen_helper_check_interrupts(dc->cpu_env);
++    }
++#endif
++}
++
++/* Comparison instructions */
++static void gen_cmpxx(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    R_TYPE(instr, code);
++    if (likely(instr.c != R_ZERO)) {
++        tcg_gen_setcond_tl(flags, dc->cpu_R[instr.c], dc->cpu_R[instr.a],
++                           dc->cpu_R[instr.b]);
++    }
++}
++
++/* Math/logic instructions */
++#define gen_r_math_logic(fname, insn, op3)                                 \
++static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)       \
++{                                                                          \
++    R_TYPE(instr, (code));                                                 \
++    if (likely(instr.c != R_ZERO)) {                                       \
++        tcg_gen_##insn((dc)->cpu_R[instr.c], load_gpr((dc), instr.a),      \
++                       (op3));                                             \
++    }                                                                      \
++}
++
++gen_r_math_logic(add,  add_tl,   load_gpr(dc, instr.b))
++gen_r_math_logic(sub,  sub_tl,   load_gpr(dc, instr.b))
++gen_r_math_logic(mul,  mul_tl,   load_gpr(dc, instr.b))
++
++gen_r_math_logic(and,  and_tl,   load_gpr(dc, instr.b))
++gen_r_math_logic(or,   or_tl,    load_gpr(dc, instr.b))
++gen_r_math_logic(xor,  xor_tl,   load_gpr(dc, instr.b))
++gen_r_math_logic(nor,  nor_tl,   load_gpr(dc, instr.b))
++
++gen_r_math_logic(srai, sari_tl,  instr.imm5)
++gen_r_math_logic(srli, shri_tl,  instr.imm5)
++gen_r_math_logic(slli, shli_tl,  instr.imm5)
++gen_r_math_logic(roli, rotli_tl, instr.imm5)
++
++#define gen_r_mul(fname, insn)                                         \
++static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)   \
++{                                                                      \
++    R_TYPE(instr, (code));                                             \
++    if (likely(instr.c != R_ZERO)) {                                   \
++        TCGv t0 = tcg_temp_new();                                      \
++        tcg_gen_##insn(t0, dc->cpu_R[instr.c],                         \
++                       load_gpr(dc, instr.a), load_gpr(dc, instr.b)); \
++        tcg_temp_free(t0);                                             \
++    }                                                                  \
++}
++
++gen_r_mul(mulxss, muls2_tl)
++gen_r_mul(mulxuu, mulu2_tl)
++gen_r_mul(mulxsu, mulsu2_tl)
++
++#define gen_r_shift_s(fname, insn)                                         \
++static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)       \
++{                                                                          \
++    R_TYPE(instr, (code));                                                 \
++    if (likely(instr.c != R_ZERO)) {                                       \
++        TCGv t0 = tcg_temp_new();                                          \
++        tcg_gen_andi_tl(t0, load_gpr((dc), instr.b), 31);                  \
++        tcg_gen_##insn((dc)->cpu_R[instr.c], load_gpr((dc), instr.a), t0); \
++        tcg_temp_free(t0);                                                 \
++    }                                                                      \
++}
++
++gen_r_shift_s(sra, sar_tl)
++gen_r_shift_s(srl, shr_tl)
++gen_r_shift_s(sll, shl_tl)
++gen_r_shift_s(rol, rotl_tl)
++gen_r_shift_s(ror, rotr_tl)
++
++static void divs(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    R_TYPE(instr, (code));
++
++    /* Stores into R_ZERO are ignored */
++    if (unlikely(instr.c == R_ZERO)) {
++        return;
++    }
++
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv t2 = tcg_temp_new();
++    TCGv t3 = tcg_temp_new();
++
++    tcg_gen_ext32s_tl(t0, load_gpr(dc, instr.a));
++    tcg_gen_ext32s_tl(t1, load_gpr(dc, instr.b));
++    tcg_gen_setcondi_tl(TCG_COND_EQ, t2, t0, INT_MIN);
++    tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, -1);
++    tcg_gen_and_tl(t2, t2, t3);
++    tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, 0);
++    tcg_gen_or_tl(t2, t2, t3);
++    tcg_gen_movi_tl(t3, 0);
++    tcg_gen_movcond_tl(TCG_COND_NE, t1, t2, t3, t2, t1);
++    tcg_gen_div_tl(dc->cpu_R[instr.c], t0, t1);
++    tcg_gen_ext32s_tl(dc->cpu_R[instr.c], dc->cpu_R[instr.c]);
++
++    tcg_temp_free(t3);
++    tcg_temp_free(t2);
++    tcg_temp_free(t1);
++    tcg_temp_free(t0);
++}
++
++static void divu(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    R_TYPE(instr, (code));
++
++    /* Stores into R_ZERO are ignored */
++    if (unlikely(instr.c == R_ZERO)) {
++        return;
++    }
++
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv t2 = tcg_const_tl(0);
++    TCGv t3 = tcg_const_tl(1);
++
++    tcg_gen_ext32u_tl(t0, load_gpr(dc, instr.a));
++    tcg_gen_ext32u_tl(t1, load_gpr(dc, instr.b));
++    tcg_gen_movcond_tl(TCG_COND_EQ, t1, t1, t2, t3, t1);
++    tcg_gen_divu_tl(dc->cpu_R[instr.c], t0, t1);
++    tcg_gen_ext32s_tl(dc->cpu_R[instr.c], dc->cpu_R[instr.c]);
++
++    tcg_temp_free(t3);
++    tcg_temp_free(t2);
++    tcg_temp_free(t1);
++    tcg_temp_free(t0);
++}
++
++static const Nios2Instruction r_type_instructions[] = {
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION(eret),                                /* eret */
++    INSTRUCTION(roli),                                /* roli */
++    INSTRUCTION(rol),                                 /* rol */
++    INSTRUCTION_NOP(),                                /* flushp */
++    INSTRUCTION(ret),                                 /* ret */
++    INSTRUCTION(nor),                                 /* nor */
++    INSTRUCTION(mulxuu),                              /* mulxuu */
++    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_GE),          /* cmpge */
++    INSTRUCTION(bret),                                /* bret */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION(ror),                                 /* ror */
++    INSTRUCTION_NOP(),                                /* flushi */
++    INSTRUCTION(jmp),                                 /* jmp */
++    INSTRUCTION(and),                                 /* and */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_LT),          /* cmplt */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION(slli),                                /* slli */
++    INSTRUCTION(sll),                                 /* sll */
++    INSTRUCTION_UNIMPLEMENTED(),                      /* wrprs */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION(or),                                  /* or */
++    INSTRUCTION(mulxsu),                              /* mulxsu */
++    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_NE),          /* cmpne */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION(srli),                                /* srli */
++    INSTRUCTION(srl),                                 /* srl */
++    INSTRUCTION(nextpc),                              /* nextpc */
++    INSTRUCTION(callr),                               /* callr */
++    INSTRUCTION(xor),                                 /* xor */
++    INSTRUCTION(mulxss),                              /* mulxss */
++    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_EQ),          /* cmpeq */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION(divu),                                /* divu */
++    INSTRUCTION(divs),                                /* div */
++    INSTRUCTION(rdctl),                               /* rdctl */
++    INSTRUCTION(mul),                                 /* mul */
++    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_GEU),         /* cmpgeu */
++    INSTRUCTION_NOP(),                                /* initi */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_excp, EXCP_TRAP),             /* trap */
++    INSTRUCTION(wrctl),                               /* wrctl */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_LTU),         /* cmpltu */
++    INSTRUCTION(add),                                 /* add */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_FLG(gen_excp, EXCP_BREAK),            /* break */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION(nop),                                 /* nop */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION(sub),                                 /* sub */
++    INSTRUCTION(srai),                                /* srai */
++    INSTRUCTION(sra),                                 /* sra */
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++    INSTRUCTION_ILLEGAL(),
++};
++
++static void handle_r_type_instr(DisasContext *dc, uint32_t code, uint32_t flags)
++{
++    uint8_t opx;
++    const Nios2Instruction *instr;
++
++    opx = get_opxcode(code);
++    if (unlikely(opx >= ARRAY_SIZE(r_type_instructions))) {
++        goto illegal_op;
++    }
++
++    instr = &r_type_instructions[opx];
++    instr->handler(dc, code, instr->flags);
++
++    return;
++
++illegal_op:
++    t_gen_helper_raise_exception(dc, EXCP_ILLEGAL);
++}
++
++static void handle_instruction(DisasContext *dc, CPUNios2State *env)
++{
++    uint32_t code;
++    uint8_t op;
++    const Nios2Instruction *instr;
++#if defined(CONFIG_USER_ONLY)
++    /* FIXME: Is this needed ? */
++    if (dc->pc >= 0x1000 && dc->pc < 0x2000) {
++        env->regs[R_PC] = dc->pc;
++        t_gen_helper_raise_exception(dc, 0xaa);
++        return;
++    }
++#endif
++    code = cpu_ldl_code(env, dc->pc);
++    op = get_opcode(code);
++
++    if (unlikely(op >= ARRAY_SIZE(i_type_instructions))) {
++        goto illegal_op;
++    }
++
++    TCGV_UNUSED_I32(dc->zero);
++
++    instr = &i_type_instructions[op];
++    instr->handler(dc, code, instr->flags);
++
++    if (!TCGV_IS_UNUSED_I32(dc->zero)) {
++        tcg_temp_free(dc->zero);
++    }
++
++    return;
++
++illegal_op:
++    t_gen_helper_raise_exception(dc, EXCP_ILLEGAL);
++}
++
++static const char *regnames[] = {
++    "zero",     "at",       "r2",       "r3",
++    "r4",       "r5",       "r6",       "r7",
++    "r8",       "r9",       "r10",      "r11",
++    "r12",      "r13",      "r14",      "r15",
++    "r16",      "r17",      "r18",      "r19",
++    "r20",      "r21",      "r22",      "r23",
++    "et",       "bt",       "gp",       "sp",
++    "fp",       "ea",       "ba",       "ra",
++    "status",   "estatus",  "bstatus",  "ienable",
++    "ipending", "cpuid",    "reserved", "exception",
++    "pteaddr",  "tlbacc",   "tlbmisc",  "reserved",
++    "badaddr",  "config",   "mpubase",  "mpuacc",
++    "reserved", "reserved", "reserved", "reserved",
++    "reserved", "reserved", "reserved", "reserved",
++    "reserved", "reserved", "reserved", "reserved",
++    "reserved", "reserved", "reserved", "reserved",
++    "rpc"
++};
++
++static TCGv_ptr cpu_env;
++static TCGv cpu_R[NUM_CORE_REGS];
++
++#include "exec/gen-icount.h"
++
++static void gen_exception(DisasContext *dc, uint32_t excp)
++{
++    TCGv_i32 tmp = tcg_const_i32(excp);
++
++    tcg_gen_movi_tl(cpu_R[R_PC], dc->pc);
++    gen_helper_raise_exception(cpu_env, tmp);
++    tcg_temp_free_i32(tmp);
++    dc->is_jmp = DISAS_UPDATE;
++}
++
++/* generate intermediate code for basic block 'tb'.  */
++void gen_intermediate_code(CPUNios2State *env, TranslationBlock *tb)
++{
++    Nios2CPU *cpu = nios2_env_get_cpu(env);
++    CPUState *cs = CPU(cpu);
++    DisasContext dc1, *dc = &dc1;
++    int num_insns;
++    int max_insns;
++
++    /* Initialize DC */
++    dc->cpu_env = cpu_env;
++    dc->cpu_R   = cpu_R;
++    dc->is_jmp  = DISAS_NEXT;
++    dc->pc      = tb->pc;
++    dc->tb      = tb;
++    dc->mem_idx = cpu_mmu_index(env, false);
++    dc->singlestep_enabled = cs->singlestep_enabled;
++
++    /* Set up instruction counts */
++    num_insns = 0;
++    if (cs->singlestep_enabled || singlestep) {
++        max_insns = 1;
++    } else {
++        int page_insns = (TARGET_PAGE_SIZE - (tb->pc & TARGET_PAGE_MASK)) / 4;
++        max_insns = tb->cflags & CF_COUNT_MASK;
++        if (max_insns == 0) {
++            max_insns = CF_COUNT_MASK;
++        }
++        if (max_insns > page_insns) {
++            max_insns = page_insns;
++        }
++        if (max_insns > TCG_MAX_INSNS) {
++            max_insns = TCG_MAX_INSNS;
++        }
++    }
++
++    gen_tb_start(tb);
++    do {
++        tcg_gen_insn_start(dc->pc);
++        num_insns++;
++
++        if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
++            gen_exception(dc, EXCP_DEBUG);
++            /* The address covered by the breakpoint must be included in
++               [tb->pc, tb->pc + tb->size) in order to for it to be
++               properly cleared -- thus we increment the PC here so that
++               the logic setting tb->size below does the right thing.  */
++            dc->pc += 4;
++            break;
++        }
++
++        if (num_insns + 1 == max_insns && (tb->cflags & CF_LAST_IO)) {
++            gen_io_start();
++        }
++
++        /* Decode an instruction */
++        handle_instruction(dc, env);
++
++        dc->pc += 4;
++
++        /* Translation stops when a conditional branch is encountered.
++         * Otherwise the subsequent code could get translated several times.
++         * Also stop translation when a page boundary is reached.  This
++         * ensures prefetch aborts occur at the right place.  */
++    } while (!dc->is_jmp &&
++             !tcg_op_buf_full() &&
++             num_insns < max_insns);
++
++    if (tb->cflags & CF_LAST_IO) {
++        gen_io_end();
++    }
++
++    /* Indicate where the next block should start */
++    switch (dc->is_jmp) {
++    case DISAS_NEXT:
++        /* Save the current PC back into the CPU register */
++        tcg_gen_movi_tl(cpu_R[R_PC], dc->pc);
++        tcg_gen_exit_tb(0);
++        break;
++
++    default:
++    case DISAS_JUMP:
++    case DISAS_UPDATE:
++        /* The jump will already have updated the PC register */
++        tcg_gen_exit_tb(0);
++        break;
++
++    case DISAS_TB_JUMP:
++        /* nothing more to generate */
++        break;
++    }
++
++    /* End off the block */
++    gen_tb_end(tb, num_insns);
++
++    /* Mark instruction starts for the final generated instruction */
++    tb->size = dc->pc - tb->pc;
++    tb->icount = num_insns;
++
++#ifdef DEBUG_DISAS
++    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
++        && qemu_log_in_addr_range(tb->pc)) {
++        qemu_log("IN: %s\n", lookup_symbol(tb->pc));
++        log_target_disas(cs, tb->pc, dc->pc - tb->pc, 0);
++        qemu_log("\n");
++    }
++#endif
++}
++
++void nios2_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
++                          int flags)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++    int i;
++
++    if (!env || !f) {
++        return;
++    }
++
++    cpu_fprintf(f, "IN: PC=%x %s\n",
++                env->regs[R_PC], lookup_symbol(env->regs[R_PC]));
++
++    for (i = 0; i < NUM_CORE_REGS; i++) {
++        cpu_fprintf(f, "%9s=%8.8x ", regnames[i], env->regs[i]);
++        if ((i + 1) % 4 == 0) {
++            cpu_fprintf(f, "\n");
++        }
++    }
++#if !defined(CONFIG_USER_ONLY)
++    cpu_fprintf(f, " mmu write: VPN=%05X PID %02X TLBACC %08X\n",
++                env->mmu.pteaddr_wr & CR_PTEADDR_VPN_MASK,
++                (env->mmu.tlbmisc_wr & CR_TLBMISC_PID_MASK) >> 4,
++                env->mmu.tlbacc_wr);
++#endif
++    cpu_fprintf(f, "\n\n");
++}
++
++void nios2_tcg_init(void)
 +{
 +    int i;
 +
-+    (*regs)[0] = -1;
-+    for (i = 1; i < 8; i++)    /* r0-r7 */
-+        (*regs)[i] = tswapreg(env->regs[i + 7]);
++    cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
 +
-+    for (i = 8; i < 16; i++)   /* r8-r15 */
-+        (*regs)[i] = tswapreg(env->regs[i - 8]);
-+
-+    for (i = 16; i < 24; i++)  /* r16-r23 */
-+        (*regs)[i] = tswapreg(env->regs[i + 7]);
-+    (*regs)[24] = -1;    /* R_ET */
-+    (*regs)[25] = -1;    /* R_BT */
-+    (*regs)[26] = tswapreg(env->regs[R_GP]);
-+    (*regs)[27] = tswapreg(env->regs[R_SP]);
-+    (*regs)[28] = tswapreg(env->regs[R_FP]);
-+    (*regs)[29] = tswapreg(env->regs[R_EA]);
-+    (*regs)[30] = -1;    /* R_SSTATUS */
-+    (*regs)[31] = tswapreg(env->regs[R_RA]);
-+
-+    (*regs)[32] = tswapreg(env->regs[R_PC]);
-+
-+    (*regs)[33] = -1; /* R_STATUS */
-+    (*regs)[34] = tswapreg(env->regs[CR_ESTATUS]);
-+
-+    for (i = 35; i < 49; i++)    /* ... */
-+        (*regs)[i] = -1;
++    for (i = 0; i < NUM_CORE_REGS; i++) {
++        cpu_R[i] = tcg_global_mem_new(cpu_env,
++                                      offsetof(CPUNios2State, regs[i]),
++                                      regnames[i]);
++    }
 +}
 +
-+#endif /* TARGET_NIOS2 */
-+
- #ifdef TARGET_OPENRISC
- 
- #define ELF_START_MMAP 0x08000000
-diff --git a/linux-user/main.c b/linux-user/main.c
-index c1d5eb4d6f..32b71151dd 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -68,8 +68,11 @@ do {                                                                    \
-  * This way we will never overlap with our own libraries or binaries or stack
-  * or anything else that QEMU maps.
-  */
--# ifdef TARGET_MIPS
--/* MIPS only supports 31 bits of virtual address space for user space */
-+# if defined(TARGET_MIPS) || defined(TARGET_NIOS2)
-+/*
-+ * MIPS only supports 31 bits of virtual address space for user space.
-+ * Nios2 also only supports 31 bits.
-+ */
- unsigned long reserved_va = 0x77000000;
- # else
- unsigned long reserved_va = 0xf7000000;
-@@ -2462,6 +2465,109 @@ error:
- }
- #endif
- 
-+#ifdef TARGET_NIOS2
-+
-+void cpu_loop(CPUNios2State *env)
++void restore_state_to_opc(CPUNios2State *env, TranslationBlock *tb,
++                          target_ulong *data)
 +{
-+    CPUState *cs = ENV_GET_CPU(env);
-+    Nios2CPU *cpu = NIOS2_CPU(cs);
-+    target_siginfo_t info;
-+    int trapnr, gdbsig, ret;
-+
-+    for (;;) {
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        gdbsig = 0;
-+
-+        switch (trapnr) {
-+        case EXCP_INTERRUPT:
-+            /* just indicate that signals should be handled asap */
-+            break;
-+        case EXCP_TRAP:
-+            if (env->regs[R_AT] == 0) {
-+                abi_long ret;
-+                qemu_log_mask(CPU_LOG_INT, "\nSyscall\n");
-+
-+                ret = do_syscall(env, env->regs[2],
-+                                 env->regs[4], env->regs[5], env->regs[6],
-+                                 env->regs[7], env->regs[8], env->regs[9],
-+                                 0, 0);
-+
-+                if (env->regs[2] == 0) {    /* FIXME: syscall 0 workaround */
-+                    ret = 0;
-+                }
-+
-+                env->regs[2] = abs(ret);
-+                /* Return value is 0..4096 */
-+                env->regs[7] = (ret > 0xfffffffffffff000ULL);
-+                env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
-+                env->regs[CR_STATUS] &= ~0x3;
-+                env->regs[R_EA] = env->regs[R_PC] + 4;
-+                env->regs[R_PC] += 4;
-+                break;
-+            } else {
-+                qemu_log_mask(CPU_LOG_INT, "\nTrap\n");
-+
-+                env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
-+                env->regs[CR_STATUS] &= ~0x3;
-+                env->regs[R_EA] = env->regs[R_PC] + 4;
-+                env->regs[R_PC] = cpu->exception_addr;
-+
-+                gdbsig = TARGET_SIGTRAP;
-+                break;
-+            }
-+        case 0xaa:
-+            switch (env->regs[R_PC]) {
-+            /*case 0x1000:*/  /* TODO:__kuser_helper_version */
-+            case 0x1004:      /* __kuser_cmpxchg */
-+                start_exclusive();
-+                if (env->regs[4] & 0x3) {
-+                    goto kuser_fail;
-+                }
-+                ret = get_user_u32(env->regs[2], env->regs[4]);
-+                if (ret) {
-+                    end_exclusive();
-+                    goto kuser_fail;
-+                }
-+                env->regs[2] -= env->regs[5];
-+                if (env->regs[2] == 0) {
-+                    put_user_u32(env->regs[6], env->regs[4]);
-+                }
-+                end_exclusive();
-+                env->regs[R_PC] = env->regs[R_RA];
-+                break;
-+            /*case 0x1040:*/  /* TODO:__kuser_sigtramp */
-+            default:
-+                ;
-+kuser_fail:
-+                info.si_signo = TARGET_SIGSEGV;
-+                info.si_errno = 0;
-+                /* TODO: check env->error_code */
-+                info.si_code = TARGET_SEGV_MAPERR;
-+                info._sifields._sigfault._addr = env->regs[R_PC];
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            }
-+            break;
-+        default:
-+            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
-+                     trapnr);
-+            gdbsig = TARGET_SIGILL;
-+            break;
-+        }
-+        if (gdbsig) {
-+            gdb_handlesig(cs, gdbsig);
-+            if (gdbsig != TARGET_SIGTRAP) {
-+                exit(EXIT_FAILURE);
-+            }
-+        }
-+
-+        process_pending_signals(env);
-+    }
++    env->regs[R_PC] = data[0];
 +}
-+
-+#endif /* TARGET_NIOS2 */
-+
- #ifdef TARGET_OPENRISC
- 
- void cpu_loop(CPUOpenRISCState *env)
-@@ -4468,6 +4574,36 @@ int main(int argc, char **argv, char **envp)
-             restore_snan_bit_mode(env);
-         }
-     }
-+#elif defined(TARGET_NIOS2)
-+    {
-+        env->regs[0] = 0;
-+        env->regs[1] = regs->r1;
-+        env->regs[2] = regs->r2;
-+        env->regs[3] = regs->r3;
-+        env->regs[4] = regs->r4;
-+        env->regs[5] = regs->r5;
-+        env->regs[6] = regs->r6;
-+        env->regs[7] = regs->r7;
-+        env->regs[8] = regs->r8;
-+        env->regs[9] = regs->r9;
-+        env->regs[10] = regs->r10;
-+        env->regs[11] = regs->r11;
-+        env->regs[12] = regs->r12;
-+        env->regs[13] = regs->r13;
-+        env->regs[14] = regs->r14;
-+        env->regs[15] = regs->r15;
-+        /* TODO: unsigned long  orig_r2; */
-+        env->regs[R_RA] = regs->ra;
-+        env->regs[R_FP] = regs->fp;
-+        env->regs[R_SP] = regs->sp;
-+        env->regs[R_GP] = regs->gp;
-+        env->regs[CR_ESTATUS] = regs->estatus;
-+        env->regs[R_EA] = regs->ea;
-+        /* TODO: unsigned long  orig_r7; */
-+
-+        /* Emulate eret when starting thread. */
-+        env->regs[R_PC] = regs->ea;
-+    }
- #elif defined(TARGET_OPENRISC)
-     {
-         int i;
-diff --git a/linux-user/nios2/syscall_nr.h b/linux-user/nios2/syscall_nr.h
-new file mode 100644
-index 0000000000..8b46763673
---- /dev/null
-+++ b/linux-user/nios2/syscall_nr.h
-@@ -0,0 +1,329 @@
-+#define TARGET_NR_io_setup                  0
-+#define TARGET_NR_io_destroy                1
-+#define TARGET_NR_io_submit                 2
-+#define TARGET_NR_io_cancel                 3
-+#define TARGET_NR_io_getevents              4
-+#define TARGET_NR_setxattr                  5
-+#define TARGET_NR_lsetxattr                 6
-+#define TARGET_NR_fsetxattr                 7
-+#define TARGET_NR_getxattr                  8
-+#define TARGET_NR_lgetxattr                 9
-+#define TARGET_NR_fgetxattr                 10
-+#define TARGET_NR_listxattr                 11
-+#define TARGET_NR_llistxattr                12
-+#define TARGET_NR_flistxattr                13
-+#define TARGET_NR_removexattr               14
-+#define TARGET_NR_lremovexattr              15
-+#define TARGET_NR_fremovexattr              16
-+#define TARGET_NR_getcwd                    17
-+#define TARGET_NR_lookup_dcookie            18
-+#define TARGET_NR_eventfd2                  19
-+#define TARGET_NR_epoll_create1             20
-+#define TARGET_NR_epoll_ctl                 21
-+#define TARGET_NR_epoll_pwait               22
-+#define TARGET_NR_dup                       23
-+#define TARGET_NR_dup3                      24
-+#define TARGET_NR_fcntl64                   25
-+#define TARGET_NR_inotify_init1             26
-+#define TARGET_NR_inotify_add_watch         27
-+#define TARGET_NR_inotify_rm_watch          28
-+#define TARGET_NR_ioctl                     29
-+#define TARGET_NR_ioprio_set                30
-+#define TARGET_NR_ioprio_get                31
-+#define TARGET_NR_flock                     32
-+#define TARGET_NR_mknodat                   33
-+#define TARGET_NR_mkdirat                   34
-+#define TARGET_NR_unlinkat                  35
-+#define TARGET_NR_symlinkat                 36
-+#define TARGET_NR_linkat                    37
-+#define TARGET_NR_renameat                  38
-+#define TARGET_NR_umount2                   39
-+#define TARGET_NR_mount                     40
-+#define TARGET_NR_pivot_root                41
-+#define TARGET_NR_nfsservctl                42
-+#define TARGET_NR_statfs64                  43
-+#define TARGET_NR_fstatfs64                 44
-+#define TARGET_NR_truncate64                45
-+#define TARGET_NR_ftruncate64               46
-+#define TARGET_NR_fallocate                 47
-+#define TARGET_NR_faccessat                 48
-+#define TARGET_NR_chdir                     49
-+#define TARGET_NR_fchdir                    50
-+#define TARGET_NR_chroot                    51
-+#define TARGET_NR_fchmod                    52
-+#define TARGET_NR_fchmodat                  53
-+#define TARGET_NR_fchownat                  54
-+#define TARGET_NR_fchown                    55
-+#define TARGET_NR_openat                    56
-+#define TARGET_NR_close                     57
-+#define TARGET_NR_vhangup                   58
-+#define TARGET_NR_pipe2                     59
-+#define TARGET_NR_quotactl                  60
-+#define TARGET_NR_getdents64                61
-+#define TARGET_NR_read                      63
-+#define TARGET_NR_write                     64
-+#define TARGET_NR_readv                     65
-+#define TARGET_NR_writev                    66
-+#define TARGET_NR_pread64                   67
-+#define TARGET_NR_pwrite64                  68
-+#define TARGET_NR_preadv                    69
-+#define TARGET_NR_pwritev                   70
-+#define TARGET_NR_sendfile64                71
-+#define TARGET_NR_pselect6                  72
-+#define TARGET_NR_ppoll                     73
-+#define TARGET_NR_signalfd4                 74
-+#define TARGET_NR_vmsplice                  75
-+#define TARGET_NR_splice                    76
-+#define TARGET_NR_tee                       77
-+#define TARGET_NR_readlinkat                78
-+#define TARGET_NR_fstatat64                 79
-+#define TARGET_NR_fstat64                   80
-+#define TARGET_NR_sync                      81
-+#define TARGET_NR_fsync                     82
-+#define TARGET_NR_fdatasync                 83
-+#define TARGET_NR_sync_file_range           84
-+#define TARGET_NR_timerfd_create            85
-+#define TARGET_NR_timerfd_settime           86
-+#define TARGET_NR_timerfd_gettime           87
-+#define TARGET_NR_utimensat                 88
-+#define TARGET_NR_acct                      89
-+#define TARGET_NR_capget                    90
-+#define TARGET_NR_capset                    91
-+#define TARGET_NR_personality               92
-+#define TARGET_NR_exit                      93
-+#define TARGET_NR_exit_group                94
-+#define TARGET_NR_waitid                    95
-+#define TARGET_NR_set_tid_address           96
-+#define TARGET_NR_unshare                   97
-+#define TARGET_NR_futex                     98
-+#define TARGET_NR_set_robust_list           99
-+#define TARGET_NR_get_robust_list           100
-+#define TARGET_NR_nanosleep                 101
-+#define TARGET_NR_getitimer                 102
-+#define TARGET_NR_setitimer                 103
-+#define TARGET_NR_kexec_load                104
-+#define TARGET_NR_init_module               105
-+#define TARGET_NR_delete_module             106
-+#define TARGET_NR_timer_create              107
-+#define TARGET_NR_timer_gettime             108
-+#define TARGET_NR_timer_getoverrun          109
-+#define TARGET_NR_timer_settime             110
-+#define TARGET_NR_timer_delete              111
-+#define TARGET_NR_clock_settime             112
-+#define TARGET_NR_clock_gettime             113
-+#define TARGET_NR_clock_getres              114
-+#define TARGET_NR_clock_nanosleep           115
-+#define TARGET_NR_syslog                    116
-+#define TARGET_NR_ptrace                    117
-+#define TARGET_NR_sched_setparam            118
-+#define TARGET_NR_sched_setscheduler        119
-+#define TARGET_NR_sched_getscheduler        120
-+#define TARGET_NR_sched_getparam            121
-+#define TARGET_NR_sched_setaffinity         122
-+#define TARGET_NR_sched_getaffinity         123
-+#define TARGET_NR_sched_yield               124
-+#define TARGET_NR_sched_get_priority_max    125
-+#define TARGET_NR_sched_get_priority_min    126
-+#define TARGET_NR_sched_rr_get_interval     127
-+#define TARGET_NR_restart_syscall           128
-+#define TARGET_NR_kill                      129
-+#define TARGET_NR_tkill                     130
-+#define TARGET_NR_tgkill                    131
-+#define TARGET_NR_sigaltstack               132
-+#define TARGET_NR_rt_sigsuspend             133
-+#define TARGET_NR_rt_sigaction              134
-+#define TARGET_NR_rt_sigprocmask            135
-+#define TARGET_NR_rt_sigpending             136
-+#define TARGET_NR_rt_sigtimedwait           137
-+#define TARGET_NR_rt_sigqueueinfo           138
-+#define TARGET_NR_rt_sigreturn              139
-+#define TARGET_NR_setpriority               140
-+#define TARGET_NR_getpriority               141
-+#define TARGET_NR_reboot                    142
-+#define TARGET_NR_setregid                  143
-+#define TARGET_NR_setgid                    144
-+#define TARGET_NR_setreuid                  145
-+#define TARGET_NR_setuid                    146
-+#define TARGET_NR_setresuid                 147
-+#define TARGET_NR_getresuid                 148
-+#define TARGET_NR_setresgid                 149
-+#define TARGET_NR_getresgid                 150
-+#define TARGET_NR_setfsuid                  151
-+#define TARGET_NR_setfsgid                  152
-+#define TARGET_NR_times                     153
-+#define TARGET_NR_setpgid                   154
-+#define TARGET_NR_getpgid                   155
-+#define TARGET_NR_getsid                    156
-+#define TARGET_NR_setsid                    157
-+#define TARGET_NR_getgroups                 158
-+#define TARGET_NR_setgroups                 159
-+#define TARGET_NR_uname                     160
-+#define TARGET_NR_sethostname               161
-+#define TARGET_NR_setdomainname             162
-+#define TARGET_NR_getrlimit                 163
-+#define TARGET_NR_setrlimit                 164
-+#define TARGET_NR_getrusage                 165
-+#define TARGET_NR_umask                     166
-+#define TARGET_NR_prctl                     167
-+#define TARGET_NR_getcpu                    168
-+#define TARGET_NR_gettimeofday              169
-+#define TARGET_NR_settimeofday              170
-+#define TARGET_NR_adjtimex                  171
-+#define TARGET_NR_getpid                    172
-+#define TARGET_NR_getppid                   173
-+#define TARGET_NR_getuid                    174
-+#define TARGET_NR_geteuid                   175
-+#define TARGET_NR_getgid                    176
-+#define TARGET_NR_getegid                   177
-+#define TARGET_NR_gettid                    178
-+#define TARGET_NR_sysinfo                   179
-+#define TARGET_NR_mq_open                   180
-+#define TARGET_NR_mq_unlink                 181
-+#define TARGET_NR_mq_timedsend              182
-+#define TARGET_NR_mq_timedreceive           183
-+#define TARGET_NR_mq_notify                 184
-+#define TARGET_NR_mq_getsetattr             185
-+#define TARGET_NR_msgget                    186
-+#define TARGET_NR_msgctl                    187
-+#define TARGET_NR_msgrcv                    188
-+#define TARGET_NR_msgsnd                    189
-+#define TARGET_NR_semget                    190
-+#define TARGET_NR_semctl                    191
-+#define TARGET_NR_semtimedop                192
-+#define TARGET_NR_semop                     193
-+#define TARGET_NR_shmget                    194
-+#define TARGET_NR_shmctl                    195
-+#define TARGET_NR_shmat                     196
-+#define TARGET_NR_shmdt                     197
-+#define TARGET_NR_socket                    198
-+#define TARGET_NR_socketpair                199
-+#define TARGET_NR_bind                      200
-+#define TARGET_NR_listen                    201
-+#define TARGET_NR_accept                    202
-+#define TARGET_NR_connect                   203
-+#define TARGET_NR_getsockname               204
-+#define TARGET_NR_getpeername               205
-+#define TARGET_NR_sendto                    206
-+#define TARGET_NR_recvfrom                  207
-+#define TARGET_NR_setsockopt                208
-+#define TARGET_NR_getsockopt                209
-+#define TARGET_NR_shutdown                  210
-+#define TARGET_NR_sendmsg                   211
-+#define TARGET_NR_recvmsg                   212
-+#define TARGET_NR_readahead                 213
-+#define TARGET_NR_brk                       214
-+#define TARGET_NR_munmap                    215
-+#define TARGET_NR_mremap                    216
-+#define TARGET_NR_add_key                   217
-+#define TARGET_NR_request_key               218
-+#define TARGET_NR_keyctl                    219
-+#define TARGET_NR_clone                     220
-+#define TARGET_NR_execve                    221
-+#define TARGET_NR_mmap2                     222
-+#define TARGET_NR_fadvise64_64              223
-+#define TARGET_NR_swapon                    224
-+#define TARGET_NR_swapoff                   225
-+#define TARGET_NR_mprotect                  226
-+#define TARGET_NR_msync                     227
-+#define TARGET_NR_mlock                     228
-+#define TARGET_NR_munlock                   229
-+#define TARGET_NR_mlockall                  230
-+#define TARGET_NR_munlockall                231
-+#define TARGET_NR_mincore                   232
-+#define TARGET_NR_madvise                   233
-+#define TARGET_NR_remap_file_pages          234
-+#define TARGET_NR_mbind                     235
-+#define TARGET_NR_get_mempolicy             236
-+#define TARGET_NR_set_mempolicy             237
-+#define TARGET_NR_migrate_pages             238
-+#define TARGET_NR_move_pages                239
-+#define TARGET_NR_rt_tgsigqueueinfo         240
-+#define TARGET_NR_perf_event_open           241
-+#define TARGET_NR_accept4                   242
-+#define TARGET_NR_recvmmsg                  243
-+#define TARGET_NR_cacheflush                244
-+#define TARGET_NR_arch_specific_syscall     244
-+#define TARGET_NR_wait4                     260
-+#define TARGET_NR_prlimit64                 261
-+#define TARGET_NR_fanotify_init             262
-+#define TARGET_NR_fanotify_mark             263
-+#define TARGET_NR_name_to_handle_at         264
-+#define TARGET_NR_open_by_handle_at         265
-+#define TARGET_NR_clock_adjtime             266
-+#define TARGET_NR_syncfs                    267
-+#define TARGET_NR_setns                     268
-+#define TARGET_NR_sendmmsg                  269
-+#define TARGET_NR_process_vm_readv          270
-+#define TARGET_NR_process_vm_writev         271
-+#define TARGET_NR_kcmp                      272
-+#define TARGET_NR_finit_module              273
-+#define TARGET_NR_sched_setattr             274
-+#define TARGET_NR_sched_getattr             275
-+#define TARGET_NR_renameat2                 276
-+#define TARGET_NR_seccomp                   277
-+#define TARGET_NR_getrandom                 278
-+#define TARGET_NR_memfd_create              279
-+#define TARGET_NR_bpf                       280
-+#define TARGET_NR_execveat                  281
-+#define TARGET_NR_userfaultfd               282
-+#define TARGET_NR_membarrier                283
-+#define TARGET_NR_mlock2                    284
-+#define TARGET_NR_copy_file_range           285
-+#define TARGET_NR_preadv2                   286
-+#define TARGET_NR_pwritev2                  287
-+#define TARGET_NR_open                      1024
-+#define TARGET_NR_link                      1025
-+#define TARGET_NR_unlink                    1026
-+#define TARGET_NR_mknod                     1027
-+#define TARGET_NR_chmod                     1028
-+#define TARGET_NR_chown                     1029
-+#define TARGET_NR_mkdir                     1030
-+#define TARGET_NR_rmdir                     1031
-+#define TARGET_NR_lchown                    1032
-+#define TARGET_NR_access                    1033
-+#define TARGET_NR_rename                    1034
-+#define TARGET_NR_readlink                  1035
-+#define TARGET_NR_symlink                   1036
-+#define TARGET_NR_utimes                    1037
-+#define TARGET_NR_3264_stat                 1038
-+#define TARGET_NR_3264_lstat                1039
-+#define TARGET_NR_pipe                      1040
-+#define TARGET_NR_dup2                      1041
-+#define TARGET_NR_epoll_create              1042
-+#define TARGET_NR_inotify_init              1043
-+#define TARGET_NR_eventfd                   1044
-+#define TARGET_NR_signalfd                  1045
-+#define TARGET_NR_sendfile                  1046
-+#define TARGET_NR_ftruncate                 1047
-+#define TARGET_NR_truncate                  1048
-+#define TARGET_NR_stat                      1049
-+#define TARGET_NR_lstat                     1050
-+#define TARGET_NR_fstat                     1051
-+#define TARGET_NR_fcntl                     1052
-+#define TARGET_NR_fadvise64                 1053
-+#define TARGET_NR_newfstatat                1054
-+#define TARGET_NR_fstatfs                   1055
-+#define TARGET_NR_statfs                    1056
-+#define TARGET_NR_lseek                     1057
-+#define TARGET_NR_mmap                      1058
-+#define TARGET_NR_alarm                     1059
-+#define TARGET_NR_getpgrp                   1060
-+#define TARGET_NR_pause                     1061
-+#define TARGET_NR_time                      1062
-+#define TARGET_NR_utime                     1063
-+#define TARGET_NR_creat                     1064
-+#define TARGET_NR_getdents                  1065
-+#define TARGET_NR_futimesat                 1066
-+#define TARGET_NR_select                    1067
-+#define TARGET_NR_poll                      1068
-+#define TARGET_NR_epoll_wait                1069
-+#define TARGET_NR_ustat                     1070
-+#define TARGET_NR_vfork                     1071
-+#define TARGET_NR_oldwait4                  1072
-+#define TARGET_NR_recv                      1073
-+#define TARGET_NR_send                      1074
-+#define TARGET_NR_bdflush                   1075
-+#define TARGET_NR_umount                    1076
-+#define TARGET_NR_uselib                    1077
-+#define TARGET_NR__sysctl                   1078
-+#define TARGET_NR_fork                      1079
-diff --git a/linux-user/nios2/target_cpu.h b/linux-user/nios2/target_cpu.h
-new file mode 100644
-index 0000000000..20ab4790a9
---- /dev/null
-+++ b/linux-user/nios2/target_cpu.h
-@@ -0,0 +1,39 @@
-+/*
-+ * Nios2 specific CPU ABI and functions for linux-user
-+ *
-+ * Copyright (c) 2016 Marek Vasut <marex@denx.de>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef TARGET_CPU_H
-+#define TARGET_CPU_H
-+
-+static inline void cpu_clone_regs(CPUNios2State *env, target_ulong newsp)
-+{
-+    if (newsp) {
-+        env->regs[R_SP] = newsp;
-+    }
-+    env->regs[R_RET0] = 0;
-+}
-+
-+static inline void cpu_set_tls(CPUNios2State *env, target_ulong newtls)
-+{
-+    /*
-+     * Linux kernel 3.10 does not pay any attention to CLONE_SETTLS
-+     * in copy_thread(), so QEMU need not do so either.
-+     */
-+}
-+
-+#endif
-diff --git a/linux-user/nios2/target_signal.h b/linux-user/nios2/target_signal.h
-new file mode 100644
-index 0000000000..23a8267696
---- /dev/null
-+++ b/linux-user/nios2/target_signal.h
-@@ -0,0 +1,26 @@
-+#ifndef TARGET_SIGNAL_H
-+#define TARGET_SIGNAL_H
-+
-+#include "cpu.h"
-+
-+/* this struct defines a stack used during syscall handling */
-+
-+typedef struct target_sigaltstack {
-+    abi_long ss_sp;
-+    abi_ulong ss_size;
-+    abi_long ss_flags;
-+} target_stack_t;
-+
-+/* sigaltstack controls  */
-+#define TARGET_SS_ONSTACK     1
-+#define TARGET_SS_DISABLE     2
-+
-+#define TARGET_MINSIGSTKSZ    2048
-+#define TARGET_SIGSTKSZ       8192
-+
-+static inline abi_ulong get_sp_from_cpustate(CPUNios2State *state)
-+{
-+    return state->regs[R_SP];
-+}
-+
-+#endif /* TARGET_SIGNAL_H */
-diff --git a/linux-user/nios2/target_structs.h b/linux-user/nios2/target_structs.h
-new file mode 100644
-index 0000000000..8713772089
---- /dev/null
-+++ b/linux-user/nios2/target_structs.h
-@@ -0,0 +1,58 @@
-+/*
-+ * Nios2 specific structures for linux-user
-+ *
-+ * Copyright (c) 2016 Marek Vasut <marex@denx.de>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef TARGET_STRUCTS_H
-+#define TARGET_STRUCTS_H
-+
-+struct target_ipc_perm {
-+    abi_int __key;                      /* Key.  */
-+    abi_uint uid;                       /* Owner's user ID.  */
-+    abi_uint gid;                       /* Owner's group ID.  */
-+    abi_uint cuid;                      /* Creator's user ID.  */
-+    abi_uint cgid;                      /* Creator's group ID.  */
-+    abi_ushort mode;                    /* Read/write permission.  */
-+    abi_ushort __pad1;
-+    abi_ushort __seq;                   /* Sequence number.  */
-+    abi_ushort __pad2;
-+    abi_ulong __unused1;
-+    abi_ulong __unused2;
-+};
-+
-+struct target_shmid_ds {
-+    struct target_ipc_perm shm_perm;    /* operation permission struct */
-+    abi_long shm_segsz;                 /* size of segment in bytes */
-+    abi_ulong shm_atime;                /* time of last shmat() */
-+#if TARGET_ABI_BITS == 32
-+    abi_ulong __unused1;
-+#endif
-+    abi_ulong shm_dtime;                /* time of last shmdt() */
-+#if TARGET_ABI_BITS == 32
-+    abi_ulong __unused2;
-+#endif
-+    abi_ulong shm_ctime;                /* time of last change by shmctl() */
-+#if TARGET_ABI_BITS == 32
-+    abi_ulong __unused3;
-+#endif
-+    abi_int shm_cpid;                   /* pid of creator */
-+    abi_int shm_lpid;                   /* pid of last shmop */
-+    abi_ulong shm_nattch;               /* number of current attaches */
-+    abi_ulong __unused4;
-+    abi_ulong __unused5;
-+};
-+
-+#endif
-diff --git a/linux-user/nios2/target_syscall.h b/linux-user/nios2/target_syscall.h
-new file mode 100644
-index 0000000000..ca6b7e69f6
---- /dev/null
-+++ b/linux-user/nios2/target_syscall.h
-@@ -0,0 +1,37 @@
-+#ifndef TARGET_SYSCALL_H
-+#define TARGET_SYSCALL_H
-+
-+#define UNAME_MACHINE "nios2"
-+#define UNAME_MINIMUM_RELEASE "3.19.0"
-+
-+struct target_pt_regs {
-+    unsigned long  r8;    /* r8-r15 Caller-saved GP registers */
-+    unsigned long  r9;
-+    unsigned long  r10;
-+    unsigned long  r11;
-+    unsigned long  r12;
-+    unsigned long  r13;
-+    unsigned long  r14;
-+    unsigned long  r15;
-+    unsigned long  r1;    /* Assembler temporary */
-+    unsigned long  r2;    /* Retval LS 32bits */
-+    unsigned long  r3;    /* Retval MS 32bits */
-+    unsigned long  r4;    /* r4-r7 Register arguments */
-+    unsigned long  r5;
-+    unsigned long  r6;
-+    unsigned long  r7;
-+    unsigned long  orig_r2;    /* Copy of r2 ?? */
-+    unsigned long  ra;    /* Return address */
-+    unsigned long  fp;    /* Frame pointer */
-+    unsigned long  sp;    /* Stack pointer */
-+    unsigned long  gp;    /* Global pointer */
-+    unsigned long  estatus;
-+    unsigned long  ea;    /* Exception return address (pc) */
-+    unsigned long  orig_r7;
-+};
-+
-+#define TARGET_MINSIGSTKSZ 2048
-+#define TARGET_MLOCKALL_MCL_CURRENT 1
-+#define TARGET_MLOCKALL_MCL_FUTURE  2
-+
-+#endif  /* TARGET_SYSCALL_H */
-diff --git a/linux-user/nios2/termbits.h b/linux-user/nios2/termbits.h
-new file mode 100644
-index 0000000000..b64ba974cf
---- /dev/null
-+++ b/linux-user/nios2/termbits.h
-@@ -0,0 +1,220 @@
-+/* from asm/termbits.h */
-+/* NOTE: exactly the same as i386 */
-+
-+#define TARGET_NCCS 19
-+
-+struct target_termios {
-+    unsigned int c_iflag;               /* input mode flags */
-+    unsigned int c_oflag;               /* output mode flags */
-+    unsigned int c_cflag;               /* control mode flags */
-+    unsigned int c_lflag;               /* local mode flags */
-+    unsigned char c_line;                    /* line discipline */
-+    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+};
-+
-+/* c_iflag bits */
-+#define TARGET_IGNBRK  0000001
-+#define TARGET_BRKINT  0000002
-+#define TARGET_IGNPAR  0000004
-+#define TARGET_PARMRK  0000010
-+#define TARGET_INPCK   0000020
-+#define TARGET_ISTRIP  0000040
-+#define TARGET_INLCR   0000100
-+#define TARGET_IGNCR   0000200
-+#define TARGET_ICRNL   0000400
-+#define TARGET_IUCLC   0001000
-+#define TARGET_IXON    0002000
-+#define TARGET_IXANY   0004000
-+#define TARGET_IXOFF   0010000
-+#define TARGET_IMAXBEL 0020000
-+#define TARGET_IUTF8   0040000
-+
-+/* c_oflag bits */
-+#define TARGET_OPOST   0000001
-+#define TARGET_OLCUC   0000002
-+#define TARGET_ONLCR   0000004
-+#define TARGET_OCRNL   0000010
-+#define TARGET_ONOCR   0000020
-+#define TARGET_ONLRET  0000040
-+#define TARGET_OFILL   0000100
-+#define TARGET_OFDEL   0000200
-+#define TARGET_NLDLY   0000400
-+#define   TARGET_NL0   0000000
-+#define   TARGET_NL1   0000400
-+#define TARGET_CRDLY   0003000
-+#define   TARGET_CR0   0000000
-+#define   TARGET_CR1   0001000
-+#define   TARGET_CR2   0002000
-+#define   TARGET_CR3   0003000
-+#define TARGET_TABDLY  0014000
-+#define   TARGET_TAB0  0000000
-+#define   TARGET_TAB1  0004000
-+#define   TARGET_TAB2  0010000
-+#define   TARGET_TAB3  0014000
-+#define   TARGET_XTABS 0014000
-+#define TARGET_BSDLY   0020000
-+#define   TARGET_BS0   0000000
-+#define   TARGET_BS1   0020000
-+#define TARGET_VTDLY   0040000
-+#define   TARGET_VT0   0000000
-+#define   TARGET_VT1   0040000
-+#define TARGET_FFDLY   0100000
-+#define   TARGET_FF0   0000000
-+#define   TARGET_FF1   0100000
-+
-+/* c_cflag bit meaning */
-+#define TARGET_CBAUD   0010017
-+#define  TARGET_B0     0000000         /* hang up */
-+#define  TARGET_B50    0000001
-+#define  TARGET_B75    0000002
-+#define  TARGET_B110   0000003
-+#define  TARGET_B134   0000004
-+#define  TARGET_B150   0000005
-+#define  TARGET_B200   0000006
-+#define  TARGET_B300   0000007
-+#define  TARGET_B600   0000010
-+#define  TARGET_B1200  0000011
-+#define  TARGET_B1800  0000012
-+#define  TARGET_B2400  0000013
-+#define  TARGET_B4800  0000014
-+#define  TARGET_B9600  0000015
-+#define  TARGET_B19200 0000016
-+#define  TARGET_B38400 0000017
-+#define TARGET_EXTA B19200
-+#define TARGET_EXTB B38400
-+#define TARGET_CSIZE   0000060
-+#define   TARGET_CS5   0000000
-+#define   TARGET_CS6   0000020
-+#define   TARGET_CS7   0000040
-+#define   TARGET_CS8   0000060
-+#define TARGET_CSTOPB  0000100
-+#define TARGET_CREAD   0000200
-+#define TARGET_PARENB  0000400
-+#define TARGET_PARODD  0001000
-+#define TARGET_HUPCL   0002000
-+#define TARGET_CLOCAL  0004000
-+#define TARGET_CBAUDEX 0010000
-+#define  TARGET_B57600  0010001
-+#define  TARGET_B115200 0010002
-+#define  TARGET_B230400 0010003
-+#define  TARGET_B460800 0010004
-+#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
-+#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
-+#define TARGET_CRTSCTS   020000000000  /* flow control */
-+
-+/* c_lflag bits */
-+#define TARGET_ISIG    0000001
-+#define TARGET_ICANON  0000002
-+#define TARGET_XCASE   0000004
-+#define TARGET_ECHO    0000010
-+#define TARGET_ECHOE   0000020
-+#define TARGET_ECHOK   0000040
-+#define TARGET_ECHONL  0000100
-+#define TARGET_NOFLSH  0000200
-+#define TARGET_TOSTOP  0000400
-+#define TARGET_ECHOCTL 0001000
-+#define TARGET_ECHOPRT 0002000
-+#define TARGET_ECHOKE  0004000
-+#define TARGET_FLUSHO  0010000
-+#define TARGET_PENDIN  0040000
-+#define TARGET_IEXTEN  0100000
-+
-+/* c_cc character offsets */
-+#define TARGET_VINTR    0
-+#define TARGET_VQUIT    1
-+#define TARGET_VERASE   2
-+#define TARGET_VKILL    3
-+#define TARGET_VEOF     4
-+#define TARGET_VTIME    5
-+#define TARGET_VMIN     6
-+#define TARGET_VSWTC    7
-+#define TARGET_VSTART   8
-+#define TARGET_VSTOP    9
-+#define TARGET_VSUSP    10
-+#define TARGET_VEOL     11
-+#define TARGET_VREPRINT 12
-+#define TARGET_VDISCARD 13
-+#define TARGET_VWERASE  14
-+#define TARGET_VLNEXT   15
-+#define TARGET_VEOL2    16
-+
-+/* ioctls */
-+
-+#define TARGET_TCGETS           0x5401
-+#define TARGET_TCSETS           0x5402
-+#define TARGET_TCSETSW          0x5403
-+#define TARGET_TCSETSF          0x5404
-+#define TARGET_TCGETA           0x5405
-+#define TARGET_TCSETA           0x5406
-+#define TARGET_TCSETAW          0x5407
-+#define TARGET_TCSETAF          0x5408
-+#define TARGET_TCSBRK           0x5409
-+#define TARGET_TCXONC           0x540A
-+#define TARGET_TCFLSH           0x540B
-+
-+#define TARGET_TIOCEXCL         0x540C
-+#define TARGET_TIOCNXCL         0x540D
-+#define TARGET_TIOCSCTTY        0x540E
-+#define TARGET_TIOCGPGRP        0x540F
-+#define TARGET_TIOCSPGRP        0x5410
-+#define TARGET_TIOCOUTQ         0x5411
-+#define TARGET_TIOCSTI          0x5412
-+#define TARGET_TIOCGWINSZ       0x5413
-+#define TARGET_TIOCSWINSZ       0x5414
-+#define TARGET_TIOCMGET         0x5415
-+#define TARGET_TIOCMBIS         0x5416
-+#define TARGET_TIOCMBIC         0x5417
-+#define TARGET_TIOCMSET         0x5418
-+#define TARGET_TIOCGSOFTCAR     0x5419
-+#define TARGET_TIOCSSOFTCAR     0x541A
-+#define TARGET_FIONREAD         0x541B
-+#define TARGET_TIOCINQ          TARGET_FIONREAD
-+#define TARGET_TIOCLINUX        0x541C
-+#define TARGET_TIOCCONS         0x541D
-+#define TARGET_TIOCGSERIAL      0x541E
-+#define TARGET_TIOCSSERIAL      0x541F
-+#define TARGET_TIOCPKT          0x5420
-+#define TARGET_FIONBIO          0x5421
-+#define TARGET_TIOCNOTTY        0x5422
-+#define TARGET_TIOCSETD         0x5423
-+#define TARGET_TIOCGETD         0x5424
-+#define TARGET_TCSBRKP          0x5425 /* Needed for POSIX tcsendbreak() */
-+#define TARGET_TIOCTTYGSTRUCT   0x5426 /* For debugging only */
-+#define TARGET_TIOCSBRK         0x5427 /* BSD compatibility */
-+#define TARGET_TIOCCBRK         0x5428 /* BSD compatibility */
-+#define TARGET_TIOCGSID         0x5429 /* Return the session ID of FD */
-+#define TARGET_TIOCGPTN         TARGET_IOR('T', 0x30, unsigned int)
-+        /* Get Pty Number (of pty-mux device) */
-+#define TARGET_TIOCSPTLCK       TARGET_IOW('T', 0x31, int)
-+        /* Lock/unlock Pty */
-+
-+#define TARGET_FIONCLEX         0x5450  /* these numbers need to be adjusted. */
-+#define TARGET_FIOCLEX          0x5451
-+#define TARGET_FIOASYNC         0x5452
-+#define TARGET_TIOCSERCONFIG    0x5453
-+#define TARGET_TIOCSERGWILD     0x5454
-+#define TARGET_TIOCSERSWILD     0x5455
-+#define TARGET_TIOCGLCKTRMIOS   0x5456
-+#define TARGET_TIOCSLCKTRMIOS   0x5457
-+#define TARGET_TIOCSERGSTRUCT   0x5458 /* For debugging only */
-+#define TARGET_TIOCSERGETLSR    0x5459 /* Get line status register */
-+#define TARGET_TIOCSERGETMULTI  0x545A /* Get multiport config  */
-+#define TARGET_TIOCSERSETMULTI  0x545B /* Set multiport config */
-+
-+#define TARGET_TIOCMIWAIT      0x545C
-+        /* wait for a change on serial input line(s) */
-+#define TARGET_TIOCGICOUNT     0x545D
-+        /* read serial port inline interrupt counts */
-+#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
-+#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
-+
-+/* Used for packet mode */
-+#define TARGET_TIOCPKT_DATA              0
-+#define TARGET_TIOCPKT_FLUSHREAD         1
-+#define TARGET_TIOCPKT_FLUSHWRITE        2
-+#define TARGET_TIOCPKT_STOP              4
-+#define TARGET_TIOCPKT_START             8
-+#define TARGET_TIOCPKT_NOSTOP           16
-+#define TARGET_TIOCPKT_DOSTOP           32
-+
-+#define TARGET_TIOCSER_TEMT    0x01 /* Transmitter physically empty */
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index c750053edd..4e4115b6f2 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -254,7 +254,7 @@ int do_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
- }
- 
- #if !defined(TARGET_OPENRISC) && !defined(TARGET_UNICORE32) && \
--    !defined(TARGET_X86_64)
-+    !defined(TARGET_X86_64) && !defined(TARGET_NIOS2)
- /* Just set the guest's signal mask to the specified value; the
-  * caller is assumed to have called block_signals() already.
-  */
-@@ -3922,6 +3922,240 @@ long do_rt_sigreturn(CPUCRISState *env)
-     return -TARGET_ENOSYS;
- }
- 
-+#elif defined(TARGET_NIOS2)
-+
-+#define MCONTEXT_VERSION 2
-+
-+struct target_sigcontext {
-+    int version;
-+    unsigned long gregs[32];
-+};
-+
-+struct target_ucontext {
-+    abi_ulong tuc_flags;
-+    abi_ulong tuc_link;
-+    target_stack_t tuc_stack;
-+    struct target_sigcontext tuc_mcontext;
-+    target_sigset_t tuc_sigmask;   /* mask last for extensibility */
-+};
-+
-+struct target_rt_sigframe {
-+    struct target_siginfo info;
-+    struct target_ucontext uc;
-+};
-+
-+static unsigned long sigsp(unsigned long sp, struct target_sigaction *ka)
-+{
-+    if (unlikely((ka->sa_flags & SA_ONSTACK)) && !sas_ss_flags(sp)) {
-+#ifdef CONFIG_STACK_GROWSUP
-+        return target_sigaltstack_used.ss_sp;
-+#else
-+        return target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
-+#endif
-+    }
-+    return sp;
-+}
-+
-+static int rt_setup_ucontext(struct target_ucontext *uc, CPUNios2State *env)
-+{
-+    unsigned long *gregs = uc->tuc_mcontext.gregs;
-+
-+    __put_user(MCONTEXT_VERSION, &uc->tuc_mcontext.version);
-+    __put_user(env->regs[1], &gregs[0]);
-+    __put_user(env->regs[2], &gregs[1]);
-+    __put_user(env->regs[3], &gregs[2]);
-+    __put_user(env->regs[4], &gregs[3]);
-+    __put_user(env->regs[5], &gregs[4]);
-+    __put_user(env->regs[6], &gregs[5]);
-+    __put_user(env->regs[7], &gregs[6]);
-+    __put_user(env->regs[8], &gregs[7]);
-+    __put_user(env->regs[9], &gregs[8]);
-+    __put_user(env->regs[10], &gregs[9]);
-+    __put_user(env->regs[11], &gregs[10]);
-+    __put_user(env->regs[12], &gregs[11]);
-+    __put_user(env->regs[13], &gregs[12]);
-+    __put_user(env->regs[14], &gregs[13]);
-+    __put_user(env->regs[15], &gregs[14]);
-+    __put_user(env->regs[16], &gregs[15]);
-+    __put_user(env->regs[17], &gregs[16]);
-+    __put_user(env->regs[18], &gregs[17]);
-+    __put_user(env->regs[19], &gregs[18]);
-+    __put_user(env->regs[20], &gregs[19]);
-+    __put_user(env->regs[21], &gregs[20]);
-+    __put_user(env->regs[22], &gregs[21]);
-+    __put_user(env->regs[23], &gregs[22]);
-+    __put_user(env->regs[R_RA], &gregs[23]);
-+    __put_user(env->regs[R_FP], &gregs[24]);
-+    __put_user(env->regs[R_GP], &gregs[25]);
-+    __put_user(env->regs[R_EA], &gregs[27]);
-+    __put_user(env->regs[R_SP], &gregs[28]);
-+
-+    return 0;
-+}
-+
-+static int rt_restore_ucontext(CPUNios2State *env, struct target_ucontext *uc,
-+                               int *pr2)
-+{
-+    int temp;
-+    abi_ulong off, frame_addr = env->regs[R_SP];
-+    unsigned long *gregs = uc->tuc_mcontext.gregs;
-+    int err;
-+
-+    /* Always make any pending restarted system calls return -EINTR */
-+    /* current->restart_block.fn = do_no_restart_syscall; */
-+
-+    __get_user(temp, &uc->tuc_mcontext.version);
-+    if (temp != MCONTEXT_VERSION) {
-+        return 1;
-+    }
-+
-+    /* restore passed registers */
-+    __get_user(env->regs[1], &gregs[0]);
-+    __get_user(env->regs[2], &gregs[1]);
-+    __get_user(env->regs[3], &gregs[2]);
-+    __get_user(env->regs[4], &gregs[3]);
-+    __get_user(env->regs[5], &gregs[4]);
-+    __get_user(env->regs[6], &gregs[5]);
-+    __get_user(env->regs[7], &gregs[6]);
-+    __get_user(env->regs[8], &gregs[7]);
-+    __get_user(env->regs[9], &gregs[8]);
-+    __get_user(env->regs[10], &gregs[9]);
-+    __get_user(env->regs[11], &gregs[10]);
-+    __get_user(env->regs[12], &gregs[11]);
-+    __get_user(env->regs[13], &gregs[12]);
-+    __get_user(env->regs[14], &gregs[13]);
-+    __get_user(env->regs[15], &gregs[14]);
-+    __get_user(env->regs[16], &gregs[15]);
-+    __get_user(env->regs[17], &gregs[16]);
-+    __get_user(env->regs[18], &gregs[17]);
-+    __get_user(env->regs[19], &gregs[18]);
-+    __get_user(env->regs[20], &gregs[19]);
-+    __get_user(env->regs[21], &gregs[20]);
-+    __get_user(env->regs[22], &gregs[21]);
-+    __get_user(env->regs[23], &gregs[22]);
-+    /* gregs[23] is handled below */
-+    /* Verify, should this be settable */
-+    __get_user(env->regs[R_FP], &gregs[24]);
-+    /* Verify, should this be settable */
-+    __get_user(env->regs[R_GP], &gregs[25]);
-+    /* Not really necessary no user settable bits */
-+    __get_user(temp, &gregs[26]);
-+    __get_user(env->regs[R_EA], &gregs[27]);
-+
-+    __get_user(env->regs[R_RA], &gregs[23]);
-+    __get_user(env->regs[R_SP], &gregs[28]);
-+
-+    off = offsetof(struct target_rt_sigframe, uc.tuc_stack);
-+    err = do_sigaltstack(frame_addr + off, 0, get_sp_from_cpustate(env));
-+    if (err == -EFAULT) {
-+        return 1;
-+    }
-+
-+    *pr2 = env->regs[2];
-+    return 0;
-+}
-+
-+static void *get_sigframe(struct target_sigaction *ka, CPUNios2State *env,
-+                          size_t frame_size)
-+{
-+    unsigned long usp;
-+
-+    /* Default to using normal stack.  */
-+    usp = env->regs[R_SP];
-+
-+    /* This is the X/Open sanctioned signal stack switching.  */
-+    usp = sigsp(usp, ka);
-+
-+    /* Verify, is it 32 or 64 bit aligned */
-+    return (void *)((usp - frame_size) & -8UL);
-+}
-+
-+static void setup_rt_frame(int sig, struct target_sigaction *ka,
-+                           target_siginfo_t *info,
-+                           target_sigset_t *set,
-+                           CPUNios2State *env)
-+{
-+    struct target_rt_sigframe *frame;
-+    int i, err = 0;
-+
-+    frame = get_sigframe(ka, env, sizeof(*frame));
-+
-+    if (ka->sa_flags & SA_SIGINFO) {
-+        tswap_siginfo(&frame->info, info);
-+    }
-+
-+    /* Create the ucontext.  */
-+    __put_user(0, &frame->uc.tuc_flags);
-+    __put_user(0, &frame->uc.tuc_link);
-+    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
-+    __put_user(sas_ss_flags(env->regs[R_SP]), &frame->uc.tuc_stack.ss_flags);
-+    __put_user(target_sigaltstack_used.ss_size, &frame->uc.tuc_stack.ss_size);
-+    err |= rt_setup_ucontext(&frame->uc, env);
-+    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
-+        __put_user((abi_ulong)set->sig[i],
-+            (abi_ulong *)&frame->uc.tuc_sigmask.sig[i]);
-+    }
-+
-+    if (err) {
-+        goto give_sigsegv;
-+    }
-+
-+    /* Set up to return from userspace; jump to fixed address sigreturn
-+       trampoline on kuser page.  */
-+    env->regs[R_RA] = (unsigned long) (0x1044);
-+
-+    /* Set up registers for signal handler */
-+    env->regs[R_SP] = (unsigned long) frame;
-+    env->regs[4] = (unsigned long) sig;
-+    env->regs[5] = (unsigned long) &frame->info;
-+    env->regs[6] = (unsigned long) &frame->uc;
-+    env->regs[R_EA] = (unsigned long) ka->_sa_handler;
-+    return;
-+
-+give_sigsegv:
-+    if (sig == TARGET_SIGSEGV) {
-+        ka->_sa_handler = TARGET_SIG_DFL;
-+    }
-+    force_sigsegv(sig);
-+    return;
-+}
-+
-+long do_sigreturn(CPUNios2State *env)
-+{
-+    trace_user_do_sigreturn(env, 0);
-+    fprintf(stderr, "do_sigreturn: not implemented\n");
-+    return -TARGET_ENOSYS;
-+}
-+
-+long do_rt_sigreturn(CPUNios2State *env)
-+{
-+    /* Verify, can we follow the stack back */
-+    abi_ulong frame_addr = env->regs[R_SP];
-+    struct target_rt_sigframe *frame;
-+    sigset_t set;
-+    int rval;
-+
-+    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
-+        goto badframe;
-+    }
-+
-+    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
-+    do_sigprocmask(SIG_SETMASK, &set, NULL);
-+
-+    if (rt_restore_ucontext(env, &frame->uc, &rval)) {
-+        goto badframe;
-+    }
-+
-+    unlock_user_struct(frame, frame_addr, 0);
-+    return rval;
-+
-+badframe:
-+    unlock_user_struct(frame, frame_addr, 0);
-+    force_sig(TARGET_SIGSEGV);
-+    return 0;
-+}
-+/* TARGET_NIOS2 */
-+
- #elif defined(TARGET_OPENRISC)
- 
- struct target_sigcontext {
-@@ -5989,7 +6223,7 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
-         /* prepare the stack frame of the virtual CPU */
- #if defined(TARGET_ABI_MIPSN32) || defined(TARGET_ABI_MIPSN64) \
-         || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) \
--        || defined(TARGET_PPC64)
-+        || defined(TARGET_PPC64) || defined(TARGET_NIOS2)
-         /* These targets do not have traditional signals.  */
-         setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
- #else
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 0b15466743..b83e7a58c5 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -70,7 +70,8 @@
- #if defined(TARGET_I386) || defined(TARGET_ARM) || defined(TARGET_SH4) \
-     || defined(TARGET_M68K) || defined(TARGET_CRIS) \
-     || defined(TARGET_UNICORE32) || defined(TARGET_S390X) \
--    || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX)
-+    || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) \
-+    || defined(TARGET_NIOS2)
- 
- #define TARGET_IOC_SIZEBITS	14
- #define TARGET_IOC_DIRBITS	2
-@@ -417,7 +418,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
-     || defined(TARGET_M68K) || defined(TARGET_ALPHA) || defined(TARGET_CRIS) \
-     || defined(TARGET_MICROBLAZE) || defined(TARGET_UNICORE32) \
-     || defined(TARGET_S390X) || defined(TARGET_OPENRISC) \
--    || defined(TARGET_TILEGX)
-+    || defined(TARGET_TILEGX) || defined(TARGET_NIOS2)
- 
- #if defined(TARGET_SPARC)
- #define TARGET_SA_NOCLDSTOP    8u
-@@ -1974,7 +1975,8 @@ struct target_stat {
-     abi_ulong  target_st_ctime_nsec;
-     unsigned int __unused[2];
- };
--#elif defined(TARGET_OPENRISC) || defined(TARGET_TILEGX)
-+#elif defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) || \
-+      defined(TARGET_NIOS2)
- 
- /* These are the asm-generic versions of the stat and stat64 structures */
- 
 -- 
 2.11.0
