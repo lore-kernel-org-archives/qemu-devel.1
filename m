@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTU6G-00026I-Cq
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:47:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cTU8f-0004Ek-2y
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:49:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cTU67-0001Jn-2m
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:47:00 -0500
-Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:35435)
+	(envelope-from <peter.maydell@linaro.org>) id 1cTU8e-0003bZ-Cj
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:49:29 -0500
+Received: from mail-vk0-x232.google.com ([2607:f8b0:400c:c05::232]:36713)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cTU66-0001JL-Po
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:46:50 -0500
-Received: by mail-ua0-x231.google.com with SMTP id y9so103293339uae.2
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 05:46:50 -0800 (PST)
+	id 1cTU8e-0003ah-89
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 08:49:28 -0500
+Received: by mail-vk0-x232.google.com with SMTP id t8so92339517vke.3
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 05:49:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1484204658-28058-4-git-send-email-wei@redhat.com>
+In-Reply-To: <1484204658-28058-5-git-send-email-wei@redhat.com>
 References: <1484204658-28058-1-git-send-email-wei@redhat.com>
-	<1484204658-28058-4-git-send-email-wei@redhat.com>
+	<1484204658-28058-5-git-send-email-wei@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jan 2017 13:46:29 +0000
-Message-ID: <CAFEAcA-_uGard1X9=NucVT87qRtX3dsipSWgwQDSfeADPvs79g@mail.gmail.com>
+Date: Tue, 17 Jan 2017 13:49:07 +0000
+Message-ID: <CAFEAcA8Scivg0rd9+vUpXAuT-NDAwsD92pn9X9jxm5rNw49Jpw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH V1 3/4] target-arm: Add support for PMU
- register PMINTENSET_EL1
+Subject: Re: [Qemu-devel] [PATCH V1 4/4] target-arm: Hook up TCG vPMU with
+ CPU pmu option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +34,34 @@ To: Wei Huang <wei@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
 On 12 January 2017 at 07:04, Wei Huang <wei@redhat.com> wrote:
-> This patch adds access support for PMINTENSET_EL1.
+> Remove the checking of kvm_enabled(). With this, .pmu option can also
+> control vPMU under TCG mode.
 >
 > Signed-off-by: Wei Huang <wei@redhat.com>
 > ---
->  target/arm/helper.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  target/arm/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 9044a33..22c66e3 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -1261,9 +1261,17 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
->        .writefn = pmuserenr_write, .raw_writefn = raw_write },
->      { .name = "PMINTENSET", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 1,
->        .access = PL1_RW, .accessfn = access_tpm,
-> +      .type = ARM_CP_ALIAS,
->        .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
->        .resetvalue = 0,
->        .writefn = pmintenset_write, .raw_writefn = raw_write },
-> +    { .name = "PMINTENSET_EL1", .state = ARM_CP_STATE_AA64,
-> +      .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 1,
-> +      .access = PL1_RW, .accessfn = access_tpm,
-> +      .type = ARM_CP_IO,
-> +      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
-> +      .writefn = pmintenset_write, .raw_writefn = raw_write,
-> +      .resetvalue = 0x0 },
->      { .name = "PMINTENCLR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 2,
->        .access = PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
->        .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
-> --
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index f5cb30a..2f87a4b 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -692,7 +692,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>          cpu->id_aa64pfr0 &= ~0xf000;
+>      }
+>
+> -    if (!cpu->has_pmu || !kvm_enabled()) {
+> +    if (!cpu->has_pmu) {
+>          cpu->has_pmu = false;
+>          unset_feature(env, ARM_FEATURE_PMU);
+>      }
 
-c9_pminten needs to become 64 bits.
+I notice that the ARM_FEATURE_PMU bit doesn't seem to control whether
+we actually provide the TCG PMU registers, so this patch is OK but
+doesn't actually change the behaviour of the emulated cpu AFAICT.
 
-We should add PMINTENCLR_EL1 too -- it's a bit weird to provide the
-SET function but not its parter CLR operation.
+Don't we now need to remove the hack where we mask out the PMUVer field
+of ID_AA64DFR1_EL1 ?
 
 thanks
 -- PMM
