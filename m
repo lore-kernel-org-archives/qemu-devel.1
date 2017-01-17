@@ -1,30 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cTXeT-0005NV-Iu
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:34:35 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cTXfV-0005yz-6R
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:35:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cTXeQ-0006NT-CJ
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:34:33 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:33225)
+	(envelope-from <ben@skyportsystems.com>) id 1cTXfS-0006nG-3M
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:35:37 -0500
+Received: from mail-pf0-x22d.google.com ([2607:f8b0:400e:c00::22d]:34911)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
-	id 1cTXeQ-0006NJ-13
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:34:30 -0500
-Received: by mail-lf0-x243.google.com with SMTP id x1so11901860lff.0
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 09:34:29 -0800 (PST)
-References: <1483979087-32663-1-git-send-email-clg@kaod.org>
-	<1483979087-32663-10-git-send-email-clg@kaod.org>
-	<304c10df-271d-5ae2-1d1f-5bf215b805c4@gmail.com>
-	<1d865c7c-837e-aa9b-b29b-6395fd083e91@kaod.org>
-From: "mar.krzeminski" <mar.krzeminski@gmail.com>
-Message-ID: <996e7e22-7eea-846d-5785-aec2c865b32b@gmail.com>
-Date: Tue, 17 Jan 2017 18:34:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <1d865c7c-837e-aa9b-b29b-6395fd083e91@kaod.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 09/11] aspeed/smc: extend tests for
- Command mode
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1cTXfR-0006nA-QK
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 12:35:34 -0500
+Received: by mail-pf0-x22d.google.com with SMTP id f144so63535595pfa.2
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 09:35:33 -0800 (PST)
+From: Ben Warren <ben@skyportsystems.com>
+Message-Id: <44B60139-6945-4914-AC93-C402EA37AD7E@skyportsystems.com>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_ADA37579-5DAE-4A61-805E-DA2E41E584C7";
+	protocol="application/pkcs7-signature"; micalg=sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Tue, 17 Jan 2017 09:35:31 -0800
+In-Reply-To: <20170117171155-mutt-send-email-mst@kernel.org>
+References: <20161006041949-mutt-send-email-mst@kernel.org>
+	<D5FCB73B-435E-4423-B21C-BEEF1C1EA2FD@skyportsystems.com>
+	<20161211052355-mutt-send-email-mst@kernel.org>
+	<FBD67273-74C4-4183-8FCF-8260D13B04D4@skyportsystems.com>
+	<20170116161857-mutt-send-email-mst@kernel.org>
+	<85C3D50B-7AFD-41E7-AD1B-634A42D04BB2@skyportsystems.com>
+	<20170117142650.2a2a351f@nial.brq.redhat.com>
+	<CAO_EM_km-04HBOZP2H3UvPPaCKyQx1nZD1QKPVYuawwTJjdYSQ@mail.gmail.com>
+	<20170117163002-mutt-send-email-mst@kernel.org>
+	<CAO_EM_kcfhVPye+5vUZPY=mWS3TrcCWYh_ozTy8gPRgkCLMG-w@mail.gmail.com>
+	<20170117171155-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] Virtual Machine Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,208 +40,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ed Swierk <eswierk@skyportsystems.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 
 
+--Apple-Mail=_ADA37579-5DAE-4A61-805E-DA2E41E584C7
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-W dniu 17.01.2017 o 09:34, Cédric Le Goater pisze:
-> On 01/16/2017 06:51 PM, mar.krzeminski wrote:
->>
->> W dniu 09.01.2017 o 17:24, Cédric Le Goater pisze:
->>> The Aspeed SMC controllers have a mode (Command mode) in which
->>> accesses to the flash content are no different than doing MMIOs. The
->>> controller generates all the necessary commands to load (or store)
->>> data in memory.
->>>
->>> So add a couple of tests doing direct reads and writes on the AHB bus.
->>>
->>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->>> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
->>> ---
->>>    tests/m25p80-test.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>    1 file changed, 102 insertions(+)
->>>
->>>    Changes since v1:
->>>
->>>    - added preliminary configuration of the controller and the flash
->>>      before starting the test.
->>>    - added a flash reset
->>>
->>> diff --git a/tests/m25p80-test.c b/tests/m25p80-test.c
->>> index 8dd550deb95e..244aa33dd941 100644
->>> --- a/tests/m25p80-test.c
->>> +++ b/tests/m25p80-test.c
->>> @@ -36,6 +36,9 @@
->>>    #define   CRTL_EXTENDED0       0  /* 32 bit addressing for SPI */
->>>    #define R_CTRL0             0x10
->>>    #define   CTRL_CE_STOP_ACTIVE  (1 << 2)
->>> +#define   CTRL_READMODE        0x0
->>> +#define   CTRL_FREADMODE       0x1
->>> +#define   CTRL_WRITEMODE       0x2
->>>    #define   CTRL_USERMODE        0x3
->>>      #define ASPEED_FMC_BASE    0x1E620000
->>> @@ -86,6 +89,22 @@ static void spi_conf_remove(uint32_t value)
->>>        writel(ASPEED_FMC_BASE + R_CONF, conf);
->>>    }
->>>    +static void spi_ce_ctrl(uint32_t value)
->>> +{
->>> +    uint32_t conf = readl(ASPEED_FMC_BASE + R_CE_CTRL);
->>> +
->>> +    conf |= value;
->>> +    writel(ASPEED_FMC_BASE + R_CE_CTRL, conf);
->>> +}
->>> +
->>> +static void spi_ctrl_setmode(uint8_t mode, uint8_t cmd)
->>> +{
->>> +    uint32_t ctrl = readl(ASPEED_FMC_BASE + R_CTRL0);
->>> +    ctrl &= ~(CTRL_USERMODE | 0xff << 16);
->>> +    ctrl |= mode | (cmd << 16);
->>> +    writel(ASPEED_FMC_BASE + R_CTRL0, ctrl);
->>> +}
->>> +
->>>    static void spi_ctrl_start_user(void)
->>>    {
->>>        uint32_t ctrl = readl(ASPEED_FMC_BASE + R_CTRL0);
->>> @@ -152,6 +171,18 @@ static void read_page(uint32_t addr, uint32_t *page)
->>>        spi_ctrl_stop_user();
->>>    }
->>>    +static void read_page_mem(uint32_t addr, uint32_t *page)
->>> +{
->>> +    int i;
->>> +
->>> +    /* move out USER mode to use direct reads from the AHB bus */
->>> +    spi_ctrl_setmode(CTRL_READMODE, READ);
->>> +
->>> +    for (i = 0; i < PAGE_SIZE / 4; i++) {
->>> +        page[i] = make_be32(readl(ASPEED_FLASH_BASE + addr + i * 4));
->> Wouldn't be better to make i < PAGE_SIZE and get rid of multiplications?
-> Hmm, we need the addresses to be 32bits aligned. Am I missing something ?
-Yes, sorry I missed page[i] in the loop.
->
->> Please check other similar loops in the code.
->>> +    }
->>> +}
->>> +
->>>    static void test_erase_sector(void)
->>>    {
->>>        uint32_t some_page_addr = 0x600 * PAGE_SIZE;
->>> @@ -248,6 +279,75 @@ static void test_write_page(void)
->>>        flash_reset();
->>>    }
->>>    +static void test_read_page_mem(void)
->>> +{
->> This function repeats write_page tests.
-> It is true that this test depends on the previous test
-> 'test_write_page()'. The test checks the flash contents
-> using the command mode.
->
-> Resetting the flash contents to an initial state did not
-> seem necessary but I should probably comment on the test
-> case  dependencies though.
->
->> Maybe would be better to have one function, do read - epected 0xFF,
->> write then read - the same data and read other sector in one function?
-> OK. I think I understand. So I should provide some toolbox
-> with highlevel functions for each test to use in order to
-> clarify what is being done.
->
-> I will try that in a followup patch.
-This is just suggestion, one function that do read/write is clearer than 
-two that do
-some part twice.
->
->>> +    uint32_t my_page_addr = 0x14000 * PAGE_SIZE; /* beyond 16MB */
->>> +    uint32_t some_page_addr = 0x15000 * PAGE_SIZE;
->>> +    uint32_t page[PAGE_SIZE / 4];
->>> +    int i;
->>> +
->>> +    /* Enable 4BYTE mode for controller. This is should be strapped by
->>> +     * HW for CE0 anyhow.
->>> +     */
->>> +    spi_ce_ctrl(1 << CRTL_EXTENDED0);
->>> +
->>> +    /* Enable 4BYTE mode for flash. */
->>> +    spi_conf(CONF_ENABLE_W0);
->>> +    spi_ctrl_start_user();
->>> +    writeb(ASPEED_FLASH_BASE, EN_4BYTE_ADDR);
->>> +    spi_ctrl_stop_user();
->>> +    spi_conf_remove(CONF_ENABLE_W0);
->>> +
->>> +    /* Check what was written */
->>> +    read_page_mem(my_page_addr, page);
->>> +    for (i = 0; i < PAGE_SIZE / 4; i++) {
->>> +        g_assert_cmphex(page[i], ==, my_page_addr + i * 4);
->>> +    }
->>> +
->>> +    /* Check some other page. It should be full of 0xff */
->>> +    read_page_mem(some_page_addr, page);
->>> +    for (i = 0; i < PAGE_SIZE / 4; i++) {
->>> +        g_assert_cmphex(page[i], ==, 0xffffffff);
->>> +    }
->>> +
->>> +    flash_reset();
->>> +}
->>> +
->>> +static void test_write_page_mem(void)
->>> +{
->>> +    uint32_t my_page_addr = 0x15000 * PAGE_SIZE;
->>> +    uint32_t page[PAGE_SIZE / 4];
->>> +    int i;
->>> +
->>> +    /* Enable 4BYTE mode for controller. This is should be strapped by
->>> +     * HW for CE0 anyhow.
->>> +     */
->>> +    spi_ce_ctrl(1 << CRTL_EXTENDED0);
->>> +
->>> +    /* Enable 4BYTE mode for flash. */
->>> +    spi_conf(CONF_ENABLE_W0);
->>> +    spi_ctrl_start_user();
->>> +    writeb(ASPEED_FLASH_BASE, EN_4BYTE_ADDR);
->>> +    writeb(ASPEED_FLASH_BASE, WREN);
->> This is a bit tricky, in real HW you need to set WREN
->> before issue PROGRAM command on most of the devices.
->> If there is no cache in emulated in SMC controller
->> (if any in HW), WREN should be issued before every write.
-> ah yes. So to be more precise, WREN should be moved in the
-> loop below.
-Yes.
 
-Thanks,
-Marcin
-> Thanks,
->
-> C.
->
->> Thanks,
->> Marcin
->>> +    spi_ctrl_stop_user();
->>> +
->>> +    /* move out USER mode to use direct writes to the AHB bus */
->>> +    spi_ctrl_setmode(CTRL_WRITEMODE, PP);
->>> +
->>> +    for (i = 0; i < PAGE_SIZE / 4; i++) {
->>> +        writel(ASPEED_FLASH_BASE + my_page_addr + i * 4,
->>> +               make_be32(my_page_addr + i * 4));
->>> +    }
->>> +
->>> +    /* Check what was written */
->>> +    read_page_mem(my_page_addr, page);
->>> +    for (i = 0; i < PAGE_SIZE / 4; i++) {
->>> +        g_assert_cmphex(page[i], ==, my_page_addr + i * 4);
->>> +    }
->>> +
->>> +    flash_reset();
->>> +}
->>> +
->>>    static char tmp_path[] = "/tmp/qtest.m25p80.XXXXXX";
->>>      int main(int argc, char **argv)
->>> @@ -273,6 +373,8 @@ int main(int argc, char **argv)
->>>        qtest_add_func("/m25p80/erase_sector", test_erase_sector);
->>>        qtest_add_func("/m25p80/erase_all",  test_erase_all);
->>>        qtest_add_func("/m25p80/write_page", test_write_page);
->>> +    qtest_add_func("/m25p80/read_page_mem", test_read_page_mem);
->>> +    qtest_add_func("/m25p80/write_page_mem", test_write_page_mem);
->>>          ret = g_test_run();
->>>    
->
+> On Jan 17, 2017, at 7:21 AM, Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>=20
+> Let's not top-post anymore pls.
+>=20
+> On Tue, Jan 17, 2017 at 07:01:27AM -0800, Ed Swierk wrote:
+>> You mean what causes the guest to re-read the vmgenid guid? The
+>> vmgenid ACPI table defines a notify method, and when the guest
+>> receives the corresponding event, it re-reads the guid. (Also it
+>> appears that with Windows Server 2012 at least, if no notify method =
+is
+>> defined, as is the case with Xen, the guest just re-reads it on
+>> demand.)
+>>=20
+>> Wouldn't it be sufficient for the qmp set-vmgenid command to call
+>> acpi_ram_update() with the new guid, and acpi_send_event() to notify
+>> the guest?
+>>=20
+>> --Ed
+>>=20
+>=20
+> Not if you want to reliably be able to know that gen ID
+> did not change.
+>=20
+> Consider an application that sends a transaction to
+> a database. It should be able to read gen ID and if that
+> is unchanged then you know you only sent it once.
+> If that is changed you may have sent it twice,
+> and may need to recover.
+>=20
+> If guest updates gen id in memory after getting a notify,
+> there's a window after receiving a notify and before
+> updating it.
+>=20
+>=20
+Guests don=E2=80=99t update gen ID, the value is read-only to Windows.  =
+The spec states:
+
+=E2=80=9CPut the generation ID in an 8-byte aligned buffer in guest RAM, =
+ROM or device memory space, which is guaranteed not to be used by the =
+operating system=E2=80=9D
+
+The host is in complete control of the data, so as long as the notify =
+event follows setting of the data, there should be no race.  In =
+practice, the only time the value will change in a running guest is when =
+recovering a snapshot.
+>=20
+> --=20
+> MST
+=E2=80=94Ben
+
+
+--Apple-Mail=_ADA37579-5DAE-4A61-805E-DA2E41E584C7
+Content-Disposition: attachment;
+	filename=smime.p7s
+Content-Type: application/pkcs7-signature;
+	name=smime.p7s
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
+ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
+MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
+dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
+WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
+c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
+BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
+IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
+51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
+FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
+kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
+aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
+P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
+VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
+AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
+RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
+YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
+cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
+am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
+BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
+nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
+2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
+mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
+VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
+GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
+IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
+NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
+A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
+R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
+gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
+ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
+AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
+uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
+MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
+BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
+UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
+Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
+gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
+dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
+Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
+SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
+iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
+dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
+7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
+TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
+gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
+bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
+NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
+8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMTcwMTE3MTczNTMxWjAjBgkqhkiG9w0BCQQxFgQUX0gQE/brWYsPfmQeQxvllcChbKQw
+gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
+Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
+BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
+YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
+QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
+KoZIhvcNAQEBBQAEggEAjhIkvq8BsUpX5jOAqBKiwFCRB8p30+zcCrovRAUvxhb86z+4dWaRUsky
+2B6/spyg+8XyzJn0B5h9jpLPqqKXLJbBZVhBrkanHRdv2S0kKXwWpAfBY9UhbZQDt8Wftkyp9I1P
+qjOFZW9Wwy2Bz9lLTrh2EC8OfQgf7mtd+LZlcPmJ8O++ryhbPyMZYc6RpGsGhSFZF9V33jH13+46
+sPqTDh9amOWQJhhnpA42c9Lzkpu5FkRoa9aM83VbIjUZ2L/9gO5cg31kk+0y2HjrnUy9wC9Wv81i
+DuuA6aMGI/5/fzPdfGFd2UZDniCRvZgPRQKL+t7hK8MK94nYtrmFpYYMowAAAAAAAA==
+--Apple-Mail=_ADA37579-5DAE-4A61-805E-DA2E41E584C7--
