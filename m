@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cTMaJ-0003Ju-SS
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 00:45:32 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1U-00079M-Uh
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cTMaF-0008Fx-0p
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 00:45:31 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:44272)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1T-0007b6-M3
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:36 -0500
+Received: from [59.151.112.132] (port=64480 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cTMaE-0008Fp-Op
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 00:45:26 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
-	<001201d26b1b$e5a8ce20$b0fa6a60$@ru>
-	<CAMo8BfJKXOhiPQz8GT6hXNNBXKsz-67iKx9ct9tEwukVLWR3QA@mail.gmail.com>
-	<001201d26cc6$f023ad00$d06b0700$@ru>
-	<CAFEAcA-AMJ33g9hO2k9oGJfDr-Fatk7TY+Sbs_wRC-OfCjWhmQ@mail.gmail.com>
-	<001301d26cce$21ad3d30$6507b790$@ru>
-	<f2f54dce-0e3f-2718-4b35-1321f5c2ae11@redhat.com>
-In-Reply-To: <f2f54dce-0e3f-2718-4b35-1321f5c2ae11@redhat.com>
-Date: Tue, 17 Jan 2017 08:45:26 +0300
-Message-ID: <000c01d27084$e749e7a0$b5ddb6e0$@ru>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTN1T-0007Ql-9j
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 01:13:35 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Tue, 17 Jan 2017 14:18:47 +0800
+Message-ID: <1484633936-25344-3-git-send-email-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <1484633936-25344-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+References: <1484633936-25344-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v9 02/11] hcd-xhci: check & correct param
+ before using it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,63 +26,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Peter Maydell' <peter.maydell@linaro.org>
-Cc: 'Alex Bligh' <alex@alex.org.uk>, 'Max Filippov' <jcmvbkbc@gmail.com>, 'qemu-devel' <qemu-devel@nongnu.org>, 'Pavel Dovgaluk' <Pavel.Dovgaluk@ispras.ru>, 'Richard Henderson' <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
-> On 12/01/2017 13:19, Pavel Dovgalyuk wrote:
-> >> From: Peter Maydell [mailto:peter.maydell@linaro.org]
-> >> On 12 January 2017 at 11:28, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> >>>> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
-> >>>> Ok, looks like what happens in my case is that instruction that
-> >>>> sets CCOMPARE and thus changes remaining icount does not
-> >>>> cause exit from the cpu_exec. So merely ending TB on
-> >>>> QEMU_CLOCK_VIRTUAL timer update is not enough, I need to
-> >>>> throw an exception of some kind? Or does the timer code need
-> >>>> to take care of that?
-> >>>
-> >>> Yes, it seems that you should end the block with an exception,
-> >>> to allow icount loop recalculate the timeouts.
-> >>
-> >> Really? The ARM translate.c doesn't generate an exception.
-> >> It just does
-> >>  gen_io_end();
-> >>  gen_lookup_tb();
-> >>
-> >> (so we force a lookup of the next TB, but don't throw an
-> >> exception of any kind).
-> >
-> > Maybe I missing something. As far as I understand, changing the virtual timer
-> > notifies the iothread and os_host_main_loop_wait kicks the CPU thread.
-> >
-> > But within that period of time before changing the timer and kicking the thread
-> > CPU may proceed some instructions and the timer will be expired if it was set
-> > to one of the soonest instructions.
-> 
-> My understanding (which may be wrong!) was that after gen_io_end you
-> would exit with TB_EXIT_ICOUNT_EXPIRED and cpu->icount_decr.u16.high =
-> -1, but indeed I don't see anything that calls cpu_interrupt in that
-> path.
-> 
-> Maybe something like this:
-> 
-> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-> index 050de59..c20d193 100644
-> --- a/include/exec/gen-icount.h
-> +++ b/include/exec/gen-icount.h
-> @@ -73,6 +73,9 @@ static inline void gen_io_end(void)
->  {
->      TCGv_i32 tmp = tcg_const_i32(0);
->      tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
-> +    /* Make the next TB exit immediately with TB_EXIT_ICOUNT_EXPIRED.  */
-> +    tcg_gen_st16_i32(-1, cpu_env,
-> +                     -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.high));
->      tcg_temp_free_i32(tmp);
->  }
+usb_xhci_realize() corrects invalid values of property "intrs"
+automatically, but the uncorrected value is passed to msi_init(),
+which chokes on invalid values.  Delay that until after the
+correction.
 
-I guess it will help, but this seems too general.
-There are some IO cases that do not need breaking the execution.
-E.g., rdtsc in x86 does not change any timers, but is translated as IO operation.
-However, I think it doesn't called too often, therefore it will not affect on performance too much.
+Resources allocated by usb_xhci_init() are leaked when msi_init()
+fails.  Fix by calling it after msi_init().
 
-Pavel Dovgalyuk
+CC: Gerd Hoffmann <kraxel@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Marcel Apfelbaum <marcel@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Marcel Apfelbaum <marcel@redhat.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ hw/usb/hcd-xhci.c | 37 ++++++++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
+
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 4acf0c6dd8c0..0ace273da472 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3627,25 +3627,6 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+     dev->config[PCI_CACHE_LINE_SIZE] = 0x10;
+     dev->config[0x60] = 0x30; /* release number */
+ 
+-    usb_xhci_init(xhci);
+-
+-    if (xhci->msi != ON_OFF_AUTO_OFF) {
+-        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
+-        /* Any error other than -ENOTSUP(board's MSI support is broken)
+-         * is a programming error */
+-        assert(!ret || ret == -ENOTSUP);
+-        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
+-            /* Can't satisfy user's explicit msi=on request, fail */
+-            error_append_hint(&err, "You have to use msi=auto (default) or "
+-                    "msi=off with this machine type.\n");
+-            error_propagate(errp, err);
+-            return;
+-        }
+-        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
+-        /* With msi=auto, we fall back to MSI off silently */
+-        error_free(err);
+-    }
+-
+     if (xhci->numintrs > MAXINTRS) {
+         xhci->numintrs = MAXINTRS;
+     }
+@@ -3667,6 +3648,24 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+         xhci->max_pstreams_mask = 0;
+     }
+ 
++    if (xhci->msi != ON_OFF_AUTO_OFF) {
++        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
++        /* Any error other than -ENOTSUP(board's MSI support is broken)
++         * is a programming error */
++        assert(!ret || ret == -ENOTSUP);
++        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
++            /* Can't satisfy user's explicit msi=on request, fail */
++            error_append_hint(&err, "You have to use msi=auto (default) or "
++                    "msi=off with this machine type.\n");
++            error_propagate(errp, err);
++            return;
++        }
++        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
++        /* With msi=auto, we fall back to MSI off silently */
++        error_free(err);
++    }
++
++    usb_xhci_init(xhci);
+     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
+ 
+     memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
+-- 
+2.1.0
