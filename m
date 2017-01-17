@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cTYNJ-0002e1-GO
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:20:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1cTYQk-0003tv-GJ
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:24:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cTYNH-0004go-SD
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:20:53 -0500
-Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:33434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cTYNH-0004ge-4t
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:20:51 -0500
-Received: by mail-it0-x230.google.com with SMTP id d9so28827962itc.0
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 10:20:51 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1cTYQg-0006LJ-H5
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:24:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cTYQg-0006Kl-94
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 13:24:22 -0500
+References: <1484657864-21708-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1484657864-21708-4-git-send-email-zhang.zhanghailiang@huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c79e149c-7d0e-76ae-20f5-b99a595650b5@redhat.com>
+Date: Tue, 17 Jan 2017 12:24:19 -0600
 MIME-Version: 1.0
-In-Reply-To: <f2f54dce-0e3f-2718-4b35-1321f5c2ae11@redhat.com>
-References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
-	<001201d26b1b$e5a8ce20$b0fa6a60$@ru>
-	<CAMo8BfJKXOhiPQz8GT6hXNNBXKsz-67iKx9ct9tEwukVLWR3QA@mail.gmail.com>
-	<001201d26cc6$f023ad00$d06b0700$@ru>
-	<CAFEAcA-AMJ33g9hO2k9oGJfDr-Fatk7TY+Sbs_wRC-OfCjWhmQ@mail.gmail.com>
-	<001301d26cce$21ad3d30$6507b790$@ru>
-	<f2f54dce-0e3f-2718-4b35-1321f5c2ae11@redhat.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 17 Jan 2017 10:20:49 -0800
-Message-ID: <CAMo8Bf+RGjXNXoZpptu6u+Kc5y8j2a0RabxP0ODztRECBFpn-Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
+In-Reply-To: <1484657864-21708-4-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eecJuWGhfj4b8q6vm4rSOeTiRlIMHxr0F"
+Subject: Re: [Qemu-devel] [PATCH 3/3] COLO: Don't process failover request
+ while loading VM's state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>, Peter Maydell <peter.maydell@linaro.org>, Alex Bligh <alex@alex.org.uk>, qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, Richard Henderson <rth@twiddle.net>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
+Cc: amit.shah@redhat.com, quintela@redhat.com, dgilbert@redhat.com, eddie.dong@intel.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com
 
-On Mon, Jan 16, 2017 at 9:19 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 12/01/2017 13:19, Pavel Dovgalyuk wrote:
->>> From: Peter Maydell [mailto:peter.maydell@linaro.org]
->>> On 12 January 2017 at 11:28, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
->>>>> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
->>>>> Ok, looks like what happens in my case is that instruction that
->>>>> sets CCOMPARE and thus changes remaining icount does not
->>>>> cause exit from the cpu_exec. So merely ending TB on
->>>>> QEMU_CLOCK_VIRTUAL timer update is not enough, I need to
->>>>> throw an exception of some kind? Or does the timer code need
->>>>> to take care of that?
->>>>
->>>> Yes, it seems that you should end the block with an exception,
->>>> to allow icount loop recalculate the timeouts.
->>>
->>> Really? The ARM translate.c doesn't generate an exception.
->>> It just does
->>>  gen_io_end();
->>>  gen_lookup_tb();
->>>
->>> (so we force a lookup of the next TB, but don't throw an
->>> exception of any kind).
->>
->> Maybe I missing something. As far as I understand, changing the virtual timer
->> notifies the iothread and os_host_main_loop_wait kicks the CPU thread.
->>
->> But within that period of time before changing the timer and kicking the thread
->> CPU may proceed some instructions and the timer will be expired if it was set
->> to one of the soonest instructions.
->
-> My understanding (which may be wrong!) was that after gen_io_end you
-> would exit with TB_EXIT_ICOUNT_EXPIRED and cpu->icount_decr.u16.high =
-> -1, but indeed I don't see anything that calls cpu_interrupt in that
-> path.
->
-> Maybe something like this:
->
-> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-> index 050de59..c20d193 100644
-> --- a/include/exec/gen-icount.h
-> +++ b/include/exec/gen-icount.h
-> @@ -73,6 +73,9 @@ static inline void gen_io_end(void)
->  {
->      TCGv_i32 tmp = tcg_const_i32(0);
->      tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
-> +    /* Make the next TB exit immediately with TB_EXIT_ICOUNT_EXPIRED.  */
-> +    tcg_gen_st16_i32(-1, cpu_env,
-> +                     -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.high));
->      tcg_temp_free_i32(tmp);
->  }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eecJuWGhfj4b8q6vm4rSOeTiRlIMHxr0F
+From: Eric Blake <eblake@redhat.com>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
+Cc: amit.shah@redhat.com, quintela@redhat.com, dgilbert@redhat.com,
+ eddie.dong@intel.com, lizhijian@cn.fujitsu.com,
+ zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com
+Message-ID: <c79e149c-7d0e-76ae-20f5-b99a595650b5@redhat.com>
+Subject: Re: [PATCH 3/3] COLO: Don't process failover request while loading
+ VM's state
+References: <1484657864-21708-1-git-send-email-zhang.zhanghailiang@huawei.com>
+ <1484657864-21708-4-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1484657864-21708-4-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-With -1 moved into TCG temporary that works for me as well.
+On 01/17/2017 06:57 AM, zhanghailiang wrote:
+> We should not do failover work while the main thread is loading
+> VM's state. Otherwise the consistent of VM's memory and
+> device state will be broken.
+>=20
+> We will restart the loading process after jump over the stage,
+> The new failover status 'RELAUNCH' will help to record if we
+> need to restart the process.
+>=20
+> Cc: Eric Blake <eblake@redhat.com>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/colo.c | 26 ++++++++++++++++++++++++++
+>  qapi-schema.json |  4 +++-
+>  2 files changed, 29 insertions(+), 1 deletion(-)
+>=20
 
--- 
-Thanks.
--- Max
+> +++ b/qapi-schema.json
+> @@ -856,10 +856,12 @@
+>  #
+>  # @completed: finish the process of failover
+>  #
+> +# @relaunch: restart the failover process, from 'none' -> 'completed'
+
+You'll need to add a '(since 2.9)' tag
+
+> +#
+>  # Since: 2.8
+>  ##
+>  { 'enum': 'FailoverStatus',
+> -  'data': [ 'none', 'require', 'active', 'completed'] }
+> +  'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
+> =20
+>  ##
+>  # @x-colo-lost-heartbeat:
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--eecJuWGhfj4b8q6vm4rSOeTiRlIMHxr0F
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYfmFTAAoJEKeha0olJ0NqdWcH/RvK8zYXvLa4M+5oxc5hCKta
+cxF/A/5j/ArAoKGSFrEnGj9UqUFYu2Y3LDRhaUTW11ra+fjJxHtMzkj42xC+F9AP
+DT1R9yVhFI4whU/earNcBU7WzrWrwI3GV0P+UfKR0EWJfNBqIUv47yiFVRKvAegr
+z+2ICOsMs8ytkj1kZasWOiRvgGLceGHfQ8d/xH9qgU7zoYGIsDl/o3zmPRYl/Qv9
+DmFMKAxVN8yXGIZGLUkEi9rN7DrkuVmipzhPGWgVx+tKR/imIz5IYxHV89cB53zX
+VBm06nb/GnuN55yHKc7GMSYHXdywYNk7Iu7aDUnWOf4X3dzMCHfQrxMPQCBVzxo=
+=PBdv
+-----END PGP SIGNATURE-----
+
+--eecJuWGhfj4b8q6vm4rSOeTiRlIMHxr0F--
