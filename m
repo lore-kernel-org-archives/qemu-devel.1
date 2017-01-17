@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cTHx2-0005hv-NA
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:48:42 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTIAF-0004oc-Kv
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 20:02:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cTHx1-0006oy-Ci
-	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 19:48:40 -0500
-Message-ID: <1484614111.2028.14.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Tue, 17 Jan 2017 11:48:31 +1100
-In-Reply-To: <20170116214030.GG15853@umbus>
-References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
-	<1484288903-18807-6-git-send-email-sjitindarsingh@gmail.com>
-	<20170116214030.GG15853@umbus>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 05/17] target/ppc/POWER9: Adapt LPCR
- handling for POWER9
+	(envelope-from <ehabkost@redhat.com>) id 1cTIAB-0001Tn-M7
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 20:02:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55546)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTIAB-0001Th-Fn
+	for qemu-devel@nongnu.org; Mon, 16 Jan 2017 20:02:15 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 16 Jan 2017 23:01:55 -0200
+Message-Id: <20170117010204.4909-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/9] i386: query-cpu-model-expansion test script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,179 +21,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, libvir-list@redhat.com, Jiri Denemark <jdenemar@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Tue, 2017-01-17 at 08:40 +1100, David Gibson wrote:
-> On Fri, Jan 13, 2017 at 05:28:11PM +1100, Suraj Jitindar Singh wrote:
-> > 
-> > The logical partitioning control register controls a threads
-> > operation
-> > based on the partition it is currently executing. Add new
-> > definitions and
-> > update the mask used when writing to the LPCR based on the POWER9
-> > spec.
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > ---
-> >  target/ppc/cpu.h            | 20 +++++++++++++++++++-
-> >  target/ppc/mmu-hash64.c     |  8 ++++++++
-> >  target/ppc/translate_init.c | 24 ++++++++++++++++++------
-> >  3 files changed, 45 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> > index afb7ddb..0ab49b3 100644
-> > --- a/target/ppc/cpu.h
-> > +++ b/target/ppc/cpu.h
-> > @@ -379,15 +379,22 @@ struct ppc_slb_t {
-> >  #define LPCR_ISL          (1ull << (63 - 2))
-> >  #define LPCR_KBV          (1ull << (63 - 3))
-> >  #define LPCR_DPFD_SHIFT   (63 - 11)
-> > -#define LPCR_DPFD         (0x3ull << LPCR_DPFD_SHIFT)
-> > +#define LPCR_DPFD         (0x7ull << LPCR_DPFD_SHIFT)
-> Changing this define effectively changes the valid LPCR mask for
-> existing POWER8 and POWER7 models, which is not what you want, I
-> think.
-I should have explained this better in the commit message, this has
-always been a 3 bit field (at least in POWER7-9) so the mask has just
-always been wrong. Afaik fixing this up won't really change anything -
-it relates to data stream prefetch depth.
+This is a follow-up to the series that implements
+query-cpu-model-expansion. Before including the test script, the
+series has some fixes to allow the results of
+query-cpu-model-expansion to be used in the QEMU command-line.
 
-I realise this should probably be a separate patch though, or atleast
-mentioned in the commit message.
-> 
-> > 
-> >  #define LPCR_VRMASD_SHIFT (63 - 16)
-> >  #define LPCR_VRMASD       (0x1full << LPCR_VRMASD_SHIFT)
-> > +/* P9: Power-saving mode Exit Cause Enable (Upper Section) Mask */
-> > +#define LPCR_PECE_U_SHIFT (63 - 19)
-> > +#define LPCR_PECE_U_MASK  (0x7ull << LPCR_PECE_U_SHIFT)
-> > +#define LPCR_HVEE         (1ull << (63 - 17)) /* Hypervisor Virt
-> > Exit Enable */
-> >  #define LPCR_RMLS_SHIFT   (63 - 37)
-> >  #define LPCR_RMLS         (0xfull << LPCR_RMLS_SHIFT)
-> >  #define LPCR_ILE          (1ull << (63 - 38))
-> >  #define LPCR_AIL_SHIFT    (63 - 40)      /* Alternate interrupt
-> > location */
-> >  #define LPCR_AIL          (3ull << LPCR_AIL_SHIFT)
-> > +#define LPCR_UPRT         (1ull << (63 - 41)) /* Use Process Table
-> > */
-> > +#define LPCR_EVIRT        (1ull << (63 - 42)) /* Enhanced
-> > Virtualisation */
-> >  #define LPCR_ONL          (1ull << (63 - 45))
-> > +#define LPCR_LD           (1ull << (63 - 46)) /* Large Decrementer
-> > */
-> >  #define LPCR_P7_PECE0     (1ull << (63 - 49))
-> >  #define LPCR_P7_PECE1     (1ull << (63 - 50))
-> >  #define LPCR_P7_PECE2     (1ull << (63 - 51))
-> > @@ -396,11 +403,22 @@ struct ppc_slb_t {
-> >  #define LPCR_P8_PECE2     (1ull << (63 - 49))
-> >  #define LPCR_P8_PECE3     (1ull << (63 - 50))
-> >  #define LPCR_P8_PECE4     (1ull << (63 - 51))
-> > +/* P9: Power-saving mode Exit Cause Enable (Lower Section) Mask */
-> > +#define LPCR_PECE_L_SHIFT (63 - 51)
-> > +#define LPCR_PECE_L_MASK  (0x1full << LPCR_PECE_L_SHIFT)
-> > +#define LPCR_PDEE         (1ull << (63 - 47)) /* Privileged
-> > Doorbell Exit EN */
-> > +#define LPCR_HDEE         (1ull << (63 - 48)) /* Hyperv Doorbell
-> > Exit Enable */
-> > +#define LPCR_EEE          (1ull << (63 - 49)) /* External Exit
-> > Enable        */
-> > +#define LPCR_DEE          (1ull << (63 - 50)) /* Decrementer Exit
-> > Enable     */
-> > +#define LPCR_OEE          (1ull << (63 - 51)) /* Other Exit
-> > Enable           */
-> >  #define LPCR_MER          (1ull << (63 - 52))
-> > +#define LPCR_GTSE         (1ull << (63 - 53)) /* Guest Translation
-> > Shootdown */
-> >  #define LPCR_TC           (1ull << (63 - 54))
-> > +#define LPCR_HEIC         (1ull << (63 - 59)) /* HV Extern
-> > Interrupt Control */
-> >  #define LPCR_LPES0        (1ull << (63 - 60))
-> >  #define LPCR_LPES1        (1ull << (63 - 61))
-> >  #define LPCR_RMI          (1ull << (63 - 62))
-> > +#define LPCR_HVICE        (1ull << (63 - 62)) /* HV Virtualisation
-> > Int Enable */
-> >  #define LPCR_HDICE        (1ull << (63 - 63))
-> >  
-> >  #define msr_sf   ((env->msr >> MSR_SF)   & 1)
-> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> > index fdb7a78..3a2acb8 100644
-> > --- a/target/ppc/mmu-hash64.c
-> > +++ b/target/ppc/mmu-hash64.c
-> > @@ -1050,6 +1050,14 @@ void helper_store_lpcr(CPUPPCState *env,
-> > target_ulong val)
-> >                        LPCR_P8_PECE2 | LPCR_P8_PECE3 |
-> > LPCR_P8_PECE4 |
-> >                        LPCR_MER | LPCR_TC | LPCR_LPES0 |
-> > LPCR_HDICE);
-> >          break;
-> > +    case POWERPC_MMU_3_00: /* P9 */
-> > +        lpcr = val & (LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD
-> > |
-> > +                      (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE |
-> > LPCR_AIL |
-> > +                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL |
-> > +                      (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE |
-> > LPCR_EEE |
-> > +                      LPCR_DEE | LPCR_OEE)) | LPCR_MER | LPCR_GTSE
-> > | LPCR_TC |
-> > +                      LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE |
-> > LPCR_HDICE);
-> > +        break;
-> >      default:
-> >          ;
-> >      }
-> > diff --git a/target/ppc/translate_init.c
-> > b/target/ppc/translate_init.c
-> > index 2402eef..a1994d3 100644
-> > --- a/target/ppc/translate_init.c
-> > +++ b/target/ppc/translate_init.c
-> > @@ -8887,12 +8887,24 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu)
-> >      lpcr->default_value &= ~LPCR_RMLS;
-> >      lpcr->default_value |= 1ull << LPCR_RMLS_SHIFT;
-> >  
-> > -    /* P7 and P8 has slightly different PECE bits, mostly because
-> > P8 adds
-> > -     * bit 47 and 48 which are reserved on P7. Here we set them
-> > all, which
-> > -     * will work as expected for both implementations
-> > -     */
-> > -    lpcr->default_value |= LPCR_P8_PECE0 | LPCR_P8_PECE1 |
-> > LPCR_P8_PECE2 |
-> > -                           LPCR_P8_PECE3 | LPCR_P8_PECE4;
-> > +    switch (env->mmu_model) {
-> I'm not sure of mmu_model is conceptually the right thing to switch
-> on, although I guess it will work in practice.
-Well we need something to indicate our default value, which is dictated
-by the cpu model, and given that a cpu model correlates to a mmu model
-I can't think of a better option.
-> 
-> > 
-> > +    case POWERPC_MMU_3_00:
-> > +        /* By default we choose legacy mode and switch to new hash
-> > or radix
-> > +         * when a register process table hcall is made. So disable
-> > process
-> > +         * tables and guest translation shootdown by default
-> > +         */
-> > +        lpcr->default_value &= ~(LPCR_UPRT | LPCR_GTSE);
-> > +        lpcr->default_value |= LPCR_PDEE | LPCR_HDEE | LPCR_EEE |
-> > LPCR_DEE |
-> > +                               LPCR_OEE;
-> > +        break;
-> > +    default:
-> > +        /* P7 and P8 has slightly different PECE bits, mostly
-> > because P8 adds
-> > +         * bit 47 and 48 which are reserved on P7. Here we set
-> > them all, which
-> > +         * will work as expected for both implementations
-> > +         */
-> > +        lpcr->default_value |= LPCR_P8_PECE0 | LPCR_P8_PECE1 |
-> > LPCR_P8_PECE2 |
-> > +                               LPCR_P8_PECE3 | LPCR_P8_PECE4;
-> > +    }
-> >  
-> >      /* We should be followed by a CPU reset but update the active
-> > value
-> >       * just in case...
+The script probably will work on s390x too, but I couldn't test
+it yet.
+
+This series and its dependencies can be pulled from the branch:
+  https://github.com/ehabkost/qemu-hacks.git work/x86-query-cpu-expansion-test
+
+---
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: libvir-list@redhat.com
+Cc: Jiri Denemark <jdenemar@redhat.com>
+Cc: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+
+Eduardo Habkost (9):
+  target-i386: Move "host" properties to base class
+  target-i386: Allow short strings to be used as vendor ID
+  cpu: Support comma escaping when parsing -cpu
+  qemu.py: Make logging optional
+  qtest.py: Support QTEST_LOG environment variable
+  qtest.py: make logging optional
+  qtest.py: Make 'binary' parameter optional
+  tests: Add rules to non-gtester qtest test cases
+  tests: Test case for query-cpu-model-expansion
+
+ scripts/qemu.py               |  25 ++-
+ scripts/qtest.py              |  15 +-
+ qom/cpu.c                     |  32 ++--
+ target/i386/cpu.c             |  83 ++++-----
+ tests/test-x86-cpuid-compat.c |  19 ++
+ tests/Makefile.include        |  40 ++++-
+ tests/query-cpu-model-test.py | 398 ++++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 551 insertions(+), 61 deletions(-)
+ create mode 100755 tests/query-cpu-model-test.py
+
+-- 
+2.11.0.259.g40922b1
