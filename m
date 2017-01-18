@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cTytP-0006o1-H4
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:48 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cTytQ-0006on-Ef
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cTytO-0002vh-AQ
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:47 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33236)
+	(envelope-from <atar4qemu@gmail.com>) id 1cTytP-0002x4-PW
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:48 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36263)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cTytO-0002v1-1a
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:46 -0500
-Received: by mail-wm0-x243.google.com with SMTP id r144so7569091wme.0
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:39:45 -0800 (PST)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cTytP-0002wJ-JL
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:47 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r126so7540774wmr.3
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:39:47 -0800 (PST)
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Wed, 18 Jan 2017 23:38:34 +0100
-Message-Id: <1484779123-18968-22-git-send-email-atar4qemu@gmail.com>
+Date: Wed, 18 Jan 2017 23:38:35 +0100
+Message-Id: <1484779123-18968-23-git-send-email-atar4qemu@gmail.com>
 In-Reply-To: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
 References: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
-Subject: [Qemu-devel] [PULL 21/30] target-sparc: simplify
- ultrasparc_tsb_pointer
+Subject: [Qemu-devel] [PULL 22/30] target-sparc: allow 256M sized pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +30,37 @@ Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, rth@twiddle.net, Artyo
 
 Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
 ---
- target/sparc/ldst_helper.c | 51 ++++++++++++++--------------------------------
- 1 file changed, 15 insertions(+), 36 deletions(-)
+ target/sparc/mmu_helper.c | 18 +-----------------
+ 1 file changed, 1 insertion(+), 17 deletions(-)
 
-diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-index aa6f77d..d4eee33 100644
---- a/target/sparc/ldst_helper.c
-+++ b/target/sparc/ldst_helper.c
-@@ -70,44 +70,35 @@
- #define QT1 (env->qt1)
- 
- #if defined(TARGET_SPARC64) && !defined(CONFIG_USER_ONLY)
--static uint64_t ultrasparc_tsb_pointer(CPUSPARCState *env, uint64_t tsb,
--                                       uint64_t *tsb_ptr,
--                                       uint64_t tag_access_register,
--                                       int idx, uint64_t *cfg_ptr)
- /* Calculates TSB pointer value for fault page size
-  * UltraSPARC IIi has fixed sizes (8k or 64k) for the page pointers
-  * UA2005 holds the page size configuration in mmu_ctx registers */
-+static uint64_t ultrasparc_tsb_pointer(CPUSPARCState *env,
-+                                       const SparcV9MMU *mmu, const int idx)
+diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
+index 044e88c..fa70dc0 100644
+--- a/target/sparc/mmu_helper.c
++++ b/target/sparc/mmu_helper.c
+@@ -456,23 +456,7 @@ static inline int ultrasparc_tag_match(SparcTLBEntry *tlb,
+                                        uint64_t address, uint64_t context,
+                                        hwaddr *physical)
  {
-     uint64_t tsb_register;
-     int page_size;
-     if (cpu_has_hypervisor(env)) {
-         int tsb_index = 0;
--        int ctx = tag_access_register & 0x1fffULL;
--        uint64_t ctx_register = cfg_ptr[ctx ? 1 : 0];
-+        int ctx = mmu->tag_access & 0x1fffULL;
-+        uint64_t ctx_register = mmu->sun4v_ctx_config[ctx ? 1 : 0];
-         tsb_index = idx;
-         tsb_index |= ctx ? 2 : 0;
-         page_size = idx ? ctx_register >> 8 : ctx_register;
-         page_size &= 7;
--        tsb_register = tsb_ptr[tsb_index];
-+        tsb_register = mmu->sun4v_tsb_pointers[tsb_index];
-     } else {
-         page_size = idx;
--        tsb_register = tsb;
-+        tsb_register = mmu->tsb;
-     }
--    uint64_t tsb_base = tsb_register & ~0x1fffULL;
-     int tsb_split = (tsb_register & 0x1000ULL) ? 1 : 0;
-     int tsb_size  = tsb_register & 0xf;
- 
--    /* discard lower 13 bits which hold tag access context */
--    uint64_t tag_access_va = tag_access_register & ~0x1fffULL;
-+    uint64_t tsb_base_mask = (~0x1fffULL) << tsb_size;
- 
--    /* now reorder bits */
--    uint64_t tsb_base_mask = ~0x1fffULL;
--    uint64_t va = tag_access_va;
+-    uint64_t mask;
 -
--    /* move va bits to correct position */
--    va >>= 3 * page_size + 9;
--
--    tsb_base_mask <<= tsb_size;
-+    /* move va bits to correct position,
-+     * the context bits will be masked out later */
-+    uint64_t va = mmu->tag_access >> (3 * page_size + 9);
+-    switch (TTE_PGSIZE(tlb->tte)) {
+-    default:
+-    case 0x0: /* 8k */
+-        mask = 0xffffffffffffe000ULL;
+-        break;
+-    case 0x1: /* 64k */
+-        mask = 0xffffffffffff0000ULL;
+-        break;
+-    case 0x2: /* 512k */
+-        mask = 0xfffffffffff80000ULL;
+-        break;
+-    case 0x3: /* 4M */
+-        mask = 0xffffffffffc00000ULL;
+-        break;
+-    }
++    uint64_t mask = -(8192ULL << 3 * TTE_PGSIZE(tlb->tte));
  
-     /* calculate tsb_base mask and adjust va if split is in use */
-     if (tsb_split) {
-@@ -119,7 +110,7 @@ static uint64_t ultrasparc_tsb_pointer(CPUSPARCState *env, uint64_t tsb,
-         tsb_base_mask <<= 1;
-     }
- 
--    return ((tsb_base & tsb_base_mask) | (va & ~tsb_base_mask)) & ~0xfULL;
-+    return ((tsb_register & tsb_base_mask) | (va & ~tsb_base_mask)) & ~0xfULL;
- }
- 
- /* Calculates tag target register value by reordering bits
-@@ -1268,20 +1259,14 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
-         {
-             /* env->immuregs[5] holds I-MMU TSB register value
-                env->immuregs[6] holds I-MMU Tag Access register value */
--            ret = ultrasparc_tsb_pointer(env, env->immu.tsb,
--                                         env->immu.sun4v_tsb_pointers,
--                                         env->immu.tag_access,
--                                         0, env->immu.sun4v_ctx_config);
-+            ret = ultrasparc_tsb_pointer(env, &env->immu, 0);
-             break;
-         }
-     case ASI_IMMU_TSB_64KB_PTR: /* I-MMU 64k TSB pointer */
-         {
-             /* env->immuregs[5] holds I-MMU TSB register value
-                env->immuregs[6] holds I-MMU Tag Access register value */
--            ret = ultrasparc_tsb_pointer(env, env->immu.tsb,
--                                         env->immu.sun4v_tsb_pointers,
--                                         env->immu.tag_access,
--                                         1, env->immu.sun4v_ctx_config);
-+            ret = ultrasparc_tsb_pointer(env, &env->immu, 1);
-             break;
-         }
-     case ASI_ITLB_DATA_ACCESS: /* I-MMU data access */
-@@ -1340,20 +1325,14 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
-         {
-             /* env->dmmuregs[5] holds D-MMU TSB register value
-                env->dmmuregs[6] holds D-MMU Tag Access register value */
--            ret = ultrasparc_tsb_pointer(env, env->dmmu.tsb,
--                                         env->dmmu.sun4v_tsb_pointers,
--                                         env->dmmu.tag_access,
--                                         0, env->dmmu.sun4v_ctx_config);
-+            ret = ultrasparc_tsb_pointer(env, &env->dmmu, 0);
-             break;
-         }
-     case ASI_DMMU_TSB_64KB_PTR: /* D-MMU 64k TSB pointer */
-         {
-             /* env->dmmuregs[5] holds D-MMU TSB register value
-                env->dmmuregs[6] holds D-MMU Tag Access register value */
--            ret = ultrasparc_tsb_pointer(env, env->dmmu.tsb,
--                                         env->dmmu.sun4v_tsb_pointers,
--                                         env->dmmu.tag_access,
--                                         1, env->dmmu.sun4v_ctx_config);
-+            ret = ultrasparc_tsb_pointer(env, &env->dmmu, 1);
-             break;
-         }
-     case ASI_DTLB_DATA_ACCESS: /* D-MMU data access */
+     /* valid, context match, virtual address match? */
+     if (TTE_IS_VALID(tlb->tte) &&
 -- 
 2.7.2
