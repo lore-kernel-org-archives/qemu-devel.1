@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cTxfs-00069d-BR
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:21:45 -0500
+	(envelope-from <mst@redhat.com>) id 1cTxhq-00076G-M4
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:23:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cTxfp-0000Vl-1v
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:21:44 -0500
-Resent-Message-Id: <E1cTxfp-0000Vl-1v@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21441)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cTxfo-0000U8-Pa
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:21:40 -0500
-In-Reply-To: <1484773521-16530-1-git-send-email-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148477448124.214.6578519895706269089@790289a7ca88>
+	(envelope-from <mst@redhat.com>) id 1cTxhn-0001jZ-9N
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:23:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42822)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTxhn-0001iM-3u
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:23:43 -0500
+Date: Wed, 18 Jan 2017 23:23:40 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170118232247-mutt-send-email-mst@kernel.org>
+References: <1484772931-16272-1-git-send-email-mst@redhat.com>
+	<1484772931-16272-3-git-send-email-mst@redhat.com>
+	<CAFEAcA_92_OZbPQGZ17-bOWwnchN14Y9yKxk362G7-c65-6Q4A@mail.gmail.com>
+	<20170118231450-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 18 Jan 2017 13:21:23 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/7] target-m68k: implement 680x0 FPU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170118231450-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] compiler: drop ; after BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, aurelien@aurel32.net, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-NDc3MzUyMS0xNjUzMC0xLWdpdC1zZW5kLWVtYWlsLWxhdXJlbnRAdml2aWVyLmV1ClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggMC83XSB0YXJnZXQtbTY4azogaW1wbGVtZW50IDY4MHgwIEZQ
-VQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
-U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
-aWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0i
-JChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1p
-dHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAx
-IC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwg
-fCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWls
-ZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxl
-ZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
-MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
-Y3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODQ3NzM1MjEtMTY1MzAtMS1n
-aXQtc2VuZC1lbWFpbC1sYXVyZW50QHZpdmllci5ldSAtPiBwYXRjaGV3LzE0ODQ3NzM1MjEtMTY1
-MzAtMS1naXQtc2VuZC1lbWFpbC1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBhIG5ldyBi
-cmFuY2ggJ3Rlc3QnCmFiYTk3ODggdGFyZ2V0LW02OGs6IGltcGxlbWVudHMgbW9yZSBGUFUgaW5z
-dHJ1Y3Rpb25zCjllYzNjNGYgdGFyZ2V0LW02OGs6IGludHJvZHVjZSBmc2NjLgphNWQ1ZGFiIHRh
-cmdldC1tNjhrOiBhZGQgZm1vdmVtCjFkYzIwNDIgdGFyZ2V0LW02OGs6IHVzZSBmbG9hdHg4MCBp
-bnRlcm5hbGx5CmMyMDI5ODUgc29mdGZsb2F0OiBkZWZpbmUgNjgweDAgc3BlY2lmaWMgdmFsdWVz
-CmUxZGU3MzggdGFyZ2V0LW02OGs6IGRlZmluZSBleHRfb3BzaXplCjFjYjAxMmQgdGFyZ2V0LW02
-OGs6IG1vdmUgRlBVIGhlbHBlcnMgdG8gZnB1X2hlbHBlci5jCgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzc6IHRhcmdldC1tNjhrOiBtb3ZlIEZQVSBoZWxwZXJzIHRvIGZw
-dV9oZWxwZXIuYy4uLgpDaGVja2luZyBQQVRDSCAyLzc6IHRhcmdldC1tNjhrOiBkZWZpbmUgZXh0
-X29wc2l6ZS4uLgpDaGVja2luZyBQQVRDSCAzLzc6IHNvZnRmbG9hdDogZGVmaW5lIDY4MHgwIHNw
-ZWNpZmljIHZhbHVlcy4uLgpDaGVja2luZyBQQVRDSCA0Lzc6IHRhcmdldC1tNjhrOiB1c2UgZmxv
-YXR4ODAgaW50ZXJuYWxseS4uLgpFUlJPUjogc3RvcmFnZSBjbGFzcyBzaG91bGQgYmUgYXQgdGhl
-IGJlZ2lubmluZyBvZiB0aGUgZGVjbGFyYXRpb24KIzg0OTogRklMRTogdGFyZ2V0L202OGsvdHJh
-bnNsYXRlLmM6Mzk6CisjZGVmaW5lIERFRkY5NihuYW1lLCBvZmZzZXQpIHN0YXRpYyBUQ0d2X2kz
-MiBRUkVHXyMjbmFtZSMjSDsgXAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxODk4IGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDUvNzogdGFyZ2V0LW02OGs6IGFkZCBmbW92ZW0uLi4KQ2hlY2tpbmcgUEFUQ0gg
-Ni83OiB0YXJnZXQtbTY4azogaW50cm9kdWNlIGZzY2MuLi4uCkNoZWNraW5nIFBBVENIIDcvNzog
-dGFyZ2V0LW02OGs6IGltcGxlbWVudHMgbW9yZSBGUFUgaW5zdHJ1Y3Rpb25zLi4uCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Wed, Jan 18, 2017 at 11:16:07PM +0200, Michael S. Tsirkin wrote:
+> On Wed, Jan 18, 2017 at 09:04:03PM +0000, Peter Maydell wrote:
+> > On 18 January 2017 at 20:55, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > All users include the trailing ;, let's require that
+> > > so that uses such as if (a) QEMU_BUILD_BUG_ON(); do not
+> > > produce unexpected results.
+> > 
+> > When would it ever make sense for a build-time
+> > assert to be the only thing inside a runtime
+> > conditional anyway?
+> > 
+> > thanks
+> > -- PMM
+> 
+> What do I know? Do you want to keep the trailing ; in there?
+> I can drop this patch.
+
+Maybe a better justification:
+
+
+QEMU_BUILD_BUG_ON(0)
+
+QEMU_BUILD_BUG_ON(0)
+
+looks ugly but is allowed by the current implementation.
+Let's drop the trailing ; within the macro to make sure all
+users include the ';'.
+
+
+> -- 
+> MST
