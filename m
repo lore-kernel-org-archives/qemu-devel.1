@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cTkDp-0007N1-T2
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 01:59:54 -0500
+	(envelope-from <lists2009@fnarfbargle.com>) id 1cTkUw-0001d3-4w
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 02:17:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cTkDp-0000DI-8p
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 01:59:53 -0500
-References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1480926904-17596-3-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170117112531.GG4265@stefanha-x1.localdomain>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <587F1140.2070702@huawei.com>
-Date: Wed, 18 Jan 2017 14:54:56 +0800
+	(envelope-from <lists2009@fnarfbargle.com>) id 1cTkUs-0006rz-64
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 02:17:34 -0500
+Received: from ns3.fnarfbargle.com ([43.245.164.105]:45611)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lists2009@fnarfbargle.com>)
+	id 1cTkUr-0006ph-Nn
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 02:17:30 -0500
+Received: from srv.home ([10.8.0.1] ident=heh4524)
+	by ns3.fnarfbargle.com with esmtps
+	(TLS1.2:DHE_RSA_AES_128_CBC_SHA1:128) (Exim 4.80)
+	(envelope-from <lists2009@fnarfbargle.com>) id 1cTkKG-0000PT-CU
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:06:32 +0800
+References: <86a7d976-780a-508e-1edd-af4334cf9d5d@fnarfbargle.com>
+From: Brad Campbell <lists2009@fnarfbargle.com>
+Message-ID: <83d9e4c6-e85c-01d5-6e55-f3260eb7a032@fnarfbargle.com>
+Date: Wed, 18 Jan 2017 15:16:17 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170117112531.GG4265@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+In-Reply-To: <86a7d976-780a-508e-1edd-af4334cf9d5d@fnarfbargle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v2 2/6] replication: add shared-disk
- and shared-disk-id options
+Subject: Re: [Qemu-devel] commit : "virtio: set ISR on dataplane
+ notifications" breaks virtio-pci network on linux guest.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
 
-On 2017/1/17 19:25, Stefan Hajnoczi wrote:
-> On Mon, Dec 05, 2016 at 04:35:00PM +0800, zhanghailiang wrote:
->> @@ -85,6 +99,9 @@ static int replication_open(BlockDriverState *bs, QDict *options,
->>       QemuOpts *opts = NULL;
->>       const char *mode;
->>       const char *top_id;
->> +    const char *shared_disk_id;
->> +    BlockBackend *blk;
->> +    BlockDriverState *tmp_bs;
->>
->>       ret = -EINVAL;
->>       opts = qemu_opts_create(&replication_runtime_opts, NULL, 0, &error_abort);
->> @@ -119,6 +136,25 @@ static int replication_open(BlockDriverState *bs, QDict *options,
->>                      "The option mode's value should be primary or secondary");
->>           goto fail;
->>       }
->> +    s->is_shared_disk = qemu_opt_get_bool(opts, REPLICATION_SHARED_DISK,
->> +                                          false);
->> +    if (s->is_shared_disk && (s->mode == REPLICATION_MODE_PRIMARY)) {
->> +        shared_disk_id = qemu_opt_get(opts, REPLICATION_SHARED_DISK_ID);
->> +        if (!shared_disk_id) {
->> +            error_setg(&local_err, "Missing shared disk blk");
->> +            goto fail;
->> +        }
->> +        s->shared_disk_id = g_strdup(shared_disk_id);
->> +        blk = blk_by_name(s->shared_disk_id);
->> +        if (!blk) {
->> +            g_free(s->shared_disk_id);
->> +            error_setg(&local_err, "There is no %s block", s->shared_disk_id);
->> +            goto fail;
+On 18/01/17 10:21, Brad Campbell wrote:
+> G'day all,
 >
-> Please move the g_free() to the fail label to prevent future code
-> changes from introducing a memory leak.
+> Upgrading from 2.7.1 to 2.8 on my machines here leaves the guests
+> without networking. All guests are using a vanilla self-compiled 4.8.12
+> kernel. The host is using a 4.9.3 kernel.
+>
+> Guests are using virtio networking into a bridge on the host.
 >
 
-OK, I will fix it in next version, thanks very much.
+Further testing indicates this only breaks when CONFIG_GENERIC_MSI_IRQ 
+is not set in the guest kernel. My guest kernel didn't have this 
+enabled. Once I recompiled and re-deployed the kernels, all linux VM's 
+networked fine.
+
+I can however confirm it breaks Windows XP 32 bit guests. Upgrading to 
+the latest driver (51.74.104.13000) does not solve the problem either, 
+so I've had to go back to 2.7.1 to be able to use these Windows VM's.
+
+When I get some time I'll try and set up a test environment outside of 
+libvirt and run further tests.
+
+Regards,
+Brad
