@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTu0T-0004T4-SC
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:26:46 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTu7h-0002Ov-W0
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cTu0P-0004j5-4h
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:26:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42236)
+	(envelope-from <ehabkost@redhat.com>) id 1cTu7d-0007iz-Vk
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:34:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53390)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cTu0O-0004if-S1
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:26:41 -0500
-References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
-	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
-	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
-	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
-	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
-	<20170117094950.5dqdpbk6u7p4yhms@kamzik.brq.redhat.com>
-	<CAFEAcA-Cdyq-dQ0U79TSsjJWQ2TO0R11RCWzAemSRS_1M65meg@mail.gmail.com>
-	<20170118161819.7f5526af@nial.brq.redhat.com>
-	<9dcc7f51-1763-e3bf-6879-7955d9ad23de@redhat.com>
-	<CAKv+Gu9_dFpjwf16WxZQN5CE+7v5zzuff3rxg3EwRgrrYCy+xA@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a8396c69-3bd3-9297-3cd1-253aafa9b695@redhat.com>
-Date: Wed, 18 Jan 2017 18:26:36 +0100
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTu7d-0007iV-PP
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:34:09 -0500
+Date: Wed, 18 Jan 2017 15:34:06 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170118173406.GF3491@thinpad.lan.raisama.net>
+References: <20170117010204.4909-1-ehabkost@redhat.com>
+	<309bd499-204d-df07-aa99-9a999cfecabc@linux.vnet.ibm.com>
+	<20170118170049.GB3491@thinpad.lan.raisama.net>
+	<45e82b29-1ebe-3f34-0cc1-35d60c6044da@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu9_dFpjwf16WxZQN5CE+7v5zzuff3rxg3EwRgrrYCy+xA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
- as PNP0C02 device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <45e82b29-1ebe-3f34-0cc1-35d60c6044da@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 0/9] i386:
+ query-cpu-model-expansion test script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Al Stone <al.stone@linaro.org>, Graeme Gregory <graeme.gregory@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>
+To: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-On 01/18/17 18:02, Ard Biesheuvel wrote:
-> On 18 January 2017 at 15:55, Laszlo Ersek <lersek@redhat.com> wrote:
->> On 01/18/17 16:18, Igor Mammedov wrote:
->>> On Tue, 17 Jan 2017 10:56:53 +0000
->>> Peter Maydell <peter.maydell@linaro.org> wrote:
->>>
->>>> On 17 January 2017 at 09:49, Andrew Jones <drjones@redhat.com> wrote:
->>>>> In some cases the problem we're solving with the compat guards is
->>>>> a bit hypothetical, but, IMHO, nonetheless a good practice. While
->>>>> we may be sure that AAVMF and Linux will be fine with this table
->>>>> changing under their feet, we can't be sure there aren't other
->>>>> mach-virt users that have more sensitive firmwares/OSes. An ACPI-
->>>>> sensitive OS may notice the change on its next reboot after a
->>>>> migration, and then simply refuse to continue.
->>>>
->>>> There's also the case where you do a VM migration midway through
->>>> UEFI booting up, I think, which might cause things to go wrong
->>>> if you catch it just at the wrong moment.
->>> acpi blobs are migrated from source so above won't happen.
->>> The time guest will see new table is fresh boot or reboot.
->>>
->>>>
->>>>> Now, that said, I just spoke with Igor in order to learn the x86
->>>>> practice. He says that the policy has been more lax than what I
->>>>> suggest above. Hypothetical, low-risk issues are left unguarded,
->>>>> and only when a bug is found during testing is it then managed.
->>>>> The idea is to try and reduce the amount of compat variables and
->>>>> conditions needed in the ACPI generation code, but, of course, at
->>>>> some level of risk to users expecting their versioned machine type
->>>>> to always appear the same.
->>>>>
->>>>> So far we've been strict with mach-virt, guarding all hypothetical
->>>>> issues. Perhaps this patch is a good example to get a discussion
->>>>> started on whether or not we should be so strict though.
->>>>
->>>> That said, I don't have a very strong opinion here, beyond that
->>>> we should be consistent at least with x86 practice.
->>> another reason why we are trying not to use strict approach with ACPI
->>> tables is that it's part of firmware and we didn't version firmwares
->>> so far. (i.e. dst host with newer QEMU will typically have newer
->>> firmware and guest with old machine-type migrated to host with newer
->>> QEMU will run new firmware on (re)boot)
->>
->> I haven't been aware of this argument, and I'm surprised by it, but I
->> think it's valid. Regardless of our choice to ultimately compose the
->> ACPI tables in QEMU, guest OSes definitely consider ACPI as part of the
->> firmware. So, different ACPI content after a migration + guest reboot on
->> the target host is not much different from any other firmware-level
->> changes encountered on the same target host, after reboot.
->>
+On Wed, Jan 18, 2017 at 12:09:28PM -0500, Jason J. Herne wrote:
+> On 01/18/2017 12:00 PM, Eduardo Habkost wrote:
+> > On Tue, Jan 17, 2017 at 10:22:10AM -0500, Jason J. Herne wrote:
+> > > On 01/16/2017 08:01 PM, Eduardo Habkost wrote:
+> > > > This is a follow-up to the series that implements
+> > > > query-cpu-model-expansion. Before including the test script, the
+> > > > series has some fixes to allow the results of
+> > > > query-cpu-model-expansion to be used in the QEMU command-line.
+> > > > 
+> > > > The script probably will work on s390x too, but I couldn't test
+> > > > it yet.
+> > > > 
+> > > 
+> > > Eduardo,
+> > > 
+> > > This test seems to mostly work on s390. The only issue I ran into is
+> > > querying host model using tcg only. s390 requires kvm to query the host
+> > > model. Perhaps we could just skip the tcg host test case on s390?
+> > 
+> > We could still try to test "host", but add it to a greylist where
+> > errors returned by query-cpu-model-expansion can be non-fatal.
+> > query-cpu-model-expansion model="host" can also fail with KVM if
+> > the host doesn't support CPU models.
+> > 
 > 
-> I agree. But does that imply that this fix should be tightly coupled
-> to the mach-virt version, considering that the UEFI firmware you run
-> *inside* such a vm is not versioned either?
+> David had the idea to just support -cpu host for tcg. We could do that.
+> In the meantime, I'm ok with your greylist idea too. This would allow the
+> script to work properly on s390 right from the start, and we can remove the
+> greylist when s390 supports specifying -cpu host for tcg.
 
-No, it implies the exact opposite: given that the UEFI firmware is not
-versioned, and may very well differ on source host and target host, the
-ACPI payload that QEMU generates (and that the guest OS considers part
-of the firmware) should be permitted to differ between src and dst host
-just the same.
+I believe we will still need to ignore query-cpu-model-expansion
+errors on some cases, otherwise the test script will fail on
+hosts where KVM doesn't support CPU models in KVM.
 
-In brief, for one data point, I'd be fine if we didn't tie this change
-to machine types.
+But we probably don't need a hardcoded greylist, anyway: we could
+just make the error non-fatal in case the CPU model is not
+reported as migration-safe in query-cpu-definitions.
 
-Thanks
-Laszlo
+But I was wondering:
+
+1) Isn't "-cpu host" the default CPU model on s390x on KVM,
+   even if the host doesn't support CPU models?
+
+2) Is it really correct to return an error on
+   "query-cpu-model-expansion model=host type=full" if the host
+   doesn't support CPU models?
+
+   What if it just returned { name: "host", props: {} }
+   on those cases, meaning that the CPU model is valid and
+   usable, but QEMU is unable to provide extra information about
+   it.
+
+-- 
+Eduardo
