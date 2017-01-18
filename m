@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cTfcZ-0005jy-1w
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:05:07 -0500
+	(envelope-from <famz@redhat.com>) id 1cTfku-0007EG-Io
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:13:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cTfcT-0004ug-Ur
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:05:06 -0500
-Received: from [45.249.212.187] (port=2528 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cTfcN-0004aL-6x
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:05:01 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 18 Jan 2017 02:04:07 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA195C57@DGGEMA505-MBX.china.huawei.com>
-References: <1484051484-86503-1-git-send-email-xin.zeng@intel.com>
-	<82063967A54EF84C8AFCD6BD7F6AD93310C4C74E@SHSMSX103.ccr.corp.intel.com>
-In-Reply-To: <82063967A54EF84C8AFCD6BD7F6AD93310C4C74E@SHSMSX103.ccr.corp.intel.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <famz@redhat.com>) id 1cTfkq-0004Ae-GS
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:13:44 -0500
+Date: Wed, 18 Jan 2017 10:13:34 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170118021334.GB31883@lemon.Home>
+References: <1484702052-7900-1-git-send-email-skiver.cloud.yzy@gmail.com>
+	<148470234043.214.7219322137444222645@790289a7ca88>
+	<CAHkcwafqx4-vMsCVJOZS04Kb1cRVbu2ea802hjdOhJp2JoPA+A@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH v3 1/1] virtio crypto device
- specification: asymmetric crypto service
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHkcwafqx4-vMsCVJOZS04Kb1cRVbu2ea802hjdOhJp2JoPA+A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] gdbstub.c: fix GDB connection segfault
+ caused by empty machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +25,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zeng, Xin" <xin.zeng@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Keating, Brian A" <brian.a.keating@intel.com>, "Griffin, John" <john.griffin@intel.com>, "Ma, Liang J" <liang.j.ma@intel.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: Yang Ziyue <skiver.cloud.yzy@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Ziyue Yang <yzylivezh@hotmail.com>
 
-Hi Xin,
+On Wed, 01/18 09:34, Yang Ziyue wrote:
+> Oops seems I forgot to check the patch before submitting. Sorry for that.
+> The new patch is tagged as v3 now, but I'm not sure whether it should
+> be tagged as v2 since the origin v2 failed. Is there any specification
+> about this? Thanks!
 
->
-> Subject: RE: [RFC PATCH v3 1/1] virtio crypto device specification: asymm=
-etric
-> crypto service
->=20
-> Ping...
-> Any comments on this part of virtio crypto spec?
->=20
-I update the virtio crypto spec to support non-session based crypto
-Operations and your asym service also needs change struct virtio_crypto_op_=
-data_req
-which maybe cause the compatibility complaint with the pre-existing code.
+Hi Ziyue, thanks for submitting the patch. When you repost, use v3 please, a
+(even failed or mistaken) version shouldn't be reused, so that people looking at
+the subjects will know which one is newer.
 
-So I strongly suggest you rebase my v16 (will be submitted today), and put
-asym service to struct virtio_crypto_op_data_req_mixed.
-
-struct virtio_crypto_op_data_req_mixed {
-    struct virtio_crypto_op_header header;
-
-    union {
-        struct virtio_crypto_sym_data_req   sym_req;
-        struct virtio_crypto_hash_data_req  hash_req;
-        struct virtio_crypto_mac_data_req   mac_req;
-        struct virtio_crypto_aead_data_req  aead_req;
-        struct virtio_crypto_sym_data_req_non_sess   sym_non_sess_req;
-        struct virtio_crypto_hash_data_req_non_sess  hash_non_sess_req;
-        struct virtio_crypto_mac_data_req_non_sess   mac_non_sess_req;
-        struct virtio_crypto_aead_data_req_non_sess  aead_non_sess_req;
-
-		/* asymmetric crypto requests here */
-		...
-    } u;
-};
-
-> We also plan to add asymmetric crypto service part support in LKCF based =
-virtio
-> crypto frontend driver, and upstream DPDK vhost library based vhost user =
-for
-> cryptodev which also focuses on asymmetric crypto service , any comments?
->=20
-Sounds great. It's very helpful to accelerate the progress of reviewing.
-After all they are kinds of special knowledge.
-
-Meanwhile, I can submit the cryptodev-vhost-user/cryptodev-vhost-kernel
-backends in QEMU if needs.
-
-Thanks,
--Gonglei
+Fam
