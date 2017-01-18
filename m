@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cThSZ-00059X-JB
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 23:02:56 -0500
+	(envelope-from <liang.z.li@intel.com>) id 1cTiJ3-00038Q-J9
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 23:57:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cThSU-000899-T1
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 23:02:55 -0500
-Received: from [59.151.112.132] (port=30633 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cThSU-00086J-HS
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 23:02:50 -0500
-References: <1484664152-24446-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<1484664152-24446-2-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20170117200913.GO3491@thinpad.lan.raisama.net>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <9e041398-8fc2-9809-ddd4-2ca0fe2b8e4e@cn.fujitsu.com>
-Date: Wed, 18 Jan 2017 12:02:35 +0800
+	(envelope-from <liang.z.li@intel.com>) id 1cTiJ0-0007z3-AJ
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 23:57:09 -0500
+Received: from mga05.intel.com ([192.55.52.43]:26981)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
+	id 1cTiJ0-0007yQ-11
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 23:57:06 -0500
+From: "Li, Liang Z" <liang.z.li@intel.com>
+Date: Wed, 18 Jan 2017 04:56:58 +0000
+Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C355672@shsmsx102.ccr.corp.intel.com>
+References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
+	<1482303148-22059-4-git-send-email-liang.z.li@intel.com>
+	<20170117211131-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170117211131-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20170117200913.GO3491@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Ensure the numa_post_machine_init
- func in the appropriate location
+Subject: Re: [Qemu-devel] [PATCH v6 kernel 3/5] virtio-balloon: speed up
+ inflate/deflate process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: stefanha@redhat.com, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "david@redhat.com" <david@redhat.com>, "aarcange@redhat.com" <aarcange@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
 
-Hi, Eduardo
+> > -	virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
+> > -	virtqueue_kick(vq);
+> > +static void do_set_resp_bitmap(struct virtio_balloon *vb,
+> > +		unsigned long base_pfn, int pages)
+> >
+> > -	/* When host has read buffer, this completes via balloon_ack */
+> > -	wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+> > +{
+> > +	__le64 *range =3D vb->resp_data + vb->resp_pos;
+> >
+> > +	if (pages > (1 << VIRTIO_BALLOON_NR_PFN_BITS)) {
+> > +		/* when the length field can't contain pages, set it to 0 to
+>=20
+> /*
+>  * Multi-line
+>  * comments
+>  * should look like this.
+>  */
+>=20
+> Also, pls start sentences with an upper-case letter.
+>=20
 
-At 01/18/2017 04:09 AM, Eduardo Habkost wrote:
-> On Tue, Jan 17, 2017 at 10:42:31PM +0800, Dou Liyang wrote:
->> In the numa_post_machine_init(), we use CPU_FOREACH macro to set all
->> CPUs' namu_node. So, we should make sure that we call it after Qemu
->> has already initialied all the CPUs.
->>
->> As we all know, the CPUs can be created by "-smp"(pc_new_cpu) or
->> "-device"(qdev_device_add) command. But, before the device init,
->> Qemu execute the numa_post_machine_init earlier. It makes the mapping
->> of NUMA nodes and CPUs incorrect.
->>
->> The patch move the numa_post_machine_init func in the appropriate
->> location.
->>
->> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
->
-> I would like to move cpu_index initialization to
-> qom/cpu.c:cpu_common_realizefn(), and remove
-> numa_post_machine_init() completely.
+Sorry for that.
 
-Thanks, it is a good idea. I will try it later.
+> > +		 * indicate the actual length is in the next __le64;
+> > +		 */
+>=20
+> This is part of the interface so should be documented as such.
+>=20
+> > +		*range =3D cpu_to_le64((base_pfn <<
+> > +				VIRTIO_BALLOON_NR_PFN_BITS) | 0);
+> > +		*(range + 1) =3D cpu_to_le64(pages);
+> > +		vb->resp_pos +=3D 2;
+>=20
+> Pls use structs for this kind of stuff.
 
-But, I hope to know that:
+I am not sure if you mean to use=20
 
-If you may want to say the cpu->**numa_node** initialization?
-Because the **cpu_index** initialization is in pc_cpu_pre_plug()
-currently, like that: cs->cpu_index = idx;
+struct  range {
+ 	__le64 pfn: 52;
+	__le64 nr_page: 12
+}
+Instead of the shift operation?
 
-OR
+I didn't use this way because I don't want to include 'virtio-balloon.h' in=
+ page_alloc.c,
+or copy the define of this struct in page_alloc.c
 
-You want to move both of them in cpu_common_realizefn() ?
-
-Thanks,
-	Liyang.
-
-  But this fixes the bug while
-> we don't do that.
->
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->
-> Queued on numa-next. Thanks!
->
->> ---
->>  vl.c | 5 +++--
->>  1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/vl.c b/vl.c
->> index c643d3f..f38b0e2 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -4549,8 +4549,6 @@ int main(int argc, char **argv, char **envp)
->>
->>      cpu_synchronize_all_post_init();
->>
->> -    numa_post_machine_init();
->> -
->>      if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
->>                            parse_fw_cfg, fw_cfg_find(), NULL) != 0) {
->>          exit(1);
->> @@ -4571,6 +4569,9 @@ int main(int argc, char **argv, char **envp)
->>                            device_init_func, NULL, NULL)) {
->>          exit(1);
->>      }
->> +
->> +    numa_post_machine_init();
->> +
->>      rom_reset_order_override();
->>
->>      /* Did we create any drives that we failed to create a device for? */
->> --
->> 2.5.5
->>
->>
->>
->
+Thanks!
+Liang
