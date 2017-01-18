@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTs3P-0003Ai-VG
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:21:40 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTs5f-0004Ze-5s
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:24:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTs3M-0004Ot-6B
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:21:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43660)
+	(envelope-from <ehabkost@redhat.com>) id 1cTs5c-0005fJ-1y
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:23:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52148)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTs3L-0004OE-WD
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:21:36 -0500
-Date: Wed, 18 Jan 2017 17:21:32 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170118171932-mutt-send-email-mst@kernel.org>
-References: <1484633936-25344-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<1484633936-25344-5-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<587DBEBE.4070409@cn.fujitsu.com>
-	<20170117175708-mutt-send-email-mst@kernel.org>
-	<587F0B3F.1040300@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTs5b-0005eo-Sf
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:23:55 -0500
+Date: Wed, 18 Jan 2017 13:23:52 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170118152352.GZ3491@thinpad.lan.raisama.net>
+References: <1484749457-87117-1-git-send-email-phil@philjordan.eu>
+	<aae83060-472d-97fb-9ada-2a78ff3f815f@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <587F0B3F.1040300@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v9 04/11] msix: check msix_init's return
- value
+In-Reply-To: <aae83060-472d-97fb-9ada-2a78ff3f815f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] x86-KVM: Supply TSC and APIC clock rates
+ to guest like VMWare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, dmitry@daynix.com, Jason Wang <jasowang@redhat.com>, jiri@resnulli.us, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Phil Dennis-Jordan <phil@philjordan.eu>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
 
-On Wed, Jan 18, 2017 at 02:29:19PM +0800, Cao jin wrote:
+On Wed, Jan 18, 2017 at 04:05:59PM +0100, Paolo Bonzini wrote:
 > 
 > 
-> On 01/18/2017 12:01 AM, Michael S. Tsirkin wrote:
-> > On Tue, Jan 17, 2017 at 02:50:38PM +0800, Cao jin wrote:
-> >> forget to cc maintainers in this new patch
-> >>
-> >> On 01/17/2017 02:18 PM, Cao jin wrote:
-> >>> Doesn't do it for megasas & hcd-xhci, later patches will fix them.
-> >>>
-> >>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> On 18/01/2017 15:24, Phil Dennis-Jordan wrote:
+> > ---
+> >  target/i386/cpu.c |  1 +
+> >  target/i386/cpu.h |  4 ++++
+> >  target/i386/kvm.c | 40 ++++++++++++++++++++++++++++++++--------
+> >  3 files changed, 37 insertions(+), 8 deletions(-)
 > > 
-> > I don't like this one, frankly. That's a bunch of code duplication.
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index aba11ae..e5523d4 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -3677,6 +3677,7 @@ static Property x86_cpu_properties[] = {
+> >      DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
+> >      DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
+> >      DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
+> > +    DEFINE_PROP_BOOL("vmware-tsc-apic-clocks", X86CPU, vmware_clock_rates, false),
 > 
-> Yes, code duplication, seems inevitable if move the asserts into a
-> separate patch.
+> Maybe just vmware-cpuid-freq instead?  Whatever the choice, please make
+> the bool field in struct X86CPU consistent with the property name (e.g.
+> enable_vmware_cpuid_freq).
 > 
-> > I suspect vfio is the only one who might reasonably get EINVAL here.
-> > So how about e.g. msix_validate_and_init that doesn't assert and use that
-> > from vfio, then switch msix_init to assert instead?
-> > 
+> One issue is that the TSC frequency can change, for example on
+> migration.  Telling the guest about the TSC frequency makes little sense
+> if it can change.
 > 
-> Not sure if I get your idea. Do you mean: do param check via assert in
-> msix_init(), so that no need check its returned error outside, and
-> introduce new api msix_validate_and_init(same content as msix_init,
-> except param check) dedicated to vfio?
+> So the leaf should be conditional on the INVTSC feature
+> (CPUID[0x80000007].EDX bit 8).  You can enable this unconditionally for
+> new machine types (i.e. making it true here, and turning it off in
+> include/hw/i386/pc.h's PC_COMPAT_2_8 macro), but only expose it if that
+> bit is also set.
 
-Something like this.
+It can be made conditional on (invtsc || cpu->user_tsc_khz). If
+the TSC frequency is configured explicitly, we know it won't
+change.
 
-> If I understand you right, the way we do param check for msi_init[*] &
-> msix_init will be inconsistent.
-
-Right, we should consolidate these for msi too.
-
-
-> [*] patch: msi_init: convert assert to return -errno
-> 
-> -- 
-> Sincerely,
-> Cao jin
-> 
+-- 
+Eduardo
