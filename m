@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1cTm2R-0005lD-Ko
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:56:16 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cTmBo-0002Bh-Rn
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 04:05:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1cTm2Q-00029c-QZ
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:56:15 -0500
-Received: from mx2.suse.de ([195.135.220.15]:48496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hare@suse.de>) id 1cTm2Q-00028q-HD
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:56:14 -0500
-References: <1484633936-25344-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<1484633936-25344-6-git-send-email-caoj.fnst@cn.fujitsu.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <0df606f7-3016-c013-d31f-7ebddc316ec9@suse.de>
-Date: Wed, 18 Jan 2017 09:56:12 +0100
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cTmBj-0007WZ-Qv
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 04:05:56 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35294)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cTmBj-0007Vx-Dr
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 04:05:51 -0500
+Received: by mail-lf0-x241.google.com with SMTP id v186so765900lfa.2
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 01:05:51 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1484556005-29701-1-git-send-email-peterx@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d5356257-f98c-8d37-0da4-f2d95f957dc0@redhat.com>
+Date: Wed, 18 Jan 2017 10:05:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <1484633936-25344-6-git-send-email-caoj.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 05/11] megasas: change behaviour of msix
- switch
+In-Reply-To: <1484556005-29701-1-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/2] memory: extend "info mtree" with
+ flat view dump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@gmail.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 01/17/2017 07:18 AM, Cao jin wrote:
-> Resolve the TODO, msix=3Dauto means msix on; if user specify msix=3Don,
-> then device creation fail on msix_init failure.
-> Also undo the overwrites of user configuration of msix.
->=20
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Hannes Reinecke <hare@suse.de>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Marcel Apfelbaum <marcel@redhat.com>
->=20
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> Acked-by: Marcel Apfelbaum <marcel@redhat.com>
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> ---
->  hw/scsi/megasas.c | 27 ++++++++++++++++++++-------
->  1 file changed, 20 insertions(+), 7 deletions(-)
->=20
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Cheers,
 
-Hannes
---=20
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
-GF: F. Imend=F6rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N=FCrnberg)
+On 16/01/2017 09:40, Peter Xu wrote:
+> v4:
+> - do unref of flatview when no view is there [Dave]
+> 
+> v3:
+> - rather than dump flatview directly in "info mtree", provide a new
+>   parameter "-f" for it. [Paolo]
+> - replace "RW" chars with the type of memory region [Paolo]
+> - (cc dave as well since it touches HMP interface)
+> 
+> v2:
+> - fix a size error in patch 2
+> - add r-b for Marc-André in patch 1
+> 
+> Each address space has its own flatview. It's another way to observe
+> memory info besides the default memory region hierachy, for example,
+> if we want to know which memory region will handle the write to
+> specific address, a flatview will suite more here than the default
+> hierachical dump.
+> 
+> Please review. Thanks,
+> 
+> Peter Xu (2):
+>   memory: tune mtree_print_mr() to dump mr type
+>   memory: hmp: add "-f" for "info mtree"
+> 
+>  hmp-commands-info.hx  |  6 ++--
+>  include/exec/memory.h |  2 +-
+>  memory.c              | 89 ++++++++++++++++++++++++++++++++++++++-------------
+>  monitor.c             |  4 ++-
+>  4 files changed, 74 insertions(+), 27 deletions(-)
+> 
+
+Queued, thanks.
+
+Paolo
