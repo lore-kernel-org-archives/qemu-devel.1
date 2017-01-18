@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTt0c-0001kb-2o
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:22:53 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTt1z-0002rm-Mn
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:24:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTt0b-0000g4-Cb
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:22:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58300)
+	(envelope-from <ehabkost@redhat.com>) id 1cTt1w-00019s-JO
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:24:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34114)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cTt0b-0000fX-6u
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:22:49 -0500
-References: <1484749457-87117-1-git-send-email-phil@philjordan.eu>
-	<aae83060-472d-97fb-9ada-2a78ff3f815f@redhat.com>
-	<CAAibmn3SqnaEiM6NED=UyPNGp5j2ymgBxpRygpUzpLCNcL-X8g@mail.gmail.com>
-	<df1239e9-e520-3c17-60cd-ec497c19e23b@redhat.com>
-	<CAAibmn2X-b4yZw6Od=f96k3gkhM7=DGV-0RKG=XWU=Ti0rBWPQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <30d84df6-c1de-d08f-fe82-daafabd1fba8@redhat.com>
-Date: Wed, 18 Jan 2017 17:22:45 +0100
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTt1w-00019L-D9
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:24:12 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9340DC05B590
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 16:24:12 +0000 (UTC)
+Date: Wed, 18 Jan 2017 14:24:09 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170118162409.GA3491@thinpad.lan.raisama.net>
+References: <20170118135624.17368-1-ehabkost@redhat.com>
+	<20170118135624.17368-3-ehabkost@redhat.com>
+	<87mveos6aq.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAibmn2X-b4yZw6Od=f96k3gkhM7=DGV-0RKG=XWU=Ti0rBWPQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] x86-KVM: Supply TSC and APIC clock rates
- to guest like VMWare
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87mveos6aq.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print warning when a default
+ config file is loaded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +35,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phil Dennis-Jordan <phil@philjordan.eu>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
+On Wed, Jan 18, 2017 at 05:04:45PM +0100, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > In case there were options set in the default config file, print
+> > a warning so users can update their scripts.
+> 
+> Can you explain why you don't warn on an empty qemu.conf?
 
+I didnt't want to show the warning to users that won't be
+affected by the change. I assume that users with empty qemu.conf
+files won't care when we stop loading it.
 
-On 18/01/2017 17:16, Phil Dennis-Jordan wrote:
-> On 18 January 2017 at 17:10, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> You enable vmware-cpuid-freq unconditionally.  But then you actually
->> publish 0x40000010 only if INVTSC is set.
-> Right, got it, thanks. What about the Hyper-V conflict? That will be
-> vastly more probable if the option is on by default. Don't publish
-> leaf 0x40000010, print the warning and carry on in this case (as the
-> patch does at the moment)?
+> 
+> > If somebody wants to keep the config file as-is, avoid the
+> > warning and use a command-line that will work in future QEMU
+> > versions, they can use:
+> >
+> >  $QEMU -nodefconfig -readconfig /etc/qemu/qemu.conf
+> >
+> > I was going to add an additional message suggesting it as a
+> > solution, but I thought it could make it more confusing. The
+> > solution can be documented in the QEMU 2.9 ChangeLog.
+> >
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  vl.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/vl.c b/vl.c
+> > index b563f9b924..e80b6da4bd 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -2999,6 +2999,12 @@ static int qemu_read_default_config_file(void)
+> >          return ret;
+> >      }
+> >  
+> > +    if (ret > 0) {
+> > +        loc_set_none();
+> > +        error_report("Warning: Future QEMU versions won't load %s automatically",
+> > +                     CONFIG_QEMU_CONFDIR "/qemu.conf");
+> > +    }
+> > +
+> >      return 0;
+> >  }
 
-Probably it's simplest to remove the warning altogether.
-
-Paolo
+-- 
+Eduardo
