@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cTw3B-0007hM-VK
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 14:37:43 -0500
+	(envelope-from <SRS0=0AIh=ZA=redhat.com=mst@kernel.org>)
+	id 1cTw3x-00084c-13
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 14:38:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cTw37-0008Te-57
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 14:37:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50308)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cTw36-0008TR-Vo
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 14:37:37 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <874m0wqofz.fsf@dusky.pond.sub.org>
-	<a1deb000-5e24-89b6-2d39-a1c94cd8b1e8@redhat.com>
-Date: Wed, 18 Jan 2017 20:37:33 +0100
-In-Reply-To: <a1deb000-5e24-89b6-2d39-a1c94cd8b1e8@redhat.com> (Paolo
-	Bonzini's message of "Wed, 18 Jan 2017 18:21:29 +0100")
-Message-ID: <8737ggkvlu.fsf@dusky.pond.sub.org>
+	(envelope-from <SRS0=0AIh=ZA=redhat.com=mst@kernel.org>)
+	id 1cTw3s-0000Fo-42
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 14:38:29 -0500
+Date: Wed, 18 Jan 2017 21:38:17 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1484768294-23336-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] SCSI HBA auto-created for -drive if=scsi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] virtio: fix up max size checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +22,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Coverity reports that ARRAY_SIZE(elem->out_sg) (and all the others too)
+is wrong because elem->out_sg is a pointer.
 
-> On 18/01/2017 18:15, Markus Armbruster wrote:
->> Some boards automatically cold-plug SCSI HBAs to honor -drive if=scsi.
->> Which one depends on the machine:
->> 
->>     pc*, realview-eb*, versatile*: lsi53c895a
->>     spapr-machine: spapr-vscsi
->> 
->> Should we use something less thoroughly obsolete than lsi53c895a for new
->> machine types?  Something that actually has a maintainer?
->
-> Or just raise an error?...
+However, the check is not in the right place and the max_size argument
+of virtqueue_map_iovec can be removed.  The check on in_num/out_num
+should be moved to qemu_get_virtqueue_element instead, before the call
+to virtqueue_alloc_element.
 
-On IRC, you remarked "there's no HBA that works reliably for all guest
-OSes".
+Cc: qemu-stable@nongnu.org
+Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+Fixes: 3724650db07057333879484c8bc7d900b5c1bf8e ("virtio: introduce virtqueue_alloc_element")
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/virtio.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-If there's really no sane default, perhaps we shouldn't provide one.
-
-Most machine types don't.  They don't error out, though, they ignore
-drives with if=scsi, which leads to an "Orphaned drive without device"
-warning, unless the user explicitly configures a suitable SCSI HBA.
-
-Suitable SCSI HBAs are "am53c974", "dc390", "esp", "lsi53c810",
-"lsi53c895a", "megasas", "megasas-gen2", "mptsas1068", "spapr-vscsi",
-"virtio-scsi-device", but not "pvscsi", "usb-storage", "usb-bot",
-"usb-uas".  QEMU is weird.
-
-This automatic creation of frontends for orphaned drives when some
-"suitable" device appears is specific to if=scsi.  It isn't done for any
-other interface type.  Again, QEMU is weird.
-
-I'd love to ditch this special SCSI magic completely.  But backward
-compatibility may compel us to ditch it only for new machine types.
-Opinions?
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 34065c7..b15a133 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -599,23 +599,11 @@ static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
+ 
+ static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
+                                 hwaddr *addr, unsigned int *num_sg,
+-                                unsigned int max_size, int is_write)
++                                int is_write)
+ {
+     unsigned int i;
+     hwaddr len;
+ 
+-    /* Note: this function MUST validate input, some callers
+-     * are passing in num_sg values received over the network.
+-     */
+-    /* TODO: teach all callers that this can fail, and return failure instead
+-     * of asserting here.
+-     * When we do, we might be able to re-enable NDEBUG below.
+-     */
+-#ifdef NDEBUG
+-#error building with NDEBUG is not supported
+-#endif
+-    assert(*num_sg <= max_size);
+-
+     for (i = 0; i < *num_sg; i++) {
+         len = sg[i].iov_len;
+         sg[i].iov_base = dma_memory_map(vdev->dma_as,
+@@ -636,7 +624,6 @@ static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
+ void virtqueue_map(VirtIODevice *vdev, VirtQueueElement *elem)
+ {
+     virtqueue_map_iovec(vdev, elem->in_sg, elem->in_addr, &elem->in_num,
+-                        MIN(ARRAY_SIZE(elem->in_sg), ARRAY_SIZE(elem->in_addr)),
+                         1);
+     virtqueue_map_iovec(vdev, elem->out_sg, elem->out_addr, &elem->out_num,
+                         MIN(ARRAY_SIZE(elem->out_sg),
+@@ -840,6 +827,16 @@ void *qemu_get_virtqueue_element(VirtIODevice *vdev, QEMUFile *f, size_t sz)
+ 
+     qemu_get_buffer(f, (uint8_t *)&data, sizeof(VirtQueueElementOld));
+ 
++    /* TODO: teach all callers that this can fail, and return failure instead
++     * of asserting here.
++     * When we do, we might be able to re-enable NDEBUG below.
++     */
++#ifdef NDEBUG
++#error building with NDEBUG is not supported
++#endif
++    assert(ARRAY_SIZE(data.in_addr) >= data.in_num);
++    assert(ARRAY_SIZE(data.out_addr) >= data.out_num);
++
+     elem = virtqueue_alloc_element(sz, data.out_num, data.in_num);
+     elem->index = data.index;
+ 
+-- 
+MST
