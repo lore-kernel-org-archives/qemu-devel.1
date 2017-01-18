@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cTrJI-0000Re-Gl
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:34:01 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cTrL1-0001NF-4v
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:35:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cTrJD-0007yS-Fj
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:34:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:17789)
+	(envelope-from <stefanha@redhat.com>) id 1cTrKw-0000BM-8F
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:35:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42706)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cTrJD-0007wj-Al
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:33:55 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cTrKv-0000Ay-RQ
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:35:42 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6092019DE9E
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:33:54 +0000 (UTC)
-Date: Wed, 18 Jan 2017 14:33:46 +0000
+	by mx1.redhat.com (Postfix) with ESMTPS id 038F9C058DA2
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:35:42 +0000 (UTC)
+Date: Wed, 18 Jan 2017 14:35:39 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170118143346.GA30347@stefanha-x1.localdomain>
+Message-ID: <20170118143539.GB30347@stefanha-x1.localdomain>
 References: <20170113131731.1246-1-pbonzini@redhat.com>
-	<20170113131731.1246-2-pbonzini@redhat.com>
+	<20170113131731.1246-3-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="BXVAT5kNtrzKuDFl"
+	protocol="application/pgp-signature"; boundary="WYTEVAkct0FjGQmd"
 Content-Disposition: inline
-In-Reply-To: <20170113131731.1246-2-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/16] aio: introduce aio_co_schedule and
- aio_co_wake
+In-Reply-To: <20170113131731.1246-3-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/16] block-backend: allow blk_prw from
+ coroutine context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,74 +39,36 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org, famz@redhat.com
 
 
---BXVAT5kNtrzKuDFl
+--WYTEVAkct0FjGQmd
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 13, 2017 at 02:17:16PM +0100, Paolo Bonzini wrote:
-> +static void co_schedule_bh_cb(void *opaque)
-> +{
-> +    AioContext *ctx = opaque;
-> +    QSLIST_HEAD(, Coroutine) straight, reversed;
-> +
-> +    QSLIST_MOVE_ATOMIC(&reversed, &ctx->scheduled_coroutines);
-> +    QSLIST_INIT(&straight);
-> +
-> +    while (!QSLIST_EMPTY(&reversed)) {
-> +        Coroutine *co = QSLIST_FIRST(&reversed);
-> +        QSLIST_REMOVE_HEAD(&reversed, co_scheduled_next);
-> +        QSLIST_INSERT_HEAD(&straight, co, co_scheduled_next);
-> +    }
-> +
-> +    while (!QSLIST_EMPTY(&straight)) {
-> +        Coroutine *co = QSLIST_FIRST(&straight);
-> +        QSLIST_REMOVE_HEAD(&straight, co_scheduled_next);
-> +        trace_aio_co_schedule_bh_cb(ctx, co);
-> +        qemu_coroutine_enter(co);
-> +    }
-> +}
+On Fri, Jan 13, 2017 at 02:17:17PM +0100, Paolo Bonzini wrote:
+> qcow2_create2 calls this.  Do not run a nested event loop, as that
+> breaks when aio_co_wake tries to queue the coroutine on the co_queue_wake=
+up
+> list of the currently running one.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/block-backend.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
 
-ctx->scheduled_coroutines is a specialized CoQueue.  Was there no way to
-modify and then use CoQueue instead of open coding it?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> +void aio_co_wake(struct Coroutine *co)
-> +{
-> +    AioContext *ctx;
-> +
-> +    /* Read coroutine before co->ctx.  Matches smp_wmb in
-> +     * qemu_coroutine_enter.
-> +     */
-> +    smp_read_barrier_depends();
-> +    ctx = atomic_read(&co->ctx);
-> +
-> +    if (ctx != qemu_get_current_aio_context()) {
-> +        aio_co_schedule(ctx, co);
-> +        return;
-> +    }
-> +
-> +    if (qemu_in_coroutine()) {
-> +        Coroutine *self = qemu_coroutine_self();
-> +        assert(self != co);
-> +        QSIMPLEQ_INSERT_TAIL(&self->co_queue_wakeup, co, co_queue_next);
-> +    } else {
-> +        aio_context_acquire(ctx);
-> +        qemu_coroutine_enter(co);
-> +        aio_context_release(ctx);
-
-Why is it necessary to acquire AioContext here?  We're already in ctx.
-
---BXVAT5kNtrzKuDFl
+--WYTEVAkct0FjGQmd
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYf3zKAAoJEJykq7OBq3PIbRsH/jf3XYtFelKdflPoEuDw8oqd
-jCJKW9hFgnQla4qYOT2e3dfBsfPyOLOromtRsfr+GDgu2HbkKkjCPK87I8GfiQNU
-owOBPmW4EQp4iDHZ/FsbKEEeNPonY/qGAHgVQCKGWl7YMz5EK+7IcjOVJJ2C3EaI
-YZeWm25LkBW75IJT9f2iClEZdaR9FMmdaKMbgTEWXTXYz8W5V7mxAOhdwWqATErT
-q87BA0YdsgmdwHcjGS+LbN1oj3Mw8PPQb2KiydDU6NEB5Z9AEaruQcunhXF2TkWw
-S9Wrks1OvClGUlOklvTzREwNQaR6j5ausCeFVw/xcRU8bzGhksL2jFQQNvXp46A=
-=5HTh
+iQEcBAEBAgAGBQJYf307AAoJEJykq7OBq3PIuz4IAIcD/E0BQVKX0lUmPsdhKoDP
+nsuqjOD6pwxHXMXx3S9s/Iq1wNlfYAZEkXBaYfh6BCNBaEwF932otZ0y1U73/vyz
+L0k9yUYxAiyJJUl8QnlTfJs+ABQUfl1zFDe7f9IGHZfEQbuwQqWowoutDBuLDiRM
+VnK1H4nxyJ3C8ryC0vPEJ4tSlHaHE4xJllfNObUpomFxcVYAAr9/2ppenKdChcMe
+iw6ocUBwvM+J/TIonPZHuu1BpIDeGfE0EC6BlKA7QMqvspwK3twixW5FJ+CZJNq7
+GPDLQhM4AsNYBKEcoXNhtk317AhCB/Lk/WGfmvVLn8aGJjElPnPqdOtWTndQPQ8=
+=cdMQ
 -----END PGP SIGNATURE-----
 
---BXVAT5kNtrzKuDFl--
+--WYTEVAkct0FjGQmd--
