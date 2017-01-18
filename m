@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cTqJV-0006rF-Et
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 08:30:10 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTqN9-00084D-P8
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 08:33:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cTqJS-0004hW-PW
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 08:30:09 -0500
-Received: from mga09.intel.com ([134.134.136.24]:16017)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
-	id 1cTqJS-0004gB-F6
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 08:30:06 -0500
-From: "Li, Liang Z" <liang.z.li@intel.com>
-Date: Wed, 18 Jan 2017 13:29:59 +0000
-Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C356F1B@shsmsx102.ccr.corp.intel.com>
-References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
-	<2a32f616-25a8-ba5a-f74c-d619fc8ab333@redhat.com>
-In-Reply-To: <2a32f616-25a8-ba5a-f74c-d619fc8ab333@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mreitz@redhat.com>) id 1cTqN8-0006s2-VY
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 08:33:55 -0500
+References: <20170111181432.18868-1-mreitz@redhat.com>
+	<20170116204921.31578-3-mreitz@redhat.com>
+	<0aa10ac5-84cb-f750-ce5e-cb6132ebbc60@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <394e0884-c0ea-b084-16d4-bf7ae86f9b84@redhat.com>
+Date: Wed, 18 Jan 2017 14:33:48 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6 kernel 0/5] Extend virtio-balloon for
- fast (de)inflating & fast live migration
+In-Reply-To: <0aa10ac5-84cb-f750-ce5e-cb6132ebbc60@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="l2ori9q1iPeojCV1xwmjcpKSgkj09sAdJ"
+Subject: Re: [Qemu-devel] [PATCH v4 10/25] block: Add bdrv_dirname()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "aarcange@redhat.com" <aarcange@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-> Am 21.12.2016 um 07:52 schrieb Liang Li:
-> > This patch set contains two parts of changes to the virtio-balloon.
-> >
-> > One is the change for speeding up the inflating & deflating process,
-> > the main idea of this optimization is to use {pfn|length} to present
-> > the page information instead of the PFNs, to reduce the overhead of
-> > virtio data transmission, address translation and madvise(). This can
-> > help to improve the performance by about 85%.
-> >
-> > Another change is for speeding up live migration. By skipping process
-> > guest's unused pages in the first round of data copy, to reduce
-> > needless data processing, this can help to save quite a lot of CPU
-> > cycles and network bandwidth. We put guest's unused page information
-> > in a {pfn|length} array and send it to host with the virt queue of
-> > virtio-balloon. For an idle guest with 8GB RAM, this can help to
-> > shorten the total live migration time from 2Sec to about 500ms in
-> > 10Gbps network environment. For an guest with quite a lot of page
-> > cache and with little unused pages, it's possible to let the guest
-> > drop it's page cache before live migration, this case can benefit from =
-this
-> new feature too.
->=20
-> I agree that both changes make sense (although the second change just
-> smells very racy, as you also pointed out in the patch description), howe=
-ver I
-> am not sure if virtio-balloon is really the right place for the latter ch=
-ange.
->=20
-> virtio-balloon is all about ballooning, nothing else. What you're doing i=
-s using
-> it as a way to communicate balloon-unrelated data from/to the hypervisor.
-> Yes, it is also about guest memory, but completely unrelated to the purpo=
-se
-> of the balloon device.
->=20
-> Maybe using virtio-balloon for this purpose is okay - I have mixed feelin=
-gs
-> (especially as I can't tell where else this could go). I would like to ge=
-t a second
-> opinion on this.
->=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--l2ori9q1iPeojCV1xwmjcpKSgkj09sAdJ
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <394e0884-c0ea-b084-16d4-bf7ae86f9b84@redhat.com>
+Subject: Re: [PATCH v4 10/25] block: Add bdrv_dirname()
+References: <20170111181432.18868-1-mreitz@redhat.com>
+ <20170116204921.31578-3-mreitz@redhat.com>
+ <0aa10ac5-84cb-f750-ce5e-cb6132ebbc60@redhat.com>
+In-Reply-To: <0aa10ac5-84cb-f750-ce5e-cb6132ebbc60@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-We have ever discussed the implementation for a long time, making use the c=
-urrent
-virtio balloon seems better than the other solutions and is recommended by =
-Michael.
-
-Thanks!
-Liang
-> --
+On 17.01.2017 00:02, Eric Blake wrote:
+> On 01/16/2017 02:49 PM, Max Reitz wrote:
+>> This function may be implemented by block drivers to derive a director=
+y
+>> name from a BDS. Concatenating this g_free()-able string with a relati=
+ve
+>> filename must result in a valid (not necessarily existing) filename, s=
+o
+>> this is a function that should generally be not implemented by format
+>> drivers, because this is protocol-specific.
+>>
+>> If a BDS's driver does not implement this function, bdrv_dirname() wil=
+l
+>> fall through to the BDS's file if it exists. If it does not, the
+>> exact_filename field will be used to generate a directory name.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  include/block/block.h     |  1 +
+>>  include/block/block_int.h |  1 +
+>>  block.c                   | 26 ++++++++++++++++++++++++++
+>>  3 files changed, 28 insertions(+)
 >=20
-> David
+>> +++ b/include/block/block_int.h
+>> @@ -130,6 +130,7 @@ struct BlockDriver {
+>>      int (*bdrv_make_empty)(BlockDriverState *bs);
+>> =20
+>>      void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *option=
+s);
+>> +    char *(*bdrv_dirname)(BlockDriverState *bs, Error **errp);
+>=20
+> I know we've been lousy at documentation in the past, but should we
+> start doing a better job of documenting the contract as we add new
+> callbacks, rather than just the commit messages?
+
+Good point, I'll add a comment.
+
+> Based on existing practice, though, I'm okay with:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks for reviewing!
+
+Max
+
+
+--l2ori9q1iPeojCV1xwmjcpKSgkj09sAdJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh/brwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ABCYH/1XNpDuxIEkn0GgK4SIFnLlumrU4kiND
+R7KusDAC6gzgHkC1jMK0HNce/FbXPkoQXHCs2qTi4L+jDcSyybPo24rSVgDxqMHk
+MbsIn4Wc/nmZ++WbyHi1YhH2pxEEWezg5Oxda708eFDIp2NsyST0MeRY3D6S0yJy
+ZBiSTR0BAApuhXz5/2PqyhtFSuzkiIkl2HNOA0mm5LYmnPzGup40buqJWlrKJ1Eh
+wwtS4kjQVB2QW5Cla5DNV4y6LHoR+/tU3TLzSj8Lc/+IxZHHkv9SQjKKwmUY5j85
+GbpWrlzoYbrE7vSNht+lD69uSG0naYNBdOGlp9py/KzNYvHeVh4GqbQ=
+=lcPt
+-----END PGP SIGNATURE-----
+
+--l2ori9q1iPeojCV1xwmjcpKSgkj09sAdJ--
