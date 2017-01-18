@@ -1,14 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cTeqU-0003ru-Rz
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 20:15:28 -0500
+	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cTerA-0004Cg-MF
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 20:16:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cTeqP-0001kr-U2
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 20:15:26 -0500
-From: Ziyue Yang <skiver.cloud.yzy@gmail.com>
-Date: Wed, 18 Jan 2017 09:14:12 +0800
-Message-Id: <1484702052-7900-1-git-send-email-skiver.cloud.yzy@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] gdbstub.c: fix GDB connection segfault
+	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cTer9-000224-OK
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 20:16:08 -0500
+MIME-Version: 1.0
+In-Reply-To: <c1e01bb3-6dd1-dfe1-1659-8b7b9b683d63@redhat.com>
+References: <1484666391-15089-1-git-send-email-skiver.cloud.yzy@gmail.com>
+	<c1e01bb3-6dd1-dfe1-1659-8b7b9b683d63@redhat.com>
+From: Yang Ziyue <skiver.cloud.yzy@gmail.com>
+Date: Wed, 18 Jan 2017 09:16:06 +0800
+Message-ID: <CAHkcwaemKr-d2qZRHYYUR1ry_spP_8ch2B886q6wxqv4WorBYA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] gdbstub.c: fix GDB connection segfault
  caused by empty machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -18,91 +23,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Liguori <aliguori@us.ibm.com>, Ziyue Yang <yzylivezh@hotmail.com>, Ziyue Yang <skiver.cloud.yzy@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Anthony Liguori <aliguori@us.ibm.com>, Ziyue Yang <yzylivezh@hotmail.com>
 
-From: Ziyue Yang <yzylivezh@hotmail.com>
+2017-01-18 1:27 GMT+08:00 Thomas Huth <thuth@redhat.com>:
+>
+> On 17.01.2017 16:19, Ziyue Yang wrote:
+> > From: Ziyue Yang <yzylivezh@hotmail.com>
+> >
+> > This patch is to fix the segmentation fault caused by attaching
+> > GDB to a QEMU instance initialized with "-M none" option.
+> >
+> > The bug can be reproduced by
+> >
+> >> ./qemu-system-x86_64 -M none -nographic -S -s
+> >
+> > and attach a GDB to it by
+> >
+> >> gdb -ex 'target remote :1234
+> >
+> > The segmentation fault was originally caused by trying to read
+> > the information about CPU when communicating with GDB. However,
+> > it's impossible for any control flow to exist on an empty machine,
+> > nor can CPU's be hot plugged to an empty machine later by QOM
+> > commands. So I think simply disabling GDB connections on empty
+> > machines makes sense.
+>
+> Yes, this sounds like a proper and easy fix for the problem.
+>
+> > Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
+> > ---
+> >  gdbstub.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/gdbstub.c b/gdbstub.c
+> > index de62d26..413e817 100644
+> > --- a/gdbstub.c
+> > +++ b/gdbstub.c
+> > @@ -1731,6 +1731,12 @@ int gdbserver_start(const char *device)
+> >      CharDriverState *mon_chr;
+> >      ChardevCommon common = { 0 };
+> >
+> > +    if (!first_cpu) {
+> > +        fprintf(stderr, "gdbstub: meaningless to attach gdb to a "
+> > +                "machine without any CPU.\n");
+> > +        return -1;
+> > +    }
+>
+> Could you maybe rather use error_report() instead of fprintf()? I think
+> that's the preferred way to print out an error in QEMU nowadays.
 
-This patch is to fix the segmentation fault caused by attaching
-GDB to a QEMU instance initialized with "-M none" option.
+Sure. I've sent a v2 version patch fixing that.
 
-The bug can be reproduced by
-
-> ./qemu-system-x86_64 -M none -nographic -S -s
-
-and attach a GDB to it by
-
-> gdb -ex 'target remote :1234
-
-The segmentation fault was originally caused by trying to read
-the information about CPU when communicating with GDB. However,
-it's impossible for any control flow to exist on an empty machine,
-nor can CPU's be hot plugged to an empty machine later by QOM
-commands. So I think simply disabling GDB connections on empty
-machines makes sense.
-
-Also some updates from fprintf(stderr, ...) to error_report.
-
-Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
----
- gdbstub.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/gdbstub.c b/gdbstub.c
-index de62d26..3a22ce3 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -18,6 +18,7 @@
-  */
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qemu/error-report.h"
- #include "qemu/cutils.h"
- #include "cpu.h"
- #ifdef CONFIG_USER_ONLY
-@@ -636,8 +637,8 @@ void gdb_register_coprocessor(CPUState *cpu,
-     *p = s;
-     if (g_pos) {
-         if (g_pos != s->base_reg) {
--            fprintf(stderr, "Error: Bad gdb register numbering for '%s'\n"
--                    "Expected %d got %d\n", xml, g_pos, s->base_reg);
-+            error_report("Error: Bad gdb register numbering for '%s'\n"
-+                         "Expected %d got %d\n", xml, g_pos, s->base_reg);
-         } else {
-             cpu->gdb_num_g_regs = cpu->gdb_num_regs;
-         }
-@@ -889,7 +890,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-     case 'k':
-         /* Kill the target */
--        fprintf(stderr, "\nQEMU: Terminated via GDBstub\n");
-+        error_report("\nQEMU: Terminated via GDBstub\n");
-         exit(0);
-     case 'D':
-         /* Detach packet */
-@@ -1357,8 +1358,8 @@ void gdb_do_syscallv(gdb_syscall_complete_cb cb, const char *fmt, va_list va)
-                 break;
-             default:
-             bad_format:
--                fprintf(stderr, "gdbstub: Bad syscall format string '%s'\n",
--                        fmt - 1);
-+                error_report("gdbstub: Bad syscall format string '%s'\n",
-+                             fmt - 1);
-                 break;
-             }
-         } else {
-@@ -1731,6 +1732,12 @@ int gdbserver_start(const char *device)
-     CharDriverState *mon_chr;
-     ChardevCommon common = { 0 };
-
-+    if (!first_cpu) {
-+        error_report("gdbstub: meaningless to attach gdb to a "
-+                     "machine without any CPU.\n");
-+        return -1;
-+    }
-+
-     if (!device)
-         return -1;
-     if (strcmp(device, "none") != 0) {
---
-2.7.4
+>
+>
+>  Thomas
+>
