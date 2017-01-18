@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTpop-0004St-07
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:58:27 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTprC-0006Se-2X
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 08:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTpol-0005kr-2Q
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:58:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44910)
+	(envelope-from <ehabkost@redhat.com>) id 1cTprB-0007MG-Ck
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 08:00:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58872)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTpok-0005kj-T9
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:58:23 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTprB-0007Ld-7H
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 08:00:53 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0326723DB9A
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 12:58:23 +0000 (UTC)
-Date: Wed, 18 Jan 2017 10:58:20 -0200
+	by mx1.redhat.com (Postfix) with ESMTPS id 41916148FEE
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 13:00:53 +0000 (UTC)
+Date: Wed, 18 Jan 2017 11:00:49 -0200
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170118125820.GX3491@thinpad.lan.raisama.net>
+Message-ID: <20170118130049.GB6657@thinpad.lan.raisama.net>
 References: <20170117180051.11958-1-ehabkost@redhat.com>
 	<50210df4-dcd8-8b2e-daab-d0c53449689a@redhat.com>
-	<20170118125246.GT3491@thinpad.lan.raisama.net>
-	<455f3089-c690-fb19-a861-aa18c07b6812@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <455f3089-c690-fb19-a861-aa18c07b6812@redhat.com>
+In-Reply-To: <50210df4-dcd8-8b2e-daab-d0c53449689a@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] arch_init: Remove unnecessary
  default_config_files table
 List-Id: <qemu-devel.nongnu.org>
@@ -39,25 +37,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
-On Wed, Jan 18, 2017 at 01:55:21PM +0100, Paolo Bonzini wrote:
+On Wed, Jan 18, 2017 at 10:17:17AM +0100, Paolo Bonzini wrote:
 > 
 > 
-> On 18/01/2017 13:52, Eduardo Habkost wrote:
-> >>
-> >> Though maybe we should just remove .conf file support completely...
-> >> who's using it?!?
-> > You mean removing /etc/qemu.conf, or removing -readconfig
-> > completely?
+> On 17/01/2017 19:00, Eduardo Habkost wrote:
+> > The existing default_config_files table in arch_init.c has a
+> > single entry, making it completely unnecessary. The whole code
+> > can be replaced by a single qemu_read_config_file() call in vl.c.
 > > 
-> > The former doesn't seem to be used often. The latter looks very
-> > useful for people trying to write scripts around QEMU and to
-> > avoid command-line length limits, so I will be surprised if
-> > nobody is using it.
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+[...]
 > 
-> Of course /etc/qemu.conf only (so that -nodefconfig/-nouserconfig become
-> no-ops).
+> Looks good!  Please include it yourself in your next pull request.
+> 
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Agreed. Should we print a warning in 2.9 and remove it in 2.10?
+Applied to machine-next. Thanks!
 
 -- 
 Eduardo
