@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cTtcb-0000i8-VV
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:02:06 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTtet-0002VG-RV
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:04:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cTtcY-0002Qx-0D
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:02:06 -0500
-Received: from mail-it0-x232.google.com ([2607:f8b0:4001:c0b::232]:37548)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1cTtcX-0002Qq-RD
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:02:01 -0500
-Received: by mail-it0-x232.google.com with SMTP id r185so15172095ita.0
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 09:02:01 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1cTteq-0003WU-MD
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:04:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTteq-0003W9-Gs
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:04:24 -0500
+Date: Wed, 18 Jan 2017 15:04:21 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170118170421.GC3491@thinpad.lan.raisama.net>
+References: <1484743490-24721-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9dcc7f51-1763-e3bf-6879-7955d9ad23de@redhat.com>
-References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
-	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
-	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
-	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
-	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
-	<20170117094950.5dqdpbk6u7p4yhms@kamzik.brq.redhat.com>
-	<CAFEAcA-Cdyq-dQ0U79TSsjJWQ2TO0R11RCWzAemSRS_1M65meg@mail.gmail.com>
-	<20170118161819.7f5526af@nial.brq.redhat.com>
-	<9dcc7f51-1763-e3bf-6879-7955d9ad23de@redhat.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 18 Jan 2017 17:02:00 +0000
-Message-ID: <CAKv+Gu9_dFpjwf16WxZQN5CE+7v5zzuff3rxg3EwRgrrYCy+xA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
- as PNP0C02 device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484743490-24721-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/core/null-machine: Add the
+ possibility to instantiate a CPU and RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,59 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Al Stone <al.stone@linaro.org>, Graeme Gregory <graeme.gregory@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-On 18 January 2017 at 15:55, Laszlo Ersek <lersek@redhat.com> wrote:
-> On 01/18/17 16:18, Igor Mammedov wrote:
->> On Tue, 17 Jan 2017 10:56:53 +0000
->> Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->>> On 17 January 2017 at 09:49, Andrew Jones <drjones@redhat.com> wrote:
->>>> In some cases the problem we're solving with the compat guards is
->>>> a bit hypothetical, but, IMHO, nonetheless a good practice. While
->>>> we may be sure that AAVMF and Linux will be fine with this table
->>>> changing under their feet, we can't be sure there aren't other
->>>> mach-virt users that have more sensitive firmwares/OSes. An ACPI-
->>>> sensitive OS may notice the change on its next reboot after a
->>>> migration, and then simply refuse to continue.
->>>
->>> There's also the case where you do a VM migration midway through
->>> UEFI booting up, I think, which might cause things to go wrong
->>> if you catch it just at the wrong moment.
->> acpi blobs are migrated from source so above won't happen.
->> The time guest will see new table is fresh boot or reboot.
->>
->>>
->>>> Now, that said, I just spoke with Igor in order to learn the x86
->>>> practice. He says that the policy has been more lax than what I
->>>> suggest above. Hypothetical, low-risk issues are left unguarded,
->>>> and only when a bug is found during testing is it then managed.
->>>> The idea is to try and reduce the amount of compat variables and
->>>> conditions needed in the ACPI generation code, but, of course, at
->>>> some level of risk to users expecting their versioned machine type
->>>> to always appear the same.
->>>>
->>>> So far we've been strict with mach-virt, guarding all hypothetical
->>>> issues. Perhaps this patch is a good example to get a discussion
->>>> started on whether or not we should be so strict though.
->>>
->>> That said, I don't have a very strong opinion here, beyond that
->>> we should be consistent at least with x86 practice.
->> another reason why we are trying not to use strict approach with ACPI
->> tables is that it's part of firmware and we didn't version firmwares
->> so far. (i.e. dst host with newer QEMU will typically have newer
->> firmware and guest with old machine-type migrated to host with newer
->> QEMU will run new firmware on (re)boot)
->
-> I haven't been aware of this argument, and I'm surprised by it, but I
-> think it's valid. Regardless of our choice to ultimately compose the
-> ACPI tables in QEMU, guest OSes definitely consider ACPI as part of the
-> firmware. So, different ACPI content after a migration + guest reboot on
-> the target host is not much different from any other firmware-level
-> changes encountered on the same target host, after reboot.
->
+On Wed, Jan 18, 2017 at 01:44:50PM +0100, Thomas Huth wrote:
+> Sometimes it is useful to have just a machine with CPU and RAM, without
+> any further hardware in it, e.g. if you just want to do some instruction
+> debugging for TCG with a remote GDB attached to QEMU, or run some embedded
+> code with the "-semihosting" QEMU parameter. qemu-system-m68k already
+> features a "dummy" machine, and xtensa a "sim" machine for exactly this
+> purpose.
+> All target architectures have nowadays also a "none" machine, which would
+> be a perfect match for this, too - but it currently does not allow to add
+> CPU and RAM yet. Thus let's add these possibilities in a generic way to the
+> "none" machine, too, so that we hopefully do not need additional "dummy"
+> machines in the future anymore (and maybe can also get rid of the already
+> existing "dummy"/"sim" machines one day).
+> Note that the default behaviour of the "none" machine is not changed, i.e.
+> no CPU and no RAM is instantiated by default. You have explicitely got to
+> specify the CPU model with "-cpu" and the amount of RAM with "-m" to get
+> these new features.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-I agree. But does that imply that this fix should be tightly coupled
-to the mach-virt version, considering that the UEFI firmware you run
-*inside* such a vm is not versioned either?
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+I will wait for the opinion of others before applying it, though.
+
+-- 
+Eduardo
