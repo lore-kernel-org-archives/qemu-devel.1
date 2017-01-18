@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTpbM-0002tb-JO
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:33 -0500
+	(envelope-from <thuth@redhat.com>) id 1cTpbk-0003DJ-1r
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cTpbH-0005Qn-Ch
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:32 -0500
-References: <20170103182801.9638-1-berrange@redhat.com>
-	<20170103182801.9638-8-berrange@redhat.com>
-	<d3f1e931-cecf-71b2-db82-f43c51361599@redhat.com>
-	<20170117095911.GB27235@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3e1a4a9a-7811-050c-3818-216b534f984a@redhat.com>
-Date: Wed, 18 Jan 2017 13:44:08 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170117095911.GB27235@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kBdVAL8cTa2nkE8IERRKbBx5p76oSRnP8"
-Subject: Re: [Qemu-devel] [PATCH v1 07/15] iotests: fix 097 when run with
- qcow
+	(envelope-from <thuth@redhat.com>) id 1cTpbi-0005nG-W6
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45204)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cTpbi-0005js-O9
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:54 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 18 Jan 2017 13:44:50 +0100
+Message-Id: <1484743490-24721-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] hw/core/null-machine: Add the possibility
+ to instantiate a CPU and RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +22,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kBdVAL8cTa2nkE8IERRKbBx5p76oSRnP8
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org
-Message-ID: <3e1a4a9a-7811-050c-3818-216b534f984a@redhat.com>
-Subject: Re: [PATCH v1 07/15] iotests: fix 097 when run with qcow
-References: <20170103182801.9638-1-berrange@redhat.com>
- <20170103182801.9638-8-berrange@redhat.com>
- <d3f1e931-cecf-71b2-db82-f43c51361599@redhat.com>
- <20170117095911.GB27235@redhat.com>
-In-Reply-To: <20170117095911.GB27235@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Sometimes it is useful to have just a machine with CPU and RAM, without
+any further hardware in it, e.g. if you just want to do some instruction
+debugging for TCG with a remote GDB attached to QEMU, or run some embedded
+code with the "-semihosting" QEMU parameter. qemu-system-m68k already
+features a "dummy" machine, and xtensa a "sim" machine for exactly this
+purpose.
+All target architectures have nowadays also a "none" machine, which would
+be a perfect match for this, too - but it currently does not allow to add
+CPU and RAM yet. Thus let's add these possibilities in a generic way to the
+"none" machine, too, so that we hopefully do not need additional "dummy"
+machines in the future anymore (and maybe can also get rid of the already
+existing "dummy"/"sim" machines one day).
+Note that the default behaviour of the "none" machine is not changed, i.e.
+no CPU and no RAM is instantiated by default. You have explicitely got to
+specify the CPU model with "-cpu" and the amount of RAM with "-m" to get
+these new features.
 
-On 17.01.2017 10:59, Daniel P. Berrange wrote:
-> On Mon, Jan 16, 2017 at 09:04:31PM +0100, Max Reitz wrote:
->> On 03.01.2017 19:27, Daniel P. Berrange wrote:
->>> The previous commit:
->>>
->>>   commit a3e1505daec31ef56f0489f8c8fff1b8e4ca92bd
->>>   Author: Eric Blake <eblake@redhat.com>
->>>   Date:   Mon Dec 5 09:49:34 2016 -0600
->>>
->>>     qcow2: Don't strand clusters near 2G intervals during commit
->>>
->>> extended the 097 test case so that it did two passes, once
->>> with an internal snapshot, once without.
->>>
->>> qcow (v1) does not support internal snapshots, so this change
->>> broke test 097 when run against qcow.
->>>
->>> This splits 097 in two, creating a new 173 that tests the
->>> internal snapshot codepath, effectively putting 097 back
->>> to its content before the above commit.
->>>
->>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>> ---
->>>  tests/qemu-iotests/097     |  10 +---
->>>  tests/qemu-iotests/097.out | 125 ++---------------------------------=
----------
->>>  tests/qemu-iotests/173     | 126 +++++++++++++++++++++++++++++++++++=
-++++++++++
->>>  tests/qemu-iotests/173.out | 119 +++++++++++++++++++++++++++++++++++=
-+++++++
->>>  tests/qemu-iotests/group   |   1 +
->>>  5 files changed, 251 insertions(+), 130 deletions(-)
->>>  create mode 100755 tests/qemu-iotests/173
->>>  create mode 100644 tests/qemu-iotests/173.out
->>
->> I don't think the effort is worth it, considering that probably
->> literally nobody is still using qcow -- or so I hope, at least.
->=20
-> The reason I fixed this was because I wanted to be able to verify my
-> refactoring to qcow didn't break anything else. It is much easier if
-> I can just run "check -qcow" and not have to worry about which failures=
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v3:
+ - Get rid of the cpu_init_def() wrapper again, make null-machine.o
+   target dependent instead and use cpu_init() directly.
+ - Omit the loader code for the "-kernel" option for now (users can
+   use "-device loader,..." instead). We can add code for the -kernel
+   parameter later (either an implementation or a warning), once we've
+   decided how it should behave for the "none" machine.
 
-> are just test bugs, vs genuine code bugs I've created. IOW, as long as
-> qcow.c exists in the code base, IMHO, we should make sure the iotests
-> continue to pass
+ hw/core/Makefile.objs  |  2 +-
+ hw/core/null-machine.c | 27 +++++++++++++++++++++++++--
+ 2 files changed, 26 insertions(+), 3 deletions(-)
 
-Right, what I meant is that I don't think it's worth fixing tests for
-qcow. If they don't work and it isn't qcow that's broken (but just the
-test requiring something that qcow does not have), just removing it from
-the _supported_fmt list is usually sufficient in my opinion.
-
-> On that point, IMHO, it would be beneficial if we had some CI system
-> that was setup to run the iotests on all new changes, across all the
-> different disk formats we expect the iotests to work on. We get far
-> too many regressions with iotests breaking and no one noticing right
-> now :-(
-
-Indeed, but that would require all of the iotests consistently passing
-first...
-
-Max
-
-
---kBdVAL8cTa2nkE8IERRKbBx5p76oSRnP8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh/YyMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A9QoH/ibds/dN3zcitR+AvpNQKgaIivslqRPZ
-UJ3fzqGqGaNQ4jB8iFSSeLXCmN470y5EBH8rSBHp9IOs/7o2Rm+SnkyVTK+fqY01
-8aCRDsnRyLHDSsOe4FiJUDRUdOQwh+v4Y4biMu1LHgY29QyFS2BXUFJHchMFHFL9
-Gxj2lEQ8bDVhJUDZyhTJkMW7YMKsbu9q3UcNpEE3mFk8KME/OAIDlibj1waCYduz
-4T4uJvdSuzpt0y8hi0L3o/g6nNB0kLiyR8ydbJCoVYv920eiG5yUbjbe5dHel9gX
-MnpLik7pkRuGhZvQTOltQulf2yDipCfTFol2/itqTal3Zninv5f0VlM=
-=fTTi
------END PGP SIGNATURE-----
-
---kBdVAL8cTa2nkE8IERRKbBx5p76oSRnP8--
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index a4c94e5..0b6c0f1 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -12,7 +12,6 @@ common-obj-$(CONFIG_XILINX_AXI) += stream.o
+ common-obj-$(CONFIG_PTIMER) += ptimer.o
+ common-obj-$(CONFIG_SOFTMMU) += sysbus.o
+ common-obj-$(CONFIG_SOFTMMU) += machine.o
+-common-obj-$(CONFIG_SOFTMMU) += null-machine.o
+ common-obj-$(CONFIG_SOFTMMU) += loader.o
+ common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
+ common-obj-$(CONFIG_SOFTMMU) += register.o
+@@ -20,3 +19,4 @@ common-obj-$(CONFIG_SOFTMMU) += or-irq.o
+ common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
+ 
+ obj-$(CONFIG_SOFTMMU) += generic-loader.o
++obj-$(CONFIG_SOFTMMU) += null-machine.o
+diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+index 0351ba7..27c8369 100644
+--- a/hw/core/null-machine.c
++++ b/hw/core/null-machine.c
+@@ -13,18 +13,41 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++#include "qemu/error-report.h"
+ #include "hw/hw.h"
+ #include "hw/boards.h"
++#include "sysemu/sysemu.h"
++#include "exec/address-spaces.h"
++#include "cpu.h"
+ 
+-static void machine_none_init(MachineState *machine)
++static void machine_none_init(MachineState *mch)
+ {
++    CPUState *cpu = NULL;
++
++    /* Initialize CPU (if a model has been specified) */
++    if (mch->cpu_model) {
++        cpu = cpu_init(mch->cpu_model);
++        if (!cpu) {
++            error_report("Unable to initialize CPU");
++            exit(1);
++        }
++    }
++
++    /* RAM at address zero */
++    if (mch->ram_size) {
++        MemoryRegion *ram = g_new(MemoryRegion, 1);
++
++        memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
++        memory_region_add_subregion(get_system_memory(), 0, ram);
++    }
+ }
+ 
+ static void machine_none_machine_init(MachineClass *mc)
+ {
+     mc->desc = "empty machine";
+     mc->init = machine_none_init;
+-    mc->max_cpus = 0;
++    mc->max_cpus = 1;
++    mc->default_ram_size = 0;
+ }
+ 
+ DEFINE_MACHINE("none", machine_none_machine_init)
+-- 
+1.8.3.1
