@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTt7z-00089w-Vu
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:30:32 -0500
+	(envelope-from <mst@redhat.com>) id 1cTt8b-0000DC-EV
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTt7t-0003qv-Rs
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:30:28 -0500
-References: <5878AF90.8020709@kamp.de>
-	<260873230.6154791.1484638426777.JavaMail.zimbra@oxygem.tv>
-	<20170117080326.dfjqzwstfxusuhgc@nora.maurer-it.com>
-	<b7f5dc23-6d72-4897-e9ca-6482acfb4c72@redhat.com>
-	<20170117112224.2st4wuivcbwuif2m@nora.maurer-it.com>
-	<196ac8f5-2fd7-37e9-d577-8177802d0fb4@redhat.com>
-	<40cbdb51-3dcc-35bc-bb99-6c85a47d20d0@redhat.com>
-	<20170118115050.6o2ut7wtfkuzy5oh@nora.maurer-it.com>
-	<20170118161941.g72fzppyyc3pdwkf@nora.maurer-it.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5de45f2f-d83b-64d2-6406-dc09fd4c455f@redhat.com>
-Date: Wed, 18 Jan 2017 17:30:17 +0100
+	(envelope-from <mst@redhat.com>) id 1cTt8X-00046H-76
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:31:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTt8W-000465-Ue
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:31:01 -0500
+Date: Wed, 18 Jan 2017 18:30:59 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170118175335-mutt-send-email-mst@kernel.org>
+References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
 MIME-Version: 1.0
-In-Reply-To: <20170118161941.g72fzppyyc3pdwkf@nora.maurer-it.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-stable] Data corruption in Qemu 2.7.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
+Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +26,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexandre DERUMIER <aderumier@odiso.com>, qemu-stable <qemu-stable@nongnu.org>
+To: Phil Dennis-Jordan <phil@philjordan.eu>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+
+On Wed, Jan 18, 2017 at 12:45:54PM +0100, Phil Dennis-Jordan wrote:
+> About 2 years ago, Reza Jelveh submitted essentially this same patch:
+> https://lists.gnu.org/archive/html/qemu-devel/2015-03/msg05832.html
+> 
+> It adds the reset register defined in ACPI 2.0 to the x86 FADT, which fixes rebooting for Darwin/OS X/macOS guests.
+> 
+> I'm trying to revive this as part of an effort to get recent versions of OS X/macOS working in Qemu/KVM with OVMF and without the need for out-of-tree patches. I've adapted the original patch so it cleanly applies on current master. The unaddressed issues last time around were:
+> 
+>  1. Does this work with a range of Windows versions?
+> 
+> I've tested this new version of the patch with KVM from Ubuntu's 4.4.0-51-generic kernel, using the following guests:
+> 
+>  * Windows XP SP2 and SP3, x86. "pc" (FX440) machine, IDE disk, SeaBIOS.
+>  * Windows 7 SP 1, x86. "pc" (FX440) machine, AHCI disk, SeaBIOS.
+>  * Windows 10 1607, x86-64, q35 machine, AHCI disk, OVMF from 2017-01-17 EDK2 master.
+>  * OS X 10.9 to 10.11, macOS 10.12; patched OVMF [1]
+> 
+> In all cases I went through a fresh install, checked basic functionality, and rebooting. I noticed nothing different in any of the Windows VMs, and of course the Darwin-based ones no longer hang when attempting to reboot.
+> 
+> 
+>  2. The reset register is defined in ACPI 2.0, this still advertises 1.0.
+> 
+> I have to admit, I know very little about how ACPI works, so I'm not sure I got this right, but: I subsequently added a line
+>     rsdp->revision = 0x02;
+> to build_rsdp() in acpi-build.c, then booted the aforementioned Windows VMs, and the macOS 10.12 one with this change. I noticed no change or ill effect whatsoever.
+
+For RSDP revision, I don't think we need to bother with it. People do
+mix revisions of tables in practice.
+
+I think what's important is the Fadt format revision. That one was 1 for 1.0b and 3 for 2.0.
+
+See page 112, Table 5-5 Fixed ACPI Description Table Format in acpi spec
+1.0b.
+
+Now look at page 110 in spec 2.0, this time
+"Table 5-8 Fixed ACPI Description Table (FADT) Format".
+
+You will see that FADT revision is now 3, and there are a bunch of new
+fields after the reset register. I think you have to fill them in,
+you probably can get away with copying the non-extended values.
 
 
 
-On 18/01/2017 17:19, Fabian Gr=FCnbichler wrote:
-> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#109 FAILED Result:=
- hostbyte=3DDID_OK driverbyte=3DDRIVER_SENSE
-> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#109 Sense Key : Il=
-legal Request [current]
-> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#109 Add. Sense: In=
-valid field in cdb
-> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#109 CDB: Write(10)=
- 2a 00 0d d6 51 48 00 08 00 00
-> Jan 18 17:07:51 ubuntu kernel: blk_update_request: critical target erro=
-r, dev sda, sector 232149320
-> Jan 18 17:07:51 ubuntu kernel: EXT4-fs warning (device sda1): ext4_end_=
-bio:329: I/O error -121 writing to inode 125 (offset 0 size 0 starting bl=
-ock 29018921)
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018409
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018410
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018411
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018412
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018413
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018414
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018415
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018416
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018417
-> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
- block 29018418
-> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#106 FAILED Result:=
- hostbyte=3DDID_OK driverbyte=3DDRIVER_SENSE
-> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#106 Sense Key : Il=
-legal Request [current]
-> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#106 Add. Sense: In=
-valid field in cdb
-> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#106 CDB: Write(10)=
- 2a 00 0d d6 59 48 00 08 00 00
-> Jan 18 17:07:51 ubuntu kernel: blk_update_request: critical target erro=
-r, dev sda, sector 232151368
-> Jan 18 17:07:51 ubuntu kernel: EXT4-fs warning (device sda1): ext4_end_=
-bio:329: I/O error -121 writing to inode 125 (offset 0 size 0 starting bl=
-ock 29019177)
-> Jan 18 17:07:52 ubuntu kernel: JBD2: Detected IO errors while flushing =
-file data on sda1-8
-> Jan 18 17:07:58 ubuntu kernel: JBD2: Detected IO errors while flushing =
-file data on sda1-8
->=20
->=20
-> strace (with some random grep-ing):
-> [pid  1794] ioctl(19, SG_IO, {'S', SG_DXFER_TO_DEV, cmd[10]=3D[2a, 00, =
-0d, d6, 51, 48, 00, 08, 00, 00], mx_sb_len=3D252, iovec_count=3D17, dxfer=
-_len=3D1048576, timeout=3D4294967295, flags=3D0x1, data[1048576]=3D["\0`\=
-235=3Dc\177\0\0\0\0\1\0\0\0\0\0\0`\236=3Dc\177\0\0\0\0\1\0\0\0\0\0"...]})=
- =3D -1 EINVAL (Invalid argument)
-> [pid  1794] ioctl(19, SG_IO, {'S', SG_DXFER_TO_DEV, cmd[10]=3D[2a, 00, =
-0d, d6, 59, 48, 00, 08, 00, 00], mx_sb_len=3D252, iovec_count=3D16, dxfer=
-_len=3D1048576, timeout=3D4294967295, flags=3D0x1, data[1048576]=3D["\0`-=
-=3Dc\177\0\0\0\0\1\0\0\0\0\0\0`.=3Dc\177\0\0\0\0\1\0\0\0\0\0"...]}) =3D -=
-1 EINVAL (Invalid argument)
 
-This is useful, thanks.  I suspect blk_rq_map_user_iov is failing,
-meaning that the scatter/gather list has too many segments for the HBA
-in the host.  (The limit can be found in /sys/block/sda/queue/max_segment=
-s).
+> I suspect more might be involved in enabling ACPI 2.0, and it should probably be an option so as to avoid regressions. I don't know what the best approach would be for this, so comments welcome. Should adding the reset register to the FADT also be configurable?
 
-This is consistent with your finding here:
+I would say an option to make FADT use rev 3 format would be a good
+idea.
 
-> disabling THP on the hypervisor host with
->=20
-> # echo 'never' > /sys/kernel/mm/transparent_hugepage/enabled
->=20
-> allows reproducing the bug very reliably, shutting the VM down, then
-> enabling THP (with 'always') and trying again makes it go away.
+I'd make it the default if XP survives.
 
-because no THP means more memory fragmentation and thus more segments.
+> 
+> Additionally, please suggest any further guest OSes and configurations I should test which seem likely to exhibit regressions with this change.
 
-I'm not sure how to fix it, unfortunately. :(
+Pls also try XP on q35. Paolo explained how on the thread you link to.
 
-Paolo
+> 
+> (First post to this list - apologies if I messed up any of the conventions! Thanks, phil)
+> 
+> [1] EDK2 fork with OS X/macOS compatibility patches: https://github.com/pmj/edk2/tree/mac-patches
+
+It looks ok - you need to add your S.O.B (and maybe the original one)
+to certify the origin of the patch. And you want to wrap lines around
+80 characters.
+
+> ---
+>  hw/i386/acpi-build.c        | 5 +++++
+>  include/hw/acpi/acpi-defs.h | 2 ++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 0c8912f..93781a0 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -296,6 +296,11 @@ static void fadt_setup(AcpiFadtDescriptorRev1 *fadt, AcpiPmInfo *pm)
+>                                (1 << ACPI_FADT_F_SLP_BUTTON) |
+>                                (1 << ACPI_FADT_F_RTC_S4));
+>      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_USE_PLATFORM_CLOCK);
+> +    fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
+> +    fadt->reset_val = 0xf;
+> +    fadt->reset_reg.address_space_id   = 1;
+> +    fadt->reset_reg.register_bit_width = 8;
+> +    fadt->reset_reg.address            = ICH9_RST_CNT_IOPORT;
+>      /* APIC destination mode ("Flat Logical") has an upper limit of 8 CPUs
+>       * For more than 8 CPUs, "Clustered Logical" mode has to be used
+>       */
+
+So this works for PC too because RCR_IOPORT has the same value.
+I think QEMU_BUILD_BUG_ON(ICH9_RST_CNT_IOPORT != RCR_IOPORT)
+and a comment would be helpful here.
+
+
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 4cc3630..5755570 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -140,6 +140,8 @@ struct AcpiFadtDescriptorRev1
+>      uint8_t  reserved4a;             /* Reserved */
+>      uint8_t  reserved4b;             /* Reserved */
+>      uint32_t flags;
+> +    Acpi20GenericAddress reset_reg;
+> +    uint8_t reset_val;
+>  } QEMU_PACKED;
+>  typedef struct AcpiFadtDescriptorRev1 AcpiFadtDescriptorRev1;
+
+I think you want a new AcpiFadtDescriptorRev3 structure.
+
+> -- 
+> 2.3.2 (Apple Git-55)
