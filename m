@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cUWGi-0006TA-Sk
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:18:05 -0500
+	(envelope-from <mtosatti@redhat.com>) id 1cUWMS-00087M-Ov
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:24:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cUWGd-00045m-SW
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:18:04 -0500
-Received: from 11.mo1.mail-out.ovh.net ([188.165.48.29]:47866)
+	(envelope-from <mtosatti@redhat.com>) id 1cUWMO-0006sF-QR
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:24:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cUWGd-00044D-LD
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:17:59 -0500
-Received: from player758.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 1730D3CCE3
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:17:52 +0100 (CET)
-References: <1483979087-32663-1-git-send-email-clg@kaod.org>
-	<1483979087-32663-8-git-send-email-clg@kaod.org>
-	<CAFEAcA_tLcVQj_kJh3iY7ZOEechPrk=9+Hj3_QcOE+pmPoWCYg@mail.gmail.com>
-	<549b1cd1-602b-8b74-add6-0648f6426694@kaod.org>
-	<CAFEAcA-YBm9WRELebX5P8MnRq86mQBonDLGcDxM0_mkLn4xuKA@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <055228dc-a145-cbcf-06e4-7bc902f71f73@kaod.org>
-Date: Fri, 20 Jan 2017 11:17:48 +0100
+	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1cUWMO-0006rV-KB
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:23:56 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 983BD76E7
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 10:23:55 +0000 (UTC)
+Date: Wed, 18 Jan 2017 15:53:45 -0200
+From: Marcelo Tosatti <mtosatti@redhat.com>
+Message-ID: <20170118175343.GA26873@amt.cnet>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-YBm9WRELebX5P8MnRq86mQBonDLGcDxM0_mkLn4xuKA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 07/11] aspeed/smc: handle SPI flash
- Command mode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [qemu PATCH] pc.h: move x-mach-use-reliable-get-clock
+ compat entry to PC_COMPAT_2_8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marcin Krzeminski <marcin.krzeminski@nokia.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 01/20/2017 11:13 AM, Peter Maydell wrote:
-> On 19 January 2017 at 20:35, C=C3=A9dric Le Goater <clg@kaod.org> wrote=
-:
->> On 01/19/2017 08:26 PM, Peter Maydell wrote:
->>> On 9 January 2017 at 16:24, C=C3=A9dric Le Goater <clg@kaod.org> wrot=
-e:
->>>> The Aspeed SMC controllers have a mode (Command mode) in which
->>>> accesses to the flash content are no different than doing MMIOs. The
->>>> controller generates all the necessary commands to load (or store)
->>>> data in memory.
->>>>
->>>> However, accesses are restricted to the segment window assigned the
->>>> the flash module by the controller. This window is defined by the
->>>> Segment Address Register.
->>>>
->>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>>> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
->>>> ---
->>>>  hw/ssi/aspeed_smc.c         | 152 +++++++++++++++++++++++++++++++++=
-+++++------
->>>>  include/hw/ssi/aspeed_smc.h |   2 +-
->>>>  2 files changed, 132 insertions(+), 22 deletions(-)
->>>
->>> This deleted the only call to aspeed_smc_is_usermode() but not
->>> its definition, which makes clang complain:
->>> /Users/pm215/src/qemu-for-merges/hw/ssi/aspeed_smc.c:409:20: error:
->>> unused function 'aspeed_smc_is_usermode' [-Werror,-Wunused-function]
->>>
->>> Presumably the function itself should be deleted?
->>
->> yes. This is correct. I will send a patch for it.
->=20
-> I'll just edit the commit in my target-arm tree, that
-> will be simplest.
 
-ok. sure.=20
+As noticed by David Gilbert, commit 6053a86 'kvmclock: reduce kvmclock
+differences on migration' added 'x-mach-use-reliable-get-clock' and a
+compatibility entry that turns it off; however it got merged after 2.8.0
+was released but the entry has gone into PC_COMPAT_2_7 where it should
+have gone into PC_COMPAT_2_8.
 
-I do push a branch on github before sending for travis to test.
-Should that error have been caught by travis ? Just asking, as
-I might have missed it.
+Fix it by moving the entry to PC_COMPAT_2_8.
 
-Thanks,
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-C.  =20
+
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index b22e699..738bfd6 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -375,14 +375,15 @@ int e820_get_num_entries(void);
+ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ 
+ #define PC_COMPAT_2_8 \
+-
+-#define PC_COMPAT_2_7 \
+-    HW_COMPAT_2_7 \
++    HW_COMPAT_2_8 \
+     {\
+         .driver   = "kvmclock",\
+         .property = "x-mach-use-reliable-get-clock",\
+         .value    = "off",\
+     },\
++
++#define PC_COMPAT_2_7 \
++    HW_COMPAT_2_7 \
+     {\
+         .driver   = TYPE_X86_CPU,\
+         .property = "l3-cache",\
