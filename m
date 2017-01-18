@@ -1,30 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cTgDB-0006Ss-PB
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:42:59 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cTgLV-0000KD-2A
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:51:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cTgD6-0004lb-T2
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:42:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49026)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cTgD6-0004jS-Mf
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:42:52 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0D658553F
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 02:42:52 +0000 (UTC)
-References: <1484625660-3312-1-git-send-email-jasowang@redhat.com>
-	<20170117164326-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <38dfab22-412f-94a5-4b01-351edf627027@redhat.com>
-Date: Wed, 18 Jan 2017 10:42:48 +0800
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cTgLQ-0004vj-5C
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:51:33 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55755)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cTgLP-0004uU-Re
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:51:28 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0I2nbTJ114971
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 21:51:26 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 281ubb0rtg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 21:51:25 -0500
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 17 Jan 2017 21:51:24 -0500
+Date: Wed, 18 Jan 2017 10:51:17 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170112072513.98411-3-bjsdjshi@linux.vnet.ibm.com>
+	<20170117145142.4954666f@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <20170117164326-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio: force VIRTIO_F_IOMMU_PLATFORM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170117145142.4954666f@t450s.home>
+Message-Id: <20170118025117.GN30301@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 02/12] vfio: linux-headers update
+ for vfio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +43,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
+* Alex Williamson <alex.williamson@redhat.com> [2017-01-17 14:51:42 -0700]:
 
+> On Thu, 12 Jan 2017 08:25:03 +0100
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> > 
+> > This is a placeholder for a linux-headers update.
+> > 
+> > Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> > ---
+> >  include/standard-headers/asm-s390/vfio_ccw.h | 28 ++++++++++++++++++++++++++++
+> >  linux-headers/linux/vfio.h                   | 17 +++++++++++++++++
+> >  2 files changed, 45 insertions(+)
+> >  create mode 100644 include/standard-headers/asm-s390/vfio_ccw.h
+> > 
+> > diff --git a/include/standard-headers/asm-s390/vfio_ccw.h b/include/standard-headers/asm-s390/vfio_ccw.h
+> > new file mode 100644
+> > index 0000000..cddc09b
+> > --- /dev/null
+> > +++ b/include/standard-headers/asm-s390/vfio_ccw.h
+> > @@ -0,0 +1,28 @@
+> > +/*
+> > + * Interfaces for vfio-ccw
+> > + *
+> > + * Copyright IBM Corp. 2017
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify
+> > + * it under the terms of the GNU General Public License (version 2 only)
+> > + * as published by the Free Software Foundation.
+> > + *
+> > + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > + */
+> > +
+> > +#ifndef _VFIO_CCW_H_
+> > +#define _VFIO_CCW_H_
+> > +
+> > +#include "standard-headers/linux/types.h"
+> > +
+> > +struct ccw_io_region {
+> > +#define ORB_AREA_SIZE 12
+> > +	uint8_t  orb_area[ORB_AREA_SIZE];
+> > +#define SCSW_AREA_SIZE 12
+> > +	uint8_t  scsw_area[SCSW_AREA_SIZE];
+> > +#define IRB_AREA_SIZE 96
+> > +	uint8_t  irb_area[IRB_AREA_SIZE];
+> > +	uint32_t ret_code;
+> > +} QEMU_PACKED;
+> > +
+> > +#endif
+> 
+> This is really part of the uapi for the vfio-ccw mdev device, isn't it?
+Yes, it is.
 
-On 2017=E5=B9=B401=E6=9C=8817=E6=97=A5 22:44, Michael S. Tsirkin wrote:
-> On Tue, Jan 17, 2017 at 12:01:00PM +0800, Jason Wang wrote:
->> We allow vhost to clear VIRITO_F_IOMMU_PLATFORM which is wrong since
->> VIRTIO_F_IOMMU_PLATFORM is mandatory for security. Fixing this by
->> enforce it after vdc->get_features().
->>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> ---
->>   hw/virtio/virtio-bus.c | 5 +++--
->>   1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
->> index d31cc00..a886011 100644
->> --- a/hw/virtio/virtio-bus.c
->> +++ b/hw/virtio/virtio-bus.c
->> @@ -47,6 +47,7 @@ void virtio_bus_device_plugged(VirtIODevice *vdev, E=
-rror **errp)
->>       VirtioBusState *bus =3D VIRTIO_BUS(qbus);
->>       VirtioBusClass *klass =3D VIRTIO_BUS_GET_CLASS(bus);
->>       VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(vdev);
->> +    bool has_iommu =3D virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_P=
-LATFORM);
->>  =20
->>       DPRINTF("%s: plug device.\n", qbus->name);
->>  =20
->> @@ -63,8 +64,8 @@ void virtio_bus_device_plugged(VirtIODevice *vdev, E=
-rror **errp)
->>           klass->device_plugged(qbus->parent, errp);
->>       }
->>  =20
->> -    if (klass->get_dma_as !=3D NULL &&
->> -        virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
->> +    if (klass->get_dma_as !=3D NULL && has_iommu) {
->> +        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATF=
-ORM);
->>           vdev->dma_as =3D klass->get_dma_as(qbus->parent);
->>       } else {
->>           vdev->dma_as =3D &address_space_memory;
-> I suspect that's not enough, we must also fail or disable vhost
-> (depending on the options), otherwise things won't work.
+> Should it really be buried in asm-s390 in the kernel?
+> 
+We had an internal discussion on this question before, since we think
+this interface is strongly s390 dependent, we put it here. What do you
+suggest? Thanks,
 
-Looks like with the patch, VIRTIO_F_IOMMU_PLATFORM will be passed to=20
-vhost_set_features(). So if vhost backend does not support it, it will=20
-fall back to userspace (This may not work for vhost-user, but it's a bug=20
-existed even before this patch).
+[...]
 
-Thanks
+-- 
+Dong Jia
