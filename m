@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cTpYs-0000tG-NJ
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cTpYu-0000tz-0u
 	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:42:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cTpYp-0003ZR-IR
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:41:58 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cTpYs-0003ar-QN
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:42:00 -0500
 Received: from [59.151.112.132] (port=61481 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cTpYo-0003Wn-8x
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:41:55 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cTpYs-0003Wn-AD
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:41:58 -0500
 From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Date: Wed, 18 Jan 2017 20:40:04 +0800
-Message-ID: <1484743207-10721-1-git-send-email-douly.fnst@cn.fujitsu.com>
+Date: Wed, 18 Jan 2017 20:40:07 +0800
+Message-ID: <1484743207-10721-4-git-send-email-douly.fnst@cn.fujitsu.com>
+In-Reply-To: <1484743207-10721-1-git-send-email-douly.fnst@cn.fujitsu.com>
+References: <1484743207-10721-1-git-send-email-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 0/3] cpu: numa: Fix the mapping initialization
- of VCPUs and NUMA nodes
+Subject: [Qemu-devel] [PATCH 3/3] cpu: make the function of
+ cpu_common_map_numa_node more efficiently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,166 +29,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: ehabkost@redhat.com, qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, vilanova@ac.upc.edu, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-As we fixed a bug(Bug 1) in below links, Named "Method-A":
+Current function does some unnecessary operations, such as it makes
+the assert() in the loop, and the loop was not stopped in time.
 
-https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03354.html
+This patch moves the assert() out the loop and stops the loop in
+time.
 
-Then, Eduardo gave us many suggests. Thanks very much!
-when we try them, we also find another bugs named "Bug 2".
+Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+---
+ qom/cpu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-[Problem]
----------
-
-As I use this command:
-
-./x86_64-softmmu/qemu-system-x86_64 \
-	-hda /image/fedora.img \
-	-m 1G,slots=4,maxmem=4G \
-	-enable-kvm \
-	-smp 2,maxcpus=16,sockets=4,cores=2,threads=2 \
-	-device qemu64-x86_64-cpu,id=cpu1,socket-id=0,core-id=1,thread-id=0 \
-	-device qemu64-x86_64-cpu,id=cpu2,socket-id=0,core-id=1,thread-id=1 \
-	-device qemu64-x86_64-cpu,id=cpu3,socket-id=1,core-id=0,thread-id=0 \
-	-device qemu64-x86_64-cpu,id=cpu4,socket-id=1,core-id=0,thread-id=1 \
-	-device qemu64-x86_64-cpu,id=cpu5,socket-id=1,core-id=1,thread-id=0 \
-	-device qemu64-x86_64-cpu,id=cpu6,socket-id=1,core-id=1,thread-id=1 \
-	-numa node,nodeid=0,cpus=0-3 \
-	-numa node,nodeid=1,cpus=4-7 \
-	-numa node,nodeid=2,cpus=8-11 \
-	-numa node,nodeid=3,cpus=12-15 \
-	-monitor stdio \
-
-1. Bug 1
---------
-In Qemu monitor:
-
-(qemu) info numa 
-4 nodes
-node 0 cpus: 0 1 2 3 4 5 6 7
-node 0 size: 256 MB
-node 1 cpus:
-node 1 size: 256 MB
-node 2 cpus:
-node 2 size: 256 MB
-node 3 cpus:
-node 3 size: 256 MB
-
-2. Bug 2
---------
-(qemu) device_add qemu64-x86_64-cpu,id=cpu7,socket-id=2,core-id=0,thread-id=0
-
-(qemu) info numa
-4 nodes
-node 0 cpus: 0 1 2 3 4 5 6 7 8
-node 0 size: 256 MB
-node 1 cpus:
-node 1 size: 256 MB
-node 2 cpus:
-node 2 size: 256 MB
-node 3 cpus:
-node 3 size: 256 MB
-
-[Method-A]
-----------
-
-1. Method-A that we provided above: 
-  * Ensure the numa_post_machine_init func in the appropriate location in
-vl.c::main().
-
-It can fix Bug 1, but, can't work for Bug 2.
-
-1.1. For Bug 1: fixed
-
-(qemu) info numa
-4 nodes
-node 0 cpus: 0 1 2 3
-node 0 size: 256 MB
-node 1 cpus: 4 5 6 7
-node 1 size: 256 MB
-node 2 cpus:
-node 2 size: 256 MB
-node 3 cpus:
-node 3 size: 256 MB
-
-1.2. For Bug 2: can not fixed
-
-(qemu) device_add qemu64-x86_64-cpu,id=cpu7,socket-id=2,core-id=0,thread-id=0
-
-(qemu) info numa
-node 0 cpus: 0 1 2 3 8
-node 0 size: 256 MB
-node 1 cpus: 4 5 6 7
-node 1 size: 256 MB
-node 2 cpus:
-node 2 size: 256 MB
-node 3 cpus:
-node 3 size: 256 MB
-
-[Solution]
-----------
-
-Move the CPUState::numa_node initialization to qom/cpu.c:cpu_common_realizefn(),
-and remove numa_post_machine_init() completely.
-
-It can fix Bug 1 and Bug 2. The result shows that:
-
-(qemu) info numa
-4 nodes
-node 0 cpus: 0 1 2 3
-node 0 size: 256 MB
-node 1 cpus: 4 5 6 7
-node 1 size: 256 MB
-node 2 cpus:
-node 2 size: 256 MB
-node 3 cpus:
-node 3 size: 256 MB
-
-(qemu) device_add qemu64-x86_64-cpu,id=cpu7,socket-id=2,core-id=0,thread-id=0
-(qemu) info numa
-4 nodes
-node 0 cpus: 0 1 2 3
-node 0 size: 256 MB
-node 1 cpus: 4 5 6 7
-node 1 size: 256 MB
-node 2 cpus: 8
-node 2 size: 256 MB
-node 3 cpus:
-node 3 size: 256 MB
-
-(qemu) device_add qemu64-x86_64-cpu,id=cpu8,socket-id=3,core-id=0,thread-id=0
-(qemu) info numa
-4 nodes
-node 0 cpus: 0 1 2 3
-node 0 size: 256 MB
-node 1 cpus: 4 5 6 7
-node 1 size: 256 MB
-node 2 cpus: 8
-node 2 size: 256 MB
-node 3 cpus: 12
-node 3 size: 256 MB
-
-(qemu) device_del cpu5
-(qemu) info numa
-4 nodes
-node 0 cpus: 0 1 2 3
-node 0 size: 256 MB
-node 1 cpus: 4 5 7
-node 1 size: 256 MB
-node 2 cpus: 8
-node 2 size: 256 MB
-node 3 cpus: 12
-node 3 size: 256 MB
-
-Dou Liyang (3):
-  cpu: Make the mapping of CPUs and NUMA nodes in cpu_common_realizefn
-  numa: Remove the numa_post_machine_init function
-  cpu: make the function of cpu_common_map_numa_node more efficiently
-
- include/sysemu/numa.h |  1 -
- numa.c                | 15 ---------------
- qom/cpu.c             | 16 ++++++++++++++++
- vl.c                  |  2 --
- 4 files changed, 16 insertions(+), 18 deletions(-)
-
+diff --git a/qom/cpu.c b/qom/cpu.c
+index e08dceb..3c655b2 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -343,10 +343,11 @@ static void cpu_common_map_numa_node(CPUState *cpu)
+ {
+     int i;
+ 
++    assert(cpu->cpu_index < max_cpus);
+     for (i = 0; i < nb_numa_nodes; i++) {
+-        assert(cpu->cpu_index < max_cpus);
+         if (test_bit(cpu->cpu_index, numa_info[i].node_cpu)) {
+             cpu->numa_node = i;
++            return;
+         }
+     }
+ }
 -- 
 2.5.5
