@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cTrh9-0002O1-3C
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:58:43 -0500
+	(envelope-from <clg@kaod.org>) id 1cTrkT-0003nm-9a
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:02:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cTrh5-0000HN-Vc
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:58:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37604)
+	(envelope-from <clg@kaod.org>) id 1cTrkM-0001ey-MI
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:02:02 -0500
+Received: from 16.mo1.mail-out.ovh.net ([178.33.104.224]:52040)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cTrh5-0000GZ-QK
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:58:35 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C90A2504BE
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:58:35 +0000 (UTC)
-Date: Wed, 18 Jan 2017 14:58:33 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170118145833.GF30347@stefanha-x1.localdomain>
-References: <20170113131731.1246-1-pbonzini@redhat.com>
-	<20170113131731.1246-6-pbonzini@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cTrkM-0001eb-Fw
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:01:58 -0500
+Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 5C9673CC3B
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 16:01:56 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Wed, 18 Jan 2017 16:01:41 +0100
+Message-Id: <1484751701-2646-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gdTfX7fkYsEEjebm"
-Content-Disposition: inline
-In-Reply-To: <20170113131731.1246-6-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 05/16] io: make qio_channel_yield aware of
- AioContexts
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3] aspeed/smc: handle dummy bytes when doing
+ fast reads in command mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,74 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com
+To: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Marcin Krzeminski <mar.krzeminski@gmail.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+When doing fast read, a certain amount of dummy bytes should be sent
+before the read. This number is configurable in the controler CE0
+Control Register and needs to be modeled using fake transfers to the
+flash module.
 
---gdTfX7fkYsEEjebm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This only supports command mode. User mode requires more work and a
+possible extension of the m25p80 device model.
 
-On Fri, Jan 13, 2017 at 02:17:20PM +0100, Paolo Bonzini wrote:
->  /**
-> + * qio_channel_set_aio_context:
-> + * @ioc: the channel object
-> + * @ctx: the #AioContext to set the handlers on
-> + *
-> + * Request that qio_channel_yield() sets I/O handlers on
-> + * the given #AioContext.  If @ctx is %NULL, qio_channel_yield()
-> + * uses QEMU's main thread event loop.
-> + */
-> +void qio_channel_set_aio_context(QIOChannel *ioc,
-> +                                 AioContext *ctx);
-> +
-> +/**
-> + * qio_channel_detach_aio_context:
-> + * @ioc: the channel object
-> + *
-> + * Disable any I/O handlers set by qio_channel_yield().  With the
-> + * help of aio_co_schedule(), this allows moving a coroutine that was
-> + * paused by qio_channel_yield() to another context.
-> + */
-> +void qio_channel_detach_aio_context(QIOChannel *ioc);
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
 
-The block layer's bdrv_set_aio_context() has different semantics.  It
-invokes .detach()/.attach() callbacks and does AioContext locking so the
-function can be called safely even while the block driver is waiting for
-events.
+ Changes since v2:
 
-It's unfortunate to that the block and io channel APIs act differently
-despite having similar names.  Was there a reason to choose different
-semantics?
+ - handled dummies under read routine and removed the test on the spi
+   command READ_FAST (0xb)
 
-> +
-> +/**
->   * qio_channel_yield:
->   * @ioc: the channel object
->   * @condition: the I/O condition to wait for
->   *
-> - * Yields execution from the current coroutine until
-> - * the condition indicated by @condition becomes
-> - * available.
-> + * Yields execution from the current coroutine until the condition
-> + * indicated by @condition becomes available.  @condition must
-> + * be either %G_IO_IN or %G_IO_OUT; it cannot contain both.  In
-> + * addition, no two coroutine can be waiting on the same condition
+ hw/ssi/aspeed_smc.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-s/coroutine/coroutines/
-
---gdTfX7fkYsEEjebm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYf4KZAAoJEJykq7OBq3PI9kEIAIzRD0jRFRzkLHHamfYLPzA0
-ipBHVi7wdfGzeg+q1vL5sBSPp5ZwnDWMrMH9yWGdBd43oZZ1un8dDu5rff6XQhUi
-QHXbKNsHJ11Z3Yao6U2neV/4AwwbNNG0B0yJjRki3iCEaVPuKBNvT7mSLlCnl8kW
-r9fkE1LWqqFekIVFScWryRLGKZAW8TLR6vi40vvbSTi7TqvYg09i8102eL4ILzT7
-Dpng9KDNEns1kHXZa+tWZDm+KLdc7cuJuykK8YLK2oAlqL8R6JGdbDaiv4lPrgYP
-9308ciYmqNarBYpwj4Um4/g+hzeU53gQiI+Ln4SZUQPvBqczWo+6QK8rUvAmqhc=
-=Zckj
------END PGP SIGNATURE-----
-
---gdTfX7fkYsEEjebm--
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index a0a816407fc1..fc3cccec0566 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -69,7 +69,9 @@
+ #define R_CTRL0           (0x10 / 4)
+ #define   CTRL_CMD_SHIFT           16
+ #define   CTRL_CMD_MASK            0xff
++#define   CTRL_DUMMY_HIGH_SHIFT    14
+ #define   CTRL_AST2400_SPI_4BYTE   (1 << 13)
++#define   CTRL_DUMMY_LOW_SHIFT     6 /* 2 bits [7:6] */
+ #define   CTRL_CE_STOP_ACTIVE      (1 << 2)
+ #define   CTRL_CMD_MODE_MASK       0x3
+ #define     CTRL_READMODE          0x0
+@@ -490,6 +492,16 @@ static uint32_t aspeed_smc_check_segment_addr(const =
+AspeedSMCFlash *fl,
+     return addr;
+ }
+=20
++static int aspeed_smc_flash_dummies(const AspeedSMCFlash *fl)
++{
++    const AspeedSMCState *s =3D fl->controller;
++    uint32_t r_ctrl0 =3D s->regs[s->r_ctrl0 + fl->id];
++    uint32_t dummy_high =3D (r_ctrl0 >> CTRL_DUMMY_HIGH_SHIFT) & 0x1;
++    uint32_t dummy_low =3D (r_ctrl0 >> CTRL_DUMMY_LOW_SHIFT) & 0x3;
++
++    return ((dummy_high << 2) | dummy_low) * 8;
++}
++
+ static void aspeed_smc_flash_send_addr(AspeedSMCFlash *fl, uint32_t addr=
+)
+ {
+     const AspeedSMCState *s =3D fl->controller;
+@@ -526,6 +538,15 @@ static uint64_t aspeed_smc_flash_read(void *opaque, =
+hwaddr addr, unsigned size)
+         aspeed_smc_flash_select(fl);
+         aspeed_smc_flash_send_addr(fl, addr);
+=20
++        /*
++         * Use fake transfers to model dummy bytes. The value should
++         * be configured to some non-zero value in fast read mode and
++         * zero in read mode.
++         */
++        for (i =3D 0; i < aspeed_smc_flash_dummies(fl); i++) {
++            ssi_transfer(fl->controller->spi, 0xFF);
++        }
++
+         for (i =3D 0; i < size; i++) {
+             ret |=3D ssi_transfer(s->spi, 0x0) << (8 * i);
+         }
+--=20
+2.7.4
