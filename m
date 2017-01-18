@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTpX1-0008Es-Ua
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:40:05 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cTpYs-0000tG-NJ
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:42:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTpWy-00031z-PG
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:40:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44401)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTpWy-00031n-Gr
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:40:00 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0EC114BFFF
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 12:40:00 +0000 (UTC)
-Date: Wed, 18 Jan 2017 10:39:57 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170118123957.GQ3491@thinpad.lan.raisama.net>
-References: <20170117010204.4909-1-ehabkost@redhat.com>
-	<20170117010204.4909-10-ehabkost@redhat.com>
-	<9b1bc94e-f1bf-d166-e796-16410a66bb93@redhat.com>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cTpYp-0003ZR-IR
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:41:58 -0500
+Received: from [59.151.112.132] (port=61481 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cTpYo-0003Wn-8x
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:41:55 -0500
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Date: Wed, 18 Jan 2017 20:40:04 +0800
+Message-ID: <1484743207-10721-1-git-send-email-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b1bc94e-f1bf-d166-e796-16410a66bb93@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 9/9] tests: Test case for
- query-cpu-model-expansion
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 0/3] cpu: numa: Fix the mapping initialization
+ of VCPUs and NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,93 +24,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: ehabkost@redhat.com, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, vilanova@ac.upc.edu, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-On Wed, Jan 18, 2017 at 10:39:46AM +0100, David Hildenbrand wrote:
-> Am 17.01.2017 um 02:02 schrieb Eduardo Habkost:
-> > +    def checkExpansions(self, model, msg):
-> > +        """Perform multiple expansion operations on model, validate results
-> > +
-> > +        @model is a CpuModelExpansionInfo struct, with some extra keys:
-> > +        * model['runnable'] should be set to True if the CPU model is
-> > +          runnable on this host
-> > +        * model['qom-props'] will be set to the full list of properties for
-> > +          the CPU, if the model is runnable
-> > +        """
-> > +        exp_s = self.checkOneExpansion(model, 'static',
-> > +                                       '%s.static' % (msg))
-> > +        exp_f = self.checkOneExpansion(model, 'full',
-> > +                                       '%s.full' % (msg))
-> > +        exp_ss = self.checkOneExpansion(exp_s, 'static',
-> > +                                        '%s.static.static' % (msg))
-> > +        exp_sf = self.checkOneExpansion(exp_s, 'full',
-> > +                                        '%s.static.full' % (msg))
-> > +        exp_ff = self.checkOneExpansion(exp_f, 'full',
-> > +                                        '%s.full.full' % (msg))
-> > +
-> > +        # static expansion twice should result in the same data:
-> > +        self.assertEquals(exp_s, exp_ss, '%s: static != static+static' % (msg))
-> > +        # full expansion twice should also result in the same data:
-> > +        self.assertEquals(exp_f, exp_ff, '%s: full != full+full' % (msg))
-> > +
-> > +        # migration-safe CPU models have an extra feature:
-> > +        # their static expansion should be equivalent to the full
-> > +        # expansion (as their static expansion is also precise)
-> 
-> This is not true for s390x:
-> 
-> "z13-base" is both, static and migration-safe.
-> 
-> Doing a full expansion will expand all features (so your check against
-> QOM properties should succeed)
-> 
-> Doing a static expansion will expand no features, as z13-base is
-> already static, so there are no features to expand (no delta changes).
-> 
-> "z13" is only migration-safe.
-> 
-> Doing a full expansion will expand all features.
-> 
-> Doing a static expansion will only expand the features different to
-> "z13-base". (Remember, delta changes only to minimize reported
-> features).
+As we fixed a bug(Bug 1) in below links, Named "Method-A":
 
-I think my comment was confusing. By "equivalent" I don't mean
-having the same expansion, but resulting in the same set of
-features.
+https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03354.html
 
-This is not comparing full_expansion(model) and
-static_expansion(model). It is comparing full_expansion(model)
-full_expansion(static_expansion(model)).
+Then, Eduardo gave us many suggests. Thanks very much!
+when we try them, we also find another bugs named "Bug 2".
 
-In other words, absolutely no feature should be lost or changed
-during static expansion, and we verify that by doing a full
-expansion after the static expansion (exp_sf) and comparing the
-results with the full expansion (exp_f).
+[Problem]
+---------
 
-I believe this is true on s390x too, isn't it?
+As I use this command:
 
-> 
-> 
-> And I wonder if that is also true for x86? This should only be true if
-> the "base" model contains absolutely no features.
+./x86_64-softmmu/qemu-system-x86_64 \
+	-hda /image/fedora.img \
+	-m 1G,slots=4,maxmem=4G \
+	-enable-kvm \
+	-smp 2,maxcpus=16,sockets=4,cores=2,threads=2 \
+	-device qemu64-x86_64-cpu,id=cpu1,socket-id=0,core-id=1,thread-id=0 \
+	-device qemu64-x86_64-cpu,id=cpu2,socket-id=0,core-id=1,thread-id=1 \
+	-device qemu64-x86_64-cpu,id=cpu3,socket-id=1,core-id=0,thread-id=0 \
+	-device qemu64-x86_64-cpu,id=cpu4,socket-id=1,core-id=0,thread-id=1 \
+	-device qemu64-x86_64-cpu,id=cpu5,socket-id=1,core-id=1,thread-id=0 \
+	-device qemu64-x86_64-cpu,id=cpu6,socket-id=1,core-id=1,thread-id=1 \
+	-numa node,nodeid=0,cpus=0-3 \
+	-numa node,nodeid=1,cpus=4-7 \
+	-numa node,nodeid=2,cpus=8-11 \
+	-numa node,nodeid=3,cpus=12-15 \
+	-monitor stdio \
 
-This is true on x86, but temporarily. "base" still contains no
-features, but I plan to add extra information to type=full that
-can't appear on type=static.
+1. Bug 1
+--------
+In Qemu monitor:
 
-> 
-> > +        if self.isMigrationSafe(model['model']):
-> > +            self.assertEquals(exp_sf['model']['props'], exp_f['model']['props'],
-> > +                              '%s: props: static+full != full' % (msg))
-> > +            self.assertEquals(exp_sf.get('qom-props'), exp_f.get('qom-props'),
-> > +                              '%s: qom-props: static+full != full' % (msg))
-> 
-> 
-> -- 
-> 
-> David
+(qemu) info numa 
+4 nodes
+node 0 cpus: 0 1 2 3 4 5 6 7
+node 0 size: 256 MB
+node 1 cpus:
+node 1 size: 256 MB
+node 2 cpus:
+node 2 size: 256 MB
+node 3 cpus:
+node 3 size: 256 MB
+
+2. Bug 2
+--------
+(qemu) device_add qemu64-x86_64-cpu,id=cpu7,socket-id=2,core-id=0,thread-id=0
+
+(qemu) info numa
+4 nodes
+node 0 cpus: 0 1 2 3 4 5 6 7 8
+node 0 size: 256 MB
+node 1 cpus:
+node 1 size: 256 MB
+node 2 cpus:
+node 2 size: 256 MB
+node 3 cpus:
+node 3 size: 256 MB
+
+[Method-A]
+----------
+
+1. Method-A that we provided above: 
+  * Ensure the numa_post_machine_init func in the appropriate location in
+vl.c::main().
+
+It can fix Bug 1, but, can't work for Bug 2.
+
+1.1. For Bug 1: fixed
+
+(qemu) info numa
+4 nodes
+node 0 cpus: 0 1 2 3
+node 0 size: 256 MB
+node 1 cpus: 4 5 6 7
+node 1 size: 256 MB
+node 2 cpus:
+node 2 size: 256 MB
+node 3 cpus:
+node 3 size: 256 MB
+
+1.2. For Bug 2: can not fixed
+
+(qemu) device_add qemu64-x86_64-cpu,id=cpu7,socket-id=2,core-id=0,thread-id=0
+
+(qemu) info numa
+node 0 cpus: 0 1 2 3 8
+node 0 size: 256 MB
+node 1 cpus: 4 5 6 7
+node 1 size: 256 MB
+node 2 cpus:
+node 2 size: 256 MB
+node 3 cpus:
+node 3 size: 256 MB
+
+[Solution]
+----------
+
+Move the CPUState::numa_node initialization to qom/cpu.c:cpu_common_realizefn(),
+and remove numa_post_machine_init() completely.
+
+It can fix Bug 1 and Bug 2. The result shows that:
+
+(qemu) info numa
+4 nodes
+node 0 cpus: 0 1 2 3
+node 0 size: 256 MB
+node 1 cpus: 4 5 6 7
+node 1 size: 256 MB
+node 2 cpus:
+node 2 size: 256 MB
+node 3 cpus:
+node 3 size: 256 MB
+
+(qemu) device_add qemu64-x86_64-cpu,id=cpu7,socket-id=2,core-id=0,thread-id=0
+(qemu) info numa
+4 nodes
+node 0 cpus: 0 1 2 3
+node 0 size: 256 MB
+node 1 cpus: 4 5 6 7
+node 1 size: 256 MB
+node 2 cpus: 8
+node 2 size: 256 MB
+node 3 cpus:
+node 3 size: 256 MB
+
+(qemu) device_add qemu64-x86_64-cpu,id=cpu8,socket-id=3,core-id=0,thread-id=0
+(qemu) info numa
+4 nodes
+node 0 cpus: 0 1 2 3
+node 0 size: 256 MB
+node 1 cpus: 4 5 6 7
+node 1 size: 256 MB
+node 2 cpus: 8
+node 2 size: 256 MB
+node 3 cpus: 12
+node 3 size: 256 MB
+
+(qemu) device_del cpu5
+(qemu) info numa
+4 nodes
+node 0 cpus: 0 1 2 3
+node 0 size: 256 MB
+node 1 cpus: 4 5 7
+node 1 size: 256 MB
+node 2 cpus: 8
+node 2 size: 256 MB
+node 3 cpus: 12
+node 3 size: 256 MB
+
+Dou Liyang (3):
+  cpu: Make the mapping of CPUs and NUMA nodes in cpu_common_realizefn
+  numa: Remove the numa_post_machine_init function
+  cpu: make the function of cpu_common_map_numa_node more efficiently
+
+ include/sysemu/numa.h |  1 -
+ numa.c                | 15 ---------------
+ qom/cpu.c             | 16 ++++++++++++++++
+ vl.c                  |  2 --
+ 4 files changed, 16 insertions(+), 18 deletions(-)
 
 -- 
-Eduardo
+2.5.5
