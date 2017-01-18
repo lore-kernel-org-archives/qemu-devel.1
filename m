@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTuNv-0007hk-Ds
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:51:00 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cTuUr-0005Lw-Rh
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:58:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cTuNs-00068o-B5
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:50:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cTuNs-00068e-4a
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:50:56 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 291CCC04BD20
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 17:50:56 +0000 (UTC)
-Date: Wed, 18 Jan 2017 19:50:54 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170118193122-mutt-send-email-mst@kernel.org>
-References: <1484625660-3312-1-git-send-email-jasowang@redhat.com>
-	<20170117164326-mutt-send-email-mst@kernel.org>
-	<38dfab22-412f-94a5-4b01-351edf627027@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1cTuUq-0000cd-OB
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:58:09 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34583)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1cTuUq-0000bt-HC
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:58:08 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so5842568wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 09:58:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <38dfab22-412f-94a5-4b01-351edf627027@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio: force VIRTIO_F_IOMMU_PLATFORM
+Sender: alistair23@gmail.com
+In-Reply-To: <1484743490-24721-1-git-send-email-thuth@redhat.com>
+References: <1484743490-24721-1-git-send-email-thuth@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 18 Jan 2017 09:57:36 -0800
+Message-ID: <CAKmqyKM5RfdR63XDQXKh5Yu6+s5GwAgj8i95AJAfgPaN8HiGYw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v3] hw/core/null-machine: Add the
+ possibility to instantiate a CPU and RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +30,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-On Wed, Jan 18, 2017 at 10:42:48AM +0800, Jason Wang wrote:
->=20
->=20
-> On 2017=E5=B9=B401=E6=9C=8817=E6=97=A5 22:44, Michael S. Tsirkin wrote:
-> > On Tue, Jan 17, 2017 at 12:01:00PM +0800, Jason Wang wrote:
-> > > We allow vhost to clear VIRITO_F_IOMMU_PLATFORM which is wrong sinc=
-e
-> > > VIRTIO_F_IOMMU_PLATFORM is mandatory for security. Fixing this by
-> > > enforce it after vdc->get_features().
-> > >=20
-> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > ---
-> > >   hw/virtio/virtio-bus.c | 5 +++--
-> > >   1 file changed, 3 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-> > > index d31cc00..a886011 100644
-> > > --- a/hw/virtio/virtio-bus.c
-> > > +++ b/hw/virtio/virtio-bus.c
-> > > @@ -47,6 +47,7 @@ void virtio_bus_device_plugged(VirtIODevice *vdev=
-, Error **errp)
-> > >       VirtioBusState *bus =3D VIRTIO_BUS(qbus);
-> > >       VirtioBusClass *klass =3D VIRTIO_BUS_GET_CLASS(bus);
-> > >       VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(vdev);
-> > > +    bool has_iommu =3D virtio_host_has_feature(vdev, VIRTIO_F_IOMM=
-U_PLATFORM);
-> > >       DPRINTF("%s: plug device.\n", qbus->name);
-> > > @@ -63,8 +64,8 @@ void virtio_bus_device_plugged(VirtIODevice *vdev=
-, Error **errp)
-> > >           klass->device_plugged(qbus->parent, errp);
-> > >       }
-> > > -    if (klass->get_dma_as !=3D NULL &&
-> > > -        virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
-> > > +    if (klass->get_dma_as !=3D NULL && has_iommu) {
-> > > +        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_PL=
-ATFORM);
-> > >           vdev->dma_as =3D klass->get_dma_as(qbus->parent);
-> > >       } else {
-> > >           vdev->dma_as =3D &address_space_memory;
-> > I suspect that's not enough, we must also fail or disable vhost
-> > (depending on the options), otherwise things won't work.
->=20
-> Looks like with the patch, VIRTIO_F_IOMMU_PLATFORM will be passed to
-> vhost_set_features().
+On Wed, Jan 18, 2017 at 4:44 AM, Thomas Huth <thuth@redhat.com> wrote:
+> Sometimes it is useful to have just a machine with CPU and RAM, without
+> any further hardware in it, e.g. if you just want to do some instruction
+> debugging for TCG with a remote GDB attached to QEMU, or run some embedded
+> code with the "-semihosting" QEMU parameter. qemu-system-m68k already
+> features a "dummy" machine, and xtensa a "sim" machine for exactly this
+> purpose.
+> All target architectures have nowadays also a "none" machine, which would
+> be a perfect match for this, too - but it currently does not allow to add
+> CPU and RAM yet. Thus let's add these possibilities in a generic way to the
+> "none" machine, too, so that we hopefully do not need additional "dummy"
+> machines in the future anymore (and maybe can also get rid of the already
+> existing "dummy"/"sim" machines one day).
+> Note that the default behaviour of the "none" machine is not changed, i.e.
+> no CPU and no RAM is instantiated by default. You have explicitely got to
+> specify the CPU model with "-cpu" and the amount of RAM with "-m" to get
+> these new features.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v3:
+>  - Get rid of the cpu_init_def() wrapper again, make null-machine.o
+>    target dependent instead and use cpu_init() directly.
+>  - Omit the loader code for the "-kernel" option for now (users can
+>    use "-device loader,..." instead). We can add code for the -kernel
+>    parameter later (either an implementation or a warning), once we've
+>    decided how it should behave for the "none" machine.
 
-Okay then. Could you please test on an old host kernel and confirm
-what happens? Pls mention this in commit log.
+I think there should at least be a warning to start with though. It
+seems confusing that no errors are reported but the argument is
+ignored.
 
-> So if vhost backend does not support it, it will fall
-> back to userspace (This may not work for vhost-user, but it's a bug exi=
-sted
-> even before this patch).
->=20
-> Thanks
+Thanks,
 
-I guess this is true but this suddenly makes it important to
-fix this. So I prefer a patchset where patch 2 addresses
-the fallback bug. In which way? Do you think we should
-just fail if vhost doesn't work? Does this apply to both
-userspace and kernel?
+Alistair
 
---=20
-MST
+>
+>  hw/core/Makefile.objs  |  2 +-
+>  hw/core/null-machine.c | 27 +++++++++++++++++++++++++--
+>  2 files changed, 26 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index a4c94e5..0b6c0f1 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -12,7 +12,6 @@ common-obj-$(CONFIG_XILINX_AXI) += stream.o
+>  common-obj-$(CONFIG_PTIMER) += ptimer.o
+>  common-obj-$(CONFIG_SOFTMMU) += sysbus.o
+>  common-obj-$(CONFIG_SOFTMMU) += machine.o
+> -common-obj-$(CONFIG_SOFTMMU) += null-machine.o
+>  common-obj-$(CONFIG_SOFTMMU) += loader.o
+>  common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
+>  common-obj-$(CONFIG_SOFTMMU) += register.o
+> @@ -20,3 +19,4 @@ common-obj-$(CONFIG_SOFTMMU) += or-irq.o
+>  common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
+>
+>  obj-$(CONFIG_SOFTMMU) += generic-loader.o
+> +obj-$(CONFIG_SOFTMMU) += null-machine.o
+> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> index 0351ba7..27c8369 100644
+> --- a/hw/core/null-machine.c
+> +++ b/hw/core/null-machine.c
+> @@ -13,18 +13,41 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> +#include "qemu/error-report.h"
+>  #include "hw/hw.h"
+>  #include "hw/boards.h"
+> +#include "sysemu/sysemu.h"
+> +#include "exec/address-spaces.h"
+> +#include "cpu.h"
+>
+> -static void machine_none_init(MachineState *machine)
+> +static void machine_none_init(MachineState *mch)
+>  {
+> +    CPUState *cpu = NULL;
+> +
+> +    /* Initialize CPU (if a model has been specified) */
+> +    if (mch->cpu_model) {
+> +        cpu = cpu_init(mch->cpu_model);
+> +        if (!cpu) {
+> +            error_report("Unable to initialize CPU");
+> +            exit(1);
+> +        }
+> +    }
+> +
+> +    /* RAM at address zero */
+> +    if (mch->ram_size) {
+> +        MemoryRegion *ram = g_new(MemoryRegion, 1);
+> +
+> +        memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
+> +        memory_region_add_subregion(get_system_memory(), 0, ram);
+> +    }
+>  }
+>
+>  static void machine_none_machine_init(MachineClass *mc)
+>  {
+>      mc->desc = "empty machine";
+>      mc->init = machine_none_init;
+> -    mc->max_cpus = 0;
+> +    mc->max_cpus = 1;
+> +    mc->default_ram_size = 0;
+>  }
+>
+>  DEFINE_MACHINE("none", machine_none_machine_init)
+> --
+> 1.8.3.1
+>
+>
