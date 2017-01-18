@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTpaG-0001zC-Bw
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:43:25 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cTpbM-0002tb-JO
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTpaB-0004Lh-D0
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:43:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTpaB-0004L0-64
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:43:19 -0500
-Date: Wed, 18 Jan 2017 10:43:15 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170118124315.GR3491@thinpad.lan.raisama.net>
-References: <1482866480-26208-1-git-send-email-ehabkost@redhat.com>
-	<1482866480-26208-5-git-send-email-ehabkost@redhat.com>
-	<20170104115656.GB14961@amt.cnet>
-	<20170104133916.GG3315@thinpad.lan.raisama.net>
-	<20170104195917.GM3315@thinpad.lan.raisama.net>
-	<20170104222623.GA21789@amt.cnet>
-	<20170105013631.GO3315@thinpad.lan.raisama.net>
-	<20170105104830.GB6299@amt.cnet>
-	<4006fc1d-f4f8-12dd-05e7-950cc839aae4@redhat.com>
-	<20170118115541.GA13762@amt.cnet>
+	(envelope-from <mreitz@redhat.com>) id 1cTpbH-0005Qn-Ch
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:32 -0500
+References: <20170103182801.9638-1-berrange@redhat.com>
+	<20170103182801.9638-8-berrange@redhat.com>
+	<d3f1e931-cecf-71b2-db82-f43c51361599@redhat.com>
+	<20170117095911.GB27235@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3e1a4a9a-7811-050c-3818-216b534f984a@redhat.com>
+Date: Wed, 18 Jan 2017 13:44:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170118115541.GA13762@amt.cnet>
-Subject: Re: [Qemu-devel] TSC frequency configuration & invtsc migration
- (was Re: [PATCH 4/4] kvm: Allow migration with invtsc)
+In-Reply-To: <20170117095911.GB27235@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kBdVAL8cTa2nkE8IERRKbBx5p76oSRnP8"
+Subject: Re: [Qemu-devel] [PATCH v1 07/15] iotests: fix 097 when run with
+ qcow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +27,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcelo Tosatti <mtosatti@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Haozhong Zhang <haozhong.zhang@intel.com>, libvir-list@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On Wed, Jan 18, 2017 at 09:55:43AM -0200, Marcelo Tosatti wrote:
-> On Tue, Jan 10, 2017 at 05:36:48PM +0100, Paolo Bonzini wrote:
-> > 
-> > 
-> > On 05/01/2017 11:48, Marcelo Tosatti wrote:
-> > >> Host A has TSC scaling, host B doesn't have TSC scaling. We want
-> > >> to be able to start the VM on host A, and migrate to B. In this
-> > >> case, the only possible solution is to use B's frequency when
-> > >> starting the VM. The QEMU process doesn't have enough information
-> > >> to make that decision.
-> > > That is a good point. But again, its a special case and 
-> > > should be supported by -cpu xxx,tsc-frequency=zzzz.
-> > 
-> > I don't think this is a scenario that can work reliably.  The computed
-> > TSC frequency may vary by 0.5% or so on every boot (e.g. you may get
-> > 2497000 kHz or 2511000 kHz for a 2.5 GHz TSC).  You can start the VM on
-> > host A, reboot host B, and then you'll be unable to migrate.
-> > 
-> > Paolo
-> 
-> Including an acceptable error in the comparison seems to be
-> acceptable to work around that case.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kBdVAL8cTa2nkE8IERRKbBx5p76oSRnP8
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <3e1a4a9a-7811-050c-3818-216b534f984a@redhat.com>
+Subject: Re: [PATCH v1 07/15] iotests: fix 097 when run with qcow
+References: <20170103182801.9638-1-berrange@redhat.com>
+ <20170103182801.9638-8-berrange@redhat.com>
+ <d3f1e931-cecf-71b2-db82-f43c51361599@redhat.com>
+ <20170117095911.GB27235@redhat.com>
+In-Reply-To: <20170117095911.GB27235@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-How much error is acceptable when exposing the invtsc flag to the
-guest?
+On 17.01.2017 10:59, Daniel P. Berrange wrote:
+> On Mon, Jan 16, 2017 at 09:04:31PM +0100, Max Reitz wrote:
+>> On 03.01.2017 19:27, Daniel P. Berrange wrote:
+>>> The previous commit:
+>>>
+>>>   commit a3e1505daec31ef56f0489f8c8fff1b8e4ca92bd
+>>>   Author: Eric Blake <eblake@redhat.com>
+>>>   Date:   Mon Dec 5 09:49:34 2016 -0600
+>>>
+>>>     qcow2: Don't strand clusters near 2G intervals during commit
+>>>
+>>> extended the 097 test case so that it did two passes, once
+>>> with an internal snapshot, once without.
+>>>
+>>> qcow (v1) does not support internal snapshots, so this change
+>>> broke test 097 when run against qcow.
+>>>
+>>> This splits 097 in two, creating a new 173 that tests the
+>>> internal snapshot codepath, effectively putting 097 back
+>>> to its content before the above commit.
+>>>
+>>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>>> ---
+>>>  tests/qemu-iotests/097     |  10 +---
+>>>  tests/qemu-iotests/097.out | 125 ++---------------------------------=
+---------
+>>>  tests/qemu-iotests/173     | 126 +++++++++++++++++++++++++++++++++++=
+++++++++++
+>>>  tests/qemu-iotests/173.out | 119 +++++++++++++++++++++++++++++++++++=
++++++++
+>>>  tests/qemu-iotests/group   |   1 +
+>>>  5 files changed, 251 insertions(+), 130 deletions(-)
+>>>  create mode 100755 tests/qemu-iotests/173
+>>>  create mode 100644 tests/qemu-iotests/173.out
+>>
+>> I don't think the effort is worth it, considering that probably
+>> literally nobody is still using qcow -- or so I hope, at least.
+>=20
+> The reason I fixed this was because I wanted to be able to verify my
+> refactoring to qcow didn't break anything else. It is much easier if
+> I can just run "check -qcow" and not have to worry about which failures=
 
--- 
-Eduardo
+> are just test bugs, vs genuine code bugs I've created. IOW, as long as
+> qcow.c exists in the code base, IMHO, we should make sure the iotests
+> continue to pass
+
+Right, what I meant is that I don't think it's worth fixing tests for
+qcow. If they don't work and it isn't qcow that's broken (but just the
+test requiring something that qcow does not have), just removing it from
+the _supported_fmt list is usually sufficient in my opinion.
+
+> On that point, IMHO, it would be beneficial if we had some CI system
+> that was setup to run the iotests on all new changes, across all the
+> different disk formats we expect the iotests to work on. We get far
+> too many regressions with iotests breaking and no one noticing right
+> now :-(
+
+Indeed, but that would require all of the iotests consistently passing
+first...
+
+Max
+
+
+--kBdVAL8cTa2nkE8IERRKbBx5p76oSRnP8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh/YyMSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A9QoH/ibds/dN3zcitR+AvpNQKgaIivslqRPZ
+UJ3fzqGqGaNQ4jB8iFSSeLXCmN470y5EBH8rSBHp9IOs/7o2Rm+SnkyVTK+fqY01
+8aCRDsnRyLHDSsOe4FiJUDRUdOQwh+v4Y4biMu1LHgY29QyFS2BXUFJHchMFHFL9
+Gxj2lEQ8bDVhJUDZyhTJkMW7YMKsbu9q3UcNpEE3mFk8KME/OAIDlibj1waCYduz
+4T4uJvdSuzpt0y8hi0L3o/g6nNB0kLiyR8ydbJCoVYv920eiG5yUbjbe5dHel9gX
+MnpLik7pkRuGhZvQTOltQulf2yDipCfTFol2/itqTal3Zninv5f0VlM=
+=fTTi
+-----END PGP SIGNATURE-----
+
+--kBdVAL8cTa2nkE8IERRKbBx5p76oSRnP8--
