@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cTlAs-0002jT-PL
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:00:55 -0500
+	(envelope-from <wouter@grep.be>) id 1cTlBm-0003DT-Tx
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:01:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cTlAp-000146-Gi
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:00:54 -0500
-Resent-Message-Id: <E1cTlAp-000146-Gi@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([165.254.168.72]:21446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cTlAp-00011L-4x
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:00:51 -0500
-In-Reply-To: <20161201052844.31819-1-bobby.prani@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148472643642.214.7504531151595764217@790289a7ca88>
+	(envelope-from <wouter@grep.be>) id 1cTlBm-00029a-6U
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:01:51 -0500
+Date: Wed, 18 Jan 2017 09:01:26 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20170118080126.nyldkjhxdsxd4u2b@grep.be>
+References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
+	<e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
+	<2EAE3C4F-58AF-4594-A284-A69D8BC3EA8F@alex.org.uk>
+	<CAJSP0QWXF2tS5q-BpmxR9ti0osjzZCFiRxdRDho4pDBLkD3UUQ@mail.gmail.com>
+	<CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
+	<90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
+	<20170114144500.oxoqvrn5x4sdfo74@grep.be>
+	<1ef924f8-1e58-fe54-dabc-06873a531412@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 18 Jan 2017 00:00:37 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v5 0/3] Add litmus tests for MTTCG
- consistency tests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ef924f8-1e58-fe54-dabc-06873a531412@redhat.com>
+Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] How to online resize qemu disk
+ with nbd protocol?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bobby.prani@gmail.com
-Cc: famz@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>
+Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Stefan Hajnoczi <stefanha@gmail.com>, qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Bob Chen <a175818323@gmail.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NjEyMDEwNTI4NDQuMzE4MTktMS1ib2JieS5wcmFuaUBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2NSAwLzNdIEFkZCBsaXRtdXMgdGVzdHMgZm9yIE1UVENHIGNvbnNpc3Rl
-bmN5IHRlc3RzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
-b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
-biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
-bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
-dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
-ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
-dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CmZhdGFsOiB1bmFibGUgdG8gYWNjZXNzICdodHRw
-czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUvJzogRmFpbGVkIGNvbm5lY3QgdG8g
-Z2l0aHViLmNvbTo0NDM7IE9wZXJhdGlvbiBub3cgaW4gcHJvZ3Jlc3MKZXJyb3I6IENvdWxkIG5v
-dCBmZXRjaCAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClRyYWNlYmFj
-ayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIvdXNyL2Jpbi9wYXRjaGV3IiwgbGlu
-ZSA0MDYsIGluIHRlc3Rfb25lCiAgICBnaXRfY2xvbmVfcmVwbyhjbG9uZSwgclsicmVwbyJdLCBy
-WyJoZWFkIl0sIGxvZ2YpCiAgRmlsZSAiL3Vzci9iaW4vcGF0Y2hldyIsIGxpbmUgNDcsIGluIGdp
-dF9jbG9uZV9yZXBvCiAgICBzdGRvdXQ9bG9nZiwgc3RkZXJyPWxvZ2YpCiAgRmlsZSAiL3Vzci9s
-aWI2NC9weXRob24zLjQvc3VicHJvY2Vzcy5weSIsIGxpbmUgNTYxLCBpbiBjaGVja19jYWxsCiAg
-ICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxl
-ZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydnaXQnLCAncmVtb3RlJywgJ2FkZCcsICctZicsICct
-LW1pcnJvcj1mZXRjaCcsICczYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-JywgJ2h0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdSddJyByZXR1cm5lZCBu
-b24temVybyBleGl0IHN0YXR1cyAxCgoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Mon, Jan 16, 2017 at 01:36:21PM -0600, Eric Blake wrote:
+> Maybe the structured reply proposal can be extended into this (reserve a
+> "reply" header that can be issued as many times as desired by the server
+> without the client ever having issued the request first, and where the
+> reply never uses the end-of-reply marker), but I'm not sure I want to go
+> that direction just yet.
+
+It's not necessarily a bad idea, which could also be used for:
+- keepalive probes from server to client
+- unsolicited ESHUTDOWN messages
+
+both of which are currently not possible and might be useful for the
+protocol to have.
+
+-- 
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
