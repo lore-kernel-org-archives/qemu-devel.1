@@ -1,42 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1cTtjw-0006k7-NX
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:09:41 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cTtnk-0001sf-K9
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:13:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1cTtjt-0005h3-F0
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:09:40 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33309
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.vnet.ibm.com>)
-	id 1cTtjt-0005gr-8T
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:09:37 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0IH8keZ027978
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 12:09:36 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 282b4mce29-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 12:09:35 -0500
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.vnet.ibm.com>;
-	Wed, 18 Jan 2017 10:09:35 -0700
-Reply-To: jjherne@linux.vnet.ibm.com
-References: <20170117010204.4909-1-ehabkost@redhat.com>
-	<309bd499-204d-df07-aa99-9a999cfecabc@linux.vnet.ibm.com>
-	<20170118170049.GB3491@thinpad.lan.raisama.net>
-From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
-Date: Wed, 18 Jan 2017 12:09:28 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170118170049.GB3491@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <45e82b29-1ebe-3f34-0cc1-35d60c6044da@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 0/9] i386:
- query-cpu-model-expansion test script
+	(envelope-from <imammedo@redhat.com>) id 1cTtnj-0007Bi-BF
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:13:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cTtnj-0007BS-2a
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:13:35 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Wed, 18 Jan 2017 18:13:16 +0100
+Message-Id: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [RFC 00/13] numa: add '-numa cpu' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,37 +21,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, ehabkost@redhat.com, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
 
-On 01/18/2017 12:00 PM, Eduardo Habkost wrote:
-> On Tue, Jan 17, 2017 at 10:22:10AM -0500, Jason J. Herne wrote:
->> On 01/16/2017 08:01 PM, Eduardo Habkost wrote:
->>> This is a follow-up to the series that implements
->>> query-cpu-model-expansion. Before including the test script, the
->>> series has some fixes to allow the results of
->>> query-cpu-model-expansion to be used in the QEMU command-line.
->>>
->>> The script probably will work on s390x too, but I couldn't test
->>> it yet.
->>>
->>
->> Eduardo,
->>
->> This test seems to mostly work on s390. The only issue I ran into is
->> querying host model using tcg only. s390 requires kvm to query the host
->> model. Perhaps we could just skip the tcg host test case on s390?
->
-> We could still try to test "host", but add it to a greylist where
-> errors returned by query-cpu-model-expansion can be non-fatal.
-> query-cpu-model-expansion model="host" can also fail with KVM if
-> the host doesn't support CPU models.
->
 
-David had the idea to just support -cpu host for tcg. We could do that.
-In the meantime, I'm ok with your greylist idea too. This would allow the
-script to work properly on s390 right from the start, and we can remove the
-greylist when s390 supports specifying -cpu host for tcg.
+Series introduces a new CLI option to allow mapping cpus to numa
+nodes using public properties [socket|core|thread]-ids instead of
+internal cpu-index and moving cpu<->node mapping from global bitmaps
+to PCMachineState struct.
+
+It focuses on PC in RFC version to see if approach is suitable in general,
+later we can move generic parts to common code or do a bigger non RFC
+version of this series that would take care of all concerned targets
+(arm-virt/spapr/pc).
+Thing which I've kept PC specific but could be generalized is:
+  * moving array possible_cpus to generic MachineState where
+    we already have possible_cpu_arch_ids(). I plan to reuse it
+    in virt-arm for CPU hotplug/-device cpu support and as this series
+    shows it also could be used for numa mapping.
+    Perhaps it could be used in simmilar manner for core based SPAPR
+    but I haven't looked it yet. So any opions on if we should move it there.
+
+So far it only provides CLI interface to do mapping, there is no QMP
+one as I haven't found a suitable place/way to update/set mapping
+after machine_done for QEMU started with -S (stoppod mode) so that
+mgmt could query hopluggable-cpus first, then map them to numa nodes
+in runtime before actually allowing guest to run.
+Any suggestions on how to make it work are welcome.
+
+PS:
+skipped travis-ci build as currently it seems to be broken.
+
+CC: Dou Liyang <douly.fnst@cn.fujitsu.com>
+CC: fanc.fnst@cn.fujitsu.com
+CC: caoj.fnst@cn.fujitsu.com
+CC: stefanha@redhat.com
+CC: izumi.taku@jp.fujitsu.com
+CC: vilanova@ac.upc.edu
+CC: ehabkost@redhat.com
+CC: peter.maydell@linaro.org
+CC: Andrew Jones <drjones@redhat.com>
+CC: David Gibson <david@gibson.dropbear.id.au>
+CC: Thomas Huth <thuth@redhat.com>
+
+Igor Mammedov (13):
+  numa: access CPU's node id via property in hmp_info_numa()
+  pc: cleanup: move smbios_set_cpuid() into pc_build_smbios()
+  pc: don't return cpu pointer from pc_new_cpu() as it's not needed
+    anymore
+  make possible_cpu_arch_ids() return const pointer
+  pc: move pcms->possible_cpus init out of pc_cpus_init()
+  pc: calculate topology only once when possible_cpus is initialised
+  pc: pass apic_id to pc_find_cpu_slot() directly so lookup could be
+    done without CPU object
+  pc: add writeonly 'cpu' property to PCMachine
+  numa: introduce '-numa cpu' cpu option
+  numa: replace cpu_index_to_socket_id() with
+    cpu_index_to_instance_props()
+  numa: use new machine.cpu property with -numa cpus=... CLI
+  pc: drop usage of legacy numa_get_node_for_cpu()
+  pc: cpu: make sure that cpu.node-id matches -numa mapping
+
+ include/hw/acpi/acpi_dev_interface.h |   2 +-
+ include/hw/boards.h                  |  14 ++-
+ include/hw/i386/pc.h                 |   2 +-
+ include/qom/cpu.h                    |   2 -
+ include/sysemu/numa.h                |   3 +-
+ target/arm/cpu.h                     |   2 +
+ target/i386/cpu.h                    |   1 +
+ target/ppc/cpu.h                     |   2 +
+ hw/acpi/cpu.c                        |  13 +--
+ hw/acpi/cpu_hotplug.c                |   4 +-
+ hw/arm/virt.c                        |  12 +-
+ hw/i386/acpi-build.c                 |  25 ++---
+ hw/i386/pc.c                         | 210 +++++++++++++++++++++++------------
+ hw/ppc/spapr.c                       |  15 ++-
+ hw/ppc/spapr_cpu_core.c              |   2 +-
+ monitor.c                            |   7 +-
+ numa.c                               |  89 +++++++++++----
+ qapi-schema.json                     |   3 +-
+ stubs/pc_madt_cpu_entry.c            |   2 +-
+ target/arm/cpu.c                     |   1 +
+ target/i386/cpu.c                    |   1 +
+ target/ppc/translate_init.c          |   1 +
+ vl.c                                 |   4 +-
+ 23 files changed, 269 insertions(+), 148 deletions(-)
 
 -- 
--- Jason J. Herne (jjherne@linux.vnet.ibm.com)
+2.7.4
