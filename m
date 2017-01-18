@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cTmBo-0002Bh-Rn
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 04:05:57 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cTmDL-000320-3y
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 04:07:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cTmBj-0007WZ-Qv
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 04:05:56 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35294)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cTmDG-0008Bw-1Q
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 04:07:31 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36139)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cTmBj-0007Vx-Dr
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 04:05:51 -0500
-Received: by mail-lf0-x241.google.com with SMTP id v186so765900lfa.2
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 01:05:51 -0800 (PST)
+	id 1cTmDF-0008BP-QQ
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 04:07:25 -0500
+Received: by mail-lf0-x243.google.com with SMTP id h65so766593lfi.3
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 01:07:25 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1484556005-29701-1-git-send-email-peterx@redhat.com>
+References: <20170117193033.23178-1-ehabkost@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d5356257-f98c-8d37-0da4-f2d95f957dc0@redhat.com>
-Date: Wed, 18 Jan 2017 10:05:49 +0100
+Message-ID: <089cc65d-6e44-5e73-82e0-36c4a7e8e867@redhat.com>
+Date: Wed, 18 Jan 2017 10:07:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <1484556005-29701-1-git-send-email-peterx@redhat.com>
+In-Reply-To: <20170117193033.23178-1-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/2] memory: extend "info mtree" with
- flat view dump
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] Remove arch_init SMBIOS and ACPI code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@gmail.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
 
 
-On 16/01/2017 09:40, Peter Xu wrote:
-> v4:
-> - do unref of flatview when no view is there [Dave]
+On 17/01/2017 20:30, Eduardo Habkost wrote:
+> This creates stubs for SMBIOS and ACPI option parsing functions,
+> so that we don't need arch-specific #ifdefs in arch_init just for
+> calling the option parsers.
 > 
-> v3:
-> - rather than dump flatview directly in "info mtree", provide a new
->   parameter "-f" for it. [Paolo]
-> - replace "RW" chars with the type of memory region [Paolo]
-> - (cc dave as well since it touches HMP interface)
+> Eduardo Habkost (3):
+>   stubs: Add smbios_entry_add() stub
+>   stubs: acpi_table_add() stub
+>   arch_init: Move acpi_table_add() call back to vl.c
 > 
-> v2:
-> - fix a size error in patch 2
-> - add r-b for Marc-André in patch 1
-> 
-> Each address space has its own flatview. It's another way to observe
-> memory info besides the default memory region hierachy, for example,
-> if we want to know which memory region will handle the write to
-> specific address, a flatview will suite more here than the default
-> hierachical dump.
-> 
-> Please review. Thanks,
-> 
-> Peter Xu (2):
->   memory: tune mtree_print_mr() to dump mr type
->   memory: hmp: add "-f" for "info mtree"
-> 
->  hmp-commands-info.hx  |  6 ++--
->  include/exec/memory.h |  2 +-
->  memory.c              | 89 ++++++++++++++++++++++++++++++++++++++-------------
->  monitor.c             |  4 ++-
->  4 files changed, 74 insertions(+), 27 deletions(-)
+>  include/sysemu/arch_init.h |  2 --
+>  arch_init.c                | 20 --------------------
+>  stubs/acpi.c               |  7 +++++++
+>  stubs/smbios.c             |  7 +++++++
+>  vl.c                       |  9 +++++++--
+>  stubs/Makefile.objs        |  2 ++
+>  6 files changed, 23 insertions(+), 24 deletions(-)
+>  create mode 100644 stubs/acpi.c
+>  create mode 100644 stubs/smbios.c
 > 
 
-Queued, thanks.
+Pretty much the same patches are in my pending pull request.
 
 Paolo
