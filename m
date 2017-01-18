@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cTkzJ-0006bO-CY
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 02:48:58 -0500
+	(envelope-from <peterx@redhat.com>) id 1cTl0C-00072Z-V8
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 02:49:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cTkzG-0002zO-9u
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 02:48:57 -0500
-References: <1484709699-3455-1-git-send-email-skiver.cloud.yzy@gmail.com>
-	<66ed2121-c207-d2f4-2e05-b6474bfa6a49@redhat.com>
-	<CAHkcwacJ_BBOTDBxrDejqNiuzWcfrjVRWM-yNeuRF98tEc+xPw@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c8fbc6e3-7862-ad33-1344-b21b8118e0fc@redhat.com>
-Date: Wed, 18 Jan 2017 08:48:49 +0100
+	(envelope-from <peterx@redhat.com>) id 1cTl09-0003XK-RL
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 02:49:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50030)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cTl09-0003Wy-JA
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 02:49:49 -0500
+Date: Wed, 18 Jan 2017 15:49:44 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170118074944.GR30108@pxdev.xzpeter.org>
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+	<1484276800-26814-14-git-send-email-peterx@redhat.com>
+	<20170116125357.31b7ef82@t450s.home>
+	<20170117140000.GN30108@pxdev.xzpeter.org>
+	<20170117084604.2b1f5e50@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <CAHkcwacJ_BBOTDBxrDejqNiuzWcfrjVRWM-yNeuRF98tEc+xPw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] gdbstub.c: fix GDB connection
- segfault caused by empty machines
+Content-Disposition: inline
+In-Reply-To: <20170117084604.2b1f5e50@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 13/14] intel_iommu: allow dynamic
+ switch of IOMMU region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +31,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Ziyue <skiver.cloud.yzy@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ziyue Yang <yzylivezh@hotmail.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com
 
- Hi,
-
-On 18.01.2017 08:43, Yang Ziyue wrote:
-> Hi Thomas,
+On Tue, Jan 17, 2017 at 08:46:04AM -0700, Alex Williamson wrote:
+> On Tue, 17 Jan 2017 22:00:00 +0800
+> Peter Xu <peterx@redhat.com> wrote:
 > 
-> I'm not quite sure about that, but did you mean that I should mention
-> the second patch before the Sign-off line instead of in the commit
-> message?
+> > On Mon, Jan 16, 2017 at 12:53:57PM -0700, Alex Williamson wrote:
+> > > On Fri, 13 Jan 2017 11:06:39 +0800
+> > > Peter Xu <peterx@redhat.com> wrote:
+> > >   
+> > > > This is preparation work to finally enabled dynamic switching ON/OFF for
+> > > > VT-d protection. The old VT-d codes is using static IOMMU address space,
+> > > > and that won't satisfy vfio-pci device listeners.
+> > > > 
+> > > > Let me explain.
+> > > > 
+> > > > vfio-pci devices depend on the memory region listener and IOMMU replay
+> > > > mechanism to make sure the device mapping is coherent with the guest
+> > > > even if there are domain switches. And there are two kinds of domain
+> > > > switches:
+> > > > 
+> > > >   (1) switch from domain A -> B
+> > > >   (2) switch from domain A -> no domain (e.g., turn DMAR off)
+> > > > 
+> > > > Case (1) is handled by the context entry invalidation handling by the
+> > > > VT-d replay logic. What the replay function should do here is to replay
+> > > > the existing page mappings in domain B.  
+> > > 
+> > > There's really 2 steps here, right?  Invalidate A, replay B.  I think
+> > > the code handles this, but I want to make sure.  We don't want to end
+> > > up with a superset of both A & B.  
+> > 
+> > First of all, this discussion should be beyond this patch's scope,
+> > since this patch is currently only handling the case when guest
+> > disables DMAR in general.
+> > 
+> > Then, my understanding for above question: when we do A -> B domain
+> > switch, guest will not send specific context entry invalidations for
+> > A, but will for sure send one when context entry is ready for B. In
+> > that sense, IMO we don't have a clear "two steps", only one, which is
+> > the latter "replay B". We do correct unmap based on the PSIs
+> > (page-selective invalidations) of A when guest unmaps the pages in A.
+> > 
+> > So, for the use case of nested device assignment (which is the goal of
+> > this series for now):
+> > 
+> > - L1 guest put device D1,D2,... of L2 guest into domain A
+> > - L1 guest map the L2 memory into L1 address space (L2GPA -> L1GPA)
+> > - ... (L2 guest runs, until it stops running)
+> > - L1 guest unmap all the pages in domain A
+> > - L1 guest move device D1,D2,... of L2 guest outside domain A
+> > 
+> > This series should work for above, since before any device leaves its
+> > domain, the domain will be clean and without unmapped pages.
+> > 
+> > However, if we have the following scenario (which I don't know whether
+> > this's achievable):
+> > 
+> > - guest iommu domain A has device D1, D2
+> > - guest iommu domain B has device D3
+> > - move device D2 from domain A into B
+> > 
+> > Here when D2 move from A to B, IIUC our current Linux IOMMU driver
+> > code will not send any PSI (page-selected invalidations) for D2 or
+> > domain A because domain A still has device in it, guest should only
+> > send a context entry invalidation for device D2, telling that D2 has
+> > switched to domain B. In that case, I am not sure whether current
+> > series can work properly, and IMHO we may need to have the domain
+> > knowledge in VT-d emulation code (while we don't have it yet) in the
+> > future to further support this kind of domain switches.
+> 
+> This is a serious issue that needs to be resolved.  The context entry
+> invalidation when D2 is switched from A->B must unmap anything from
+> domain A before the replay of domain B.  Your example is easily
+> achieved, for instance what if domain A is the SI (static identity)
+> domain for the L1 guest, domain B is the device assignment domain for
+> the L2 guest with current device D3.  The user hot adds device D2 into
+> the L2 guest moving it from the L1 SI domain to the device assignment
+> domain.  vfio will not override existing mappings on replay, it will
+> error, giving the L2 guest a device with access to the static identity
+> mappings of the L1 host.  This isn't acceptable.
+>  
+> > > On the invalidation, a future optimization when disabling an entire
+> > > memory region might also be to invalidate the entire range at once
+> > > rather than each individual mapping within the range, which I think is
+> > > what happens now, right?  
+> > 
+> > Right. IIUC this can be an enhancement to current page walk logic - we
+> > can coalesce continuous IOTLB with same property and notify only once
+> > for these coalesced entries.
+> > 
+> > Noted in my todo list.
+> 
+> A context entry invalidation as in the example above might make use of
+> this to skip any sort of page walk logic, simply invalidate the entire
+> address space.
 
-No, I meant: You still got the sentence "Also some updates from
-fprintf(stderr, ...) to error_report." in the description of your first
-patch. But indeed this is now done in the second patch instead. So
-simply remove that sentence from the description of your first patch,
-and everything is fine :-)
+Alex, I got one more thing to ask:
 
- Thomas
+I was trying to invalidate the entire address space by sending a big
+IOTLB notification to vfio-pci, which looks like:
+
+  IOMMUTLBEntry entry = {
+      .target_as = &address_space_memory,
+      .iova = 0,
+      .translated_addr = 0,
+      .addr_mask = (1 << 63) - 1,
+      .perm = IOMMU_NONE,     /* UNMAP */
+  };
+
+Then I feed this entry to vfio-pci IOMMU notifier.
+
+However, this was blocked in vfio_iommu_map_notify(), with error:
+
+  qemu-system-x86_64: iommu has granularity incompatible with target AS
+
+Since we have:
+
+  /*
+   * The IOMMU TLB entry we have just covers translation through
+   * this IOMMU to its immediate target.  We need to translate
+   * it the rest of the way through to memory.
+   */
+  rcu_read_lock();
+  mr = address_space_translate(&address_space_memory,
+                               iotlb->translated_addr,
+                               &xlat, &len, iotlb->perm & IOMMU_WO);
+  if (!memory_region_is_ram(mr)) {
+      error_report("iommu map to non memory area %"HWADDR_PRIx"",
+                   xlat);
+      goto out;
+  }
+  /*
+   * Translation truncates length to the IOMMU page size,
+   * check that it did not truncate too much.
+   */
+  if (len & iotlb->addr_mask) {
+      error_report("iommu has granularity incompatible with target AS");
+      goto out;
+  }
+
+In my case len == 0xa0000 (that's the translation result), and
+iotlb->addr_mask == (1<<63)-1. So looks like the translation above
+splitted the big region and a simple big UNMAP doesn't work for me.
+
+Do you have any suggestion on how I can solve this? In what case will
+we need the above address_space_translate()?
+
+> 
+> > >   
+> > > > However for case (2), we don't want to replay any domain mappings - we
+> > > > just need the default GPA->HPA mappings (the address_space_memory
+> > > > mapping). And this patch helps on case (2) to build up the mapping
+> > > > automatically by leveraging the vfio-pci memory listeners.  
+> > > 
+> > > Have you thought about using this address space switching to emulate
+> > > ecap.PT?  ie. advertise hardware based passthrough so that the guest
+> > > doesn't need to waste pagetable entries for a direct mapped, static
+> > > identity domain.  
+> > 
+> > Kind of. Currently we still don't have iommu=pt for the emulated code.
+> > We can achieve that by leveraging this patch.
+> 
+> Well, we have iommu=pt, but the L1 guest will implement this as a fully
+> populated SI domain rather than as a bit in the context entry to do
+> hardware direct translation.  Given the mapping overhead through vfio,
+> the L1 guest will always want to use iommu=pt as dynamic mapping
+> performance is going to be horrid.  Thanks,
+
+I see, so we have iommu=pt in guest even VT-d emulation does not
+provide that bit. Anyway, supporting ecap.pt is in my todo list.
+
+Thanks,
+
+-- peterx
