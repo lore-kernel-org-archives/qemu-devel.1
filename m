@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTroM-0006UL-JY
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:06:12 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cTs0K-0001WA-DV
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:18:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cTroJ-0003ic-Cc
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:06:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37306)
+	(envelope-from <imammedo@redhat.com>) id 1cTs0G-0000sa-8I
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:18:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50922)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cTroJ-0003iK-3o
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:06:03 -0500
-References: <1484749457-87117-1-git-send-email-phil@philjordan.eu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aae83060-472d-97fb-9ada-2a78ff3f815f@redhat.com>
-Date: Wed, 18 Jan 2017 16:05:59 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cTs0F-0000rC-Vy
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:18:24 -0500
+Date: Wed, 18 Jan 2017 16:18:19 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170118161819.7f5526af@nial.brq.redhat.com>
+In-Reply-To: <CAFEAcA-Cdyq-dQ0U79TSsjJWQ2TO0R11RCWzAemSRS_1M65meg@mail.gmail.com>
+References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
+	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
+	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
+	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
+	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
+	<20170117094950.5dqdpbk6u7p4yhms@kamzik.brq.redhat.com>
+	<CAFEAcA-Cdyq-dQ0U79TSsjJWQ2TO0R11RCWzAemSRS_1M65meg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1484749457-87117-1-git-send-email-phil@philjordan.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] x86-KVM: Supply TSC and APIC clock rates
- to guest like VMWare
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
+ as PNP0C02 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,161 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phil Dennis-Jordan <phil@philjordan.eu>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
+On Tue, 17 Jan 2017 10:56:53 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
+> On 17 January 2017 at 09:49, Andrew Jones <drjones@redhat.com> wrote:
+> > In some cases the problem we're solving with the compat guards is
+> > a bit hypothetical, but, IMHO, nonetheless a good practice. While
+> > we may be sure that AAVMF and Linux will be fine with this table
+> > changing under their feet, we can't be sure there aren't other
+> > mach-virt users that have more sensitive firmwares/OSes. An ACPI-
+> > sensitive OS may notice the change on its next reboot after a
+> > migration, and then simply refuse to continue.  
+> 
+> There's also the case where you do a VM migration midway through
+> UEFI booting up, I think, which might cause things to go wrong
+> if you catch it just at the wrong moment.
+acpi blobs are migrated from source so above won't happen.
+The time guest will see new table is fresh boot or reboot.
 
-On 18/01/2017 15:24, Phil Dennis-Jordan wrote:
-> ---
->  target/i386/cpu.c |  1 +
->  target/i386/cpu.h |  4 ++++
->  target/i386/kvm.c | 40 ++++++++++++++++++++++++++++++++--------
->  3 files changed, 37 insertions(+), 8 deletions(-)
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index aba11ae..e5523d4 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -3677,6 +3677,7 @@ static Property x86_cpu_properties[] =3D {
->      DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
->      DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
->      DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
-> +    DEFINE_PROP_BOOL("vmware-tsc-apic-clocks", X86CPU, vmware_clock_ra=
-tes, false),
+> 
+> > Now, that said, I just spoke with Igor in order to learn the x86
+> > practice. He says that the policy has been more lax than what I
+> > suggest above. Hypothetical, low-risk issues are left unguarded,
+> > and only when a bug is found during testing is it then managed.
+> > The idea is to try and reduce the amount of compat variables and
+> > conditions needed in the ACPI generation code, but, of course, at
+> > some level of risk to users expecting their versioned machine type
+> > to always appear the same.
+> >
+> > So far we've been strict with mach-virt, guarding all hypothetical
+> > issues. Perhaps this patch is a good example to get a discussion
+> > started on whether or not we should be so strict though.  
+> 
+> That said, I don't have a very strong opinion here, beyond that
+> we should be consistent at least with x86 practice.
+another reason why we are trying not to use strict approach with ACPI
+tables is that it's part of firmware and we didn't version firmwares
+so far. (i.e. dst host with newer QEMU will typically have newer
+firmware and guest with old machine-type migrated to host with newer
+QEMU will run new firmware on (re)boot)
 
-Maybe just vmware-cpuid-freq instead?  Whatever the choice, please make
-the bool field in struct X86CPU consistent with the property name (e.g.
-enable_vmware_cpuid_freq).
-
-One issue is that the TSC frequency can change, for example on
-migration.  Telling the guest about the TSC frequency makes little sense
-if it can change.
-
-So the leaf should be conditional on the INVTSC feature
-(CPUID[0x80000007].EDX bit 8).  You can enable this unconditionally for
-new machine types (i.e. making it true here, and turning it off in
-include/hw/i386/pc.h's PC_COMPAT_2_8 macro), but only expose it if that
-bit is also set.
-
->      DEFINE_PROP_END_OF_LIST()
->  };
-> =20
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 6c1902b..1d8590b 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1213,6 +1213,10 @@ struct X86CPU {
->      bool host_features;
->      uint32_t apic_id;
-> =20
-> +    /* Enables publishing of TSC increment and Local APIC bus frequenc=
-ies to
-> +     * the guest OS in CPUID page 0x40000010, the same way that VMWare=
- does. */
-> +    bool vmware_clock_rates;
-> +
->      /* if true the CPUID code directly forward host cache leaves to th=
-e guest */
->      bool cache_info_passthrough;
-> =20
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 10a9cd8..7830b3a 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -778,10 +778,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      }
-> =20
->      if (cpu->expose_kvm) {
-> +        uint32_t kvm_max_page =3D KVM_CPUID_FEATURES | kvm_base;
-
-s/page/leaf/
-
-> +        if (cpu->vmware_clock_rates && kvm_base =3D=3D KVM_CPUID_SIGNA=
-TURE) {
-> +            kvm_max_page =3D MAX(kvm_max_page, KVM_CPUID_SIGNATURE | 0=
-x10);
-> +        }
->          memcpy(signature, "KVMKVMKVM\0\0\0", 12);
->          c =3D &cpuid_data.entries[cpuid_i++];
->          c->function =3D KVM_CPUID_SIGNATURE | kvm_base;
-> -        c->eax =3D KVM_CPUID_FEATURES | kvm_base;
-> +        c->eax =3D kvm_max_page;
->          c->ebx =3D signature[0];
->          c->ecx =3D signature[1];
->          c->edx =3D signature[2];
-> @@ -910,7 +914,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          }
->      }
-> =20
-> -    cpuid_data.cpuid.nent =3D cpuid_i;
-> =20
->      if (((env->cpuid_version >> 8)&0xF) >=3D 6
->          && (env->features[FEAT_1_EDX] & (CPUID_MCE | CPUID_MCA)) =3D=3D
-> @@ -973,12 +976,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          vmstate_x86_cpu.unmigratable =3D 1;
->      }
-> =20
-> -    cpuid_data.cpuid.padding =3D 0;
-> -    r =3D kvm_vcpu_ioctl(cs, KVM_SET_CPUID2, &cpuid_data);
-> -    if (r) {
-> -        return r;
-> -    }
-> -
->      r =3D kvm_arch_set_tsc_khz(cs);
->      if (r < 0) {
->          return r;
-> @@ -998,6 +995,33 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          }
->      }
-> =20
-> +    if (cpu->vmware_clock_rates) {
-
-^^ Here is where you should also check invtsc.
-
-> +        if (cpu->expose_kvm
-
-I think this should not depend on cpu->expose_kvm.  This is not a KVM
-leaf, it's a vmware leaf; if it were a KVM leaf, it would obey kvm_base.
- Of course checking kvm_base is still a good idea, to avoid stomping on
-Hyper-V's CPUID space.
-
-Thanks,
-
-Paolo
-
-> +            && kvm_base =3D=3D KVM_CPUID_SIGNATURE
-> +            && env->tsc_khz !=3D 0) {
-> +            /* Publish TSC and LAPIC resolution on CPUID page 0x400000=
-10
-> +             * like VMWare for benefit of Darwin guests. */
-> +            c =3D &cpuid_data.entries[cpuid_i++];
-> +            c->function =3D KVM_CPUID_SIGNATURE | 0x10;
-> +            c->eax =3D env->tsc_khz;
-> +            /* LAPIC resolution of 1ns (freq: 1GHz) is hardcoded in KV=
-M's
-> +             * APIC_BUS_CYCLE_NS*/
-> +            c->ebx =3D 1000000;
-> +            c->ecx =3D c->edx =3D 0;
-> +        } else {
-> +            error_report(
-> +                "Warning: VMWare-style TSC/LAPIC clock reporting impos=
-sible.");
-
-
-> +        }
-> +    }
-> +
-> +    cpuid_data.cpuid.nent =3D cpuid_i;
-> +
-> +    cpuid_data.cpuid.padding =3D 0;
-> +    r =3D kvm_vcpu_ioctl(cs, KVM_SET_CPUID2, &cpuid_data);
-> +    if (r) {
-> +        return r;
-> +    }
-> +
->      if (has_xsave) {
->          env->kvm_xsave_buf =3D qemu_memalign(4096, sizeof(struct kvm_x=
-save));
->      }
->=20
+> 
+> thanks
+> -- PMM
