@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cTpbk-0003DJ-1r
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:57 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTpcH-0003kR-83
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:45:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cTpbi-0005nG-W6
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45204)
+	(envelope-from <ehabkost@redhat.com>) id 1cTpcC-0006NA-Oa
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:45:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cTpbi-0005js-O9
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:44:54 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 18 Jan 2017 13:44:50 +0100
-Message-Id: <1484743490-24721-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] hw/core/null-machine: Add the possibility
- to instantiate a CPU and RAM
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTpcC-0006M6-IX
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:45:24 -0500
+Date: Wed, 18 Jan 2017 10:45:21 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170118124521.GS3491@thinpad.lan.raisama.net>
+References: <1484664152-24446-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<1484664152-24446-2-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20170117200913.GO3491@thinpad.lan.raisama.net>
+	<9e041398-8fc2-9809-ddd4-2ca0fe2b8e4e@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9e041398-8fc2-9809-ddd4-2ca0fe2b8e4e@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Ensure the numa_post_machine_init
+ func in the appropriate location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,104 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: stefanha@redhat.com, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com
 
-Sometimes it is useful to have just a machine with CPU and RAM, without
-any further hardware in it, e.g. if you just want to do some instruction
-debugging for TCG with a remote GDB attached to QEMU, or run some embedded
-code with the "-semihosting" QEMU parameter. qemu-system-m68k already
-features a "dummy" machine, and xtensa a "sim" machine for exactly this
-purpose.
-All target architectures have nowadays also a "none" machine, which would
-be a perfect match for this, too - but it currently does not allow to add
-CPU and RAM yet. Thus let's add these possibilities in a generic way to the
-"none" machine, too, so that we hopefully do not need additional "dummy"
-machines in the future anymore (and maybe can also get rid of the already
-existing "dummy"/"sim" machines one day).
-Note that the default behaviour of the "none" machine is not changed, i.e.
-no CPU and no RAM is instantiated by default. You have explicitely got to
-specify the CPU model with "-cpu" and the amount of RAM with "-m" to get
-these new features.
+On Wed, Jan 18, 2017 at 12:02:35PM +0800, Dou Liyang wrote:
+> Hi, Eduardo
+> 
+> At 01/18/2017 04:09 AM, Eduardo Habkost wrote:
+> > On Tue, Jan 17, 2017 at 10:42:31PM +0800, Dou Liyang wrote:
+> > > In the numa_post_machine_init(), we use CPU_FOREACH macro to set all
+> > > CPUs' namu_node. So, we should make sure that we call it after Qemu
+> > > has already initialied all the CPUs.
+> > > 
+> > > As we all know, the CPUs can be created by "-smp"(pc_new_cpu) or
+> > > "-device"(qdev_device_add) command. But, before the device init,
+> > > Qemu execute the numa_post_machine_init earlier. It makes the mapping
+> > > of NUMA nodes and CPUs incorrect.
+> > > 
+> > > The patch move the numa_post_machine_init func in the appropriate
+> > > location.
+> > > 
+> > > Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> > 
+> > I would like to move cpu_index initialization to
+> > qom/cpu.c:cpu_common_realizefn(), and remove
+> > numa_post_machine_init() completely.
+> 
+> Thanks, it is a good idea. I will try it later.
+> 
+> But, I hope to know that:
+> 
+> If you may want to say the cpu->**numa_node** initialization?
+> Because the **cpu_index** initialization is in pc_cpu_pre_plug()
+> currently, like that: cs->cpu_index = idx;
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v3:
- - Get rid of the cpu_init_def() wrapper again, make null-machine.o
-   target dependent instead and use cpu_init() directly.
- - Omit the loader code for the "-kernel" option for now (users can
-   use "-device loader,..." instead). We can add code for the -kernel
-   parameter later (either an implementation or a warning), once we've
-   decided how it should behave for the "none" machine.
+Oops, I meant the numa_node initialization. :)
 
- hw/core/Makefile.objs  |  2 +-
- hw/core/null-machine.c | 27 +++++++++++++++++++++++++--
- 2 files changed, 26 insertions(+), 3 deletions(-)
-
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index a4c94e5..0b6c0f1 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -12,7 +12,6 @@ common-obj-$(CONFIG_XILINX_AXI) += stream.o
- common-obj-$(CONFIG_PTIMER) += ptimer.o
- common-obj-$(CONFIG_SOFTMMU) += sysbus.o
- common-obj-$(CONFIG_SOFTMMU) += machine.o
--common-obj-$(CONFIG_SOFTMMU) += null-machine.o
- common-obj-$(CONFIG_SOFTMMU) += loader.o
- common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
- common-obj-$(CONFIG_SOFTMMU) += register.o
-@@ -20,3 +19,4 @@ common-obj-$(CONFIG_SOFTMMU) += or-irq.o
- common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
- 
- obj-$(CONFIG_SOFTMMU) += generic-loader.o
-+obj-$(CONFIG_SOFTMMU) += null-machine.o
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index 0351ba7..27c8369 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -13,18 +13,41 @@
- 
- #include "qemu/osdep.h"
- #include "qemu-common.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/boards.h"
-+#include "sysemu/sysemu.h"
-+#include "exec/address-spaces.h"
-+#include "cpu.h"
- 
--static void machine_none_init(MachineState *machine)
-+static void machine_none_init(MachineState *mch)
- {
-+    CPUState *cpu = NULL;
-+
-+    /* Initialize CPU (if a model has been specified) */
-+    if (mch->cpu_model) {
-+        cpu = cpu_init(mch->cpu_model);
-+        if (!cpu) {
-+            error_report("Unable to initialize CPU");
-+            exit(1);
-+        }
-+    }
-+
-+    /* RAM at address zero */
-+    if (mch->ram_size) {
-+        MemoryRegion *ram = g_new(MemoryRegion, 1);
-+
-+        memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
-+        memory_region_add_subregion(get_system_memory(), 0, ram);
-+    }
- }
- 
- static void machine_none_machine_init(MachineClass *mc)
- {
-     mc->desc = "empty machine";
-     mc->init = machine_none_init;
--    mc->max_cpus = 0;
-+    mc->max_cpus = 1;
-+    mc->default_ram_size = 0;
- }
- 
- DEFINE_MACHINE("none", machine_none_machine_init)
 -- 
-1.8.3.1
+Eduardo
