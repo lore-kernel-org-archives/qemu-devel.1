@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cTx2R-0006Gt-TP
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:41:01 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cTx53-0008AA-6I
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:43:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cTx2P-0007YO-8z
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:41:00 -0500
-Resent-Message-Id: <E1cTx2P-0007YO-8z@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21477)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cTx2O-0007XY-W7
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:40:57 -0500
-In-Reply-To: <1484771412-28024-1-git-send-email-mst@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148477204953.214.4233575593065257938@790289a7ca88>
+	(envelope-from <alex.williamson@redhat.com>) id 1cTx4x-0000nS-5f
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:43:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cTx4w-0000mt-TT
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:43:35 -0500
+Date: Wed, 18 Jan 2017 13:43:32 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170118134332.4210104e@t450s.home>
+In-Reply-To: <20170118134147.5cf6beb0.cornelia.huck@de.ibm.com>
+References: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170112072513.98411-3-bjsdjshi@linux.vnet.ibm.com>
+	<20170117145142.4954666f@t450s.home>
+	<20170118025117.GN30301@bjsdjshi@linux.vnet.ibm.com>
+	<20170118134147.5cf6beb0.cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 18 Jan 2017 12:40:50 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/4] virtio: ARRAY_SIZE fixups
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v2 02/12] vfio: linux-headers update
+ for vfio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +32,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-NDc3MTQxMi0yODAyNC0xLWdpdC1zZW5kLWVtYWlsLW1zdEByZWRoYXQuY29tClN1YmplY3Q6IFtR
-ZW11LWRldmVsXSBbUEFUQ0ggMC80XSB2aXJ0aW86IEFSUkFZX1NJWkUgZml4dXBzClR5cGU6IHNl
-cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
-MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMg
-VXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
-IFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NDc3MTQxMi0yODAyNC0xLWdpdC1zZW5kLWVt
-YWlsLW1zdEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4NDc3MTQxMi0yODAyNC0xLWdpdC1zZW5k
-LWVtYWlsLW1zdEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzhi
-MDMxYiBBUlJBWV9TSVpFOiBjaGVjayB0aGF0IGFyZ3VtZW50IGlzIGFuIGFycmF5CjE5ZWYwMDMg
-Y29tcGlsZXI6IGV4cHJlc3Npb24gdmVyc2lvbiBvZiBRRU1VX0JVSUxEX0JVR19PTgo3MTg3MGU2
-IGNvbXBpbGVyOiBkcm9wIDsgYWZ0ZXIgQlVJTERfQlVHX09OCmM2NTJkNzkgdmlydGlvOiBmaXgg
-dXAgbWF4IHNpemUgY2hlY2tzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
-LzQ6IHZpcnRpbzogZml4IHVwIG1heCBzaXplIGNoZWNrcy4uLgpDaGVja2luZyBQQVRDSCAyLzQ6
-IGNvbXBpbGVyOiBkcm9wIDsgYWZ0ZXIgQlVJTERfQlVHX09OLi4uCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiMyNTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6ODk6Cisg
-ICAgdHlwZWRlZiBjaGFyIGdsdWUocWVtdV9idWlsZF9idWdfb25fXyxfX0xJTkVfXylbKHgpPy0x
-OjFdIF9fYXR0cmlidXRlX18oKHVudXNlZCkpCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIg
-dGhhdCAnLCcgKGN0eDpWeFYpCiMyNTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6ODk6
-CisgICAgdHlwZWRlZiBjaGFyIGdsdWUocWVtdV9idWlsZF9idWdfb25fXyxfX0xJTkVfXylbKHgp
-Py0xOjFdIF9fYXR0cmlidXRlX18oKHVudXNlZCkpCiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJz8n
-IChjdHg6VnhPKQojMjU6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjg5OgorICAgIHR5
-cGVkZWYgY2hhciBnbHVlKHFlbXVfYnVpbGRfYnVnX29uX18sX19MSU5FX18pWyh4KT8tMToxXSBf
-X2F0dHJpYnV0ZV9fKCh1bnVzZWQpKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhh
-dCAnLScgKGN0eDpPeFYpCiMyNTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6ODk6Cisg
-ICAgdHlwZWRlZiBjaGFyIGdsdWUocWVtdV9idWlsZF9idWdfb25fXyxfX0xJTkVfXylbKHgpPy0x
-OjFdIF9fYXR0cmlidXRlX18oKHVudXNlZCkpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJv
-dW5kIHRoYXQgJzonIChjdHg6VnhWKQojMjU6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5o
-Ojg5OgorICAgIHR5cGVkZWYgY2hhciBnbHVlKHFlbXVfYnVpbGRfYnVnX29uX18sX19MSU5FX18p
-Wyh4KT8tMToxXSBfX2F0dHJpYnV0ZV9fKCh1bnVzZWQpKQogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiA0IGVycm9ycywg
-MSB3YXJuaW5ncywgOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzQ6IGNvbXBpbGVyOiBleHByZXNzaW9uIHZlcnNp
-b24gb2YgUUVNVV9CVUlMRF9CVUdfT04uLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
-dGhhdCAnPycgKGN0eDpWeE8pCiMyMzogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6OTE6
-CisjZGVmaW5lIFFFTVVfQlVJTERfQlVHX09OX1pFUk8oeCkgKHNpemVvZihpbnRbKHgpPy0xOjFd
-KSAtIHNpemVvZihpbnQpKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhhdCAnLScgKGN0eDpP
-eFYpCiMyMzogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6OTE6CisjZGVmaW5lIFFFTVVf
-QlVJTERfQlVHX09OX1pFUk8oeCkgKHNpemVvZihpbnRbKHgpPy0xOjFdKSAtIHNpemVvZihpbnQp
-KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
-UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4VikKIzIzOiBGSUxF
-OiBpbmNsdWRlL3FlbXUvY29tcGlsZXIuaDo5MToKKyNkZWZpbmUgUUVNVV9CVUlMRF9CVUdfT05f
-WkVSTyh4KSAoc2l6ZW9mKGludFsoeCk/LTE6MV0pIC0gc2l6ZW9mKGludCkpCiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDMgZXJy
-b3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNDogQVJSQVlfU0laRTogY2hlY2sgdGhh
-dCBhcmd1bWVudCBpcyBhbiBhcnJheS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Wed, 18 Jan 2017 13:41:47 +0100
+Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+
+> On Wed, 18 Jan 2017 10:51:17 +0800
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > * Alex Williamson <alex.williamson@redhat.com> [2017-01-17 14:51:42 -0700]:
+> >   
+> > > On Thu, 12 Jan 2017 08:25:03 +0100
+> > > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> > >   
+> > > > From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> > > > 
+> > > > This is a placeholder for a linux-headers update.
+> > > > 
+> > > > Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> > > > ---
+> > > >  include/standard-headers/asm-s390/vfio_ccw.h | 28 ++++++++++++++++++++++++++++
+> > > >  linux-headers/linux/vfio.h                   | 17 +++++++++++++++++
+> > > >  2 files changed, 45 insertions(+)
+> > > >  create mode 100644 include/standard-headers/asm-s390/vfio_ccw.h
+> > > > 
+> > > > diff --git a/include/standard-headers/asm-s390/vfio_ccw.h b/include/standard-headers/asm-s390/vfio_ccw.h
+> > > > new file mode 100644
+> > > > index 0000000..cddc09b
+> > > > --- /dev/null
+> > > > +++ b/include/standard-headers/asm-s390/vfio_ccw.h
+> > > > @@ -0,0 +1,28 @@
+> > > > +/*
+> > > > + * Interfaces for vfio-ccw
+> > > > + *
+> > > > + * Copyright IBM Corp. 2017
+> > > > + *
+> > > > + * This program is free software; you can redistribute it and/or modify
+> > > > + * it under the terms of the GNU General Public License (version 2 only)
+> > > > + * as published by the Free Software Foundation.
+> > > > + *
+> > > > + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > > > + */
+> > > > +
+> > > > +#ifndef _VFIO_CCW_H_
+> > > > +#define _VFIO_CCW_H_
+> > > > +
+> > > > +#include "standard-headers/linux/types.h"
+> > > > +
+> > > > +struct ccw_io_region {
+> > > > +#define ORB_AREA_SIZE 12
+> > > > +	uint8_t  orb_area[ORB_AREA_SIZE];
+> > > > +#define SCSW_AREA_SIZE 12
+> > > > +	uint8_t  scsw_area[SCSW_AREA_SIZE];
+> > > > +#define IRB_AREA_SIZE 96
+> > > > +	uint8_t  irb_area[IRB_AREA_SIZE];
+> > > > +	uint32_t ret_code;
+> > > > +} QEMU_PACKED;
+> > > > +
+> > > > +#endif  
+> > > 
+> > > This is really part of the uapi for the vfio-ccw mdev device, isn't it?  
+> > Yes, it is.
+> >   
+> > > Should it really be buried in asm-s390 in the kernel?
+> > >   
+> > We had an internal discussion on this question before, since we think
+> > this interface is strongly s390 dependent, we put it here. What do you
+> > suggest? Thanks,  
+> 
+> As there are already architecture-specific definitions in the common
+> file, having everything in the same file is probably better. I'm
+> certainly not against moving it out from asm-s390.
+
+As soon as we use it for the interface definition to the vfio region, I
+think it makes sense for it to move to uapi.  It's not really
+architecture specific as much as it is device specific, for a device
+which happens to only appear on s390 hardware.  Putting it in uapi
+should also make sure people think twice about changing it.  Thanks,
+
+Alex
