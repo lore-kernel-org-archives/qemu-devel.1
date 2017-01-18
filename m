@@ -1,15 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cTgpJ-0004iT-AP
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 22:22:22 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cTgpX-0004sQ-LF
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 22:22:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cTgpG-0006Vf-7T
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 22:22:21 -0500
-From: Ziyue Yang <skiver.cloud.yzy@gmail.com>
-Date: Wed, 18 Jan 2017 11:22:02 +0800
-Message-Id: <1484709722-3546-1-git-send-email-skiver.cloud.yzy@gmail.com>
-Subject: [Qemu-devel] [PATCH v4 2/2] gdbstub.c: update old error report
- statements
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cTgpU-0006mg-Gl
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 22:22:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38694
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cTgpU-0006lb-BI
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 22:22:32 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0I3IfEV015573
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 22:22:31 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 281yknhd29-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 22:22:31 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 17 Jan 2017 20:22:30 -0700
+Date: Wed, 18 Jan 2017 11:22:23 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170112072513.98411-8-bjsdjshi@linux.vnet.ibm.com>
+	<20170117154928.6b7886fb@t450s.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170117154928.6b7886fb@t450s.home>
+Message-Id: <20170118032223.GO30301@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 07/12] vfio/ccw: vfio based
+ subchannel passthrough driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,52 +44,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Liguori <aliguori@us.ibm.com>, Ziyue Yang <yzylivezh@hotmail.com>, Ziyue Yang <skiver.cloud.yzy@gmail.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-From: Ziyue Yang <yzylivezh@hotmail.com>
+* Alex Williamson <alex.williamson@redhat.com> [2017-01-17 15:49:28 -0700]:
 
-Some updates from fprintf(stderr, ...) to error_report.
+> On Thu, 12 Jan 2017 08:25:08 +0100
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> > 
+> > We use the IOMMU_TYPE1 of VFIO to realize the subchannels
+> > passthrough, implement a vfio based subchannels passthrough
+> > driver called "vfio-ccw".
+> > 
+> > Support qemu parameters in the style of:
+> > "-device vfio-ccw,id=xx,hostid=xx(,guestid=xx),mdevid=xx"
+> 
+> Why not adopt the same syntax as vfio-pci with mdev devices,
+> sysfsdev=%s where %s is a path to the mdev device in sysfs, which can
+> be /sys/bus/mdev/devices/$UUID or as you create from the hostid
+> below /sys/bus/css/devices/%x.%x.%04x/$UUID.
+Ok. This is a good point.
 
-Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
----
- gdbstub.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+I will change the cmdline interface to:
+-device vfio-ccw,id=xx,sysfsdev=xx(,devno=xx)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 426d55e..fe1d0f8 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -637,8 +637,8 @@ void gdb_register_coprocessor(CPUState *cpu,
-     *p = s;
-     if (g_pos) {
-         if (g_pos != s->base_reg) {
--            fprintf(stderr, "Error: Bad gdb register numbering for '%s'\n"
--                    "Expected %d got %d\n", xml, g_pos, s->base_reg);
-+            error_report("Error: Bad gdb register numbering for '%s', "
-+                         "Expected %d got %d", xml, g_pos, s->base_reg);
-         } else {
-             cpu->gdb_num_g_regs = cpu->gdb_num_regs;
-         }
-@@ -890,7 +890,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-     case 'k':
-         /* Kill the target */
--        fprintf(stderr, "\nQEMU: Terminated via GDBstub\n");
-+        error_report("QEMU: Terminated via GDBstub");
-         exit(0);
-     case 'D':
-         /* Detach packet */
-@@ -1358,8 +1358,8 @@ void gdb_do_syscallv(gdb_syscall_complete_cb cb, const char *fmt, va_list va)
-                 break;
-             default:
-             bad_format:
--                fprintf(stderr, "gdbstub: Bad syscall format string '%s'\n",
--                        fmt - 1);
-+                error_report("gdbstub: Bad syscall format string '%s'",
-+                             fmt - 1);
-                 break;
-             }
-         } else {
---
-2.7.4
+Since "hostid" is removed, I will also rename "guestid" to "devno" to
+make it looking consistent with the virtio-ccw devices.
+
+> It seems if we know where
+> to find the mdev device then we can determine the parent information on
+> our own through sysfs.
+> 
+This is true.
+
+> > Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+[...]
+
+-- 
+Dong Jia
