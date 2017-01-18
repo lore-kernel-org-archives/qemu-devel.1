@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTucq-0003BC-SI
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:06:26 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cTudY-0003jp-I3
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:07:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTucp-0003n9-Hn
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:06:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42330)
+	(envelope-from <imammedo@redhat.com>) id 1cTudT-0003wK-Hv
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:07:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTucp-0003mk-A7
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:06:23 -0500
-Date: Wed, 18 Jan 2017 16:06:19 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170118180619.GG3491@thinpad.lan.raisama.net>
-References: <1484750925-176844-1-git-send-email-imammedo@redhat.com>
-	<20170118151945.GY3491@thinpad.lan.raisama.net>
-	<20170118180824.52d84031@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cTudT-0003vd-9D
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:07:03 -0500
+Date: Wed, 18 Jan 2017 19:06:59 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170118190659.67b96115@nial.brq.redhat.com>
+In-Reply-To: <e0eabf75-dd4e-2c66-ce56-232a4dc262d2@redhat.com>
+References: <20170112182446.9600-1-lersek@redhat.com>
+	<20170112182446.9600-3-lersek@redhat.com>
+	<20170113140914.62af8755@nial.brq.redhat.com>
+	<32d3f5cf-9428-29db-45bb-d3a35c6cbd04@redhat.com>
+	<20170117122131.466d4147@nial.brq.redhat.com>
+	<bbd7f2a5-cdec-aaf3-acfb-c99ce9054a3c@redhat.com>
+	<20170117142059.3a7689de@nial.brq.redhat.com>
+	<17a61164-0cb8-98fd-b340-8cb3a27edb0e@redhat.com>
+	<20170117152056.4e37468e@nial.brq.redhat.com>
+	<ce81a37b-231c-6a7d-feae-bbf5b6cd45a1@redhat.com>
+	<20170118110353.3f2ac8a3@nial.brq.redhat.com>
+	<98895612-58dd-f0cb-e761-515f9e29c373@redhat.com>
+	<e94a097e-274b-b26a-ec89-70929c422c69@redhat.com>
+	<20170118133844.75422b55@nial.brq.redhat.com>
+	<73c6dc4e-805e-a9a1-712d-7373a3409b66@redhat.com>
+	<20170118172608.0db201ce@nial.brq.redhat.com>
+	<e0eabf75-dd4e-2c66-ce56-232a4dc262d2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170118180824.52d84031@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] numa: access CPU's node id via property in
- hmp_info_numa()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 wave 2 2/3] hw/isa/lpc_ich9: add
+ broadcast SMI feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,163 +43,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Michael Kinney <michael.d.kinney@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Wed, Jan 18, 2017 at 06:08:24PM +0100, Igor Mammedov wrote:
-> On Wed, 18 Jan 2017 13:19:45 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Wed, 18 Jan 2017 18:23:45 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
+
+> On 01/18/17 17:26, Igor Mammedov wrote:
+> > On Wed, 18 Jan 2017 16:42:27 +0100
+> > Laszlo Ersek <lersek@redhat.com> wrote:
+> >   
+> >> On 01/18/17 13:38, Igor Mammedov wrote:  
+> >>> On Wed, 18 Jan 2017 11:23:48 +0100
+> >>> Laszlo Ersek <lersek@redhat.com> wrote:
+> >>>     
+> >>>> On 01/18/17 11:19, Laszlo Ersek wrote:    
+> >>>>> On 01/18/17 11:03, Igor Mammedov wrote:      
+> >>>>>> On Tue, 17 Jan 2017 19:53:21 +0100
+> >>>>>> Laszlo Ersek <lersek@redhat.com> wrote:
+> >>>>>>      
+> >>>>
+> >>>> [snip]
+> >>>>    
+> >>>>>>> This is the code I wrote (extracting a new ich9_apm_broadcast_smi()
+> >>>>>>> function from ich9_apm_ctrl_changed(), due to size reasons):
+> >>>>>>>      
+> >>>>>>>> static void ich9_apm_broadcast_smi(void)
+> >>>>>>>> {
+> >>>>>>>>     CPUState *cs;
+> >>>>>>>>
+> >>>>>>>>     cpu_synchronize_all_states(); /* <--------- mark this */      
+> >>>>>> it probably should be executed after pause_all_vcpus(),
+> >>>>>> maybe it will help.
+> >>>>>>      
+> >>>>>>>>     CPU_FOREACH(cs) {
+> >>>>>>>>         X86CPU *cpu = X86_CPU(cs);
+> >>>>>>>>         CPUX86State *env = &cpu->env;
+> >>>>>>>>
+> >>>>>>>>         if (env->smbase == 0x30000 && env->eip == 0xfff0) {
+> >>>>>>>>             CPUClass *k = CPU_GET_CLASS(cs);
+> >>>>>>>>             uint64_t cpu_arch_id = k->get_arch_id(cs);
+> >>>>>>>>
+> >>>>>>>>             trace_ich9_apm_broadcast_smi_skip(cpu_arch_id);
+> >>>>>>>>             continue;
+> >>>>>>>>         }
+> >>>>>>>>
+> >>>>>>>>         cpu_interrupt(cs, CPU_INTERRUPT_SMI);
+> >>>>>>>>     }
+> >>>>>>>> }        
+> >>>>>>>      
+> >>>>>> [...]      
+> >>>>>>> (b) If I add the cpu_synchronize_all_states() call before the loop, then
+> >>>>>>> the incorrect filter matches go away; QEMU sees the KVM VCPU states
+> >>>>>>> correctly, and the SMI is broad-cast.
+> >>>>>>>
+> >>>>>>> However, in this case, the boot slows to a *crawl*. It's unbearable. All
+> >>>>>>> VCPUs are pegged at 100%, and you can easily follow the OVMF debug log
+> >>>>>>> with the naked eye, almost line by line.
+> >>>>>>> I didn't expect that cpu_synchronize_all_states() would be so costly,
+> >>>>>>> but it makes the idea of checking VCPU state in the APM_CNT handler a
+> >>>>>>> non-starter.      
+> >>>>>> I wonder were bottleneck is to slow down guest so much.
+> >>>>>> What is actual cost of calling cpu_synchronize_all_states()?
+> >>>>>>
+> >>>>>> Maybe calling pause_all_vcpus() before cpu_synchronize_all_states()
+> >>>>>> would help.      
+> >>>>>
+> >>>>> If I prepend just a pause_all_vcpus() function call, at the top, then
+> >>>>> the VM freezes (quite understandably) when the first SMI is raised via
+> >>>>> APM_CNT.
+> >>>>>
+> >>>>> If I, instead, bracket the function body with pause_all_vcpus() and
+> >>>>> resume_all_vcpus(), like this:
+> >>>>>
+> >>>>> static void ich9_apm_broadcast_smi(void)
+> >>>>> {
+> >>>>>     CPUState *cs;
+> >>>>>
+> >>>>>     pause_all_vcpus();
+> >>>>>     cpu_synchronize_all_states();
+> >>>>>     CPU_FOREACH(cs) {
+> >>>>>         X86CPU *cpu = X86_CPU(cs);
+> >>>>>         CPUX86State *env = &cpu->env;
+> >>>>>
+> >>>>>         if (env->smbase == 0x30000 && env->eip == 0xfff0) {
+> >>>>>             CPUClass *k = CPU_GET_CLASS(cs);
+> >>>>>             uint64_t cpu_arch_id = k->get_arch_id(cs);
+> >>>>>
+> >>>>>             trace_ich9_apm_broadcast_smi_skip(cpu_arch_id);
+> >>>>>             continue;
+> >>>>>         }
+> >>>>>
+> >>>>>         cpu_interrupt(cs, CPU_INTERRUPT_SMI);
+> >>>>>     }
+> >>>>>     resume_all_vcpus();
+> >>>>> }
+> >>>>>
+> >>>>> then I see the following symptoms:
+> >>>>> - rather than 4 VCPUs being pegged at 100%, only one VCPU is pegged at
+> >>>>>   100%
+> >>>>> - the boot process, as observed from the OVMF log, is just as slow
+> >>>>>   (= crawling) as without the VCPU pausing/resuming (i.e., like with
+> >>>>>   cpu_synchronize_all_states() only); so ultimately the
+> >>>>>   pausing/resuming doesn't help.      
+> >>>>
+> >>>> I also tried this variant (bracketing only the sync call with pause/resume):
+> >>>>
+> >>>> static void ich9_apm_broadcast_smi(void)
+> >>>> {
+> >>>>     CPUState *cs;
+> >>>>
+> >>>>     pause_all_vcpus();
+> >>>>     cpu_synchronize_all_states();
+> >>>>     resume_all_vcpus();
+> >>>>     CPU_FOREACH(cs) {
+> >>>>         X86CPU *cpu = X86_CPU(cs);
+> >>>>         CPUX86State *env = &cpu->env;
+> >>>>
+> >>>>         if (env->smbase == 0x30000 && env->eip == 0xfff0) {
+> >>>>             CPUClass *k = CPU_GET_CLASS(cs);
+> >>>>             uint64_t cpu_arch_id = k->get_arch_id(cs);
+> >>>>
+> >>>>             trace_ich9_apm_broadcast_smi_skip(cpu_arch_id);
+> >>>>             continue;
+> >>>>         }
+> >>>>
+> >>>>         cpu_interrupt(cs, CPU_INTERRUPT_SMI);
+> >>>>     }
+> >>>> }
+> >>>>
+> >>>> This behaves identically to the version where pause/resume bracket the
+> >>>> entire function body (i.e., 1 VCPU pegged, super-slow boot progress).    
+> >>> wrapping entire function into pause_all_vcpus()/resume_all_vcpus()
+> >>> looks better as then cpu_interrupt() would not need to send IPIs to CPUs
+> >>> since pause_all_vcpus() would have done it.  
+> >>
+> >> I don't understand, why would a pause operation send IPIs?  
+> > pause_all forces exit on all CPUs and cpu_interrupt() does the same to
+> > a CPU so if all CPUs were kicked out of running state then cpu_interrupt()
+> > would skip kick out step.  
 > 
-> > On Wed, Jan 18, 2017 at 03:48:45PM +0100, Igor Mammedov wrote:
-> > > Move vcpu's assocciated numa_node field out of generic CPUState
-> > > into inherited classes that actually care about cpu<->numa mapping
-> > > and make monitor 'info numa' get vcpu's assocciated node id via
-> > > node-id property.
-> > > It allows to drop implicit node id intialization in
-> > > numa_post_machine_init() and would allow switching to mapping
-> > > defined by target's CpuInstanceProperties instead of global
-> > > numa_info[i].node_cpu bitmaps.  
+> Understood.
+> 
+> >   
+> >> Do you mean the resume? Even in that case, why would the resume send
+> >> precisely SMIs (substituting for the specific CPU_INTERRUPT_SMI calls)
+> >> and not some other kind of interrupt?
+> >>  
+> >>> So the left question is what this 1 CPU does to make things so slow.
+> >>> Does it send a lot of SMIs or something else?    
+> >>
+> >> The firmware uses many SMIs / Trigger() calls, for example for the
+> >> implementation of UEFI variable services, and SMM lockbox operations.
+> >> However, it does not use *masses* of them. Following the OVMF log, I see
+> >> that *individual* APM_CNT writes take very long (on the order of a
+> >> second, even), which implies that a single cpu_synchronize_all_states()
+> >> function call takes very long.
+> >>
+> >> I briefly checked what cpu_synchronize_all_states() does, digging down
+> >> its call stack. I don't see anything in it that we should or could
+> >> modify for the sake of this work.
+> >>
+> >>
+> >> I think the current line of investigation is way out of scope for this
+> >> work, and that we've lost focus. In the original "PATCH v6 wave 2 2/3",
+> >> cpu_interrupt() just works as intended.  
+> 
+> > It's not that I'm outright against of v6 as is,
+> > it just seems that something fundamentally broken on
+> > cpu_synchronize_all_states() call chain  
+> 
+> Maybe, but I don't see how fixing that is a prerequisite for this patch.
+> 
+> > and instead of fixing issue
+> > the same SMBASE race case would be just ignored  
+> 
+> I don't understand. What SMBASE race? Ignored by what and when? Sorry,
+> I'm lost.
+> 
+> If you are saying that, for the moment we can ignore any SMBASE races
+> (whatever they may be) because CPU hotplug is broken with OVMF anyway,
+> then I agree. I would like to limit the scope of this series as much as
+> possible.
+> 
+> > since CPU hotplug is
+> > broken with OVMF anyways.
 > > 
-> > I agree to allow the node-id assignment logic to be defined by
-> > arch-specific code, but:
-> > 
-> > Considering that we still have the generic CPU<->node mapping in
-> > numa_info[].node_cpu, I don't see the benefit of moving the
-> > numa_info[].node_cpu => node-id translation from common generic
-> > code to duplicated arch-specific code.
-> it's duplicated for a time being until all targets that use
-> node_cpu are internally converted to socket/core/thread-id interface.
-> This patch is a part if re-factoring RFC which I'm about to post.
+> > So I'm fine with applying v6 as is
+> > and as follow up fix to cpu_synchronize_all_states()  
 > 
+> I cannot promise to work on cpu_synchronize_all_states(). It ties into
+> KVM and it goes over my head.
 > 
-
-Maybe the duplication will be OK if it's temporary, and going to
-be removed immediately by the same series. But if it is a
-standalone patch, I don't want to make the existing duplication
-worse.
-
-> > What about adding this to cpu_generic_realize():
-> > 
-> >   node = (numa_get_node_for_cpu(cpu)
-> >   if (node >= 0) {
-> >      int cur_node = object_property_find(cpu, "node-id") ?
-> >                     object_property_get_int(cpu, "node-id") : -1;
-> >      if (cur_node >= 0 && cur_node != node) {
-> >          error_setg(&err, "Conflict between -numa option and CPU node-id");
-> >          goto out;
-> >      }
-> >      object_property_set_int(cpu, "node-id", node, &err);
-> >   }
-> What I don't like here is that putting above snippet into
-> cpu_generic_realize() is just doing the same implicit init
-> that numa_post_machine_init() has been doing before just
-> a bit later. It looks like a quick fix for 'info numa' issues.
-
-Yes, it is. But I still don't see what's the problem with it. If
-numa_info[].node_cpu still exists in generic code, I don't see
-why not handle it in generic code.
-
+> In fact, if there is a problem with cpu_synchronize_all_states(), it
+> must be a general one.
 > 
-> However it would add stumble block on getting rid of 
-> numa_get_node_for_cpu() { numa_info[].node_cpu } and keeping
-> node-mapping along with the rest of topology in Machine object
-> instead of globals.
-
-Removing duplication would make it easier: then you'll have only
-one user of numa_info[].node_cpu/numa_get_node_for_cpu() to get
-rid of, instead of 4.
-
+> The only reason I even thought of calling cpu_synchronize_all_states()
+> here, after seeing the out-of-date register values, is that I recalled
+> it from when I worked on dump-guest-memory. dump-guest-memory writes the
+> register file to the dump, and so it needs cpu_synchronize_all_states().
 > 
-> I'm in process of getting rid of numa_info[].node_cpu/numa_get_node_for_cpu()
-> altogether. And incrementally done it for PC, so I'd be forced
-> to reduplicate above snippet from cpu_generic_realize() in concrete
-> users anyway to do conversion without breaking other users.
+> But, again, cpu_synchronize_all_states() is a general facility, and I
+> can't promise to work on it.
+> 
+> > with
+> > follow up filtering out of the same SMBASE in reset state CPUs
+> > if possible in 2.9 merge window.  
+> 
+> I'm still not convinced that this filtering is absolutely necessary, in
+> the face of feature negotiation; *but*, if someone figures out what's
+> wrong with cpu_synchronize_all_states(), and manages to make its
+> performance impact negligible, then I am certainly willing to add the
+> filtering to the SMI broadcast.
+> 
+> At that point, it shouldn't be much work, I hope.
+> 
+> >   
+> >> Why are we branching out this far from that? Just to avoid the CPU
+> >> unpark feature that Paolo suggested (which would also be negotiated)?
+> >>
+> >> What is so wrong with the planned CPU unpark stuff that justifies
+> >> blocking this patch?
+> >>
+> >> Honestly I don't understand why we can't approach these features
+> >> *incrementally*. Let's do the negotiable SMI broadcast now, then do VCPU
+> >> hotplug later. I think the current negotiation pattern is flexible and
+> >> future-proofed enough for that. It was you who suggested, for
+> >> simplifying the last patch in the series, that we completely ignore VCPU
+> >> hotplug for now (and I whole-heartedly agreed).
+> >>
+> >> Let me put it like this: what is in this patch, in your opinion, that
+> >> *irrevocably* breaks the upcoming VCPU hotplug feature, or else limits
+> >> our options in implementing it? In my opinion, we can later implement
+> >> *anything at all*, dependent on new feature bits. We can even decide to
+> >> reject guest feature requests that specify *only* bit#0; which
+> >> practically means disabling guests (using SMIs) that don't conform to
+> >> our VCPU hotlpug implementation.  
+> 
+> > Why do negotiation if hotplug could be done without it,  
+> 
+> Because it lets us segment the feature set into several small steps,
+> where I have a chance of grasping the small pieces and maybe even
+> contributing small, surgical patches?
+> 
+> You and Paolo might be seeing the big picture, and I certainly don't
+> want to go *against* the big picture. I just want to advance with as
+> little steps as possible.
+> 
+> There's the historical observation that a compiler has as many stages as
+> there are sub-teams in the compiler team. (Please excuse me for not
+> recalling the exact phrasing and the person who quipped it.) That
+> observation exists for a reason. Feature and module boundaries tend to
+> mirror human understanding.
+> 
+> > on hw(QEMU)
+> > side hotplug seems to be implemented sufficiently (but we still missing
+> > SMRR support). The only thing to make hotplug work with OVMF might be
+> > issuing SMI either directly from QEMU or from AML (write into APM_CNT)
+> > after CPU is hotplugged.  
+> 
+> Maybe. For me, that looms in the future.
+> 
+> If you agree with my participation as outlined above; that is,
+> - I care about this exact patch, as posted,
+> - someone else looks into cpu_synchronize_all_states(),
+CCing Radim who graciously agreed to take a look what wrong from KVM side,
+Could you give him steps to reproduce issue, pls.
 
-If you manage to get rid of numa_info[].node_cpu somehow, then we
-could get rid of numa_post_machine_init()/numa_get_node_for_cpu()
-at the same time. But I don't see the benefit of duplicating
-existing generic code into arch-specific code while keeping the
-existing generic numa_info[].node_cpu data structure untouched.
-
->  
-> [...]
-> > > --- a/hw/i386/pc.c
-> > > +++ b/hw/i386/pc.c
-> > > @@ -1978,6 +1978,11 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-> > >  
-> > >      cs = CPU(cpu);
-> > >      cs->cpu_index = idx;
-> > > +
-> > > +    idx = numa_get_node_for_cpu(cs->cpu_index);
-> > > +    if (idx < nb_numa_nodes) {
-> > > +        cpu->numa_nid = idx;
-> > > +    }
-> this is the only place where I add above mentioned duplication,
-> which sort of compensated by removed numa_post_machine_init().
-
-Is it? I see the same logic duplicated in 3 places (see below).
-Not all cases were added by you, but that doesn't mean it is OK
-to make it worse.
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f721fde..9d2b265 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1978,6 +1978,11 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
- 
-     cs = CPU(cpu);
-     cs->cpu_index = idx;
-+
-+    idx = numa_get_node_for_cpu(cs->cpu_index);
-+    if (idx < nb_numa_nodes) {
-+        cpu->numa_nid = idx;
-+    }
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c18632b..7f6661b 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -71,7 +71,7 @@ void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu, Error **errp)
-     /* Set NUMA node for the added CPUs  */
-     i = numa_get_node_for_cpu(cs->cpu_index);
-     if (i < nb_numa_nodes) {
--            cs->numa_node = i;
-+        cpu->numa_nid = i;
-     }
- 
-     xics_cpu_setup(spapr->xics, cpu);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 7a03f84..b86b5fd 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1333,6 +1332,11 @@ static void machvirt_init(MachineState *machine)
-                                      "secure-memory", &error_abort);
-         }
- 
-+        if (nb_numa_nodes) {
-+            object_property_set_int(cpuobj, numa_get_node_for_cpu(n),
-+                                    "node-id", NULL);
-+        }
-+
-         object_property_set_bool(cpuobj, true, "realized", NULL);
-     }
-     fdt_add_timer_nodes(vms);
+> - and then I'm willing to care about the incremental patch for the
+>   filtering,
+ok
 
 
-> And it's here only to keep working+fix 'info numa'.
-> The other targets currently already do numa_get_node_for_cpu(),
-> lookup so I'm not changing there anything.
-> Later(not in this patch) I'm removing numa_get_node_for_cpu() from
-> pc_cpu_pre_plug() and from PC code altogether and replacing it
-> with node-id from possible_cpus.
-
-I will look at the whole series to re-evaluate this patch, then.
+> then I propose we go ahead with this patch. It's the last one in the
+> series that needs your R-b.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 > 
-> PS:
-> since travis-ci seems to be broken, I'll post re-factoring
-> RFC without building there and it includes this patch as well.
-
-No problem to me, if it's a RFC.
-
--- 
-Eduardo
+> Thanks
+> Laszlo
