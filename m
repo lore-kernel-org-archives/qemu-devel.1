@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cTpZ1-000105-S8
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:42:08 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTpaG-0001zC-Bw
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:43:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cTpZ1-0003eq-0d
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:42:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51562)
+	(envelope-from <ehabkost@redhat.com>) id 1cTpaB-0004Lh-D0
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:43:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cTpZ0-0003eU-O4
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:42:06 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CFF5515F55F
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 12:42:06 +0000 (UTC)
-References: <20170117010204.4909-1-ehabkost@redhat.com>
-	<20170117010204.4909-10-ehabkost@redhat.com>
-	<9b1bc94e-f1bf-d166-e796-16410a66bb93@redhat.com>
-	<20170118123957.GQ3491@thinpad.lan.raisama.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <2213f682-abbc-e00c-f7b0-2439a400a18d@redhat.com>
-Date: Wed, 18 Jan 2017 13:42:04 +0100
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTpaB-0004L0-64
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 07:43:19 -0500
+Date: Wed, 18 Jan 2017 10:43:15 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170118124315.GR3491@thinpad.lan.raisama.net>
+References: <1482866480-26208-1-git-send-email-ehabkost@redhat.com>
+	<1482866480-26208-5-git-send-email-ehabkost@redhat.com>
+	<20170104115656.GB14961@amt.cnet>
+	<20170104133916.GG3315@thinpad.lan.raisama.net>
+	<20170104195917.GM3315@thinpad.lan.raisama.net>
+	<20170104222623.GA21789@amt.cnet>
+	<20170105013631.GO3315@thinpad.lan.raisama.net>
+	<20170105104830.GB6299@amt.cnet>
+	<4006fc1d-f4f8-12dd-05e7-950cc839aae4@redhat.com>
+	<20170118115541.GA13762@amt.cnet>
 MIME-Version: 1.0
-In-Reply-To: <20170118123957.GQ3491@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 9/9] tests: Test case for
- query-cpu-model-expansion
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170118115541.GA13762@amt.cnet>
+Subject: Re: [Qemu-devel] TSC frequency configuration & invtsc migration
+ (was Re: [PATCH 4/4] kvm: Allow migration with invtsc)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,80 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Haozhong Zhang <haozhong.zhang@intel.com>, libvir-list@redhat.com
 
-Am 18.01.2017 um 13:39 schrieb Eduardo Habkost:
-> On Wed, Jan 18, 2017 at 10:39:46AM +0100, David Hildenbrand wrote:
->> Am 17.01.2017 um 02:02 schrieb Eduardo Habkost:
->>> +    def checkExpansions(self, model, msg):
->>> +        """Perform multiple expansion operations on model, validate results
->>> +
->>> +        @model is a CpuModelExpansionInfo struct, with some extra keys:
->>> +        * model['runnable'] should be set to True if the CPU model is
->>> +          runnable on this host
->>> +        * model['qom-props'] will be set to the full list of properties for
->>> +          the CPU, if the model is runnable
->>> +        """
->>> +        exp_s = self.checkOneExpansion(model, 'static',
->>> +                                       '%s.static' % (msg))
->>> +        exp_f = self.checkOneExpansion(model, 'full',
->>> +                                       '%s.full' % (msg))
->>> +        exp_ss = self.checkOneExpansion(exp_s, 'static',
->>> +                                        '%s.static.static' % (msg))
->>> +        exp_sf = self.checkOneExpansion(exp_s, 'full',
->>> +                                        '%s.static.full' % (msg))
->>> +        exp_ff = self.checkOneExpansion(exp_f, 'full',
->>> +                                        '%s.full.full' % (msg))
->>> +
->>> +        # static expansion twice should result in the same data:
->>> +        self.assertEquals(exp_s, exp_ss, '%s: static != static+static' % (msg))
->>> +        # full expansion twice should also result in the same data:
->>> +        self.assertEquals(exp_f, exp_ff, '%s: full != full+full' % (msg))
->>> +
->>> +        # migration-safe CPU models have an extra feature:
->>> +        # their static expansion should be equivalent to the full
->>> +        # expansion (as their static expansion is also precise)
->>
->> This is not true for s390x:
->>
->> "z13-base" is both, static and migration-safe.
->>
->> Doing a full expansion will expand all features (so your check against
->> QOM properties should succeed)
->>
->> Doing a static expansion will expand no features, as z13-base is
->> already static, so there are no features to expand (no delta changes).
->>
->> "z13" is only migration-safe.
->>
->> Doing a full expansion will expand all features.
->>
->> Doing a static expansion will only expand the features different to
->> "z13-base". (Remember, delta changes only to minimize reported
->> features).
+On Wed, Jan 18, 2017 at 09:55:43AM -0200, Marcelo Tosatti wrote:
+> On Tue, Jan 10, 2017 at 05:36:48PM +0100, Paolo Bonzini wrote:
+> > 
+> > 
+> > On 05/01/2017 11:48, Marcelo Tosatti wrote:
+> > >> Host A has TSC scaling, host B doesn't have TSC scaling. We want
+> > >> to be able to start the VM on host A, and migrate to B. In this
+> > >> case, the only possible solution is to use B's frequency when
+> > >> starting the VM. The QEMU process doesn't have enough information
+> > >> to make that decision.
+> > > That is a good point. But again, its a special case and 
+> > > should be supported by -cpu xxx,tsc-frequency=zzzz.
+> > 
+> > I don't think this is a scenario that can work reliably.  The computed
+> > TSC frequency may vary by 0.5% or so on every boot (e.g. you may get
+> > 2497000 kHz or 2511000 kHz for a 2.5 GHz TSC).  You can start the VM on
+> > host A, reboot host B, and then you'll be unable to migrate.
+> > 
+> > Paolo
 > 
-> I think my comment was confusing. By "equivalent" I don't mean
-> having the same expansion, but resulting in the same set of
-> features.
-> 
-> This is not comparing full_expansion(model) and
-> static_expansion(model). It is comparing full_expansion(model)
-> full_expansion(static_expansion(model)).
-> 
-> In other words, absolutely no feature should be lost or changed
-> during static expansion, and we verify that by doing a full
-> expansion after the static expansion (exp_sf) and comparing the
-> results with the full expansion (exp_f).
-> 
-> I believe this is true on s390x too, isn't it?
+> Including an acceptable error in the comparison seems to be
+> acceptable to work around that case.
 
-Okay, I actually was confused by this comment. This makes sense!
-
-full(z13) == full(static(z13))
-
-Thanks for clarifying!
+How much error is acceptable when exposing the invtsc flag to the
+guest?
 
 -- 
-
-David
+Eduardo
