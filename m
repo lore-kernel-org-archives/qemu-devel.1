@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cTs0K-0001WA-DV
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:18:29 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cTs1h-00026i-2o
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:19:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cTs0G-0000sa-8I
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:18:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50922)
+	(envelope-from <ehabkost@redhat.com>) id 1cTs1d-0002a2-Qa
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:19:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42164)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cTs0F-0000rC-Vy
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:18:24 -0500
-Date: Wed, 18 Jan 2017 16:18:19 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170118161819.7f5526af@nial.brq.redhat.com>
-In-Reply-To: <CAFEAcA-Cdyq-dQ0U79TSsjJWQ2TO0R11RCWzAemSRS_1M65meg@mail.gmail.com>
-References: <1484328738-21149-1-git-send-email-ard.biesheuvel@linaro.org>
-	<CAFEAcA-s4To6BCgFzUG6Bs_rpeVupatXpHm45b=26QmLJAwy8A@mail.gmail.com>
-	<CAKv+Gu-hAzng0ff4=r2JZF5p=nEhhv12-kwg7wz+m7Uj4w42DA@mail.gmail.com>
-	<CAFEAcA8n5grNz+z1ZcNcX9Er9s=uXRPgV-b1-3tkrzWEv-=1Uw@mail.gmail.com>
-	<CAKv+Gu_+O-_x-CwQdiTf4efWAMue6LdXK3Afo9YW8Xz+6BFyzw@mail.gmail.com>
-	<20170117094950.5dqdpbk6u7p4yhms@kamzik.brq.redhat.com>
-	<CAFEAcA-Cdyq-dQ0U79TSsjJWQ2TO0R11RCWzAemSRS_1M65meg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTs1d-0002Ym-HG
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 10:19:49 -0500
+Date: Wed, 18 Jan 2017 13:19:45 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170118151945.GY3491@thinpad.lan.raisama.net>
+References: <1484750925-176844-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt-acpi - reserve ECAM space
- as PNP0C02 device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484750925-176844-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] numa: access CPU's node id via property in
+ hmp_info_numa()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +27,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Graeme Gregory <graeme.gregory@linaro.org>, Al Stone <al.stone@linaro.org>, "Michael S.
-	Tsirkin" <mst@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
 
-On Tue, 17 Jan 2017 10:56:53 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On Wed, Jan 18, 2017 at 03:48:45PM +0100, Igor Mammedov wrote:
+> Move vcpu's assocciated numa_node field out of generic CPUState
+> into inherited classes that actually care about cpu<->numa mapping
+> and make monitor 'info numa' get vcpu's assocciated node id via
+> node-id property.
+> It allows to drop implicit node id intialization in
+> numa_post_machine_init() and would allow switching to mapping
+> defined by target's CpuInstanceProperties instead of global
+> numa_info[i].node_cpu bitmaps.
 
-> On 17 January 2017 at 09:49, Andrew Jones <drjones@redhat.com> wrote:
-> > In some cases the problem we're solving with the compat guards is
-> > a bit hypothetical, but, IMHO, nonetheless a good practice. While
-> > we may be sure that AAVMF and Linux will be fine with this table
-> > changing under their feet, we can't be sure there aren't other
-> > mach-virt users that have more sensitive firmwares/OSes. An ACPI-
-> > sensitive OS may notice the change on its next reboot after a
-> > migration, and then simply refuse to continue.  
-> 
-> There's also the case where you do a VM migration midway through
-> UEFI booting up, I think, which might cause things to go wrong
-> if you catch it just at the wrong moment.
-acpi blobs are migrated from source so above won't happen.
-The time guest will see new table is fresh boot or reboot.
+I agree to allow the node-id assignment logic to be defined by
+arch-specific code, but:
 
-> 
-> > Now, that said, I just spoke with Igor in order to learn the x86
-> > practice. He says that the policy has been more lax than what I
-> > suggest above. Hypothetical, low-risk issues are left unguarded,
-> > and only when a bug is found during testing is it then managed.
-> > The idea is to try and reduce the amount of compat variables and
-> > conditions needed in the ACPI generation code, but, of course, at
-> > some level of risk to users expecting their versioned machine type
-> > to always appear the same.
-> >
-> > So far we've been strict with mach-virt, guarding all hypothetical
-> > issues. Perhaps this patch is a good example to get a discussion
-> > started on whether or not we should be so strict though.  
-> 
-> That said, I don't have a very strong opinion here, beyond that
-> we should be consistent at least with x86 practice.
-another reason why we are trying not to use strict approach with ACPI
-tables is that it's part of firmware and we didn't version firmwares
-so far. (i.e. dst host with newer QEMU will typically have newer
-firmware and guest with old machine-type migrated to host with newer
-QEMU will run new firmware on (re)boot)
+Considering that we still have the generic CPU<->node mapping in
+numa_info[].node_cpu, I don't see the benefit of moving the
+numa_info[].node_cpu => node-id translation from common generic
+code to duplicated arch-specific code.
+
+What about adding this to cpu_generic_realize():
+
+  node = numa_get_node_for_cpu(cpu)
+  if (node >= 0) {
+     int cur_node = object_property_find(cpu, "node-id") ?
+                    object_property_get_int(cpu, "node-id") : -1;
+     if (cur_node >= 0 && cur_node != node) {
+         error_setg(&err, "Conflict between -numa option and CPU node-id");
+         goto out;
+     }
+     object_property_set_int(cpu, "node-id", node, &err);
+  }
+
+This way, the (legacy?) numa_info.node_cpu table will still work
+automatically, but we can implement arch-specific validation of
+the property if we want to, and architectures that don't support
+NUMA would be able to report an error in case the user tries to
+configure NUMA.
 
 > 
-> thanks
-> -- PMM
+> As side effect it fixes 'info numa' displaying wrong mapping
+> for CPUs specified with -device/device_add.
+> Before patch following CLI would produce:
+> QEMU -smp 1,sockets=3,maxcpus=3 \
+>        -device qemu64-x86_64-cpu,socket-id=1,core-id=0,thread-id=0 \
+>        -numa node,nodeid=0,cpus=0 \
+>        -numa node,nodeid=1,cpus=1 \
+>        -numa node,nodeid=2,cpus=2
+> (qemu) device_add qemu64-x86_64-cpu,socket-id=2,core-id=0,thread-id=0
+> (qemu) info numa
+> 3 nodes
+> node 0 cpus: 0 1 2
+> node 0 size: 40 MB
+> node 1 cpus:
+> node 1 size: 40 MB
+> node 2 cpus:
+> node 2 size: 48 MB
+> 
+> after patch all CPUs are on nodes they are supposed to be:
+> (qemu) device_add qemu64-x86_64-cpu,socket-id=2,core-id=0,thread-id=0
+> (qemu) info numa
+> 3 nodes
+> node 0 cpus: 0
+> node 0 size: 40 MB
+> node 1 cpus: 1
+> node 1 size: 40 MB
+> node 2 cpus: 2
+> node 2 size: 48 MB
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> CC: fanc.fnst@cn.fujitsu.com
+> CC: caoj.fnst@cn.fujitsu.com
+> CC: stefanha@redhat.com
+> CC: izumi.taku@jp.fujitsu.com
+> CC: vilanova@ac.upc.edu
+> CC: ehabkost@redhat.com
+> CC: peter.maydell@linaro.org
+> CC: Andrew Jones <drjones@redhat.com>
+> CC: David Gibson <david@gibson.dropbear.id.au>
+> CC: Thomas Huth <thuth@redhat.com>
+> ---
+>  include/qom/cpu.h           |  2 --
+>  include/sysemu/numa.h       |  1 -
+>  target/arm/cpu.h            |  2 ++
+>  target/i386/cpu.h           |  1 +
+>  target/ppc/cpu.h            |  2 ++
+>  hw/arm/virt.c               | 12 ++++++++----
+>  hw/i386/pc.c                |  5 +++++
+>  hw/ppc/spapr.c              |  2 +-
+>  hw/ppc/spapr_cpu_core.c     |  2 +-
+>  monitor.c                   |  7 +++++--
+>  numa.c                      | 15 ---------------
+>  target/arm/cpu.c            |  1 +
+>  target/i386/cpu.c           |  1 +
+>  target/ppc/translate_init.c |  1 +
+>  vl.c                        |  2 --
+>  15 files changed, 28 insertions(+), 28 deletions(-)
+> 
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 3f79a8e..ae637a9 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -257,7 +257,6 @@ struct qemu_work_item;
+>   * @cpu_index: CPU index (informative).
+>   * @nr_cores: Number of cores within this CPU package.
+>   * @nr_threads: Number of threads within this CPU.
+> - * @numa_node: NUMA node this CPU is belonging to.
+>   * @host_tid: Host thread ID.
+>   * @running: #true if CPU is currently running (lockless).
+>   * @has_waiter: #true if a CPU is currently waiting for the cpu_exec_end;
+> @@ -306,7 +305,6 @@ struct CPUState {
+>  
+>      int nr_cores;
+>      int nr_threads;
+> -    int numa_node;
+>  
+>      struct QemuThread *thread;
+>  #ifdef _WIN32
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 8f09dcf..b8015a5 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -25,7 +25,6 @@ typedef struct node_info {
+>  
+>  extern NodeInfo numa_info[MAX_NODES];
+>  void parse_numa_opts(MachineClass *mc);
+> -void numa_post_machine_init(void);
+>  void query_numa_node_mem(uint64_t node_mem[]);
+>  extern QemuOptsList qemu_numa_opts;
+>  void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 7bd16ee..ef263f1 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -662,6 +662,8 @@ struct ARMCPU {
+>  
+>      ARMELChangeHook *el_change_hook;
+>      void *el_change_hook_opaque;
+> +
+> +    int32_t numa_nid;
+>  };
+>  
+>  static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 6c1902b..e43dcc2 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1264,6 +1264,7 @@ struct X86CPU {
+>      int32_t socket_id;
+>      int32_t core_id;
+>      int32_t thread_id;
+> +    int32_t numa_nid;
+>  };
+>  
+>  static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 2a50c43..2d12ad5 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1154,6 +1154,7 @@ do {                                            \
+>   * @cpu_dt_id: CPU index used in the device tree. KVM uses this index too
+>   * @max_compat: Maximal supported logical PVR from the command line
+>   * @cpu_version: Current logical PVR, zero if in "raw" mode
+> + * @numa_nid: Numa node id the CPU belongs to
+>   *
+>   * A PowerPC CPU.
+>   */
+> @@ -1166,6 +1167,7 @@ struct PowerPCCPU {
+>      int cpu_dt_id;
+>      uint32_t max_compat;
+>      uint32_t cpu_version;
+> +    int32_t numa_nid;
+>  
+>      /* Fields related to migration compatibility hacks */
+>      bool pre_2_8_migration;
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 7a03f84..b86b5fd 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -329,7 +329,6 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
+>  {
+>      int cpu;
+>      int addr_cells = 1;
+> -    unsigned int i;
+>  
+>      /*
+>       * From Documentation/devicetree/bindings/arm/cpus.txt
+> @@ -379,9 +378,9 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
+>                                    armcpu->mp_affinity);
+>          }
+>  
+> -        i = numa_get_node_for_cpu(cpu);
+> -        if (i < nb_numa_nodes) {
+> -            qemu_fdt_setprop_cell(vms->fdt, nodename, "numa-node-id", i);
+> +        if (armcpu->numa_nid < nb_numa_nodes) {
+> +            qemu_fdt_setprop_cell(vms->fdt, nodename, "numa-node-id",
+> +                                  armcpu->numa_nid);
+>          }
+>  
+>          g_free(nodename);
+> @@ -1333,6 +1332,11 @@ static void machvirt_init(MachineState *machine)
+>                                       "secure-memory", &error_abort);
+>          }
+>  
+> +        if (nb_numa_nodes) {
+> +            object_property_set_int(cpuobj, numa_get_node_for_cpu(n),
+> +                                    "node-id", NULL);
+> +        }
+> +
+>          object_property_set_bool(cpuobj, true, "realized", NULL);
+>      }
+>      fdt_add_timer_nodes(vms);
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f721fde..9d2b265 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1978,6 +1978,11 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>  
+>      cs = CPU(cpu);
+>      cs->cpu_index = idx;
+> +
+> +    idx = numa_get_node_for_cpu(cs->cpu_index);
+> +    if (idx < nb_numa_nodes) {
+> +        cpu->numa_nid = idx;
+> +    }
+>  }
+>  
+>  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 208ef7b..efcd925 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -182,7 +182,7 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, CPUState *cs)
+>                                  cpu_to_be32(0x0),
+>                                  cpu_to_be32(0x0),
+>                                  cpu_to_be32(0x0),
+> -                                cpu_to_be32(cs->numa_node),
+> +                                cpu_to_be32(cpu->numa_nid),
+>                                  cpu_to_be32(index)};
+>  
+>      /* Advertise NUMA via ibm,associativity */
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index c18632b..7f6661b 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -71,7 +71,7 @@ void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu, Error **errp)
+>      /* Set NUMA node for the added CPUs  */
+>      i = numa_get_node_for_cpu(cs->cpu_index);
+>      if (i < nb_numa_nodes) {
+> -            cs->numa_node = i;
+> +        cpu->numa_nid = i;
+>      }
+>  
+>      xics_cpu_setup(spapr->xics, cpu);
+> diff --git a/monitor.c b/monitor.c
+> index 0841d43..8856d5b 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1544,9 +1544,12 @@ static void hmp_info_numa(Monitor *mon, const QDict *qdict)
+>      for (i = 0; i < nb_numa_nodes; i++) {
+>          monitor_printf(mon, "node %d cpus:", i);
+>          CPU_FOREACH(cpu) {
+> -            if (cpu->numa_node == i) {
+> -                monitor_printf(mon, " %d", cpu->cpu_index);
+> +            Error *err = NULL;
+> +            int64_t nid = object_property_get_int(OBJECT(cpu), "node-id", &err);
+> +            if (nid == i && !err) {
+> +                    monitor_printf(mon, " %d", cpu->cpu_index);
+>              }
+> +            error_free(err);
+>          }
+>          monitor_printf(mon, "\n");
+>          monitor_printf(mon, "node %d size: %" PRId64 " MB\n", i,
+> diff --git a/numa.c b/numa.c
+> index 379bc8a..5f68497 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -394,21 +394,6 @@ void parse_numa_opts(MachineClass *mc)
+>      }
+>  }
+>  
+> -void numa_post_machine_init(void)
+> -{
+> -    CPUState *cpu;
+> -    int i;
+> -
+> -    CPU_FOREACH(cpu) {
+> -        for (i = 0; i < nb_numa_nodes; i++) {
+> -            assert(cpu->cpu_index < max_cpus);
+> -            if (test_bit(cpu->cpu_index, numa_info[i].node_cpu)) {
+> -                cpu->numa_node = i;
+> -            }
+> -        }
+> -    }
+> -}
+> -
+>  static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+>                                             const char *name,
+>                                             uint64_t ram_size)
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 9104611..8caf853 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1515,6 +1515,7 @@ static Property arm_cpu_properties[] = {
+>      DEFINE_PROP_UINT32("midr", ARMCPU, midr, 0),
+>      DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
+>                          mp_affinity, ARM64_AFFINITY_INVALID),
+> +    DEFINE_PROP_INT32("node-id", ARMCPU, numa_nid, 0),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index aba11ae..85c52f1 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3649,6 +3649,7 @@ static Property x86_cpu_properties[] = {
+>      DEFINE_PROP_INT32("core-id", X86CPU, core_id, -1),
+>      DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, -1),
+>  #endif
+> +    DEFINE_PROP_INT32("node-id", X86CPU, numa_nid, 0),
+>      DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
+>      { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
+>      DEFINE_PROP_BOOL("hv-relaxed", X86CPU, hyperv_relaxed_timing, false),
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index e6a835c..64bd7be 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -10520,6 +10520,7 @@ static gchar *ppc_gdb_arch_name(CPUState *cs)
+>  
+>  static Property ppc_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("pre-2.8-migration", PowerPCCPU, pre_2_8_migration, false),
+> +    DEFINE_PROP_INT32("node-id", PowerPCCPU, numa_nid, 0),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/vl.c b/vl.c
+> index c643d3f..afe40ce 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4549,8 +4549,6 @@ int main(int argc, char **argv, char **envp)
+>  
+>      cpu_synchronize_all_post_init();
+>  
+> -    numa_post_machine_init();
+> -
+>      if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
+>                            parse_fw_cfg, fw_cfg_find(), NULL) != 0) {
+>          exit(1);
+> -- 
+> 2.7.4
+> 
+
+-- 
+Eduardo
