@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTuoV-0004lV-JA
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:18:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1cTus5-0007IZ-MU
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:22:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cTuoR-0000RC-Kk
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:18:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54848)
+	(envelope-from <eblake@redhat.com>) id 1cTus1-0001Gj-NQ
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:22:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cTuoR-0000R5-Ca
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:18:23 -0500
-Date: Wed, 18 Jan 2017 16:18:20 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170118181820.GH3491@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cTus1-0001GK-Ey
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:22:05 -0500
 References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
-	<1484759609-264075-2-git-send-email-imammedo@redhat.com>
+	<1484759609-264075-10-git-send-email-imammedo@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7fc85b46-880d-04f1-1410-3131f55c596e@redhat.com>
+Date: Wed, 18 Jan 2017 12:22:01 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1484759609-264075-2-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 01/13] numa: access CPU's node id via
- property in hmp_info_numa()
+In-Reply-To: <1484759609-264075-10-git-send-email-imammedo@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4CvwdEdNlsJwKcGXRLUEPjLBfjdxhecGU"
+Subject: Re: [Qemu-devel] [RFC 09/13] numa: introduce '-numa cpu' cpu option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, Andrew Jones <drjones@redhat.com>, ehabkost@redhat.com, peter.maydell@linaro.org, fanc.fnst@cn.fujitsu.com, Thomas Huth <thuth@redhat.com>, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Jan 18, 2017 at 06:13:17PM +0100, Igor Mammedov wrote:
-> Move vcpu's assocciated numa_node field out of generic CPUState
-> into inherited classes that actually care about cpu<->numa mapping
-> and make monitor 'info numa' get vcpu's assocciated node id via
-> node-id property.
-> It allows to drop implicit node id intialization in
-> numa_post_machine_init() and would allow switching to mapping
-> defined by target's CpuInstanceProperties instead of global
-> numa_info[i].node_cpu bitmaps.
-> 
-> As side effect it fixes 'info numa' displaying wrong mapping
-> for CPUs specified with -device/device_add.
-> Before patch following CLI would produce:
-> QEMU -smp 1,sockets=3,maxcpus=3 \
->        -device qemu64-x86_64-cpu,socket-id=1,core-id=0,thread-id=0 \
->        -numa node,nodeid=0,cpus=0 \
->        -numa node,nodeid=1,cpus=1 \
->        -numa node,nodeid=2,cpus=2
-> (qemu) device_add qemu64-x86_64-cpu,socket-id=2,core-id=0,thread-id=0
-> (qemu) info numa
-> 3 nodes
-> node 0 cpus: 0 1 2
-> node 0 size: 40 MB
-> node 1 cpus:
-> node 1 size: 40 MB
-> node 2 cpus:
-> node 2 size: 48 MB
-> 
-> after patch all CPUs are on nodes they are supposed to be:
-> (qemu) device_add qemu64-x86_64-cpu,socket-id=2,core-id=0,thread-id=0
-> (qemu) info numa
-> 3 nodes
-> node 0 cpus: 0
-> node 0 size: 40 MB
-> node 1 cpus: 1
-> node 1 size: 40 MB
-> node 2 cpus: 2
-> node 2 size: 48 MB
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4CvwdEdNlsJwKcGXRLUEPjLBfjdxhecGU
+From: Eric Blake <eblake@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, Andrew Jones
+ <drjones@redhat.com>, ehabkost@redhat.com, peter.maydell@linaro.org,
+ fanc.fnst@cn.fujitsu.com, Thomas Huth <thuth@redhat.com>,
+ caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com,
+ vilanova@ac.upc.edu, David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <7fc85b46-880d-04f1-1410-3131f55c596e@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 09/13] numa: introduce '-numa cpu' cpu option
+References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
+ <1484759609-264075-10-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1484759609-264075-10-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/18/2017 11:13 AM, Igor Mammedov wrote:
+> It allows to specify mapping of a CPU to NUMA node on CLI.
+> Option should be repeated for each present/possible CPU.
+> Example for PC machine:
+>   -numa node,nodeid=3D0 -numa node,nodeid=3D1 \
+>   -numa cpu,socket-id=3D0,core-id=3D0,thread-id=3D0,node-id=3D0 \
+>   -numa cpu,socket-id=3D1,core-id=3D0,thread-id=3D0,node-id=3D1
+>=20
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
 
-So, in addition to the other comments I had, it looks like this
-patch is doing 3 things at the same time:
+> +++ b/qapi-schema.json
+> @@ -5543,7 +5543,8 @@
+>  ##
+>  { 'union': 'NumaOptions',
+>    'data': {
+> -    'node': 'NumaNodeOptions' }}
+> +    'node': 'NumaNodeOptions',
+> +    'cpu': 'CpuInstanceProperties' }}
 
-1) Adding a "node-id" property to CPU objects.
-2) Moving CPUState::numa_node to arch-specific CPU structs.
-3) Fixing the bug where the NUMA node info isn't initialized
-   for PC on CPUs created by -device/device_add.
+Missing a documentation blurb that includes a '(since 2.9)' tag.
 
-All of them are independent from each other. For example, all you
-need to fix the bug you describe above is (3), which is contained
-in a single hunk from this patch, that is:
 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index f721fde..9d2b265 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1978,6 +1978,11 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->  
->      cs = CPU(cpu);
->      cs->cpu_index = idx;
-> +
-> +    idx = numa_get_node_for_cpu(cs->cpu_index);
-> +    if (idx < nb_numa_nodes) {
-> +        cpu->numa_nid = idx;
-> +    }
->  }
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-All the rest seems irrelevant to fix the bug. (1) and (2) may be
-useful, but they need separate justification.
 
--- 
-Eduardo
+--4CvwdEdNlsJwKcGXRLUEPjLBfjdxhecGU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYf7JJAAoJEKeha0olJ0NqirUIAI8wmEHIBqZBJEy9ICdcrVHx
+K7GTWjRwDe/+LpHjoHYHRfNoFxiSzsoC1o+y1wl4u8NPm9bBls001k9tjX96zXMM
+0B9gNpqgiQ032pdqR2j44k6AcxwuWrLn8BeZTKRYqwu6ui8ASM8rgPq5GPedlltN
+QAbqGCXvSWm+2ZRZkFUs/7ci5ol7jQTSiiU5s/+AtBj1CaZsM0q/iqw3XFeUtCu0
+KqVj96xaMEHVrnHkD47GwPz7WWVaadwF25Kd9fMjmu9D/wr1CZLuEGbPgUHdGTgZ
+G2vkTgpFm6w+fHXbY9Q3sehNXk6sw01VqePFmgDmE2dmhSHPMj2XIl8Ujsipea4=
+=/6Ay
+-----END PGP SIGNATURE-----
+
+--4CvwdEdNlsJwKcGXRLUEPjLBfjdxhecGU--
