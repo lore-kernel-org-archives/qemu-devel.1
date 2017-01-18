@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cTxQU-0002MD-JU
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:51 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cTxQa-0002Pq-3e
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cTxQQ-0006lN-IL
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:50 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:55090)
+	(envelope-from <laurent@vivier.eu>) id 1cTxQW-0006qq-0x
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:56 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:59135)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cTxQQ-0006kV-08
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:46 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cTxQV-0006pv-Nc
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:51 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 18 Jan 2017 22:05:16 +0100
-Message-Id: <1484773521-16530-3-git-send-email-laurent@vivier.eu>
+Date: Wed, 18 Jan 2017 22:05:19 +0100
+Message-Id: <1484773521-16530-6-git-send-email-laurent@vivier.eu>
 In-Reply-To: <1484773521-16530-1-git-send-email-laurent@vivier.eu>
 References: <1484773521-16530-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 2/7] target-m68k: define ext_opsize
+Subject: [Qemu-devel] [PATCH 5/7] target-m68k: add fmovem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +28,160 @@ Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, 
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/translate.c | 43 ++++++++++++++++++++++++-------------------
- 1 file changed, 24 insertions(+), 19 deletions(-)
+ target/m68k/fpu_helper.c |  6 +++
+ target/m68k/helper.h     |  1 +
+ target/m68k/translate.c  | 99 +++++++++++++++++++++++++++++++++++-------------
+ 3 files changed, 80 insertions(+), 26 deletions(-)
 
+diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+index b308364..126535f 100644
+--- a/target/m68k/fpu_helper.c
++++ b/target/m68k/fpu_helper.c
+@@ -409,3 +409,9 @@ void HELPER(update_fpstatus)(CPUM68KState *env)
+ 
+     set_float_exception_flags(flags, &env->fp_status);
+ }
++
++void HELPER(fmovem)(CPUM68KState *env, uint32_t opsize,
++                    uint32_t mode, uint32_t mask)
++{
++    fprintf(stderr, "MISSING HELPER fmovem\n");
++}
+diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+index 072a6d0..58bc273 100644
+--- a/target/m68k/helper.h
++++ b/target/m68k/helper.h
+@@ -31,6 +31,7 @@ DEF_HELPER_1(cmp_FP0_FP1, void, env)
+ DEF_HELPER_2(set_fpcr, void, env, i32)
+ DEF_HELPER_1(tst_FP0, void, env)
+ DEF_HELPER_1(update_fpstatus, void, env)
++DEF_HELPER_4(fmovem, void, env, i32, i32, i32)
+ 
+ DEF_HELPER_3(mac_move, void, env, i32, i32)
+ DEF_HELPER_3(macmulf, i64, env, i32, i32)
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 9f60fbc..d9ba735 100644
+index 70fd680..49c0b06 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -669,6 +669,21 @@ static inline int insn_opsize(int insn)
-     }
+@@ -4483,13 +4483,79 @@ static void gen_op_fmove_fcr(CPUM68KState *env, DisasContext *s,
+     tcg_temp_free_i32(addr);
  }
  
-+static inline int ext_opsize(int ext, int pos)
++static void gen_op_fmovem(CPUM68KState *env, DisasContext *s,
++                          uint32_t insn, uint32_t ext)
 +{
-+    switch ((ext >> pos) & 7) {
-+    case 0: return OS_LONG;
-+    case 1: return OS_SINGLE;
-+    case 2: return OS_EXTENDED;
-+    case 3: return OS_PACKED;
-+    case 4: return OS_WORD;
-+    case 5: return OS_DOUBLE;
-+    case 6: return OS_BYTE;
-+    default:
-+        g_assert_not_reached();
++    int opsize;
++    uint16_t mask;
++    int i;
++    uint32_t mode;
++    int32_t incr;
++    TCGv addr, tmp;
++    int is_load;
++
++    if (m68k_feature(s->env, M68K_FEATURE_FPU)) {
++        opsize = OS_EXTENDED;
++    } else {
++        opsize = OS_DOUBLE;  /* FIXME */
 +    }
++
++    mode = (ext >> 11) & 0x3;
++    if ((mode & 0x1) == 1) {
++        gen_helper_fmovem(cpu_env, tcg_const_i32(opsize),
++                          tcg_const_i32(mode), DREG(ext, 0));
++        return;
++    }
++
++    tmp = gen_lea(env, s, insn, opsize);
++    if (IS_NULL_QREG(tmp)) {
++        gen_addr_fault(s);
++        return;
++    }
++
++    addr = tcg_temp_new();
++    tcg_gen_mov_i32(addr, tmp);
++    is_load = ((ext & 0x2000) == 0);
++    incr = opsize_bytes(opsize);
++    mask = ext & 0x00FF;
++
++    if (!is_load && (mode & 2) == 0) {
++        for (i = 7; i >= 0; i--, mask <<= 1) {
++            if (mask & 0x80) {
++                gen_op_load_fpr_FP0(i);
++                gen_store_FP0(s, opsize, addr);
++                if ((mask & 0xff) != 0x80) {
++                    tcg_gen_subi_i32(addr, addr, incr);
++                }
++            }
++        }
++        tcg_gen_mov_i32(AREG(insn, 0), addr);
++    } else {
++        for (i = 0; i < 8; i++, mask <<= 1) {
++            if (mask & 0x80) {
++                if (is_load) {
++                    gen_load_FP0(s, opsize, addr);
++                    gen_op_store_fpr_FP0(i);
++                } else {
++                    gen_op_load_fpr_FP0(i);
++                    gen_store_FP0(s, opsize, addr);
++                }
++                tcg_gen_addi_i32(addr, addr, incr);
++            }
++        }
++        if ((insn & 070) == 030) {
++            tcg_gen_mov_i32(AREG(insn, 0), addr);
++        }
++    }
++    tcg_temp_free_i32(addr);
 +}
 +
- /* Assign value to a register.  If the width is less than the register width
-    only the low part of the register is set.  */
- static void gen_partset_reg(int opsize, TCGv reg, TCGv val)
-@@ -4101,20 +4116,19 @@ DISAS_INSN(fpu)
-         tmp32 = tcg_temp_new_i32();
-         /* fmove */
-         /* ??? TODO: Proper behavior on overflow.  */
--        switch ((ext >> 10) & 7) {
--        case 0:
--            opsize = OS_LONG;
-+
-+        opsize = ext_opsize(ext, 10);
-+        switch (opsize) {
-+        case OS_LONG:
-             gen_helper_f64_to_i32(tmp32, cpu_env, src);
-             break;
--        case 1:
--            opsize = OS_SINGLE;
-+        case OS_SINGLE:
-             gen_helper_f64_to_f32(tmp32, cpu_env, src);
-             break;
--        case 4:
--            opsize = OS_WORD;
-+        case OS_WORD:
-             gen_helper_f64_to_i32(tmp32, cpu_env, src);
-             break;
--        case 5: /* OS_DOUBLE */
-+        case OS_DOUBLE:
-             tcg_gen_mov_i32(tmp32, AREG(insn, 0));
-             switch ((insn >> 3) & 7) {
-             case 2:
-@@ -4143,8 +4157,7 @@ DISAS_INSN(fpu)
-             }
-             tcg_temp_free_i32(tmp32);
-             return;
--        case 6:
--            opsize = OS_BYTE;
-+        case OS_BYTE:
-             gen_helper_f64_to_i32(tmp32, cpu_env, src);
-             break;
-         default:
-@@ -4217,15 +4230,7 @@ DISAS_INSN(fpu)
+ /* ??? FP exceptions are not implemented.  Most exceptions are deferred until
+    immediately before the next FP instruction is executed.  */
+ DISAS_INSN(fpu)
+ {
+     uint16_t ext;
+     int opmode;
+-    TCGv tmp32;
+     int opsize;
+ 
+     ext = read_im16(env, s);
+@@ -4514,32 +4580,13 @@ DISAS_INSN(fpu)
+         return;
+     case 6: /* fmovem */
+     case 7:
+-        {
+-            TCGv addr;
+-            uint16_t mask;
+-            int i;
+-            if ((ext & 0x1f00) != 0x1000 || (ext & 0xff) == 0)
+-                goto undef;
+-            tmp32 = gen_lea(env, s, insn, OS_LONG);
+-            if (IS_NULL_QREG(tmp32)) {
+-                gen_addr_fault(s);
+-                return;
+-            }
+-            addr = tcg_temp_new_i32();
+-            tcg_gen_mov_i32(addr, tmp32);
+-            mask = 0x80;
+-            for (i = 0; i < 8; i++) {
+-                if (ext & mask) {
+-                    gen_op_load_fpr_FP0(REG(i, 0));
+-                    gen_ldst_FP0(s, OS_DOUBLE, addr, (ext & (1 << 13)) ?
+-                                                     EA_STORE : EA_LOADS);
+-                    if (ext & (mask - 1))
+-                        tcg_gen_addi_i32(addr, addr, 8);
+-                }
+-                mask >>= 1;
+-            }
+-            tcg_temp_free_i32(addr);
++        if ((ext & 0xf00) != 0 || (ext & 0xff) == 0) {
++            goto undef;
++        }
++        if ((ext & 0x1000) == 0 && !m68k_feature(s->env, M68K_FEATURE_FPU)) {
++            goto undef;
+         }
++        gen_op_fmovem(env, s, insn, ext);
+         return;
      }
      if (ext & (1 << 14)) {
-         /* Source effective address.  */
--        switch ((ext >> 10) & 7) {
--        case 0: opsize = OS_LONG; break;
--        case 1: opsize = OS_SINGLE; break;
--        case 4: opsize = OS_WORD; break;
--        case 5: opsize = OS_DOUBLE; break;
--        case 6: opsize = OS_BYTE; break;
--        default:
--            goto undef;
--        }
-+        opsize = ext_opsize(ext, 10);
-         if (opsize == OS_DOUBLE) {
-             tmp32 = tcg_temp_new_i32();
-             tcg_gen_mov_i32(tmp32, AREG(insn, 0));
 -- 
 2.7.4
