@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cTysq-0006H3-2z
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:13 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cTysp-0002XI-2Q
+	(envelope-from <atar4qemu@gmail.com>) id 1cTysp-0006Gm-Ps
 	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:12 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33176)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cTyso-0002Wu-Ph
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <atar4qemu@gmail.com>) id 1cTysl-0002Vb-0B
 	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:11 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r144so7565917wme.0
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:39:10 -0800 (PST)
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cTysk-0002Ug-R2
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:06 -0500
+Received: by mail-wm0-x242.google.com with SMTP id d140so7554665wmd.2
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:39:05 -0800 (PST)
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Wed, 18 Jan 2017 23:38:16 +0100
-Message-Id: <1484779123-18968-4-git-send-email-atar4qemu@gmail.com>
-In-Reply-To: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
-References: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
-Subject: [Qemu-devel] [PULL 03/30] target-sparc: use explicit mmu register
- pointers
+Date: Wed, 18 Jan 2017 23:38:13 +0100
+Message-Id: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/30] target-sparc sun4v support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,140 +29,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, rth@twiddle.net, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Use explicit register pointers while accessing D/I-MMU registers.
-Call cpu_unassigned_access on access to missing registers.
+This series adds sun4v support. Its v2 was previously submitted via Richard's tree, but produced 
+a clang warning due to a missing #ifdef.
 
-Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
----
- target/sparc/cpu.h         |  4 +++
- target/sparc/ldst_helper.c | 66 +++++++++++++++++++++++++++++++++++++---------
- 2 files changed, 58 insertions(+), 12 deletions(-)
+v2 -> v3:
+added an #ifdef to avoid unused function warning in user mode
 
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 1e65c94..10c9ac6 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -446,6 +446,8 @@ struct CPUSPARCState {
-             uint64_t sfar;
-             uint64_t tsb;
-             uint64_t tag_access;
-+            uint64_t virtual_watchpoint;
-+            uint64_t physical_watchpoint;
-         } immu;
-     };
-     union {
-@@ -458,6 +460,8 @@ struct CPUSPARCState {
-             uint64_t sfar;
-             uint64_t tsb;
-             uint64_t tag_access;
-+            uint64_t virtual_watchpoint;
-+            uint64_t physical_watchpoint;
-         } dmmu;
-     };
-     SparcTLBEntry itlb[64];
-diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-index e479efd..20e202b 100644
---- a/target/sparc/ldst_helper.c
-+++ b/target/sparc/ldst_helper.c
-@@ -1220,14 +1220,25 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
-     case ASI_IMMU: /* I-MMU regs */
-         {
-             int reg = (addr >> 3) & 0xf;
--
--            if (reg == 0) {
--                /* I-TSB Tag Target register */
-+            switch (reg) {
-+            case 0:
-+                /* 0x00 I-TSB Tag Target register */
-                 ret = ultrasparc_tag_target(env->immu.tag_access);
--            } else {
--                ret = env->immuregs[reg];
-+                break;
-+            case 3: /* SFSR */
-+                ret = env->immu.sfsr;
-+                break;
-+            case 5: /* TSB access */
-+                ret = env->immu.tsb;
-+                break;
-+            case 6:
-+                /* 0x30 I-TSB Tag Access register */
-+                ret = env->immu.tag_access;
-+                break;
-+            default:
-+                cpu_unassigned_access(cs, addr, false, false, 1, size);
-+                ret = 0;
-             }
--
-             break;
-         }
-     case ASI_IMMU_TSB_8KB_PTR: /* I-MMU 8k TSB pointer */
-@@ -1263,12 +1274,38 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
-     case ASI_DMMU: /* D-MMU regs */
-         {
-             int reg = (addr >> 3) & 0xf;
--
--            if (reg == 0) {
--                /* D-TSB Tag Target register */
-+            switch (reg) {
-+            case 0:
-+                /* 0x00 D-TSB Tag Target register */
-                 ret = ultrasparc_tag_target(env->dmmu.tag_access);
--            } else {
--                ret = env->dmmuregs[reg];
-+                break;
-+            case 1: /* 0x08 Primary Context */
-+                ret = env->dmmu.mmu_primary_context;
-+                break;
-+            case 2: /* 0x10 Secondary Context */
-+                ret = env->dmmu.mmu_secondary_context;
-+                break;
-+            case 3: /* SFSR */
-+                ret = env->dmmu.sfsr;
-+                break;
-+            case 4: /* 0x20 SFAR */
-+                ret = env->dmmu.sfar;
-+                break;
-+            case 5: /* 0x28 TSB access */
-+                ret = env->dmmu.tsb;
-+                break;
-+            case 6: /* 0x30 D-TSB Tag Access register */
-+                ret = env->dmmu.tag_access;
-+                break;
-+            case 7:
-+                ret = env->dmmu.virtual_watchpoint;
-+                break;
-+            case 8:
-+                ret = env->dmmu.physical_watchpoint;
-+                break;
-+            default:
-+                cpu_unassigned_access(cs, addr, false, false, 1, size);
-+                ret = 0;
-             }
-             break;
-         }
-@@ -1456,6 +1493,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
-             case 8:
-                 return;
-             default:
-+                cpu_unassigned_access(cs, addr, true, false, 1, size);
-                 break;
-             }
- 
-@@ -1526,9 +1564,13 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
-                 env->dmmu.tag_access = val;
-                 break;
-             case 7: /* Virtual Watchpoint */
-+                env->dmmu.virtual_watchpoint = val;
-+                break;
-             case 8: /* Physical Watchpoint */
-+                env->dmmu.physical_watchpoint = val;
-+                break;
-             default:
--                env->dmmuregs[reg] = val;
-+                cpu_unassigned_access(cs, addr, true, false, 1, size);
-                 break;
-             }
- 
--- 
-2.7.2
+The following changes since commit 23eb9e6b6d5315171cc15969bbc755f258004df0:
+
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-01-16' into staging (2017-01-17 13:53:50 +0000)
+
+are available in the git repository at:
+
+  https://github.com/artyom-tarasenko/qemu/ tags/pull-sun4v-20170118
+
+for you to fetch changes up to a2664ca0eced57dfc9f261fa1b210f24ddac649d:
+
+  target-sparc: fix up niagara machine (2017-01-18 22:03:44 +0100)
+
+----------------------------------------------------------------
+Artyom Tarasenko (30):
+      target-sparc: ignore MMU-faults if MMU is disabled in hypervisor mode
+      target-sparc: store cpu super- and hypervisor flags in TB
+      target-sparc: use explicit mmu register pointers
+      target-sparc: add UA2005 TTE bit #defines
+      target-sparc: add UltraSPARC T1 TLB #defines
+      target-sparc: on UA2005 don't deliver Interrupt_level_n IRQs in hypervisor mode
+      target-sparc: simplify replace_tlb_entry by using TTE_PGSIZE
+      target-sparc: implement UA2005 scratchpad registers
+      target-sparc: implement UltraSPARC-T1 Strand status ASR
+      target-sparc: hypervisor mode takes over nucleus mode
+      target-sparc: implement UA2005 hypervisor traps
+      target-sparc: implement UA2005 GL register
+      target-sparc: implement UA2005 rdhpstate and wrhpstate instructions
+      target-sparc: fix immediate UA2005 traps
+      target-sparc: use direct address translation in hyperprivileged mode
+      target-sparc: allow priveleged ASIs in hyperprivileged mode
+      target-sparc: ignore writes to UA2005 CPU mondo queue register
+      target-sparc: replace the last tlb entry when no free entries left
+      target-sparc: use SparcV9MMU type for sparc64 I/D-MMUs
+      target-sparc: implement UA2005 TSB Pointers
+      target-sparc: simplify ultrasparc_tsb_pointer
+      target-sparc: allow 256M sized pages
+      target-sparc: implement auto-demapping for UA2005 CPUs
+      target-sparc: add more registers to dump_mmu
+      target-sparc: implement UA2005 ASI_MMU (0x21)
+      target-sparc: store the UA2005 entries in sun4u format
+      target-sparc: add ST_BLKINIT_ ASIs for UA2005+ CPUs
+      target-sparc: implement sun4v RTC
+      target-sparc: move common cpu initialisation routines to sparc64.c
+      target-sparc: fix up niagara machine
+
+ MAINTAINERS                         |   7 +
+ default-configs/sparc64-softmmu.mak |   2 +
+ hw/sparc64/Makefile.objs            |   2 +
+ hw/sparc64/niagara.c                | 177 +++++++++++++++++
+ hw/sparc64/sparc64.c                | 378 +++++++++++++++++++++++++++++++++++
+ hw/sparc64/sun4u.c                  | 379 +----------------------------------
+ hw/timer/Makefile.objs              |   2 +
+ hw/timer/sun4v-rtc.c                | 102 ++++++++++
+ include/hw/sparc/sparc64.h          |   5 +
+ include/hw/timer/sun4v-rtc.h        |   1 +
+ linux-user/main.c                   |   2 +-
+ qemu-doc.texi                       |  14 +-
+ target/sparc/asi.h                  |   1 +
+ target/sparc/cpu.c                  |  13 +-
+ target/sparc/cpu.h                  | 105 +++++++---
+ target/sparc/helper.h               |   1 +
+ target/sparc/int64_helper.c         |  43 +++-
+ target/sparc/ldst_helper.c          | 387 ++++++++++++++++++++++++++++--------
+ target/sparc/machine.c              |   4 +-
+ target/sparc/mmu_helper.c           |  20 +-
+ target/sparc/translate.c            |  64 +++++-
+ target/sparc/win_helper.c           |  46 ++++-
+ 22 files changed, 1227 insertions(+), 528 deletions(-)
+ create mode 100644 hw/sparc64/niagara.c
+ create mode 100644 hw/sparc64/sparc64.c
+ create mode 100644 hw/timer/sun4v-rtc.c
+ create mode 100644 include/hw/sparc/sparc64.h
+ create mode 100644 include/hw/timer/sun4v-rtc.h
