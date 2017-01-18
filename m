@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cTlBm-0003DT-Tx
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:01:51 -0500
+	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cTlDQ-00045Y-Ho
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:03:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cTlBm-00029a-6U
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:01:51 -0500
-Date: Wed, 18 Jan 2017 09:01:26 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20170118080126.nyldkjhxdsxd4u2b@grep.be>
-References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
-	<e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
-	<2EAE3C4F-58AF-4594-A284-A69D8BC3EA8F@alex.org.uk>
-	<CAJSP0QWXF2tS5q-BpmxR9ti0osjzZCFiRxdRDho4pDBLkD3UUQ@mail.gmail.com>
-	<CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
-	<90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
-	<20170114144500.oxoqvrn5x4sdfo74@grep.be>
-	<1ef924f8-1e58-fe54-dabc-06873a531412@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1ef924f8-1e58-fe54-dabc-06873a531412@redhat.com>
-Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] How to online resize qemu disk
- with nbd protocol?
+	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cTlDN-0004EN-Ft
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 03:03:32 -0500
+From: Ziyue Yang <skiver.cloud.yzy@gmail.com>
+Date: Wed, 18 Jan 2017 16:02:41 +0800
+Message-Id: <1484726561-16441-1-git-send-email-skiver.cloud.yzy@gmail.com>
+Subject: [Qemu-devel] [PATCH v5 1/2] gdbstub.c: fix GDB connection segfault
+ caused by empty machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +18,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Stefan Hajnoczi <stefanha@gmail.com>, qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Bob Chen <a175818323@gmail.com>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Liguori <aliguori@us.ibm.com>, Ziyue Yang <yzylivezh@hotmail.com>, Ziyue Yang <skiver.cloud.yzy@gmail.com>
 
-On Mon, Jan 16, 2017 at 01:36:21PM -0600, Eric Blake wrote:
-> Maybe the structured reply proposal can be extended into this (reserve a
-> "reply" header that can be issued as many times as desired by the server
-> without the client ever having issued the request first, and where the
-> reply never uses the end-of-reply marker), but I'm not sure I want to go
-> that direction just yet.
+From: Ziyue Yang <yzylivezh@hotmail.com>
 
-It's not necessarily a bad idea, which could also be used for:
-- keepalive probes from server to client
-- unsolicited ESHUTDOWN messages
+This patch is to fix the segmentation fault caused by attaching
+GDB to a QEMU instance initialized with "-M none" option.
 
-both of which are currently not possible and might be useful for the
-protocol to have.
+The bug can be reproduced by
 
--- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+> ./qemu-system-x86_64 -M none -nographic -S -s
+
+and attach a GDB to it by
+
+> gdb -ex 'target remote :1234
+
+The segmentation fault was originally caused by trying to read
+the information about CPU when communicating with GDB. However,
+it's impossible for any control flow to exist on an empty machine,
+nor can CPU's be hot plugged to an empty machine later by QOM
+commands. So I think simply disabling GDB connections on empty
+machines makes sense.
+
+Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
+---
+ gdbstub.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/gdbstub.c b/gdbstub.c
+index de62d26..426d55e 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -18,6 +18,7 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "qemu/cutils.h"
+ #include "cpu.h"
+ #ifdef CONFIG_USER_ONLY
+@@ -1731,6 +1732,12 @@ int gdbserver_start(const char *device)
+     CharDriverState *mon_chr;
+     ChardevCommon common = { 0 };
+
++    if (!first_cpu) {
++        error_report("gdbstub: meaningless to attach gdb to a "
++                     "machine without any CPU.");
++        return -1;
++    }
++
+     if (!device)
+         return -1;
+     if (strcmp(device, "none") != 0) {
+--
+2.7.4
