@@ -1,40 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cTgLV-0000KD-2A
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:51:34 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cTgeP-0002cY-OR
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 22:11:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cTgLQ-0004vj-5C
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:51:33 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55755)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cTgLP-0004uU-Re
-	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 21:51:28 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0I2nbTJ114971
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 21:51:26 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 281ubb0rtg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Jan 2017 21:51:25 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 17 Jan 2017 21:51:24 -0500
-Date: Wed, 18 Jan 2017 10:51:17 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170112072513.98411-3-bjsdjshi@linux.vnet.ibm.com>
-	<20170117145142.4954666f@t450s.home>
+	(envelope-from <jasowang@redhat.com>) id 1cTgeM-0006fR-J4
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 22:11:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49268)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cTgeM-0006eh-AI
+	for qemu-devel@nongnu.org; Tue, 17 Jan 2017 22:11:02 -0500
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+	<1484276800-26814-15-git-send-email-peterx@redhat.com>
+	<fad506bc-2398-fef9-b720-7720569ac0a6@redhat.com>
+	<20170116091801.GL30108@pxdev.xzpeter.org>
+	<0eedf780-16b2-ca5c-8eea-5d41e6837f23@redhat.com>
+	<20170117144514.GO30108@pxdev.xzpeter.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <99e185dc-e3c9-678f-7a69-fc006658d07f@redhat.com>
+Date: Wed, 18 Jan 2017 11:10:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170117145142.4954666f@t450s.home>
-Message-Id: <20170118025117.GN30301@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 02/12] vfio: linux-headers update
- for vfio-ccw
+In-Reply-To: <20170117144514.GO30108@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC v3 14/14] intel_iommu: enable vfio
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,70 +32,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-* Alex Williamson <alex.williamson@redhat.com> [2017-01-17 14:51:42 -0700]:
 
-> On Thu, 12 Jan 2017 08:25:03 +0100
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
-> > From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> > 
-> > This is a placeholder for a linux-headers update.
-> > 
-> > Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> > ---
-> >  include/standard-headers/asm-s390/vfio_ccw.h | 28 ++++++++++++++++++++++++++++
-> >  linux-headers/linux/vfio.h                   | 17 +++++++++++++++++
-> >  2 files changed, 45 insertions(+)
-> >  create mode 100644 include/standard-headers/asm-s390/vfio_ccw.h
-> > 
-> > diff --git a/include/standard-headers/asm-s390/vfio_ccw.h b/include/standard-headers/asm-s390/vfio_ccw.h
-> > new file mode 100644
-> > index 0000000..cddc09b
-> > --- /dev/null
-> > +++ b/include/standard-headers/asm-s390/vfio_ccw.h
-> > @@ -0,0 +1,28 @@
-> > +/*
-> > + * Interfaces for vfio-ccw
-> > + *
-> > + * Copyright IBM Corp. 2017
-> > + *
-> > + * This program is free software; you can redistribute it and/or modify
-> > + * it under the terms of the GNU General Public License (version 2 only)
-> > + * as published by the Free Software Foundation.
-> > + *
-> > + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > + */
-> > +
-> > +#ifndef _VFIO_CCW_H_
-> > +#define _VFIO_CCW_H_
-> > +
-> > +#include "standard-headers/linux/types.h"
-> > +
-> > +struct ccw_io_region {
-> > +#define ORB_AREA_SIZE 12
-> > +	uint8_t  orb_area[ORB_AREA_SIZE];
-> > +#define SCSW_AREA_SIZE 12
-> > +	uint8_t  scsw_area[SCSW_AREA_SIZE];
-> > +#define IRB_AREA_SIZE 96
-> > +	uint8_t  irb_area[IRB_AREA_SIZE];
-> > +	uint32_t ret_code;
-> > +} QEMU_PACKED;
-> > +
-> > +#endif
-> 
-> This is really part of the uapi for the vfio-ccw mdev device, isn't it?
-Yes, it is.
 
-> Should it really be buried in asm-s390 in the kernel?
-> 
-We had an internal discussion on this question before, since we think
-this interface is strongly s390 dependent, we put it here. What do you
-suggest? Thanks,
+On 2017=E5=B9=B401=E6=9C=8817=E6=97=A5 22:45, Peter Xu wrote:
+> On Mon, Jan 16, 2017 at 05:54:55PM +0800, Jason Wang wrote:
+>>
+>> On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 17:18, Peter Xu wrote:
+>>>>>   static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_=
+t domain_id,
+>>>>>                                         hwaddr addr, uint8_t am)
+>>>>>   {
+>>>>> @@ -1222,6 +1251,7 @@ static void vtd_iotlb_page_invalidate(IntelIO=
+MMUState *s, uint16_t domain_id,
+>>>>>       info.addr =3D addr;
+>>>>>       info.mask =3D ~((1 << am) - 1);
+>>>>>       g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page=
+, &info);
+>>>>> +    vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
+>>>> Is the case of GLOBAL or DSI flush missed, or we don't care it at al=
+l?
+>>> IMHO we don't. For device assignment, since we are having CM=3D1 here=
+,
+>>> we should have explicit page invalidations even if guest sends
+>>> global/domain invalidations.
+>>>
+>>> Thanks,
+>>>
+>>> -- peterx
+>> Is this spec required?
+> I think not. IMO the spec is very coarse grained on describing cache
+> mode...
+>
+>> Btw, it looks to me that both DSI and GLOBAL are
+>> indeed explicit flush.
+> Actually when cache mode is on, it is unclear to me on how we should
+> treat domain/global invalidations, at least from the spec (as
+> mentioned earlier). My understanding is that they are not "explicit
+> flushes", which IMHO should only mean page selective IOTLB
+> invalidations.
 
-[...]
+Probably not, at least from the view of performance. DSI and global=20
+should be more efficient in some cases.
 
--- 
-Dong Jia
+>
+>> Just have a quick go through on driver codes and find this something
+>> interesting in intel_iommu_flush_iotlb_psi():
+>>
+>> ...
+>>      /*
+>>       * Fallback to domain selective flush if no PSI support or the si=
+ze is
+>>       * too big.
+>>       * PSI requires page size to be 2 ^ x, and the base address is na=
+turally
+>>       * aligned to the size
+>>       */
+>>      if (!cap_pgsel_inv(iommu->cap) || mask > cap_max_amask_val(iommu-=
+>cap))
+>>          iommu->flush.flush_iotlb(iommu, did, 0, 0,
+>>                          DMA_TLB_DSI_FLUSH);
+>>      else
+>>          iommu->flush.flush_iotlb(iommu, did, addr | ih, mask,
+>>                          DMA_TLB_PSI_FLUSH);
+>> ...
+> I think this is interesting... and I doubt its correctness while with
+> cache mode enabled.
+>
+> If so (sending domain invalidation instead of a big range of page
+> invalidations), how should we capture which pages are unmapped in
+> emulated IOMMU?
+
+We don't need to track individual pages here, since all pages for a=20
+specific domain were unmapped I believe?
+
+>
+>> It looks like DSI_FLUSH is possible even for CM on.
+>>
+>> And in flush_unmaps():
+>>
+>> ...
+>>          /* In caching mode, global flushes turn emulation expensive *=
+/
+>>          if (!cap_caching_mode(iommu->cap))
+>>              iommu->flush.flush_iotlb(iommu, 0, 0, 0,
+>>                       DMA_TLB_GLOBAL_FLUSH);
+>> ...
+>>
+>> If I understand the comments correctly, GLOBAL is ok for CM too (thoug=
+h the
+>> code did not do it for performance reason).
+> I think it should be okay to send global flush for CM, but not sure
+> whether we should notify anything when we receive it. Hmm, anyway, I
+> think I need some more reading to make sure I understand the whole
+> thing correctly. :)
+>
+> For example, when I see this commit:
+>
+> commit 78d5f0f500e6ba8f6cfd0673475ff4d941d705a2
+> Author: Nadav Amit <nadav.amit@gmail.com>
+> Date:   Thu Apr 8 23:00:41 2010 +0300
+>
+>      intel-iommu: Avoid global flushes with caching mode.
+>     =20
+>      While it may be efficient on real hardware, emulation of global
+>      invalidations is very expensive as all shadow entries must be exam=
+ined.
+>      This patch changes the behaviour when caching mode is enabled (whi=
+ch is
+>      the case when IOMMU emulation takes place). In this case, page spe=
+cific
+>      invalidation is used instead.
+>
+> Before I ask someone else besides qemu-devel, I am curious about
+> whether there is existing VT-d emulation code (outside QEMU, of
+> course) so that I can have a reference?
+
+Yes, it has. The author of this patch - Nadav has done lots of research=20
+on emulated IOMMU. See following papers:
+
+https://hal.inria.fr/inria-00493752/document
+http://www.cse.iitd.ac.in/~sbansal/csl862-virt/readings/vIOMMU.pdf
+
+Thanks
+
+> Quick search didn't answer me.
+>
+> Thanks,
+>
+> -- peterx
