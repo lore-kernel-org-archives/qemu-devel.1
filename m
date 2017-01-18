@@ -1,25 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cTtir-0005oZ-3D
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:08:34 -0500
+	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1cTtjw-0006k7-NX
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:09:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cTtin-0005Hm-SQ
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:08:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56784)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cTtin-0005HO-Jb
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:08:29 -0500
-Date: Wed, 18 Jan 2017 18:08:24 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170118180824.52d84031@nial.brq.redhat.com>
-In-Reply-To: <20170118151945.GY3491@thinpad.lan.raisama.net>
-References: <1484750925-176844-1-git-send-email-imammedo@redhat.com>
-	<20170118151945.GY3491@thinpad.lan.raisama.net>
+	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1cTtjt-0005h3-F0
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:09:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33309
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.vnet.ibm.com>)
+	id 1cTtjt-0005gr-8T
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:09:37 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0IH8keZ027978
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 12:09:36 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 282b4mce29-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 12:09:35 -0500
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.vnet.ibm.com>;
+	Wed, 18 Jan 2017 10:09:35 -0700
+Reply-To: jjherne@linux.vnet.ibm.com
+References: <20170117010204.4909-1-ehabkost@redhat.com>
+	<309bd499-204d-df07-aa99-9a999cfecabc@linux.vnet.ibm.com>
+	<20170118170049.GB3491@thinpad.lan.raisama.net>
+From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+Date: Wed, 18 Jan 2017 12:09:28 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170118170049.GB3491@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] numa: access CPU's node id via property in
- hmp_info_numa()
+Message-Id: <45e82b29-1ebe-3f34-0cc1-35d60c6044da@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 0/9] i386:
+ query-cpu-model-expansion test script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +46,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-On Wed, 18 Jan 2017 13:19:45 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On 01/18/2017 12:00 PM, Eduardo Habkost wrote:
+> On Tue, Jan 17, 2017 at 10:22:10AM -0500, Jason J. Herne wrote:
+>> On 01/16/2017 08:01 PM, Eduardo Habkost wrote:
+>>> This is a follow-up to the series that implements
+>>> query-cpu-model-expansion. Before including the test script, the
+>>> series has some fixes to allow the results of
+>>> query-cpu-model-expansion to be used in the QEMU command-line.
+>>>
+>>> The script probably will work on s390x too, but I couldn't test
+>>> it yet.
+>>>
+>>
+>> Eduardo,
+>>
+>> This test seems to mostly work on s390. The only issue I ran into is
+>> querying host model using tcg only. s390 requires kvm to query the host
+>> model. Perhaps we could just skip the tcg host test case on s390?
+>
+> We could still try to test "host", but add it to a greylist where
+> errors returned by query-cpu-model-expansion can be non-fatal.
+> query-cpu-model-expansion model="host" can also fail with KVM if
+> the host doesn't support CPU models.
+>
 
-> On Wed, Jan 18, 2017 at 03:48:45PM +0100, Igor Mammedov wrote:
-> > Move vcpu's assocciated numa_node field out of generic CPUState
-> > into inherited classes that actually care about cpu<->numa mapping
-> > and make monitor 'info numa' get vcpu's assocciated node id via
-> > node-id property.
-> > It allows to drop implicit node id intialization in
-> > numa_post_machine_init() and would allow switching to mapping
-> > defined by target's CpuInstanceProperties instead of global
-> > numa_info[i].node_cpu bitmaps.  
-> 
-> I agree to allow the node-id assignment logic to be defined by
-> arch-specific code, but:
-> 
-> Considering that we still have the generic CPU<->node mapping in
-> numa_info[].node_cpu, I don't see the benefit of moving the
-> numa_info[].node_cpu => node-id translation from common generic
-> code to duplicated arch-specific code.
-it's duplicated for a time being until all targets that use
-node_cpu are internally converted to socket/core/thread-id interface.
-This patch is a part if re-factoring RFC which I'm about to post.
+David had the idea to just support -cpu host for tcg. We could do that.
+In the meantime, I'm ok with your greylist idea too. This would allow the
+script to work properly on s390 right from the start, and we can remove the
+greylist when s390 supports specifying -cpu host for tcg.
 
-
-> What about adding this to cpu_generic_realize():
-> 
->   node = (numa_get_node_for_cpu(cpu)
->   if (node >= 0) {
->      int cur_node = object_property_find(cpu, "node-id") ?
->                     object_property_get_int(cpu, "node-id") : -1;
->      if (cur_node >= 0 && cur_node != node) {
->          error_setg(&err, "Conflict between -numa option and CPU node-id");
->          goto out;
->      }
->      object_property_set_int(cpu, "node-id", node, &err);
->   }
-What I don't like here is that putting above snippet into
-cpu_generic_realize() is just doing the same implicit init
-that numa_post_machine_init() has been doing before just
-a bit later. It looks like a quick fix for 'info numa' issues.
-
-However it would add stumble block on getting rid of 
-numa_get_node_for_cpu() { numa_info[].node_cpu } and keeping
-node-mapping along with the rest of topology in Machine object
-instead of globals.
-
-I'm in process of getting rid of numa_info[].node_cpu/numa_get_node_for_cpu()
-altogether. And incrementally done it for PC, so I'd be forced
-to reduplicate above snippet from cpu_generic_realize() in concrete
-users anyway to do conversion without breaking other users.
- 
-[...]
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -1978,6 +1978,11 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-> >  
-> >      cs = CPU(cpu);
-> >      cs->cpu_index = idx;
-> > +
-> > +    idx = numa_get_node_for_cpu(cs->cpu_index);
-> > +    if (idx < nb_numa_nodes) {
-> > +        cpu->numa_nid = idx;
-> > +    }
-this is the only place where I add above mentioned duplication,
-which sort of compensated by removed numa_post_machine_init().
-And it's here only to keep working+fix 'info numa'.
-The other targets currently already do numa_get_node_for_cpu(),
-lookup so I'm not changing there anything.
-Later(not in this patch) I'm removing numa_get_node_for_cpu() from
-pc_cpu_pre_plug() and from PC code altogether and replacing it
-with node-id from possible_cpus.
-
-PS:
-since travis-ci seems to be broken, I'll post re-factoring
-RFC without building there and it includes this patch as well.
+-- 
+-- Jason J. Herne (jjherne@linux.vnet.ibm.com)
