@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cTuUr-0005Lw-Rh
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:58:10 -0500
+	(envelope-from <bounces@canonical.com>) id 1cTucC-0002iO-Fh
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:05:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cTuUq-0000cd-OB
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:58:09 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34583)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1cTuUq-0000bt-HC
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 12:58:08 -0500
-Received: by mail-wm0-x242.google.com with SMTP id c85so5842568wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 09:58:08 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cTuc7-0003eD-4D
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:05:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cTuc6-0003dy-TV
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 13:05:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cTuc4-0000oB-IY
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 18:05:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 87B022E80CA
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 18:05:36 +0000 (UTC)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <1484743490-24721-1-git-send-email-thuth@redhat.com>
-References: <1484743490-24721-1-git-send-email-thuth@redhat.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 18 Jan 2017 09:57:36 -0800
-Message-ID: <CAKmqyKM5RfdR63XDQXKh5Yu6+s5GwAgj8i95AJAfgPaN8HiGYw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3] hw/core/null-machine: Add the
- possibility to instantiate a CPU and RAM
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Jan 2017 17:51:49 -0000
+From: luigiburdo <intermediadc@hotmail.com>
+Reply-To: Bug 1657538 <1657538@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170118175149.27340.89188.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1657538] [NEW] qemu 2.7.x 2.8 softmmu dont work
+ on BE machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,116 +36,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Jan 18, 2017 at 4:44 AM, Thomas Huth <thuth@redhat.com> wrote:
-> Sometimes it is useful to have just a machine with CPU and RAM, without
-> any further hardware in it, e.g. if you just want to do some instruction
-> debugging for TCG with a remote GDB attached to QEMU, or run some embedded
-> code with the "-semihosting" QEMU parameter. qemu-system-m68k already
-> features a "dummy" machine, and xtensa a "sim" machine for exactly this
-> purpose.
-> All target architectures have nowadays also a "none" machine, which would
-> be a perfect match for this, too - but it currently does not allow to add
-> CPU and RAM yet. Thus let's add these possibilities in a generic way to the
-> "none" machine, too, so that we hopefully do not need additional "dummy"
-> machines in the future anymore (and maybe can also get rid of the already
-> existing "dummy"/"sim" machines one day).
-> Note that the default behaviour of the "none" machine is not changed, i.e.
-> no CPU and no RAM is instantiated by default. You have explicitely got to
-> specify the CPU model with "-cpu" and the amount of RAM with "-m" to get
-> these new features.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v3:
->  - Get rid of the cpu_init_def() wrapper again, make null-machine.o
->    target dependent instead and use cpu_init() directly.
->  - Omit the loader code for the "-kernel" option for now (users can
->    use "-device loader,..." instead). We can add code for the -kernel
->    parameter later (either an implementation or a warning), once we've
->    decided how it should behave for the "none" machine.
+Public bug reported:
 
-I think there should at least be a warning to start with though. It
-seems confusing that no errors are reported but the argument is
-ignored.
+Build on Be machine qemu 2.7.1 and 2.8 in pure softmmu (tgc) dont work on b=
+ig endian hardware .
+tested with ppc-softmmu,i386-softmmu,arm-softmmu same result:
 
-Thanks,
+with :
+ ./qemu-system-i386 =
 
-Alistair
+Gtk-Message: Failed to load module "overlay-scrollbar"
+qemu-system-i386: Trying to execute code outside RAM or ROM at 0x000a0000
+This usually means one of the following happened:
 
->
->  hw/core/Makefile.objs  |  2 +-
->  hw/core/null-machine.c | 27 +++++++++++++++++++++++++--
->  2 files changed, 26 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index a4c94e5..0b6c0f1 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -12,7 +12,6 @@ common-obj-$(CONFIG_XILINX_AXI) += stream.o
->  common-obj-$(CONFIG_PTIMER) += ptimer.o
->  common-obj-$(CONFIG_SOFTMMU) += sysbus.o
->  common-obj-$(CONFIG_SOFTMMU) += machine.o
-> -common-obj-$(CONFIG_SOFTMMU) += null-machine.o
->  common-obj-$(CONFIG_SOFTMMU) += loader.o
->  common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
->  common-obj-$(CONFIG_SOFTMMU) += register.o
-> @@ -20,3 +19,4 @@ common-obj-$(CONFIG_SOFTMMU) += or-irq.o
->  common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
->
->  obj-$(CONFIG_SOFTMMU) += generic-loader.o
-> +obj-$(CONFIG_SOFTMMU) += null-machine.o
-> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> index 0351ba7..27c8369 100644
-> --- a/hw/core/null-machine.c
-> +++ b/hw/core/null-machine.c
-> @@ -13,18 +13,41 @@
->
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
-> +#include "qemu/error-report.h"
->  #include "hw/hw.h"
->  #include "hw/boards.h"
-> +#include "sysemu/sysemu.h"
-> +#include "exec/address-spaces.h"
-> +#include "cpu.h"
->
-> -static void machine_none_init(MachineState *machine)
-> +static void machine_none_init(MachineState *mch)
->  {
-> +    CPUState *cpu = NULL;
-> +
-> +    /* Initialize CPU (if a model has been specified) */
-> +    if (mch->cpu_model) {
-> +        cpu = cpu_init(mch->cpu_model);
-> +        if (!cpu) {
-> +            error_report("Unable to initialize CPU");
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    /* RAM at address zero */
-> +    if (mch->ram_size) {
-> +        MemoryRegion *ram = g_new(MemoryRegion, 1);
-> +
-> +        memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
-> +        memory_region_add_subregion(get_system_memory(), 0, ram);
-> +    }
->  }
->
->  static void machine_none_machine_init(MachineClass *mc)
->  {
->      mc->desc = "empty machine";
->      mc->init = machine_none_init;
-> -    mc->max_cpus = 0;
-> +    mc->max_cpus = 1;
-> +    mc->default_ram_size = 0;
->  }
->
->  DEFINE_MACHINE("none", machine_none_machine_init)
-> --
-> 1.8.3.1
->
->
+(1) You told QEMU to execute a kernel for the wrong machine type, and it cr=
+ashed on startup (eg trying to run a raspberry pi kernel on a versatilepb Q=
+EMU machine)
+(2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU execute=
+d a ROM full of no-op instructions until it fell off the end
+(3) Your guest kernel has a bug and crashed by jumping off into nowhere
+
+This is almost always one of the first two, so check your command line and =
+that you are using the right type of kernel for this machine.
+If you think option (3) is likely then you can try debugging your guest wit=
+h the -d debug options; in particular -d guest_errors will cause the log to=
+ include a dump of the guest register state at this point.
+
+Execution cannot continue; stopping here.
+
+
+I try to add the -L option with ../pc-bios/bios.bin =
+
+and have the same result.
+
+note the ppc-softmmu and ppc64-softmmu work in kvm mode only emulated
+mode have issue.
+
+
+tested on my hardware a  Qriq P5040 and G5 4x970MP with Ubuntu Mate 16.10 =
+
+thanks
+Luigi
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1657538
+
+Title:
+  qemu 2.7.x 2.8 softmmu dont work on BE machine
+
+Status in QEMU:
+  New
+
+Bug description:
+  Build on Be machine qemu 2.7.1 and 2.8 in pure softmmu (tgc) dont work on=
+ big endian hardware .
+  tested with ppc-softmmu,i386-softmmu,arm-softmmu same result:
+
+  with :
+   ./qemu-system-i386 =
+
+  Gtk-Message: Failed to load module "overlay-scrollbar"
+  qemu-system-i386: Trying to execute code outside RAM or ROM at 0x000a0000
+  This usually means one of the following happened:
+
+  (1) You told QEMU to execute a kernel for the wrong machine type, and it =
+crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb=
+ QEMU machine)
+  (2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU execu=
+ted a ROM full of no-op instructions until it fell off the end
+  (3) Your guest kernel has a bug and crashed by jumping off into nowhere
+
+  This is almost always one of the first two, so check your command line an=
+d that you are using the right type of kernel for this machine.
+  If you think option (3) is likely then you can try debugging your guest w=
+ith the -d debug options; in particular -d guest_errors will cause the log =
+to include a dump of the guest register state at this point.
+
+  Execution cannot continue; stopping here.
+
+  =
+
+  I try to add the -L option with ../pc-bios/bios.bin =
+
+  and have the same result.
+
+  note the ppc-softmmu and ppc64-softmmu work in kvm mode only emulated
+  mode have issue.
+
+  =
+
+  tested on my hardware a  Qriq P5040 and G5 4x970MP with Ubuntu Mate 16.10 =
+
+  thanks
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1657538/+subscriptions
