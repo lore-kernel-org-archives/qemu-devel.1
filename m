@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cTrXj-0005pK-5L
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:48:57 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cTrXj-0005pS-Bj
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:48:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cTrXf-0004zi-5k
+	(envelope-from <stefanha@redhat.com>) id 1cTrXh-00050q-7P
 	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:48:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60248)
+Received: from mx1.redhat.com ([209.132.183.28]:59512)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cTrXe-0004ym-Sp
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:48:51 -0500
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 18 Jan 2017 15:48:45 +0100
-Message-Id: <1484750925-176844-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH] numa: access CPU's node id via property in
- hmp_info_numa()
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cTrXg-00050Y-V9
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 09:48:53 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 13E2945DCF
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:48:53 +0000 (UTC)
+Date: Wed, 18 Jan 2017 14:48:49 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170118144849.GE30347@stefanha-x1.localdomain>
+References: <20170113131731.1246-1-pbonzini@redhat.com>
+	<20170113131731.1246-6-pbonzini@redhat.com>
+	<20170116113824.GD14226@lemon.Home>
+	<20170116125559.GH13096@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="dFWYt1i2NyOo1oI9"
+Content-Disposition: inline
+In-Reply-To: <20170116125559.GH13096@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/16] io: make qio_channel_yield aware of
+ AioContexts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,327 +37,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, ehabkost@redhat.com, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Move vcpu's assocciated numa_node field out of generic CPUState
-into inherited classes that actually care about cpu<->numa mapping
-and make monitor 'info numa' get vcpu's assocciated node id via
-node-id property.
-It allows to drop implicit node id intialization in
-numa_post_machine_init() and would allow switching to mapping
-defined by target's CpuInstanceProperties instead of global
-numa_info[i].node_cpu bitmaps.
 
-As side effect it fixes 'info numa' displaying wrong mapping
-for CPUs specified with -device/device_add.
-Before patch following CLI would produce:
-QEMU -smp 1,sockets=3,maxcpus=3 \
-       -device qemu64-x86_64-cpu,socket-id=1,core-id=0,thread-id=0 \
-       -numa node,nodeid=0,cpus=0 \
-       -numa node,nodeid=1,cpus=1 \
-       -numa node,nodeid=2,cpus=2
-(qemu) device_add qemu64-x86_64-cpu,socket-id=2,core-id=0,thread-id=0
-(qemu) info numa
-3 nodes
-node 0 cpus: 0 1 2
-node 0 size: 40 MB
-node 1 cpus:
-node 1 size: 40 MB
-node 2 cpus:
-node 2 size: 48 MB
+--dFWYt1i2NyOo1oI9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-after patch all CPUs are on nodes they are supposed to be:
-(qemu) device_add qemu64-x86_64-cpu,socket-id=2,core-id=0,thread-id=0
-(qemu) info numa
-3 nodes
-node 0 cpus: 0
-node 0 size: 40 MB
-node 1 cpus: 1
-node 1 size: 40 MB
-node 2 cpus: 2
-node 2 size: 48 MB
+On Mon, Jan 16, 2017 at 12:55:59PM +0000, Daniel P. Berrange wrote:
+> On Mon, Jan 16, 2017 at 07:38:24PM +0800, Fam Zheng wrote:
+> > On Fri, 01/13 14:17, Paolo Bonzini wrote:
+> > > Support separate coroutines for reading and writing, and place the
+> > > read/write handlers on the AioContext that the QIOChannel is register=
+ed
+> > > with.
+> > >=20
+> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > ---
+> > >  include/io/channel.h   | 37 ++++++++++++++++++----
+> > >  io/channel.c           | 86 ++++++++++++++++++++++++++++++++++++++--=
+----------
+> > >  tests/Makefile.include |  2 +-
+> > >  3 files changed, 96 insertions(+), 29 deletions(-)
+> > >=20
+> > > diff --git a/include/io/channel.h b/include/io/channel.h
+> > > index 665edd7..d7bad94 100644
+> > > --- a/include/io/channel.h
+> > > +++ b/include/io/channel.h
+> > > @@ -23,6 +23,7 @@
+> > > =20
+> > >  #include "qemu-common.h"
+> > >  #include "qom/object.h"
+> > > +#include "qemu/coroutine.h"
+> > >  #include "block/aio.h"
+> > > =20
+> > >  #define TYPE_QIO_CHANNEL "qio-channel"
+> > > @@ -59,8 +60,6 @@ typedef gboolean (*QIOChannelFunc)(QIOChannel *ioc,
+> > >                                     GIOCondition condition,
+> > >                                     gpointer data);
+> > > =20
+> > > -typedef struct QIOChannelRestart QIOChannelRestart;
+> > > -
+> > >  /**
+> > >   * QIOChannel:
+> > >   *
+> > > @@ -84,8 +83,8 @@ struct QIOChannel {
+> > >      unsigned int features; /* bitmask of QIOChannelFeatures */
+> > >      char *name;
+> > >      AioContext *ctx;
+> > > -    QIOChannelRestart *read_coroutine;
+> > > -    QIOChannelRestart *write_coroutine;
+> > > +    Coroutine *read_coroutine;
+> > > +    Coroutine *write_coroutine;
+> > >  #ifdef _WIN32
+> > >      HANDLE event; /* For use with GSource on Win32 */
+> > >  #endif
+> > > @@ -508,13 +507,37 @@ guint qio_channel_add_watch(QIOChannel *ioc,
+> > > =20
+> > > =20
+> > >  /**
+> > > + * qio_channel_set_aio_context:
+> > > + * @ioc: the channel object
+> > > + * @ctx: the #AioContext to set the handlers on
+> > > + *
+> > > + * Request that qio_channel_yield() sets I/O handlers on
+> > > + * the given #AioContext.  If @ctx is %NULL, qio_channel_yield()
+> > > + * uses QEMU's main thread event loop.
+> > > + */
+> > > +void qio_channel_set_aio_context(QIOChannel *ioc,
+> > > +                                 AioContext *ctx);
+> > > +
+> > > +/**
+> > > + * qio_channel_detach_aio_context:
+> > > + * @ioc: the channel object
+> > > + *
+> > > + * Disable any I/O handlers set by qio_channel_yield().  With the
+> > > + * help of aio_co_schedule(), this allows moving a coroutine that was
+> > > + * paused by qio_channel_yield() to another context.
+> > > + */
+> > > +void qio_channel_detach_aio_context(QIOChannel *ioc);
+> > > +
+> > > +/**
+> > >   * qio_channel_yield:
+> > >   * @ioc: the channel object
+> > >   * @condition: the I/O condition to wait for
+> > >   *
+> > > - * Yields execution from the current coroutine until
+> > > - * the condition indicated by @condition becomes
+> > > - * available.
+> > > + * Yields execution from the current coroutine until the condition
+> > > + * indicated by @condition becomes available.  @condition must
+> > > + * be either %G_IO_IN or %G_IO_OUT; it cannot contain both.  In
+> > > + * addition, no two coroutine can be waiting on the same condition
+> > > + * and channel at the same time.
+> > >   *
+> > >   * This must only be called from coroutine context
+> > >   */
+> > > diff --git a/io/channel.c b/io/channel.c
+> > > index ce470d7..1e043bf 100644
+> > > --- a/io/channel.c
+> > > +++ b/io/channel.c
+> > > @@ -21,7 +21,7 @@
+> > >  #include "qemu/osdep.h"
+> > >  #include "io/channel.h"
+> > >  #include "qapi/error.h"
+> > > -#include "qemu/coroutine.h"
+> > > +#include "qemu/main-loop.h"
+> > > =20
+> > >  bool qio_channel_has_feature(QIOChannel *ioc,
+> > >                               QIOChannelFeature feature)
+> > > @@ -238,36 +238,80 @@ off_t qio_channel_io_seek(QIOChannel *ioc,
+> > >  }
+> > > =20
+> > > =20
+> > > -typedef struct QIOChannelYieldData QIOChannelYieldData;
+> > > -struct QIOChannelYieldData {
+> > > -    QIOChannel *ioc;
+> > > -    Coroutine *co;
+> > > -};
+> > > +static void qio_channel_set_aio_fd_handlers(QIOChannel *ioc);
+> > > +
+> > > +static void qio_channel_restart_read(void *opaque)
+> > > +{
+> > > +    QIOChannel *ioc =3D opaque;
+> > > +    Coroutine *co =3D ioc->read_coroutine;
+> > > =20
+> > > +    ioc->read_coroutine =3D NULL;
+> > > +    qio_channel_set_aio_fd_handlers(ioc);
+> > > +    aio_co_wake(co);
+> > > +}
+> > > =20
+> > > -static gboolean qio_channel_yield_enter(QIOChannel *ioc,
+> > > -                                        GIOCondition condition,
+> > > -                                        gpointer opaque)
+> > > +static void qio_channel_restart_write(void *opaque)
+> > >  {
+> > > -    QIOChannelYieldData *data =3D opaque;
+> > > -    qemu_coroutine_enter(data->co);
+> > > -    return FALSE;
+> > > +    QIOChannel *ioc =3D opaque;
+> > > +    Coroutine *co =3D ioc->write_coroutine;
+> > > +
+> > > +    ioc->write_coroutine =3D NULL;
+> > > +    qio_channel_set_aio_fd_handlers(ioc);
+> > > +    aio_co_wake(co);
+> > >  }
+> > > =20
+> > > +static void qio_channel_set_aio_fd_handlers(QIOChannel *ioc)
+> > > +{
+> > > +    IOHandler *rd_handler =3D NULL, *wr_handler =3D NULL;
+> > > +    AioContext *ctx;
+> > > +
+> > > +    if (ioc->read_coroutine) {
+> > > +	rd_handler =3D qio_channel_restart_read;
+> >=20
+> > s/\t/        /
+> >=20
+> > > +    }
+> > > +    if (ioc->write_coroutine) {
+> > > +	rd_handler =3D qio_channel_restart_write;
+> >=20
+> > s/\t/        /
+> >=20
+> > > +    }
+> > > +
+> > > +    ctx =3D ioc->ctx ? ioc->ctx : iohandler_get_aio_context();
+> > > +    qio_channel_set_aio_fd_handler(ioc, ctx, rd_handler, wr_handler,=
+ ioc);
+> > > +}
+> > > +
+> > > +void qio_channel_set_aio_context(QIOChannel *ioc,
+> > > +                                 AioContext *ctx)
+> > > +{
+> > > +    AioContext *old_ctx;
+> > > +    if (ioc->ctx =3D=3D ctx) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    old_ctx =3D ioc->ctx ? ioc->ctx : iohandler_get_aio_context();
+> > > +    qio_channel_set_aio_fd_handler(ioc, old_ctx, NULL, NULL, NULL);
+> > > +    ioc->ctx =3D ctx;
+> > > +    qio_channel_set_aio_fd_handlers(ioc);
+> > > +}
+> > > +
+> > > +void qio_channel_detach_aio_context(QIOChannel *ioc)
+> > > +{
+> > > +    ioc->read_coroutine =3D NULL;
+> > > +    ioc->write_coroutine =3D NULL;
+> > > +    qio_channel_set_aio_fd_handlers(ioc);
+> >=20
+> > Why is qio_channel_set_aio_fd_handler not needed here?
+> >=20
+> > > +    ioc->ctx =3D NULL;
+> > > +}
+> > > =20
+> > >  void coroutine_fn qio_channel_yield(QIOChannel *ioc,
+> > >                                      GIOCondition condition)
+> > >  {
+> > > -    QIOChannelYieldData data;
+> > > -
+> > >      assert(qemu_in_coroutine());
+> > > -    data.ioc =3D ioc;
+> > > -    data.co =3D qemu_coroutine_self();
+> > > -    qio_channel_add_watch(ioc,
+> > > -                          condition,
+> > > -                          qio_channel_yield_enter,
+> > > -                          &data,
+> > > -                          NULL);
+> > > +    if (condition =3D=3D G_IO_IN) {
+> > > +        assert(!ioc->read_coroutine);
+> > > +        ioc->read_coroutine =3D qemu_coroutine_self();
+> > > +    } else if (condition =3D=3D G_IO_OUT) {
+> > > +        assert(!ioc->write_coroutine);
+> > > +        ioc->write_coroutine =3D qemu_coroutine_self();
+> > > +    } else {
+> > > +        abort();
+> > > +    }
+> > > +    qio_channel_set_aio_fd_handlers(ioc);
+> > >      qemu_coroutine_yield();
+> > >  }
+> > > =20
+> > > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > > index 3b8ed9d..7d11bbb 100644
+> > > --- a/tests/Makefile.include
+> > > +++ b/tests/Makefile.include
+> > > @@ -493,7 +493,7 @@ tests/check-qjson$(EXESUF): tests/check-qjson.o $=
+(test-util-obj-y)
+> > >  tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(te=
+st-qom-obj-y)
+> > >  tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test=
+-qom-obj-y)
+> > > =20
+> > > -tests/test-char$(EXESUF): tests/test-char.o qemu-char.o qemu-timer.o=
+ $(test-util-obj-y) $(qtest-obj-y) $(test-io-obj-y)
+> > > +tests/test-char$(EXESUF): tests/test-char.o qemu-char.o qemu-timer.o=
+ $(test-util-obj-y) $(qtest-obj-y) $(test-io-obj-y) $(test-block-obj-y)
+> >=20
+> > I guess this is a hint for moving coroutine code into a lower level lib=
+rary like
+> > util.
+>=20
+> The coroutine code is already in util/, so I'm assuming this is actually
+> for the AioContext stuff. Yes, though, AioContext ought to be moved into
+> util/ as part of this series IMHO, since the io/ channel code shouldn't
+> have a dependancy on block/ layer.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-CC: Dou Liyang <douly.fnst@cn.fujitsu.com>
-CC: fanc.fnst@cn.fujitsu.com
-CC: caoj.fnst@cn.fujitsu.com
-CC: stefanha@redhat.com
-CC: izumi.taku@jp.fujitsu.com
-CC: vilanova@ac.upc.edu
-CC: ehabkost@redhat.com
-CC: peter.maydell@linaro.org
-CC: Andrew Jones <drjones@redhat.com>
-CC: David Gibson <david@gibson.dropbear.id.au>
-CC: Thomas Huth <thuth@redhat.com>
----
- include/qom/cpu.h           |  2 --
- include/sysemu/numa.h       |  1 -
- target/arm/cpu.h            |  2 ++
- target/i386/cpu.h           |  1 +
- target/ppc/cpu.h            |  2 ++
- hw/arm/virt.c               | 12 ++++++++----
- hw/i386/pc.c                |  5 +++++
- hw/ppc/spapr.c              |  2 +-
- hw/ppc/spapr_cpu_core.c     |  2 +-
- monitor.c                   |  7 +++++--
- numa.c                      | 15 ---------------
- target/arm/cpu.c            |  1 +
- target/i386/cpu.c           |  1 +
- target/ppc/translate_init.c |  1 +
- vl.c                        |  2 --
- 15 files changed, 28 insertions(+), 28 deletions(-)
+That makes sense to me.  I think the move is overdue since coroutines
+are widely useful outside the block layer and aren't specific to block
+I/O.
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 3f79a8e..ae637a9 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -257,7 +257,6 @@ struct qemu_work_item;
-  * @cpu_index: CPU index (informative).
-  * @nr_cores: Number of cores within this CPU package.
-  * @nr_threads: Number of threads within this CPU.
-- * @numa_node: NUMA node this CPU is belonging to.
-  * @host_tid: Host thread ID.
-  * @running: #true if CPU is currently running (lockless).
-  * @has_waiter: #true if a CPU is currently waiting for the cpu_exec_end;
-@@ -306,7 +305,6 @@ struct CPUState {
- 
-     int nr_cores;
-     int nr_threads;
--    int numa_node;
- 
-     struct QemuThread *thread;
- #ifdef _WIN32
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 8f09dcf..b8015a5 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -25,7 +25,6 @@ typedef struct node_info {
- 
- extern NodeInfo numa_info[MAX_NODES];
- void parse_numa_opts(MachineClass *mc);
--void numa_post_machine_init(void);
- void query_numa_node_mem(uint64_t node_mem[]);
- extern QemuOptsList qemu_numa_opts;
- void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 7bd16ee..ef263f1 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -662,6 +662,8 @@ struct ARMCPU {
- 
-     ARMELChangeHook *el_change_hook;
-     void *el_change_hook_opaque;
-+
-+    int32_t numa_nid;
- };
- 
- static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 6c1902b..e43dcc2 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1264,6 +1264,7 @@ struct X86CPU {
-     int32_t socket_id;
-     int32_t core_id;
-     int32_t thread_id;
-+    int32_t numa_nid;
- };
- 
- static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 2a50c43..2d12ad5 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1154,6 +1154,7 @@ do {                                            \
-  * @cpu_dt_id: CPU index used in the device tree. KVM uses this index too
-  * @max_compat: Maximal supported logical PVR from the command line
-  * @cpu_version: Current logical PVR, zero if in "raw" mode
-+ * @numa_nid: Numa node id the CPU belongs to
-  *
-  * A PowerPC CPU.
-  */
-@@ -1166,6 +1167,7 @@ struct PowerPCCPU {
-     int cpu_dt_id;
-     uint32_t max_compat;
-     uint32_t cpu_version;
-+    int32_t numa_nid;
- 
-     /* Fields related to migration compatibility hacks */
-     bool pre_2_8_migration;
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 7a03f84..b86b5fd 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -329,7 +329,6 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
- {
-     int cpu;
-     int addr_cells = 1;
--    unsigned int i;
- 
-     /*
-      * From Documentation/devicetree/bindings/arm/cpus.txt
-@@ -379,9 +378,9 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
-                                   armcpu->mp_affinity);
-         }
- 
--        i = numa_get_node_for_cpu(cpu);
--        if (i < nb_numa_nodes) {
--            qemu_fdt_setprop_cell(vms->fdt, nodename, "numa-node-id", i);
-+        if (armcpu->numa_nid < nb_numa_nodes) {
-+            qemu_fdt_setprop_cell(vms->fdt, nodename, "numa-node-id",
-+                                  armcpu->numa_nid);
-         }
- 
-         g_free(nodename);
-@@ -1333,6 +1332,11 @@ static void machvirt_init(MachineState *machine)
-                                      "secure-memory", &error_abort);
-         }
- 
-+        if (nb_numa_nodes) {
-+            object_property_set_int(cpuobj, numa_get_node_for_cpu(n),
-+                                    "node-id", NULL);
-+        }
-+
-         object_property_set_bool(cpuobj, true, "realized", NULL);
-     }
-     fdt_add_timer_nodes(vms);
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f721fde..9d2b265 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1978,6 +1978,11 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
- 
-     cs = CPU(cpu);
-     cs->cpu_index = idx;
-+
-+    idx = numa_get_node_for_cpu(cs->cpu_index);
-+    if (idx < nb_numa_nodes) {
-+        cpu->numa_nid = idx;
-+    }
- }
- 
- static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 208ef7b..efcd925 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -182,7 +182,7 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, CPUState *cs)
-                                 cpu_to_be32(0x0),
-                                 cpu_to_be32(0x0),
-                                 cpu_to_be32(0x0),
--                                cpu_to_be32(cs->numa_node),
-+                                cpu_to_be32(cpu->numa_nid),
-                                 cpu_to_be32(index)};
- 
-     /* Advertise NUMA via ibm,associativity */
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c18632b..7f6661b 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -71,7 +71,7 @@ void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu, Error **errp)
-     /* Set NUMA node for the added CPUs  */
-     i = numa_get_node_for_cpu(cs->cpu_index);
-     if (i < nb_numa_nodes) {
--            cs->numa_node = i;
-+        cpu->numa_nid = i;
-     }
- 
-     xics_cpu_setup(spapr->xics, cpu);
-diff --git a/monitor.c b/monitor.c
-index 0841d43..8856d5b 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1544,9 +1544,12 @@ static void hmp_info_numa(Monitor *mon, const QDict *qdict)
-     for (i = 0; i < nb_numa_nodes; i++) {
-         monitor_printf(mon, "node %d cpus:", i);
-         CPU_FOREACH(cpu) {
--            if (cpu->numa_node == i) {
--                monitor_printf(mon, " %d", cpu->cpu_index);
-+            Error *err = NULL;
-+            int64_t nid = object_property_get_int(OBJECT(cpu), "node-id", &err);
-+            if (nid == i && !err) {
-+                    monitor_printf(mon, " %d", cpu->cpu_index);
-             }
-+            error_free(err);
-         }
-         monitor_printf(mon, "\n");
-         monitor_printf(mon, "node %d size: %" PRId64 " MB\n", i,
-diff --git a/numa.c b/numa.c
-index 379bc8a..5f68497 100644
---- a/numa.c
-+++ b/numa.c
-@@ -394,21 +394,6 @@ void parse_numa_opts(MachineClass *mc)
-     }
- }
- 
--void numa_post_machine_init(void)
--{
--    CPUState *cpu;
--    int i;
--
--    CPU_FOREACH(cpu) {
--        for (i = 0; i < nb_numa_nodes; i++) {
--            assert(cpu->cpu_index < max_cpus);
--            if (test_bit(cpu->cpu_index, numa_info[i].node_cpu)) {
--                cpu->numa_node = i;
--            }
--        }
--    }
--}
--
- static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
-                                            const char *name,
-                                            uint64_t ram_size)
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 9104611..8caf853 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1515,6 +1515,7 @@ static Property arm_cpu_properties[] = {
-     DEFINE_PROP_UINT32("midr", ARMCPU, midr, 0),
-     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
-                         mp_affinity, ARM64_AFFINITY_INVALID),
-+    DEFINE_PROP_INT32("node-id", ARMCPU, numa_nid, 0),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index aba11ae..85c52f1 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3649,6 +3649,7 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_INT32("core-id", X86CPU, core_id, -1),
-     DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, -1),
- #endif
-+    DEFINE_PROP_INT32("node-id", X86CPU, numa_nid, 0),
-     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
-     { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
-     DEFINE_PROP_BOOL("hv-relaxed", X86CPU, hyperv_relaxed_timing, false),
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index e6a835c..64bd7be 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10520,6 +10520,7 @@ static gchar *ppc_gdb_arch_name(CPUState *cs)
- 
- static Property ppc_cpu_properties[] = {
-     DEFINE_PROP_BOOL("pre-2.8-migration", PowerPCCPU, pre_2_8_migration, false),
-+    DEFINE_PROP_INT32("node-id", PowerPCCPU, numa_nid, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/vl.c b/vl.c
-index c643d3f..afe40ce 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4549,8 +4549,6 @@ int main(int argc, char **argv, char **envp)
- 
-     cpu_synchronize_all_post_init();
- 
--    numa_post_machine_init();
--
-     if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
-                           parse_fw_cfg, fw_cfg_find(), NULL) != 0) {
-         exit(1);
--- 
-2.7.4
+Stefan
+
+--dFWYt1i2NyOo1oI9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYf4BRAAoJEJykq7OBq3PIXGwIAJZ+Rh4swepWRUP/tf5vbU4G
+cNj9EdQN8uX293+DNhEtws7jFsby0IfYCnMjP1loFXpoJQWqRaPIh3Bn7ggOIbEQ
+JSMZaKYUHxViT28SLMTkEdiBUKLZOydI0Z4BZcl6gOGw0y+VYdsxt+BOgFQ+Bt7w
+Z3ucIahSjdtwW6j9Xdb7VjI7HTUSGqd80XUbg4KB7tQLI0bY13MQrQFRroIgwN28
+337//tCmSIg0BTWgsMX3FiwfR/IgAMMeGMooHpFNA3JgikCLdvt2pahcMKLD3on1
+GhoJMfmAENEkvNeg9r5uftlMZwEy0apytxY6Q158+9APuFsavkx/4u68toEeG3w=
+=J469
+-----END PGP SIGNATURE-----
+
+--dFWYt1i2NyOo1oI9--
