@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTnqg-00033q-J2
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 05:52:18 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cTo0G-00057C-4I
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 06:02:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cTnqf-0007y2-NP
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 05:52:14 -0500
-Received: from mail-io0-x22e.google.com ([2607:f8b0:4001:c06::22e]:36458)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cTnqf-0007xw-Hr
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 05:52:13 -0500
-Received: by mail-io0-x22e.google.com with SMTP id j13so8747448iod.3
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 02:52:13 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1cTo08-0003zg-SJ
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 06:02:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56708)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cTo08-0003yV-K2
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 06:02:00 -0500
+Date: Wed, 18 Jan 2017 11:01:54 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170118110153.GA2085@work-vm>
+References: <1484657864-21708-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1484657864-21708-3-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 18 Jan 2017 10:52:11 +0000
-Message-ID: <CAJSP0QWGcG9bTZZr22BEj-P_G2r4UhmNwGSfwSnwjZeTC687GQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] Call for GSoC 2017 mentors & project ideas
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484657864-21708-3-git-send-email-zhang.zhanghailiang@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] COLO: Shutdown related socket fd while
+ do failover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +28,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: kvm <kvm@vger.kernel.org>, Jailhouse <jailhouse-dev@googlegroups.com>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, quintela@redhat.com, eddie.dong@intel.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com
 
-QEMU will be applying to Google Summer of Code again this year.
+* zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+> If the net connection between primary host and secondary host breaks
+> while COLO/COLO incoming threads are doing read() or write().
+> It will block until connection is timeout, and the failover process
+> will be blocked because of it.
+> 
+> So it is necessary to shutdown all the socket fds used by COLO
+> to avoid this situation. Besides, we should close the corresponding
+> file descriptors after failvoer BH shutdown them,
+> Or there will be an error.
 
-Do you want to help some of the most talented university students
-begin contributing to open source by working on our codebase and
-joining our community?
+Hi,
+  There are two parts to this patch:
+   a) Add some semaphores to sequence failover
+   b) Use shutdown()
 
-We need to put together a list of project ideas by February 9:
-http://qemu-project.org/Google_Summer_of_Code_2017#Project_Ideas
+  At first I wondered if perhaps they should be split; but I see
+the reason for the semaphores is mostly to stop the race between
+the fd's getting closed and the shutdown() calls; so I think it's
+OK.
 
-Active contributors are invited to post project ideas.  The project
-should be doable in 12 weeks by someone fluent in C programming but
-not familiar with the codebase.  Good project ideas have a clear
-scope, few dependencies, a high chance of being merged, and can be
-broken down into smaller steps.
+Do you have any problems with these semaphores during powering off the
+guest?
 
-For background on why QEMU participates in GSoC and how it works,
-check out my KVM Forum presentation:
-https://www.youtube.com/watch?v=xNVCX7YMUL8
-https://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
+Dave
 
-KVM and Jailhouse are invited to participate under the QEMU umbrella
-organization.
 
-Please let me know if you have any questions.
 
-Stefan
+
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  include/migration/migration.h |  3 +++
+>  migration/colo.c              | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 46 insertions(+)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 487ac1e..7cac877 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -113,6 +113,7 @@ struct MigrationIncomingState {
+>      QemuThread colo_incoming_thread;
+>      /* The coroutine we should enter (back) after failover */
+>      Coroutine *migration_incoming_co;
+> +    QemuSemaphore colo_incoming_sem;
+>  
+>      /* See savevm.c */
+>      LoadStateEntry_Head loadvm_handlers;
+> @@ -182,6 +183,8 @@ struct MigrationState
+>      QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
+>      /* The RAMBlock used in the last src_page_request */
+>      RAMBlock *last_req_rb;
+> +    /* The semaphore is used to notify COLO thread that failover is finished */
+> +    QemuSemaphore colo_exit_sem;
+>  
+>      /* The semaphore is used to notify COLO thread to do checkpoint */
+>      QemuSemaphore colo_checkpoint_sem;
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 08b2e46..3222812 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -59,6 +59,18 @@ static void secondary_vm_do_failover(void)
+>          /* recover runstate to normal migration finish state */
+>          autostart = true;
+>      }
+> +    /*
+> +     * Make sure COLO incoming thread not block in recv or send,
+> +     * If mis->from_src_file and mis->to_src_file use the same fd,
+> +     * The second shutdown() will return -1, we ignore this value,
+> +     * It is harmless.
+> +     */
+> +    if (mis->from_src_file) {
+> +        qemu_file_shutdown(mis->from_src_file);
+> +    }
+> +    if (mis->to_src_file) {
+> +        qemu_file_shutdown(mis->to_src_file);
+> +    }
+>  
+>      old_state = failover_set_state(FAILOVER_STATUS_ACTIVE,
+>                                     FAILOVER_STATUS_COMPLETED);
+> @@ -67,6 +79,8 @@ static void secondary_vm_do_failover(void)
+>                       "secondary VM", FailoverStatus_lookup[old_state]);
+>          return;
+>      }
+> +    /* Notify COLO incoming thread that failover work is finished */
+> +    qemu_sem_post(&mis->colo_incoming_sem);
+>      /* For Secondary VM, jump to incoming co */
+>      if (mis->migration_incoming_co) {
+>          qemu_coroutine_enter(mis->migration_incoming_co);
+> @@ -81,6 +95,18 @@ static void primary_vm_do_failover(void)
+>      migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
+>                        MIGRATION_STATUS_COMPLETED);
+>  
+> +    /*
+> +     * Wake up COLO thread which may blocked in recv() or send(),
+> +     * The s->rp_state.from_dst_file and s->to_dst_file may use the
+> +     * same fd, but we still shutdown the fd for twice, it is harmless.
+> +     */
+> +    if (s->to_dst_file) {
+> +        qemu_file_shutdown(s->to_dst_file);
+> +    }
+> +    if (s->rp_state.from_dst_file) {
+> +        qemu_file_shutdown(s->rp_state.from_dst_file);
+> +    }
+> +
+>      old_state = failover_set_state(FAILOVER_STATUS_ACTIVE,
+>                                     FAILOVER_STATUS_COMPLETED);
+>      if (old_state != FAILOVER_STATUS_ACTIVE) {
+> @@ -88,6 +114,8 @@ static void primary_vm_do_failover(void)
+>                       FailoverStatus_lookup[old_state]);
+>          return;
+>      }
+> +    /* Notify COLO thread that failover work is finished */
+> +    qemu_sem_post(&s->colo_exit_sem);
+>  }
+>  
+>  void colo_do_failover(MigrationState *s)
+> @@ -361,6 +389,14 @@ out:
+>  
+>      timer_del(s->colo_delay_timer);
+>  
+> +    /* Hope this not to be too long to wait here */
+> +    qemu_sem_wait(&s->colo_exit_sem);
+> +    qemu_sem_destroy(&s->colo_exit_sem);
+> +    /*
+> +     * Must be called after failover BH is completed,
+> +     * Or the failover BH may shutdown the wrong fd that
+> +     * re-used by other threads after we release here.
+> +     */
+>      if (s->rp_state.from_dst_file) {
+>          qemu_fclose(s->rp_state.from_dst_file);
+>      }
+> @@ -385,6 +421,7 @@ void migrate_start_colo_process(MigrationState *s)
+>      s->colo_delay_timer =  timer_new_ms(QEMU_CLOCK_HOST,
+>                                  colo_checkpoint_notify, s);
+>  
+> +    qemu_sem_init(&s->colo_exit_sem, 0);
+>      migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+>                        MIGRATION_STATUS_COLO);
+>      colo_process_checkpoint(s);
+> @@ -423,6 +460,8 @@ void *colo_process_incoming_thread(void *opaque)
+>      uint64_t value;
+>      Error *local_err = NULL;
+>  
+> +    qemu_sem_init(&mis->colo_incoming_sem, 0);
+> +
+>      migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+>                        MIGRATION_STATUS_COLO);
+>  
+> @@ -533,6 +572,10 @@ out:
+>          qemu_fclose(fb);
+>      }
+>  
+> +    /* Hope this not to be too long to loop here */
+> +    qemu_sem_wait(&mis->colo_incoming_sem);
+> +    qemu_sem_destroy(&mis->colo_incoming_sem);
+> +    /* Must be called after failover BH is completed */
+>      if (mis->to_src_file) {
+>          qemu_fclose(mis->to_src_file);
+>      }
+> -- 
+> 1.8.3.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
