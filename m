@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cTt5f-0005zh-Kx
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:28:04 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cTt7z-00089w-Vu
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:30:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cTt5e-0002o5-V3
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:28:03 -0500
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:36539)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cTt5e-0002nm-Qu
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:28:02 -0500
-Received: by mail-oi0-x231.google.com with SMTP id u143so9606963oif.3
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 08:28:02 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1cTt7t-0003qv-Rs
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:30:28 -0500
+References: <5878AF90.8020709@kamp.de>
+	<260873230.6154791.1484638426777.JavaMail.zimbra@oxygem.tv>
+	<20170117080326.dfjqzwstfxusuhgc@nora.maurer-it.com>
+	<b7f5dc23-6d72-4897-e9ca-6482acfb4c72@redhat.com>
+	<20170117112224.2st4wuivcbwuif2m@nora.maurer-it.com>
+	<196ac8f5-2fd7-37e9-d577-8177802d0fb4@redhat.com>
+	<40cbdb51-3dcc-35bc-bb99-6c85a47d20d0@redhat.com>
+	<20170118115050.6o2ut7wtfkuzy5oh@nora.maurer-it.com>
+	<20170118161941.g72fzppyyc3pdwkf@nora.maurer-it.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5de45f2f-d83b-64d2-6406-dc09fd4c455f@redhat.com>
+Date: Wed, 18 Jan 2017 17:30:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Ag8u0d9h7mEMT6mo8nb3MAbh_yQ=2PhwnTGD-oM=zwQ@mail.gmail.com>
-References: <20170118150235.23850-1-bobby.prani@gmail.com>
-	<CAFEAcA8Ag8u0d9h7mEMT6mo8nb3MAbh_yQ=2PhwnTGD-oM=zwQ@mail.gmail.com>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Wed, 18 Jan 2017 11:27:31 -0500
-Message-ID: <CAJhHMCAVTdZd7fA+=UMkzV7pf9BpShW9mq+YuSEJvKC0w4cdsg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 1/2] linux-user: fix settime old value
- location
+In-Reply-To: <20170118161941.g72fzppyyc3pdwkf@nora.maurer-it.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-stable] Data corruption in Qemu 2.7.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexandre DERUMIER <aderumier@odiso.com>, qemu-stable <qemu-stable@nongnu.org>
 
-On Wed, Jan 18, 2017 at 11:20 AM, Peter Maydell
-<peter.maydell@linaro.org> wrote:
 
->
-> I reviewed this when Marc sent it back in November,
-> but this resend doesn't seem to have addressed any
-> of that.
->
 
-Sorry about that. I seem to have missed the reviews last time.
+On 18/01/2017 17:19, Fabian Gr=FCnbichler wrote:
+> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#109 FAILED Result:=
+ hostbyte=3DDID_OK driverbyte=3DDRIVER_SENSE
+> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#109 Sense Key : Il=
+legal Request [current]
+> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#109 Add. Sense: In=
+valid field in cdb
+> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#109 CDB: Write(10)=
+ 2a 00 0d d6 51 48 00 08 00 00
+> Jan 18 17:07:51 ubuntu kernel: blk_update_request: critical target erro=
+r, dev sda, sector 232149320
+> Jan 18 17:07:51 ubuntu kernel: EXT4-fs warning (device sda1): ext4_end_=
+bio:329: I/O error -121 writing to inode 125 (offset 0 size 0 starting bl=
+ock 29018921)
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018409
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018410
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018411
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018412
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018413
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018414
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018415
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018416
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018417
+> Jan 18 17:07:51 ubuntu kernel: Buffer I/O error on device sda1, logical=
+ block 29018418
+> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#106 FAILED Result:=
+ hostbyte=3DDID_OK driverbyte=3DDRIVER_SENSE
+> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#106 Sense Key : Il=
+legal Request [current]
+> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#106 Add. Sense: In=
+valid field in cdb
+> Jan 18 17:07:51 ubuntu kernel: sd 2:0:0:0: [sda] tag#106 CDB: Write(10)=
+ 2a 00 0d d6 59 48 00 08 00 00
+> Jan 18 17:07:51 ubuntu kernel: blk_update_request: critical target erro=
+r, dev sda, sector 232151368
+> Jan 18 17:07:51 ubuntu kernel: EXT4-fs warning (device sda1): ext4_end_=
+bio:329: I/O error -121 writing to inode 125 (offset 0 size 0 starting bl=
+ock 29019177)
+> Jan 18 17:07:52 ubuntu kernel: JBD2: Detected IO errors while flushing =
+file data on sda1-8
+> Jan 18 17:07:58 ubuntu kernel: JBD2: Detected IO errors while flushing =
+file data on sda1-8
+>=20
+>=20
+> strace (with some random grep-ing):
+> [pid  1794] ioctl(19, SG_IO, {'S', SG_DXFER_TO_DEV, cmd[10]=3D[2a, 00, =
+0d, d6, 51, 48, 00, 08, 00, 00], mx_sb_len=3D252, iovec_count=3D17, dxfer=
+_len=3D1048576, timeout=3D4294967295, flags=3D0x1, data[1048576]=3D["\0`\=
+235=3Dc\177\0\0\0\0\1\0\0\0\0\0\0`\236=3Dc\177\0\0\0\0\1\0\0\0\0\0"...]})=
+ =3D -1 EINVAL (Invalid argument)
+> [pid  1794] ioctl(19, SG_IO, {'S', SG_DXFER_TO_DEV, cmd[10]=3D[2a, 00, =
+0d, d6, 59, 48, 00, 08, 00, 00], mx_sb_len=3D252, iovec_count=3D16, dxfer=
+_len=3D1048576, timeout=3D4294967295, flags=3D0x1, data[1048576]=3D["\0`-=
+=3Dc\177\0\0\0\0\1\0\0\0\0\0\0`.=3Dc\177\0\0\0\0\1\0\0\0\0\0"...]}) =3D -=
+1 EINVAL (Invalid argument)
 
-I'll update and resend them.
+This is useful, thanks.  I suspect blk_rq_map_user_iov is failing,
+meaning that the scatter/gather list has too many segments for the HBA
+in the host.  (The limit can be found in /sys/block/sda/queue/max_segment=
+s).
 
-Thanks,
--- 
-Pranith
+This is consistent with your finding here:
+
+> disabling THP on the hypervisor host with
+>=20
+> # echo 'never' > /sys/kernel/mm/transparent_hugepage/enabled
+>=20
+> allows reproducing the bug very reliably, shutting the VM down, then
+> enabling THP (with 'always') and trying again makes it go away.
+
+because no THP means more memory fragmentation and thus more segments.
+
+I'm not sure how to fix it, unfortunately. :(
+
+Paolo
