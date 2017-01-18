@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTjet-0000g0-SM
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 01:23:48 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cTk7l-0004ev-Kd
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 01:53:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTjep-0001tQ-AM
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 01:23:47 -0500
-Received: from [59.151.112.132] (port=17167 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cTjeo-0001in-Sz
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 01:23:43 -0500
-References: <1484633936-25344-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<1484633936-25344-5-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<587DBEBE.4070409@cn.fujitsu.com>
-	<20170117175708-mutt-send-email-mst@kernel.org>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <587F0B3F.1040300@cn.fujitsu.com>
-Date: Wed, 18 Jan 2017 14:29:19 +0800
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cTk7k-0005MK-Nj
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 01:53:37 -0500
+References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1480926904-17596-6-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170117131916.GJ4265@stefanha-x1.localdomain>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <587F10D4.9050608@huawei.com>
+Date: Wed, 18 Jan 2017 14:53:08 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170117175708-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <20170117131916.GJ4265@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 04/11] msix: check msix_init's return
- value
+Subject: Re: [Qemu-devel] [PATCH RFC v2 5/6] replication: Implement block
+ replication for shared disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, dmitry@daynix.com, Jason Wang <jasowang@redhat.com>, jiri@resnulli.us, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
+Hi Stefan,
 
-
-On 01/18/2017 12:01 AM, Michael S. Tsirkin wrote:
-> On Tue, Jan 17, 2017 at 02:50:38PM +0800, Cao jin wrote:
->> forget to cc maintainers in this new patch
+On 2017/1/17 21:19, Stefan Hajnoczi wrote:
+> On Mon, Dec 05, 2016 at 04:35:03PM +0800, zhanghailiang wrote:
+>> @@ -663,8 +695,12 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
 >>
->> On 01/17/2017 02:18 PM, Cao jin wrote:
->>> Doesn't do it for megasas & hcd-xhci, later patches will fix them.
->>>
->>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> 
-> I don't like this one, frankly. That's a bunch of code duplication.
+>>       switch (s->mode) {
+>>       case REPLICATION_MODE_PRIMARY:
+>> -        s->replication_state = BLOCK_REPLICATION_DONE;
+>> -        s->error = 0;
+>> +        if (s->is_shared_disk && s->primary_disk->bs->job) {
+>> +            block_job_cancel(s->primary_disk->bs->job);
+>
+> Should this be block_job_cancel_sync()?
+>
 
-Yes, code duplication, seems inevitable if move the asserts into a
-separate patch.
+No, here it is different from the secondary side which needs to wait
+until backup job been canceled before resumes to run (Or there will be
+an error, https://patchwork.kernel.org/patch/9128841/).
 
-> I suspect vfio is the only one who might reasonably get EINVAL here.
-> So how about e.g. msix_validate_and_init that doesn't assert and use that
-> from vfio, then switch msix_init to assert instead?
-> 
+For primary VM, Just as you can see the design scenario in patch 1,
+It accesses the shared disk directly, the backup job whose source side
+is just the shared disk does not influence primary VM's running,
+So IMHO, it is safe to call block_job_cancel here.
 
-Not sure if I get your idea. Do you mean: do param check via assert in
-msix_init(), so that no need check its returned error outside, and
-introduce new api msix_validate_and_init(same content as msix_init,
-except param check) dedicated to vfio?
+Thanks,
+Hailiang
 
-If I understand you right, the way we do param check for msi_init[*] &
-msix_init will be inconsistent.
 
-[*] patch: msi_init: convert assert to return -errno
-
--- 
-Sincerely,
-Cao jin
+>> +        } else {
+>> +            s->replication_state = BLOCK_REPLICATION_DONE;
+>> +            s->error = 0;
+>> +        }
+>>           break;
+>>       case REPLICATION_MODE_SECONDARY:
+>>           /*
+>> --
+>> 1.8.3.1
+>>
+>>
