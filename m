@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58442)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=0AIh=ZA=redhat.com=mst@kernel.org>)
-	id 1cTwsL-0007Dm-6d
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:30:34 -0500
+	id 1cTwsO-0007Fl-It
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:30:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=0AIh=ZA=redhat.com=mst@kernel.org>)
-	id 1cTwsJ-0001Wc-CM
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:30:33 -0500
-Date: Wed, 18 Jan 2017 22:30:26 +0200
+	id 1cTwsN-0001YH-Py
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:30:37 -0500
+Received: from mail.kernel.org ([198.145.29.136]:49584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <SRS0=0AIh=ZA=redhat.com=mst@kernel.org>)
+	id 1cTwsN-0001Xy-J7
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 15:30:35 -0500
+Date: Wed, 18 Jan 2017 22:30:29 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1484771412-28024-2-git-send-email-mst@redhat.com>
+Message-ID: <1484771412-28024-3-git-send-email-mst@redhat.com>
 References: <1484771412-28024-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1484771412-28024-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/4] virtio: fix up max size checks
+Subject: [Qemu-devel] [PATCH 2/4] compiler: drop ; after BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +30,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-stable@nongnu.org
+Cc: pbonzini@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Coverity reports that ARRAY_SIZE(elem->out_sg) (and all the others too)
-is wrong because elem->out_sg is a pointer.
+All users include the trailing ;, let's require that
+so that uses such as if (a) QEMU_BUILD_BUG_ON(); do not
+produce unexpected results.
 
-However, the check is not in the right place and the max_size argument
-of virtqueue_map_iovec can be removed.  The check on in_num/out_num
-should be moved to qemu_get_virtqueue_element instead, before the call
-to virtqueue_alloc_element.
+Not a huge problem for QEMU since our style requires the use
+of {} but seems cleaner nevertheless.
 
-Cc: qemu-stable@nongnu.org
-Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-Fixes: 3724650db07057333879484c8bc7d900b5c1bf8e ("virtio: introduce virtqueue_alloc_element")
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio.c | 27 +++++++++++----------------
- 1 file changed, 11 insertions(+), 16 deletions(-)
+ include/qemu/compiler.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 34065c7..c29127a 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -599,23 +599,11 @@ static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 157698b..1a9eeb9 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -86,7 +86,7 @@
+ #define type_check(t1,t2) ((t1*)0 - (t2*)0)
  
- static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
-                                 hwaddr *addr, unsigned int *num_sg,
--                                unsigned int max_size, int is_write)
-+                                int is_write)
- {
-     unsigned int i;
-     hwaddr len;
+ #define QEMU_BUILD_BUG_ON(x) \
+-    typedef char glue(qemu_build_bug_on__,__LINE__)[(x)?-1:1] __attribute__((unused));
++    typedef char glue(qemu_build_bug_on__,__LINE__)[(x)?-1:1] __attribute__((unused))
  
--    /* Note: this function MUST validate input, some callers
--     * are passing in num_sg values received over the network.
--     */
--    /* TODO: teach all callers that this can fail, and return failure instead
--     * of asserting here.
--     * When we do, we might be able to re-enable NDEBUG below.
--     */
--#ifdef NDEBUG
--#error building with NDEBUG is not supported
--#endif
--    assert(*num_sg <= max_size);
--
-     for (i = 0; i < *num_sg; i++) {
-         len = sg[i].iov_len;
-         sg[i].iov_base = dma_memory_map(vdev->dma_as,
-@@ -636,11 +624,8 @@ static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
- void virtqueue_map(VirtIODevice *vdev, VirtQueueElement *elem)
- {
-     virtqueue_map_iovec(vdev, elem->in_sg, elem->in_addr, &elem->in_num,
--                        MIN(ARRAY_SIZE(elem->in_sg), ARRAY_SIZE(elem->in_addr)),
-                         1);
-     virtqueue_map_iovec(vdev, elem->out_sg, elem->out_addr, &elem->out_num,
--                        MIN(ARRAY_SIZE(elem->out_sg),
--                        ARRAY_SIZE(elem->out_addr)),
-                         0);
- }
- 
-@@ -840,6 +825,16 @@ void *qemu_get_virtqueue_element(VirtIODevice *vdev, QEMUFile *f, size_t sz)
- 
-     qemu_get_buffer(f, (uint8_t *)&data, sizeof(VirtQueueElementOld));
- 
-+    /* TODO: teach all callers that this can fail, and return failure instead
-+     * of asserting here.
-+     * When we do, we might be able to re-enable NDEBUG below.
-+     */
-+#ifdef NDEBUG
-+#error building with NDEBUG is not supported
-+#endif
-+    assert(ARRAY_SIZE(data.in_addr) >= data.in_num);
-+    assert(ARRAY_SIZE(data.out_addr) >= data.out_num);
-+
-     elem = virtqueue_alloc_element(sz, data.out_num, data.in_num);
-     elem->index = data.index;
- 
+ #if defined __GNUC__
+ # if !QEMU_GNUC_PREREQ(4, 4)
 -- 
 MST
