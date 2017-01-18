@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cTxQa-0002Pq-3e
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:57 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cTxQc-0002Qu-4F
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cTxQW-0006qq-0x
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:56 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:59135)
+	(envelope-from <laurent@vivier.eu>) id 1cTxQY-0006sv-1L
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:58 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:65241)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cTxQV-0006pv-Nc
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:51 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cTxQX-0006s1-NW
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 16:05:53 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 18 Jan 2017 22:05:19 +0100
-Message-Id: <1484773521-16530-6-git-send-email-laurent@vivier.eu>
+Date: Wed, 18 Jan 2017 22:05:15 +0100
+Message-Id: <1484773521-16530-2-git-send-email-laurent@vivier.eu>
 In-Reply-To: <1484773521-16530-1-git-send-email-laurent@vivier.eu>
 References: <1484773521-16530-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 5/7] target-m68k: add fmovem
+Subject: [Qemu-devel] [PATCH 1/7] target-m68k: move FPU helpers to
+ fpu_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,160 +29,237 @@ Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, 
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/fpu_helper.c |  6 +++
- target/m68k/helper.h     |  1 +
- target/m68k/translate.c  | 99 +++++++++++++++++++++++++++++++++++-------------
- 3 files changed, 80 insertions(+), 26 deletions(-)
+ target/m68k/Makefile.objs |   2 +-
+ target/m68k/fpu_helper.c  | 112 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/m68k/helper.c      |  88 ------------------------------------
+ 3 files changed, 113 insertions(+), 89 deletions(-)
+ create mode 100644 target/m68k/fpu_helper.c
 
+diff --git a/target/m68k/Makefile.objs b/target/m68k/Makefile.objs
+index 02cf616..39141ab 100644
+--- a/target/m68k/Makefile.objs
++++ b/target/m68k/Makefile.objs
+@@ -1,3 +1,3 @@
+ obj-y += m68k-semi.o
+-obj-y += translate.o op_helper.o helper.o cpu.o
++obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o
+ obj-y += gdbstub.o
 diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index b308364..126535f 100644
---- a/target/m68k/fpu_helper.c
+new file mode 100644
+index 0000000..5bf2576
+--- /dev/null
 +++ b/target/m68k/fpu_helper.c
-@@ -409,3 +409,9 @@ void HELPER(update_fpstatus)(CPUM68KState *env)
- 
-     set_float_exception_flags(flags, &env->fp_status);
- }
+@@ -0,0 +1,112 @@
++/*
++ *  m68k FPU helpers
++ *
++ *  Copyright (c) 2006-2007 CodeSourcery
++ *  Written by Paul Brook
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+void HELPER(fmovem)(CPUM68KState *env, uint32_t opsize,
-+                    uint32_t mode, uint32_t mask)
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "exec/helper-proto.h"
++
++uint32_t HELPER(f64_to_i32)(CPUM68KState *env, float64 val)
 +{
-+    fprintf(stderr, "MISSING HELPER fmovem\n");
-+}
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 072a6d0..58bc273 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -31,6 +31,7 @@ DEF_HELPER_1(cmp_FP0_FP1, void, env)
- DEF_HELPER_2(set_fpcr, void, env, i32)
- DEF_HELPER_1(tst_FP0, void, env)
- DEF_HELPER_1(update_fpstatus, void, env)
-+DEF_HELPER_4(fmovem, void, env, i32, i32, i32)
- 
- DEF_HELPER_3(mac_move, void, env, i32, i32)
- DEF_HELPER_3(macmulf, i64, env, i32, i32)
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 70fd680..49c0b06 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -4483,13 +4483,79 @@ static void gen_op_fmove_fcr(CPUM68KState *env, DisasContext *s,
-     tcg_temp_free_i32(addr);
- }
- 
-+static void gen_op_fmovem(CPUM68KState *env, DisasContext *s,
-+                          uint32_t insn, uint32_t ext)
-+{
-+    int opsize;
-+    uint16_t mask;
-+    int i;
-+    uint32_t mode;
-+    int32_t incr;
-+    TCGv addr, tmp;
-+    int is_load;
-+
-+    if (m68k_feature(s->env, M68K_FEATURE_FPU)) {
-+        opsize = OS_EXTENDED;
-+    } else {
-+        opsize = OS_DOUBLE;  /* FIXME */
-+    }
-+
-+    mode = (ext >> 11) & 0x3;
-+    if ((mode & 0x1) == 1) {
-+        gen_helper_fmovem(cpu_env, tcg_const_i32(opsize),
-+                          tcg_const_i32(mode), DREG(ext, 0));
-+        return;
-+    }
-+
-+    tmp = gen_lea(env, s, insn, opsize);
-+    if (IS_NULL_QREG(tmp)) {
-+        gen_addr_fault(s);
-+        return;
-+    }
-+
-+    addr = tcg_temp_new();
-+    tcg_gen_mov_i32(addr, tmp);
-+    is_load = ((ext & 0x2000) == 0);
-+    incr = opsize_bytes(opsize);
-+    mask = ext & 0x00FF;
-+
-+    if (!is_load && (mode & 2) == 0) {
-+        for (i = 7; i >= 0; i--, mask <<= 1) {
-+            if (mask & 0x80) {
-+                gen_op_load_fpr_FP0(i);
-+                gen_store_FP0(s, opsize, addr);
-+                if ((mask & 0xff) != 0x80) {
-+                    tcg_gen_subi_i32(addr, addr, incr);
-+                }
-+            }
-+        }
-+        tcg_gen_mov_i32(AREG(insn, 0), addr);
-+    } else {
-+        for (i = 0; i < 8; i++, mask <<= 1) {
-+            if (mask & 0x80) {
-+                if (is_load) {
-+                    gen_load_FP0(s, opsize, addr);
-+                    gen_op_store_fpr_FP0(i);
-+                } else {
-+                    gen_op_load_fpr_FP0(i);
-+                    gen_store_FP0(s, opsize, addr);
-+                }
-+                tcg_gen_addi_i32(addr, addr, incr);
-+            }
-+        }
-+        if ((insn & 070) == 030) {
-+            tcg_gen_mov_i32(AREG(insn, 0), addr);
-+        }
-+    }
-+    tcg_temp_free_i32(addr);
++    return float64_to_int32(val, &env->fp_status);
 +}
 +
- /* ??? FP exceptions are not implemented.  Most exceptions are deferred until
-    immediately before the next FP instruction is executed.  */
- DISAS_INSN(fpu)
- {
-     uint16_t ext;
-     int opmode;
--    TCGv tmp32;
-     int opsize;
- 
-     ext = read_im16(env, s);
-@@ -4514,32 +4580,13 @@ DISAS_INSN(fpu)
-         return;
-     case 6: /* fmovem */
-     case 7:
--        {
--            TCGv addr;
--            uint16_t mask;
--            int i;
--            if ((ext & 0x1f00) != 0x1000 || (ext & 0xff) == 0)
--                goto undef;
--            tmp32 = gen_lea(env, s, insn, OS_LONG);
--            if (IS_NULL_QREG(tmp32)) {
--                gen_addr_fault(s);
--                return;
--            }
--            addr = tcg_temp_new_i32();
--            tcg_gen_mov_i32(addr, tmp32);
--            mask = 0x80;
--            for (i = 0; i < 8; i++) {
--                if (ext & mask) {
--                    gen_op_load_fpr_FP0(REG(i, 0));
--                    gen_ldst_FP0(s, OS_DOUBLE, addr, (ext & (1 << 13)) ?
--                                                     EA_STORE : EA_LOADS);
--                    if (ext & (mask - 1))
--                        tcg_gen_addi_i32(addr, addr, 8);
--                }
--                mask >>= 1;
--            }
--            tcg_temp_free_i32(addr);
-+        if ((ext & 0xf00) != 0 || (ext & 0xff) == 0) {
-+            goto undef;
++float32 HELPER(f64_to_f32)(CPUM68KState *env, float64 val)
++{
++    return float64_to_float32(val, &env->fp_status);
++}
++
++float64 HELPER(i32_to_f64)(CPUM68KState *env, uint32_t val)
++{
++    return int32_to_float64(val, &env->fp_status);
++}
++
++float64 HELPER(f32_to_f64)(CPUM68KState *env, float32 val)
++{
++    return float32_to_float64(val, &env->fp_status);
++}
++
++float64 HELPER(iround_f64)(CPUM68KState *env, float64 val)
++{
++    return float64_round_to_int(val, &env->fp_status);
++}
++
++float64 HELPER(itrunc_f64)(CPUM68KState *env, float64 val)
++{
++    return float64_trunc_to_int(val, &env->fp_status);
++}
++
++float64 HELPER(sqrt_f64)(CPUM68KState *env, float64 val)
++{
++    return float64_sqrt(val, &env->fp_status);
++}
++
++float64 HELPER(abs_f64)(float64 val)
++{
++    return float64_abs(val);
++}
++
++float64 HELPER(chs_f64)(float64 val)
++{
++    return float64_chs(val);
++}
++
++float64 HELPER(add_f64)(CPUM68KState *env, float64 a, float64 b)
++{
++    return float64_add(a, b, &env->fp_status);
++}
++
++float64 HELPER(sub_f64)(CPUM68KState *env, float64 a, float64 b)
++{
++    return float64_sub(a, b, &env->fp_status);
++}
++
++float64 HELPER(mul_f64)(CPUM68KState *env, float64 a, float64 b)
++{
++    return float64_mul(a, b, &env->fp_status);
++}
++
++float64 HELPER(div_f64)(CPUM68KState *env, float64 a, float64 b)
++{
++    return float64_div(a, b, &env->fp_status);
++}
++
++float64 HELPER(sub_cmp_f64)(CPUM68KState *env, float64 a, float64 b)
++{
++    /* ??? This may incorrectly raise exceptions.  */
++    /* ??? Should flush denormals to zero.  */
++    float64 res;
++    res = float64_sub(a, b, &env->fp_status);
++    if (float64_is_quiet_nan(res, &env->fp_status)) {
++        /* +/-inf compares equal against itself, but sub returns nan.  */
++        if (!float64_is_quiet_nan(a, &env->fp_status)
++            && !float64_is_quiet_nan(b, &env->fp_status)) {
++            res = float64_zero;
++            if (float64_lt_quiet(a, res, &env->fp_status)) {
++                res = float64_chs(res);
++            }
 +        }
-+        if ((ext & 0x1000) == 0 && !m68k_feature(s->env, M68K_FEATURE_FPU)) {
-+            goto undef;
-         }
-+        gen_op_fmovem(env, s, insn, ext);
-         return;
-     }
-     if (ext & (1 << 14)) {
++    }
++    return res;
++}
++
++uint32_t HELPER(compare_f64)(CPUM68KState *env, float64 val)
++{
++    return float64_compare_quiet(val, float64_zero, &env->fp_status);
++}
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index f750d3d..5ca9911 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -284,94 +284,6 @@ void HELPER(set_sr)(CPUM68KState *env, uint32_t val)
+     m68k_switch_sp(env);
+ }
+ 
+-/* FPU helpers.  */
+-uint32_t HELPER(f64_to_i32)(CPUM68KState *env, float64 val)
+-{
+-    return float64_to_int32(val, &env->fp_status);
+-}
+-
+-float32 HELPER(f64_to_f32)(CPUM68KState *env, float64 val)
+-{
+-    return float64_to_float32(val, &env->fp_status);
+-}
+-
+-float64 HELPER(i32_to_f64)(CPUM68KState *env, uint32_t val)
+-{
+-    return int32_to_float64(val, &env->fp_status);
+-}
+-
+-float64 HELPER(f32_to_f64)(CPUM68KState *env, float32 val)
+-{
+-    return float32_to_float64(val, &env->fp_status);
+-}
+-
+-float64 HELPER(iround_f64)(CPUM68KState *env, float64 val)
+-{
+-    return float64_round_to_int(val, &env->fp_status);
+-}
+-
+-float64 HELPER(itrunc_f64)(CPUM68KState *env, float64 val)
+-{
+-    return float64_trunc_to_int(val, &env->fp_status);
+-}
+-
+-float64 HELPER(sqrt_f64)(CPUM68KState *env, float64 val)
+-{
+-    return float64_sqrt(val, &env->fp_status);
+-}
+-
+-float64 HELPER(abs_f64)(float64 val)
+-{
+-    return float64_abs(val);
+-}
+-
+-float64 HELPER(chs_f64)(float64 val)
+-{
+-    return float64_chs(val);
+-}
+-
+-float64 HELPER(add_f64)(CPUM68KState *env, float64 a, float64 b)
+-{
+-    return float64_add(a, b, &env->fp_status);
+-}
+-
+-float64 HELPER(sub_f64)(CPUM68KState *env, float64 a, float64 b)
+-{
+-    return float64_sub(a, b, &env->fp_status);
+-}
+-
+-float64 HELPER(mul_f64)(CPUM68KState *env, float64 a, float64 b)
+-{
+-    return float64_mul(a, b, &env->fp_status);
+-}
+-
+-float64 HELPER(div_f64)(CPUM68KState *env, float64 a, float64 b)
+-{
+-    return float64_div(a, b, &env->fp_status);
+-}
+-
+-float64 HELPER(sub_cmp_f64)(CPUM68KState *env, float64 a, float64 b)
+-{
+-    /* ??? This may incorrectly raise exceptions.  */
+-    /* ??? Should flush denormals to zero.  */
+-    float64 res;
+-    res = float64_sub(a, b, &env->fp_status);
+-    if (float64_is_quiet_nan(res, &env->fp_status)) {
+-        /* +/-inf compares equal against itself, but sub returns nan.  */
+-        if (!float64_is_quiet_nan(a, &env->fp_status)
+-            && !float64_is_quiet_nan(b, &env->fp_status)) {
+-            res = float64_zero;
+-            if (float64_lt_quiet(a, res, &env->fp_status))
+-                res = float64_chs(res);
+-        }
+-    }
+-    return res;
+-}
+-
+-uint32_t HELPER(compare_f64)(CPUM68KState *env, float64 val)
+-{
+-    return float64_compare_quiet(val, float64_zero, &env->fp_status);
+-}
+ 
+ /* MAC unit.  */
+ /* FIXME: The MAC unit implementation is a bit of a mess.  Some helpers
 -- 
 2.7.4
