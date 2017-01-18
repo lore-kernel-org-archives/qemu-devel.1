@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cTyqf-00053i-P2
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:36:58 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cTysp-0006Go-QQ
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cTyqb-00018k-0k
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:36:57 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:32979)
+	(envelope-from <atar4qemu@gmail.com>) id 1cTysl-0002Vk-2O
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:11 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34267)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cTyqa-00018E-T3
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:36:52 -0500
-Received: by mail-qt0-x241.google.com with SMTP id n13so4637787qtc.0
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:36:52 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170118220146.489-1-marex@denx.de>
-	<20170118220146.489-2-marex@denx.de>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <faf70def-be47-cf05-8f90-2ec89253cded@twiddle.net>
-Date: Wed, 18 Jan 2017 14:36:47 -0800
-MIME-Version: 1.0
-In-Reply-To: <20170118220146.489-2-marex@denx.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4 1/7] nios2: Add disas entries
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cTysk-0002VK-Sw
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 17:39:07 -0500
+Received: by mail-wm0-x241.google.com with SMTP id c85so7555317wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 14:39:06 -0800 (PST)
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Wed, 18 Jan 2017 23:38:14 +0100
+Message-Id: <1484779123-18968-2-git-send-email-atar4qemu@gmail.com>
+In-Reply-To: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
+References: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
+Subject: [Qemu-devel] [PULL 01/30] target-sparc: ignore MMU-faults if MMU is
+ disabled in hypervisor mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marek Vasut <marex@denx.de>, qemu-devel@nongnu.org
-Cc: Chris Wulff <crwulff@gmail.com>, Jeff Da Silva <jdasilva@altera.com>, Ley Foon Tan <lftan@altera.com>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>, Alexander Graf <agraf@suse.de>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, rth@twiddle.net, Artyom Tarasenko <atar4qemu@gmail.com>
 
-On 01/18/2017 02:01 PM, Marek Vasut wrote:
-> Add nios2 disassembler support. This patch is composed from binutils files
-> from commit "Opcodes and assembler support for Nios II R2". The files from
-> binutils used in this patch are:
->
->     include/opcode/nios2.h
->     include/opcode/nios2r1.h
->     include/opcode/nios2r2.h
->     opcodes/nios2-opc.c
->     opcodes/nios2-dis.c
->
-> Checkpatch says total: 114 errors, 0 warnings, 3609 lines checked , which
-> is caused by a different coding style in those files. These warnings and
-> errors are not addressed To let these files be easily synchronized between
-> binutils and qemu.
+while IMMU/DMMU is disabled
+- ignore MMU-faults in hypervisorv mode or if CPU doesn't have hypervisor
+- signal TT_INSN_REAL_TRANSLATION_MISS/TT_DATA_REAL_TRANSLATION_MISS otherwise
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+---
+ target/sparc/cpu.h         |  2 ++
+ target/sparc/ldst_helper.c | 15 +++++++++++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-
-r~
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 601c018..e815a19 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -68,6 +68,8 @@
+ #define TT_DATA_ACCESS 0x32
+ #define TT_UNALIGNED 0x34
+ #define TT_PRIV_ACT 0x37
++#define TT_INSN_REAL_TRANSLATION_MISS 0x3e
++#define TT_DATA_REAL_TRANSLATION_MISS 0x3f
+ #define TT_EXTINT   0x40
+ #define TT_IVEC     0x60
+ #define TT_TMISS    0x64
+diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
+index a0171f7..e479efd 100644
+--- a/target/sparc/ldst_helper.c
++++ b/target/sparc/ldst_helper.c
+@@ -1664,14 +1664,25 @@ void sparc_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+ {
+     SPARCCPU *cpu = SPARC_CPU(cs);
+     CPUSPARCState *env = &cpu->env;
+-    int tt = is_exec ? TT_CODE_ACCESS : TT_DATA_ACCESS;
+ 
+ #ifdef DEBUG_UNASSIGNED
+     printf("Unassigned mem access to " TARGET_FMT_plx " from " TARGET_FMT_lx
+            "\n", addr, env->pc);
+ #endif
+ 
+-    cpu_raise_exception_ra(env, tt, GETPC());
++    if (is_exec) { /* XXX has_hypervisor */
++        if (env->lsu & (IMMU_E)) {
++            cpu_raise_exception_ra(env, TT_CODE_ACCESS, GETPC());
++        } else if (cpu_has_hypervisor(env) && !(env->hpstate & HS_PRIV)) {
++            cpu_raise_exception_ra(env, TT_INSN_REAL_TRANSLATION_MISS, GETPC());
++        }
++    } else {
++        if (env->lsu & (DMMU_E)) {
++            cpu_raise_exception_ra(env, TT_DATA_ACCESS, GETPC());
++        } else if (cpu_has_hypervisor(env) && !(env->hpstate & HS_PRIV)) {
++            cpu_raise_exception_ra(env, TT_DATA_REAL_TRANSLATION_MISS, GETPC());
++        }
++    }
+ }
+ #endif
+ #endif
+-- 
+2.7.2
