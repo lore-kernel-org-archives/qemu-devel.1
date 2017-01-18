@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cTsio-0003Di-Sv
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:04:30 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cTsit-0003HX-0B
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:04:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cTsim-0007jp-Tu
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:04:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45120)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cTsiq-0007kr-Su
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:04:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52384)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cTsim-0007jR-Kp
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:04:24 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	id 1cTsiq-0007kZ-LT
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 11:04:28 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CC91F74E34
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 16:04:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C8E6EC04F468
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 16:04:28 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 18 Jan 2017 20:03:18 +0400
-Message-Id: <20170118160332.13390-12-marcandre.lureau@redhat.com>
+Date: Wed, 18 Jan 2017 20:03:19 +0400
+Message-Id: <20170118160332.13390-13-marcandre.lureau@redhat.com>
 In-Reply-To: <20170118160332.13390-1-marcandre.lureau@redhat.com>
 References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 11/25] scripts: learn 'async' qapi commands
+Subject: [Qemu-devel] [PATCH v2 12/25] tests: add dispatch async tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,523 +36,249 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, berrange@redhat.com, kraxel@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Commands with the 'async' key will be registered as async type (see
-related commit), and will allow a synchronous (in scope callback) or
-asynchronous return (when ready, in idle etc) by keeping the given
-QmpReturn and calling qmp_return function later.
-
-Ex:
-  { 'command': 'foo-async,
-    'data': {'arg': 'str'},
-    'returns': 'Foo',
-    'async': true }
-
-generates the following marshaller:
-
-void qmp_marshal_foo_async(QDict *args, QmpReturn *qret)
-{
-    Error *err =3D NULL;
-    Visitor *v;
-    q_obj_foo_async_arg arg =3D {0};
-
-    v =3D qmp_input_visitor_new(QOBJECT(args), true);
-    visit_start_struct(v, NULL, NULL, 0, &err);
-    if (err) {
-        goto out;
-    }
-    visit_type_q_obj_foo_async_arg_members(v, &arg, &err);
-    if (!err) {
-        visit_check_struct(v, &err);
-    }
-    visit_end_struct(v, NULL);
-    if (err) {
-        goto out;
-    }
-
-    qmp_foo_async(arg.arg, qret);
-
-out:
-    if (err) {
-        qmp_return_error(qret, err);
-    }
-    visit_free(v);
-    v =3D qapi_dealloc_visitor_new();
-    visit_start_struct(v, NULL, NULL, 0, NULL);
-    visit_type_q_obj_foo_async_arg_members(v, &arg, NULL);
-    visit_end_struct(v, NULL);
-    visit_free(v);
-}
-
-and return helper:
-
-void qmp_foo_async_return(QmpReturn *qret, Foo *ret_in)
-{
-    Error *err =3D NULL;
-    QObject *ret_out =3D NULL;
-
-    qmp_marshal_output_Foo(ret_in, &ret_out, &err);
-
-    if (err) {
-        qmp_return_error(qret, err);
-    } else {
-        qmp_return(qret, ret_out);
-    }
-}
-
-The dispatched function may call the return helper within the calling
-scope or delay the return. To return an error, it should call
-qmp_return_error().
+Add a few tests to check:
+- async dispatch
+- async command without "id" failure
+- destroying the client with pending requests
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qapi/introspect.json           |   2 +-
- scripts/qapi.py                |  14 +++--
- scripts/qapi-commands.py       | 139 +++++++++++++++++++++++++++++++++--=
-------
- scripts/qapi-introspect.py     |   7 ++-
- tests/Makefile.include         |   1 +
- tests/qapi-schema/async.err    |   0
- tests/qapi-schema/async.exit   |   1 +
- tests/qapi-schema/async.json   |   6 ++
- tests/qapi-schema/async.out    |  10 +++
- tests/qapi-schema/test-qapi.py |   7 ++-
- 10 files changed, 151 insertions(+), 36 deletions(-)
- create mode 100644 tests/qapi-schema/async.err
- create mode 100644 tests/qapi-schema/async.exit
- create mode 100644 tests/qapi-schema/async.json
- create mode 100644 tests/qapi-schema/async.out
+ tests/test-qmp-commands.c               | 132 ++++++++++++++++++++++++++=
+++++++
+ tests/qapi-schema/qapi-schema-test.json |   6 ++
+ tests/qapi-schema/qapi-schema-test.out  |   6 ++
+ 3 files changed, 144 insertions(+)
 
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index f6adc439bb..fd6a9e98a4 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -262,7 +262,7 @@
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoCommand',
--  'data': { 'arg-type': 'str', 'ret-type': 'str' } }
-+  'data': { 'arg-type': 'str', 'ret-type': 'str', 'async': 'bool' } }
+diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
+index a3c7c590d1..4613a9a4c8 100644
+--- a/tests/test-qmp-commands.c
++++ b/tests/test-qmp-commands.c
+@@ -85,6 +85,36 @@ __org_qemu_x_Union1 *qmp___org_qemu_x_command(__org_qe=
+mu_x_EnumList *a,
+     return ret;
+ }
 =20
- ##
- # @SchemaInfoEvent:
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 53a44779d0..066b97a7fb 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -881,7 +881,8 @@ def check_exprs(exprs):
-             add_struct(expr, info)
-         elif 'command' in expr:
-             check_keys(expr_elem, 'command', [],
--                       ['data', 'returns', 'gen', 'success-response', 'b=
-oxed'])
-+                       ['data', 'returns', 'gen', 'success-response', 'b=
-oxed',
-+                        'async'])
-             add_name(expr['command'], info, 'command')
-         elif 'event' in expr:
-             check_keys(expr_elem, 'event', [], ['data', 'boxed'])
-@@ -1064,7 +1065,7 @@ class QAPISchemaVisitor(object):
-         pass
-=20
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, async):
-         pass
-=20
-     def visit_event(self, name, info, arg_type, boxed):
-@@ -1406,7 +1407,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
-=20
- class QAPISchemaCommand(QAPISchemaEntity):
-     def __init__(self, name, info, arg_type, ret_type, gen, success_resp=
-onse,
--                 boxed):
-+                 boxed, async):
-         QAPISchemaEntity.__init__(self, name, info)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
-@@ -1417,6 +1418,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         self.gen =3D gen
-         self.success_response =3D success_response
-         self.boxed =3D boxed
-+        self.async =3D async
-=20
-     def check(self, schema):
-         if self._arg_type_name:
-@@ -1440,7 +1442,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
-     def visit(self, visitor):
-         visitor.visit_command(self.name, self.info,
-                               self.arg_type, self.ret_type,
--                              self.gen, self.success_response, self.boxe=
-d)
-+                              self.gen, self.success_response, self.boxe=
-d,
-+                              self.async)
-=20
-=20
- class QAPISchemaEvent(QAPISchemaEntity):
-@@ -1645,6 +1648,7 @@ class QAPISchema(object):
-         data =3D expr.get('data')
-         rets =3D expr.get('returns')
-         gen =3D expr.get('gen', True)
-+        async =3D expr.get('async', False)
-         success_response =3D expr.get('success-response', True)
-         boxed =3D expr.get('boxed', False)
-         if isinstance(data, OrderedDict):
-@@ -1654,7 +1658,7 @@ class QAPISchema(object):
-             assert len(rets) =3D=3D 1
-             rets =3D self._make_array_type(rets[0], info)
-         self._def_entity(QAPISchemaCommand(name, info, data, rets, gen,
--                                           success_response, boxed))
-+                                           success_response, boxed, asyn=
-c))
-=20
-     def _def_event(self, expr, info):
-         name =3D expr['event']
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index 09e8467d90..8c6a281b7f 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -16,18 +16,30 @@ from qapi import *
- import re
-=20
-=20
--def gen_command_decl(name, arg_type, boxed, ret_type):
--    return mcgen('''
-+def gen_command_decl(name, arg_type, boxed, ret_type, async):
-+    if async:
-+        extra =3D "QmpReturn *qret"
-+    else:
-+        extra =3D 'Error **errp'
++static GMainLoop *loop;
 +
-+    if async:
-+        return mcgen('''
-+void qmp_%(name)s(%(params)s);
-+void qmp_%(name)s_return(QmpReturn *qret%(c_type)s);
-+''',
-+                     c_type=3D(", " + ret_type.c_type() if ret_type else=
- ""),
-+                     name=3Dc_name(name),
-+                     params=3Dgen_params(arg_type, boxed, extra))
-+    else:
-+        return mcgen('''
- %(c_type)s qmp_%(c_name)s(%(params)s);
- ''',
--                 c_type=3D(ret_type and ret_type.c_type()) or 'void',
--                 c_name=3Dc_name(name),
--                 params=3Dgen_params(arg_type, boxed, 'Error **errp'))
-+                     c_type=3D(ret_type and ret_type.c_type()) or 'void'=
-,
-+                     c_name=3Dc_name(name),
-+                     params=3Dgen_params(arg_type, boxed, extra))
-=20
-=20
--def gen_call(name, arg_type, boxed, ret_type):
--    ret =3D ''
--
-+def gen_argstr(arg_type, boxed):
-     argstr =3D ''
-     if boxed:
-         assert arg_type and not arg_type.is_empty()
-@@ -39,6 +51,13 @@ def gen_call(name, arg_type, boxed, ret_type):
-                 argstr +=3D 'arg.has_%s, ' % c_name(memb.name)
-             argstr +=3D 'arg.%s, ' % c_name(memb.name)
-=20
-+    return argstr
++typedef struct AsyncRet {
++    QmpReturn *qret;
++    UserDefB *ret;
++} AsyncRet;
 +
-+
-+def gen_call(name, arg_type, boxed, ret_type):
-+    ret =3D ''
-+
-+    argstr =3D gen_argstr(arg_type, boxed)
-     lhs =3D ''
-     if ret_type:
-         lhs =3D 'retval =3D '
-@@ -60,6 +79,50 @@ def gen_call(name, arg_type, boxed, ret_type):
-     return ret
-=20
-=20
-+def gen_async_call(name, arg_type, boxed):
-+    argstr =3D gen_argstr(arg_type, boxed)
-+
-+    push_indent()
-+    ret =3D mcgen('''
-+
-+qmp_%(c_name)s(%(args)sqret);
-+''',
-+                c_name=3Dc_name(name), args=3Dargstr)
-+
-+    pop_indent()
-+    return ret
-+
-+
-+def gen_async_return(name, ret_type):
-+    if ret_type:
-+        return mcgen('''
-+
-+void qmp_%(c_name)s_return(QmpReturn *qret, %(ret_type)s ret_in)
++static gboolean qmp_user_async_idle(gpointer data)
 +{
-+    Error *err =3D NULL;
-+    QObject *ret_out =3D NULL;
++    struct AsyncRet *async =3D (struct AsyncRet *)data;
 +
-+    qmp_marshal_output_%(ret_c_name)s(ret_in, &ret_out, &err);
++    qmp_user_async_return(async->qret, async->ret);
++    g_free(async);
 +
-+    if (err) {
-+        qmp_return_error(qret, err);
-+    } else {
-+        qmp_return(qret, ret_out);
-+    }
++    g_main_loop_quit(loop);
++
++    return FALSE;
 +}
-+''',
-+                     c_name=3Dc_name(name),
-+                     ret_type=3Dret_type.c_type(), ret_c_name=3Dret_type=
-.c_name())
-+    else:
-+        return mcgen('''
 +
-+void qmp_%(c_name)s_return(QmpReturn *qret)
++void qmp_user_async(int64_t a, bool has_b, int64_t b, QmpReturn *qret)
 +{
-+    qmp_return(qret, QOBJECT(qdict_new()));
-+}
-+''',
-+                     c_name=3Dc_name(name))
++    AsyncRet *async =3D g_new0(AsyncRet, 1);
 +
- def gen_marshal_output(ret_type):
-     return mcgen('''
-=20
-@@ -83,18 +146,22 @@ static void qmp_marshal_output_%(c_name)s(%(c_type)s=
- ret_in, QObject **ret_out,
-                  c_type=3Dret_type.c_type(), c_name=3Dret_type.c_name())
-=20
-=20
--def gen_marshal_proto(name):
--    return 'void qmp_marshal_%s(QDict *args, QObject **ret, Error **errp=
-)' % c_name(name)
-+def gen_marshal_proto(name, async):
-+    if async:
-+        tmpl =3D 'void qmp_marshal_%s(QDict *args, QmpReturn *qret)'
-+    else:
-+        tmpl =3D 'void qmp_marshal_%s(QDict *args, QObject **ret, Error =
-**errp)'
-+    return tmpl % c_name(name)
-=20
-=20
--def gen_marshal_decl(name):
-+def gen_marshal_decl(name, async):
-     return mcgen('''
- %(proto)s;
- ''',
--                 proto=3Dgen_marshal_proto(name))
-+                 proto=3Dgen_marshal_proto(name, async))
-=20
-=20
--def gen_marshal(name, arg_type, boxed, ret_type):
-+def gen_marshal(name, arg_type, boxed, ret_type, async):
-     have_args =3D arg_type and not arg_type.is_empty()
-=20
-     ret =3D mcgen('''
-@@ -103,9 +170,9 @@ def gen_marshal(name, arg_type, boxed, ret_type):
++    async->ret =3D g_new0(UserDefB, 1);
++    async->ret->intb =3D a + (has_b ? b : 0);
++    async->qret =3D qret;
++
++    g_idle_add(qmp_user_async_idle, async);
++}
++
+ static void dispatch_cmd_return(QmpClient *client, QObject *resp)
  {
-     Error *err =3D NULL;
- ''',
--                proto=3Dgen_marshal_proto(name))
-+                proto=3Dgen_marshal_proto(name, async))
+     assert(resp !=3D NULL);
+@@ -142,14 +172,19 @@ static void test_dispatch_cmd_failure(void)
+ }
 =20
--    if ret_type:
-+    if ret_type and not async:
-         ret +=3D mcgen('''
-     %(c_type)s retval;
- ''',
-@@ -152,12 +219,28 @@ def gen_marshal(name, arg_type, boxed, ret_type):
-     }
- ''')
+ static QObject *dispatch_ret;
++static char *ret_id;
 =20
--    ret +=3D gen_call(name, arg_type, boxed, ret_type)
-+    if async:
-+        ret +=3D gen_async_call(name, arg_type, boxed)
-+    else:
-+        ret +=3D gen_call(name, arg_type, boxed, ret_type)
-=20
-     ret +=3D mcgen('''
-=20
- out:
-+''')
+ static void qmp_dispatch_return(QmpClient *client, QObject *resp_obj)
+ {
+     QDict *resp =3D qobject_to_qdict(resp_obj);
 +
-+    if async:
-+         ret +=3D mcgen('''
-+    if (err) {
-+        qmp_return_error(qret, err);
+     assert(resp && !qdict_haskey(resp, "error"));
+     dispatch_ret =3D qdict_get(resp, "return");
+     assert(dispatch_ret);
+     qobject_incref(dispatch_ret);
++
++    g_free(ret_id);
++    ret_id =3D g_strdup(qdict_get_try_str(resp, "id"));
+ }
+=20
+ static QObject *test_qmp_dispatch(QDict *req)
+@@ -216,6 +251,97 @@ static void test_dispatch_cmd_io(void)
+     QDECREF(req);
+ }
+=20
++static void test_dispatch_cmd_async(void)
++{
++    QmpClient client =3D { .has_async =3D true };
++    QDict *dret, *req =3D qdict_new();
++    QDict *args =3D qdict_new();
++
++    loop =3D g_main_loop_new(NULL, FALSE);
++    qmp_client_init(&client, qmp_dispatch_return);
++
++    qdict_put(args, "a", qint_from_int(99));
++    qdict_put(req, "arguments", args);
++    qdict_put(req, "id", qstring_from_str("foo99"));
++    qdict_put(req, "execute", qstring_from_str("user-async"));
++
++    qmp_dispatch(&client, QOBJECT(req), NULL);
++    assert(!dispatch_ret);
++
++    g_main_loop_run(loop);
++    g_main_loop_unref(loop);
++
++    g_assert_cmpstr(ret_id, =3D=3D, "foo99");
++    dret =3D qobject_to_qdict(dispatch_ret);
++    assert(qdict_get_int(dret, "intb") =3D=3D 99);
++    QDECREF(dret);
++    dispatch_ret =3D NULL;
++
++    qmp_client_destroy(&client);
++    QDECREF(req);
++}
++
++static void test_dispatch_cmd_async_no_id(void)
++{
++    QmpClient client =3D { .has_async =3D true };
++    QDict *req =3D qdict_new();
++    QDict *args =3D qdict_new();
++
++    qmp_client_init(&client, dispatch_cmd_error_return);
++
++    qdict_put(args, "a", qint_from_int(99));
++    qdict_put(req, "arguments", args);
++    qdict_put(req, "execute", qstring_from_str("user-async"));
++
++    qmp_dispatch(&client, QOBJECT(req), NULL);
++
++    assert(!dispatch_ret);
++    assert(QLIST_EMPTY(&client.pending));
++
++    qmp_client_destroy(&client);
++    QDECREF(req);
++}
++
++static void test_destroy_pending_async(void)
++{
++    QmpClient client =3D { .has_async =3D true };
++    QDict *req =3D qdict_new();
++    QDict *args =3D qdict_new();
++    QmpReturn *r;
++    int npending =3D 0;
++
++    loop =3D g_main_loop_new(NULL, FALSE);
++    qmp_client_init(&client, qmp_dispatch_return);
++
++    qdict_put(args, "a", qint_from_int(99));
++    qdict_put(req, "arguments", args);
++    qdict_put(req, "id", qstring_from_str("foo99"));
++    qdict_put(req, "execute", qstring_from_str("user-async"));
++
++    qmp_dispatch(&client, QOBJECT(req), NULL);
++    qmp_dispatch(&client, QOBJECT(req), NULL);
++    assert(!dispatch_ret);
++    QDECREF(req);
++
++    npending =3D 0;
++    QLIST_FOREACH(r, &client.pending, link) {
++        npending++;
 +    }
-+''')
-+    else:
-+        ret +=3D mcgen('''
-     error_propagate(errp, err);
-+''')
 +
-+    ret +=3D mcgen('''
-     visit_free(v);
- ''')
++    g_assert_cmpint(npending, =3D=3D, 2);
++
++    /* destroy with pending async */
++    qmp_client_destroy(&client);
++
++    while (g_main_context_pending(NULL)) {
++        g_main_loop_run(loop);
++        /* no return since the client is gone */
++        assert(!dispatch_ret);
++    }
++
++    g_main_loop_unref(loop);
++}
++
+ /* test generated dealloc functions for generated types */
+ static void test_dealloc_types(void)
+ {
+@@ -287,11 +413,17 @@ int main(int argc, char **argv)
+     g_test_add_func("/qmp/dispatch_cmd", test_dispatch_cmd);
+     g_test_add_func("/qmp/dispatch_cmd_failure", test_dispatch_cmd_failu=
+re);
+     g_test_add_func("/qmp/dispatch_cmd_io", test_dispatch_cmd_io);
++    g_test_add_func("/qmp/dispatch_cmd_async", test_dispatch_cmd_async);
++    g_test_add_func("/qmp/dispatch_cmd_async_no_id",
++                    test_dispatch_cmd_async_no_id);
++    g_test_add_func("/qmp/destroy_pending_async", test_destroy_pending_a=
+sync);
+     g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
+     g_test_add_func("/qmp/dealloc_partial", test_dealloc_partial);
 =20
-@@ -192,15 +275,17 @@ out:
-     return ret
+     module_call_init(MODULE_INIT_QAPI);
+     g_test_run();
 =20
-=20
--def gen_register_command(name, success_response):
-+def gen_register_command(name, success_response, async):
-     options =3D 'QCO_NO_OPTIONS'
-     if not success_response:
-         options =3D 'QCO_NO_SUCCESS_RESP'
--
-+    func =3D 'qmp_register_command'
-+    if async:
-+        func =3D 'qmp_register_async_command'
-     ret =3D mcgen('''
--    qmp_register_command("%(name)s", qmp_marshal_%(c_name)s, %(opts)s);
-+    %(func)s("%(name)s", qmp_marshal_%(c_name)s, %(opts)s);
- ''',
--                name=3Dname, c_name=3Dc_name(name),
-+                func=3Dfunc, name=3Dname, c_name=3Dc_name(name),
-                 opts=3Doptions)
-     return ret
-=20
-@@ -239,16 +324,19 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor=
-):
-         self._visited_ret_types =3D None
-=20
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, async):
-         if not gen:
-             return
--        self.decl +=3D gen_command_decl(name, arg_type, boxed, ret_type)
-+        self.decl +=3D gen_command_decl(name, arg_type, boxed,
-+                                      ret_type, async)
-         if ret_type and ret_type not in self._visited_ret_types:
-             self._visited_ret_types.add(ret_type)
-             self.defn +=3D gen_marshal_output(ret_type)
--        self.decl +=3D gen_marshal_decl(name)
--        self.defn +=3D gen_marshal(name, arg_type, boxed, ret_type)
--        self._regy +=3D gen_register_command(name, success_response)
-+        if async:
-+            self.defn +=3D gen_async_return(name, ret_type)
-+        self.decl +=3D gen_marshal_decl(name, async)
-+        self.defn +=3D gen_marshal(name, arg_type, boxed, ret_type, asyn=
-c)
-+        self._regy +=3D gen_register_command(name, success_response, asy=
-nc)
-=20
-=20
- (input_file, output_dir, do_c, do_h, prefix, opts) =3D parse_command_lin=
-e()
-@@ -306,6 +394,7 @@ fdef.write(mcgen('''
- fdecl.write(mcgen('''
- #include "%(prefix)sqapi-types.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/dispatch.h"
- #include "qapi/error.h"
-=20
- ''',
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index 541644e350..f8a854dd0f 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -28,6 +28,8 @@ def to_json(obj, level=3D0):
-                               to_json(obj[key], level + 1))
-                 for key in sorted(obj.keys())]
-         ret =3D '{' + ', '.join(elts) + '}'
-+    elif isinstance(obj, bool):
-+        ret =3D 'true' if obj else 'false'
-     else:
-         assert False                # not implemented
-     if level =3D=3D 1:
-@@ -154,12 +156,13 @@ const char %(c_name)s[] =3D %(c_string)s;
-                                     for m in variants.variants]})
-=20
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, async):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
-         ret_type =3D ret_type or self._schema.the_empty_object_type
-         self._gen_json(name, 'command',
-                        {'arg-type': self._use_type(arg_type),
--                        'ret-type': self._use_type(ret_type)})
-+                        'ret-type': self._use_type(ret_type),
-+                        'async': async})
-=20
-     def visit_event(self, name, info, arg_type, boxed):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 152655d086..d9b575e657 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -343,6 +343,7 @@ qapi-schema +=3D args-member-unknown.json
- qapi-schema +=3D args-name-clash.json
- qapi-schema +=3D args-union.json
- qapi-schema +=3D args-unknown.json
-+qapi-schema +=3D async.json
- qapi-schema +=3D bad-base.json
- qapi-schema +=3D bad-data.json
- qapi-schema +=3D bad-ident.json
-diff --git a/tests/qapi-schema/async.err b/tests/qapi-schema/async.err
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/async.exit b/tests/qapi-schema/async.exit
-new file mode 100644
-index 0000000000..573541ac97
---- /dev/null
-+++ b/tests/qapi-schema/async.exit
-@@ -0,0 +1 @@
-+0
-diff --git a/tests/qapi-schema/async.json b/tests/qapi-schema/async.json
-new file mode 100644
-index 0000000000..2073349d39
---- /dev/null
-+++ b/tests/qapi-schema/async.json
-@@ -0,0 +1,6 @@
-+##
-+# @screendump-async:
-+#
-+# @filename: foo
-+##
-+{ 'command': 'screendump-async', 'data': {'filename': 'str'}, 'async': t=
++    g_free(ret_id);
++
+     return 0;
+ }
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index f4d8cc4230..6fe35bae77 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -292,6 +292,12 @@
+ { 'command': 'boxed-union', 'data': 'UserDefNativeListUnion', 'boxed': t=
 rue }
-diff --git a/tests/qapi-schema/async.out b/tests/qapi-schema/async.out
-new file mode 100644
-index 0000000000..bcb5a400d7
---- /dev/null
-+++ b/tests/qapi-schema/async.out
-@@ -0,0 +1,10 @@
-+enum QType ['none', 'qnull', 'qint', 'qstring', 'qdict', 'qlist', 'qfloa=
-t', 'qbool']
-+    prefix QTYPE
-+object q_empty
-+object q_obj_screendump-async-arg
-+    member filename: str optional=3DFalse
-+command screendump-async q_obj_screendump-async-arg -> None
+=20
+ ##
++# @user-async:
++##
++{ 'command': 'user-async', 'data': { 'a': 'int', '*b': 'int' },
++  'returns': 'UserDefB', 'async': true  }
++
++##
+ # @UserDefOptions:
+ #
+ # For testing integer range flattening in opts-visitor. The following sc=
+hema
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index bc8d496ff4..5b97906aae 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -219,11 +219,16 @@ object q_obj_uint64List-wrapper
+     member data: uint64List optional=3DFalse
+ object q_obj_uint8List-wrapper
+     member data: uint8List optional=3DFalse
++object q_obj_user-async-arg
++    member a: int optional=3DFalse
++    member b: int optional=3DTrue
+ object q_obj_user_def_cmd1-arg
+     member ud1a: UserDefOne optional=3DFalse
+ object q_obj_user_def_cmd2-arg
+     member ud1a: UserDefOne optional=3DFalse
+     member ud1b: UserDefOne optional=3DTrue
++command user-async q_obj_user-async-arg -> UserDefB
 +   gen=3DTrue success_response=3DTrue boxed=3DFalse async=3DTrue
-+doc symbol=3Dscreendump-async expr=3D('command', 'screendump-async')
-+    arg=3Dfilename
-+foo
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index b4cde4ff4f..608c304995 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -36,11 +36,12 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         self._print_variants(variants)
-=20
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, async):
-         print 'command %s %s -> %s' % \
-             (name, arg_type and arg_type.name, ret_type and ret_type.nam=
-e)
--        print '   gen=3D%s success_response=3D%s boxed=3D%s' % \
--            (gen, success_response, boxed)
-+        print '   gen=3D%s success_response=3D%s boxed=3D%s%s' % \
-+            (gen, success_response, boxed,
-+             ' async=3DTrue' if async else '')
-=20
-     def visit_event(self, name, info, arg_type, boxed):
-         print 'event %s %s' % (name, arg_type and arg_type.name)
+ command user_def_cmd None -> None
+    gen=3DTrue success_response=3DTrue boxed=3DFalse
+ command user_def_cmd0 Empty2 -> Empty2
+@@ -337,6 +342,7 @@ returns something
+ doc symbol=3Dguest-sync expr=3D('command', 'guest-sync')
+ doc symbol=3Dboxed-struct expr=3D('command', 'boxed-struct')
+ doc symbol=3Dboxed-union expr=3D('command', 'boxed-union')
++doc symbol=3Duser-async expr=3D('command', 'user-async')
+ doc symbol=3DUserDefOptions expr=3D('struct', 'UserDefOptions')
+     body=3D
+ For testing integer range flattening in opts-visitor. The following sche=
+ma
 --=20
 2.11.0.295.gd7dffce1c
