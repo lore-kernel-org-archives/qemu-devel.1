@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cUJvx-0007Gd-Vx
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:07:50 -0500
+	(envelope-from <SRS0=Ovvj=ZB=redhat.com=mst@kernel.org>)
+	id 1cUJxJ-000056-1T
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:09:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cUJvu-0005Gp-Nb
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:07:49 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34345)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cUJvu-0005DI-IJ
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:07:46 -0500
-Received: by mail-wm0-x241.google.com with SMTP id c85so1903128wmi.1
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 13:07:44 -0800 (PST)
-Received: from donizetti.lan (94-39-143-196.adsl-ull.clienti.tiscali.it.
-	[94.39.143.196])
-	by smtp.gmail.com with ESMTPSA id r6sm917540wmd.4.2017.01.19.13.07.42
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 19 Jan 2017 13:07:42 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 19 Jan 2017 22:07:41 +0100
-Message-Id: <20170119210741.10814-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] KVM: PPC: eliminate unnecessary duplicate
- constants
+	(envelope-from <SRS0=Ovvj=ZB=redhat.com=mst@kernel.org>)
+	id 1cUJxE-0007Tn-TL
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:09:12 -0500
+Received: from mail.kernel.org ([198.145.29.136]:56484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <SRS0=Ovvj=ZB=redhat.com=mst@kernel.org>)
+	id 1cUJxE-0007Qs-Lo
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:09:08 -0500
+Date: Thu, 19 Jan 2017 23:09:04 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1484860116-25361-2-git-send-email-mst@redhat.com>
+References: <1484860116-25361-1-git-send-email-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484860116-25361-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 01/17] virtio-net: enable ioeventfd even if
+ vhost=off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +31,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-These are not needed since linux-headers/ provides up-to-date definitions.
-The constants are in linux-headers/asm-powerpc/kvm.h.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-The sole users, hw/intc/xics_kvm.c and target/ppc/kvm.c, include asm/kvm.h
-via sysemu/kvm.h->linux/kvm.h.
+virtio-net-pci does not enable ioeventfd for historical reasons (and
+nobody ever checked whether it should be revisited).  Note that other
+backends do enable ioeventfd for virtio-net.
+
+However, it has a major effect on performance.  On Windows, throughput is
+_multiplied_ by 2 or 3 on TCP_STREAM (on small packets it is "only" a 30%
+improvement) and a little less so on TCP_MAERTS albeit still very much
+statistically significant.  Latency also has a single digit improvement.
+
+This is not visible when using vhost, which forces ioeventfd=on, but it
+is substantial without vhost.  In addition, also on Windows and with the
+RHEL 7.3 kernel, APICv seems to slow down virtio-net performance a bit,
+but the penalty with this patch goes from -25% to -7%.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- target/ppc/kvm_ppc.h | 12 ------------
- 1 file changed, 12 deletions(-)
+ hw/virtio/virtio-pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index bd1d78b..4b43283 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -315,16 +315,4 @@ static inline void kvmppc_icbi_range(PowerPCCPU *cpu, uint8_t *addr, int len)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 854b8f2..8baaf2b 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2278,7 +2278,7 @@ static const TypeInfo virtio_serial_pci_info = {
  
- #endif  /* CONFIG_KVM */
- 
--#ifndef KVM_INTERRUPT_SET
--#define KVM_INTERRUPT_SET -1
--#endif
--
--#ifndef KVM_INTERRUPT_UNSET
--#define KVM_INTERRUPT_UNSET -2
--#endif
--
--#ifndef KVM_INTERRUPT_SET_LEVEL
--#define KVM_INTERRUPT_SET_LEVEL -3
--#endif
--
- #endif /* KVM_PPC_H */
+ static Property virtio_net_properties[] = {
+     DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
+-                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, false),
++                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
+     DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 -- 
-2.9.3
+MST
