@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUG9H-0007SD-29
+	(envelope-from <alex.bennee@linaro.org>) id 1cUG9H-0007Sy-ON
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:05:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUG9F-0007lv-Uw
+	(envelope-from <alex.bennee@linaro.org>) id 1cUG9B-0007jA-EM
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:05:19 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:33374)
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36383)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cUG9F-0007lH-PT
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:05:17 -0500
-Received: by mail-wm0-x230.google.com with SMTP id d140so7375121wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:05:17 -0800 (PST)
+	id 1cUG9B-0007gr-9M
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:05:13 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id c85so2312076wmi.1
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:05:11 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 19 Jan 2017 17:04:46 +0000
-Message-Id: <20170119170507.16185-7-alex.bennee@linaro.org>
+Date: Thu, 19 Jan 2017 17:04:44 +0000
+Message-Id: <20170119170507.16185-5-alex.bennee@linaro.org>
 In-Reply-To: <20170119170507.16185-1-alex.bennee@linaro.org>
 References: <20170119170507.16185-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 06/27] tcg: add kick timer for
- single-threaded vCPU emulation
+Subject: [Qemu-devel] [PATCH v7 04/27] tcg: move TCG_MO/BAR types into own
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,130 +31,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
-Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Currently we rely on the side effect of the main loop grabbing the
-iothread_mutex to give any long running basic block chains a kick to
-ensure the next vCPU is scheduled. As this code is being re-factored and
-rationalised we now do it explicitly here.
+We'll be using the memory ordering definitions to define values for
+both the host and guest. To avoid fighting with circular header
+dependencies just move these types into their own minimal header.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
-v2
-  - re-base fixes
-  - get_ticks_per_sec() -> NANOSECONDS_PER_SEC
-v3
-  - add define for TCG_KICK_FREQ
-  - fix checkpatch warning
-v4
-  - wrap next calc in inline qemu_tcg_next_kick() instead of macro
-v5
-  - move all kick code into own section
-  - use global for timer
-  - add helper functions to start/stop timer
-  - stop timer when all cores paused
-v7
-  - checkpatch > 80 char fix
----
- cpus.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+ tcg/tcg-mo.h | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.h    | 18 +-----------------
+ 2 files changed, 46 insertions(+), 17 deletions(-)
+ create mode 100644 tcg/tcg-mo.h
 
-diff --git a/cpus.c b/cpus.c
-index eaefaebffc..8f182dff72 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -763,6 +763,53 @@ void configure_icount(QemuOpts *opts, Error **errp)
- }
- 
- /***********************************************************/
-+/* TCG vCPU kick timer
+diff --git a/tcg/tcg-mo.h b/tcg/tcg-mo.h
+new file mode 100644
+index 0000000000..429b022561
+--- /dev/null
++++ b/tcg/tcg-mo.h
+@@ -0,0 +1,45 @@
++/*
++ * Tiny Code Generator for QEMU
 + *
-+ * The kick timer is responsible for moving single threaded vCPU
-+ * emulation on to the next vCPU. If more than one vCPU is running a
-+ * timer event with force a cpu->exit so the next vCPU can get
-+ * scheduled.
++ * Copyright (c) 2008 Fabrice Bellard
 + *
-+ * The timer is removed if all vCPUs are idle and restarted again once
-+ * idleness is complete.
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
 +
-+static QEMUTimer *tcg_kick_vcpu_timer;
++#ifndef TCG_MO_H
++#define TCG_MO_H
 +
-+static void qemu_cpu_kick_no_halt(void);
++typedef enum {
++    /* Used to indicate the type of accesses on which ordering
++       is to be ensured.  Modeled after SPARC barriers.  */
++    TCG_MO_LD_LD  = 0x01,
++    TCG_MO_ST_LD  = 0x02,
++    TCG_MO_LD_ST  = 0x04,
++    TCG_MO_ST_ST  = 0x08,
++    TCG_MO_ALL    = 0x0F,  /* OR of the above */
 +
-+#define TCG_KICK_PERIOD (NANOSECONDS_PER_SECOND / 10)
++    /* Used to indicate the kind of ordering which is to be ensured by the
++       instruction.  These types are derived from x86/aarch64 instructions.
++       It should be noted that these are different from C11 semantics.  */
++    TCG_BAR_LDAQ  = 0x10,  /* Following ops will not come forward */
++    TCG_BAR_STRL  = 0x20,  /* Previous ops will not be delayed */
++    TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
++} TCGBar;
 +
-+static inline int64_t qemu_tcg_next_kick(void)
-+{
-+    return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + TCG_KICK_PERIOD;
-+}
-+
-+static void kick_tcg_thread(void *opaque)
-+{
-+    timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
-+    qemu_cpu_kick_no_halt();
-+}
-+
-+static void start_tcg_kick_timer(void)
-+{
-+    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
-+        tcg_kick_vcpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                                           kick_tcg_thread, NULL);
-+        timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
-+    }
-+}
-+
-+static void stop_tcg_kick_timer(void)
-+{
-+    if (tcg_kick_vcpu_timer) {
-+        timer_del(tcg_kick_vcpu_timer);
-+        tcg_kick_vcpu_timer = NULL;
-+    }
-+}
-+
-+
-+/***********************************************************/
- void hw_error(const char *fmt, ...)
- {
-     va_list ap;
-@@ -1016,9 +1063,12 @@ static void qemu_wait_io_event_common(CPUState *cpu)
- static void qemu_tcg_wait_io_event(CPUState *cpu)
- {
-     while (all_cpu_threads_idle()) {
-+        stop_tcg_kick_timer();
-         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-     }
++#endif /* TCG_MO_H */
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 631c6f69b1..f946452049 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -29,6 +29,7 @@
+ #include "cpu.h"
+ #include "exec/tb-context.h"
+ #include "qemu/bitops.h"
++#include "tcg-mo.h"
+ #include "tcg-target.h"
  
-+    start_tcg_kick_timer();
-+
-     while (iothread_requesting_mutex) {
-         qemu_cond_wait(&qemu_io_proceeded_cond, &qemu_global_mutex);
-     }
-@@ -1218,6 +1268,15 @@ static void deal_with_unplugged_cpus(void)
-     }
- }
+ /* XXX: make safe guess about sizes */
+@@ -498,23 +499,6 @@ static inline intptr_t QEMU_ARTIFICIAL GET_TCGV_PTR(TCGv_ptr t)
+ #define TCG_CALL_DUMMY_TCGV     MAKE_TCGV_I32(-1)
+ #define TCG_CALL_DUMMY_ARG      ((TCGArg)(-1))
  
-+/* Single-threaded TCG
-+ *
-+ * In the single-threaded case each vCPU is simulated in turn. If
-+ * there is more than a single vCPU we create a simple timer to kick
-+ * the vCPU and ensure we don't get stuck in a tight loop in one vCPU.
-+ * This is done explicitly rather than relying on side-effects
-+ * elsewhere.
-+ */
-+
- static void *qemu_tcg_cpu_thread_fn(void *arg)
- {
-     CPUState *cpu = arg;
-@@ -1244,6 +1303,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-         }
-     }
- 
-+    start_tcg_kick_timer();
-+
-     /* process any pending work */
-     atomic_mb_set(&exit_request, 1);
- 
+-typedef enum {
+-    /* Used to indicate the type of accesses on which ordering
+-       is to be ensured.  Modeled after SPARC barriers.  */
+-    TCG_MO_LD_LD  = 0x01,
+-    TCG_MO_ST_LD  = 0x02,
+-    TCG_MO_LD_ST  = 0x04,
+-    TCG_MO_ST_ST  = 0x08,
+-    TCG_MO_ALL    = 0x0F,  /* OR of the above */
+-
+-    /* Used to indicate the kind of ordering which is to be ensured by the
+-       instruction.  These types are derived from x86/aarch64 instructions.
+-       It should be noted that these are different from C11 semantics.  */
+-    TCG_BAR_LDAQ  = 0x10,  /* Following ops will not come forward */
+-    TCG_BAR_STRL  = 0x20,  /* Previous ops will not be delayed */
+-    TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
+-} TCGBar;
+-
+ /* Conditions.  Note that these are laid out for easy manipulation by
+    the functions below:
+      bit 0 is used for inverting;
 -- 
 2.11.0
