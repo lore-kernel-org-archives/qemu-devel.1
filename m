@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cUIaV-0005Ep-UW
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:41:36 -0500
+	(envelope-from <mst@redhat.com>) id 1cUJ7y-0004Eq-Ff
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:16:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cUIaT-0000U5-UL
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:41:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:61247)
+	(envelope-from <mst@redhat.com>) id 1cUJ7v-0008Ah-Pm
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:16:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46812)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cUIaT-0000Tq-Ob
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:41:33 -0500
-Date: Thu, 19 Jan 2017 19:41:27 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170119194126.GL2085@work-vm>
-References: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
-	<1484566314-3987-6-git-send-email-ashijeetacharya@gmail.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUJ7v-00089P-Gj
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:16:07 -0500
+Date: Thu, 19 Jan 2017 22:16:03 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170119001744-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1484566314-3987-6-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 5/5] migration: Fail migration blocker
- for --only-migratable
+Subject: [Qemu-devel] [PATCH RFC] vfio error recovery: kernel support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +24,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com
 
-* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
-> migrate_add_blocker should rightly fail if the '--only-migratable'
-> option was specified and the device in use should not be able to
-> perform the action which results in an unmigratable VM.
-> 
-> Make migrate_add_blocker return -EACCES in this case.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+This is a design and an initial patch for kernel side for AER
+support in VFIO.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+0. What happens now (PCIE AER only)
+   Fatal errors cause a link reset.
+   Non fatal errors don't.
+   All errors stop the VM eventually, but not immediately
+   because it's detected and reported asynchronously.
+   Interrupts are forwarded as usual.
+   Correctable errors are not reported to guest at all.
+   Note: PPC EEH is different. This focuses on AER.
 
-> ---
->  include/migration/migration.h | 2 +-
->  migration/migration.c         | 7 +++++++
->  2 files changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index bcbdb03..7881e89 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -291,7 +291,7 @@ int ram_postcopy_incoming_init(MigrationIncomingState *mis);
->   *
->   * @errp - [out] The reason (if any) we cannot block migration right now.
->   *
-> - * @returns - 0 on success, -EBUSY on failure, with errp set.
-> + * @returns - 0 on success, -EBUSY/-EACCES on failure, with errp set.
->   */
->  int migrate_add_blocker(Error *reason, Error **errp);
->  
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 0d88286..7dcb7d7 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1113,6 +1113,13 @@ static GSList *migration_blockers;
->  
->  int migrate_add_blocker(Error *reason, Error **errp)
->  {
-> +    if (only_migratable) {
-> +        error_propagate(errp, error_copy(reason));
-> +        error_prepend(errp, "disallowing migration blocker "
-> +                          "(--only_migratable) for: ");
-> +        return -EACCES;
-> +    }
-> +
->      if (migration_is_idle(NULL)) {
->          migration_blockers = g_slist_prepend(migration_blockers, reason);
->          return 0;
-> -- 
-> 2.6.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+1. Correctable errors
+   I don't see a need to report these to guest. So let's not.
+
+2. Fatal errors
+   It's not easy to handle them gracefully since link reset
+   is needed. As a first step, let's use the existing mechanism
+   in that case.
+   
+2. Non-fatal errors
+   Here we could make progress by reporting them to guest
+   and have guest handle them.
+   Issues:
+    a. this behaviour should only be enabled with new userspace
+       old userspace should work without changes
+    Suggestion: One way to address this would be to add a new eventfd
+    non_fatal_err_trigger. If not set, invoke err_trigger.
+
+    b. drivers are supposed to stop MMIO when error is reported
+    if vm keeps going, we will keep doing MMIO/config
+    Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
+    so we are not making things much worse
+    Suggestion 2: try to stop MMIO/config, resume on resume call
+
+    Patch below implements Suggestion 1.
+
+    c. PF driver might detect that function is completely broken,
+    if vm keeps going, we will keep doing MMIO/config
+    Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
+    so we are not making things much worse
+    Suggestion 2: detect this and invoke err_trigger to stop VM
+
+    Patch below implements Suggestion 2.
+
+Aside: we currently return PCI_ERS_RESULT_DISCONNECT when device
+is not attached. This seems bogus, likely based on the confusing name.
+We probably should return PCI_ERS_RESULT_CAN_RECOVER.
+
+The following patch does not change that.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+---
+
+The patch is completely untested. Let's discuss the design first.
+Cao jin, if this is deemed acceptable please take it from here.
+
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index dce511f..fdca683 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -1292,7 +1292,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+ 
+ 	mutex_lock(&vdev->igate);
+ 
+-	if (vdev->err_trigger)
++	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
++		eventfd_signal(vdev->err_trigger, 1);
++	else if (vdev->err_trigger)
+ 		eventfd_signal(vdev->err_trigger, 1);
+ 
+ 	mutex_unlock(&vdev->igate);
+@@ -1302,8 +1304,38 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+ 	return PCI_ERS_RESULT_CAN_RECOVER;
+ }
+ 
++static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev,
++						pci_channel_state_t state)
++{
++	struct vfio_pci_device *vdev;
++	struct vfio_device *device;
++
++	device = vfio_device_get_from_dev(&pdev->dev);
++	if (!device)
++		goto err_dev;
++
++	vdev = vfio_device_data(device);
++	if (!vdev)
++		goto err_dev;
++
++	mutex_lock(&vdev->igate);
++
++	if (vdev->err_trigger)
++		eventfd_signal(vdev->err_trigger, 1);
++
++	mutex_unlock(&vdev->igate);
++
++	vfio_device_put(device);
++
++err_data:
++	vfio_device_put(device);
++err_dev:
++	return PCI_ERS_RESULT_RECOVERED;
++}
++
+ static const struct pci_error_handlers vfio_err_handlers = {
+ 	.error_detected = vfio_pci_aer_err_detected,
++	.slot_reset = vfio_pci_aer_slot_reset,
+ };
+ 
+ static struct pci_driver vfio_pci_driver = {
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 1c46045..e883db5 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -611,6 +611,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
+ 					       count, flags, data);
+ }
+ 
++static int vfio_pci_set_non_fatal_err_trigger(struct vfio_pci_device *vdev,
++				    unsigned index, unsigned start,
++				    unsigned count, uint32_t flags, void *data)
++{
++	if (index != VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX || start != 0 || count > 1)
++		return -EINVAL;
++
++	return vfio_pci_set_ctx_trigger_single(&vdev->non_fatal_err_trigger,
++					       count, flags, data);
++}
++
+ static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
+ 				    unsigned index, unsigned start,
+ 				    unsigned count, uint32_t flags, void *data)
+@@ -664,6 +675,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
+ 			break;
+ 		}
+ 		break;
++	case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
++		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
++		case VFIO_IRQ_SET_ACTION_TRIGGER:
++			if (pci_is_pcie(vdev->pdev))
++				func = vfio_pci_set_err_trigger;
++			break;
++		}
++		break;
+ 	case VFIO_PCI_REQ_IRQ_INDEX:
+ 		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+ 		case VFIO_IRQ_SET_ACTION_TRIGGER:
+diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+index f37c73b..c27a507 100644
+--- a/drivers/vfio/pci/vfio_pci_private.h
++++ b/drivers/vfio/pci/vfio_pci_private.h
+@@ -93,6 +93,7 @@ struct vfio_pci_device {
+ 	struct pci_saved_state	*pci_saved_state;
+ 	int			refcnt;
+ 	struct eventfd_ctx	*err_trigger;
++	struct eventfd_ctx	*non_fatal_err_trigger;
+ 	struct eventfd_ctx	*req_trigger;
+ 	struct list_head	dummy_resources_list;
+ };
+
+-- 
+MST
