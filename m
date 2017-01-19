@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cUG89-0006P9-EK
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:04:10 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cUG9E-0007OU-01
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:05:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cUG88-0006ke-H2
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:04:09 -0500
-Date: Thu, 19 Jan 2017 17:03:55 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170119170355.GF16641@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <0bb184fe-d348-a1d4-ac14-0f02f070c287@kamp.de>
-	<20170119163845.GC16641@redhat.com>
-	<8e98321f-70ce-f86a-37d3-de2c1a5f45bd@kamp.de>
+	(envelope-from <alex.bennee@linaro.org>) id 1cUG9A-0007iI-Ob
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:05:15 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:38680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cUG9A-0007fp-HJ
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:05:12 -0500
+Received: by mail-wm0-x235.google.com with SMTP id r144so2706420wme.1
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:05:10 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 19 Jan 2017 17:04:43 +0000
+Message-Id: <20170119170507.16185-4-alex.bennee@linaro.org>
+In-Reply-To: <20170119170507.16185-1-alex.bennee@linaro.org>
+References: <20170119170507.16185-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8e98321f-70ce-f86a-37d3-de2c1a5f45bd@kamp.de>
-Subject: Re: [Qemu-devel] qemu-img: complains about missing iscsi option
- group
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 03/27] mttcg: Add missing tb_lock/unlock()
+ in cpu_exec_step()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Thu, Jan 19, 2017 at 05:57:45PM +0100, Peter Lieven wrote:
-> Am 19.01.2017 um 17:38 schrieb Daniel P. Berrange:
-> > On Thu, Jan 19, 2017 at 05:30:20PM +0100, Peter Lieven wrote:
-> > > Hi all,
-> > > 
-> > > 
-> > > since commit f57b4b5 (blockdev: prepare iSCSI block driver for dynamic loading)
-> > > 
-> > > qemu-img complains about a missing option group several times.
-> > > 
-> > > 
-> > > ~/git/qemu$ ./qemu-img info iscsi://172.21.200.56:3260/iqn.2001-05.com.equallogic:0-8a0906-69d384e0a-aa3004e55e15878d-00lieven-data/0
-> > > qemu-img: There is no option group 'iscsi'
-> > > qemu-img: There is no option group 'iscsi'
-> > > qemu-img: There is no option group 'iscsi'
-> > > qemu-img: There is no option group 'iscsi'
-> > > image: iscsi://172.21.200.56:3260/iqn.2001-05.com.equallogic:0-8a0906-69d384e0a-aa3004e55e15878d-00lieven-data/0
-> > > file format: raw
-> > > virtual size: 25G (26848788480 bytes)
-> > > disk size: unavailable
-> > > cluster_size: 15728640
-> > > 
-> > > I don't know whats the proper way to fix this?
-> > Move the iscsi option registration out of vl.c and back into a shared file
-> > in block/ such that all programs see the options, not just the emulators.
-> 
-> Any preference which file? It seems no other block driver registers options.
+From: Pranith Kumar <bobby.prani@gmail.com>
 
-ISCSI is somewhat bizarre in that it has a separate global -iscsi arg
-instead of just accepting all args via the -drive spec like every other
-block driver does, so there's no precedent to follow.
+The recent patch enabling lock assertions uncovered the missing lock
+acquisition in cpu_exec_step(). This patch adds them.
 
-So suggest we just need a block/iscsi-global.c to deal with this.
+CC: Richard Henderson <rth@twiddle.net>
+CC: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ cpu-exec.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Regards,
-Daniel
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 4188fed3c6..1b8685dc21 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -233,14 +233,18 @@ static void cpu_exec_step(CPUState *cpu)
+     uint32_t flags;
+ 
+     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
++    tb_lock();
+     tb = tb_gen_code(cpu, pc, cs_base, flags,
+                      1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+     tb->orig_tb = NULL;
++    tb_unlock();
+     /* execute the generated code */
+     trace_exec_tb_nocache(tb, pc);
+     cpu_tb_exec(cpu, tb);
++    tb_lock();
+     tb_phys_invalidate(tb, -1);
+     tb_free(tb);
++    tb_unlock();
+ }
+ 
+ void cpu_exec_step_atomic(CPUState *cpu)
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.11.0
