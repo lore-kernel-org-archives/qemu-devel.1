@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cUHbi-0001J2-VH
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:38:48 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cUHp6-0004Hr-P1
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:52:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cUHbf-0005Gg-6s
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:38:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53582)
+	(envelope-from <dgilbert@redhat.com>) id 1cUHp2-0002xY-TZ
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:52:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34204)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cUHbf-0005GL-0t
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:38:43 -0500
-Date: Thu, 19 Jan 2017 18:38:36 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170119183836.GK16641@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170116195452.23532-1-ehabkost@redhat.com>
-	<20170119175003.GJ16641@redhat.com>
-	<CAFEAcA9HEp+-JvtA49NRUWpA2LsOOLw+SaA-knS5x9=bn89UjQ@mail.gmail.com>
-	<20170119183145.GP3491@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cUHp2-0002xQ-Lg
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:52:32 -0500
+Date: Thu, 19 Jan 2017 18:52:26 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170119185225.GJ2085@work-vm>
+References: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
+	<1484566314-3987-4-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170119183145.GP3491@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
+In-Reply-To: <1484566314-3987-4-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 3/5] migration: Allow "device add"
+ options to only add migratable devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Thu, Jan 19, 2017 at 04:31:45PM -0200, Eduardo Habkost wrote:
-> On Thu, Jan 19, 2017 at 06:22:40PM +0000, Peter Maydell wrote:
-> > On 19 January 2017 at 17:50, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > > On Mon, Jan 16, 2017 at 05:54:52PM -0200, Eduardo Habkost wrote:
-> > >> Change the meaning of "-cpu host" to "enable all features
-> > >> supported by the accelerator in the current host", so that it can
-> > >> be used to enable/query all features supported by TCG.
-> > >>
-> > >> To make sure "host" is still at the end of the list in "-cpu
-> > >> help", add a "ordering" field that will be used when sorting the
-> > >> CPU model list.
-> > >
-> > > To be clear, "-cpu host" for TCG is not talking about the actual
-> > > host OS feature support, right ? x86_64 TCG can be run on a ppc host,
-> > > so presumably "-cpu host" just means "all features that this TCG binary
-> > > is able to emulate" ?
-> > >
-> > > This feels like it is introducing scope for confusion vs KVM -cpu host,
-> > > so I wonder if different naming is better for this.
-> > 
-> > The idea is that you do want an option that works whatever the
-> > accelerator is, though, so as a user you don't need to worry
-> > about messing with the command line for KVM vs TCG vs "try
-> > KVM and fall back to TCG". (I think "-cpu best" has been thrown about
-> > as a suggestion for this before.)
+* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> Introduce checks for the unmigratable flag in the VMStateDescription
+> structs of respective devices when user attempts to add them. If the
+> "--only-migratable" was specified, all unmigratable devices will
+> rightly fail to add. This feature is made compatible for both "-device"
+> and "-usbdevice" command line options and covers their hmp and qmp
+> counterparts as well.
 > 
-> "-cpu best" has been proposed with different semantics before:
-> one meant "select the the best CPU model from the builtin table",
-> and another that's equivalent to the meaning of "host" in this
-> patch.
-> 
-> s390x uses "max CPU model" internally to represent a CPU model
-> that has all supported features enabled.
-> 
-> If "-cpu host" is not a good name, I suggest "-cpu max".
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Yeah, I think "-cpu max" better describes the intended semantics for this
-with TCG. I guess for KVM  -cpu host & -cpu max would be equivalent.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> ---
+>  hw/usb/bus.c   | 19 +++++++++++++++++++
+>  qdev-monitor.c |  9 +++++++++
+>  2 files changed, 28 insertions(+)
+> 
+> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+> index 25913ad..1dcc35c 100644
+> --- a/hw/usb/bus.c
+> +++ b/hw/usb/bus.c
+> @@ -8,6 +8,7 @@
+>  #include "monitor/monitor.h"
+>  #include "trace.h"
+>  #include "qemu/cutils.h"
+> +#include "migration/migration.h"
+>  
+>  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
+>  
+> @@ -686,6 +687,8 @@ USBDevice *usbdevice_create(const char *cmdline)
+>      const char *params;
+>      int len;
+>      USBDevice *dev;
+> +    ObjectClass *klass;
+> +    DeviceClass *dc;
+>  
+>      params = strchr(cmdline,':');
+>      if (params) {
+> @@ -720,6 +723,22 @@ USBDevice *usbdevice_create(const char *cmdline)
+>          return NULL;
+>      }
+>  
+> +    klass = object_class_by_name(f->name);
+> +    if (klass == NULL) {
+> +        error_report("Device '%s' not found", f->name);
+> +        return NULL;
+> +    }
+> +
+> +    dc = DEVICE_CLASS(klass);
+> +
+> +    if (only_migratable) {
+> +        if (dc->vmsd->unmigratable) {
+> +            error_report("Device %s is not migratable, but --only-migratable "
+> +                         "was specified", f->name);
+> +            return NULL;
+> +        }
+> +    }
+> +
+>      if (f->usbdevice_init) {
+>          dev = f->usbdevice_init(bus, params);
+>      } else {
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index c73410c..81d01df 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -29,6 +29,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/help_option.h"
+>  #include "sysemu/block-backend.h"
+> +#include "migration/migration.h"
+>  
+>  /*
+>   * Aliases were a bad idea from the start.  Let's keep them
+> @@ -577,6 +578,14 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>          return NULL;
+>      }
+>  
+> +    if (only_migratable) {
+> +        if (dc->vmsd->unmigratable) {
+> +            error_setg(errp, "Device %s is not migratable, but "
+> +                       "--only-migratable was specified", driver);
+> +            return NULL;
+> +        }
+> +    }
+> +
+>      /* find bus */
+>      path = qemu_opt_get(opts, "bus");
+>      if (path != NULL) {
+> -- 
+> 2.6.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
