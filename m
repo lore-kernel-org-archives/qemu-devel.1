@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUDsP-0000aF-Bh
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:39:51 -0500
+	(envelope-from <famz@redhat.com>) id 1cUDsb-0000kI-77
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:40:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUDsO-0003jd-Gh
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:39:45 -0500
+	(envelope-from <famz@redhat.com>) id 1cUDsa-0003o1-CQ
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:39:57 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 19 Jan 2017 22:38:13 +0800
-Message-Id: <20170119143816.21972-14-famz@redhat.com>
+Date: Thu, 19 Jan 2017 22:38:15 +0800
+Message-Id: <20170119143816.21972-16-famz@redhat.com>
 In-Reply-To: <20170119143816.21972-1-famz@redhat.com>
 References: <20170119143816.21972-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 13/16] tests: Disable image lock in
- test-replication
+Subject: [Qemu-devel] [PATCH v10 15/16] qcow2: Force "no other writer" lock
+ on bs->file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, rjones@redhat.com
 
-The COLO block replication architecture requires one disk to be shared
-between primary and secondary, in the test both processes use posix file
-protocol (instead of over NBD) so it is affected by image locking.
-Disable the lock.
+Writing to the same qcow2 file from two QEMU processes at the same time
+will never work correctly, so disable it even when the caller specifies
+BDRV_O_RDWR.
+
+Other formats are less vulnerable because they don't have internal
+snapshots thus qemu-img is less often misused to create live snapshot.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/test-replication.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ block/qcow2.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index fac2da3..5bede49 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -179,7 +179,8 @@ static BlockBackend *start_primary(void)
-     char *cmdline;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 96fb8a8..879361a 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1177,6 +1177,17 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+         }
+     }
  
-     cmdline = g_strdup_printf("driver=replication,mode=primary,node-name=xxx,"
--                              "file.driver=qcow2,file.file.filename=%s"
-+                              "file.driver=qcow2,file.file.filename=%s,"
-+                              "file.file.disable-lock=on"
-                               , p_local_disk);
-     opts = qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
-     g_free(cmdline);
-@@ -310,7 +311,9 @@ static BlockBackend *start_secondary(void)
-     Error *local_err = NULL;
- 
-     /* add s_local_disk and forge S_LOCAL_DISK_ID */
--    cmdline = g_strdup_printf("file.filename=%s,driver=qcow2", s_local_disk);
-+    cmdline = g_strdup_printf("file.filename=%s,driver=qcow2,"
-+                              "file.file.disable-lock=on",
-+                              s_local_disk);
-     opts = qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
-     g_free(cmdline);
- 
-@@ -331,8 +334,10 @@ static BlockBackend *start_secondary(void)
-     /* add S_(ACTIVE/HIDDEN)_DISK and forge S_ID */
-     cmdline = g_strdup_printf("driver=replication,mode=secondary,top-id=%s,"
-                               "file.driver=qcow2,file.file.filename=%s,"
-+                              "file.file.disable-lock=on",
-                               "file.backing.driver=qcow2,"
-                               "file.backing.file.filename=%s,"
-+                              "file.backing.file.disable-lock=on",
-                               "file.backing.backing=%s"
-                               , S_ID, s_active_disk, s_hidden_disk
-                               , S_LOCAL_DISK_ID);
++    if ((flags & BDRV_O_SHARE_RW) && (flags & BDRV_O_RDWR)) {
++        /* Shared write is never a good idea for qcow2, override it.
++         * XXX: Use permission propagation and masking mechanism in op blockers
++         * API once it's there. */
++        ret = bdrv_reopen(bs->file->bs, flags & ~BDRV_O_SHARE_RW, &local_err);
++        if (ret) {
++            error_propagate(errp, local_err);
++            goto fail;
++        }
++    }
++
+ #ifdef DEBUG_ALLOC
+     {
+         BdrvCheckResult result = {0};
 -- 
 2.9.3
