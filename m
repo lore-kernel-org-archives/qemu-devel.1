@@ -1,44 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cU1wP-0002Ng-2E
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 20:55:06 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cU2oZ-0008Oz-4Q
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 21:51:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cU1wM-0001aC-0G
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 20:55:05 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55158
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cU1wL-0001Zz-Rl
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 20:55:01 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0J1rdno031605
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 20:55:00 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 282etctrpu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 20:55:00 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 18 Jan 2017 18:55:00 -0700
-Date: Thu, 19 Jan 2017 09:54:52 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170112072513.98411-3-bjsdjshi@linux.vnet.ibm.com>
-	<20170117145142.4954666f@t450s.home>
-	<20170118025117.GN30301@bjsdjshi@linux.vnet.ibm.com>
-	<20170118134147.5cf6beb0.cornelia.huck@de.ibm.com>
-	<20170118134332.4210104e@t450s.home>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cU2oY-0004cA-DA
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 21:51:03 -0500
+References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1480926904-17596-2-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170113134148.GC10706@stefanha-x1.localdomain>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <5880296B.7080709@huawei.com>
+Date: Thu, 19 Jan 2017 10:50:19 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170118134332.4210104e@t450s.home>
-Message-Id: <20170119015452.GS30301@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 02/12] vfio: linux-headers update
- for vfio-ccw
+In-Reply-To: <20170113134148.GC10706@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v2 1/6] docs/block-replication: Add
+ description for shared-disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,90 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-* Alex Williamson <alex.williamson@redhat.com> [2017-01-18 13:43:32 -0700]:
+On 2017/1/13 21:41, Stefan Hajnoczi wrote:
+> On Mon, Dec 05, 2016 at 04:34:59PM +0800, zhanghailiang wrote:
+>> +Issue qmp command:
+>> +  { 'execute': 'blockdev-add',
+>> +    'arguments': {
+>> +        'driver': 'replication',
+>> +        'node-name': 'rep',
+>> +        'mode': 'primary',
+>> +        'shared-disk-id': 'primary_disk0',
+>> +        'shared-disk': true,
+>> +        'file': {
+>> +            'driver': 'nbd',
+>> +            'export': 'hidden_disk0',
+>> +            'server': {
+>> +                'type': 'inet',
+>> +                'data': {
+>> +                    'host': 'xxx.xxx.xxx.xxx',
+>> +                    'port': 'yyy'
+>> +                }
+>> +            }
+>
+> block/nbd.c does have good error handling and recovery in case there is
+> a network issue.  There are no reconnection attempts or timeouts that
+> deal with a temporary loss of network connectivity.
+>
+> This is a general problem with block/nbd.c and not something to solve in
+> this patch series.  I'm just mentioning it because it may affect COLO
+> replication.
+>
+> I'm sure these limitations in block/nbd.c can be fixed but it will take
+> some effort.  Maybe block/sheepdog.c, net/socket.c, and other network
+> code could also benefit from generic network connection recovery.
+>
 
-> On Wed, 18 Jan 2017 13:41:47 +0100
-> Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
-> 
-> > On Wed, 18 Jan 2017 10:51:17 +0800
-> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> > 
-> > > * Alex Williamson <alex.williamson@redhat.com> [2017-01-17 14:51:42 -0700]:
-> > >   
-> > > > On Thu, 12 Jan 2017 08:25:03 +0100
-> > > > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> > > >   
-> > > > > From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> > > > > 
-> > > > > This is a placeholder for a linux-headers update.
-> > > > > 
-> > > > > Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> > > > > ---
-> > > > >  include/standard-headers/asm-s390/vfio_ccw.h | 28 ++++++++++++++++++++++++++++
-> > > > >  linux-headers/linux/vfio.h                   | 17 +++++++++++++++++
-> > > > >  2 files changed, 45 insertions(+)
-> > > > >  create mode 100644 include/standard-headers/asm-s390/vfio_ccw.h
-> > > > > 
-> > > > > diff --git a/include/standard-headers/asm-s390/vfio_ccw.h b/include/standard-headers/asm-s390/vfio_ccw.h
-> > > > > new file mode 100644
-> > > > > index 0000000..cddc09b
-> > > > > --- /dev/null
-> > > > > +++ b/include/standard-headers/asm-s390/vfio_ccw.h
-> > > > > @@ -0,0 +1,28 @@
-> > > > > +/*
-> > > > > + * Interfaces for vfio-ccw
-> > > > > + *
-> > > > > + * Copyright IBM Corp. 2017
-> > > > > + *
-> > > > > + * This program is free software; you can redistribute it and/or modify
-> > > > > + * it under the terms of the GNU General Public License (version 2 only)
-> > > > > + * as published by the Free Software Foundation.
-> > > > > + *
-> > > > > + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > > > > + */
-> > > > > +
-> > > > > +#ifndef _VFIO_CCW_H_
-> > > > > +#define _VFIO_CCW_H_
-> > > > > +
-> > > > > +#include "standard-headers/linux/types.h"
-> > > > > +
-> > > > > +struct ccw_io_region {
-> > > > > +#define ORB_AREA_SIZE 12
-> > > > > +	uint8_t  orb_area[ORB_AREA_SIZE];
-> > > > > +#define SCSW_AREA_SIZE 12
-> > > > > +	uint8_t  scsw_area[SCSW_AREA_SIZE];
-> > > > > +#define IRB_AREA_SIZE 96
-> > > > > +	uint8_t  irb_area[IRB_AREA_SIZE];
-> > > > > +	uint32_t ret_code;
-> > > > > +} QEMU_PACKED;
-> > > > > +
-> > > > > +#endif  
-> > > > 
-> > > > This is really part of the uapi for the vfio-ccw mdev device, isn't it?  
-> > > Yes, it is.
-> > >   
-> > > > Should it really be buried in asm-s390 in the kernel?
-> > > >   
-> > > We had an internal discussion on this question before, since we think
-> > > this interface is strongly s390 dependent, we put it here. What do you
-> > > suggest? Thanks,  
-> > 
-> > As there are already architecture-specific definitions in the common
-> > file, having everything in the same file is probably better. I'm
-> > certainly not against moving it out from asm-s390.
-> 
-> As soon as we use it for the interface definition to the vfio region, I
-> think it makes sense for it to move to uapi.  It's not really
-> architecture specific as much as it is device specific, for a device
-> which happens to only appear on s390 hardware.  Putting it in uapi
-> should also make sure people think twice about changing it.  Thanks,
-> 
-> Alex
-> 
-Fair enough. Let's move it to include/uapi/linux/vfio_ccw.h.
+Hmm, good suggestion, but IMHO, here, COLO is a little different from
+other scenes, if the reconnection method has been implemented,
+it still needs a mechanism to identify the temporary loss of network
+connection or real broken in network connection.
 
--- 
-Dong Jia
+I did a simple test, just ifconfig down the network card that be used
+by block replication, It seems that NBD in qemu doesn't has a ability to
+find the connection has been broken, there was no error reports
+and COLO just got stuck in vm_stop() where it called aio_poll().
+
+Thanks,
+Hailiang
+
+
+
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>
