@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cU7xU-0004rc-01
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:36 -0500
+	(envelope-from <peterx@redhat.com>) id 1cU7xm-00053F-D4
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:21:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cU7xQ-0008Ds-Rh
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54846)
+	(envelope-from <peterx@redhat.com>) id 1cU7xj-0008IV-8y
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:31837)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cU7xQ-0008Dd-MX
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:32 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F26817E9CC
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 08:20:31 +0000 (UTC)
-Message-ID: <1484814026.15364.15.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 19 Jan 2017 09:20:26 +0100
-In-Reply-To: <20170118160332.13390-24-marcandre.lureau@redhat.com>
-References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
-	<20170118160332.13390-24-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 23/25] console: make screendump async
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cU7xj-0008IL-2b
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:51 -0500
+Date: Thu, 19 Jan 2017 16:20:44 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170119082044.GE4914@pxdev.xzpeter.org>
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+	<1484276800-26814-14-git-send-email-peterx@redhat.com>
+	<20170116125357.31b7ef82@t450s.home>
+	<20170117140000.GN30108@pxdev.xzpeter.org>
+	<20170117084604.2b1f5e50@t450s.home>
+	<20170118074944.GR30108@pxdev.xzpeter.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170118074944.GR30108@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 13/14] intel_iommu: allow dynamic
+ switch of IOMMU region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +32,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, berrange@redhat.com, armbru@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com
 
-On Mi, 2017-01-18 at 20:03 +0400, Marc-Andr=C3=A9 Lureau wrote:
-> +    surface =3D qemu_console_surface(con);
-> +
-> +    /* FIXME: async save with coroutine? it would have to copy or
-> lock
-> +     * the surface. */
-> +    ppm_save(filename, surface, &err);
-> +
+On Wed, Jan 18, 2017 at 03:49:44PM +0800, Peter Xu wrote:
 
-No need to lock or copy.
+[...]
 
-ppm_save() uses the pixman image (surface->image) only anyway, so
-changing it to accept a pixman image instead of the surface is easy.
+> I was trying to invalidate the entire address space by sending a big
+> IOTLB notification to vfio-pci, which looks like:
+> 
+>   IOMMUTLBEntry entry = {
+>       .target_as = &address_space_memory,
+>       .iova = 0,
+>       .translated_addr = 0,
+>       .addr_mask = (1 << 63) - 1,
+>       .perm = IOMMU_NONE,     /* UNMAP */
+>   };
+> 
+> Then I feed this entry to vfio-pci IOMMU notifier.
+> 
+> However, this was blocked in vfio_iommu_map_notify(), with error:
+> 
+>   qemu-system-x86_64: iommu has granularity incompatible with target AS
+> 
+> Since we have:
+> 
+>   /*
+>    * The IOMMU TLB entry we have just covers translation through
+>    * this IOMMU to its immediate target.  We need to translate
+>    * it the rest of the way through to memory.
+>    */
+>   rcu_read_lock();
+>   mr = address_space_translate(&address_space_memory,
+>                                iotlb->translated_addr,
+>                                &xlat, &len, iotlb->perm & IOMMU_WO);
+>   if (!memory_region_is_ram(mr)) {
+>       error_report("iommu map to non memory area %"HWADDR_PRIx"",
+>                    xlat);
+>       goto out;
+>   }
+>   /*
+>    * Translation truncates length to the IOMMU page size,
+>    * check that it did not truncate too much.
+>    */
+>   if (len & iotlb->addr_mask) {
+>       error_report("iommu has granularity incompatible with target AS");
+>       goto out;
+>   }
+> 
+> In my case len == 0xa0000 (that's the translation result), and
+> iotlb->addr_mask == (1<<63)-1. So looks like the translation above
+> splitted the big region and a simple big UNMAP doesn't work for me.
+> 
+> Do you have any suggestion on how I can solve this? In what case will
+> we need the above address_space_translate()?
 
-pixman images are reference counted, so you can just grab a reference
-using pixman_image_ref() and run with it, without risking it'll be
-released underneath your feet, then unref when done.
+Hmm... it should be checking that the translated address range is RAM.
 
-cheers,
-  Gerd
+However if with this, IOMMU notifiers won't be able to leverage the
+vfio driver feature to unmap a very big region.
+
+IMHO the check should only be meaningful for map operations. I'll try
+to post a RFC patch for vfio-pci to allow unmap of very big regions,
+to see whether that'll be a workable approach.
+
+Thanks,
+
+-- peterx
