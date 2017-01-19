@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cUJR4-00083S-0B
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:35:55 -0500
+	(envelope-from <clg@kaod.org>) id 1cUJSO-0000P8-UI
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:37:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cUJQz-0007xJ-1a
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:35:53 -0500
-Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:56889)
+	(envelope-from <clg@kaod.org>) id 1cUJSK-0000BO-29
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:37:17 -0500
+Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:59328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cUJQy-0007tX-Ro
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:35:48 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cUJSJ-0000Ar-Ry
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:37:11 -0500
 Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id BA8DA1539C
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 21:35:39 +0100 (CET)
-References: <1483979087-32663-1-git-send-email-clg@kaod.org>
-	<1483979087-32663-8-git-send-email-clg@kaod.org>
-	<CAFEAcA_tLcVQj_kJh3iY7ZOEechPrk=9+Hj3_QcOE+pmPoWCYg@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <549b1cd1-602b-8b74-add6-0648f6426694@kaod.org>
-Date: Thu, 19 Jan 2017 21:35:30 +0100
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 82F5B156CB
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 21:37:10 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 19 Jan 2017 21:36:58 +0100
+Message-Id: <1484858218-28693-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_tLcVQj_kJh3iY7ZOEechPrk=9+Hj3_QcOE+pmPoWCYg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 07/11] aspeed/smc: handle SPI flash
- Command mode
+Subject: [Qemu-devel] [PATCH] aspeed/smc: remove unused routine
+ aspeed_smc_is_usermode()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +29,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Marcin Krzeminski <marcin.krzeminski@nokia.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On 01/19/2017 08:26 PM, Peter Maydell wrote:
-> On 9 January 2017 at 16:24, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->> The Aspeed SMC controllers have a mode (Command mode) in which
->> accesses to the flash content are no different than doing MMIOs. The
->> controller generates all the necessary commands to load (or store)
->> data in memory.
->>
->> However, accesses are restricted to the segment window assigned the
->> the flash module by the controller. This window is defined by the
->> Segment Address Register.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
->> ---
->>  hw/ssi/aspeed_smc.c         | 152 +++++++++++++++++++++++++++++++++++=
-+++------
->>  include/hw/ssi/aspeed_smc.h |   2 +-
->>  2 files changed, 132 insertions(+), 22 deletions(-)
->=20
-> This deleted the only call to aspeed_smc_is_usermode() but not
-> its definition, which makes clang complain:
-> /Users/pm215/src/qemu-for-merges/hw/ssi/aspeed_smc.c:409:20: error:
-> unused function 'aspeed_smc_is_usermode' [-Werror,-Wunused-function]
->=20
-> Presumably the function itself should be deleted?
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/ssi/aspeed_smc.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-yes. This is correct. I will send a patch for it.
-
-Thanks,
-
-C.
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index a0a816407fc1..ae1ad2dba6ff 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -406,11 +406,6 @@ static inline int aspeed_smc_flash_mode(const Aspeed=
+SMCFlash *fl)
+     return s->regs[s->r_ctrl0 + fl->id] & CTRL_CMD_MODE_MASK;
+ }
+=20
+-static inline bool aspeed_smc_is_usermode(const AspeedSMCFlash *fl)
+-{
+-    return aspeed_smc_flash_mode(fl) =3D=3D CTRL_USERMODE;
+-}
+-
+ static inline bool aspeed_smc_is_writable(const AspeedSMCFlash *fl)
+ {
+     const AspeedSMCState *s =3D fl->controller;
+--=20
+2.7.4
