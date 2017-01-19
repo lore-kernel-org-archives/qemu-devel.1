@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cUHxP-0001hU-HO
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:01:12 -0500
+	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cUHxR-0001io-B4
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:01:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cUHxL-0007vO-Mh
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:01:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49213)
+	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cUHxQ-0007wq-1L
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:01:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46827
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <duanj@linux.vnet.ibm.com>)
-	id 1cUHxL-0007u3-EY
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:01:07 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0JIx0Tu112629
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:01:05 -0500
+	id 1cUHxP-0007wW-Rm
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:01:11 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0JIxCqk003566
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:01:11 -0500
 Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 282nq01g6w-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28302g874s-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:01:05 -0500
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:01:10 -0500
 Received: from localhost
 	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <duanj@linux.vnet.ibm.com>;
-	Thu, 19 Jan 2017 12:01:03 -0700
+	Thu, 19 Jan 2017 12:01:09 -0700
 From: Jianjun Duan <duanj@linux.vnet.ibm.com>
-Date: Thu, 19 Jan 2017 11:00:49 -0800
-Message-Id: <1484852453-12728-1-git-send-email-duanj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [QEMU PATCH v17 0/4] migration: migrate QTAILQ
+Date: Thu, 19 Jan 2017 11:00:51 -0800
+In-Reply-To: <1484852453-12728-1-git-send-email-duanj@linux.vnet.ibm.com>
+References: <1484852453-12728-1-git-send-email-duanj@linux.vnet.ibm.com>
+Message-Id: <1484852453-12728-3-git-send-email-duanj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [QEMU PATCH v17 2/4] migration: migrate QTAILQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,124 +41,238 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, duanj@linux.vnet.ibm.com, dmitry@daynix.com, peter.maydell@linaro.org, kraxel@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, veroniabahaa@gmail.com, quintela@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, rth@twiddle.net, aurelien@aurel32.net, leon.alrae@imgtec.com, blauwirbel@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
 
-Hi all,
+Currently we cannot directly transfer a QTAILQ instance because of the
+limitation in the migration code. Here we introduce an approach to
+transfer such structures. We created VMStateInfo vmstate_info_qtailq
+for QTAILQ. Similar VMStateInfo can be created for other data structures
+such as list.
 
-    Comments are welcome.     
+When a QTAILQ is migrated from source to target, it is appended to the
+corresponding QTAILQ structure, which is assumed to have been properly
+initialized.
 
-v17: - Fixed a type cast issue in test-vmstate.c.
-Previous versions are:
+This approach will be used to transfer pending_events and ccs_list in spapr
+state.
 
-v16: - Moved a variable to global in test-vmstate.c following Dave's suggestion.
-(link: http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg01187.html)
+We also create some macros in qemu/queue.h to access a QTAILQ using pointer
+arithmetic. This ensures that we do not depend on the implementation
+details about QTAILQ in the migration code.
 
-v15: - Improved error messages.
-(link: http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg01059.html)
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-v14: - Fixed a return statement.
-(link: http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg04467.html)
+Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+---
+ include/migration/vmstate.h | 20 +++++++++++++
+ include/qemu/queue.h        | 60 +++++++++++++++++++++++++++++++++++++++
+ migration/trace-events      |  4 +++
+ migration/vmstate.c         | 69 +++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 153 insertions(+)
 
-v13: - Changed some QTAILQ related macro names to match existing ones. 
-(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-11/msg00226.html)
-
-v12: - Fixed type for put_qtailq which caused build break.
-(link: http://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01328.html
-
-v11: - Split error_report statements into a separate patch.
-     - Changed the signature of put. It now returns int type.
-     - Minor changes to QTAILQ macros. 
-         
-v10: - Fixed a typo.
-(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg01206.html)
-
-v9: - No more hard encoding of QTAILQ layout information
-(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg01042.html)
-
-v8: - Fixed a style issue. 
-(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg00874.html)
-
-v7: - Fixed merge errors.
-    - Simplified macro definitions related to pointer arithmetic based QTAILQ access.
-    - Added test case for QTAILQ migration in tests/test-vmstate.c.
-(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg00711.html)
-
-
-v6: - Split from Power specific patches. 
-    - Dropped VMS_LINKED flag.
-    - Rebased to master.
-    - Added comments to clarify about put/get in VMStateInfo.  
-(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg00336.html)
-
-v5: - Rebased to David's ppc-for-2.8. 
-(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-10/msg00270.html)
-
-v4: - Introduce a way to set customized instance_id in SaveStateEntry. Use it
-      to set instance_id for DRC using its unique index to address David 
-      Gibson's concern.
-    - Rename VMS_CSTM to VMS_LINKED based on Paolo Bonzini's suggestions.
-    - Clean up qjson stuff in put_qtailq. 
-    - Add trace for put_qtailq and get_qtailq based on David Gilbert's 
-      suggestion.
-    - Based on David's ppc-for-2.7. 
-(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-06/msg07720.html)
-
-v3: - Simplify overall design followng discussion with Paolo. No longer need
-      metadata to migrate QTAILQ.
-    - Extend VMStateInfo instead of adding similar fields to VMStateField.
-    - Clean up macros in qemu/queue.h.
-(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg05695.html)
-
-v2: - Introduce a general approach to migrate QTAILQ in qemu/queue.h.
-    - Migrate signalled field in the DRC state.
-    - Put the newly added migrating fields in subsections so that backward 
-      migration is not broken.  
-    - Set detach_cb field right after migration so that a migrated hot-unplug
-      event could finish its course.
-(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg04188.html)
-
-v1: - Inital version.
-(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-04/msg02601.html)
-
-To make guest device (PCI, CPU and memory) hotplug work together 
-with guest migration, spapr drc state needs be transmitted in
-migration. This patch defines the VMStateDescription struct for
-spapr drc state to enable it.
-
-To fix the potential racing between hotplug events on guest and 
-guest migration, ccs_list and pending_events of spapr state need be 
-transmitted in migration. This patch also takes care of it.
-
-Jianjun Duan (4):
-  migration: extend VMStateInfo
-  migration: migrate QTAILQ
-  tests/migration: Add test for QTAILQ migration
-  migration: add error_report
-
- hw/display/virtio-gpu.c     |   8 +-
- hw/intc/s390_flic_kvm.c     |   8 +-
- hw/net/vmxnet3.c            |  24 ++++--
- hw/nvram/eeprom93xx.c       |   8 +-
- hw/nvram/fw_cfg.c           |   8 +-
- hw/pci/msix.c               |   8 +-
- hw/pci/pci.c                |  16 +++-
- hw/pci/shpc.c               |   7 +-
- hw/scsi/scsi-bus.c          |   8 +-
- hw/timer/twl92230.c         |   8 +-
- hw/usb/redirect.c           |  26 ++++--
- hw/virtio/virtio-pci.c      |   8 +-
- hw/virtio/virtio.c          |  15 +++-
- include/migration/vmstate.h |  39 +++++++--
- include/qemu/queue.h        |  60 ++++++++++++++
- migration/savevm.c          |   7 +-
- migration/trace-events      |   4 +
- migration/vmstate.c         | 188 +++++++++++++++++++++++++++++++++++---------
- target-alpha/machine.c      |   6 +-
- target-arm/machine.c        |  14 +++-
- target-i386/machine.c       |  26 ++++--
- target-mips/machine.c       |  14 +++-
- target-ppc/machine.c        |  12 ++-
- target-sparc/machine.c      |   6 +-
- tests/test-vmstate.c        | 147 ++++++++++++++++++++++++++++++++++
- 25 files changed, 569 insertions(+), 106 deletions(-)
-
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index eafc8f2..e47ad6e 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -253,6 +253,7 @@ extern const VMStateInfo vmstate_info_timer;
+ extern const VMStateInfo vmstate_info_buffer;
+ extern const VMStateInfo vmstate_info_unused_buffer;
+ extern const VMStateInfo vmstate_info_bitmap;
++extern const VMStateInfo vmstate_info_qtailq;
+ 
+ #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
+ #define type_check_array(t1,t2,n) ((t1(*)[n])0 - (t2*)0)
+@@ -664,6 +665,25 @@ extern const VMStateInfo vmstate_info_bitmap;
+     .offset       = offsetof(_state, _field),                        \
+ }
+ 
++/* For migrating a QTAILQ.
++ * Target QTAILQ needs be properly initialized.
++ * _type: type of QTAILQ element
++ * _next: name of QTAILQ entry field in QTAILQ element
++ * _vmsd: VMSD for QTAILQ element
++ * size: size of QTAILQ element
++ * start: offset of QTAILQ entry in QTAILQ element
++ */
++#define VMSTATE_QTAILQ_V(_field, _state, _version, _vmsd, _type, _next)  \
++{                                                                        \
++    .name         = (stringify(_field)),                                 \
++    .version_id   = (_version),                                          \
++    .vmsd         = &(_vmsd),                                            \
++    .size         = sizeof(_type),                                       \
++    .info         = &vmstate_info_qtailq,                                \
++    .offset       = offsetof(_state, _field),                            \
++    .start        = offsetof(_type, _next),                              \
++}
++
+ /* _f : field name
+    _f_n : num of elements field_name
+    _n : num of elements
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index 342073f..35292c3 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -438,4 +438,64 @@ struct {                                                                \
+ #define QTAILQ_PREV(elm, headname, field) \
+         (*(((struct headname *)((elm)->field.tqe_prev))->tqh_last))
+ 
++#define field_at_offset(base, offset, type)                                    \
++        ((type) (((char *) (base)) + (offset)))
++
++typedef struct DUMMY_Q_ENTRY DUMMY_Q_ENTRY;
++typedef struct DUMMY_Q DUMMY_Q;
++
++struct DUMMY_Q_ENTRY {
++        QTAILQ_ENTRY(DUMMY_Q_ENTRY) next;
++};
++
++struct DUMMY_Q {
++        QTAILQ_HEAD(DUMMY_Q_HEAD, DUMMY_Q_ENTRY) head;
++};
++
++#define dummy_q ((DUMMY_Q *) 0)
++#define dummy_qe ((DUMMY_Q_ENTRY *) 0)
++
++/*
++ * Offsets of layout of a tail queue head.
++ */
++#define QTAILQ_FIRST_OFFSET (offsetof(typeof(dummy_q->head), tqh_first))
++#define QTAILQ_LAST_OFFSET  (offsetof(typeof(dummy_q->head), tqh_last))
++/*
++ * Raw access of elements of a tail queue
++ */
++#define QTAILQ_RAW_FIRST(head)                                                 \
++        (*field_at_offset(head, QTAILQ_FIRST_OFFSET, void **))
++#define QTAILQ_RAW_TQH_LAST(head)                                              \
++        (*field_at_offset(head, QTAILQ_LAST_OFFSET, void ***))
++
++/*
++ * Offsets of layout of a tail queue element.
++ */
++#define QTAILQ_NEXT_OFFSET (offsetof(typeof(dummy_qe->next), tqe_next))
++#define QTAILQ_PREV_OFFSET (offsetof(typeof(dummy_qe->next), tqe_prev))
++
++/*
++ * Raw access of elements of a tail entry
++ */
++#define QTAILQ_RAW_NEXT(elm, entry)                                            \
++        (*field_at_offset(elm, entry + QTAILQ_NEXT_OFFSET, void **))
++#define QTAILQ_RAW_TQE_PREV(elm, entry)                                        \
++        (*field_at_offset(elm, entry + QTAILQ_PREV_OFFSET, void ***))
++/*
++ * Tail queue tranversal using pointer arithmetic.
++ */
++#define QTAILQ_RAW_FOREACH(elm, head, entry)                                   \
++        for ((elm) = QTAILQ_RAW_FIRST(head);                                   \
++             (elm);                                                            \
++             (elm) = QTAILQ_RAW_NEXT(elm, entry))
++/*
++ * Tail queue insertion using pointer arithmetic.
++ */
++#define QTAILQ_RAW_INSERT_TAIL(head, elm, entry) do {                          \
++        QTAILQ_RAW_NEXT(elm, entry) = NULL;                                    \
++        QTAILQ_RAW_TQE_PREV(elm, entry) = QTAILQ_RAW_TQH_LAST(head);           \
++        *QTAILQ_RAW_TQH_LAST(head) = (elm);                                    \
++        QTAILQ_RAW_TQH_LAST(head) = &QTAILQ_RAW_NEXT(elm, entry);              \
++} while (/*CONSTCOND*/0)
++
+ #endif /* QEMU_SYS_QUEUE_H */
+diff --git a/migration/trace-events b/migration/trace-events
+index 94134f7..c46f9e9 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -52,6 +52,10 @@ vmstate_n_elems(const char *name, int n_elems) "%s: %d"
+ vmstate_subsection_load(const char *parent) "%s"
+ vmstate_subsection_load_bad(const char *parent,  const char *sub, const char *sub2) "%s: %s/%s"
+ vmstate_subsection_load_good(const char *parent) "%s"
++get_qtailq(const char *name, int version_id) "%s v%d"
++get_qtailq_end(const char *name, const char *reason, int val) "%s %s/%d"
++put_qtailq(const char *name, int version_id) "%s v%d"
++put_qtailq_end(const char *name, const char *reason) "%s %s"
+ 
+ # migration/qemu-file.c
+ qemu_file_fclose(void) ""
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index 7b4bd6e..2f9d4ba 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -5,6 +5,7 @@
+ #include "migration/vmstate.h"
+ #include "qemu/bitops.h"
+ #include "qemu/error-report.h"
++#include "qemu/queue.h"
+ #include "trace.h"
+ #include "migration/qjson.h"
+ 
+@@ -965,3 +966,71 @@ const VMStateInfo vmstate_info_bitmap = {
+     .get = get_bitmap,
+     .put = put_bitmap,
+ };
++
++/* get for QTAILQ
++ * meta data about the QTAILQ is encoded in a VMStateField structure
++ */
++static int get_qtailq(QEMUFile *f, void *pv, size_t unused_size,
++                      VMStateField *field)
++{
++    int ret = 0;
++    const VMStateDescription *vmsd = field->vmsd;
++    /* size of a QTAILQ element */
++    size_t size = field->size;
++    /* offset of the QTAILQ entry in a QTAILQ element */
++    size_t entry_offset = field->start;
++    int version_id = field->version_id;
++    void *elm;
++
++    trace_get_qtailq(vmsd->name, version_id);
++    if (version_id > vmsd->version_id) {
++        error_report("%s %s",  vmsd->name, "too new");
++        trace_get_qtailq_end(vmsd->name, "too new", -EINVAL);
++
++        return -EINVAL;
++    }
++    if (version_id < vmsd->minimum_version_id) {
++        error_report("%s %s",  vmsd->name, "too old");
++        trace_get_qtailq_end(vmsd->name, "too old", -EINVAL);
++        return -EINVAL;
++    }
++
++    while (qemu_get_byte(f)) {
++        elm = g_malloc(size);
++        ret = vmstate_load_state(f, vmsd, elm, version_id);
++        if (ret) {
++            return ret;
++        }
++        QTAILQ_RAW_INSERT_TAIL(pv, elm, entry_offset);
++    }
++
++    trace_get_qtailq_end(vmsd->name, "end", ret);
++    return ret;
++}
++
++/* put for QTAILQ */
++static int put_qtailq(QEMUFile *f, void *pv, size_t unused_size,
++                      VMStateField *field, QJSON *vmdesc)
++{
++    const VMStateDescription *vmsd = field->vmsd;
++    /* offset of the QTAILQ entry in a QTAILQ element*/
++    size_t entry_offset = field->start;
++    void *elm;
++
++    trace_put_qtailq(vmsd->name, vmsd->version_id);
++
++    QTAILQ_RAW_FOREACH(elm, pv, entry_offset) {
++        qemu_put_byte(f, true);
++        vmstate_save_state(f, vmsd, elm, vmdesc);
++    }
++    qemu_put_byte(f, false);
++
++    trace_put_qtailq_end(vmsd->name, "end");
++
++    return 0;
++}
++const VMStateInfo vmstate_info_qtailq = {
++    .name = "qtailq",
++    .get  = get_qtailq,
++    .put  = put_qtailq,
++};
 -- 
 1.9.1
