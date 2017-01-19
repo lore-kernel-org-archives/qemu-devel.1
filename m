@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUGGa-0005cf-KQ
+	(envelope-from <alex.bennee@linaro.org>) id 1cUGGa-0005cq-QH
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:12:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUGGY-0001iz-3U
+	(envelope-from <alex.bennee@linaro.org>) id 1cUGGV-0001hY-MZ
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:12:52 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37120)
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:34726)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cUGGX-0001iS-Pm
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:12:50 -0500
-Received: by mail-wm0-x232.google.com with SMTP id c206so3178299wme.0
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:12:49 -0800 (PST)
+	id 1cUGGV-0001gY-DO
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:12:47 -0500
+Received: by mail-wm0-x236.google.com with SMTP id f73so7394261wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:12:47 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 19 Jan 2017 17:05:05 +0000
-Message-Id: <20170119170507.16185-26-alex.bennee@linaro.org>
+Date: Thu, 19 Jan 2017 17:04:57 +0000
+Message-Id: <20170119170507.16185-18-alex.bennee@linaro.org>
 In-Reply-To: <20170119170507.16185-1-alex.bennee@linaro.org>
 References: <20170119170507.16185-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 25/27] target-arm: ensure all cross vCPUs
- TLB flushes complete
+Subject: [Qemu-devel] [PATCH v7 17/27] cputlb: atomically update tlb fields
+ used by tlb_reset_dirty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,484 +31,247 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
-Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Previously flushes on other vCPUs would only get serviced when they
-exited their TranslationBlocks. While this isn't overly problematic it
-violates the semantics of TLB flush from the point of view of source
-vCPU.
+The main use case for tlb_reset_dirty is to set the TLB_NOTDIRTY flags
+in TLB entries to force the slow-path on writes. This is used to mark
+page ranges containing code which has been translated so it can be
+invalidated if written to. To do this safely we need to ensure the TLB
+entries in question for all vCPUs are updated before we attempt to run
+the code otherwise a race could be introduced.
 
-To solve this we call the cputlb *_all_cpus() functions to do the
-flushes and ask it to ensure all flushes are completed before we start
-the next instruction. As this involves exiting the cpu_loop we need to
-ensure the PC is saved before the tlb helper functions are called.
+To achieve this we atomically set the flag in tlb_reset_dirty_range and
+take care when setting it when the TLB entry is filled.
+
+On 32 bit systems attempting to emulate 64 bit guests we don't even
+bother as we might not have the atomic primitives available. MTTCG is
+disabled in this case and can't be forced on. The copy_tlb_helper
+function helps keep the atomic semantics in one place to avoid
+confusion.
+
+The dirty helper function is made static as it isn't used outside of
+cputlb.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/helper.c | 194 ++++++++++++++++++++++------------------------------
- 1 file changed, 83 insertions(+), 111 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 87809562b9..2b696ef8ee 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -536,41 +536,33 @@ static void tlbimvaa_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush(other_cs);
--    }
-+    tlb_flush_all_cpus(cs, true);
+---
+v6
+  - use TARGET_PAGE_BITS_MIN
+  - use run_on_cpu helpers
+v7
+  - fix tlb_debug fmt for 32bit build
+  - un-merged the mmuidx async work which got mashed in last round
+  - introduced copy_tlb_helper function and made TCG_OVERSIZED_GUEST aware
+---
+ cputlb.c              | 120 +++++++++++++++++++++++++++++++++++++++-----------
+ include/exec/cputlb.h |   2 -
+ 2 files changed, 95 insertions(+), 27 deletions(-)
+
+diff --git a/cputlb.c b/cputlb.c
+index 207faf2ea0..856213cbcb 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -384,32 +384,90 @@ void tlb_unprotect_code(ram_addr_t ram_addr)
+     cpu_physical_memory_set_dirty_flag(ram_addr, DIRTY_MEMORY_CODE);
  }
  
- static void tlbiasid_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
+-static bool tlb_is_dirty_ram(CPUTLBEntry *tlbe)
+-{
+-    return (tlbe->addr_write & (TLB_INVALID_MASK|TLB_MMIO|TLB_NOTDIRTY)) == 0;
+-}
  
--    CPU_FOREACH(other_cs) {
--        tlb_flush(other_cs);
--    }
-+    tlb_flush_all_cpus(cs, true);
- }
- 
- static void tlbimva_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page(other_cs, value & TARGET_PAGE_MASK);
--    }
-+    tlb_flush_page_all_cpus(cs, true, value & TARGET_PAGE_MASK);
- }
- 
- static void tlbimvaa_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page(other_cs, value & TARGET_PAGE_MASK);
--    }
-+    tlb_flush_page_all_cpus(cs, true, value & TARGET_PAGE_MASK);
- }
- 
- static void tlbiall_nsnh_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -585,12 +577,10 @@ static void tlbiall_nsnh_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_nsnh_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                   uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_by_mmuidx(other_cs, ARMMMUIdx_S12NSE1,
--                            ARMMMUIdx_S12NSE0, ARMMMUIdx_S2NS, -1);
--    }
-+    tlb_flush_by_mmuidx_all_cpus(cs, true, ARMMMUIdx_S12NSE1,
-+                                 ARMMMUIdx_S12NSE0, ARMMMUIdx_S2NS, -1);
- }
- 
- static void tlbiipas2_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -617,7 +607,7 @@ static void tlbiipas2_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiipas2_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr;
- 
-     if (!arm_feature(env, ARM_FEATURE_EL2) || !(env->cp15.scr_el3 & SCR_NS)) {
-@@ -626,9 +616,7 @@ static void tlbiipas2_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- 
-     pageaddr = sextract64(value << 12, 0, 40);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, ARMMMUIdx_S2NS, -1);
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus(cs, true, pageaddr, ARMMMUIdx_S2NS, -1);
- }
- 
- static void tlbiall_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -642,11 +630,9 @@ static void tlbiall_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_hyp_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                  uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_by_mmuidx(other_cs, ARMMMUIdx_S1E2, -1);
--    }
-+    tlb_flush_by_mmuidx_all_cpus(cs, true, ARMMMUIdx_S1E2, -1);
- }
- 
- static void tlbimva_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -661,12 +647,10 @@ static void tlbimva_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbimva_hyp_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                  uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr = value & ~MAKE_64BIT_MASK(0, 12);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, ARMMMUIdx_S1E2, -1);
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus(cs, true, pageaddr, ARMMMUIdx_S1E2, -1);
- }
- 
- static const ARMCPRegInfo cp_reginfo[] = {
-@@ -1335,14 +1319,16 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
- static const ARMCPRegInfo v7mp_cp_reginfo[] = {
-     /* 32 bit TLB invalidates, Inner Shareable */
-     { .name = "TLBIALLIS", .cp = 15, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 0,
--      .type = ARM_CP_NO_RAW, .access = PL1_W, .writefn = tlbiall_is_write },
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL1_W,
-+      .writefn = tlbiall_is_write },
-     { .name = "TLBIMVAIS", .cp = 15, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 1,
--      .type = ARM_CP_NO_RAW, .access = PL1_W, .writefn = tlbimva_is_write },
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL1_W,
-+      .writefn = tlbimva_is_write },
-     { .name = "TLBIASIDIS", .cp = 15, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 2,
--      .type = ARM_CP_NO_RAW, .access = PL1_W,
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL1_W,
-       .writefn = tlbiasid_is_write },
-     { .name = "TLBIMVAAIS", .cp = 15, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 3,
--      .type = ARM_CP_NO_RAW, .access = PL1_W,
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL1_W,
-       .writefn = tlbimvaa_is_write },
-     REGINFO_SENTINEL
- };
-@@ -2855,8 +2841,7 @@ static CPAccessResult aa64_cacheop_access(CPUARMState *env,
- static void tlbi_aa64_vmalle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    ARMCPU *cpu = arm_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUState *cs = ENV_GET_CPU(env);
- 
-     if (arm_is_secure_below_el3(env)) {
-         tlb_flush_by_mmuidx(cs, ARMMMUIdx_S1SE1, ARMMMUIdx_S1SE0, -1);
-@@ -2868,16 +2853,15 @@ static void tlbi_aa64_vmalle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_vmalle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                       uint64_t value)
- {
-+    CPUState *cs = ENV_GET_CPU(env);
-     bool sec = arm_is_secure_below_el3(env);
--    CPUState *other_cs;
- 
--    CPU_FOREACH(other_cs) {
--        if (sec) {
--            tlb_flush_by_mmuidx(other_cs, ARMMMUIdx_S1SE1, ARMMMUIdx_S1SE0, -1);
--        } else {
--            tlb_flush_by_mmuidx(other_cs, ARMMMUIdx_S12NSE1,
--                                ARMMMUIdx_S12NSE0, -1);
--        }
-+    if (sec) {
-+        tlb_flush_by_mmuidx_all_cpus(cs, true, ARMMMUIdx_S1SE1,
-+                                     ARMMMUIdx_S1SE0, -1);
-+    } else {
-+        tlb_flush_by_mmuidx_all_cpus(cs, true, ARMMMUIdx_S12NSE1,
-+                                     ARMMMUIdx_S12NSE0, -1);
-     }
- }
- 
-@@ -2930,39 +2914,34 @@ static void tlbi_aa64_alle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-      */
-     bool sec = arm_is_secure_below_el3(env);
-     bool has_el2 = arm_feature(env, ARM_FEATURE_EL2);
--    CPUState *other_cs;
--
--    CPU_FOREACH(other_cs) {
--        if (sec) {
--            tlb_flush_by_mmuidx(other_cs, ARMMMUIdx_S1SE1, ARMMMUIdx_S1SE0, -1);
--        } else if (has_el2) {
--            tlb_flush_by_mmuidx(other_cs, ARMMMUIdx_S12NSE1,
--                                ARMMMUIdx_S12NSE0, ARMMMUIdx_S2NS, -1);
--        } else {
--            tlb_flush_by_mmuidx(other_cs, ARMMMUIdx_S12NSE1,
--                                ARMMMUIdx_S12NSE0, -1);
--        }
-+    CPUState *cs = ENV_GET_CPU(env);
+-void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
++/*
++ * Dirty write flag handling
++ *
++ * When the TCG code writes to a location it looks up the address in
++ * the TLB and uses that data to compute the final address. If any of
++ * the lower bits of the address are set then the slow path is forced.
++ * There are a number of reasons to do this but for normal RAM the
++ * most usual is detecting writes to code regions which may invalidate
++ * generated code.
++ *
++ * Because we want other vCPUs to respond to changes straight away we
++ * update the te->addr_write field atomically. If the TLB entry has
++ * been changed by the vCPU in the mean time we skip the update.
++ *
++ * As this function uses atomic accesses we also need to ensure
++ * updates to tlb_entries follow the same access rules. We don't need
++ * to worry about this for oversized guests as MTTCG is disabled for
++ * them.
++ */
 +
-+    if (sec) {
-+        tlb_flush_by_mmuidx_all_cpus(cs, true, ARMMMUIdx_S1SE1,
-+                                     ARMMMUIdx_S1SE0, -1);
-+    } else if (has_el2) {
-+        tlb_flush_by_mmuidx_all_cpus(cs, true, ARMMMUIdx_S12NSE1,
-+                                     ARMMMUIdx_S12NSE0, ARMMMUIdx_S2NS, -1);
-+    } else {
-+        tlb_flush_by_mmuidx_all_cpus(cs, true, ARMMMUIdx_S12NSE1,
-+                                     ARMMMUIdx_S12NSE0, -1);
++static void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+                            uintptr_t length)
+ {
+-    uintptr_t addr;
++#if TCG_OVERSIZED_GUEST
++    uintptr_t addr = tlb_entry->addr_write;
+ 
+-    if (tlb_is_dirty_ram(tlb_entry)) {
+-        addr = (tlb_entry->addr_write & TARGET_PAGE_MASK) + tlb_entry->addend;
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += tlb_entry->addend;
+         if ((addr - start) < length) {
+             tlb_entry->addr_write |= TLB_NOTDIRTY;
+         }
      }
- }
- 
- static void tlbi_aa64_alle2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_by_mmuidx(other_cs, ARMMMUIdx_S1E2, -1);
--    }
-+    tlb_flush_by_mmuidx_all_cpus(cs, true, ARMMMUIdx_S1E2, -1);
- }
- 
- static void tlbi_aa64_alle3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_by_mmuidx(other_cs, ARMMMUIdx_S1E3, -1);
--    }
-+    tlb_flush_by_mmuidx_all_cpus(cs, true, ARMMMUIdx_S1E3, -1);
- }
- 
- static void tlbi_aa64_vae1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -3017,41 +2996,36 @@ static void tlbi_aa64_vae3_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_vae1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    uint64_t value)
- {
-+    ARMCPU *cpu = arm_env_get_cpu(env);
-+    CPUState *cs = CPU(cpu);
-     bool sec = arm_is_secure_below_el3(env);
--    CPUState *other_cs;
-     uint64_t pageaddr = sextract64(value << 12, 0, 56);
- 
--    CPU_FOREACH(other_cs) {
--        if (sec) {
--            tlb_flush_page_by_mmuidx(other_cs, pageaddr, ARMMMUIdx_S1SE1,
--                                     ARMMMUIdx_S1SE0, -1);
--        } else {
--            tlb_flush_page_by_mmuidx(other_cs, pageaddr, ARMMMUIdx_S12NSE1,
--                                     ARMMMUIdx_S12NSE0, -1);
--        }
-+    if (sec) {
-+        tlb_flush_page_by_mmuidx_all_cpus(cs, true, pageaddr, ARMMMUIdx_S1SE1,
-+                                          ARMMMUIdx_S1SE0, -1);
++#else
++    /* paired with atomic_mb_set in tlb_set_page_with_attrs */
++    uintptr_t orig_addr = atomic_mb_read(&tlb_entry->addr_write);
++    uintptr_t addr = orig_addr;
++
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += atomic_read(&tlb_entry->addend);
++        if ((addr - start) < length) {
++            uintptr_t notdirty_addr = orig_addr | TLB_NOTDIRTY;
++            atomic_cmpxchg(&tlb_entry->addr_write, orig_addr, notdirty_addr);
++        }
++    }
++#endif
++}
++
++/* For atomic correctness when running MTTCG we need to use the right
++ * primitives when copying entries */
++static inline void copy_tlb_helper(CPUTLBEntry *d, CPUTLBEntry *s,
++                                   bool atomic_set)
++{
++#if TCG_OVERSIZED_GUEST
++    *d = *s;
++#else
++    if (atomic_set) {
++        d->addr_read = s->addr_read;
++        d->addr_code = s->addr_code;
++        atomic_set(&d->addend, atomic_read(&s->addend));
++        /* Pairs with flag setting in tlb_reset_dirty_range */
++        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
 +    } else {
-+        tlb_flush_page_by_mmuidx_all_cpus(cs, true, pageaddr, ARMMMUIdx_S12NSE1,
-+                                          ARMMMUIdx_S12NSE0, -1);
++        d->addr_read = s->addr_read;
++        d->addr_write = atomic_read(&s->addr_write);
++        d->addr_code = s->addr_code;
++        d->addend = atomic_read(&s->addend);
++    }
++#endif
+ }
+ 
++/* This is a cross vCPU call (i.e. another vCPU resetting the flags of
++ * the target vCPU). As such care needs to be taken that we don't
++ * dangerously race with another vCPU update. The only thing actually
++ * updated is the target TLB entry ->addr_write flags.
++ */
+ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
+ {
+     CPUArchState *env;
+ 
+     int mmu_idx;
+ 
+-    assert_cpu_is_self(cpu);
+-
+     env = cpu->env_ptr;
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+         unsigned int i;
+@@ -497,7 +555,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+     target_ulong address;
+     target_ulong code_address;
+     uintptr_t addend;
+-    CPUTLBEntry *te;
++    CPUTLBEntry *te, *tv, tn;
+     hwaddr iotlb, xlat, sz;
+     unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
+     int asidx = cpu_asidx_from_attrs(cpu, attrs);
+@@ -532,41 +590,50 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+ 
+     index = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+     te = &env->tlb_table[mmu_idx][index];
+-
+     /* do not discard the translation in te, evict it into a victim tlb */
+-    env->tlb_v_table[mmu_idx][vidx] = *te;
++    tv = &env->tlb_v_table[mmu_idx][vidx];
++
++    /* addr_write can race with tlb_reset_dirty_range */
++    copy_tlb_helper(tv, te, true);
++
+     env->iotlb_v[mmu_idx][vidx] = env->iotlb[mmu_idx][index];
+ 
+     /* refill the tlb */
+     env->iotlb[mmu_idx][index].addr = iotlb - vaddr;
+     env->iotlb[mmu_idx][index].attrs = attrs;
+-    te->addend = addend - vaddr;
++
++    /* Now calculate the new entry */
++    tn.addend = addend - vaddr;
+     if (prot & PAGE_READ) {
+-        te->addr_read = address;
++        tn.addr_read = address;
+     } else {
+-        te->addr_read = -1;
++        tn.addr_read = -1;
      }
+ 
+     if (prot & PAGE_EXEC) {
+-        te->addr_code = code_address;
++        tn.addr_code = code_address;
+     } else {
+-        te->addr_code = -1;
++        tn.addr_code = -1;
+     }
++
++    tn.addr_write = -1;
+     if (prot & PAGE_WRITE) {
+         if ((memory_region_is_ram(section->mr) && section->readonly)
+             || memory_region_is_romd(section->mr)) {
+             /* Write access calls the I/O callback.  */
+-            te->addr_write = address | TLB_MMIO;
++            tn.addr_write = address | TLB_MMIO;
+         } else if (memory_region_is_ram(section->mr)
+                    && cpu_physical_memory_is_clean(
+                         memory_region_get_ram_addr(section->mr) + xlat)) {
+-            te->addr_write = address | TLB_NOTDIRTY;
++            tn.addr_write = address | TLB_NOTDIRTY;
+         } else {
+-            te->addr_write = address;
++            tn.addr_write = address;
+         }
+-    } else {
+-        te->addr_write = -1;
+     }
++
++    /* Pairs with flag setting in tlb_reset_dirty_range */
++    copy_tlb_helper(te, &tn, true);
++    /* atomic_mb_set(&te->addr_write, write_address); */
  }
  
- static void tlbi_aa64_vae2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr = sextract64(value << 12, 0, 56);
+ /* Add a new TLB entry, but without specifying the memory
+@@ -729,10 +796,13 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
+         if (cmp == page) {
+             /* Found entry in victim tlb, swap tlb and iotlb.  */
+             CPUTLBEntry tmptlb, *tlb = &env->tlb_table[mmu_idx][index];
++
++            copy_tlb_helper(&tmptlb, tlb, false);
++            copy_tlb_helper(tlb, vtlb, true);
++            copy_tlb_helper(vtlb, &tmptlb, true);
++
+             CPUIOTLBEntry tmpio, *io = &env->iotlb[mmu_idx][index];
+             CPUIOTLBEntry *vio = &env->iotlb_v[mmu_idx][vidx];
+-
+-            tmptlb = *tlb; *tlb = *vtlb; *vtlb = tmptlb;
+             tmpio = *io; *io = *vio; *vio = tmpio;
+             return true;
+         }
+diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
+index d454c005b7..3f941783c5 100644
+--- a/include/exec/cputlb.h
++++ b/include/exec/cputlb.h
+@@ -23,8 +23,6 @@
+ /* cputlb.c */
+ void tlb_protect_code(ram_addr_t ram_addr);
+ void tlb_unprotect_code(ram_addr_t ram_addr);
+-void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+-                           uintptr_t length);
+ extern int tlb_flush_count;
  
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, ARMMMUIdx_S1E2, -1);
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus(cs, true, pageaddr, ARMMMUIdx_S1E2, -1);
- }
- 
- static void tlbi_aa64_vae3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr = sextract64(value << 12, 0, 56);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, ARMMMUIdx_S1E3, -1);
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus(cs, true, pageaddr, ARMMMUIdx_S1E3, -1);
- }
- 
- static void tlbi_aa64_ipas2e1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -3079,7 +3053,7 @@ static void tlbi_aa64_ipas2e1_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_ipas2e1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                       uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr;
- 
-     if (!arm_feature(env, ARM_FEATURE_EL2) || !(env->cp15.scr_el3 & SCR_NS)) {
-@@ -3088,9 +3062,7 @@ static void tlbi_aa64_ipas2e1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- 
-     pageaddr = sextract64(value << 12, 0, 48);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, ARMMMUIdx_S2NS, -1);
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus(cs, true, pageaddr, ARMMMUIdx_S2NS, -1);
- }
- 
- static CPAccessResult aa64_zva_access(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -3247,27 +3219,27 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-     /* TLBI operations */
-     { .name = "TLBI_VMALLE1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 0,
--      .access = PL1_W, .type = ARM_CP_NO_RAW,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_vmalle1is_write },
-     { .name = "TLBI_VAE1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 1,
--      .access = PL1_W, .type = ARM_CP_NO_RAW,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_vae1is_write },
-     { .name = "TLBI_ASIDE1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 2,
--      .access = PL1_W, .type = ARM_CP_NO_RAW,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_vmalle1is_write },
-     { .name = "TLBI_VAAE1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 3,
--      .access = PL1_W, .type = ARM_CP_NO_RAW,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_vae1is_write },
-     { .name = "TLBI_VALE1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 5,
--      .access = PL1_W, .type = ARM_CP_NO_RAW,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_vae1is_write },
-     { .name = "TLBI_VAALE1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 7,
--      .access = PL1_W, .type = ARM_CP_NO_RAW,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_vae1is_write },
-     { .name = "TLBI_VMALLE1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 8, .crm = 7, .opc2 = 0,
-@@ -3295,19 +3267,19 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-       .writefn = tlbi_aa64_vae1_write },
-     { .name = "TLBI_IPAS2E1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 0, .opc2 = 1,
--      .access = PL2_W, .type = ARM_CP_NO_RAW,
-+      .access = PL2_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_ipas2e1is_write },
-     { .name = "TLBI_IPAS2LE1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 0, .opc2 = 5,
--      .access = PL2_W, .type = ARM_CP_NO_RAW,
-+      .access = PL2_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_ipas2e1is_write },
-     { .name = "TLBI_ALLE1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 4,
--      .access = PL2_W, .type = ARM_CP_NO_RAW,
-+      .access = PL2_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_alle1is_write },
-     { .name = "TLBI_VMALLS12E1IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 6,
--      .access = PL2_W, .type = ARM_CP_NO_RAW,
-+      .access = PL2_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_alle1is_write },
-     { .name = "TLBI_IPAS2E1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 4, .opc2 = 1,
-@@ -3323,7 +3295,7 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-       .writefn = tlbi_aa64_alle1_write },
-     { .name = "TLBI_VMALLS12E1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 7, .opc2 = 6,
--      .access = PL2_W, .type = ARM_CP_NO_RAW,
-+      .access = PL2_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_alle1is_write },
- #ifndef CONFIG_USER_ONLY
-     /* 64 bit address translation operations */
-@@ -3369,7 +3341,7 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-     { .name = "TLBIMVALIS", .cp = 15, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 5,
-       .type = ARM_CP_NO_RAW, .access = PL1_W, .writefn = tlbimva_is_write },
-     { .name = "TLBIMVAALIS", .cp = 15, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 7,
--      .type = ARM_CP_NO_RAW, .access = PL1_W,
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL1_W,
-       .writefn = tlbimvaa_is_write },
-     { .name = "TLBIMVAL", .cp = 15, .opc1 = 0, .crn = 8, .crm = 7, .opc2 = 5,
-       .type = ARM_CP_NO_RAW, .access = PL1_W, .writefn = tlbimva_write },
-@@ -3380,7 +3352,7 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-       .writefn = tlbimva_hyp_write },
-     { .name = "TLBIMVALHIS",
-       .cp = 15, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 5,
--      .type = ARM_CP_NO_RAW, .access = PL2_W,
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL2_W,
-       .writefn = tlbimva_hyp_is_write },
-     { .name = "TLBIIPAS2",
-       .cp = 15, .opc1 = 4, .crn = 8, .crm = 4, .opc2 = 1,
-@@ -3388,7 +3360,7 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-       .writefn = tlbiipas2_write },
-     { .name = "TLBIIPAS2IS",
-       .cp = 15, .opc1 = 4, .crn = 8, .crm = 0, .opc2 = 1,
--      .type = ARM_CP_NO_RAW, .access = PL2_W,
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL2_W,
-       .writefn = tlbiipas2_is_write },
-     { .name = "TLBIIPAS2L",
-       .cp = 15, .opc1 = 4, .crn = 8, .crm = 4, .opc2 = 5,
-@@ -3396,7 +3368,7 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-       .writefn = tlbiipas2_write },
-     { .name = "TLBIIPAS2LIS",
-       .cp = 15, .opc1 = 4, .crn = 8, .crm = 0, .opc2 = 5,
--      .type = ARM_CP_NO_RAW, .access = PL2_W,
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL2_W,
-       .writefn = tlbiipas2_is_write },
-     /* 32 bit cache operations */
-     { .name = "ICIALLUIS", .cp = 15, .opc1 = 0, .crn = 7, .crm = 1, .opc2 = 0,
-@@ -3736,7 +3708,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
-       .writefn = tlbiall_nsnh_write },
-     { .name = "TLBIALLNSNHIS",
-       .cp = 15, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 4,
--      .type = ARM_CP_NO_RAW, .access = PL2_W,
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL2_W,
-       .writefn = tlbiall_nsnh_is_write },
-     { .name = "TLBIALLH", .cp = 15, .opc1 = 4, .crn = 8, .crm = 7, .opc2 = 0,
-       .type = ARM_CP_NO_RAW, .access = PL2_W,
-@@ -3748,7 +3720,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
-       .type = ARM_CP_NO_RAW, .access = PL2_W,
-       .writefn = tlbimva_hyp_write },
-     { .name = "TLBIMVAHIS", .cp = 15, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 1,
--      .type = ARM_CP_NO_RAW, .access = PL2_W,
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL2_W,
-       .writefn = tlbimva_hyp_is_write },
-     { .name = "TLBI_ALLE2", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 7, .opc2 = 0,
-@@ -3764,15 +3736,15 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
-       .writefn = tlbi_aa64_vae2_write },
-     { .name = "TLBI_ALLE2IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 0,
--      .access = PL2_W, .type = ARM_CP_NO_RAW,
-+      .access = PL2_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_alle2is_write },
-     { .name = "TLBI_VAE2IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 1,
--      .type = ARM_CP_NO_RAW, .access = PL2_W,
-+      .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC, .access = PL2_W,
-       .writefn = tlbi_aa64_vae2is_write },
-     { .name = "TLBI_VALE2IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 5,
--      .access = PL2_W, .type = ARM_CP_NO_RAW,
-+      .access = PL2_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_vae2is_write },
- #ifndef CONFIG_USER_ONLY
-     /* Unlike the other EL2-related AT operations, these must
-@@ -3959,15 +3931,15 @@ static const ARMCPRegInfo el3_cp_reginfo[] = {
-       .resetvalue = 0 },
-     { .name = "TLBI_ALLE3IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 6, .crn = 8, .crm = 3, .opc2 = 0,
--      .access = PL3_W, .type = ARM_CP_NO_RAW,
-+      .access = PL3_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_alle3is_write },
-     { .name = "TLBI_VAE3IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 6, .crn = 8, .crm = 3, .opc2 = 1,
--      .access = PL3_W, .type = ARM_CP_NO_RAW,
-+      .access = PL3_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_vae3is_write },
-     { .name = "TLBI_VALE3IS", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 6, .crn = 8, .crm = 3, .opc2 = 5,
--      .access = PL3_W, .type = ARM_CP_NO_RAW,
-+      .access = PL3_W, .type = ARM_CP_NO_RAW | ARM_CP_EXIT_PC,
-       .writefn = tlbi_aa64_vae3is_write },
-     { .name = "TLBI_ALLE3", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 6, .crn = 8, .crm = 7, .opc2 = 0,
+ #endif
 -- 
 2.11.0
