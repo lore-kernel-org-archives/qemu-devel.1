@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUFJR-00033y-GK
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1cUFJR-00033z-GU
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUFJN-0001Ah-9r
+	(envelope-from <bounces@canonical.com>) id 1cUFJO-0001Bd-Rx
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43844)
+Received: from indium.canonical.com ([91.189.90.7]:43926)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cUFJN-0001AU-1W
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:41 -0500
+	id 1cUFJO-0001Az-It
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:42 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cUFJL-0005Cl-9g
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 16:11:39 +0000
+	id 1cUFJN-0005Cd-4m
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 16:11:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3D2EA2E80C0
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 16:11:37 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C8ABA2E80E2
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 16:11:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Jan 2017 16:03:59 -0000
-From: Launchpad Bug Tracker <1626972@bugs.launchpad.net>
+Date: Thu, 19 Jan 2017 16:04:11 -0000
+From: Brian Murray <brian@ubuntu.com>
 Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
-Message-Id: <20170119160404.26132.1105.malone@ackee.canonical.com>
+Message-Id: <20170119160411.21508.22525.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
- change for security drivers
+Subject: [Qemu-devel] [Bug 1626972] Update Released
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,20 +38,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This bug was fixed in the package qemu - 1:2.6.1+dfsg-0ubuntu5.2
-
----------------
-qemu (1:2.6.1+dfsg-0ubuntu5.2) yakkety; urgency=3Dmedium
-
-  [ Rafael David Tinoco ]
-  * Fixed wrong migration blocker when vhost is used (LP: #1626972)
-    - d/p/vhost_migration-blocker-only-if-shared-log-is-used.patch
-
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Tue, 22 Nov
-2016 13:45:46 +0100
-
-** Changed in: qemu (Ubuntu Yakkety)
-       Status: Fix Committed =3D> Fix Released
+The verification of the Stable Release Update for qemu has completed
+successfully and the package has now been released to -updates.
+Subsequently, the Ubuntu Stable Release Updates Team is being
+unsubscribed and will not receive messages about this bug report.  In
+the event that you encounter a regression using the package from
+-updates please report a new bug using ubuntu-bug and tag the bug report
+regression-update so we can easily find any regressions.
 
 -- =
 
