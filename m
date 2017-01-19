@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56116)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cUFZ9-0007Uq-4G
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:27:59 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56867)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1cUFbX-0001HO-Lh
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:30:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cUFZ8-0001kk-47
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:27:59 -0500
-Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:34336)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cUFZ8-0001jx-0E
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:27:58 -0500
-Received: by mail-io0-x233.google.com with SMTP id l66so41612135ioi.1
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 08:27:57 -0800 (PST)
+	(envelope-from <pl@kamp.de>) id 1cUFbU-0002tT-Gd
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:30:27 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:39571 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cUFbU-0002sk-7u
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:30:24 -0500
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <0bb184fe-d348-a1d4-ac14-0f02f070c287@kamp.de>
+Date: Thu, 19 Jan 2017 17:30:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <87r340tyf3.fsf@linaro.org>
-References: <CAJSP0QWGcG9bTZZr22BEj-P_G2r4UhmNwGSfwSnwjZeTC687GQ@mail.gmail.com>
-	<87r340tyf3.fsf@linaro.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 19 Jan 2017 16:27:55 +0000
-Message-ID: <CAJSP0QVwtU7joWU_EXZ-4G7yYowzrFCARhR1ks2YScLGMoVNtQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Call for GSoC 2017 mentors & project ideas
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] qemu-img: complains about missing iscsi option group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Jailhouse <jailhouse-dev@googlegroups.com>, kvm <kvm@vger.kernel.org>
+To: qemu block <qemu-block@nongnu.org>
+Cc: pbonzini@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Wed, Jan 18, 2017 at 11:12 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->
-> Stefan Hajnoczi <stefanha@gmail.com> writes:
->
->> QEMU will be applying to Google Summer of Code again this year.
->>
->> Do you want to help some of the most talented university students
->> begin contributing to open source by working on our codebase and
->> joining our community?
->>
->> We need to put together a list of project ideas by February 9:
->> http://qemu-project.org/Google_Summer_of_Code_2017#Project_Ideas
->
-> Will Outreachy point here as well or are we going to be duplicating
-> ideas? I seem to recall a lot of copy and pasting last time.
->
-> Could we not write a page-per-project and use categories with
-> transclusion on the wiki?
+Hi all,
 
-Sure, feel free to create a page for the project idea.
 
-Stefan
+since commit f57b4b5 (blockdev: prepare iSCSI block driver for dynamic loading)
+
+qemu-img complains about a missing option group several times.
+
+
+~/git/qemu$ ./qemu-img info iscsi://172.21.200.56:3260/iqn.2001-05.com.equallogic:0-8a0906-69d384e0a-aa3004e55e15878d-00lieven-data/0
+qemu-img: There is no option group 'iscsi'
+qemu-img: There is no option group 'iscsi'
+qemu-img: There is no option group 'iscsi'
+qemu-img: There is no option group 'iscsi'
+image: iscsi://172.21.200.56:3260/iqn.2001-05.com.equallogic:0-8a0906-69d384e0a-aa3004e55e15878d-00lieven-data/0
+file format: raw
+virtual size: 25G (26848788480 bytes)
+disk size: unavailable
+cluster_size: 15728640
+
+I don't know whats the proper way to fix this?
+
+
+Thanks,
+
+Peter
