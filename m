@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cU8gH-0002tP-TH
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:06:54 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cU8h7-0003Pn-3y
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:07:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cU8gH-0000H6-4b
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:06:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cU8gG-0000G5-UH
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:06:53 -0500
-Message-ID: <1484816807.15364.26.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 19 Jan 2017 10:06:47 +0100
-In-Reply-To: <1484749850-87206-1-git-send-email-phil@philjordan.eu>
-References: <1484749850-87206-1-git-send-email-phil@philjordan.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] hw/usb/dev-hid: add a Mac guest
- compatibility option to usb-tablet
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cU8h3-0000pc-6A
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:07:45 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34424)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cU8h2-0000pM-VI
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:07:41 -0500
+Received: by mail-lf0-x241.google.com with SMTP id q89so4527049lfi.1
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 01:07:40 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1484026704-28027-1-git-send-email-mst@redhat.com>
+	<1484026704-28027-9-git-send-email-mst@redhat.com>
+	<2163e04a-68cb-6c49-61bf-71c9e32e0487@redhat.com>
+	<b9d04ac2-1978-1821-abdf-d73ef80276e4@redhat.com>
+	<665c0c20-e39d-8f6e-2a09-e2169e5376bb@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a83f2689-b016-d77d-48ac-625e258bfb7a@redhat.com>
+Date: Thu, 19 Jan 2017 10:07:37 +0100
+MIME-Version: 1.0
+In-Reply-To: <665c0c20-e39d-8f6e-2a09-e2169e5376bb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
+ descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phil Dennis-Jordan <phil@philjordan.eu>
-Cc: qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mi, 2017-01-18 at 15:30 +0100, Phil Dennis-Jordan wrote:
-> Darwin/OS X/macOS's HID driver stack does not correctly drive Qemu's
-> simulated USB Tablet. This adds a boolean option "mac_compat" which
-> subtly changes the device so it behaves in a way that Mac guests can
-> handle.
->=20
-> The specific incompatibilities with the regular Qemu USB tablet are:
->=20
->  1. Absolute pointing devices with HID Report Descriptor usage page of
-> 0x01 (pointing) are handled by the macOS HID driver as analog sticks,
-> so the movement of the cursor ends up being the cumulative deviance
-> from the centre position.
->  2. The bInterfaceProtocol of 0x02 enables a particular macOS HID
-> driver mode which only works properly with mice (relative motion) not
-> absolute pointing devices, so spurious events with relative
-> coordinates are generated in addition to absolute ones. This manifests
-> as a very jittery cursor.
->=20
-> The workaround is to report a usage page of 0x02 (mouse) and a
-> bInterfaceProtocol value of 0x00.
 
-Waded through the specs.  Setting bInterfaceProtocol to 0x00 should be
-done anyway.  Only boot protocol devices (which the tablet isn't) should
-set this to 1 (kbd) or 2 (mouse).  No need to hide that behind a macos
-option, we can do that for everybody.
 
-The other one is more tricky.  Declaring the device as "mouse" is
-clearly wrong according to the specs.  There is no explicit "tablet"
-device.  "pointing" comes closest.
+On 19/01/2017 04:32, Jason Wang wrote:
+>>
+>>>
+>>>> +        addr &= ~(sz - 1);
+>>>> +    } else {
+>>>> +        sz = VTD_PAGE_SIZE;
+>>>> +    }
+>>>>   +    entry.target_as = &vtd_dev_as->as;
+>>>> +    entry.addr_mask = sz - 1;
+>>>> +    entry.iova = addr;
+>>> If S=1, entry.iova must mask away the 1 bits that specified the size.
+>>> For example,
+>>>
+>>>       addr = 0xabcd1000
+>>>
+>>> has cto64(0xabcd1) == 1, so it indicates a 16K invalidation from
+>>> 0xabcd0000 to 0xabcd3fff.  The "1" must be masked away with "addr & -sz"
+>>> or "addr & ~entry.addr_mask".
+>>>
+>>> Thanks,
+>>>
+>>> Paolo
+>>
+>> Good catch.
+> 
+> It should be addr & ~(sz - 1) I think? And it has been done above :)
 
-Does the issue still show up with bInterfaceProtocol being fixed?
+Oh, of course!
 
-cheers,
-  Gerd
+Paolo
