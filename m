@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUDyZ-0006My-Ek
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:46:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1cUDzh-0007GF-Th
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:47:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUDyU-0006TY-Hl
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:46:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cUDyU-0006TF-B9
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:46:02 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cUDyS-0007Ie-O6
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:46:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4960E2E80D3
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:46:00 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1cUDzd-00070N-3T
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:47:17 -0500
+References: <1484802878-22681-1-git-send-email-bharata@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8b867af9-a039-f0de-9072-77c2a260ec23@redhat.com>
+Date: Thu, 19 Jan 2017 08:47:09 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Jan 2017 14:25:52 -0000
-From: Thomas Huth <1588328@bugs.launchpad.net>
-Reply-To: Bug 1588328 <1588328@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160602115809.16901.66842.malonedeb@gac.canonical.com>
-Message-Id: <20170119142553.20674.3054.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1588328] Re: Qemu 2.6 Solaris 9 Sparc
- Segmentation Fault
+In-Reply-To: <1484802878-22681-1-git-send-email-bharata@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6pdhOGelU2F0gugnnQkQBcvaIE9jIDF9U"
+Subject: Re: [Qemu-devel] [RFC PATCH v0] softfloat: Add round-to-odd
+ rounding mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,99 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, qemu-ppc@nongnu.org, nikunj@linux.vnet.ibm.com, david@gibson.dropbear.id.au
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6pdhOGelU2F0gugnnQkQBcvaIE9jIDF9U
+From: Eric Blake <eblake@redhat.com>
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, qemu-ppc@nongnu.org, nikunj@linux.vnet.ibm.com,
+ david@gibson.dropbear.id.au
+Message-ID: <8b867af9-a039-f0de-9072-77c2a260ec23@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v0] softfloat: Add round-to-odd rounding
+ mode
+References: <1484802878-22681-1-git-send-email-bharata@linux.vnet.ibm.com>
+In-Reply-To: <1484802878-22681-1-git-send-email-bharata@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 01/18/2017 11:14 PM, Bharata B Rao wrote:
+> Power ISA 3.0 introduces a few quadruple precision floating point
+> instructions that support round-to-add rounding mode. The
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1588328
+s/add/odd/
 
-Title:
-  Qemu 2.6 Solaris 9 Sparc Segmentation Fault
+> round-to-odd mode is explained as under:
+>=20
+> Let Z be the intermediate arithmetic result or the operand of a convert=
 
-Status in QEMU:
-  Fix Released
+> operation. If Z can be represented exactly in the target format, the
+> result is Z. Otherwise the result is either Z1 or Z2 whichever is odd.
+> Here Z1 and Z2 are the next larger and smaller numbers representable
+> in the target format respectively.
 
-Bug description:
-  Hi,
-  I tried the following command to boot Solaris 9 sparc:
-  qemu-system-sparc -nographic -boot d -hda ./Spark9.disk -m 256 -cdrom sol=
--9-905hw-ga-sparc-dvd.iso -serial telnet:0.0.0.0:3000,server =
+IEEE 854 and thus POSIX <float.h> specifies round-to-zero,
+round-to-pos-inf, round-to-neg-inf, and round-to-even. It sounds like
+round-to-odd is similar to round-to-even, only that the ties are broken
+in the opposite direction.  I don't know if portable C code can even
+request this mode (although float.h is allowed to add additional
+implementation-defined values to FLT_ROUNDS), but since the hardware can
+do it, I guess we have to emulate it.
+
+>=20
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> ---
+> - I am not fully sure if this the correct implementation for the above
+>   described round-to-odd rounding method. Any help is appreciated.
+
+I don't know the code either, but if round-to-even is implemented
+correctly, it sounds like round-to-odd is a one-off tweak from that.
 
 
-  It seems there are a few Segmentation Faults, one from the starting of
-  the boot. Another at the beginning of the commandline installation.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-  Trying 127.0.0.1...
-  Connected to localhost.
-  Escape character is '^]'.
-  Configuration device id QEMU version 1 machine id 32
-  Probing SBus slot 0 offset 0
-  Probing SBus slot 1 offset 0
-  Probing SBus slot 2 offset 0
-  Probing SBus slot 3 offset 0
-  Probing SBus slot 4 offset 0
-  Probing SBus slot 5 offset 0
-  Invalid FCode start byte
-  CPUs: 1 x FMI,MB86904
-  UUID: 00000000-0000-0000-0000-000000000000
-  Welcome to OpenBIOS v1.1 built on Apr 18 2016 08:19
-    Type 'help' for detailed information
-  Trying cdrom:d...
-  Not a bootable ELF image
-  Loading a.out image...
-  Loaded 7680 bytes
-  entry point is 0x4000
-  bootpath: /iommu@0,10000000/sbus@0,10001000/espdma@5,8400000/esp@5,880000=
-0/sd@2,0:d
 
-  Jumping to entry point 00004000 for type 00000005...
-  switching to new context:
-  SunOS Release 5.9 Version Generic_118558-34 32-bit
-  Copyright 1983-2003 Sun Microsystems, Inc.  All rights reserved.
-  Use is subject to license terms.
-  WARNING: /iommu@0,10000000/sbus@0,10001000/espdma@5,8400000/esp@5,8800000=
-/sd@0,0 (sd0):
-  	Corrupt label; wrong magic number
+--6pdhOGelU2F0gugnnQkQBcvaIE9jIDF9U
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  Segmentation Fault
-  Configuring /dev and /devices
-  NOTICE: Couldn't set value (../../sun/io/audio/sada/drv/audiocs/audio_423=
-1.c, Line #1759 0x00 0x88)
-  audio may not work correctly until it is stopped and restarted
-  Segmentation Fault
-  Using RPC Bootparams for network configuration information.
-  Skipping interface le0
-  Searching for configuration file(s)...
-  Search complete.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  ....
+iQEcBAEBCAAGBQJYgNFtAAoJEKeha0olJ0NqlMsH+wVXPCSnWd4HN8VnIyk44vxI
+vTltZbDNtfJfQi7xV4j8IGPnocjPYuWixr0wB2+FvFVqc9ObFEgHOSdpAcl2HxPs
+6CJFKaKDwLMUPlriCrB9aaWfENVovWMMPBIWn/DyOGlxLCBx0Ihu6QKcSnwlOuA4
+vNZidqg/tHwp2oOw+tvCIq7L+r4sUIC7we3k0VsR8l3N40tjwr1hpOJV265jSMa2
+tjt0NqrYsJS3yGkTCcZrHE51W72Q/YORHoruKEm3LBHwXixHWoKjFTXnycW69UV3
+udXTmCrCj22cihqBV8kAkxNenzzyxYcu8GfMXM6UJ/mi6wl4A+8ojks008t5Qzk=
+=aqi5
+-----END PGP SIGNATURE-----
 
-  What type of terminal are you using?
-   1) ANSI Standard CRT
-   2) DEC VT52
-   3) DEC VT100
-   4) Heathkit 19
-   5) Lear Siegler ADM31
-   6) PC Console
-   7) Sun Command Tool
-   8) Sun Workstation
-   9) Televideo 910
-   10) Televideo 925
-   11) Wyse Model 50
-   12) X Terminal Emulator (xterms)
-   13) CDE Terminal Emulator (dtterm)
-   14) Other
-  Type the number of your choice and press Return: 3
-  syslog service starting.
-  savecore: no dump device configured
-  Running in command line mode
-  /sbin/disk0_install[109]: 143 Segmentation Fault
-  /sbin/run_install[130]: 155 Segmentation Fault
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1588328/+subscriptions
+--6pdhOGelU2F0gugnnQkQBcvaIE9jIDF9U--
