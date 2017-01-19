@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36600)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=Ovvj=ZB=redhat.com=mst@kernel.org>)
-	id 1cUJxL-00007G-5g
+	id 1cUJxM-00007w-13
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:09:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=Ovvj=ZB=redhat.com=mst@kernel.org>)
-	id 1cUJxI-0007ci-Ui
+	id 1cUJxL-0007gB-4a
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:09:15 -0500
-Received: from mail.kernel.org ([198.145.29.136]:56510)
+Received: from mail.kernel.org ([198.145.29.136]:56540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=Ovvj=ZB=redhat.com=mst@kernel.org>)
-	id 1cUJxI-0007aF-H8
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:09:12 -0500
-Date: Thu, 19 Jan 2017 23:09:06 +0200
+	id 1cUJxK-0007ey-Tj
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:09:15 -0500
+Date: Thu, 19 Jan 2017 23:09:10 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1484860116-25361-3-git-send-email-mst@redhat.com>
+Message-ID: <1484860116-25361-4-git-send-email-mst@redhat.com>
 References: <1484860116-25361-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1484860116-25361-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 02/17] Revert "virtio: turn vq->notification
- into a nested counter"
+Subject: [Qemu-devel] [PULL 03/17] virtio: disable notifications again after
+ poll succeeded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +31,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Doug Goldstein <cardoe@cardoe.com>, Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-This reverts commit aff8fd18f1786fc5af259a9bc0077727222f51ca.
+While AioContext is in polling mode virtqueue notifications are not
+necessary.  Some device virtqueue handlers enable notifications.  Make
+sure they stay disabled to avoid unnecessary vmexits.
 
-Both virtio-net and virtio-crypto do not balance
-virtio_queue_set_notification() enable and disable calls.  This makes
-the notifications_disabled counter unreliable and Doug Goldstein
-reported the following assertion failure:
-
-  #3  0x00007ffff44d1c62 in __GI___assert_fail (
-      assertion=assertion@entry=0x555555ae8e8a "vq->notification_disabled > 0",
-      file=file@entry=0x555555ae89c0 "/home/doug/work/qemu/hw/virtio/virtio.c",
-      line=line@entry=215,
-      function=function@entry=0x555555ae9630 <__PRETTY_FUNCTION__.43707>
-      "virtio_queue_set_notification") at assert.c:101
-  #4  0x00005555557f25d6 in virtio_queue_set_notification (vq=0x55555666aa90,
-      enable=enable@entry=1) at /home/doug/work/qemu/hw/virtio/virtio.c:215
-  #5  0x00005555557dc311 in virtio_net_has_buffers (q=<optimized out>,
-      q=<optimized out>, bufsize=102)
-      at /home/doug/work/qemu/hw/net/virtio-net.c:1008
-  #6  virtio_net_receive (nc=<optimized out>, buf=0x555557386b88 "", size=102)
-      at /home/doug/work/qemu/hw/net/virtio-net.c:1148
-  #7  0x00005555559cad33 in nc_sendv_compat (flags=<optimized out>, iovcnt=1,
-      iov=0x7fffead746d0, nc=0x55555788b340) at net/net.c:705
-  #8  qemu_deliver_packet_iov (sender=<optimized out>, flags=<optimized out>,
-      iov=0x7fffead746d0, iovcnt=1, opaque=0x55555788b340) at net/net.c:732
-  #9  0x00005555559cd929 in qemu_net_queue_deliver (size=<optimized out>,
-      data=<optimized out>, flags=<optimized out>, sender=<optimized out>,
-      queue=0x55555788b550) at net/queue.c:164
-  #10 qemu_net_queue_flush (queue=0x55555788b550) at net/queue.c:261
-
-This patch is safe to revert since it's just an optimization for
-virtqueue polling.  The next patch will improve the situation again
-without resorting to nesting.
-
-Reported-by: Doug Goldstein <cardoe@cardoe.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
@@ -77,65 +47,22 @@ Tested-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ hw/virtio/virtio.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index aa4f38f..f04ab7a 100644
+index f04ab7a..34065c7 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -88,8 +88,8 @@ struct VirtQueue
-     /* Last used index value we have signalled on */
-     bool signalled_used_valid;
- 
--    /* Nested host->guest notification disabled counter */
--    unsigned int notification_disabled;
-+    /* Notification enabled? */
-+    bool notification;
- 
-     uint16_t queue_index;
- 
-@@ -202,7 +202,7 @@ static inline void vring_used_flags_unset_bit(VirtQueue *vq, int mask)
- static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
- {
-     hwaddr pa;
--    if (vq->notification_disabled) {
-+    if (!vq->notification) {
-         return;
+@@ -2126,6 +2126,9 @@ static bool virtio_queue_host_notifier_aio_poll(void *opaque)
      }
-     pa = vq->vring.used + offsetof(VRingUsed, ring[vq->vring.num]);
-@@ -211,13 +211,7 @@ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
  
- void virtio_queue_set_notification(VirtQueue *vq, int enable)
- {
--    if (enable) {
--        assert(vq->notification_disabled > 0);
--        vq->notification_disabled--;
--    } else {
--        vq->notification_disabled++;
--    }
--
-+    vq->notification = enable;
-     if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
-         vring_set_avail_event(vq, vring_avail_idx(vq));
-     } else if (enable) {
-@@ -1020,7 +1014,7 @@ void virtio_reset(void *opaque)
-         virtio_queue_set_vector(vdev, i, VIRTIO_NO_VECTOR);
-         vdev->vq[i].signalled_used = 0;
-         vdev->vq[i].signalled_used_valid = false;
--        vdev->vq[i].notification_disabled = 0;
-+        vdev->vq[i].notification = true;
-         vdev->vq[i].vring.num = vdev->vq[i].vring.num_default;
-         vdev->vq[i].inuse = 0;
-     }
-@@ -1831,7 +1825,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-         vdev->vq[i].vring.desc = qemu_get_be64(f);
-         qemu_get_be16s(f, &vdev->vq[i].last_avail_idx);
-         vdev->vq[i].signalled_used_valid = false;
--        vdev->vq[i].notification_disabled = 0;
-+        vdev->vq[i].notification = true;
+     virtio_queue_notify_aio_vq(vq);
++
++    /* In case the handler function re-enabled notifications */
++    virtio_queue_set_notification(vq, 0);
+     return true;
+ }
  
-         if (vdev->vq[i].vring.desc) {
-             /* XXX virtio-1 devices */
 -- 
 MST
