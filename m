@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUKk7-00053V-SR
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:59:40 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cUKv7-0007HF-HS
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 17:11:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUKk4-0007JR-NL
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:59:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42468)
+	(envelope-from <alex.williamson@redhat.com>) id 1cUKv4-00059U-R3
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 17:11:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44698)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cUKk4-0007Iy-ER
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:59:36 -0500
-References: <1484859998-25074-1-git-send-email-mst@redhat.com>
-	<1484859998-25074-5-git-send-email-mst@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <aa9a259a-a649-d399-5895-837a5a23f56c@redhat.com>
-Date: Thu, 19 Jan 2017 15:59:33 -0600
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cUKv4-00058O-I9
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 17:10:58 -0500
+Date: Thu, 19 Jan 2017 15:10:56 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170119151056.44b559d1@t450s.home>
+In-Reply-To: <20170119001744-mutt-send-email-mst@kernel.org>
+References: <20170119001744-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1484859998-25074-5-git-send-email-mst@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Df7InsV8lAAbGDF3gb1ERou4wCjIVxwgg"
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] ARRAY_SIZE: check that argument is
- an array
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] vfio error recovery: kernel support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,93 +27,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Sergey Fedorov <serge.fdrv@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Df7InsV8lAAbGDF3gb1ERou4wCjIVxwgg
-From: Eric Blake <eblake@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Sergey Fedorov <serge.fdrv@gmail.com>
-Message-ID: <aa9a259a-a649-d399-5895-837a5a23f56c@redhat.com>
-Subject: Re: [PATCH v3 4/4] ARRAY_SIZE: check that argument is an array
-References: <1484859998-25074-1-git-send-email-mst@redhat.com>
- <1484859998-25074-5-git-send-email-mst@redhat.com>
-In-Reply-To: <1484859998-25074-5-git-send-email-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 19 Jan 2017 22:16:03 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-On 01/19/2017 03:07 PM, Michael S. Tsirkin wrote:
-> It's a familiar pattern: some code uses ARRAY_SIZE, then refactoring
-> changes the argument from an array to a pointer to a dynamically
-> allocated buffer.  Code keeps compiling but any ARRAY_SIZE calls now
-> return the size of the pointer divided by element size.
->=20
-> Let's add build time checks to ARRAY_SIZE before we allow more
-> of these in the code-base.
->=20
+> This is a design and an initial patch for kernel side for AER
+> support in VFIO.
+> 
+> 0. What happens now (PCIE AER only)
+>    Fatal errors cause a link reset.
+>    Non fatal errors don't.
+>    All errors stop the VM eventually, but not immediately
+>    because it's detected and reported asynchronously.
+>    Interrupts are forwarded as usual.
+>    Correctable errors are not reported to guest at all.
+>    Note: PPC EEH is different. This focuses on AER.
+> 
+> 1. Correctable errors
+>    I don't see a need to report these to guest. So let's not.
+> 
+> 2. Fatal errors
+>    It's not easy to handle them gracefully since link reset
+>    is needed. As a first step, let's use the existing mechanism
+>    in that case.
+>    
+> 2. Non-fatal errors
+>    Here we could make progress by reporting them to guest
+>    and have guest handle them.
+>    Issues:
+>     a. this behaviour should only be enabled with new userspace
+>        old userspace should work without changes
+>     Suggestion: One way to address this would be to add a new eventfd
+>     non_fatal_err_trigger. If not set, invoke err_trigger.
+> 
+>     b. drivers are supposed to stop MMIO when error is reported
+>     if vm keeps going, we will keep doing MMIO/config
+>     Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
+>     so we are not making things much worse
+>     Suggestion 2: try to stop MMIO/config, resume on resume call
+> 
+>     Patch below implements Suggestion 1.
+
+Although this is really against the documentation, which states
+error_detected() is the point at which the driver should quiesce the
+device and not touch it further (until diagnostic poking at
+mmio_enabled or full access at resume callback).
+ 
+>     c. PF driver might detect that function is completely broken,
+>     if vm keeps going, we will keep doing MMIO/config
+>     Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
+>     so we are not making things much worse
+>     Suggestion 2: detect this and invoke err_trigger to stop VM
+> 
+>     Patch below implements Suggestion 2.
+> 
+> Aside: we currently return PCI_ERS_RESULT_DISCONNECT when device
+> is not attached. This seems bogus, likely based on the confusing name.
+> We probably should return PCI_ERS_RESULT_CAN_RECOVER.
+
+Not sure I agree here, if we get called for the error_detected callback
+and we can't find a handle for the device, we certainly don't want to
+see any of the other callbacks for this device and we can't do anything
+about recovering it.  What's wrong with putting the device into a
+failed state in that case?
+
+I actually question whether CAN_RECOVER is really the right return for
+the existing path.  If we consider this to be a fatal error, should we
+be voting NEED_RESET?  We're certainly not doing anything to return the
+device to a working state.  Should we be more harsh if err_trigger is
+not registered, putting the device into DISCONNECT?  Should only the new
+path you've added below for non-fatal errors return CAN_RECOVER?
+
+> The following patch does not change that.
+> 
 > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
 > ---
->  include/qemu/osdep.h | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> The patch is completely untested. Let's discuss the design first.
+> Cao jin, if this is deemed acceptable please take it from here.
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index dce511f..fdca683 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -1292,7 +1292,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+>  
+>  	mutex_lock(&vdev->igate);
+>  
+> -	if (vdev->err_trigger)
+> +	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
+> +		eventfd_signal(vdev->err_trigger, 1);
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+s/err_trigger/non_fatal_err_trigger/
 
->=20
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 689f253..56c9e22 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -198,8 +198,15 @@ extern int daemon(int, int);
->  #define DIV_ROUND_UP(n,d) (((n) + (d) - 1) / (d))
->  #endif
-> =20
-> +/*
-> + * &(x)[0] is always a pointer - if it's same type as x then the argum=
-ent is a
-> + * pointer, not an array.
-> + */
-> +#define QEMU_IS_ARRAY(x) (!__builtin_types_compatible_p(typeof(x), \
-> +                                                        typeof(&(x)[0]=
-)))
->  #ifndef ARRAY_SIZE
-> -#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-> +#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + \
-> +                       QEMU_BUILD_BUG_ON_ZERO(!QEMU_IS_ARRAY(x)))
+> +	else if (vdev->err_trigger)
+>  		eventfd_signal(vdev->err_trigger, 1);
+>  
+>  	mutex_unlock(&vdev->igate);
+> @@ -1302,8 +1304,38 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+>  	return PCI_ERS_RESULT_CAN_RECOVER;
+>  }
+>  
+> +static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev,
+> +						pci_channel_state_t state)
+> +{
+> +	struct vfio_pci_device *vdev;
+> +	struct vfio_device *device;
+> +
+> +	device = vfio_device_get_from_dev(&pdev->dev);
+> +	if (!device)
+> +		goto err_dev;
+> +
+> +	vdev = vfio_device_data(device);
+> +	if (!vdev)
+> +		goto err_dev;
 
-We've got some double-negation going on here ("cause a build bug if the
-negation of QEMU_IS_ARRAY() is not 0") which takes some mental
-gymnastics, but it is the correct result.  [I kind of like that gnulib
-uses positive logic in its 'verify(x)' meaning "verify that x is true,
-or cause a build error"; compared to the negative logic in the kernal
-'BUILD_BUG_ON[_ZERO](x)' meaning "cause a build bug if x is non-zero" -
-but that's personal preference and not something for qemu to change]
+s/err_dev/err_data/
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+> +
+> +	mutex_lock(&vdev->igate);
+> +
+> +	if (vdev->err_trigger)
+> +		eventfd_signal(vdev->err_trigger, 1);
+> +
+> +	mutex_unlock(&vdev->igate);
+> +
+> +	vfio_device_put(device);
+> +
+> +err_data:
+> +	vfio_device_put(device);
+> +err_dev:
+> +	return PCI_ERS_RESULT_RECOVERED;
+> +}
+> +
+>  static const struct pci_error_handlers vfio_err_handlers = {
+>  	.error_detected = vfio_pci_aer_err_detected,
+> +	.slot_reset = vfio_pci_aer_slot_reset,
+>  };
+>  
+>  static struct pci_driver vfio_pci_driver = {
+> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+> index 1c46045..e883db5 100644
+> --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> @@ -611,6 +611,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
+>  					       count, flags, data);
+>  }
+>  
+> +static int vfio_pci_set_non_fatal_err_trigger(struct vfio_pci_device *vdev,
+> +				    unsigned index, unsigned start,
+> +				    unsigned count, uint32_t flags, void *data)
+> +{
+> +	if (index != VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX || start != 0 || count > 1)
+> +		return -EINVAL;
+> +
+> +	return vfio_pci_set_ctx_trigger_single(&vdev->non_fatal_err_trigger,
+> +					       count, flags, data);
+> +}
+> +
+>  static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
+>  				    unsigned index, unsigned start,
+>  				    unsigned count, uint32_t flags, void *data)
+> @@ -664,6 +675,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
+>  			break;
+>  		}
+>  		break;
+> +	case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
+> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> +			if (pci_is_pcie(vdev->pdev))
+> +				func = vfio_pci_set_err_trigger;
+> +			break;
+> +		}
+> +		break;
+>  	case VFIO_PCI_REQ_IRQ_INDEX:
+>  		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+>  		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> index f37c73b..c27a507 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -93,6 +93,7 @@ struct vfio_pci_device {
+>  	struct pci_saved_state	*pci_saved_state;
+>  	int			refcnt;
+>  	struct eventfd_ctx	*err_trigger;
+> +	struct eventfd_ctx	*non_fatal_err_trigger;
+>  	struct eventfd_ctx	*req_trigger;
+>  	struct list_head	dummy_resources_list;
+>  };
+> 
 
+VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX never got defined.
 
---Df7InsV8lAAbGDF3gb1ERou4wCjIVxwgg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+So if we think the link is ok, we notify a non-fatal event to the user,
+but we don't do anything about preventing access to the device between
+error_detected and resume as the documentation indicates we should.  If
+the system does a slot reset anyway, perhaps as a response to another
+driver on the same bus, we promote to fatal error signaling.  If we
+have no user signaling mechanism, shouldn't that also mark the device
+failed via returning DISCONNECT?  On the QEMU side, we'd still need to
+try to guess whether the VM is attempting a link reset is in response to
+the AER event and QEMU would need to vm_stop() in that case, right?
+Thanks,
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYgTbFAAoJEKeha0olJ0NqbAEIAKIZG5AnIKS6fsQKajyFmGWL
-PZoKqwAQ/LRfMvYTK/qZrN8o3xBsUwAOpPK0NQPcCGRzF9dh9xsofCfjU8XvsAmY
-Ncg8l5Lxr4FHAo0bzNbPK+wtAKlLYm3E4aforrbWe0yy07bLZOQ7VqpKyEuZR6Lw
-oQzSYoLaQNVCS7DYm61Ob9nKzJ4ucoUAggzKF1ww8akLJ6EciajAld2y2xBB6Y24
-XOiUxrMrbCr5KiuoNv5/tcSbJOxgCb+SwNqDUL2Y3FJNzYFiJu7rrKHDboyXxPNC
-R5qL94jwcA3wEfh79Xt0fvPSh8RrknW4P8scO3EZ1KZ/TH9XkYkejqqZYkyxQ2k=
-=668x
------END PGP SIGNATURE-----
-
---Df7InsV8lAAbGDF3gb1ERou4wCjIVxwgg--
+Alex
