@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cUEHY-0006Fa-8y
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:05:45 -0500
+	(envelope-from <mst@redhat.com>) id 1cUEIq-0007Kd-Um
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:07:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cUEHT-0001Kh-E1
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:05:44 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:58010)
+	(envelope-from <mst@redhat.com>) id 1cUEIn-0001r1-Iw
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:07:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36602)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cUEHT-0001KM-45
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:05:39 -0500
-References: <20170119142311.8310-1-bobby.prani@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <96ad6596-573e-2b29-83ab-fc45b74a1ce0@vivier.eu>
-Date: Thu, 19 Jan 2017 16:05:27 +0100
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUEIn-0001qe-E0
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:07:01 -0500
+Date: Thu, 19 Jan 2017 17:06:59 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170119170645-mutt-send-email-mst@kernel.org>
+References: <1484772931-16272-1-git-send-email-mst@redhat.com>
+	<1484772931-16272-5-git-send-email-mst@redhat.com>
+	<29f56f57-76f5-8585-c286-70bc0eb60b92@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170119142311.8310-1-bobby.prani@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] linux-user: fix settime old value
- location
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <29f56f57-76f5-8585-c286-70bc0eb60b92@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] ARRAY_SIZE: check that argument is
+ an array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>, alex.bennee@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, peter.maydell@linaro.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Sergey Fedorov <serge.fdrv@gmail.com>
 
-Le 19/01/2017 à 15:23, Pranith Kumar a écrit :
-> From: Marc-André Lureau <marcandre.lureau@redhat.com>
+On Thu, Jan 19, 2017 at 08:53:34AM -0600, Eric Blake wrote:
+> On 01/18/2017 02:55 PM, Michael S. Tsirkin wrote:
+> > It's a familiar pattern: some code uses ARRAY_SIZE, then refactoring
+> > changes the argument from an array to a pointer to a dynamically
+> > allocated buffer.  Code keeps compiling but any ARRAY_SIZE calls now
+> > return the size of the pointer divided by element size.
+> > 
+> > Let's add build time checks to ARRAY_SIZE before we allow more
+> > of these in the code-base.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  include/qemu/osdep.h | 8 +++++++-
 > 
-> old_value is the 4th argument of timer_settime(), not the 2nd.
+> >  
+> >  #ifndef ARRAY_SIZE
+> > -#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+> > +/*
+> > + * &(x)[0] is always a pointer - if it's same type as x then the argument is a
+> > + * pointer, not an array as expected.
+> > + */
+> > +#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + QEMU_BUILD_BUG_ON_ZERO( \
+> > +                        __builtin_types_compatible_p(typeof(x), \
 > 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  linux-user/syscall.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+> Are we sure that __builtin_types_compatible_p() is supported for all
+> versions of gcc and clang that we support, or does this need further
+> #ifdefs?
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 7b77503f94..a393764a17 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -12024,10 +12024,14 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->              timer_t htimer = g_posix_timers[timerid];
->              struct itimerspec hspec_new = {{0},}, hspec_old = {{0},};
->  
-> -            target_to_host_itimerspec(&hspec_new, arg3);
-> +            if (arg3 && target_to_host_itimerspec(&hspec_new, arg3)) {
+> 
+> -- 
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+> 
 
-arg3 cannot be NULL, see 8 lines above, you need to only check the
-result of target_to_host_itimerspec().
 
-Thanks,
-Laurent
+We seem to use it without ifdefs elsewhere.
+
+-- 
+MST
