@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUJ7y-0004Eq-Ff
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:16:11 -0500
+	(envelope-from <clg@kaod.org>) id 1cUJR4-00083S-0B
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:35:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUJ7v-0008Ah-Pm
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:16:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46812)
+	(envelope-from <clg@kaod.org>) id 1cUJQz-0007xJ-1a
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:35:53 -0500
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:56889)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUJ7v-00089P-Gj
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:16:07 -0500
-Date: Thu, 19 Jan 2017 22:16:03 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170119001744-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cUJQy-0007tX-Ro
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 15:35:48 -0500
+Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id BA8DA1539C
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 21:35:39 +0100 (CET)
+References: <1483979087-32663-1-git-send-email-clg@kaod.org>
+	<1483979087-32663-8-git-send-email-clg@kaod.org>
+	<CAFEAcA_tLcVQj_kJh3iY7ZOEechPrk=9+Hj3_QcOE+pmPoWCYg@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <549b1cd1-602b-8b74-add6-0648f6426694@kaod.org>
+Date: Thu, 19 Jan 2017 21:35:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH RFC] vfio error recovery: kernel support
+In-Reply-To: <CAFEAcA_tLcVQj_kJh3iY7ZOEechPrk=9+Hj3_QcOE+pmPoWCYg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 07/11] aspeed/smc: handle SPI flash
+ Command mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,170 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Marcin Krzeminski <marcin.krzeminski@nokia.com>
 
-This is a design and an initial patch for kernel side for AER
-support in VFIO.
+On 01/19/2017 08:26 PM, Peter Maydell wrote:
+> On 9 January 2017 at 16:24, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>> The Aspeed SMC controllers have a mode (Command mode) in which
+>> accesses to the flash content are no different than doing MMIOs. The
+>> controller generates all the necessary commands to load (or store)
+>> data in memory.
+>>
+>> However, accesses are restricted to the segment window assigned the
+>> the flash module by the controller. This window is defined by the
+>> Segment Address Register.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+>> ---
+>>  hw/ssi/aspeed_smc.c         | 152 +++++++++++++++++++++++++++++++++++=
++++------
+>>  include/hw/ssi/aspeed_smc.h |   2 +-
+>>  2 files changed, 132 insertions(+), 22 deletions(-)
+>=20
+> This deleted the only call to aspeed_smc_is_usermode() but not
+> its definition, which makes clang complain:
+> /Users/pm215/src/qemu-for-merges/hw/ssi/aspeed_smc.c:409:20: error:
+> unused function 'aspeed_smc_is_usermode' [-Werror,-Wunused-function]
+>=20
+> Presumably the function itself should be deleted?
 
-0. What happens now (PCIE AER only)
-   Fatal errors cause a link reset.
-   Non fatal errors don't.
-   All errors stop the VM eventually, but not immediately
-   because it's detected and reported asynchronously.
-   Interrupts are forwarded as usual.
-   Correctable errors are not reported to guest at all.
-   Note: PPC EEH is different. This focuses on AER.
+yes. This is correct. I will send a patch for it.
 
-1. Correctable errors
-   I don't see a need to report these to guest. So let's not.
+Thanks,
 
-2. Fatal errors
-   It's not easy to handle them gracefully since link reset
-   is needed. As a first step, let's use the existing mechanism
-   in that case.
-   
-2. Non-fatal errors
-   Here we could make progress by reporting them to guest
-   and have guest handle them.
-   Issues:
-    a. this behaviour should only be enabled with new userspace
-       old userspace should work without changes
-    Suggestion: One way to address this would be to add a new eventfd
-    non_fatal_err_trigger. If not set, invoke err_trigger.
-
-    b. drivers are supposed to stop MMIO when error is reported
-    if vm keeps going, we will keep doing MMIO/config
-    Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
-    so we are not making things much worse
-    Suggestion 2: try to stop MMIO/config, resume on resume call
-
-    Patch below implements Suggestion 1.
-
-    c. PF driver might detect that function is completely broken,
-    if vm keeps going, we will keep doing MMIO/config
-    Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
-    so we are not making things much worse
-    Suggestion 2: detect this and invoke err_trigger to stop VM
-
-    Patch below implements Suggestion 2.
-
-Aside: we currently return PCI_ERS_RESULT_DISCONNECT when device
-is not attached. This seems bogus, likely based on the confusing name.
-We probably should return PCI_ERS_RESULT_CAN_RECOVER.
-
-The following patch does not change that.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
----
-
-The patch is completely untested. Let's discuss the design first.
-Cao jin, if this is deemed acceptable please take it from here.
-
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index dce511f..fdca683 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -1292,7 +1292,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
- 
- 	mutex_lock(&vdev->igate);
- 
--	if (vdev->err_trigger)
-+	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
-+		eventfd_signal(vdev->err_trigger, 1);
-+	else if (vdev->err_trigger)
- 		eventfd_signal(vdev->err_trigger, 1);
- 
- 	mutex_unlock(&vdev->igate);
-@@ -1302,8 +1304,38 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
- 	return PCI_ERS_RESULT_CAN_RECOVER;
- }
- 
-+static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev,
-+						pci_channel_state_t state)
-+{
-+	struct vfio_pci_device *vdev;
-+	struct vfio_device *device;
-+
-+	device = vfio_device_get_from_dev(&pdev->dev);
-+	if (!device)
-+		goto err_dev;
-+
-+	vdev = vfio_device_data(device);
-+	if (!vdev)
-+		goto err_dev;
-+
-+	mutex_lock(&vdev->igate);
-+
-+	if (vdev->err_trigger)
-+		eventfd_signal(vdev->err_trigger, 1);
-+
-+	mutex_unlock(&vdev->igate);
-+
-+	vfio_device_put(device);
-+
-+err_data:
-+	vfio_device_put(device);
-+err_dev:
-+	return PCI_ERS_RESULT_RECOVERED;
-+}
-+
- static const struct pci_error_handlers vfio_err_handlers = {
- 	.error_detected = vfio_pci_aer_err_detected,
-+	.slot_reset = vfio_pci_aer_slot_reset,
- };
- 
- static struct pci_driver vfio_pci_driver = {
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 1c46045..e883db5 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -611,6 +611,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
- 					       count, flags, data);
- }
- 
-+static int vfio_pci_set_non_fatal_err_trigger(struct vfio_pci_device *vdev,
-+				    unsigned index, unsigned start,
-+				    unsigned count, uint32_t flags, void *data)
-+{
-+	if (index != VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX || start != 0 || count > 1)
-+		return -EINVAL;
-+
-+	return vfio_pci_set_ctx_trigger_single(&vdev->non_fatal_err_trigger,
-+					       count, flags, data);
-+}
-+
- static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
- 				    unsigned index, unsigned start,
- 				    unsigned count, uint32_t flags, void *data)
-@@ -664,6 +675,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
- 			break;
- 		}
- 		break;
-+	case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
-+		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
-+		case VFIO_IRQ_SET_ACTION_TRIGGER:
-+			if (pci_is_pcie(vdev->pdev))
-+				func = vfio_pci_set_err_trigger;
-+			break;
-+		}
-+		break;
- 	case VFIO_PCI_REQ_IRQ_INDEX:
- 		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
- 		case VFIO_IRQ_SET_ACTION_TRIGGER:
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-index f37c73b..c27a507 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
-+++ b/drivers/vfio/pci/vfio_pci_private.h
-@@ -93,6 +93,7 @@ struct vfio_pci_device {
- 	struct pci_saved_state	*pci_saved_state;
- 	int			refcnt;
- 	struct eventfd_ctx	*err_trigger;
-+	struct eventfd_ctx	*non_fatal_err_trigger;
- 	struct eventfd_ctx	*req_trigger;
- 	struct list_head	dummy_resources_list;
- };
-
--- 
-MST
+C.
