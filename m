@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUE5J-0003af-Eg
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:53:06 -0500
+	(envelope-from <eblake@redhat.com>) id 1cUE5t-00047d-LT
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUE5F-0001RB-HP
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:53:05 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cUE5F-0001Pf-85
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:53:01 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0JEpe5Y147407
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:52:59 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 282y7a8yq8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:52:58 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 19 Jan 2017 14:52:55 -0000
-Date: Thu, 19 Jan 2017 15:52:50 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <0503ac26-e660-325c-8257-59227c41021d@redhat.com>
-References: <20170116195452.23532-1-ehabkost@redhat.com>
-	<0503ac26-e660-325c-8257-59227c41021d@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cUE5p-0001kd-NT
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:53:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cUE5p-0001k5-Ep
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:53:37 -0500
+References: <1484772931-16272-1-git-send-email-mst@redhat.com>
+	<1484772931-16272-5-git-send-email-mst@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <29f56f57-76f5-8585-c286-70bc0eb60b92@redhat.com>
+Date: Thu, 19 Jan 2017 08:53:34 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170119155250.79a5f90c.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
+In-Reply-To: <1484772931-16272-5-git-send-email-mst@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rS12n8S7Cq4KdW1EU2j0T9s9J9vi96p6m"
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] ARRAY_SIZE: check that argument is
+ an array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,69 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Sergey Fedorov <serge.fdrv@gmail.com>
 
-On Tue, 17 Jan 2017 18:43:40 +0100
-David Hildenbrand <david@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rS12n8S7Cq4KdW1EU2j0T9s9J9vi96p6m
+From: Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Sergey Fedorov <serge.fdrv@gmail.com>
+Message-ID: <29f56f57-76f5-8585-c286-70bc0eb60b92@redhat.com>
+Subject: Re: [PATCH v2 4/4] ARRAY_SIZE: check that argument is an array
+References: <1484772931-16272-1-git-send-email-mst@redhat.com>
+ <1484772931-16272-5-git-send-email-mst@redhat.com>
+In-Reply-To: <1484772931-16272-5-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Uncompiled and untested.
-
-@Jason: have you given this a try?
-
-> @Conny and Christian, feel free to pick up and modify if this makes
-> sense
-> 
->  From 4a2af1ca47421b68eb7677cd91af350dd9be4e0e Mon Sep 17 00:00:00 2001
-> From: David Hildenbrand <david@redhat.com>
-> Date: Tue, 17 Jan 2017 18:34:45 +0100
-> Subject: [PATCH] s390x/cpumodel: allow the "host" model also for tcg
-> 
-> Let's also allow the host model for tcg, therefore meaning
-> "enable all features supported by the selected accelerator in the current
-> host".
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On 01/18/2017 02:55 PM, Michael S. Tsirkin wrote:
+> It's a familiar pattern: some code uses ARRAY_SIZE, then refactoring
+> changes the argument from an array to a pointer to a dynamically
+> allocated buffer.  Code keeps compiling but any ARRAY_SIZE calls now
+> return the size of the pointer divided by element size.
+>=20
+> Let's add build time checks to ARRAY_SIZE before we allow more
+> of these in the code-base.
+>=20
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
->   qapi-schema.json          |  4 ++--
->   target/s390x/cpu-qom.h    |  1 -
->   target/s390x/cpu_models.c | 34 ++++++++--------------------------
->   3 files changed, 10 insertions(+), 29 deletions(-)
+>  include/qemu/osdep.h | 8 +++++++-
 
-(...)
+> =20
+>  #ifndef ARRAY_SIZE
+> -#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+> +/*
+> + * &(x)[0] is always a pointer - if it's same type as x then the argum=
+ent is a
+> + * pointer, not an array as expected.
+> + */
+> +#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + QEMU_BUILD_BUG_O=
+N_ZERO( \
+> +                        __builtin_types_compatible_p(typeof(x), \
 
-> -#ifdef CONFIG_KVM
->   static void s390_host_cpu_model_initfn(Object *obj)
->   {
-> +    S390CPUModel *max_model;
->       S390CPU *cpu = S390_CPU(obj);
->       Error *err = NULL;
-> 
-> -    if (!kvm_enabled() || !kvm_s390_cpu_models_supported()) {
-> +    if (kvm_enabled() && !kvm_s390_cpu_models_supported()) {
->           return;
->       }
-> 
-> -    cpu->model = g_malloc0(sizeof(*cpu->model));
-> -    kvm_s390_get_host_cpu_model(cpu->model, &err);
-> -    if (err) {
-> +    max_model = get_max_cpu_model(&err);
-> +    if (err || !max_model) {
+Are we sure that __builtin_types_compatible_p() is supported for all
+versions of gcc and clang that we support, or does this need further
+#ifdefs?
 
-I think checking for !max_model is enough.
 
->           error_report_err(err);
-> -        g_free(cpu->model);
->           /* fallback to unsupported cpu models */
-> -        cpu->model = NULL;
-> +        return;
->       }
-> +    /* copy the host model so it can be modified */
-> +    cpu->model = g_memdup(max_model, sizeof(*cpu->model));
->   }
-> -#endif
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-(...)
 
-This gives us the same as before on kvm and z900 for tcg, so this seems
-reasonable to me.
+--rS12n8S7Cq4KdW1EU2j0T9s9J9vi96p6m
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYgNLuAAoJEKeha0olJ0Nqi9oH/25YTiNBoOeO58SGESaLKLm3
+x80rR6q/uiiA9u+sMNuLdPs7wekdCZbegGsKx12WB8yr/2J7u8griNctu3mj6Ugw
+DFpozPdpe3ZEcy3VJ9YgjNcZGkzJKAi/vohdJ1SsJvO9Ag/YTprrLAqaWcEjh2Gt
+KCZwCJpBqd2hE+JFx9cGIQIYV1+jlNIuYCkjxhc0adKsi2pL5EzSMserkaEwSpZL
+ZWL3OlOoSXL5bVO9SnLXpCz/oC2lDGAn3lMRFnaQlMaG5cZj67rvicznzFhDZAr+
+ovHEuRQYRuz0knw1SirMth5NzQhhqatRZ8EHRolSmA3GjswjMW0qKEiMguxt46E=
+=1h3a
+-----END PGP SIGNATURE-----
+
+--rS12n8S7Cq4KdW1EU2j0T9s9J9vi96p6m--
