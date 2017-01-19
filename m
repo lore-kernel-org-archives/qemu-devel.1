@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUDPt-00011Q-W0
+	(envelope-from <pm215@archaic.org.uk>) id 1cUDPu-00011R-0b
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUDPr-0005E0-Kl
+	(envelope-from <pm215@archaic.org.uk>) id 1cUDPr-0005Dh-HQ
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:17 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48210)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48208)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cUDPr-00059u-8V
+	id 1cUDPq-00055o-VV
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:15 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUDPc-00036l-91
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:10:00 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cUDPd-00037V-6g
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:10:01 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Jan 2017 14:09:28 +0000
-Message-Id: <1484834995-26826-10-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 19 Jan 2017 14:09:30 +0000
+Message-Id: <1484834995-26826-12-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1484834995-26826-1-git-send-email-peter.maydell@linaro.org>
 References: <1484834995-26826-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/36] aspeed/smc: rework the prototype of the
- AspeedSMCFlash helper routines
+Subject: [Qemu-devel] [PULL 11/36] aspeed/smc: unfold the
+ AspeedSMCController array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,117 +35,132 @@ To: qemu-devel@nongnu.org
 
 From: Cédric Le Goater <clg@kaod.org>
 
-Change the routines prototype to use a 'AspeedSMCFlash *' instead of
-'AspeedSMCState *'. The result will help in making future changes
-clearer.
-
-Also change aspeed_smc_update_cs() which uselessly loops on all slave
-devices to update their status.
+This is getting difficult to read. Also add a 'has_dma' field for each
+controller type.
 
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 Reviewed-by: Joel Stanley <joel@jms.id.au>
 Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-Message-id: 1483979087-32663-4-git-send-email-clg@kaod.org
+Message-id: 1483979087-32663-6-git-send-email-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ssi/aspeed_smc.c | 39 ++++++++++++++++++++++-----------------
- 1 file changed, 22 insertions(+), 17 deletions(-)
+ include/hw/ssi/aspeed_smc.h |  1 +
+ hw/ssi/aspeed_smc.c         | 91 ++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 74 insertions(+), 18 deletions(-)
 
+diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+index bdfbcc0..861120b 100644
+--- a/include/hw/ssi/aspeed_smc.h
++++ b/include/hw/ssi/aspeed_smc.h
+@@ -44,6 +44,7 @@ typedef struct AspeedSMCController {
+     const AspeedSegments *segments;
+     hwaddr flash_window_base;
+     uint32_t flash_window_size;
++    bool has_dma;
+ } AspeedSMCController;
+ 
+ typedef struct AspeedSMCFlash {
 diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 205c0ab..9b31d5d 100644
+index 3bd381b..d8287ab 100644
 --- a/hw/ssi/aspeed_smc.c
 +++ b/hw/ssi/aspeed_smc.c
-@@ -328,19 +328,23 @@ static const MemoryRegionOps aspeed_smc_flash_default_ops = {
-     },
+@@ -173,24 +173,79 @@ static const AspeedSegments aspeed_segments_ast2500_spi2[] = {
  };
  
--static inline int aspeed_smc_flash_mode(const AspeedSMCState *s, int cs)
-+static inline int aspeed_smc_flash_mode(const AspeedSMCFlash *fl)
- {
--    return s->regs[s->r_ctrl0 + cs] & CTRL_CMD_MODE_MASK;
-+    const AspeedSMCState *s = fl->controller;
-+
-+    return s->regs[s->r_ctrl0 + fl->id] & CTRL_CMD_MODE_MASK;
- }
- 
--static inline bool aspeed_smc_is_usermode(const AspeedSMCState *s, int cs)
-+static inline bool aspeed_smc_is_usermode(const AspeedSMCFlash *fl)
- {
--    return aspeed_smc_flash_mode(s, cs) == CTRL_USERMODE;
-+    return aspeed_smc_flash_mode(fl) == CTRL_USERMODE;
- }
- 
--static inline bool aspeed_smc_is_writable(const AspeedSMCState *s, int cs)
-+static inline bool aspeed_smc_is_writable(const AspeedSMCFlash *fl)
- {
--    return s->regs[s->r_conf] & (1 << (s->conf_enable_w0 + cs));
-+    const AspeedSMCState *s = fl->controller;
-+
-+    return s->regs[s->r_conf] & (1 << (s->conf_enable_w0 + fl->id));
- }
- 
- static uint64_t aspeed_smc_flash_read(void *opaque, hwaddr addr, unsigned size)
-@@ -350,7 +354,7 @@ static uint64_t aspeed_smc_flash_read(void *opaque, hwaddr addr, unsigned size)
-     uint64_t ret = 0;
-     int i;
- 
--    if (aspeed_smc_is_usermode(s, fl->id)) {
-+    if (aspeed_smc_is_usermode(fl)) {
-         for (i = 0; i < size; i++) {
-             ret |= ssi_transfer(s->spi, 0x0) << (8 * i);
-         }
-@@ -370,13 +374,13 @@ static void aspeed_smc_flash_write(void *opaque, hwaddr addr, uint64_t data,
-     const AspeedSMCState *s = fl->controller;
-     int i;
- 
--    if (!aspeed_smc_is_writable(s, fl->id)) {
-+    if (!aspeed_smc_is_writable(fl)) {
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: flash is not writable at 0x%"
-                       HWADDR_PRIx "\n", __func__, addr);
-         return;
-     }
- 
--    if (!aspeed_smc_is_usermode(s, fl->id)) {
-+    if (!aspeed_smc_is_usermode(fl)) {
-         qemu_log_mask(LOG_UNIMP, "%s: usermode not implemented\n",
-                       __func__);
-         return;
-@@ -397,18 +401,18 @@ static const MemoryRegionOps aspeed_smc_flash_ops = {
-     },
+ static const AspeedSMCController controllers[] = {
+-    { "aspeed.smc.smc", R_CONF, R_CE_CTRL, R_CTRL0, R_TIMINGS,
+-      CONF_ENABLE_W0, 5, aspeed_segments_legacy,
+-      ASPEED_SOC_SMC_FLASH_BASE, 0x6000000 },
+-    { "aspeed.smc.fmc", R_CONF, R_CE_CTRL, R_CTRL0, R_TIMINGS,
+-      CONF_ENABLE_W0, 5, aspeed_segments_fmc,
+-      ASPEED_SOC_FMC_FLASH_BASE, 0x10000000 },
+-    { "aspeed.smc.spi", R_SPI_CONF, 0xff, R_SPI_CTRL0, R_SPI_TIMINGS,
+-      SPI_CONF_ENABLE_W0, 1, aspeed_segments_spi,
+-      ASPEED_SOC_SPI_FLASH_BASE, 0x10000000 },
+-    { "aspeed.smc.ast2500-fmc", R_CONF, R_CE_CTRL, R_CTRL0, R_TIMINGS,
+-      CONF_ENABLE_W0, 3, aspeed_segments_ast2500_fmc,
+-      ASPEED_SOC_FMC_FLASH_BASE, 0x10000000 },
+-    { "aspeed.smc.ast2500-spi1", R_CONF, R_CE_CTRL, R_CTRL0, R_TIMINGS,
+-      CONF_ENABLE_W0, 2, aspeed_segments_ast2500_spi1,
+-      ASPEED_SOC_SPI_FLASH_BASE, 0x8000000 },
+-    { "aspeed.smc.ast2500-spi2", R_CONF, R_CE_CTRL, R_CTRL0, R_TIMINGS,
+-      CONF_ENABLE_W0, 2, aspeed_segments_ast2500_spi2,
+-      ASPEED_SOC_SPI2_FLASH_BASE, 0x8000000 },
++    {
++        .name              = "aspeed.smc.smc",
++        .r_conf            = R_CONF,
++        .r_ce_ctrl         = R_CE_CTRL,
++        .r_ctrl0           = R_CTRL0,
++        .r_timings         = R_TIMINGS,
++        .conf_enable_w0    = CONF_ENABLE_W0,
++        .max_slaves        = 5,
++        .segments          = aspeed_segments_legacy,
++        .flash_window_base = ASPEED_SOC_SMC_FLASH_BASE,
++        .flash_window_size = 0x6000000,
++        .has_dma           = false,
++    }, {
++        .name              = "aspeed.smc.fmc",
++        .r_conf            = R_CONF,
++        .r_ce_ctrl         = R_CE_CTRL,
++        .r_ctrl0           = R_CTRL0,
++        .r_timings         = R_TIMINGS,
++        .conf_enable_w0    = CONF_ENABLE_W0,
++        .max_slaves        = 5,
++        .segments          = aspeed_segments_fmc,
++        .flash_window_base = ASPEED_SOC_FMC_FLASH_BASE,
++        .flash_window_size = 0x10000000,
++        .has_dma           = true,
++    }, {
++        .name              = "aspeed.smc.spi",
++        .r_conf            = R_SPI_CONF,
++        .r_ce_ctrl         = 0xff,
++        .r_ctrl0           = R_SPI_CTRL0,
++        .r_timings         = R_SPI_TIMINGS,
++        .conf_enable_w0    = SPI_CONF_ENABLE_W0,
++        .max_slaves        = 1,
++        .segments          = aspeed_segments_spi,
++        .flash_window_base = ASPEED_SOC_SPI_FLASH_BASE,
++        .flash_window_size = 0x10000000,
++        .has_dma           = false,
++    }, {
++        .name              = "aspeed.smc.ast2500-fmc",
++        .r_conf            = R_CONF,
++        .r_ce_ctrl         = R_CE_CTRL,
++        .r_ctrl0           = R_CTRL0,
++        .r_timings         = R_TIMINGS,
++        .conf_enable_w0    = CONF_ENABLE_W0,
++        .max_slaves        = 3,
++        .segments          = aspeed_segments_ast2500_fmc,
++        .flash_window_base = ASPEED_SOC_FMC_FLASH_BASE,
++        .flash_window_size = 0x10000000,
++        .has_dma           = true,
++    }, {
++        .name              = "aspeed.smc.ast2500-spi1",
++        .r_conf            = R_CONF,
++        .r_ce_ctrl         = R_CE_CTRL,
++        .r_ctrl0           = R_CTRL0,
++        .r_timings         = R_TIMINGS,
++        .conf_enable_w0    = CONF_ENABLE_W0,
++        .max_slaves        = 2,
++        .segments          = aspeed_segments_ast2500_spi1,
++        .flash_window_base = ASPEED_SOC_SPI_FLASH_BASE,
++        .flash_window_size = 0x8000000,
++        .has_dma           = false,
++    }, {
++        .name              = "aspeed.smc.ast2500-spi2",
++        .r_conf            = R_CONF,
++        .r_ce_ctrl         = R_CE_CTRL,
++        .r_ctrl0           = R_CTRL0,
++        .r_timings         = R_TIMINGS,
++        .conf_enable_w0    = CONF_ENABLE_W0,
++        .max_slaves        = 2,
++        .segments          = aspeed_segments_ast2500_spi2,
++        .flash_window_base = ASPEED_SOC_SPI2_FLASH_BASE,
++        .flash_window_size = 0x8000000,
++        .has_dma           = false,
++    },
  };
  
--static bool aspeed_smc_is_ce_stop_active(const AspeedSMCState *s, int cs)
-+static inline bool aspeed_smc_is_ce_stop_active(const AspeedSMCFlash *fl)
- {
--    return s->regs[s->r_ctrl0 + cs] & CTRL_CE_STOP_ACTIVE;
-+    const AspeedSMCState *s = fl->controller;
-+
-+    return s->regs[s->r_ctrl0 + fl->id] & CTRL_CE_STOP_ACTIVE;
- }
- 
--static void aspeed_smc_update_cs(const AspeedSMCState *s)
-+static void aspeed_smc_flash_update_cs(AspeedSMCFlash *fl)
- {
--    int i;
-+    const AspeedSMCState *s = fl->controller;
- 
--    for (i = 0; i < s->num_cs; ++i) {
--        qemu_set_irq(s->cs_lines[i], aspeed_smc_is_ce_stop_active(s, i));
--    }
-+    qemu_set_irq(s->cs_lines[fl->id], aspeed_smc_is_ce_stop_active(fl));
- }
- 
- static void aspeed_smc_reset(DeviceState *d)
-@@ -481,8 +485,9 @@ static void aspeed_smc_write(void *opaque, hwaddr addr, uint64_t data,
-         addr == s->r_ce_ctrl) {
-         s->regs[addr] = value;
-     } else if (addr >= s->r_ctrl0 && addr < s->r_ctrl0 + s->num_cs) {
-+        int cs = addr - s->r_ctrl0;
-         s->regs[addr] = value;
--        aspeed_smc_update_cs(s);
-+        aspeed_smc_flash_update_cs(&s->flashes[cs]);
-     } else if (addr >= R_SEG_ADDR0 &&
-                addr < R_SEG_ADDR0 + s->ctrl->max_slaves) {
-         int cs = addr - R_SEG_ADDR0;
+ /*
 -- 
 2.7.4
