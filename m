@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cU8wa-0005CZ-0J
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:23:45 -0500
+	(envelope-from <peterx@redhat.com>) id 1cU8yY-0006Ew-N1
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cU8wV-00073L-WC
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:23:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38044)
+	(envelope-from <peterx@redhat.com>) id 1cU8yX-0008Hu-Ac
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45572)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cU8wV-00072w-Nm
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:23:39 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cU8yX-0008HD-5D
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:45 -0500
 Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
 	[10.5.11.28])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B282B76EF
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:23:39 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170118161653.19296-1-eblake@redhat.com>
-	<20170118161653.19296-2-eblake@redhat.com>
-Date: Thu, 19 Jan 2017 10:23:36 +0100
-In-Reply-To: <20170118161653.19296-2-eblake@redhat.com> (Eric Blake's message
-	of "Wed, 18 Jan 2017 10:16:48 -0600")
-Message-ID: <87pojjflnr.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] pci: Use struct instead of QDict to
- pass back parameters
+	by mx1.redhat.com (Postfix) with ESMTPS id 51A477E9C1
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:25:45 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Thu, 19 Jan 2017 17:25:30 +0800
+Message-Id: <1484817932-14452-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1484817932-14452-1-git-send-email-peterx@redhat.com>
+References: <1484817932-14452-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 1/3] vfio: trace map/unmap for notify as
+ well
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,115 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, peterx@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+We traces its range, but we don't know whether it's a MAP/UNMAP. Let's
+dump it as well.
 
-> It's simpler to just use a C struct than it is to bundle things
-> into a QDict in one function just to pull them back out in the
-> caller.  Plus, doing this gets rid of one more user of dynamic
-> JSON through qobject_from_jsonf().
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  hw/pci/pcie_aer.c | 36 +++++++++++++++++-------------------
->  1 file changed, 17 insertions(+), 19 deletions(-)
->
-> diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
-> index daf1f65..78fd2c3 100644
-> --- a/hw/pci/pcie_aer.c
-> +++ b/hw/pci/pcie_aer.c
-> @@ -44,6 +44,13 @@
->  #define PCI_ERR_SRC_COR_OFFS    0
->  #define PCI_ERR_SRC_UNCOR_OFFS  2
->
-> +typedef struct PCIEErrorInject {
-> +    const char *id;
-> +    const char *root_bus;
-> +    int bus;
-> +    int devfn;
-> +} PCIEErrorInject;
-> +
->  /* From 6.2.7 Error Listing and Rules. Table 6-2, 6-3 and 6-4 */
->  static uint32_t pcie_aer_uncor_default_severity(uint32_t status)
->  {
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/vfio/common.c     | 3 ++-
+ hw/vfio/trace-events | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-Aside: both pcie_aer_inject_error() and pcie_aer_msg() could be made
-static.
-
-> @@ -943,7 +950,8 @@ static int pcie_aer_parse_error_string(const char *error_name,
->  }
->
->  static int do_pcie_aer_inject_error(Monitor *mon,
-> -                                    const QDict *qdict, QObject **ret_data)
-> +                                    const QDict *qdict,
-> +                                    PCIEErrorInject *ret_data)
-
-Your chance to pick a better name than @ret_data, if you like.
-
->  {
->      const char *id = qdict_get_str(qdict, "id");
->      const char *error_name;
-> @@ -1004,34 +1012,24 @@ static int do_pcie_aer_inject_error(Monitor *mon,
->      err.prefix[2] = qdict_get_try_int(qdict, "prefix2", 0);
->      err.prefix[3] = qdict_get_try_int(qdict, "prefix3", 0);
->
-> -    ret = pcie_aer_inject_error(dev, &err);
-> -    *ret_data = qobject_from_jsonf("{'id': %s, "
-> -                                   "'root_bus': %s, 'bus': %d, 'devfn': %d, "
-> -                                   "'ret': %d}",
-> -                                   id, pci_root_bus_path(dev),
-> -                                   pci_bus_num(dev->bus), dev->devfn,
-> -                                   ret);
-> -    assert(*ret_data);
-> +    pcie_aer_inject_error(dev, &err);
-
-Ignores failure (assuming it can happen here).
-
-Turns out this is no change: before, we passed the return code to the
-caller, and ignored it there.  So this is an improvement of sorts.
-
-Still, is ignoring errors correct?  For what it's worth, the other
-caller of pcie_aer_inject_error() asserts it succeeds.
-
-> +    ret_data->id = id;
-> +    ret_data->root_bus = pci_root_bus_path(dev);
-> +    ret_data->bus = pci_bus_num(dev->bus);
-> +    ret_data->devfn = dev->devfn;
->
->      return 0;
->  }
->
->  void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
->  {
-> -    QObject *data;
-> -    int devfn;
-> +    PCIEErrorInject data;
-
-Your chance to pick a better name than @data, if you like.
-
->
->      if (do_pcie_aer_inject_error(mon, qdict, &data) < 0) {
->          return;
->      }
->
-> -    assert(qobject_type(data) == QTYPE_QDICT);
-> -    qdict = qobject_to_qdict(data);
-> -
-> -    devfn = (int)qdict_get_int(qdict, "devfn");
->      monitor_printf(mon, "OK id: %s root bus: %s, bus: %x devfn: %x.%x\n",
-> -                   qdict_get_str(qdict, "id"),
-> -                   qdict_get_str(qdict, "root_bus"),
-> -                   (int) qdict_get_int(qdict, "bus"),
-> -                   PCI_SLOT(devfn), PCI_FUNC(devfn));
-
-Here's where we ignore the return code.
-
-> +                   data.id, data.root_bus, data.bus,
-> +                   PCI_SLOT(data.devfn), PCI_FUNC(data.devfn));
->  }
-
-Since the fishy error ignore is pre-existing:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 801578b..174f351 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -305,7 +305,8 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+     void *vaddr;
+     int ret;
+ 
+-    trace_vfio_iommu_map_notify(iova, iova + iotlb->addr_mask);
++    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
++                                iova, iova + iotlb->addr_mask);
+ 
+     if (iotlb->target_as != &address_space_memory) {
+         error_report("Wrong target AS \"%s\", only system memory is allowed",
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index ef81609..7ae8233 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -84,7 +84,7 @@ vfio_pci_igd_lpc_bridge_enabled(const char *name) "%s"
+ # hw/vfio/common.c
+ vfio_region_write(const char *name, int index, uint64_t addr, uint64_t data, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
+ vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t data) " (%s:region%d+0x%"PRIx64", %d) = 0x%"PRIx64
+-vfio_iommu_map_notify(uint64_t iova_start, uint64_t iova_end) "iommu map @ %"PRIx64" - %"PRIx64
++vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "iommu %s @ %"PRIx64" - %"PRIx64
+ vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add %"PRIx64" - %"PRIx64
+ vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] %"PRIx64" - %"PRIx64
+ vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] %"PRIx64" - %"PRIx64" [%p]"
+-- 
+2.7.4
