@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUDPv-000121-6R
+	(envelope-from <pm215@archaic.org.uk>) id 1cUDPv-00012p-OF
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUDPs-0005FZ-It
+	(envelope-from <pm215@archaic.org.uk>) id 1cUDPq-0005CF-Df
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:19 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48207)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48208)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cUDPs-00051T-9o
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:16 -0500
+	id 1cUDPq-00055o-2f
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:14 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUDPZ-00034L-G4
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:09:57 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cUDPp-0003Go-7W
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:10:13 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Jan 2017 14:09:22 +0000
-Message-Id: <1484834995-26826-4-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 19 Jan 2017 14:09:55 +0000
+Message-Id: <1484834995-26826-37-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1484834995-26826-1-git-send-email-peter.maydell@linaro.org>
 References: <1484834995-26826-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 03/36] block: m25p80: Introduce die erase command
+Subject: [Qemu-devel] [PULL 36/36] hw/arm/virt: Add board property to enable
+ EL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,119 +30,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Marcin Krzeminski <mar.krzeminski@gmail.com>
+Add a board level property to the virt board which will
+enable EL2 on the CPU if the user asks for it. The
+default is not to provide EL2. If EL2 is enabled then
+we will use SMC as our PSCI conduit, and report the
+virtualization support in the GICv3 device tree node
+and the ACPI tables.
 
-Modern big flash NOR devices consist of more than one die.
-Some of them do not support chip erase and instead have a die
-erase command that can erase one die only. This commit adds
-support for defining the number of dies in the chip, and adds
-support for die erase command.
-
-The NOR flash model is not strict, so no option to
-disable chip erase has been added.
-
-Signed-off-by: Marcin Krzeminski <mar.krzeminski@gmail.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20170108083854.5006-3-mar.krzeminski@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-id: 1483977924-14522-19-git-send-email-peter.maydell@linaro.org
 ---
- hw/block/m25p80.c | 41 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 40 insertions(+), 1 deletion(-)
+ include/hw/arm/virt.h    |  1 +
+ hw/arm/virt-acpi-build.c |  3 +++
+ hw/arm/virt.c            | 44 ++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 46 insertions(+), 2 deletions(-)
 
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index 4ad67ac..74c6e39 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -74,6 +74,12 @@ typedef struct FlashPartInfo {
-     uint32_t n_sectors;
-     uint32_t page_size;
-     uint16_t flags;
-+    /*
-+     * Big sized spi nor are often stacked devices, thus sometime
-+     * replace chip erase with die erase.
-+     * This field inform how many die is in the chip.
-+     */
-+    uint8_t die_cnt;
- } FlashPartInfo;
- 
- /* adapted from linux */
-@@ -91,7 +97,8 @@ typedef struct FlashPartInfo {
-     .sector_size = (_sector_size),\
-     .n_sectors = (_n_sectors),\
-     .page_size = 256,\
--    .flags = (_flags),
-+    .flags = (_flags),\
-+    .die_cnt = 0
- 
- #define INFO6(_part_name, _jedec_id, _ext_id, _sector_size, _n_sectors, _flags)\
-     .part_name = _part_name,\
-@@ -108,6 +115,24 @@ typedef struct FlashPartInfo {
-     .n_sectors = (_n_sectors),\
-     .page_size = 256,\
-     .flags = (_flags),\
-+    .die_cnt = 0
-+
-+#define INFO_STACKED(_part_name, _jedec_id, _ext_id, _sector_size, _n_sectors,\
-+                    _flags, _die_cnt)\
-+    .part_name = _part_name,\
-+    .id = {\
-+        ((_jedec_id) >> 16) & 0xff,\
-+        ((_jedec_id) >> 8) & 0xff,\
-+        (_jedec_id) & 0xff,\
-+        ((_ext_id) >> 8) & 0xff,\
-+        (_ext_id) & 0xff,\
-+          },\
-+    .id_len = (!(_jedec_id) ? 0 : (3 + ((_ext_id) ? 2 : 0))),\
-+    .sector_size = (_sector_size),\
-+    .n_sectors = (_n_sectors),\
-+    .page_size = 256,\
-+    .flags = (_flags),\
-+    .die_cnt = _die_cnt
- 
- #define JEDEC_NUMONYX 0x20
- #define JEDEC_WINBOND 0xEF
-@@ -360,6 +385,8 @@ typedef enum {
- 
-     REVCR = 0x65,
-     WEVCR = 0x61,
-+
-+    DIE_ERASE = 0xC4,
- } FlashCMD;
- 
- typedef enum {
-@@ -517,6 +544,16 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
-     case BULK_ERASE:
-         len = s->size;
-         break;
-+    case DIE_ERASE:
-+        if (s->pi->die_cnt) {
-+            len = s->size / s->pi->die_cnt;
-+            offset = offset & (~(len - 1));
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR, "M25P80: die erase is not supported"
-+                          " by device\n");
-+            return;
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 53507e6..58ce74e 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -93,6 +93,7 @@ typedef struct {
+     FWCfgState *fw_cfg;
+     bool secure;
+     bool highmem;
++    bool virt;
+     int32_t gic_version;
+     struct arm_boot_info bootinfo;
+     const MemMapEntry *memmap;
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 73aca9e..d0a8a0f 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -614,6 +614,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
+             gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
+         }
++        if (vms->virt && vms->gic_version == 3) {
++            gicc->vgic_interrupt = cpu_to_le32(PPI(ARCH_GICV3_MAINT_IRQ));
 +        }
-+        break;
-     default:
-         abort();
      }
-@@ -638,6 +675,7 @@ static void complete_collecting_data(Flash *s)
-     case ERASE4_32K:
-     case ERASE_SECTOR:
-     case ERASE4_SECTOR:
-+    case DIE_ERASE:
-         flash_erase(s, s->cur_addr, s->cmd_in_progress);
-         break;
-     case WRSR:
-@@ -884,6 +922,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-     case PP:
-     case PP4:
-     case PP4_4:
-+    case DIE_ERASE:
-         s->needed_bytes = get_addr_length(s);
-         s->pos = 0;
-         s->len = 0;
+ 
+     if (vms->gic_version == 3) {
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 769afa0..6c9e898 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -443,6 +443,11 @@ static void fdt_add_gic_node(VirtMachineState *vms)
+                                      2, vms->memmap[VIRT_GIC_DIST].size,
+                                      2, vms->memmap[VIRT_GIC_REDIST].base,
+                                      2, vms->memmap[VIRT_GIC_REDIST].size);
++        if (vms->virt) {
++            qemu_fdt_setprop_cells(vms->fdt, "/intc", "interrupts",
++                                   GIC_FDT_IRQ_TYPE_PPI, ARCH_GICV3_MAINT_IRQ,
++                                   GIC_FDT_IRQ_FLAGS_LEVEL_HI);
++        }
+     } else {
+         /* 'cortex-a15-gic' means 'GIC v2' */
+         qemu_fdt_setprop_string(vms->fdt, "/intc", "compatible",
+@@ -1239,10 +1244,15 @@ static void machvirt_init(MachineState *machine)
+      * so it doesn't get in the way. Instead of starting secondary
+      * CPUs in PSCI powerdown state we will start them all running and
+      * let the boot ROM sort them out.
+-     * The usual case is that we do use QEMU's PSCI implementation.
++     * The usual case is that we do use QEMU's PSCI implementation;
++     * if the guest has EL2 then we will use SMC as the conduit,
++     * and otherwise we will use HVC (for backwards compatibility and
++     * because if we're using KVM then we must use HVC).
+      */
+     if (vms->secure && firmware_loaded) {
+         vms->psci_conduit = QEMU_PSCI_CONDUIT_DISABLED;
++    } else if (vms->virt) {
++        vms->psci_conduit = QEMU_PSCI_CONDUIT_SMC;
+     } else {
+         vms->psci_conduit = QEMU_PSCI_CONDUIT_HVC;
+     }
+@@ -1272,6 +1282,12 @@ static void machvirt_init(MachineState *machine)
+         exit(1);
+     }
+ 
++    if (vms->virt && kvm_enabled()) {
++        error_report("mach-virt: KVM does not support providing "
++                     "Virtualization extensions to the guest CPU");
++        exit(1);
++    }
++
+     if (vms->secure) {
+         if (kvm_enabled()) {
+             error_report("mach-virt: KVM does not support Security extensions");
+@@ -1328,7 +1344,7 @@ static void machvirt_init(MachineState *machine)
+             object_property_set_bool(cpuobj, false, "has_el3", NULL);
+         }
+ 
+-        if (object_property_find(cpuobj, "has_el2", NULL)) {
++        if (!vms->virt && object_property_find(cpuobj, "has_el2", NULL)) {
+             object_property_set_bool(cpuobj, false, "has_el2", NULL);
+         }
+ 
+@@ -1434,6 +1450,20 @@ static void virt_set_secure(Object *obj, bool value, Error **errp)
+     vms->secure = value;
+ }
+ 
++static bool virt_get_virt(Object *obj, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    return vms->virt;
++}
++
++static void virt_set_virt(Object *obj, bool value, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    vms->virt = value;
++}
++
+ static bool virt_get_highmem(Object *obj, Error **errp)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+@@ -1521,6 +1551,16 @@ static void virt_2_9_instance_init(Object *obj)
+                                     "Security Extensions (TrustZone)",
+                                     NULL);
+ 
++    /* EL2 is also disabled by default, for similar reasons */
++    vms->virt = false;
++    object_property_add_bool(obj, "virtualization", virt_get_virt,
++                             virt_set_virt, NULL);
++    object_property_set_description(obj, "virtualization",
++                                    "Set on/off to enable/disable emulating a "
++                                    "guest CPU which implements the ARM "
++                                    "Virtualization Extensions",
++                                    NULL);
++
+     /* High memory is enabled by default */
+     vms->highmem = true;
+     object_property_add_bool(obj, "highmem", virt_get_highmem,
 -- 
 2.7.4
