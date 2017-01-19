@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cU7xU-0004rd-0A
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:37 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cU7xU-0004rc-01
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cU7xS-0008EQ-J3
+	(envelope-from <kraxel@redhat.com>) id 1cU7xQ-0008Ds-Rh
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57086)
+Received: from mx1.redhat.com ([209.132.183.28]:54846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cU7xS-0008E6-7Y
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:34 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1484772931-16272-1-git-send-email-mst@redhat.com>
-	<1484772931-16272-5-git-send-email-mst@redhat.com>
-Date: Thu, 19 Jan 2017 09:20:31 +0100
-In-Reply-To: <1484772931-16272-5-git-send-email-mst@redhat.com> (Michael
-	S. Tsirkin's message of "Wed, 18 Jan 2017 22:55:55 +0200")
-Message-ID: <87lgu7ihps.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] ARRAY_SIZE: check that argument is
- an array
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cU7xQ-0008Dd-MX
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:32 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F26817E9CC
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 08:20:31 +0000 (UTC)
+Message-ID: <1484814026.15364.15.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 19 Jan 2017 09:20:26 +0100
+In-Reply-To: <20170118160332.13390-24-marcandre.lureau@redhat.com>
+References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
+	<20170118160332.13390-24-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 23/25] console: make screendump async
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +33,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Sergey Fedorov <serge.fdrv@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, berrange@redhat.com, armbru@redhat.com
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
+On Mi, 2017-01-18 at 20:03 +0400, Marc-Andr=C3=A9 Lureau wrote:
+> +    surface =3D qemu_console_surface(con);
+> +
+> +    /* FIXME: async save with coroutine? it would have to copy or
+> lock
+> +     * the surface. */
+> +    ppm_save(filename, surface, &err);
+> +
 
-> It's a familiar pattern: some code uses ARRAY_SIZE, then refactoring
-> changes the argument from an array to a pointer to a dynamically
-> allocated buffer.  Code keeps compiling but any ARRAY_SIZE calls now
-> return the size of the pointer divided by element size.
->
-> Let's add build time checks to ARRAY_SIZE before we allow more
-> of these in the code-base.
+No need to lock or copy.
 
-Yes, please!
+ppm_save() uses the pixman image (surface->image) only anyway, so
+changing it to accept a pixman image instead of the surface is easy.
 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  include/qemu/osdep.h | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 689f253..24bfda0 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -199,7 +199,13 @@ extern int daemon(int, int);
->  #endif
->  
->  #ifndef ARRAY_SIZE
-> -#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-> +/*
-> + * &(x)[0] is always a pointer - if it's same type as x then the argument is a
-> + * pointer, not an array as expected.
-> + */
-> +#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + QEMU_BUILD_BUG_ON_ZERO( \
-> +                        __builtin_types_compatible_p(typeof(x), \
-> +                                                     typeof(&(x)[0]))))
+pixman images are reference counted, so you can just grab a reference
+using pixman_image_ref() and run with it, without risking it'll be
+released underneath your feet, then unref when done.
 
-Please break the line near the operator, not within one of its operands:
-
-   #define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0]))			\
-                          + QEMU_BUILD_BUG_ON_ZERO(			\
-                               __builtin_types_compatible_p(typeof(x),	\
-                                                            typeof(&(x)[0]))))
->  #endif
->  
->  int qemu_daemon(int nochdir, int noclose);
-
-With the confusing line break tiedied up:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+cheers,
+  Gerd
