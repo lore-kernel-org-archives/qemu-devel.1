@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cUExf-0001ad-7z
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:49:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cUF4Q-0007iW-Co
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:56:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cUExa-000627-TG
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:49:15 -0500
-Date: Thu, 19 Jan 2017 15:49:00 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170119154900.GB16641@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170119143816.21972-1-famz@redhat.com>
-	<20170119143816.21972-15-famz@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1cUF4M-0000vs-FT
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:56:14 -0500
+Date: Thu, 19 Jan 2017 16:55:59 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170119155559.GC5443@noname.redhat.com>
+References: <1477926350-15869-1-git-send-email-ashijeetacharya@gmail.com>
+	<20161031172022.GD12558@noname.redhat.com>
+	<50472f2d-4a71-5f6b-1037-bbefd2d8f4f4@kamp.de>
+	<20170118095952.GA5258@noname.str.redhat.com>
+	<566d163c-eb70-718f-b04b-a86d6370a007@kamp.de>
+	<43209b10-7760-8df6-d5a9-d6b66bebc292@redhat.com>
+	<20170119152029.GA5443@noname.redhat.com>
+	<772ba40f-7748-6d6a-8d7f-28ebeab14ff4@kamp.de>
+	<20170119154202.GB5443@noname.redhat.com>
+	<314bb7a6-3c9e-c259-469c-20acfa20c144@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170119143816.21972-15-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 14/16] file-posix: Implement image
- locking
+In-Reply-To: <314bb7a6-3c9e-c259-469c-20acfa20c144@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH v6 0/2] allow blockdev-add for NFS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: Eric Blake <eblake@redhat.com>, Ashijeet Acharya <ashijeetacharya@gmail.com>, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Thu, Jan 19, 2017 at 10:38:14PM +0800, Fam Zheng wrote:
-> This implements open flag sensible image locking for local file
-> and host device protocol.
+Am 19.01.2017 um 16:44 hat Peter Lieven geschrieben:
+> Am 19.01.2017 um 16:42 schrieb Kevin Wolf:
+> >Am 19.01.2017 um 16:34 hat Peter Lieven geschrieben:
+> >>Am 19.01.2017 um 16:20 schrieb Kevin Wolf:
+> >>>Am 19.01.2017 um 15:59 hat Eric Blake geschrieben:
+> >>>>On 01/19/2017 08:30 AM, Peter Lieven wrote:
+> >>>>>>>qemu-img: Could not open
+> >>>>>>>'nfs://172.21.200.61/vcore-dev-cdrom/templates/VC_debian8-20170116.qcow2,linux?readahead=131072':
+> >>>>>>>Block protocol 'nfs' doesn't support the option 'readahead-size'
+> >>>>>>>
+> >>>>>>>Please let me know if the below fix would be correct:
+> >>>>>>No, this needs to be fixed the other way round: runtime_opts must use
+> >>>>>>the names as specified in the schema, and nfs_client_open() must access
+> >>>>>>them as such. Without that, blockdev-add can't work (and the command
+> >>>>>>line only with the "wrong" old option names from the URL, whereas it
+> >>>>>>should be using the same names as the QAPI schema).
+> >>>>>Shouldn't we support both for backwards compatiblity.?
+> >>>>blockdev-add only needs to support the modern naming.  But yes,
+> >>>>preserving back-compat spelling of the command-line spellings, as well
+> >>>>as matching blockdev-add spellings, is desirable.
+> >>>We only just added the individual command line options, previously it
+> >>>only supported the URL.
+> >>>
+> >>>It's true that we have the messed up version of the options in 2.8, so
+> >>>strictly speaking we would break compatibility with a release, but it's
+> >>>only one release, it's only the nfs driver, and the documentation of the
+> >>>options is the schema, which had the right option names even in 2.8
+> >>>(they just didn't work).
+> >>>
+> >>>So I wouldn't feel bad about removing the wrong names in this specific
+> >>>case.
+> >>So want exactly do you want to do? Fix the names in the QAPI schema
+> >>to use the old naming?
+> >No, fix the command line to use the names in the QAPI schema.
+> >
+> >The option names from the URL were never supposed to be supported on the
+> >command line.
 > 
-> virtlockd in libvirt locks the first byte, so we start looking at the
-> file bytes from 1.
-> 
-> Quoting what was proposed by Kevin Wolf <kwolf@redhat.com>, there are
-> four locking modes by combining two bits (BDRV_O_RDWR and
-> BDRV_O_SHARE_RW), and implemented by taking two locks:
-> 
-> Lock bytes:
-> 
-> * byte 1: I can't allow other processes to write to the image
-> * byte 2: I am writing to the image
-> 
-> Lock modes:
-> 
-> * shared writer (BDRV_O_RDWR | BDRV_O_SHARE_RW): Take shared lock on
->   byte 2. Test whether byte 1 is locked using an exclusive lock, and
->   fail if so.
-> 
-> * exclusive writer (BDRV_O_RDWR only): Take shared lock on byte 2. Test
->   whether byte 1 is locked using an exclusive lock, and fail if so. Then
->   take shared lock on byte 1. I suppose this is racy, but we can
->   probably tolerate that.
-> 
-> * reader that can tolerate writers (BDRV_O_SHARE_RW only): Don't do anything
-> 
-> * reader that can't tolerate writers (neither bit is set): Take shared
->   lock on byte 1. Test whether byte 2 is locked, and fail if so.
+> Okay, so no backwards compatiblity? I actually used the options on the command line...
 
-Ahh, using two bytes is an interesting technique for mapping the four
-different access methods onto the more limit fcntl lock semantics. We
-might want to copy this approach in libvirt too....
+Well, do you _need_ compatibility?
 
-> +/* Posix file locking bytes. Libvirt takes byte 0, so start from byte 1. */
-> +#define RAW_LOCK_BYTE_MIN             1
-> +#define RAW_LOCK_BYTE_NO_OTHER_WRITER 1
-> +#define RAW_LOCK_BYTE_WRITE           2
+It can certainly be done, but as the (wrong) options on the command line
+have only existed since November and were never documented, I wouldn't
+bother unless there's a good reason.
 
-...would you mind if QEMU started from say byte 10, leaving the first 10
-reserved for libvirt uses. This lets libvirt have a continuous space for
-its own usage if we want to use more bytes
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Kevin
