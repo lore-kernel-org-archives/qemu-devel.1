@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cU8ef-0001qS-5u
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:05:13 -0500
+	(envelope-from <armbru@redhat.com>) id 1cU8gF-0002rB-1S
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:06:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cU8eb-0007FN-90
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:05:13 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1484026704-28027-1-git-send-email-mst@redhat.com>
-	<1484026704-28027-5-git-send-email-mst@redhat.com>
-	<14ee35d6-3b41-31da-69d6-5d25da95548b@redhat.com>
-	<20170118210535-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <209114d7-8884-5f15-948c-e8be674b8e95@redhat.com>
-Date: Thu, 19 Jan 2017 10:05:06 +0100
+	(envelope-from <armbru@redhat.com>) id 1cU8gB-0000BJ-2h
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:06:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59668)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cU8gA-0000Af-U1
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:06:47 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0F1E063716
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:06:47 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 19 Jan 2017 10:06:44 +0100
+Message-Id: <1484816804-12598-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170118210535-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 04/41] virtio: convert to use DMA api
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] build-sys: Minor qapi doc generation target
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Amit Shah <amit.shah@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+Move makeinfo flags from MAKEINFO to MAKEINFOFLAGS.  Fix the call of
+quiet-command for target qemu-ga-qapi.texi.  Both messed up in commit
+56e8bdd.
 
+Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On 18/01/2017 20:10, Michael S. Tsirkin wrote:
->> Coverity reports that ARRAY_SIZE(elem->out_sg) (and all the others too)
->> is wrong because elem->out_sg is a pointer.
->>
->> However, the check is not in the right place and the max_size argument
->> of virtqueue_map_iovec can be removed.  The check on in_num/out_num can
->> be moved to qemu_get_virtqueue_element instead, before the call to
->> virtqueue_alloc_element.
->
-> I guess the effect of this bug is basically false-positive asserts, correct?
-
-Yes, migration is probably broken in the case where the stream includes
-VirtQueueElements.
-
-Paolo
+diff --git a/Makefile b/Makefile
+index 9f8968d..f35c422 100644
+--- a/Makefile
++++ b/Makefile
+@@ -542,8 +542,8 @@ ui/console-gl.o: $(SRC_PATH)/ui/console-gl.c \
+ 	ui/shader/texture-blit-vert.h ui/shader/texture-blit-frag.h
+=20
+ # documentation
+-MAKEINFO=3Dmakeinfo -D 'VERSION $(VERSION)'
+-MAKEINFOFLAGS=3D--no-split --number-sections
++MAKEINFO=3Dmakeinfo
++MAKEINFOFLAGS=3D--no-split --number-sections -D 'VERSION $(VERSION)'
+ TEXIFLAG=3D$(if $(V),,--quiet) --command=3D'@set VERSION $(VERSION)'
+=20
+ %.html: %.texi
+@@ -573,7 +573,7 @@ qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx $(SR=
+C_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","=
+$@")
+=20
+ qemu-qapi.texi: $(qapi-modules) $(qapi-py)
+-	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@=
+,"GEN" "$@")
++	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@=
+,"GEN","$@")
+=20
+ qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
+ 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@=
+,"GEN","$@")
+--=20
+2.7.4
