@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUGGX-0005Wu-NN
+	(envelope-from <alex.bennee@linaro.org>) id 1cUGGU-0005Ty-Qe
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:12:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUGGW-0001iF-HB
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:12:49 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37106)
+	(envelope-from <alex.bennee@linaro.org>) id 1cUGGR-0001ev-Fa
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:12:46 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37050)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cUGGW-0001hd-Bd
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:12:48 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id c206so3177010wme.0
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:12:48 -0800 (PST)
+	id 1cUGGR-0001eV-9E
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:12:43 -0500
+Received: by mail-wm0-x231.google.com with SMTP id c206so3172893wme.0
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:12:43 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 19 Jan 2017 17:05:03 +0000
-Message-Id: <20170119170507.16185-24-alex.bennee@linaro.org>
+Date: Thu, 19 Jan 2017 17:05:02 +0000
+Message-Id: <20170119170507.16185-23-alex.bennee@linaro.org>
 In-Reply-To: <20170119170507.16185-1-alex.bennee@linaro.org>
 References: <20170119170507.16185-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 23/27] target-arm/cpu.h: make ARM_CP defined
- consistent
+Subject: [Qemu-devel] [PATCH v7 22/27] target-arm: don't generate WFE/YIELD
+ calls for MTTCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,53 +33,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
 Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-This is a purely mechanical change to make the ARM_CP flags neatly
-align and use a consistent format so it is easier to see which bit
-each flag is.
+The WFE and YIELD instructions are really only hints and in TCG's case
+they were useful to move the scheduling on from one vCPU to the next. In
+the parallel context (MTTCG) this just causes an unnecessary cpu_exit
+and contention of the BQL.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/cpu.h | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ target/arm/op_helper.c     |  7 +++++++
+ target/arm/translate-a64.c |  8 ++++++--
+ target/arm/translate.c     | 20 ++++++++++++++++----
+ 3 files changed, 29 insertions(+), 6 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 7bd16eec18..366b619b8a 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1389,20 +1389,20 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
-  * need to be surrounded by gen_io_start()/gen_io_end(). In particular,
-  * registers which implement clocks or timers require this.
-  */
--#define ARM_CP_SPECIAL 1
--#define ARM_CP_CONST 2
--#define ARM_CP_64BIT 4
--#define ARM_CP_SUPPRESS_TB_END 8
--#define ARM_CP_OVERRIDE 16
--#define ARM_CP_ALIAS 32
--#define ARM_CP_IO 64
--#define ARM_CP_NO_RAW 128
--#define ARM_CP_NOP (ARM_CP_SPECIAL | (1 << 8))
--#define ARM_CP_WFI (ARM_CP_SPECIAL | (2 << 8))
--#define ARM_CP_NZCV (ARM_CP_SPECIAL | (3 << 8))
--#define ARM_CP_CURRENTEL (ARM_CP_SPECIAL | (4 << 8))
--#define ARM_CP_DC_ZVA (ARM_CP_SPECIAL | (5 << 8))
--#define ARM_LAST_SPECIAL ARM_CP_DC_ZVA
-+#define ARM_CP_SPECIAL         (1 << 0)
-+#define ARM_CP_CONST           (1 << 1)
-+#define ARM_CP_64BIT           (1 << 2)
-+#define ARM_CP_SUPPRESS_TB_END (1 << 3)
-+#define ARM_CP_OVERRIDE        (1 << 4)
-+#define ARM_CP_ALIAS           (1 << 5)
-+#define ARM_CP_IO              (1 << 6)
-+#define ARM_CP_NO_RAW          (1 << 7)
-+#define ARM_CP_NOP             (ARM_CP_SPECIAL | (1 << 8))
-+#define ARM_CP_WFI             (ARM_CP_SPECIAL | (2 << 8))
-+#define ARM_CP_NZCV            (ARM_CP_SPECIAL | (3 << 8))
-+#define ARM_CP_CURRENTEL       (ARM_CP_SPECIAL | (4 << 8))
-+#define ARM_CP_DC_ZVA          (ARM_CP_SPECIAL | (5 << 8))
-+#define ARM_LAST_SPECIAL       ARM_CP_DC_ZVA
- /* Used only as a terminator for ARMCPRegInfo lists */
- #define ARM_CP_SENTINEL 0xffff
- /* Mask of only the flag bits in a type field */
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index e1a883c595..abfa7cdd39 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -436,6 +436,13 @@ void HELPER(yield)(CPUARMState *env)
+     ARMCPU *cpu = arm_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
+ 
++    /* When running in MTTCG we don't generate jumps to the yield and
++     * WFE helpers as it won't affect the scheduling of other vCPUs.
++     * If we wanted to more completely model WFE/SEV so we don't busy
++     * spin unnecessarily we would need to do something more involved.
++     */
++    g_assert(!parallel_cpus);
++
+     /* This is a non-trappable hint instruction that generally indicates
+      * that the guest is currently busy-looping. Yield control back to the
+      * top level loop so that a more deserving VCPU has a chance to run.
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index d0352e2045..7e7131fe2f 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1342,10 +1342,14 @@ static void handle_hint(DisasContext *s, uint32_t insn,
+         s->is_jmp = DISAS_WFI;
+         return;
+     case 1: /* YIELD */
+-        s->is_jmp = DISAS_YIELD;
++        if (!parallel_cpus) {
++            s->is_jmp = DISAS_YIELD;
++        }
+         return;
+     case 2: /* WFE */
+-        s->is_jmp = DISAS_WFE;
++        if (!parallel_cpus) {
++            s->is_jmp = DISAS_WFE;
++        }
+         return;
+     case 4: /* SEV */
+     case 5: /* SEVL */
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index c9186b6195..4301562527 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4345,20 +4345,32 @@ static void gen_exception_return(DisasContext *s, TCGv_i32 pc)
+     gen_rfe(s, pc, load_cpu_field(spsr));
+ }
+ 
++/*
++ * For WFI we will halt the vCPU until an IRQ. For WFE and YIELD we
++ * only call the helper when running single threaded TCG code to ensure
++ * the next round-robin scheduled vCPU gets a crack. In MTTCG mode we
++ * just skip this instruction. Currently the SEV/SEVL instructions
++ * which are *one* of many ways to wake the CPU from WFE are not
++ * implemented so we can't sleep like WFI does.
++ */
+ static void gen_nop_hint(DisasContext *s, int val)
+ {
+     switch (val) {
+     case 1: /* yield */
+-        gen_set_pc_im(s, s->pc);
+-        s->is_jmp = DISAS_YIELD;
++        if (!parallel_cpus) {
++            gen_set_pc_im(s, s->pc);
++            s->is_jmp = DISAS_YIELD;
++        }
+         break;
+     case 3: /* wfi */
+         gen_set_pc_im(s, s->pc);
+         s->is_jmp = DISAS_WFI;
+         break;
+     case 2: /* wfe */
+-        gen_set_pc_im(s, s->pc);
+-        s->is_jmp = DISAS_WFE;
++        if (!parallel_cpus) {
++            gen_set_pc_im(s, s->pc);
++            s->is_jmp = DISAS_WFE;
++        }
+         break;
+     case 4: /* sev */
+     case 5: /* sevl */
 -- 
 2.11.0
