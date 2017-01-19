@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cUHV2-0005OL-HU
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:31:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cUHWE-0005zC-P8
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:33:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cUHUz-0001GC-Dr
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:31:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58114)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cUHUz-0001Fb-88
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:31:49 -0500
-Date: Thu, 19 Jan 2017 16:31:45 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170119183145.GP3491@thinpad.lan.raisama.net>
-References: <20170116195452.23532-1-ehabkost@redhat.com>
-	<20170119175003.GJ16641@redhat.com>
-	<CAFEAcA9HEp+-JvtA49NRUWpA2LsOOLw+SaA-knS5x9=bn89UjQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cUHWD-0001wP-Ty
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:33:06 -0500
+Received: from mail-vk0-x235.google.com ([2607:f8b0:400c:c05::235]:33058)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cUHWD-0001vt-PB
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:33:05 -0500
+Received: by mail-vk0-x235.google.com with SMTP id k127so36355328vke.0
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 10:33:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9HEp+-JvtA49NRUWpA2LsOOLw+SaA-knS5x9=bn89UjQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
+In-Reply-To: <20170117085645.4267-1-cornelia.huck@de.ibm.com>
+References: <20170117085645.4267-1-cornelia.huck@de.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Jan 2017 18:32:44 +0000
+Message-ID: <CAFEAcA_9rrsKkGetqQKRCGedx3E1PeE3OrS=Ea5N-qdK6PN7Cg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/12] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Jens Freimann <jfrei@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Jan 19, 2017 at 06:22:40PM +0000, Peter Maydell wrote:
-> On 19 January 2017 at 17:50, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > On Mon, Jan 16, 2017 at 05:54:52PM -0200, Eduardo Habkost wrote:
-> >> Change the meaning of "-cpu host" to "enable all features
-> >> supported by the accelerator in the current host", so that it can
-> >> be used to enable/query all features supported by TCG.
-> >>
-> >> To make sure "host" is still at the end of the list in "-cpu
-> >> help", add a "ordering" field that will be used when sorting the
-> >> CPU model list.
-> >
-> > To be clear, "-cpu host" for TCG is not talking about the actual
-> > host OS feature support, right ? x86_64 TCG can be run on a ppc host,
-> > so presumably "-cpu host" just means "all features that this TCG binary
-> > is able to emulate" ?
-> >
-> > This feels like it is introducing scope for confusion vs KVM -cpu host,
-> > so I wonder if different naming is better for this.
-> 
-> The idea is that you do want an option that works whatever the
-> accelerator is, though, so as a user you don't need to worry
-> about messing with the command line for KVM vs TCG vs "try
-> KVM and fall back to TCG". (I think "-cpu best" has been thrown about
-> as a suggestion for this before.)
+On 17 January 2017 at 08:56, Cornelia Huck <cornelia.huck@de.ibm.com> wrote=
+:
+> The following changes since commit 2ccede18bd24fce5db83fef3674563a1f25671=
+7b:
+>
+>   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.9-pull-req=
+uest' into staging (2017-01-16 12:41:35 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20170117
+>
+> for you to fetch changes up to 5fd04a2b92bf81f39da63fba9e5ae563a8b929ae:
+>
+>   virtio-ccw: fix ring sizing (2017-01-16 16:23:27 +0100)
+>
+> ----------------------------------------------------------------
+> First set of s390x patches for 2.9:
+> - rework of the zpci code, giving us proper multibus support
+> - introduction of the 2.9 machine
+> - fixes and improvements
+>
+> ----------------------------------------------------------------
 
-"-cpu best" has been proposed with different semantics before:
-one meant "select the the best CPU model from the builtin table",
-and another that's equivalent to the meaning of "host" in this
-patch.
+Hi; I'm afraid this fails to build on Windows:
 
-s390x uses "max CPU model" internally to represent a CPU model
-that has all supported features enabled.
+/home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c: In
+function =E2=80=98s390_pci_get_iommu=E2=80=99:
+/home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c:415:20:
+error: cast from pointer to integer of different size
+[-Werror=3Dpointer-to-int-cast]
+     uint64_t key =3D (unsigned long)bus;
+                    ^
+/home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c: In
+function =E2=80=98s390_pci_iommu_free=E2=80=99:
+/home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c:539:20:
+error: cast from pointer to integer of different size
+[-Werror=3Dpointer-to-int-cast]
+     uint64_t key =3D (unsigned long)bus;
+                    ^
+cc1: all warnings being treated as errors
 
-If "-cpu host" is not a good name, I suggest "-cpu max".
 
--- 
-Eduardo
+You probably wanted uintptr_t.
+
+thanks
+-- PMM
