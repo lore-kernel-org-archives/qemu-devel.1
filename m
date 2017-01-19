@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUFJR-00033z-GU
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1cUFR3-0000xt-H9
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:19:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUFJO-0001Bd-Rx
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43926)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cUFJO-0001Az-It
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cUFJN-0005Cd-4m
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 16:11:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C8ABA2E80E2
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 16:11:39 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1cUFR2-0004EU-JY
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:19:37 -0500
+References: <20170119143816.21972-1-famz@redhat.com>
+	<20170119143816.21972-15-famz@redhat.com>
+	<20170119154900.GB16641@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9d9d7b54-bc34-e0fe-79d9-1ec83472aca9@redhat.com>
+Date: Thu, 19 Jan 2017 10:19:29 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Jan 2017 16:04:11 -0000
-From: Brian Murray <brian@ubuntu.com>
-Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
-Message-Id: <20170119160411.21508.22525.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1626972] Update Released
+In-Reply-To: <20170119154900.GB16641@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nrqkKRVjXGx1woTn5IWUUoSL24We7ecpm"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v10 14/16] file-posix:
+ Implement image locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,148 +26,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
 
-The verification of the Stable Release Update for qemu has completed
-successfully and the package has now been released to -updates.
-Subsequently, the Ubuntu Stable Release Updates Team is being
-unsubscribed and will not receive messages about this bug report.  In
-the event that you encounter a regression using the package from
--updates please report a new bug using ubuntu-bug and tag the bug report
-regression-update so we can easily find any regressions.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nrqkKRVjXGx1woTn5IWUUoSL24We7ecpm
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
+Message-ID: <9d9d7b54-bc34-e0fe-79d9-1ec83472aca9@redhat.com>
+Subject: Re: [Qemu-block] [Qemu-devel] [PATCH v10 14/16] file-posix: Implement
+ image locking
+References: <20170119143816.21972-1-famz@redhat.com>
+ <20170119143816.21972-15-famz@redhat.com> <20170119154900.GB16641@redhat.com>
+In-Reply-To: <20170119154900.GB16641@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 01/19/2017 09:49 AM, Daniel P. Berrange wrote:
+> On Thu, Jan 19, 2017 at 10:38:14PM +0800, Fam Zheng wrote:
+>> This implements open flag sensible image locking for local file
+>> and host device protocol.
+>>
+>> virtlockd in libvirt locks the first byte, so we start looking at the
+>> file bytes from 1.
+>>
+>> Quoting what was proposed by Kevin Wolf <kwolf@redhat.com>, there are
+>> four locking modes by combining two bits (BDRV_O_RDWR and
+>> BDRV_O_SHARE_RW), and implemented by taking two locks:
+>>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1626972
+>> +/* Posix file locking bytes. Libvirt takes byte 0, so start from byte=
+ 1. */
+>> +#define RAW_LOCK_BYTE_MIN             1
+>> +#define RAW_LOCK_BYTE_NO_OTHER_WRITER 1
+>> +#define RAW_LOCK_BYTE_WRITE           2
+>=20
+> ...would you mind if QEMU started from say byte 10, leaving the first 1=
+0
+> reserved for libvirt uses. This lets libvirt have a continuous space fo=
+r
+> its own usage if we want to use more bytes
 
-Title:
-  QEMU memfd_create fallback mechanism change for security drivers
+Thankfully, fcntl() locks can be taken beyond end-of-file, so I think
+we're okay making an arbitrarily larger range of bytes reserved for each
+process, even in the unlikely corner case of passing files smaller than
+512 bytes.
 
-Status in Ubuntu Cloud Archive:
-  Invalid
-Status in Ubuntu Cloud Archive mitaka series:
-  Fix Committed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Fix Committed
-Status in qemu source package in Yakkety:
-  Fix Released
-Status in qemu source package in Zesty:
-  Fix Released
-
-Bug description:
-  [Impact]
-
-   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
-   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
-   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
-
-  [Test Case]
-
-   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
-   * Try to live-migration from one to another. =
-
-   * Apparmor will block creation of /tmp/memfd-XXX files.
-
-  [Regression Potential]
-
-   Pros:
-   * Exhaustively tested this.
-   * Worked with upstream on this fix. =
-
-   * I'm implementing new vhost log mechanism for upstream.
-   * One line change to a blocker that is already broken.
-
-   Cons:
-   * To break live migration in other circumstances. =
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-  [Other Info]
+--nrqkKRVjXGx1woTn5IWUUoSL24We7ecpm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-   * Christian Ehrhardt has been following this.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  ORIGINAL DESCRIPTION:
+iQEcBAEBCAAGBQJYgOcRAAoJEKeha0olJ0NqdZQIAKgVu93DO7i0VuM9oAWGw+Nd
+jMiMWoDaaoYopwt4wPo02O8O62A+mudAYJ2SjeBAkylAx/IPdmD32iJvq7Ud/wUi
+9LbSURhGl0qiKFJXwEawuQ+vbXbOQxXaWFJYaYAzbJH7dHmFpu8OLERnKWkHz9ra
++2zse8YnFpGNWhQYRP4JRRIvsIVc2JglQB/eCkn/9GV75ye+TNGsBLnsD/w6Q50O
+Ksp0rdRcAnwbHEPXbm2YMyhR3FVWCXgZSh6WM+HVAnVO5w9wNp6N2FYMeuqcnyvh
+SCObv+3Nn03nI9XIgU73pSD1YNnPxKcq+KbvKVrNiLs9Sw9Icjl/YLVJtquYzmM=
+=bChz
+-----END PGP SIGNATURE-----
 
-  When libvirt starts using apparmor, and creating apparmor profiles for
-  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
-  and upstream also) uses a fallback mechanism for creating shared
-  memory for live-migrations. This fall back mechanism, on kernels 3.13
-  - that don't have memfd_create() system-call, try to create files on
-  /tmp/ directory and fails.. causing live-migration not to work.
-
-  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
-  can't live migrate.
-
-  From qemu 2.5, logic is on :
-
-  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
- int *fd)
-  {
-  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
-els
-
-  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
-  }
-
-  And you can see the errors:
-
-  From the host trying to send the virtual machine:
-
-  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
--8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
-1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
- Migration operation has aborted
-  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
--8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
-1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
- Live Migration failure: internal error: unable to execute QEMU command 'mi=
-grate': Migration disabled: failed to allocate shared memory
-
-  From the host trying to receive the virtual machine:
-
-  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
-289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
-nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
-5 comm=3D"apparmor_parser"
-  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
-289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
-nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
-289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
-=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
-=3D12613 comm=3D"apparmor_parser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
-289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
-=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
-rser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
-289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
-5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
-07 ouid=3D107
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
-289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
-afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
-u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
-289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
-afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
-"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
-=3D0
-
-  When leaving libvirt without apparmor capabilities (thus not confining
-  virtual machines on compute nodes, the live migration works as
-  expected, so, clearly, apparmor is stepping into the live migration).
-  I'm sure that virtual machines have to be confined and that this isn't
-  the desired behaviour...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
+--nrqkKRVjXGx1woTn5IWUUoSL24We7ecpm--
