@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUDre-0008Kf-Bq
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:38:59 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUDrd-0003Eu-KW
+	(envelope-from <famz@redhat.com>) id 1cUDrd-0008JU-Ew
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:38:58 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <famz@redhat.com>) id 1cUDrc-0003E1-M7
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:38:57 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 19 Jan 2017 22:38:05 +0800
-Message-Id: <20170119143816.21972-6-famz@redhat.com>
+Date: Thu, 19 Jan 2017 22:38:04 +0800
+Message-Id: <20170119143816.21972-5-famz@redhat.com>
 In-Reply-To: <20170119143816.21972-1-famz@redhat.com>
 References: <20170119143816.21972-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 05/16] block: Set "share-rw" flag in
- drive-backup when sync=none
+Subject: [Qemu-devel] [PATCH v10 04/16] qemu-img: Set "share-rw" flag in
+ read-only commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +23,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, rjones@redhat.com
 
-In this case we may open the source's backing image chain multiple
-times. Setting share flag means the new open won't try to acquire or
-check any lock, once we implement image locking.
+Checking the status of an image when it is being used by guest is
+usually useful, and there is no risk of corrupting data, so don't let
+the upcoming image locking feature limit this use case.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- blockdev.c | 3 +++
- 1 file changed, 3 insertions(+)
+ qemu-img.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 245e1e1..c97e97f 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3177,6 +3177,9 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-     }
-     if (backup->sync == MIRROR_SYNC_MODE_NONE) {
-         source = bs;
-+        /* FIXME: block layer should really open target with BDRV_O_NO_BACKING
-+         * and reuse source's backing chain, if they share one. */
-+        flags |= BDRV_O_SHARE_RW;
+diff --git a/qemu-img.c b/qemu-img.c
+index 5df66fe..6a091e0 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -705,6 +705,10 @@ static int img_check(int argc, char **argv)
+         return 1;
      }
  
-     size = bdrv_getlength(bs);
++    if (!(flags & BDRV_O_RDWR)) {
++        flags |= BDRV_O_SHARE_RW;
++    }
++
+     blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet);
+     if (!blk) {
+         return 1;
+@@ -1238,6 +1242,7 @@ static int img_compare(int argc, char **argv)
+         goto out3;
+     }
+ 
++    flags |= BDRV_O_SHARE_RW;
+     blk1 = img_open(image_opts, filename1, fmt1, flags, writethrough, quiet);
+     if (!blk1) {
+         ret = 2;
+@@ -2286,7 +2291,8 @@ static ImageInfoList *collect_image_info_list(bool image_opts,
+         g_hash_table_insert(filenames, (gpointer)filename, NULL);
+ 
+         blk = img_open(image_opts, filename, fmt,
+-                       BDRV_O_NO_BACKING | BDRV_O_NO_IO, false, false);
++                       BDRV_O_NO_BACKING | BDRV_O_NO_IO | BDRV_O_SHARE_RW,
++                       false, false);
+         if (!blk) {
+             goto err;
+         }
+@@ -2612,7 +2618,7 @@ static int img_map(int argc, char **argv)
+         return 1;
+     }
+ 
+-    blk = img_open(image_opts, filename, fmt, 0, false, false);
++    blk = img_open(image_opts, filename, fmt, BDRV_O_SHARE_RW, false, false);
+     if (!blk) {
+         return 1;
+     }
 -- 
 2.9.3
