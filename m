@@ -1,34 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cU6kX-0006hz-4f
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 02:03:10 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cU6ql-0000EG-Ms
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 02:09:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cU6kS-0002WR-U1
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 02:03:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39346)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cU6kS-0002VZ-MQ
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 02:03:04 -0500
-Date: Thu, 19 Jan 2017 15:02:59 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170119070259.GD4914@pxdev.xzpeter.org>
-References: <fad506bc-2398-fef9-b720-7720569ac0a6@redhat.com>
-	<20170116091801.GL30108@pxdev.xzpeter.org>
-	<0eedf780-16b2-ca5c-8eea-5d41e6837f23@redhat.com>
-	<20170117144514.GO30108@pxdev.xzpeter.org>
-	<99e185dc-e3c9-678f-7a69-fc006658d07f@redhat.com>
-	<20170118081137.GS30108@pxdev.xzpeter.org>
-	<f89c8ad4-a95d-bf66-33c6-f151531c2174@redhat.com>
-	<20170118084627.GT30108@pxdev.xzpeter.org>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190C0951D@SHSMSX101.ccr.corp.intel.com>
-	<A2975661238FB949B60364EF0F2C257438FF9300@shsmsx102.ccr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C257438FF9300@shsmsx102.ccr.corp.intel.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v3 14/14] intel_iommu: enable vfio
- devices
+	(envelope-from <ben@skyportsystems.com>) id 1cU6qk-0005ig-Ep
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 02:09:35 -0500
+Received: from mail-yw0-x236.google.com ([2607:f8b0:4002:c05::236]:33044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1cU6qk-0005g9-8L
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 02:09:34 -0500
+Received: by mail-yw0-x236.google.com with SMTP id l75so24769214ywb.0
+	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 23:09:32 -0800 (PST)
+From: Ben Warren <ben@skyportsystems.com>
+Message-Id: <DD5278F7-9CF4-4BAA-861D-F615430C1991@skyportsystems.com>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_3F66B4E5-26F3-4700-BE08-2E02C2C181D0";
+	protocol="application/pkcs7-signature"; micalg=sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Wed, 18 Jan 2017 23:09:29 -0800
+In-Reply-To: <BD6CD44B-68C2-40F6-9251-7DFD06821AD4@skyportsystems.com>
+References: <CAO_EM_kuP9kk55bzxWqNOeuL8yW7gKNnacd1-UVGnJPyx2ZNYw@mail.gmail.com>
+	<20160916033402-mutt-send-email-mst@kernel.org>
+	<CAO_EM_mHyC7cywV4KUqH_MWwt2vVkK6GEOuaUX0FHpffdfaAuQ@mail.gmail.com>
+	<20161006041949-mutt-send-email-mst@kernel.org>
+	<D5FCB73B-435E-4423-B21C-BEEF1C1EA2FD@skyportsystems.com>
+	<20161211052355-mutt-send-email-mst@kernel.org>
+	<FBD67273-74C4-4183-8FCF-8260D13B04D4@skyportsystems.com>
+	<20170116161857-mutt-send-email-mst@kernel.org>
+	<85C3D50B-7AFD-41E7-AD1B-634A42D04BB2@skyportsystems.com>
+	<20170117194321-mutt-send-email-mst@kernel.org>
+	<BD6CD44B-68C2-40F6-9251-7DFD06821AD4@skyportsystems.com>
+Subject: Re: [Qemu-devel] Virtual Machine Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,276 +40,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, Jason Wang <jasowang@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ed Swierk <eswierk@skyportsystems.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-On Thu, Jan 19, 2017 at 06:44:06AM +0000, Liu, Yi L wrote:
-> > -----Original Message-----
-> > From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nong=
-nu.org]
-> > On Behalf Of Tian, Kevin
-> > Sent: Wednesday, January 18, 2017 5:39 PM
-> > To: Peter Xu <peterx@redhat.com>; Jason Wang <jasowang@redhat.com>
-> > Cc: Lan, Tianyu <tianyu.lan@intel.com>; Raj, Ashok <ashok.raj@intel.c=
-om>;
-> > mst@redhat.com; jan.kiszka@siemens.com; bd.aviv@gmail.com; qemu-
-> > devel@nongnu.org; alex.williamson@redhat.com
-> > Subject: Re: [Qemu-devel] [PATCH RFC v3 14/14] intel_iommu: enable vf=
-io
-> > devices
-> >=20
-> > > From: Peter Xu [mailto:peterx@redhat.com]
-> > > Sent: Wednesday, January 18, 2017 4:46 PM
-> > >
-> > > On Wed, Jan 18, 2017 at 04:36:05PM +0800, Jason Wang wrote:
-> > > >
-> > > >
-> > > > On 2017=E5=B9=B401=E6=9C=8818=E6=97=A5 16:11, Peter Xu wrote:
-> > > > >On Wed, Jan 18, 2017 at 11:10:53AM +0800, Jason Wang wrote:
-> > > > >>
-> > > > >>On 2017=E5=B9=B401=E6=9C=8817=E6=97=A5 22:45, Peter Xu wrote:
-> > > > >>>On Mon, Jan 16, 2017 at 05:54:55PM +0800, Jason Wang wrote:
-> > > > >>>>On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 17:18, Peter Xu wrote:
-> > > > >>>>>>>  static void vtd_iotlb_page_invalidate(IntelIOMMUState *s=
-,
-> > > > >>>>>>> uint16_t
-> > > domain_id,
-> > > > >>>>>>>                                        hwaddr addr, uint8=
-_t
-> > > > >>>>>>>am)
-> > > > >>>>>>>  {
-> > > > >>>>>>>@@ -1222,6 +1251,7 @@ static void
-> > > vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
-> > > > >>>>>>>      info.addr =3D addr;
-> > > > >>>>>>>      info.mask =3D ~((1 << am) - 1);
-> > > > >>>>>>>      g_hash_table_foreach_remove(s->iotlb,
-> > > > >>>>>>> vtd_hash_remove_by_page,
-> > > &info);
-> > > > >>>>>>>+    vtd_iotlb_page_invalidate_notify(s, domain_id, addr,
-> > > > >>>>>>>+ am);
-> > > > >>>>>>Is the case of GLOBAL or DSI flush missed, or we don't care=
- it at all?
-> > > > >>>>>IMHO we don't. For device assignment, since we are having CM=
-=3D1
-> > > > >>>>>here, we should have explicit page invalidations even if gue=
-st
-> > > > >>>>>sends global/domain invalidations.
-> > > > >>>>>
-> > > > >>>>>Thanks,
-> > > > >>>>>
-> > > > >>>>>-- peterx
-> > > > >>>>Is this spec required?
-> > > > >>>I think not. IMO the spec is very coarse grained on describing
-> > > > >>>cache mode...
-> > > > >>>
-> > > > >>>>Btw, it looks to me that both DSI and GLOBAL are indeed expli=
-cit
-> > > > >>>>flush.
-> > > > >>>Actually when cache mode is on, it is unclear to me on how we
-> > > > >>>should treat domain/global invalidations, at least from the sp=
-ec
-> > > > >>>(as mentioned earlier). My understanding is that they are not
-> > > > >>>"explicit flushes", which IMHO should only mean page selective
-> > > > >>>IOTLB invalidations.
-> > > > >>Probably not, at least from the view of performance. DSI and
-> > > > >>global should be more efficient in some cases.
-> > > > >I agree with you that DSI/GLOBAL flushes are more efficient in s=
-ome
-> > > > >way. But IMHO that does not mean these invalidations are "explic=
-it
-> > > > >invalidations", and I suspect whether cache mode has to coop wit=
-h it.
-> > > >
-> > > > Well, the spec does not forbid DSI/GLOBAL with CM and the driver
-> > > > codes had used them for almost ten years. I can hardly believe it=
-'s wrong.
-> > >
-> > > I think we have misunderstanding here. :)
-> > >
-> > > I never thought we should not send DSI/GLOBAL invalidations with ca=
-che
-> > > mode. I just think we should not do anything special even if we hav=
-e
-> > > cache mode on when we receive these signals.
-> > >
-> > > In the spec, "explicit invalidation" is mentioned in the cache mode
-> > > chapter:
-> > >
-> > >     The Caching Mode (CM) field in Capability Register indicates if
-> > >     the hardware implementation caches not-present or erroneous
-> > >     translation-structure entries. When the CM field is reported as
-> > >     Set, any software updates to any remapping structures (includin=
-g
-> > >     updates to not-present entries or present entries whose
-> > >     programming resulted in translation faults) requires explicit
-> > >     invalidation of the caches.
-> > >
-> > > And I thought we were discussion about "what is explicit invalidati=
-on"
-> > > mentioned above.
-> >=20
-> > Check 6.5.3.1 Implicit Invalidation on Page Requests
-> >=20
-> > 	In addition to the explicit invalidation through invalidation comman=
-ds
-> > 	(see Section 6.5.1 and Section 6.5.2) or through deferred invalidati=
-on
-> > 	messages (see Section 6.5.4), identified above, Page Requests from
-> > 	endpoint devices invalidate entries in the IOTLBs and paging-structu=
-re
-> > 	caches.
-> >=20
-> > My impression is that above indirectly defines invalidation commands =
-(
-> > PSI/DSI/GLOBAL) as explicit invalidation, because they are explicitly=
- issued by
-> > driver. Then section 6.5.3.1 further describes implicit invalidations=
- caused by
-> > other VT-d operations.
-> >=20
-> > I will check with VT-d spec owner to clarify.
-> >=20
-> > >
-> > > >
-> > > > >
-> > > > >But here I should add one more thing besides PSI - context entry
-> > > > >invalidation should be one of "the explicit invalidations" as we=
-ll,
-> > > > >which we need to handle just like PSI when cache mode is on.
-> > > > >
-> > > > >>>>Just have a quick go through on driver codes and find this
-> > > > >>>>something interesting in intel_iommu_flush_iotlb_psi():
-> > > > >>>>
-> > > > >>>>...
-> > > > >>>>     /*
-> > > > >>>>      * Fallback to domain selective flush if no PSI support =
-or the size is
-> > > > >>>>      * too big.
-> > > > >>>>      * PSI requires page size to be 2 ^ x, and the base addr=
-ess is
-> > naturally
-> > > > >>>>      * aligned to the size
-> > > > >>>>      */
-> > > > >>>>     if (!cap_pgsel_inv(iommu->cap) || mask >
-> > > cap_max_amask_val(iommu->cap))
-> > > > >>>>         iommu->flush.flush_iotlb(iommu, did, 0, 0,
-> > > > >>>>                         DMA_TLB_DSI_FLUSH);
-> > > > >>>>     else
-> > > > >>>>         iommu->flush.flush_iotlb(iommu, did, addr | ih, mask=
-,
-> > > > >>>>                         DMA_TLB_PSI_FLUSH); ...
-> > > > >>>I think this is interesting... and I doubt its correctness whi=
-le
-> > > > >>>with cache mode enabled.
-> > > > >>>
-> > > > >>>If so (sending domain invalidation instead of a big range of p=
-age
-> > > > >>>invalidations), how should we capture which pages are unmapped=
- in
-> > > > >>>emulated IOMMU?
-> > > > >>We don't need to track individual pages here, since all pages f=
-or
-> > > > >>a specific domain were unmapped I believe?
-> > > > >IMHO this might not be the correct behavior.
-> > > > >
-> > > > >If we receive one domain specific invalidation, I agree that we
-> > > > >should invalidate the IOTLB cache for all the devices inside the=
- domain.
-> > > > >However, when cache mode is on, we should be depending on the PS=
-Is
-> > > > >to unmap each page (unless we want to unmap the whole address
-> > > > >space, in this case it's very possible that the guest is just
-> > > > >unmapping a range, not the entire space). If we convert several
-> > > > >PSIs into one big DSI, IMHO we will leave those pages
-> > > > >mapped/unmapped while we should unmap/map them.
-> > > >
-> > > > Confused, do you have an example for this? (I fail to understand =
-why
-> > > > DSI can't work, at least implementation can convert DSI to severa=
-l
-> > > > PSIs internally).
-> > >
-> > > That's how I understand it. It might be wrong. Btw, could you
-> > > elaborate a bit on how can we convert a DSI into several PSIs?
-> > >
-> > > Thanks,
-> >=20
-> > If my understanding above is correct, there is nothing wrong with abo=
-ve
-> > IOMMU driver code - actually it makes sense on bare metal when CM is
-> > disabled.
-> >=20
-> > But yes, DSI/GLOBAL is far less efficient than PSI when CM is enabled=
-.
-> > We rely on cache invalidations to indirectly capture remapping struct=
-ure change.
-> > PSI provides accurate info, while DSI/GLOBAL doesn't. To emulate corr=
-ect
-> > behavior of DSI/GLOBAL, we have to pretend that the whole address spa=
-ce
-> > (iova=3D0, size=3Dagaw) needs to be unmapped (for GLOBAL it further m=
-eans
-> > multiple address spaces)
-> >=20
-> > Though not efficient, it doesn't mean it's wrong since guest driver f=
-ollows spec.
-> > We can ask for linux IOMMU driver change (CC Ashok) to not use above
-> > optimization when cache mode is enabled, but anyway we need emulate c=
-orrect
-> > DSI/GLOBAL behavior to follow spec, because:
-> >=20
-> > - even when driver fix is in place, old version still has this logic;
-> >=20
-> > - there is still scenario where guest IOMMU driver does want to inval=
-idate the
-> > whole address space, e.g. when changing context entry. Asking guest d=
-river to
-> > use PSI for such purpose is another bad thing.
+
+--Apple-Mail=_3F66B4E5-26F3-4700-BE08-2E02C2C181D0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
+
+
+> On Jan 18, 2017, at 4:02 PM, Ben Warren <ben@skyportsystems.com> =
+wrote:
 >=20
-> Hi Kevin/Peter/Jason,
+> Hi Michael,
+>> On Jan 17, 2017, at 9:45 AM, Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>>=20
+>> On Mon, Jan 16, 2017 at 10:57:42AM -0800, Ben Warren wrote:
+>>> I think we have a misunderstanding here.  I=E2=80=99m storing the VM
+>>> Generation ID __data__ (a GUID) in a fw_cfg blob, not the address.
+>>=20
+>> Yes, I think I gathered this much from the discussion. This is what
+>> I'm saying - don't. Have guest loader reserve guest memory and write =
+the
+>> address into a fw cfg blob, and have qemu write the id at that =
+address.
+>> This way you can update guest memory at any time.
+>>=20
+> So I=E2=80=99ve gone down the path of creating a writeable fw_cfg blob =
+to hold the VGID address, but it doesn=E2=80=99t seem to be getting =
+updated.
 >=20
-> I agree we should think DSI/GLOBAL. Herby, I guess there may be a chanc=
-e to ignore
-> DSI/GLOBAL flush if the following assumption is correct.
+> Here=E2=80=99s the code I=E2=80=99ve added:
 >=20
-> It seems like that all DSI/GLOBAL flush would always be after a context=
- entry invalidation.=20
+> #define VMGENID_FW_CFG_FILE      "etc/vmgenid"
+> #define VMGENID_FW_CFG_ADDR_FILE      "etc/vmgenid_addr=E2=80=9D
 >=20
-> With this assumption, I remember Peter added memory_replay in context i=
-nvalidation.
-> This memory_replay would walk guest second-level page table and do map.=
- So the
-> second-level page table in host should be able to get the latest mappin=
-g info. Guest
-> IOMMU driver would issue an DSI/GLOBAL flush after changing context. Si=
-nce the
-> mapping info has updated in host, then there is no need to deal this DS=
-I/GLOBAL flush.
+> // Create writeable fw_cfg blob, vas->vgia is a GArray of size 8 and =
+element size 1
+> fw_cfg_add_file_callback(s, VMGENID_FW_CFG_ADDR_FILE, NULL, NULL, =
+vms->vgia->data, 8, false);
 >=20
-> So gentlemen, pls help judge if the assumption is correct. If it is cor=
-rect, then Peter's patch
-> may just work without special process against DSI/GLOBAL flush.
+> // Request BIOS to allocate memory for the read-only DATA file:
+> bios_linker_loader_alloc(linker, VMGENID_FW_CFG_FILE, guid, 0,false);
+>=20
+> // Request BIOS to allocate memory for the writeable ADDRESS file:
+> bios_linker_loader_alloc(linker, VMGENID_FW_CFG_ADDR_FILE, s->vgia, 0, =
+false);
+>=20
+> // Request BIOS to write the address of the DATA file into the ADDRESS =
+file:
+> bios_linker_loader_add_pointer(linker, VMGENID_FW_CFG_ADDR_FILE, 0, =
+sizeof(uint64_t), VMGENID_FW_CFG_FILE, 0);
+>=20
+> I=E2=80=99ve instrumented SeaBIOS and see the requests being made and =
+memcpy to the file happening, but don=E2=80=99t see any changes in QEMU =
+in the memory pointed to by VMGENID_FW_CFG_ADDR_FILE.  Is this how =
+writeable fw_cfg is supposed to work?
+>=20
+Ed explained it to me and I think I get it now.  I realize that you and =
+Igor have explained this throughout the e-mail chain, but I=E2=80=99m a =
+little bit slower.
 
-Actually above is exactly what I thought before (I think I may not
-have explaint clearly though :).
+Anyway, is this understanding correct?  BIOS is in fact patching fw_cfg =
+data, but it=E2=80=99s in a copy of the fw_cfg file that is in guest =
+space.  In order to get this to work we would need to add a new command =
+to the linker/loader protocol to write back changes to QEMU after =
+patching, and of course implement the change in BIOS and UEFI projects.
+> thanks,
+> Ben
+>=20
+>> --=20
+>> MST
+>=20
 
-But I won't disagree on strictly following the spec, as Jason/Kevin
-has suggested. The problem is, whether the spec is "strict enough to
-be strictly followed", especially on caching mode part... :(
 
-For example, logically, it is legal for a guest to send multiple PSIs
-for a single page. When without caching mode, it never hurts, since
-these PSIs will just let IOMMU flush cache for multiple times, that's
-fine. However, if with caching mode, multiple PSIs means multiple
-UNMAPs. That's a problem.
+--Apple-Mail=_3F66B4E5-26F3-4700-BE08-2E02C2C181D0
+Content-Disposition: attachment;
+	filename=smime.p7s
+Content-Type: application/pkcs7-signature;
+	name=smime.p7s
+Content-Transfer-Encoding: base64
 
-If to solve it, we need a per-device tree in QEMU to maintain the IOVA
-address space, just like what vfio has done per-domain inside kernel.
-Then when we see the 2nd and Nth unmap, we ignore it. But I guess
-that's an overkill. A better way maybe we just restrict the guest to
-send the invalidation once for each entry update. But I guess we don't
-have such a requirement in spec now.
-
-Thanks,
-
--- peterx
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
+ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
+MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
+dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
+WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
+c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
+BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
+IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
+51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
+FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
+kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
+aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
+P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
+VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
+AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
+RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
+YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
+cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
+am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
+BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
+nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
+2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
+mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
+VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
+GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
+IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
+NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
+A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
+R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
+gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
+ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
+AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
+uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
+MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
+BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
+UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
+Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
+gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
+dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
+Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
+SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
+iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
+dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
+7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
+TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
+gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
+bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
+NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
+8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMTcwMTE5MDcwOTI5WjAjBgkqhkiG9w0BCQQxFgQUwblmdAQJzKGiWbLs3zPec9qVfYMw
+gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
+Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
+BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
+YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
+QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
+KoZIhvcNAQEBBQAEggEApRnFLDErn0811f4KyBJvgspTXLgikFPk6nNK+2UQQ4YqSIqtHtHb0Y4r
+I6yVJBPxyf/j5f5ViYIv+WnDf+2/gtHPgFDNsTrZYiHa8JdFzONL0IwFwf+z0rYrhiMMzYMqln0I
+n1QHDYhYaTS34m33HaeAlHUhqurxCzkgPBWmoZC0KxUdGeYTTduI0dhZn7nDqFFY09PogQ47HBuO
+JocX8yucmvUb3Z2q9iy/Svd4Rf0O++27R4j8dVI/C/9FwwiTEKdRXC62HKziXqcHoZq0/ma1YrD5
+LN+HPTPSeC1GGxmE880GRALovZW3FxDwn/mQz96kxTKH4vvszB5n4HVtPwAAAAAAAA==
+--Apple-Mail=_3F66B4E5-26F3-4700-BE08-2E02C2C181D0--
