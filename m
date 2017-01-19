@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cUHxY-0001q5-Qi
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:01:22 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cUHyT-0002bX-Ma
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:02:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cUHxU-0007zr-Va
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:01:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33089
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <duanj@linux.vnet.ibm.com>)
-	id 1cUHxU-0007zO-Ph
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:01:16 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0JIwsHU135516
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:01:16 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2830n06w8t-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:01:15 -0500
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <duanj@linux.vnet.ibm.com>;
-	Thu, 19 Jan 2017 14:01:15 -0500
-From: Jianjun Duan <duanj@linux.vnet.ibm.com>
-Date: Thu, 19 Jan 2017 11:00:53 -0800
-In-Reply-To: <1484852453-12728-1-git-send-email-duanj@linux.vnet.ibm.com>
-References: <1484852453-12728-1-git-send-email-duanj@linux.vnet.ibm.com>
-Message-Id: <1484852453-12728-5-git-send-email-duanj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [QEMU PATCH v17 4/4] migration: add error_report
+	(envelope-from <ehabkost@redhat.com>) id 1cUHyP-0008CB-P2
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:02:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53544)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cUHyP-0008Bu-JP
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:02:13 -0500
+Date: Thu, 19 Jan 2017 17:02:10 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170119190210.GQ3491@thinpad.lan.raisama.net>
+References: <20170116195452.23532-1-ehabkost@redhat.com>
+	<20170119175003.GJ16641@redhat.com>
+	<CAFEAcA9HEp+-JvtA49NRUWpA2LsOOLw+SaA-knS5x9=bn89UjQ@mail.gmail.com>
+	<20170119183145.GP3491@thinpad.lan.raisama.net>
+	<20170119183836.GK16641@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170119183836.GK16641@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,41 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, duanj@linux.vnet.ibm.com, dmitry@daynix.com, peter.maydell@linaro.org, kraxel@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, veroniabahaa@gmail.com, quintela@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, rth@twiddle.net, aurelien@aurel32.net, leon.alrae@imgtec.com, blauwirbel@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-Added error_report where version_ids do not match in vmstate_load_state.
+On Thu, Jan 19, 2017 at 06:38:36PM +0000, Daniel P. Berrange wrote:
+> On Thu, Jan 19, 2017 at 04:31:45PM -0200, Eduardo Habkost wrote:
+> > On Thu, Jan 19, 2017 at 06:22:40PM +0000, Peter Maydell wrote:
+> > > On 19 January 2017 at 17:50, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > > > On Mon, Jan 16, 2017 at 05:54:52PM -0200, Eduardo Habkost wrote:
+> > > >> Change the meaning of "-cpu host" to "enable all features
+> > > >> supported by the accelerator in the current host", so that it can
+> > > >> be used to enable/query all features supported by TCG.
+> > > >>
+> > > >> To make sure "host" is still at the end of the list in "-cpu
+> > > >> help", add a "ordering" field that will be used when sorting the
+> > > >> CPU model list.
+> > > >
+> > > > To be clear, "-cpu host" for TCG is not talking about the actual
+> > > > host OS feature support, right ? x86_64 TCG can be run on a ppc host,
+> > > > so presumably "-cpu host" just means "all features that this TCG binary
+> > > > is able to emulate" ?
+> > > >
+> > > > This feels like it is introducing scope for confusion vs KVM -cpu host,
+> > > > so I wonder if different naming is better for this.
+> > > 
+> > > The idea is that you do want an option that works whatever the
+> > > accelerator is, though, so as a user you don't need to worry
+> > > about messing with the command line for KVM vs TCG vs "try
+> > > KVM and fall back to TCG". (I think "-cpu best" has been thrown about
+> > > as a suggestion for this before.)
+> > 
+> > "-cpu best" has been proposed with different semantics before:
+> > one meant "select the the best CPU model from the builtin table",
+> > and another that's equivalent to the meaning of "host" in this
+> > patch.
+> > 
+> > s390x uses "max CPU model" internally to represent a CPU model
+> > that has all supported features enabled.
+> > 
+> > If "-cpu host" is not a good name, I suggest "-cpu max".
+> 
+> Yeah, I think "-cpu max" better describes the intended semantics for this
+> with TCG. I guess for KVM  -cpu host & -cpu max would be equivalent.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Agreed. I will send v2 with "-cpu max".
 
-Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
----
- migration/vmstate.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/migration/vmstate.c b/migration/vmstate.c
-index 2f9d4ba..8ddd230 100644
---- a/migration/vmstate.c
-+++ b/migration/vmstate.c
-@@ -85,6 +85,9 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
- 
-     trace_vmstate_load_state(vmsd->name, version_id);
-     if (version_id > vmsd->version_id) {
-+        error_report("%s: incoming version_id %d is too new "
-+                     "for local version_id %d",
-+                     vmsd->name, version_id, vmsd->version_id);
-         trace_vmstate_load_state_end(vmsd->name, "too new", -EINVAL);
-         return -EINVAL;
-     }
-@@ -95,6 +98,9 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
-             trace_vmstate_load_state_end(vmsd->name, "old path", ret);
-             return ret;
-         }
-+        error_report("%s: incoming version_id %d is too old "
-+                     "for local minimum version_id  %d",
-+                     vmsd->name, version_id, vmsd->minimum_version_id);
-         trace_vmstate_load_state_end(vmsd->name, "too old", -EINVAL);
-         return -EINVAL;
-     }
 -- 
-1.9.1
+Eduardo
