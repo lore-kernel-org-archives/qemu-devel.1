@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cU8yY-0006Ey-NH
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:47 -0500
+	(envelope-from <peterx@redhat.com>) id 1cU8ya-0006Fu-5J
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cU8yV-0008GB-HH
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39730)
+	(envelope-from <peterx@redhat.com>) id 1cU8yZ-0008KG-3m
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49826)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cU8yV-0008FF-6G
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:43 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cU8yY-0008JO-SH
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:47 -0500
 Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
 	[10.5.11.28])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5AD52635F9
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:25:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 16938C04BD48
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:25:47 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Thu, 19 Jan 2017 17:25:29 +0800
-Message-Id: <1484817932-14452-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 0/3] vfio: allow to notify unmap for very
- big region
+Date: Thu, 19 Jan 2017 17:25:31 +0800
+Message-Id: <1484817932-14452-3-git-send-email-peterx@redhat.com>
+In-Reply-To: <1484817932-14452-1-git-send-email-peterx@redhat.com>
+References: <1484817932-14452-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 2/3] vfio: introduce vfio_get_vaddr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +32,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alex Williamson <alex.williamson@redhat.com>, peterx@redhat.com
 
-This requirement originates from the VT-d vfio series:
+A cleanup for vfio_iommu_map_notify(). Should have no functional change,
+just to make the function shorter and easier to understand.
 
-  https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03495.html
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 38 insertions(+), 20 deletions(-)
 
-The goal of this series is to allow IOMMU to notify unmap with very
-big IOTLB range, for example, with base=0 and size=2^63-1 (to unmap
-the whole address space).
-
-The first patch is a good to have, for traces.
-
-The second one is a cleanup of existing code, only.
-
-The third one moves the further RAM translation and check into map
-operation logic, so that it'll free unmap operations.
-
-The series is marked as RFC since I am not sure whether this is a
-workable way. Anyway, please review to help confirm it.
-
-Thanks.
-
-Peter Xu (3):
-  vfio: trace map/unmap for notify as well
-  vfio: introduce vfio_get_vaddr()
-  vfio: allow to notify unmap for very large region
-
- hw/vfio/common.c     | 56 ++++++++++++++++++++++++++++++++++------------------
- hw/vfio/trace-events |  2 +-
- 2 files changed, 38 insertions(+), 20 deletions(-)
-
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 174f351..ce55dff 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+            section->offset_within_address_space & (1ULL << 63);
+ }
+ 
+-static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
++static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
++                           bool *read_only)
+ {
+-    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+-    VFIOContainer *container = giommu->container;
+-    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+     MemoryRegion *mr;
+     hwaddr xlat;
+     hwaddr len = iotlb->addr_mask + 1;
+-    void *vaddr;
+-    int ret;
+-
+-    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+-                                iova, iova + iotlb->addr_mask);
+-
+-    if (iotlb->target_as != &address_space_memory) {
+-        error_report("Wrong target AS \"%s\", only system memory is allowed",
+-                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+-        return;
+-    }
++    bool ret = false;
++    bool writable = iotlb->perm & IOMMU_WO;
+ 
+     /*
+      * The IOMMU TLB entry we have just covers translation through
+@@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+     rcu_read_lock();
+     mr = address_space_translate(&address_space_memory,
+                                  iotlb->translated_addr,
+-                                 &xlat, &len, iotlb->perm & IOMMU_WO);
++                                 &xlat, &len, writable);
+     if (!memory_region_is_ram(mr)) {
+         error_report("iommu map to non memory area %"HWADDR_PRIx"",
+                      xlat);
+         goto out;
+     }
++
+     /*
+      * Translation truncates length to the IOMMU page size,
+      * check that it did not truncate too much.
+@@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+         goto out;
+     }
+ 
++    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
++    *read_only = !writable || mr->readonly;
++    ret = true;
++
++out:
++    rcu_read_unlock();
++    return ret;
++}
++
++static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
++{
++    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
++    VFIOContainer *container = giommu->container;
++    hwaddr iova = iotlb->iova + giommu->iommu_offset;
++    bool read_only;
++    void *vaddr;
++    int ret;
++
++    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
++                                iova, iova + iotlb->addr_mask);
++
++    if (iotlb->target_as != &address_space_memory) {
++        error_report("Wrong target AS \"%s\", only system memory is allowed",
++                     iotlb->target_as->name ? iotlb->target_as->name : "none");
++        return;
++    }
++
++    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
++        return;
++    }
++
+     if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+-        vaddr = memory_region_get_ram_ptr(mr) + xlat;
+         ret = vfio_dma_map(container, iova,
+                            iotlb->addr_mask + 1, vaddr,
+-                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
++                           read_only);
+         if (ret) {
+             error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+                          "0x%"HWADDR_PRIx", %p) = %d (%m)",
+@@ -357,8 +377,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+                          iotlb->addr_mask + 1, ret);
+         }
+     }
+-out:
+-    rcu_read_unlock();
+ }
+ 
+ static void vfio_listener_region_add(MemoryListener *listener,
 -- 
 2.7.4
