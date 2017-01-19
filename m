@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cU6SJ-0003bP-CT
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 01:44:20 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cU6kF-0006Zy-SZ
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 02:02:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cU6SF-0001jU-9C
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 01:44:19 -0500
-Received: from mga06.intel.com ([134.134.136.31]:20109)
+	(envelope-from <jasowang@redhat.com>) id 1cU6kB-0002Ea-LX
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 02:02:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cU6SE-0001iP-QO
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 01:44:15 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Thu, 19 Jan 2017 06:44:06 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257438FF9300@shsmsx102.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cU6kB-0002DS-CH
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 02:02:47 -0500
 References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
 	<1484276800-26814-15-git-send-email-peterx@redhat.com>
 	<fad506bc-2398-fef9-b720-7720569ac0a6@redhat.com>
@@ -23,11 +20,14 @@ References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
 	<f89c8ad4-a95d-bf66-33c6-f151531c2174@redhat.com>
 	<20170118084627.GT30108@pxdev.xzpeter.org>
 	<AADFC41AFE54684AB9EE6CBC0274A5D190C0951D@SHSMSX101.ccr.corp.intel.com>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190C0951D@SHSMSX101.ccr.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	<A2975661238FB949B60364EF0F2C257438FF9300@shsmsx102.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <4103ea92-e713-9114-5be9-7e698fc14631@redhat.com>
+Date: Thu, 19 Jan 2017 15:02:37 +0800
 MIME-Version: 1.0
+In-Reply-To: <A2975661238FB949B60364EF0F2C257438FF9300@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH RFC v3 14/14] intel_iommu: enable vfio
  devices
 List-Id: <qemu-devel.nongnu.org>
@@ -38,167 +38,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>, Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, Peter Xu <peterx@redhat.com>
+Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11LWRldmVsIFttYWlsdG86
-cWVtdS1kZXZlbC1ib3VuY2VzK3lpLmwubGl1PWludGVsLmNvbUBub25nbnUub3JnXQ0KPiBPbiBC
-ZWhhbGYgT2YgVGlhbiwgS2V2aW4NCj4gU2VudDogV2VkbmVzZGF5LCBKYW51YXJ5IDE4LCAyMDE3
-IDU6MzkgUE0NCj4gVG86IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT47IEphc29uIFdhbmcg
-PGphc293YW5nQHJlZGhhdC5jb20+DQo+IENjOiBMYW4sIFRpYW55dSA8dGlhbnl1LmxhbkBpbnRl
-bC5jb20+OyBSYWosIEFzaG9rIDxhc2hvay5yYWpAaW50ZWwuY29tPjsNCj4gbXN0QHJlZGhhdC5j
-b207IGphbi5raXN6a2FAc2llbWVucy5jb207IGJkLmF2aXZAZ21haWwuY29tOyBxZW11LQ0KPiBk
-ZXZlbEBub25nbnUub3JnOyBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbQ0KPiBTdWJqZWN0OiBS
-ZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCBSRkMgdjMgMTQvMTRdIGludGVsX2lvbW11OiBlbmFibGUg
-dmZpbw0KPiBkZXZpY2VzDQo+IA0KPiA+IEZyb206IFBldGVyIFh1IFttYWlsdG86cGV0ZXJ4QHJl
-ZGhhdC5jb21dDQo+ID4gU2VudDogV2VkbmVzZGF5LCBKYW51YXJ5IDE4LCAyMDE3IDQ6NDYgUE0N
-Cj4gPg0KPiA+IE9uIFdlZCwgSmFuIDE4LCAyMDE3IGF0IDA0OjM2OjA1UE0gKzA4MDAsIEphc29u
-IFdhbmcgd3JvdGU6DQo+ID4gPg0KPiA+ID4NCj4gPiA+IE9uIDIwMTflubQwMeaciDE45pelIDE2
-OjExLCBQZXRlciBYdSB3cm90ZToNCj4gPiA+ID5PbiBXZWQsIEphbiAxOCwgMjAxNyBhdCAxMTox
-MDo1M0FNICswODAwLCBKYXNvbiBXYW5nIHdyb3RlOg0KPiA+ID4gPj4NCj4gPiA+ID4+T24gMjAx
-N+W5tDAx5pyIMTfml6UgMjI6NDUsIFBldGVyIFh1IHdyb3RlOg0KPiA+ID4gPj4+T24gTW9uLCBK
-YW4gMTYsIDIwMTcgYXQgMDU6NTQ6NTVQTSArMDgwMCwgSmFzb24gV2FuZyB3cm90ZToNCj4gPiA+
-ID4+Pj5PbiAyMDE35bm0MDHmnIgxNuaXpSAxNzoxOCwgUGV0ZXIgWHUgd3JvdGU6DQo+ID4gPiA+
-Pj4+Pj4+ICBzdGF0aWMgdm9pZCB2dGRfaW90bGJfcGFnZV9pbnZhbGlkYXRlKEludGVsSU9NTVVT
-dGF0ZSAqcywNCj4gPiA+ID4+Pj4+Pj4gdWludDE2X3QNCj4gPiBkb21haW5faWQsDQo+ID4gPiA+
-Pj4+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGh3YWRkciBhZGRy
-LCB1aW50OF90DQo+ID4gPiA+Pj4+Pj4+YW0pDQo+ID4gPiA+Pj4+Pj4+ICB7DQo+ID4gPiA+Pj4+
-Pj4+QEAgLTEyMjIsNiArMTI1MSw3IEBAIHN0YXRpYyB2b2lkDQo+ID4gdnRkX2lvdGxiX3BhZ2Vf
-aW52YWxpZGF0ZShJbnRlbElPTU1VU3RhdGUgKnMsIHVpbnQxNl90IGRvbWFpbl9pZCwNCj4gPiA+
-ID4+Pj4+Pj4gICAgICBpbmZvLmFkZHIgPSBhZGRyOw0KPiA+ID4gPj4+Pj4+PiAgICAgIGluZm8u
-bWFzayA9IH4oKDEgPDwgYW0pIC0gMSk7DQo+ID4gPiA+Pj4+Pj4+ICAgICAgZ19oYXNoX3RhYmxl
-X2ZvcmVhY2hfcmVtb3ZlKHMtPmlvdGxiLA0KPiA+ID4gPj4+Pj4+PiB2dGRfaGFzaF9yZW1vdmVf
-YnlfcGFnZSwNCj4gPiAmaW5mbyk7DQo+ID4gPiA+Pj4+Pj4+KyAgICB2dGRfaW90bGJfcGFnZV9p
-bnZhbGlkYXRlX25vdGlmeShzLCBkb21haW5faWQsIGFkZHIsDQo+ID4gPiA+Pj4+Pj4+KyBhbSk7
-DQo+ID4gPiA+Pj4+Pj5JcyB0aGUgY2FzZSBvZiBHTE9CQUwgb3IgRFNJIGZsdXNoIG1pc3NlZCwg
-b3Igd2UgZG9uJ3QgY2FyZSBpdCBhdCBhbGw/DQo+ID4gPiA+Pj4+PklNSE8gd2UgZG9uJ3QuIEZv
-ciBkZXZpY2UgYXNzaWdubWVudCwgc2luY2Ugd2UgYXJlIGhhdmluZyBDTT0xDQo+ID4gPiA+Pj4+
-PmhlcmUsIHdlIHNob3VsZCBoYXZlIGV4cGxpY2l0IHBhZ2UgaW52YWxpZGF0aW9ucyBldmVuIGlm
-IGd1ZXN0DQo+ID4gPiA+Pj4+PnNlbmRzIGdsb2JhbC9kb21haW4gaW52YWxpZGF0aW9ucy4NCj4g
-PiA+ID4+Pj4+DQo+ID4gPiA+Pj4+PlRoYW5rcywNCj4gPiA+ID4+Pj4+DQo+ID4gPiA+Pj4+Pi0t
-IHBldGVyeA0KPiA+ID4gPj4+PklzIHRoaXMgc3BlYyByZXF1aXJlZD8NCj4gPiA+ID4+PkkgdGhp
-bmsgbm90LiBJTU8gdGhlIHNwZWMgaXMgdmVyeSBjb2Fyc2UgZ3JhaW5lZCBvbiBkZXNjcmliaW5n
-DQo+ID4gPiA+Pj5jYWNoZSBtb2RlLi4uDQo+ID4gPiA+Pj4NCj4gPiA+ID4+Pj5CdHcsIGl0IGxv
-b2tzIHRvIG1lIHRoYXQgYm90aCBEU0kgYW5kIEdMT0JBTCBhcmUgaW5kZWVkIGV4cGxpY2l0DQo+
-ID4gPiA+Pj4+Zmx1c2guDQo+ID4gPiA+Pj5BY3R1YWxseSB3aGVuIGNhY2hlIG1vZGUgaXMgb24s
-IGl0IGlzIHVuY2xlYXIgdG8gbWUgb24gaG93IHdlDQo+ID4gPiA+Pj5zaG91bGQgdHJlYXQgZG9t
-YWluL2dsb2JhbCBpbnZhbGlkYXRpb25zLCBhdCBsZWFzdCBmcm9tIHRoZSBzcGVjDQo+ID4gPiA+
-Pj4oYXMgbWVudGlvbmVkIGVhcmxpZXIpLiBNeSB1bmRlcnN0YW5kaW5nIGlzIHRoYXQgdGhleSBh
-cmUgbm90DQo+ID4gPiA+Pj4iZXhwbGljaXQgZmx1c2hlcyIsIHdoaWNoIElNSE8gc2hvdWxkIG9u
-bHkgbWVhbiBwYWdlIHNlbGVjdGl2ZQ0KPiA+ID4gPj4+SU9UTEIgaW52YWxpZGF0aW9ucy4NCj4g
-PiA+ID4+UHJvYmFibHkgbm90LCBhdCBsZWFzdCBmcm9tIHRoZSB2aWV3IG9mIHBlcmZvcm1hbmNl
-LiBEU0kgYW5kDQo+ID4gPiA+Pmdsb2JhbCBzaG91bGQgYmUgbW9yZSBlZmZpY2llbnQgaW4gc29t
-ZSBjYXNlcy4NCj4gPiA+ID5JIGFncmVlIHdpdGggeW91IHRoYXQgRFNJL0dMT0JBTCBmbHVzaGVz
-IGFyZSBtb3JlIGVmZmljaWVudCBpbiBzb21lDQo+ID4gPiA+d2F5LiBCdXQgSU1ITyB0aGF0IGRv
-ZXMgbm90IG1lYW4gdGhlc2UgaW52YWxpZGF0aW9ucyBhcmUgImV4cGxpY2l0DQo+ID4gPiA+aW52
-YWxpZGF0aW9ucyIsIGFuZCBJIHN1c3BlY3Qgd2hldGhlciBjYWNoZSBtb2RlIGhhcyB0byBjb29w
-IHdpdGggaXQuDQo+ID4gPg0KPiA+ID4gV2VsbCwgdGhlIHNwZWMgZG9lcyBub3QgZm9yYmlkIERT
-SS9HTE9CQUwgd2l0aCBDTSBhbmQgdGhlIGRyaXZlcg0KPiA+ID4gY29kZXMgaGFkIHVzZWQgdGhl
-bSBmb3IgYWxtb3N0IHRlbiB5ZWFycy4gSSBjYW4gaGFyZGx5IGJlbGlldmUgaXQncyB3cm9uZy4N
-Cj4gPg0KPiA+IEkgdGhpbmsgd2UgaGF2ZSBtaXN1bmRlcnN0YW5kaW5nIGhlcmUuIDopDQo+ID4N
-Cj4gPiBJIG5ldmVyIHRob3VnaHQgd2Ugc2hvdWxkIG5vdCBzZW5kIERTSS9HTE9CQUwgaW52YWxp
-ZGF0aW9ucyB3aXRoIGNhY2hlDQo+ID4gbW9kZS4gSSBqdXN0IHRoaW5rIHdlIHNob3VsZCBub3Qg
-ZG8gYW55dGhpbmcgc3BlY2lhbCBldmVuIGlmIHdlIGhhdmUNCj4gPiBjYWNoZSBtb2RlIG9uIHdo
-ZW4gd2UgcmVjZWl2ZSB0aGVzZSBzaWduYWxzLg0KPiA+DQo+ID4gSW4gdGhlIHNwZWMsICJleHBs
-aWNpdCBpbnZhbGlkYXRpb24iIGlzIG1lbnRpb25lZCBpbiB0aGUgY2FjaGUgbW9kZQ0KPiA+IGNo
-YXB0ZXI6DQo+ID4NCj4gPiAgICAgVGhlIENhY2hpbmcgTW9kZSAoQ00pIGZpZWxkIGluIENhcGFi
-aWxpdHkgUmVnaXN0ZXIgaW5kaWNhdGVzIGlmDQo+ID4gICAgIHRoZSBoYXJkd2FyZSBpbXBsZW1l
-bnRhdGlvbiBjYWNoZXMgbm90LXByZXNlbnQgb3IgZXJyb25lb3VzDQo+ID4gICAgIHRyYW5zbGF0
-aW9uLXN0cnVjdHVyZSBlbnRyaWVzLiBXaGVuIHRoZSBDTSBmaWVsZCBpcyByZXBvcnRlZCBhcw0K
-PiA+ICAgICBTZXQsIGFueSBzb2Z0d2FyZSB1cGRhdGVzIHRvIGFueSByZW1hcHBpbmcgc3RydWN0
-dXJlcyAoaW5jbHVkaW5nDQo+ID4gICAgIHVwZGF0ZXMgdG8gbm90LXByZXNlbnQgZW50cmllcyBv
-ciBwcmVzZW50IGVudHJpZXMgd2hvc2UNCj4gPiAgICAgcHJvZ3JhbW1pbmcgcmVzdWx0ZWQgaW4g
-dHJhbnNsYXRpb24gZmF1bHRzKSByZXF1aXJlcyBleHBsaWNpdA0KPiA+ICAgICBpbnZhbGlkYXRp
-b24gb2YgdGhlIGNhY2hlcy4NCj4gPg0KPiA+IEFuZCBJIHRob3VnaHQgd2Ugd2VyZSBkaXNjdXNz
-aW9uIGFib3V0ICJ3aGF0IGlzIGV4cGxpY2l0IGludmFsaWRhdGlvbiINCj4gPiBtZW50aW9uZWQg
-YWJvdmUuDQo+IA0KPiBDaGVjayA2LjUuMy4xIEltcGxpY2l0IEludmFsaWRhdGlvbiBvbiBQYWdl
-IFJlcXVlc3RzDQo+IA0KPiAJSW4gYWRkaXRpb24gdG8gdGhlIGV4cGxpY2l0IGludmFsaWRhdGlv
-biB0aHJvdWdoIGludmFsaWRhdGlvbiBjb21tYW5kcw0KPiAJKHNlZSBTZWN0aW9uIDYuNS4xIGFu
-ZCBTZWN0aW9uIDYuNS4yKSBvciB0aHJvdWdoIGRlZmVycmVkIGludmFsaWRhdGlvbg0KPiAJbWVz
-c2FnZXMgKHNlZSBTZWN0aW9uIDYuNS40KSwgaWRlbnRpZmllZCBhYm92ZSwgUGFnZSBSZXF1ZXN0
-cyBmcm9tDQo+IAllbmRwb2ludCBkZXZpY2VzIGludmFsaWRhdGUgZW50cmllcyBpbiB0aGUgSU9U
-TEJzIGFuZCBwYWdpbmctc3RydWN0dXJlDQo+IAljYWNoZXMuDQo+IA0KPiBNeSBpbXByZXNzaW9u
-IGlzIHRoYXQgYWJvdmUgaW5kaXJlY3RseSBkZWZpbmVzIGludmFsaWRhdGlvbiBjb21tYW5kcyAo
-DQo+IFBTSS9EU0kvR0xPQkFMKSBhcyBleHBsaWNpdCBpbnZhbGlkYXRpb24sIGJlY2F1c2UgdGhl
-eSBhcmUgZXhwbGljaXRseSBpc3N1ZWQgYnkNCj4gZHJpdmVyLiBUaGVuIHNlY3Rpb24gNi41LjMu
-MSBmdXJ0aGVyIGRlc2NyaWJlcyBpbXBsaWNpdCBpbnZhbGlkYXRpb25zIGNhdXNlZCBieQ0KPiBv
-dGhlciBWVC1kIG9wZXJhdGlvbnMuDQo+IA0KPiBJIHdpbGwgY2hlY2sgd2l0aCBWVC1kIHNwZWMg
-b3duZXIgdG8gY2xhcmlmeS4NCj4gDQo+ID4NCj4gPiA+DQo+ID4gPiA+DQo+ID4gPiA+QnV0IGhl
-cmUgSSBzaG91bGQgYWRkIG9uZSBtb3JlIHRoaW5nIGJlc2lkZXMgUFNJIC0gY29udGV4dCBlbnRy
-eQ0KPiA+ID4gPmludmFsaWRhdGlvbiBzaG91bGQgYmUgb25lIG9mICJ0aGUgZXhwbGljaXQgaW52
-YWxpZGF0aW9ucyIgYXMgd2VsbCwNCj4gPiA+ID53aGljaCB3ZSBuZWVkIHRvIGhhbmRsZSBqdXN0
-IGxpa2UgUFNJIHdoZW4gY2FjaGUgbW9kZSBpcyBvbi4NCj4gPiA+ID4NCj4gPiA+ID4+Pj5KdXN0
-IGhhdmUgYSBxdWljayBnbyB0aHJvdWdoIG9uIGRyaXZlciBjb2RlcyBhbmQgZmluZCB0aGlzDQo+
-ID4gPiA+Pj4+c29tZXRoaW5nIGludGVyZXN0aW5nIGluIGludGVsX2lvbW11X2ZsdXNoX2lvdGxi
-X3BzaSgpOg0KPiA+ID4gPj4+Pg0KPiA+ID4gPj4+Pi4uLg0KPiA+ID4gPj4+PiAgICAgLyoNCj4g
-PiA+ID4+Pj4gICAgICAqIEZhbGxiYWNrIHRvIGRvbWFpbiBzZWxlY3RpdmUgZmx1c2ggaWYgbm8g
-UFNJIHN1cHBvcnQgb3IgdGhlIHNpemUgaXMNCj4gPiA+ID4+Pj4gICAgICAqIHRvbyBiaWcuDQo+
-ID4gPiA+Pj4+ICAgICAgKiBQU0kgcmVxdWlyZXMgcGFnZSBzaXplIHRvIGJlIDIgXiB4LCBhbmQg
-dGhlIGJhc2UgYWRkcmVzcyBpcw0KPiBuYXR1cmFsbHkNCj4gPiA+ID4+Pj4gICAgICAqIGFsaWdu
-ZWQgdG8gdGhlIHNpemUNCj4gPiA+ID4+Pj4gICAgICAqLw0KPiA+ID4gPj4+PiAgICAgaWYgKCFj
-YXBfcGdzZWxfaW52KGlvbW11LT5jYXApIHx8IG1hc2sgPg0KPiA+IGNhcF9tYXhfYW1hc2tfdmFs
-KGlvbW11LT5jYXApKQ0KPiA+ID4gPj4+PiAgICAgICAgIGlvbW11LT5mbHVzaC5mbHVzaF9pb3Rs
-Yihpb21tdSwgZGlkLCAwLCAwLA0KPiA+ID4gPj4+PiAgICAgICAgICAgICAgICAgICAgICAgICBE
-TUFfVExCX0RTSV9GTFVTSCk7DQo+ID4gPiA+Pj4+ICAgICBlbHNlDQo+ID4gPiA+Pj4+ICAgICAg
-ICAgaW9tbXUtPmZsdXNoLmZsdXNoX2lvdGxiKGlvbW11LCBkaWQsIGFkZHIgfCBpaCwgbWFzaywN
-Cj4gPiA+ID4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgRE1BX1RMQl9QU0lfRkxVU0gpOyAu
-Li4NCj4gPiA+ID4+PkkgdGhpbmsgdGhpcyBpcyBpbnRlcmVzdGluZy4uLiBhbmQgSSBkb3VidCBp
-dHMgY29ycmVjdG5lc3Mgd2hpbGUNCj4gPiA+ID4+PndpdGggY2FjaGUgbW9kZSBlbmFibGVkLg0K
-PiA+ID4gPj4+DQo+ID4gPiA+Pj5JZiBzbyAoc2VuZGluZyBkb21haW4gaW52YWxpZGF0aW9uIGlu
-c3RlYWQgb2YgYSBiaWcgcmFuZ2Ugb2YgcGFnZQ0KPiA+ID4gPj4+aW52YWxpZGF0aW9ucyksIGhv
-dyBzaG91bGQgd2UgY2FwdHVyZSB3aGljaCBwYWdlcyBhcmUgdW5tYXBwZWQgaW4NCj4gPiA+ID4+
-PmVtdWxhdGVkIElPTU1VPw0KPiA+ID4gPj5XZSBkb24ndCBuZWVkIHRvIHRyYWNrIGluZGl2aWR1
-YWwgcGFnZXMgaGVyZSwgc2luY2UgYWxsIHBhZ2VzIGZvcg0KPiA+ID4gPj5hIHNwZWNpZmljIGRv
-bWFpbiB3ZXJlIHVubWFwcGVkIEkgYmVsaWV2ZT8NCj4gPiA+ID5JTUhPIHRoaXMgbWlnaHQgbm90
-IGJlIHRoZSBjb3JyZWN0IGJlaGF2aW9yLg0KPiA+ID4gPg0KPiA+ID4gPklmIHdlIHJlY2VpdmUg
-b25lIGRvbWFpbiBzcGVjaWZpYyBpbnZhbGlkYXRpb24sIEkgYWdyZWUgdGhhdCB3ZQ0KPiA+ID4g
-PnNob3VsZCBpbnZhbGlkYXRlIHRoZSBJT1RMQiBjYWNoZSBmb3IgYWxsIHRoZSBkZXZpY2VzIGlu
-c2lkZSB0aGUgZG9tYWluLg0KPiA+ID4gPkhvd2V2ZXIsIHdoZW4gY2FjaGUgbW9kZSBpcyBvbiwg
-d2Ugc2hvdWxkIGJlIGRlcGVuZGluZyBvbiB0aGUgUFNJcw0KPiA+ID4gPnRvIHVubWFwIGVhY2gg
-cGFnZSAodW5sZXNzIHdlIHdhbnQgdG8gdW5tYXAgdGhlIHdob2xlIGFkZHJlc3MNCj4gPiA+ID5z
-cGFjZSwgaW4gdGhpcyBjYXNlIGl0J3MgdmVyeSBwb3NzaWJsZSB0aGF0IHRoZSBndWVzdCBpcyBq
-dXN0DQo+ID4gPiA+dW5tYXBwaW5nIGEgcmFuZ2UsIG5vdCB0aGUgZW50aXJlIHNwYWNlKS4gSWYg
-d2UgY29udmVydCBzZXZlcmFsDQo+ID4gPiA+UFNJcyBpbnRvIG9uZSBiaWcgRFNJLCBJTUhPIHdl
-IHdpbGwgbGVhdmUgdGhvc2UgcGFnZXMNCj4gPiA+ID5tYXBwZWQvdW5tYXBwZWQgd2hpbGUgd2Ug
-c2hvdWxkIHVubWFwL21hcCB0aGVtLg0KPiA+ID4NCj4gPiA+IENvbmZ1c2VkLCBkbyB5b3UgaGF2
-ZSBhbiBleGFtcGxlIGZvciB0aGlzPyAoSSBmYWlsIHRvIHVuZGVyc3RhbmQgd2h5DQo+ID4gPiBE
-U0kgY2FuJ3Qgd29yaywgYXQgbGVhc3QgaW1wbGVtZW50YXRpb24gY2FuIGNvbnZlcnQgRFNJIHRv
-IHNldmVyYWwNCj4gPiA+IFBTSXMgaW50ZXJuYWxseSkuDQo+ID4NCj4gPiBUaGF0J3MgaG93IEkg
-dW5kZXJzdGFuZCBpdC4gSXQgbWlnaHQgYmUgd3JvbmcuIEJ0dywgY291bGQgeW91DQo+ID4gZWxh
-Ym9yYXRlIGEgYml0IG9uIGhvdyBjYW4gd2UgY29udmVydCBhIERTSSBpbnRvIHNldmVyYWwgUFNJ
-cz8NCj4gPg0KPiA+IFRoYW5rcywNCj4gDQo+IElmIG15IHVuZGVyc3RhbmRpbmcgYWJvdmUgaXMg
-Y29ycmVjdCwgdGhlcmUgaXMgbm90aGluZyB3cm9uZyB3aXRoIGFib3ZlDQo+IElPTU1VIGRyaXZl
-ciBjb2RlIC0gYWN0dWFsbHkgaXQgbWFrZXMgc2Vuc2Ugb24gYmFyZSBtZXRhbCB3aGVuIENNIGlz
-DQo+IGRpc2FibGVkLg0KPiANCj4gQnV0IHllcywgRFNJL0dMT0JBTCBpcyBmYXIgbGVzcyBlZmZp
-Y2llbnQgdGhhbiBQU0kgd2hlbiBDTSBpcyBlbmFibGVkLg0KPiBXZSByZWx5IG9uIGNhY2hlIGlu
-dmFsaWRhdGlvbnMgdG8gaW5kaXJlY3RseSBjYXB0dXJlIHJlbWFwcGluZyBzdHJ1Y3R1cmUgY2hh
-bmdlLg0KPiBQU0kgcHJvdmlkZXMgYWNjdXJhdGUgaW5mbywgd2hpbGUgRFNJL0dMT0JBTCBkb2Vz
-bid0LiBUbyBlbXVsYXRlIGNvcnJlY3QNCj4gYmVoYXZpb3Igb2YgRFNJL0dMT0JBTCwgd2UgaGF2
-ZSB0byBwcmV0ZW5kIHRoYXQgdGhlIHdob2xlIGFkZHJlc3Mgc3BhY2UNCj4gKGlvdmE9MCwgc2l6
-ZT1hZ2F3KSBuZWVkcyB0byBiZSB1bm1hcHBlZCAoZm9yIEdMT0JBTCBpdCBmdXJ0aGVyIG1lYW5z
-DQo+IG11bHRpcGxlIGFkZHJlc3Mgc3BhY2VzKQ0KPiANCj4gVGhvdWdoIG5vdCBlZmZpY2llbnQs
-IGl0IGRvZXNuJ3QgbWVhbiBpdCdzIHdyb25nIHNpbmNlIGd1ZXN0IGRyaXZlciBmb2xsb3dzIHNw
-ZWMuDQo+IFdlIGNhbiBhc2sgZm9yIGxpbnV4IElPTU1VIGRyaXZlciBjaGFuZ2UgKENDIEFzaG9r
-KSB0byBub3QgdXNlIGFib3ZlDQo+IG9wdGltaXphdGlvbiB3aGVuIGNhY2hlIG1vZGUgaXMgZW5h
-YmxlZCwgYnV0IGFueXdheSB3ZSBuZWVkIGVtdWxhdGUgY29ycmVjdA0KPiBEU0kvR0xPQkFMIGJl
-aGF2aW9yIHRvIGZvbGxvdyBzcGVjLCBiZWNhdXNlOg0KPiANCj4gLSBldmVuIHdoZW4gZHJpdmVy
-IGZpeCBpcyBpbiBwbGFjZSwgb2xkIHZlcnNpb24gc3RpbGwgaGFzIHRoaXMgbG9naWM7DQo+IA0K
-PiAtIHRoZXJlIGlzIHN0aWxsIHNjZW5hcmlvIHdoZXJlIGd1ZXN0IElPTU1VIGRyaXZlciBkb2Vz
-IHdhbnQgdG8gaW52YWxpZGF0ZSB0aGUNCj4gd2hvbGUgYWRkcmVzcyBzcGFjZSwgZS5nLiB3aGVu
-IGNoYW5naW5nIGNvbnRleHQgZW50cnkuIEFza2luZyBndWVzdCBkcml2ZXIgdG8NCj4gdXNlIFBT
-SSBmb3Igc3VjaCBwdXJwb3NlIGlzIGFub3RoZXIgYmFkIHRoaW5nLg0KDQpIaSBLZXZpbi9QZXRl
-ci9KYXNvbiwNCg0KSSBhZ3JlZSB3ZSBzaG91bGQgdGhpbmsgRFNJL0dMT0JBTC4gSGVyYnksIEkg
-Z3Vlc3MgdGhlcmUgbWF5IGJlIGEgY2hhbmNlIHRvIGlnbm9yZQ0KRFNJL0dMT0JBTCBmbHVzaCBp
-ZiB0aGUgZm9sbG93aW5nIGFzc3VtcHRpb24gaXMgY29ycmVjdC4NCg0KSXQgc2VlbXMgbGlrZSB0
-aGF0IGFsbCBEU0kvR0xPQkFMIGZsdXNoIHdvdWxkIGFsd2F5cyBiZSBhZnRlciBhIGNvbnRleHQg
-ZW50cnkgaW52YWxpZGF0aW9uLiANCg0KV2l0aCB0aGlzIGFzc3VtcHRpb24sIEkgcmVtZW1iZXIg
-UGV0ZXIgYWRkZWQgbWVtb3J5X3JlcGxheSBpbiBjb250ZXh0IGludmFsaWRhdGlvbi4NClRoaXMg
-bWVtb3J5X3JlcGxheSB3b3VsZCB3YWxrIGd1ZXN0IHNlY29uZC1sZXZlbCBwYWdlIHRhYmxlIGFu
-ZCBkbyBtYXAuIFNvIHRoZQ0Kc2Vjb25kLWxldmVsIHBhZ2UgdGFibGUgaW4gaG9zdCBzaG91bGQg
-YmUgYWJsZSB0byBnZXQgdGhlIGxhdGVzdCBtYXBwaW5nIGluZm8uIEd1ZXN0DQpJT01NVSBkcml2
-ZXIgd291bGQgaXNzdWUgYW4gRFNJL0dMT0JBTCBmbHVzaCBhZnRlciBjaGFuZ2luZyBjb250ZXh0
-LiBTaW5jZSB0aGUNCm1hcHBpbmcgaW5mbyBoYXMgdXBkYXRlZCBpbiBob3N0LCB0aGVuIHRoZXJl
-IGlzIG5vIG5lZWQgdG8gZGVhbCB0aGlzIERTSS9HTE9CQUwgZmx1c2guDQoNClNvIGdlbnRsZW1l
-biwgcGxzIGhlbHAganVkZ2UgaWYgdGhlIGFzc3VtcHRpb24gaXMgY29ycmVjdC4gSWYgaXQgaXMg
-Y29ycmVjdCwgdGhlbiBQZXRlcidzIHBhdGNoDQptYXkganVzdCB3b3JrIHdpdGhvdXQgc3BlY2lh
-bCBwcm9jZXNzIGFnYWluc3QgRFNJL0dMT0JBTCBmbHVzaC4NCiANClJlZ2FyZHMsDQpZaSBMIA0K
+
+
+On 2017=E5=B9=B401=E6=9C=8819=E6=97=A5 14:44, Liu, Yi L wrote:
+>> -----Original Message-----
+>> From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongn=
+u.org]
+>> On Behalf Of Tian, Kevin
+>> Sent: Wednesday, January 18, 2017 5:39 PM
+>> To: Peter Xu <peterx@redhat.com>; Jason Wang <jasowang@redhat.com>
+>> Cc: Lan, Tianyu <tianyu.lan@intel.com>; Raj, Ashok <ashok.raj@intel.co=
+m>;
+>> mst@redhat.com; jan.kiszka@siemens.com; bd.aviv@gmail.com; qemu-
+>> devel@nongnu.org; alex.williamson@redhat.com
+>> Subject: Re: [Qemu-devel] [PATCH RFC v3 14/14] intel_iommu: enable vfi=
+o
+>> devices
+>>
+>>> From: Peter Xu [mailto:peterx@redhat.com]
+>>> Sent: Wednesday, January 18, 2017 4:46 PM
+>>>
+>>> On Wed, Jan 18, 2017 at 04:36:05PM +0800, Jason Wang wrote:
+>>>>
+>>>> On 2017=E5=B9=B401=E6=9C=8818=E6=97=A5 16:11, Peter Xu wrote:
+>>>>> On Wed, Jan 18, 2017 at 11:10:53AM +0800, Jason Wang wrote:
+>>>>>> On 2017=E5=B9=B401=E6=9C=8817=E6=97=A5 22:45, Peter Xu wrote:
+>>>>>>> On Mon, Jan 16, 2017 at 05:54:55PM +0800, Jason Wang wrote:
+>>>>>>>> On 2017=E5=B9=B401=E6=9C=8816=E6=97=A5 17:18, Peter Xu wrote:
+>>>>>>>>>>>   static void vtd_iotlb_page_invalidate(IntelIOMMUState *s,
+>>>>>>>>>>> uint16_t
+>>> domain_id,
+>>>>>>>>>>>                                         hwaddr addr, uint8_t
+>>>>>>>>>>> am)
+>>>>>>>>>>>   {
+>>>>>>>>>>> @@ -1222,6 +1251,7 @@ static void
+>>> vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
+>>>>>>>>>>>       info.addr =3D addr;
+>>>>>>>>>>>       info.mask =3D ~((1 << am) - 1);
+>>>>>>>>>>>       g_hash_table_foreach_remove(s->iotlb,
+>>>>>>>>>>> vtd_hash_remove_by_page,
+>>> &info);
+>>>>>>>>>>> +    vtd_iotlb_page_invalidate_notify(s, domain_id, addr,
+>>>>>>>>>>> + am);
+>>>>>>>>>> Is the case of GLOBAL or DSI flush missed, or we don't care it=
+ at all?
+>>>>>>>>> IMHO we don't. For device assignment, since we are having CM=3D=
+1
+>>>>>>>>> here, we should have explicit page invalidations even if guest
+>>>>>>>>> sends global/domain invalidations.
+>>>>>>>>>
+>>>>>>>>> Thanks,
+>>>>>>>>>
+>>>>>>>>> -- peterx
+>>>>>>>> Is this spec required?
+>>>>>>> I think not. IMO the spec is very coarse grained on describing
+>>>>>>> cache mode...
+>>>>>>>
+>>>>>>>> Btw, it looks to me that both DSI and GLOBAL are indeed explicit
+>>>>>>>> flush.
+>>>>>>> Actually when cache mode is on, it is unclear to me on how we
+>>>>>>> should treat domain/global invalidations, at least from the spec
+>>>>>>> (as mentioned earlier). My understanding is that they are not
+>>>>>>> "explicit flushes", which IMHO should only mean page selective
+>>>>>>> IOTLB invalidations.
+>>>>>> Probably not, at least from the view of performance. DSI and
+>>>>>> global should be more efficient in some cases.
+>>>>> I agree with you that DSI/GLOBAL flushes are more efficient in some
+>>>>> way. But IMHO that does not mean these invalidations are "explicit
+>>>>> invalidations", and I suspect whether cache mode has to coop with i=
+t.
+>>>> Well, the spec does not forbid DSI/GLOBAL with CM and the driver
+>>>> codes had used them for almost ten years. I can hardly believe it's =
+wrong.
+>>> I think we have misunderstanding here. :)
+>>>
+>>> I never thought we should not send DSI/GLOBAL invalidations with cach=
+e
+>>> mode. I just think we should not do anything special even if we have
+>>> cache mode on when we receive these signals.
+>>>
+>>> In the spec, "explicit invalidation" is mentioned in the cache mode
+>>> chapter:
+>>>
+>>>      The Caching Mode (CM) field in Capability Register indicates if
+>>>      the hardware implementation caches not-present or erroneous
+>>>      translation-structure entries. When the CM field is reported as
+>>>      Set, any software updates to any remapping structures (including
+>>>      updates to not-present entries or present entries whose
+>>>      programming resulted in translation faults) requires explicit
+>>>      invalidation of the caches.
+>>>
+>>> And I thought we were discussion about "what is explicit invalidation=
+"
+>>> mentioned above.
+>> Check 6.5.3.1 Implicit Invalidation on Page Requests
+>>
+>> 	In addition to the explicit invalidation through invalidation command=
+s
+>> 	(see Section 6.5.1 and Section 6.5.2) or through deferred invalidatio=
+n
+>> 	messages (see Section 6.5.4), identified above, Page Requests from
+>> 	endpoint devices invalidate entries in the IOTLBs and paging-structur=
+e
+>> 	caches.
+>>
+>> My impression is that above indirectly defines invalidation commands (
+>> PSI/DSI/GLOBAL) as explicit invalidation, because they are explicitly =
+issued by
+>> driver. Then section 6.5.3.1 further describes implicit invalidations =
+caused by
+>> other VT-d operations.
+>>
+>> I will check with VT-d spec owner to clarify.
+>>
+>>>>> But here I should add one more thing besides PSI - context entry
+>>>>> invalidation should be one of "the explicit invalidations" as well,
+>>>>> which we need to handle just like PSI when cache mode is on.
+>>>>>
+>>>>>>>> Just have a quick go through on driver codes and find this
+>>>>>>>> something interesting in intel_iommu_flush_iotlb_psi():
+>>>>>>>>
+>>>>>>>> ...
+>>>>>>>>      /*
+>>>>>>>>       * Fallback to domain selective flush if no PSI support or =
+the size is
+>>>>>>>>       * too big.
+>>>>>>>>       * PSI requires page size to be 2 ^ x, and the base address=
+ is
+>> naturally
+>>>>>>>>       * aligned to the size
+>>>>>>>>       */
+>>>>>>>>      if (!cap_pgsel_inv(iommu->cap) || mask >
+>>> cap_max_amask_val(iommu->cap))
+>>>>>>>>          iommu->flush.flush_iotlb(iommu, did, 0, 0,
+>>>>>>>>                          DMA_TLB_DSI_FLUSH);
+>>>>>>>>      else
+>>>>>>>>          iommu->flush.flush_iotlb(iommu, did, addr | ih, mask,
+>>>>>>>>                          DMA_TLB_PSI_FLUSH); ...
+>>>>>>> I think this is interesting... and I doubt its correctness while
+>>>>>>> with cache mode enabled.
+>>>>>>>
+>>>>>>> If so (sending domain invalidation instead of a big range of page
+>>>>>>> invalidations), how should we capture which pages are unmapped in
+>>>>>>> emulated IOMMU?
+>>>>>> We don't need to track individual pages here, since all pages for
+>>>>>> a specific domain were unmapped I believe?
+>>>>> IMHO this might not be the correct behavior.
+>>>>>
+>>>>> If we receive one domain specific invalidation, I agree that we
+>>>>> should invalidate the IOTLB cache for all the devices inside the do=
+main.
+>>>>> However, when cache mode is on, we should be depending on the PSIs
+>>>>> to unmap each page (unless we want to unmap the whole address
+>>>>> space, in this case it's very possible that the guest is just
+>>>>> unmapping a range, not the entire space). If we convert several
+>>>>> PSIs into one big DSI, IMHO we will leave those pages
+>>>>> mapped/unmapped while we should unmap/map them.
+>>>> Confused, do you have an example for this? (I fail to understand why
+>>>> DSI can't work, at least implementation can convert DSI to several
+>>>> PSIs internally).
+>>> That's how I understand it. It might be wrong. Btw, could you
+>>> elaborate a bit on how can we convert a DSI into several PSIs?
+>>>
+>>> Thanks,
+>> If my understanding above is correct, there is nothing wrong with abov=
+e
+>> IOMMU driver code - actually it makes sense on bare metal when CM is
+>> disabled.
+>>
+>> But yes, DSI/GLOBAL is far less efficient than PSI when CM is enabled.
+>> We rely on cache invalidations to indirectly capture remapping structu=
+re change.
+>> PSI provides accurate info, while DSI/GLOBAL doesn't. To emulate corre=
+ct
+>> behavior of DSI/GLOBAL, we have to pretend that the whole address spac=
+e
+>> (iova=3D0, size=3Dagaw) needs to be unmapped (for GLOBAL it further me=
+ans
+>> multiple address spaces)
+>>
+>> Though not efficient, it doesn't mean it's wrong since guest driver fo=
+llows spec.
+>> We can ask for linux IOMMU driver change (CC Ashok) to not use above
+>> optimization when cache mode is enabled, but anyway we need emulate co=
+rrect
+>> DSI/GLOBAL behavior to follow spec, because:
+>>
+>> - even when driver fix is in place, old version still has this logic;
+>>
+>> - there is still scenario where guest IOMMU driver does want to invali=
+date the
+>> whole address space, e.g. when changing context entry. Asking guest dr=
+iver to
+>> use PSI for such purpose is another bad thing.
+> Hi Kevin/Peter/Jason,
+>
+> I agree we should think DSI/GLOBAL. Herby, I guess there may be a chanc=
+e to ignore
+> DSI/GLOBAL flush if the following assumption is correct.
+>
+> It seems like that all DSI/GLOBAL flush would always be after a context=
+ entry invalidation.
+
+Well it looks like at least for DSI, flush could happen when the size is=20
+too big?
+
+>
+> With this assumption, I remember Peter added memory_replay in context i=
+nvalidation.
+> This memory_replay would walk guest second-level page table and do map.=
+ So the
+> second-level page table in host should be able to get the latest mappin=
+g info. Guest
+> IOMMU driver would issue an DSI/GLOBAL flush after changing context. Si=
+nce the
+> mapping info has updated in host, then there is no need to deal this DS=
+I/GLOBAL flush.
+>
+> So gentlemen, pls help judge if the assumption is correct. If it is cor=
+rect, then Peter's patch
+> may just work without special process against DSI/GLOBAL flush.
+>  =20
+> Regards,
+> Yi L
+
+Even if this may be the usual case, I think we'd better not make the=20
+codes depends on (usual) guest behaviors.
+
+Thanks
