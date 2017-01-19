@@ -1,21 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUDzh-0007GF-Th
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:47:19 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUE5J-0003af-Eg
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:53:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUDzd-00070N-3T
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:47:17 -0500
-References: <1484802878-22681-1-git-send-email-bharata@linux.vnet.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8b867af9-a039-f0de-9072-77c2a260ec23@redhat.com>
-Date: Thu, 19 Jan 2017 08:47:09 -0600
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUE5F-0001RB-HP
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:53:05 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52107)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cUE5F-0001Pf-85
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:53:01 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0JEpe5Y147407
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:52:59 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 282y7a8yq8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:52:58 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Thu, 19 Jan 2017 14:52:55 -0000
+Date: Thu, 19 Jan 2017 15:52:50 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <0503ac26-e660-325c-8257-59227c41021d@redhat.com>
+References: <20170116195452.23532-1-ehabkost@redhat.com>
+	<0503ac26-e660-325c-8257-59227c41021d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1484802878-22681-1-git-send-email-bharata@linux.vnet.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6pdhOGelU2F0gugnnQkQBcvaIE9jIDF9U"
-Subject: Re: [Qemu-devel] [RFC PATCH v0] softfloat: Add round-to-odd
- rounding mode
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170119155250.79a5f90c.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,78 +41,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, qemu-ppc@nongnu.org, nikunj@linux.vnet.ibm.com, david@gibson.dropbear.id.au
+To: David Hildenbrand <david@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6pdhOGelU2F0gugnnQkQBcvaIE9jIDF9U
-From: Eric Blake <eblake@redhat.com>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, qemu-ppc@nongnu.org, nikunj@linux.vnet.ibm.com,
- david@gibson.dropbear.id.au
-Message-ID: <8b867af9-a039-f0de-9072-77c2a260ec23@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v0] softfloat: Add round-to-odd rounding
- mode
-References: <1484802878-22681-1-git-send-email-bharata@linux.vnet.ibm.com>
-In-Reply-To: <1484802878-22681-1-git-send-email-bharata@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 17 Jan 2017 18:43:40 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-On 01/18/2017 11:14 PM, Bharata B Rao wrote:
-> Power ISA 3.0 introduces a few quadruple precision floating point
-> instructions that support round-to-add rounding mode. The
+> Uncompiled and untested.
 
-s/add/odd/
+@Jason: have you given this a try?
 
-> round-to-odd mode is explained as under:
->=20
-> Let Z be the intermediate arithmetic result or the operand of a convert=
-
-> operation. If Z can be represented exactly in the target format, the
-> result is Z. Otherwise the result is either Z1 or Z2 whichever is odd.
-> Here Z1 and Z2 are the next larger and smaller numbers representable
-> in the target format respectively.
-
-IEEE 854 and thus POSIX <float.h> specifies round-to-zero,
-round-to-pos-inf, round-to-neg-inf, and round-to-even. It sounds like
-round-to-odd is similar to round-to-even, only that the ties are broken
-in the opposite direction.  I don't know if portable C code can even
-request this mode (although float.h is allowed to add additional
-implementation-defined values to FLT_ROUNDS), but since the hardware can
-do it, I guess we have to emulate it.
-
->=20
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> @Conny and Christian, feel free to pick up and modify if this makes
+> sense
+> 
+>  From 4a2af1ca47421b68eb7677cd91af350dd9be4e0e Mon Sep 17 00:00:00 2001
+> From: David Hildenbrand <david@redhat.com>
+> Date: Tue, 17 Jan 2017 18:34:45 +0100
+> Subject: [PATCH] s390x/cpumodel: allow the "host" model also for tcg
+> 
+> Let's also allow the host model for tcg, therefore meaning
+> "enable all features supported by the selected accelerator in the current
+> host".
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
-> - I am not fully sure if this the correct implementation for the above
->   described round-to-odd rounding method. Any help is appreciated.
+>   qapi-schema.json          |  4 ++--
+>   target/s390x/cpu-qom.h    |  1 -
+>   target/s390x/cpu_models.c | 34 ++++++++--------------------------
+>   3 files changed, 10 insertions(+), 29 deletions(-)
 
-I don't know the code either, but if round-to-even is implemented
-correctly, it sounds like round-to-odd is a one-off tweak from that.
+(...)
 
+> -#ifdef CONFIG_KVM
+>   static void s390_host_cpu_model_initfn(Object *obj)
+>   {
+> +    S390CPUModel *max_model;
+>       S390CPU *cpu = S390_CPU(obj);
+>       Error *err = NULL;
+> 
+> -    if (!kvm_enabled() || !kvm_s390_cpu_models_supported()) {
+> +    if (kvm_enabled() && !kvm_s390_cpu_models_supported()) {
+>           return;
+>       }
+> 
+> -    cpu->model = g_malloc0(sizeof(*cpu->model));
+> -    kvm_s390_get_host_cpu_model(cpu->model, &err);
+> -    if (err) {
+> +    max_model = get_max_cpu_model(&err);
+> +    if (err || !max_model) {
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+I think checking for !max_model is enough.
 
+>           error_report_err(err);
+> -        g_free(cpu->model);
+>           /* fallback to unsupported cpu models */
+> -        cpu->model = NULL;
+> +        return;
+>       }
+> +    /* copy the host model so it can be modified */
+> +    cpu->model = g_memdup(max_model, sizeof(*cpu->model));
+>   }
+> -#endif
 
---6pdhOGelU2F0gugnnQkQBcvaIE9jIDF9U
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+(...)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYgNFtAAoJEKeha0olJ0NqlMsH+wVXPCSnWd4HN8VnIyk44vxI
-vTltZbDNtfJfQi7xV4j8IGPnocjPYuWixr0wB2+FvFVqc9ObFEgHOSdpAcl2HxPs
-6CJFKaKDwLMUPlriCrB9aaWfENVovWMMPBIWn/DyOGlxLCBx0Ihu6QKcSnwlOuA4
-vNZidqg/tHwp2oOw+tvCIq7L+r4sUIC7we3k0VsR8l3N40tjwr1hpOJV265jSMa2
-tjt0NqrYsJS3yGkTCcZrHE51W72Q/YORHoruKEm3LBHwXixHWoKjFTXnycW69UV3
-udXTmCrCj22cihqBV8kAkxNenzzyxYcu8GfMXM6UJ/mi6wl4A+8ojks008t5Qzk=
-=aqi5
------END PGP SIGNATURE-----
-
---6pdhOGelU2F0gugnnQkQBcvaIE9jIDF9U--
+This gives us the same as before on kvm and z900 for tcg, so this seems
+reasonable to me.
