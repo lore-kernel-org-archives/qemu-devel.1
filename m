@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUDvN-0003Kd-So
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:42:50 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cUDyO-0006B5-PR
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:45:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUDvI-00053m-VH
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:42:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57338)
+	(envelope-from <imammedo@redhat.com>) id 1cUDyJ-0006Oe-Sz
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:45:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cUDvI-00053T-Mc
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:42:44 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D2EDB7E9C2
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:42:44 +0000 (UTC)
-References: <20170118161653.19296-1-eblake@redhat.com>
-	<20170118161653.19296-7-eblake@redhat.com>
-	<8737gffkhy.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f5618def-ca46-72e7-c872-85e6d79a17b5@redhat.com>
-Date: Thu, 19 Jan 2017 08:42:42 -0600
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cUDyJ-0006OM-Kc
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:45:51 -0500
+Date: Thu, 19 Jan 2017 15:45:46 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170119154546.755b6dba@nial.brq.redhat.com>
+In-Reply-To: <20170118182721.GI3491@thinpad.lan.raisama.net>
+References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
+	<1484759609-264075-9-git-send-email-imammedo@redhat.com>
+	<20170118182721.GI3491@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <8737gffkhy.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="sOjj506jk06bEDiSfp11edQS1vbiLo71o"
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] qapi: Promote
- blockdev-change-medium arguments to QAPI type
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 08/13] pc: add writeonly 'cpu' property to
+ PCMachine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,80 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sOjj506jk06bEDiSfp11edQS1vbiLo71o
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <f5618def-ca46-72e7-c872-85e6d79a17b5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] qapi: Promote blockdev-change-medium
- arguments to QAPI type
-References: <20170118161653.19296-1-eblake@redhat.com>
- <20170118161653.19296-7-eblake@redhat.com>
- <8737gffkhy.fsf@dusky.pond.sub.org>
-In-Reply-To: <8737gffkhy.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 18 Jan 2017 16:27:21 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-On 01/19/2017 03:48 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
->=20
->> Having a named rather than anonymous C type will make it easier
->> to improve the testsuite in a later patch.
->=20
-> Post it together with said later patch then.
+> On Wed, Jan 18, 2017 at 06:13:24PM +0100, Igor Mammedov wrote:
+> > it will allow generic numa code to set cpu to numa node mapping
+> > in target independent manner in the next patch.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> 
+> This looks like a creative way to abuse the QOM property system.
+> What's the problem with using a simple C function like:
+>   void (*set_cpu_affinity)(MachineState *m, CpuInstanceProperties *props, Error **errp)
+Agreed, it should simplify parsing code as well.
 
-It was that way in the v1 series, but I had enough else going on with
-removal of dynamic JSON parsing that I thought I could pick this one
-early.  But I have no problems omitting it in a v3 respin, and saving it
-for the dynamic JSON work (if we even want to revisit that discussion).
-
-
->    # @format:          #optional, format to open the new image with (de=
-faults to
->    #                   the probed format)
->    #
->    # @read-only-mode:  #optional, change the read-only mode of the devi=
-ce; defaults
->    #                   to 'retain'
->    #
->    # Since: 2.5
->=20
-> Isn't Since: 2.5 misleading?  The anonymous type goes back to 2.5, but
-> the name doesn't.
-
-It matches what we've done elsewhere - when refactoring .json files to
-create a new type, but where the new type doesn't represent anything
-different over the wire than what was previously sent, we've documented
-the new struct name as of the older release where the wire format was
-introduced.  But as long as the command says 'since 2.5', I'm okay if we
-want to mark the struct as 'since 2.9', if that's easier to think about.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---sOjj506jk06bEDiSfp11edQS1vbiLo71o
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYgNBiAAoJEKeha0olJ0Nqi6EH/i7vv7W1BNqpxPwFtDDLPXCn
-daU7ep2XGhyBxJ6aY2ULGCnET71gJWfYkGm6HnuLW+I8TE51CKtX9LSlQIeYTYHV
-InQH0anbqJJbge4QaiWnn1jt8wQ4DHnUVu9FLY9dL3SMicAivC0oYcZHLTgxKbu5
-vBVTFsPpXzibJVBaACVrBy28Bgg/Ot3SGWjrCubdz++XM8UsfS2pnFbPlJUPrMMQ
-Z2pURJbmFi6KeZIeXiafxxMim3255wvm25MwXxoxqBKLEO4Iethh/mxqEtDO0hfq
-yqDlLBYD0VQrqwFZNCGcbVckDRJZIWuvfjPlHlcl1yMaBjVN6SZ4uYzcFBnChOc=
-=LhF9
------END PGP SIGNATURE-----
-
---sOjj506jk06bEDiSfp11edQS1vbiLo71o--
+> ?
+> 
+> 
+> > ---
+> >  hw/i386/pc.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 56 insertions(+)
+> > 
+> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > index f8ea635..1d33a5e 100644
+> > --- a/hw/i386/pc.c
+> > +++ b/hw/i386/pc.c
+> > @@ -2201,6 +2201,56 @@ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
+> >      pcms->pit = value;
+> >  }
+> >  
+> > +static void pc_machine_set_cpu(Object *obj, Visitor *v, const char *name,
+> > +                               void *opaque, Error **errp)
+> > +{
+> > +    uint32_t apic_id;
+> > +    X86CPUTopoInfo topo;
+> > +    CPUArchId *cpu_slot;
+> > +    Error *local_err = NULL;
+> > +    CpuInstanceProperties *cpu_props = NULL;
+> > +    PCMachineState *pcms = PC_MACHINE(obj);
+> > +    MachineClass *mc = MACHINE_GET_CLASS(obj);
+> > +
+> > +    visit_type_CpuInstanceProperties(v, name, &cpu_props, &local_err);
+> > +    if (local_err) {
+> > +        goto out;
+> > +    }
+> > +
+> > +    if (!cpu_props->has_node_id) {
+> > +        error_setg(&local_err, "node-id property is not specified");
+> > +        goto out;
+> > +    }
+> > +
+> > +    /*
+> > +     * make sure that possible_cpus is initialized
+> > +     * as property setter might be called before machine init is called
+> > +     */
+> > +    mc->possible_cpu_arch_ids(MACHINE(obj));
+> > +
+> > +    topo.pkg_id = cpu_props->socket_id;
+> > +    topo.core_id = cpu_props->core_id;
+> > +    topo.smt_id = cpu_props->thread_id;
+> > +    apic_id = apicid_from_topo_ids(smp_cores, smp_threads, &topo);
+> > +    cpu_slot = pc_find_cpu_slot(pcms, apic_id, NULL);
+> > +    if (!cpu_slot) {
+> > +        error_setg(&local_err, "unable to find CPU");
+> > +        goto out;
+> > +    }
+> > +
+> > +    if (cpu_slot->props.has_node_id) {
+> > +        error_setg(&local_err, "CPU has already been assigned to node: %"PRId64,
+> > +                   cpu_slot->props.node_id);
+> > +        goto out;
+> > +    }
+> > +    cpu_slot->props.has_node_id = true;
+> > +    cpu_slot->props.node_id = cpu_props->node_id;
+> > +
+> > + out:
+> > +    error_propagate(errp, local_err);
+> > +    qapi_free_CpuInstanceProperties(cpu_props);
+> > +}
+> > +
+> >  static void pc_machine_initfn(Object *obj)
+> >  {
+> >      PCMachineState *pcms = PC_MACHINE(obj);
+> > @@ -2395,6 +2445,12 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+> >  
+> >      object_class_property_add_bool(oc, PC_MACHINE_PIT,
+> >          pc_machine_get_pit, pc_machine_set_pit, &error_abort);
+> > +
+> > +    object_class_property_add(oc, "cpu", "CpuInstanceProperties",
+> > +        NULL, pc_machine_set_cpu,
+> > +        NULL, NULL, &error_abort);
+> > +    object_class_property_set_description(oc, "cpu",
+> > +        "Possible cpu placement", &error_abort);
+> >  }
+> >  
+> >  static const TypeInfo pc_machine_info = {
+> > -- 
+> > 2.7.4
+> >   
+> 
