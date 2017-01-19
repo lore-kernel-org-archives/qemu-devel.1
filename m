@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cU8h7-0003Pn-3y
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:07:45 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cU8hY-0003o2-M9
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:08:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cU8h3-0000pc-6A
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:07:45 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34424)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cU8hX-00011G-Mn
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:08:12 -0500
+Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:36147)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cU8h2-0000pM-VI
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:07:41 -0500
-Received: by mail-lf0-x241.google.com with SMTP id q89so4527049lfi.1
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 01:07:40 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1484026704-28027-1-git-send-email-mst@redhat.com>
-	<1484026704-28027-9-git-send-email-mst@redhat.com>
-	<2163e04a-68cb-6c49-61bf-71c9e32e0487@redhat.com>
-	<b9d04ac2-1978-1821-abdf-d73ef80276e4@redhat.com>
-	<665c0c20-e39d-8f6e-2a09-e2169e5376bb@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a83f2689-b016-d77d-48ac-625e258bfb7a@redhat.com>
-Date: Thu, 19 Jan 2017 10:07:37 +0100
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cU8hX-00010C-Hq
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:08:11 -0500
+Received: by mail-yw0-x244.google.com with SMTP id l75so3256441ywb.3
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 01:08:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <665c0c20-e39d-8f6e-2a09-e2169e5376bb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
- descriptor
+References: <20170118161653.19296-1-eblake@redhat.com>
+	<20170118161653.19296-7-eblake@redhat.com>
+In-Reply-To: <20170118161653.19296-7-eblake@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 19 Jan 2017 09:07:58 +0000
+Message-ID: <CAJ+F1CKTcqhcyxGzn=PC2aeunzzT3orTDhrG=M7-T=tJ-uD88Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] qapi: Promote
+ blockdev-change-medium arguments to QAPI type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
+
+Hi
+
+On Wed, Jan 18, 2017 at 9:02 PM Eric Blake <eblake@redhat.com> wrote:
+
+> Having a named rather than anonymous C type will make it easier
+> to improve the testsuite in a later patch. No semantic change,
+> to any of the existing code or to the introspection output.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
+>
+
+You should move the "Example:" back to blockdev-change-medium command.
+
+Otherwise,
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 
-On 19/01/2017 04:32, Jason Wang wrote:
->>
->>>
->>>> +        addr &= ~(sz - 1);
->>>> +    } else {
->>>> +        sz = VTD_PAGE_SIZE;
->>>> +    }
->>>>   +    entry.target_as = &vtd_dev_as->as;
->>>> +    entry.addr_mask = sz - 1;
->>>> +    entry.iova = addr;
->>> If S=1, entry.iova must mask away the 1 bits that specified the size.
->>> For example,
->>>
->>>       addr = 0xabcd1000
->>>
->>> has cto64(0xabcd1) == 1, so it indicates a 16K invalidation from
->>> 0xabcd0000 to 0xabcd3fff.  The "1" must be masked away with "addr & -sz"
->>> or "addr & ~entry.addr_mask".
->>>
->>> Thanks,
->>>
->>> Paolo
->>
->> Good catch.
-> 
-> It should be addr & ~(sz - 1) I think? And it has been done above :)
-
-Oh, of course!
-
-Paolo
+> ---
+> v2: rebase to master
+> ---
+>  qapi/block-core.json | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 1b3e6eb..0e31d25 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3119,6 +3119,15 @@
+>  # combines blockdev-open-tray, x-blockdev-remove-medium,
+>  # x-blockdev-insert-medium and blockdev-close-tray).
+>  #
+> +# Since: 2.5
+> +##
+> +{ 'command': 'blockdev-change-medium',
+> +  'data': 'BlockdevChangeMedium' }
+> +
+> +
+> +##
+> +# @BlockdevChangeMedium:
+> +#
+>  # @device:          #optional Block device name (deprecated, use @id
+> instead)
+>  #
+>  # @id:              #optional The name or QOM path of the guest device
+> @@ -3165,7 +3174,7 @@
+>  # <- { "return": {} }
+>  #
+>  ##
+> -{ 'command': 'blockdev-change-medium',
+> +{ 'struct': 'BlockdevChangeMedium',
+>    'data': { '*device': 'str',
+>              '*id': 'str',
+>              'filename': 'str',
+> --
+> 2.9.3
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
