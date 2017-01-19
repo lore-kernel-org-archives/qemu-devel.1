@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cUGSS-0000Jv-7o
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:25:09 -0500
+	(envelope-from <rjones@redhat.com>) id 1cUGd1-0001Nc-DW
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:36:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cUGSO-0007m2-Cf
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:25:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58436)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cUGSO-0007ln-60
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:25:04 -0500
-References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
-	<2a32f616-25a8-ba5a-f74c-d619fc8ab333@redhat.com>
-	<20170118173139-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <b11c5cbe-6c63-e9dc-0313-e2dff3830951@redhat.com>
-Date: Thu, 19 Jan 2017 18:24:59 +0100
+	(envelope-from <rjones@redhat.com>) id 1cUGd0-0004q1-4x
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:36:03 -0500
+Date: Thu, 19 Jan 2017 17:35:53 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20170119173553.GH1947@redhat.com>
+References: <20170119143816.21972-1-famz@redhat.com>
+	<20170119143816.21972-15-famz@redhat.com>
+	<20170119154900.GB16641@redhat.com>
+	<9d9d7b54-bc34-e0fe-79d9-1ec83472aca9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170118173139-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 kernel 0/5] Extend virtio-balloon for
- fast (de)inflating & fast live migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9d9d7b54-bc34-e0fe-79d9-1ec83472aca9@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v10 14/16] file-posix:
+ Implement image locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Liang Li <liang.z.li@intel.com>, kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, amit.shah@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, aarcange@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-
-> As long as the interface is similar, it seems to make
-> sense for me - why invent a completely new device that
-> looks very much like the old one?
-
-The only reason would be that this feature could be used independently
-of virtio-balloon. But this would of course only be the case, if
-ballooning is strictly not wanted in a configuration, or the current
-balloon driver gets replaced by an alternative solution.
-
-I don't have any strong feelings about this, just wanted to double check.
-
-Thanks,
-
-David
-
+On Thu, Jan 19, 2017 at 10:19:29AM -0600, Eric Blake wrote:
+> On 01/19/2017 09:49 AM, Daniel P. Berrange wrote:
+> > On Thu, Jan 19, 2017 at 10:38:14PM +0800, Fam Zheng wrote:
+> >> This implements open flag sensible image locking for local file
+> >> and host device protocol.
+> >>
+> >> virtlockd in libvirt locks the first byte, so we start looking at the
+> >> file bytes from 1.
+> >>
+> >> Quoting what was proposed by Kevin Wolf <kwolf@redhat.com>, there are
+> >> four locking modes by combining two bits (BDRV_O_RDWR and
+> >> BDRV_O_SHARE_RW), and implemented by taking two locks:
+> >>
 > 
-> So this boils down to whether the speedup patches are merged.
+> >> +/* Posix file locking bytes. Libvirt takes byte 0, so start from byte 1. */
+> >> +#define RAW_LOCK_BYTE_MIN             1
+> >> +#define RAW_LOCK_BYTE_NO_OTHER_WRITER 1
+> >> +#define RAW_LOCK_BYTE_WRITE           2
+> > 
+> > ...would you mind if QEMU started from say byte 10, leaving the first 10
+> > reserved for libvirt uses. This lets libvirt have a continuous space for
+> > its own usage if we want to use more bytes
 > 
-> 
->> -- 
->>
->> David
+> Thankfully, fcntl() locks can be taken beyond end-of-file, so I think
+> we're okay making an arbitrarily larger range of bytes reserved for each
+> process, even in the unlikely corner case of passing files smaller than
+> 512 bytes.
+
+Not so unlikely.  libguestfs actually detects and works around this
+case because qemu was (possibly still is) very broken when you pass
+small files.
+
+https://github.com/libguestfs/libguestfs/blob/master/src/drives.c#L395-L441
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
