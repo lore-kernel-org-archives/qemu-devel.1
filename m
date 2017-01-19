@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cU7xm-00053F-D4
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:21:01 -0500
+	(envelope-from <bounces@canonical.com>) id 1cU81Y-0007Ma-7W
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:24:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cU7xj-0008IV-8y
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:31837)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cU7xj-0008IL-2b
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:20:51 -0500
-Date: Thu, 19 Jan 2017 16:20:44 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170119082044.GE4914@pxdev.xzpeter.org>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-14-git-send-email-peterx@redhat.com>
-	<20170116125357.31b7ef82@t450s.home>
-	<20170117140000.GN30108@pxdev.xzpeter.org>
-	<20170117084604.2b1f5e50@t450s.home>
-	<20170118074944.GR30108@pxdev.xzpeter.org>
+	(envelope-from <bounces@canonical.com>) id 1cU81V-0001Se-3t
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:24:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37583)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cU81U-0001R5-Ts
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 03:24:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cU81T-0008UQ-2r
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 08:24:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 131082E8019
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 08:24:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170118074944.GR30108@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 13/14] intel_iommu: allow dynamic
- switch of IOMMU region
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Jan 2017 08:11:30 -0000
+From: Thomas Huth <665743@bugs.launchpad.net>
+Reply-To: Bug 665743 <665743@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20101023233336.5102.72622.malonedeb@palladium.canonical.com>
+Message-Id: <20170119081130.27373.96473.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 665743] Re: Cocoa video corruption when guest
+ uses RGB565 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com
+To: qemu-devel@nongnu.org
 
-On Wed, Jan 18, 2017 at 03:49:44PM +0800, Peter Xu wrote:
+Can you still reproduce this problem with the latest version of QEMU? If
+so, could you please rebase your patch to the latest git version and
+send it to the mailing list (see http://qemu-
+project.org/Contribute/SubmitAPatch for details)? Sorry, we do not take
+patches from the bugtracker, they always have got to be discussed on the
+qemu-devel mailing list first.
 
-[...]
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> I was trying to invalidate the entire address space by sending a big
-> IOTLB notification to vfio-pci, which looks like:
-> 
->   IOMMUTLBEntry entry = {
->       .target_as = &address_space_memory,
->       .iova = 0,
->       .translated_addr = 0,
->       .addr_mask = (1 << 63) - 1,
->       .perm = IOMMU_NONE,     /* UNMAP */
->   };
-> 
-> Then I feed this entry to vfio-pci IOMMU notifier.
-> 
-> However, this was blocked in vfio_iommu_map_notify(), with error:
-> 
->   qemu-system-x86_64: iommu has granularity incompatible with target AS
-> 
-> Since we have:
-> 
->   /*
->    * The IOMMU TLB entry we have just covers translation through
->    * this IOMMU to its immediate target.  We need to translate
->    * it the rest of the way through to memory.
->    */
->   rcu_read_lock();
->   mr = address_space_translate(&address_space_memory,
->                                iotlb->translated_addr,
->                                &xlat, &len, iotlb->perm & IOMMU_WO);
->   if (!memory_region_is_ram(mr)) {
->       error_report("iommu map to non memory area %"HWADDR_PRIx"",
->                    xlat);
->       goto out;
->   }
->   /*
->    * Translation truncates length to the IOMMU page size,
->    * check that it did not truncate too much.
->    */
->   if (len & iotlb->addr_mask) {
->       error_report("iommu has granularity incompatible with target AS");
->       goto out;
->   }
-> 
-> In my case len == 0xa0000 (that's the translation result), and
-> iotlb->addr_mask == (1<<63)-1. So looks like the translation above
-> splitted the big region and a simple big UNMAP doesn't work for me.
-> 
-> Do you have any suggestion on how I can solve this? In what case will
-> we need the above address_space_translate()?
+-- =
 
-Hmm... it should be checking that the translated address range is RAM.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/665743
 
-However if with this, IOMMU notifiers won't be able to leverage the
-vfio driver feature to unmap a very big region.
+Title:
+  Cocoa video corruption when guest uses RGB565 mode
 
-IMHO the check should only be meaningful for map operations. I'll try
-to post a RFC patch for vfio-pci to allow unmap of very big regions,
-to see whether that'll be a workable approach.
+Status in QEMU:
+  Incomplete
 
-Thanks,
+Bug description:
+  The cocoa video driver doesn't currently support when the guest uses
+  RGB565 or HighColor mode resulting in corrupted video.  The initial
+  graphics screen of recent Ubuntu installs is an example.  The attached
+  patch against 0.13.0-release seems to fix the problem by introducing
+  an indirect data provider that translates from RGB565 to RGB888, a
+  mode that core graphics supports.
 
--- peterx
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/665743/+subscriptions
