@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cU0hG-0000a0-C0
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 19:35:23 -0500
+	(envelope-from <liang.z.li@intel.com>) id 1cU1ZD-0005v4-Ob
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 20:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cU0hF-0007KL-4N
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 19:35:22 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34294)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1cU0hE-0007Ib-VJ
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 19:35:21 -0500
-Received: by mail-wm0-x244.google.com with SMTP id c85so8075463wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 18 Jan 2017 16:35:19 -0800 (PST)
+	(envelope-from <liang.z.li@intel.com>) id 1cU1ZA-0007CN-LI
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 20:31:07 -0500
+Received: from mga06.intel.com ([134.134.136.31]:3654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
+	id 1cU1ZA-0007BL-AA
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 20:31:04 -0500
+From: "Li, Liang Z" <liang.z.li@intel.com>
+Date: Thu, 19 Jan 2017 01:30:57 +0000
+Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C3576D9@shsmsx102.ccr.corp.intel.com>
+References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
+	<1482303148-22059-3-git-send-email-liang.z.li@intel.com>
+	<20170112185719-mutt-send-email-mst@kernel.org>
+	<F2CBF3009FA73547804AE4C663CAB28E3C351AE8@shsmsx102.ccr.corp.intel.com>
+	<20170117210845-mutt-send-email-mst@kernel.org>
+	<F2CBF3009FA73547804AE4C663CAB28E3C3554D3@shsmsx102.ccr.corp.intel.com>
+	<20170118173025-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170118173025-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <b37aa0c3-2baa-0256-7f55-87012c9002b9@redhat.com>
-References: <1484743490-24721-1-git-send-email-thuth@redhat.com>
-	<CAKmqyKM5RfdR63XDQXKh5Yu6+s5GwAgj8i95AJAfgPaN8HiGYw@mail.gmail.com>
-	<b37aa0c3-2baa-0256-7f55-87012c9002b9@redhat.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 18 Jan 2017 16:34:47 -0800
-Message-ID: <CAKmqyKOBn5aaOMvGHe80Eax6-n9kETRzMgoD24d=daydaTudKQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3] hw/core/null-machine: Add the
- possibility to instantiate a CPU and RAM
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v6 kernel 2/5]
+ virtio-balloon: define new feature bit and head struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +35,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <laurent@vivier.eu>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "david@redhat.com" <david@redhat.com>, "aarcange@redhat.com" <aarcange@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
 
-On Wed, Jan 18, 2017 at 10:56 AM, Thomas Huth <thuth@redhat.com> wrote:
-> On 18.01.2017 18:57, Alistair Francis wrote:
->> On Wed, Jan 18, 2017 at 4:44 AM, Thomas Huth <thuth@redhat.com> wrote:
->>> Sometimes it is useful to have just a machine with CPU and RAM, without
->>> any further hardware in it, e.g. if you just want to do some instruction
->>> debugging for TCG with a remote GDB attached to QEMU, or run some embedded
->>> code with the "-semihosting" QEMU parameter. qemu-system-m68k already
->>> features a "dummy" machine, and xtensa a "sim" machine for exactly this
->>> purpose.
->>> All target architectures have nowadays also a "none" machine, which would
->>> be a perfect match for this, too - but it currently does not allow to add
->>> CPU and RAM yet. Thus let's add these possibilities in a generic way to the
->>> "none" machine, too, so that we hopefully do not need additional "dummy"
->>> machines in the future anymore (and maybe can also get rid of the already
->>> existing "dummy"/"sim" machines one day).
->>> Note that the default behaviour of the "none" machine is not changed, i.e.
->>> no CPU and no RAM is instantiated by default. You have explicitely got to
->>> specify the CPU model with "-cpu" and the amount of RAM with "-m" to get
->>> these new features.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  v3:
->>>  - Get rid of the cpu_init_def() wrapper again, make null-machine.o
->>>    target dependent instead and use cpu_init() directly.
->>>  - Omit the loader code for the "-kernel" option for now (users can
->>>    use "-device loader,..." instead). We can add code for the -kernel
->>>    parameter later (either an implementation or a warning), once we've
->>>    decided how it should behave for the "none" machine.
->>
->> I think there should at least be a warning to start with though. It
->> seems confusing that no errors are reported but the argument is
->> ignored.
->
-> I'm still rather in favor of adding the hunk here that calls the generic
-> loader for "-kernel" ... anyway, we can add either behavior with a later
-> patch. So far the "none" machine never reported an error here, so this
-> is not a regression if we do not have this right from the start.
+> > > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > > > > > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > > > > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > > > > > Cc: Amit Shah <amit.shah@redhat.com>
+> > > > > > Cc: Dave Hansen <dave.hansen@intel.com>
+> > > > > > Cc: Andrea Arcangeli <aarcange@redhat.com>
+> > > > > > Cc: David Hildenbrand <david@redhat.com>
+> > > > > > ---
+> > > > > >  include/uapi/linux/virtio_balloon.h | 12 ++++++++++++
+> > > > > >  1 file changed, 12 insertions(+)
+> > > > > >
+> > > > > > diff --git a/include/uapi/linux/virtio_balloon.h
+> > > > > > b/include/uapi/linux/virtio_balloon.h
+> > > > > > index 343d7dd..2f850bf 100644
+> > > > > > --- a/include/uapi/linux/virtio_balloon.h
+> > > > > > +++ b/include/uapi/linux/virtio_balloon.h
+> > > > > > @@ -34,10 +34,14 @@
+> > > > > >  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell
+> before
+> > > > > reclaiming pages */
+> > > > > >  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats
+> virtqueue
+> > > > > */
+> > > > > >  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate
+> > > balloon
+> > > > > on OOM */
+> > > > > > +#define VIRTIO_BALLOON_F_PAGE_RANGE	3 /* Send page info
+> > > > > with ranges */
+> > > > > >
+> > > > > >  /* Size of a PFN in the balloon interface. */  #define
+> > > > > > VIRTIO_BALLOON_PFN_SHIFT 12
+> > > > > >
+> > > > > > +/* Bits width for the length of the pfn range */
+> > > > >
+> > > > > What does this mean? Couldn't figure it out.
+> > > > >
+> > > > > > +#define VIRTIO_BALLOON_NR_PFN_BITS 12
+> > > > > > +
+> > > > > >  struct virtio_balloon_config {
+> > > > > >  	/* Number of pages host wants Guest to give up. */
+> > > > > >  	__u32 num_pages;
+> > > > > > @@ -82,4 +86,12 @@ struct virtio_balloon_stat {
+> > > > > >  	__virtio64 val;
+> > > > > >  } __attribute__((packed));
+> > > > > >
+> > > > > > +/* Response header structure */ struct
+> > > > > > +virtio_balloon_resp_hdr {
+> > > > > > +	__le64 cmd : 8; /* Distinguish different requests type */
+> > > > > > +	__le64 flag: 8; /* Mark status for a specific request type */
+> > > > > > +	__le64 id : 16; /* Distinguish requests of a specific type */
+> > > > > > +	__le64 data_len: 32; /* Length of the following data, in
+> > > > > > +bytes */
+> > > > >
+> > > > > This use of __le64 makes no sense.  Just use u8/le16/le32 pls.
+> > > > >
+> > > >
+> > > > Got it, will change in the next version.
+> > > >
+> > > > And could help take a look at other parts? as well as the QEMU part=
+.
+> > > >
+> > > > Thanks!
+> > > > Liang
+> > >
+> > > Yes but first I would like to understand how come no fields in this
+> > > new structure come up if I search for them in the following patch. I
+> > > don't see why
+> >
+> > It's not true, all of the field will be referenced in the following
+> > patches except the 'reserved' filed.
+>=20
+> But none of these are used in the following patch 3.
 
-Your right, it isn't a regression. I still think we should try to get
-some sort of action in there before the next release.
+Yes. Only 'data_len' is used in patch 3, and for expansibility maybe at lea=
+st 'cmd' is needed to. I should set it in patch 3 to some default value eve=
+n
+it's not currently useful. 'flag' and 'id' are for patch 4. I just want to =
+reuse the 'struct virtio_balloon_resp_hdr' and make the code simpler.
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Thanks,
-
-Alistair
-
->
->  Thomas
->
->
+Thanks!
+Liang
