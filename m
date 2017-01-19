@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33174)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cUFmo-0002bB-Gv
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:42:07 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33521)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1cUFof-0003mW-Vo
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:44:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cUFmn-00088F-IK
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:42:06 -0500
-Date: Thu, 19 Jan 2017 16:41:54 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170119164154.GA27032@stefanha-x1.localdomain>
-References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1480926904-17596-2-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170113134148.GC10706@stefanha-x1.localdomain>
-	<5880296B.7080709@huawei.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gBBFr7Ir9EOA20Yy"
-Content-Disposition: inline
-In-Reply-To: <5880296B.7080709@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 1/6] docs/block-replication: Add
- description for shared-disk case
+	(envelope-from <pl@kamp.de>) id 1cUFob-0004Kc-0A
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:44:02 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:34979 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cUFoa-0004Am-Nl
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:43:56 -0500
+From: Peter Lieven <pl@kamp.de>
+Date: Thu, 19 Jan 2017 17:43:50 +0100
+Message-Id: <1484844230-24490-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH] bitmap: assert that start and nr are non
+ negative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +22,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, Peter Lieven <pl@kamp.de>
 
+commit e1123a3b introduced a data corruption regression
+in the iscsi driver because it passed -1 as nr to bitmap_set
+and bitmap_clear. Add an assertion to catch such flaws earlier.
 
---gBBFr7Ir9EOA20Yy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Suggested-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+ util/bitmap.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-On Thu, Jan 19, 2017 at 10:50:19AM +0800, Hailiang Zhang wrote:
-> On 2017/1/13 21:41, Stefan Hajnoczi wrote:
-> > On Mon, Dec 05, 2016 at 04:34:59PM +0800, zhanghailiang wrote:
-> > > +Issue qmp command:
-> > > +  { 'execute': 'blockdev-add',
-> > > +    'arguments': {
-> > > +        'driver': 'replication',
-> > > +        'node-name': 'rep',
-> > > +        'mode': 'primary',
-> > > +        'shared-disk-id': 'primary_disk0',
-> > > +        'shared-disk': true,
-> > > +        'file': {
-> > > +            'driver': 'nbd',
-> > > +            'export': 'hidden_disk0',
-> > > +            'server': {
-> > > +                'type': 'inet',
-> > > +                'data': {
-> > > +                    'host': 'xxx.xxx.xxx.xxx',
-> > > +                    'port': 'yyy'
-> > > +                }
-> > > +            }
-> >=20
-> > block/nbd.c does have good error handling and recovery in case there is
-> > a network issue.  There are no reconnection attempts or timeouts that
-> > deal with a temporary loss of network connectivity.
-> >=20
-> > This is a general problem with block/nbd.c and not something to solve in
-> > this patch series.  I'm just mentioning it because it may affect COLO
-> > replication.
-> >=20
-> > I'm sure these limitations in block/nbd.c can be fixed but it will take
-> > some effort.  Maybe block/sheepdog.c, net/socket.c, and other network
-> > code could also benefit from generic network connection recovery.
-> >=20
->=20
-> Hmm, good suggestion, but IMHO, here, COLO is a little different from
-> other scenes, if the reconnection method has been implemented,
-> it still needs a mechanism to identify the temporary loss of network
-> connection or real broken in network connection.
->=20
-> I did a simple test, just ifconfig down the network card that be used
-> by block replication, It seems that NBD in qemu doesn't has a ability to
-> find the connection has been broken, there was no error reports
-> and COLO just got stuck in vm_stop() where it called aio_poll().
-
-Yes, this is the vm_stop() problem again.  There is no reliable way to
-cancel I/O requests so instead QEMU waits...forever.  A solution is
-needed so COLO doesn't hang on network failure.
-
-I'm not sure how to solve the problem.  The secondary still has the last
-successful checkpoint so it could resume instead of waiting for the
-current checkpoint to commit.
-
-There may still be NBD I/O in flight, so the would need to drain it or
-fence storage to prevent interference once the secondary VM is running.
-
-Stefan
-
---gBBFr7Ir9EOA20Yy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYgOxSAAoJEJykq7OBq3PIzdAH/2dz8cIfhAF9liPYbS+7nKum
-ueKVkFsAyzmeksb3aynlDKzCuysdqSmn2U27P1MOrD2HuGuaIzAeYnnc/TqdnyOg
-8EG5ew4uBzQGukL96yQKfzqRzYTpHEKhAbaz7wMXQA4FkzAfNKZL6aeQILwmBXld
-F9sBJ9YPViu1EJtCszu4upxaPxOJ/Gf7TsTX5uKfbNMBr3tIyrlbdvbouLneD1ld
-DfNJ2W94PGqjyrp309pVqdqFR1bHdDrqwoauT4Diw1eRsAxSkgpafvhHO1/7PgNQ
-6TsuowUbKPZ8BdSXpYcsDbc94S/IljPXMjkZ6GnpKy9aju/qxCXtXRN+fsEP9zw=
-=mi7d
------END PGP SIGNATURE-----
-
---gBBFr7Ir9EOA20Yy--
+diff --git a/util/bitmap.c b/util/bitmap.c
+index 43ed011..c1a84ca 100644
+--- a/util/bitmap.c
++++ b/util/bitmap.c
+@@ -164,6 +164,8 @@ void bitmap_set(unsigned long *map, long start, long nr)
+     int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
+     unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
+ 
++    assert(start >= 0 && nr >= 0);
++
+     while (nr - bits_to_set >= 0) {
+         *p |= mask_to_set;
+         nr -= bits_to_set;
+@@ -184,6 +186,8 @@ void bitmap_set_atomic(unsigned long *map, long start, long nr)
+     int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
+     unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
+ 
++    assert(start >= 0 && nr >= 0);
++
+     /* First word */
+     if (nr - bits_to_set > 0) {
+         atomic_or(p, mask_to_set);
+@@ -221,6 +225,8 @@ void bitmap_clear(unsigned long *map, long start, long nr)
+     int bits_to_clear = BITS_PER_LONG - (start % BITS_PER_LONG);
+     unsigned long mask_to_clear = BITMAP_FIRST_WORD_MASK(start);
+ 
++    assert(start >= 0 && nr >= 0);
++
+     while (nr - bits_to_clear >= 0) {
+         *p &= ~mask_to_clear;
+         nr -= bits_to_clear;
+@@ -243,6 +249,8 @@ bool bitmap_test_and_clear_atomic(unsigned long *map, long start, long nr)
+     unsigned long dirty = 0;
+     unsigned long old_bits;
+ 
++    assert(start >= 0 && nr >= 0);
++
+     /* First word */
+     if (nr - bits_to_clear > 0) {
+         old_bits = atomic_fetch_and(p, ~mask_to_clear);
+-- 
+1.9.1
