@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUDPx-00014p-2s
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:26 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUDPs-0005Ea-7t
+	(envelope-from <pm215@archaic.org.uk>) id 1cUDPw-00014L-PW
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:21 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48208)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1cUDPr-0005Dq-I2
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:20 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48206)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cUDPr-00055o-W6
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:16 -0500
+	id 1cUDPr-0004w9-7c
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:10:15 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUDPa-00035V-Si
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:09:58 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cUDPc-000378-Nu
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:10:00 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Jan 2017 14:09:25 +0000
-Message-Id: <1484834995-26826-7-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 19 Jan 2017 14:09:29 +0000
+Message-Id: <1484834995-26826-11-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1484834995-26826-1-git-send-email-peter.maydell@linaro.org>
 References: <1484834995-26826-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 06/36] target/arm: Implement DBGVCR32_EL2 system
- register
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 10/36] aspeed/smc: autostrap CE0/1 configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +32,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The DBGVCR_EL2 system register is needed to run a 32-bit
-EL1 guest under a Linux EL2 64-bit hypervisor. Its only
-purpose is to provide AArch64 with access to the state of
-the DBGVCR AArch32 register. Since we only have a dummy
-DBGVCR, implement a corresponding dummy DBGVCR32_EL2.
+From: Cédric Le Goater <clg@kaod.org>
 
+On the AST2500 SoC, the FMC controller flash type is fixed to SPI for
+CE0 and CE1 and 4BYTE mode is autodetected for CE0.
+
+On the AST2400 SoC, the FMC controller flash type and 4BYTE mode are
+strapped with register SCU70. We use the default settings from the
+palmetto-bmc machine for now.
+
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+Message-id: 1483979087-32663-5-git-send-email-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/arm/helper.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/ssi/aspeed_smc.c | 32 +++++++++++++++++++++++++++-----
+ 1 file changed, 27 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index ba72ebb..7111c8c 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4066,6 +4066,13 @@ static const ARMCPRegInfo debug_cp_reginfo[] = {
-       .cp = 14, .opc1 = 0, .crn = 0, .crm = 7, .opc2 = 0,
-       .access = PL1_RW, .accessfn = access_tda,
-       .type = ARM_CP_NOP },
-+    /* Dummy DBGVCR32_EL2 (which is only for a 64-bit hypervisor
-+     * to save and restore a 32-bit guest's DBGVCR)
-+     */
-+    { .name = "DBGVCR32_EL2", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 2, .opc1 = 4, .crn = 0, .crm = 7, .opc2 = 0,
-+      .access = PL2_RW, .accessfn = access_tda,
-+      .type = ARM_CP_NOP },
-     /* Dummy MDCCINT_EL1, since we don't implement the Debug Communications
-      * Channel but Linux may try to access this register. The 32-bit
-      * alias is DBGDCCINT.
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 9b31d5d..3bd381b 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -39,11 +39,14 @@
+ #define   CONF_ENABLE_W2       18
+ #define   CONF_ENABLE_W1       17
+ #define   CONF_ENABLE_W0       16
+-#define   CONF_FLASH_TYPE4     9
+-#define   CONF_FLASH_TYPE3     7
+-#define   CONF_FLASH_TYPE2     5
+-#define   CONF_FLASH_TYPE1     3
+-#define   CONF_FLASH_TYPE0     1
++#define   CONF_FLASH_TYPE4     8
++#define   CONF_FLASH_TYPE3     6
++#define   CONF_FLASH_TYPE2     4
++#define   CONF_FLASH_TYPE1     2
++#define   CONF_FLASH_TYPE0     0
++#define      CONF_FLASH_TYPE_NOR   0x0
++#define      CONF_FLASH_TYPE_NAND  0x1
++#define      CONF_FLASH_TYPE_SPI   0x2
+ 
+ /* CE Control Register */
+ #define R_CE_CTRL            (0x04 / 4)
+@@ -436,6 +439,25 @@ static void aspeed_smc_reset(DeviceState *d)
+         s->regs[R_SEG_ADDR0 + i] =
+             aspeed_smc_segment_to_reg(&s->ctrl->segments[i]);
+     }
++
++    /* HW strapping for AST2500 FMC controllers  */
++    if (s->ctrl->segments == aspeed_segments_ast2500_fmc) {
++        /* flash type is fixed to SPI for CE0 and CE1 */
++        s->regs[s->r_conf] |= (CONF_FLASH_TYPE_SPI << CONF_FLASH_TYPE0);
++        s->regs[s->r_conf] |= (CONF_FLASH_TYPE_SPI << CONF_FLASH_TYPE1);
++
++        /* 4BYTE mode is autodetected for CE0. Let's force it to 1 for
++         * now */
++        s->regs[s->r_ce_ctrl] |= (1 << (CTRL_EXTENDED0));
++    }
++
++    /* HW strapping for AST2400 FMC controllers (SCU70). Let's use the
++     * configuration of the palmetto-bmc machine */
++    if (s->ctrl->segments == aspeed_segments_fmc) {
++        s->regs[s->r_conf] |= (CONF_FLASH_TYPE_SPI << CONF_FLASH_TYPE0);
++
++        s->regs[s->r_ce_ctrl] |= (1 << (CTRL_EXTENDED0));
++    }
+ }
+ 
+ static uint64_t aspeed_smc_read(void *opaque, hwaddr addr, unsigned int size)
 -- 
 2.7.4
