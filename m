@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cUGv5-00012a-3l
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:54:47 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cUH2P-0007Ji-8s
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:02:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cUGv1-0007Qo-R5
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:54:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43090)
+	(envelope-from <dgilbert@redhat.com>) id 1cUH2M-0002xY-0i
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:02:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35456)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cUGv1-0007Pt-Kc
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:54:39 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7B4E480466
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 17:54:39 +0000 (UTC)
-Date: Thu, 19 Jan 2017 10:54:37 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170119105437.5b17d979@t450s.home>
-In-Reply-To: <1484817932-14452-1-git-send-email-peterx@redhat.com>
-References: <1484817932-14452-1-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cUH2L-0002xB-PY
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 13:02:13 -0500
+Date: Thu, 19 Jan 2017 18:02:07 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170119180206.GI2085@work-vm>
+References: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
+	<1484566314-3987-3-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 0/3] vfio: allow to notify unmap for
- very big region
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484566314-3987-3-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 2/5] migration: Add a new option to
+ enable only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Thu, 19 Jan 2017 17:25:29 +0800
-Peter Xu <peterx@redhat.com> wrote:
-
-> This requirement originates from the VT-d vfio series:
+* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> Add a new option "--only-migratable" in qemu which will allow to add
+> only those devices which will not fail qemu after migration. Devices
+> set with the flag 'unmigratable' cannot be added when this option will
+> be used.
 > 
->   https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03495.html
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  include/migration/migration.h | 3 +++
+>  qemu-options.hx               | 9 +++++++++
+>  vl.c                          | 4 ++++
+>  3 files changed, 16 insertions(+)
 > 
-> The goal of this series is to allow IOMMU to notify unmap with very
-> big IOTLB range, for example, with base=0 and size=2^63-1 (to unmap
-> the whole address space).
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index c309d23..40b3697 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -38,6 +38,9 @@
+>  #define QEMU_VM_COMMAND              0x08
+>  #define QEMU_VM_SECTION_FOOTER       0x7e
+>  
+> +/* for vl.c */
+> +extern int only_migratable;
+> +
+>  struct MigrationParams {
+>      bool blk;
+>      bool shared;
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index c534a2f..1e16ae8 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3574,6 +3574,15 @@ be used to change settings (such as migration parameters) prior to issuing
+>  the migrate_incoming to allow the migration to begin.
+>  ETEXI
+>  
+> +DEF("only-migratable", 0, QEMU_OPTION_only_migratable, \
+> +    "-only-migratable     allow only migratable devices\n", QEMU_ARCH_ALL)
+> +STEXI
+> +@item -only-migratable
+> +@findex -only-migratable
+> +Only allow migratable devices. Devices will not be allowed to enter an
+> +unmigratable state.
+> +ETEXI
+> +
+>  DEF("nodefaults", 0, QEMU_OPTION_nodefaults, \
+>      "-nodefaults     don't create default devices\n", QEMU_ARCH_ALL)
+>  STEXI
+> diff --git a/vl.c b/vl.c
+> index c643d3f..cbcb459 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -180,6 +180,7 @@ bool boot_strict;
+>  uint8_t *boot_splash_filedata;
+>  size_t boot_splash_filedata_size;
+>  uint8_t qemu_extra_params_fw[2];
+> +int only_migratable; /* turn it off unless user states otherwise */
+>  
+>  int icount_align_option;
+>  
+> @@ -3910,6 +3911,9 @@ int main(int argc, char **argv, char **envp)
+>                  }
+>                  incoming = optarg;
+>                  break;
+> +            case QEMU_OPTION_only_migratable:
+> +                only_migratable = 1;
+> +                break;
+>              case QEMU_OPTION_nodefaults:
+>                  has_defaults = 0;
+>                  break;
+> -- 
+> 2.6.2
 > 
-> The first patch is a good to have, for traces.
-> 
-> The second one is a cleanup of existing code, only.
-
-Sort of, it does add some overhead to the unmap path, but you remove
-that and more in the third patch.
- 
-> The third one moves the further RAM translation and check into map
-> operation logic, so that it'll free unmap operations.
-> 
-> The series is marked as RFC since I am not sure whether this is a
-> workable way. Anyway, please review to help confirm it.
-
-It seems reasonable to me, except for the example here of using 2^63-1,
-which I expect is to work around the vfio {un}map API bug as we
-discussed on irc.  For everyone, the root of the problem is that the
-ioctls use:
-
-        __u64   iova;                           /* IO virtual address */
-        __u64   size;                           /* Size of mapping (bytes) */
-
-So we can only express a size of 2^64-1 and we have an off-by-one error
-trying to perform a map/unmap of an entire 64-bit space.  Note when
-designing an API, use start/end rather than base/size to avoid this.
-
-What I don't want to see is for this API bug to leak out into the rest
-of the QEMU code such that intel_iommu code, or iommu code in general
-subtly avoids it by artificially using a smaller range.  VT-d hardware
-has an actual physical address space of either 2^39 or 2^48 bits, so if
-you want to make the iommu address space match the device we're trying
-to emulate, that's perfectly fine.  AIUI, AMD-Vi does actually have a
-64-bit address space on the IOMMU, so to handle that case I'd expect
-the simplest solution would be to track the and mapped iova high water
-mark per container in vfio and truncate unmaps to that high water end
-address.  Realistically we're probably not going to see iovas at the end
-of the 64-bit address space, but we can come up with some other
-workaround in the vfio code or update the kernel API if we do.  Thanks,
-
-Alex
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
