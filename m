@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cUGOw-0005Fe-16
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:21:30 -0500
+	(envelope-from <unix.co@gmail.com>) id 1cUGQO-0006fB-TY
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:23:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cUGOt-0005bh-D9
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:21:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54468)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cUGOt-0005b8-6r
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:21:27 -0500
-References: <20170117010204.4909-1-ehabkost@redhat.com>
-	<309bd499-204d-df07-aa99-9a999cfecabc@linux.vnet.ibm.com>
-	<20170118170049.GB3491@thinpad.lan.raisama.net>
-	<45e82b29-1ebe-3f34-0cc1-35d60c6044da@linux.vnet.ibm.com>
-	<20170118173406.GF3491@thinpad.lan.raisama.net>
-	<fd9074e6-8b39-9139-415e-cec2a8970a5e@redhat.com>
-	<20170119104837.GL3491@thinpad.lan.raisama.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <c0d8a827-5999-51b5-73fc-aa781b77fe8f@redhat.com>
-Date: Thu, 19 Jan 2017 18:21:22 +0100
+	(envelope-from <unix.co@gmail.com>) id 1cUGQO-0006Z1-2i
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:23:00 -0500
+Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:34508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <unix.co@gmail.com>) id 1cUGQN-0006Xy-Sh
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:22:59 -0500
+Received: by mail-yw0-x244.google.com with SMTP id v73so5207966ywg.1
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:22:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170119104837.GL3491@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 0/9] i386:
- query-cpu-model-expansion test script
+In-Reply-To: <CAJSP0QUU3CgJdX6p-vAQAyAeQio3Br7grUFBRrT-N0s2F6X58g@mail.gmail.com>
+References: <CAAKRE72RN=DvVqxYMba5KdnWQ+jrAXTpxQc7Qdgiymu6oByosg@mail.gmail.com>
+	<20170118102942.GA5284@stefanha-x1.localdomain>
+	<CAAKRE70s=Cdk9xedS3xavOj9_TMRa4ZNvZqVw8jqVxVMDCM7Vg@mail.gmail.com>
+	<CAJSP0QUU3CgJdX6p-vAQAyAeQio3Br7grUFBRrT-N0s2F6X58g@mail.gmail.com>
+From: Umar Draz <unix.co@gmail.com>
+Date: Thu, 19 Jan 2017 22:22:57 +0500
+Message-ID: <CAAKRE72fjOwKs6V8MMOB-9WWv1vYidKYt3QSTZAoxEboXq2f5g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] VM Hung issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
+Yes the display is blank, and network also not responding, it means vm
+somewhere hung.
 
->> Also think about "query-cpu-model-expansion model=host type=static",
->> which will primarily be used by libvirt on s390x. There is no way to
->> expand this into a static cpu model. Faking anything will just hide errors.
-> 
-> Yes, static expansion of host model must always return an error
-> if it's not possible to expand.
-> 
->>
->> If "host" can't be expanded, QEMU has to be treated like there is no CPU
->> model support (as for older QEMU versions).
-> 
-> OK. I will propose a patch updating the query-cpu-model-expansion
-> documentation to be more explicit about it.
+On Thu, Jan 19, 2017 at 9:26 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-The only real alternative I see would be disabling the query-cpu-model-*
-interface completely if KVM support is not available.
-
-This would however mean, that the same QEMU binary would have the
-interface when running under TCG, but not when running under KVM on an
-old KVM version.
-
-That also doesn't really feel right, or what do you think?
-
--- 
-
-David
+> On Wed, Jan 18, 2017 at 10:46 AM, Umar Draz <unix.co@gmail.com> wrote:
+> > Well yes, whenever vm hung, then there is nothing on vnc display, and
+> > network of that vm is also down. I can not ping the vm that time.
+>
+> Are you saying the VNC client connects successfully to a hung VM but
+> the display is blank?
+>
+> Stefan
+>
