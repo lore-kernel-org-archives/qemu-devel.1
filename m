@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cUHyT-0002bX-Ma
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:02:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cUIGx-00044P-Kv
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:21:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cUHyP-0008CB-P2
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:02:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53544)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cUHyP-0008Bu-JP
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:02:13 -0500
-Date: Thu, 19 Jan 2017 17:02:10 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170119190210.GQ3491@thinpad.lan.raisama.net>
-References: <20170116195452.23532-1-ehabkost@redhat.com>
-	<20170119175003.GJ16641@redhat.com>
-	<CAFEAcA9HEp+-JvtA49NRUWpA2LsOOLw+SaA-knS5x9=bn89UjQ@mail.gmail.com>
-	<20170119183145.GP3491@thinpad.lan.raisama.net>
-	<20170119183836.GK16641@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cUIGw-0007e0-Mt
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:21:23 -0500
+Received: from mail-vk0-x22e.google.com ([2607:f8b0:400c:c05::22e]:34439)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cUIGw-0007dJ-In
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 14:21:22 -0500
+Received: by mail-vk0-x22e.google.com with SMTP id r136so37344362vke.1
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 11:21:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170119183836.GK16641@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
+In-Reply-To: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
+References: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Jan 2017 19:21:01 +0000
+Message-ID: <CAFEAcA8kGGfUBjNre4RDOfdf0zoAjVtbMvxxUk3MjqA9qxc3yw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/30] target-sparc sun4v support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Jan 19, 2017 at 06:38:36PM +0000, Daniel P. Berrange wrote:
-> On Thu, Jan 19, 2017 at 04:31:45PM -0200, Eduardo Habkost wrote:
-> > On Thu, Jan 19, 2017 at 06:22:40PM +0000, Peter Maydell wrote:
-> > > On 19 January 2017 at 17:50, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > > > On Mon, Jan 16, 2017 at 05:54:52PM -0200, Eduardo Habkost wrote:
-> > > >> Change the meaning of "-cpu host" to "enable all features
-> > > >> supported by the accelerator in the current host", so that it can
-> > > >> be used to enable/query all features supported by TCG.
-> > > >>
-> > > >> To make sure "host" is still at the end of the list in "-cpu
-> > > >> help", add a "ordering" field that will be used when sorting the
-> > > >> CPU model list.
-> > > >
-> > > > To be clear, "-cpu host" for TCG is not talking about the actual
-> > > > host OS feature support, right ? x86_64 TCG can be run on a ppc host,
-> > > > so presumably "-cpu host" just means "all features that this TCG binary
-> > > > is able to emulate" ?
-> > > >
-> > > > This feels like it is introducing scope for confusion vs KVM -cpu host,
-> > > > so I wonder if different naming is better for this.
-> > > 
-> > > The idea is that you do want an option that works whatever the
-> > > accelerator is, though, so as a user you don't need to worry
-> > > about messing with the command line for KVM vs TCG vs "try
-> > > KVM and fall back to TCG". (I think "-cpu best" has been thrown about
-> > > as a suggestion for this before.)
-> > 
-> > "-cpu best" has been proposed with different semantics before:
-> > one meant "select the the best CPU model from the builtin table",
-> > and another that's equivalent to the meaning of "host" in this
-> > patch.
-> > 
-> > s390x uses "max CPU model" internally to represent a CPU model
-> > that has all supported features enabled.
-> > 
-> > If "-cpu host" is not a good name, I suggest "-cpu max".
-> 
-> Yeah, I think "-cpu max" better describes the intended semantics for this
-> with TCG. I guess for KVM  -cpu host & -cpu max would be equivalent.
+On 18 January 2017 at 22:38, Artyom Tarasenko <atar4qemu@gmail.com> wrote:
+> This series adds sun4v support. Its v2 was previously submitted via Richard's tree, but produced
+> a clang warning due to a missing #ifdef.
+>
+> v2 -> v3:
+> added an #ifdef to avoid unused function warning in user mode
+>
+> The following changes since commit 23eb9e6b6d5315171cc15969bbc755f258004df0:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-01-16' into staging (2017-01-17 13:53:50 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/artyom-tarasenko/qemu/ tags/pull-sun4v-20170118
+>
+> for you to fetch changes up to a2664ca0eced57dfc9f261fa1b210f24ddac649d:
+>
+>   target-sparc: fix up niagara machine (2017-01-18 22:03:44 +0100)
+>
 
-Agreed. I will send v2 with "-cpu max".
+Applied, thanks.
 
--- 
-Eduardo
+-- PMM
