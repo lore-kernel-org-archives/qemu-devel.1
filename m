@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cU8hd-0003sD-Qm
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:08:19 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cU8hr-00044G-PF
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:08:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cU8hb-00014G-Nw
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:08:17 -0500
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:33150)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cU8hq-00019i-Kt
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:08:31 -0500
+Received: from mail-yw0-x243.google.com ([2607:f8b0:4002:c05::243]:35588)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cU8hb-00013z-Hi
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:08:15 -0500
-Received: by mail-yw0-x242.google.com with SMTP id u68so3285354ywg.0
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 01:08:15 -0800 (PST)
+	id 1cU8hq-00019M-FT
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:08:30 -0500
+Received: by mail-yw0-x243.google.com with SMTP id 17so3278027ywk.2
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 01:08:30 -0800 (PST)
 MIME-Version: 1.0
 References: <20170118161653.19296-1-eblake@redhat.com>
-	<20170118161653.19296-2-eblake@redhat.com>
-In-Reply-To: <20170118161653.19296-2-eblake@redhat.com>
+	<20170118161653.19296-4-eblake@redhat.com>
+In-Reply-To: <20170118161653.19296-4-eblake@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 19 Jan 2017 09:08:04 +0000
-Message-ID: <CAJ+F1C+R1G2UijUGkpo35jBchCoR6tQLqfPbm4n7svCayLKy=A@mail.gmail.com>
+Date: Thu, 19 Jan 2017 09:08:19 +0000
+Message-ID: <CAJ+F1CJad2iG3n0T6dTJs74XadoWF3tUyyt9dxD+AvMLeXn-5Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] pci: Use struct instead of QDict to
- pass back parameters
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] qlist: Add convenience helpers for
+ wrapped appends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +32,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: armbru@redhat.com
 
-On Wed, Jan 18, 2017 at 8:58 PM Eric Blake <eblake@redhat.com> wrote:
+Hi
 
-> It's simpler to just use a C struct than it is to bundle things
-> into a QDict in one function just to pull them back out in the
-> caller.  Plus, doing this gets rid of one more user of dynamic
-> JSON through qobject_from_jsonf().
->
+On Wed, Jan 18, 2017 at 8:34 PM Eric Blake <eblake@redhat.com> wrote:
 
-and it looks like it removes a leak
-
+> Similar to the qdict additions of the previous patch, although
+> this time there are not as many clients.
 >
 > Signed-off-by: Eric Blake <eblake@redhat.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
 >
 
+Not very useful, but why not:
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
+
 > ---
->  hw/pci/pcie_aer.c | 36 +++++++++++++++++-------------------
->  1 file changed, 17 insertions(+), 19 deletions(-)
+>  include/qapi/qmp/qlist.h |  8 ++++++++
+>  tests/check-qdict.c      | 10 +++++-----
+>  tests/check-qlist.c      |  2 +-
+>  3 files changed, 14 insertions(+), 6 deletions(-)
 >
-> diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
-> index daf1f65..78fd2c3 100644
-> --- a/hw/pci/pcie_aer.c
-> +++ b/hw/pci/pcie_aer.c
-> @@ -44,6 +44,13 @@
->  #define PCI_ERR_SRC_COR_OFFS    0
->  #define PCI_ERR_SRC_UNCOR_OFFS  2
+> diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+> index a84117e..659325a 100644
+> --- a/include/qapi/qmp/qlist.h
+> +++ b/include/qapi/qmp/qlist.h
+> @@ -29,6 +29,14 @@ typedef struct QList {
+>  #define qlist_append(qlist, obj) \
+>          qlist_append_obj(qlist, QOBJECT(obj))
 >
-> +typedef struct PCIEErrorInject {
-> +    const char *id;
-> +    const char *root_bus;
-> +    int bus;
-> +    int devfn;
-> +} PCIEErrorInject;
+> +/* Helpers for int, bool, and const char*. */
+> +#define qlist_append_int(qlist, value) \
+> +        qlist_append(qlist, qint_from_int(value))
+> +#define qlist_append_bool(qlist, value) \
+> +        qlist_append(qlist, qbool_from_bool(value))
+> +#define qlist_append_str(qlist, value) \
+> +        qlist_append(qlist, qstring_from_str(value))
 > +
->  /* From 6.2.7 Error Listing and Rules. Table 6-2, 6-3 and 6-4 */
->  static uint32_t pcie_aer_uncor_default_severity(uint32_t status)
->  {
-> @@ -943,7 +950,8 @@ static int pcie_aer_parse_error_string(const char
-> *error_name,
->  }
+>  #define QLIST_FOREACH_ENTRY(qlist, var)             \
+>          for ((var) =3D ((qlist)->head.tqh_first);     \
+>              (var);                                  \
+> diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+> index d00b411..6d4f8a7 100644
+> --- a/tests/check-qdict.c
+> +++ b/tests/check-qdict.c
+> @@ -297,11 +297,11 @@ static void qdict_flatten_test(void)
+>      qdict_put_int(dict1, "a", 0);
+>      qdict_put_int(dict1, "b", 1);
 >
->  static int do_pcie_aer_inject_error(Monitor *mon,
-> -                                    const QDict *qdict, QObject
-> **ret_data)
-> +                                    const QDict *qdict,
-> +                                    PCIEErrorInject *ret_data)
->  {
->      const char *id =3D qdict_get_str(qdict, "id");
->      const char *error_name;
-> @@ -1004,34 +1012,24 @@ static int do_pcie_aer_inject_error(Monitor *mon,
->      err.prefix[2] =3D qdict_get_try_int(qdict, "prefix2", 0);
->      err.prefix[3] =3D qdict_get_try_int(qdict, "prefix3", 0);
+> -    qlist_append_obj(list1, QOBJECT(qint_from_int(23)));
+> -    qlist_append_obj(list1, QOBJECT(qint_from_int(66)));
+> -    qlist_append_obj(list1, QOBJECT(dict1));
+> -    qlist_append_obj(list2, QOBJECT(qint_from_int(42)));
+> -    qlist_append_obj(list2, QOBJECT(list1));
+> +    qlist_append_int(list1, 23);
+> +    qlist_append_int(list1, 66);
+> +    qlist_append(list1, dict1);
+> +    qlist_append_int(list2, 42);
+> +    qlist_append(list2, list1);
 >
-> -    ret =3D pcie_aer_inject_error(dev, &err);
-> -    *ret_data =3D qobject_from_jsonf("{'id': %s, "
-> -                                   "'root_bus': %s, 'bus': %d, 'devfn':
-> %d, "
-> -                                   "'ret': %d}",
-> -                                   id, pci_root_bus_path(dev),
-> -                                   pci_bus_num(dev->bus), dev->devfn,
-> -                                   ret);
-> -    assert(*ret_data);
-> +    pcie_aer_inject_error(dev, &err);
-> +    ret_data->id =3D id;
-> +    ret_data->root_bus =3D pci_root_bus_path(dev);
-> +    ret_data->bus =3D pci_bus_num(dev->bus);
-> +    ret_data->devfn =3D dev->devfn;
+>      qdict_put_int(dict2, "c", 2);
+>      qdict_put_int(dict2, "d", 3);
+> diff --git a/tests/check-qlist.c b/tests/check-qlist.c
+> index e16da5e..38463f1 100644
+> --- a/tests/check-qlist.c
+> +++ b/tests/check-qlist.c
+> @@ -74,7 +74,7 @@ static void qlist_destroy_test(void)
+>      qlist =3D qlist_new();
 >
->      return 0;
->  }
+>      for (i =3D 0; i < 42; i++)
+> -        qlist_append(qlist, qint_from_int(i));
+> +        qlist_append_int(qlist, i);
 >
->  void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
->  {
-> -    QObject *data;
-> -    int devfn;
-> +    PCIEErrorInject data;
->
->      if (do_pcie_aer_inject_error(mon, qdict, &data) < 0) {
->          return;
->      }
->
-> -    assert(qobject_type(data) =3D=3D QTYPE_QDICT);
-> -    qdict =3D qobject_to_qdict(data);
-> -
-> -    devfn =3D (int)qdict_get_int(qdict, "devfn");
->      monitor_printf(mon, "OK id: %s root bus: %s, bus: %x devfn: %x.%x\n"=
-,
-> -                   qdict_get_str(qdict, "id"),
-> -                   qdict_get_str(qdict, "root_bus"),
-> -                   (int) qdict_get_int(qdict, "bus"),
-> -                   PCI_SLOT(devfn), PCI_FUNC(devfn));
-> +                   data.id, data.root_bus, data.bus,
-> +                   PCI_SLOT(data.devfn), PCI_FUNC(data.devfn));
+>      QDECREF(qlist);
 >  }
 > --
 > 2.9.3
