@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <unix.co@gmail.com>) id 1cUGQO-0006fB-TY
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:23:01 -0500
+	(envelope-from <david@redhat.com>) id 1cUGSS-0000Jv-7o
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:25:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <unix.co@gmail.com>) id 1cUGQO-0006Z1-2i
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:23:00 -0500
-Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:34508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <unix.co@gmail.com>) id 1cUGQN-0006Xy-Sh
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:22:59 -0500
-Received: by mail-yw0-x244.google.com with SMTP id v73so5207966ywg.1
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:22:58 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1cUGSO-0007m2-Cf
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:25:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cUGSO-0007ln-60
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 12:25:04 -0500
+References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
+	<2a32f616-25a8-ba5a-f74c-d619fc8ab333@redhat.com>
+	<20170118173139-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <b11c5cbe-6c63-e9dc-0313-e2dff3830951@redhat.com>
+Date: Thu, 19 Jan 2017 18:24:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QUU3CgJdX6p-vAQAyAeQio3Br7grUFBRrT-N0s2F6X58g@mail.gmail.com>
-References: <CAAKRE72RN=DvVqxYMba5KdnWQ+jrAXTpxQc7Qdgiymu6oByosg@mail.gmail.com>
-	<20170118102942.GA5284@stefanha-x1.localdomain>
-	<CAAKRE70s=Cdk9xedS3xavOj9_TMRa4ZNvZqVw8jqVxVMDCM7Vg@mail.gmail.com>
-	<CAJSP0QUU3CgJdX6p-vAQAyAeQio3Br7grUFBRrT-N0s2F6X58g@mail.gmail.com>
-From: Umar Draz <unix.co@gmail.com>
-Date: Thu, 19 Jan 2017 22:22:57 +0500
-Message-ID: <CAAKRE72fjOwKs6V8MMOB-9WWv1vYidKYt3QSTZAoxEboXq2f5g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] VM Hung issue
+In-Reply-To: <20170118173139-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 kernel 0/5] Extend virtio-balloon for
+ fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Liang Li <liang.z.li@intel.com>, kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, amit.shah@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, aarcange@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 
-Yes the display is blank, and network also not responding, it means vm
-somewhere hung.
 
-On Thu, Jan 19, 2017 at 9:26 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> As long as the interface is similar, it seems to make
+> sense for me - why invent a completely new device that
+> looks very much like the old one?
 
-> On Wed, Jan 18, 2017 at 10:46 AM, Umar Draz <unix.co@gmail.com> wrote:
-> > Well yes, whenever vm hung, then there is nothing on vnc display, and
-> > network of that vm is also down. I can not ping the vm that time.
->
-> Are you saying the VNC client connects successfully to a hung VM but
-> the display is blank?
->
-> Stefan
->
+The only reason would be that this feature could be used independently
+of virtio-balloon. But this would of course only be the case, if
+ballooning is strictly not wanted in a configuration, or the current
+balloon driver gets replaced by an alternative solution.
+
+I don't have any strong feelings about this, just wanted to double check.
+
+Thanks,
+
+David
+
+> 
+> So this boils down to whether the speedup patches are merged.
+> 
+> 
+>> -- 
+>>
+>> David
