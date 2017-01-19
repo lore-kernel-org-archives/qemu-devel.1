@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUEBo-00019X-18
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:59:49 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cUEGP-0005Cn-Eu
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:04:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUEBn-00070M-7P
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:59:48 -0500
-References: <1477926350-15869-1-git-send-email-ashijeetacharya@gmail.com>
-	<20161031172022.GD12558@noname.redhat.com>
-	<50472f2d-4a71-5f6b-1037-bbefd2d8f4f4@kamp.de>
-	<20170118095952.GA5258@noname.str.redhat.com>
-	<566d163c-eb70-718f-b04b-a86d6370a007@kamp.de>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <43209b10-7760-8df6-d5a9-d6b66bebc292@redhat.com>
-Date: Thu, 19 Jan 2017 08:59:38 -0600
+	(envelope-from <imammedo@redhat.com>) id 1cUEGL-0000jx-Bd
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:04:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46182)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cUEGL-0000jV-42
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:04:29 -0500
+Date: Thu, 19 Jan 2017 16:04:23 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170119160423.761d2c57@nial.brq.redhat.com>
+In-Reply-To: <20170118185713.GK3491@thinpad.lan.raisama.net>
+References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
+	<1484759609-264075-9-git-send-email-imammedo@redhat.com>
+	<20170118185713.GK3491@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <566d163c-eb70-718f-b04b-a86d6370a007@kamp.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="UBVoRtaW3dBv1ivxw6oHOG39kQ05JI611"
-Subject: Re: [Qemu-devel] [PATCH v6 0/2] allow blockdev-add for NFS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 08/13] pc: add writeonly 'cpu' property to
+ PCMachine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +29,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
-Cc: Ashijeet Acharya <ashijeetacharya@gmail.com>, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UBVoRtaW3dBv1ivxw6oHOG39kQ05JI611
-From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
-Cc: Ashijeet Acharya <ashijeetacharya@gmail.com>, jcody@redhat.com,
- mreitz@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <43209b10-7760-8df6-d5a9-d6b66bebc292@redhat.com>
-Subject: Re: [PATCH v6 0/2] allow blockdev-add for NFS
-References: <1477926350-15869-1-git-send-email-ashijeetacharya@gmail.com>
- <20161031172022.GD12558@noname.redhat.com>
- <50472f2d-4a71-5f6b-1037-bbefd2d8f4f4@kamp.de>
- <20170118095952.GA5258@noname.str.redhat.com>
- <566d163c-eb70-718f-b04b-a86d6370a007@kamp.de>
-In-Reply-To: <566d163c-eb70-718f-b04b-a86d6370a007@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 18 Jan 2017 16:57:13 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-On 01/19/2017 08:30 AM, Peter Lieven wrote:
->>> qemu-img: Could not open
->>> 'nfs://172.21.200.61/vcore-dev-cdrom/templates/VC_debian8-20170116.qc=
-ow2,linux?readahead=3D131072':
->>> Block protocol 'nfs' doesn't support the option 'readahead-size'
->>>
->>> Please let me know if the below fix would be correct:
->> No, this needs to be fixed the other way round: runtime_opts must use
->> the names as specified in the schema, and nfs_client_open() must acces=
-s
->> them as such. Without that, blockdev-add can't work (and the command
->> line only with the "wrong" old option names from the URL, whereas it
->> should be using the same names as the QAPI schema).
->=20
-> Shouldn't we support both for backwards compatiblity.?
+> On Wed, Jan 18, 2017 at 06:13:24PM +0100, Igor Mammedov wrote:
+> > it will allow generic numa code to set cpu to numa node mapping
+> > in target independent manner in the next patch.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  hw/i386/pc.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 56 insertions(+)
+> > 
+> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > index f8ea635..1d33a5e 100644
+> > --- a/hw/i386/pc.c
+> > +++ b/hw/i386/pc.c
+> > @@ -2201,6 +2201,56 @@ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
+> >      pcms->pit = value;
+> >  }
+> >  
+> > +static void pc_machine_set_cpu(Object *obj, Visitor *v, const char *name,
+> > +                               void *opaque, Error **errp)
+> > +{
+> > +    uint32_t apic_id;
+> > +    X86CPUTopoInfo topo;
+> > +    CPUArchId *cpu_slot;
+> > +    Error *local_err = NULL;
+> > +    CpuInstanceProperties *cpu_props = NULL;
+> > +    PCMachineState *pcms = PC_MACHINE(obj);
+> > +    MachineClass *mc = MACHINE_GET_CLASS(obj);
+> > +
+> > +    visit_type_CpuInstanceProperties(v, name, &cpu_props, &local_err);
+> > +    if (local_err) {
+> > +        goto out;
+> > +    }
+> > +
+> > +    if (!cpu_props->has_node_id) {
+> > +        error_setg(&local_err, "node-id property is not specified");
+> > +        goto out;
+> > +    }
+> > +
+> > +    /*
+> > +     * make sure that possible_cpus is initialized
+> > +     * as property setter might be called before machine init is called
+> > +     */
+> > +    mc->possible_cpu_arch_ids(MACHINE(obj));
+> > +
+> > +    topo.pkg_id = cpu_props->socket_id;
+> > +    topo.core_id = cpu_props->core_id;
+> > +    topo.smt_id = cpu_props->thread_id;
+> > +    apic_id = apicid_from_topo_ids(smp_cores, smp_threads, &topo);
+> > +    cpu_slot = pc_find_cpu_slot(pcms, apic_id, NULL);  
+> 
+> If we make TYPE_MACHINE provide an API to query CPU slots, e.g.:
+>   CPUArchId *machine_find_cpu_slot(MachineState *m, CpuInstanceProperties *props)
+so if there is no objections, 
+I'll move possible_cpus to MachineState
+and add to MachineClass above callback so target machine
+would be able to provide arch specific lookup function.
+it should work for both x86 and ARM.
 
-blockdev-add only needs to support the modern naming.  But yes,
-preserving back-compat spelling of the command-line spellings, as well
-as matching blockdev-add spellings, is desirable.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
 
 
---UBVoRtaW3dBv1ivxw6oHOG39kQ05JI611
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>   CPUArchId *machine_slot_for_cpu(MachineState *m, CPUState *cpu)
+probably won't work for SPAPR where they have cores,
+machine_find_cpu_slot() alone might be sufficient.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYgNRaAAoJEKeha0olJ0NqQigH/jKQN8NvLirjLTD8wPtkU5WU
-Zd/EMLl5SDTe3+gpIO+RzhM95y1UvT3yFYgSj0TZ2mdBlWd2IROiUmNAHUjUzrz0
-nIceusdZk/M7mL+9g0Ya+xWJnAaDjdOKgaOY9LMDI0VnyxSfoK5RHhSQXFNNmve4
-hU4uXf1QJAQfD8473qh7hAdDmwA3ExwTmLxnwpvqfyWoSy+x0ED1Ss5RB1dBfk/2
-+3EMBvOY/md7vBSA+fYXwdjkodfe5RXpR2G5Ud4XHIUpHFtLgsK2+PM6SdclOQeP
-PisYJvduI5IMduo6jllhSkrx5LzCynR4o57HKdU3ZPSgs/rdLAkiPdCR8uEikEM=
-=PdBe
------END PGP SIGNATURE-----
+> (Which can probably be implemented using
+> MachineClass::possible_cpu_arch_ids(), already)
+> 
+> Then this function could be implemented in a generic way, and all
+> existing calls of:
+>   numa_get_node_for_cpu(cpu->cpu_index)
+> could be easily replaced by:
+>   machine_slot_for_cpu(cpu)->props.node_id
+most of such places could be replaced directly by plain
+cpu->node_id
 
---UBVoRtaW3dBv1ivxw6oHOG39kQ05JI611--
+> 
+> This should make it easier to get rid numa_info[].node_cpu.
+
+PS:
+Adding Bharata to CC so SPAPR side could voice their opinion.
+
+
+> > +    if (!cpu_slot) {
+> > +        error_setg(&local_err, "unable to find CPU");
+> > +        goto out;
+> > +    }
+> > +
+> > +    if (cpu_slot->props.has_node_id) {
+> > +        error_setg(&local_err, "CPU has already been assigned to node: %"PRId64,
+> > +                   cpu_slot->props.node_id);
+> > +        goto out;
+> > +    }
+> > +    cpu_slot->props.has_node_id = true;
+> > +    cpu_slot->props.node_id = cpu_props->node_id;
+> > +
+> > + out:
+> > +    error_propagate(errp, local_err);
+> > +    qapi_free_CpuInstanceProperties(cpu_props);
+> > +}
+> > +
+> >  static void pc_machine_initfn(Object *obj)
+> >  {
+> >      PCMachineState *pcms = PC_MACHINE(obj);
+> > @@ -2395,6 +2445,12 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+> >  
+> >      object_class_property_add_bool(oc, PC_MACHINE_PIT,
+> >          pc_machine_get_pit, pc_machine_set_pit, &error_abort);
+> > +
+> > +    object_class_property_add(oc, "cpu", "CpuInstanceProperties",
+> > +        NULL, pc_machine_set_cpu,
+> > +        NULL, NULL, &error_abort);
+> > +    object_class_property_set_description(oc, "cpu",
+> > +        "Possible cpu placement", &error_abort);
+> >  }
+> >  
+> >  static const TypeInfo pc_machine_info = {
+> > -- 
+> > 2.7.4
+> >   
+> 
