@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cU2oZ-0008Oz-4Q
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 21:51:03 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cU2ou-00007B-24
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 21:51:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cU2oY-0004cA-DA
-	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 21:51:03 -0500
-References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1480926904-17596-2-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170113134148.GC10706@stefanha-x1.localdomain>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <5880296B.7080709@huawei.com>
-Date: Thu, 19 Jan 2017 10:50:19 +0800
+	(envelope-from <jasowang@redhat.com>) id 1cU2oq-0004it-Rp
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 21:51:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34152)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cU2oq-0004iW-JH
+	for qemu-devel@nongnu.org; Wed, 18 Jan 2017 21:51:20 -0500
+References: <1484026704-28027-1-git-send-email-mst@redhat.com>
+	<1484026704-28027-9-git-send-email-mst@redhat.com>
+	<2163e04a-68cb-6c49-61bf-71c9e32e0487@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b9d04ac2-1978-1821-abdf-d73ef80276e4@redhat.com>
+Date: Thu, 19 Jan 2017 10:50:59 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170113134148.GC10706@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v2 1/6] docs/block-replication: Add
- description for shared-disk case
+In-Reply-To: <2163e04a-68cb-6c49-61bf-71c9e32e0487@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
+ descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +29,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 2017/1/13 21:41, Stefan Hajnoczi wrote:
-> On Mon, Dec 05, 2016 at 04:34:59PM +0800, zhanghailiang wrote:
->> +Issue qmp command:
->> +  { 'execute': 'blockdev-add',
->> +    'arguments': {
->> +        'driver': 'replication',
->> +        'node-name': 'rep',
->> +        'mode': 'primary',
->> +        'shared-disk-id': 'primary_disk0',
->> +        'shared-disk': true,
->> +        'file': {
->> +            'driver': 'nbd',
->> +            'export': 'hidden_disk0',
->> +            'server': {
->> +                'type': 'inet',
->> +                'data': {
->> +                    'host': 'xxx.xxx.xxx.xxx',
->> +                    'port': 'yyy'
->> +                }
->> +            }
+
+
+On 2017=E5=B9=B401=E6=9C=8818=E6=97=A5 20:19, Paolo Bonzini wrote:
 >
-> block/nbd.c does have good error handling and recovery in case there is
-> a network issue.  There are no reconnection attempts or timeouts that
-> deal with a temporary loss of network connectivity.
+> On 10/01/2017 06:39, Michael S. Tsirkin wrote:
+>> From: Jason Wang <jasowang@redhat.com>
+>>
+>> This patch enables device IOTLB support for intel iommu. The major
+>> work is to implement QI device IOTLB descriptor processing and notify
+>> the device through iommu notifier.
+>>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Richard Henderson <rth@twiddle.net>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>> Reviewed-by: Peter Xu <peterx@redhat.com>
+>> ---
+>>   hw/i386/intel_iommu_internal.h | 13 ++++++-
+>>   include/hw/i386/x86-iommu.h    |  1 +
+>>   hw/i386/intel_iommu.c          | 83 ++++++++++++++++++++++++++++++++=
++++++++---
+>>   hw/i386/x86-iommu.c            | 17 +++++++++
+>>   4 files changed, 107 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_inte=
+rnal.h
+>> index 11abfa2..356f188 100644
+>> --- a/hw/i386/intel_iommu_internal.h
+>> +++ b/hw/i386/intel_iommu_internal.h
+>> @@ -183,6 +183,7 @@
+>>   /* (offset >> 4) << 8 */
+>>   #define VTD_ECAP_IRO                (DMAR_IOTLB_REG_OFFSET << 4)
+>>   #define VTD_ECAP_QI                 (1ULL << 1)
+>> +#define VTD_ECAP_DT                 (1ULL << 2)
+>>   /* Interrupt Remapping support */
+>>   #define VTD_ECAP_IR                 (1ULL << 3)
+>>   #define VTD_ECAP_EIM                (1ULL << 4)
+>> @@ -326,6 +327,7 @@ typedef union VTDInvDesc VTDInvDesc;
+>>   #define VTD_INV_DESC_TYPE               0xf
+>>   #define VTD_INV_DESC_CC                 0x1 /* Context-cache Invalid=
+ate Desc */
+>>   #define VTD_INV_DESC_IOTLB              0x2
+>> +#define VTD_INV_DESC_DEVICE             0x3
+>>   #define VTD_INV_DESC_IEC                0x4 /* Interrupt Entry Cache
+>>                                                  Invalidate Descriptor=
+ */
+>>   #define VTD_INV_DESC_WAIT               0x5 /* Invalidation Wait Des=
+criptor */
+>> @@ -361,6 +363,13 @@ typedef union VTDInvDesc VTDInvDesc;
+>>   #define VTD_INV_DESC_IOTLB_RSVD_LO      0xffffffff0000ff00ULL
+>>   #define VTD_INV_DESC_IOTLB_RSVD_HI      0xf80ULL
+>>  =20
+>> +/* Mask for Device IOTLB Invalidate Descriptor */
+>> +#define VTD_INV_DESC_DEVICE_IOTLB_ADDR(val) ((val) & 0xfffffffffffff0=
+00ULL)
+>> +#define VTD_INV_DESC_DEVICE_IOTLB_SIZE(val) ((val) & 0x1)
+>> +#define VTD_INV_DESC_DEVICE_IOTLB_SID(val) (((val) >> 32) & 0xFFFFULL=
+)
+>> +#define VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI 0xffeULL
+>> +#define VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
+>> +
+>>   /* Information about page-selective IOTLB invalidate */
+>>   struct VTDIOTLBPageInvInfo {
+>>       uint16_t domain_id;
+>> @@ -399,8 +408,8 @@ typedef struct VTDRootEntry VTDRootEntry;
+>>   #define VTD_CONTEXT_ENTRY_FPD       (1ULL << 1) /* Fault Processing =
+Disable */
+>>   #define VTD_CONTEXT_ENTRY_TT        (3ULL << 2) /* Translation Type =
+*/
+>>   #define VTD_CONTEXT_TT_MULTI_LEVEL  0
+>> -#define VTD_CONTEXT_TT_DEV_IOTLB    1
+>> -#define VTD_CONTEXT_TT_PASS_THROUGH 2
+>> +#define VTD_CONTEXT_TT_DEV_IOTLB    (1ULL << 2)
+>> +#define VTD_CONTEXT_TT_PASS_THROUGH (2ULL << 2)
+>>   /* Second Level Page Translation Pointer*/
+>>   #define VTD_CONTEXT_ENTRY_SLPTPTR   (~0xfffULL)
+>>   #define VTD_CONTEXT_ENTRY_RSVD_LO   (0xff0ULL | ~VTD_HAW_MASK)
+>> diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
+>> index 0c89d98..361c07c 100644
+>> --- a/include/hw/i386/x86-iommu.h
+>> +++ b/include/hw/i386/x86-iommu.h
+>> @@ -73,6 +73,7 @@ typedef struct IEC_Notifier IEC_Notifier;
+>>   struct X86IOMMUState {
+>>       SysBusDevice busdev;
+>>       bool intr_supported;        /* Whether vIOMMU supports IR */
+>> +    bool dt_supported;          /* Whether vIOMMU supports DT */
+>>       IommuType type;             /* IOMMU type - AMD/Intel     */
+>>       QLIST_HEAD(, IEC_Notifier) iec_notifiers; /* IEC notify list */
+>>   };
+>> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+>> index e39b764..ec62239 100644
+>> --- a/hw/i386/intel_iommu.c
+>> +++ b/hw/i386/intel_iommu.c
+>> @@ -738,11 +738,18 @@ static int vtd_dev_to_context_entry(IntelIOMMUSt=
+ate *s, uint8_t bus_num,
+>>                       "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+>>                       ce->hi, ce->lo);
+>>           return -VTD_FR_CONTEXT_ENTRY_INV;
+>> -    } else if (ce->lo & VTD_CONTEXT_ENTRY_TT) {
+>> -        VTD_DPRINTF(GENERAL, "error: unsupported Translation Type in =
+"
+>> -                    "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+>> -                    ce->hi, ce->lo);
+>> -        return -VTD_FR_CONTEXT_ENTRY_INV;
+>> +    } else {
+>> +        switch (ce->lo & VTD_CONTEXT_ENTRY_TT) {
+>> +        case VTD_CONTEXT_TT_MULTI_LEVEL:
+>> +            /* fall through */
+>> +        case VTD_CONTEXT_TT_DEV_IOTLB:
+>> +            break;
+>> +        default:
+>> +            VTD_DPRINTF(GENERAL, "error: unsupported Translation Type=
+ in "
+>> +                        "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+>> +                        ce->hi, ce->lo);
+>> +            return -VTD_FR_CONTEXT_ENTRY_INV;
+>> +        }
+>>       }
+>>       return 0;
+>>   }
+>> @@ -1438,7 +1445,61 @@ static bool vtd_process_inv_iec_desc(IntelIOMMU=
+State *s,
+>>       vtd_iec_notify_all(s, !inv_desc->iec.granularity,
+>>                          inv_desc->iec.index,
+>>                          inv_desc->iec.index_mask);
+>> +    return true;
+>> +}
+>> +
+>> +static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
+>> +                                          VTDInvDesc *inv_desc)
+>> +{
+>> +    VTDAddressSpace *vtd_dev_as;
+>> +    IOMMUTLBEntry entry;
+>> +    struct VTDBus *vtd_bus;
+>> +    hwaddr addr;
+>> +    uint64_t sz;
+>> +    uint16_t sid;
+>> +    uint8_t devfn;
+>> +    bool size;
+>> +    uint8_t bus_num;
+>> +
+>> +    addr =3D VTD_INV_DESC_DEVICE_IOTLB_ADDR(inv_desc->hi);
+>> +    sid =3D VTD_INV_DESC_DEVICE_IOTLB_SID(inv_desc->lo);
+>> +    devfn =3D sid & 0xff;
+>> +    bus_num =3D sid >> 8;
+>> +    size =3D VTD_INV_DESC_DEVICE_IOTLB_SIZE(inv_desc->hi);
+>> +
+>> +    if ((inv_desc->lo & VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO) ||
+>> +        (inv_desc->hi & VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI)) {
+>> +        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in Devic=
+e "
+>> +                    "IOTLB Invalidate Descriptor hi 0x%"PRIx64 " lo 0=
+x%"PRIx64,
+>> +                    inv_desc->hi, inv_desc->lo);
+>> +        return false;
+>> +    }
+>> +
+>> +    vtd_bus =3D vtd_find_as_from_bus_num(s, bus_num);
+>> +    if (!vtd_bus) {
+>> +        goto done;
+>> +    }
+>> +
+>> +    vtd_dev_as =3D vtd_bus->dev_as[devfn];
+>> +    if (!vtd_dev_as) {
+>> +        goto done;
+>> +    }
+>> +
+>> +    if (size) {
+>> +        sz =3D 1 << (ctz64(~(addr | (VTD_PAGE_MASK_4K - 1))) + 1);
+> This should be 1ULL.
+
+Yes.
+
+>    It could also be converted to cto64:
 >
-> This is a general problem with block/nbd.c and not something to solve in
-> this patch series.  I'm just mentioning it because it may affect COLO
-> replication.
+> (VTD_PAGE_SIZE * 2) << cto64(addr >> VTD_PAGE_SHIFT)
 >
-> I'm sure these limitations in block/nbd.c can be fixed but it will take
-> some effort.  Maybe block/sheepdog.c, net/socket.c, and other network
-> code could also benefit from generic network connection recovery.
+> Here, I'm shifting addr right to avoid the case of an addr that is all =
+ones.
 >
-
-Hmm, good suggestion, but IMHO, here, COLO is a little different from
-other scenes, if the reconnection method has been implemented,
-it still needs a mechanism to identify the temporary loss of network
-connection or real broken in network connection.
-
-I did a simple test, just ifconfig down the network card that be used
-by block replication, It seems that NBD in qemu doesn't has a ability to
-find the connection has been broken, there was no error reports
-and COLO just got stuck in vm_stop() where it called aio_poll().
-
-Thanks,
-Hailiang
-
-
-
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> It probably could use a comment too. :)  The examples in table 2-4 of
+> the PCIe ATS specification are useful:
 >
+> 	S =3D 0, bits 15:12 =3D xxxx     range size: 4K
+> 	S =3D 1, bits 15:12 =3D xxx0     range size: 8K
+> 	S =3D 1, bits 15:12 =3D xx01     range size: 16K
+> 	S =3D 1, bits 15:12 =3D x011     range size: 32K
+> 	S =3D 1, bits 15:12 =3D 0111     range size: 64K
+>
+>          and so on
+
+This seems simpler let me add them comment and convert it to cto64.
+
+>
+>> +        addr &=3D ~(sz - 1);
+>> +    } else {
+>> +        sz =3D VTD_PAGE_SIZE;
+>> +    }
+>>  =20
+>> +    entry.target_as =3D &vtd_dev_as->as;
+>> +    entry.addr_mask =3D sz - 1;
+>> +    entry.iova =3D addr;
+> If S=3D1, entry.iova must mask away the 1 bits that specified the size.
+> For example,
+>
+>       addr =3D 0xabcd1000
+>
+> has cto64(0xabcd1) =3D=3D 1, so it indicates a 16K invalidation from
+> 0xabcd0000 to 0xabcd3fff.  The "1" must be masked away with "addr & -sz=
+"
+> or "addr & ~entry.addr_mask".
+>
+> Thanks,
+>
+> Paolo
+
+Good catch.
+
+Let me fix it.
+
+Thanks
