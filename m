@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50690)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUDed-0005Uv-Co
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:25:35 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51624)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1cUDjF-0001L5-FC
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:30:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUDea-0005Ih-6k
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:25:31 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cUDea-0005IL-1O
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:25:28 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cUDeY-00027L-Vk
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:25:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ED9962E80BF
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 14:25:26 +0000 (UTC)
+	(envelope-from <pl@kamp.de>) id 1cUDjB-00085D-Ck
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:30:17 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:34448 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cUDjB-00081I-3x
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 09:30:13 -0500
+References: <1477926350-15869-1-git-send-email-ashijeetacharya@gmail.com>
+	<20161031172022.GD12558@noname.redhat.com>
+	<50472f2d-4a71-5f6b-1037-bbefd2d8f4f4@kamp.de>
+	<20170118095952.GA5258@noname.str.redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <566d163c-eb70-718f-b04b-a86d6370a007@kamp.de>
+Date: Thu, 19 Jan 2017 15:30:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Jan 2017 14:15:30 -0000
-From: Thomas Huth <1422285@bugs.launchpad.net>
-Reply-To: Bug 1422285 <1422285@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150216084539.20665.82421.malonedeb@wampee.canonical.com>
-Message-Id: <20170119141532.19993.2653.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1422285] Re: The guest will be destroyed when hot
- plug the VF to guest for the second time.
+In-Reply-To: <20170118095952.GA5258@noname.str.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 0/2] allow blockdev-add for NFS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,85 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Ashijeet Acharya <ashijeetacharya@gmail.com>, eblake@redhat.com, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+Am 18.01.2017 um 10:59 schrieb Kevin Wolf:
+> Am 17.01.2017 um 16:14 hat Peter Lieven geschrieben:
+>> Am 31.10.2016 um 18:20 schrieb Kevin Wolf:
+>>> Am 31.10.2016 um 16:05 hat Ashijeet Acharya geschrieben:
+>>>> Previously posted series patches:
+>>>> v5: https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07580.html
+>>>> v4: https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07449.html
+>>>> v3: https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg06903.html
+>>>> v2: https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg05844.html
+>>>> v1: https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg04487.html
+>>>>
+>>>> This series adds blockdev-add support for NFS block driver.
+>>> Thanks, fixed as commented on patch 1 and applied.
+>> Hi,
+>>
+>> it seems this series breaks passing options via URI.
+>>
+>> 1) in nfs_parse_uri
+>>
+>> parse_uint_full(qp->p[i].value, NULL, 0)
+>>
+>> segfaults, as the routine wants to set *NULL = val.
+> Yes, you're right.
+>
+>> 2) all parameters that have a different names in options and qdict
+>> e.g. readahead-size vs. readahead cannot be passed via URI.
+>>
+>> $ qemu-img convert -p nfs://172.21.200.61/templates/VC_debian8-20170116.qcow2,linux\?readahead=131072 iscsi://172.21.200.56:3260/iqn.2001-05.com.equallogic:0-8a0906-69d384e0a-aa3004e55e15878d-XXX/0
+>>
+>> qemu-img: Could not open 'nfs://172.21.200.61/vcore-dev-cdrom/templates/VC_debian8-20170116.qcow2,linux?readahead=131072': Block protocol 'nfs' doesn't support the option 'readahead-size'
+>>
+>> Please let me know if the below fix would be correct:
+> No, this needs to be fixed the other way round: runtime_opts must use
+> the names as specified in the schema, and nfs_client_open() must access
+> them as such. Without that, blockdev-add can't work (and the command
+> line only with the "wrong" old option names from the URL, whereas it
+> should be using the same names as the QAPI schema).
 
--- =
+Shouldn't we support both for backwards compatiblity.?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1422285
-
-Title:
-  The guest will be destroyed when hot plug the VF to guest for the
-  second time.
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Environment:
-  ------------
-  Host OS (ia32/ia32e/IA64):ia32e
-  Guest OS (ia32/ia32e/IA64):ia32e
-  Guest OS Type (Linux/Windows):linux
-  kvm.git Commit: 6557bada461afeaa920a189fae2cff7c8fdce39f
-  qemu.kvm Commit: cd2d5541271f1934345d8ca42f5fafff1744eee7
-  Host Kernel Version:3.19.0-rc3
-  Hardware:Haswell_EP,Ivytown_EP
-
-  =
-
-  Bug detailed description:
-  --------------------------
-  create guest , then hot plug the VF to the guest for the second time, the=
- guest will be destroyed.
-
-  note:
-  1. hot plug the device to guest with vfio, the guest works fine
-  2.this should be a qemu bug:
-  kvm      +  qemu     =3D result
-  6557bada +  cd2d5541 =3D bad
-  6557bada +  a805ca54 =3D good
-
-  =
-
-  Reproduce steps:
-  ----------------
-  1. qemu-system-x86_64 -enable-kvm -m 2G -net none -monitor pty rhel6u5.qc=
-ow
-  2. echo "device_add pci-assign,host=3D03:10.1,id=3Dnic" >/dev/pts/2
-  3. cat /dev/pts/2 &
-  4. echo "device_del nic" >/dev/pts/2
-  5. echo "device_add pci-assign,host=3D03:10.0,id=3Dnic" >/dev/pts/2
-
-  Current result:
-  ----------------
-  guest will be destroyed when hot plug the vf to guest for the second time.
-
-  Expected result:
-  ----------------
-  guest works fine when hot plug the vf to guest for the second time
-
-  Basic root-causing log:
-  ----------------------
-  [root@vt-hsw2 cathy]# qemu-system-x86_64 -enable-kvm -m 2G -net none -mon=
-itor pty rhel6u5.qcow =
-
-  char device redirected to /dev/pts/2 (label compat_monitor0)
-  Segmentation fault (core dumped)
-
-  =
-
-  some dmesg log:
-
-  pci-stub 0000:03:10.1: kvm deassign device
-  pci-stub 0000:03:10.1: enabling device (0000 -> 0002)
-  qemu-system-x86[9894]: segfault at 0 ip           (null) sp 00007fa73df0c=
-ae8 error 14
-  pci-stub 0000:03:10.1: kvm assign device
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1422285/+subscriptions
+Peter
