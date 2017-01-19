@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45480)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1cUF6Y-0001CP-EU
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:58:30 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50454)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <bounces@canonical.com>) id 1cUFJR-00033y-GK
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1cUF6T-0002sQ-Kq
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:58:26 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:42637 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cUF6T-0002qr-BI
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:58:21 -0500
-References: <1477926350-15869-1-git-send-email-ashijeetacharya@gmail.com>
-	<20161031172022.GD12558@noname.redhat.com>
-	<50472f2d-4a71-5f6b-1037-bbefd2d8f4f4@kamp.de>
-	<20170118095952.GA5258@noname.str.redhat.com>
-	<566d163c-eb70-718f-b04b-a86d6370a007@kamp.de>
-	<43209b10-7760-8df6-d5a9-d6b66bebc292@redhat.com>
-	<20170119152029.GA5443@noname.redhat.com>
-	<772ba40f-7748-6d6a-8d7f-28ebeab14ff4@kamp.de>
-	<20170119154202.GB5443@noname.redhat.com>
-	<314bb7a6-3c9e-c259-469c-20acfa20c144@kamp.de>
-	<20170119155559.GC5443@noname.redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <97063398-5dab-a17f-253d-c0be1c34cfa8@kamp.de>
-Date: Thu, 19 Jan 2017 16:58:18 +0100
+	(envelope-from <bounces@canonical.com>) id 1cUFJN-0001Ah-9r
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cUFJN-0001AU-1W
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 11:11:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cUFJL-0005Cl-9g
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 16:11:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3D2EA2E80C0
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 16:11:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170119155559.GC5443@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 0/2] allow blockdev-add for NFS
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Jan 2017 16:03:59 -0000
+From: Launchpad Bug Tracker <1626972@bugs.launchpad.net>
+Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
+Message-Id: <20170119160404.26132.1105.malone@ackee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
+ change for security drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,56 +37,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Ashijeet Acharya <ashijeetacharya@gmail.com>, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-Am 19.01.2017 um 16:55 schrieb Kevin Wolf:
-> Am 19.01.2017 um 16:44 hat Peter Lieven geschrieben:
->> Am 19.01.2017 um 16:42 schrieb Kevin Wolf:
->>> Am 19.01.2017 um 16:34 hat Peter Lieven geschrieben:
->>>> Am 19.01.2017 um 16:20 schrieb Kevin Wolf:
->>>>> Am 19.01.2017 um 15:59 hat Eric Blake geschrieben:
->>>>>> On 01/19/2017 08:30 AM, Peter Lieven wrote:
->>>>>>>>> qemu-img: Could not open
->>>>>>>>> 'nfs://172.21.200.61/vcore-dev-cdrom/templates/VC_debian8-20170116.qcow2,linux?readahead=131072':
->>>>>>>>> Block protocol 'nfs' doesn't support the option 'readahead-size'
->>>>>>>>>
->>>>>>>>> Please let me know if the below fix would be correct:
->>>>>>>> No, this needs to be fixed the other way round: runtime_opts must use
->>>>>>>> the names as specified in the schema, and nfs_client_open() must access
->>>>>>>> them as such. Without that, blockdev-add can't work (and the command
->>>>>>>> line only with the "wrong" old option names from the URL, whereas it
->>>>>>>> should be using the same names as the QAPI schema).
->>>>>>> Shouldn't we support both for backwards compatiblity.?
->>>>>> blockdev-add only needs to support the modern naming.  But yes,
->>>>>> preserving back-compat spelling of the command-line spellings, as well
->>>>>> as matching blockdev-add spellings, is desirable.
->>>>> We only just added the individual command line options, previously it
->>>>> only supported the URL.
->>>>>
->>>>> It's true that we have the messed up version of the options in 2.8, so
->>>>> strictly speaking we would break compatibility with a release, but it's
->>>>> only one release, it's only the nfs driver, and the documentation of the
->>>>> options is the schema, which had the right option names even in 2.8
->>>>> (they just didn't work).
->>>>>
->>>>> So I wouldn't feel bad about removing the wrong names in this specific
->>>>> case.
->>>> So want exactly do you want to do? Fix the names in the QAPI schema
->>>> to use the old naming?
->>> No, fix the command line to use the names in the QAPI schema.
->>>
->>> The option names from the URL were never supposed to be supported on the
->>> command line.
->> Okay, so no backwards compatiblity? I actually used the options on the command line...
-> Well, do you _need_ compatibility?
->
-> It can certainly be done, but as the (wrong) options on the command line
-> have only existed since November and were never documented, I wouldn't
-> bother unless there's a good reason.
+This bug was fixed in the package qemu - 1:2.6.1+dfsg-0ubuntu5.2
 
-Every Qemu before 2.8.0 was working with sth like:
+---------------
+qemu (1:2.6.1+dfsg-0ubuntu5.2) yakkety; urgency=3Dmedium
 
-qemu -cdrom nfs://10.0.0.1/expory/my.iso?readahead=131072
+  [ Rafael David Tinoco ]
+  * Fixed wrong migration blocker when vhost is used (LP: #1626972)
+    - d/p/vhost_migration-blocker-only-if-shared-log-is-used.patch
 
-Peter
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Tue, 22 Nov
+2016 13:45:46 +0100
+
+** Changed in: qemu (Ubuntu Yakkety)
+       Status: Fix Committed =3D> Fix Released
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1626972
+
+Title:
+  QEMU memfd_create fallback mechanism change for security drivers
+
+Status in Ubuntu Cloud Archive:
+  Invalid
+Status in Ubuntu Cloud Archive mitaka series:
+  Fix Committed
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Fix Committed
+Status in qemu source package in Yakkety:
+  Fix Released
+Status in qemu source package in Zesty:
+  Fix Released
+
+Bug description:
+  [Impact]
+
+   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
+   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
+   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
+
+  [Test Case]
+
+   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
+   * Try to live-migration from one to another. =
+
+   * Apparmor will block creation of /tmp/memfd-XXX files.
+
+  [Regression Potential]
+
+   Pros:
+   * Exhaustively tested this.
+   * Worked with upstream on this fix. =
+
+   * I'm implementing new vhost log mechanism for upstream.
+   * One line change to a blocker that is already broken.
+
+   Cons:
+   * To break live migration in other circumstances. =
+
+
+  [Other Info]
+
+   * Christian Ehrhardt has been following this.
+
+  ORIGINAL DESCRIPTION:
+
+  When libvirt starts using apparmor, and creating apparmor profiles for
+  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
+  and upstream also) uses a fallback mechanism for creating shared
+  memory for live-migrations. This fall back mechanism, on kernels 3.13
+  - that don't have memfd_create() system-call, try to create files on
+  /tmp/ directory and fails.. causing live-migration not to work.
+
+  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
+  can't live migrate.
+
+  From qemu 2.5, logic is on :
+
+  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
+ int *fd)
+  {
+  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
+els
+
+  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
+  }
+
+  And you can see the errors:
+
+  From the host trying to send the virtual machine:
+
+  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Migration operation has aborted
+  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Live Migration failure: internal error: unable to execute QEMU command 'mi=
+grate': Migration disabled: failed to allocate shared memory
+
+  From the host trying to receive the virtual machine:
+
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
+289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
+5 comm=3D"apparmor_parser"
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
+289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
+289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
+=3D12613 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
+289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
+rser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
+289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
+2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
+5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
+07 ouid=3D107
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
+289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
+u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
+289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
+"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
+=3D0
+
+  When leaving libvirt without apparmor capabilities (thus not confining
+  virtual machines on compute nodes, the live migration works as
+  expected, so, clearly, apparmor is stepping into the live migration).
+  I'm sure that virtual machines have to be confined and that this isn't
+  the desired behaviour...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
