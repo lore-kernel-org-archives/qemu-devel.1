@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cUEL6-0000o7-Ai
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:09:25 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cUEOl-00049s-AT
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:13:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cUEL3-0002yP-3Z
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:09:24 -0500
-Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:33828)
+	(envelope-from <peter.maydell@linaro.org>) id 1cUEOk-0004ny-7F
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:13:11 -0500
+Received: from mail-ua0-x236.google.com ([2607:f8b0:400c:c08::236]:35004)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cUEL2-0002y9-V5
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:09:21 -0500
-Received: by mail-yb0-x241.google.com with SMTP id w194so2810799ybe.1
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 07:09:20 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
-	<1484644078-21312-2-git-send-email-batuzovk@ispras.ru>
-	<4d351b53-8724-b245-0077-942de1bebd66@twiddle.net>
-	<alpine.DEB.2.11.1701191515580.1724@bulbul.intra.ispras.ru>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <7178d6dd-4252-ad60-e1f0-51acffcd393c@twiddle.net>
-Date: Thu, 19 Jan 2017 07:09:16 -0800
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cUEOk-0004nU-2Y
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 10:13:10 -0500
+Received: by mail-ua0-x236.google.com with SMTP id y9so35788956uae.2
+	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 07:13:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.11.1701191515580.1724@bulbul.intra.ispras.ru>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/18] tcg: add support for 128bit vector
- type
+In-Reply-To: <20170118165256.GC6657@thinpad.lan.raisama.net>
+References: <cover.1481121503.git.julian@codesourcery.com>
+	<b7f0904f00d135f9b2760b8881dbc9ead23cedbf.1481121503.git.julian@codesourcery.com>
+	<CAFEAcA-EQ-e39uv1rnTUb5SwDZzPrHUfhydY5hzc8CrP4NhX_w@mail.gmail.com>
+	<20170111123552.1873cb3b@squid.athome>
+	<20170112142836.53bbd87b@squid.athome>
+	<CAFEAcA8eYeLNrTK-hupM9jA7CPjD8OgEU85As94fWXQETxRgXA@mail.gmail.com>
+	<20170118165256.GC6657@thinpad.lan.raisama.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Jan 2017 15:12:49 +0000
+Message-ID: <CAFEAcA-VmK+oMdV7GONa=H2v6Oz1uO=gaM3UgRf0SvK1QHO+3w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] Add cfgend parameter for ARM CPU
+ selection.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,51 +35,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirill Batuzov <batuzovk@ispras.ru>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Julian Brown <julian@codesourcery.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 01/19/2017 05:04 AM, Kirill Batuzov wrote:
-> On Wed, 18 Jan 2017, Richard Henderson wrote:
+On 18 January 2017 at 16:52, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Tue, Jan 17, 2017 at 11:52:24AM +0000, Peter Maydell wrote:
+>> Oops, I'd forgotten there was board-specific code for handling
+>> cpu feature flags. I think we want to change the other boards
+>> to do it like the virt board does, but maybe I'm wrong.
+>> I've cc'd Eduardo who will hopefully know the right way to handle
+>> this.
 >
->> On 01/17/2017 01:07 AM, Kirill Batuzov wrote:
->>> +static inline TCGv_v128 tcg_global_mem_new_v128(TCGv_ptr reg, intptr_t
->>> offset,
->>> +                                                const char *name)
->>> +{
->>> +    int idx = tcg_global_mem_new_internal(TCG_TYPE_V128, reg, offset,
->>> name);
->>> +    return MAKE_TCGV_V128(idx);
->>> +}
->>
->> You shouldn't allow a v128 type to be created if the host doesn't support it.
->
-> The idea here was to create it either way, but make sure no operation
-> will ever be issued if host does not support it (tcg_gen_* wrappers take
-> care of this).
+> I don't understand what's missing here: cpu_arm_init() already
+> calls cpu_generic_init(), which already calls
+> CPUClass::parse_features() after splitting the cpu_model string
+> and calling CPUClass::class_by_name().
 
-Huh?  If you issue *no* operation, then how is the operation being emulated?
+Well, the 'virt' board calls cc->parse_features() directly,
+and so (judging by grep) do a handful of other boards, but most
+don't. Is this the right new thing going forward, and do we
+need to convert the remaining boards over to match?
 
-> I'm not sure about this last part. The host may not have i64, so there
-> should be another case - 4 x i32. So we'll get 4 cases for v128:
+> Which board aree you using to test this? Is the board calling
+> cpu_arm_init() to create the CPU?
 
-Recursively you'd get 4 x i32, but at least they'll be tagged TCG_TYPE_I64, and 
-be handled by the rest of the tcg code generator like it should be.
+It looks like only a very few ARM boards still call
+cpu_arm_init() [just musicpal, omap, pxa2xx, strongarm and the
+v7m ones] -- most do something like:
 
->
-> v128
-> 2 x v64
-> 2 x i64
-> 4 x i32
->
-> 3 cases will need to be added to tcg_temp_new_internal and
-> tcg_global_new_mem_internal, two of which are rather useless (2 x i64, 4 x i32).
-> Introduction of v256 will add 4 more cases two of which will be useless
-> again. This sounds like too much code that serves no purpose to me.
+   ObjectClass *cpu_oc = cpu_class_by_name(TYPE_ARM_CPU, cpu_model);
+   [...]
 
-Useless?  Surely you mean "used by hosts that don't implement v128".
+        Object *cpuobj = object_new(object_class_get_name(cpu_oc));
 
-I think one of us is very confused about how you intend to generate fallback 
-code.  Perhaps any future patchset revision should update tcg/README first.
+        if (!secure) {
+            object_property_set_bool(cpuobj, false, "has_el3", NULL);
+        }
 
+        if (object_property_find(cpuobj, "reset-cbar", NULL)) {
+            object_property_set_int(cpuobj, periphbase,
+                                    "reset-cbar", &error_abort);
+        }
+        object_property_set_bool(cpuobj, true, "realized", &error_fatal);
 
-r~
+(that example is from hw/arm/vexpress.c)
+
+This is because cpu_generic_init() provides no way for the
+board to set CPU properties -- it does both the object init
+and realize in one go.
+
+I'm actually looking at a patch at the moment that attempts
+to fix this by adding a cpu_generic_init_unrealized(),
+which does everything that cpu_generic_init() does except
+the final "set the realized prop to true" step, so that you
+can call it, set CPU properties and then realize the CPU
+yourself. Does that sound like a good idea, or a bad idea?
+[https://github.com/mdavidsaver/qemu/commit/82823fb6f97859dc5f2945bd3b2733df2c81b2d8]
+
+I'm not sure which board Julian is using, but I guess it's one
+of the ones that doesn't call cpu_generic_init().
+
+thanks
+-- PMM
