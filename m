@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36984)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=Ovvj=ZB=redhat.com=mst@kernel.org>)
-	id 1cUJy5-0000rg-Oe
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:10:05 -0500
+	id 1cUJyA-0000vQ-2X
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:10:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=Ovvj=ZB=redhat.com=mst@kernel.org>)
-	id 1cUJy2-0000HT-Hg
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:10:01 -0500
-Received: from mail.kernel.org ([198.145.29.136]:56958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <SRS0=Ovvj=ZB=redhat.com=mst@kernel.org>)
-	id 1cUJy2-0000G7-BB
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:09:58 -0500
-Date: Thu, 19 Jan 2017 23:09:53 +0200
+	id 1cUJy6-0000MQ-1W
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:10:06 -0500
+Date: Thu, 19 Jan 2017 23:09:56 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1484860116-25361-16-git-send-email-mst@redhat.com>
+Message-ID: <1484860116-25361-17-git-send-email-mst@redhat.com>
 References: <1484860116-25361-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1484860116-25361-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 15/17] vhost: drop VHOST_F_DEVICE_IOTLB
+Subject: [Qemu-devel] [PULL 16/17] virtio: fix up max size checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +25,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-Upstream does not have it, uses VIRTIO_F_IOMMU_PLATFORM
-to signal support instead.
+Coverity reports that ARRAY_SIZE(elem->out_sg) (and all the others too)
+is wrong because elem->out_sg is a pointer.
 
+However, the check is not in the right place and the max_size argument
+of virtqueue_map_iovec can be removed.  The check on in_num/out_num
+should be moved to qemu_get_virtqueue_element instead, before the call
+to virtqueue_alloc_element.
+
+Cc: qemu-stable@nongnu.org
+Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+Fixes: 3724650db07057333879484c8bc7d900b5c1bf8e ("virtio: introduce virtqueue_alloc_element")
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- linux-headers/linux/vhost.h | 2 --
- 1 file changed, 2 deletions(-)
+ hw/virtio/virtio.c | 33 +++++++++++++--------------------
+ 1 file changed, 13 insertions(+), 20 deletions(-)
 
-diff --git a/linux-headers/linux/vhost.h b/linux-headers/linux/vhost.h
-index ac7a1f1..1e86a3d 100644
---- a/linux-headers/linux/vhost.h
-+++ b/linux-headers/linux/vhost.h
-@@ -172,8 +172,6 @@ struct vhost_memory {
- #define VHOST_F_LOG_ALL 26
- /* vhost-net should add virtio_net_hdr for RX, and strip for TX packets. */
- #define VHOST_NET_F_VIRTIO_NET_HDR 27
--/* Vhost have device IOTLB */
--#define VHOST_F_DEVICE_IOTLB 63
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 34065c7..6e34f05 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -599,23 +599,11 @@ static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
  
- /* VHOST_SCSI specific definitions */
+ static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
+                                 hwaddr *addr, unsigned int *num_sg,
+-                                unsigned int max_size, int is_write)
++                                int is_write)
+ {
+     unsigned int i;
+     hwaddr len;
+ 
+-    /* Note: this function MUST validate input, some callers
+-     * are passing in num_sg values received over the network.
+-     */
+-    /* TODO: teach all callers that this can fail, and return failure instead
+-     * of asserting here.
+-     * When we do, we might be able to re-enable NDEBUG below.
+-     */
+-#ifdef NDEBUG
+-#error building with NDEBUG is not supported
+-#endif
+-    assert(*num_sg <= max_size);
+-
+     for (i = 0; i < *num_sg; i++) {
+         len = sg[i].iov_len;
+         sg[i].iov_base = dma_memory_map(vdev->dma_as,
+@@ -635,13 +623,8 @@ static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
+ 
+ void virtqueue_map(VirtIODevice *vdev, VirtQueueElement *elem)
+ {
+-    virtqueue_map_iovec(vdev, elem->in_sg, elem->in_addr, &elem->in_num,
+-                        MIN(ARRAY_SIZE(elem->in_sg), ARRAY_SIZE(elem->in_addr)),
+-                        1);
+-    virtqueue_map_iovec(vdev, elem->out_sg, elem->out_addr, &elem->out_num,
+-                        MIN(ARRAY_SIZE(elem->out_sg),
+-                        ARRAY_SIZE(elem->out_addr)),
+-                        0);
++    virtqueue_map_iovec(vdev, elem->in_sg, elem->in_addr, &elem->in_num, 1);
++    virtqueue_map_iovec(vdev, elem->out_sg, elem->out_addr, &elem->out_num, 0);
+ }
+ 
+ static void *virtqueue_alloc_element(size_t sz, unsigned out_num, unsigned in_num)
+@@ -840,6 +823,16 @@ void *qemu_get_virtqueue_element(VirtIODevice *vdev, QEMUFile *f, size_t sz)
+ 
+     qemu_get_buffer(f, (uint8_t *)&data, sizeof(VirtQueueElementOld));
+ 
++    /* TODO: teach all callers that this can fail, and return failure instead
++     * of asserting here.
++     * When we do, we might be able to re-enable NDEBUG below.
++     */
++#ifdef NDEBUG
++#error building with NDEBUG is not supported
++#endif
++    assert(ARRAY_SIZE(data.in_addr) >= data.in_num);
++    assert(ARRAY_SIZE(data.out_addr) >= data.out_num);
++
+     elem = virtqueue_alloc_element(sz, data.out_num, data.in_num);
+     elem->index = data.index;
  
 -- 
 MST
