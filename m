@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUKAe-00042X-Mq
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:23:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1cUKEZ-0007Xo-3t
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:27:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUKAZ-0004jZ-Ph
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:23:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35198)
+	(envelope-from <eblake@redhat.com>) id 1cUKEU-0006nq-6f
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:27:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cUKAZ-0004ij-GM
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:22:55 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cUKET-0006ms-Ty
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 16:26:58 -0500
 References: <1484859998-25074-1-git-send-email-mst@redhat.com>
-	<1484859998-25074-2-git-send-email-mst@redhat.com>
+	<1484859998-25074-3-git-send-email-mst@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <596f956e-8e52-57ac-5153-87002c68ecef@redhat.com>
-Date: Thu, 19 Jan 2017 15:22:52 -0600
+Message-ID: <e41f19d3-0a9f-49cf-3f73-bc88b706f38b@redhat.com>
+Date: Thu, 19 Jan 2017 15:26:55 -0600
 MIME-Version: 1.0
-In-Reply-To: <1484859998-25074-2-git-send-email-mst@redhat.com>
+In-Reply-To: <1484859998-25074-3-git-send-email-mst@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="HG8PmTroG9CvRace6IH7egRU6L6jmemjM"
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] compiler: drop ; after BUILD_BUG_ON
+	boundary="qMkkrTusTeOMO14afrmTEvNLtOLi975QE"
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
+ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +33,51 @@ To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HG8PmTroG9CvRace6IH7egRU6L6jmemjM
+--qMkkrTusTeOMO14afrmTEvNLtOLi975QE
 From: Eric Blake <eblake@redhat.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
-Message-ID: <596f956e-8e52-57ac-5153-87002c68ecef@redhat.com>
-Subject: Re: [PATCH v3 1/4] compiler: drop ; after BUILD_BUG_ON
+Message-ID: <e41f19d3-0a9f-49cf-3f73-bc88b706f38b@redhat.com>
+Subject: Re: [PATCH v3 2/4] compiler: rework BUG_ON using a struct
 References: <1484859998-25074-1-git-send-email-mst@redhat.com>
- <1484859998-25074-2-git-send-email-mst@redhat.com>
-In-Reply-To: <1484859998-25074-2-git-send-email-mst@redhat.com>
+ <1484859998-25074-3-git-send-email-mst@redhat.com>
+In-Reply-To: <1484859998-25074-3-git-send-email-mst@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 01/19/2017 03:07 PM, Michael S. Tsirkin wrote:
-> All users include the trailing ; anyway, let's require that -
-> it seems cleaner.
+> There are theoretical concerns that some compilers might not trigger
+> build failures on attempts to define an array of size -1 and make it a
+> variable sized array instead.
+
+Rather, the concern is that if someone changes code so that the 'x' of
+QEMU_BUILD_BUG_ON(x) is no longer a compile time constant, we want a
+compile-time failure rather than a runtime variable-sized array that may
+or may not crash.
+
+> Let rewrite using a struct with a negative
+> bit field size instead as there are no dynamic bit field sizes.  This i=
+s
+> similar to what Linux does.
 >=20
 > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
->  include/qemu/compiler.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  include/qemu/compiler.h | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+>
+
+I don't know if you want to tweak the commit wording, but I'm okay with
+the patch itself.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-> index 157698b..7512082 100644
-> --- a/include/qemu/compiler.h
-> +++ b/include/qemu/compiler.h
-> @@ -86,7 +86,8 @@
->  #define type_check(t1,t2) ((t1*)0 - (t2*)0)
-> =20
->  #define QEMU_BUILD_BUG_ON(x) \
-> -    typedef char glue(qemu_build_bug_on__,__LINE__)[(x)?-1:1] __attrib=
-ute__((unused));
-> +    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
-> +        __attribute__((unused))
-> =20
->  #if defined __GNUC__
->  # if !QEMU_GNUC_PREREQ(4, 4)
->=20
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---HG8PmTroG9CvRace6IH7egRU6L6jmemjM
+--qMkkrTusTeOMO14afrmTEvNLtOLi975QE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -89,13 +87,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYgS4sAAoJEKeha0olJ0NqJ58IAJkQtpLnH5fFcs+uR6kk/tpo
-1N5VuWph0L2Q9M1fm5gv52PElYLfT0qcH+PjTiqFpPyNB/lDVFPVu5ArgDUZRPXD
-Lz59cKbD8GylTFu790n4IqGFnA4NgS9FU1K5IbOGjUHdlvApqFIMJ22mAc4ridGJ
-MeFdWCOuOV3mqRSOIdjG4azVg64CEASMdUks1uq0TUwSk+FztvSGIvBAUfh+XMIt
-K0E7HVUqFOkDxfzljbDwwogwLG3ZiesclY+HORfeIB+8nNXzD3YaxetcMBy8XJgI
-euu6OQ741bSRz/93xbfqSU80LQTOVnK+snvJ1LhSciByw/i8zQIInoUUgQs7ZT8=
-=f72G
+iQEcBAEBCAAGBQJYgS8fAAoJEKeha0olJ0Nqb6MH/RaBwePHh1F0zZHhyjgufLbK
+CynWSx/jgryfL4mLTZgThYP6aerraAfm0RGWQhnXQU+ASih6MTaPZvFcvZG4N/y3
+O0hnPp+N9DLc4H99oEDcoiYwbWmnIo26dAm+aj3qOXj78n97HLw078ljF3IhO8ya
+Stqtop0awk6Eyx5ywAJBXRfWpWWZVRt8bVnCiF+JnhNaIkwqs9eXt+55bebAB4yv
+vwIPUnCFDCbtz0CUYKonX1W8JrFdaU4FmJ3Rd0OT5I2Gx2xZ3+61F66onj8wifaO
+bwYi1TqIiZlUjzqa2+ItAId7OGl9hB4ByvYbOmgOEbFLLo+Gf3nthi3dn48nAoo=
+=mybL
 -----END PGP SIGNATURE-----
 
---HG8PmTroG9CvRace6IH7egRU6L6jmemjM--
+--qMkkrTusTeOMO14afrmTEvNLtOLi975QE--
