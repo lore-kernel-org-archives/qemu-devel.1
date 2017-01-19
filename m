@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cU8ya-0006Fu-5J
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:49 -0500
+	(envelope-from <armbru@redhat.com>) id 1cU8yd-0006J3-FX
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cU8yZ-0008KG-3m
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cU8yY-0008JO-SH
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:47 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 16938C04BD48
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 09:25:47 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Thu, 19 Jan 2017 17:25:31 +0800
-Message-Id: <1484817932-14452-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1484817932-14452-1-git-send-email-peterx@redhat.com>
-References: <1484817932-14452-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 2/3] vfio: introduce vfio_get_vaddr()
+	(envelope-from <armbru@redhat.com>) id 1cU8yZ-0008LB-MS
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 04:25:51 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170118161653.19296-1-eblake@redhat.com>
+	<20170118161653.19296-3-eblake@redhat.com>
+Date: Thu, 19 Jan 2017 10:25:39 +0100
+In-Reply-To: <20170118161653.19296-3-eblake@redhat.com> (Eric Blake's message
+	of "Wed, 18 Jan 2017 10:16:49 -0600")
+Message-ID: <87lgu7flkc.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] qdict: Add convenience helpers for
+ wrapped puts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +24,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alex Williamson <alex.williamson@redhat.com>, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Alexander Graf <agraf@suse.de>, Anthony Perard <anthony.perard@citrix.com>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Chrysostomos Nanakos <chris@include.gr>, Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "open list:X86" <xen-devel@lists.xensource.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-A cleanup for vfio_iommu_map_notify(). Should have no functional change,
-just to make the function shorter and easier to understand.
+Eric Blake <eblake@redhat.com> writes:
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 38 insertions(+), 20 deletions(-)
+> Quite a few users of qdict_put() were manually wrapping a
+> non-QObject. We can make such call-sites shorter, by providing
+> common macros to do the tedious work.  Also shorten nearby
+> qdict_put_obj(,,QOBJECT()) sequences.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>
+> ---
+>
+> v2: rebase to current master
+>
+> I'm okay if you want me to break this patch into smaller pieces.
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 174f351..ce55dff 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
-            section->offset_within_address_space & (1ULL << 63);
- }
- 
--static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-+static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-+                           bool *read_only)
- {
--    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
--    VFIOContainer *container = giommu->container;
--    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-     MemoryRegion *mr;
-     hwaddr xlat;
-     hwaddr len = iotlb->addr_mask + 1;
--    void *vaddr;
--    int ret;
--
--    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
--                                iova, iova + iotlb->addr_mask);
--
--    if (iotlb->target_as != &address_space_memory) {
--        error_report("Wrong target AS \"%s\", only system memory is allowed",
--                     iotlb->target_as->name ? iotlb->target_as->name : "none");
--        return;
--    }
-+    bool ret = false;
-+    bool writable = iotlb->perm & IOMMU_WO;
- 
-     /*
-      * The IOMMU TLB entry we have just covers translation through
-@@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-     rcu_read_lock();
-     mr = address_space_translate(&address_space_memory,
-                                  iotlb->translated_addr,
--                                 &xlat, &len, iotlb->perm & IOMMU_WO);
-+                                 &xlat, &len, writable);
-     if (!memory_region_is_ram(mr)) {
-         error_report("iommu map to non memory area %"HWADDR_PRIx"",
-                      xlat);
-         goto out;
-     }
-+
-     /*
-      * Translation truncates length to the IOMMU page size,
-      * check that it did not truncate too much.
-@@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-         goto out;
-     }
- 
-+    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
-+    *read_only = !writable || mr->readonly;
-+    ret = true;
-+
-+out:
-+    rcu_read_unlock();
-+    return ret;
-+}
-+
-+static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-+{
-+    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-+    VFIOContainer *container = giommu->container;
-+    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-+    bool read_only;
-+    void *vaddr;
-+    int ret;
-+
-+    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
-+                                iova, iova + iotlb->addr_mask);
-+
-+    if (iotlb->target_as != &address_space_memory) {
-+        error_report("Wrong target AS \"%s\", only system memory is allowed",
-+                     iotlb->target_as->name ? iotlb->target_as->name : "none");
-+        return;
-+    }
-+
-+    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-+        return;
-+    }
-+
-     if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
--        vaddr = memory_region_get_ram_ptr(mr) + xlat;
-         ret = vfio_dma_map(container, iova,
-                            iotlb->addr_mask + 1, vaddr,
--                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
-+                           read_only);
-         if (ret) {
-             error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-                          "0x%"HWADDR_PRIx", %p) = %d (%m)",
-@@ -357,8 +377,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-                          iotlb->addr_mask + 1, ret);
-         }
-     }
--out:
--    rcu_read_unlock();
- }
- 
- static void vfio_listener_region_add(MemoryListener *listener,
--- 
-2.7.4
+I guess I'm okay with a single piece, but I'd like to know how you did
+the conversion.  Coccinelle?  Manually?
