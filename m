@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cUAsS-0006Zz-Qz
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 06:27:37 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cUAul-0007bk-A4
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 06:30:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cUAsO-0005yL-Tw
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 06:27:36 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:56339)
+	(envelope-from <dgilbert@redhat.com>) id 1cUAuh-0007Tc-BX
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 06:29:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cUAsO-0005xb-NH
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 06:27:32 -0500
-References: <1484773521-16530-1-git-send-email-laurent@vivier.eu>
-	<510d4403-7ca4-4536-8896-44835f253dc4@twiddle.net>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <01027665-7e44-76bc-a15e-11492a7cef11@vivier.eu>
-Date: Thu, 19 Jan 2017 12:27:13 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cUAuh-0007Sw-6d
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 06:29:55 -0500
+Date: Thu, 19 Jan 2017 11:29:49 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170119112949.GD2085@work-vm>
+References: <1484771412-28024-1-git-send-email-mst@redhat.com>
+	<1484771412-28024-4-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <510d4403-7ca4-4536-8896-44835f253dc4@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/7] target-m68k: implement 680x0 FPU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484771412-28024-4-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] compiler: expression version of
+ QEMU_BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
 
-Le 18/01/2017 à 22:42, Richard Henderson a écrit :
-> On 01/18/2017 01:05 PM, Laurent Vivier wrote:
->> This series modifies the original ColdFire FPU implementation
->> to use floatx80 instead of float64 internally as this
->> is the native datatype for 680x0. I didn't keep the float64
->> type for ColdFire, but if someone thinks it's required I
->> can update this series in this way.
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> QEMU_BUILD_BUG_ON uses a typedef in order to be safe
+> to use outside functions, but sometimes it's useful
+> to have a version that can be used within an expression.
+> Following what Linux does, introduce QEMU_BUILD_BUG_ON_ZERO
+> that return zero after checking condition at build time.
 > 
-> I think at minimum you'll need to round to float64.  But this control is
-> also needed for 68040 FPU, so probably you can use the same helpers.
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  include/qemu/compiler.h | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> I'm thinking something like
-> 
-> void helper_foo_d(args);
-> {
->   ...
->   r80 = floatx80_foo(args);
->   r64 = floatx80_to_float64(r80, &env->fp_status);
->   r80 = float64_to_floatx80(r64, &env->fp_status);
->   [store r80]
->   ...
-> }
-> 
-> since iirc 68040 has fadd.d, fadd.s to go with fadd.
+> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> index 1a9eeb9..d2b05dd 100644
+> --- a/include/qemu/compiler.h
+> +++ b/include/qemu/compiler.h
+> @@ -88,6 +88,8 @@
+>  #define QEMU_BUILD_BUG_ON(x) \
+>      typedef char glue(qemu_build_bug_on__,__LINE__)[(x)?-1:1] __attribute__((unused))
+>  
+> +#define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(int[(x)?-1:1]) - sizeof(int))
+> +
 
-OK, I will modify this part.
+Yes, pretty much the same as:
+https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07090.html
 
-Thanks,
-Laurent
+I'd used -sizeof(int[1])   in the right hand size to match the left, but
+I think it should always be the same.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+>  #if defined __GNUC__
+>  # if !QEMU_GNUC_PREREQ(4, 4)
+>     /* gcc versions before 4.4.x don't support gnu_printf, so use printf. */
+> -- 
+> MST
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
