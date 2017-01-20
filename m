@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUcol-0006wo-Eh
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:17:40 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cUd3w-0002i1-0a
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:33:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUcoh-00062m-GN
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:17:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42528)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUcoh-00062Z-Ak
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:17:35 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9AFBEC04BD23
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 17:17:35 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 20 Jan 2017 18:17:32 +0100
-Message-Id: <20170120171732.32055-2-pbonzini@redhat.com>
-In-Reply-To: <20170120171732.32055-1-pbonzini@redhat.com>
-References: <20170120171732.32055-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 35/35] pc.h: move x-mach-use-reliable-get-clock
- compat entry to PC_COMPAT_2_8
+	(envelope-from <alex.bennee@linaro.org>) id 1cUd3s-0004s1-2T
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:33:20 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38721)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cUd3r-0004qb-Rn
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:33:16 -0500
+Received: by mail-wm0-x231.google.com with SMTP id r144so54795824wme.1
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 09:33:14 -0800 (PST)
+References: <000301d259dc$f9d097c0$ed71c740$@ru>
+	<000601d25a95$12b1b9f0$38152dd0$@ru>
+	<20161220102126.GE5602@stefanha-x1.localdomain>
+	<002501d25ab1$af024b00$0d06e100$@ru>
+	<CAJSP0QXm9ssLC5C+gV_agkEW_fdUY=NWBMvHqMh55UhYTR276g@mail.gmail.com>
+	<000301d25b4f$20018440$60048cc0$@ru>
+	<CAJSP0QW1pOcthcEt16Pp5xQu3miUh2Leq3kn3yvQqWqhi1P=QQ@mail.gmail.com>
+	<000801d26bd9$dca56db0$95f04910$@ru> <87o9zd3jta.fsf@linaro.org>
+	<000e01d26caa$dfdb3150$9f9193f0$@ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <000e01d26caa$dfdb3150$9f9193f0$@ru>
+Date: Fri, 20 Jan 2017 17:33:11 +0000
+Message-ID: <87mveleiw8.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] qemu-2.8-rc4 is broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcelo Tosatti <mtosatti@redhat.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Stefan Hajnoczi' <stefanha@gmail.com>, 'qemu-devel' <qemu-devel@nongnu.org>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>
 
-From: Marcelo Tosatti <mtosatti@redhat.com>
 
-As noticed by David Gilbert, commit 6053a86 'kvmclock: reduce kvmclock
-differences on migration' added 'x-mach-use-reliable-get-clock' and a
-compatibility entry that turns it off; however it got merged after 2.8.0
-was released but the entry has gone into PC_COMPAT_2_7 where it should
-have gone into PC_COMPAT_2_8.
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-Fix it by moving the entry to PC_COMPAT_2_8.
+>> From: Alex Bennée [mailto:alex.bennee@linaro.org]
+>> >> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+>> >> >
+>> >> > Yes, this option helps.
+>> >> > Thank you.
+>> >>
+>> >> Good news.  This can be fixed in 2.8.1 once someone finds a solution.
+>> >
+>> > It seems that something still goes wrong.
+>> > I'm using this workaround, but there is a kind of deadlock in translation.
+>> > call_rcu_thread hangs at some moment in qemu_event_wait.
+>> >
+>> > As far as I understand, it is used by QHT in translate-all.c.
+>> > I can't get more information yet, because logging makes everything too slow.
+>>
+>> There are a number of users of RCU bit for QHT I think it only gets
+>> activated when it needs to re-size its hash table on insertion of new
+>> TranslationBlocks.
+>>
+>> Can you get a backtrace of all threads when it deadlocks?
+>
+> Sorry, this is another problem which occurs only in icount replay mode:
+> 1. cpu_handle_exception tries to force exception when is cannot occur due to
+>    running out all the planned instructions:
+>     } else if (replay_has_exception()
+>                && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
+>         /* try to cause an exception pending in the log */
+>         cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
+>         *ret = -1;
+>         return true;
+>
+> 2. tb_find calls tb_gen_code, which cannot allocate new translation block
+>    and calls tb_flush (which only queues the flushing) and cpu_loop_exit
+> 3. cpu_loop_exit returns to infinite loop of cpu_exec and the condition
+>             if (cpu_handle_exception(cpu, &ret)) {
+>                 break;
+>             }
+>    is checked again causing an infinite loop.
+>
+> TB cache is not flushed because we never execute that break and real work of tb_flush
+> is made outside this loop.
 
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20170118175343.GA26873@amt.cnet>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- include/hw/i386/pc.h | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+I think what we need is a:
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 230e9e7..738bfd6 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -376,15 +376,14 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
- #define PC_COMPAT_2_8 \
-     HW_COMPAT_2_8 \
--
--
--#define PC_COMPAT_2_7 \
--    HW_COMPAT_2_7 \
-     {\
-         .driver   = "kvmclock",\
-         .property = "x-mach-use-reliable-get-clock",\
-         .value    = "off",\
-     },\
-+
-+#define PC_COMPAT_2_7 \
-+    HW_COMPAT_2_7 \
-     {\
-         .driver   = TYPE_X86_CPU,\
-         .property = "l3-cache",\
--- 
-2.9.3
+
+  if (cpu->exit_request)
+    break;
+
+before the cpu_handle_exception() call to ensure any queued work gets
+processed first. Can you give me you current command line so I can
+reproduce this and check the fix works?
+
+--
+Alex Bennée
