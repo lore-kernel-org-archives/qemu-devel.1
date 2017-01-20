@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cUeUg-0007y3-7A
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:05:07 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cUeee-0002Ht-5V
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:15:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cUeUc-0004MM-S2
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:05:02 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cUeeZ-0001WA-Ar
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:15:20 -0500
+Resent-Message-Id: <E1cUeeZ-0001WA-Ar@eggs.gnu.org>
+Message-ID: <148493969359.28.10118375645387403835@b042e9bf0dd0>
+In-Reply-To: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <1484937883-1068-5-git-send-email-peter.maydell@linaro.org>
-References: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
-	<1484937883-1068-5-git-send-email-peter.maydell@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 20 Jan 2017 11:04:18 -0800
-Message-ID: <CAKmqyKOwzNj827103eSYZp6wAbsn4Ymvit-ZSOV9J7dLRgvO1A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 4/6] hw/registerfields.h: Pull FIELD etc
- macros out of hw/register.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 20 Jan 2017 11:14:54 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/6] ARMv7M: some simple bugfixes and
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,166 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>, Patch Tracking <patches@linaro.org>
+To: peter.maydell@linaro.org
+Cc: famz@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, ilg@livius.net, mdavidsaver@gmail.com, patches@linaro.org
 
-On Fri, Jan 20, 2017 at 10:44 AM, Peter Maydell
-<peter.maydell@linaro.org> wrote:
-> hw/register.h provides macros like FIELD which make it easy to define
-> shift, mask and length constants for the fields within a register.
-> Unfortunately register.h also includes a lot of other things, some
-> of which will only compile in the softmmu build.
->
-> Pull the FIELD macro and friends out into a separate header file,
-> so they can be used in places like target/arm files which also
-> get built in the user-only configs.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Looks good to me, I'm glad this is being used by others :)
-
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Thanks,
-
-Alistair
-
-> ---
->  include/hw/register.h       | 47 +----------------------------------
->  include/hw/registerfields.h | 60 +++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 61 insertions(+), 46 deletions(-)
->  create mode 100644 include/hw/registerfields.h
->
-> diff --git a/include/hw/register.h b/include/hw/register.h
-> index 8c12233..8bff5fb 100644
-> --- a/include/hw/register.h
-> +++ b/include/hw/register.h
-> @@ -13,6 +13,7 @@
->
->  #include "hw/qdev-core.h"
->  #include "exec/memory.h"
-> +#include "hw/registerfields.h"
->
->  typedef struct RegisterInfo RegisterInfo;
->  typedef struct RegisterAccessInfo RegisterAccessInfo;
-> @@ -206,50 +207,4 @@ RegisterInfoArray *register_init_block32(DeviceState *owner,
->
->  void register_finalize_block(RegisterInfoArray *r_array);
->
-> -/* Define constants for a 32 bit register */
-> -
-> -/* This macro will define A_FOO, for the byte address of a register
-> - * as well as R_FOO for the uint32_t[] register number (A_FOO / 4).
-> - */
-> -#define REG32(reg, addr)                                                  \
-> -    enum { A_ ## reg = (addr) };                                          \
-> -    enum { R_ ## reg = (addr) / 4 };
-> -
-> -/* Define SHIFT, LENGTH and MASK constants for a field within a register */
-> -
-> -/* This macro will define FOO_BAR_MASK, FOO_BAR_SHIFT and FOO_BAR_LENGTH
-> - * constants for field BAR in register FOO.
-> - */
-> -#define FIELD(reg, field, shift, length)                                  \
-> -    enum { R_ ## reg ## _ ## field ## _SHIFT = (shift)};                  \
-> -    enum { R_ ## reg ## _ ## field ## _LENGTH = (length)};                \
-> -    enum { R_ ## reg ## _ ## field ## _MASK =                             \
-> -                                        MAKE_64BIT_MASK(shift, length)};
-> -
-> -/* Extract a field from a register */
-> -#define FIELD_EX32(storage, reg, field)                                   \
-> -    extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,               \
-> -              R_ ## reg ## _ ## field ## _LENGTH)
-> -
-> -/* Extract a field from an array of registers */
-> -#define ARRAY_FIELD_EX32(regs, reg, field)                                \
-> -    FIELD_EX32((regs)[R_ ## reg], reg, field)
-> -
-> -/* Deposit a register field.
-> - * Assigning values larger then the target field will result in
-> - * compilation warnings.
-> - */
-> -#define FIELD_DP32(storage, reg, field, val) ({                           \
-> -    struct {                                                              \
-> -        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
-> -    } v = { .v = val };                                                   \
-> -    uint32_t d;                                                           \
-> -    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
-> -                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
-> -    d; })
-> -
-> -/* Deposit a field to array of registers.  */
-> -#define ARRAY_FIELD_DP32(regs, reg, field, val)                           \
-> -    (regs)[R_ ## reg] = FIELD_DP32((regs)[R_ ## reg], reg, field, val);
-> -
->  #endif
-> diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
-> new file mode 100644
-> index 0000000..af101d5
-> --- /dev/null
-> +++ b/include/hw/registerfields.h
-> @@ -0,0 +1,60 @@
-> +/*
-> + * Register Definition API: field macros
-> + *
-> + * Copyright (c) 2016 Xilinx Inc.
-> + * Copyright (c) 2013 Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef REGISTERFIELDS_H
-> +#define REGISTERFIELDS_H
-> +
-> +/* Define constants for a 32 bit register */
-> +
-> +/* This macro will define A_FOO, for the byte address of a register
-> + * as well as R_FOO for the uint32_t[] register number (A_FOO / 4).
-> + */
-> +#define REG32(reg, addr)                                                  \
-> +    enum { A_ ## reg = (addr) };                                          \
-> +    enum { R_ ## reg = (addr) / 4 };
-> +
-> +/* Define SHIFT, LENGTH and MASK constants for a field within a register */
-> +
-> +/* This macro will define FOO_BAR_MASK, FOO_BAR_SHIFT and FOO_BAR_LENGTH
-> + * constants for field BAR in register FOO.
-> + */
-> +#define FIELD(reg, field, shift, length)                                  \
-> +    enum { R_ ## reg ## _ ## field ## _SHIFT = (shift)};                  \
-> +    enum { R_ ## reg ## _ ## field ## _LENGTH = (length)};                \
-> +    enum { R_ ## reg ## _ ## field ## _MASK =                             \
-> +                                        MAKE_64BIT_MASK(shift, length)};
-> +
-> +/* Extract a field from a register */
-> +#define FIELD_EX32(storage, reg, field)                                   \
-> +    extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,               \
-> +              R_ ## reg ## _ ## field ## _LENGTH)
-> +
-> +/* Extract a field from an array of registers */
-> +#define ARRAY_FIELD_EX32(regs, reg, field)                                \
-> +    FIELD_EX32((regs)[R_ ## reg], reg, field)
-> +
-> +/* Deposit a register field.
-> + * Assigning values larger then the target field will result in
-> + * compilation warnings.
-> + */
-> +#define FIELD_DP32(storage, reg, field, val) ({                           \
-> +    struct {                                                              \
-> +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
-> +    } v = { .v = val };                                                   \
-> +    uint32_t d;                                                           \
-> +    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
-> +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
-> +    d; })
-> +
-> +/* Deposit a field to array of registers.  */
-> +#define ARRAY_FIELD_DP32(regs, reg, field, val)                           \
-> +    (regs)[R_ ## reg] = FIELD_DP32((regs)[R_ ## reg], reg, field, val);
-> +
-> +#endif
-> --
-> 2.7.4
->
->
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwLzZdIEFSTXY3TTogc29tZSBzaW1wbGUgYnVnZml4ZXMgYW5kIGNsZWFu
+dXBzCk1lc3NhZ2UtaWQ6IDE0ODQ5Mzc4ODMtMTA2OC0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1h
+eWRlbGxAbGluYXJvLm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
+Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
+ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
+LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
+ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
+bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFu
+Y2ggJ3Rlc3QnCjY2MzAyZjcgYXJtdjdtOiBDbGVhciBGQVVMVE1BU0sgb24gcmV0dXJuIGZyb20g
+bm9uLU5NSSBleGNlcHRpb25zCjE3MmJjZGYgYXJtdjdtOiBGaXggcmVhZHMgb2YgQ09OVFJPTCBy
+ZWdpc3RlciBiaXQgMQo4ZGIyZDZhIGh3L3JlZ2lzdGVyZmllbGRzLmg6IFB1bGwgRklFTEQgZXRj
+IG1hY3JvcyBvdXQgb2YgaHcvcmVnaXN0ZXIuaAo2MTVkYzZhIGFybXY3bTogRXhwbGljaXQgZXJy
+b3IgZm9yIGJhZCB2ZWN0b3IgdGFibGUKYzIwMzU0ZSBhcm12N206IFJlcGxhY2UgYXJtdjdtLmhh
+Y2sgd2l0aCB1bmFzc2lnbmVkX2FjY2VzcyBoYW5kbGVyCjhmNTBmZTIgYXJtdjdtOiBNUlMvTVNS
+OiBoYW5kbGUgdW5wcml2aWxlZ2VkIGFjY2VzcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
+bmcgUEFUQ0ggMS82OiBhcm12N206IE1SUy9NU1I6IGhhbmRsZSB1bnByaXZpbGVnZWQgYWNjZXNz
+Li4uCkNoZWNraW5nIFBBVENIIDIvNjogYXJtdjdtOiBSZXBsYWNlIGFybXY3bS5oYWNrIHdpdGgg
+dW5hc3NpZ25lZF9hY2Nlc3MgaGFuZGxlci4uLgpDaGVja2luZyBQQVRDSCAzLzY6IGFybXY3bTog
+RXhwbGljaXQgZXJyb3IgZm9yIGJhZCB2ZWN0b3IgdGFibGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC82
+OiBody9yZWdpc3RlcmZpZWxkcy5oOiBQdWxsIEZJRUxEIGV0YyBtYWNyb3Mgb3V0IG9mIGh3L3Jl
+Z2lzdGVyLmguLi4KRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxk
+IGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMxMDY6IEZJTEU6IGluY2x1ZGUvaHcv
+cmVnaXN0ZXJmaWVsZHMuaDoxOToKKyNkZWZpbmUgUkVHMzIocmVnLCBhZGRyKSAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBBXyAj
+IyByZWcgPSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBcCisgICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSAvIDQgfTsKCkVSUk9SOiB0cmFpbGlu
+ZyB3aGl0ZXNwYWNlCiMxMTI6IEZJTEU6IGluY2x1ZGUvaHcvcmVnaXN0ZXJmaWVsZHMuaDoyNToK
+Ky8qIFRoaXMgbWFjcm8gd2lsbCBkZWZpbmUgRk9PX0JBUl9NQVNLLCBGT09fQkFSX1NISUZUIGFu
+ZCBGT09fQkFSX0xFTkdUSCAkCgpFUlJPUjogTWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVtZW50
+cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AKIzExNTogRklMRTogaW5j
+bHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI4OgorI2RlZmluZSBGSUVMRChyZWcsIGZpZWxkLCBz
+aGlmdCwgbGVuZ3RoKSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51
+bSB7IFJfICMjIHJlZyAjIyBfICMjIGZpZWxkICMjIF9TSElGVCA9IChzaGlmdCl9OyAgICAgICAg
+ICAgICAgICAgIFwKKyAgICBlbnVtIHsgUl8gIyMgcmVnICMjIF8gIyMgZmllbGQgIyMgX0xFTkdU
+SCA9IChsZW5ndGgpfTsgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBSXyAjIyByZWcgIyMg
+XyAjIyBmaWVsZCAjIyBfTUFTSyA9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTUFLRV82NEJJVF9NQVNLKHNoaWZ0
+LCBsZW5ndGgpfTsKCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgMTE3IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDUvNjogYXJtdjdtOiBGaXggcmVhZHMgb2YgQ09OVFJPTCByZWdpc3RlciBiaXQgMS4uLgpDaGVj
+a2luZyBQQVRDSCA2LzY6IGFybXY3bTogQ2xlYXIgRkFVTFRNQVNLIG9uIHJldHVybiBmcm9tIG5v
+bi1OTUkgZXhjZXB0aW9ucy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
