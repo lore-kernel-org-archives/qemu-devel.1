@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUORV-0000gJ-4T
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 20:56:42 -0500
+	(envelope-from <famz@redhat.com>) id 1cUOm3-0005dz-N0
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 21:17:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUORU-00015w-6b
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 20:56:41 -0500
-Date: Fri, 20 Jan 2017 09:56:28 +0800
+	(envelope-from <famz@redhat.com>) id 1cUOlz-0002B5-Od
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 21:17:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cUOlz-0002Ao-Ja
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 21:17:51 -0500
+Date: Fri, 20 Jan 2017 10:17:45 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170120015628.GA29561@lemon>
-References: <20170119143816.21972-1-famz@redhat.com>
-	<20170119143816.21972-15-famz@redhat.com>
-	<20170119154900.GB16641@redhat.com>
+Message-ID: <20170120021745.GB29561@lemon>
+References: <1484844230-24490-1-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170119154900.GB16641@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 14/16] file-posix: Implement image
- locking
+In-Reply-To: <1484844230-24490-1-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH] bitmap: assert that start and nr are non
+ negative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Thu, 01/19 15:49, Daniel P. Berrange wrote:
-> On Thu, Jan 19, 2017 at 10:38:14PM +0800, Fam Zheng wrote:
-> > This implements open flag sensible image locking for local file
-> > and host device protocol.
-> > 
-> > virtlockd in libvirt locks the first byte, so we start looking at the
-> > file bytes from 1.
-> > 
-> > Quoting what was proposed by Kevin Wolf <kwolf@redhat.com>, there are
-> > four locking modes by combining two bits (BDRV_O_RDWR and
-> > BDRV_O_SHARE_RW), and implemented by taking two locks:
-> > 
-> > Lock bytes:
-> > 
-> > * byte 1: I can't allow other processes to write to the image
-> > * byte 2: I am writing to the image
-> > 
-> > Lock modes:
-> > 
-> > * shared writer (BDRV_O_RDWR | BDRV_O_SHARE_RW): Take shared lock on
-> >   byte 2. Test whether byte 1 is locked using an exclusive lock, and
-> >   fail if so.
-> > 
-> > * exclusive writer (BDRV_O_RDWR only): Take shared lock on byte 2. Test
-> >   whether byte 1 is locked using an exclusive lock, and fail if so. Then
-> >   take shared lock on byte 1. I suppose this is racy, but we can
-> >   probably tolerate that.
-> > 
-> > * reader that can tolerate writers (BDRV_O_SHARE_RW only): Don't do anything
-> > 
-> > * reader that can't tolerate writers (neither bit is set): Take shared
-> >   lock on byte 1. Test whether byte 2 is locked, and fail if so.
+On Thu, 01/19 17:43, Peter Lieven wrote:
+> commit e1123a3b introduced a data corruption regression
+> in the iscsi driver because it passed -1 as nr to bitmap_set
+> and bitmap_clear. Add an assertion to catch such flaws earlier.
 > 
-> Ahh, using two bytes is an interesting technique for mapping the four
-> different access methods onto the more limit fcntl lock semantics. We
-> might want to copy this approach in libvirt too....
+> Suggested-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+>  util/bitmap.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> > +/* Posix file locking bytes. Libvirt takes byte 0, so start from byte 1. */
-> > +#define RAW_LOCK_BYTE_MIN             1
-> > +#define RAW_LOCK_BYTE_NO_OTHER_WRITER 1
-> > +#define RAW_LOCK_BYTE_WRITE           2
+> diff --git a/util/bitmap.c b/util/bitmap.c
+> index 43ed011..c1a84ca 100644
+> --- a/util/bitmap.c
+> +++ b/util/bitmap.c
+> @@ -164,6 +164,8 @@ void bitmap_set(unsigned long *map, long start, long nr)
+>      int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
+>      unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
+>  
+> +    assert(start >= 0 && nr >= 0);
+> +
+>      while (nr - bits_to_set >= 0) {
+>          *p |= mask_to_set;
+>          nr -= bits_to_set;
+> @@ -184,6 +186,8 @@ void bitmap_set_atomic(unsigned long *map, long start, long nr)
+>      int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
+>      unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
+>  
+> +    assert(start >= 0 && nr >= 0);
+> +
+>      /* First word */
+>      if (nr - bits_to_set > 0) {
+>          atomic_or(p, mask_to_set);
+> @@ -221,6 +225,8 @@ void bitmap_clear(unsigned long *map, long start, long nr)
+>      int bits_to_clear = BITS_PER_LONG - (start % BITS_PER_LONG);
+>      unsigned long mask_to_clear = BITMAP_FIRST_WORD_MASK(start);
+>  
+> +    assert(start >= 0 && nr >= 0);
+> +
+>      while (nr - bits_to_clear >= 0) {
+>          *p &= ~mask_to_clear;
+>          nr -= bits_to_clear;
+> @@ -243,6 +249,8 @@ bool bitmap_test_and_clear_atomic(unsigned long *map, long start, long nr)
+>      unsigned long dirty = 0;
+>      unsigned long old_bits;
+>  
+> +    assert(start >= 0 && nr >= 0);
+> +
+>      /* First word */
+>      if (nr - bits_to_clear > 0) {
+>          old_bits = atomic_fetch_and(p, ~mask_to_clear);
+> -- 
+> 1.9.1
 > 
-> ...would you mind if QEMU started from say byte 10, leaving the first 10
-> reserved for libvirt uses. This lets libvirt have a continuous space for
-> its own usage if we want to use more bytes
+> 
 
-That's easy, will do it. (Actually the descriptions above are a bit stale
-because exclusive writers now take two bytes exclusively and the lock testings
-are done with F_OFD_GETLK so that RO readers can test against shared locks
-without acquiring a write lock, which requires O_RDWR).
-
-Fam
+Reviewed-by: Fam Zheng <famz@redhat.com>
