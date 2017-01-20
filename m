@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cUYLA-0007Rp-5l
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:30:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cUYLp-0007oO-TB
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:31:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cUYL9-0007bQ-8b
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:30:48 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36558)
+	(envelope-from <peter.maydell@linaro.org>) id 1cUYLp-0007uP-8H
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:31:29 -0500
+Received: from mail-vk0-x235.google.com ([2607:f8b0:400c:c05::235]:33485)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cUYL9-0007bE-1u
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:30:47 -0500
-Received: by mail-wm0-x243.google.com with SMTP id r126so6366282wmr.3
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:30:46 -0800 (PST)
-From: Phil Dennis-Jordan <phil@philjordan.eu>
-Date: Fri, 20 Jan 2017 13:30:16 +0100
-Message-Id: <1484915417-10499-2-git-send-email-phil@philjordan.eu>
-In-Reply-To: <1484915417-10499-1-git-send-email-phil@philjordan.eu>
-References: <1484915417-10499-1-git-send-email-phil@philjordan.eu>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cUYLo-0007u2-QR
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:31:29 -0500
+Received: by mail-vk0-x235.google.com with SMTP id k127so50333845vke.0
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:31:28 -0800 (PST)
 MIME-Version: 1.0
+In-Reply-To: <1484914681-2986-1-git-send-email-thuth@redhat.com>
+References: <1484914681-2986-1-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Jan 2017 12:31:07 +0000
+Message-ID: <CAFEAcA-fY53-z2awJ_e9738A+MNgYiaVQEn=xJkWn3Xj60nCMw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/2] hw/usb/dev-hid: set bInterfaceProtocol
- to 0x00 for usb-tablet
+Subject: Re: [Qemu-devel] [PATCH] Introduce DEVICE_CATEGORY_CPU for CPU
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-This should be non-zero for boot protocol devices only, which the usb-tablet is not.
+On 20 January 2017 at 12:18, Thomas Huth <thuth@redhat.com> wrote:
+> Now that the hot-pluggable CPUs show up in the help text of
+> "-device ?", we should group them into an appropriate category.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/ppc/pnv_core.c       | 1 +
+>  hw/ppc/spapr_cpu_core.c | 1 +
+>  include/hw/qdev-core.h  | 1 +
+>  qdev-monitor.c          | 1 +
+>  target/i386/cpu.c       | 2 ++
+>  5 files changed, 6 insertions(+)
 
-A boot protocol of 0x02 specifically confuses OS X/macOS' HID driver stack, causing it to generate additional bogus HID events with relative motion in addition to the tablet's absolute coordinate events.
+Can we just set the category bit in the class init functions
+for the TYPE_CPU and TYPE_CPU_CORE superclasses, rather
+than having to do it in a subclass for each architecture
+(and thus potentially forgetting to do it for other archs) ?
 
-Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
----
- hw/usb/dev-hid.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/usb/dev-hid.c b/hw/usb/dev-hid.c
-index 24d05f7..a23e5d4 100644
---- a/hw/usb/dev-hid.c
-+++ b/hw/usb/dev-hid.c
-@@ -144,7 +144,7 @@ static const USBDescIface desc_iface_tablet = {
-     .bInterfaceNumber              = 0,
-     .bNumEndpoints                 = 1,
-     .bInterfaceClass               = USB_CLASS_HID,
--    .bInterfaceProtocol            = 0x02,
-+    .bInterfaceProtocol            = 0x00,
-     .ndesc                         = 1,
-     .descs = (USBDescOther[]) {
-         {
-@@ -174,7 +174,7 @@ static const USBDescIface desc_iface_tablet2 = {
-     .bInterfaceNumber              = 0,
-     .bNumEndpoints                 = 1,
-     .bInterfaceClass               = USB_CLASS_HID,
--    .bInterfaceProtocol            = 0x02,
-+    .bInterfaceProtocol            = 0x00,
-     .ndesc                         = 1,
-     .descs = (USBDescOther[]) {
-         {
--- 
-2.3.2 (Apple Git-55)
+thanks
+-- PMM
