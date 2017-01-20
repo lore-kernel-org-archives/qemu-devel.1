@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTXt-0005v8-DM
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:38 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTXu-0005vu-D9
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTXs-0008RY-MV
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:37 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTXt-0008S6-LP
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:38 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 20 Jan 2017 15:22:56 +0800
-Message-Id: <20170120072310.8009-3-famz@redhat.com>
+Date: Fri, 20 Jan 2017 15:22:57 +0800
+Message-Id: <20170120072310.8009-4-famz@redhat.com>
 In-Reply-To: <20170120072310.8009-1-famz@redhat.com>
 References: <20170120072310.8009-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 02/16] block: Define BDRV_O_SHARE_RW
+Subject: [Qemu-devel] [PATCH v11 03/16] qemu-io: Set "share-rw" flag
+ together with read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,23 +23,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, eblake@redhat.com
 
+qemu-io is a low level tool to read or modify guest visible data, which
+implies the user knows very well what is being done. Allowing reading
+from a locked image is harmless in most cases, so do it.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- include/block/block.h | 2 ++
+ qemu-io.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 8b0dcda..243839d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -97,6 +97,8 @@ typedef struct HDGeometry {
-                                       select an appropriate protocol driver,
-                                       ignoring the format layer */
- #define BDRV_O_NO_IO       0x10000 /* don't initialize for I/O */
-+#define BDRV_O_SHARE_RW    0x20000 /* accept shared read-write from other users
-+                                      of the image */
+diff --git a/qemu-io.c b/qemu-io.c
+index 23a229f..f000504 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -585,6 +585,8 @@ int main(int argc, char **argv)
+     /* open the device */
+     if (!readonly) {
+         flags |= BDRV_O_RDWR;
++    } else {
++        flags |= BDRV_O_SHARE_RW;
+     }
  
- #define BDRV_O_CACHE_MASK  (BDRV_O_NOCACHE | BDRV_O_NO_FLUSH)
- 
+     if ((argc - optind) == 1) {
 -- 
 2.9.3
