@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUchM-00007E-M3
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:10:01 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cUclM-00043e-Cd
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:14:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUchH-0002NU-N0
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:10:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58850)
+	(envelope-from <alex.williamson@redhat.com>) id 1cUclH-0004Gs-Vy
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:14:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUchH-0002NC-Gx
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:09:55 -0500
-References: <1484859998-25074-1-git-send-email-mst@redhat.com>
-	<1484859998-25074-3-git-send-email-mst@redhat.com>
-	<87wpdq2n4e.fsf@dusky.pond.sub.org>
-	<20170120185551-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <024df752-27f3-88f3-99a3-a7f5e18069b4@redhat.com>
-Date: Fri, 20 Jan 2017 18:09:52 +0100
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cUclH-0004Ge-Pe
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:14:03 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CEAB73D95F
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 17:14:03 +0000 (UTC)
+Date: Fri, 20 Jan 2017 10:14:01 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170120101401.597847f7@t450s.home>
+In-Reply-To: <20170120122718.GB13810@pxdev.xzpeter.org>
+References: <1484817932-14452-1-git-send-email-peterx@redhat.com>
+	<20170119105437.5b17d979@t450s.home>
+	<20170120034328.GG4914@pxdev.xzpeter.org>
+	<20170120122718.GB13810@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20170120185551-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
- struct
+Subject: Re: [Qemu-devel] [PATCH RFC 0/3] vfio: allow to notify unmap for
+ very big region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+On Fri, 20 Jan 2017 20:27:18 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-
-On 20/01/2017 17:57, Michael S. Tsirkin wrote:
-> On Fri, Jan 20, 2017 at 08:42:41AM +0100, Markus Armbruster wrote:
->> "Michael S. Tsirkin" <mst@redhat.com> writes:
->>
->>> There are theoretical concerns that some compilers might not trigger
->>> build failures on attempts to define an array of size -1 and make it a
->>> variable sized array instead. Let rewrite using a struct with a negative
->>> bit field size instead as there are no dynamic bit field sizes.  This is
->>> similar to what Linux does.
->>>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> ---
->>>  include/qemu/compiler.h | 9 ++++++---
->>>  1 file changed, 6 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
->>> index 7512082..c6f673e 100644
->>> --- a/include/qemu/compiler.h
->>> +++ b/include/qemu/compiler.h
->>> @@ -85,9 +85,12 @@
->>>  #define typeof_field(type, field) typeof(((type *)0)->field)
->>>  #define type_check(t1,t2) ((t1*)0 - (t2*)0)
->>>  
->>> -#define QEMU_BUILD_BUG_ON(x) \
->>> -    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
->>> -        __attribute__((unused))
->>> +#define QEMU_BUILD_BUG_ON_STRUCT(x) \
->>> +    struct { \
->>> +        int qemu_build_bug_on : (x) ? -1 : 1; \
->>> +    }
->>
->> The qemu_build_bug_on name space pollution is harmless, but quite
->> unnecessary: the name can be simply omitted (unnamed bit-field).
+> On Fri, Jan 20, 2017 at 11:43:28AM +0800, Peter Xu wrote:
 > 
-> I have concerns about it's portability though. I remember
-> we had to get rid of unnamed fields in some structs at some point
-> for the sake of some old compiler.
+> [...]
+> 
+> > > What I don't want to see is for this API bug to leak out into the rest
+> > > of the QEMU code such that intel_iommu code, or iommu code in general
+> > > subtly avoids it by artificially using a smaller range.  VT-d hardware
+> > > has an actual physical address space of either 2^39 or 2^48 bits, so if
+> > > you want to make the iommu address space match the device we're trying
+> > > to emulate, that's perfectly fine.  AIUI, AMD-Vi does actually have a
+> > > 64-bit address space on the IOMMU, so to handle that case I'd expect
+> > > the simplest solution would be to track the and mapped iova high water
+> > > mark per container in vfio and truncate unmaps to that high water end
+> > > address.  Realistically we're probably not going to see iovas at the end
+> > > of the 64-bit address space, but we can come up with some other
+> > > workaround in the vfio code or update the kernel API if we do.  Thanks,  
+> > 
+> > Agree that high watermark can be a good solution for VT-d. I'll use
+> > that instead of 2^63-1.  
+> 
+> Okay when I replied I didn't notice this "watermark" may need more
+> than several (even tens of) LOCs. :(
+> 
+> Considering that I see no further usage of this watermark, I'm
+> thinking whether it's okay I directly use (1ULL << VTD_MGAW) here as
+> the watermark - it's simple, efficient and secure imho.
 
-Unnamed bitfields are in C89 and we definitely use unnamed unions.
-Maybe that was an unnamed struct or scalar.
+Avoiding the issue based on the virtual iommu hardware properties is a
+fine solution, my intention was only to discourage introduction of
+artificial limitations in the surrounding code to avoid this vfio
+issue.  Thanks,
 
-Paolo
-
->>> +#define QEMU_BUILD_BUG_ON(x) typedef QEMU_BUILD_BUG_ON_STRUCT(x) \
->>> +    glue(qemu_build_bug_on__, __LINE__) __attribute__((unused))
->>>  
->>>  #if defined __GNUC__
->>>  # if !QEMU_GNUC_PREREQ(4, 4)
+Alex
