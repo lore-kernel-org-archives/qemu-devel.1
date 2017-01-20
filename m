@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUdKQ-0006zZ-5m
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:50:23 -0500
+	(envelope-from <mst@redhat.com>) id 1cUdOb-000252-1l
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:54:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUdKM-0006Aw-Uu
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:50:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48668)
+	(envelope-from <mst@redhat.com>) id 1cUdOX-0008J3-V3
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:54:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50944)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUdKM-0006AC-NX
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:50:18 -0500
-Date: Fri, 20 Jan 2017 19:50:16 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUdOX-0008Ij-PZ
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:54:37 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F0F583F3F
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 17:54:37 +0000 (UTC)
+Date: Fri, 20 Jan 2017 19:54:35 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170120194950-mutt-send-email-mst@kernel.org>
-References: <1484772931-16272-1-git-send-email-mst@redhat.com>
-	<1484772931-16272-4-git-send-email-mst@redhat.com>
-	<87r33zii2m.fsf@dusky.pond.sub.org>
-	<8721518c-5063-bd5b-60a9-3a3752894e74@redhat.com>
-	<8737gfb2dn.fsf@dusky.pond.sub.org>
-	<20170119212409-mutt-send-email-mst@kernel.org>
-	<87d1fi42o7.fsf@dusky.pond.sub.org>
+Message-ID: <20170120195406-mutt-send-email-mst@kernel.org>
+References: <20170120170757.30308-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87d1fi42o7.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] compiler: expression version of
- QEMU_BUILD_BUG_ON
+In-Reply-To: <20170120170757.30308-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/7] virtio: use MemoryRegionCache for
+ descriptors and rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,81 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
-On Fri, Jan 20, 2017 at 08:21:28AM +0100, Markus Armbruster wrote:
-> "Michael S. Tsirkin" <mst@redhat.com> writes:
+On Fri, Jan 20, 2017 at 06:07:50PM +0100, Paolo Bonzini wrote:
+> Patch posted during 2.8 hard freeze.  Quick measurements give a 10%
+> performance improvement on various virtio-blk benchmarks, but the machine
+> I used seems to love my patches particularly today!
 > 
-> > On Thu, Jan 19, 2017 at 02:33:40PM +0100, Markus Armbruster wrote:
-> >> Paolo Bonzini <pbonzini@redhat.com> writes:
-> >> 
-> >> > On 19/01/2017 09:12, Markus Armbruster wrote:
-> >> >> "Michael S. Tsirkin" <mst@redhat.com> writes:
-> >> >> 
-> >> >>> QEMU_BUILD_BUG_ON uses a typedef in order to be safe
-> >> >>> to use outside functions, but sometimes it's useful
-> >> >>> to have a version that can be used within an expression.
-> >> >>> Following what Linux does, introduce QEMU_BUILD_BUG_ON_ZERO
-> >> >>> that return zero after checking condition at build time.
-> >> >> 
-> >> >> Following Linux's example makes sense, but I can't help but wonder
-> >> >> whether we need both QEMU_BUILD_BUG_ON_ZERO() and QEMU_BUILD_BUG_ON().
-> >> >
-> >> > I think so, most notably QEMU_BUILD_BUG_ON was added to C11 as
-> >> > _Static_assert but QEMU_BUILD_BUG_ON_ZERO wasn't.
-> >> 
-> >> Okay.
-> >> 
-> >> > But we can indeed redefine QEMU_BUILD_BUG_ON to
-> >> > (void)QEMU_BUILD_BUG_ON_ZERO(x) like Linux does, until we add optional
-> >> > support for _Static_assert.
-> >> 
-> >> Yes, please.
-> >
-> >
-> > I don't think we can because we use QEMU_BUILD_BUG_ON outside
-> > any functions. I don't think you can put 0 there.
-> 
-> Point taken.  Still, we should be able to factor out a common core of
-> the bug condition.
-> 
-> >> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >> >>> ---
-> >> >>>  include/qemu/compiler.h | 2 ++
-> >> >>>  1 file changed, 2 insertions(+)
-> >> >>>
-> >> >>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-> >> >>> index 2882470..f4cf13b 100644
-> >> >>> --- a/include/qemu/compiler.h
-> >> >>> +++ b/include/qemu/compiler.h
-> >> >>> @@ -89,6 +89,8 @@
-> >> >>>      typedef char glue(qemu_build_bug_on__,__LINE__)[(x) ? -1 : 1] \
-> >> >>>          __attribute__((unused))
-> >> >>>  
-> >> >>> +#define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(int[(x) ? -1 : 1]) - sizeof(int))
-> >> >
-> >> > Linux here uses:
-> >> >
-> >> > #define BUILD_BUG_ON_ZERO(e) (sizeof(struct { int:-!!(e); }))
-> >> >
-> >> > and the issue is that sizeof(int[(x) ? -1 : 1]) could be
-> >> > runtime-evaluated (the type is a variable-length array).
-> >> 
-> >> Let's copy both macros from Linux.
-> >
-> > I prefer our variant, I don't think it's portable to assume that
-> > sizeof(struct {int:0}) is 0. Besides, Linux code is GPLv2 only and this
-> > file is 2 or later.
-> 
-> Use (sizeof(struct { int: X }) - sizeof(struct { int: 0 })) if you care
-> for portability to lesser compilers.  I don't, because we use common
-> extensions supported by both GCC and Clang all over the place.
-> 
-> The idea to use bitfield size is not copyrightable, only expressions of
-> the idea.
+> Paolo
 
-Right I did that before reading this reply.
+Will review, thanks!
 
--- 
-MST
+
+> Paolo Bonzini (7):
+>   virtio: make virtio_should_notify static
+>   virtio: add virtio_*_phys_cached
+>   virtio: use address_space_map/unmap to access descriptors
+>   virtio: use MemoryRegionCache to access descriptors
+>   virtio: add MemoryListener to cache ring translations
+>   virtio: use VRingMemoryRegionCaches for descriptor ring
+>   virtio: use VRingMemoryRegionCaches for avail and used rings
+> 
+>  hw/net/virtio-net.c               |  14 +-
+>  hw/virtio/virtio.c                | 322 ++++++++++++++++++++++++++++++--------
+>  include/hw/virtio/virtio-access.h |  52 ++++++
+>  include/hw/virtio/virtio.h        |   2 +-
+>  4 files changed, 322 insertions(+), 68 deletions(-)
+> 
+> -- 
+> 2.9.3
