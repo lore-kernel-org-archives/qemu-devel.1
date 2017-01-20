@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cUcER-0008WJ-Q9
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:40:09 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cUcHg-0002z8-Kl
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cUcEQ-0001Nj-Vw
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:40:07 -0500
-Received: from mail-vk0-x22c.google.com ([2607:f8b0:400c:c05::22c]:33008)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cUcEQ-0001Mb-Oq
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:40:06 -0500
-Received: by mail-vk0-x22c.google.com with SMTP id k127so53405499vke.0
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 08:40:06 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170120091553.11013-1-cornelia.huck@de.ibm.com>
-References: <20170120091553.11013-1-cornelia.huck@de.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jan 2017 16:39:45 +0000
-Message-ID: <CAFEAcA8QobUVjLkW+qsHMumT6bx33BUR7N=0OdVm1W0N214ung@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 00/12] s390x update
+	(envelope-from <pbonzini@redhat.com>) id 1cUcHf-000374-MW
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUcHf-00036v-GR
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:27 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9680B80469
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 16:43:27 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 20 Jan 2017 17:43:07 +0100
+Message-Id: <20170120164322.21851-3-pbonzini@redhat.com>
+In-Reply-To: <20170120164322.21851-1-pbonzini@redhat.com>
+References: <20170120164322.21851-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/17] block-backend: allow blk_prw from
+ coroutine context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Jens Freimann <jfrei@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, famz@redhat.com
 
-On 20 January 2017 at 09:15, Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
-> The following changes since commit 0f6bcf68a99efdc531b209551f2b760b0bdcc554:
->
->   Merge remote-tracking branch 'remotes/artyom/tags/pull-sun4v-20170118' into staging (2017-01-19 18:34:13 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/cohuck/qemu tags/s390x-20170120-v2
->
-> for you to fetch changes up to 8c797e758ad41b8dd6ea6f72c6f0194dedb30a2f:
->
->   virtio-ccw: fix ring sizing (2017-01-20 10:02:02 +0100)
->
-> ----------------------------------------------------------------
-> First set of s390x patches for 2.9:
-> - rework of the zpci code, giving us proper multibus support
-> - introduction of the 2.9 machine
-> - fixes and improvements
->
+qcow2_create2 calls this.  Do not run a nested event loop, as that
+breaks when aio_co_wake tries to queue the coroutine on the co_queue_wakeup
+list of the currently running one.
 
-Applied, thanks.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/block-backend.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
--- PMM
+diff --git a/block/block-backend.c b/block/block-backend.c
+index efbf398..1177598 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -880,7 +880,6 @@ static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
+ {
+     QEMUIOVector qiov;
+     struct iovec iov;
+-    Coroutine *co;
+     BlkRwCo rwco;
+ 
+     iov = (struct iovec) {
+@@ -897,9 +896,14 @@ static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
+         .ret    = NOT_DONE,
+     };
+ 
+-    co = qemu_coroutine_create(co_entry, &rwco);
+-    qemu_coroutine_enter(co);
+-    BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
++    if (qemu_in_coroutine()) {
++        /* Fast-path if already in coroutine context */
++        co_entry(&rwco);
++    } else {
++        Coroutine *co = qemu_coroutine_create(co_entry, &rwco);
++        qemu_coroutine_enter(co);
++        BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
++    }
+ 
+     return rwco.ret;
+ }
+-- 
+2.9.3
