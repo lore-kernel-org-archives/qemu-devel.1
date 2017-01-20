@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUcQ4-0001x7-TT
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:52:10 -0500
+	(envelope-from <mst@redhat.com>) id 1cUcUt-00064k-Pw
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:57:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUcQ1-0000dm-TR
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:52:09 -0500
-Date: Fri, 20 Jan 2017 18:51:54 +0200
+	(envelope-from <mst@redhat.com>) id 1cUcUq-0003R6-Pk
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:57:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57074)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUcUq-0003Q3-Jn
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:57:04 -0500
+Date: Fri, 20 Jan 2017 18:57:02 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170120185017-mutt-send-email-mst@kernel.org>
-References: <1484880649-12600-1-git-send-email-zhaoshenglong@huawei.com>
+Message-ID: <20170120185551-mutt-send-email-mst@kernel.org>
+References: <1484859998-25074-1-git-send-email-mst@redhat.com>
+	<1484859998-25074-3-git-send-email-mst@redhat.com>
+	<87wpdq2n4e.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1484880649-12600-1-git-send-email-zhaoshenglong@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: Fix no interrupt when not creating
- msi controller
+In-Reply-To: <87wpdq2n4e.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
+ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, shannon.zhao@linaro.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Jan 20, 2017 at 10:50:49AM +0800, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
+On Fri, Jan 20, 2017 at 08:42:41AM +0100, Markus Armbruster wrote:
+> "Michael S. Tsirkin" <mst@redhat.com> writes:
 > 
-> For ARM virt machine, if we use virt-2.7 which will not create ITS node,
-> the virtio-net can not recieve interrupts so it can't get ip address
-> through dhcp.
-> This fixes commit 83d768b(virtio: set ISR on dataplane notifications).
+> > There are theoretical concerns that some compilers might not trigger
+> > build failures on attempts to define an array of size -1 and make it a
+> > variable sized array instead. Let rewrite using a struct with a negative
+> > bit field size instead as there are no dynamic bit field sizes.  This is
+> > similar to what Linux does.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  include/qemu/compiler.h | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> > index 7512082..c6f673e 100644
+> > --- a/include/qemu/compiler.h
+> > +++ b/include/qemu/compiler.h
+> > @@ -85,9 +85,12 @@
+> >  #define typeof_field(type, field) typeof(((type *)0)->field)
+> >  #define type_check(t1,t2) ((t1*)0 - (t2*)0)
+> >  
+> > -#define QEMU_BUILD_BUG_ON(x) \
+> > -    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
+> > -        __attribute__((unused))
+> > +#define QEMU_BUILD_BUG_ON_STRUCT(x) \
+> > +    struct { \
+> > +        int qemu_build_bug_on : (x) ? -1 : 1; \
+> > +    }
 > 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
->  hw/virtio/virtio.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index aa4f38f..709b718 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2082,6 +2082,7 @@ static void virtio_queue_guest_notifier_read(EventNotifier *n)
->  {
->      VirtQueue *vq = container_of(n, VirtQueue, guest_notifier);
->      if (event_notifier_test_and_clear(n)) {
-> +        virtio_set_isr(vq->vdev, 0x1);
->          virtio_notify_vector(vq->vdev, vq->vector);
->      }
->  }
+> The qemu_build_bug_on name space pollution is harmless, but quite
+> unnecessary: the name can be simply omitted (unnamed bit-field).
 
-Then you should bring back virtio_irq, to avoid duplicating
-code from virtio_notify.
+I have concerns about it's portability though. I remember
+we had to get rid of unnamed fields in some structs at some point
+for the sake of some old compiler.
 
-
-
-> -- 
-> 2.0.4
-> 
+> > +#define QEMU_BUILD_BUG_ON(x) typedef QEMU_BUILD_BUG_ON_STRUCT(x) \
+> > +    glue(qemu_build_bug_on__, __LINE__) __attribute__((unused))
+> >  
+> >  #if defined __GNUC__
+> >  # if !QEMU_GNUC_PREREQ(4, 4)
