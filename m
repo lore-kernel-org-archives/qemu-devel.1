@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUaIZ-0007WZ-EE
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:36:16 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUaJK-00089h-Ql
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:37:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUaIV-0007C6-H0
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:36:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cUaIV-0007Bh-89
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:36:11 -0500
-References: <1484859998-25074-1-git-send-email-mst@redhat.com>
-	<1484859998-25074-3-git-send-email-mst@redhat.com>
-	<20170120094124.GB2658@work-vm>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7af547e6-8758-388a-17e9-9f749e927da2@redhat.com>
-Date: Fri, 20 Jan 2017 08:36:08 -0600
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUaJH-0007Uf-O1
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:37:02 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33373
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cUaJH-0007UU-IV
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:36:59 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0KEYY73002825
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 09:36:58 -0500
+Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 283kj1a82j-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 09:36:58 -0500
+Received: from localhost
+	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Fri, 20 Jan 2017 14:36:54 -0000
+Date: Fri, 20 Jan 2017 15:36:48 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170119210449.11991-1-ehabkost@redhat.com>
+References: <20170119210449.11991-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170120094124.GB2658@work-vm>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oRFPsHufXLG2pSjudvDKprsi92OCBFqMA"
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
- struct
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170120153648.391034a7.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/6] i386: Add "max" CPU model to TCG and
+ KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +42,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oRFPsHufXLG2pSjudvDKprsi92OCBFqMA
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
-Message-ID: <7af547e6-8758-388a-17e9-9f749e927da2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
- struct
-References: <1484859998-25074-1-git-send-email-mst@redhat.com>
- <1484859998-25074-3-git-send-email-mst@redhat.com>
- <20170120094124.GB2658@work-vm>
-In-Reply-To: <20170120094124.GB2658@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 19 Jan 2017 19:04:43 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-On 01/20/2017 03:41 AM, Dr. David Alan Gilbert wrote:
+> This is v2 of the previous series that enabled the "host" CPU
+> model on TCG. Now a new "max" CPU is being added, while keeping
+> "host" KVM-specific.
 
->> -#define QEMU_BUILD_BUG_ON(x) \
->> -    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
->> -        __attribute__((unused))
->> +#define QEMU_BUILD_BUG_ON_STRUCT(x) \
->> +    struct { \
->> +        int qemu_build_bug_on : (x) ? -1 : 1; \
->> +    }
->=20
-> The problem with this is it can't be used as an expression, where as
-> your previous version could.
-> I've got a similar case (see previous reply) that needed an expression
-> bug-on that would evaluate to zero.
-
-Keep reading the series - the version usable in an expression is
-QEMU_BUILD_BUG_ON_ZERO, introduced in 3/4.  Patch 2/4 is just rewriting
-the existing check, with no change in the fact that it is still a
-declaration.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---oRFPsHufXLG2pSjudvDKprsi92OCBFqMA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYgiBYAAoJEKeha0olJ0NqwfQH/11zvL6/jAAR0UM22DkDRanp
-HX/ifR5W/1HbQPOatHmmtHYxOD6ZvLMTUZlHN9MjWeavpv5ye51XQ+PWF1gMl5RE
-45bk8cVwmQ8IeUhw9vqxAJpOdThTWVaRdUZVfI8v6bQU8+atxoqFQjbTNI67r57I
-taZm3sJbd9rfcsR4sQxpI78tb3AaRW3MAziZ8vYn6wi/e0D0J/rZsZ2vaTQQeRi4
-XRKKgp4LB/z4pamol7bZBPKxOMMvO+X5ul5bP7VM+AWMpQLmoZB5miQXzMuz9vUm
-M9IuLjKLVLvd3VIcdrZELrdJBwsuHep1ey53De7BHKO9kn2crqKaL+KPbao1XhI=
-=FzmS
------END PGP SIGNATURE-----
-
---oRFPsHufXLG2pSjudvDKprsi92OCBFqMA--
+This looks like a good idea, and I think we'll do the same on s390.
