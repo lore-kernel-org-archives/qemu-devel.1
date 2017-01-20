@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTYE-0006BJ-Em
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:59 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTYG-0006Ca-9P
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTY9-000080-HE
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:58 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTYF-0000Bh-G8
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:00 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 20 Jan 2017 15:23:00 +0800
-Message-Id: <20170120072310.8009-7-famz@redhat.com>
+Date: Fri, 20 Jan 2017 15:23:01 +0800
+Message-Id: <20170120072310.8009-8-famz@redhat.com>
 In-Reply-To: <20170120072310.8009-1-famz@redhat.com>
 References: <20170120072310.8009-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 06/16] iotests: 055: Don't attach the drive
- to vm for drive-backup
+Subject: [Qemu-devel] [PATCH v11 07/16] iotests: 030: Read-only open image
+ for getting map
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +25,30 @@ Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/qemu-iotests/055 | 32 ++++++++++++++++++--------------
- 1 file changed, 18 insertions(+), 14 deletions(-)
+ tests/qemu-iotests/030 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index 1d3fd04..20a7596 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -455,17 +455,18 @@ class TestDriveCompression(iotests.QMPTestCase):
-         except OSError:
-             pass
- 
--    def do_prepare_drives(self, fmt, args):
-+    def do_prepare_drives(self, fmt, args, attach):
-         self.vm = iotests.VM().add_drive(test_img)
- 
-         qemu_img('create', '-f', fmt, blockdev_target_img,
-                  str(TestDriveCompression.image_len), *args)
--        self.vm.add_drive(blockdev_target_img, format=fmt)
-+        if attach:
-+            self.vm.add_drive(blockdev_target_img, format=fmt)
- 
-         self.vm.launch()
- 
--    def do_test_compress_complete(self, cmd, format, **args):
--        self.do_prepare_drives(format['type'], format['args'])
-+    def do_test_compress_complete(self, cmd, format, attach, **args):
-+        self.do_prepare_drives(format['type'], format['args'], attach)
- 
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 54db54a..fe0c73f 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -114,7 +114,7 @@ class TestSingleDrive(iotests.QMPTestCase):
          self.assert_no_active_block_jobs()
  
-@@ -481,15 +482,16 @@ class TestDriveCompression(iotests.QMPTestCase):
+         # The image map is empty before the operation
+-        empty_map = qemu_io('-f', iotests.imgfmt, '-c', 'map', test_img)
++        empty_map = qemu_io('-f', iotests.imgfmt, '-c', 'map', '-r', test_img)
  
-     def test_complete_compress_drive_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_complete('drive-backup', format,
-+            self.do_test_compress_complete('drive-backup', format, attach=False,
-                                            target=blockdev_target_img, mode='existing')
- 
-     def test_complete_compress_blockdev_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_complete('blockdev-backup', format, target='drive1')
-+            self.do_test_compress_complete('blockdev-backup', format,
-+                                           attach=True, target='drive1')
- 
--    def do_test_compress_cancel(self, cmd, format, **args):
--        self.do_prepare_drives(format['type'], format['args'])
-+    def do_test_compress_cancel(self, cmd, format, attach, **args):
-+        self.do_prepare_drives(format['type'], format['args'], attach)
- 
+         # This is a no-op: no data should ever be copied from the base image
+         result = self.vm.qmp('block-stream', device='drive0', base=mid_img)
+@@ -125,7 +125,7 @@ class TestSingleDrive(iotests.QMPTestCase):
          self.assert_no_active_block_jobs()
+         self.vm.shutdown()
  
-@@ -503,15 +505,16 @@ class TestDriveCompression(iotests.QMPTestCase):
+-        self.assertEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', test_img),
++        self.assertEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', '-r', test_img),
+                          empty_map, 'image file map changed after a no-op')
  
-     def test_compress_cancel_drive_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_cancel('drive-backup', format,
-+            self.do_test_compress_cancel('drive-backup', format, attach=False,
-                                          target=blockdev_target_img, mode='existing')
- 
-     def test_compress_cancel_blockdev_backup(self):
-        for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_cancel('blockdev-backup', format, target='drive1')
-+            self.do_test_compress_cancel('blockdev-backup', format, attach=True,
-+                                         target='drive1')
- 
--    def do_test_compress_pause(self, cmd, format, **args):
--        self.do_prepare_drives(format['type'], format['args'])
-+    def do_test_compress_pause(self, cmd, format, attach, **args):
-+        self.do_prepare_drives(format['type'], format['args'], attach)
- 
-         self.assert_no_active_block_jobs()
- 
-@@ -543,12 +546,13 @@ class TestDriveCompression(iotests.QMPTestCase):
- 
-     def test_compress_pause_drive_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_pause('drive-backup', format,
-+            self.do_test_compress_pause('drive-backup', format, attach=False,
-                                         target=blockdev_target_img, mode='existing')
- 
-     def test_compress_pause_blockdev_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_pause('blockdev-backup', format, target='drive1')
-+            self.do_test_compress_pause('blockdev-backup', format, attach=True,
-+                                        target='drive1')
- 
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['raw', 'qcow2'])
+     def test_stream_partial(self):
 -- 
 2.9.3
