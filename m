@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUbFF-0001qn-PQ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:36:54 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cUbFn-0002Kd-OD
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:37:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cUbFE-0006Qw-QO
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:36:53 -0500
-References: <1484905570-10520-1-git-send-email-pl@kamp.de>
-	<1484905570-10520-3-git-send-email-pl@kamp.de>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2f7747d5-17dc-0d3b-143a-9e7bb22095ff@redhat.com>
-Date: Fri, 20 Jan 2017 09:36:39 -0600
+	(envelope-from <imammedo@redhat.com>) id 1cUbFm-0006iM-U9
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:37:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44800)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cUbFm-0006hF-Nr
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:37:26 -0500
+Date: Fri, 20 Jan 2017 16:37:22 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170120163722.11ca9ce6@nial.brq.redhat.com>
+In-Reply-To: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
+References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1484905570-10520-3-git-send-email-pl@kamp.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rHEDPUHSdHhe9wXWdIMXxjI12k17rLGXU"
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/nfs: fix naming of runtime opts
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 00/13] numa: add '-numa cpu' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, ashijeetacharya@gmail.com, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, Andrew Jones <drjones@redhat.com>, ehabkost@redhat.com, peter.maydell@linaro.org, fanc.fnst@cn.fujitsu.com, Thomas Huth <thuth@redhat.com>, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, David Gibson <david@gibson.dropbear.id.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rHEDPUHSdHhe9wXWdIMXxjI12k17rLGXU
-From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, ashijeetacharya@gmail.com,
- jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com,
- qemu-stable@nongnu.org
-Message-ID: <2f7747d5-17dc-0d3b-143a-9e7bb22095ff@redhat.com>
-Subject: Re: [PATCH 2/2] block/nfs: fix naming of runtime opts
-References: <1484905570-10520-1-git-send-email-pl@kamp.de>
- <1484905570-10520-3-git-send-email-pl@kamp.de>
-In-Reply-To: <1484905570-10520-3-git-send-email-pl@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 18 Jan 2017 18:13:16 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-On 01/20/2017 03:46 AM, Peter Lieven wrote:
-> commit 94d6a7a accidently left the naming of runtime opts and QAPI
-> scheme inconsistent. As one consequence passing of parameters in the
-> URI is broken. Sync the naming of the runtime opts to the QAPI
-> scheme.
+[...]
+>   pc: cleanup: move smbios_set_cpuid() into pc_build_smbios()
+>   pc: don't return cpu pointer from pc_new_cpu() as it's not needed
+>     anymore
+>   make possible_cpu_arch_ids() return const pointer
+Eduardo,
 
-The commit message should explicitly mention that this is technically
-backwards incompatible with the 2.8 release, but that the 2.8 release is
-the only version that had the wrong naming and that release also had the
-(just-fixed) bug of a crash during URI parsing.
+Could you review/merge 2-4/13 as generic cleanups to PC code
+so I won't spam list with them on respin?
 
->=20
-> Fixes: 94d6a7a76e9df9919629428f6c598e2b97d9426c
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> ---
->  block/nfs.c | 30 +++++++++++++++---------------
->  1 file changed, 15 insertions(+), 15 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---rHEDPUHSdHhe9wXWdIMXxjI12k17rLGXU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYgi6HAAoJEKeha0olJ0NquaIH/jmO5/bUYTrW1e2t6t+5Nhds
-Omlhm5VcGg/3FMQOoqKXC0KsIaChmcWwChwrYRquCkwD4JlS3lvKK3aGF74uJUTT
-opT/ldNFScdsqYBAsiJ2A5/SYGxUOdFVAGEba/OVrM+YW1Jn4Qx560xIR+P0PY2U
-jhzRB7w8TtTDUuAJr9Dl91ZDEFVkkj5zUI7dtFz+ofttyvqCeYPKGZKX/h6a2VWl
-3jfATVMRqs0jABqWrwkgthDKaVI8qnu/zpfkMVIpVS7wL56fUz2LMOx/MxeM+sgu
-dSAv9irrnro+Ge3IGAHCwf2Z7zENLSArNKVgl2wLKrV3FhJZpBEYrqcTpr8clow=
-=Q1xg
------END PGP SIGNATURE-----
-
---rHEDPUHSdHhe9wXWdIMXxjI12k17rLGXU--
+>   pc: move pcms->possible_cpus init out of pc_cpus_init()
+>   pc: calculate topology only once when possible_cpus is initialised
+>   pc: pass apic_id to pc_find_cpu_slot() directly so lookup could be
+>     done without CPU object
+>   pc: add writeonly 'cpu' property to PCMachine
+>   numa: introduce '-numa cpu' cpu option
+>   numa: replace cpu_index_to_socket_id() with
+>     cpu_index_to_instance_props()
+>   numa: use new machine.cpu property with -numa cpus=... CLI
+>   pc: drop usage of legacy numa_get_node_for_cpu()
+>   pc: cpu: make sure that cpu.node-id matches -numa mapping
+> 
+>  include/hw/acpi/acpi_dev_interface.h |   2 +-
+>  include/hw/boards.h                  |  14 ++-
+>  include/hw/i386/pc.h                 |   2 +-
+>  include/qom/cpu.h                    |   2 -
+>  include/sysemu/numa.h                |   3 +-
+>  target/arm/cpu.h                     |   2 +
+>  target/i386/cpu.h                    |   1 +
+>  target/ppc/cpu.h                     |   2 +
+>  hw/acpi/cpu.c                        |  13 +--
+>  hw/acpi/cpu_hotplug.c                |   4 +-
+>  hw/arm/virt.c                        |  12 +-
+>  hw/i386/acpi-build.c                 |  25 ++---
+>  hw/i386/pc.c                         | 210 +++++++++++++++++++++++------------
+>  hw/ppc/spapr.c                       |  15 ++-
+>  hw/ppc/spapr_cpu_core.c              |   2 +-
+>  monitor.c                            |   7 +-
+>  numa.c                               |  89 +++++++++++----
+>  qapi-schema.json                     |   3 +-
+>  stubs/pc_madt_cpu_entry.c            |   2 +-
+>  target/arm/cpu.c                     |   1 +
+>  target/i386/cpu.c                    |   1 +
+>  target/ppc/translate_init.c          |   1 +
+>  vl.c                                 |   4 +-
+>  23 files changed, 269 insertions(+), 148 deletions(-)
+> 
