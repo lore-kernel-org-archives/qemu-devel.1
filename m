@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cUO0U-0003ii-Tj
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 20:28:47 -0500
+	(envelope-from <famz@redhat.com>) id 1cUORV-0000gJ-4T
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 20:56:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cUO0R-0002zk-Qb
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 20:28:46 -0500
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:32969)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cUO0R-0002zd-Ky
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 20:28:43 -0500
-Received: by mail-yw0-x242.google.com with SMTP id u68so7375859ywg.0
-	for <qemu-devel@nongnu.org>; Thu, 19 Jan 2017 17:28:43 -0800 (PST)
-References: <20170119170507.16185-1-alex.bennee@linaro.org>
-	<20170119170507.16185-6-alex.bennee@linaro.org>
-From: Pranith Kumar <bobby.prani@gmail.com>
-In-reply-to: <20170119170507.16185-6-alex.bennee@linaro.org>
-Date: Thu, 19 Jan 2017 20:28:41 -0500
-Message-ID: <878tq6r03a.fsf@gmail.com>
+	(envelope-from <famz@redhat.com>) id 1cUORU-00015w-6b
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 20:56:41 -0500
+Date: Fri, 20 Jan 2017 09:56:28 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170120015628.GA29561@lemon>
+References: <20170119143816.21972-1-famz@redhat.com>
+	<20170119143816.21972-15-famz@redhat.com>
+	<20170119154900.GB16641@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 05/27] tcg: add options for enabling
- MTTCG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170119154900.GB16641@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v10 14/16] file-posix: Implement image
+ locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
 
+On Thu, 01/19 15:49, Daniel P. Berrange wrote:
+> On Thu, Jan 19, 2017 at 10:38:14PM +0800, Fam Zheng wrote:
+> > This implements open flag sensible image locking for local file
+> > and host device protocol.
+> > 
+> > virtlockd in libvirt locks the first byte, so we start looking at the
+> > file bytes from 1.
+> > 
+> > Quoting what was proposed by Kevin Wolf <kwolf@redhat.com>, there are
+> > four locking modes by combining two bits (BDRV_O_RDWR and
+> > BDRV_O_SHARE_RW), and implemented by taking two locks:
+> > 
+> > Lock bytes:
+> > 
+> > * byte 1: I can't allow other processes to write to the image
+> > * byte 2: I am writing to the image
+> > 
+> > Lock modes:
+> > 
+> > * shared writer (BDRV_O_RDWR | BDRV_O_SHARE_RW): Take shared lock on
+> >   byte 2. Test whether byte 1 is locked using an exclusive lock, and
+> >   fail if so.
+> > 
+> > * exclusive writer (BDRV_O_RDWR only): Take shared lock on byte 2. Test
+> >   whether byte 1 is locked using an exclusive lock, and fail if so. Then
+> >   take shared lock on byte 1. I suppose this is racy, but we can
+> >   probably tolerate that.
+> > 
+> > * reader that can tolerate writers (BDRV_O_SHARE_RW only): Don't do anything
+> > 
+> > * reader that can't tolerate writers (neither bit is set): Take shared
+> >   lock on byte 1. Test whether byte 2 is locked, and fail if so.
+> 
+> Ahh, using two bytes is an interesting technique for mapping the four
+> different access methods onto the more limit fcntl lock semantics. We
+> might want to copy this approach in libvirt too....
+> 
+> > +/* Posix file locking bytes. Libvirt takes byte 0, so start from byte 1. */
+> > +#define RAW_LOCK_BYTE_MIN             1
+> > +#define RAW_LOCK_BYTE_NO_OTHER_WRITER 1
+> > +#define RAW_LOCK_BYTE_WRITE           2
+> 
+> ...would you mind if QEMU started from say byte 10, leaving the first 10
+> reserved for libvirt uses. This lets libvirt have a continuous space for
+> its own usage if we want to use more bytes
 
-Alex Bennée writes:
+That's easy, will do it. (Actually the descriptions above are a bit stale
+because exclusive writers now take two bytes exclusively and the lock testings
+are done with F_OFD_GETLK so that RO readers can test against shared locks
+without acquiring a write lock, which requires O_RDWR).
 
-> From: KONRAD Frederic <fred.konrad@greensocs.com>
->
-> We know there will be cases where MTTCG won't work until additional work
-> is done in the front/back ends to support. It will however be useful to
-> be able to turn it on.
->
-> As a result MTTCG will default to off unless the combination is
-> supported. However the user can turn it on for the sake of testing.
->
-
-<snip>
-
->  static TimersState timers_state;
-> +bool mttcg_enabled;
-> +
-> +/*
-> + * We default to false if we know other options have been enabled
-> + * which are currently incompatible with MTTCG. Otherwise when each
-> + * guest (target) has been updated to support:
-> + *   - atomic instructions
-> + *   - memory ordering primitives (barriers)
-> + * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
-> + *
-> + * Once a guest architecture has been converted to the new primitives
-> + * there are two remaining limitations to check.
-> + *
-> + * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
-> + * - The host must have a stronger memory order than the guest
-> + *
-> + * It may be possible in future to support strong guests on weak hosts
-> + * but that will require tagging all load/stores in a guest with their
-> + * implicit memory order requirements which would likely slow things
-> + * down a lot.
-> + */
-> +
-> +static bool check_tcg_memory_orders_compatible(void)
-> +{
-> +#if defined(TCG_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
-> +    return (TCG_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
-
-I am not sure this is what we intended. If the guest is weaker than the host,
-we can still run the guest if we translate the guest barriers. With the above,
-a strong host cannot run a weaker host.
-
-I think what we want is to disallow weak hosts from running stronger guests,
-since we do not enforce the implicit ordering semantics of the guest as of
-now.  In that case you can filter them out using the following:
-
-TCG_DEFAULT_MO | (TCG_DEFAULT_MO ^ ~TCG_TARGET_DEFAULT_MO) == TCG_MO_ALL
-
-We want our guest execution to prevent all possible re-ordering. The first
-term above is the host memory order. If the host is SC, we do not need to
-check anything else. If not, the second term tells us the difference in
-ordering between the guest and the host. It gives the kind of barriers
-which will be translated from guest to host. Both these together should cover
-all the cases for the memory order to be compatible.
-
-Thoughts?
-
-Thanks,
---
-Pranith
+Fam
