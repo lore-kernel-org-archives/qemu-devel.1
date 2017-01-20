@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cUbeE-00014d-5M
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:02:46 -0500
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1cUc0T-0005Dh-I6
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:25:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cUbeB-0003Vb-0F
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:02:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49908)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cUbeA-0003V3-OV
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:02:38 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87h94tn9qm.fsf@dusky.pond.sub.org>
-	<CACXAS8AL_j-tqBNnx_92xASz5ZE2+9K3RFw51PYMPQ-vcXYagw@mail.gmail.com>
-Date: Fri, 20 Jan 2017 17:02:34 +0100
-In-Reply-To: <CACXAS8AL_j-tqBNnx_92xASz5ZE2+9K3RFw51PYMPQ-vcXYagw@mail.gmail.com>
-	(Artyom Tarasenko's message of "Fri, 20 Jan 2017 15:19:38 +0100")
-Message-ID: <87wpdpk9d1.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] -M niagara -nodefaults crashes
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1cUc0P-0000Z6-HM
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:25:41 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
+	id 1cUc0P-0000YF-6M
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:25:37 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0KGOYgV061245
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:25:36 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2833bghbxw-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:25:35 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
+	Fri, 20 Jan 2017 16:25:32 -0000
+From: Eric Farman <farman@linux.vnet.ibm.com>
+Date: Fri, 20 Jan 2017 17:25:25 +0100
+In-Reply-To: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
+References: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
+Message-Id: <20170120162527.66075-2-farman@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 1/3] hw/scsi: Fix debug message of cdb
+ structure in scsi-generic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +38,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Beniamino Galvani <b.galvani@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Jia Liu <proljc@gmail.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Eric Farman <farman@linux.vnet.ibm.com>, pbonzini@redhat.com
 
-Artyom Tarasenko <atar4qemu@gmail.com> writes:
+When running with debug enabled, the scsi-generic cdb that is
+dumped skips byte 0 of the command, which is the opcode.  This
+makes identifying which command is being issued/completed a
+little difficult.  Example:
 
-> On Fri, Jan 20, 2017 at 2:26 PM, Markus Armbruster <armbru@redhat.com> wrote:
->> Watch this:
->>
->>     $ gdb --args bld/sparc64-softmmu/qemu-system-* -nodefaults -M niagara
->>     [...]
->>     (gdb) r
->>     Starting program: /work/armbru/qemu/bld/sparc64-softmmu/qemu-system-sparc64 -nodefaults -M niagara
->>     [Thread debugging using libthread_db enabled]
->>     Using host libthread_db library "/lib64/libthread_db.so.1".
->>     [New Thread 0x7fffce25d700 (LWP 17401)]
->>     [New Thread 0x7fffcb0c1700 (LWP 17402)]
->>     Could not open option rom 'nvram1': No such file or directory
->>     Could not open option rom '1up-md.bin': No such file or directory
->>     Could not open option rom '1up-hv.bin': No such file or directory
->>     Could not open option rom 'reset.bin': No such file or directory
->>     Could not open option rom 'q.bin': No such file or directory
->>     Could not open option rom 'openboot.bin': No such file or directory
->>
->>     Thread 1 "qemu-system-spa" received signal SIGSEGV, Segmentation fault.
->>     qemu_chr_fe_init (b=b@entry=0x5555566bea60, s=0x0,
->>         errp=0x555556497e68 <error_abort>) at /work/armbru/qemu/qemu-char.c:897
->>     897     if (s->is_mux) {
->>     (gdb) bt
->>     #0  0x0000555555833500 in qemu_chr_fe_init (b=b@entry=0x5555566bea60, s=0x0, errp=0x555556497e68 <error_abort>) at /work/armbru/qemu/qemu-char.c:897
->>     #1  0x0000555555890a0a in serial_mm_init (address_space=address_space@entry=0x55555653dbd0, base=base@entry=133412421632, it_shift=it_shift@entry=0, irq=irq@entry=0x0, baudbase=baudbase@entry=115200, chr=<optimized out>, end=
->>         DEVICE_BIG_ENDIAN) at /work/armbru/qemu/hw/char/serial.c:995
->>     #2  0x00005555558107e2 in niagara_init (machine=0x55555653bf80)
->>         at /work/armbru/qemu/hw/sparc64/niagara.c:149
->>     #3  0x00005555557726ea in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /work/armbru/qemu/vl.c:4544
->>
->> In other code that's similarly stuck in the pre-qdev world, the call to
->> serial_mm_init() is conditional on serial_hds[0].
->
-> Will add a check. A -nodefaults with -M niagara makes currenlty a
-> little sense though: there is no any known firmware which can use any
-> other configuration. Do we have any machines in qemu which don't
-> support -nodefaults ?
+  0x00 0x00 0x01 0x00 0x00
+  scsi-generic: scsi_read_data 0x0
+  scsi-generic: Data ready tag=0x0 len=164
+  scsi-generic: scsi_read_data 0x0
+  scsi-generic: Command complete 0x0x10a42c60 tag=0x0 status=0
 
-If the machine doesn't support a certain configuration, it should reject
-it, not crash.  The following machines crash in my testing:
+Improve this by adding a message prior to the loop, similar to
+what exists for scsi-disk.  Clean up a few other messages to be
+more explicit of what is being represented.  Example:
 
-* aarch64/arm cubieboard
-* microblaze/microblazeel petalogix-ml605
-* or32 or32-sim
-* ppc/ppc64/ppcemb virtex-ml507
-* sparc64 niagara
+  scsi-generic: Command: data=0x12 0x00 0x00 0x01 0x00 0x00
+  scsi-generic: scsi_read_data tag=0x0
+  scsi-generic: Data ready tag=0x0 len=164
+  scsi-generic: scsi_read_data tag=0x0
+  scsi-generic: Command complete 0x0x10a452d0 tag=0x0 status=0
 
-Reproducer:
+Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
+---
+ hw/scsi/scsi-generic.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-    echo -e 'q' | QEMU_AUDIO_DRV=none $q -nodefaults -S -display none -M $m,accel=qtest -monitor stdio
-
-Maintainers cc'ed.
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index 7a588a7..92f091a 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -246,7 +246,7 @@ static void scsi_read_data(SCSIRequest *req)
+     SCSIDevice *s = r->req.dev;
+     int ret;
+ 
+-    DPRINTF("scsi_read_data 0x%x\n", req->tag);
++    DPRINTF("scsi_read_data tag=0x%x\n", req->tag);
+ 
+     /* The request is used as the AIO opaque value, so add a ref.  */
+     scsi_req_ref(&r->req);
+@@ -294,7 +294,7 @@ static void scsi_write_data(SCSIRequest *req)
+     SCSIDevice *s = r->req.dev;
+     int ret;
+ 
+-    DPRINTF("scsi_write_data 0x%x\n", req->tag);
++    DPRINTF("scsi_write_data tag=0x%x\n", req->tag);
+     if (r->len == 0) {
+         r->len = r->buflen;
+         scsi_req_data(&r->req, r->len);
+@@ -329,6 +329,7 @@ static int32_t scsi_send_command(SCSIRequest *req, uint8_t *cmd)
+     int ret;
+ 
+ #ifdef DEBUG_SCSI
++    DPRINTF("Command: data=0x%02x", cmd[0]);
+     {
+         int i;
+         for (i = 1; i < r->req.cmd.len; i++) {
+-- 
+2.8.4
