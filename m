@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cUeSN-0006Mw-CT
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:02:43 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cUeUg-0007y3-7A
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:05:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cUeSI-0003MH-HO
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:02:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53118)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cUeSI-0003LJ-C5
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:02:34 -0500
-Date: Fri, 20 Jan 2017 17:02:31 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170120190231.GU3491@thinpad.lan.raisama.net>
-References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
-	<1484759609-264075-4-git-send-email-imammedo@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1cUeUc-0004MM-S2
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:05:02 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1484759609-264075-4-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 03/13] pc: don't return cpu pointer from
- pc_new_cpu() as it's not needed anymore
+In-Reply-To: <1484937883-1068-5-git-send-email-peter.maydell@linaro.org>
+References: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
+	<1484937883-1068-5-git-send-email-peter.maydell@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 20 Jan 2017 11:04:18 -0800
+Message-ID: <CAKmqyKOwzNj827103eSYZp6wAbsn4Ymvit-ZSOV9J7dLRgvO1A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 4/6] hw/registerfields.h: Pull FIELD etc
+ macros out of hw/register.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,15 +23,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>, Patch Tracking <patches@linaro.org>
 
-On Wed, Jan 18, 2017 at 06:13:19PM +0100, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On Fri, Jan 20, 2017 at 10:44 AM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+> hw/register.h provides macros like FIELD which make it easy to define
+> shift, mask and length constants for the fields within a register.
+> Unfortunately register.h also includes a lot of other things, some
+> of which will only compile in the softmmu build.
+>
+> Pull the FIELD macro and friends out into a separate header file,
+> so they can be used in places like target/arm files which also
+> get built in the user-only configs.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Looks good to me, I'm glad this is being used by others :)
 
-Applying to machine-next. Thanks!
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
--- 
-Eduardo
+Thanks,
+
+Alistair
+
+> ---
+>  include/hw/register.h       | 47 +----------------------------------
+>  include/hw/registerfields.h | 60 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 61 insertions(+), 46 deletions(-)
+>  create mode 100644 include/hw/registerfields.h
+>
+> diff --git a/include/hw/register.h b/include/hw/register.h
+> index 8c12233..8bff5fb 100644
+> --- a/include/hw/register.h
+> +++ b/include/hw/register.h
+> @@ -13,6 +13,7 @@
+>
+>  #include "hw/qdev-core.h"
+>  #include "exec/memory.h"
+> +#include "hw/registerfields.h"
+>
+>  typedef struct RegisterInfo RegisterInfo;
+>  typedef struct RegisterAccessInfo RegisterAccessInfo;
+> @@ -206,50 +207,4 @@ RegisterInfoArray *register_init_block32(DeviceState *owner,
+>
+>  void register_finalize_block(RegisterInfoArray *r_array);
+>
+> -/* Define constants for a 32 bit register */
+> -
+> -/* This macro will define A_FOO, for the byte address of a register
+> - * as well as R_FOO for the uint32_t[] register number (A_FOO / 4).
+> - */
+> -#define REG32(reg, addr)                                                  \
+> -    enum { A_ ## reg = (addr) };                                          \
+> -    enum { R_ ## reg = (addr) / 4 };
+> -
+> -/* Define SHIFT, LENGTH and MASK constants for a field within a register */
+> -
+> -/* This macro will define FOO_BAR_MASK, FOO_BAR_SHIFT and FOO_BAR_LENGTH
+> - * constants for field BAR in register FOO.
+> - */
+> -#define FIELD(reg, field, shift, length)                                  \
+> -    enum { R_ ## reg ## _ ## field ## _SHIFT = (shift)};                  \
+> -    enum { R_ ## reg ## _ ## field ## _LENGTH = (length)};                \
+> -    enum { R_ ## reg ## _ ## field ## _MASK =                             \
+> -                                        MAKE_64BIT_MASK(shift, length)};
+> -
+> -/* Extract a field from a register */
+> -#define FIELD_EX32(storage, reg, field)                                   \
+> -    extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,               \
+> -              R_ ## reg ## _ ## field ## _LENGTH)
+> -
+> -/* Extract a field from an array of registers */
+> -#define ARRAY_FIELD_EX32(regs, reg, field)                                \
+> -    FIELD_EX32((regs)[R_ ## reg], reg, field)
+> -
+> -/* Deposit a register field.
+> - * Assigning values larger then the target field will result in
+> - * compilation warnings.
+> - */
+> -#define FIELD_DP32(storage, reg, field, val) ({                           \
+> -    struct {                                                              \
+> -        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
+> -    } v = { .v = val };                                                   \
+> -    uint32_t d;                                                           \
+> -    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
+> -                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
+> -    d; })
+> -
+> -/* Deposit a field to array of registers.  */
+> -#define ARRAY_FIELD_DP32(regs, reg, field, val)                           \
+> -    (regs)[R_ ## reg] = FIELD_DP32((regs)[R_ ## reg], reg, field, val);
+> -
+>  #endif
+> diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
+> new file mode 100644
+> index 0000000..af101d5
+> --- /dev/null
+> +++ b/include/hw/registerfields.h
+> @@ -0,0 +1,60 @@
+> +/*
+> + * Register Definition API: field macros
+> + *
+> + * Copyright (c) 2016 Xilinx Inc.
+> + * Copyright (c) 2013 Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef REGISTERFIELDS_H
+> +#define REGISTERFIELDS_H
+> +
+> +/* Define constants for a 32 bit register */
+> +
+> +/* This macro will define A_FOO, for the byte address of a register
+> + * as well as R_FOO for the uint32_t[] register number (A_FOO / 4).
+> + */
+> +#define REG32(reg, addr)                                                  \
+> +    enum { A_ ## reg = (addr) };                                          \
+> +    enum { R_ ## reg = (addr) / 4 };
+> +
+> +/* Define SHIFT, LENGTH and MASK constants for a field within a register */
+> +
+> +/* This macro will define FOO_BAR_MASK, FOO_BAR_SHIFT and FOO_BAR_LENGTH
+> + * constants for field BAR in register FOO.
+> + */
+> +#define FIELD(reg, field, shift, length)                                  \
+> +    enum { R_ ## reg ## _ ## field ## _SHIFT = (shift)};                  \
+> +    enum { R_ ## reg ## _ ## field ## _LENGTH = (length)};                \
+> +    enum { R_ ## reg ## _ ## field ## _MASK =                             \
+> +                                        MAKE_64BIT_MASK(shift, length)};
+> +
+> +/* Extract a field from a register */
+> +#define FIELD_EX32(storage, reg, field)                                   \
+> +    extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,               \
+> +              R_ ## reg ## _ ## field ## _LENGTH)
+> +
+> +/* Extract a field from an array of registers */
+> +#define ARRAY_FIELD_EX32(regs, reg, field)                                \
+> +    FIELD_EX32((regs)[R_ ## reg], reg, field)
+> +
+> +/* Deposit a register field.
+> + * Assigning values larger then the target field will result in
+> + * compilation warnings.
+> + */
+> +#define FIELD_DP32(storage, reg, field, val) ({                           \
+> +    struct {                                                              \
+> +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
+> +    } v = { .v = val };                                                   \
+> +    uint32_t d;                                                           \
+> +    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
+> +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
+> +    d; })
+> +
+> +/* Deposit a field to array of registers.  */
+> +#define ARRAY_FIELD_DP32(regs, reg, field, val)                           \
+> +    (regs)[R_ ## reg] = FIELD_DP32((regs)[R_ ## reg], reg, field, val);
+> +
+> +#endif
+> --
+> 2.7.4
+>
+>
