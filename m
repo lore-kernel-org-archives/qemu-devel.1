@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTYJ-0006FN-7f
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:04 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTYT-0006OT-8W
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTYI-0000Dm-DZ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:03 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTYS-0000HQ-KS
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:13 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 20 Jan 2017 15:23:02 +0800
-Message-Id: <20170120072310.8009-9-famz@redhat.com>
+Date: Fri, 20 Jan 2017 15:23:04 +0800
+Message-Id: <20170120072310.8009-11-famz@redhat.com>
 In-Reply-To: <20170120072310.8009-1-famz@redhat.com>
 References: <20170120072310.8009-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 08/16] iotests: 087: Don't attach test
- image twice
+Subject: [Qemu-devel] [PATCH v11 10/16] iotests: 091: Quit QEMU before
+ checking image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +23,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, eblake@redhat.com
 
-The test scenario doesn't require the same image, instead it focuses on
-the duplicated node-name, so use null-co to avoid locking conflict.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/qemu-iotests/087 | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/091 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
-index 9de57dd..6d52f7d 100755
---- a/tests/qemu-iotests/087
-+++ b/tests/qemu-iotests/087
-@@ -82,8 +82,7 @@ run_qemu -drive driver=$IMGFMT,id=disk,node-name=test-node,file="$TEST_IMG" <<EO
-       "driver": "$IMGFMT",
-       "node-name": "disk",
-       "file": {
--          "driver": "file",
--          "filename": "$TEST_IMG"
-+          "driver": "null-co"
-       }
-     }
-   }
-@@ -92,8 +91,7 @@ run_qemu -drive driver=$IMGFMT,id=disk,node-name=test-node,file="$TEST_IMG" <<EO
-       "driver": "$IMGFMT",
-       "node-name": "test-node",
-       "file": {
--          "driver": "file",
--          "filename": "$TEST_IMG"
-+          "driver": "null-co"
-       }
-     }
-   }
+diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
+index 32bbd56..10ac4a8 100755
+--- a/tests/qemu-iotests/091
++++ b/tests/qemu-iotests/091
+@@ -95,7 +95,9 @@ echo "vm2: qemu process running successfully"
+ echo "vm2: flush io, and quit"
+ _send_qemu_cmd $h2 'qemu-io disk flush' "(qemu)"
+ _send_qemu_cmd $h2 'quit' ""
++_send_qemu_cmd $h1 'quit' ""
+ 
++wait
+ echo "Check image pattern"
+ ${QEMU_IO} -c "read -P 0x22 0 4M" "${TEST_IMG}" | _filter_testdir | _filter_qemu_io
+ 
 -- 
 2.9.3
