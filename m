@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cUbOG-0007IP-Aa
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:46:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cUbPU-0007sl-7A
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:47:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cUbOC-00045t-DR
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:46:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43722)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cUbOC-00045I-7X
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:46:08 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
-	<87pojmjdep.fsf@dusky.pond.sub.org>
-	<CAFEAcA9nhd6x+PT5bG0=YqvmUdxJVFPZ6ACiv-2OKrDFJhrqzg@mail.gmail.com>
-	<87h94x99e4.fsf@dusky.pond.sub.org>
-	<CAFEAcA8vRw=13Lj_98A+3NovSeTg6e0xBopdz9EcdEeUMjjZow@mail.gmail.com>
-	<874m0x7ra2.fsf@dusky.pond.sub.org>
-	<CAFEAcA_txNPj6JNDavmCREse98XTkQgiFAqx5Vf8KCCu9V-6mQ@mail.gmail.com>
-	<878tq93guz.fsf@dusky.pond.sub.org>
-	<CAFEAcA-zV8RWCXMCbAHLMEM1oEw7CWT_aDrTc49Xv_wSnMeAyw@mail.gmail.com>
-	<CAFEAcA-fSJ5PfpKFaehruzjidBtmQP_435WLqgSLg=cQiETR8Q@mail.gmail.com>
-Date: Fri, 20 Jan 2017 16:46:05 +0100
-In-Reply-To: <CAFEAcA-fSJ5PfpKFaehruzjidBtmQP_435WLqgSLg=cQiETR8Q@mail.gmail.com>
-	(Peter Maydell's message of "Fri, 20 Jan 2017 14:39:37 +0000")
-Message-ID: <878tq5looy.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cUbPT-0004hc-9U
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:47:28 -0500
+Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:33115)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cUbPT-0004hN-0p
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:47:27 -0500
+Received: by mail-ua0-x22a.google.com with SMTP id i68so64635248uad.0
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 07:47:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
+In-Reply-To: <20170120152141.14276.42073.malonedeb@soybean.canonical.com>
+References: <20170120152141.14276.42073.malonedeb@soybean.canonical.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Jan 2017 15:47:05 +0000
+Message-ID: <CAFEAcA9_j-7qoRFB7QWC=dM6eVsTjwV6EdSmFN+v+7pbdhXC6Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Bug 1658120] [NEW] building with
+ gcc-aarch64-linux-gnu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,40 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Bug 1658120 <1658120@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 17 January 2017 at 16:43, Peter Maydell <peter.maydell@linaro.org> wrote:
->> In any case, applied this pullreq to master.
+On 20 January 2017 at 15:21, Bilal Amarni <1658120@bugs.launchpad.net> wrote:
+> Hi, while trying to build qemu v2.8.0 with gcc-aarch64-linux-gnu cross-
+> compiler I'm getting the following :
 >
-> Although it works fine on my OSX box (with warnings) it seems
-> to have broken the Travis OSX builds:
-> https://travis-ci.org/qemu/qemu/jobs/192750574
 >
->   GEN     qemu-options.texi
->   GEN     qemu-monitor.texi
->   GEN     qemu-img-cmds.texi
->   GEN     qemu-monitor-info.texi
->   GEN     qemu-doc.txt
-> qemu-doc.texi:7: warning: unrecognized encoding name `UTF-8'.
->   GEN     qemu-img.1
-> /Users/travis/build/qemu/qemu//qemu-options.texi:60: warning: unlikely
-> character [ in @var.
-> /Users/travis/build/qemu/qemu//qemu-options.texi:60: warning: unlikely
-> character ] in @var.
-> /Users/travis/build/qemu/qemu//qemu-options.texi:61: warning: unlikely
-> character [ in @var.
-> /Users/travis/build/qemu/qemu//qemu-options.texi:61: warning: unlikely
-> character ] in @var.
-> /Users/travis/build/qemu/qemu//qemu-options.texi:630: No matching `@end table'.
-> /Users/travis/build/qemu/qemu//qemu-doc.texi:1419: Cross reference to
-> nonexistent node `bt-hcis' (perhaps incorrect sectioning?).
-> makeinfo: Removing output file `qemu-doc.txt' due to errors; use
-> --force to preserve.
-> make: *** [qemu-doc.txt] Error 1
+> In file included from /usr/include/x86_64-linux-gnu/sys/syscall.h:31:0,
+>                  from /root/qemu/util/compatfd.c:21:
+> /root/qemu/util/compatfd.c: In function 'qemu_signalfd':
+> /root/qemu/util/compatfd.c:103:19: error: '__NR_signalfd' undeclared (first use in this function)
+>      ret = syscall(SYS_signalfd, -1, mask, _NSIG / 8);
+>                    ^
+> /root/qemu/util/compatfd.c:103:19: note: each undeclared identifier is reported only once for each function it appears in
+> /root/qemu/rules.mak:59: recipe for target 'util/compatfd.o' failed
+> make: *** [util/compatfd.o] Error 1
 
-@table and @end table are nested correctly in my generated
-qemu-options.texi, and @anchor{bt-hcis} is present.  Can you grab the
-offending qemu-options.texi for me?
+You can see from the error message that the compile has
+pulled in the include file /usr/include/x86_64-linux-gnu/sys/syscall.h
+from the host, which is the x86-64 version. This is an
+indication that either your cross compiler is broken, or
+you're not using it at all.
+
+>  ../configure --target-list=x86_64-linux-user --static --cpu=aarch64
+
+You haven't told configure to use a cross compiler at all,
+so it is building with the x86 system compiler, which
+doesn't work. You shouldn't need to use the --cpu argument
+at all, because if you get the build to use the right
+compiler it can figure that out itself. (Passing --cpu=aarch64
+tells configure "ignore the fact this is an x86 compiler
+and assume it's aarch64 instead", which just results in
+things breaking because that assumption is wrong.)
+
+You need to pass configure --cross-prefix=aarch64-linux-gnu-
+You'll also need to ensure you have an aarch64-linux-gnu-pkg-config
+and that you have cross versions of all QEMU's library
+dependencies (notably zlib and glib) in the right place that
+your cross-compiler can find them, and that your cross
+pkg-config is set up to point to them.
+
+On Ubuntu, you may find it easier to set up a cross-architecture
+chroot and do the build in that (where it looks like a native
+build). Cross-compilation of software with non-trivial
+dependencies is always an enormous pain in the neck.
+
+thanks
+-- PMM
