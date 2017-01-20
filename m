@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cUYL7-0007RA-Ja
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:30:46 -0500
+	(envelope-from <phil@philjordan.eu>) id 1cUYLO-0007YP-R1
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:31:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cUYL4-0007Zg-Dl
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:30:45 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:34837)
+	(envelope-from <phil@philjordan.eu>) id 1cUYLL-0007gA-22
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:31:02 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:32894)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cUYL4-0007ZV-15
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:30:42 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id r126so35218650wmr.0
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:30:41 -0800 (PST)
+	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cUYLK-0007fi-SM
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:30:58 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r144so6409191wme.0
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:30:58 -0800 (PST)
 From: Phil Dennis-Jordan <phil@philjordan.eu>
-Date: Fri, 20 Jan 2017 13:30:15 +0100
-Message-Id: <1484915417-10499-1-git-send-email-phil@philjordan.eu>
+Date: Fri, 20 Jan 2017 13:30:17 +0100
+Message-Id: <1484915417-10499-3-git-send-email-phil@philjordan.eu>
+In-Reply-To: <1484915417-10499-1-git-send-email-phil@philjordan.eu>
+References: <1484915417-10499-1-git-send-email-phil@philjordan.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 0/2] hw/usb/dev-hid: Make usb-tablet work
- with OS X/macOS guests
+Subject: [Qemu-devel] [PATCH v2 2/2] hw/usb/dev-hid: add a usb-tablet Mac
+ guest compatibility option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +32,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>
 
-This series makes the Qemu usb-tablet work correctly with OS X/macOS guests without the need for a special guest driver.
+Darwin/OS X/macOS's HID driver stack previously did not correctly drive Qemu's simulated USB Tablet. This adds a boolean option "mac_compat" to the device which subtly changes the device's report descriptor so it behaves in a way that Mac guests can handle.
 
- * The usb-tablet should not have a boot protocol of 2. Other OSes seem to ignore this, but the IOHIDFamily driver stack chokes on it for anything but conventional (relative motion) mice.
- * A "mac_compat" boolean option is added to the usb-tablet, which changes its report descriptor to specify a usage of 0x02 (mouse) instead of 0x01 (pointer). This is required for correct operation in the Mac HID driver stack.
+Absolute pointing devices with HID Report Descriptor usage page of 0x01 (pointing) are handled by the macOS HID driver as analog sticks, and absolute coordinates are not directly translated to absolute mouse cursor positions.
 
-Changelog
-=========
+The workaround is to report a usage page of 0x02 (mouse) instead. In combination with the previous commit's boot protocol fix, this allows the usb-tablet to correctly control the mouse cursor in OS X/macOS guest systems.
 
-v1 -> v2:
- * v1 Thread was "[PATCH] hw/usb/dev-hid: add a Mac guest compatibility option to usb-tablet"
- * Always apply the boot protocol (bInterfaceProtocol) change to usb-tablet, not just when the Mac compatibility option is active. The original value of 0x02 was determined to be incorrect according to the spec anyway.
- * As the boot protocol change is permanent, separate interface and device descriptor constants for the Mac/non-Mac variants of the tablet are no longer required, and have been removed.
+Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+---
+ hw/usb/dev-hid.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Phil Dennis-Jordan (2):
-  hw/usb/dev-hid: set bInterfaceProtocol to 0x00 for usb-tablet
-  hw/usb/dev-hid: add a usb-tablet Mac guest compatibility option
-
- hw/usb/dev-hid.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
+diff --git a/hw/usb/dev-hid.c b/hw/usb/dev-hid.c
+index a23e5d4..c4a0d22 100644
+--- a/hw/usb/dev-hid.c
++++ b/hw/usb/dev-hid.c
+@@ -51,6 +51,7 @@ typedef struct USBHIDState {
+     uint32_t usb_version;
+     char *display;
+     uint32_t head;
++    bool mac_compat;
+ } USBHIDState;
+ 
+ #define TYPE_USB_HID "usb-hid"
+@@ -599,6 +600,9 @@ static void usb_hid_handle_control(USBDevice *dev, USBPacket *p,
+                 memcpy(data, qemu_tablet_hid_report_descriptor,
+ 		       sizeof(qemu_tablet_hid_report_descriptor));
+                 p->actual_length = sizeof(qemu_tablet_hid_report_descriptor);
++                if (us->mac_compat) {
++                    data[3] = 0x02; /* Set usage to mouse, not pointing (1) */
++                }
+             } else if (hs->kind == HID_KEYBOARD) {
+                 memcpy(data, qemu_keyboard_hid_report_descriptor,
+                        sizeof(qemu_keyboard_hid_report_descriptor));
+@@ -801,6 +805,7 @@ static Property usb_tablet_properties[] = {
+         DEFINE_PROP_UINT32("usb_version", USBHIDState, usb_version, 2),
+         DEFINE_PROP_STRING("display", USBHIDState, display),
+         DEFINE_PROP_UINT32("head", USBHIDState, head, 0),
++        DEFINE_PROP_BOOL("mac_compat", USBHIDState, mac_compat, false),
+         DEFINE_PROP_END_OF_LIST(),
+ };
+ 
 -- 
 2.3.2 (Apple Git-55)
