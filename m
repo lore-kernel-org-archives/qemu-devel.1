@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cUVKh-0006BC-IQ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:18:09 -0500
+	(envelope-from <kevin.tian@intel.com>) id 1cUVMh-0007nr-LT
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:20:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cUVKc-0004Z8-IJ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:18:07 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35808
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cUVKc-0004Y8-Cj
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:18:02 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0K9DhWa121205
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:18:00 -0500
-Received: from e28smtp06.in.ibm.com (e28smtp06.in.ibm.com [125.16.236.6])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 283fpgg8f7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:17:59 -0500
-Received: from localhost
-	by e28smtp06.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Fri, 20 Jan 2017 14:47:56 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Fri, 20 Jan 2017 14:47:46 +0530
-Message-Id: <1484903866-17940-1-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v1] softfloat: Add round-to-odd rounding
- mode
+	(envelope-from <kevin.tian@intel.com>) id 1cUVMc-0005in-Nn
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:20:11 -0500
+Received: from mga14.intel.com ([192.55.52.115]:32016)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1cUVMc-0005hs-EZ
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:20:06 -0500
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Fri, 20 Jan 2017 09:20:01 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190C15137@SHSMSX101.ccr.corp.intel.com>
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+	<1484276800-26814-2-git-send-email-peterx@redhat.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190C14FD2@SHSMSX101.ccr.corp.intel.com>
+	<20170120085457.GI4914@pxdev.xzpeter.org>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190C150AD@SHSMSX101.ccr.corp.intel.com>
+	<20170120091143.GK4914@pxdev.xzpeter.org>
+In-Reply-To: <20170120091143.GK4914@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH RFC v3 01/14] IOMMU: add option to enable
+ VTD_CAP_CM to vIOMMU capility exposoed to guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,86 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>
 
-Power ISA 3.0 introduces a few quadruple precision floating point
-instructions that support round-to-odd rounding mode. The
-round-to-odd mode is explained as under:
-
-Let Z be the intermediate arithmetic result or the operand of a convert
-operation. If Z can be represented exactly in the target format, the
-result is Z. Otherwise the result is either Z1 or Z2 whichever is odd.
-Here Z1 and Z2 are the next larger and smaller numbers representable
-in the target format respectively.
-
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
----
-Changes in v1:
-- Addressed rounding to infinity in roundAndPackFloat128().
-- Added 64bit round to odd implementation(roundAndPackFloat64()) as
-  it is needed by xscvqpdp instruction of Power ISA 3.0.
-
-v0: http://patchwork.ozlabs.org/patch/716956/
-
- fpu/softfloat.c         | 10 ++++++++++
- include/fpu/softfloat.h |  2 ++
- 2 files changed, 12 insertions(+)
-
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index c295f31..b9b36ad 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -623,6 +623,9 @@ static float64 roundAndPackFloat64(flag zSign, int zExp, uint64_t zSig,
-     case float_round_down:
-         roundIncrement = zSign ? 0x3ff : 0;
-         break;
-+    case float_round_to_odd:
-+        roundIncrement = (zSig & 0x200) ? 0 : 0x3ff;
-+        break;
-     default:
-         abort();
-     }
-@@ -1149,6 +1152,9 @@ static float128 roundAndPackFloat128(flag zSign, int32_t zExp,
-     case float_round_down:
-         increment = zSign && zSig2;
-         break;
-+    case float_round_to_odd:
-+        increment = !(zSig1 & 0x1) && zSig2;
-+        break;
-     default:
-         abort();
-     }
-@@ -1168,6 +1174,7 @@ static float128 roundAndPackFloat128(flag zSign, int32_t zExp,
-             if (    ( roundingMode == float_round_to_zero )
-                  || ( zSign && ( roundingMode == float_round_up ) )
-                  || ( ! zSign && ( roundingMode == float_round_down ) )
-+                 || ( roundingMode == float_round_to_odd )
-                ) {
-                 return
-                     packFloat128(
-@@ -1215,6 +1222,9 @@ static float128 roundAndPackFloat128(flag zSign, int32_t zExp,
-             case float_round_down:
-                 increment = zSign && zSig2;
-                 break;
-+            case float_round_to_odd:
-+                increment = !(zSig1 & 0x1) && zSig2;
-+                break;
-             default:
-                 abort();
-             }
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 842ec6b..8a39028 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -180,6 +180,8 @@ enum {
-     float_round_up           = 2,
-     float_round_to_zero      = 3,
-     float_round_ties_away    = 4,
-+    /* Not an IEEE rounding mode: round to the closest odd mantissa value */
-+    float_round_to_odd       = 5,
- };
- 
- /*----------------------------------------------------------------------------
--- 
-2.7.4
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlk
+YXksIEphbnVhcnkgMjAsIDIwMTcgNToxMiBQTQ0KPiANCj4gT24gRnJpLCBKYW4gMjAsIDIwMTcg
+YXQgMDg6NTk6MDFBTSArMDAwMCwgVGlhbiwgS2V2aW4gd3JvdGU6DQo+IA0KPiBbLi4uXQ0KPiAN
+Cj4gPiA+ID4gQWxzbyBmb3IgaG90LWFkZA0KPiA+ID4gPiBkZXZpY2UgcGF0aCwgc29tZSBjaGVj
+ayBvZiBjYWNoaW5nIG1vZGUgaXMgcmVxdWlyZWQuIElmIG5vdCBzZXQsDQo+ID4gPiA+IHNob3Vs
+ZCB3ZSBmYWlsIGhvdC1hZGQgb3BlcmF0aW9uPyBJIGRvbid0IHRoaW5rIHdlIGhhdmUgc3VjaCBw
+aHlzaWNhbA0KPiA+ID4gPiBwbGF0Zm9ybSB3aXRoIHNvbWUgZGV2aWNlcyBiZWhpbmQgSU9NTVUg
+d2hpbGUgb3RoZXJzIG5vdC4NCj4gPiA+DQo+ID4gPiBDb3VsZCB5b3UgZXhwbGFpbiBpbiB3aGF0
+IGNhc2Ugd2lsbCB3ZSBmYWlsIGEgaG90IHBsdWc/DQo+ID4gPg0KPiA+DQo+ID4gdXNlciBlbmFi
+bGVzIGludGVsLWlvbW11LCBidXQgZG9uJ3Qgc2V0IGNhY2hpbmcgbW9kZS4NCj4gPg0KPiA+IFRo
+ZW4gbGF0ZXIgdXNlciBob3QtYWRkIGEgUENJIGRldmljZSB0byB0aGUgVk0uIEd1ZXN0IHdpbGwg
+YXNzdW1lDQo+ID4gbmV3bHkgYXNzaWduZWQgZGV2aWNlIGFsc28gYmVoaW5kIHRoZSBkZWZhdWx0
+IHZJT01NVSwgYW5kIHRodXMNCj4gPiBuZWVkcyB0byBzZXR1cCBJT1ZBIG1hcHBpbmdzLCB3aGlj
+aCBpcyB0aGVuIGJyb2tlbi4uLg0KPiANCj4gSXMgdGhlIG5ld2x5IGFkZGVkIGRldmljZSBhIHZm
+aW8tcGNpIGRldmljZT8gSWYgc28sIHdlIHNob3VsZCBoaXQNCj4gdGhpcyBhbmQgVk0gd2lsbCBz
+dG9wcyB0byB3b3JrOg0KPiANCj4gICAgIGlmICghcy0+Y2FjaGVfbW9kZV9lbmFibGVkICYmIG5l
+dyAmIElPTU1VX05PVElGSUVSX01BUCkgew0KPiAgICAgICAgIGVycm9yX3JlcG9ydCgiV2UgbmVl
+ZCB0byBzZXQgY2FjaGVfbW9kZT0xIGZvciBpbnRlbC1pb21tdSB0byBlbmFibGUgIg0KPiAgICAg
+ICAgICAgICAgICAgICAgICAiZGV2aWNlIGFzc2lnbm1lbnQgd2l0aCBJT01NVSBwcm90ZWN0aW9u
+LiIpOw0KPiAgICAgICAgIGV4aXQoMSk7DQo+ICAgICB9DQoNCnNvcnJ5IEkgZGlkbid0IGZvdW5k
+IHRoaXMgY29kZS4gSW4gd2hpY2ggY29kZSBwYXRoIGlzIGl0IGhpdD8NCg0KPiANCj4gSSBhZG1p
+dCB0aGlzIGlzIG5vdCB1c2VyLWZyaWVuZGx5LCBhbmQgYSBiZXR0ZXIgd2F5IG1heSBiZSB0aGF0
+IHdlDQo+IGRpc2FsbG93IHRoZSBob3QtcGx1ZyBpbiB0aGF0IGNhc2UsIHRlbGxpbmcgdGhlIHVz
+ZXIgYWJvdXQgdGhlIGVycm9yLA0KPiByYXRoZXIgdGhhbiBjcmFzaGluZyB0aGUgVk0uIEJ1dCwg
+SSB0aGluayB0aGF0IGNhbiBiZSBhIHBhdGNoIG91dHNpZGUNCj4gdGhpcyBzZXJpZXMsIGNvbnNp
+ZGVyaW5nIChhZ2FpbikgdGhhdCB0aGlzIG9ubHkgYWZmZWN0cyBhZHZhbmNlZA0KPiB1c2Vycy4N
+Cj4gDQoNCkNyYXNoaW5nIFZNIGlzIGJhZC4uLi4gYnV0IGFueXdheSwgSSdsbCBsZWF2ZSBtYWlu
+dGFpbmVyIHRvIGRlY2lkZQ0Kd2hldGhlciB0aGV5J2QgbGlrZSBpdCBmaXhlZCBub3cgb3IgbGF0
+ZXIuIDotKQ0KDQpUaGFua3MNCktldmluDQo=
