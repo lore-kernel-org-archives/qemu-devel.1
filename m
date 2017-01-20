@@ -1,29 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cUTVw-0004ne-Qt
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:21:37 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTXk-0005om-31
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cUTVr-0007VU-T3
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:21:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47944)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cUTVr-0007V3-KI
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:21:31 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1484772931-16272-1-git-send-email-mst@redhat.com>
-	<1484772931-16272-4-git-send-email-mst@redhat.com>
-	<87r33zii2m.fsf@dusky.pond.sub.org>
-	<8721518c-5063-bd5b-60a9-3a3752894e74@redhat.com>
-	<8737gfb2dn.fsf@dusky.pond.sub.org>
-	<20170119212409-mutt-send-email-mst@kernel.org>
-Date: Fri, 20 Jan 2017 08:21:28 +0100
-In-Reply-To: <20170119212409-mutt-send-email-mst@kernel.org> (Michael
-	S. Tsirkin's message of "Thu, 19 Jan 2017 21:25:49 +0200")
-Message-ID: <87d1fi42o7.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] compiler: expression version of
- QEMU_BUILD_BUG_ON
+	(envelope-from <famz@redhat.com>) id 1cUTXj-0008My-0d
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:28 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 20 Jan 2017 15:22:54 +0800
+Message-Id: <20170120072310.8009-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v11 00/16] block: Image locking series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +17,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, eblake@redhat.com
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
+v11: Move lock bytes from 1-2 to 0x10-0x12. [Daniel]
 
-> On Thu, Jan 19, 2017 at 02:33:40PM +0100, Markus Armbruster wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->> 
->> > On 19/01/2017 09:12, Markus Armbruster wrote:
->> >> "Michael S. Tsirkin" <mst@redhat.com> writes:
->> >> 
->> >>> QEMU_BUILD_BUG_ON uses a typedef in order to be safe
->> >>> to use outside functions, but sometimes it's useful
->> >>> to have a version that can be used within an expression.
->> >>> Following what Linux does, introduce QEMU_BUILD_BUG_ON_ZERO
->> >>> that return zero after checking condition at build time.
->> >> 
->> >> Following Linux's example makes sense, but I can't help but wonder
->> >> whether we need both QEMU_BUILD_BUG_ON_ZERO() and QEMU_BUILD_BUG_ON().
->> >
->> > I think so, most notably QEMU_BUILD_BUG_ON was added to C11 as
->> > _Static_assert but QEMU_BUILD_BUG_ON_ZERO wasn't.
->> 
->> Okay.
->> 
->> > But we can indeed redefine QEMU_BUILD_BUG_ON to
->> > (void)QEMU_BUILD_BUG_ON_ZERO(x) like Linux does, until we add optional
->> > support for _Static_assert.
->> 
->> Yes, please.
->
->
-> I don't think we can because we use QEMU_BUILD_BUG_ON outside
-> any functions. I don't think you can put 0 there.
+v10: While we still don't have comprehensive propagation mechanism that will be
+provided by new op blocker system for "permissive modes", the locking enabled
+by default is regardlessly useful and long overdue. So I think we should merge
+this for 2.9 and build user options on top later when the op blocker API
+settles.
 
-Point taken.  Still, we should be able to factor out a common core of
-the bug condition.
+Address comments from Max and Eric:
+  - Use F_OFD_GETLK instead of opening r/w for ro images. [Max]
+  - Lock both bytes exclusively for non-shared write. [Max]
+  - Spell fixes. [Eric]
+  - Fix test matrix. [Max]
+  - Comment tweaks. [Max]
+  - Return code cleanups. [Max]
+  - Don't abuse "disable_lock" for migration. [Max]
+  - Use bs->exact_filename instead of bs->filename. [Max]
+  - Force protect qcow2 concurrent write.
+  - Fix indentation. [Max]
+  - Always use re-open for lockfd instead of dup. [Max]
+  - Fall through to "abort" where "prepare" failed. [Max]
+  - Fix option handling in raw_reopen_handle_lock. [Max]
+  - Use "error_abort" in commit and abort. [Max]
+  - Fix cleanup of raw_reopen_handle_lock() failure. [Max]
+  - Add a patch for qcow2 to mask BDRV_O_SHARE_RW if r/w.
+  - Rebase and fix new more cases that will be broken by "lock by default".
 
->> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> >>> ---
->> >>>  include/qemu/compiler.h | 2 ++
->> >>>  1 file changed, 2 insertions(+)
->> >>>
->> >>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
->> >>> index 2882470..f4cf13b 100644
->> >>> --- a/include/qemu/compiler.h
->> >>> +++ b/include/qemu/compiler.h
->> >>> @@ -89,6 +89,8 @@
->> >>>      typedef char glue(qemu_build_bug_on__,__LINE__)[(x) ? -1 : 1] \
->> >>>          __attribute__((unused))
->> >>>  
->> >>> +#define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(int[(x) ? -1 : 1]) - sizeof(int))
->> >
->> > Linux here uses:
->> >
->> > #define BUILD_BUG_ON_ZERO(e) (sizeof(struct { int:-!!(e); }))
->> >
->> > and the issue is that sizeof(int[(x) ? -1 : 1]) could be
->> > runtime-evaluated (the type is a variable-length array).
->> 
->> Let's copy both macros from Linux.
->
-> I prefer our variant, I don't think it's portable to assume that
-> sizeof(struct {int:0}) is 0. Besides, Linux code is GPLv2 only and this
-> file is 2 or later.
+Fam Zheng (16):
+  osdep: Add qemu_lock_fd and qemu_unlock_fd
+  block: Define BDRV_O_SHARE_RW
+  qemu-io: Set "share-rw" flag together with read-only
+  qemu-img: Set "share-rw" flag in read-only commands
+  block: Set "share-rw" flag in drive-backup when sync=none
+  iotests: 055: Don't attach the drive to vm for drive-backup
+  iotests: 030: Read-only open image for getting map
+  iotests: 087: Don't attach test image twice
+  iotests: 085: Avoid image locking conflict
+  iotests: 091: Quit QEMU before checking image
+  iotests: 172: Use separate images for multiple devices
+  tests: Use null-co:// instead of /dev/null as the dummy image
+  tests: Disable image lock in test-replication
+  file-posix: Implement image locking
+  qcow2: Force "no other writer" lock on bs->file
+  tests: Add test-image-lock
 
-Use (sizeof(struct { int: X }) - sizeof(struct { int: 0 })) if you care
-for portability to lesser compilers.  I don't, because we use common
-extensions supported by both GCC and Clang all over the place.
+ block/file-posix.c         | 668 ++++++++++++++++++++++++++++++++++++++++++++-
+ block/qcow2.c              |  11 +
+ blockdev.c                 |   3 +
+ include/block/block.h      |   2 +
+ include/qemu/osdep.h       |   3 +
+ qemu-img.c                 |  10 +-
+ qemu-io.c                  |   2 +
+ tests/Makefile.include     |   2 +
+ tests/drive_del-test.c     |   2 +-
+ tests/nvme-test.c          |   2 +-
+ tests/qemu-iotests/030     |   4 +-
+ tests/qemu-iotests/055     |  32 ++-
+ tests/qemu-iotests/085     |  32 ++-
+ tests/qemu-iotests/085.out |   3 +-
+ tests/qemu-iotests/087     |   6 +-
+ tests/qemu-iotests/091     |   2 +
+ tests/qemu-iotests/172     |  53 ++--
+ tests/qemu-iotests/172.out |  50 ++--
+ tests/test-image-lock.c    | 200 ++++++++++++++
+ tests/test-replication.c   |   9 +-
+ tests/usb-hcd-uhci-test.c  |   2 +-
+ tests/usb-hcd-xhci-test.c  |   2 +-
+ tests/virtio-blk-test.c    |   2 +-
+ tests/virtio-scsi-test.c   |   4 +-
+ util/osdep.c               |  48 ++++
+ 25 files changed, 1057 insertions(+), 97 deletions(-)
+ create mode 100644 tests/test-image-lock.c
 
-The idea to use bitfield size is not copyrightable, only expressions of
-the idea.
+-- 
+2.9.3
