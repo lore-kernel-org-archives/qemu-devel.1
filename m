@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUYBZ-00024P-15
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:20:53 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cUYDE-00031g-6O
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:22:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUYBX-0002e8-Va
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:20:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50744)
+	(envelope-from <pbonzini@redhat.com>) id 1cUYDB-0003UD-3j
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:22:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43746)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUYBX-0002dl-QQ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:20:51 -0500
-References: <1484859998-25074-1-git-send-email-mst@redhat.com>
-	<1484859998-25074-5-git-send-email-mst@redhat.com>
-	<aa9a259a-a649-d399-5895-837a5a23f56c@redhat.com>
-	<20170120000636-mutt-send-email-mst@kernel.org>
-	<459939cd-4f0e-bc08-7de8-5788e6f2e2aa@redhat.com>
-	<877f5q421q.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUYDA-0003Ts-To
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:22:33 -0500
+References: <1484844230-24490-1-git-send-email-pl@kamp.de>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <50f7a120-c0eb-9832-2ac1-d906b7884b42@redhat.com>
-Date: Fri, 20 Jan 2017 13:20:47 +0100
+Message-ID: <e4dacdcb-34b7-6f48-363d-62a8c14dda8b@redhat.com>
+Date: Fri, 20 Jan 2017 13:22:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <877f5q421q.fsf@dusky.pond.sub.org>
+In-Reply-To: <1484844230-24490-1-git-send-email-pl@kamp.de>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] ARRAY_SIZE: check that argument is
- an array
+Subject: Re: [Qemu-devel] [PATCH] bitmap: assert that start and nr are non
+ negative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Sergey Fedorov <serge.fdrv@gmail.com>, qemu-devel@nongnu.org
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
 
 
-On 20/01/2017 08:34, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
+On 19/01/2017 17:43, Peter Lieven wrote:
+> commit e1123a3b introduced a data corruption regression
+> in the iscsi driver because it passed -1 as nr to bitmap_set
+> and bitmap_clear. Add an assertion to catch such flaws earlier.
 > 
->> On 01/19/2017 04:11 PM, Michael S. Tsirkin wrote:
->>
->>>>> +#define QEMU_IS_ARRAY(x) (!__builtin_types_compatible_p(typeof(x), \
->>>>> +                                                        typeof(&(x)[0])))
->>>>>  #ifndef ARRAY_SIZE
->>>>> -#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
->>>>> +#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + \
->>>>> +                       QEMU_BUILD_BUG_ON_ZERO(!QEMU_IS_ARRAY(x)))
->>>>
->>>> We've got some double-negation going on here ("cause a build bug if the
->>>> negation of QEMU_IS_ARRAY() is not 0") which takes some mental
->>>> gymnastics, but it is the correct result.  [I kind of like that gnulib
->>>> uses positive logic in its 'verify(x)' meaning "verify that x is true,
->>>> or cause a build error"; compared to the negative logic in the kernal
->>>> 'BUILD_BUG_ON[_ZERO](x)' meaning "cause a build bug if x is non-zero" -
->>>> but that's personal preference and not something for qemu to change]
->>>
->>> I can rename QEMU_IS_ARRAY to QEMU_IS_PTR and reverse the logic - would
->>> this be preferable?
->>
->> No, that's worse. As written, "cause a build bug if x is not an array"
->> is easier than "cause a build bug if x is a pointer", because now you
->> are missing an implicit "(instead of the intended array)".  Keep it the
->> way you have it.  I guess it's the _ZERO as a suffix that's throwing me;
->> a better name might have been QEMU_ZERO_OR_BUILD_BUG_ON(x) ("give me a
->> zero expression, or a build bug if x is non-zero") rather than
->> QEMU_BUILD_BUG_ON_ZERO (my first read was "give me a build bug if x is
->> zero", but a better read is "give me a build bug if x is not zero, else
->> give me x because it is zero") - but our choice of naming in patch 3/4
->> mirrors the kernel naming, so it's not worth changing.
+> Suggested-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+>  util/bitmap.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> Two ways to skin the assertion cat:
+> diff --git a/util/bitmap.c b/util/bitmap.c
+> index 43ed011..c1a84ca 100644
+> --- a/util/bitmap.c
+> +++ b/util/bitmap.c
+> @@ -164,6 +164,8 @@ void bitmap_set(unsigned long *map, long start, long nr)
+>      int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
+>      unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
+>  
+> +    assert(start >= 0 && nr >= 0);
+> +
+>      while (nr - bits_to_set >= 0) {
+>          *p |= mask_to_set;
+>          nr -= bits_to_set;
+> @@ -184,6 +186,8 @@ void bitmap_set_atomic(unsigned long *map, long start, long nr)
+>      int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
+>      unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
+>  
+> +    assert(start >= 0 && nr >= 0);
+> +
+>      /* First word */
+>      if (nr - bits_to_set > 0) {
+>          atomic_or(p, mask_to_set);
+> @@ -221,6 +225,8 @@ void bitmap_clear(unsigned long *map, long start, long nr)
+>      int bits_to_clear = BITS_PER_LONG - (start % BITS_PER_LONG);
+>      unsigned long mask_to_clear = BITMAP_FIRST_WORD_MASK(start);
+>  
+> +    assert(start >= 0 && nr >= 0);
+> +
+>      while (nr - bits_to_clear >= 0) {
+>          *p &= ~mask_to_clear;
+>          nr -= bits_to_clear;
+> @@ -243,6 +249,8 @@ bool bitmap_test_and_clear_atomic(unsigned long *map, long start, long nr)
+>      unsigned long dirty = 0;
+>      unsigned long old_bits;
+>  
+> +    assert(start >= 0 && nr >= 0);
+> +
+>      /* First word */
+>      if (nr - bits_to_clear > 0) {
+>          old_bits = atomic_fetch_and(p, ~mask_to_clear);
 > 
->     assert must_be_true
->     bug_on must_be_false
-> 
-> The C language picks the first one, both with assert() and with C11's
-> _Static_assert().  I'd prefer we stick to that, but I'm not asking you
-> to change your series.
 
-We should probably change it to QEMU_STATIC_ASSERT and
-QEMU_STATIC_ASSERT_VALUE, but that shouldn't be in this series.
+Queued, thanks.
 
 Paolo
