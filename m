@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cUZvW-0004Ru-PQ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:27 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cUa2s-0002Ny-5p
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:20:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cUZvS-0003CZ-2j
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:26 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34252)
+	(envelope-from <atar4qemu@gmail.com>) id 1cUa2q-0007Ur-UN
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:20:02 -0500
+Received: from mail-io0-x231.google.com ([2607:f8b0:4001:c06::231]:35726)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cUZvR-0003CC-Sn
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:22 -0500
-Received: by mail-wm0-x243.google.com with SMTP id c85so6982944wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:12:21 -0800 (PST)
-From: Phil Dennis-Jordan <phil@philjordan.eu>
-Date: Fri, 20 Jan 2017 15:11:36 +0100
-Message-Id: <1484921496-11257-4-git-send-email-phil@philjordan.eu>
-In-Reply-To: <1484921496-11257-1-git-send-email-phil@philjordan.eu>
-References: <1484921496-11257-1-git-send-email-phil@philjordan.eu>
-Subject: [Qemu-devel] [PATCH v2 3/3] pc: Enable vmware-cpuid-freq CPU option
- for 2.9+ machine types
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cUa2q-0007Ts-QN
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:20:00 -0500
+Received: by mail-io0-x231.google.com with SMTP id j18so62271656ioe.2
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:19:59 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <87h94tn9qm.fsf@dusky.pond.sub.org>
+References: <87h94tn9qm.fsf@dusky.pond.sub.org>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Fri, 20 Jan 2017 15:19:38 +0100
+Message-ID: <CACXAS8AL_j-tqBNnx_92xASz5ZE2+9K3RFw51PYMPQ-vcXYagw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] -M niagara -nodefaults crashes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Phil Dennis-Jordan <phil@philjordan.eu>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
----
- include/hw/i386/pc.h | 5 +++++
- target/i386/cpu.c    | 2 +-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+On Fri, Jan 20, 2017 at 2:26 PM, Markus Armbruster <armbru@redhat.com> wrote:
+> Watch this:
+>
+>     $ gdb --args bld/sparc64-softmmu/qemu-system-* -nodefaults -M niagara
+>     [...]
+>     (gdb) r
+>     Starting program: /work/armbru/qemu/bld/sparc64-softmmu/qemu-system-sparc64 -nodefaults -M niagara
+>     [Thread debugging using libthread_db enabled]
+>     Using host libthread_db library "/lib64/libthread_db.so.1".
+>     [New Thread 0x7fffce25d700 (LWP 17401)]
+>     [New Thread 0x7fffcb0c1700 (LWP 17402)]
+>     Could not open option rom 'nvram1': No such file or directory
+>     Could not open option rom '1up-md.bin': No such file or directory
+>     Could not open option rom '1up-hv.bin': No such file or directory
+>     Could not open option rom 'reset.bin': No such file or directory
+>     Could not open option rom 'q.bin': No such file or directory
+>     Could not open option rom 'openboot.bin': No such file or directory
+>
+>     Thread 1 "qemu-system-spa" received signal SIGSEGV, Segmentation fault.
+>     qemu_chr_fe_init (b=b@entry=0x5555566bea60, s=0x0,
+>         errp=0x555556497e68 <error_abort>) at /work/armbru/qemu/qemu-char.c:897
+>     897     if (s->is_mux) {
+>     (gdb) bt
+>     #0  0x0000555555833500 in qemu_chr_fe_init (b=b@entry=0x5555566bea60, s=0x0, errp=0x555556497e68 <error_abort>) at /work/armbru/qemu/qemu-char.c:897
+>     #1  0x0000555555890a0a in serial_mm_init (address_space=address_space@entry=0x55555653dbd0, base=base@entry=133412421632, it_shift=it_shift@entry=0, irq=irq@entry=0x0, baudbase=baudbase@entry=115200, chr=<optimized out>, end=
+>         DEVICE_BIG_ENDIAN) at /work/armbru/qemu/hw/char/serial.c:995
+>     #2  0x00005555558107e2 in niagara_init (machine=0x55555653bf80)
+>         at /work/armbru/qemu/hw/sparc64/niagara.c:149
+>     #3  0x00005555557726ea in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /work/armbru/qemu/vl.c:4544
+>
+> In other code that's similarly stuck in the pre-qdev world, the call to
+> serial_mm_init() is conditional on serial_hds[0].
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 853edf8..e0ad244 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -376,6 +376,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
- #define PC_COMPAT_2_8 \
-     HW_COMPAT_2_8 \
-+    {\
-+        .driver   = TYPE_X86_CPU,\
-+        .property = "vmware-cpuid-freq",\
-+        .value    = "off",\
-+    },
- 
- #define PC_COMPAT_2_7 \
-     HW_COMPAT_2_7 \
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index dabad37..feded98 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3677,7 +3677,7 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
-     DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
-     DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
--    DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, false),
-+    DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
+Will add a check. A -nodefaults with -M niagara makes currenlty a
+little sense though: there is no any known firmware which can use any
+other configuration. Do we have any machines in qemu which don't
+support -nodefaults ?
+
+Artyom
+
 -- 
-2.3.2 (Apple Git-55)
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
