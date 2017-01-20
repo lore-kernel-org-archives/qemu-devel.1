@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cUPst-000153-LT
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:29:04 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cUPvx-0002By-F0
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:32:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cUPso-0004mK-OX
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:29:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cUPso-0004m4-FN
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:28:58 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6B50361B95
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 03:28:58 +0000 (UTC)
-References: <1484625660-3312-1-git-send-email-jasowang@redhat.com>
-	<20170117164326-mutt-send-email-mst@kernel.org>
-	<38dfab22-412f-94a5-4b01-351edf627027@redhat.com>
-	<20170118193122-mutt-send-email-mst@kernel.org>
-	<fc140450-dbd4-4a2d-578f-8226e0bd02fc@redhat.com>
-	<20170120002554-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <cd014c96-dc69-0ba2-fe42-7797bf1385ea@redhat.com>
-Date: Fri, 20 Jan 2017 11:28:53 +0800
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cUPvs-0005ve-KW
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:32:13 -0500
+Received: from [59.151.112.132] (port=32163 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cUPvs-0005tW-5P
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:32:08 -0500
+References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
+	<1484759609-264075-6-git-send-email-imammedo@redhat.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <d6ddd2f5-9ebc-7e19-c904-6271b47f5c1d@cn.fujitsu.com>
+Date: Fri, 20 Jan 2017 11:31:56 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170120002554-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio: force VIRTIO_F_IOMMU_PLATFORM
+In-Reply-To: <1484759609-264075-6-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 05/13] pc: move pcms->possible_cpus init out
+ of pc_cpus_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,94 +28,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, ehabkost@redhat.com, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
 
 
 
-On 2017=E5=B9=B401=E6=9C=8820=E6=97=A5 06:27, Michael S. Tsirkin wrote:
-> On Thu, Jan 19, 2017 at 11:12:21AM +0800, Jason Wang wrote:
->>
->> On 2017=E5=B9=B401=E6=9C=8819=E6=97=A5 01:50, Michael S. Tsirkin wrote=
-:
->>> On Wed, Jan 18, 2017 at 10:42:48AM +0800, Jason Wang wrote:
->>>> On 2017=E5=B9=B401=E6=9C=8817=E6=97=A5 22:44, Michael S. Tsirkin wro=
-te:
->>>>> On Tue, Jan 17, 2017 at 12:01:00PM +0800, Jason Wang wrote:
->>>>>> We allow vhost to clear VIRITO_F_IOMMU_PLATFORM which is wrong sin=
-ce
->>>>>> VIRTIO_F_IOMMU_PLATFORM is mandatory for security. Fixing this by
->>>>>> enforce it after vdc->get_features().
->>>>>>
->>>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>>>>> ---
->>>>>>     hw/virtio/virtio-bus.c | 5 +++--
->>>>>>     1 file changed, 3 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
->>>>>> index d31cc00..a886011 100644
->>>>>> --- a/hw/virtio/virtio-bus.c
->>>>>> +++ b/hw/virtio/virtio-bus.c
->>>>>> @@ -47,6 +47,7 @@ void virtio_bus_device_plugged(VirtIODevice *vde=
-v, Error **errp)
->>>>>>         VirtioBusState *bus =3D VIRTIO_BUS(qbus);
->>>>>>         VirtioBusClass *klass =3D VIRTIO_BUS_GET_CLASS(bus);
->>>>>>         VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(vdev);
->>>>>> +    bool has_iommu =3D virtio_host_has_feature(vdev, VIRTIO_F_IOM=
-MU_PLATFORM);
->>>>>>         DPRINTF("%s: plug device.\n", qbus->name);
->>>>>> @@ -63,8 +64,8 @@ void virtio_bus_device_plugged(VirtIODevice *vde=
-v, Error **errp)
->>>>>>             klass->device_plugged(qbus->parent, errp);
->>>>>>         }
->>>>>> -    if (klass->get_dma_as !=3D NULL &&
->>>>>> -        virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
->>>>>> +    if (klass->get_dma_as !=3D NULL && has_iommu) {
->>>>>> +        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_P=
-LATFORM);
->>>>>>             vdev->dma_as =3D klass->get_dma_as(qbus->parent);
->>>>>>         } else {
->>>>>>             vdev->dma_as =3D &address_space_memory;
->>>>> I suspect that's not enough, we must also fail or disable vhost
->>>>> (depending on the options), otherwise things won't work.
->>>> Looks like with the patch, VIRTIO_F_IOMMU_PLATFORM will be passed to
->>>> vhost_set_features().
->>> Okay then. Could you please test on an old host kernel and confirm
->>> what happens? Pls mention this in commit log.
->> Test were done before sending this patch :)
->>
->> Vhost fallback to userspace since it lacks VIRTIO_F_IOMMU_PLATFORM.
->>
->>>> So if vhost backend does not support it, it will fall
->>>> back to userspace (This may not work for vhost-user, but it's a bug =
-existed
->>>> even before this patch).
->>>>
->>>> Thanks
->>> I guess this is true but this suddenly makes it important to
->>> fix this. So I prefer a patchset where patch 2 addresses
->>> the fallback bug. In which way? Do you think we should
->>> just fail if vhost doesn't work? Does this apply to both
->>> userspace and kernel?
->> For 1.0 devices we could do this through NEEDS_RESET, but it doesn't w=
-ork
->> for legacy device. For kernel vhost, I'd prefer to keep the current
->> fallback.
-> I'm not so sure. This has security implications, e.g. user might
-> expect not to be affected by a bug in qemu if specifying vhost=3Don.
+At 01/19/2017 01:13 AM, Igor Mammedov wrote:
+> possible_cpus could be initialized earlier then cpu objects,
 
-Ok.
+s/then/than/
 
->
->> For vhost-user, it seems not easy and we could not just terminate
->> qemu in this case consider this kind of failure can only be detected d=
-uring
->> start not init.
->>
->> Thanks
-> I think we should at least deny connection.
+> i.e. when -smp is parsed so move init code to possible_cpu_arch_ids()
 
-Ok and we need do something after denying it, how about vdev->broken or=20
-others?
-
-Thanks
+[...]
