@@ -1,29 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cUXlz-0006Qi-6k
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:54:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1cUY8u-0000uK-JM
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:18:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cUXlw-0007Hk-1E
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:54:27 -0500
-Received: from mga07.intel.com ([134.134.136.100]:8698)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cUXlv-0007Go-L3
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:54:23 -0500
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Fri, 20 Jan 2017 11:54:17 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F7391716D9@shsmsx102.ccr.corp.intel.com>
-References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
-	<CAJ+F1C+WV7OhxpYb3RgmtRjXU7_kfygr2jh2cawYwZq8MMrJGQ@mail.gmail.com>
-	<79bc9757-3ba0-87c3-3502-a25a30e304a3@siemens.com>
-	<286AC319A985734F985F78AFA26841F73916DDD2@shsmsx102.ccr.corp.intel.com>
-	<58a51a88-967d-bdc7-dc0b-e3e501ecccd3@siemens.com>
-In-Reply-To: <58a51a88-967d-bdc7-dc0b-e3e501ecccd3@siemens.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
+	(envelope-from <thuth@redhat.com>) id 1cUY8r-00015r-FY
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:18:08 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 20 Jan 2017 13:18:01 +0100
+Message-Id: <1484914681-2986-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Introduce DEVICE_CATEGORY_CPU for CPU devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +17,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>, =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Jailhouse <jailhouse-dev@googlegroups.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-T24gVHVlc2RheSwgSmFudWFyeSAxNywgMjAxNyA1OjQ2IFBNLCBKYW4gS2lzemthIHdyb3RlOg0K
-PiBPbiAyMDE3LTAxLTE3IDEwOjEzLCBXYW5nLCBXZWkgVyB3cm90ZToNCj4gPiBIaSBKYW4sDQo+
-ID4NCj4gPiBPbiBNb25kYXksIEphbnVhcnkgMTYsIDIwMTcgOToxMCBQTSwgSmFuIEtpc3prYSB3
-cm90ZToNCj4gPj4gT24gMjAxNy0wMS0xNiAxMzo0MSwgTWFyYy1BbmRyw6kgTHVyZWF1IHdyb3Rl
-Og0KPiA+Pj4gT24gTW9uLCBKYW4gMTYsIDIwMTcgYXQgMTI6MzcgUE0gSmFuIEtpc3prYSA8amFu
-Lmtpc3prYUBzaWVtZW5zLmNvbQ0KPiA+Pj4gPG1haWx0bzpqYW4ua2lzemthQHNpZW1lbnMuY29t
-Pj4gd3JvdGU6DQo+ID4+PiAgICAgc29tZSBvZiB5b3UgbWF5IGtub3cgdGhhdCB3ZSBhcmUgdXNp
-bmcgYSBzaGFyZWQgbWVtb3J5IGRldmljZSBzaW1pbGFyDQo+IHRvDQo+ID4+PiAgICAgaXZzaG1l
-bSBpbiB0aGUgcGFydGl0aW9uaW5nIGh5cGVydmlzb3IgSmFpbGhvdXNlIFsxXS4NCj4gPj4+DQo+
-ID4+PiAgICAgV2Ugc3RhcnRlZCBhcyBiZWluZyBjb21wYXRpYmxlIHRvIHRoZSBvcmlnaW5hbCBp
-dnNobWVtIHRoYXQgUUVNVQ0KPiA+Pj4gICAgIGltcGxlbWVudHMsIGJ1dCB3ZSBxdWlja2x5IGRl
-dmlhdGVkIGluIHNvbWUgZGV0YWlscywgYW5kIGluIHRoZSByZWNlbnQNCj4gPj4+ICAgICBtb250
-aHMgZXZlbiBtb3JlLiBTb21lIG9mIHRoZSBkZXZpYXRpb25zIGFyZSByZWxhdGVkIHRvIG1ha2lu
-ZyB0aGUNCj4gPj4+ICAgICBpbXBsZW1lbnRhdGlvbiBzaW1wbGVyLiBUaGUgbmV3IGl2c2htZW0g
-dGFrZXMgPDUwMCBMb0MgLSBKYWlsaG91c2UgaXMNCj4gPj4+ICAgICBhaW1pbmcgYXQgc2FmZXR5
-IGNyaXRpY2FsIHN5c3RlbXMgYW5kLCB0aGVyZWZvcmUsIGEgc21hbGwgY29kZSBiYXNlLg0KPiA+
-Pj4gICAgIE90aGVyIGNoYW5nZXMgYWRkcmVzcyBkZWZpY2l0cyBpbiB0aGUgb3JpZ2luYWwgZGVz
-aWduLCBsaWtlIG1pc3NpbmcNCj4gPj4+ICAgICBsaWZlLWN5Y2xlIG1hbmFnZW1lbnQuDQo+ID4+
-Pg0KPiA+Pj4gICAgIE5vdyB0aGUgcXVlc3Rpb24gaXMgaWYgdGhlcmUgaXMgaW50ZXJlc3QgaW4g
-ZGVmaW5pbmcgYSBjb21tb24gbmV3DQo+ID4+PiAgICAgcmV2aXNpb24gb2YgdGhpcyBkZXZpY2Ug
-YW5kIG1heWJlIGFsc28gb2Ygc29tZSBwcm90b2NvbHMgdXNlZCBvbiB0b3AsDQo+ID4+PiAgICAg
-c3VjaCBhcyB2aXJ0dWFsIG5ldHdvcmsgbGlua3MuIElkZWFsbHksIHRoaXMgd291bGQgZW5hYmxl
-IHVzIHRvIHNoYXJlDQo+ID4+PiAgICAgTGludXggZHJpdmVycy4gV2Ugd2lsbCBkZWZpbml0ZWx5
-IGdvIGZvciB1cHN0cmVhbWluZyBhdCBsZWFzdCBhIG5ldHdvcmsNCj4gPj4+ICAgICBkcml2ZXIg
-c3VjaCBhcyBbMl0sIGEgVUlPIGRyaXZlciBhbmQgbWF5YmUgYWxzbyBhIHNlcmlhbCBwb3J0L2Nv
-bnNvbGUuDQo+ID4+Pg0KPiA+Pj4NCj4gPj4+IFRoaXMgc291bmRzIGxpa2UgZHVwbGljYXRpbmcg
-ZWZmb3J0cyBkb25lIHdpdGggdmlydGlvIGFuZCB2aG9zdC1wY2kuDQo+ID4+PiBIYXZlIHlvdSBs
-b29rZWQgYXQgV2VpIFdhbmcgcHJvcG9zYWw/DQo+ID4+DQo+ID4+IEkgZGlkbid0IGZvbGxvdyBp
-dCByZWNlbnRseSwgYnV0IHRoZSBvcmlnaW5hbCBjb25jZXB0IHdhcyBhYm91dA0KPiA+PiBpbnRy
-b2R1Y2luZyBhbiBJT01NVSBtb2RlbCB0byB0aGUgcGljdHVyZSwgYW5kIHRoYXQncyBjb21wbGV4
-aXR5LXdpc2UNCj4gPj4gYSBuby1nbyBmb3IgdXMgKHdlIGNhbiBkbyB0aGlzIHdob2xlIHRoaW5n
-IGluIGxlc3MgdGhhbiA1MDAgbGluZXMsDQo+ID4+IGV2ZW4gdmlydGlvIGl0c2VsZiBpcyBtb3Jl
-IGNvbXBsZXgpLiBJSVVDLCB0aGUgYWx0ZXJuYXRpdmUgdG8gYW4NCj4gPj4gSU9NTVUgaXMgbWFw
-cGluZyB0aGUgd2hvbGUgZnJvbnRlbmQgVk0gbWVtb3J5IGludG8gdGhlIGJhY2tlbmQgVk0gLQ0K
-PiB0aGF0J3Mgc2VjdXJpdHkvc2FmZXR5LXdpc2UgYW4gYWJzb2x1dGUgbm8tZ28uDQo+ID4NCj4g
-PiBUaG91Z2ggdGhlIHZpcnRpbyBiYXNlZCBzb2x1dGlvbiBtaWdodCBiZSBjb21wbGV4IGZvciB5
-b3UsIGEgYmlnIGFkdmFudGFnZSBpcw0KPiB0aGF0IHdlIGhhdmUgbG90cyBvZiBwZW9wbGUgd29y
-a2luZyB0byBpbXByb3ZlIHZpcnRpby4gRm9yIGV4YW1wbGUsIHRoZQ0KPiB1cGNvbWluZyB2aXJ0
-aW8gMS4xIGhhcyB2cmluZyBpbXByb3ZlbWVudCwgd2UgY2FuIGVhc2lseSB1cGdyYWRlIGFsbCB0
-aGUgdmlydGlvDQo+IGJhc2VkIHNvbHV0aW9ucywgc3VjaCBhcyB2aG9zdC1wY2ksIHRvIHRha2Ug
-YWR2YW50YWdlIG9mIHRoaXMgaW1wcm92ZW1lbnQuIEZyb20NCj4gdGhlIGxvbmcgdGVybSBwZXJz
-cGVjdGl2ZSwgSSB0aGluayB0aGlzIGtpbmQgb2YgY29tcGxleGl0eSBpcyB3b3J0aHdoaWxlLg0K
-PiANCj4gV2Ugd2lsbCBhZG9wdCB2aXJ0aW8gMS4xIHJpbmcgZm9ybWF0cy4gVGhhdCdzIG9uZSBy
-ZWFzb24gd2h5IHRoZXJlIGlzIGFsc28gc3RpbGwgYQ0KPiBiaWRpcmVjdGlvbmFsIHNoYXJlZCBt
-ZW1vcnkgcmVnaW9uOiB0byBob3N0IHRoZSBuZXcgZGVzY3JpcHRvcnMgKHdoaWxlIGtlZXBpbmcN
-Cj4gdGhlIHBheWxvYWQgc2FmZWx5IGluIHRoZSB1bmlkaXJlY3Rpb25hbCByZWdpb25zKS4NCg0K
-VGhlIHZyaW5nIGV4YW1wbGUgSSBnYXZlIG1pZ2h0IGJlIGNvbmZ1c2luZywgc29ycnkgYWJvdXQg
-IHRoYXQuIE15IHBvaW50IGlzIHRoYXQgZXZlcnkgcGFydCBvZiB2aXJ0aW8gaXMgZ2V0dGluZyBt
-YXR1cmVkIGFuZCBpbXByb3ZlZCBmcm9tIHRpbWUgdG8gdGltZS4gIFBlcnNvbmFsbHksIGhhdmlu
-ZyBhIG5ldyBkZXZpY2UgZGV2ZWxvcGVkIGFuZCBtYWludGFpbmVkIGluIGFuIGFjdGl2ZSBhbmQg
-cG9wdWxhciBtb2RlbCBpcyBoZWxwZnVsLiBBbHNvLCBhcyBuZXcgZmVhdHVyZXMgYmVpbmcgZ3Jh
-ZHVhbGx5IGFkZGVkIGluIHRoZSBmdXR1cmUsIGEgc2ltcGxlIGRldmljZSBjb3VsZCBiZWNvbWUg
-Y29tcGxleC4gDQoNCkhhdmluZyBhIHRoZW9yZXRpY2FsIGFuYWx5c2lzIG9uIHRoZSBwZXJmb3Jt
-YW5jZTogDQpUaGUgdHJhZGl0aW9uYWwgc2hhcmVkIG1lbW9yeSBtZWNoYW5pc20sIHNoYXJpbmcg
-YW4gaW50ZXJtZWRpYXRlIG1lbW9yeSwgcmVxdWlyZXMgMiBjb3BpZXMgdG8gZ2V0IHRoZSBwYWNr
-ZXQgdHJhbnNtaXR0ZWQuIEl0J3Mgbm90IGp1c3Qgb25lIG1vcmUgY29weSBjb21wYXJlZCB0byB0
-aGUgMS1jb3B5IHNvbHV0aW9uLCBJIHRoaW5rIHNvbWUgbW9yZSB0aGluZ3Mgd2UgbWF5IG5lZWQg
-dG8gdGFrZSBpbnRvIGFjY291bnQ6DQoxKSB0aGVyZSBhcmUgZXh0cmEgcmluZyBvcGVyYXRpb24g
-b3ZlcmhlYWQgIG9uIGJvdGggdGhlIHNlbmRpbmcgYW5kIHJlY2VpdmluZyBzaWRlIHRvIGFjY2Vz
-cyB0aGUgc2hhcmVkIG1lbW9yeSAoaS5lLiBJVlNITUVNKTsNCjIpIGV4dHJhIHByb3RvY29sIHRv
-IHVzZSB0aGUgc2hhcmVkIG1lbW9yeTsNCjMpIHRoZSBwaWVjZSBvZiBhbGxvY2F0ZWQgc2hhcmVk
-IG1lbW9yeSBmcm9tIHRoZSBob3N0ID0gQyhuLDIpLCB3aGVyZSBuIGlzIHRoZSBudW1iZXIgb2Yg
-Vk1zLiBMaWtlIGZvciAyMCBWTXMgd2hvIHdhbnQgdG8gdGFsayB0byBlYWNoIG90aGVyLCB0aGVy
-ZSB3aWxsIGJlIDE5MCBwaWVjZXMgb2YgbWVtb3J5IGFsbG9jYXRlZCBmcm9tIHRoZSBob3N0LiAN
-Cg0KVGhhdCBiZWluZyBzYWlkLCBpZiBwZW9wbGUgcmVhbGx5IHdhbnQgdGhlIDItY29weSBzb2x1
-dGlvbiwgd2UgY2FuIGFsc28gaGF2ZSB2aG9zdC1wY2kgc3VwcG9ydCBpdCB0aGF0IHdheSBhcyBh
-IG5ldyBmZWF0dXJlIChub3Qgc3VyZSBpZiB5b3Ugd291bGQgYmUgaW50ZXJlc3RlZCBpbiBjb2xs
-YWJvcmF0aW5nIG9uIHRoZSBwcm9qZWN0KToNCldpdGggdGhlIG5ldyBmZWF0dXJlIGFkZGVkLCB0
-aGUgbWFzdGVyIFZNIHNlbmRzIG9ubHkgYSBwaWVjZSBvZiBtZW1vcnkgKGVxdWl2YWxlbnQgdG8g
-SVZTSE1FTSwgYnV0IGFsbG9jYXRlZCBieSB0aGUgZ3Vlc3QpIHRvIHRoZSBzbGF2ZSBvdmVyIHZo
-b3N0LXVzZXIgcHJvdG9jb2wsIGFuZCB0aGUgdmhvc3QtcGNpIGRldmljZSBvbiB0aGUgc2xhdmUg
-c2lkZSBvbmx5IGhvc3RzIHRoYXQgcGllY2Ugb2Ygc2hhcmVkIG1lbW9yeS4NCg0KQmVzdCwNCldl
-aQ0K
+Now that the hot-pluggable CPUs show up in the help text of
+"-device ?", we should group them into an appropriate category.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/ppc/pnv_core.c       | 1 +
+ hw/ppc/spapr_cpu_core.c | 1 +
+ include/hw/qdev-core.h  | 1 +
+ qdev-monitor.c          | 1 +
+ target/i386/cpu.c       | 2 ++
+ 5 files changed, 6 insertions(+)
+
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index d79d530..a9c981e 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -190,6 +190,7 @@ static void pnv_core_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     PnvCoreClass *pcc = PNV_CORE_CLASS(oc);
+ 
++    set_bit(DEVICE_CATEGORY_CPU, dc->categories);
+     dc->realize = pnv_core_realize;
+     dc->props = pnv_core_properties;
+     pcc->cpu_oc = cpu_class_by_name(TYPE_POWERPC_CPU, data);
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index c18632b..dd0028e 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -365,6 +365,7 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
+ 
++    set_bit(DEVICE_CATEGORY_CPU, dc->categories);
+     dc->realize = spapr_cpu_core_realize;
+     scc->cpu_class = cpu_class_by_name(TYPE_POWERPC_CPU, data);
+     g_assert(scc->cpu_class);
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 2c97347..b44b476 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -26,6 +26,7 @@ typedef enum DeviceCategory {
+     DEVICE_CATEGORY_DISPLAY,
+     DEVICE_CATEGORY_SOUND,
+     DEVICE_CATEGORY_MISC,
++    DEVICE_CATEGORY_CPU,
+     DEVICE_CATEGORY_MAX
+ } DeviceCategory;
+ 
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index c73410c..5f2fcdf 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -136,6 +136,7 @@ static void qdev_print_devinfos(bool show_no_user)
+         [DEVICE_CATEGORY_DISPLAY] = "Display",
+         [DEVICE_CATEGORY_SOUND]   = "Sound",
+         [DEVICE_CATEGORY_MISC]    = "Misc",
++        [DEVICE_CATEGORY_CPU]     = "CPU",
+         [DEVICE_CATEGORY_MAX]     = "Uncategorized",
+     };
+     GSList *list, *elt;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index aba11ae..7b8ca5f 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2381,8 +2381,10 @@ static void x86_cpu_cpudef_class_init(ObjectClass *oc, void *data)
+ {
+     X86CPUDefinition *cpudef = data;
+     X86CPUClass *xcc = X86_CPU_CLASS(oc);
++    DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+     xcc->cpu_def = cpudef;
++    set_bit(DEVICE_CATEGORY_CPU, dc->categories);
+ }
+ 
+ static void x86_register_cpudef_type(X86CPUDefinition *def)
+-- 
+1.8.3.1
