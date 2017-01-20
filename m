@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cUXg5-0002OB-8J
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:48:22 -0500
+	(envelope-from <bounces@canonical.com>) id 1cUXiW-0003qm-Kx
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:50:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cUXg1-0004QU-BV
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:48:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44850)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cUXg1-0004Po-65
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:48:17 -0500
-Date: Fri, 20 Jan 2017 11:48:09 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170120114809.GH2658@work-vm>
-References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
-	<1482303148-22059-4-git-send-email-liang.z.li@intel.com>
+	(envelope-from <bounces@canonical.com>) id 1cUXiS-0005mi-NM
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:50:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42705)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cUXiS-0005le-BX
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:50:48 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cUXiQ-0000ZU-8p
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:50:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AFF9F2E80E0
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:50:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1482303148-22059-4-git-send-email-liang.z.li@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v6 kernel 3/5] virtio-balloon: speed up
- inflate/deflate process
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Jan 2017 11:41:53 -0000
+From: Thomas Huth <1657538@bugs.launchpad.net>
+Reply-To: Bug 1657538 <1657538@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170118175149.27340.89188.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170120114153.13992.41485.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1657538] Re: qemu 2.7.x 2.8 softmmu dont work on
+ BE machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liang Li <liang.z.li@intel.com>
-Cc: kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, amit.shah@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, mst@redhat.com, david@redhat.com, aarcange@redhat.com, quintela@redhat.com
+To: qemu-devel@nongnu.org
 
-* Liang Li (liang.z.li@intel.com) wrote:
+Something else to try: Could you please check whether you get any output
+when you run "qemu-system-ppc -nographic" on your system? So we can make
+sure that it is not related to GTK or something similar...
 
-<snip>
+-- =
 
-> +static void free_extended_page_bitmap(struct virtio_balloon *vb)
-> +{
-> +	int i, bmap_count = vb->nr_page_bmap;
-> +
-> +	for (i = 1; i < bmap_count; i++) {
-> +		kfree(vb->page_bitmap[i]);
-> +		vb->page_bitmap[i] = NULL;
-> +		vb->nr_page_bmap--;
-> +	}
-> +}
-> +
-> +static void kfree_page_bitmap(struct virtio_balloon *vb)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < vb->nr_page_bmap; i++)
-> +		kfree(vb->page_bitmap[i]);
-> +}
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1657538
 
-It might be worth commenting that pair of functions to make it clear
-why they are so different; I guess the kfree_page_bitmap
-is used just before you free the structure above it so you
-don't need to keep the count/pointers updated?
+Title:
+  qemu 2.7.x 2.8 softmmu dont work on BE machine
 
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Status in QEMU:
+  New
+
+Bug description:
+  Build on Be machine qemu 2.7.1 and 2.8 in pure softmmu (tgc) dont work on=
+ big endian hardware .
+  tested with ppc-softmmu,i386-softmmu,arm-softmmu same result:
+
+  with :
+   ./qemu-system-i386 =
+
+  Gtk-Message: Failed to load module "overlay-scrollbar"
+  qemu-system-i386: Trying to execute code outside RAM or ROM at 0x000a0000
+  This usually means one of the following happened:
+
+  (1) You told QEMU to execute a kernel for the wrong machine type, and it =
+crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb=
+ QEMU machine)
+  (2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU execu=
+ted a ROM full of no-op instructions until it fell off the end
+  (3) Your guest kernel has a bug and crashed by jumping off into nowhere
+
+  This is almost always one of the first two, so check your command line an=
+d that you are using the right type of kernel for this machine.
+  If you think option (3) is likely then you can try debugging your guest w=
+ith the -d debug options; in particular -d guest_errors will cause the log =
+to include a dump of the guest register state at this point.
+
+  Execution cannot continue; stopping here.
+
+  =
+
+  I try to add the -L option with ../pc-bios/bios.bin =
+
+  and have the same result.
+
+  note the ppc-softmmu and ppc64-softmmu work in kvm mode only emulated
+  mode have issue.
+
+  =
+
+  tested on my hardware a  Qriq P5040 and G5 4x970MP with Ubuntu Mate 16.10 =
+
+  thanks
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1657538/+subscriptions
