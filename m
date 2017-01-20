@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUd3w-0002i1-0a
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:33:21 -0500
+	(envelope-from <mst@redhat.com>) id 1cUdFy-0003gM-Ae
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:45:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUd3s-0004s1-2T
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:33:20 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38721)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cUd3r-0004qb-Rn
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:33:16 -0500
-Received: by mail-wm0-x231.google.com with SMTP id r144so54795824wme.1
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 09:33:14 -0800 (PST)
-References: <000301d259dc$f9d097c0$ed71c740$@ru>
-	<000601d25a95$12b1b9f0$38152dd0$@ru>
-	<20161220102126.GE5602@stefanha-x1.localdomain>
-	<002501d25ab1$af024b00$0d06e100$@ru>
-	<CAJSP0QXm9ssLC5C+gV_agkEW_fdUY=NWBMvHqMh55UhYTR276g@mail.gmail.com>
-	<000301d25b4f$20018440$60048cc0$@ru>
-	<CAJSP0QW1pOcthcEt16Pp5xQu3miUh2Leq3kn3yvQqWqhi1P=QQ@mail.gmail.com>
-	<000801d26bd9$dca56db0$95f04910$@ru> <87o9zd3jta.fsf@linaro.org>
-	<000e01d26caa$dfdb3150$9f9193f0$@ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <000e01d26caa$dfdb3150$9f9193f0$@ru>
-Date: Fri, 20 Jan 2017 17:33:11 +0000
-Message-ID: <87mveleiw8.fsf@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1cUdFv-00038g-5B
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:45:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUdFu-000381-VC
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:45:43 -0500
+Date: Fri, 20 Jan 2017 19:45:40 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170120194511-mutt-send-email-mst@kernel.org>
+References: <1484859998-25074-1-git-send-email-mst@redhat.com>
+	<1484859998-25074-3-git-send-email-mst@redhat.com>
+	<87wpdq2n4e.fsf@dusky.pond.sub.org>
+	<20170120185551-mutt-send-email-mst@kernel.org>
+	<024df752-27f3-88f3-99a3-a7f5e18069b4@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] qemu-2.8-rc4 is broken
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <024df752-27f3-88f3-99a3-a7f5e18069b4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
+ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Stefan Hajnoczi' <stefanha@gmail.com>, 'qemu-devel' <qemu-devel@nongnu.org>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>
+
+On Fri, Jan 20, 2017 at 06:09:52PM +0100, Paolo Bonzini wrote:
+> 
+> 
+> On 20/01/2017 17:57, Michael S. Tsirkin wrote:
+> > On Fri, Jan 20, 2017 at 08:42:41AM +0100, Markus Armbruster wrote:
+> >> "Michael S. Tsirkin" <mst@redhat.com> writes:
+> >>
+> >>> There are theoretical concerns that some compilers might not trigger
+> >>> build failures on attempts to define an array of size -1 and make it a
+> >>> variable sized array instead. Let rewrite using a struct with a negative
+> >>> bit field size instead as there are no dynamic bit field sizes.  This is
+> >>> similar to what Linux does.
+> >>>
+> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >>> ---
+> >>>  include/qemu/compiler.h | 9 ++++++---
+> >>>  1 file changed, 6 insertions(+), 3 deletions(-)
+> >>>
+> >>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> >>> index 7512082..c6f673e 100644
+> >>> --- a/include/qemu/compiler.h
+> >>> +++ b/include/qemu/compiler.h
+> >>> @@ -85,9 +85,12 @@
+> >>>  #define typeof_field(type, field) typeof(((type *)0)->field)
+> >>>  #define type_check(t1,t2) ((t1*)0 - (t2*)0)
+> >>>  
+> >>> -#define QEMU_BUILD_BUG_ON(x) \
+> >>> -    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
+> >>> -        __attribute__((unused))
+> >>> +#define QEMU_BUILD_BUG_ON_STRUCT(x) \
+> >>> +    struct { \
+> >>> +        int qemu_build_bug_on : (x) ? -1 : 1; \
+> >>> +    }
+> >>
+> >> The qemu_build_bug_on name space pollution is harmless, but quite
+> >> unnecessary: the name can be simply omitted (unnamed bit-field).
+> > 
+> > I have concerns about it's portability though. I remember
+> > we had to get rid of unnamed fields in some structs at some point
+> > for the sake of some old compiler.
+> 
+> Unnamed bitfields are in C89 and we definitely use unnamed unions.
+> Maybe that was an unnamed struct or scalar.
+> 
+> Paolo
+
+I don't think we use unnamed bitfields anywhere though. do we?
 
 
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-
->> From: Alex Bennée [mailto:alex.bennee@linaro.org]
->> >> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
->> >> >
->> >> > Yes, this option helps.
->> >> > Thank you.
->> >>
->> >> Good news.  This can be fixed in 2.8.1 once someone finds a solution.
->> >
->> > It seems that something still goes wrong.
->> > I'm using this workaround, but there is a kind of deadlock in translation.
->> > call_rcu_thread hangs at some moment in qemu_event_wait.
->> >
->> > As far as I understand, it is used by QHT in translate-all.c.
->> > I can't get more information yet, because logging makes everything too slow.
->>
->> There are a number of users of RCU bit for QHT I think it only gets
->> activated when it needs to re-size its hash table on insertion of new
->> TranslationBlocks.
->>
->> Can you get a backtrace of all threads when it deadlocks?
->
-> Sorry, this is another problem which occurs only in icount replay mode:
-> 1. cpu_handle_exception tries to force exception when is cannot occur due to
->    running out all the planned instructions:
->     } else if (replay_has_exception()
->                && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
->         /* try to cause an exception pending in the log */
->         cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
->         *ret = -1;
->         return true;
->
-> 2. tb_find calls tb_gen_code, which cannot allocate new translation block
->    and calls tb_flush (which only queues the flushing) and cpu_loop_exit
-> 3. cpu_loop_exit returns to infinite loop of cpu_exec and the condition
->             if (cpu_handle_exception(cpu, &ret)) {
->                 break;
->             }
->    is checked again causing an infinite loop.
->
-> TB cache is not flushed because we never execute that break and real work of tb_flush
-> is made outside this loop.
-
-I think what we need is a:
-
-
-  if (cpu->exit_request)
-    break;
-
-before the cpu_handle_exception() call to ensure any queued work gets
-processed first. Can you give me you current command line so I can
-reproduce this and check the fix works?
-
---
-Alex Bennée
+> >>> +#define QEMU_BUILD_BUG_ON(x) typedef QEMU_BUILD_BUG_ON_STRUCT(x) \
+> >>> +    glue(qemu_build_bug_on__, __LINE__) __attribute__((unused))
+> >>>  
+> >>>  #if defined __GNUC__
+> >>>  # if !QEMU_GNUC_PREREQ(4, 4)
