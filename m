@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUdtV-0006Dh-QQ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:26:38 -0500
+	(envelope-from <armbru@redhat.com>) id 1cUdzu-0007c6-Dt
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUdtR-00035p-Sa
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:26:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48260)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cUdtR-00035K-NM
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:26:33 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cUdtQ-0006St-Fq
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 18:26:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 58E132E80C2
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 18:26:32 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1cUdzq-0005e0-HM
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50236)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cUdzq-0005ck-9W
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:10 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1484859998-25074-1-git-send-email-mst@redhat.com>
+	<1484859998-25074-3-git-send-email-mst@redhat.com>
+	<87wpdq2n4e.fsf@dusky.pond.sub.org>
+	<20170120185551-mutt-send-email-mst@kernel.org>
+	<024df752-27f3-88f3-99a3-a7f5e18069b4@redhat.com>
+	<20170120194511-mutt-send-email-mst@kernel.org>
+Date: Fri, 20 Jan 2017 19:33:07 +0100
+In-Reply-To: <20170120194511-mutt-send-email-mst@kernel.org> (Michael
+	S. Tsirkin's message of "Fri, 20 Jan 2017 19:45:40 +0200")
+Message-ID: <87inp9h998.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Jan 2017 18:14:58 -0000
-From: Thomas Huth <903365@bugs.launchpad.net>
-Reply-To: Bug 903365 <903365@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111212200001.27381.35693.malonedeb@gac.canonical.com>
-Message-Id: <20170120181501.21508.24600.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 903365] Re: [feature request] bind nat (-net
- user) to other interface (like eth0:2)
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
+ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,29 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-** Changed in: qemu
-   Importance: Undecided =3D> Wishlist
+"Michael S. Tsirkin" <mst@redhat.com> writes:
 
--- =
+> On Fri, Jan 20, 2017 at 06:09:52PM +0100, Paolo Bonzini wrote:
+>> 
+>> 
+>> On 20/01/2017 17:57, Michael S. Tsirkin wrote:
+>> > On Fri, Jan 20, 2017 at 08:42:41AM +0100, Markus Armbruster wrote:
+>> >> "Michael S. Tsirkin" <mst@redhat.com> writes:
+>> >>
+>> >>> There are theoretical concerns that some compilers might not trigger
+>> >>> build failures on attempts to define an array of size -1 and make it a
+>> >>> variable sized array instead. Let rewrite using a struct with a negative
+>> >>> bit field size instead as there are no dynamic bit field sizes.  This is
+>> >>> similar to what Linux does.
+>> >>>
+>> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>> >>> ---
+>> >>>  include/qemu/compiler.h | 9 ++++++---
+>> >>>  1 file changed, 6 insertions(+), 3 deletions(-)
+>> >>>
+>> >>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+>> >>> index 7512082..c6f673e 100644
+>> >>> --- a/include/qemu/compiler.h
+>> >>> +++ b/include/qemu/compiler.h
+>> >>> @@ -85,9 +85,12 @@
+>> >>>  #define typeof_field(type, field) typeof(((type *)0)->field)
+>> >>>  #define type_check(t1,t2) ((t1*)0 - (t2*)0)
+>> >>>  
+>> >>> -#define QEMU_BUILD_BUG_ON(x) \
+>> >>> -    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
+>> >>> -        __attribute__((unused))
+>> >>> +#define QEMU_BUILD_BUG_ON_STRUCT(x) \
+>> >>> +    struct { \
+>> >>> +        int qemu_build_bug_on : (x) ? -1 : 1; \
+>> >>> +    }
+>> >>
+>> >> The qemu_build_bug_on name space pollution is harmless, but quite
+>> >> unnecessary: the name can be simply omitted (unnamed bit-field).
+>> > 
+>> > I have concerns about it's portability though. I remember
+>> > we had to get rid of unnamed fields in some structs at some point
+>> > for the sake of some old compiler.
+>> 
+>> Unnamed bitfields are in C89 and we definitely use unnamed unions.
+>> Maybe that was an unnamed struct or scalar.
+>> 
+>> Paolo
+>
+> I don't think we use unnamed bitfields anywhere though. do we?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/903365
+If we were talking about some obscure GCC extension, this would be a
+valid question.  But we're talking about an ISO C feature that's pretty
+central to how bit-fields work, and older than quite a few hackers.
 
-Title:
-  [feature request] bind nat (-net user) to other interface (like
-  eth0:2)
-
-Status in QEMU:
-  New
-
-Bug description:
-  -net user mode is very nice because it does not require any changes in
-  host system. However if host system has muplitple IPs You cant use it,
-  or even switch to another. Qemu should be able to "bind" to eth0:1
-  eth0:2 so that outgoing traffic uses this interface and thus other IP.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/903365/+subscriptions
+[...]
