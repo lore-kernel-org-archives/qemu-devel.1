@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUWpC-00061a-IE
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:53:43 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cUX0C-00081O-E5
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:05:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUWp9-0005IY-HT
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:53:42 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35888)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cUWp9-0005Gn-7M
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:53:39 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id c85so31950857wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 02:53:38 -0800 (PST)
-References: <20170119170507.16185-1-alex.bennee@linaro.org>
-	<20170119170507.16185-27-alex.bennee@linaro.org>
-	<87a8amr3sj.fsf@gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87a8amr3sj.fsf@gmail.com>
-Date: Fri, 20 Jan 2017 10:53:35 +0000
-Message-ID: <87r33ydmts.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1cUX09-0001ac-8r
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:05:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cUX09-0001aB-3D
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:05:01 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D7DB480461
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:05:00 +0000 (UTC)
+Date: Fri, 20 Jan 2017 11:04:56 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170120110455.GG2658@work-vm>
+References: <20170118175343.GA26873@amt.cnet>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 26/27] tcg: enable MTTCG by default for
- ARM on x86 hosts
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170118175343.GA26873@amt.cnet>
+Subject: Re: [Qemu-devel] [qemu PATCH] pc.h: move
+ x-mach-use-reliable-get-clock compat entry to PC_COMPAT_2_8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, "open list:ARM" <qemu-arm@nongnu.org>
+To: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
+* Marcelo Tosatti (mtosatti@redhat.com) wrote:
+> 
+> As noticed by David Gilbert, commit 6053a86 'kvmclock: reduce kvmclock
+> differences on migration' added 'x-mach-use-reliable-get-clock' and a
+> compatibility entry that turns it off; however it got merged after 2.8.0
+> was released but the entry has gone into PC_COMPAT_2_7 where it should
+> have gone into PC_COMPAT_2_8.
+> 
+> Fix it by moving the entry to PC_COMPAT_2_8.
+> 
+> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-Pranith Kumar <bobby.prani@gmail.com> writes:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> Alex Bennée writes:
->
->> This enables the multi-threaded system emulation by default for ARMv7
->> and ARMv8 guests using the x86_64 TCG backend. This is because on the
->> guest side:
->>
->>   - The ARM translate.c/translate-64.c have been converted to
->>     - use MTTCG safe atomic primitives
->>     - emit the appropriate barrier ops
->>   - The ARM machine has been updated to
->>     - hold the BQL when modifying shared cross-vCPU state
->>     - defer cpu_reset to async safe work
->>
->> All the host backends support the barrier and atomic primitives but
->> need to provide same-or-better support for normal load/store
->> operations.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->
-> <snip>
->
->>
->> +/* This defines the natural memory order supported by this
->> + * architecture before guarantees made by various barrier
->> + * instructions.
->> + *
->> + * The x86 has a pretty strong memory ordering which only really
->> + * allows for some stores to be re-ordered after loads.
->> + */
->> +#include "tcg-mo.h"
->> +
->> +static inline int get_tcg_target_mo(void)
->> +{
->> +    return TCG_MO_ALL & ~TCG_MO_LD_ST;
->> +}
->> +
->
-> Shouldn't this be TCG_MO_ALL & ~TCG_MO_ST_LD?
-
-The case that x86 doesn't handle normally is store-after-load which is
-what I assumed TCG_MO_LD_ST was. Perhaps we need some better comments
-for each of the enums?
-
->
-> Thanks,
-
-
+> 
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index b22e699..738bfd6 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -375,14 +375,15 @@ int e820_get_num_entries(void);
+>  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>  
+>  #define PC_COMPAT_2_8 \
+> -
+> -#define PC_COMPAT_2_7 \
+> -    HW_COMPAT_2_7 \
+> +    HW_COMPAT_2_8 \
+>      {\
+>          .driver   = "kvmclock",\
+>          .property = "x-mach-use-reliable-get-clock",\
+>          .value    = "off",\
+>      },\
+> +
+> +#define PC_COMPAT_2_7 \
+> +    HW_COMPAT_2_7 \
+>      {\
+>          .driver   = TYPE_X86_CPU,\
+>          .property = "l3-cache",\
+> 
+> 
 --
-Alex Bennée
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
