@@ -1,36 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUc6T-0001me-Uf
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:31:58 -0500
+	(envelope-from <Julian_Brown@mentor.com>) id 1cUc73-0002BS-C4
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:32:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUc6P-0004Rn-UA
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:31:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50770)
+	(envelope-from <Julian_Brown@mentor.com>) id 1cUc72-0004yP-4c
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:32:29 -0500
+Received: from relay1.mentorg.com ([192.94.38.131]:41780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUc6P-0004Pw-LS
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:31:49 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8B97C67BA8
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 16:31:49 +0000 (UTC)
-Date: Fri, 20 Jan 2017 18:31:47 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170120182638-mutt-send-email-mst@kernel.org>
-References: <1484625660-3312-1-git-send-email-jasowang@redhat.com>
-	<20170117164326-mutt-send-email-mst@kernel.org>
-	<38dfab22-412f-94a5-4b01-351edf627027@redhat.com>
-	<20170118193122-mutt-send-email-mst@kernel.org>
-	<fc140450-dbd4-4a2d-578f-8226e0bd02fc@redhat.com>
-	<20170120002554-mutt-send-email-mst@kernel.org>
-	<cd014c96-dc69-0ba2-fe42-7797bf1385ea@redhat.com>
+	(Exim 4.71) (envelope-from <Julian_Brown@mentor.com>)
+	id 1cUc71-0004xy-Uh
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:32:28 -0500
+Received: from nat-ies.mentorg.com ([192.94.31.2]
+	helo=SVR-IES-MBX-04.mgc.mentorg.com)
+	by relay1.mentorg.com with esmtp
+	id 1cUc70-0005ZJ-SP from Julian_Brown@mentor.com
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:32:27 -0800
+From: Julian Brown <julian@codesourcery.com>
+Date: Fri, 20 Jan 2017 08:32:07 -0800
+Message-ID: <3787ef677853c10ae60beb867c4b3d170391ad2d.1484929304.git.julian@codesourcery.com>
+In-Reply-To: <cover.1484929304.git.julian@codesourcery.com>
+References: <cover.1484929304.git.julian@codesourcery.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cd014c96-dc69-0ba2-fe42-7797bf1385ea@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio: force VIRTIO_F_IOMMU_PLATFORM
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 5/7] ARM big-endian system-mode gdbstub
+ support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,107 +32,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Fri, Jan 20, 2017 at 11:28:53AM +0800, Jason Wang wrote:
->=20
->=20
-> On 2017=E5=B9=B401=E6=9C=8820=E6=97=A5 06:27, Michael S. Tsirkin wrote:
-> > On Thu, Jan 19, 2017 at 11:12:21AM +0800, Jason Wang wrote:
-> > >=20
-> > > On 2017=E5=B9=B401=E6=9C=8819=E6=97=A5 01:50, Michael S. Tsirkin wr=
-ote:
-> > > > On Wed, Jan 18, 2017 at 10:42:48AM +0800, Jason Wang wrote:
-> > > > > On 2017=E5=B9=B401=E6=9C=8817=E6=97=A5 22:44, Michael S. Tsirki=
-n wrote:
-> > > > > > On Tue, Jan 17, 2017 at 12:01:00PM +0800, Jason Wang wrote:
-> > > > > > > We allow vhost to clear VIRITO_F_IOMMU_PLATFORM which is wr=
-ong since
-> > > > > > > VIRTIO_F_IOMMU_PLATFORM is mandatory for security. Fixing t=
-his by
-> > > > > > > enforce it after vdc->get_features().
-> > > > > > >=20
-> > > > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > > > > > ---
-> > > > > > >     hw/virtio/virtio-bus.c | 5 +++--
-> > > > > > >     1 file changed, 3 insertions(+), 2 deletions(-)
-> > > > > > >=20
-> > > > > > > diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.=
-c
-> > > > > > > index d31cc00..a886011 100644
-> > > > > > > --- a/hw/virtio/virtio-bus.c
-> > > > > > > +++ b/hw/virtio/virtio-bus.c
-> > > > > > > @@ -47,6 +47,7 @@ void virtio_bus_device_plugged(VirtIODevi=
-ce *vdev, Error **errp)
-> > > > > > >         VirtioBusState *bus =3D VIRTIO_BUS(qbus);
-> > > > > > >         VirtioBusClass *klass =3D VIRTIO_BUS_GET_CLASS(bus)=
-;
-> > > > > > >         VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(=
-vdev);
-> > > > > > > +    bool has_iommu =3D virtio_host_has_feature(vdev, VIRTI=
-O_F_IOMMU_PLATFORM);
-> > > > > > >         DPRINTF("%s: plug device.\n", qbus->name);
-> > > > > > > @@ -63,8 +64,8 @@ void virtio_bus_device_plugged(VirtIODevi=
-ce *vdev, Error **errp)
-> > > > > > >             klass->device_plugged(qbus->parent, errp);
-> > > > > > >         }
-> > > > > > > -    if (klass->get_dma_as !=3D NULL &&
-> > > > > > > -        virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATF=
-ORM)) {
-> > > > > > > +    if (klass->get_dma_as !=3D NULL && has_iommu) {
-> > > > > > > +        virtio_add_feature(&vdev->host_features, VIRTIO_F_=
-IOMMU_PLATFORM);
-> > > > > > >             vdev->dma_as =3D klass->get_dma_as(qbus->parent=
-);
-> > > > > > >         } else {
-> > > > > > >             vdev->dma_as =3D &address_space_memory;
-> > > > > > I suspect that's not enough, we must also fail or disable vho=
-st
-> > > > > > (depending on the options), otherwise things won't work.
-> > > > > Looks like with the patch, VIRTIO_F_IOMMU_PLATFORM will be pass=
-ed to
-> > > > > vhost_set_features().
-> > > > Okay then. Could you please test on an old host kernel and confir=
-m
-> > > > what happens? Pls mention this in commit log.
-> > > Test were done before sending this patch :)
-> > >=20
-> > > Vhost fallback to userspace since it lacks VIRTIO_F_IOMMU_PLATFORM.
-> > >=20
-> > > > > So if vhost backend does not support it, it will fall
-> > > > > back to userspace (This may not work for vhost-user, but it's a=
- bug existed
-> > > > > even before this patch).
-> > > > >=20
-> > > > > Thanks
-> > > > I guess this is true but this suddenly makes it important to
-> > > > fix this. So I prefer a patchset where patch 2 addresses
-> > > > the fallback bug. In which way? Do you think we should
-> > > > just fail if vhost doesn't work? Does this apply to both
-> > > > userspace and kernel?
-> > > For 1.0 devices we could do this through NEEDS_RESET, but it doesn'=
-t work
-> > > for legacy device. For kernel vhost, I'd prefer to keep the current
-> > > fallback.
-> > I'm not so sure. This has security implications, e.g. user might
-> > expect not to be affected by a bug in qemu if specifying vhost=3Don.
->=20
-> Ok.
->=20
-> >=20
-> > > For vhost-user, it seems not easy and we could not just terminate
-> > > qemu in this case consider this kind of failure can only be detecte=
-d during
-> > > start not init.
-> > >=20
-> > > Thanks
-> > I think we should at least deny connection.
->=20
-> Ok and we need do something after denying it, how about vdev->broken or
-> others?
->=20
-> Thanks
+When debugging a big-endian (either BE8 or BE32) executable, GDB uses
+a big-endian byte ordering for its remote protocol.  The gdb stub
+code in QEMU needs to interpret data in host (little-endian) order in
+arm_cpu_gdb_read_register and arm_cpu_gdb_write_register, so this patch
+arranges to byte-swap the data to/from GDB in those cases.
 
-For vhost-user qemu does not make progress until there's
-a valid connection.
+Signed-off-by: Julian Brown <julian@codesourcery.com>
+---
+ target/arm/gdbstub.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+
+diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
+index 04c1208..1e9fe68 100644
+--- a/target/arm/gdbstub.c
++++ b/target/arm/gdbstub.c
+@@ -21,6 +21,7 @@
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "exec/gdbstub.h"
++#include "exec/softmmu-arm-semi.h"
+ 
+ /* Old gdb always expect FPA registers.  Newer (xml-aware) gdb only expect
+    whatever the target description contains.  Due to a historical mishap
+@@ -32,10 +33,22 @@ int arm_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+ {
+     ARMCPU *cpu = ARM_CPU(cs);
+     CPUARMState *env = &cpu->env;
++#ifndef CONFIG_USER_ONLY
++    bool targ_bigendian = arm_bswap_needed(env);
++#endif
+ 
+     if (n < 16) {
+         /* Core integer register.  */
++#ifdef CONFIG_USER_ONLY
+         return gdb_get_reg32(mem_buf, env->regs[n]);
++#else
++        if (targ_bigendian) {
++            stl_be_p(mem_buf, env->regs[n]);
++        } else {
++            stl_le_p(mem_buf, env->regs[n]);
++        }
++        return 4;
++#endif
+     }
+     if (n < 24) {
+         /* FPA registers.  */
+@@ -51,10 +64,28 @@ int arm_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+         if (gdb_has_xml) {
+             return 0;
+         }
++#ifdef CONFIG_USER_ONLY
+         return gdb_get_reg32(mem_buf, 0);
++#else
++        if (targ_bigendian) {
++            stl_be_p(mem_buf, 0);
++        } else {
++            stl_le_p(mem_buf, 0);
++        }
++        return 4;
++#endif
+     case 25:
+         /* CPSR */
++#ifdef CONFIG_USER_ONLY
+         return gdb_get_reg32(mem_buf, cpsr_read(env));
++#else
++        if (targ_bigendian) {
++            stl_be_p(mem_buf, cpsr_read(env));
++        } else {
++            stl_le_p(mem_buf, cpsr_read(env));
++        }
++        return 4;
++#endif
+     }
+     /* Unknown register.  */
+     return 0;
+@@ -65,8 +96,19 @@ int arm_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+     ARMCPU *cpu = ARM_CPU(cs);
+     CPUARMState *env = &cpu->env;
+     uint32_t tmp;
++#ifndef CONFIG_USER_ONLY
++    bool targ_bigendian = arm_bswap_needed(env);
++#endif
+ 
++#ifdef CONFIG_USER_ONLY
+     tmp = ldl_p(mem_buf);
++#else
++    if (targ_bigendian) {
++        tmp = ldl_be_p(mem_buf);
++    } else {
++        tmp = ldl_le_p(mem_buf);
++    }
++#endif
+ 
+     /* Mask out low bit of PC to workaround gdb bugs.  This will probably
+        cause problems if we ever implement the Jazelle DBX extensions.  */
+-- 
+2.8.1
