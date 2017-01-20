@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cUYLp-0007oO-TB
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:31:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cUYPc-0002If-Hc
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:35:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cUYLp-0007uP-8H
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:31:29 -0500
-Received: from mail-vk0-x235.google.com ([2607:f8b0:400c:c05::235]:33485)
+	(envelope-from <peter.maydell@linaro.org>) id 1cUYPY-0001pA-5t
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:35:24 -0500
+Received: from mail-ua0-x236.google.com ([2607:f8b0:400c:c08::236]:36557)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cUYLo-0007u2-QR
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:31:29 -0500
-Received: by mail-vk0-x235.google.com with SMTP id k127so50333845vke.0
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:31:28 -0800 (PST)
+	id 1cUYPY-0001p4-1Y
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:35:20 -0500
+Received: by mail-ua0-x236.google.com with SMTP id 96so58956271uaq.3
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:35:19 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1484914681-2986-1-git-send-email-thuth@redhat.com>
-References: <1484914681-2986-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1484912166-19271-1-git-send-email-peter.maydell@linaro.org>
+References: <1484912166-19271-1-git-send-email-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jan 2017 12:31:07 +0000
-Message-ID: <CAFEAcA-fY53-z2awJ_e9738A+MNgYiaVQEn=xJkWn3Xj60nCMw@mail.gmail.com>
+Date: Fri, 20 Jan 2017 12:34:59 +0000
+Message-ID: <CAFEAcA-LyJmOf3SpVPBp=OKuwU0kJGKz5+Hu61+7J9qcrvMhJg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] Introduce DEVICE_CATEGORY_CPU for CPU
- devices
+Subject: Re: [Qemu-devel] [PULL v2 00/36] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On 20 January 2017 at 12:18, Thomas Huth <thuth@redhat.com> wrote:
-> Now that the hot-pluggable CPUs show up in the help text of
-> "-device ?", we should group them into an appropriate category.
+On 20 January 2017 at 11:36, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Changes from v1: just squashed in
+> http://patchwork.ozlabs.org/patch/717312/
+> which deletes a now-unused function.
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/ppc/pnv_core.c       | 1 +
->  hw/ppc/spapr_cpu_core.c | 1 +
->  include/hw/qdev-core.h  | 1 +
->  qdev-monitor.c          | 1 +
->  target/i386/cpu.c       | 2 ++
->  5 files changed, 6 insertions(+)
+> thanks
+> -- PMM
+>
+> The following changes since commit 0f6bcf68a99efdc531b209551f2b760b0bdcc554:
+>
+>   Merge remote-tracking branch 'remotes/artyom/tags/pull-sun4v-20170118' into staging (2017-01-19 18:34:13 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170120
+>
+> for you to fetch changes up to f29cacfb5fc0a6e93efc3f6d2900d82d625f143e:
+>
+>   hw/arm/virt: Add board property to enable EL2 (2017-01-20 11:15:11 +0000)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * support virtualization in GICv3
+>  * enable EL2 in AArch64 CPU models
+>  * allow EL2 to be enabled on 'virt' board via -machine virtualization=on
+>  * aspeed: SMC improvements
+>  * m25p80: support die erase command
+>  * m25p80: Add Quad Page Program 4byte
+>  * m25p80: Improve 1GiB Micron flash definition
+>  * arm: Uniquely name imx25 I2C buses
+>
 
-Can we just set the category bit in the class init functions
-for the TYPE_CPU and TYPE_CPU_CORE superclasses, rather
-than having to do it in a subclass for each architecture
-(and thus potentially forgetting to do it for other archs) ?
+Applied, thanks.
 
-thanks
 -- PMM
