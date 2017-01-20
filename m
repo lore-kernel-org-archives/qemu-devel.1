@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZI9-0003lz-Q5
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:46 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cUZIB-0003nX-AR
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZI6-0005t0-K5
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46898)
+	(envelope-from <pbonzini@redhat.com>) id 1cUZI9-0005x0-TC
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34998)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZI6-0005sL-Dz
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:42 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZI9-0005vP-J3
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:45 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 20 Jan 2017 14:31:05 +0100
-Message-Id: <20170120133139.31080-2-pbonzini@redhat.com>
+Date: Fri, 20 Jan 2017 14:31:08 +0100
+Message-Id: <20170120133139.31080-5-pbonzini@redhat.com>
 In-Reply-To: <20170120133139.31080-1-pbonzini@redhat.com>
 References: <20170120133139.31080-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 01/35] bugfix: vm halt when in reset looping
+Subject: [Qemu-devel] [PULL 04/35] smbios: filter based on CONFIG_SMBIOS
+ rather than TARGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +25,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: hangaohuai <hangaohuai@huawei.com>
+Cc: Leif Lindholm <leif.lindholm@linaro.org>
 
-From: hangaohuai <hangaohuai@huawei.com>
+From: Leif Lindholm <leif.lindholm@linaro.org>
 
-reset mc146818rtc device when RESET event happens.
+-smbios command line options were accepted but silently ignored on
+TARGET_ARM, due to a test for TARGET_I386 in arch_init.c.
 
-Fix the problem:
-  1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect selfboot;
-  2. VM being reset by others, hmp_system_reset;
-  3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
-     resume execution by jump via 40h:0067h;
-  4. Guest halt;
+Copy the mechanism of hw/pci/pci-stub.c to implement an smbios-stub
+instead, enabled for all targets without CONFIG_SMBIOS.
 
-Signed-off-by: hangaohuai <hangaohuai@huawei.com>
-Message-Id: <20161219060336.10176-1-hangaohuai@huawei.com>
+Signed-off-by: Leif Lindholm <leif.lindholm@linaro.org>
+Message-Id: <20161222151828.28292-1-leif.lindholm@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/timer/mc146818rtc.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ arch_init.c                |  8 --------
+ hw/Makefile.objs           |  2 +-
+ hw/smbios/Makefile.objs    |  3 +++
+ hw/smbios/smbios-stub.c    | 31 +++++++++++++++++++++++++++++++
+ hw/smbios/smbios.c         |  2 +-
+ include/hw/smbios/smbios.h |  2 +-
+ include/sysemu/arch_init.h |  1 -
+ vl.c                       |  2 +-
+ 8 files changed, 38 insertions(+), 13 deletions(-)
+ create mode 100644 hw/smbios/smbios-stub.c
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index da209d0..637f872 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -946,11 +946,23 @@ static Property mc146818rtc_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
+diff --git a/arch_init.c b/arch_init.c
+index 5cc58b2..34e7694 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -28,7 +28,6 @@
+ #include "sysemu/arch_init.h"
+ #include "hw/pci/pci.h"
+ #include "hw/audio/audio.h"
+-#include "hw/smbios/smbios.h"
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+ #include "qmp-commands.h"
+@@ -248,13 +247,6 @@ void do_acpitable_option(const QemuOpts *opts)
+ #endif
+ }
  
-+static void rtc_resetdev(DeviceState *d)
-+{
-+    RTCState *s = MC146818_RTC(d);
-+
-+    /* Reason: VM do suspend self will set 0xfe
-+     * Reset any values other than 0xfe(Guest suspend case) */
-+    if (s->cmos_data[0x0f] != 0xfe) {
-+        s->cmos_data[0x0f] = 0x00;
-+    }
-+}
-+
- static void rtc_class_initfn(ObjectClass *klass, void *data)
+-void do_smbios_option(QemuOpts *opts)
+-{
+-#ifdef TARGET_I386
+-    smbios_entry_add(opts);
+-#endif
+-}
+-
+ int kvm_available(void)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
+ #ifdef CONFIG_KVM
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 0ffd281..2a73ae5 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -33,7 +33,7 @@ devices-dirs-$(CONFIG_VIRTIO) += virtio/
+ devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
+ devices-dirs-$(CONFIG_SOFTMMU) += xen/
+ devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
+-devices-dirs-$(CONFIG_SMBIOS) += smbios/
++devices-dirs-$(CONFIG_SOFTMMU) += smbios/
+ devices-dirs-y += core/
+ common-obj-y += $(devices-dirs-y)
+ obj-y += $(devices-dirs-y)
+diff --git a/hw/smbios/Makefile.objs b/hw/smbios/Makefile.objs
+index c3d3753..ee0712b 100644
+--- a/hw/smbios/Makefile.objs
++++ b/hw/smbios/Makefile.objs
+@@ -1,2 +1,5 @@
+ common-obj-$(CONFIG_SMBIOS) += smbios.o
+ common-obj-$(call land,$(CONFIG_SMBIOS),$(CONFIG_IPMI)) += smbios_type_38.o
++
++common-obj-$(call lnot,$(CONFIG_SMBIOS)) += smbios-stub.o
++common-obj-$(CONFIG_ALL) += smbios-stub.o
+diff --git a/hw/smbios/smbios-stub.c b/hw/smbios/smbios-stub.c
+new file mode 100644
+index 0000000..3087394
+--- /dev/null
++++ b/hw/smbios/smbios-stub.c
+@@ -0,0 +1,31 @@
++/*
++ * SMBIOS stubs for platforms that don't support SMBIOS.
++ *
++ * Copyright (c) 2010 Isaku Yamahata <yamahata at valinux co jp>
++ *                    VA Linux Systems Japan K.K.
++ * Copyright (c) 2016 Leif Lindholm <leif.lindholm@linaro.org>
++ *                    Linaro Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/qmp/qerror.h"
++#include "qmp-commands.h"
++#include "hw/smbios/smbios.h"
++
++void smbios_entry_add(QemuOpts *opts, Error **errp)
++{
++    error_setg(errp, QERR_UNSUPPORTED);
++}
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 3a96ced..1a5437a 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -882,7 +882,7 @@ static void save_opt(const char **dest, QemuOpts *opts, const char *name)
+     }
+ }
  
-     dc->realize = rtc_realizefn;
-+    dc->reset = rtc_resetdev;
-     dc->vmsd = &vmstate_rtc;
-     dc->props = mc146818rtc_properties;
-     /* Reason: needs to be wired up by rtc_init() */
+-void smbios_entry_add(QemuOpts *opts)
++void smbios_entry_add(QemuOpts *opts, Error **errp)
+ {
+     const char *val;
+ 
+diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
+index 1cd53cc..31e8d5f 100644
+--- a/include/hw/smbios/smbios.h
++++ b/include/hw/smbios/smbios.h
+@@ -257,7 +257,7 @@ struct smbios_type_127 {
+     struct smbios_structure_header header;
+ } QEMU_PACKED;
+ 
+-void smbios_entry_add(QemuOpts *opts);
++void smbios_entry_add(QemuOpts *opts, Error **errp);
+ void smbios_set_cpuid(uint32_t version, uint32_t features);
+ void smbios_set_defaults(const char *manufacturer, const char *product,
+                          const char *version, bool legacy_mode,
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 1c9dad1..88dcf77 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -29,7 +29,6 @@ extern const uint32_t arch_type;
+ 
+ void select_soundhw(const char *optarg);
+ void do_acpitable_option(const QemuOpts *opts);
+-void do_smbios_option(QemuOpts *opts);
+ void audio_init(void);
+ int kvm_available(void);
+ int xen_available(void);
+diff --git a/vl.c b/vl.c
+index c643d3f..63355e5 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3707,7 +3707,7 @@ int main(int argc, char **argv, char **envp)
+                 if (!opts) {
+                     exit(1);
+                 }
+-                do_smbios_option(opts);
++                smbios_entry_add(opts, &error_fatal);
+                 break;
+             case QEMU_OPTION_fwcfg:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("fw_cfg"),
 -- 
 2.9.3
