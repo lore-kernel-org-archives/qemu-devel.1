@@ -1,14 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUeBJ-00039b-5M
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:45:02 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cUeGd-0007UK-9s
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:50:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUeBH-0002Zy-Vq
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:45:01 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cUeGc-00056r-Ga
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:50:31 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jan 2017 18:44:37 +0000
-Message-Id: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/6] ARMv7M: some simple bugfixes and cleanups
+Date: Fri, 20 Jan 2017 18:50:22 +0000
+Message-Id: <1484938222-1423-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] arm: stellaris: make MII accesses complete
+ immediately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,47 +19,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>
+Cc: patches@linaro.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-This set of six patches is some simple bug fixes which
-I've pulled out of Michael Davidsaver's old NVIC rewrite
-patchset, as an initial start on getting it upstream.
-None of them are particularly exciting, but they're
-self-contained so they might as well go through code
-review and get into master ahead of the main rewrite.
+From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-NB the patch which pulls the FIELD macros out of register.h;
-they're too useful to be only accessible in softmmu builds.
+When the guest attempts to start an MII register
+access via the MCTL register, clear the START bit,
+so that when the guest reads it back the register
+transaction will be signalled as having completed.
+This avoids the guest spinning as it polls the
+START bit waiting for it to clear (which it
+previously never would).
 
-I've CC'd Michael as the original author and Liviu
-as somebody interested in v7M; if either of you would
-prefer not to be cc'd let me know and I'll leave you off
-subsequent respins and later NVIC related patchset emails.
+The  MII registers themselves still aren't implemented,
+but at least we can avoid guests spending quite so much
+time busy waiting.
 
-thanks
--- PMM
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[PMM: expand commit message]
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This is a minor bugfix that was lurking in Michael's
+git tree from his unfinished work on a v3 of the NVIC
+patchset.
 
-Michael Davidsaver (5):
-  armv7m: MRS/MSR: handle unprivileged access
-  armv7m: Replace armv7m.hack with unassigned_access handler
-  armv7m: Explicit error for bad vector table
-  armv7m: Fix reads of CONTROL register bit 1
-  armv7m: Clear FAULTMASK on return from non-NMI exceptions
+ hw/net/stellaris_enet.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Peter Maydell (1):
-  hw/registerfields.h: Pull FIELD etc macros out of hw/register.h
-
- include/hw/register.h       |  47 +-------------
- include/hw/registerfields.h |  60 ++++++++++++++++++
- target/arm/cpu.h            |   1 -
- target/arm/internals.h      |   7 +++
- hw/arm/armv7m.c             |   8 ---
- target/arm/cpu.c            |  28 +++++++++
- target/arm/helper.c         | 147 +++++++++++++++++++++++++++-----------------
- target/arm/machine.c        |   6 +-
- target/arm/translate.c      |  12 ++--
- 9 files changed, 195 insertions(+), 121 deletions(-)
- create mode 100644 include/hw/registerfields.h
-
+diff --git a/hw/net/stellaris_enet.c b/hw/net/stellaris_enet.c
+index 957730e..04bd10a 100644
+--- a/hw/net/stellaris_enet.c
++++ b/hw/net/stellaris_enet.c
+@@ -416,7 +416,10 @@ static void stellaris_enet_write(void *opaque, hwaddr offset,
+         s->thr = value;
+         break;
+     case 0x20: /* MCTL */
+-        s->mctl = value;
++        /* TODO: MII registers aren't modelled.
++         * Clear START, indicating that the operation completes immediately.
++         */
++        s->mctl = value & ~1;
+         break;
+     case 0x24: /* MDV */
+         s->mdv = value;
 -- 
 2.7.4
