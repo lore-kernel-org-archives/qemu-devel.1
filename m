@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZIZ-0004BP-PL
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:32:12 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cUZIb-0004Cw-9r
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:32:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZIY-0006SO-OH
+	(envelope-from <pbonzini@redhat.com>) id 1cUZIZ-0006TD-N2
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:32:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47148)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZIZ-0006Sb-EV
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:32:11 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9B54061BB0
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 13:32:11 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-138.ams2.redhat.com
+	[10.36.117.138])
+	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v0KDVeVZ014401
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 08:32:11 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 20 Jan 2017 14:31:30 +0100
-Message-Id: <20170120133139.31080-27-pbonzini@redhat.com>
+Date: Fri, 20 Jan 2017 14:31:31 +0100
+Message-Id: <20170120133139.31080-28-pbonzini@redhat.com>
 In-Reply-To: <20170120133139.31080-1-pbonzini@redhat.com>
 References: <20170120133139.31080-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 26/35] char: fix ctrl-a b not working
+Subject: [Qemu-devel] [PULL 27/35] ramblock-notifier: new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +35,286 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-stable@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+This adds a notify interface of ram block additions and removals.
 
-CharDriverState.be should be updated to point to the current
-associated backend.
-
-Fix the regression introduced in the "mux" chardev from commit
-a4afa548fc6dd9842ed86639b4d37d4d1c4ad480.
-
-https://bugs.launchpad.net/bugs/1654137
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170110110621.15287-1-marcandre.lureau@redhat.com>
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qemu-char.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ exec.c                  |  5 ++++
+ include/exec/memory.h   |  6 +----
+ include/exec/ram_addr.h | 46 ++-----------------------------
+ include/exec/ramlist.h  | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
+ numa.c                  | 29 ++++++++++++++++++++
+ xen-mapcache.c          |  3 +++
+ 6 files changed, 112 insertions(+), 49 deletions(-)
+ create mode 100644 include/exec/ramlist.h
 
-diff --git a/qemu-char.c b/qemu-char.c
-index 2c9940c..676944a 100644
---- a/qemu-char.c
-+++ b/qemu-char.c
-@@ -499,7 +499,7 @@ void qemu_chr_fe_printf(CharBackend *be, const char *=
-fmt, ...)
-=20
- static void remove_fd_in_watch(CharDriverState *chr);
- static void mux_chr_set_handlers(CharDriverState *chr, GMainContext *con=
-text);
--static void mux_set_focus(MuxDriver *d, int focus);
-+static void mux_set_focus(CharDriverState *chr, int focus);
-=20
- static int null_chr_write(CharDriverState *chr, const uint8_t *buf, int =
-len)
- {
-@@ -666,7 +666,7 @@ static int mux_proc_byte(CharDriverState *chr, MuxDri=
-ver *d, int ch)
-         case 'c':
-             assert(d->mux_cnt > 0); /* handler registered with first fe =
-*/
-             /* Switch to the next registered device */
--            mux_set_focus(d, (d->focus + 1) % d->mux_cnt);
-+            mux_set_focus(chr, (d->focus + 1) % d->mux_cnt);
-             break;
-         case 't':
-             d->timestamps =3D !d->timestamps;
-@@ -826,8 +826,10 @@ static void mux_chr_set_handlers(CharDriverState *ch=
-r, GMainContext *context)
-                              context, true);
+diff --git a/exec.c b/exec.c
+index c95ae33..067c51b 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1687,6 +1687,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
+         qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_HUGEPAGE);
+         /* MADV_DONTFORK is also needed by KVM in absence of synchronous MMU */
+         qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_DONTFORK);
++        ram_block_notify_add(new_block->host, new_block->max_length);
+     }
  }
-=20
--static void mux_set_focus(MuxDriver *d, int focus)
-+static void mux_set_focus(CharDriverState *chr, int focus)
- {
-+    MuxDriver *d =3D chr->opaque;
+ 
+@@ -1817,6 +1818,10 @@ void qemu_ram_free(RAMBlock *block)
+         return;
+     }
+ 
++    if (block->host) {
++        ram_block_notify_remove(block->host, block->max_length);
++    }
 +
-     assert(focus >=3D 0);
-     assert(focus < d->mux_cnt);
-=20
-@@ -836,6 +838,7 @@ static void mux_set_focus(MuxDriver *d, int focus)
-     }
-=20
-     d->focus =3D focus;
-+    chr->be =3D d->backends[focus];
-     mux_chr_send_event(d, d->focus, CHR_EVENT_MUX_IN);
+     qemu_mutex_lock_ramlist();
+     QLIST_REMOVE_RCU(block, next);
+     ram_list.mru_block = NULL;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index bec9756..a10044f 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -16,16 +16,12 @@
+ 
+ #ifndef CONFIG_USER_ONLY
+ 
+-#define DIRTY_MEMORY_VGA       0
+-#define DIRTY_MEMORY_CODE      1
+-#define DIRTY_MEMORY_MIGRATION 2
+-#define DIRTY_MEMORY_NUM       3        /* num of dirty bits */
+-
+ #include "exec/cpu-common.h"
+ #ifndef CONFIG_USER_ONLY
+ #include "exec/hwaddr.h"
+ #endif
+ #include "exec/memattrs.h"
++#include "exec/ramlist.h"
+ #include "qemu/queue.h"
+ #include "qemu/int128.h"
+ #include "qemu/notify.h"
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 54d7108..3e79466 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -21,6 +21,7 @@
+ 
+ #ifndef CONFIG_USER_ONLY
+ #include "hw/xen/xen.h"
++#include "exec/ramlist.h"
+ 
+ struct RAMBlock {
+     struct rcu_head rcu;
+@@ -35,6 +36,7 @@ struct RAMBlock {
+     char idstr[256];
+     /* RCU-enabled, writes protected by the ramlist lock */
+     QLIST_ENTRY(RAMBlock) next;
++    QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
+     int fd;
+     size_t page_size;
+ };
+@@ -50,51 +52,7 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
+     return (char *)block->host + offset;
  }
-=20
-@@ -935,7 +938,9 @@ void qemu_chr_fe_deinit(CharBackend *b)
-=20
-     if (b->chr) {
-         qemu_chr_fe_set_handlers(b, NULL, NULL, NULL, NULL, NULL, true);
--        b->chr->be =3D NULL;
-+        if (b->chr->be =3D=3D b) {
-+            b->chr->be =3D NULL;
-+        }
-         if (b->chr->is_mux) {
-             MuxDriver *d =3D b->chr->opaque;
-             d->backends[b->tag] =3D NULL;
-@@ -999,7 +1004,7 @@ void qemu_chr_fe_take_focus(CharBackend *b)
+ 
+-/* The dirty memory bitmap is split into fixed-size blocks to allow growth
+- * under RCU.  The bitmap for a block can be accessed as follows:
+- *
+- *   rcu_read_lock();
+- *
+- *   DirtyMemoryBlocks *blocks =
+- *       atomic_rcu_read(&ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
+- *
+- *   ram_addr_t idx = (addr >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
+- *   unsigned long *block = blocks.blocks[idx];
+- *   ...access block bitmap...
+- *
+- *   rcu_read_unlock();
+- *
+- * Remember to check for the end of the block when accessing a range of
+- * addresses.  Move on to the next block if you reach the end.
+- *
+- * Organization into blocks allows dirty memory to grow (but not shrink) under
+- * RCU.  When adding new RAMBlocks requires the dirty memory to grow, a new
+- * DirtyMemoryBlocks array is allocated with pointers to existing blocks kept
+- * the same.  Other threads can safely access existing blocks while dirty
+- * memory is being grown.  When no threads are using the old DirtyMemoryBlocks
+- * anymore it is freed by RCU (but the underlying blocks stay because they are
+- * pointed to from the new DirtyMemoryBlocks).
+- */
+-#define DIRTY_MEMORY_BLOCK_SIZE ((ram_addr_t)256 * 1024 * 8)
+-typedef struct {
+-    struct rcu_head rcu;
+-    unsigned long *blocks[];
+-} DirtyMemoryBlocks;
+-
+-typedef struct RAMList {
+-    QemuMutex mutex;
+-    RAMBlock *mru_block;
+-    /* RCU-enabled, writes protected by the ramlist lock. */
+-    QLIST_HEAD(, RAMBlock) blocks;
+-    DirtyMemoryBlocks *dirty_memory[DIRTY_MEMORY_NUM];
+-    uint32_t version;
+-} RAMList;
+-extern RAMList ram_list;
+-
+ ram_addr_t last_ram_offset(void);
+-void qemu_mutex_lock_ramlist(void);
+-void qemu_mutex_unlock_ramlist(void);
+-
+ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+                                    bool share, const char *mem_path,
+                                    Error **errp);
+diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
+new file mode 100644
+index 0000000..c59880d
+--- /dev/null
++++ b/include/exec/ramlist.h
+@@ -0,0 +1,72 @@
++#ifndef RAMLIST_H
++#define RAMLIST_H
++
++#include "qemu/queue.h"
++#include "qemu/thread.h"
++#include "qemu/rcu.h"
++
++typedef struct RAMBlockNotifier RAMBlockNotifier;
++
++#define DIRTY_MEMORY_VGA       0
++#define DIRTY_MEMORY_CODE      1
++#define DIRTY_MEMORY_MIGRATION 2
++#define DIRTY_MEMORY_NUM       3        /* num of dirty bits */
++
++/* The dirty memory bitmap is split into fixed-size blocks to allow growth
++ * under RCU.  The bitmap for a block can be accessed as follows:
++ *
++ *   rcu_read_lock();
++ *
++ *   DirtyMemoryBlocks *blocks =
++ *       atomic_rcu_read(&ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
++ *
++ *   ram_addr_t idx = (addr >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
++ *   unsigned long *block = blocks.blocks[idx];
++ *   ...access block bitmap...
++ *
++ *   rcu_read_unlock();
++ *
++ * Remember to check for the end of the block when accessing a range of
++ * addresses.  Move on to the next block if you reach the end.
++ *
++ * Organization into blocks allows dirty memory to grow (but not shrink) under
++ * RCU.  When adding new RAMBlocks requires the dirty memory to grow, a new
++ * DirtyMemoryBlocks array is allocated with pointers to existing blocks kept
++ * the same.  Other threads can safely access existing blocks while dirty
++ * memory is being grown.  When no threads are using the old DirtyMemoryBlocks
++ * anymore it is freed by RCU (but the underlying blocks stay because they are
++ * pointed to from the new DirtyMemoryBlocks).
++ */
++#define DIRTY_MEMORY_BLOCK_SIZE ((ram_addr_t)256 * 1024 * 8)
++typedef struct {
++    struct rcu_head rcu;
++    unsigned long *blocks[];
++} DirtyMemoryBlocks;
++
++typedef struct RAMList {
++    QemuMutex mutex;
++    RAMBlock *mru_block;
++    /* RCU-enabled, writes protected by the ramlist lock. */
++    QLIST_HEAD(, RAMBlock) blocks;
++    DirtyMemoryBlocks *dirty_memory[DIRTY_MEMORY_NUM];
++    uint32_t version;
++    QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
++} RAMList;
++extern RAMList ram_list;
++
++void qemu_mutex_lock_ramlist(void);
++void qemu_mutex_unlock_ramlist(void);
++
++struct RAMBlockNotifier {
++    void (*ram_block_added)(RAMBlockNotifier *n, void *host, size_t size);
++    void (*ram_block_removed)(RAMBlockNotifier *n, void *host, size_t size);
++    QLIST_ENTRY(RAMBlockNotifier) next;
++};
++
++void ram_block_notifier_add(RAMBlockNotifier *n);
++void ram_block_notifier_remove(RAMBlockNotifier *n);
++void ram_block_notify_add(void *host, size_t size);
++void ram_block_notify_remove(void *host, size_t size);
++
++
++#endif /* RAMLIST_H */
+diff --git a/numa.c b/numa.c
+index 379bc8a..9f56be9 100644
+--- a/numa.c
++++ b/numa.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "sysemu/numa.h"
+ #include "exec/cpu-common.h"
++#include "exec/ramlist.h"
+ #include "qemu/bitmap.h"
+ #include "qom/cpu.h"
+ #include "qemu/error-report.h"
+@@ -572,3 +573,31 @@ int numa_get_node_for_cpu(int idx)
      }
-=20
-     if (b->chr->is_mux) {
--        mux_set_focus(b->chr->opaque, b->tag);
-+        mux_set_focus(b->chr, b->tag);
-     }
+     return i;
  }
-=20
---=20
++
++void ram_block_notifier_add(RAMBlockNotifier *n)
++{
++    QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
++}
++
++void ram_block_notifier_remove(RAMBlockNotifier *n)
++{
++    QLIST_REMOVE(n, next);
++}
++
++void ram_block_notify_add(void *host, size_t size)
++{
++    RAMBlockNotifier *notifier;
++
++    QLIST_FOREACH(notifier, &ram_list.ramblock_notifiers, next) {
++        notifier->ram_block_added(notifier, host, size);
++    }
++}
++
++void ram_block_notify_remove(void *host, size_t size)
++{
++    RAMBlockNotifier *notifier;
++
++    QLIST_FOREACH(notifier, &ram_list.ramblock_notifiers, next) {
++        notifier->ram_block_removed(notifier, host, size);
++    }
++}
+diff --git a/xen-mapcache.c b/xen-mapcache.c
+index 8f3a592..31debdf 100644
+--- a/xen-mapcache.c
++++ b/xen-mapcache.c
+@@ -163,6 +163,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+     err = g_malloc0(nb_pfn * sizeof (int));
+ 
+     if (entry->vaddr_base != NULL) {
++        ram_block_notify_remove(entry->vaddr_base, entry->size);
+         if (munmap(entry->vaddr_base, entry->size) != 0) {
+             perror("unmap fails");
+             exit(-1);
+@@ -188,6 +189,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+     entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long) *
+             BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
+ 
++    ram_block_notify_add(entry->vaddr_base, entry->size);
+     bitmap_zero(entry->valid_mapping, nb_pfn);
+     for (i = 0; i < nb_pfn; i++) {
+         if (!err[i]) {
+@@ -397,6 +399,7 @@ static void xen_invalidate_map_cache_entry_unlocked(uint8_t *buffer)
+     }
+ 
+     pentry->next = entry->next;
++    ram_block_notify_remove(entry->vaddr_base, entry->size);
+     if (munmap(entry->vaddr_base, entry->size) != 0) {
+         perror("unmap fails");
+         exit(-1);
+-- 
 2.9.3
