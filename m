@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cUPYh-0000WG-UN
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:08:12 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cUPst-000153-LT
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:29:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cUPYg-0002uV-WD
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:08:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54332)
+	(envelope-from <jasowang@redhat.com>) id 1cUPso-0004mK-OX
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:29:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33536)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cUPYg-0002uG-QA
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:08:10 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cUPso-0004m4-FN
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:28:58 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6B50361B95
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 03:28:58 +0000 (UTC)
+References: <1484625660-3312-1-git-send-email-jasowang@redhat.com>
+	<20170117164326-mutt-send-email-mst@kernel.org>
+	<38dfab22-412f-94a5-4b01-351edf627027@redhat.com>
+	<20170118193122-mutt-send-email-mst@kernel.org>
+	<fc140450-dbd4-4a2d-578f-8226e0bd02fc@redhat.com>
+	<20170120002554-mutt-send-email-mst@kernel.org>
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 20 Jan 2017 11:07:50 +0800
-Message-Id: <1484881670-24237-7-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1484881670-24237-1-git-send-email-jasowang@redhat.com>
-References: <1484881670-24237-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 6/6] tap: fix memory leak on failure in
- net_init_tap()
+Message-ID: <cd014c96-dc69-0ba2-fe42-7797bf1385ea@redhat.com>
+Date: Fri, 20 Jan 2017 11:28:53 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170120002554-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio: force VIRTIO_F_IOMMU_PLATFORM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +37,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-From: Peter Maydell <peter.maydell@linaro.org>
 
-Commit 091a6b2ac fixed most of the memory leaks in failure
-paths in net_init_tap() reported by Coverity (CID 1356216),
-but missed one. Fix it by deferring the allocation of
-fds and vhost_fds until after the error check.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- net/tap.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+On 2017=E5=B9=B401=E6=9C=8820=E6=97=A5 06:27, Michael S. Tsirkin wrote:
+> On Thu, Jan 19, 2017 at 11:12:21AM +0800, Jason Wang wrote:
+>>
+>> On 2017=E5=B9=B401=E6=9C=8819=E6=97=A5 01:50, Michael S. Tsirkin wrote=
+:
+>>> On Wed, Jan 18, 2017 at 10:42:48AM +0800, Jason Wang wrote:
+>>>> On 2017=E5=B9=B401=E6=9C=8817=E6=97=A5 22:44, Michael S. Tsirkin wro=
+te:
+>>>>> On Tue, Jan 17, 2017 at 12:01:00PM +0800, Jason Wang wrote:
+>>>>>> We allow vhost to clear VIRITO_F_IOMMU_PLATFORM which is wrong sin=
+ce
+>>>>>> VIRTIO_F_IOMMU_PLATFORM is mandatory for security. Fixing this by
+>>>>>> enforce it after vdc->get_features().
+>>>>>>
+>>>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>>>>> ---
+>>>>>>     hw/virtio/virtio-bus.c | 5 +++--
+>>>>>>     1 file changed, 3 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
+>>>>>> index d31cc00..a886011 100644
+>>>>>> --- a/hw/virtio/virtio-bus.c
+>>>>>> +++ b/hw/virtio/virtio-bus.c
+>>>>>> @@ -47,6 +47,7 @@ void virtio_bus_device_plugged(VirtIODevice *vde=
+v, Error **errp)
+>>>>>>         VirtioBusState *bus =3D VIRTIO_BUS(qbus);
+>>>>>>         VirtioBusClass *klass =3D VIRTIO_BUS_GET_CLASS(bus);
+>>>>>>         VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(vdev);
+>>>>>> +    bool has_iommu =3D virtio_host_has_feature(vdev, VIRTIO_F_IOM=
+MU_PLATFORM);
+>>>>>>         DPRINTF("%s: plug device.\n", qbus->name);
+>>>>>> @@ -63,8 +64,8 @@ void virtio_bus_device_plugged(VirtIODevice *vde=
+v, Error **errp)
+>>>>>>             klass->device_plugged(qbus->parent, errp);
+>>>>>>         }
+>>>>>> -    if (klass->get_dma_as !=3D NULL &&
+>>>>>> -        virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
+>>>>>> +    if (klass->get_dma_as !=3D NULL && has_iommu) {
+>>>>>> +        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_P=
+LATFORM);
+>>>>>>             vdev->dma_as =3D klass->get_dma_as(qbus->parent);
+>>>>>>         } else {
+>>>>>>             vdev->dma_as =3D &address_space_memory;
+>>>>> I suspect that's not enough, we must also fail or disable vhost
+>>>>> (depending on the options), otherwise things won't work.
+>>>> Looks like with the patch, VIRTIO_F_IOMMU_PLATFORM will be passed to
+>>>> vhost_set_features().
+>>> Okay then. Could you please test on an old host kernel and confirm
+>>> what happens? Pls mention this in commit log.
+>> Test were done before sending this patch :)
+>>
+>> Vhost fallback to userspace since it lacks VIRTIO_F_IOMMU_PLATFORM.
+>>
+>>>> So if vhost backend does not support it, it will fall
+>>>> back to userspace (This may not work for vhost-user, but it's a bug =
+existed
+>>>> even before this patch).
+>>>>
+>>>> Thanks
+>>> I guess this is true but this suddenly makes it important to
+>>> fix this. So I prefer a patchset where patch 2 addresses
+>>> the fallback bug. In which way? Do you think we should
+>>> just fail if vhost doesn't work? Does this apply to both
+>>> userspace and kernel?
+>> For 1.0 devices we could do this through NEEDS_RESET, but it doesn't w=
+ork
+>> for legacy device. For kernel vhost, I'd prefer to keep the current
+>> fallback.
+> I'm not so sure. This has security implications, e.g. user might
+> expect not to be affected by a bug in qemu if specifying vhost=3Don.
 
-diff --git a/net/tap.c b/net/tap.c
-index b6896a7..6248e85 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -788,8 +788,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
-             return -1;
-         }
-     } else if (tap->has_fds) {
--        char **fds = g_new0(char *, MAX_TAP_QUEUES);
--        char **vhost_fds = g_new0(char *, MAX_TAP_QUEUES);
-+        char **fds;
-+        char **vhost_fds;
-         int nfds, nvhosts;
- 
-         if (tap->has_ifname || tap->has_script || tap->has_downscript ||
-@@ -801,6 +801,9 @@ int net_init_tap(const Netdev *netdev, const char *name,
-             return -1;
-         }
- 
-+        fds = g_new0(char *, MAX_TAP_QUEUES);
-+        vhost_fds = g_new0(char *, MAX_TAP_QUEUES);
-+
-         nfds = get_fds(tap->fds, fds, MAX_TAP_QUEUES);
-         if (tap->has_vhostfds) {
-             nvhosts = get_fds(tap->vhostfds, vhost_fds, MAX_TAP_QUEUES);
--- 
-2.7.4
+Ok.
+
+>
+>> For vhost-user, it seems not easy and we could not just terminate
+>> qemu in this case consider this kind of failure can only be detected d=
+uring
+>> start not init.
+>>
+>> Thanks
+> I think we should at least deny connection.
+
+Ok and we need do something after denying it, how about vdev->broken or=20
+others?
+
+Thanks
