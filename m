@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUdFy-0003gM-Ae
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:45:47 -0500
+	(envelope-from <mst@redhat.com>) id 1cUdKQ-0006zZ-5m
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:50:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cUdFv-00038g-5B
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:45:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46792)
+	(envelope-from <mst@redhat.com>) id 1cUdKM-0006Aw-Uu
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:50:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUdFu-000381-VC
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:45:43 -0500
-Date: Fri, 20 Jan 2017 19:45:40 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUdKM-0006AC-NX
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:50:18 -0500
+Date: Fri, 20 Jan 2017 19:50:16 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170120194511-mutt-send-email-mst@kernel.org>
-References: <1484859998-25074-1-git-send-email-mst@redhat.com>
-	<1484859998-25074-3-git-send-email-mst@redhat.com>
-	<87wpdq2n4e.fsf@dusky.pond.sub.org>
-	<20170120185551-mutt-send-email-mst@kernel.org>
-	<024df752-27f3-88f3-99a3-a7f5e18069b4@redhat.com>
+Message-ID: <20170120194950-mutt-send-email-mst@kernel.org>
+References: <1484772931-16272-1-git-send-email-mst@redhat.com>
+	<1484772931-16272-4-git-send-email-mst@redhat.com>
+	<87r33zii2m.fsf@dusky.pond.sub.org>
+	<8721518c-5063-bd5b-60a9-3a3752894e74@redhat.com>
+	<8737gfb2dn.fsf@dusky.pond.sub.org>
+	<20170119212409-mutt-send-email-mst@kernel.org>
+	<87d1fi42o7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <024df752-27f3-88f3-99a3-a7f5e18069b4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
- struct
+In-Reply-To: <87d1fi42o7.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] compiler: expression version of
+ QEMU_BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +33,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Jan 20, 2017 at 06:09:52PM +0100, Paolo Bonzini wrote:
+On Fri, Jan 20, 2017 at 08:21:28AM +0100, Markus Armbruster wrote:
+> "Michael S. Tsirkin" <mst@redhat.com> writes:
 > 
+> > On Thu, Jan 19, 2017 at 02:33:40PM +0100, Markus Armbruster wrote:
+> >> Paolo Bonzini <pbonzini@redhat.com> writes:
+> >> 
+> >> > On 19/01/2017 09:12, Markus Armbruster wrote:
+> >> >> "Michael S. Tsirkin" <mst@redhat.com> writes:
+> >> >> 
+> >> >>> QEMU_BUILD_BUG_ON uses a typedef in order to be safe
+> >> >>> to use outside functions, but sometimes it's useful
+> >> >>> to have a version that can be used within an expression.
+> >> >>> Following what Linux does, introduce QEMU_BUILD_BUG_ON_ZERO
+> >> >>> that return zero after checking condition at build time.
+> >> >> 
+> >> >> Following Linux's example makes sense, but I can't help but wonder
+> >> >> whether we need both QEMU_BUILD_BUG_ON_ZERO() and QEMU_BUILD_BUG_ON().
+> >> >
+> >> > I think so, most notably QEMU_BUILD_BUG_ON was added to C11 as
+> >> > _Static_assert but QEMU_BUILD_BUG_ON_ZERO wasn't.
+> >> 
+> >> Okay.
+> >> 
+> >> > But we can indeed redefine QEMU_BUILD_BUG_ON to
+> >> > (void)QEMU_BUILD_BUG_ON_ZERO(x) like Linux does, until we add optional
+> >> > support for _Static_assert.
+> >> 
+> >> Yes, please.
+> >
+> >
+> > I don't think we can because we use QEMU_BUILD_BUG_ON outside
+> > any functions. I don't think you can put 0 there.
 > 
-> On 20/01/2017 17:57, Michael S. Tsirkin wrote:
-> > On Fri, Jan 20, 2017 at 08:42:41AM +0100, Markus Armbruster wrote:
-> >> "Michael S. Tsirkin" <mst@redhat.com> writes:
-> >>
-> >>> There are theoretical concerns that some compilers might not trigger
-> >>> build failures on attempts to define an array of size -1 and make it a
-> >>> variable sized array instead. Let rewrite using a struct with a negative
-> >>> bit field size instead as there are no dynamic bit field sizes.  This is
-> >>> similar to what Linux does.
-> >>>
-> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >>> ---
-> >>>  include/qemu/compiler.h | 9 ++++++---
-> >>>  1 file changed, 6 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-> >>> index 7512082..c6f673e 100644
-> >>> --- a/include/qemu/compiler.h
-> >>> +++ b/include/qemu/compiler.h
-> >>> @@ -85,9 +85,12 @@
-> >>>  #define typeof_field(type, field) typeof(((type *)0)->field)
-> >>>  #define type_check(t1,t2) ((t1*)0 - (t2*)0)
-> >>>  
-> >>> -#define QEMU_BUILD_BUG_ON(x) \
-> >>> -    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
-> >>> -        __attribute__((unused))
-> >>> +#define QEMU_BUILD_BUG_ON_STRUCT(x) \
-> >>> +    struct { \
-> >>> +        int qemu_build_bug_on : (x) ? -1 : 1; \
-> >>> +    }
-> >>
-> >> The qemu_build_bug_on name space pollution is harmless, but quite
-> >> unnecessary: the name can be simply omitted (unnamed bit-field).
-> > 
-> > I have concerns about it's portability though. I remember
-> > we had to get rid of unnamed fields in some structs at some point
-> > for the sake of some old compiler.
+> Point taken.  Still, we should be able to factor out a common core of
+> the bug condition.
 > 
-> Unnamed bitfields are in C89 and we definitely use unnamed unions.
-> Maybe that was an unnamed struct or scalar.
+> >> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >> >>> ---
+> >> >>>  include/qemu/compiler.h | 2 ++
+> >> >>>  1 file changed, 2 insertions(+)
+> >> >>>
+> >> >>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> >> >>> index 2882470..f4cf13b 100644
+> >> >>> --- a/include/qemu/compiler.h
+> >> >>> +++ b/include/qemu/compiler.h
+> >> >>> @@ -89,6 +89,8 @@
+> >> >>>      typedef char glue(qemu_build_bug_on__,__LINE__)[(x) ? -1 : 1] \
+> >> >>>          __attribute__((unused))
+> >> >>>  
+> >> >>> +#define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(int[(x) ? -1 : 1]) - sizeof(int))
+> >> >
+> >> > Linux here uses:
+> >> >
+> >> > #define BUILD_BUG_ON_ZERO(e) (sizeof(struct { int:-!!(e); }))
+> >> >
+> >> > and the issue is that sizeof(int[(x) ? -1 : 1]) could be
+> >> > runtime-evaluated (the type is a variable-length array).
+> >> 
+> >> Let's copy both macros from Linux.
+> >
+> > I prefer our variant, I don't think it's portable to assume that
+> > sizeof(struct {int:0}) is 0. Besides, Linux code is GPLv2 only and this
+> > file is 2 or later.
 > 
-> Paolo
+> Use (sizeof(struct { int: X }) - sizeof(struct { int: 0 })) if you care
+> for portability to lesser compilers.  I don't, because we use common
+> extensions supported by both GCC and Clang all over the place.
+> 
+> The idea to use bitfield size is not copyrightable, only expressions of
+> the idea.
 
-I don't think we use unnamed bitfields anywhere though. do we?
+Right I did that before reading this reply.
 
-
-> >>> +#define QEMU_BUILD_BUG_ON(x) typedef QEMU_BUILD_BUG_ON_STRUCT(x) \
-> >>> +    glue(qemu_build_bug_on__, __LINE__) __attribute__((unused))
-> >>>  
-> >>>  #if defined __GNUC__
-> >>>  # if !QEMU_GNUC_PREREQ(4, 4)
+-- 
+MST
