@@ -1,23 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUW6a-00019T-8W
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:07:40 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUWAv-0003aW-14
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:12:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUW6V-0006yS-A6
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:07:36 -0500
-Received: from [59.151.112.132] (port=32428 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUW6U-0006uN-BM
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:07:31 -0500
-References: <20170119001744-mutt-send-email-mst@kernel.org>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <5881E2C2.2060502@cn.fujitsu.com>
-Date: Fri, 20 Jan 2017 18:13:22 +0800
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUWAq-0001FQ-0Z
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:12:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59517
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cUWAp-0001Es-RD
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:11:59 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0KA48hR007151
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 05:11:58 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28302h46gm-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 05:11:58 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Fri, 20 Jan 2017 10:11:56 -0000
+Date: Fri, 20 Jan 2017 11:11:51 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <234b3164-4884-208f-5e45-b6e519b0db74@redhat.com>
+References: <20170117085645.4267-1-cornelia.huck@de.ibm.com>
+	<CAFEAcA_9rrsKkGetqQKRCGedx3E1PeE3OrS=Ea5N-qdK6PN7Cg@mail.gmail.com>
+	<20170120102104.69dac2c7.cornelia.huck@de.ibm.com>
+	<b3558860-1ef6-d39a-4b4f-bd5e042c84bb@redhat.com>
+	<20170120110044.2127c9a9.cornelia.huck@de.ibm.com>
+	<234b3164-4884-208f-5e45-b6e519b0db74@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170119001744-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] vfio error recovery: kernel support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <20170120111151.347bda15.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PULL 00/12] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,188 +46,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Jens Freimann <jfrei@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>
 
+On Fri, 20 Jan 2017 11:04:29 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
+> On 20.01.2017 11:00, Cornelia Huck wrote:
+> > On Fri, 20 Jan 2017 10:52:26 +0100
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >=20
+> >> On 20.01.2017 10:21, Cornelia Huck wrote:
+> >>> On Thu, 19 Jan 2017 18:32:44 +0000
+> >>> Peter Maydell <peter.maydell@linaro.org> wrote:
+> >>>
+> >>>> Hi; I'm afraid this fails to build on Windows:
+> >>>>
+> >>>> /home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c: In
+> >>>> function =E2=80=98s390_pci_get_iommu=E2=80=99:
+> >>>> /home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c:415:20:
+> >>>> error: cast from pointer to integer of different size
+> >>>> [-Werror=3Dpointer-to-int-cast]
+> >>>>      uint64_t key =3D (unsigned long)bus;
+> >>>>                     ^
+> >>>> /home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c: In
+> >>>> function =E2=80=98s390_pci_iommu_free=E2=80=99:
+> >>>> /home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c:539:20:
+> >>>> error: cast from pointer to integer of different size
+> >>>> [-Werror=3Dpointer-to-int-cast]
+> >>>>      uint64_t key =3D (unsigned long)bus;
+> >>>>                     ^
+> >>>> cc1: all warnings being treated as errors
+> >>>>
+> >>>>
+> >>>> You probably wanted uintptr_t.
+> >>>
+> >>> Fixed and v2 sent.
+> >>>
+> >>> I'm wondering if there is any way to catch this earlier (without
+> >>> actually building on Windows)? My mingw 4.8.2 cross-build worked fine=
+...
+> >>
+> >> You likely got to use the 32-bit version of MinGW (or compile with -m32
+> >> with any other version of GCC) to catch this issue, so that you get
+> >> sizeof(long) !=3D sizeof(void *).
+> >=20
+> > Well, I already do that (mingw32, and I see -m32 on the command line;
+> > that already caught sizeof(uint64_t) !=3D sizeof(void *) here.) But isn=
+'t
+> > sizeof(long) =3D=3D sizeof(void *) even in the -m32 case?
+>=20
+> Yes, sorry, my bad, it's the 64-bit version of MinGW where sizeof(long)
+> is different to sizeof(void *), see
+> https://sourceforge.net/p/mingw-w64/bugs/58/ for example.
 
-On 01/20/2017 04:16 AM, Michael S. Tsirkin wrote:
-> This is a design and an initial patch for kernel side for AER
-> support in VFIO.
-> 
-> 0. What happens now (PCIE AER only)
->    Fatal errors cause a link reset.
->    Non fatal errors don't.
->    All errors stop the VM eventually, but not immediately
->    because it's detected and reported asynchronously.
->    Interrupts are forwarded as usual.
->    Correctable errors are not reported to guest at all.
->    Note: PPC EEH is different. This focuses on AER.
-> 
-> 1. Correctable errors
->    I don't see a need to report these to guest. So let's not.
-> 
-> 2. Fatal errors
->    It's not easy to handle them gracefully since link reset
->    is needed. As a first step, let's use the existing mechanism
->    in that case.
->    
-> 2. Non-fatal errors
->    Here we could make progress by reporting them to guest
->    and have guest handle them.
->    Issues:
->     a. this behaviour should only be enabled with new userspace
->        old userspace should work without changes
->     Suggestion: One way to address this would be to add a new eventfd
->     non_fatal_err_trigger. If not set, invoke err_trigger.
-> 
->     b. drivers are supposed to stop MMIO when error is reported
->     if vm keeps going, we will keep doing MMIO/config
->     Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
->     so we are not making things much worse
->     Suggestion 2: try to stop MMIO/config, resume on resume call
-> 
->     Patch below implements Suggestion 1.
-> 
->     c. PF driver might detect that function is completely broken,
->     if vm keeps going, we will keep doing MMIO/config
->     Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
->     so we are not making things much worse
->     Suggestion 2: detect this and invoke err_trigger to stop VM
-> 
->     Patch below implements Suggestion 2.
-> 
-> Aside: we currently return PCI_ERS_RESULT_DISCONNECT when device
-> is not attached. This seems bogus, likely based on the confusing name.
-> We probably should return PCI_ERS_RESULT_CAN_RECOVER.
-> 
-> The following patch does not change that.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> ---
-> 
-> The patch is completely untested. Let's discuss the design first.
-> Cao jin, if this is deemed acceptable please take it from here.
-> 
-
-Ok, thanks very much.
-
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index dce511f..fdca683 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -1292,7 +1292,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
->  
->  	mutex_lock(&vdev->igate);
->  
-> -	if (vdev->err_trigger)
-> +	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
-> +		eventfd_signal(vdev->err_trigger, 1);
-> +	else if (vdev->err_trigger)
->  		eventfd_signal(vdev->err_trigger, 1);
->  
->  	mutex_unlock(&vdev->igate);
-> @@ -1302,8 +1304,38 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
->  	return PCI_ERS_RESULT_CAN_RECOVER;
->  }
->  
-> +static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev,
-> +						pci_channel_state_t state)
-> +{
-> +	struct vfio_pci_device *vdev;
-> +	struct vfio_device *device;
-> +
-> +	device = vfio_device_get_from_dev(&pdev->dev);
-> +	if (!device)
-> +		goto err_dev;
-> +
-> +	vdev = vfio_device_data(device);
-> +	if (!vdev)
-> +		goto err_dev;
-> +
-> +	mutex_lock(&vdev->igate);
-> +
-> +	if (vdev->err_trigger)
-> +		eventfd_signal(vdev->err_trigger, 1);
-> +
-> +	mutex_unlock(&vdev->igate);
-> +
-> +	vfio_device_put(device);
-> +
-> +err_data:
-> +	vfio_device_put(device);
-> +err_dev:
-> +	return PCI_ERS_RESULT_RECOVERED;
-> +}
-> +
->  static const struct pci_error_handlers vfio_err_handlers = {
->  	.error_detected = vfio_pci_aer_err_detected,
-> +	.slot_reset = vfio_pci_aer_slot_reset,
->  };
->  
-
-if .slot_reset wants to be called, .error_detected should return
-PCI_ERS_RESULT_NEED_RESET, as pci-error-recovery.txt said, so does code.
-
-Is .slot_reset now just a copy of .error_detected and we are going do
-some tricks here? or else don't get why .slot_reset signal user again.
-
->  static struct pci_driver vfio_pci_driver = {
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index 1c46045..e883db5 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -611,6 +611,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
->  					       count, flags, data);
->  }
->  
-> +static int vfio_pci_set_non_fatal_err_trigger(struct vfio_pci_device *vdev,
-> +				    unsigned index, unsigned start,
-> +				    unsigned count, uint32_t flags, void *data)
-> +{
-> +	if (index != VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX || start != 0 || count > 1)
-> +		return -EINVAL;
-> +
-> +	return vfio_pci_set_ctx_trigger_single(&vdev->non_fatal_err_trigger,
-> +					       count, flags, data);
-> +}
-> +
->  static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
->  				    unsigned index, unsigned start,
->  				    unsigned count, uint32_t flags, void *data)
-> @@ -664,6 +675,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
->  			break;
->  		}
->  		break;
-> +	case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
-> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
-> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
-> +			if (pci_is_pcie(vdev->pdev))
-> +				func = vfio_pci_set_err_trigger;
-
-s/vfio_pci_set_err_trigger/vfio_pci_set_non_fatal_err_trigger
-
-> +			break;
-> +		}
-> +		break;
->  	case VFIO_PCI_REQ_IRQ_INDEX:
->  		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
->  		case VFIO_IRQ_SET_ACTION_TRIGGER:
-> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-> index f37c73b..c27a507 100644
-> --- a/drivers/vfio/pci/vfio_pci_private.h
-> +++ b/drivers/vfio/pci/vfio_pci_private.h
-> @@ -93,6 +93,7 @@ struct vfio_pci_device {
->  	struct pci_saved_state	*pci_saved_state;
->  	int			refcnt;
->  	struct eventfd_ctx	*err_trigger;
-> +	struct eventfd_ctx	*non_fatal_err_trigger;
->  	struct eventfd_ctx	*req_trigger;
->  	struct list_head	dummy_resources_list;
->  };
-> 
-
--- 
-Sincerely,
-Cao jin
+Ah, that makes sense. Thanks!
