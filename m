@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cUZv9-00046t-Ba
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:09 -0500
+	(envelope-from <phil@philjordan.eu>) id 1cUZvG-0004Cz-LR
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cUZv4-0002wu-Dk
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:03 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34189)
+	(envelope-from <phil@philjordan.eu>) id 1cUZvC-00031R-2N
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:10 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34216)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cUZv4-0002vs-61
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:11:58 -0500
-Received: by mail-wm0-x242.google.com with SMTP id c85so6980510wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:11:56 -0800 (PST)
+	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cUZvB-00030k-Si
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:06 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so6981383wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:12:05 -0800 (PST)
 From: Phil Dennis-Jordan <phil@philjordan.eu>
-Date: Fri, 20 Jan 2017 15:11:33 +0100
-Message-Id: <1484921496-11257-1-git-send-email-phil@philjordan.eu>
-Subject: [Qemu-devel] [PATCH v2 0/3] x86-kvm: Fix Mac guest timekeeping by
- exposing TSC frequency in CPUID
+Date: Fri, 20 Jan 2017 15:11:34 +0100
+Message-Id: <1484921496-11257-2-git-send-email-phil@philjordan.eu>
+In-Reply-To: <1484921496-11257-1-git-send-email-phil@philjordan.eu>
+References: <1484921496-11257-1-git-send-email-phil@philjordan.eu>
+Subject: [Qemu-devel] [PATCH v2 1/3] x86-KVM: Supply TSC and APIC clock
+ rates to guest like VMWare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +29,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Phil Dennis-Jordan <phil@philjordan.eu>
 
-Darwin/OS X/macOS for x86-64 uses the TSC for timekeeping; it normally calibrates this by querying various clock frequency scaling MSRs. Details depend on the exact CPU model detected. The local APIC timer frequency is extracted from (EFI) firmware. Virtualisation environments including Qemu/KVM don't expose those MSRs to guests, and in any case the host and guest CPUs' MSRs may not match up. To solve this, the xnu kernel queries CPUID leaf 0x40000010 for the TSC and APIC timers if leaf 0x40000000 suggests that this leaf exists, which is the case when running inside VMWare (Fusion). This patch series replicates the behaviour of these CPUID leaves for Qemu/KVM via a new x86 CPU option, "vmware-cpuid-freq."
+This fixes timekeeping of x86-64 Darwin/OS X/macOS guests when using KVM.
 
-The option is activated by default on 2.9 and newer pc (PIIX and Q35) machine variants, if the TSC is stable and known (invtsc or user-specified).
+Darwin/OS X/macOS for x86-64 uses the TSC for timekeeping; it normally calibrates this by querying various clock frequency scaling MSRs. Details depend on the exact CPU model detected. The local APIC timer frequency is extracted from (EFI) firmware.
 
-Changelog
-========
+This is problematic in the presence of virtualisation, as the MSRs in question are typically not handled by the hypervisor. VMWare (Fusion) advertises TSC and APIC frequency via a custom 0x40000010 CPUID leaf, in the eax and ebx registers respectively. This is documented at https://lwn.net/Articles/301888/ among other places.
 
-v1 -> v2
- * The v1 thread was "[PATCH] x86-KVM: Supply TSC and APIC clock rates to guest like VMWare"
- * The option has been renamed as suggested in the v1 discussion.
- * It now checks that either invtsc or a user-specified TSC clock rate are active before activating leaf 0x40000010.
- * CPUID leaf 0x40000000 exposed by KVM will only reference 0x40000010 if all preconditions are met and the functionality is actually active.
- * No more error message if preconditions are not met.
- * cpuid_data.cpuid.nent update/cpuid_find_entry bug fixed.
- * 2 extra patches included, one for setting up PC machine version 2.8/2.9 compatibility configurations, the second for enabling the new option in version 2.9+ PIIX/q35 configurations by default, while leaving it disabled for 2.8 or older machines.
+Darwin/OS X/macOS looks for the generic 0x40000000 hypervisor leaf, and if this indicates via eax that leaf 0x40000010 might be available, that is in turn queried for the two frequencies.
 
-Phil Dennis-Jordan (3):
-  x86-KVM: Supply TSC and APIC clock rates to guest like VMWare
-  pc: Add 2.9 machine type
-  pc: Enable vmware-cpuid-freq CPU option for 2.9+ machine types
+This adds a CPU option "vmware-cpuid-freq" to enable the same behaviour when running Qemu with KVM acceleration, if the KVM TSC frequency can be determined, and it is stable. (invtsc or user-specified) The virtualised APIC bus cycle is hardcoded to 1GHz in KVM, so ebx of the CPUID leaf is also hardcoded to this value.
 
- hw/i386/pc_piix.c    | 13 ++++++++++++-
- hw/i386/pc_q35.c     | 12 +++++++++++-
- include/hw/i386/pc.h |  6 ++++++
- target/i386/cpu.c    |  1 +
- target/i386/cpu.h    |  4 ++++
- target/i386/kvm.c    | 36 ++++++++++++++++++++++++++++++------
- 6 files changed, 64 insertions(+), 8 deletions(-)
+Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+---
+ target/i386/cpu.c |  1 +
+ target/i386/cpu.h |  4 ++++
+ target/i386/kvm.c | 36 ++++++++++++++++++++++++++++++------
+ 3 files changed, 35 insertions(+), 6 deletions(-)
 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index aba11ae..dabad37 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3677,6 +3677,7 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
+     DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
+     DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
++    DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, false),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 6c1902b..d51b892 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1213,6 +1213,10 @@ struct X86CPU {
+     bool host_features;
+     uint32_t apic_id;
+ 
++    /* Enables publishing of TSC increment and Local APIC bus frequencies to
++     * the guest OS in CPUID page 0x40000010, the same way that VMWare does. */
++    bool vmware_cpuid_freq;
++
+     /* if true the CPUID code directly forward host cache leaves to the guest */
+     bool cache_info_passthrough;
+ 
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 10a9cd8..6854e76 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -973,12 +973,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         vmstate_x86_cpu.unmigratable = 1;
+     }
+ 
+-    cpuid_data.cpuid.padding = 0;
+-    r = kvm_vcpu_ioctl(cs, KVM_SET_CPUID2, &cpuid_data);
+-    if (r) {
+-        return r;
+-    }
+-
+     r = kvm_arch_set_tsc_khz(cs);
+     if (r < 0) {
+         return r;
+@@ -998,6 +992,36 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         }
+     }
+ 
++    if (cpu->vmware_cpuid_freq
++        /* Guests depend on 0x40000000 to detect this feature, so only expose
++         * it if KVM exposes leaf 0x40000000. (Conflicts with Hyper-V) */
++        && cpu->expose_kvm
++        && kvm_base == KVM_CPUID_SIGNATURE
++        /* TSC clock must be stable and known for this feature. */
++        && ((env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC)
++            || env->user_tsc_khz != 0)
++        && env->tsc_khz != 0) {
++
++        c = &cpuid_data.entries[cpuid_i++];
++        c->function = KVM_CPUID_SIGNATURE | 0x10;
++        c->eax = env->tsc_khz;
++        /* LAPIC resolution of 1ns (freq: 1GHz) is hardcoded in KVM's
++         * APIC_BUS_CYCLE_NS */
++        c->ebx = 1000000;
++        c->ecx = c->edx = 0;
++
++        c = cpuid_find_entry(&cpuid_data.cpuid, kvm_base, 0);
++        c->eax = MAX(c->eax, KVM_CPUID_SIGNATURE | 0x10);
++    }
++
++    cpuid_data.cpuid.nent = cpuid_i;
++
++    cpuid_data.cpuid.padding = 0;
++    r = kvm_vcpu_ioctl(cs, KVM_SET_CPUID2, &cpuid_data);
++    if (r) {
++        return r;
++    }
++
+     if (has_xsave) {
+         env->kvm_xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
+     }
 -- 
 2.3.2 (Apple Git-55)
