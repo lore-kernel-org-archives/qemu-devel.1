@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTYT-0006On-LZ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:14 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTYg-0006fY-KX
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTYS-0000HY-Qb
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:13 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTYf-0000Ms-Eo
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:24:26 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 20 Jan 2017 15:23:03 +0800
-Message-Id: <20170120072310.8009-10-famz@redhat.com>
+Date: Fri, 20 Jan 2017 15:23:06 +0800
+Message-Id: <20170120072310.8009-13-famz@redhat.com>
 In-Reply-To: <20170120072310.8009-1-famz@redhat.com>
 References: <20170120072310.8009-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 09/16] iotests: 085: Avoid image locking
- conflict
+Subject: [Qemu-devel] [PATCH v11 12/16] tests: Use null-co:// instead of
+ /dev/null as the dummy image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +23,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, eblake@redhat.com
 
-In the case where we test the expected error when a blockdev-snapshot
-target already has a backing image, backing chain is opened multiple
-times. This will be a problem when we use image locking, so use a
-different backing file that is not already open.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/qemu-iotests/085     | 32 +++++++++++++++++++-------------
- tests/qemu-iotests/085.out |  3 ++-
- 2 files changed, 21 insertions(+), 14 deletions(-)
+ tests/drive_del-test.c    | 2 +-
+ tests/nvme-test.c         | 2 +-
+ tests/usb-hcd-uhci-test.c | 2 +-
+ tests/usb-hcd-xhci-test.c | 2 +-
+ tests/virtio-blk-test.c   | 2 +-
+ tests/virtio-scsi-test.c  | 4 ++--
+ 6 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index c53e97f..c91d78d 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -87,24 +87,26 @@ function create_group_snapshot()
- }
- 
- # ${1}: unique identifier for the snapshot filename
--# ${2}: true: open backing images; false: don't open them (default)
-+# ${2}: extra_params to the blockdev-add command
-+# ${3}: filename
-+function do_blockdev_add()
-+{
-+    cmd="{ 'execute': 'blockdev-add', 'arguments':
-+           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${2}
-+             'file':
-+             { 'driver': 'file', 'filename': '${3}',
-+               'node-name': 'file_${1}' } } }"
-+    _send_qemu_cmd $h "${cmd}" "return"
-+}
-+
-+# ${1}: unique identifier for the snapshot filename
- function add_snapshot_image()
+diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
+index 121b9c9..2175139 100644
+--- a/tests/drive_del-test.c
++++ b/tests/drive_del-test.c
+@@ -92,7 +92,7 @@ static void test_after_failed_device_add(void)
+ static void test_drive_del_device_del(void)
  {
--    if [ "${2}" = "true" ]; then
--        extra_params=""
--    else
--        extra_params="'backing': '', "
--    fi
-     base_image="${TEST_DIR}/$((${1}-1))-${snapshot_virt0}"
-     snapshot_file="${TEST_DIR}/${1}-${snapshot_virt0}"
-     _make_test_img -b "${base_image}" "$size"
-     mv "${TEST_IMG}" "${snapshot_file}"
--    cmd="{ 'execute': 'blockdev-add', 'arguments':
--           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${extra_params}
--             'file':
--             { 'driver': 'file', 'filename': '${snapshot_file}',
--               'node-name': 'file_${1}' } } }"
--    _send_qemu_cmd $h "${cmd}" "return"
-+    do_blockdev_add "$1" "'backing': '', " "${snapshot_file}"
- }
+     /* Start with a drive used by a device that unplugs instantaneously */
+-    qtest_start("-drive if=none,id=drive0,file=/dev/null,format=raw"
++    qtest_start("-drive if=none,id=drive0,file=null-co://,format=raw"
+                 " -device virtio-scsi-pci"
+                 " -device scsi-hd,drive=drive0,id=dev0");
  
- # ${1}: unique identifier for the snapshot filename
-@@ -222,7 +224,11 @@ echo === Invalid command - snapshot node has a backing image ===
- echo
+diff --git a/tests/nvme-test.c b/tests/nvme-test.c
+index c8bece4..7674a44 100644
+--- a/tests/nvme-test.c
++++ b/tests/nvme-test.c
+@@ -22,7 +22,7 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
+     qtest_add_func("/nvme/nop", nop);
  
- SNAPSHOTS=$((${SNAPSHOTS}+1))
--add_snapshot_image ${SNAPSHOTS} true
-+
-+_make_test_img "$size"
-+mv "${TEST_IMG}" "${TEST_IMG}.base"
-+_make_test_img -b "${TEST_IMG}.base" "$size"
-+do_blockdev_add ${SNAPSHOTS} "" "${TEST_IMG}"
- blockdev_snapshot ${SNAPSHOTS} error
+-    qtest_start("-drive id=drv0,if=none,file=/dev/null,format=raw "
++    qtest_start("-drive id=drv0,if=none,file=null-co://,format=raw "
+                 "-device nvme,drive=drv0,serial=foo");
+     ret = g_test_run();
  
- echo
-diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
-index 08e4bb7..7bbf84d 100644
---- a/tests/qemu-iotests/085.out
-+++ b/tests/qemu-iotests/085.out
-@@ -78,7 +78,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/
+diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
+index e956b9c..24c3ea9 100644
+--- a/tests/usb-hcd-uhci-test.c
++++ b/tests/usb-hcd-uhci-test.c
+@@ -78,7 +78,7 @@ int main(int argc, char **argv)
+ {
+     const char *arch = qtest_get_arch();
+     const char *cmd = "-device piix3-usb-uhci,id=uhci,addr=1d.0"
+-                      " -drive id=drive0,if=none,file=/dev/null,format=raw"
++                      " -drive id=drive0,if=none,file=null-co://,format=raw"
+                       " -device usb-tablet,bus=uhci.0,port=1";
+     int ret;
  
- === Invalid command - snapshot node has a backing image ===
+diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
+index 22513e9..031764d 100644
+--- a/tests/usb-hcd-xhci-test.c
++++ b/tests/usb-hcd-xhci-test.c
+@@ -89,7 +89,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/xhci/pci/hotplug/usb-uas", test_usb_uas_hotplug);
  
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/12-snapshot-v0.IMGFMT
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "The snapshot already has a backing image"}}
+     qtest_start("-device nec-usb-xhci,id=xhci"
+-                " -drive id=drive0,if=none,file=/dev/null,format=raw");
++                " -drive id=drive0,if=none,file=null-co://,format=raw");
+     ret = g_test_run();
+     qtest_end();
  
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 0e32e41..0fc7c99 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -63,7 +63,7 @@ static QOSState *pci_test_start(void)
+     const char *arch = qtest_get_arch();
+     char *tmp_path;
+     const char *cmd = "-drive if=none,id=drive0,file=%s,format=raw "
+-                      "-drive if=none,id=drive1,file=/dev/null,format=raw "
++                      "-drive if=none,id=drive1,file=null-co://,format=raw "
+                       "-device virtio-blk-pci,id=drv0,drive=drive0,"
+                       "addr=%x.%x";
+ 
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index 69220ef..8c27641 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -35,7 +35,7 @@ typedef struct {
+ static QOSState *qvirtio_scsi_start(const char *extra_opts)
+ {
+     const char *arch = qtest_get_arch();
+-    const char *cmd = "-drive id=drv0,if=none,file=/dev/null,format=raw "
++    const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
+                       "-device virtio-scsi-pci,id=vs0 "
+                       "-device scsi-hd,bus=vs0.0,drive=drv0 %s";
+ 
+@@ -195,7 +195,7 @@ static void hotplug(void)
+     QDict *response;
+     QOSState *qs;
+ 
+-    qs = qvirtio_scsi_start("-drive id=drv1,if=none,file=/dev/null,format=raw");
++    qs = qvirtio_scsi_start("-drive id=drv1,if=none,file=null-co://,format=raw");
+     response = qmp("{\"execute\": \"device_add\","
+                    " \"arguments\": {"
+                    "   \"driver\": \"scsi-hd\","
 -- 
 2.9.3
