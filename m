@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUdTX-0003wZ-Nj
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:59:48 -0500
+	(envelope-from <bounces@canonical.com>) id 1cUdTX-0003wY-N9
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:59:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUdTU-0001pj-TC
+	(envelope-from <bounces@canonical.com>) id 1cUdTU-0001pL-JX
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:59:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42153)
+Received: from indium.canonical.com ([91.189.90.7]:42148)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cUdTU-0001ot-Me
+	id 1cUdTU-0001od-DX
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 12:59:44 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cUdTT-00065l-Nc
+	id 1cUdTT-00065i-A0
 	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 17:59:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B11F82E80C2
+	by loganberry.canonical.com (Postfix) with ESMTP id 3D05C2E80C2
 	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 17:59:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Jan 2017 17:46:21 -0000
+Date: Fri, 20 Jan 2017 17:45:18 -0000
 From: Francois Gouget <1499908@bugs.launchpad.net>
 Reply-To: Bug 1499908 <1499908@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20150925223907.9398.42616.malonedeb@gac.canonical.com>
-Message-Id: <20170120174621.14598.39421.malone@soybean.canonical.com>
+Message-Id: <20170120174519.14419.59777.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1499908] Re: hda sound capture broken with VNC
 List-Id: <qemu-devel.nongnu.org>
@@ -38,12 +38,18 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-As an alternative to compiling the source code yourselves, I have
-attached the capture.exe binary.
+On Debian this is still present in QEMU 1:2.7+dfsg-3+b1 with the 4.8.11-1 L=
+inux kernel.
+So no change in the past 5 quarters :-(
 
-** Attachment added: "Executable to reproduce this bug"
-   https://bugs.launchpad.net/qemu/+bug/1499908/+attachment/4806840/+files/=
-capture.exe.bz2
+So I'm attaching a tar file containing standalone and somewhat
+minimalist source code for reproducing this issue. Just compile it with
+MinGW by typing 'make', send the capture.exe binary to the VM and run
+it. Again if you see 'Test failed' messages the bug is still present.
+
+** Attachment added: "Source code to reproduce this bug"
+   https://bugs.launchpad.net/qemu/+bug/1499908/+attachment/4806839/+files/=
+capture.tar.bz2
 
 -- =
 
