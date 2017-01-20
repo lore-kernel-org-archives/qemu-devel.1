@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUXiW-0003qk-K9
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:50:53 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cUXlz-0006Qi-6k
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:54:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUXiS-0005ma-MQ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:50:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42704)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cUXiS-0005lb-BT
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:50:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cUXiQ-0000ZB-1g
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:50:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 55DA22E80D6
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:50:45 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <wei.w.wang@intel.com>) id 1cUXlw-0007Hk-1E
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:54:27 -0500
+Received: from mga07.intel.com ([134.134.136.100]:8698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cUXlv-0007Go-L3
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:54:23 -0500
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Fri, 20 Jan 2017 11:54:17 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F7391716D9@shsmsx102.ccr.corp.intel.com>
+References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
+	<CAJ+F1C+WV7OhxpYb3RgmtRjXU7_kfygr2jh2cawYwZq8MMrJGQ@mail.gmail.com>
+	<79bc9757-3ba0-87c3-3502-a25a30e304a3@siemens.com>
+	<286AC319A985734F985F78AFA26841F73916DDD2@shsmsx102.ccr.corp.intel.com>
+	<58a51a88-967d-bdc7-dc0b-e3e501ecccd3@siemens.com>
+In-Reply-To: <58a51a88-967d-bdc7-dc0b-e3e501ecccd3@siemens.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Jan 2017 11:39:31 -0000
-From: Thomas Huth <1657538@bugs.launchpad.net>
-Reply-To: Bug 1657538 <1657538@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170118175149.27340.89188.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170120113931.21568.95702.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1657538] Re: qemu 2.7.x 2.8 softmmu dont work on
- BE machine
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jan Kiszka <jan.kiszka@siemens.com>, =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Jailhouse <jailhouse-dev@googlegroups.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 
-I can not reproduce this issue. QEMU 2.8 works fine here on a POWER8 big
-endian host (running RHEL7). Can you still run older versions of QEMU
-that used to work for you in the past, to check whether it is QEMU or
-whether it is Ubuntu 16.10 that is causing the trouble here? Could you
-please also post the full output of the "configure" run on your system?
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1657538
-
-Title:
-  qemu 2.7.x 2.8 softmmu dont work on BE machine
-
-Status in QEMU:
-  New
-
-Bug description:
-  Build on Be machine qemu 2.7.1 and 2.8 in pure softmmu (tgc) dont work on=
- big endian hardware .
-  tested with ppc-softmmu,i386-softmmu,arm-softmmu same result:
-
-  with :
-   ./qemu-system-i386 =
-
-  Gtk-Message: Failed to load module "overlay-scrollbar"
-  qemu-system-i386: Trying to execute code outside RAM or ROM at 0x000a0000
-  This usually means one of the following happened:
-
-  (1) You told QEMU to execute a kernel for the wrong machine type, and it =
-crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb=
- QEMU machine)
-  (2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU execu=
-ted a ROM full of no-op instructions until it fell off the end
-  (3) Your guest kernel has a bug and crashed by jumping off into nowhere
-
-  This is almost always one of the first two, so check your command line an=
-d that you are using the right type of kernel for this machine.
-  If you think option (3) is likely then you can try debugging your guest w=
-ith the -d debug options; in particular -d guest_errors will cause the log =
-to include a dump of the guest register state at this point.
-
-  Execution cannot continue; stopping here.
-
-  =
-
-  I try to add the -L option with ../pc-bios/bios.bin =
-
-  and have the same result.
-
-  note the ppc-softmmu and ppc64-softmmu work in kvm mode only emulated
-  mode have issue.
-
-  =
-
-  tested on my hardware a  Qriq P5040 and G5 4x970MP with Ubuntu Mate 16.10 =
-
-  thanks
-  Luigi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1657538/+subscriptions
+T24gVHVlc2RheSwgSmFudWFyeSAxNywgMjAxNyA1OjQ2IFBNLCBKYW4gS2lzemthIHdyb3RlOg0K
+PiBPbiAyMDE3LTAxLTE3IDEwOjEzLCBXYW5nLCBXZWkgVyB3cm90ZToNCj4gPiBIaSBKYW4sDQo+
+ID4NCj4gPiBPbiBNb25kYXksIEphbnVhcnkgMTYsIDIwMTcgOToxMCBQTSwgSmFuIEtpc3prYSB3
+cm90ZToNCj4gPj4gT24gMjAxNy0wMS0xNiAxMzo0MSwgTWFyYy1BbmRyw6kgTHVyZWF1IHdyb3Rl
+Og0KPiA+Pj4gT24gTW9uLCBKYW4gMTYsIDIwMTcgYXQgMTI6MzcgUE0gSmFuIEtpc3prYSA8amFu
+Lmtpc3prYUBzaWVtZW5zLmNvbQ0KPiA+Pj4gPG1haWx0bzpqYW4ua2lzemthQHNpZW1lbnMuY29t
+Pj4gd3JvdGU6DQo+ID4+PiAgICAgc29tZSBvZiB5b3UgbWF5IGtub3cgdGhhdCB3ZSBhcmUgdXNp
+bmcgYSBzaGFyZWQgbWVtb3J5IGRldmljZSBzaW1pbGFyDQo+IHRvDQo+ID4+PiAgICAgaXZzaG1l
+bSBpbiB0aGUgcGFydGl0aW9uaW5nIGh5cGVydmlzb3IgSmFpbGhvdXNlIFsxXS4NCj4gPj4+DQo+
+ID4+PiAgICAgV2Ugc3RhcnRlZCBhcyBiZWluZyBjb21wYXRpYmxlIHRvIHRoZSBvcmlnaW5hbCBp
+dnNobWVtIHRoYXQgUUVNVQ0KPiA+Pj4gICAgIGltcGxlbWVudHMsIGJ1dCB3ZSBxdWlja2x5IGRl
+dmlhdGVkIGluIHNvbWUgZGV0YWlscywgYW5kIGluIHRoZSByZWNlbnQNCj4gPj4+ICAgICBtb250
+aHMgZXZlbiBtb3JlLiBTb21lIG9mIHRoZSBkZXZpYXRpb25zIGFyZSByZWxhdGVkIHRvIG1ha2lu
+ZyB0aGUNCj4gPj4+ICAgICBpbXBsZW1lbnRhdGlvbiBzaW1wbGVyLiBUaGUgbmV3IGl2c2htZW0g
+dGFrZXMgPDUwMCBMb0MgLSBKYWlsaG91c2UgaXMNCj4gPj4+ICAgICBhaW1pbmcgYXQgc2FmZXR5
+IGNyaXRpY2FsIHN5c3RlbXMgYW5kLCB0aGVyZWZvcmUsIGEgc21hbGwgY29kZSBiYXNlLg0KPiA+
+Pj4gICAgIE90aGVyIGNoYW5nZXMgYWRkcmVzcyBkZWZpY2l0cyBpbiB0aGUgb3JpZ2luYWwgZGVz
+aWduLCBsaWtlIG1pc3NpbmcNCj4gPj4+ICAgICBsaWZlLWN5Y2xlIG1hbmFnZW1lbnQuDQo+ID4+
+Pg0KPiA+Pj4gICAgIE5vdyB0aGUgcXVlc3Rpb24gaXMgaWYgdGhlcmUgaXMgaW50ZXJlc3QgaW4g
+ZGVmaW5pbmcgYSBjb21tb24gbmV3DQo+ID4+PiAgICAgcmV2aXNpb24gb2YgdGhpcyBkZXZpY2Ug
+YW5kIG1heWJlIGFsc28gb2Ygc29tZSBwcm90b2NvbHMgdXNlZCBvbiB0b3AsDQo+ID4+PiAgICAg
+c3VjaCBhcyB2aXJ0dWFsIG5ldHdvcmsgbGlua3MuIElkZWFsbHksIHRoaXMgd291bGQgZW5hYmxl
+IHVzIHRvIHNoYXJlDQo+ID4+PiAgICAgTGludXggZHJpdmVycy4gV2Ugd2lsbCBkZWZpbml0ZWx5
+IGdvIGZvciB1cHN0cmVhbWluZyBhdCBsZWFzdCBhIG5ldHdvcmsNCj4gPj4+ICAgICBkcml2ZXIg
+c3VjaCBhcyBbMl0sIGEgVUlPIGRyaXZlciBhbmQgbWF5YmUgYWxzbyBhIHNlcmlhbCBwb3J0L2Nv
+bnNvbGUuDQo+ID4+Pg0KPiA+Pj4NCj4gPj4+IFRoaXMgc291bmRzIGxpa2UgZHVwbGljYXRpbmcg
+ZWZmb3J0cyBkb25lIHdpdGggdmlydGlvIGFuZCB2aG9zdC1wY2kuDQo+ID4+PiBIYXZlIHlvdSBs
+b29rZWQgYXQgV2VpIFdhbmcgcHJvcG9zYWw/DQo+ID4+DQo+ID4+IEkgZGlkbid0IGZvbGxvdyBp
+dCByZWNlbnRseSwgYnV0IHRoZSBvcmlnaW5hbCBjb25jZXB0IHdhcyBhYm91dA0KPiA+PiBpbnRy
+b2R1Y2luZyBhbiBJT01NVSBtb2RlbCB0byB0aGUgcGljdHVyZSwgYW5kIHRoYXQncyBjb21wbGV4
+aXR5LXdpc2UNCj4gPj4gYSBuby1nbyBmb3IgdXMgKHdlIGNhbiBkbyB0aGlzIHdob2xlIHRoaW5n
+IGluIGxlc3MgdGhhbiA1MDAgbGluZXMsDQo+ID4+IGV2ZW4gdmlydGlvIGl0c2VsZiBpcyBtb3Jl
+IGNvbXBsZXgpLiBJSVVDLCB0aGUgYWx0ZXJuYXRpdmUgdG8gYW4NCj4gPj4gSU9NTVUgaXMgbWFw
+cGluZyB0aGUgd2hvbGUgZnJvbnRlbmQgVk0gbWVtb3J5IGludG8gdGhlIGJhY2tlbmQgVk0gLQ0K
+PiB0aGF0J3Mgc2VjdXJpdHkvc2FmZXR5LXdpc2UgYW4gYWJzb2x1dGUgbm8tZ28uDQo+ID4NCj4g
+PiBUaG91Z2ggdGhlIHZpcnRpbyBiYXNlZCBzb2x1dGlvbiBtaWdodCBiZSBjb21wbGV4IGZvciB5
+b3UsIGEgYmlnIGFkdmFudGFnZSBpcw0KPiB0aGF0IHdlIGhhdmUgbG90cyBvZiBwZW9wbGUgd29y
+a2luZyB0byBpbXByb3ZlIHZpcnRpby4gRm9yIGV4YW1wbGUsIHRoZQ0KPiB1cGNvbWluZyB2aXJ0
+aW8gMS4xIGhhcyB2cmluZyBpbXByb3ZlbWVudCwgd2UgY2FuIGVhc2lseSB1cGdyYWRlIGFsbCB0
+aGUgdmlydGlvDQo+IGJhc2VkIHNvbHV0aW9ucywgc3VjaCBhcyB2aG9zdC1wY2ksIHRvIHRha2Ug
+YWR2YW50YWdlIG9mIHRoaXMgaW1wcm92ZW1lbnQuIEZyb20NCj4gdGhlIGxvbmcgdGVybSBwZXJz
+cGVjdGl2ZSwgSSB0aGluayB0aGlzIGtpbmQgb2YgY29tcGxleGl0eSBpcyB3b3J0aHdoaWxlLg0K
+PiANCj4gV2Ugd2lsbCBhZG9wdCB2aXJ0aW8gMS4xIHJpbmcgZm9ybWF0cy4gVGhhdCdzIG9uZSBy
+ZWFzb24gd2h5IHRoZXJlIGlzIGFsc28gc3RpbGwgYQ0KPiBiaWRpcmVjdGlvbmFsIHNoYXJlZCBt
+ZW1vcnkgcmVnaW9uOiB0byBob3N0IHRoZSBuZXcgZGVzY3JpcHRvcnMgKHdoaWxlIGtlZXBpbmcN
+Cj4gdGhlIHBheWxvYWQgc2FmZWx5IGluIHRoZSB1bmlkaXJlY3Rpb25hbCByZWdpb25zKS4NCg0K
+VGhlIHZyaW5nIGV4YW1wbGUgSSBnYXZlIG1pZ2h0IGJlIGNvbmZ1c2luZywgc29ycnkgYWJvdXQg
+IHRoYXQuIE15IHBvaW50IGlzIHRoYXQgZXZlcnkgcGFydCBvZiB2aXJ0aW8gaXMgZ2V0dGluZyBt
+YXR1cmVkIGFuZCBpbXByb3ZlZCBmcm9tIHRpbWUgdG8gdGltZS4gIFBlcnNvbmFsbHksIGhhdmlu
+ZyBhIG5ldyBkZXZpY2UgZGV2ZWxvcGVkIGFuZCBtYWludGFpbmVkIGluIGFuIGFjdGl2ZSBhbmQg
+cG9wdWxhciBtb2RlbCBpcyBoZWxwZnVsLiBBbHNvLCBhcyBuZXcgZmVhdHVyZXMgYmVpbmcgZ3Jh
+ZHVhbGx5IGFkZGVkIGluIHRoZSBmdXR1cmUsIGEgc2ltcGxlIGRldmljZSBjb3VsZCBiZWNvbWUg
+Y29tcGxleC4gDQoNCkhhdmluZyBhIHRoZW9yZXRpY2FsIGFuYWx5c2lzIG9uIHRoZSBwZXJmb3Jt
+YW5jZTogDQpUaGUgdHJhZGl0aW9uYWwgc2hhcmVkIG1lbW9yeSBtZWNoYW5pc20sIHNoYXJpbmcg
+YW4gaW50ZXJtZWRpYXRlIG1lbW9yeSwgcmVxdWlyZXMgMiBjb3BpZXMgdG8gZ2V0IHRoZSBwYWNr
+ZXQgdHJhbnNtaXR0ZWQuIEl0J3Mgbm90IGp1c3Qgb25lIG1vcmUgY29weSBjb21wYXJlZCB0byB0
+aGUgMS1jb3B5IHNvbHV0aW9uLCBJIHRoaW5rIHNvbWUgbW9yZSB0aGluZ3Mgd2UgbWF5IG5lZWQg
+dG8gdGFrZSBpbnRvIGFjY291bnQ6DQoxKSB0aGVyZSBhcmUgZXh0cmEgcmluZyBvcGVyYXRpb24g
+b3ZlcmhlYWQgIG9uIGJvdGggdGhlIHNlbmRpbmcgYW5kIHJlY2VpdmluZyBzaWRlIHRvIGFjY2Vz
+cyB0aGUgc2hhcmVkIG1lbW9yeSAoaS5lLiBJVlNITUVNKTsNCjIpIGV4dHJhIHByb3RvY29sIHRv
+IHVzZSB0aGUgc2hhcmVkIG1lbW9yeTsNCjMpIHRoZSBwaWVjZSBvZiBhbGxvY2F0ZWQgc2hhcmVk
+IG1lbW9yeSBmcm9tIHRoZSBob3N0ID0gQyhuLDIpLCB3aGVyZSBuIGlzIHRoZSBudW1iZXIgb2Yg
+Vk1zLiBMaWtlIGZvciAyMCBWTXMgd2hvIHdhbnQgdG8gdGFsayB0byBlYWNoIG90aGVyLCB0aGVy
+ZSB3aWxsIGJlIDE5MCBwaWVjZXMgb2YgbWVtb3J5IGFsbG9jYXRlZCBmcm9tIHRoZSBob3N0LiAN
+Cg0KVGhhdCBiZWluZyBzYWlkLCBpZiBwZW9wbGUgcmVhbGx5IHdhbnQgdGhlIDItY29weSBzb2x1
+dGlvbiwgd2UgY2FuIGFsc28gaGF2ZSB2aG9zdC1wY2kgc3VwcG9ydCBpdCB0aGF0IHdheSBhcyBh
+IG5ldyBmZWF0dXJlIChub3Qgc3VyZSBpZiB5b3Ugd291bGQgYmUgaW50ZXJlc3RlZCBpbiBjb2xs
+YWJvcmF0aW5nIG9uIHRoZSBwcm9qZWN0KToNCldpdGggdGhlIG5ldyBmZWF0dXJlIGFkZGVkLCB0
+aGUgbWFzdGVyIFZNIHNlbmRzIG9ubHkgYSBwaWVjZSBvZiBtZW1vcnkgKGVxdWl2YWxlbnQgdG8g
+SVZTSE1FTSwgYnV0IGFsbG9jYXRlZCBieSB0aGUgZ3Vlc3QpIHRvIHRoZSBzbGF2ZSBvdmVyIHZo
+b3N0LXVzZXIgcHJvdG9jb2wsIGFuZCB0aGUgdmhvc3QtcGNpIGRldmljZSBvbiB0aGUgc2xhdmUg
+c2lkZSBvbmx5IGhvc3RzIHRoYXQgcGllY2Ugb2Ygc2hhcmVkIG1lbW9yeS4NCg0KQmVzdCwNCldl
+aQ0K
