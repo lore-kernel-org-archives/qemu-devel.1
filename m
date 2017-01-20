@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cUQCC-0005Pj-1C
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:49:01 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cUQCC-0005Q8-S5
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:49:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cUQCA-0006fG-O1
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cUQCB-0006hE-Km
 	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:49:00 -0500
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Fri, 20 Jan 2017 11:47:55 +0800
-Message-ID: <1484884080-28836-2-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Fri, 20 Jan 2017 11:47:59 +0800
+Message-ID: <1484884080-28836-6-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 1/6] docs/block-replication: Add description
- for shared-disk case
+Subject: [Qemu-devel] [PATCH v3 5/6] replication: Implement block
+ replication for shared disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,194 +26,145 @@ To: qemu-devel@nongnu.org, stefanha@redhat.com
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Wen
 	Congyang <wency@cn.fujitsu.com>
 
-Introuduce the scenario of shared-disk block replication
-and how to use it.
+Just as the scenario of non-shared disk block replication,
+we are going to implement block replication from many basic
+blocks that are already in QEMU.
+The architecture is:
 
-Reviewed-by: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+         virtio-blk                     ||                               .----------
+             /                          ||                               | Secondary
+            /                           ||                               '----------
+           /                            ||                                 virtio-blk
+          /                             ||                                      |
+          |                             ||                               replication(5)
+          |                    NBD  -------->   NBD   (2)                       |
+          |                  client     ||    server ---> hidden disk <-- active disk(4)
+          |                     ^       ||                      |
+          |              replication(1) ||                      |
+          |                     |       ||                      |
+          |   +-----------------'       ||                      |
+         (3)  |drive-backup sync=none   ||                      |
+--------. |   +-----------------+       ||                      |
+Primary | |                     |       ||           backing    |
+--------' |                     |       ||                      |
+          V                     |                               |
+       +-------------------------------------------+            |
+       |               shared disk                 | <----------+
+       +-------------------------------------------+
+
+    1) Primary writes will read original data and forward it to Secondary
+       QEMU.
+    2) The hidden-disk is created automatically. It buffers the original content
+       that is modified by the primary VM. It should also be an empty disk, and
+       the driver supports bdrv_make_empty() and backing file.
+    3) Primary write requests will be written to Shared disk.
+    4) Secondary write requests will be buffered in the active disk and it
+       will overwrite the existing sector content in the buffer.
+
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 ---
- docs/block-replication.txt | 139 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 135 insertions(+), 4 deletions(-)
+ block/replication.c | 48 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 42 insertions(+), 6 deletions(-)
 
-diff --git a/docs/block-replication.txt b/docs/block-replication.txt
-index 6bde673..fbfe005 100644
---- a/docs/block-replication.txt
-+++ b/docs/block-replication.txt
-@@ -24,7 +24,7 @@ only dropped at next checkpoint time. To reduce the network transportation
- effort during a vmstate checkpoint, the disk modification operations of
- the Primary disk are asynchronously forwarded to the Secondary node.
+diff --git a/block/replication.c b/block/replication.c
+index 70ec08c..a0b3e41 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -233,7 +233,7 @@ static coroutine_fn int replication_co_readv(BlockDriverState *bs,
+                                              QEMUIOVector *qiov)
+ {
+     BDRVReplicationState *s = bs->opaque;
+-    BdrvChild *child = s->secondary_disk;
++    BdrvChild *child = s->is_shared_disk ? s->primary_disk : s->secondary_disk;
+     BlockJob *job = NULL;
+     CowRequest req;
+     int ret;
+@@ -415,7 +415,12 @@ static void backup_job_completed(void *opaque, int ret)
+         s->error = -EIO;
+     }
  
--== Workflow ==
-+== Non-shared disk workflow ==
- The following is the image of block replication workflow:
+-    backup_job_cleanup(bs);
++    if (s->mode == REPLICATION_MODE_PRIMARY) {
++        s->replication_state = BLOCK_REPLICATION_DONE;
++        s->error = 0;
++    } else {
++        backup_job_cleanup(bs);
++    }
+ }
  
-         +----------------------+            +------------------------+
-@@ -57,7 +57,7 @@ The following is the image of block replication workflow:
-     4) Secondary write requests will be buffered in the Disk buffer and it
-        will overwrite the existing sector content in the buffer.
+ static bool check_top_bs(BlockDriverState *top_bs, BlockDriverState *bs)
+@@ -467,6 +472,19 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
  
--== Architecture ==
-+== Non-shared disk architecture ==
- We are going to implement block replication from many basic
- blocks that are already in QEMU.
+     switch (s->mode) {
+     case REPLICATION_MODE_PRIMARY:
++        if (s->is_shared_disk) {
++            job = backup_job_create(NULL, s->primary_disk->bs, bs, 0,
++                MIRROR_SYNC_MODE_NONE, NULL, false, BLOCKDEV_ON_ERROR_REPORT,
++                BLOCKDEV_ON_ERROR_REPORT, BLOCK_JOB_INTERNAL,
++                backup_job_completed, bs, NULL, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                backup_job_cleanup(bs);
++                aio_context_release(aio_context);
++                return;
++            }
++            block_job_start(job);
++        }
+         break;
+     case REPLICATION_MODE_SECONDARY:
+         s->active_disk = bs->file;
+@@ -485,7 +503,8 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+         }
  
-@@ -106,6 +106,74 @@ any state that would otherwise be lost by the speculative write-through
- of the NBD server into the secondary disk. So before block replication,
- the primary disk and secondary disk should contain the same data.
+         s->secondary_disk = s->hidden_disk->bs->backing;
+-        if (!s->secondary_disk->bs || !bdrv_has_blk(s->secondary_disk->bs)) {
++        if (!s->secondary_disk->bs ||
++            (!s->is_shared_disk && !bdrv_has_blk(s->secondary_disk->bs))) {
+             error_setg(errp, "The secondary disk doesn't have block backend");
+             aio_context_release(aio_context);
+             return;
+@@ -580,11 +599,24 @@ static void replication_do_checkpoint(ReplicationState *rs, Error **errp)
  
-+== Shared Disk Mode Workflow ==
-+The following is the image of block replication workflow:
+     switch (s->mode) {
+     case REPLICATION_MODE_PRIMARY:
++        if (s->is_shared_disk) {
++            if (!s->primary_disk->bs->job) {
++                error_setg(errp, "Primary backup job was cancelled"
++                           " unexpectedly");
++                break;
++            }
 +
-+        +----------------------+            +------------------------+
-+        |Primary Write Requests|            |Secondary Write Requests|
-+        +----------------------+            +------------------------+
-+                  |                                       |
-+                  |                                      (4)
-+                  |                                       V
-+                  |                              /-------------\
-+                  | (2)Forward and write through |             |
-+                  | +--------------------------> | Disk Buffer |
-+                  | |                            |             |
-+                  | |                            \-------------/
-+                  | |(1)read                           |
-+                  | |                                  |
-+       (3)write   | |                                  | backing file
-+                  V |                                  |
-+                 +-----------------------------+       |
-+                 | Shared Disk                 | <-----+
-+                 +-----------------------------+
-+
-+    1) Primary writes will read original data and forward it to Secondary
-+       QEMU.
-+    2) Before Primary write requests are written to Shared disk, the
-+       original sector content will be read from Shared disk and
-+       forwarded and buffered in the Disk buffer on the secondary site,
-+       but it will not overwrite the existing sector content (it could be
-+       from either "Secondary Write Requests" or previous COW of "Primary
-+       Write Requests") in the Disk buffer.
-+    3) Primary write requests will be written to Shared disk.
-+    4) Secondary write requests will be buffered in the Disk buffer and it
-+       will overwrite the existing sector content in the buffer.
-+
-+== Shared Disk Mode Architecture ==
-+We are going to implement block replication from many basic
-+blocks that are already in QEMU.
-+         virtio-blk                     ||                               .----------
-+             /                          ||                               | Secondary
-+            /                           ||                               '----------
-+           /                            ||                                 virtio-blk
-+          /                             ||                                      |
-+          |                             ||                               replication(5)
-+          |                    NBD  -------->   NBD   (2)                       |
-+          |                  client     ||    server ---> hidden disk <-- active disk(4)
-+          |                     ^       ||                      |
-+          |              replication(1) ||                      |
-+          |                     |       ||                      |
-+          |   +-----------------'       ||                      |
-+         (3)  |drive-backup sync=none   ||                      |
-+--------. |   +-----------------+       ||                      |
-+Primary | |                     |       ||           backing    |
-+--------' |                     |       ||                      |
-+          V                     |                               |
-+       +-------------------------------------------+            |
-+       |               shared disk                 | <----------+
-+       +-------------------------------------------+
-+
-+
-+    1) Primary writes will read original data and forward it to Secondary
-+       QEMU.
-+    2) The hidden-disk buffers the original content that is modified by the
-+       primary VM. It should also be an empty disk, and the driver supports
-+       bdrv_make_empty() and backing file.
-+    3) Primary write requests will be written to Shared disk.
-+    4) Secondary write requests will be buffered in the active disk and it
-+       will overwrite the existing sector content in the buffer.
-+
- == Failure Handling ==
- There are 7 internal errors when block replication is running:
- 1. I/O error on primary disk
-@@ -145,7 +213,7 @@ d. replication_stop_all()
-    things except failover. The caller must hold the I/O mutex lock if it is
-    in migration/checkpoint thread.
- 
--== Usage ==
-+== Non-shared disk usage ==
- Primary:
-   -drive if=xxx,driver=quorum,read-pattern=fifo,id=colo1,vote-threshold=1,\
-          children.0.file.filename=1.raw,\
-@@ -234,6 +302,69 @@ Secondary:
-   The primary host is down, so we should do the following thing:
-   { 'execute': 'nbd-server-stop' }
- 
-+== Shared disk usage ==
-+Primary:
-+ -drive if=virtio,id=primary_disk0,file.filename=1.raw,driver=raw
-+
-+Issue qmp command:
-+  { 'execute': 'blockdev-add',
-+    'arguments': {
-+        'driver': 'replication',
-+        'node-name': 'rep',
-+        'mode': 'primary',
-+        'shared-disk-id': 'primary_disk0',
-+        'shared-disk': true,
-+        'file': {
-+            'driver': 'nbd',
-+            'export': 'hidden_disk0',
-+            'server': {
-+                'type': 'inet',
-+                'data': {
-+                    'host': 'xxx.xxx.xxx.xxx',
-+                    'port': 'yyy'
-+                }
++            backup_do_checkpoint(s->primary_disk->bs->job, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
 +            }
 +        }
-+     }
-+  }
-+
-+Secondary:
-+ -drive if=none,driver=qcow2,file.filename=/mnt/ramfs/hidden_disk.img,id=hidden_disk0,\
-+        backing.driver=raw,backing.file.filename=1.raw \
-+ -drive if=virtio,id=active-disk0,driver=replication,mode=secondary,\
-+        file.driver=qcow2,top-id=active-disk0,\
-+        file.file.filename=/mnt/ramfs/active_disk.img,\
-+        file.backing=hidden_disk0,shared-disk=on
-+
-+Issue qmp command:
-+1. { 'execute': 'nbd-server-start',
-+     'arguments': {
-+        'addr': {
-+            'type': 'inet',
-+            'data': {
-+                'host': '0',
-+                'port': 'yyy'
-+            }
+         break;
+     case REPLICATION_MODE_SECONDARY:
+         if (!s->is_shared_disk) {
+             if (!s->secondary_disk->bs->job) {
+-                error_setg(errp, "Backup job was cancelled unexpectedly");
++                error_setg(errp, "Secondary backup job was cancelled"
++                           " unexpectedly");
+                 break;
+             }
+             backup_do_checkpoint(s->secondary_disk->bs->job, &local_err);
+@@ -663,8 +695,12 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+ 
+     switch (s->mode) {
+     case REPLICATION_MODE_PRIMARY:
+-        s->replication_state = BLOCK_REPLICATION_DONE;
+-        s->error = 0;
++        if (s->is_shared_disk && s->primary_disk->bs->job) {
++            block_job_cancel(s->primary_disk->bs->job);
++        } else {
++            s->replication_state = BLOCK_REPLICATION_DONE;
++            s->error = 0;
 +        }
-+     }
-+   }
-+2. { 'execute': 'nbd-server-add',
-+     'arguments': {
-+        'device': 'hidden_disk0',
-+        'writable': true
-+    }
-+  }
-+
-+After Failover:
-+Primary:
-+  { 'execute': 'x-blockdev-del',
-+    'arguments': {
-+        'node-name': 'rep'
-+    }
-+  }
-+
-+Secondary:
-+  {'execute': 'nbd-server-stop' }
-+
- TODO:
- 1. Continuous block replication
--2. Shared disk
+         break;
+     case REPLICATION_MODE_SECONDARY:
+         /*
 -- 
 1.8.3.1
