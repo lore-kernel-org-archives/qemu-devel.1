@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUcI5-0003Mr-LU
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cUcI2-0003KT-QQ
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUcI0-0003Iw-JQ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46210)
+	(envelope-from <pbonzini@redhat.com>) id 1cUcHz-0003IE-AG
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUcI0-0003Ia-Az
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:48 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUcHz-0003Hz-1P
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:47 -0500
 Received: from int-mx13.intmail.prod.int.phx2.redhat.com
 	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72CF47FE84
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 16:43:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 27EE97E9D7
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 16:43:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 20 Jan 2017 17:43:22 +0100
-Message-Id: <20170120164322.21851-18-pbonzini@redhat.com>
+Date: Fri, 20 Jan 2017 17:43:21 +0100
+Message-Id: <20170120164322.21851-17-pbonzini@redhat.com>
 In-Reply-To: <20170120164322.21851-1-pbonzini@redhat.com>
 References: <20170120164322.21851-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 17/17] block: document fields protected by
- AioContext lock
+Subject: [Qemu-devel] [PATCH 16/17] async: remove unnecessary inc/dec pairs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,153 +32,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, famz@redhat.com
 
+Pull the increment/decrement pair out of aio_bh_poll and into the
+callers.
+
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/block/block_int.h      | 64 +++++++++++++++++++++++++-----------------
- include/sysemu/block-backend.h | 14 ++++++---
- 2 files changed, 49 insertions(+), 29 deletions(-)
+ util/aio-posix.c |  8 +++-----
+ util/aio-win32.c |  8 ++++----
+ util/async.c     | 12 ++++++------
+ 3 files changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 2d92d7e..1670941 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -430,8 +430,9 @@ struct BdrvChild {
-  * copied as well.
-  */
- struct BlockDriverState {
--    int64_t total_sectors; /* if we are reading a disk image, give its
--                              size in sectors */
-+    /* Protected by big QEMU lock or read-only after opening.  No special
-+     * locking needed during I/O...
-+     */
-     int open_flags; /* flags used to open the file, re-used for re-open */
-     bool read_only; /* if true, the media is read only */
-     bool encrypted; /* if true, the media is encrypted */
-@@ -439,14 +440,6 @@ struct BlockDriverState {
-     bool sg;        /* if true, the device is a /dev/sg* */
-     bool probed;    /* if true, format was probed rather than specified */
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 51e92b8..2537bcd 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -425,9 +425,8 @@ static bool aio_dispatch_handlers(AioContext *ctx)
  
--    int copy_on_read; /* if nonzero, copy read backing sectors into image.
--                         note this is a reference count */
+ void aio_dispatch(AioContext *ctx)
+ {
+-    aio_bh_poll(ctx);
 -
--    CoQueue flush_queue;            /* Serializing flush queue */
--    bool active_flush_req;          /* Flush request in flight? */
--    unsigned int write_gen;         /* Current data generation */
--    unsigned int flushed_gen;       /* Flushed write generation */
+     qemu_lockcnt_inc(&ctx->list_lock);
++    aio_bh_poll(ctx);
+     aio_dispatch_handlers(ctx);
+     qemu_lockcnt_dec(&ctx->list_lock);
+ 
+@@ -678,16 +677,15 @@ bool aio_poll(AioContext *ctx, bool blocking)
+     }
+ 
+     npfd = 0;
+-    qemu_lockcnt_dec(&ctx->list_lock);
+ 
+     progress |= aio_bh_poll(ctx);
+ 
+     if (ret > 0) {
+-        qemu_lockcnt_inc(&ctx->list_lock);
+         progress |= aio_dispatch_handlers(ctx);
+-        qemu_lockcnt_dec(&ctx->list_lock);
+     }
+ 
++    qemu_lockcnt_dec(&ctx->list_lock);
++
+     progress |= timerlistgroup_run_timers(&ctx->tlg);
+ 
+     return progress;
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index 442a179..bca496a 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -253,8 +253,6 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
+     bool progress = false;
+     AioHandler *tmp;
+ 
+-    qemu_lockcnt_inc(&ctx->list_lock);
 -
-     BlockDriver *drv; /* NULL means no media */
-     void *opaque;
+     /*
+      * We have to walk very carefully in case aio_set_fd_handler is
+      * called while we're walking.
+@@ -305,14 +303,15 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
+         }
+     }
  
-@@ -468,18 +461,6 @@ struct BlockDriverState {
-     BdrvChild *backing;
-     BdrvChild *file;
+-    qemu_lockcnt_dec(&ctx->list_lock);
+     return progress;
+ }
  
--    /* Callback before write request is processed */
--    NotifierWithReturnList before_write_notifiers;
+ void aio_dispatch(AioContext *ctx)
+ {
++    qemu_lockcnt_inc(&ctx->list_lock);
+     aio_bh_poll(ctx);
+     aio_dispatch_handlers(ctx, INVALID_HANDLE_VALUE);
++    qemu_lockcnt_dec(&ctx->list_lock);
+     timerlistgroup_run_timers(&ctx->tlg);
+ }
+ 
+@@ -349,7 +348,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
+         }
+     }
+ 
+-    qemu_lockcnt_dec(&ctx->list_lock);
+     first = true;
+ 
+     /* ctx->notifier is always registered.  */
+@@ -392,6 +390,8 @@ bool aio_poll(AioContext *ctx, bool blocking)
+         progress |= aio_dispatch_handlers(ctx, event);
+     } while (count > 0);
+ 
++    qemu_lockcnt_dec(&ctx->list_lock);
++
+     progress |= timerlistgroup_run_timers(&ctx->tlg);
+     return progress;
+ }
+diff --git a/util/async.c b/util/async.c
+index cc40735..9c3ce6a 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -90,15 +90,16 @@ void aio_bh_call(QEMUBH *bh)
+     bh->cb(bh->opaque);
+ }
+ 
+-/* Multiple occurrences of aio_bh_poll cannot be called concurrently */
++/* Multiple occurrences of aio_bh_poll cannot be called concurrently.
++ * The count in ctx->list_lock is incremented before the call, and is
++ * not affected by the call.
++ */
+ int aio_bh_poll(AioContext *ctx)
+ {
+     QEMUBH *bh, **bhp, *next;
+     int ret;
+     bool deleted = false;
+ 
+-    qemu_lockcnt_inc(&ctx->list_lock);
 -
--    /* number of in-flight requests; overall and serialising */
--    unsigned int in_flight;
--    unsigned int serialising_in_flight;
--
--    bool wakeup;
--
--    /* Offset after the highest byte written to */
--    uint64_t wr_highest_offset;
--
-     /* I/O Limits */
-     BlockLimits bl;
+     ret = 0;
+     for (bh = atomic_rcu_read(&ctx->first_bh); bh; bh = next) {
+         next = atomic_rcu_read(&bh->next);
+@@ -123,11 +124,10 @@ int aio_bh_poll(AioContext *ctx)
  
-@@ -497,11 +478,8 @@ struct BlockDriverState {
-     QTAILQ_ENTRY(BlockDriverState) bs_list;
-     /* element of the list of monitor-owned BDS */
-     QTAILQ_ENTRY(BlockDriverState) monitor_list;
--    QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
-     int refcnt;
+     /* remove deleted bhs */
+     if (!deleted) {
+-        qemu_lockcnt_dec(&ctx->list_lock);
+         return ret;
+     }
  
--    QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
--
-     /* operation blockers */
-     QLIST_HEAD(, BdrvOpBlocker) op_blockers[BLOCK_OP_TYPE_MAX];
- 
-@@ -522,6 +500,31 @@ struct BlockDriverState {
-     /* The error object in use for blocking operations on backing_hd */
-     Error *backing_blocker;
- 
-+    /* Protected by AioContext lock */
-+
-+    /* If true, copy read backing sectors into image.  Can be >1 if more
-+     * than one client has requested copy-on-read.
-+     */
-+    int copy_on_read;
-+
-+    /* If we are reading a disk image, give its size in sectors.
-+     * Generally read-only; it is written to by load_vmstate and save_vmstate,
-+     * but the block layer is quiescent during those.
-+     */
-+    int64_t total_sectors;
-+
-+    /* Callback before write request is processed */
-+    NotifierWithReturnList before_write_notifiers;
-+
-+    /* number of in-flight requests; overall and serialising */
-+    unsigned int in_flight;
-+    unsigned int serialising_in_flight;
-+
-+    bool wakeup;
-+
-+    /* Offset after the highest byte written to */
-+    uint64_t wr_highest_offset;
-+
-     /* threshold limit for writes, in bytes. "High water mark". */
-     uint64_t write_threshold_offset;
-     NotifierWithReturn write_threshold_notifier;
-@@ -529,6 +532,17 @@ struct BlockDriverState {
-     /* counter for nested bdrv_io_plug */
-     unsigned io_plugged;
- 
-+    QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
-+    CoQueue flush_queue;                  /* Serializing flush queue */
-+    bool active_flush_req;                /* Flush request in flight? */
-+    unsigned int write_gen;               /* Current data generation */
-+    unsigned int flushed_gen;             /* Flushed write generation */
-+
-+    QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
-+
-+    /* do we need to tell the quest if we have a volatile write cache? */
-+    int enable_write_cache;
-+
-     int quiesce_counter;
- };
- 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 6444e41..f365a51 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -64,14 +64,20 @@ typedef struct BlockDevOps {
-  * fields that must be public. This is in particular for QLIST_ENTRY() and
-  * friends so that BlockBackends can be kept in lists outside block-backend.c */
- typedef struct BlockBackendPublic {
--    /* I/O throttling.
--     * throttle_state tells us if this BlockBackend has I/O limits configured.
--     * io_limits_disabled tells us if they are currently being enforced */
-+    /* I/O throttling has its own locking, but also some fields are
-+     * protected by the AioContext lock.
-+     */
-+
-+    /* Protected by AioContext lock.  */
-     CoQueue      throttled_reqs[2];
-+
-+    /* Nonzero if the I/O limits are currently being ignored; generally
-+     * it is zero.  */
-     unsigned int io_limits_disabled;
- 
-     /* The following fields are protected by the ThrottleGroup lock.
--     * See the ThrottleGroup documentation for details. */
-+     * See the ThrottleGroup documentation for details.
-+     * throttle_state tells us if I/O limits are configured. */
-     ThrottleState *throttle_state;
-     ThrottleTimers throttle_timers;
-     unsigned       pending_reqs[2];
+-    if (qemu_lockcnt_dec_and_lock(&ctx->list_lock)) {
++    if (qemu_lockcnt_dec_if_lock(&ctx->list_lock)) {
+         bhp = &ctx->first_bh;
+         while (*bhp) {
+             bh = *bhp;
+@@ -138,7 +138,7 @@ int aio_bh_poll(AioContext *ctx)
+                 bhp = &bh->next;
+             }
+         }
+-        qemu_lockcnt_unlock(&ctx->list_lock);
++        qemu_lockcnt_inc_and_unlock(&ctx->list_lock);
+     }
+     return ret;
+ }
 -- 
 2.9.3
