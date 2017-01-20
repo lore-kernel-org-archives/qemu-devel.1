@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUSDG-0000Qc-WF
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 00:58:15 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cUSnT-00063W-Ba
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 01:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUSDD-0005i7-UG
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 00:58:15 -0500
-Received: from [59.151.112.132] (port=39013 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUSDD-0005h4-HZ
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 00:58:11 -0500
-References: <1483175588-17006-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<1483175588-17006-5-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<20170118153621.75d8b83d@t450s.home>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <5881A858.2020203@cn.fujitsu.com>
-Date: Fri, 20 Jan 2017 14:04:08 +0800
-MIME-Version: 1.0
-In-Reply-To: <20170118153621.75d8b83d@t450s.home>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v11 4/4] vfio: add 'aer' property to
- expose aercap
+	(envelope-from <jasowang@redhat.com>) id 1cUSnO-0005LM-Cd
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 01:35:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51392)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cUSnO-0005Kn-1D
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 01:35:34 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BEB72BDD4
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:35:33 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 20 Jan 2017 14:35:28 +0800
+Message-Id: <1484894128-7871-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PATCH] intel_iommu: fix and simplify size calculation
+ in process_device_iotlb_desc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, izumi.taku@jp.fujitsu.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+We don't use 1ULL which is wrong during size calculation. Fix it, and
+while at it, switch to use cto64() and adds a comments to make it
+simpler and easier to be understood.
 
+Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/i386/intel_iommu.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-On 01/19/2017 06:36 AM, Alex Williamson wrote:
-> On Sat, 31 Dec 2016 17:13:08 +0800
-> Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
-> 
->> From: Chen Fan <chen.fan.fnst@cn.fujitsu.com>
->>
->> Add 'aer' property, let user choose whether expose the aer capability
->> or not.
-> 
-> But that's not what it does, it only controls the behavior in response
-> to non-fatal errors, the capability is exposed regardless.
-> 
-
-This commit log is legacy, and defaults to off is a result of the
-configuration restriction & your previous discussion, right?
-
-In current version, if 'aer' property is off, we just allocate the
-config space via pcie_add_capability(), we don't init the AER
-capability, the value is all 0s there, so does that still mean
-"capability is exposed regardless"?
-
->> Should disable aer feature by default, because only non-fatal
->> error is supported now. 
-> 
-> Why does that mean it should be disabled by default?  What bad thing
-> happens if we enable this opportunistically?
-> 
->> Signed-off-by: Chen Fan <chen.fan.fnst@cn.fujitsu.com>
->> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
->> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
->> ---
->>  hw/vfio/pci.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index 9861f72..fc9db66 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -3057,6 +3057,8 @@ static Property vfio_pci_dev_properties[] = {
->>      DEFINE_PROP_UINT32("x-pci-sub-device-id", VFIOPCIDevice,
->>                         sub_device_id, PCI_ANY_ID),
->>      DEFINE_PROP_UINT32("x-igd-gms", VFIOPCIDevice, igd_gms, 0),
->> +    DEFINE_PROP_BIT("aer", VFIOPCIDevice, features,
->> +                    VFIO_FEATURE_ENABLE_AER_BIT, false),
->>      /*
->>       * TODO - support passed fds... is this necessary?
->>       * DEFINE_PROP_STRING("vfiofd", VFIOPCIDevice, vfiofd_name),
-> 
-> 
-> 
-> .
-> 
-
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index ec62239..3270fb9 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -1485,8 +1485,16 @@ static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
+         goto done;
+     }
+ 
++    /* According to ATS spec table 2.4:
++     * S = 0, bits 15:12 = xxxx     range size: 4K
++     * S = 1, bits 15:12 = xxx0     range size: 8K
++     * S = 1, bits 15:12 = xx01     range size: 16K
++     * S = 1, bits 15:12 = x011     range size: 32K
++     * S = 1, bits 15:12 = 0111     range size: 64K
++     * ...
++     */
+     if (size) {
+-        sz = 1 << (ctz64(~(addr | (VTD_PAGE_MASK_4K - 1))) + 1);
++        sz = (VTD_PAGE_SIZE * 2) << cto64(addr >> VTD_PAGE_SHIFT);
+         addr &= ~(sz - 1);
+     } else {
+         sz = VTD_PAGE_SIZE;
 -- 
-Sincerely,
-Cao jin
+2.7.4
