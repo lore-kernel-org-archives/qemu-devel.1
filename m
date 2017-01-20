@@ -1,28 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Julian_Brown@mentor.com>) id 1cUc5f-00010t-15
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:31:04 -0500
+	(envelope-from <mst@redhat.com>) id 1cUc6T-0001me-Uf
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:31:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Julian_Brown@mentor.com>) id 1cUc5e-0003kZ-7l
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:31:03 -0500
-Received: from relay1.mentorg.com ([192.94.38.131]:41462)
+	(envelope-from <mst@redhat.com>) id 1cUc6P-0004Rn-UA
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:31:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Julian_Brown@mentor.com>)
-	id 1cUc5e-0003kE-1e
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:31:02 -0500
-Received: from nat-ies.mentorg.com ([192.94.31.2]
-	helo=SVR-IES-MBX-04.mgc.mentorg.com)
-	by relay1.mentorg.com with esmtp
-	id 1cUc5c-000548-Uq from Julian_Brown@mentor.com
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:01 -0800
-From: Julian Brown <julian@codesourcery.com>
-Date: Fri, 20 Jan 2017 08:30:28 -0800
-Message-ID: <1ebabcf0e1af7a81774fef22f7e765089fb2685d.1484929304.git.julian@codesourcery.com>
-In-Reply-To: <cover.1484929304.git.julian@codesourcery.com>
-References: <cover.1484929304.git.julian@codesourcery.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cUc6P-0004Pw-LS
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:31:49 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B97C67BA8
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 16:31:49 +0000 (UTC)
+Date: Fri, 20 Jan 2017 18:31:47 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170120182638-mutt-send-email-mst@kernel.org>
+References: <1484625660-3312-1-git-send-email-jasowang@redhat.com>
+	<20170117164326-mutt-send-email-mst@kernel.org>
+	<38dfab22-412f-94a5-4b01-351edf627027@redhat.com>
+	<20170118193122-mutt-send-email-mst@kernel.org>
+	<fc140450-dbd4-4a2d-578f-8226e0bd02fc@redhat.com>
+	<20170120002554-mutt-send-email-mst@kernel.org>
+	<cd014c96-dc69-0ba2-fe42-7797bf1385ea@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 3/7] Move target_memory_rw_debug function.
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cd014c96-dc69-0ba2-fe42-7797bf1385ea@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio: force VIRTIO_F_IOMMU_PLATFORM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +39,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This patch moves the target_memory_rw_debug function to
-include/exec/cpu-all.h, so that it can be used by the ARM semihosting
-code as well as the gdbstub code. (I tried Peter Maydell's suggestion
-of include/qom/cpu.h as a location for the function, but that raised
-uncomfortably-many dependency problems for my taste).
+On Fri, Jan 20, 2017 at 11:28:53AM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2017=E5=B9=B401=E6=9C=8820=E6=97=A5 06:27, Michael S. Tsirkin wrote:
+> > On Thu, Jan 19, 2017 at 11:12:21AM +0800, Jason Wang wrote:
+> > >=20
+> > > On 2017=E5=B9=B401=E6=9C=8819=E6=97=A5 01:50, Michael S. Tsirkin wr=
+ote:
+> > > > On Wed, Jan 18, 2017 at 10:42:48AM +0800, Jason Wang wrote:
+> > > > > On 2017=E5=B9=B401=E6=9C=8817=E6=97=A5 22:44, Michael S. Tsirki=
+n wrote:
+> > > > > > On Tue, Jan 17, 2017 at 12:01:00PM +0800, Jason Wang wrote:
+> > > > > > > We allow vhost to clear VIRITO_F_IOMMU_PLATFORM which is wr=
+ong since
+> > > > > > > VIRTIO_F_IOMMU_PLATFORM is mandatory for security. Fixing t=
+his by
+> > > > > > > enforce it after vdc->get_features().
+> > > > > > >=20
+> > > > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > > > > > ---
+> > > > > > >     hw/virtio/virtio-bus.c | 5 +++--
+> > > > > > >     1 file changed, 3 insertions(+), 2 deletions(-)
+> > > > > > >=20
+> > > > > > > diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.=
+c
+> > > > > > > index d31cc00..a886011 100644
+> > > > > > > --- a/hw/virtio/virtio-bus.c
+> > > > > > > +++ b/hw/virtio/virtio-bus.c
+> > > > > > > @@ -47,6 +47,7 @@ void virtio_bus_device_plugged(VirtIODevi=
+ce *vdev, Error **errp)
+> > > > > > >         VirtioBusState *bus =3D VIRTIO_BUS(qbus);
+> > > > > > >         VirtioBusClass *klass =3D VIRTIO_BUS_GET_CLASS(bus)=
+;
+> > > > > > >         VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(=
+vdev);
+> > > > > > > +    bool has_iommu =3D virtio_host_has_feature(vdev, VIRTI=
+O_F_IOMMU_PLATFORM);
+> > > > > > >         DPRINTF("%s: plug device.\n", qbus->name);
+> > > > > > > @@ -63,8 +64,8 @@ void virtio_bus_device_plugged(VirtIODevi=
+ce *vdev, Error **errp)
+> > > > > > >             klass->device_plugged(qbus->parent, errp);
+> > > > > > >         }
+> > > > > > > -    if (klass->get_dma_as !=3D NULL &&
+> > > > > > > -        virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATF=
+ORM)) {
+> > > > > > > +    if (klass->get_dma_as !=3D NULL && has_iommu) {
+> > > > > > > +        virtio_add_feature(&vdev->host_features, VIRTIO_F_=
+IOMMU_PLATFORM);
+> > > > > > >             vdev->dma_as =3D klass->get_dma_as(qbus->parent=
+);
+> > > > > > >         } else {
+> > > > > > >             vdev->dma_as =3D &address_space_memory;
+> > > > > > I suspect that's not enough, we must also fail or disable vho=
+st
+> > > > > > (depending on the options), otherwise things won't work.
+> > > > > Looks like with the patch, VIRTIO_F_IOMMU_PLATFORM will be pass=
+ed to
+> > > > > vhost_set_features().
+> > > > Okay then. Could you please test on an old host kernel and confir=
+m
+> > > > what happens? Pls mention this in commit log.
+> > > Test were done before sending this patch :)
+> > >=20
+> > > Vhost fallback to userspace since it lacks VIRTIO_F_IOMMU_PLATFORM.
+> > >=20
+> > > > > So if vhost backend does not support it, it will fall
+> > > > > back to userspace (This may not work for vhost-user, but it's a=
+ bug existed
+> > > > > even before this patch).
+> > > > >=20
+> > > > > Thanks
+> > > > I guess this is true but this suddenly makes it important to
+> > > > fix this. So I prefer a patchset where patch 2 addresses
+> > > > the fallback bug. In which way? Do you think we should
+> > > > just fail if vhost doesn't work? Does this apply to both
+> > > > userspace and kernel?
+> > > For 1.0 devices we could do this through NEEDS_RESET, but it doesn'=
+t work
+> > > for legacy device. For kernel vhost, I'd prefer to keep the current
+> > > fallback.
+> > I'm not so sure. This has security implications, e.g. user might
+> > expect not to be affected by a bug in qemu if specifying vhost=3Don.
+>=20
+> Ok.
+>=20
+> >=20
+> > > For vhost-user, it seems not easy and we could not just terminate
+> > > qemu in this case consider this kind of failure can only be detecte=
+d during
+> > > start not init.
+> > >=20
+> > > Thanks
+> > I think we should at least deny connection.
+>=20
+> Ok and we need do something after denying it, how about vdev->broken or
+> others?
+>=20
+> Thanks
 
-Signed-off-by: Julian Brown <julian@codesourcery.com>
----
- gdbstub.c              | 11 -----------
- include/exec/cpu-all.h | 22 ++++++++++++++++++++++
- 2 files changed, 22 insertions(+), 11 deletions(-)
-
-diff --git a/gdbstub.c b/gdbstub.c
-index 64f2696..cb77e15 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -44,17 +44,6 @@
- #define GDB_ATTACHED "0"
- #endif
- 
--static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
--                                         uint8_t *buf, int len, bool is_write)
--{
--    CPUClass *cc = CPU_GET_CLASS(cpu);
--
--    if (cc->memory_rw_debug) {
--        return cc->memory_rw_debug(cpu, addr, buf, len, is_write);
--    }
--    return cpu_memory_rw_debug(cpu, addr, buf, len, is_write);
--}
--
- enum {
-     GDB_SIGNAL_0 = 0,
-     GDB_SIGNAL_INT = 2,
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index ffe43d5..700b90d 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -347,4 +347,26 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
- 
- int cpu_exec(CPUState *cpu);
- 
-+/**
-+  * target_memory_rw_debug:
-+  * @cpu: The CPU to use.
-+  * @addr: The target address to read or write.
-+  * @buf: Host buffer to read or write from or into.
-+  * @len: Length of data.
-+  * @is_write: True for write, false for read.
-+  *
-+  * A wrapper for cpu_memory_rw_debug that can be overridden with a
-+  * CPUClass-specific version if required.
-+  */
-+static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
-+                                         uint8_t *buf, int len, bool is_write)
-+{
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-+
-+    if (cc->memory_rw_debug) {
-+        return cc->memory_rw_debug(cpu, addr, buf, len, is_write);
-+    }
-+    return cpu_memory_rw_debug(cpu, addr, buf, len, is_write);
-+}
-+
- #endif /* CPU_ALL_H */
--- 
-2.8.1
+For vhost-user qemu does not make progress until there's
+a valid connection.
