@@ -1,14 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cUY8u-0000uK-JM
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:18:12 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cUYBZ-00024P-15
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:20:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cUY8r-00015r-FY
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:18:08 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 20 Jan 2017 13:18:01 +0100
-Message-Id: <1484914681-2986-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] Introduce DEVICE_CATEGORY_CPU for CPU devices
+	(envelope-from <pbonzini@redhat.com>) id 1cUYBX-0002e8-Va
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:20:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50744)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUYBX-0002dl-QQ
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 07:20:51 -0500
+References: <1484859998-25074-1-git-send-email-mst@redhat.com>
+	<1484859998-25074-5-git-send-email-mst@redhat.com>
+	<aa9a259a-a649-d399-5895-837a5a23f56c@redhat.com>
+	<20170120000636-mutt-send-email-mst@kernel.org>
+	<459939cd-4f0e-bc08-7de8-5788e6f2e2aa@redhat.com>
+	<877f5q421q.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <50f7a120-c0eb-9832-2ac1-d906b7884b42@redhat.com>
+Date: Fri, 20 Jan 2017 13:20:47 +0100
+MIME-Version: 1.0
+In-Reply-To: <877f5q421q.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] ARRAY_SIZE: check that argument is
+ an array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,83 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Sergey Fedorov <serge.fdrv@gmail.com>, qemu-devel@nongnu.org
 
-Now that the hot-pluggable CPUs show up in the help text of
-"-device ?", we should group them into an appropriate category.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/ppc/pnv_core.c       | 1 +
- hw/ppc/spapr_cpu_core.c | 1 +
- include/hw/qdev-core.h  | 1 +
- qdev-monitor.c          | 1 +
- target/i386/cpu.c       | 2 ++
- 5 files changed, 6 insertions(+)
 
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index d79d530..a9c981e 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -190,6 +190,7 @@ static void pnv_core_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     PnvCoreClass *pcc = PNV_CORE_CLASS(oc);
- 
-+    set_bit(DEVICE_CATEGORY_CPU, dc->categories);
-     dc->realize = pnv_core_realize;
-     dc->props = pnv_core_properties;
-     pcc->cpu_oc = cpu_class_by_name(TYPE_POWERPC_CPU, data);
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c18632b..dd0028e 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -365,6 +365,7 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
- 
-+    set_bit(DEVICE_CATEGORY_CPU, dc->categories);
-     dc->realize = spapr_cpu_core_realize;
-     scc->cpu_class = cpu_class_by_name(TYPE_POWERPC_CPU, data);
-     g_assert(scc->cpu_class);
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 2c97347..b44b476 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -26,6 +26,7 @@ typedef enum DeviceCategory {
-     DEVICE_CATEGORY_DISPLAY,
-     DEVICE_CATEGORY_SOUND,
-     DEVICE_CATEGORY_MISC,
-+    DEVICE_CATEGORY_CPU,
-     DEVICE_CATEGORY_MAX
- } DeviceCategory;
- 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index c73410c..5f2fcdf 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -136,6 +136,7 @@ static void qdev_print_devinfos(bool show_no_user)
-         [DEVICE_CATEGORY_DISPLAY] = "Display",
-         [DEVICE_CATEGORY_SOUND]   = "Sound",
-         [DEVICE_CATEGORY_MISC]    = "Misc",
-+        [DEVICE_CATEGORY_CPU]     = "CPU",
-         [DEVICE_CATEGORY_MAX]     = "Uncategorized",
-     };
-     GSList *list, *elt;
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index aba11ae..7b8ca5f 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2381,8 +2381,10 @@ static void x86_cpu_cpudef_class_init(ObjectClass *oc, void *data)
- {
-     X86CPUDefinition *cpudef = data;
-     X86CPUClass *xcc = X86_CPU_CLASS(oc);
-+    DeviceClass *dc = DEVICE_CLASS(oc);
- 
-     xcc->cpu_def = cpudef;
-+    set_bit(DEVICE_CATEGORY_CPU, dc->categories);
- }
- 
- static void x86_register_cpudef_type(X86CPUDefinition *def)
--- 
-1.8.3.1
+On 20/01/2017 08:34, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+> 
+>> On 01/19/2017 04:11 PM, Michael S. Tsirkin wrote:
+>>
+>>>>> +#define QEMU_IS_ARRAY(x) (!__builtin_types_compatible_p(typeof(x), \
+>>>>> +                                                        typeof(&(x)[0])))
+>>>>>  #ifndef ARRAY_SIZE
+>>>>> -#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+>>>>> +#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + \
+>>>>> +                       QEMU_BUILD_BUG_ON_ZERO(!QEMU_IS_ARRAY(x)))
+>>>>
+>>>> We've got some double-negation going on here ("cause a build bug if the
+>>>> negation of QEMU_IS_ARRAY() is not 0") which takes some mental
+>>>> gymnastics, but it is the correct result.  [I kind of like that gnulib
+>>>> uses positive logic in its 'verify(x)' meaning "verify that x is true,
+>>>> or cause a build error"; compared to the negative logic in the kernal
+>>>> 'BUILD_BUG_ON[_ZERO](x)' meaning "cause a build bug if x is non-zero" -
+>>>> but that's personal preference and not something for qemu to change]
+>>>
+>>> I can rename QEMU_IS_ARRAY to QEMU_IS_PTR and reverse the logic - would
+>>> this be preferable?
+>>
+>> No, that's worse. As written, "cause a build bug if x is not an array"
+>> is easier than "cause a build bug if x is a pointer", because now you
+>> are missing an implicit "(instead of the intended array)".  Keep it the
+>> way you have it.  I guess it's the _ZERO as a suffix that's throwing me;
+>> a better name might have been QEMU_ZERO_OR_BUILD_BUG_ON(x) ("give me a
+>> zero expression, or a build bug if x is non-zero") rather than
+>> QEMU_BUILD_BUG_ON_ZERO (my first read was "give me a build bug if x is
+>> zero", but a better read is "give me a build bug if x is not zero, else
+>> give me x because it is zero") - but our choice of naming in patch 3/4
+>> mirrors the kernel naming, so it's not worth changing.
+> 
+> Two ways to skin the assertion cat:
+> 
+>     assert must_be_true
+>     bug_on must_be_false
+> 
+> The C language picks the first one, both with assert() and with C11's
+> _Static_assert().  I'd prefer we stick to that, but I'm not asking you
+> to change your series.
+
+We should probably change it to QEMU_STATIC_ASSERT and
+QEMU_STATIC_ASSERT_VALUE, but that shouldn't be in this series.
+
+Paolo
