@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUeBH-00037P-BY
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:45:00 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cUeBI-000399-KN
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:45:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUeBG-0002Yf-FP
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:44:59 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cUeBH-0002ZX-LA
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:45:00 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jan 2017 18:44:40 +0000
-Message-Id: <1484937883-1068-4-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 20 Jan 2017 18:44:39 +0000
+Message-Id: <1484937883-1068-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
 References: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 3/6] armv7m: Explicit error for bad vector table
+Subject: [Qemu-devel] [PATCH 2/6] armv7m: Replace armv7m.hack with
+ unassigned_access handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +25,130 @@ Cc: patches@linaro.org, Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdav
 
 From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-Give an explicit error and abort when a load
-from the vector table fails. Architecturally this
-should HardFault (which will then immediately
-fail to load the HardFault vector and go into Lockup).
-Since we don't model Lockup, just report this guest
-error via cpu_abort(). This is more helpful than the
-previous behaviour of reading a zero, which is the
-address of the reset stack pointer and not a sensible
-location to jump to.
+For v7m we need to catch attempts to execute from special
+addresses at 0xfffffff0 and above. Previously we did this
+with the aid of a hacky special purpose lump of memory
+in the address space and a check in translate.c for whether
+we were translating code at those addresses.
+
+We can implement this more cleanly using a CPU
+unassigned access handler which throws the exception
+if the unassigned access is for one of the special addresses.
 
 Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: expanded commit message]
+[PMM:
+ * drop the deletion of the "don't interrupt if PC is magic"
+   code in arm_v7m_cpu_exec_interrupt() -- this is still
+   required
+ * don't generate an exception for unassigned accesses
+   which aren't to the magic address -- although doing
+   this is in theory correct in practice it will break
+   currently working guests which rely on the RAZ/WI
+   behaviour when they touch devices which we haven't
+   modelled.
+ * trigger EXCP_EXCEPTION_EXIT on is_exec, not !is_write
+]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+ hw/arm/armv7m.c        |  8 --------
+ target/arm/cpu.c       | 28 ++++++++++++++++++++++++++++
+ target/arm/translate.c | 12 ++++++------
+ 3 files changed, 34 insertions(+), 14 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index ad23de3..8edb08c 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6014,6 +6014,30 @@ static void arm_log_exception(int idx)
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 49d3078..0c9ca7b 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -180,7 +180,6 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+     uint64_t entry;
+     uint64_t lowaddr;
+     int big_endian;
+-    MemoryRegion *hack = g_new(MemoryRegion, 1);
+ 
+     if (cpu_model == NULL) {
+ 	cpu_model = "cortex-m3";
+@@ -225,13 +224,6 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+         }
      }
+ 
+-    /* Hack to map an additional page of ram at the top of the address
+-       space.  This stops qemu complaining about executing code outside RAM
+-       when returning from an exception.  */
+-    memory_region_init_ram(hack, NULL, "armv7m.hack", 0x1000, &error_fatal);
+-    vmstate_register_ram_global(hack);
+-    memory_region_add_subregion(system_memory, 0xfffff000, hack);
+-
+     qemu_register_reset(armv7m_reset, cpu);
+     return nvic;
+ }
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 3f2cdb6..47759c9 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -292,6 +292,33 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
  }
  
-+static uint32_t arm_v7m_load_vector(ARMCPU *cpu)
-+
+ #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
++static void arm_v7m_unassigned_access(CPUState *cpu, hwaddr addr,
++                                      bool is_write, bool is_exec, int opaque,
++                                      unsigned size)
 +{
-+    CPUState *cs = CPU(cpu);
-+    CPUARMState *env = &cpu->env;
-+    MemTxResult result;
-+    hwaddr vec = env->v7m.vecbase + env->v7m.exception * 4;
-+    uint32_t addr;
++    ARMCPU *arm = ARM_CPU(cpu);
++    CPUARMState *env = &arm->env;
 +
-+    addr = address_space_ldl(cs->as, vec,
-+                             MEMTXATTRS_UNSPECIFIED, &result);
-+    if (result != MEMTX_OK) {
-+        /* Architecturally this should cause a HardFault setting HSFR.VECTTBL,
-+         * which would then be immediately followed by our failing to load
-+         * the entry vector for that HardFault, which is a Lockup case.
-+         * Since we don't model Lockup, we just report this guest error
-+         * via cpu_abort().
-+         */
-+        cpu_abort(cs, "Failed to read from exception vector table "
-+                  "entry %08x\n", (unsigned)vec);
++    /* ARMv7-M interrupt return works by loading a magic value into the PC.
++     * On real hardware the load causes the return to occur.  The qemu
++     * implementation performs the jump normally, then does the exception
++     * return by throwing a special exception when when the CPU tries to
++     * execute code at the magic address.
++     */
++    if (env->v7m.exception != 0 && addr >= 0xfffffff0 && is_exec) {
++        cpu->exception_index = EXCP_EXCEPTION_EXIT;
++        cpu_loop_exit(cpu);
 +    }
-+    return addr;
++
++    /* In real hardware an attempt to access parts of the address space
++     * with nothing there will usually cause an external abort.
++     * However our QEMU board models are often missing device models where
++     * the guest can boot anyway with the default read-as-zero/writes-ignored
++     * behaviour that you get without a QEMU unassigned_access hook.
++     * So just return here to retain that default behaviour.
++     */
 +}
 +
- void arm_v7m_cpu_do_interrupt(CPUState *cs)
+ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
  {
-     ARMCPU *cpu = ARM_CPU(cs);
-@@ -6095,7 +6119,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-     /* Clear IT bits */
-     env->condexec_bits = 0;
-     env->regs[14] = lr;
--    addr = ldl_phys(cs->as, env->v7m.vecbase + env->v7m.exception * 4);
-+    addr = arm_v7m_load_vector(cpu);
-     env->regs[15] = addr & 0xfffffffe;
-     env->thumb = addr & 1;
+     CPUClass *cc = CPU_GET_CLASS(cs);
+@@ -1016,6 +1043,7 @@ static void arm_v7m_class_init(ObjectClass *oc, void *data)
+     cc->do_interrupt = arm_v7m_cpu_do_interrupt;
+ #endif
+ 
++    cc->do_unassigned_access = arm_v7m_unassigned_access;
+     cc->cpu_exec_interrupt = arm_v7m_cpu_exec_interrupt;
  }
+ 
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index c9186b6..a7c2abe 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11719,12 +11719,12 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             break;
+         }
+ #else
+-        if (dc->pc >= 0xfffffff0 && arm_dc_feature(dc, ARM_FEATURE_M)) {
+-            /* We always get here via a jump, so know we are not in a
+-               conditional execution block.  */
+-            gen_exception_internal(EXCP_EXCEPTION_EXIT);
+-            dc->is_jmp = DISAS_EXC;
+-            break;
++        if (arm_dc_feature(dc, ARM_FEATURE_M)) {
++            /* Branches to the magic exception-return addresses should
++             * already have been caught via the arm_v7m_unassigned_access hook,
++             * and never get here.
++             */
++            assert(dc->pc < 0xfffffff0);
+         }
+ #endif
+ 
 -- 
 2.7.4
