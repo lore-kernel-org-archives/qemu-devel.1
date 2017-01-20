@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cUe0M-0007oc-Fc
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:45 -0500
+	(envelope-from <bounces@canonical.com>) id 1cUe2c-0000rw-FV
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:36:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cUe0I-0005sV-J6
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53730)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cUe0I-0005sD-Ae
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:38 -0500
-Date: Fri, 20 Jan 2017 16:33:34 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170120183334.GS3491@thinpad.lan.raisama.net>
-References: <20170117010204.4909-1-ehabkost@redhat.com>
-	<309bd499-204d-df07-aa99-9a999cfecabc@linux.vnet.ibm.com>
-	<20170118170049.GB3491@thinpad.lan.raisama.net>
-	<45e82b29-1ebe-3f34-0cc1-35d60c6044da@linux.vnet.ibm.com>
-	<20170118173406.GF3491@thinpad.lan.raisama.net>
-	<fd9074e6-8b39-9139-415e-cec2a8970a5e@redhat.com>
-	<20170119104837.GL3491@thinpad.lan.raisama.net>
-	<c0d8a827-5999-51b5-73fc-aa781b77fe8f@redhat.com>
-	<20170119174559.GI16641@redhat.com>
-	<c682e80b-23e5-544e-c78e-c633b7d6259f@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cUe2Y-0006rJ-JV
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:36:02 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51269)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cUe2Y-0006qy-De
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:35:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cUe2W-0008Ui-IB
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 18:35:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9483A2E81F1
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 18:35:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c682e80b-23e5-544e-c78e-c633b7d6259f@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 0/9] i386:
- query-cpu-model-expansion test script
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Jan 2017 18:17:58 -0000
+From: Thomas Huth <954099@bugs.launchpad.net>
+Reply-To: Bug 954099 <954099@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120313144218.21504.88722.malonedeb@wampee.canonical.com>
+Message-Id: <20170120181758.27340.60857.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 954099] Re: Assertion failed arp_table.c line 41
+ on raspberry pi fedora image boot up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Fri, Jan 20, 2017 at 03:30:54PM +0100, David Hildenbrand wrote:
-> Am 19.01.2017 um 18:45 schrieb Daniel P. Berrange:
-> > On Thu, Jan 19, 2017 at 06:21:22PM +0100, David Hildenbrand wrote:
-> >>
-> >>>> Also think about "query-cpu-model-expansion model=host type=static",
-> >>>> which will primarily be used by libvirt on s390x. There is no way to
-> >>>> expand this into a static cpu model. Faking anything will just hide errors.
-> >>>
-> >>> Yes, static expansion of host model must always return an error
-> >>> if it's not possible to expand.
-> >>>
-> >>>>
-> >>>> If "host" can't be expanded, QEMU has to be treated like there is no CPU
-> >>>> model support (as for older QEMU versions).
-> >>>
-> >>> OK. I will propose a patch updating the query-cpu-model-expansion
-> >>> documentation to be more explicit about it.
-> >>
-> >> The only real alternative I see would be disabling the query-cpu-model-*
-> >> interface completely if KVM support is not available.
-> >>
-> >> This would however mean, that the same QEMU binary would have the
-> >> interface when running under TCG, but not when running under KVM on an
-> >> old KVM version.
-> >>
-> >> That also doesn't really feel right, or what do you think?
-> > 
-> > Yeah that really isn't good.  query-cpu-model-* needs to work on TCG
-> > and *not* have a dependancy on KVM in that case, since you can be
-> > running TCG s390 on a x86_64 host, so the host CPU is totally irrelevant
-> > for TCG
-> > 
-> 
-> Actually what I meant was:
-> 
-> TCG: query-cpu-model-* interface always provided
-> KVM (with cpu model support): query-cpu-model-* interface provided
-> KVM (without cpu model support): no query-cpu-model-* interface provided
-> 
-> This would avoid having to report an error when expanding "host" in the
-> third case (KVM without cpu model support) but would lead to one QEMU
-> binary having a different set of supported qmp calls when called from
-> TCG and KVM.
+Since there hasn't been any more complains about later binaries, I
+assume we can close this issue nowadays. (Feel free to re-open it
+otherwise)
 
-I don't think we should do that. Expansion of static and
-migration-safe CPU models is host-independent by design, so it
-should always work on any host. Management software could even
-choose to run CPU expansion on one host, and start the VM (using
-the results of the expansion) on a different host.
+** Changed in: qemu
+       Status: New =3D> Won't Fix
 
--- 
-Eduardo
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/954099
+
+Title:
+  Assertion failed arp_table.c line 41 on raspberry pi fedora image boot
+  up
+
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  OS Win XP pro, 32 bit SP3
+  Intel Core Duo, 4G RAM.
+
+  Qemu 1.0.1
+
+  Launch command:
+  qemu-system-arm.exe -M versatilepb -cpu arm1136-r2 -hda raspberrypi-fedor=
+a-remix-14-r1.img -kernel zImage-devtmpfs -m 192 -append "root=3D/dev/sda2"=
+ -vga std -net nic -net user -localtime
+
+  Starting HAL daemon: eth0: link up
+  Assert fires :
+  File : slirp\arp_table.c line 41
+  Expression (ip_addr & htonl(~0xf << 28))) 1=3D0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/954099/+subscriptions
