@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUeGd-0007UK-9s
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:50:32 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cUeRf-0005rB-00
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:01:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUeGc-00056r-Ga
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:50:31 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jan 2017 18:50:22 +0000
-Message-Id: <1484938222-1423-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] arm: stellaris: make MII accesses complete
- immediately
+	(envelope-from <ehabkost@redhat.com>) id 1cUeRa-0002zX-6V
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:01:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56970)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cUeRa-0002yg-1S
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 14:01:50 -0500
+Date: Fri, 20 Jan 2017 17:01:44 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170120190144.GT3491@thinpad.lan.raisama.net>
+References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
+	<1484759609-264075-3-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484759609-264075-3-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 02/13] pc: cleanup: move smbios_set_cpuid()
+ into pc_build_smbios()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,50 +28,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Michael Davidsaver <mdavidsaver@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
 
-From: Michael Davidsaver <mdavidsaver@gmail.com>
+On Wed, Jan 18, 2017 at 06:13:18PM +0100, Igor Mammedov wrote:
+> move smbios_set_cpuid() close to the rest of smbios init code
+> where it belongs to instead of calling it from pc_cpus_init().
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-When the guest attempts to start an MII register
-access via the MCTL register, clear the START bit,
-so that when the guest reads it back the register
-transaction will be signalled as having completed.
-This avoids the guest spinning as it polls the
-START bit waiting for it to clear (which it
-previously never would).
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-The  MII registers themselves still aren't implemented,
-but at least we can avoid guests spending quite so much
-time busy waiting.
+Applying to machine-next. Thanks!
 
-Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: expand commit message]
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This is a minor bugfix that was lurking in Michael's
-git tree from his unfinished work on a v3 of the NVIC
-patchset.
-
- hw/net/stellaris_enet.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/hw/net/stellaris_enet.c b/hw/net/stellaris_enet.c
-index 957730e..04bd10a 100644
---- a/hw/net/stellaris_enet.c
-+++ b/hw/net/stellaris_enet.c
-@@ -416,7 +416,10 @@ static void stellaris_enet_write(void *opaque, hwaddr offset,
-         s->thr = value;
-         break;
-     case 0x20: /* MCTL */
--        s->mctl = value;
-+        /* TODO: MII registers aren't modelled.
-+         * Clear START, indicating that the operation completes immediately.
-+         */
-+        s->mctl = value & ~1;
-         break;
-     case 0x24: /* MDV */
-         s->mdv = value;
 -- 
-2.7.4
+Eduardo
