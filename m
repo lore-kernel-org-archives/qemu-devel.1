@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cUPvx-0002By-F0
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:32:14 -0500
+	(envelope-from <peterx@redhat.com>) id 1cUQ70-0003vK-Sr
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:43:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cUPvs-0005ve-KW
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:32:13 -0500
-Received: from [59.151.112.132] (port=32163 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cUPvs-0005tW-5P
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:32:08 -0500
-References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
-	<1484759609-264075-6-git-send-email-imammedo@redhat.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <d6ddd2f5-9ebc-7e19-c904-6271b47f5c1d@cn.fujitsu.com>
-Date: Fri, 20 Jan 2017 11:31:56 +0800
+	(envelope-from <peterx@redhat.com>) id 1cUQ6w-0003jW-Vg
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:43:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cUQ6w-0003iC-Na
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:43:34 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BD45BC04B922
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 03:43:31 +0000 (UTC)
+Date: Fri, 20 Jan 2017 11:43:28 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170120034328.GG4914@pxdev.xzpeter.org>
+References: <1484817932-14452-1-git-send-email-peterx@redhat.com>
+	<20170119105437.5b17d979@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <1484759609-264075-6-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 05/13] pc: move pcms->possible_cpus init out
- of pc_cpus_init()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170119105437.5b17d979@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/3] vfio: allow to notify unmap for
+ very big region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,16 +34,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, ehabkost@redhat.com, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+On Thu, Jan 19, 2017 at 10:54:37AM -0700, Alex Williamson wrote:
+> On Thu, 19 Jan 2017 17:25:29 +0800
+> Peter Xu <peterx@redhat.com> wrote:
+> 
+> > This requirement originates from the VT-d vfio series:
+> > 
+> >   https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03495.html
+> > 
+> > The goal of this series is to allow IOMMU to notify unmap with very
+> > big IOTLB range, for example, with base=0 and size=2^63-1 (to unmap
+> > the whole address space).
+> > 
+> > The first patch is a good to have, for traces.
+> > 
+> > The second one is a cleanup of existing code, only.
+> 
+> Sort of, it does add some overhead to the unmap path, but you remove
+> that and more in the third patch.
 
+Hmm, yes, I tried to get the ram pointer even for unmap. I should
+remove the ending "only".
 
-At 01/19/2017 01:13 AM, Igor Mammedov wrote:
-> possible_cpus could be initialized earlier then cpu objects,
+>  
+> > The third one moves the further RAM translation and check into map
+> > operation logic, so that it'll free unmap operations.
+> > 
+> > The series is marked as RFC since I am not sure whether this is a
+> > workable way. Anyway, please review to help confirm it.
+> 
+> It seems reasonable to me,
 
-s/then/than/
+Good to know that you didn't disagree on this. :) Then let me take
+these patches along with that series in the next post (since that
+series will depend on this one, so I'll keep them together, though
+please maintainers decide on how you'll merge them when you want to),
 
-> i.e. when -smp is parsed so move init code to possible_cpu_arch_ids()
+> except for the example here of using 2^63-1,
+> which I expect is to work around the vfio {un}map API bug as we
+> discussed on irc.
 
-[...]
+Actually not only for that one, I don't know whether we have problem
+here:
+
+(I mentioned this in IRC, in case you missed that, I paste it here as
+ well)
+
+static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
+				      dma_addr_t start, size_t size)
+{
+	struct rb_node *node = iommu->dma_list.rb_node;
+
+	while (node) {
+		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
+
+		if (start + size <= dma->iova)
+			node = node->rb_left;
+		else if (start >= dma->iova + dma->size)
+                          ^^^^^^^^^^^^^^^^^^^^^
+                          Could it overflow here? <--------------
+			node = node->rb_right;
+		else
+			return dma;
+	}
+
+	return NULL;
+}
+
+I used 2^63-1 to try to avoid both cases.
+
+> For everyone, the root of the problem is that the
+> ioctls use:
+> 
+>         __u64   iova;                           /* IO virtual address */
+>         __u64   size;                           /* Size of mapping (bytes) */
+> 
+> So we can only express a size of 2^64-1 and we have an off-by-one error
+> trying to perform a map/unmap of an entire 64-bit space.  Note when
+> designing an API, use start/end rather than base/size to avoid this.
+
+Lesson learned.
+
+> 
+> What I don't want to see is for this API bug to leak out into the rest
+> of the QEMU code such that intel_iommu code, or iommu code in general
+> subtly avoids it by artificially using a smaller range.  VT-d hardware
+> has an actual physical address space of either 2^39 or 2^48 bits, so if
+> you want to make the iommu address space match the device we're trying
+> to emulate, that's perfectly fine.  AIUI, AMD-Vi does actually have a
+> 64-bit address space on the IOMMU, so to handle that case I'd expect
+> the simplest solution would be to track the and mapped iova high water
+> mark per container in vfio and truncate unmaps to that high water end
+> address.  Realistically we're probably not going to see iovas at the end
+> of the 64-bit address space, but we can come up with some other
+> workaround in the vfio code or update the kernel API if we do.  Thanks,
+
+Agree that high watermark can be a good solution for VT-d. I'll use
+that instead of 2^63-1. Though for AMD, if it supports 64bits, we may
+still need to solve existing issues in the future, since in that case
+the high watermark can be (hwaddr)-1 as well if guest specifies it.
+
+(Though anyway I'm not sure when AMD vIOMMUs will be ready for device
+ assignment, so I don't think that's a big issue at least for now)
+
+Thanks!
+
+-- peterx
