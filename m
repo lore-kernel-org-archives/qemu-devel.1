@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUbSn-0001dk-8x
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:50:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cUbV7-0002z9-Os
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:53:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cUbSj-0006C0-C8
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:50:53 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38400)
+	(envelope-from <peter.maydell@linaro.org>) id 1cUbV4-0007KF-1w
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:53:17 -0500
+Received: from mail-ua0-x232.google.com ([2607:f8b0:400c:c08::232]:33655)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cUbSj-0006Br-5v
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:50:49 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id r144so49968911wme.1
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 07:50:48 -0800 (PST)
-References: <20170120152141.14276.42073.malonedeb@soybean.canonical.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170120152141.14276.42073.malonedeb@soybean.canonical.com>
-Date: Fri, 20 Jan 2017 15:50:46 +0000
-Message-ID: <87o9z1enmx.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cUbV3-0007Jt-U1
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:53:13 -0500
+Received: by mail-ua0-x232.google.com with SMTP id i68so64877104uad.0
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 07:53:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Bug 1658120] [NEW] building with
- gcc-aarch64-linux-gnu
+In-Reply-To: <1476117341-32690-3-git-send-email-drjones@redhat.com>
+References: <1476117341-32690-1-git-send-email-drjones@redhat.com>
+	<1476117341-32690-3-git-send-email-drjones@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Jan 2017 15:52:52 +0000
+Message-ID: <CAFEAcA92X+oCMji_bnWkjRWvqQ+CyqrR0ogy-SKOGW7TRYsZ3g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/arm/virt: no ITS on older machine
+ types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1658120 <1658120@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>
 
-
-Bilal Amarni <1658120@bugs.launchpad.net> writes:
-
-> Public bug reported:
+On 10 October 2016 at 17:35, Andrew Jones <drjones@redhat.com> wrote:
+> We should avoid exposing new hardware (through DT and ACPI) on older
+> machine types. This patch keeps 2.7 and older from changing, despite
+> the introduction of ITS support for 2.8.
 >
-> Hi, while trying to build qemu v2.8.0 with gcc-aarch64-linux-gnu cross-
-> compiler I'm getting the following :
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
 >
->
-> In file included from /usr/include/x86_64-linux-gnu/sys/syscall.h:31:0,
->                  from /root/qemu/util/compatfd.c:21:
-> /root/qemu/util/compatfd.c: In function 'qemu_signalfd':
-> /root/qemu/util/compatfd.c:103:19: error: '__NR_signalfd' undeclared (first use in this function)
->      ret = syscall(SYS_signalfd, -1, mask, _NSIG / 8);
->                    ^
-> /root/qemu/util/compatfd.c:103:19: note: each undeclared identifier is reported only once for each function it appears in
-> /root/qemu/rules.mak:59: recipe for target 'util/compatfd.o' failed
-> make: *** [util/compatfd.o] Error 1
->
->
-> I had configured it with :
->
-> ../configure --target-list=x86_64-linux-user --static --cpu=aarch64
->
-> And I'm on :
->
-> Linux ubuntu-512mb-fra1-01 4.4.0-59-generic #80-Ubuntu SMP Fri Jan 6
-> 17:47:47 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+> As Eduardo pointed out long ago for a different reason, we should
+> probably replace VirtGuestInfo with direct use of VirtMachineClass,
+> like x86 has done to replace PcGuestInfo with direct use of
+> PCMachineClass. I'll work on that, but wanted to get this ITS
+> fixup in sooner than later, so I'm posting this patch now, which
+> requires 'no_its' to be duplicated.
 
-Do you have:
+So this patch added a no_its flag which gets set for virt-2.7
+and earlier, but there's no user-facing way to say "I'd like
+a virt-2.8 board with no ITS", right? That's a bit unfortunate
+because the ITS can't be migrated, which means there's no way
+to ask for a post-2.7 virt board which can be migrated...
 
-/usr/include/aarch64-linux-gnu/bits/syscall.h
-
-In your system?
-
-When cross compiling it is these sort of problems come from not having
-the architecture specific development files. On Ubuntu you want
-something like:
-
-  apt-get build-dep -a arm64 qemu
-
---
-Alex Bennée
+thanks
+-- PMM
