@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cUZnv-00060I-PR
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:04:36 -0500
+	(envelope-from <phil@philjordan.eu>) id 1cUZv9-00046t-Ba
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cUZnu-0007cO-Pm
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:04:35 -0500
-Received: from mail-vk0-x22b.google.com ([2607:f8b0:400c:c05::22b]:34601)
+	(envelope-from <phil@philjordan.eu>) id 1cUZv4-0002wu-Dk
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:12:03 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34189)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cUZnu-0007c1-DE
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:04:34 -0500
-Received: by mail-vk0-x22b.google.com with SMTP id r136so51992885vke.1
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:04:34 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1484837637-16896-1-git-send-email-armbru@redhat.com>
-References: <1484837637-16896-1-git-send-email-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jan 2017 14:04:13 +0000
-Message-ID: <CAFEAcA8D5GD3inrv55P60k=+ny-Ya_s7y8Pb4ZOW8bTzmHtY9w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/2] Error reporting patches for 2017-01-19
+	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cUZv4-0002vs-61
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:11:58 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so6980510wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:11:56 -0800 (PST)
+From: Phil Dennis-Jordan <phil@philjordan.eu>
+Date: Fri, 20 Jan 2017 15:11:33 +0100
+Message-Id: <1484921496-11257-1-git-send-email-phil@philjordan.eu>
+Subject: [Qemu-devel] [PATCH v2 0/3] x86-kvm: Fix Mac guest timekeeping by
+ exposing TSC frequency in CPUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Phil Dennis-Jordan <phil@philjordan.eu>
 
-On 19 January 2017 at 14:53, Markus Armbruster <armbru@redhat.com> wrote:
-> The following changes since commit ab4b92760498e097ff668f0e9c83aa87a2ec11=
-28:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-reques=
-t' into staging (2017-01-17 16:54:09 +0000)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-error-2017-01-19
->
-> for you to fetch changes up to 0d6b50d474090b9085c595e2475c40cfdc092411:
->
->   error: Report certain hints on stderr when no monitor (2017-01-19 15:42=
-:36 +0100)
->
-> ----------------------------------------------------------------
-> Error reporting patches for 2017-01-19
->
-> ----------------------------------------------------------------
-> Marc-Andr=C3=A9 Lureau (1):
->       error: Report certain hints on stderr when no monitor
->
-> Sascha Silbe (1):
->       error: error_setg_errno(): errno gets preserved
->
->  include/qapi/error.h | 3 +++
->  monitor.c            | 2 ++
->  2 files changed, 5 insertions(+)
+Darwin/OS X/macOS for x86-64 uses the TSC for timekeeping; it normally calibrates this by querying various clock frequency scaling MSRs. Details depend on the exact CPU model detected. The local APIC timer frequency is extracted from (EFI) firmware. Virtualisation environments including Qemu/KVM don't expose those MSRs to guests, and in any case the host and guest CPUs' MSRs may not match up. To solve this, the xnu kernel queries CPUID leaf 0x40000010 for the TSC and APIC timers if leaf 0x40000000 suggests that this leaf exists, which is the case when running inside VMWare (Fusion). This patch series replicates the behaviour of these CPUID leaves for Qemu/KVM via a new x86 CPU option, "vmware-cpuid-freq."
 
-Applied, thanks.
+The option is activated by default on 2.9 and newer pc (PIIX and Q35) machine variants, if the TSC is stable and known (invtsc or user-specified).
 
--- PMM
+Changelog
+========
+
+v1 -> v2
+ * The v1 thread was "[PATCH] x86-KVM: Supply TSC and APIC clock rates to guest like VMWare"
+ * The option has been renamed as suggested in the v1 discussion.
+ * It now checks that either invtsc or a user-specified TSC clock rate are active before activating leaf 0x40000010.
+ * CPUID leaf 0x40000000 exposed by KVM will only reference 0x40000010 if all preconditions are met and the functionality is actually active.
+ * No more error message if preconditions are not met.
+ * cpuid_data.cpuid.nent update/cpuid_find_entry bug fixed.
+ * 2 extra patches included, one for setting up PC machine version 2.8/2.9 compatibility configurations, the second for enabling the new option in version 2.9+ PIIX/q35 configurations by default, while leaving it disabled for 2.8 or older machines.
+
+Phil Dennis-Jordan (3):
+  x86-KVM: Supply TSC and APIC clock rates to guest like VMWare
+  pc: Add 2.9 machine type
+  pc: Enable vmware-cpuid-freq CPU option for 2.9+ machine types
+
+ hw/i386/pc_piix.c    | 13 ++++++++++++-
+ hw/i386/pc_q35.c     | 12 +++++++++++-
+ include/hw/i386/pc.h |  6 ++++++
+ target/i386/cpu.c    |  1 +
+ target/i386/cpu.h    |  4 ++++
+ target/i386/kvm.c    | 36 ++++++++++++++++++++++++++++++------
+ 6 files changed, 64 insertions(+), 8 deletions(-)
+
+-- 
+2.3.2 (Apple Git-55)
