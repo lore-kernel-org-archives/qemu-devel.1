@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUW3d-00076P-FX
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:04:37 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUW6a-00019T-8W
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:07:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUW3a-00053q-Ca
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:04:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46238)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cUW3a-00053d-7a
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:04:30 -0500
-Date: Fri, 20 Jan 2017 18:04:26 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170120100426.GO4914@pxdev.xzpeter.org>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-3-git-send-email-peterx@redhat.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190C14F86@SHSMSX101.ccr.corp.intel.com>
-	<20170120090506.GJ4914@pxdev.xzpeter.org>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190C15103@SHSMSX101.ccr.corp.intel.com>
-	<20170120092736.GM4914@pxdev.xzpeter.org>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190C1525C@SHSMSX101.ccr.corp.intel.com>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUW6V-0006yS-A6
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:07:36 -0500
+Received: from [59.151.112.132] (port=32428 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUW6U-0006uN-BM
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 05:07:31 -0500
+References: <20170119001744-mutt-send-email-mst@kernel.org>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <5881E2C2.2060502@cn.fujitsu.com>
+Date: Fri, 20 Jan 2017 18:13:22 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190C1525C@SHSMSX101.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 02/14] intel_iommu: simplify irq
- region translation
+In-Reply-To: <20170119001744-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] vfio error recovery: kernel support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +26,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com
 
-On Fri, Jan 20, 2017 at 09:52:01AM +0000, Tian, Kevin wrote:
 
-[...]
 
-> btw what about guest setups a valid mapping at 0xFEEx_xxxx in
-> its remapping structure, which is then programmed to virtual
-> device as DMA destination? Then when emulating that virtual DMA,
-> vtd_do_iommu_translate should simply return (maybe throw out
-> a warning for diagnostic purpose) instead of assert here. 
+On 01/20/2017 04:16 AM, Michael S. Tsirkin wrote:
+> This is a design and an initial patch for kernel side for AER
+> support in VFIO.
 > 
-> VT-d spec defines as below:
+> 0. What happens now (PCIE AER only)
+>    Fatal errors cause a link reset.
+>    Non fatal errors don't.
+>    All errors stop the VM eventually, but not immediately
+>    because it's detected and reported asynchronously.
+>    Interrupts are forwarded as usual.
+>    Correctable errors are not reported to guest at all.
+>    Note: PPC EEH is different. This focuses on AER.
 > 
-> 	Software must ensure the second-level paging-structure entries 
-> 	are programmed not to remap input addresses to the interrupt 
-> 	address range. Hardware behavior is undefined for memory 
-> 	requests remapped to the interrupt address range.
-
-Thanks for this reference. That's something I was curious about.
-
+> 1. Correctable errors
+>    I don't see a need to report these to guest. So let's not.
 > 
-> I don't think "hardware behavior is undefined" is equal to "assert
-> thus kill VM"...
+> 2. Fatal errors
+>    It's not easy to handle them gracefully since link reset
+>    is needed. As a first step, let's use the existing mechanism
+>    in that case.
+>    
+> 2. Non-fatal errors
+>    Here we could make progress by reporting them to guest
+>    and have guest handle them.
+>    Issues:
+>     a. this behaviour should only be enabled with new userspace
+>        old userspace should work without changes
+>     Suggestion: One way to address this would be to add a new eventfd
+>     non_fatal_err_trigger. If not set, invoke err_trigger.
+> 
+>     b. drivers are supposed to stop MMIO when error is reported
+>     if vm keeps going, we will keep doing MMIO/config
+>     Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
+>     so we are not making things much worse
+>     Suggestion 2: try to stop MMIO/config, resume on resume call
+> 
+>     Patch below implements Suggestion 1.
+> 
+>     c. PF driver might detect that function is completely broken,
+>     if vm keeps going, we will keep doing MMIO/config
+>     Suggestion 1: ignore this. vm stop happens much later when userspace runs anyway,
+>     so we are not making things much worse
+>     Suggestion 2: detect this and invoke err_trigger to stop VM
+> 
+>     Patch below implements Suggestion 2.
+> 
+> Aside: we currently return PCI_ERS_RESULT_DISCONNECT when device
+> is not attached. This seems bogus, likely based on the confusing name.
+> We probably should return PCI_ERS_RESULT_CAN_RECOVER.
+> 
+> The following patch does not change that.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> ---
+> 
+> The patch is completely untested. Let's discuss the design first.
+> Cao jin, if this is deemed acceptable please take it from here.
+> 
 
-I don't think it will kill the VM. After we have the MSI region, it
-should just use that IR region for everything (read/write/translate).
-So iiuc when anyone setups IOVA mapping within range 0xfeexxxxx, then
-a DMA will trigger an interrupt (rather than memory moves), but in
-most cases the interrupt will be illegal since either the data is
-invalid (e.g., non-zero reserved bits, or SID verification failure),
-further it should trigger a vIOMMU fault (though IR fault reporting is
-still incomplete, that's my next thing to do after this series).
+Ok, thanks very much.
 
-Thanks,
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index dce511f..fdca683 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -1292,7 +1292,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+>  
+>  	mutex_lock(&vdev->igate);
+>  
+> -	if (vdev->err_trigger)
+> +	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
+> +		eventfd_signal(vdev->err_trigger, 1);
+> +	else if (vdev->err_trigger)
+>  		eventfd_signal(vdev->err_trigger, 1);
+>  
+>  	mutex_unlock(&vdev->igate);
+> @@ -1302,8 +1304,38 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+>  	return PCI_ERS_RESULT_CAN_RECOVER;
+>  }
+>  
+> +static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev,
+> +						pci_channel_state_t state)
+> +{
+> +	struct vfio_pci_device *vdev;
+> +	struct vfio_device *device;
+> +
+> +	device = vfio_device_get_from_dev(&pdev->dev);
+> +	if (!device)
+> +		goto err_dev;
+> +
+> +	vdev = vfio_device_data(device);
+> +	if (!vdev)
+> +		goto err_dev;
+> +
+> +	mutex_lock(&vdev->igate);
+> +
+> +	if (vdev->err_trigger)
+> +		eventfd_signal(vdev->err_trigger, 1);
+> +
+> +	mutex_unlock(&vdev->igate);
+> +
+> +	vfio_device_put(device);
+> +
+> +err_data:
+> +	vfio_device_put(device);
+> +err_dev:
+> +	return PCI_ERS_RESULT_RECOVERED;
+> +}
+> +
+>  static const struct pci_error_handlers vfio_err_handlers = {
+>  	.error_detected = vfio_pci_aer_err_detected,
+> +	.slot_reset = vfio_pci_aer_slot_reset,
+>  };
+>  
 
--- peterx
+if .slot_reset wants to be called, .error_detected should return
+PCI_ERS_RESULT_NEED_RESET, as pci-error-recovery.txt said, so does code.
+
+Is .slot_reset now just a copy of .error_detected and we are going do
+some tricks here? or else don't get why .slot_reset signal user again.
+
+>  static struct pci_driver vfio_pci_driver = {
+> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+> index 1c46045..e883db5 100644
+> --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> @@ -611,6 +611,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
+>  					       count, flags, data);
+>  }
+>  
+> +static int vfio_pci_set_non_fatal_err_trigger(struct vfio_pci_device *vdev,
+> +				    unsigned index, unsigned start,
+> +				    unsigned count, uint32_t flags, void *data)
+> +{
+> +	if (index != VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX || start != 0 || count > 1)
+> +		return -EINVAL;
+> +
+> +	return vfio_pci_set_ctx_trigger_single(&vdev->non_fatal_err_trigger,
+> +					       count, flags, data);
+> +}
+> +
+>  static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
+>  				    unsigned index, unsigned start,
+>  				    unsigned count, uint32_t flags, void *data)
+> @@ -664,6 +675,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
+>  			break;
+>  		}
+>  		break;
+> +	case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
+> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> +			if (pci_is_pcie(vdev->pdev))
+> +				func = vfio_pci_set_err_trigger;
+
+s/vfio_pci_set_err_trigger/vfio_pci_set_non_fatal_err_trigger
+
+> +			break;
+> +		}
+> +		break;
+>  	case VFIO_PCI_REQ_IRQ_INDEX:
+>  		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+>  		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> index f37c73b..c27a507 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -93,6 +93,7 @@ struct vfio_pci_device {
+>  	struct pci_saved_state	*pci_saved_state;
+>  	int			refcnt;
+>  	struct eventfd_ctx	*err_trigger;
+> +	struct eventfd_ctx	*non_fatal_err_trigger;
+>  	struct eventfd_ctx	*req_trigger;
+>  	struct list_head	dummy_resources_list;
+>  };
+> 
+
+-- 
+Sincerely,
+Cao jin
