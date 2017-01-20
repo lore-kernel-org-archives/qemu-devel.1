@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUcHo-00036F-3j
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:40 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cUcHr-00039Y-BY
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUcHi-000399-D6
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:4441)
+	(envelope-from <pbonzini@redhat.com>) id 1cUcHm-0003Ai-UO
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:23855)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUcHi-00038L-4b
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:30 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUcHm-0003AQ-Ks
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:43:34 -0500
 Received: from int-mx13.intmail.prod.int.phx2.redhat.com
 	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46E914F639
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 16:43:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B7A4B33C151
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 16:43:34 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 20 Jan 2017 17:43:09 +0100
-Message-Id: <20170120164322.21851-5-pbonzini@redhat.com>
+Date: Fri, 20 Jan 2017 17:43:12 +0100
+Message-Id: <20170120164322.21851-8-pbonzini@redhat.com>
 In-Reply-To: <20170120164322.21851-1-pbonzini@redhat.com>
 References: <20170120164322.21851-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/17] block: move AioContext and QEMUTimer to
- libqemuutil
+Subject: [Qemu-devel] [PATCH 07/17] nbd: convert to use qio_channel_yield
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,342 +32,537 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, famz@redhat.com
 
-AioContext is fairly self contained, the only dependency is QEMUTimer but
-that in turn doesn't need anything else.  So move them out of block-obj-y
-to avoid introducing a dependency from io/ to block-obj-y.
+In the client, read the reply headers from a coroutine, switching the
+read side between the "read header" coroutine and the I/O coroutine that
+reads the body of the reply.
+
+In the server, if the server can read more requests it will create a new
+"read request" coroutine as soon as a request has been read.  Otherwise,
+the new coroutine is created in nbd_request_put.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
-        v1->v2: new patch [Daniel]
+        v1->v2:
+        allow NULL s->read_reply_co [Fam]
+        converted NBD server to qio_channel_yield too [Fam]
 
- Makefile.objs                       |  5 +---
- block/io.c                          | 29 -------------------
- stubs/Makefile.objs                 |  2 ++
- stubs/linux-aio.c                   | 32 +++++++++++++++++++++
- stubs/main-loop.c                   |  8 ++++++
- stubs/set-fd-handler.c              | 11 --------
- tests/Makefile.include              | 13 ++++-----
- util/Makefile.objs                  |  5 +++-
- aio-posix.c => util/aio-posix.c     |  0
- aio-win32.c => util/aio-win32.c     |  0
- util/aiocb.c                        | 55 +++++++++++++++++++++++++++++++++++++
- async.c => util/async.c             |  3 +-
- qemu-timer.c => util/qemu-timer.c   |  0
- thread-pool.c => util/thread-pool.c |  0
- 14 files changed, 110 insertions(+), 53 deletions(-)
- create mode 100644 stubs/linux-aio.c
- create mode 100644 stubs/main-loop.c
- rename aio-posix.c => util/aio-posix.c (100%)
- rename aio-win32.c => util/aio-win32.c (100%)
- create mode 100644 util/aiocb.c
- rename async.c => util/async.c (99%)
- rename qemu-timer.c => util/qemu-timer.c (100%)
- rename thread-pool.c => util/thread-pool.c (100%)
+ block/nbd-client.c | 108 +++++++++++++++++++++--------------------------------
+ block/nbd-client.h |   2 +-
+ nbd/client.c       |   2 +-
+ nbd/common.c       |   9 +----
+ nbd/server.c       |  94 ++++++++++++++--------------------------------
+ 5 files changed, 74 insertions(+), 141 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 01cef86..432edf8 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -7,12 +7,9 @@ util-obj-y += qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
- #######################################################################
- # block-obj-y is code used by both qemu system emulation and qemu-img
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 06f1532..6ea54f9 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -33,8 +33,9 @@
+ #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ ((uint64_t)(intptr_t)bs))
+ #define INDEX_TO_HANDLE(bs, index)  ((index)  ^ ((uint64_t)(intptr_t)bs))
  
--block-obj-y = async.o thread-pool.o
- block-obj-y += nbd/
- block-obj-y += block.o blockjob.o
--block-obj-y += main-loop.o iohandler.o qemu-timer.o
--block-obj-$(CONFIG_POSIX) += aio-posix.o
--block-obj-$(CONFIG_WIN32) += aio-win32.o
-+block-obj-y += main-loop.o iohandler.o
- block-obj-y += block/
- block-obj-y += qemu-io-cmds.o
- block-obj-$(CONFIG_REPLICATION) += replication.o
-diff --git a/block/io.c b/block/io.c
-index c42b34a..76dfaf4 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2239,35 +2239,6 @@ BlockAIOCB *bdrv_aio_flush(BlockDriverState *bs,
-     return &acb->common;
+-static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
++static void nbd_recv_coroutines_enter_all(BlockDriverState *bs)
+ {
++    NBDClientSession *s = nbd_get_client_session(bs);
+     int i;
+ 
+     for (i = 0; i < MAX_NBD_REQUESTS; i++) {
+@@ -42,6 +43,7 @@ static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
+             qemu_coroutine_enter(s->recv_coroutine[i]);
+         }
+     }
++    BDRV_POLL_WHILE(bs, s->read_reply_co);
  }
  
--void *qemu_aio_get(const AIOCBInfo *aiocb_info, BlockDriverState *bs,
--                   BlockCompletionFunc *cb, void *opaque)
--{
--    BlockAIOCB *acb;
+ static void nbd_teardown_connection(BlockDriverState *bs)
+@@ -56,7 +58,7 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     qio_channel_shutdown(client->ioc,
+                          QIO_CHANNEL_SHUTDOWN_BOTH,
+                          NULL);
+-    nbd_recv_coroutines_enter_all(client);
++    nbd_recv_coroutines_enter_all(bs);
+ 
+     nbd_client_detach_aio_context(bs);
+     object_unref(OBJECT(client->sioc));
+@@ -65,54 +67,34 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     client->ioc = NULL;
+ }
+ 
+-static void nbd_reply_ready(void *opaque)
++static coroutine_fn void nbd_read_reply_entry(void *opaque)
+ {
+-    BlockDriverState *bs = opaque;
+-    NBDClientSession *s = nbd_get_client_session(bs);
++    NBDClientSession *s = opaque;
+     uint64_t i;
+     int ret;
+ 
+-    if (!s->ioc) { /* Already closed */
+-        return;
+-    }
 -
--    acb = g_malloc(aiocb_info->aiocb_size);
--    acb->aiocb_info = aiocb_info;
--    acb->bs = bs;
--    acb->cb = cb;
--    acb->opaque = opaque;
--    acb->refcnt = 1;
--    return acb;
+-    if (s->reply.handle == 0) {
+-        /* No reply already in flight.  Fetch a header.  It is possible
+-         * that another thread has done the same thing in parallel, so
+-         * the socket is not readable anymore.
+-         */
++    for (;;) {
++        assert(s->reply.handle == 0);
+         ret = nbd_receive_reply(s->ioc, &s->reply);
+-        if (ret == -EAGAIN) {
+-            return;
+-        }
+         if (ret < 0) {
+-            s->reply.handle = 0;
+-            goto fail;
++            break;
+         }
+-    }
+-
+-    /* There's no need for a mutex on the receive side, because the
+-     * handler acts as a synchronization point and ensures that only
+-     * one coroutine is called until the reply finishes.  */
+-    i = HANDLE_TO_INDEX(s, s->reply.handle);
+-    if (i >= MAX_NBD_REQUESTS) {
+-        goto fail;
+-    }
+-
+-    if (s->recv_coroutine[i]) {
+-        qemu_coroutine_enter(s->recv_coroutine[i]);
+-        return;
+-    }
+ 
+-fail:
+-    nbd_teardown_connection(bs);
 -}
--
--void qemu_aio_ref(void *p)
++        /* There's no need for a mutex on the receive side, because the
++         * handler acts as a synchronization point and ensures that only
++         * one coroutine is called until the reply finishes.
++         */
++        i = HANDLE_TO_INDEX(s, s->reply.handle);
++        if (i >= MAX_NBD_REQUESTS || !s->recv_coroutine[i]) {
++            break;
++        }
+ 
+-static void nbd_restart_write(void *opaque)
 -{
--    BlockAIOCB *acb = p;
--    acb->refcnt++;
--}
+-    BlockDriverState *bs = opaque;
++        aio_co_wake(s->recv_coroutine[i]);
+ 
+-    qemu_coroutine_enter(nbd_get_client_session(bs)->send_coroutine);
++        /* We're woken up by the recv_coroutine itself.  */
++        qemu_coroutine_yield();
++    }
++    s->read_reply_co = NULL;
+ }
+ 
+ static int nbd_co_send_request(BlockDriverState *bs,
+@@ -120,7 +102,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
+                                QEMUIOVector *qiov)
+ {
+     NBDClientSession *s = nbd_get_client_session(bs);
+-    AioContext *aio_context;
+     int rc, ret, i;
+ 
+     qemu_co_mutex_lock(&s->send_mutex);
+@@ -141,11 +122,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
+         return -EPIPE;
+     }
+ 
+-    s->send_coroutine = qemu_coroutine_self();
+-    aio_context = bdrv_get_aio_context(bs);
 -
--void qemu_aio_unref(void *p)
+-    aio_set_fd_handler(aio_context, s->sioc->fd, false,
+-                       nbd_reply_ready, nbd_restart_write, NULL, bs);
+     if (qiov) {
+         qio_channel_set_cork(s->ioc, true);
+         rc = nbd_send_request(s->ioc, request);
+@@ -160,9 +136,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
+     } else {
+         rc = nbd_send_request(s->ioc, request);
+     }
+-    aio_set_fd_handler(aio_context, s->sioc->fd, false,
+-                       nbd_reply_ready, NULL, NULL, bs);
+-    s->send_coroutine = NULL;
+     qemu_co_mutex_unlock(&s->send_mutex);
+     return rc;
+ }
+@@ -174,8 +147,7 @@ static void nbd_co_receive_reply(NBDClientSession *s,
+ {
+     int ret;
+ 
+-    /* Wait until we're woken up by the read handler.  TODO: perhaps
+-     * peek at the next reply and avoid yielding if it's ours?  */
++    /* Wait until we're woken up by nbd_read_reply_entry.  */
+     qemu_coroutine_yield();
+     *reply = s->reply;
+     if (reply->handle != request->handle ||
+@@ -209,13 +181,19 @@ static void nbd_coroutine_start(NBDClientSession *s,
+     /* s->recv_coroutine[i] is set as soon as we get the send_lock.  */
+ }
+ 
+-static void nbd_coroutine_end(NBDClientSession *s,
++static void nbd_coroutine_end(BlockDriverState *bs,
+                               NBDRequest *request)
+ {
++    NBDClientSession *s = nbd_get_client_session(bs);
+     int i = HANDLE_TO_INDEX(s, request->handle);
++
+     s->recv_coroutine[i] = NULL;
+-    if (s->in_flight-- == MAX_NBD_REQUESTS) {
+-        qemu_co_queue_next(&s->free_sema);
++    s->in_flight--;
++    qemu_co_queue_next(&s->free_sema);
++
++    /* Kick the read_reply_co to get the next reply.  */
++    if (s->read_reply_co) {
++        aio_co_wake(s->read_reply_co);
+     }
+ }
+ 
+@@ -241,7 +219,7 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, qiov);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
+ 
+@@ -271,7 +249,7 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
+ 
+@@ -306,7 +284,7 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
+ 
+@@ -331,7 +309,7 @@ int nbd_client_co_flush(BlockDriverState *bs)
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
+ 
+@@ -357,23 +335,23 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int count)
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ 
+ }
+ 
+ void nbd_client_detach_aio_context(BlockDriverState *bs)
+ {
+-    aio_set_fd_handler(bdrv_get_aio_context(bs),
+-                       nbd_get_client_session(bs)->sioc->fd,
+-                       false, NULL, NULL, NULL, NULL);
++    NBDClientSession *client = nbd_get_client_session(bs);
++    qio_channel_detach_aio_context(QIO_CHANNEL(client->sioc));
+ }
+ 
+ void nbd_client_attach_aio_context(BlockDriverState *bs,
+                                    AioContext *new_context)
+ {
+-    aio_set_fd_handler(new_context, nbd_get_client_session(bs)->sioc->fd,
+-                       false, nbd_reply_ready, NULL, NULL, bs);
++    NBDClientSession *client = nbd_get_client_session(bs);
++    qio_channel_attach_aio_context(QIO_CHANNEL(client->sioc), new_context);
++    aio_co_schedule(new_context, client->read_reply_co);
+ }
+ 
+ void nbd_client_close(BlockDriverState *bs)
+@@ -434,7 +412,7 @@ int nbd_client_init(BlockDriverState *bs,
+     /* Now that we're connected, set the socket to be non-blocking and
+      * kick the reply mechanism.  */
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
+-
++    client->read_reply_co = qemu_coroutine_create(nbd_read_reply_entry, client);
+     nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
+ 
+     logout("Established connection with NBD server\n");
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index f8d6006..8cdfc92 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -25,7 +25,7 @@ typedef struct NBDClientSession {
+ 
+     CoMutex send_mutex;
+     CoQueue free_sema;
+-    Coroutine *send_coroutine;
++    Coroutine *read_reply_co;
+     int in_flight;
+ 
+     Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
+diff --git a/nbd/client.c b/nbd/client.c
+index ffb0743..5c9dee3 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -778,7 +778,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
+     ssize_t ret;
+ 
+     ret = read_sync(ioc, buf, sizeof(buf));
+-    if (ret < 0) {
++    if (ret <= 0) {
+         return ret;
+     }
+ 
+diff --git a/nbd/common.c b/nbd/common.c
+index b583a4f..805dbdc 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -43,14 +43,7 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+         }
+         if (len == QIO_CHANNEL_ERR_BLOCK) {
+             if (qemu_in_coroutine()) {
+-                /* XXX figure out if we can create a variant on
+-                 * qio_channel_yield() that works with AIO contexts
+-                 * and consider using that in this branch */
+-                qemu_coroutine_yield();
+-            } else if (done) {
+-                /* XXX this is needed by nbd_reply_ready.  */
+-                qio_channel_wait(ioc,
+-                                 do_read ? G_IO_IN : G_IO_OUT);
++                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+             } else {
+                 return -EAGAIN;
+             }
+diff --git a/nbd/server.c b/nbd/server.c
+index efe5cb8..1130055 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -95,8 +95,6 @@ struct NBDClient {
+     CoMutex send_lock;
+     Coroutine *send_coroutine;
+ 
+-    bool can_read;
+-
+     QTAILQ_ENTRY(NBDClient) next;
+     int nb_requests;
+     bool closing;
+@@ -104,9 +102,7 @@ struct NBDClient {
+ 
+ /* That's all folks */
+ 
+-static void nbd_set_handlers(NBDClient *client);
+-static void nbd_unset_handlers(NBDClient *client);
+-static void nbd_update_can_read(NBDClient *client);
++static void nbd_client_receive_next_request(NBDClient *client);
+ 
+ static gboolean nbd_negotiate_continue(QIOChannel *ioc,
+                                        GIOCondition condition,
+@@ -785,7 +781,7 @@ void nbd_client_put(NBDClient *client)
+          */
+         assert(client->closing);
+ 
+-        nbd_unset_handlers(client);
++        qio_channel_detach_aio_context(client->ioc);
+         object_unref(OBJECT(client->sioc));
+         object_unref(OBJECT(client->ioc));
+         if (client->tlscreds) {
+@@ -826,7 +822,6 @@ static NBDRequestData *nbd_request_get(NBDClient *client)
+ 
+     assert(client->nb_requests <= MAX_NBD_REQUESTS - 1);
+     client->nb_requests++;
+-    nbd_update_can_read(client);
+ 
+     req = g_new0(NBDRequestData, 1);
+     nbd_client_get(client);
+@@ -844,7 +839,8 @@ static void nbd_request_put(NBDRequestData *req)
+     g_free(req);
+ 
+     client->nb_requests--;
+-    nbd_update_can_read(client);
++    nbd_client_receive_next_request(client);
++
+     nbd_client_put(client);
+ }
+ 
+@@ -858,7 +854,13 @@ static void blk_aio_attached(AioContext *ctx, void *opaque)
+     exp->ctx = ctx;
+ 
+     QTAILQ_FOREACH(client, &exp->clients, next) {
+-        nbd_set_handlers(client);
++        qio_channel_attach_aio_context(client->ioc, ctx);
++        if (client->recv_coroutine) {
++            aio_co_schedule(ctx, client->recv_coroutine);
++        }
++        if (client->send_coroutine) {
++            aio_co_schedule(ctx, client->send_coroutine);
++        }
+     }
+ }
+ 
+@@ -870,7 +872,7 @@ static void blk_aio_detach(void *opaque)
+     TRACE("Export %s: Detaching clients from AIO context %p\n", exp->name, exp->ctx);
+ 
+     QTAILQ_FOREACH(client, &exp->clients, next) {
+-        nbd_unset_handlers(client);
++        qio_channel_detach_aio_context(client->ioc);
+     }
+ 
+     exp->ctx = NULL;
+@@ -1045,7 +1047,6 @@ static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
+     g_assert(qemu_in_coroutine());
+     qemu_co_mutex_lock(&client->send_lock);
+     client->send_coroutine = qemu_coroutine_self();
+-    nbd_set_handlers(client);
+ 
+     if (!len) {
+         rc = nbd_send_reply(client->ioc, reply);
+@@ -1062,7 +1063,6 @@ static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
+     }
+ 
+     client->send_coroutine = NULL;
+-    nbd_set_handlers(client);
+     qemu_co_mutex_unlock(&client->send_lock);
+     return rc;
+ }
+@@ -1079,9 +1079,7 @@ static ssize_t nbd_co_receive_request(NBDRequestData *req,
+     ssize_t rc;
+ 
+     g_assert(qemu_in_coroutine());
+-    client->recv_coroutine = qemu_coroutine_self();
+-    nbd_update_can_read(client);
+-
++    assert(client->recv_coroutine == qemu_coroutine_self());
+     rc = nbd_receive_request(client->ioc, request);
+     if (rc < 0) {
+         if (rc != -EAGAIN) {
+@@ -1163,23 +1161,25 @@ static ssize_t nbd_co_receive_request(NBDRequestData *req,
+ 
+ out:
+     client->recv_coroutine = NULL;
+-    nbd_update_can_read(client);
++    nbd_client_receive_next_request(client);
+ 
+     return rc;
+ }
+ 
+-static void nbd_trip(void *opaque)
++/* Owns a reference to the NBDClient passed as opaque.  */
++static coroutine_fn void nbd_trip(void *opaque)
+ {
+     NBDClient *client = opaque;
+     NBDExport *exp = client->exp;
+     NBDRequestData *req;
+-    NBDRequest request;
++    NBDRequest request = { 0 };    /* GCC thinks it can be used uninitialized */
+     NBDReply reply;
+     ssize_t ret;
+     int flags;
+ 
+     TRACE("Reading request.");
+     if (client->closing) {
++        nbd_client_put(client);
+         return;
+     }
+ 
+@@ -1338,60 +1338,21 @@ static void nbd_trip(void *opaque)
+ 
+ done:
+     nbd_request_put(req);
++    nbd_client_put(client);
+     return;
+ 
+ out:
+     nbd_request_put(req);
+     client_close(client);
++    nbd_client_put(client);
+ }
+ 
+-static void nbd_read(void *opaque)
 -{
--    BlockAIOCB *acb = p;
--    assert(acb->refcnt > 0);
--    if (--acb->refcnt == 0) {
--        g_free(acb);
+-    NBDClient *client = opaque;
+-
+-    if (client->recv_coroutine) {
+-        qemu_coroutine_enter(client->recv_coroutine);
+-    } else {
+-        qemu_coroutine_enter(qemu_coroutine_create(nbd_trip, client));
 -    }
 -}
 -
- /**************************************************************/
- /* Coroutine block device emulation */
- 
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 2b5bb74..2329be7 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -21,7 +21,9 @@ stub-obj-y += get-vm-name.o
- stub-obj-y += iothread.o
- stub-obj-y += iothread-lock.o
- stub-obj-y += is-daemonized.o
-+stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
- stub-obj-y += machine-init-done.o
-+stub-obj-y += main-loop.o
- stub-obj-y += migr-blocker.o
- stub-obj-y += mon-is-qmp.o
- stub-obj-y += monitor-init.o
-diff --git a/stubs/linux-aio.c b/stubs/linux-aio.c
-new file mode 100644
-index 0000000..ed47bd4
---- /dev/null
-+++ b/stubs/linux-aio.c
-@@ -0,0 +1,32 @@
-+/*
-+ * Linux native AIO support.
-+ *
-+ * Copyright (C) 2009 IBM, Corp.
-+ * Copyright (C) 2009 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "block/aio.h"
-+#include "block/raw-aio.h"
-+
-+void laio_detach_aio_context(LinuxAioState *s, AioContext *old_context)
-+{
-+    abort();
-+}
-+
-+void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context)
-+{
-+    abort();
-+}
-+
-+LinuxAioState *laio_init(void)
-+{
-+    abort();
-+}
-+
-+void laio_cleanup(LinuxAioState *s)
-+{
-+    abort();
-+}
-diff --git a/stubs/main-loop.c b/stubs/main-loop.c
-new file mode 100644
-index 0000000..a457a02
---- /dev/null
-+++ b/stubs/main-loop.c
-@@ -0,0 +1,8 @@
-+#include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
-+
-+/* Stubs for main-loop.c */
-+AioContext *qemu_get_aio_context(void)
-+{
-+    abort();
-+}
-diff --git a/stubs/set-fd-handler.c b/stubs/set-fd-handler.c
-index acbe65c..26965de 100644
---- a/stubs/set-fd-handler.c
-+++ b/stubs/set-fd-handler.c
-@@ -9,14 +9,3 @@ void qemu_set_fd_handler(int fd,
- {
-     abort();
- }
--
--void aio_set_fd_handler(AioContext *ctx,
--                        int fd,
--                        bool is_external,
--                        IOHandler *io_read,
--                        IOHandler *io_write,
--                        AioPollFn *io_poll,
--                        void *opaque)
+-static void nbd_restart_write(void *opaque)
 -{
--    abort();
+-    NBDClient *client = opaque;
+-
+-    qemu_coroutine_enter(client->send_coroutine);
 -}
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 4478616..91dcd5c 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -45,9 +45,9 @@ check-unit-y += tests/test-visitor-serialization$(EXESUF)
- check-unit-y += tests/test-iov$(EXESUF)
- gcov-files-test-iov-y = util/iov.c
- check-unit-y += tests/test-aio$(EXESUF)
--gcov-files-test-aio-y = async.c
--gcov-files-test-aio-$(CONFIG_WIN32) += aio-win32.c
--gcov-files-test-aio-$(CONFIG_POSIX) += aio-posix.c
-+gcov-files-test-aio-y = util/async.c util/qemu-timer.o
-+gcov-files-test-aio-$(CONFIG_WIN32) += util/aio-win32.c
-+gcov-files-test-aio-$(CONFIG_POSIX) += util/aio-posix.c
- check-unit-y += tests/test-aio-multithread$(EXESUF)
- gcov-files-test-aio-multithread-y = $(gcov-files-test-aio-y)
- gcov-files-test-aio-multithread-y += util/qemu-coroutine.c tests/iothread.c
-@@ -493,7 +493,7 @@ tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
- tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-qom-obj-y)
- tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-qom-obj-y)
+-
+-static void nbd_set_handlers(NBDClient *client)
+-{
+-    if (client->exp && client->exp->ctx) {
+-        aio_set_fd_handler(client->exp->ctx, client->sioc->fd, true,
+-                           client->can_read ? nbd_read : NULL,
+-                           client->send_coroutine ? nbd_restart_write : NULL,
+-                           NULL, client);
+-    }
+-}
+-
+-static void nbd_unset_handlers(NBDClient *client)
+-{
+-    if (client->exp && client->exp->ctx) {
+-        aio_set_fd_handler(client->exp->ctx, client->sioc->fd, true, NULL,
+-                           NULL, NULL, NULL);
+-    }
+-}
+-
+-static void nbd_update_can_read(NBDClient *client)
++static void nbd_client_receive_next_request(NBDClient *client)
+ {
+-    bool can_read = client->recv_coroutine ||
+-                    client->nb_requests < MAX_NBD_REQUESTS;
+-
+-    if (can_read != client->can_read) {
+-        client->can_read = can_read;
+-        nbd_set_handlers(client);
+-
+-        /* There is no need to invoke aio_notify(), since aio_set_fd_handler()
+-         * in nbd_set_handlers() will have taken care of that */
++    if (!client->recv_coroutine && client->nb_requests < MAX_NBD_REQUESTS) {
++        nbd_client_get(client);
++        client->recv_coroutine = qemu_coroutine_create(nbd_trip, client);
++        aio_co_schedule(client->exp->ctx, client->recv_coroutine);
+     }
+ }
  
--tests/test-char$(EXESUF): tests/test-char.o qemu-char.o qemu-timer.o $(test-util-obj-y) $(qtest-obj-y) $(test-io-obj-y)
-+tests/test-char$(EXESUF): tests/test-char.o qemu-char.o $(qtest-obj-y) $(test-io-obj-y) $(test-util-obj-y)
- tests/test-coroutine$(EXESUF): tests/test-coroutine.o $(test-block-obj-y)
- tests/test-aio$(EXESUF): tests/test-aio.o $(test-block-obj-y)
- tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-obj-y)
-@@ -526,8 +526,7 @@ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
- 	migration/vmstate.o migration/qemu-file.o \
-         migration/qemu-file-channel.o migration/qjson.o \
- 	$(test-io-obj-y)
--tests/test-timed-average$(EXESUF): tests/test-timed-average.o qemu-timer.o \
--	$(test-util-obj-y)
-+tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-util-obj-y)
- tests/test-base64$(EXESUF): tests/test-base64.o \
- 	libqemuutil.a libqemustub.a
- tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o libqemustub.a
-@@ -685,7 +684,7 @@ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb-obj-y)
- tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
- tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
- tests/postcopy-test$(EXESUF): tests/postcopy-test.o
--tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o qemu-char.o qemu-timer.o $(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y)
-+tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o qemu-char.o $(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y)
- tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o
- tests/test-qemu-opts$(EXESUF): tests/test-qemu-opts.o $(test-util-obj-y)
- tests/test-write-threshold$(EXESUF): tests/test-write-threshold.o $(test-block-obj-y)
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index c1f247d..8db62bf 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -1,14 +1,17 @@
- util-obj-y = osdep.o cutils.o unicode.o qemu-timer-common.o
- util-obj-y += bufferiszero.o
- util-obj-y += lockcnt.o
-+util-obj-y += aiocb.o async.o thread-pool.o qemu-timer.o
-+util-obj-$(CONFIG_POSIX) += aio-posix.o
- util-obj-$(CONFIG_POSIX) += compatfd.o
- util-obj-$(CONFIG_POSIX) += event_notifier-posix.o
- util-obj-$(CONFIG_POSIX) += mmap-alloc.o
- util-obj-$(CONFIG_POSIX) += oslib-posix.o
- util-obj-$(CONFIG_POSIX) += qemu-openpty.o
- util-obj-$(CONFIG_POSIX) += qemu-thread-posix.o
--util-obj-$(CONFIG_WIN32) += event_notifier-win32.o
- util-obj-$(CONFIG_POSIX) += memfd.o
-+util-obj-$(CONFIG_WIN32) += aio-win32.o
-+util-obj-$(CONFIG_WIN32) += event_notifier-win32.o
- util-obj-$(CONFIG_WIN32) += oslib-win32.o
- util-obj-$(CONFIG_WIN32) += qemu-thread-win32.o
- util-obj-y += envlist.o path.o module.o
-diff --git a/aio-posix.c b/util/aio-posix.c
-similarity index 100%
-rename from aio-posix.c
-rename to util/aio-posix.c
-diff --git a/aio-win32.c b/util/aio-win32.c
-similarity index 100%
-rename from aio-win32.c
-rename to util/aio-win32.c
-diff --git a/util/aiocb.c b/util/aiocb.c
-new file mode 100644
-index 0000000..305a9cf
---- /dev/null
-+++ b/util/aiocb.c
-@@ -0,0 +1,55 @@
-+/*
-+ * BlockAIOCB allocation
-+ *
-+ * Copyright (c) 2003-2017 Fabrice Bellard and the QEMU team
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+@@ -1409,11 +1370,13 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
+         goto out;
+     }
+     qemu_co_mutex_init(&client->send_lock);
+-    nbd_set_handlers(client);
+ 
+     if (exp) {
+         QTAILQ_INSERT_TAIL(&exp->clients, client, next);
+     }
 +
-+#include "qemu/osdep.h"
-+#include "block/aio.h"
++    nbd_client_receive_next_request(client);
 +
-+void *qemu_aio_get(const AIOCBInfo *aiocb_info, BlockDriverState *bs,
-+                   BlockCompletionFunc *cb, void *opaque)
-+{
-+    BlockAIOCB *acb;
-+
-+    acb = g_malloc(aiocb_info->aiocb_size);
-+    acb->aiocb_info = aiocb_info;
-+    acb->bs = bs;
-+    acb->cb = cb;
-+    acb->opaque = opaque;
-+    acb->refcnt = 1;
-+    return acb;
-+}
-+
-+void qemu_aio_ref(void *p)
-+{
-+    BlockAIOCB *acb = p;
-+    acb->refcnt++;
-+}
-+
-+void qemu_aio_unref(void *p)
-+{
-+    BlockAIOCB *acb = p;
-+    assert(acb->refcnt > 0);
-+    if (--acb->refcnt == 0) {
-+        g_free(acb);
-+    }
-+}
-diff --git a/async.c b/util/async.c
-similarity index 99%
-rename from async.c
-rename to util/async.c
-index 1338682..44c9c3b 100644
---- a/async.c
-+++ b/util/async.c
-@@ -1,7 +1,8 @@
- /*
-- * QEMU System Emulator
-+ * Data plane event loop
-  *
-  * Copyright (c) 2003-2008 Fabrice Bellard
-+ * Copyright (c) 2009-2017 the QEMU team
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-  * of this software and associated documentation files (the "Software"), to deal
-diff --git a/qemu-timer.c b/util/qemu-timer.c
-similarity index 100%
-rename from qemu-timer.c
-rename to util/qemu-timer.c
-diff --git a/thread-pool.c b/util/thread-pool.c
-similarity index 100%
-rename from thread-pool.c
-rename to util/thread-pool.c
+ out:
+     g_free(data);
+ }
+@@ -1439,7 +1402,6 @@ void nbd_client_new(NBDExport *exp,
+     object_ref(OBJECT(client->sioc));
+     client->ioc = QIO_CHANNEL(sioc);
+     object_ref(OBJECT(client->ioc));
+-    client->can_read = true;
+     client->close = close_fn;
+ 
+     data->client = client;
 -- 
 2.9.3
