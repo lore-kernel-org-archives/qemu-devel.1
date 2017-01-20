@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cUaZY-0002z0-LK
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:53:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cUacR-0004TE-2x
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:56:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cUaZT-0000VI-Ss
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:53:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53704)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cUaZT-0000Uo-MR
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:53:43 -0500
-Date: Fri, 20 Jan 2017 14:53:38 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170120145337.GK2658@work-vm>
-References: <1484859998-25074-1-git-send-email-mst@redhat.com>
-	<1484859998-25074-3-git-send-email-mst@redhat.com>
-	<20170120094124.GB2658@work-vm>
-	<7af547e6-8758-388a-17e9-9f749e927da2@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cUacQ-0001j7-AF
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:56:47 -0500
+Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:35798)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cUacQ-0001iv-3e
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 09:56:46 -0500
+Received: by mail-ua0-x22a.google.com with SMTP id y9so62791614uae.2
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:56:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7af547e6-8758-388a-17e9-9f749e927da2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
- struct
+In-Reply-To: <1484860116-25361-1-git-send-email-mst@redhat.com>
+References: <1484860116-25361-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Jan 2017 14:56:24 +0000
+Message-ID: <CAFEAcA85rz2M1cZSEu4XwPjhwL5k-yjyXEWskUw1Z1cmw0wvvw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/17] virtio, vhost, pc: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 01/20/2017 03:41 AM, Dr. David Alan Gilbert wrote:
-> 
-> >> -#define QEMU_BUILD_BUG_ON(x) \
-> >> -    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
-> >> -        __attribute__((unused))
-> >> +#define QEMU_BUILD_BUG_ON_STRUCT(x) \
-> >> +    struct { \
-> >> +        int qemu_build_bug_on : (x) ? -1 : 1; \
-> >> +    }
-> > 
-> > The problem with this is it can't be used as an expression, where as
-> > your previous version could.
-> > I've got a similar case (see previous reply) that needed an expression
-> > bug-on that would evaluate to zero.
-> 
-> Keep reading the series - the version usable in an expression is
-> QEMU_BUILD_BUG_ON_ZERO, introduced in 3/4.  Patch 2/4 is just rewriting
-> the existing check, with no change in the fact that it is still a
-> declaration.
+On 19 January 2017 at 21:09, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit 23eb9e6b6d5315171cc15969bbc755f258004df0:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-01-16' into staging (2017-01-17 13:53:50 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 2943b53f682f54548e7ddcf2ebb6c6d12d8dc821:
+>
+>   virtio: force VIRTIO_F_IOMMU_PLATFORM (2017-01-19 23:00:31 +0200)
+>
+> ----------------------------------------------------------------
+> virtio, vhost, pc: fixes, features
+>
+> writeable fw cfg blobs which will be used for guest to host
+> communication
+> fixes and cleanups all over the place
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
 
-Ah hmm, yeh that's OK.
+Applied, thanks.
 
-Dave
-
-> 
-> -- 
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
-> 
-
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
