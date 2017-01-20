@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZI9-0003lw-PA
+	(envelope-from <pbonzini@redhat.com>) id 1cUZI9-0003lz-Q5
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZI7-0005tc-Gg
+	(envelope-from <pbonzini@redhat.com>) id 1cUZI6-0005t0-K5
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51470)
+Received: from mx1.redhat.com ([209.132.183.28]:46898)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZI7-0005tA-BB
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:43 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 88F9F83F3F
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 13:31:43 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-117-138.ams2.redhat.com
-	[10.36.117.138])
-	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v0KDVeVA014401
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 08:31:42 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZI6-0005sL-Dz
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:42 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 20 Jan 2017 14:31:06 +0100
-Message-Id: <20170120133139.31080-3-pbonzini@redhat.com>
+Date: Fri, 20 Jan 2017 14:31:05 +0100
+Message-Id: <20170120133139.31080-2-pbonzini@redhat.com>
 In-Reply-To: <20170120133139.31080-1-pbonzini@redhat.com>
 References: <20170120133139.31080-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 02/35] megasas: fix guest-triggered memory leak
+Subject: [Qemu-devel] [PULL 01/35] bugfix: vm halt when in reset looping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,62 +24,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: hangaohuai <hangaohuai@huawei.com>
 
-If the guest sets the sglist size to a value >=2GB, megasas_handle_dcmd
-will return MFI_STAT_MEMORY_NOT_AVAILABLE without freeing the memory.
-Avoid this by returning only the status from map_dcmd, and loading
-cmd->iov_size in the caller.
+From: hangaohuai <hangaohuai@huawei.com>
 
-Reported-by: Li Qiang <liqiang6-s@360.cn>
+reset mc146818rtc device when RESET event happens.
+
+Fix the problem:
+  1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect selfboot;
+  2. VM being reset by others, hmp_system_reset;
+  3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
+     resume execution by jump via 40h:0067h;
+  4. Guest halt;
+
+Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+Message-Id: <20161219060336.10176-1-hangaohuai@huawei.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/megasas.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ hw/timer/mc146818rtc.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index 67fc1e7..6233865 100644
---- a/hw/scsi/megasas.c
-+++ b/hw/scsi/megasas.c
-@@ -683,14 +683,14 @@ static int megasas_map_dcmd(MegasasState *s, MegasasCmd *cmd)
-         trace_megasas_dcmd_invalid_sge(cmd->index,
-                                        cmd->frame->header.sge_count);
-         cmd->iov_size = 0;
--        return -1;
-+        return -EINVAL;
-     }
-     iov_pa = megasas_sgl_get_addr(cmd, &cmd->frame->dcmd.sgl);
-     iov_size = megasas_sgl_get_len(cmd, &cmd->frame->dcmd.sgl);
-     pci_dma_sglist_init(&cmd->qsg, PCI_DEVICE(s), 1);
-     qemu_sglist_add(&cmd->qsg, iov_pa, iov_size);
-     cmd->iov_size = iov_size;
--    return cmd->iov_size;
-+    return 0;
- }
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index da209d0..637f872 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -946,11 +946,23 @@ static Property mc146818rtc_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
- static void megasas_finish_dcmd(MegasasCmd *cmd, uint32_t iov_size)
-@@ -1559,19 +1559,20 @@ static const struct dcmd_cmd_tbl_t {
- 
- static int megasas_handle_dcmd(MegasasState *s, MegasasCmd *cmd)
++static void rtc_resetdev(DeviceState *d)
++{
++    RTCState *s = MC146818_RTC(d);
++
++    /* Reason: VM do suspend self will set 0xfe
++     * Reset any values other than 0xfe(Guest suspend case) */
++    if (s->cmos_data[0x0f] != 0xfe) {
++        s->cmos_data[0x0f] = 0x00;
++    }
++}
++
+ static void rtc_class_initfn(ObjectClass *klass, void *data)
  {
--    int opcode, len;
-+    int opcode;
-     int retval = 0;
-+    size_t len;
-     const struct dcmd_cmd_tbl_t *cmdptr = dcmd_cmd_tbl;
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
-     opcode = le32_to_cpu(cmd->frame->dcmd.opcode);
-     trace_megasas_handle_dcmd(cmd->index, opcode);
--    len = megasas_map_dcmd(s, cmd);
--    if (len < 0) {
-+    if (megasas_map_dcmd(s, cmd) < 0) {
-         return MFI_STAT_MEMORY_NOT_AVAILABLE;
-     }
-     while (cmdptr->opcode != -1 && cmdptr->opcode != opcode) {
-         cmdptr++;
-     }
-+    len = cmd->iov_size;
-     if (cmdptr->opcode == -1) {
-         trace_megasas_dcmd_unhandled(cmd->index, opcode, len);
-         retval = megasas_dcmd_dummy(s, cmd);
+     dc->realize = rtc_realizefn;
++    dc->reset = rtc_resetdev;
+     dc->vmsd = &vmstate_rtc;
+     dc->props = mc146818rtc_properties;
+     /* Reason: needs to be wired up by rtc_init() */
 -- 
 2.9.3
