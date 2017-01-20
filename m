@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUXiW-0003qm-Kx
+	(envelope-from <bounces@canonical.com>) id 1cUXiW-0003qk-K9
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:50:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUXiS-0005mi-NM
+	(envelope-from <bounces@canonical.com>) id 1cUXiS-0005ma-MQ
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:50:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42705)
+Received: from indium.canonical.com ([91.189.90.7]:42704)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cUXiS-0005le-BX
+	id 1cUXiS-0005lb-BT
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:50:48 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cUXiQ-0000ZU-8p
+	id 1cUXiQ-0000ZB-1g
 	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:50:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AFF9F2E80E0
+	by loganberry.canonical.com (Postfix) with ESMTP id 55DA22E80D6
 	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 11:50:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Jan 2017 11:41:53 -0000
+Date: Fri, 20 Jan 2017 11:39:31 -0000
 From: Thomas Huth <1657538@bugs.launchpad.net>
 Reply-To: Bug 1657538 <1657538@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170118175149.27340.89188.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170120114153.13992.41485.malone@soybean.canonical.com>
+Message-Id: <20170120113931.21568.95702.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1657538] Re: qemu 2.7.x 2.8 softmmu dont work on
  BE machine
@@ -39,9 +39,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Something else to try: Could you please check whether you get any output
-when you run "qemu-system-ppc -nographic" on your system? So we can make
-sure that it is not related to GTK or something similar...
+I can not reproduce this issue. QEMU 2.8 works fine here on a POWER8 big
+endian host (running RHEL7). Can you still run older versions of QEMU
+that used to work for you in the past, to check whether it is QEMU or
+whether it is Ubuntu 16.10 that is causing the trouble here? Could you
+please also post the full output of the "configure" run on your system?
 
 -- =
 
