@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUQ70-0003vK-Sr
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:43:40 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cUQC9-0005PD-RD
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:48:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUQ6w-0003jW-Vg
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:43:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49364)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cUQ6w-0003iC-Na
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:43:34 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BD45BC04B922
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 03:43:31 +0000 (UTC)
-Date: Fri, 20 Jan 2017 11:43:28 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170120034328.GG4914@pxdev.xzpeter.org>
-References: <1484817932-14452-1-git-send-email-peterx@redhat.com>
-	<20170119105437.5b17d979@t450s.home>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cUQC8-0006di-6j
+	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 22:48:57 -0500
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Fri, 20 Jan 2017 11:48:00 +0800
+Message-ID: <1484884080-28836-7-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
+References: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170119105437.5b17d979@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/3] vfio: allow to notify unmap for
- very big region
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 6/6] nbd/replication: implement
+ .bdrv_get_info() for nbd and replication driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,112 +22,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Eric
+	Blake <eblake@redhat.com>, Wen Congyang <wency@cn.fujitsu.com>
 
-On Thu, Jan 19, 2017 at 10:54:37AM -0700, Alex Williamson wrote:
-> On Thu, 19 Jan 2017 17:25:29 +0800
-> Peter Xu <peterx@redhat.com> wrote:
-> 
-> > This requirement originates from the VT-d vfio series:
-> > 
-> >   https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03495.html
-> > 
-> > The goal of this series is to allow IOMMU to notify unmap with very
-> > big IOTLB range, for example, with base=0 and size=2^63-1 (to unmap
-> > the whole address space).
-> > 
-> > The first patch is a good to have, for traces.
-> > 
-> > The second one is a cleanup of existing code, only.
-> 
-> Sort of, it does add some overhead to the unmap path, but you remove
-> that and more in the third patch.
+Without this callback, there will be an error reports in the primary side:
+"qemu-system-x86_64: Couldn't determine the cluster size of the target image,
+which has no backing file: Operation not supported
+Aborting, since this may create an unusable destination image"
 
-Hmm, yes, I tried to get the ram pointer even for unmap. I should
-remove the ending "only".
+For nbd driver, it doesn't have cluster size, so here we return
+a fake value for it.
 
->  
-> > The third one moves the further RAM translation and check into map
-> > operation logic, so that it'll free unmap operations.
-> > 
-> > The series is marked as RFC since I am not sure whether this is a
-> > workable way. Anyway, please review to help confirm it.
-> 
-> It seems reasonable to me,
+This patch should be dropped if Eric's nbd patch be merged.
+https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg03567.html
 
-Good to know that you didn't disagree on this. :) Then let me take
-these patches along with that series in the next post (since that
-series will depend on this one, so I'll keep them together, though
-please maintainers decide on how you'll merge them when you want to),
+Cc: Eric Blake <eblake@redhat.com>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
+---
+ block/nbd.c         | 12 ++++++++++++
+ block/replication.c |  6 ++++++
+ 2 files changed, 18 insertions(+)
 
-> except for the example here of using 2^63-1,
-> which I expect is to work around the vfio {un}map API bug as we
-> discussed on irc.
-
-Actually not only for that one, I don't know whether we have problem
-here:
-
-(I mentioned this in IRC, in case you missed that, I paste it here as
- well)
-
-static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
-				      dma_addr_t start, size_t size)
-{
-	struct rb_node *node = iommu->dma_list.rb_node;
-
-	while (node) {
-		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
-
-		if (start + size <= dma->iova)
-			node = node->rb_left;
-		else if (start >= dma->iova + dma->size)
-                          ^^^^^^^^^^^^^^^^^^^^^
-                          Could it overflow here? <--------------
-			node = node->rb_right;
-		else
-			return dma;
-	}
-
-	return NULL;
-}
-
-I used 2^63-1 to try to avoid both cases.
-
-> For everyone, the root of the problem is that the
-> ioctls use:
-> 
->         __u64   iova;                           /* IO virtual address */
->         __u64   size;                           /* Size of mapping (bytes) */
-> 
-> So we can only express a size of 2^64-1 and we have an off-by-one error
-> trying to perform a map/unmap of an entire 64-bit space.  Note when
-> designing an API, use start/end rather than base/size to avoid this.
-
-Lesson learned.
-
-> 
-> What I don't want to see is for this API bug to leak out into the rest
-> of the QEMU code such that intel_iommu code, or iommu code in general
-> subtly avoids it by artificially using a smaller range.  VT-d hardware
-> has an actual physical address space of either 2^39 or 2^48 bits, so if
-> you want to make the iommu address space match the device we're trying
-> to emulate, that's perfectly fine.  AIUI, AMD-Vi does actually have a
-> 64-bit address space on the IOMMU, so to handle that case I'd expect
-> the simplest solution would be to track the and mapped iova high water
-> mark per container in vfio and truncate unmaps to that high water end
-> address.  Realistically we're probably not going to see iovas at the end
-> of the 64-bit address space, but we can come up with some other
-> workaround in the vfio code or update the kernel API if we do.  Thanks,
-
-Agree that high watermark can be a good solution for VT-d. I'll use
-that instead of 2^63-1. Though for AMD, if it supports 64bits, we may
-still need to solve existing issues in the future, since in that case
-the high watermark can be (hwaddr)-1 as well if guest specifies it.
-
-(Though anyway I'm not sure when AMD vIOMMUs will be ready for device
- assignment, so I don't think that's a big issue at least for now)
-
-Thanks!
-
--- peterx
+diff --git a/block/nbd.c b/block/nbd.c
+index 35f24be..b71a13d 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -43,6 +43,8 @@
+ 
+ #define EN_OPTSTR ":exportname="
+ 
++#define NBD_FAKE_CLUSTER_SIZE 512
++
+ typedef struct BDRVNBDState {
+     NBDClientSession client;
+ 
+@@ -552,6 +554,13 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
+     bs->full_open_options = opts;
+ }
+ 
++static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
++{
++    bdi->cluster_size  = NBD_FAKE_CLUSTER_SIZE;
++
++    return 0;
++}
++
+ static BlockDriver bdrv_nbd = {
+     .format_name                = "nbd",
+     .protocol_name              = "nbd",
+@@ -569,6 +578,7 @@ static BlockDriver bdrv_nbd = {
+     .bdrv_detach_aio_context    = nbd_detach_aio_context,
+     .bdrv_attach_aio_context    = nbd_attach_aio_context,
+     .bdrv_refresh_filename      = nbd_refresh_filename,
++    .bdrv_get_info              = nbd_get_info,
+ };
+ 
+ static BlockDriver bdrv_nbd_tcp = {
+@@ -588,6 +598,7 @@ static BlockDriver bdrv_nbd_tcp = {
+     .bdrv_detach_aio_context    = nbd_detach_aio_context,
+     .bdrv_attach_aio_context    = nbd_attach_aio_context,
+     .bdrv_refresh_filename      = nbd_refresh_filename,
++    .bdrv_get_info              = nbd_get_info,
+ };
+ 
+ static BlockDriver bdrv_nbd_unix = {
+@@ -607,6 +618,7 @@ static BlockDriver bdrv_nbd_unix = {
+     .bdrv_detach_aio_context    = nbd_detach_aio_context,
+     .bdrv_attach_aio_context    = nbd_attach_aio_context,
+     .bdrv_refresh_filename      = nbd_refresh_filename,
++    .bdrv_get_info              = nbd_get_info,
+ };
+ 
+ static void bdrv_nbd_init(void)
+diff --git a/block/replication.c b/block/replication.c
+index a0b3e41..e4f8069 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -731,6 +731,11 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+     aio_context_release(aio_context);
+ }
+ 
++static int replication_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
++{
++    return bdrv_get_info(bs->file->bs, bdi);
++}
++
+ BlockDriver bdrv_replication = {
+     .format_name                = "replication",
+     .protocol_name              = "replication",
+@@ -743,6 +748,7 @@ BlockDriver bdrv_replication = {
+     .bdrv_co_readv              = replication_co_readv,
+     .bdrv_co_writev             = replication_co_writev,
+ 
++    .bdrv_get_info              = replication_get_info,
+     .is_filter                  = true,
+     .bdrv_recurse_is_first_non_filter = replication_recurse_is_first_non_filter,
+ 
+-- 
+1.8.3.1
