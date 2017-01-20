@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cUavz-0002B6-V5
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:17:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1cUb7q-0005YG-Es
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:29:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cUavu-0003i7-RU
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:16:59 -0500
-Resent-Message-Id: <E1cUavu-0003i7-RU@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21419)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cUavu-0003ho-Ib
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:16:54 -0500
-Message-ID: <148492541025.28.9189956603712971156@b042e9bf0dd0>
-In-Reply-To: <20170120133139.31080-1-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1cUb7p-0001bj-Fg
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 10:29:14 -0500
+References: <1484905570-10520-1-git-send-email-pl@kamp.de>
+	<1484905570-10520-2-git-send-email-pl@kamp.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9a67a7cd-6303-3b44-4542-6f9472e3abde@redhat.com>
+Date: Fri, 20 Jan 2017 09:29:04 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 20 Jan 2017 07:16:51 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL v3 00/32] Misc patches for 2017-01-11
+In-Reply-To: <1484905570-10520-2-git-send-email-pl@kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Co31sWV5Muf7WTtw1S6knt52Jp0t95wrK"
+Subject: Re: [Qemu-devel] [PATCH 1/2] block/nfs: fix NULL pointer
+ dereference in URI parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, ashijeetacharya@gmail.com, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-stable@nongnu.org
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIHYzIDAwLzMyXSBNaXNjIHBhdGNoZXMgZm9yIDIwMTctMDEtMTEKTWVzc2Fn
-ZS1pZDogMjAxNzAxMjAxMzMxMzkuMzEwODAtMS1wYm9uemluaUByZWRoYXQuY29tClR5cGU6IHNl
-cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
-MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMg
-VXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjZiOTNjOSBwYy5oOiBt
-b3ZlIHgtbWFjaC11c2UtcmVsaWFibGUtZ2V0LWNsb2NrIGNvbXBhdCBlbnRyeSB0byBQQ19DT01Q
-QVRfMl84CjMzNGE1NDYgYml0bWFwOiBhc3NlcnQgdGhhdCBzdGFydCBhbmQgbnIgYXJlIG5vbiBu
-ZWdhdGl2ZQpjYTE1ZjBkIGhheDogYWRkIERhcndpbiBzdXBwb3J0CmRlZGJkMzUgUGx1bWIgdGhl
-IEhBWE0tYmFzZWQgaGFyZHdhcmUgYWNjZWxlcmF0aW9uIHN1cHBvcnQKYmM1ZjBiMyB0YXJnZXQv
-aTM4NjogQWRkIEludGVsIEhBWCBmaWxlcwo4YmM4OWU5IGt2bTogbW92ZSBjcHUgc3luY2hyb25p
-emF0aW9uIGNvZGUKYWY2ZTBhNiBLVk06IFBQQzogZWxpbWluYXRlIHVubmVjZXNzYXJ5IGR1cGxp
-Y2F0ZSBjb25zdGFudHMKNjg2NDQ2MiByYW1ibG9jay1ub3RpZmllcjogbmV3Cjg1NGNiYTUgY2hh
-cjogZml4IGN0cmwtYSBiIG5vdCB3b3JraW5nCjUyMzhhMDcgZXhlYzogQWRkIG1pc3NpbmcgcmN1
-X3JlYWRfdW5sb2NrCjA5NGM3ZjMgeDg2OiBpb2FwaWM6IGZpeCBmYWlsIG1pZ3JhdGlvbiB3aGVu
-IGlycWNoaXA9c3BsaXQKNWRkNmY5MiB4ODY6IGlvYXBpYzogZHVtcCB2ZXJzaW9uIGZvciAiaW5m
-byBpb2FwaWMiCjBlMmQ2MDcgeDg2OiBpb2FwaWM6IGFkZCB0cmFjZXMgZm9yIGlvYXBpYwoyMjJh
-M2RkIGh4dG9vbDogZW1pdCBUZXhpbmZvIGhlYWRpbmdzIGFzIEBzdWJzZWN0aW9uCmJhZDZiODUg
-cWVtdS10aHJlYWQ6IGZpeCBxZW11X3RocmVhZF9zZXRfbmFtZSgpIHJhY2UgaW4gcWVtdV90aHJl
-YWRfY3JlYXRlKCkKNmZjMzI4NSBzZXJpYWw6IGZpeCBtZW1vcnkgbGVhayBpbiBzZXJpYWwgZXhp
-dAo2MTcxZjI5IHNjc2ktYmxvY2s6IGZpeCBkaXJlY3Rpb24gb2YgQllUQ0hLIHRlc3QgZm9yIFZF
-UklGWSBjb21tYW5kcwpiNjEwMDEzIHBjOiBmaXggY3Jhc2ggaW4gcnRjX3NldF9tZW1vcnkoKSBp
-ZiBpbml0aWFsIGNwdSBpcyBtYXJrZWQgYXMgaG90cGx1Z2dlZAphMTc2ZTEwIGFjcGk6IGZpbHRl
-ciBiYXNlZCBvbiBDT05GSUdfQUNQSV9YODYgcmF0aGVyIHRoYW4gVEFSR0VUCmJlMGE5Njkgc3R1
-YnM6IHJlbW92ZSBzdHVicy9rdm0uYwpmOGExNmU2IGJ1aWxkOiByZW1vdmUgLS1lbmFibGUtY29s
-by8tLWRpc2FibGUtY29sbwo0YzZmODk4IGV2ZW50X25vdGlmaWVyOiBjbGVhbnVwcyBhcm91bmQg
-ZXZlbnRfbm90aWZpZXJfc2V0X2hhbmRsZXIKZWY4YWFmOSBzdHViczogbW92ZSB2aG9zdCBzdHVi
-cyB0byBzdHVicy92aG9zdC5vCmZmYTQ2NWMgc3R1YnM6IGdyb3VwIGFsbCBtb25pdG9yX2Zkc2V0
-XyogZnVuY3Rpb25zIGluIGEgc2luZ2xlIGZpbGUKZjYxNGNjNiBzdHViczogZ3JvdXAgc3R1YnMg
-Zm9yIHVzZXItbW9kZSBlbXVsYXRpb24KMGY3MjA4ZCBodzogbW92ZSByZXNldCBoYW5kbGVycyBm
-cm9tIHZsLmMgdG8gaHcvY29yZQpmN2MyMjU2IHN0dWJzOiByZW1vdmUgdW51c2VkIHN0dWIgZm9y
-IHNlcmlhbF9oZAphNTRkOGVlIHN0dWJzOiBtb3ZlIGFjcGkgc3R1YnMgdG8gaHcvYWNwaQphNTZl
-MmVmIHN0dWJzOiBtb3ZlIHNtYmlvcyBzdHVicyB0byBody9zbWJpb3MKMDg2YTJmOCBzdHViczog
-bWVyZ2UgYWxsIG1vbml0b3Igc3R1YnMgaW4gb25lIGZpbGUsIHJlbW92ZSBtb25pdG9yX2N1cl9p
-c19xbXAgc3R1Ygo5NDM4NzQ1IHNtYmlvczogZmlsdGVyIGJhc2VkIG9uIENPTkZJR19TTUJJT1Mg
-cmF0aGVyIHRoYW4gVEFSR0VUCjFhMGY1OWIgcW9tOiBNYWtlIGFsbCBpbnRlcmZhY2UgdHlwZXMg
-YWJzdHJhY3QKZmE3ZDEzNSBtZWdhc2FzOiBmaXggZ3Vlc3QtdHJpZ2dlcmVkIG1lbW9yeSBsZWFr
-CjI4YTQzODggYnVnZml4OiB2bSBoYWx0IHdoZW4gaW4gcmVzZXQgbG9vcGluZwoKPT09IE9VVFBV
-VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zNDogYnVnZml4OiB2bSBoYWx0IHdoZW4gaW4g
-cmVzZXQgbG9vcGluZy4uLgpDaGVja2luZyBQQVRDSCAyLzM0OiBtZWdhc2FzOiBmaXggZ3Vlc3Qt
-dHJpZ2dlcmVkIG1lbW9yeSBsZWFrLi4uCkNoZWNraW5nIFBBVENIIDMvMzQ6IHFvbTogTWFrZSBh
-bGwgaW50ZXJmYWNlIHR5cGVzIGFic3RyYWN0Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMxMzI6IEZJTEU6IHRlc3RzL2RldmljZS1pbnRyb3NwZWN0LXRlc3QuYzoxNzQ6Cisg
-ICAgcXRlc3RfYWRkX2Z1bmMoImRldmljZS9pbnRyb3NwZWN0L2Fic3RyYWN0LWludGVyZmFjZXMi
-LCB0ZXN0X2Fic3RyYWN0X2ludGVyZmFjZXMpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
-LCAxMDUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgpDaGVja2luZyBQQVRDSCA0LzM0OiBzbWJpb3M6IGZpbHRlciBiYXNlZCBvbiBDT05GSUdfU01C
-SU9TIHJhdGhlciB0aGFuIFRBUkdFVC4uLgpDaGVja2luZyBQQVRDSCA1LzM0OiBzdHViczogbWVy
-Z2UgYWxsIG1vbml0b3Igc3R1YnMgaW4gb25lIGZpbGUsIHJlbW92ZSBtb25pdG9yX2N1cl9pc19x
-bXAgc3R1Yi4uLgpFUlJPUjogZG8gbm90IGluaXRpYWxpc2UgZ2xvYmFscyB0byAwIG9yIE5VTEwK
-Izc2OiBGSUxFOiBzdHVicy9tb25pdG9yLmM6NjoKK01vbml0b3IgKmN1cl9tb24gPSBOVUxMOwoK
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA2LzM0OiBzdHViczog
-bW92ZSBzbWJpb3Mgc3R1YnMgdG8gaHcvc21iaW9zLi4uCkNoZWNraW5nIFBBVENIIDcvMzQ6IHN0
-dWJzOiBtb3ZlIGFjcGkgc3R1YnMgdG8gaHcvYWNwaS4uLgpDaGVja2luZyBQQVRDSCA4LzM0OiBz
-dHViczogcmVtb3ZlIHVudXNlZCBzdHViIGZvciBzZXJpYWxfaGQuLi4KQ2hlY2tpbmcgUEFUQ0gg
-OS8zNDogaHc6IG1vdmUgcmVzZXQgaGFuZGxlcnMgZnJvbSB2bC5jIHRvIGh3L2NvcmUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTAvMzQ6IHN0dWJzOiBncm91cCBzdHVicyBmb3IgdXNlci1tb2RlIGVtdWxh
-dGlvbi4uLgpDaGVja2luZyBQQVRDSCAxMS8zNDogc3R1YnM6IGdyb3VwIGFsbCBtb25pdG9yX2Zk
-c2V0XyogZnVuY3Rpb25zIGluIGEgc2luZ2xlIGZpbGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMzQ6
-IHN0dWJzOiBtb3ZlIHZob3N0IHN0dWJzIHRvIHN0dWJzL3Zob3N0Lm8uLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTMvMzQ6IGV2ZW50X25vdGlmaWVyOiBjbGVhbnVwcyBhcm91bmQgZXZlbnRfbm90aWZpZXJf
-c2V0X2hhbmRsZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMzQ6IGJ1aWxkOiByZW1vdmUgLS1lbmFi
-bGUtY29sby8tLWRpc2FibGUtY29sby4uLgpDaGVja2luZyBQQVRDSCAxNS8zNDogc3R1YnM6IHJl
-bW92ZSBzdHVicy9rdm0uYy4uLgpDaGVja2luZyBQQVRDSCAxNi8zNDogYWNwaTogZmlsdGVyIGJh
-c2VkIG9uIENPTkZJR19BQ1BJX1g4NiByYXRoZXIgdGhhbiBUQVJHRVQuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTcvMzQ6IHBjOiBmaXggY3Jhc2ggaW4gcnRjX3NldF9tZW1vcnkoKSBpZiBpbml0aWFsIGNw
-dSBpcyBtYXJrZWQgYXMgaG90cGx1Z2dlZC4uLgpDaGVja2luZyBQQVRDSCAxOC8zNDogc2NzaS1i
-bG9jazogZml4IGRpcmVjdGlvbiBvZiBCWVRDSEsgdGVzdCBmb3IgVkVSSUZZIGNvbW1hbmRzLi4u
-CkNoZWNraW5nIFBBVENIIDE5LzM0OiBzZXJpYWw6IGZpeCBtZW1vcnkgbGVhayBpbiBzZXJpYWwg
-ZXhpdC4uLgpDaGVja2luZyBQQVRDSCAyMC8zNDogcWVtdS10aHJlYWQ6IGZpeCBxZW11X3RocmVh
-ZF9zZXRfbmFtZSgpIHJhY2UgaW4gcWVtdV90aHJlYWRfY3JlYXRlKCkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMjEvMzQ6IGh4dG9vbDogZW1pdCBUZXhpbmZvIGhlYWRpbmdzIGFzIEBzdWJzZWN0aW9uLi4u
-CkNoZWNraW5nIFBBVENIIDIyLzM0OiB4ODY6IGlvYXBpYzogYWRkIHRyYWNlcyBmb3IgaW9hcGlj
-Li4uCkNoZWNraW5nIFBBVENIIDIzLzM0OiB4ODY6IGlvYXBpYzogZHVtcCB2ZXJzaW9uIGZvciAi
-aW5mbyBpb2FwaWMiLi4uCkNoZWNraW5nIFBBVENIIDI0LzM0OiB4ODY6IGlvYXBpYzogZml4IGZh
-aWwgbWlncmF0aW9uIHdoZW4gaXJxY2hpcD1zcGxpdC4uLgpDaGVja2luZyBQQVRDSCAyNS8zNDog
-ZXhlYzogQWRkIG1pc3NpbmcgcmN1X3JlYWRfdW5sb2NrLi4uCkNoZWNraW5nIFBBVENIIDI2LzM0
-OiBjaGFyOiBmaXggY3RybC1hIGIgbm90IHdvcmtpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcvMzQ6
-IHJhbWJsb2NrLW5vdGlmaWVyOiBuZXcuLi4KQ2hlY2tpbmcgUEFUQ0ggMjgvMzQ6IEtWTTogUFBD
-OiBlbGltaW5hdGUgdW5uZWNlc3NhcnkgZHVwbGljYXRlIGNvbnN0YW50cy4uLgpDaGVja2luZyBQ
-QVRDSCAyOS8zNDoga3ZtOiBtb3ZlIGNwdSBzeW5jaHJvbml6YXRpb24gY29kZS4uLgpDaGVja2lu
-ZyBQQVRDSCAzMC8zNDogdGFyZ2V0L2kzODY6IEFkZCBJbnRlbCBIQVggZmlsZXMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMzEvMzQ6IFBsdW1iIHRoZSBIQVhNLWJhc2VkIGhhcmR3YXJlIGFjY2VsZXJhdGlv
-biBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDMyLzM0OiBoYXg6IGFkZCBEYXJ3aW4gc3VwcG9y
-dC4uLgpDaGVja2luZyBQQVRDSCAzMy8zNDogYml0bWFwOiBhc3NlcnQgdGhhdCBzdGFydCBhbmQg
-bnIgYXJlIG5vbiBuZWdhdGl2ZS4uLgpDaGVja2luZyBQQVRDSCAzNC8zNDogcGMuaDogbW92ZSB4
-LW1hY2gtdXNlLXJlbGlhYmxlLWdldC1jbG9jayBjb21wYXQgZW50cnkgdG8gUENfQ09NUEFUXzJf
-OC4uLgpVc2Ugb2YgdW5pbml0aWFsaXplZCB2YWx1ZSBpbiBjb25jYXRlbmF0aW9uICguKSBvciBz
-dHJpbmcgYXQgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgbGluZSAyMTY5Lgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Co31sWV5Muf7WTtw1S6knt52Jp0t95wrK
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, ashijeetacharya@gmail.com,
+ jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com,
+ qemu-stable@nongnu.org
+Message-ID: <9a67a7cd-6303-3b44-4542-6f9472e3abde@redhat.com>
+Subject: Re: [PATCH 1/2] block/nfs: fix NULL pointer dereference in URI
+ parsing
+References: <1484905570-10520-1-git-send-email-pl@kamp.de>
+ <1484905570-10520-2-git-send-email-pl@kamp.de>
+In-Reply-To: <1484905570-10520-2-git-send-email-pl@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/20/2017 03:46 AM, Peter Lieven wrote:
+> parse_uint_full wants to put the parsed value into the
+> variabled passed via its second argument which is NULL.
+
+s/variabled/variable/
+
+>=20
+> Fixes: 94d6a7a76e9df9919629428f6c598e2b97d9426c
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+>  block/nfs.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/nfs.c b/block/nfs.c
+> index a564340..baaecff 100644
+> --- a/block/nfs.c
+> +++ b/block/nfs.c
+> @@ -108,12 +108,13 @@ static int nfs_parse_uri(const char *filename, QD=
+ict *options, Error **errp)
+>      qdict_put(options, "path", qstring_from_str(uri->path));
+> =20
+>      for (i =3D 0; i < qp->n; i++) {
+> +        unsigned long long val;
+>          if (!qp->p[i].value) {
+>              error_setg(errp, "Value for NFS parameter expected: %s",
+>                         qp->p[i].name);
+>              goto out;
+>          }
+> -        if (parse_uint_full(qp->p[i].value, NULL, 0)) {
+> +        if (parse_uint_full(qp->p[i].value, &val, 0)) {
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>              error_setg(errp, "Illegal value for NFS parameter: %s",
+
+Not your fault, but I'm always wary of "Illegal" in an error message -
+the user isn't breaking any laws :)  Better is "Invalid", but such a
+cleanup can be a separate tree-wide patch for qemu-trivial, if someone
+wants it.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--Co31sWV5Muf7WTtw1S6knt52Jp0t95wrK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYgizAAAoJEKeha0olJ0Nq/fQH/1jkOu4etHgUCPLovTiTSJNI
+1042jWFvt9oV619Z5LxsMGGYr2mqiOg+ZyKQjjkKOCdVP+sDkP0zexIz5ZwLpb8N
++M40+0qn8do6qmrldYM3IdwducSJpIE0OCWHaXnSweyhssKpMt/mYHpVvHpHwcwy
+UxK6wdNgY5AJfcM9goZfFjjrmYOV5wy62sGij6514UVovSwiIEni7ZNgWxwgd+9r
+D9KIaUcIUbtOc9LQ6YnPeNUrll+2Ji1Za/OXf+GTsUmDz3UXSulB9qjiie/bHIq6
+ULnFxFEHSDPl0ldpMUPru94mqsje8iYbXySXE4IYLYZu3WUW55++ZP2ZifRn4K4=
+=85H6
+-----END PGP SIGNATURE-----
+
+--Co31sWV5Muf7WTtw1S6knt52Jp0t95wrK--
