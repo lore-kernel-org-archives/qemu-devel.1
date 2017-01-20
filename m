@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cUUUF-000080-Tt
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 03:24:01 -0500
+	(envelope-from <kevin.tian@intel.com>) id 1cUUXs-0001ar-TI
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 03:27:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cUUUC-00042Y-Ka
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 03:23:55 -0500
-Received: from mo69.mail-out.ovh.net ([178.32.228.69]:44403)
+	(envelope-from <kevin.tian@intel.com>) id 1cUUXp-0005cN-Lq
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 03:27:40 -0500
+Received: from mga06.intel.com ([134.134.136.31]:54281)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cUUUC-00041o-7R
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 03:23:52 -0500
-Received: from player798.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 138A810C8B
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 09:23:48 +0100 (CET)
-Date: Fri, 20 Jan 2017 09:23:33 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170120092333.2fefd8d2@bahia.lan>
-In-Reply-To: <1484566314-3987-5-git-send-email-ashijeetacharya@gmail.com>
-References: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
-	<1484566314-3987-5-git-send-email-ashijeetacharya@gmail.com>
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1cUUXp-0005bp-8s
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 03:27:37 -0500
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Fri, 20 Jan 2017 08:27:31 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190C14FAA@SHSMSX101.ccr.corp.intel.com>
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+	<1484276800-26814-4-git-send-email-peterx@redhat.com>
+In-Reply-To: <1484276800-26814-4-git-send-email-peterx@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 4/5] migration: disallow
- migrate_add_blocker during migration
+Subject: Re: [Qemu-devel] [PATCH RFC v3 03/14] intel_iommu: renaming gpa to
+ iova where proper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,719 +30,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: dgilbert@redhat.com, jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>
 
-On Mon, 16 Jan 2017 17:01:53 +0530
-Ashijeet Acharya <ashijeetacharya@gmail.com> wrote:
+> From: Peter Xu [mailto:peterx@redhat.com]
+> Sent: Friday, January 13, 2017 11:06 AM
+>=20
+> There are lots of places in current intel_iommu.c codes that named
+> "iova" as "gpa". It is really confusing to use a name "gpa" in these
+> places (which is very easily to be understood as "Guest Physical
+> Address", while it's not). To make the codes (much) easier to be read, I
+> decided to do this once and for all.
+>=20
+> No functional change is made. Only literal ones.
 
-> If a migration is already in progress and somebody attempts
-> to add a migration blocker, this should rightly fail.
-> 
-> Add an errp parameter and a retcode return value to migrate_add_blocker.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+If looking at VT-d spec (3.2 Domains and Address Translation)
+
+	Remapping hardware treats the address in inbound requests as DMA=20
+	Address. Depending on the software usage model, the DMA address=20
+	space may be the Guest-Physical Address (GPA) space of the virtual=20
+	machine to which the device is assigned, or application Virtual Address=20
+	(VA) space defined by the PASID assigned to an application, or some=20
+	abstract I/O virtual address (IOVA) space defined by software.
+
+	For simplicity, this document refers to address in requests-without-
+	PASID as GPA, and address in requests-with-PASID as Virtual Address=20
+	(VA) (or Guest Virtual Address (GVA), if such request is from a device=20
+	assigned to a virtual machine). The translated address is referred to as=20
+	HPA.
+
+It will add more readability if similar comment is added in this file - you
+can say choosing iova to represent address in requests-without-PASID.
+
+>=20
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
-
-For the 9pfs part.
-
-Acked-by: Greg Kurz <groug@kaod.org>
-
->  block/qcow.c                  |  8 +++++++-
->  block/vdi.c                   |  8 +++++++-
->  block/vhdx.c                  | 17 +++++++++++------
->  block/vmdk.c                  |  9 ++++++++-
->  block/vpc.c                   | 11 ++++++++---
->  block/vvfat.c                 | 19 ++++++++++++-------
->  hw/9pfs/9p.c                  | 33 ++++++++++++++++++++++-----------
->  hw/display/virtio-gpu.c       | 32 +++++++++++++++++++-------------
->  hw/intc/arm_gic_kvm.c         | 17 +++++++++++------
->  hw/intc/arm_gicv3_its_kvm.c   | 20 +++++++++++++-------
->  hw/intc/arm_gicv3_kvm.c       | 19 ++++++++++++-------
->  hw/misc/ivshmem.c             | 14 ++++++++++----
->  hw/scsi/vhost-scsi.c          | 25 +++++++++++++++++++------
->  hw/virtio/vhost.c             |  8 +++++++-
->  include/migration/migration.h |  7 ++++++-
->  migration/migration.c         | 37 +++++++++++++++++++++++++++++++++++--
->  stubs/migr-blocker.c          |  3 ++-
->  target/i386/kvm.c             | 16 +++++++++++++---
->  18 files changed, 222 insertions(+), 81 deletions(-)
-> 
-> diff --git a/block/qcow.c b/block/qcow.c
-> index 7540f43..fb738fc 100644
-> --- a/block/qcow.c
-> +++ b/block/qcow.c
-> @@ -104,6 +104,7 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
->      unsigned int len, i, shift;
->      int ret;
->      QCowHeader header;
-> +    Error *local_err = NULL;
->  
->      ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
->      if (ret < 0) {
-> @@ -252,7 +253,12 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
->      error_setg(&s->migration_blocker, "The qcow format used by node '%s' "
->                 "does not support live migration",
->                 bdrv_get_device_or_node_name(bs));
-> -    migrate_add_blocker(s->migration_blocker);
-> +    ret = migrate_add_blocker(s->migration_blocker, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        error_free(s->migration_blocker);
-> +        goto fail;
-> +    }
->  
->      qemu_co_mutex_init(&s->lock);
->      return 0;
-> diff --git a/block/vdi.c b/block/vdi.c
-> index 96b78d5..0aeb940 100644
-> --- a/block/vdi.c
-> +++ b/block/vdi.c
-> @@ -361,6 +361,7 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
->      VdiHeader header;
->      size_t bmap_size;
->      int ret;
-> +    Error *local_err = NULL;
->  
->      logout("\n");
->  
-> @@ -471,7 +472,12 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
->      error_setg(&s->migration_blocker, "The vdi format used by node '%s' "
->                 "does not support live migration",
->                 bdrv_get_device_or_node_name(bs));
-> -    migrate_add_blocker(s->migration_blocker);
-> +    ret = migrate_add_blocker(s->migration_blocker, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        error_free(s->migration_blocker);
-> +        goto fail_free_bmap;
-> +    }
->  
->      qemu_co_mutex_init(&s->write_lock);
->  
-> diff --git a/block/vhdx.c b/block/vhdx.c
-> index 0ba2f0a..68db9e0 100644
-> --- a/block/vhdx.c
-> +++ b/block/vhdx.c
-> @@ -991,6 +991,17 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
->          }
->      }
->  
-> +    /* Disable migration when VHDX images are used */
-> +    error_setg(&s->migration_blocker, "The vhdx format used by node '%s' "
-> +               "does not support live migration",
-> +               bdrv_get_device_or_node_name(bs));
-> +    ret = migrate_add_blocker(s->migration_blocker, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        error_free(s->migration_blocker);
-> +        goto fail;
-> +    }
-> +
->      if (flags & BDRV_O_RDWR) {
->          ret = vhdx_update_headers(bs, s, false, NULL);
->          if (ret < 0) {
-> @@ -1000,12 +1011,6 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
->  
->      /* TODO: differencing files */
->  
-> -    /* Disable migration when VHDX images are used */
-> -    error_setg(&s->migration_blocker, "The vhdx format used by node '%s' "
-> -               "does not support live migration",
-> -               bdrv_get_device_or_node_name(bs));
-> -    migrate_add_blocker(s->migration_blocker);
-> -
->      return 0;
->  fail:
->      vhdx_close(bs);
-> diff --git a/block/vmdk.c b/block/vmdk.c
-> index a11c27a..7750212 100644
-> --- a/block/vmdk.c
-> +++ b/block/vmdk.c
-> @@ -941,6 +941,7 @@ static int vmdk_open(BlockDriverState *bs, QDict *options, int flags,
->      int ret;
->      BDRVVmdkState *s = bs->opaque;
->      uint32_t magic;
-> +    Error *local_err = NULL;
->  
->      buf = vmdk_read_desc(bs->file, 0, errp);
->      if (!buf) {
-> @@ -976,7 +977,13 @@ static int vmdk_open(BlockDriverState *bs, QDict *options, int flags,
->      error_setg(&s->migration_blocker, "The vmdk format used by node '%s' "
->                 "does not support live migration",
->                 bdrv_get_device_or_node_name(bs));
-> -    migrate_add_blocker(s->migration_blocker);
-> +    ret = migrate_add_blocker(s->migration_blocker, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        error_free(s->migration_blocker);
-> +        goto fail;
-> +    }
-> +
->      g_free(buf);
->      return 0;
->  
-> diff --git a/block/vpc.c b/block/vpc.c
-> index 8d5886f..ed6353d 100644
-> --- a/block/vpc.c
-> +++ b/block/vpc.c
-> @@ -422,13 +422,18 @@ static int vpc_open(BlockDriverState *bs, QDict *options, int flags,
->  #endif
->      }
->  
-> -    qemu_co_mutex_init(&s->lock);
-> -
->      /* Disable migration when VHD images are used */
->      error_setg(&s->migration_blocker, "The vpc format used by node '%s' "
->                 "does not support live migration",
->                 bdrv_get_device_or_node_name(bs));
-> -    migrate_add_blocker(s->migration_blocker);
-> +    ret = migrate_add_blocker(s->migration_blocker, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        error_free(s->migration_blocker);
-> +        goto fail;
-> +    }
-> +
-> +    qemu_co_mutex_init(&s->lock);
->  
->      return 0;
->  
-> diff --git a/block/vvfat.c b/block/vvfat.c
-> index 7b706dc..c6bf67e 100644
-> --- a/block/vvfat.c
-> +++ b/block/vvfat.c
-> @@ -1185,21 +1185,26 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
->  
->      s->sector_count = s->faked_sectors + s->sectors_per_cluster*s->cluster_count;
->  
-> -    if (s->first_sectors_number == 0x40) {
-> -        init_mbr(s, cyls, heads, secs);
-> -    }
-> -
-> -    qemu_co_mutex_init(&s->lock);
-> -
->      /* Disable migration when vvfat is used rw */
->      if (s->qcow) {
->          error_setg(&s->migration_blocker,
->                     "The vvfat (rw) format used by node '%s' "
->                     "does not support live migration",
->                     bdrv_get_device_or_node_name(bs));
-> -        migrate_add_blocker(s->migration_blocker);
-> +        ret = migrate_add_blocker(s->migration_blocker, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            error_free(s->migration_blocker);
-> +            goto fail;
-> +        }
->      }
->  
-> +    if (s->first_sectors_number == 0x40) {
-> +        init_mbr(s, cyls, heads, secs);
-> +    }
-> +
-> +    qemu_co_mutex_init(&s->lock);
-> +
->      ret = 0;
->  fail:
->      qemu_opts_del(opts);
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index fa58877..06b6e7e 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -979,6 +979,7 @@ static void coroutine_fn v9fs_attach(void *opaque)
->      size_t offset = 7;
->      V9fsQID qid;
->      ssize_t err;
-> +    Error *local_err = NULL;
->  
->      v9fs_string_init(&uname);
->      v9fs_string_init(&aname);
-> @@ -1007,26 +1008,36 @@ static void coroutine_fn v9fs_attach(void *opaque)
->          clunk_fid(s, fid);
->          goto out;
->      }
-> -    err = pdu_marshal(pdu, offset, "Q", &qid);
-> -    if (err < 0) {
-> -        clunk_fid(s, fid);
-> -        goto out;
-> -    }
-> -    err += offset;
-> -    memcpy(&s->root_qid, &qid, sizeof(qid));
-> -    trace_v9fs_attach_return(pdu->tag, pdu->id,
-> -                             qid.type, qid.version, qid.path);
-> +
->      /*
->       * disable migration if we haven't done already.
->       * attach could get called multiple times for the same export.
->       */
->      if (!s->migration_blocker) {
-> -        s->root_fid = fid;
->          error_setg(&s->migration_blocker,
->                     "Migration is disabled when VirtFS export path '%s' is mounted in the guest using mount_tag '%s'",
->                     s->ctx.fs_root ? s->ctx.fs_root : "NULL", s->tag);
-> -        migrate_add_blocker(s->migration_blocker);
-> +        err = migrate_add_blocker(s->migration_blocker, &local_err);
-> +        if (local_err) {
-> +            error_free(local_err);
-> +            error_free(s->migration_blocker);
-> +            s->migration_blocker = NULL;
-> +            clunk_fid(s, fid);
-> +            goto out;
-> +        }
-> +        s->root_fid = fid;
-> +    }
-> +
-> +    err = pdu_marshal(pdu, offset, "Q", &qid);
-> +    if (err < 0) {
-> +        clunk_fid(s, fid);
-> +        goto out;
->      }
-> +    err += offset;
-> +
-> +    memcpy(&s->root_qid, &qid, sizeof(qid));
-> +    trace_v9fs_attach_return(pdu->tag, pdu->id,
-> +                             qid.type, qid.version, qid.path);
->  out:
->      put_fid(pdu, fidp);
->  out_nofid:
-> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> index 7a15c61..d8e3d1c 100644
-> --- a/hw/display/virtio-gpu.c
-> +++ b/hw/display/virtio-gpu.c
-> @@ -1132,6 +1132,7 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
->      VirtIODevice *vdev = VIRTIO_DEVICE(qdev);
->      VirtIOGPU *g = VIRTIO_GPU(qdev);
->      bool have_virgl;
-> +    Error *local_err = NULL;
->      int i;
->  
->      if (g->conf.max_outputs > VIRTIO_GPU_MAX_SCANOUTS) {
-> @@ -1139,14 +1140,6 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
->          return;
->      }
->  
-> -    g->config_size = sizeof(struct virtio_gpu_config);
-> -    g->virtio_config.num_scanouts = g->conf.max_outputs;
-> -    virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
-> -                g->config_size);
-> -
-> -    g->req_state[0].width = 1024;
-> -    g->req_state[0].height = 768;
-> -
->      g->use_virgl_renderer = false;
->  #if !defined(CONFIG_VIRGL) || defined(HOST_WORDS_BIGENDIAN)
->      have_virgl = false;
-> @@ -1158,6 +1151,24 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
->      }
->  
->      if (virtio_gpu_virgl_enabled(g->conf)) {
-> +        error_setg(&g->migration_blocker, "virgl is not yet migratable");
-> +        migrate_add_blocker(g->migration_blocker, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            error_free(g->migration_blocker);
-> +            return;
-> +        }
-> +    }
-> +
-> +    g->config_size = sizeof(struct virtio_gpu_config);
-> +    g->virtio_config.num_scanouts = g->conf.max_outputs;
-> +    virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
-> +                g->config_size);
-> +
-> +    g->req_state[0].width = 1024;
-> +    g->req_state[0].height = 768;
-> +
-> +    if (virtio_gpu_virgl_enabled(g->conf)) {
->          /* use larger control queue in 3d mode */
->          g->ctrl_vq   = virtio_add_queue(vdev, 256, virtio_gpu_handle_ctrl_cb);
->          g->cursor_vq = virtio_add_queue(vdev, 16, virtio_gpu_handle_cursor_cb);
-> @@ -1183,11 +1194,6 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
->              dpy_gfx_replace_surface(g->scanout[i].con, NULL);
->          }
->      }
-> -
-> -    if (virtio_gpu_virgl_enabled(g->conf)) {
-> -        error_setg(&g->migration_blocker, "virgl is not yet migratable");
-> -        migrate_add_blocker(g->migration_blocker);
-> -    }
+>  hw/i386/intel_iommu.c | 36 ++++++++++++++++++------------------
+>  1 file changed, 18 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 77d467a..275c3db 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -259,7 +259,7 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint=
+16_t
+> source_id,
+>      uint64_t *key =3D g_malloc(sizeof(*key));
+>      uint64_t gfn =3D vtd_get_iotlb_gfn(addr, level);
+>=20
+> -    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " gpa 0x%"PRIx64
+> +    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
+>                  " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr, sl=
+pte,
+>                  domain_id);
+>      if (g_hash_table_size(s->iotlb) >=3D VTD_IOTLB_MAX_SIZE) {
+> @@ -575,12 +575,12 @@ static uint64_t vtd_get_slpte(dma_addr_t base_addr,=
+ uint32_t
+> index)
+>      return slpte;
 >  }
->  
->  static void virtio_gpu_device_unrealize(DeviceState *qdev, Error **errp)
-> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-> index 11729ee..ec952ec 100644
-> --- a/hw/intc/arm_gic_kvm.c
-> +++ b/hw/intc/arm_gic_kvm.c
-> @@ -510,6 +510,17 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> +    if (!kvm_arm_gic_can_save_restore(s)) {
-> +        error_setg(&s->migration_blocker, "This operating system kernel does "
-> +                                          "not support vGICv2 migration");
-> +        migrate_add_blocker(s->migration_blocker, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            error_free(s->migration_blocker);
-> +            return;
-> +        }
-> +    }
-> +
->      gic_init_irqs_and_mmio(s, kvm_arm_gicv2_set_irq, NULL);
->  
->      for (i = 0; i < s->num_irq - GIC_INTERNAL; i++) {
-> @@ -558,12 +569,6 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
->                              KVM_VGIC_V2_ADDR_TYPE_CPU,
->                              s->dev_fd);
->  
-> -    if (!kvm_arm_gic_can_save_restore(s)) {
-> -        error_setg(&s->migration_blocker, "This operating system kernel does "
-> -                                          "not support vGICv2 migration");
-> -        migrate_add_blocker(s->migration_blocker);
-> -    }
-> -
->      if (kvm_has_gsi_routing()) {
->          /* set up irq routing */
->          kvm_init_irq_routing(kvm_state);
-> diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-> index fc246e0..bd4f3aa 100644
-> --- a/hw/intc/arm_gicv3_its_kvm.c
-> +++ b/hw/intc/arm_gicv3_its_kvm.c
-> @@ -56,6 +56,19 @@ static int kvm_its_send_msi(GICv3ITSState *s, uint32_t value, uint16_t devid)
->  static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
->  {
->      GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
-> +    Error *local_err = NULL;
-> +
-> +    /*
-> +     * Block migration of a KVM GICv3 ITS device: the API for saving and
-> +     * restoring the state in the kernel is not yet available
-> +     */
-> +    error_setg(&s->migration_blocker, "vITS migration is not implemented");
-> +    migrate_add_blocker(s->migration_blocker, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        error_free(s->migration_blocker);
-> +        return;
-> +    }
->  
->      s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
->      if (s->dev_fd < 0) {
-> @@ -73,13 +86,6 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
->  
->      gicv3_its_init_mmio(s, NULL);
->  
-> -    /*
-> -     * Block migration of a KVM GICv3 ITS device: the API for saving and
-> -     * restoring the state in the kernel is not yet available
-> -     */
-> -    error_setg(&s->migration_blocker, "vITS migration is not implemented");
-> -    migrate_add_blocker(s->migration_blocker);
-> -
->      kvm_msi_use_devid = true;
->      kvm_gsi_direct_mapping = false;
->      kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
-> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-> index 199a439..d69dc47 100644
-> --- a/hw/intc/arm_gicv3_kvm.c
-> +++ b/hw/intc/arm_gicv3_kvm.c
-> @@ -103,6 +103,18 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->  
->      gicv3_init_irqs_and_mmio(s, kvm_arm_gicv3_set_irq, NULL);
->  
-> +    /* Block migration of a KVM GICv3 device: the API for saving and restoring
-> +     * the state in the kernel is not yet finalised in the kernel or
-> +     * implemented in QEMU.
-> +     */
-> +    error_setg(&s->migration_blocker, "vGICv3 migration is not implemented");
-> +    migrate_add_blocker(s->migration_blocker, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        error_free(s->migration_blocker);
-> +        return;
-> +    }
-> +
->      /* Try to create the device via the device control API */
->      s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_V3, false);
->      if (s->dev_fd < 0) {
-> @@ -122,13 +134,6 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->      kvm_arm_register_device(&s->iomem_redist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
->                              KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd);
->  
-> -    /* Block migration of a KVM GICv3 device: the API for saving and restoring
-> -     * the state in the kernel is not yet finalised in the kernel or
-> -     * implemented in QEMU.
-> -     */
-> -    error_setg(&s->migration_blocker, "vGICv3 migration is not implemented");
-> -    migrate_add_blocker(s->migration_blocker);
-> -
->      if (kvm_has_gsi_routing()) {
->          /* set up irq routing */
->          kvm_init_irq_routing(kvm_state);
-> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-> index abeaf3d..fd14d7a 100644
-> --- a/hw/misc/ivshmem.c
-> +++ b/hw/misc/ivshmem.c
-> @@ -840,6 +840,7 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
->      uint8_t *pci_conf;
->      uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
->          PCI_BASE_ADDRESS_MEM_PREFETCH;
-> +    Error *local_err = NULL;
->  
->      /* IRQFD requires MSI */
->      if (ivshmem_has_feature(s, IVSHMEM_IOEVENTFD) &&
-> @@ -903,9 +904,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
->          }
->      }
->  
-> -    vmstate_register_ram(s->ivshmem_bar2, DEVICE(s));
-> -    pci_register_bar(PCI_DEVICE(s), 2, attr, s->ivshmem_bar2);
-> -
->      if (s->master == ON_OFF_AUTO_AUTO) {
->          s->master = s->vm_id == 0 ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
->      }
-> @@ -913,8 +911,16 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
->      if (!ivshmem_is_master(s)) {
->          error_setg(&s->migration_blocker,
->                     "Migration is disabled when using feature 'peer mode' in device 'ivshmem'");
-> -        migrate_add_blocker(s->migration_blocker);
-> +        migrate_add_blocker(s->migration_blocker, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            error_free(s->migration_blocker);
-> +            return;
-> +        }
->      }
-> +
-> +    vmstate_register_ram(s->ivshmem_bar2, DEVICE(s));
-> +    pci_register_bar(PCI_DEVICE(s), 2, attr, s->ivshmem_bar2);
->  }
->  
->  static void ivshmem_exit(PCIDevice *dev)
-> diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-> index 5b26946..c491ece 100644
-> --- a/hw/scsi/vhost-scsi.c
-> +++ b/hw/scsi/vhost-scsi.c
-> @@ -238,8 +238,16 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
->                                 vhost_dummy_handle_output);
->      if (err != NULL) {
->          error_propagate(errp, err);
-> -        close(vhostfd);
-> -        return;
-> +        goto close_fd;
-> +    }
-> +
-> +    error_setg(&s->migration_blocker,
-> +               "vhost-scsi does not support migration");
-> +    migrate_add_blocker(s->migration_blocker, &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        error_free(s->migration_blocker);
-> +        goto close_fd;
->      }
->  
->      s->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
-> @@ -252,7 +260,7 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
->      if (ret < 0) {
->          error_setg(errp, "vhost-scsi: vhost initialization failed: %s",
->                     strerror(-ret));
-> -        return;
-> +        goto free_vqs;
->      }
->  
->      /* At present, channel and lun both are 0 for bootable vhost-scsi disk */
-> @@ -261,9 +269,14 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
->      /* Note: we can also get the minimum tpgt from kernel */
->      s->target = vs->conf.boot_tpgt;
->  
-> -    error_setg(&s->migration_blocker,
-> -            "vhost-scsi does not support migration");
-> -    migrate_add_blocker(s->migration_blocker);
-> +    return;
-> +
-> + free_vqs:
-> +    migrate_del_blocker(s->migration_blocker);
-> +    g_free(s->dev.vqs);
-> + close_fd:
-> +    close(vhostfd);
-> +    return;
->  }
->  
->  static void vhost_scsi_unrealize(DeviceState *dev, Error **errp)
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index d396b22..cca1788 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -1082,6 +1082,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
->  {
->      uint64_t features;
->      int i, r, n_initialized_vqs = 0;
-> +    Error *local_err = NULL;
->  
->      hdev->migration_blocker = NULL;
->  
-> @@ -1158,7 +1159,12 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
->      }
->  
->      if (hdev->migration_blocker != NULL) {
-> -        migrate_add_blocker(hdev->migration_blocker);
-> +        r = migrate_add_blocker(hdev->migration_blocker, &local_err);
-> +        if (local_err) {
-> +            error_report_err(local_err);
-> +            error_free(hdev->migration_blocker);
-> +            goto fail_busyloop;
-> +        }
->      }
->  
->      hdev->mem = g_malloc0(offsetof(struct vhost_memory, regions));
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 40b3697..bcbdb03 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -243,6 +243,7 @@ void remove_migration_state_change_notifier(Notifier *notify);
->  MigrationState *migrate_init(const MigrationParams *params);
->  bool migration_is_blocked(Error **errp);
->  bool migration_in_setup(MigrationState *);
-> +bool migration_is_idle(MigrationState *s);
->  bool migration_has_finished(MigrationState *);
->  bool migration_has_failed(MigrationState *);
->  /* True if outgoing migration has entered postcopy phase */
-> @@ -287,8 +288,12 @@ int ram_postcopy_incoming_init(MigrationIncomingState *mis);
->   * @migrate_add_blocker - prevent migration from proceeding
->   *
->   * @reason - an error to be returned whenever migration is attempted
-> + *
-> + * @errp - [out] The reason (if any) we cannot block migration right now.
-> + *
-> + * @returns - 0 on success, -EBUSY on failure, with errp set.
+>=20
+> -/* Given a gpa and the level of paging structure, return the offset of c=
+urrent
+> - * level.
+> +/* Given an iova and the level of paging structure, return the offset
+> + * of current level.
 >   */
-> -void migrate_add_blocker(Error *reason);
-> +int migrate_add_blocker(Error *reason, Error **errp);
->  
->  /**
->   * @migrate_del_blocker - remove a blocking error from migration
-> diff --git a/migration/migration.c b/migration/migration.c
-> index f498ab8..0d88286 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1044,6 +1044,31 @@ bool migration_in_postcopy_after_devices(MigrationState *s)
->      return migration_in_postcopy(s) && s->postcopy_after_devices;
->  }
->  
-> +bool migration_is_idle(MigrationState *s)
-> +{
-> +    if (!s) {
-> +        s = migrate_get_current();
-> +    }
-> +
-> +    switch (s->state) {
-> +    case MIGRATION_STATUS_NONE:
-> +    case MIGRATION_STATUS_CANCELLED:
-> +    case MIGRATION_STATUS_COMPLETED:
-> +    case MIGRATION_STATUS_FAILED:
-> +        return true;
-> +    case MIGRATION_STATUS_SETUP:
-> +    case MIGRATION_STATUS_CANCELLING:
-> +    case MIGRATION_STATUS_ACTIVE:
-> +    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-> +    case MIGRATION_STATUS_COLO:
-> +        return false;
-> +    case MIGRATION_STATUS__MAX:
-> +        g_assert_not_reached();
-> +    }
-> +
-> +    return false;
-> +}
-> +
->  MigrationState *migrate_init(const MigrationParams *params)
+> -static inline uint32_t vtd_gpa_level_offset(uint64_t gpa, uint32_t level=
+)
+> +static inline uint32_t vtd_iova_level_offset(uint64_t iova, uint32_t lev=
+el)
 >  {
->      MigrationState *s = migrate_get_current();
-> @@ -1086,9 +1111,17 @@ MigrationState *migrate_init(const MigrationParams *params)
->  
->  static GSList *migration_blockers;
->  
-> -void migrate_add_blocker(Error *reason)
-> +int migrate_add_blocker(Error *reason, Error **errp)
+> -    return (gpa >> vtd_slpt_level_shift(level)) &
+> +    return (iova >> vtd_slpt_level_shift(level)) &
+>              ((1ULL << VTD_SL_LEVEL_BITS) - 1);
+>  }
+>=20
+> @@ -628,10 +628,10 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, =
+uint32_t
+> level)
+>      }
+>  }
+>=20
+> -/* Given the @gpa, get relevant @slptep. @slpte_level will be the last l=
+evel
+> +/* Given the @iova, get relevant @slptep. @slpte_level will be the last =
+level
+>   * of the translation, can be used for deciding the size of large page.
+>   */
+> -static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa, bool is_w=
+rite,
+> +static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_=
+write,
+>                              uint64_t *slptep, uint32_t *slpte_level,
+>                              bool *reads, bool *writes)
 >  {
-> -    migration_blockers = g_slist_prepend(migration_blockers, reason);
-> +    if (migration_is_idle(NULL)) {
-> +        migration_blockers = g_slist_prepend(migration_blockers, reason);
-> +        return 0;
-> +    }
-> +
-> +    error_propagate(errp, error_copy(reason));
-> +    error_prepend(errp, "disallowing migration blocker (migration in "
-> +                      "progress) for: ");
-> +    return -EBUSY;
->  }
->  
->  void migrate_del_blocker(Error *reason)
-> diff --git a/stubs/migr-blocker.c b/stubs/migr-blocker.c
-> index 8ab3604..a5ba18f 100644
-> --- a/stubs/migr-blocker.c
-> +++ b/stubs/migr-blocker.c
-> @@ -2,8 +2,9 @@
->  #include "qemu-common.h"
->  #include "migration/migration.h"
->  
-> -void migrate_add_blocker(Error *reason)
-> +int migrate_add_blocker(Error *reason, Error **errp)
->  {
-> +    return 0;
->  }
->  
->  void migrate_del_blocker(Error *reason)
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 10a9cd8..9887052 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -709,6 +709,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      uint32_t signature[3];
->      int kvm_base = KVM_CPUID_SIGNATURE;
->      int r;
-> +    Error *local_err = NULL;
->  
->      memset(&cpuid_data, 0, sizeof(cpuid_data));
->  
-> @@ -968,7 +969,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          error_setg(&invtsc_mig_blocker,
->                     "State blocked by non-migratable CPU device"
->                     " (invtsc flag)");
-> -        migrate_add_blocker(invtsc_mig_blocker);
-> +        r = migrate_add_blocker(invtsc_mig_blocker, &local_err);
-> +        if (local_err) {
-> +            error_report_err(local_err);
-> +            error_free(invtsc_mig_blocker);
-> +            goto fail;
-> +        }
->          /* for savevm */
->          vmstate_x86_cpu.unmigratable = 1;
+> @@ -642,11 +642,11 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, ui=
+nt64_t gpa,
+> bool is_write,
+>      uint32_t ce_agaw =3D vtd_get_agaw_from_context_entry(ce);
+>      uint64_t access_right_check;
+>=20
+> -    /* Check if @gpa is above 2^X-1, where X is the minimum of MGAW in C=
+AP_REG
+> -     * and AW in context-entry.
+> +    /* Check if @iova is above 2^X-1, where X is the minimum of MGAW
+> +     * in CAP_REG and AW in context-entry.
+>       */
+> -    if (gpa & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
+> -        VTD_DPRINTF(GENERAL, "error: gpa 0x%"PRIx64 " exceeds limits", g=
+pa);
+> +    if (iova & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
+> +        VTD_DPRINTF(GENERAL, "error: iova 0x%"PRIx64 " exceeds limits", =
+iova);
+>          return -VTD_FR_ADDR_BEYOND_MGAW;
 >      }
-> @@ -976,12 +982,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      cpuid_data.cpuid.padding = 0;
->      r = kvm_vcpu_ioctl(cs, KVM_SET_CPUID2, &cpuid_data);
->      if (r) {
-> -        return r;
-> +        goto fail;
->      }
->  
->      r = kvm_arch_set_tsc_khz(cs);
->      if (r < 0) {
-> -        return r;
-> +        goto fail;
->      }
->  
->      /* vcpu's TSC frequency is either specified by user, or following
-> @@ -1008,6 +1014,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      }
->  
->      return 0;
-> +
-> + fail:
-> +    migrate_del_blocker(invtsc_mig_blocker);
-> +    return r;
->  }
->  
->  void kvm_arch_reset_vcpu(X86CPU *cpu)
+>=20
+> @@ -654,13 +654,13 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, ui=
+nt64_t gpa,
+> bool is_write,
+>      access_right_check =3D is_write ? VTD_SL_W : VTD_SL_R;
+>=20
+>      while (true) {
+> -        offset =3D vtd_gpa_level_offset(gpa, level);
+> +        offset =3D vtd_iova_level_offset(iova, level);
+>          slpte =3D vtd_get_slpte(addr, offset);
+>=20
+>          if (slpte =3D=3D (uint64_t)-1) {
+>              VTD_DPRINTF(GENERAL, "error: fail to access second-level pag=
+ing "
+> -                        "entry at level %"PRIu32 " for gpa 0x%"PRIx64,
+> -                        level, gpa);
+> +                        "entry at level %"PRIu32 " for iova 0x%"PRIx64,
+> +                        level, iova);
+>              if (level =3D=3D vtd_get_level_from_context_entry(ce)) {
+>                  /* Invalid programming of context-entry */
+>                  return -VTD_FR_CONTEXT_ENTRY_INV;
+> @@ -672,8 +672,8 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint=
+64_t gpa,
+> bool is_write,
+>          *writes =3D (*writes) && (slpte & VTD_SL_W);
+>          if (!(slpte & access_right_check)) {
+>              VTD_DPRINTF(GENERAL, "error: lack of %s permission for "
+> -                        "gpa 0x%"PRIx64 " slpte 0x%"PRIx64,
+> -                        (is_write ? "write" : "read"), gpa, slpte);
+> +                        "iova 0x%"PRIx64 " slpte 0x%"PRIx64,
+> +                        (is_write ? "write" : "read"), iova, slpte);
+>              return is_write ? -VTD_FR_WRITE : -VTD_FR_READ;
+>          }
+>          if (vtd_slpte_nonzero_rsvd(slpte, level)) {
+> @@ -827,7 +827,7 @@ static void vtd_do_iommu_translate(VTDAddressSpace *v=
+td_as,
+> PCIBus *bus,
+>      /* Try to fetch slpte form IOTLB */
+>      iotlb_entry =3D vtd_lookup_iotlb(s, source_id, addr);
+>      if (iotlb_entry) {
+> -        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " gpa 0x%"PRIx64
+> +        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
+>                      " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr=
+,
+>                      iotlb_entry->slpte, iotlb_entry->domain_id);
+>          slpte =3D iotlb_entry->slpte;
+> @@ -2025,7 +2025,7 @@ static IOMMUTLBEntry vtd_iommu_translate(MemoryRegi=
+on
+> *iommu, hwaddr addr,
+>                             is_write, &ret);
+>      VTD_DPRINTF(MMU,
+>                  "bus %"PRIu8 " slot %"PRIu8 " func %"PRIu8 " devfn %"PRI=
+u8
+> -                " gpa 0x%"PRIx64 " hpa 0x%"PRIx64, pci_bus_num(vtd_as->b=
+us),
+> +                " iova 0x%"PRIx64 " hpa 0x%"PRIx64, pci_bus_num(vtd_as->=
+bus),
+>                  VTD_PCI_SLOT(vtd_as->devfn), VTD_PCI_FUNC(vtd_as->devfn)=
+,
+>                  vtd_as->devfn, addr, ret.translated_addr);
+>      return ret;
+> --
+> 2.7.4
