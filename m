@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUXUK-00063M-5F
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:36:13 -0500
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cUXVH-0006lu-Na
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:37:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUXUI-0006Q9-Nb
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:36:12 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48214)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cUXUI-0006Oi-Fo
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:36:10 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUXUF-0003vX-KA
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 11:36:07 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jan 2017 11:36:06 +0000
-Message-Id: <1484912166-19271-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cUXVD-000709-Nl
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:37:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36173)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1cUXVD-0006zj-DX
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 06:37:07 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0KBXlsZ061333
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:37:06 -0500
+Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 283bmf5xy0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 06:37:05 -0500
+Received: from localhost
+	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Fri, 20 Jan 2017 21:37:03 +1000
+Date: Fri, 20 Jan 2017 17:06:06 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <1484903866-17940-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<CAFEAcA97fSC6DoaF41ifh-L5S1XYfJmG+3a_Njw3UJ=sULk6ig@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/36] target-arm queue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA97fSC6DoaF41ifh-L5S1XYfJmG+3a_Njw3UJ=sULk6ig@mail.gmail.com>
+Message-Id: <20170120113606.GB21081@in.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1] softfloat: Add round-to-odd
+ rounding mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +43,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-Changes from v1: just squashed in
-http://patchwork.ozlabs.org/patch/717312/
-which deletes a now-unused function.
+On Fri, Jan 20, 2017 at 10:28:22AM +0000, Peter Maydell wrote:
+> On 20 January 2017 at 09:17, Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
+> > Power ISA 3.0 introduces a few quadruple precision floating point
+> > instructions that support round-to-odd rounding mode. The
+> > round-to-odd mode is explained as under:
+> >
+> > Let Z be the intermediate arithmetic result or the operand of a convert
+> > operation. If Z can be represented exactly in the target format, the
+> > result is Z. Otherwise the result is either Z1 or Z2 whichever is odd.
+> > Here Z1 and Z2 are the next larger and smaller numbers representable
+> > in the target format respectively.
+> >
+> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> > ---
+> > Changes in v1:
+> > - Addressed rounding to infinity in roundAndPackFloat128().
+> > - Added 64bit round to odd implementation(roundAndPackFloat64()) as
+> >   it is needed by xscvqpdp instruction of Power ISA 3.0.
+> >
+> > v0: http://patchwork.ozlabs.org/patch/716956/
+> >
+> >  fpu/softfloat.c         | 10 ++++++++++
+> >  include/fpu/softfloat.h |  2 ++
+> >  2 files changed, 12 insertions(+)
+> >
+> > diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> > index c295f31..b9b36ad 100644
+> > --- a/fpu/softfloat.c
+> > +++ b/fpu/softfloat.c
+> > @@ -623,6 +623,9 @@ static float64 roundAndPackFloat64(flag zSign, int zExp, uint64_t zSig,
+> >      case float_round_down:
+> >          roundIncrement = zSign ? 0x3ff : 0;
+> >          break;
+> > +    case float_round_to_odd:
+> > +        roundIncrement = (zSig & 0x200) ? 0 : 0x3ff;
+> 
+> Are you sure that should be 0x200 and not 0x400 ?
 
-thanks
--- PMM
+You are right, it should have been 0x400 as we are discarding lower
+10 precision bits. The even or odd check should have been for
+the next higher significant bit to that of these 10 discarded bits.
 
-The following changes since commit 0f6bcf68a99efdc531b209551f2b760b0bdcc554:
+> 
+> > +        break;
+> >      default:
+> >          abort();
+> >      }
+> 
+> This isn't sufficient, because it won't do the right thing
+> in the code which is picking between "round to infinity" and
+> "round to largest/smallest representable number". That's
+> phrased differently from the Float128 code but it's still
+> there:
+> 
+>             return packFloat64( zSign, 0x7FF, - ( roundIncrement == 0 ));
+> 
+> will generate a result with an all-zeros mantissa for
+> roundIncrement == 0 (ie go to infinity) and an all-ones
+> mantissa otherwise (ie go to largest-representable).
+> That works for the existing cases but it doesn't work
+> for round_to_odd.
 
-  Merge remote-tracking branch 'remotes/artyom/tags/pull-sun4v-20170118' into staging (2017-01-19 18:34:13 +0000)
+Based on my understanding of your and Richard's clarification, we
+shouldn't overflow to infinity in round-to-odd mode. Like I did for 128 bit
+case where we return the max possible value in the similar situation, I
+suppose we should explicitly take care of returning max 64bit value here
+for round-to-odd case ?
 
-are available in the git repository at:
+> 
+> How are you testing these patches? You ought to be able
+> to compare the results against a known-good implementation
+> for a bunch of these corner cases and a lot of random
+> input values, which is the best way to be confident there
+> aren't bugs in them. (risu should be able to do this since
+> it supports PPC now, though it can miss things depending
+> on the number of iterations you ask it to do.)
 
-  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170120
+I have been manually checking the result of new PPC instructions like
+xsdivqp[o], xsmulqp[o], xscvqpdp[0]. But that is clearly not enough.
+Let me look at RISU and do a more thorough corner cases testing
+before posting the next version.
 
-for you to fetch changes up to f29cacfb5fc0a6e93efc3f6d2900d82d625f143e:
+Thanks for your review.
 
-  hw/arm/virt: Add board property to enable EL2 (2017-01-20 11:15:11 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * support virtualization in GICv3
- * enable EL2 in AArch64 CPU models
- * allow EL2 to be enabled on 'virt' board via -machine virtualization=on
- * aspeed: SMC improvements
- * m25p80: support die erase command
- * m25p80: Add Quad Page Program 4byte
- * m25p80: Improve 1GiB Micron flash definition
- * arm: Uniquely name imx25 I2C buses
-
-----------------------------------------------------------------
-Alastair D'Silva (1):
-      arm: Uniquely name imx25 I2C buses.
-
-Andrew Jones (1):
-      hw/arm/virt-acpi-build: use SMC if booting in EL2
-
-Ard Biesheuvel (1):
-      hw/arm/virt-acpi - reserve ECAM space as PNP0C02 device
-
-Cédric Le Goater (10):
-      aspeed/smc: remove call to reset in realize function
-      aspeed/smc: remove call to aspeed_smc_update_cs() in reset function
-      aspeed/smc: rework the prototype of the AspeedSMCFlash helper routines
-      aspeed/smc: autostrap CE0/1 configuration
-      aspeed/smc: unfold the AspeedSMCController array
-      aspeed/smc: adjust the size of the register region
-      aspeed/smc: handle SPI flash Command mode
-      aspeed/smc: reset flash after each test
-      aspeed/smc: extend tests for Command mode
-      aspeed: use first FMC flash as a boot ROM
-
-Marcin Krzeminski (3):
-      block: m25p80: Add Quad Page Program 4byte
-      block: m25p80: Introduce die erase command
-      block: m25p80: Improve 1GiB Micron flash definition
-
-Peter Maydell (19):
-      target/arm: Handle VIRQ and VFIQ in arm_cpu_do_interrupt_aarch32()
-      target/arm: Implement DBGVCR32_EL2 system register
-      hw/intc/arm_gicv3: Add external IRQ lines for VIRQ and VFIQ
-      hw/intc/arm_gic: Add external IRQ lines for VIRQ and VFIQ
-      target-arm: Expose output GPIO line for VCPU maintenance interrupt
-      hw/arm/virt: Wire VIRQ, VFIQ, maintenance irq lines from GIC to CPU
-      target-arm: Add ARMCPU fields for GIC CPU i/f config
-      hw/intc/gicv3: Add defines for ICH system register fields
-      hw/intc/gicv3: Add data fields for virtualization support
-      hw/intc/arm_gicv3: Add accessors for ICH_ system registers
-      hw/intc/arm_gicv3: Implement ICV_ registers which are just accessors
-      hw/intc/arm_gicv3: Implement ICV_ HPPIR, DIR and RPR registers
-      hw/intc/arm_gicv3: Implement ICV_ registers EOIR and IAR
-      hw/intc/arm_gicv3: Implement gicv3_cpuif_virt_update()
-      hw/intc/arm_gicv3: Implement EL2 traps for CPU i/f regs
-      hw/arm/virt: Support using SMC for PSCI
-      target/arm/psci.c: If EL2 implemented, start CPUs in EL2
-      target-arm: Enable EL2 feature bit on A53 and A57
-      hw/arm/virt: Add board property to enable EL2
-
-Shannon Zhao (1):
-      arm: virt: Fix segmentation fault when specifying an unsupported CPU
-
- hw/intc/gicv3_internal.h           |   79 +++
- include/hw/arm/virt.h              |    5 +-
- include/hw/intc/arm_gic_common.h   |    2 +
- include/hw/intc/arm_gicv3_common.h |   21 +
- include/hw/ssi/aspeed_smc.h        |    4 +-
- target/arm/cpu.h                   |    9 +
- hw/arm/aspeed.c                    |   41 ++
- hw/arm/imx25_pdk.c                 |    2 +-
- hw/arm/virt-acpi-build.c           |   36 +-
- hw/arm/virt.c                      |   88 ++-
- hw/arm/xlnx-zynqmp.c               |    2 +
- hw/block/m25p80.c                  |   51 +-
- hw/i2c/imx_i2c.c                   |    2 +-
- hw/intc/arm_gic_common.c           |    6 +
- hw/intc/arm_gicv3_common.c         |   31 +
- hw/intc/arm_gicv3_cpuif.c          | 1351 +++++++++++++++++++++++++++++++++++-
- hw/ssi/aspeed_smc.c                |  325 +++++++--
- target/arm/cpu.c                   |   15 +
- target/arm/cpu64.c                 |    8 +
- target/arm/helper.c                |   21 +
- target/arm/psci.c                  |   25 +-
- tests/m25p80-test.c                |  133 ++++
- hw/intc/trace-events               |   33 +
- 23 files changed, 2149 insertions(+), 141 deletions(-)
+Regards,
+Bharata.
