@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTXu-0005vu-D9
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:39 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTY3-00062e-73
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTXt-0008S6-LP
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:38 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTXy-0008Un-9B
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:47 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 20 Jan 2017 15:22:57 +0800
-Message-Id: <20170120072310.8009-4-famz@redhat.com>
+Date: Fri, 20 Jan 2017 15:22:58 +0800
+Message-Id: <20170120072310.8009-5-famz@redhat.com>
 In-Reply-To: <20170120072310.8009-1-famz@redhat.com>
 References: <20170120072310.8009-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 03/16] qemu-io: Set "share-rw" flag
- together with read-only
+Subject: [Qemu-devel] [PATCH v11 04/16] qemu-img: Set "share-rw" flag in
+ read-only commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +23,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, eblake@redhat.com
 
-qemu-io is a low level tool to read or modify guest visible data, which
-implies the user knows very well what is being done. Allowing reading
-from a locked image is harmless in most cases, so do it.
+Checking the status of an image when it is being used by guest is
+usually useful, and there is no risk of corrupting data, so don't let
+the upcoming image locking feature limit this use case.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- qemu-io.c | 2 ++
- 1 file changed, 2 insertions(+)
+ qemu-img.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index 23a229f..f000504 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -585,6 +585,8 @@ int main(int argc, char **argv)
-     /* open the device */
-     if (!readonly) {
-         flags |= BDRV_O_RDWR;
-+    } else {
-+        flags |= BDRV_O_SHARE_RW;
+diff --git a/qemu-img.c b/qemu-img.c
+index 5df66fe..6a091e0 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -705,6 +705,10 @@ static int img_check(int argc, char **argv)
+         return 1;
      }
  
-     if ((argc - optind) == 1) {
++    if (!(flags & BDRV_O_RDWR)) {
++        flags |= BDRV_O_SHARE_RW;
++    }
++
+     blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet);
+     if (!blk) {
+         return 1;
+@@ -1238,6 +1242,7 @@ static int img_compare(int argc, char **argv)
+         goto out3;
+     }
+ 
++    flags |= BDRV_O_SHARE_RW;
+     blk1 = img_open(image_opts, filename1, fmt1, flags, writethrough, quiet);
+     if (!blk1) {
+         ret = 2;
+@@ -2286,7 +2291,8 @@ static ImageInfoList *collect_image_info_list(bool image_opts,
+         g_hash_table_insert(filenames, (gpointer)filename, NULL);
+ 
+         blk = img_open(image_opts, filename, fmt,
+-                       BDRV_O_NO_BACKING | BDRV_O_NO_IO, false, false);
++                       BDRV_O_NO_BACKING | BDRV_O_NO_IO | BDRV_O_SHARE_RW,
++                       false, false);
+         if (!blk) {
+             goto err;
+         }
+@@ -2612,7 +2618,7 @@ static int img_map(int argc, char **argv)
+         return 1;
+     }
+ 
+-    blk = img_open(image_opts, filename, fmt, 0, false, false);
++    blk = img_open(image_opts, filename, fmt, BDRV_O_SHARE_RW, false, false);
+     if (!blk) {
+         return 1;
+     }
 -- 
 2.9.3
