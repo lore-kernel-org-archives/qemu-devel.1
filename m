@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTXk-0005om-31
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:29 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTXl-0005pT-2H
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUTXj-0008My-0d
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:28 -0500
+	(envelope-from <famz@redhat.com>) id 1cUTXk-0008Ne-2f
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 02:23:29 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 20 Jan 2017 15:22:54 +0800
-Message-Id: <20170120072310.8009-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 00/16] block: Image locking series
+Date: Fri, 20 Jan 2017 15:22:55 +0800
+Message-Id: <20170120072310.8009-2-famz@redhat.com>
+In-Reply-To: <20170120072310.8009-1-famz@redhat.com>
+References: <20170120072310.8009-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v11 01/16] osdep: Add qemu_lock_fd and
+ qemu_unlock_fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,78 +23,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, eblake@redhat.com
 
-v11: Move lock bytes from 1-2 to 0x10-0x12. [Daniel]
+They are wrappers of POSIX fcntl "file private locking", with a
+convenient "try lock" wrapper implemented with F_OFD_GETLK.
 
-v10: While we still don't have comprehensive propagation mechanism that will be
-provided by new op blocker system for "permissive modes", the locking enabled
-by default is regardlessly useful and long overdue. So I think we should merge
-this for 2.9 and build user options on top later when the op blocker API
-settles.
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ include/qemu/osdep.h |  3 +++
+ util/osdep.c         | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
-Address comments from Max and Eric:
-  - Use F_OFD_GETLK instead of opening r/w for ro images. [Max]
-  - Lock both bytes exclusively for non-shared write. [Max]
-  - Spell fixes. [Eric]
-  - Fix test matrix. [Max]
-  - Comment tweaks. [Max]
-  - Return code cleanups. [Max]
-  - Don't abuse "disable_lock" for migration. [Max]
-  - Use bs->exact_filename instead of bs->filename. [Max]
-  - Force protect qcow2 concurrent write.
-  - Fix indentation. [Max]
-  - Always use re-open for lockfd instead of dup. [Max]
-  - Fall through to "abort" where "prepare" failed. [Max]
-  - Fix option handling in raw_reopen_handle_lock. [Max]
-  - Use "error_abort" in commit and abort. [Max]
-  - Fix cleanup of raw_reopen_handle_lock() failure. [Max]
-  - Add a patch for qcow2 to mask BDRV_O_SHARE_RW if r/w.
-  - Rebase and fix new more cases that will be broken by "lock by default".
-
-Fam Zheng (16):
-  osdep: Add qemu_lock_fd and qemu_unlock_fd
-  block: Define BDRV_O_SHARE_RW
-  qemu-io: Set "share-rw" flag together with read-only
-  qemu-img: Set "share-rw" flag in read-only commands
-  block: Set "share-rw" flag in drive-backup when sync=none
-  iotests: 055: Don't attach the drive to vm for drive-backup
-  iotests: 030: Read-only open image for getting map
-  iotests: 087: Don't attach test image twice
-  iotests: 085: Avoid image locking conflict
-  iotests: 091: Quit QEMU before checking image
-  iotests: 172: Use separate images for multiple devices
-  tests: Use null-co:// instead of /dev/null as the dummy image
-  tests: Disable image lock in test-replication
-  file-posix: Implement image locking
-  qcow2: Force "no other writer" lock on bs->file
-  tests: Add test-image-lock
-
- block/file-posix.c         | 668 ++++++++++++++++++++++++++++++++++++++++++++-
- block/qcow2.c              |  11 +
- blockdev.c                 |   3 +
- include/block/block.h      |   2 +
- include/qemu/osdep.h       |   3 +
- qemu-img.c                 |  10 +-
- qemu-io.c                  |   2 +
- tests/Makefile.include     |   2 +
- tests/drive_del-test.c     |   2 +-
- tests/nvme-test.c          |   2 +-
- tests/qemu-iotests/030     |   4 +-
- tests/qemu-iotests/055     |  32 ++-
- tests/qemu-iotests/085     |  32 ++-
- tests/qemu-iotests/085.out |   3 +-
- tests/qemu-iotests/087     |   6 +-
- tests/qemu-iotests/091     |   2 +
- tests/qemu-iotests/172     |  53 ++--
- tests/qemu-iotests/172.out |  50 ++--
- tests/test-image-lock.c    | 200 ++++++++++++++
- tests/test-replication.c   |   9 +-
- tests/usb-hcd-uhci-test.c  |   2 +-
- tests/usb-hcd-xhci-test.c  |   2 +-
- tests/virtio-blk-test.c    |   2 +-
- tests/virtio-scsi-test.c   |   4 +-
- util/osdep.c               |  48 ++++
- 25 files changed, 1057 insertions(+), 97 deletions(-)
- create mode 100644 tests/test-image-lock.c
-
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 689f253..e864fe8 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -297,6 +297,9 @@ int qemu_close(int fd);
+ #ifndef _WIN32
+ int qemu_dup(int fd);
+ #endif
++int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
++int qemu_unlock_fd(int fd, int64_t start, int64_t len);
++int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
+ 
+ #if defined(__HAIKU__) && defined(__i386__)
+ #define FMT_pid "%ld"
+diff --git a/util/osdep.c b/util/osdep.c
+index 06fb1cf..3de4a18 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -140,6 +140,54 @@ static int qemu_parse_fdset(const char *param)
+ {
+     return qemu_parse_fd(param);
+ }
++
++static int qemu_lock_fcntl(int fd, int64_t start, int64_t len, int fl_type)
++{
++#ifdef F_OFD_SETLK
++    int ret;
++    struct flock fl = {
++        .l_whence = SEEK_SET,
++        .l_start  = start,
++        .l_len    = len,
++        .l_type   = fl_type,
++    };
++    ret = fcntl(fd, F_OFD_SETLK, &fl);
++    return ret == -1 ? -errno : 0;
++#else
++    return -ENOTSUP;
++#endif
++}
++
++int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive)
++{
++    return qemu_lock_fcntl(fd, start, len, exclusive ? F_WRLCK : F_RDLCK);
++}
++
++int qemu_unlock_fd(int fd, int64_t start, int64_t len)
++{
++    return qemu_lock_fcntl(fd, start, len, F_UNLCK);
++}
++
++int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive)
++{
++#ifdef F_OFD_SETLK
++    int ret;
++    struct flock fl = {
++        .l_whence = SEEK_SET,
++        .l_start  = start,
++        .l_len    = len,
++        .l_type   = exclusive ? F_WRLCK : F_RDLCK,
++    };
++    ret = fcntl(fd, F_OFD_GETLK, &fl);
++    if (ret == -1) {
++        return -errno;
++    } else {
++        return fl.l_type == F_UNLCK ? 0 : -EAGAIN;
++    }
++#else
++    return -ENOTSUP;
++#endif
++}
+ #endif
+ 
+ /*
 -- 
 2.9.3
