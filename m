@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZIB-0003nX-AR
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:48 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZI9-0005x0-TC
+	(envelope-from <pbonzini@redhat.com>) id 1cUZI9-0003lv-P3
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZI9-0005vP-J3
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pbonzini@redhat.com>) id 1cUZI5-0005sG-PT
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51466)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZI5-0005rU-GP
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:41 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 738057FE89
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 13:31:41 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-138.ams2.redhat.com
+	[10.36.117.138])
+	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v0KDVeV8014401
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 08:31:40 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 20 Jan 2017 14:31:08 +0100
-Message-Id: <20170120133139.31080-5-pbonzini@redhat.com>
-In-Reply-To: <20170120133139.31080-1-pbonzini@redhat.com>
-References: <20170120133139.31080-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 04/35] smbios: filter based on CONFIG_SMBIOS
- rather than TARGET
+Date: Fri, 20 Jan 2017 14:31:04 +0100
+Message-Id: <20170120133139.31080-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 00/32] Misc patches for 2017-01-11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,167 +36,253 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Leif Lindholm <leif.lindholm@linaro.org>
 
-From: Leif Lindholm <leif.lindholm@linaro.org>
+The following changes since commit 2ccede18bd24fce5db83fef3674563a1f25671=
+7b:
 
--smbios command line options were accepted but silently ignored on
-TARGET_ARM, due to a test for TARGET_I386 in arch_init.c.
+  Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.9-pull-req=
+uest' into staging (2017-01-16 12:41:35 +0000)
 
-Copy the mechanism of hw/pci/pci-stub.c to implement an smbios-stub
-instead, enabled for all targets without CONFIG_SMBIOS.
+are available in the git repository at:
 
-Signed-off-by: Leif Lindholm <leif.lindholm@linaro.org>
-Message-Id: <20161222151828.28292-1-leif.lindholm@linaro.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch_init.c                |  8 --------
- hw/Makefile.objs           |  2 +-
- hw/smbios/Makefile.objs    |  3 +++
- hw/smbios/smbios-stub.c    | 31 +++++++++++++++++++++++++++++++
- hw/smbios/smbios.c         |  2 +-
- include/hw/smbios/smbios.h |  2 +-
- include/sysemu/arch_init.h |  1 -
- vl.c                       |  2 +-
- 8 files changed, 38 insertions(+), 13 deletions(-)
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to abc62c89f3191774dbd600a2caec803cbf557160:
+
+  pc.h: move x-mach-use-reliable-get-clock compat entry to PC_COMPAT_2_8 =
+(2017-01-20 13:22:57 +0100)
+
+Third time is the charm...
+
+v2->v3 adds "KVM: PPC: eliminate unnecessary duplicate constants"
+to fix the build failure, and patches 34-35 just because they're
+small and nice.
+
+----------------------------------------------------------------
+* QOM interface fix (Eduardo)
+* RTC fixes (Gaohuai, Igor)
+* Memory leak fixes (Li Qiang, me)
+* Ctrl-a b regression (Marc-Andr=C3=A9)
+* Stubs cleanups and fixes (Leif, me)
+* hxtool tweak (me)
+* HAX support (Vincent)
+* QemuThread, exec.c and SCSI fixes (Roman, Xinhua, me)
+* PC_COMPAT_2_8 fix (Marcelo)
+* stronger bitmap assertions (Peter)
+
+----------------------------------------------------------------
+Caoxinhua (1):
+      qemu-thread: fix qemu_thread_set_name() race in qemu_thread_create(=
+)
+
+Eduardo Habkost (1):
+      qom: Make all interface types abstract
+
+Igor Mammedov (1):
+      pc: fix crash in rtc_set_memory() if initial cpu is marked as hotpl=
+ugged
+
+Leif Lindholm (1):
+      smbios: filter based on CONFIG_SMBIOS rather than TARGET
+
+Li Qiang (1):
+      serial: fix memory leak in serial exit
+
+Marc-Andr=C3=A9 Lureau (2):
+      char: fix ctrl-a b not working
+      Revert "win32: don't run subprocess tests on Mingw32 platform"
+
+Marcelo Tosatti (1):
+      pc.h: move x-mach-use-reliable-get-clock compat entry to PC_COMPAT_=
+2_8
+
+Paolo Bonzini (17):
+      megasas: fix guest-triggered memory leak
+      stubs: merge all monitor stubs in one file, remove monitor_cur_is_q=
+mp stub
+      stubs: move smbios stubs to hw/smbios
+      stubs: move acpi stubs to hw/acpi
+      stubs: remove unused stub for serial_hd
+      hw: move reset handlers from vl.c to hw/core
+      stubs: group stubs for user-mode emulation
+      stubs: group all monitor_fdset_* functions in a single file
+      stubs: move vhost stubs to stubs/vhost.o
+      event_notifier: cleanups around event_notifier_set_handler
+      build: remove --enable-colo/--disable-colo
+      stubs: remove stubs/kvm.c
+      acpi: filter based on CONFIG_ACPI_X86 rather than TARGET
+      scsi-block: fix direction of BYTCHK test for VERIFY commands
+      hxtool: emit Texinfo headings as @subsection
+      ramblock-notifier: new
+      KVM: PPC: eliminate unnecessary duplicate constants
+
+Peter Lieven (1):
+      bitmap: assert that start and nr are non negative
+
+Peter Xu (3):
+      x86: ioapic: add traces for ioapic
+      x86: ioapic: dump version for "info ioapic"
+      x86: ioapic: fix fail migration when irqchip=3Dsplit
+
+Roman Kapl (1):
+      exec: Add missing rcu_read_unlock
+
+Vincent Palatin (4):
+      kvm: move cpu synchronization code
+      target/i386: Add Intel HAX files
+      Plumb the HAXM-based hardware acceleration support
+      hax: add Darwin support
+
+hangaohuai (1):
+      bugfix: vm halt when in reset looping
+
+ MAINTAINERS                                        |    1 +
+ Makefile.target                                    |    5 +-
+ arch_init.c                                        |   21 -
+ configure                                          |   27 +-
+ cpus.c                                             |   79 +-
+ exec.c                                             |    6 +
+ gdbstub.c                                          |    1 +
+ hax-stub.c                                         |   34 +
+ hw/Makefile.objs                                   |    6 +-
+ hw/acpi/Makefile.objs                              |   17 +-
+ hw/acpi/acpi-stub.c                                |   29 +
+ stubs/ipmi.c =3D> hw/acpi/ipmi-stub.c                |    0
+ hw/char/serial.c                                   |   10 +
+ hw/core/Makefile.objs                              |    2 +-
+ hw/core/reset.c                                    |   72 ++
+ hw/i386/kvm/apic.c                                 |    1 +
+ hw/i386/kvmvapic.c                                 |    1 +
+ hw/i386/pc.c                                       |    4 +-
+ hw/intc/apic_common.c                              |    3 +-
+ hw/intc/ioapic.c                                   |   22 +-
+ hw/intc/ioapic_common.c                            |    3 +-
+ hw/intc/trace-events                               |    7 +
+ hw/misc/vmport.c                                   |    2 +-
+ hw/ppc/pnv_xscom.c                                 |    2 +-
+ hw/ppc/ppce500_spin.c                              |    4 +-
+ hw/ppc/spapr.c                                     |    2 +-
+ hw/ppc/spapr_hcall.c                               |    2 +-
+ hw/s390x/s390-pci-inst.c                           |    1 +
+ hw/scsi/megasas.c                                  |   11 +-
+ hw/scsi/scsi-disk.c                                |    2 +-
+ hw/smbios/Makefile.objs                            |   12 +-
+ hw/smbios/smbios-stub.c                            |   31 +
+ hw/smbios/smbios.c                                 |    2 +-
+ .../smbios/smbios_type_38-stub.c                   |    0
+ hw/timer/mc146818rtc.c                             |   12 +
+ hw/usb/ccid-card-emulated.c                        |    2 +-
+ hw/virtio/Makefile.objs                            |    6 +-
+ stubs/vhost.c =3D> hw/virtio/vhost-stub.c            |    0
+ hw/virtio/virtio.c                                 |   10 +-
+ include/exec/memory.h                              |    6 +-
+ include/exec/ram_addr.h                            |   46 +-
+ include/exec/ramlist.h                             |   72 ++
+ include/hw/hw.h                                    |    6 +-
+ include/hw/i386/pc.h                               |    7 +-
+ include/hw/smbios/smbios.h                         |    2 +-
+ include/qemu/event_notifier.h                      |    3 -
+ include/qemu/main-loop.h                           |   15 +
+ include/qom/cpu.h                                  |    5 +
+ include/sysemu/arch_init.h                         |    2 -
+ include/sysemu/hax.h                               |   56 +
+ include/sysemu/hw_accel.h                          |   48 +
+ include/sysemu/kvm.h                               |   23 -
+ include/sysemu/reset.h                             |   10 +
+ include/sysemu/sysemu.h                            |    1 -
+ iohandler.c                                        |    8 +
+ migration/Makefile.objs                            |    3 +-
+ monitor.c                                          |    2 +-
+ numa.c                                             |   29 +
+ qemu-char.c                                        |   15 +-
+ qemu-options-wrapper.h                             |    2 +-
+ qemu-options.hx                                    |   42 +-
+ qom/cpu.c                                          |    2 +-
+ qom/object.c                                       |    6 +
+ scripts/hxtool                                     |   11 +-
+ stubs/Makefile.objs                                |   19 +-
+ stubs/cpus.c                                       |   11 -
+ stubs/fdset-add-fd.c                               |    8 -
+ stubs/fdset-find-fd.c                              |    8 -
+ stubs/fdset-get-fd.c                               |    8 -
+ stubs/fdset-remove-fd.c                            |    7 -
+ stubs/fdset.c                                      |   22 +
+ stubs/get-next-serial.c                            |    4 -
+ stubs/iohandler.c                                  |    8 -
+ stubs/kvm.c                                        |    8 -
+ stubs/migration-colo.c                             |   46 -
+ stubs/mon-is-qmp.c                                 |   10 -
+ stubs/monitor-init.c                               |    7 -
+ stubs/{get-fd.c =3D> monitor.c}                      |    6 +
+ stubs/replay-user.c                                |   33 -
+ stubs/reset.c                                      |   14 -
+ target/arm/cpu.c                                   |    2 +-
+ target/i386/Makefile.objs                          |    7 +
+ target/i386/hax-all.c                              | 1155 ++++++++++++++=
+++++++
+ target/i386/hax-darwin.c                           |  316 ++++++
+ target/i386/hax-darwin.h                           |   63 ++
+ target/i386/hax-i386.h                             |   94 ++
+ target/i386/hax-interface.h                        |  361 ++++++
+ target/i386/hax-mem.c                              |  289 +++++
+ target/i386/hax-windows.c                          |  479 ++++++++
+ target/i386/hax-windows.h                          |   89 ++
+ target/i386/helper.c                               |    1 +
+ target/i386/hyperv.c                               |    7 +-
+ target/i386/kvm.c                                  |    1 +
+ target/mips/kvm.c                                  |    5 +
+ target/ppc/kvm.c                                   |    7 +-
+ target/ppc/kvm_ppc.h                               |   12 -
+ target/ppc/mmu-hash64.c                            |    2 +-
+ target/ppc/translate_init.c                        |    2 +-
+ target/s390x/gdbstub.c                             |    1 +
+ target/s390x/kvm.c                                 |    5 +
+ tests/Makefile.include                             |    1 +
+ tests/device-introspect-test.c                     |   60 +-
+ user-exec-stub.c                                   |   34 +
+ util/bitmap.c                                      |    8 +
+ util/event_notifier-posix.c                        |    9 -
+ util/event_notifier-win32.c                        |   12 -
+ util/qemu-thread-posix.c                           |   12 +-
+ util/qemu-thread-win32.c                           |    4 +-
+ vl.c                                               |   62 +-
+ xen-mapcache.c                                     |    3 +
+ 110 files changed, 3729 insertions(+), 467 deletions(-)
+ create mode 100644 hax-stub.c
+ create mode 100644 hw/acpi/acpi-stub.c
+ rename stubs/ipmi.c =3D> hw/acpi/ipmi-stub.c (100%)
+ create mode 100644 hw/core/reset.c
  create mode 100644 hw/smbios/smbios-stub.c
-
-diff --git a/arch_init.c b/arch_init.c
-index 5cc58b2..34e7694 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -28,7 +28,6 @@
- #include "sysemu/arch_init.h"
- #include "hw/pci/pci.h"
- #include "hw/audio/audio.h"
--#include "hw/smbios/smbios.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "qmp-commands.h"
-@@ -248,13 +247,6 @@ void do_acpitable_option(const QemuOpts *opts)
- #endif
- }
- 
--void do_smbios_option(QemuOpts *opts)
--{
--#ifdef TARGET_I386
--    smbios_entry_add(opts);
--#endif
--}
--
- int kvm_available(void)
- {
- #ifdef CONFIG_KVM
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 0ffd281..2a73ae5 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -33,7 +33,7 @@ devices-dirs-$(CONFIG_VIRTIO) += virtio/
- devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
- devices-dirs-$(CONFIG_SOFTMMU) += xen/
- devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
--devices-dirs-$(CONFIG_SMBIOS) += smbios/
-+devices-dirs-$(CONFIG_SOFTMMU) += smbios/
- devices-dirs-y += core/
- common-obj-y += $(devices-dirs-y)
- obj-y += $(devices-dirs-y)
-diff --git a/hw/smbios/Makefile.objs b/hw/smbios/Makefile.objs
-index c3d3753..ee0712b 100644
---- a/hw/smbios/Makefile.objs
-+++ b/hw/smbios/Makefile.objs
-@@ -1,2 +1,5 @@
- common-obj-$(CONFIG_SMBIOS) += smbios.o
- common-obj-$(call land,$(CONFIG_SMBIOS),$(CONFIG_IPMI)) += smbios_type_38.o
-+
-+common-obj-$(call lnot,$(CONFIG_SMBIOS)) += smbios-stub.o
-+common-obj-$(CONFIG_ALL) += smbios-stub.o
-diff --git a/hw/smbios/smbios-stub.c b/hw/smbios/smbios-stub.c
-new file mode 100644
-index 0000000..3087394
---- /dev/null
-+++ b/hw/smbios/smbios-stub.c
-@@ -0,0 +1,31 @@
-+/*
-+ * SMBIOS stubs for platforms that don't support SMBIOS.
-+ *
-+ * Copyright (c) 2010 Isaku Yamahata <yamahata at valinux co jp>
-+ *                    VA Linux Systems Japan K.K.
-+ * Copyright (c) 2016 Leif Lindholm <leif.lindholm@linaro.org>
-+ *                    Linaro Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qmp-commands.h"
-+#include "hw/smbios/smbios.h"
-+
-+void smbios_entry_add(QemuOpts *opts, Error **errp)
-+{
-+    error_setg(errp, QERR_UNSUPPORTED);
-+}
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 3a96ced..1a5437a 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -882,7 +882,7 @@ static void save_opt(const char **dest, QemuOpts *opts, const char *name)
-     }
- }
- 
--void smbios_entry_add(QemuOpts *opts)
-+void smbios_entry_add(QemuOpts *opts, Error **errp)
- {
-     const char *val;
- 
-diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
-index 1cd53cc..31e8d5f 100644
---- a/include/hw/smbios/smbios.h
-+++ b/include/hw/smbios/smbios.h
-@@ -257,7 +257,7 @@ struct smbios_type_127 {
-     struct smbios_structure_header header;
- } QEMU_PACKED;
- 
--void smbios_entry_add(QemuOpts *opts);
-+void smbios_entry_add(QemuOpts *opts, Error **errp);
- void smbios_set_cpuid(uint32_t version, uint32_t features);
- void smbios_set_defaults(const char *manufacturer, const char *product,
-                          const char *version, bool legacy_mode,
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 1c9dad1..88dcf77 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -29,7 +29,6 @@ extern const uint32_t arch_type;
- 
- void select_soundhw(const char *optarg);
- void do_acpitable_option(const QemuOpts *opts);
--void do_smbios_option(QemuOpts *opts);
- void audio_init(void);
- int kvm_available(void);
- int xen_available(void);
-diff --git a/vl.c b/vl.c
-index c643d3f..63355e5 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3707,7 +3707,7 @@ int main(int argc, char **argv, char **envp)
-                 if (!opts) {
-                     exit(1);
-                 }
--                do_smbios_option(opts);
-+                smbios_entry_add(opts, &error_fatal);
-                 break;
-             case QEMU_OPTION_fwcfg:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("fw_cfg"),
--- 
+ rename stubs/smbios_type_38.c =3D> hw/smbios/smbios_type_38-stub.c (100%=
+)
+ rename stubs/vhost.c =3D> hw/virtio/vhost-stub.c (100%)
+ create mode 100644 include/exec/ramlist.h
+ create mode 100644 include/sysemu/hax.h
+ create mode 100644 include/sysemu/hw_accel.h
+ create mode 100644 include/sysemu/reset.h
+ delete mode 100644 stubs/cpus.c
+ delete mode 100644 stubs/fdset-add-fd.c
+ delete mode 100644 stubs/fdset-find-fd.c
+ delete mode 100644 stubs/fdset-get-fd.c
+ delete mode 100644 stubs/fdset-remove-fd.c
+ create mode 100644 stubs/fdset.c
+ delete mode 100644 stubs/get-next-serial.c
+ delete mode 100644 stubs/iohandler.c
+ delete mode 100644 stubs/kvm.c
+ delete mode 100644 stubs/migration-colo.c
+ delete mode 100644 stubs/mon-is-qmp.c
+ delete mode 100644 stubs/monitor-init.c
+ rename stubs/{get-fd.c =3D> monitor.c} (75%)
+ delete mode 100644 stubs/replay-user.c
+ delete mode 100644 stubs/reset.c
+ create mode 100644 target/i386/hax-all.c
+ create mode 100644 target/i386/hax-darwin.c
+ create mode 100644 target/i386/hax-darwin.h
+ create mode 100644 target/i386/hax-i386.h
+ create mode 100644 target/i386/hax-interface.h
+ create mode 100644 target/i386/hax-mem.c
+ create mode 100644 target/i386/hax-windows.c
+ create mode 100644 target/i386/hax-windows.h
+ create mode 100644 user-exec-stub.c
+--=20
 2.9.3
