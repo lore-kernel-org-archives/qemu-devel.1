@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUVQK-0002VR-7z
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:23:57 -0500
+	(envelope-from <peterx@redhat.com>) id 1cUVU0-0005md-8a
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:27:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUVQH-0008E3-3e
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:23:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36546)
+	(envelope-from <peterx@redhat.com>) id 1cUVTx-0001oo-5F
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:27:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43992)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cUVQG-0008D1-SN
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:23:53 -0500
-Date: Fri, 20 Jan 2017 17:23:48 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cUVTw-0001oY-Vn
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:27:41 -0500
+Date: Fri, 20 Jan 2017 17:27:36 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170120092348.GL4914@pxdev.xzpeter.org>
+Message-ID: <20170120092736.GM4914@pxdev.xzpeter.org>
 References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-4-git-send-email-peterx@redhat.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190C14FAA@SHSMSX101.ccr.corp.intel.com>
+	<1484276800-26814-3-git-send-email-peterx@redhat.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190C14F86@SHSMSX101.ccr.corp.intel.com>
+	<20170120090506.GJ4914@pxdev.xzpeter.org>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190C15103@SHSMSX101.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190C14FAA@SHSMSX101.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 03/14] intel_iommu: renaming gpa to
- iova where proper
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190C15103@SHSMSX101.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 02/14] intel_iommu: simplify irq
+ region translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +34,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Tian, Kevin" <kevin.tian@intel.com>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>
 
-On Fri, Jan 20, 2017 at 08:27:31AM +0000, Tian, Kevin wrote:
+On Fri, Jan 20, 2017 at 09:15:27AM +0000, Tian, Kevin wrote:
 > > From: Peter Xu [mailto:peterx@redhat.com]
-> > Sent: Friday, January 13, 2017 11:06 AM
+> > Sent: Friday, January 20, 2017 5:05 PM
 > > 
-> > There are lots of places in current intel_iommu.c codes that named
-> > "iova" as "gpa". It is really confusing to use a name "gpa" in these
-> > places (which is very easily to be understood as "Guest Physical
-> > Address", while it's not). To make the codes (much) easier to be read, I
-> > decided to do this once and for all.
+> > On Fri, Jan 20, 2017 at 08:22:14AM +0000, Tian, Kevin wrote:
+> > > > From: Peter Xu [mailto:peterx@redhat.com]
+> > > > Sent: Friday, January 13, 2017 11:06 AM
+> > > >
+> > > > Before we have int-remap, we need to bypass interrupt write requests.
+> > > > That's not necessary now - we have supported int-remap, and all the irq
+> > > > region requests should be redirected there. Cleaning up the block with
+> > > > an assertion instead.
+> > >
+> > > This comment is not accurate. According to code, the reason why you
+> > > can do such simplification is because we have standalone memory
+> > > region now for interrupt addresses. There should be nothing to do
+> > > with int-remap, which can be disabled by guest... Maybe the standalone
+> > > region was added when developing int-remap, but functionally they
+> > > are not related. :-)
 > > 
-> > No functional change is made. Only literal ones.
+> > IMHO the above commit message is fairly clear. :-)
+> > 
+> > But sure I can add some more emphasise like:
+> > 
+> >   "Before we have int-remap memory region, ..."
+> > 
+> > Do you think it's okay? Or any better suggestion?
+> > 
+> > (Just to mention that even guest disables IR, the MSI region will
+> >  still be there.)
+> > 
 > 
-> If looking at VT-d spec (3.2 Domains and Address Translation)
-> 
-> 	Remapping hardware treats the address in inbound requests as DMA 
-> 	Address. Depending on the software usage model, the DMA address 
-> 	space may be the Guest-Physical Address (GPA) space of the virtual 
-> 	machine to which the device is assigned, or application Virtual Address 
-> 	(VA) space defined by the PASID assigned to an application, or some 
-> 	abstract I/O virtual address (IOVA) space defined by software.
-> 
-> 	For simplicity, this document refers to address in requests-without-
-> 	PASID as GPA, and address in requests-with-PASID as Virtual Address 
-> 	(VA) (or Guest Virtual Address (GVA), if such request is from a device 
-> 	assigned to a virtual machine). The translated address is referred to as 
-> 	HPA.
-> 
-> It will add more readability if similar comment is added in this file - you
-> can say choosing iova to represent address in requests-without-PASID.
+> My option is simple - this patch has nothing to do with int-remap.
+> It's not necessary, not because we supported int-remap. It's because
+> we have a standalone memory region for interrupt addresses, as you
+> described in the code. :-)
 
-I agree that the code will be more readable if we can explain all the
-bits in detail.
+I really think they are the same thing...
 
-However this patch is not adding comments, but to "fix" an existing
-literal problem, which is very misleading to people reading the codes
-for the first time. The places touched in this patch was doing the
-namings incorrectly, so I just corrected them. So even if we want to
-have more comments on explaining the bits, IMHO it'll be nicer to use
-a separate patch, not squashing all the things into a single one.
+How about this:
 
-If you won't disagree, I'd like to keep this single patch as-it-is, to
-make sure this series can converge soon (I will be sorry since I'll
-extend this series a bit, I hope that won't extend the review process
-too long for it). After that, we can add more documentations if
-needed.
-
-Thanks,
+    Now we have a standalone memory region for MSI, all the irq region
+    requests should be redirected there. Cleaning up the block with an
+    assertion instead.
 
 -- peterx
