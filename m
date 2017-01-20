@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUeBE-000346-H0
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:44:57 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cUeBH-00037P-BY
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:45:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cUeBD-0002Wj-HH
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:44:56 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cUeBG-0002Yf-FP
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:44:59 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jan 2017 18:44:38 +0000
-Message-Id: <1484937883-1068-2-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 20 Jan 2017 18:44:40 +0000
+Message-Id: <1484937883-1068-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
 References: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/6] armv7m: MRS/MSR: handle unprivileged access
+Subject: [Qemu-devel] [PATCH 3/6] armv7m: Explicit error for bad vector table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,137 +24,67 @@ Cc: patches@linaro.org, Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdav
 
 From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-The MRS and MSR instruction handling has a number of flaws:
- * unprivileged accesses should only be able to read
-   CONTROL and the xPSR subfields, and only write APSR
-   (others RAZ/WI)
- * privileged access should not be able to write xPSR
-   subfields other than APSR
- * accesses to unimplemented registers should log as
-   guest errors, not abort QEMU
+Give an explicit error and abort when a load
+from the vector table fails. Architecturally this
+should HardFault (which will then immediately
+fail to load the HardFault vector and go into Lockup).
+Since we don't model Lockup, just report this guest
+error via cpu_abort(). This is more helpful than the
+previous behaviour of reading a zero, which is the
+address of the reset stack pointer and not a sensible
+location to jump to.
 
 Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: rewrote commit message]
+[PMM: expanded commit message]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 79 +++++++++++++++++++++++++----------------------------
- 1 file changed, 37 insertions(+), 42 deletions(-)
+ target/arm/helper.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 7111c8c..ad23de3 100644
+index ad23de3..8edb08c 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -8243,23 +8243,32 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
- 
- uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
- {
--    ARMCPU *cpu = arm_env_get_cpu(env);
-+    uint32_t mask;
-+    unsigned el = arm_current_el(env);
-+
-+    /* First handle registers which unprivileged can read */
-+
-+    switch (reg) {
-+    case 0 ... 7: /* xPSR sub-fields */
-+        mask = 0;
-+        if ((reg & 1) && el) {
-+            mask |= 0x000001ff; /* IPSR (unpriv. reads as zero) */
-+        }
-+        if (!(reg & 4)) {
-+            mask |= 0xf8000000; /* APSR */
-+        }
-+        /* EPSR reads as zero */
-+        return xpsr_read(env) & mask;
-+        break;
-+    case 20: /* CONTROL */
-+        return env->v7m.control;
-+    }
-+
-+    if (el == 0) {
-+        return 0; /* unprivileged reads others as zero */
-+    }
- 
-     switch (reg) {
--    case 0: /* APSR */
--        return xpsr_read(env) & 0xf8000000;
--    case 1: /* IAPSR */
--        return xpsr_read(env) & 0xf80001ff;
--    case 2: /* EAPSR */
--        return xpsr_read(env) & 0xff00fc00;
--    case 3: /* xPSR */
--        return xpsr_read(env) & 0xff00fdff;
--    case 5: /* IPSR */
--        return xpsr_read(env) & 0x000001ff;
--    case 6: /* EPSR */
--        return xpsr_read(env) & 0x0700fc00;
--    case 7: /* IEPSR */
--        return xpsr_read(env) & 0x0700edff;
-     case 8: /* MSP */
-         return env->v7m.current_sp ? env->v7m.other_sp : env->regs[13];
-     case 9: /* PSP */
-@@ -8271,40 +8280,26 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
-         return env->v7m.basepri;
-     case 19: /* FAULTMASK */
-         return (env->daif & PSTATE_F) != 0;
--    case 20: /* CONTROL */
--        return env->v7m.control;
-     default:
--        /* ??? For debugging only.  */
--        cpu_abort(CPU(cpu), "Unimplemented system register read (%d)\n", reg);
-+        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to read unknown special"
-+                                       " register %d\n", reg);
-         return 0;
+@@ -6014,6 +6014,30 @@ static void arm_log_exception(int idx)
      }
  }
  
- void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
- {
--    ARMCPU *cpu = arm_env_get_cpu(env);
-+    if (arm_current_el(env) == 0 && reg > 7) {
-+        /* only xPSR sub-fields may be written by unprivileged */
-+        return;
++static uint32_t arm_v7m_load_vector(ARMCPU *cpu)
++
++{
++    CPUState *cs = CPU(cpu);
++    CPUARMState *env = &cpu->env;
++    MemTxResult result;
++    hwaddr vec = env->v7m.vecbase + env->v7m.exception * 4;
++    uint32_t addr;
++
++    addr = address_space_ldl(cs->as, vec,
++                             MEMTXATTRS_UNSPECIFIED, &result);
++    if (result != MEMTX_OK) {
++        /* Architecturally this should cause a HardFault setting HSFR.VECTTBL,
++         * which would then be immediately followed by our failing to load
++         * the entry vector for that HardFault, which is a Lockup case.
++         * Since we don't model Lockup, we just report this guest error
++         * via cpu_abort().
++         */
++        cpu_abort(cs, "Failed to read from exception vector table "
++                  "entry %08x\n", (unsigned)vec);
 +    }
- 
-     switch (reg) {
--    case 0: /* APSR */
--        xpsr_write(env, val, 0xf8000000);
--        break;
--    case 1: /* IAPSR */
--        xpsr_write(env, val, 0xf8000000);
--        break;
--    case 2: /* EAPSR */
--        xpsr_write(env, val, 0xfe00fc00);
--        break;
--    case 3: /* xPSR */
--        xpsr_write(env, val, 0xfe00fc00);
--        break;
--    case 5: /* IPSR */
--        /* IPSR bits are readonly.  */
--        break;
--    case 6: /* EPSR */
--        xpsr_write(env, val, 0x0600fc00);
--        break;
--    case 7: /* IEPSR */
--        xpsr_write(env, val, 0x0600fc00);
-+    case 0 ... 7: /* xPSR sub-fields */
-+        /* only APSR is actually writable */
-+        if (reg & 4) {
-+            xpsr_write(env, val, 0xf8000000); /* APSR */
-+        }
-         break;
-     case 8: /* MSP */
-         if (env->v7m.current_sp)
-@@ -8345,8 +8340,8 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
-         switch_v7m_sp(env, (val & 2) != 0);
-         break;
-     default:
--        /* ??? For debugging only.  */
--        cpu_abort(CPU(cpu), "Unimplemented system register write (%d)\n", reg);
-+        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to write unknown special"
-+                                       " register %d\n", reg);
-         return;
-     }
++    return addr;
++}
++
+ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+ {
+     ARMCPU *cpu = ARM_CPU(cs);
+@@ -6095,7 +6119,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+     /* Clear IT bits */
+     env->condexec_bits = 0;
+     env->regs[14] = lr;
+-    addr = ldl_phys(cs->as, env->v7m.vecbase + env->v7m.exception * 4);
++    addr = arm_v7m_load_vector(cpu);
+     env->regs[15] = addr & 0xfffffffe;
+     env->thumb = addr & 1;
  }
 -- 
 2.7.4
