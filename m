@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZIj-0004LE-V7
+	(envelope-from <pbonzini@redhat.com>) id 1cUZIi-0004KI-Px
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:32:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZIi-0006bv-Ae
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:32:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47216)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZIi-0006bX-1j
+	(envelope-from <pbonzini@redhat.com>) id 1cUZIh-0006bB-2R
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:32:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49838)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZIg-0006aV-Qa
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:32:19 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 20 Jan 2017 14:31:36 +0100
-Message-Id: <20170120133139.31080-33-pbonzini@redhat.com>
+Date: Fri, 20 Jan 2017 14:31:35 +0100
+Message-Id: <20170120133139.31080-32-pbonzini@redhat.com>
 In-Reply-To: <20170120133139.31080-1-pbonzini@redhat.com>
 References: <20170120133139.31080-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 32/35] hax: add Darwin support
+Subject: [Qemu-devel] [PULL 31/35] Plumb the HAXM-based hardware
+ acceleration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,453 +29,433 @@ Cc: Vincent Palatin <vpalatin@chromium.org>
 
 From: Vincent Palatin <vpalatin@chromium.org>
 
-Re-add the MacOSX/Darwin support:
-Use the Intel HAX is kernel-based hardware acceleration module
-(similar to KVM on Linux).
+Use the Intel HAX is kernel-based hardware acceleration module for
+Windows (similar to KVM on Linux).
 
-Based on the original "target/i386: Add Intel HAX to android emulator" patch
-from David Chou <david.j.chou@intel.com> from  emu-2.2-release branch in
-the external/qemu-android repository.
+Based on the "target/i386: Add Intel HAX to android emulator" patch
+from David Chou <david.j.chou@intel.com>
 
 Signed-off-by: Vincent Palatin <vpalatin@chromium.org>
-Message-Id: <81b85c3032da902e73e77302af508b4b1a7c0ead.1484045952.git.vpalatin@chromium.org>
+Message-Id: <7b9cae28a0c379ab459c7a8545c9a39762bd394f.1484045952.git.vpalatin@chromium.org>
+[Drop hax_populate_ram stub. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/Makefile.objs |   3 +
- target/i386/hax-darwin.c  | 316 ++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/hax-darwin.h  |  63 +++++++++
- target/i386/hax-i386.h    |   8 ++
- 4 files changed, 390 insertions(+)
- create mode 100644 target/i386/hax-darwin.c
- create mode 100644 target/i386/hax-darwin.h
+ Makefile.target           |  1 +
+ configure                 | 18 +++++++++++
+ cpus.c                    | 78 ++++++++++++++++++++++++++++++++++++++++++++++-
+ hax-stub.c                |  5 ---
+ hw/intc/apic_common.c     |  3 +-
+ include/qom/cpu.h         |  5 +++
+ include/sysemu/hw_accel.h |  9 ++++++
+ qemu-options.hx           | 11 +++++++
+ target/i386/Makefile.objs |  4 +++
+ util/qemu-thread-win32.c  |  4 +--
+ vl.c                      | 15 +++++++--
+ 11 files changed, 141 insertions(+), 12 deletions(-)
 
+diff --git a/Makefile.target b/Makefile.target
+index 9e8edd9..fa2b151 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -97,6 +97,7 @@ obj-y += target/$(TARGET_BASE_ARCH)/
+ obj-y += disas.o
+ obj-y += tcg-runtime.o
+ obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
++obj-$(call lnot,$(CONFIG_HAX)) += hax-stub.o
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+ 
+ obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decContext.o
+diff --git a/configure b/configure
+index 9879c65..091ae05 100755
+--- a/configure
++++ b/configure
+@@ -228,6 +228,7 @@ vhost_net="no"
+ vhost_scsi="no"
+ vhost_vsock="no"
+ kvm="no"
++hax="no"
+ rdma=""
+ gprof="no"
+ debug_tcg="no"
+@@ -561,6 +562,7 @@ CYGWIN*)
+ ;;
+ MINGW32*)
+   mingw32="yes"
++  hax="yes"
+   audio_possible_drivers="dsound sdl"
+   if check_include dsound.h; then
+     audio_drv_list="dsound"
+@@ -610,6 +612,7 @@ OpenBSD)
+ Darwin)
+   bsd="yes"
+   darwin="yes"
++  hax="yes"
+   LDFLAGS_SHARED="-bundle -undefined dynamic_lookup"
+   if [ "$cpu" = "x86_64" ] ; then
+     QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
+@@ -919,6 +922,10 @@ for opt do
+   ;;
+   --enable-kvm) kvm="yes"
+   ;;
++  --disable-hax) hax="no"
++  ;;
++  --enable-hax) hax="yes"
++  ;;
+   --disable-tcg-interpreter) tcg_interpreter="no"
+   ;;
+   --enable-tcg-interpreter) tcg_interpreter="yes"
+@@ -1367,6 +1374,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   fdt             fdt device tree
+   bluez           bluez stack connectivity
+   kvm             KVM acceleration support
++  hax             HAX acceleration support
+   rdma            RDMA-based migration support
+   vde             support for vde network
+   netmap          support for netmap network
+@@ -5056,6 +5064,7 @@ echo "Linux AIO support $linux_aio"
+ echo "ATTR/XATTR support $attr"
+ echo "Install blobs     $blobs"
+ echo "KVM support       $kvm"
++echo "HAX support       $hax"
+ echo "RDMA support      $rdma"
+ echo "TCG interpreter   $tcg_interpreter"
+ echo "fdt support       $fdt"
+@@ -6039,6 +6048,15 @@ case "$target_name" in
+       fi
+     fi
+ esac
++if test "$hax" = "yes" ; then
++  if test "$target_softmmu" = "yes" ; then
++    case "$target_name" in
++    i386|x86_64)
++      echo "CONFIG_HAX=y" >> $config_target_mak
++    ;;
++    esac
++  fi
++fi
+ if test "$target_bigendian" = "yes" ; then
+   echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
+ fi
+diff --git a/cpus.c b/cpus.c
+index fc78502..71a82e5 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -35,6 +35,7 @@
+ #include "sysemu/dma.h"
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/hax.h"
+ #include "qmp-commands.h"
+ #include "exec/exec-all.h"
+ 
+@@ -1221,6 +1222,46 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+     return NULL;
+ }
+ 
++static void *qemu_hax_cpu_thread_fn(void *arg)
++{
++    CPUState *cpu = arg;
++    int r;
++    qemu_thread_get_self(cpu->thread);
++    qemu_mutex_lock(&qemu_global_mutex);
++
++    cpu->thread_id = qemu_get_thread_id();
++    cpu->created = true;
++    cpu->halted = 0;
++    current_cpu = cpu;
++
++    hax_init_vcpu(cpu);
++    qemu_cond_signal(&qemu_cpu_cond);
++
++    while (1) {
++        if (cpu_can_run(cpu)) {
++            r = hax_smp_cpu_exec(cpu);
++            if (r == EXCP_DEBUG) {
++                cpu_handle_guest_debug(cpu);
++            }
++        }
++
++        while (cpu_thread_is_idle(cpu)) {
++            qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
++        }
++#ifdef _WIN32
++        SleepEx(0, TRUE);
++#endif
++        qemu_wait_io_event_common(cpu);
++    }
++    return NULL;
++}
++
++#ifdef _WIN32
++static void CALLBACK dummy_apc_func(ULONG_PTR unused)
++{
++}
++#endif
++
+ static void qemu_cpu_kick_thread(CPUState *cpu)
+ {
+ #ifndef _WIN32
+@@ -1236,7 +1277,13 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
+         exit(1);
+     }
+ #else /* _WIN32 */
+-    abort();
++    if (!qemu_cpu_is_self(cpu)) {
++        if (!QueueUserAPC(dummy_apc_func, cpu->hThread, 0)) {
++            fprintf(stderr, "%s: QueueUserAPC failed with error %lu\n",
++                    __func__, GetLastError());
++            exit(1);
++        }
++    }
+ #endif
+ }
+ 
+@@ -1259,6 +1306,13 @@ void qemu_cpu_kick(CPUState *cpu)
+     if (tcg_enabled()) {
+         qemu_cpu_kick_no_halt();
+     } else {
++        if (hax_enabled()) {
++            /*
++             * FIXME: race condition with the exit_request check in
++             * hax_vcpu_hax_exec
++             */
++            cpu->exit_request = 1;
++        }
+         qemu_cpu_kick_thread(cpu);
+     }
+ }
+@@ -1419,6 +1473,26 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+     }
+ }
+ 
++static void qemu_hax_start_vcpu(CPUState *cpu)
++{
++    char thread_name[VCPU_THREAD_NAME_SIZE];
++
++    cpu->thread = g_malloc0(sizeof(QemuThread));
++    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
++    qemu_cond_init(cpu->halt_cond);
++
++    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HAX",
++             cpu->cpu_index);
++    qemu_thread_create(cpu->thread, thread_name, qemu_hax_cpu_thread_fn,
++                       cpu, QEMU_THREAD_JOINABLE);
++#ifdef _WIN32
++    cpu->hThread = qemu_thread_get_handle(cpu->thread);
++#endif
++    while (!cpu->created) {
++        qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
++    }
++}
++
+ static void qemu_kvm_start_vcpu(CPUState *cpu)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+@@ -1469,6 +1543,8 @@ void qemu_init_vcpu(CPUState *cpu)
+ 
+     if (kvm_enabled()) {
+         qemu_kvm_start_vcpu(cpu);
++    } else if (hax_enabled()) {
++        qemu_hax_start_vcpu(cpu);
+     } else if (tcg_enabled()) {
+         qemu_tcg_init_vcpu(cpu);
+     } else {
+diff --git a/hax-stub.c b/hax-stub.c
+index a532dba..c0e6f89 100644
+--- a/hax-stub.c
++++ b/hax-stub.c
+@@ -23,11 +23,6 @@ int hax_sync_vcpus(void)
+     return 0;
+ }
+ 
+-int hax_populate_ram(uint64_t va, uint32_t size)
+-{
+-    return -ENOSYS;
+-}
+-
+ int hax_init_vcpu(CPUState *cpu)
+ {
+     return -ENOSYS;
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index d78c885..3945dfd 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -26,6 +26,7 @@
+ #include "hw/i386/apic.h"
+ #include "hw/i386/apic_internal.h"
+ #include "trace.h"
++#include "sysemu/hax.h"
+ #include "sysemu/kvm.h"
+ #include "hw/qdev.h"
+ #include "hw/sysbus.h"
+@@ -316,7 +317,7 @@ static void apic_common_realize(DeviceState *dev, Error **errp)
+ 
+     /* Note: We need at least 1M to map the VAPIC option ROM */
+     if (!vapic && s->vapic_control & VAPIC_ENABLE_MASK &&
+-        ram_size >= 1024 * 1024) {
++        !hax_enabled() && ram_size >= 1024 * 1024) {
+         vapic = sysbus_create_simple("kvmvapic", -1, NULL);
+     }
+     s->vapic = vapic;
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 3f79a8e..ca4d0fb 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -227,6 +227,8 @@ struct CPUWatchpoint {
+ struct KVMState;
+ struct kvm_run;
+ 
++struct hax_vcpu_state;
++
+ #define TB_JMP_CACHE_BITS 12
+ #define TB_JMP_CACHE_SIZE (1 << TB_JMP_CACHE_BITS)
+ 
+@@ -392,6 +394,9 @@ struct CPUState {
+        (absolute value) offset as small as possible.  This reduces code
+        size, especially for hosts without large memory offsets.  */
+     uint32_t tcg_exit_req;
++
++    bool hax_vcpu_dirty;
++    struct hax_vcpu_state *hax_vcpu;
+ };
+ 
+ QTAILQ_HEAD(CPUTailQ, CPUState);
+diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+index 03812cf..c9b3105 100644
+--- a/include/sysemu/hw_accel.h
++++ b/include/sysemu/hw_accel.h
+@@ -20,6 +20,9 @@ static inline void cpu_synchronize_state(CPUState *cpu)
+     if (kvm_enabled()) {
+         kvm_cpu_synchronize_state(cpu);
+     }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_state(cpu);
++    }
+ }
+ 
+ static inline void cpu_synchronize_post_reset(CPUState *cpu)
+@@ -27,6 +30,9 @@ static inline void cpu_synchronize_post_reset(CPUState *cpu)
+     if (kvm_enabled()) {
+         kvm_cpu_synchronize_post_reset(cpu);
+     }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_post_reset(cpu);
++    }
+ }
+ 
+ static inline void cpu_synchronize_post_init(CPUState *cpu)
+@@ -34,6 +40,9 @@ static inline void cpu_synchronize_post_init(CPUState *cpu)
+     if (kvm_enabled()) {
+         kvm_cpu_synchronize_post_init(cpu);
+     }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_post_init(cpu);
++    }
+ }
+ 
+ #endif /* QEMU_HW_ACCEL_H */
+diff --git a/qemu-options.hx b/qemu-options.hx
+index b62d2d7..80df526 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3280,6 +3280,17 @@ Enable KVM full virtualization support. This option is only available
+ if KVM support is enabled when compiling.
+ ETEXI
+ 
++DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
++    "-enable-hax     enable HAX virtualization support\n", QEMU_ARCH_I386)
++STEXI
++@item -enable-hax
++@findex -enable-hax
++Enable HAX (Hardware-based Acceleration eXecution) support. This option
++is only available if HAX support is enabled when compiling. HAX is only
++applicable to MAC and Windows platform, and thus does not conflict with
++KVM.
++ETEXI
++
+ DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
+     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
+ DEF("xen-create", 0, QEMU_OPTION_xen_create,
 diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-index acbe7b0..4fcb7f3 100644
+index b223d79..acbe7b0 100644
 --- a/target/i386/Makefile.objs
 +++ b/target/i386/Makefile.objs
-@@ -9,3 +9,6 @@ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
- ifdef CONFIG_WIN32
- obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
- endif
-+ifdef CONFIG_DARWIN
-+obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-darwin.o
+@@ -5,3 +5,7 @@ obj-y += gdbstub.o
+ obj-$(CONFIG_SOFTMMU) += machine.o arch_memory_mapping.o arch_dump.o monitor.o
+ obj-$(CONFIG_KVM) += kvm.o hyperv.o
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
++# HAX support
++ifdef CONFIG_WIN32
++obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
 +endif
-diff --git a/target/i386/hax-darwin.c b/target/i386/hax-darwin.c
-new file mode 100644
-index 0000000..1c5bbd0
---- /dev/null
-+++ b/target/i386/hax-darwin.c
-@@ -0,0 +1,316 @@
-+/*
-+ * QEMU HAXM support
-+ *
-+ * Copyright (c) 2011 Intel Corporation
-+ *  Written by:
-+ *  Jiang Yunhong<yunhong.jiang@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+/* HAX module interface - darwin version */
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <errno.h>
-+#include <sys/ioctl.h>
-+
-+#include "qemu/osdep.h"
-+#include "target/i386/hax-i386.h"
-+
-+hax_fd hax_mod_open(void)
-+{
-+    int fd = open("/dev/HAX", O_RDWR);
-+    if (fd == -1) {
-+        fprintf(stderr, "Failed to open the hax module\n");
-+    }
-+
-+    fcntl(fd, F_SETFD, FD_CLOEXEC);
-+
-+    return fd;
-+}
-+
-+int hax_populate_ram(uint64_t va, uint32_t size)
-+{
-+    int ret;
-+    struct hax_alloc_ram_info info;
-+
-+    if (!hax_global.vm || !hax_global.vm->fd) {
-+        fprintf(stderr, "Allocate memory before vm create?\n");
-+        return -EINVAL;
-+    }
-+
-+    info.size = size;
-+    info.va = va;
-+    ret = ioctl(hax_global.vm->fd, HAX_VM_IOCTL_ALLOC_RAM, &info);
-+    if (ret < 0) {
-+        fprintf(stderr, "Failed to allocate %x memory\n", size);
-+        return ret;
-+    }
-+    return 0;
-+}
-+
-+int hax_set_ram(uint64_t start_pa, uint32_t size, uint64_t host_va, int flags)
-+{
-+    struct hax_set_ram_info info;
-+    int ret;
-+
-+    info.pa_start = start_pa;
-+    info.size = size;
-+    info.va = host_va;
-+    info.flags = (uint8_t) flags;
-+
-+    ret = ioctl(hax_global.vm->fd, HAX_VM_IOCTL_SET_RAM, &info);
-+    if (ret < 0) {
-+        return -errno;
-+    }
-+    return 0;
-+}
-+
-+int hax_capability(struct hax_state *hax, struct hax_capabilityinfo *cap)
-+{
-+    int ret;
-+
-+    ret = ioctl(hax->fd, HAX_IOCTL_CAPABILITY, cap);
-+    if (ret == -1) {
-+        fprintf(stderr, "Failed to get HAX capability\n");
-+        return -errno;
-+    }
-+
-+    return 0;
-+}
-+
-+int hax_mod_version(struct hax_state *hax, struct hax_module_version *version)
-+{
-+    int ret;
-+
-+    ret = ioctl(hax->fd, HAX_IOCTL_VERSION, version);
-+    if (ret == -1) {
-+        fprintf(stderr, "Failed to get HAX version\n");
-+        return -errno;
-+    }
-+
-+    return 0;
-+}
-+
-+static char *hax_vm_devfs_string(int vm_id)
-+{
-+    char *name;
-+
-+    if (vm_id > MAX_VM_ID) {
-+        fprintf(stderr, "Too big VM id\n");
-+        return NULL;
-+    }
-+
-+#define HAX_VM_DEVFS "/dev/hax_vm/vmxx"
-+    name = g_strdup(HAX_VM_DEVFS);
-+    if (!name) {
-+        return NULL;
-+    }
-+
-+    snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_id);
-+    return name;
-+}
-+
-+static char *hax_vcpu_devfs_string(int vm_id, int vcpu_id)
-+{
-+    char *name;
-+
-+    if (vm_id > MAX_VM_ID || vcpu_id > MAX_VCPU_ID) {
-+        fprintf(stderr, "Too big vm id %x or vcpu id %x\n", vm_id, vcpu_id);
-+        return NULL;
-+    }
-+
-+#define HAX_VCPU_DEVFS "/dev/hax_vmxx/vcpuxx"
-+    name = g_strdup(HAX_VCPU_DEVFS);
-+    if (!name) {
-+        return NULL;
-+    }
-+
-+    snprintf(name, sizeof HAX_VCPU_DEVFS, "/dev/hax_vm%02d/vcpu%02d",
-+             vm_id, vcpu_id);
-+    return name;
-+}
-+
-+int hax_host_create_vm(struct hax_state *hax, int *vmid)
-+{
-+    int ret;
-+    int vm_id = 0;
-+
-+    if (hax_invalid_fd(hax->fd)) {
-+        return -EINVAL;
-+    }
-+
-+    if (hax->vm) {
-+        return 0;
-+    }
-+
-+    ret = ioctl(hax->fd, HAX_IOCTL_CREATE_VM, &vm_id);
-+    *vmid = vm_id;
-+    return ret;
-+}
-+
-+hax_fd hax_host_open_vm(struct hax_state *hax, int vm_id)
-+{
-+    hax_fd fd;
-+    char *vm_name = NULL;
-+
-+    vm_name = hax_vm_devfs_string(vm_id);
-+    if (!vm_name) {
-+        return -1;
-+    }
-+
-+    fd = open(vm_name, O_RDWR);
-+    g_free(vm_name);
-+
-+    fcntl(fd, F_SETFD, FD_CLOEXEC);
-+
-+    return fd;
-+}
-+
-+int hax_notify_qemu_version(hax_fd vm_fd, struct hax_qemu_version *qversion)
-+{
-+    int ret;
-+
-+    if (hax_invalid_fd(vm_fd)) {
-+        return -EINVAL;
-+    }
-+
-+    ret = ioctl(vm_fd, HAX_VM_IOCTL_NOTIFY_QEMU_VERSION, qversion);
-+
-+    if (ret < 0) {
-+        fprintf(stderr, "Failed to notify qemu API version\n");
-+        return ret;
-+    }
-+    return 0;
-+}
-+
-+/* Simply assume the size should be bigger than the hax_tunnel,
-+ * since the hax_tunnel can be extended later with compatibility considered
-+ */
-+int hax_host_create_vcpu(hax_fd vm_fd, int vcpuid)
-+{
-+    int ret;
-+
-+    ret = ioctl(vm_fd, HAX_VM_IOCTL_VCPU_CREATE, &vcpuid);
-+    if (ret < 0) {
-+        fprintf(stderr, "Failed to create vcpu %x\n", vcpuid);
-+    }
-+
-+    return ret;
-+}
-+
-+hax_fd hax_host_open_vcpu(int vmid, int vcpuid)
-+{
-+    char *devfs_path = NULL;
-+    hax_fd fd;
-+
-+    devfs_path = hax_vcpu_devfs_string(vmid, vcpuid);
-+    if (!devfs_path) {
-+        fprintf(stderr, "Failed to get the devfs\n");
-+        return -EINVAL;
-+    }
-+
-+    fd = open(devfs_path, O_RDWR);
-+    g_free(devfs_path);
-+    if (fd < 0) {
-+        fprintf(stderr, "Failed to open the vcpu devfs\n");
-+    }
-+    fcntl(fd, F_SETFD, FD_CLOEXEC);
-+    return fd;
-+}
-+
-+int hax_host_setup_vcpu_channel(struct hax_vcpu_state *vcpu)
-+{
-+    int ret;
-+    struct hax_tunnel_info info;
-+
-+    ret = ioctl(vcpu->fd, HAX_VCPU_IOCTL_SETUP_TUNNEL, &info);
-+    if (ret) {
-+        fprintf(stderr, "Failed to setup the hax tunnel\n");
-+        return ret;
-+    }
-+
-+    if (!valid_hax_tunnel_size(info.size)) {
-+        fprintf(stderr, "Invalid hax tunnel size %x\n", info.size);
-+        ret = -EINVAL;
-+        return ret;
-+    }
-+
-+    vcpu->tunnel = (struct hax_tunnel *) (intptr_t) (info.va);
-+    vcpu->iobuf = (unsigned char *) (intptr_t) (info.io_va);
-+    return 0;
-+}
-+
-+int hax_vcpu_run(struct hax_vcpu_state *vcpu)
-+{
-+    int ret;
-+
-+    ret = ioctl(vcpu->fd, HAX_VCPU_IOCTL_RUN, NULL);
-+    return ret;
-+}
-+
-+int hax_sync_fpu(CPUArchState *env, struct fx_layout *fl, int set)
-+{
-+    int ret, fd;
-+
-+    fd = hax_vcpu_get_fd(env);
-+    if (fd <= 0) {
-+        return -1;
-+    }
-+
-+    if (set) {
-+        ret = ioctl(fd, HAX_VCPU_IOCTL_SET_FPU, fl);
-+    } else {
-+        ret = ioctl(fd, HAX_VCPU_IOCTL_GET_FPU, fl);
-+    }
-+    return ret;
-+}
-+
-+int hax_sync_msr(CPUArchState *env, struct hax_msr_data *msrs, int set)
-+{
-+    int ret, fd;
-+
-+    fd = hax_vcpu_get_fd(env);
-+    if (fd <= 0) {
-+        return -1;
-+    }
-+    if (set) {
-+        ret = ioctl(fd, HAX_VCPU_IOCTL_SET_MSRS, msrs);
-+    } else {
-+        ret = ioctl(fd, HAX_VCPU_IOCTL_GET_MSRS, msrs);
-+    }
-+    return ret;
-+}
-+
-+int hax_sync_vcpu_state(CPUArchState *env, struct vcpu_state_t *state, int set)
-+{
-+    int ret, fd;
-+
-+    fd = hax_vcpu_get_fd(env);
-+    if (fd <= 0) {
-+        return -1;
-+    }
-+
-+    if (set) {
-+        ret = ioctl(fd, HAX_VCPU_SET_REGS, state);
-+    } else {
-+        ret = ioctl(fd, HAX_VCPU_GET_REGS, state);
-+    }
-+    return ret;
-+}
-+
-+int hax_inject_interrupt(CPUArchState *env, int vector)
-+{
-+    int ret, fd;
-+
-+    fd = hax_vcpu_get_fd(env);
-+    if (fd <= 0) {
-+        return -1;
-+    }
-+
-+    ret = ioctl(fd, HAX_VCPU_IOCTL_INTERRUPT, &vector);
-+    return ret;
-+}
-diff --git a/target/i386/hax-darwin.h b/target/i386/hax-darwin.h
-new file mode 100644
-index 0000000..0c0968b
---- /dev/null
-+++ b/target/i386/hax-darwin.h
-@@ -0,0 +1,63 @@
-+/*
-+ * QEMU HAXM support
-+ *
-+ * Copyright (c) 2011 Intel Corporation
-+ *  Written by:
-+ *  Jiang Yunhong<yunhong.jiang@intel.com>
-+ *  Xin Xiaohui<xiaohui.xin@intel.com>
-+ *  Zhang Xiantao<xiantao.zhang@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef TARGET_I386_HAX_DARWIN_H
-+#define TARGET_I386_HAX_DARWIN_H
-+
-+#include <sys/types.h>
-+#include <sys/ioctl.h>
-+#include <sys/mman.h>
-+#include <stdarg.h>
-+
-+#define HAX_INVALID_FD  (-1)
-+static inline int hax_invalid_fd(hax_fd fd)
-+{
-+    return fd <= 0;
-+}
-+
-+static inline void hax_mod_close(struct hax_state *hax)
-+{
-+    close(hax->fd);
-+}
-+
-+static inline void hax_close_fd(hax_fd fd)
-+{
-+    close(fd);
-+}
-+
-+/* HAX model level ioctl */
-+#define HAX_IOCTL_VERSION _IOWR(0, 0x20, struct hax_module_version)
-+#define HAX_IOCTL_CREATE_VM _IOWR(0, 0x21, uint32_t)
-+#define HAX_IOCTL_DESTROY_VM _IOW(0, 0x22, uint32_t)
-+#define HAX_IOCTL_CAPABILITY _IOR(0, 0x23, struct hax_capabilityinfo)
-+
-+#define HAX_VM_IOCTL_VCPU_CREATE _IOWR(0, 0x80, uint32_t)
-+#define HAX_VM_IOCTL_ALLOC_RAM _IOWR(0, 0x81, struct hax_alloc_ram_info)
-+#define HAX_VM_IOCTL_SET_RAM _IOWR(0, 0x82, struct hax_set_ram_info)
-+#define HAX_VM_IOCTL_VCPU_DESTROY _IOW(0, 0x83, uint32_t)
-+#define HAX_VM_IOCTL_NOTIFY_QEMU_VERSION _IOW(0, 0x84, struct hax_qemu_version)
-+
-+#define HAX_VCPU_IOCTL_RUN  _IO(0, 0xc0)
-+#define HAX_VCPU_IOCTL_SET_MSRS _IOWR(0, 0xc1, struct hax_msr_data)
-+#define HAX_VCPU_IOCTL_GET_MSRS _IOWR(0, 0xc2, struct hax_msr_data)
-+
-+#define HAX_VCPU_IOCTL_SET_FPU  _IOW(0, 0xc3, struct fx_layout)
-+#define HAX_VCPU_IOCTL_GET_FPU  _IOR(0, 0xc4, struct fx_layout)
-+
-+#define HAX_VCPU_IOCTL_SETUP_TUNNEL _IOWR(0, 0xc5, struct hax_tunnel_info)
-+#define HAX_VCPU_IOCTL_INTERRUPT _IOWR(0, 0xc6, uint32_t)
-+#define HAX_VCPU_SET_REGS       _IOWR(0, 0xc7, struct vcpu_state_t)
-+#define HAX_VCPU_GET_REGS       _IOWR(0, 0xc8, struct vcpu_state_t)
-+
-+#endif /* TARGET_I386_HAX_DARWIN_H */
-diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
-index bcbd105..8ffe91f 100644
---- a/target/i386/hax-i386.h
-+++ b/target/i386/hax-i386.h
-@@ -16,6 +16,10 @@
- #include "cpu.h"
- #include "sysemu/hax.h"
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 728e76b..95d4ba4 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -497,8 +497,8 @@ HANDLE qemu_thread_get_handle(QemuThread *thread)
  
-+#ifdef CONFIG_DARWIN
-+typedef int hax_fd;
-+#endif
-+
- #ifdef CONFIG_WIN32
- typedef HANDLE hax_fd;
+     EnterCriticalSection(&data->cs);
+     if (!data->exited) {
+-        handle = OpenThread(SYNCHRONIZE | THREAD_SUSPEND_RESUME, FALSE,
+-                            thread->tid);
++        handle = OpenThread(SYNCHRONIZE | THREAD_SUSPEND_RESUME |
++                            THREAD_SET_CONTEXT, FALSE, thread->tid);
+     } else {
+         handle = NULL;
+     }
+diff --git a/vl.c b/vl.c
+index a52c5f2..a260f30 100644
+--- a/vl.c
++++ b/vl.c
+@@ -93,6 +93,7 @@ int main(int argc, char **argv)
+ #include "sysemu/cpus.h"
+ #include "migration/colo.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/hax.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+@@ -1913,7 +1914,7 @@ static void main_loop(void)
+     int64_t ti;
  #endif
-@@ -77,6 +81,10 @@ hax_fd hax_mod_open(void);
- void hax_memory_init(void);
- 
- 
-+#ifdef CONFIG_DARWIN
-+#include "target/i386/hax-darwin.h"
-+#endif
-+
- #ifdef CONFIG_WIN32
- #include "target/i386/hax-windows.h"
+     do {
+-        nonblocking = !kvm_enabled() && !xen_enabled() && last_io > 0;
++        nonblocking = tcg_enabled() && last_io > 0;
+ #ifdef CONFIG_PROFILER
+         ti = profile_getclock();
  #endif
+@@ -3679,6 +3680,10 @@ int main(int argc, char **argv, char **envp)
+                 olist = qemu_find_opts("machine");
+                 qemu_opts_parse_noisily(olist, "accel=kvm", false);
+                 break;
++            case QEMU_OPTION_enable_hax:
++                olist = qemu_find_opts("machine");
++                qemu_opts_parse_noisily(olist, "accel=hax", false);
++                break;
+             case QEMU_OPTION_M:
+             case QEMU_OPTION_machine:
+                 olist = qemu_find_opts("machine");
+@@ -4373,8 +4378,8 @@ int main(int argc, char **argv, char **envp)
+ 
+     cpu_ticks_init();
+     if (icount_opts) {
+-        if (kvm_enabled() || xen_enabled()) {
+-            error_report("-icount is not allowed with kvm or xen");
++        if (!tcg_enabled()) {
++            error_report("-icount is not allowed with hardware virtualization");
+             exit(1);
+         }
+         configure_icount(icount_opts, &error_abort);
+@@ -4510,6 +4515,10 @@ int main(int argc, char **argv, char **envp)
+ 
+     numa_post_machine_init();
+ 
++    if (hax_enabled()) {
++        hax_sync_vcpus();
++    }
++
+     if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
+                           parse_fw_cfg, fw_cfg_find(), NULL) != 0) {
+         exit(1);
 -- 
 2.9.3
