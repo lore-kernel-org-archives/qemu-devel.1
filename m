@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZIJ-0003uX-Ie
+	(envelope-from <pbonzini@redhat.com>) id 1cUZIJ-0003uW-IM
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cUZIH-00068i-8g
+	(envelope-from <pbonzini@redhat.com>) id 1cUZIF-000661-KO
 	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51544)
+Received: from mx1.redhat.com ([209.132.183.28]:35034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZIH-00067t-42
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:53 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cUZIF-000654-C0
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 08:31:51 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5B33383F3F
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 13:31:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 909C080468
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 13:31:51 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-117-138.ams2.redhat.com
 	[10.36.117.138])
 	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v0KDVeVK014401
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 08:31:52 -0500
+	id v0KDVeVI014401
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 08:31:50 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 20 Jan 2017 14:31:16 +0100
-Message-Id: <20170120133139.31080-13-pbonzini@redhat.com>
+Date: Fri, 20 Jan 2017 14:31:14 +0100
+Message-Id: <20170120133139.31080-11-pbonzini@redhat.com>
 In-Reply-To: <20170120133139.31080-1-pbonzini@redhat.com>
 References: <20170120133139.31080-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 12/35] stubs: move vhost stubs to stubs/vhost.o
+Subject: [Qemu-devel] [PULL 10/35] stubs: group stubs for user-mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,67 +36,171 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-No need to include them in libqemustub.a, since only system emulators
-need them.
+Some stubs are used for user-mode emulation only; they are not
+needed by tools.  Move them out of stubs/.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs                        | 2 +-
- hw/virtio/Makefile.objs                 | 6 +++++-
- stubs/vhost.c => hw/virtio/vhost-stub.c | 0
- stubs/Makefile.objs                     | 1 -
- 4 files changed, 6 insertions(+), 3 deletions(-)
- rename stubs/vhost.c => hw/virtio/vhost-stub.c (100%)
+ MAINTAINERS         |  1 +
+ Makefile.target     |  4 ++--
+ stubs/Makefile.objs |  2 --
+ stubs/cpus.c        | 11 -----------
+ stubs/replay-user.c | 33 ---------------------------------
+ user-exec-stub.c    | 34 ++++++++++++++++++++++++++++++++++
+ 6 files changed, 37 insertions(+), 48 deletions(-)
+ delete mode 100644 stubs/cpus.c
+ delete mode 100644 stubs/replay-user.c
+ create mode 100644 user-exec-stub.c
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 2a73ae5..7be399e 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -29,7 +29,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += timer/
- devices-dirs-$(CONFIG_TPM) += tpm/
- devices-dirs-$(CONFIG_SOFTMMU) += usb/
- devices-dirs-$(CONFIG_SOFTMMU) += vfio/
--devices-dirs-$(CONFIG_VIRTIO) += virtio/
-+devices-dirs-$(CONFIG_SOFTMMU) += virtio/
- devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
- devices-dirs-$(CONFIG_SOFTMMU) += xen/
- devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 95c4c30..765d363 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -1,3 +1,4 @@
-+ifeq ($(CONFIG_VIRTIO),y)
- common-obj-y += virtio-rng.o
- common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
- common-obj-y += virtio-bus.o
-@@ -5,7 +6,10 @@ common-obj-y += virtio-mmio.o
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1444b26..39e8230 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1494,6 +1494,7 @@ M: Riku Voipio <riku.voipio@iki.fi>
+ S: Maintained
+ F: thunk.c
+ F: user-exec.c
++F: user-exec-stub.c
  
- obj-y += virtio.o virtio-balloon.o 
- obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
--
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
- obj-y += virtio-crypto.o
- obj-$(CONFIG_VIRTIO_PCI) += virtio-crypto-pci.o
-+endif
-+
-+common-obj-$(call lnot,$(CONFIG_LINUX)) += vhost-stub.o
-+common-obj-$(CONFIG_ALL) += vhost-stub.o
-diff --git a/stubs/vhost.c b/hw/virtio/vhost-stub.c
-similarity index 100%
-rename from stubs/vhost.c
-rename to hw/virtio/vhost-stub.c
+ BSD user
+ S: Orphan
+diff --git a/Makefile.target b/Makefile.target
+index 8ae82cb..9e8edd9 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -115,7 +115,7 @@ QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \
+              -I$(SRC_PATH)/linux-user
+ 
+ obj-y += linux-user/
+-obj-y += gdbstub.o thunk.o user-exec.o
++obj-y += gdbstub.o thunk.o user-exec.o user-exec-stub.o
+ 
+ endif #CONFIG_LINUX_USER
+ 
+@@ -128,7 +128,7 @@ QEMU_CFLAGS+=-I$(SRC_PATH)/bsd-user -I$(SRC_PATH)/bsd-user/$(TARGET_ABI_DIR) \
+ 			 -I$(SRC_PATH)/bsd-user/$(HOST_VARIANT_DIR)
+ 
+ obj-y += bsd-user/
+-obj-y += gdbstub.o user-exec.o
++obj-y += gdbstub.o user-exec.o user-exec-stub.o
+ 
+ endif #CONFIG_BSD_USER
+ 
 diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 40b4e15..0b642d7 100644
+index c89a9da..1eec1fb 100644
 --- a/stubs/Makefile.objs
 +++ b/stubs/Makefile.objs
-@@ -35,7 +35,6 @@ stub-obj-y += kvm.o
+@@ -25,7 +25,6 @@ stub-obj-y += monitor.o
+ stub-obj-y += notify-event.o
+ stub-obj-y += qtest.o
+ stub-obj-y += replay.o
+-stub-obj-y += replay-user.o
+ stub-obj-y += runstate-check.o
+ stub-obj-y += set-fd-handler.o
+ stub-obj-y += slirp.o
+@@ -35,7 +34,6 @@ stub-obj-y += uuid.o
+ stub-obj-y += vm-stop.o
+ stub-obj-y += vmstate.o
+ stub-obj-$(CONFIG_WIN32) += fd-register.o
+-stub-obj-y += cpus.o
+ stub-obj-y += kvm.o
  stub-obj-y += qmp_pc_dimm_device_list.o
  stub-obj-y += target-monitor-defs.o
- stub-obj-y += target-get-monitor-def.o
--stub-obj-y += vhost.o
- stub-obj-y += iohandler.o
- stub-obj-y += pc_madt_cpu_entry.o
- stub-obj-y += migration-colo.o
+diff --git a/stubs/cpus.c b/stubs/cpus.c
+deleted file mode 100644
+index e192722..0000000
+--- a/stubs/cpus.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "qom/cpu.h"
+-
+-void cpu_resume(CPUState *cpu)
+-{
+-}
+-
+-void qemu_init_vcpu(CPUState *cpu)
+-{
+-}
+diff --git a/stubs/replay-user.c b/stubs/replay-user.c
+deleted file mode 100644
+index b29e7eb..0000000
+--- a/stubs/replay-user.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/*
+- * replay.c
+- *
+- * Copyright (c) 2010-2015 Institute for System Programming
+- *                         of the Russian Academy of Sciences.
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or later.
+- * See the COPYING file in the top-level directory.
+- *
+- */
+-
+-#include "qemu/osdep.h"
+-#include "sysemu/replay.h"
+-
+-bool replay_exception(void)
+-{
+-    return true;
+-}
+-
+-bool replay_has_exception(void)
+-{
+-    return false;
+-}
+-
+-bool replay_interrupt(void)
+-{
+-    return true;
+-}
+-
+-bool replay_has_interrupt(void)
+-{
+-    return false;
+-}
+diff --git a/user-exec-stub.c b/user-exec-stub.c
+new file mode 100644
+index 0000000..dbcf1ad
+--- /dev/null
++++ b/user-exec-stub.c
+@@ -0,0 +1,34 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qom/cpu.h"
++#include "sysemu/replay.h"
++
++void cpu_resume(CPUState *cpu)
++{
++}
++
++void qemu_init_vcpu(CPUState *cpu)
++{
++}
++
++/* User mode emulation does not support record/replay yet.  */
++
++bool replay_exception(void)
++{
++    return true;
++}
++
++bool replay_has_exception(void)
++{
++    return false;
++}
++
++bool replay_interrupt(void)
++{
++    return true;
++}
++
++bool replay_has_interrupt(void)
++{
++    return false;
++}
 -- 
 2.9.3
