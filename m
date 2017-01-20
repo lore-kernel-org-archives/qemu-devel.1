@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUVJ1-0004eu-76
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:16:28 -0500
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cUVKh-0006BC-IQ
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:18:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cUVIw-0003j9-9S
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:16:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54135)
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cUVKc-0004Z8-IJ
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:18:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35808
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cUVIw-0003iU-0R
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:16:18 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0K9DhcD117692
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:16:17 -0500
-Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 283dmbvx8n-1
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1cUVKc-0004Y8-Cj
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:18:02 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0K9DhWa121205
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:18:00 -0500
+Received: from e28smtp06.in.ibm.com (e28smtp06.in.ibm.com [125.16.236.6])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 283fpgg8f7-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:16:16 -0500
+	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:17:59 -0500
 Received: from localhost
-	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e28smtp06.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 20 Jan 2017 09:16:14 -0000
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Fri, 20 Jan 2017 10:15:53 +0100
-In-Reply-To: <20170120091553.11013-1-cornelia.huck@de.ibm.com>
-References: <20170120091553.11013-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170120091553.11013-13-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL v2 12/12] virtio-ccw: fix ring sizing
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Fri, 20 Jan 2017 14:47:56 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Date: Fri, 20 Jan 2017 14:47:46 +0530
+Message-Id: <1484903866-17940-1-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH v1] softfloat: Add round-to-odd rounding
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-From: "Michael S. Tsirkin" <mst@redhat.com>
+Power ISA 3.0 introduces a few quadruple precision floating point
+instructions that support round-to-odd rounding mode. The
+round-to-odd mode is explained as under:
 
-Current code seems to assume ring size is
-always decreased but this is not required by spec:
-what spec says is just that size can not exceed
-the maximum. Fix it up.
+Let Z be the intermediate arithmetic result or the operand of a convert
+operation. If Z can be represented exactly in the target format, the
+result is Z. Otherwise the result is either Z1 or Z2 whichever is odd.
+Here Z1 and Z2 are the next larger and smaller numbers representable
+in the target format respectively.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <1484256243-1982-1-git-send-email-mst@redhat.com>
-Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 ---
- hw/s390x/virtio-ccw.c      | 2 +-
- hw/virtio/virtio.c         | 5 +++++
- include/hw/virtio/virtio.h | 1 +
- 3 files changed, 7 insertions(+), 1 deletion(-)
+Changes in v1:
+- Addressed rounding to infinity in roundAndPackFloat128().
+- Added 64bit round to odd implementation(roundAndPackFloat64()) as
+  it is needed by xscvqpdp instruction of Power ISA 3.0.
 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 07650683f7..63c46373fb 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -149,7 +149,7 @@ static int virtio_ccw_set_vqs(SubchDev *sch, VqInfoBlock *info,
-     } else {
-         if (info) {
-             /* virtio-1 allows changing the ring size. */
--            if (virtio_queue_get_num(vdev, index) < num) {
-+            if (virtio_queue_get_max_num(vdev, index) < num) {
-                 /* Fail if we exceed the maximum number. */
-                 return -EINVAL;
+v0: http://patchwork.ozlabs.org/patch/716956/
+
+ fpu/softfloat.c         | 10 ++++++++++
+ include/fpu/softfloat.h |  2 ++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index c295f31..b9b36ad 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -623,6 +623,9 @@ static float64 roundAndPackFloat64(flag zSign, int zExp, uint64_t zSig,
+     case float_round_down:
+         roundIncrement = zSign ? 0x3ff : 0;
+         break;
++    case float_round_to_odd:
++        roundIncrement = (zSig & 0x200) ? 0 : 0x3ff;
++        break;
+     default:
+         abort();
+     }
+@@ -1149,6 +1152,9 @@ static float128 roundAndPackFloat128(flag zSign, int32_t zExp,
+     case float_round_down:
+         increment = zSign && zSig2;
+         break;
++    case float_round_to_odd:
++        increment = !(zSig1 & 0x1) && zSig2;
++        break;
+     default:
+         abort();
+     }
+@@ -1168,6 +1174,7 @@ static float128 roundAndPackFloat128(flag zSign, int32_t zExp,
+             if (    ( roundingMode == float_round_to_zero )
+                  || ( zSign && ( roundingMode == float_round_up ) )
+                  || ( ! zSign && ( roundingMode == float_round_down ) )
++                 || ( roundingMode == float_round_to_odd )
+                ) {
+                 return
+                     packFloat128(
+@@ -1215,6 +1222,9 @@ static float128 roundAndPackFloat128(flag zSign, int32_t zExp,
+             case float_round_down:
+                 increment = zSign && zSig2;
+                 break;
++            case float_round_to_odd:
++                increment = !(zSig1 & 0x1) && zSig2;
++                break;
+             default:
+                 abort();
              }
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index aa4f38f50a..94d7dbae6c 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1262,6 +1262,11 @@ int virtio_queue_get_num(VirtIODevice *vdev, int n)
-     return vdev->vq[n].vring.num;
- }
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 842ec6b..8a39028 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -180,6 +180,8 @@ enum {
+     float_round_up           = 2,
+     float_round_to_zero      = 3,
+     float_round_ties_away    = 4,
++    /* Not an IEEE rounding mode: round to the closest odd mantissa value */
++    float_round_to_odd       = 5,
+ };
  
-+int virtio_queue_get_max_num(VirtIODevice *vdev, int n)
-+{
-+    return vdev->vq[n].vring.num_default;
-+}
-+
- int virtio_get_num_queues(VirtIODevice *vdev)
- {
-     int i;
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index e5541c61f7..6523bacd2f 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -228,6 +228,7 @@ void virtio_queue_set_addr(VirtIODevice *vdev, int n, hwaddr addr);
- hwaddr virtio_queue_get_addr(VirtIODevice *vdev, int n);
- void virtio_queue_set_num(VirtIODevice *vdev, int n, int num);
- int virtio_queue_get_num(VirtIODevice *vdev, int n);
-+int virtio_queue_get_max_num(VirtIODevice *vdev, int n);
- int virtio_get_num_queues(VirtIODevice *vdev);
- void virtio_queue_set_rings(VirtIODevice *vdev, int n, hwaddr desc,
-                             hwaddr avail, hwaddr used);
+ /*----------------------------------------------------------------------------
 -- 
-2.11.0
+2.7.4
