@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cUdzu-0007c6-Dt
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:15 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cUe0M-0007oc-Fc
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cUdzq-0005e0-HM
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50236)
+	(envelope-from <ehabkost@redhat.com>) id 1cUe0I-0005sV-J6
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53730)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cUdzq-0005ck-9W
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:10 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1484859998-25074-1-git-send-email-mst@redhat.com>
-	<1484859998-25074-3-git-send-email-mst@redhat.com>
-	<87wpdq2n4e.fsf@dusky.pond.sub.org>
-	<20170120185551-mutt-send-email-mst@kernel.org>
-	<024df752-27f3-88f3-99a3-a7f5e18069b4@redhat.com>
-	<20170120194511-mutt-send-email-mst@kernel.org>
-Date: Fri, 20 Jan 2017 19:33:07 +0100
-In-Reply-To: <20170120194511-mutt-send-email-mst@kernel.org> (Michael
-	S. Tsirkin's message of "Fri, 20 Jan 2017 19:45:40 +0200")
-Message-ID: <87inp9h998.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cUe0I-0005sD-Ae
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 13:33:38 -0500
+Date: Fri, 20 Jan 2017 16:33:34 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170120183334.GS3491@thinpad.lan.raisama.net>
+References: <20170117010204.4909-1-ehabkost@redhat.com>
+	<309bd499-204d-df07-aa99-9a999cfecabc@linux.vnet.ibm.com>
+	<20170118170049.GB3491@thinpad.lan.raisama.net>
+	<45e82b29-1ebe-3f34-0cc1-35d60c6044da@linux.vnet.ibm.com>
+	<20170118173406.GF3491@thinpad.lan.raisama.net>
+	<fd9074e6-8b39-9139-415e-cec2a8970a5e@redhat.com>
+	<20170119104837.GL3491@thinpad.lan.raisama.net>
+	<c0d8a827-5999-51b5-73fc-aa781b77fe8f@redhat.com>
+	<20170119174559.GI16641@redhat.com>
+	<c682e80b-23e5-544e-c78e-c633b7d6259f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] compiler: rework BUG_ON using a
- struct
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c682e80b-23e5-544e-c78e-c633b7d6259f@redhat.com>
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 0/9] i386:
+ query-cpu-model-expansion test script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +36,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
+On Fri, Jan 20, 2017 at 03:30:54PM +0100, David Hildenbrand wrote:
+> Am 19.01.2017 um 18:45 schrieb Daniel P. Berrange:
+> > On Thu, Jan 19, 2017 at 06:21:22PM +0100, David Hildenbrand wrote:
+> >>
+> >>>> Also think about "query-cpu-model-expansion model=host type=static",
+> >>>> which will primarily be used by libvirt on s390x. There is no way to
+> >>>> expand this into a static cpu model. Faking anything will just hide errors.
+> >>>
+> >>> Yes, static expansion of host model must always return an error
+> >>> if it's not possible to expand.
+> >>>
+> >>>>
+> >>>> If "host" can't be expanded, QEMU has to be treated like there is no CPU
+> >>>> model support (as for older QEMU versions).
+> >>>
+> >>> OK. I will propose a patch updating the query-cpu-model-expansion
+> >>> documentation to be more explicit about it.
+> >>
+> >> The only real alternative I see would be disabling the query-cpu-model-*
+> >> interface completely if KVM support is not available.
+> >>
+> >> This would however mean, that the same QEMU binary would have the
+> >> interface when running under TCG, but not when running under KVM on an
+> >> old KVM version.
+> >>
+> >> That also doesn't really feel right, or what do you think?
+> > 
+> > Yeah that really isn't good.  query-cpu-model-* needs to work on TCG
+> > and *not* have a dependancy on KVM in that case, since you can be
+> > running TCG s390 on a x86_64 host, so the host CPU is totally irrelevant
+> > for TCG
+> > 
+> 
+> Actually what I meant was:
+> 
+> TCG: query-cpu-model-* interface always provided
+> KVM (with cpu model support): query-cpu-model-* interface provided
+> KVM (without cpu model support): no query-cpu-model-* interface provided
+> 
+> This would avoid having to report an error when expanding "host" in the
+> third case (KVM without cpu model support) but would lead to one QEMU
+> binary having a different set of supported qmp calls when called from
+> TCG and KVM.
 
-> On Fri, Jan 20, 2017 at 06:09:52PM +0100, Paolo Bonzini wrote:
->> 
->> 
->> On 20/01/2017 17:57, Michael S. Tsirkin wrote:
->> > On Fri, Jan 20, 2017 at 08:42:41AM +0100, Markus Armbruster wrote:
->> >> "Michael S. Tsirkin" <mst@redhat.com> writes:
->> >>
->> >>> There are theoretical concerns that some compilers might not trigger
->> >>> build failures on attempts to define an array of size -1 and make it a
->> >>> variable sized array instead. Let rewrite using a struct with a negative
->> >>> bit field size instead as there are no dynamic bit field sizes.  This is
->> >>> similar to what Linux does.
->> >>>
->> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> >>> ---
->> >>>  include/qemu/compiler.h | 9 ++++++---
->> >>>  1 file changed, 6 insertions(+), 3 deletions(-)
->> >>>
->> >>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
->> >>> index 7512082..c6f673e 100644
->> >>> --- a/include/qemu/compiler.h
->> >>> +++ b/include/qemu/compiler.h
->> >>> @@ -85,9 +85,12 @@
->> >>>  #define typeof_field(type, field) typeof(((type *)0)->field)
->> >>>  #define type_check(t1,t2) ((t1*)0 - (t2*)0)
->> >>>  
->> >>> -#define QEMU_BUILD_BUG_ON(x) \
->> >>> -    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
->> >>> -        __attribute__((unused))
->> >>> +#define QEMU_BUILD_BUG_ON_STRUCT(x) \
->> >>> +    struct { \
->> >>> +        int qemu_build_bug_on : (x) ? -1 : 1; \
->> >>> +    }
->> >>
->> >> The qemu_build_bug_on name space pollution is harmless, but quite
->> >> unnecessary: the name can be simply omitted (unnamed bit-field).
->> > 
->> > I have concerns about it's portability though. I remember
->> > we had to get rid of unnamed fields in some structs at some point
->> > for the sake of some old compiler.
->> 
->> Unnamed bitfields are in C89 and we definitely use unnamed unions.
->> Maybe that was an unnamed struct or scalar.
->> 
->> Paolo
->
-> I don't think we use unnamed bitfields anywhere though. do we?
+I don't think we should do that. Expansion of static and
+migration-safe CPU models is host-independent by design, so it
+should always work on any host. Management software could even
+choose to run CPU expansion on one host, and start the VM (using
+the results of the expansion) on a different host.
 
-If we were talking about some obscure GCC extension, this would be a
-valid question.  But we're talking about an ISO C feature that's pretty
-central to how bit-fields work, and older than quite a few hackers.
-
-[...]
+-- 
+Eduardo
