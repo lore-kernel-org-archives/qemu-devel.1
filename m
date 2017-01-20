@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUVtZ-0001Vx-Aa
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:54:10 -0500
+	(envelope-from <thuth@redhat.com>) id 1cUVxh-00052P-3h
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:58:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cUVtY-0007bN-Ja
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:54:09 -0500
-Date: Fri, 20 Jan 2017 17:53:59 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170120095359.GE29561@lemon>
-References: <20170119205134.50112-1-farman@linux.vnet.ibm.com>
-	<20170119205134.50112-4-farman@linux.vnet.ibm.com>
-	<20170120093151.GD29561@lemon>
+	(envelope-from <thuth@redhat.com>) id 1cUVxe-0001qP-3Z
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:58:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cUVxd-0001pu-Tp
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:58:22 -0500
+References: <20170117085645.4267-1-cornelia.huck@de.ibm.com>
+	<CAFEAcA_9rrsKkGetqQKRCGedx3E1PeE3OrS=Ea5N-qdK6PN7Cg@mail.gmail.com>
+	<20170120102104.69dac2c7.cornelia.huck@de.ibm.com>
+	<b3558860-1ef6-d39a-4b4f-bd5e042c84bb@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <bf45de76-772e-6b92-6983-93e84cd96e81@redhat.com>
+Date: Fri, 20 Jan 2017 10:58:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170120093151.GD29561@lemon>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: get max_transfer limit for
- char (scsi-generic) devices
+In-Reply-To: <b3558860-1ef6-d39a-4b4f-bd5e042c84bb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/12] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,24 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.vnet.ibm.com>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Cornelia Huck <cornelia.huck@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Jens Freimann <jfrei@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 01/20 17:31, Fam Zheng wrote:
-> > diff --git a/block/file-posix.c b/block/file-posix.c
-> > index 2115155..94068ca 100644
-> > --- a/block/file-posix.c
-> > +++ b/block/file-posix.c
-> > @@ -657,9 +657,11 @@ static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
-> >      int max_sectors = 0;
-> >      short max_sectors_short = 0;
-> >      if (bs->sg && ioctl(fd, BLKSECTGET, &max_sectors) == 0) {
-> > +        /* sg returns a value in bytes */
-> >          return max_sectors;
-> 
-> The variable name is now misleading, maybe use "bytes" instead?
+On 20.01.2017 10:52, Thomas Huth wrote:
+> On 20.01.2017 10:21, Cornelia Huck wrote:
+>> On Thu, 19 Jan 2017 18:32:44 +0000
+>> Peter Maydell <peter.maydell@linaro.org> wrote:
+>>
+>>> Hi; I'm afraid this fails to build on Windows:
+>>>
+>>> /home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c: In
+>>> function =E2=80=98s390_pci_get_iommu=E2=80=99:
+>>> /home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c:415:20:
+>>> error: cast from pointer to integer of different size
+>>> [-Werror=3Dpointer-to-int-cast]
+>>>      uint64_t key =3D (unsigned long)bus;
+>>>                     ^
+>>> /home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c: In
+>>> function =E2=80=98s390_pci_iommu_free=E2=80=99:
+>>> /home/petmay01/linaro/qemu-for-merges/hw/s390x/s390-pci-bus.c:539:20:
+>>> error: cast from pointer to integer of different size
+>>> [-Werror=3Dpointer-to-int-cast]
+>>>      uint64_t key =3D (unsigned long)bus;
+>>>                     ^
+>>> cc1: all warnings being treated as errors
+>>>
+>>>
+>>> You probably wanted uintptr_t.
+>>
+>> Fixed and v2 sent.
+>>
+>> I'm wondering if there is any way to catch this earlier (without
+>> actually building on Windows)? My mingw 4.8.2 cross-build worked fine.=
+..
+>=20
+> You likely got to use the 32-bit version of MinGW (or compile with -m32
+> with any other version of GCC) to catch this issue, so that you get
+> sizeof(long) !=3D sizeof(void *).
 
-BTW patch 2 should already make the function return bytes consistently.  Doing
-it here is meaningless code churn.
+... or was it the other way round? ... use the 64-bit version of MinGW?
+... that likely makes more sense... sorry, it's been a while that I used
+MinGW for the last time.
 
-Fam
+ Thomas
