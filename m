@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUR4a-0000lR-Nn
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 23:45:14 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUSCz-0000IC-01
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 00:57:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUR4X-0003Pm-JZ
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 23:45:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cUR4X-0003OC-Af
-	for qemu-devel@nongnu.org; Thu, 19 Jan 2017 23:45:09 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4A7E188E60
-	for <qemu-devel@nongnu.org>; Fri, 20 Jan 2017 04:45:09 +0000 (UTC)
-Date: Fri, 20 Jan 2017 12:45:05 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170120044505.GH4914@pxdev.xzpeter.org>
-References: <1484817932-14452-1-git-send-email-peterx@redhat.com>
-	<20170119105437.5b17d979@t450s.home>
-	<20170120034328.GG4914@pxdev.xzpeter.org>
-	<20170119212110.3406d921@t450s.home>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUSCv-0005ZW-U5
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 00:57:57 -0500
+Received: from [59.151.112.132] (port=22444 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cUSCu-0005X3-V8
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 00:57:53 -0500
+References: <1483175588-17006-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<1483175588-17006-3-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<20170118150957.63c38425@t450s.home>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <5881A83E.3000803@cn.fujitsu.com>
+Date: Fri, 20 Jan 2017 14:03:42 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170119212110.3406d921@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/3] vfio: allow to notify unmap for
- very big region
+In-Reply-To: <20170118150957.63c38425@t450s.home>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v11 2/4] vfio: new function to init aer
+ cap for vfio device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,158 +30,141 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, mst@redhat.com, izumi.taku@jp.fujitsu.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-On Thu, Jan 19, 2017 at 09:21:10PM -0700, Alex Williamson wrote:
-> On Fri, 20 Jan 2017 11:43:28 +0800
-> Peter Xu <peterx@redhat.com> wrote:
+
+
+On 01/19/2017 06:09 AM, Alex Williamson wrote:
+> On Sat, 31 Dec 2016 17:13:06 +0800
+> Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
 > 
-> > On Thu, Jan 19, 2017 at 10:54:37AM -0700, Alex Williamson wrote:
-> > > On Thu, 19 Jan 2017 17:25:29 +0800
-> > > Peter Xu <peterx@redhat.com> wrote:
-> > >   
-> > > > This requirement originates from the VT-d vfio series:
-> > > > 
-> > > >   https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03495.html
-> > > > 
-> > > > The goal of this series is to allow IOMMU to notify unmap with very
-> > > > big IOTLB range, for example, with base=0 and size=2^63-1 (to unmap
-> > > > the whole address space).
-> > > > 
-> > > > The first patch is a good to have, for traces.
-> > > > 
-> > > > The second one is a cleanup of existing code, only.  
-> > > 
-> > > Sort of, it does add some overhead to the unmap path, but you remove
-> > > that and more in the third patch.  
-> > 
-> > Hmm, yes, I tried to get the ram pointer even for unmap. I should
-> > remove the ending "only".
-> > 
-> > >    
-> > > > The third one moves the further RAM translation and check into map
-> > > > operation logic, so that it'll free unmap operations.
-> > > > 
-> > > > The series is marked as RFC since I am not sure whether this is a
-> > > > workable way. Anyway, please review to help confirm it.  
-> > > 
-> > > It seems reasonable to me,  
-> > 
-> > Good to know that you didn't disagree on this. :) Then let me take
-> > these patches along with that series in the next post (since that
-> > series will depend on this one, so I'll keep them together, though
-> > please maintainers decide on how you'll merge them when you want to),
-> > 
-> > > except for the example here of using 2^63-1,
-> > > which I expect is to work around the vfio {un}map API bug as we
-> > > discussed on irc.  
-> > 
-> > Actually not only for that one, I don't know whether we have problem
-> > here:
-> > 
-> > (I mentioned this in IRC, in case you missed that, I paste it here as
-> >  well)
-> > 
-> > static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
-> > 				      dma_addr_t start, size_t size)
-> > {
-> > 	struct rb_node *node = iommu->dma_list.rb_node;
-> > 
-> > 	while (node) {
-> > 		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
-> > 
-> > 		if (start + size <= dma->iova)
-> > 			node = node->rb_left;
-> > 		else if (start >= dma->iova + dma->size)
-> >                           ^^^^^^^^^^^^^^^^^^^^^
-> >                           Could it overflow here? <--------------
-> > 			node = node->rb_right;
-> > 		else
-> > 			return dma;
-> > 	}
-> > 
-> > 	return NULL;
-> > }
-> > 
-> > I used 2^63-1 to try to avoid both cases.
+>> From: Chen Fan <chen.fan.fnst@cn.fujitsu.com>
+>>
+>> Introduce new function to initilize AER capability registers
+>> for vfio-pci device.
+>>
+>> Signed-off-by: Chen Fan <chen.fan.fnst@cn.fujitsu.com>
+>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+>> ---
+>>  hw/vfio/pci.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>>  hw/vfio/pci.h |  3 +++
+>>  2 files changed, 85 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>> index d7dbe0e..76a8ac3 100644
+>> --- a/hw/vfio/pci.c
+>> +++ b/hw/vfio/pci.c
+>> @@ -1851,18 +1851,81 @@ out:
+>>      return 0;
+>>  }
+>>  
+>> -static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+>> +static int vfio_setup_aer(VFIOPCIDevice *vdev, uint8_t cap_ver,
+>> +                          int pos, uint16_t size, Error **errp)
+>> +{
+>> +    PCIDevice *pdev = &vdev->pdev;
+>> +    PCIDevice *dev_iter;
+>> +    uint8_t type;
+>> +    uint32_t errcap;
+>> +
+>> +    /* In case the physical device has AER cap while user doesn't enable AER,
+>> +     * still allocate the config space in the emulated device for AER */
 > 
+> Bad comment style
 > 
-> Perhaps I'm not seeing the overflow you're trying to identify,
-> but dma->iova + dma->size cannot overflow, these are existing DMA
-> mappings and the DMA mapping path does test for overflow.  I think we
-> can consider those sanitized.  I am wondering if the test above it is
-> suspect though, start + size doesn't seem to be checked for overflow on
-> the unmap path.  It seems pretty easy to avoid from the user side
-> though, but maybe we should add a test for it in the kernel.
-
-Ah, yes. :-)
-
+> /*
+>  * Multi-line comments should
+>  * look like this.
+>  */
 > 
->  
-> > > For everyone, the root of the problem is that the
-> > > ioctls use:
-> > > 
-> > >         __u64   iova;                           /* IO virtual address */
-> > >         __u64   size;                           /* Size of mapping (bytes) */
-> > > 
-> > > So we can only express a size of 2^64-1 and we have an off-by-one error
-> > > trying to perform a map/unmap of an entire 64-bit space.  Note when
-> > > designing an API, use start/end rather than base/size to avoid this.  
-> > 
-> > Lesson learned.
-> > 
-> > > 
-> > > What I don't want to see is for this API bug to leak out into the rest
-> > > of the QEMU code such that intel_iommu code, or iommu code in general
-> > > subtly avoids it by artificially using a smaller range.  VT-d hardware
-> > > has an actual physical address space of either 2^39 or 2^48 bits, so if
-> > > you want to make the iommu address space match the device we're trying
-> > > to emulate, that's perfectly fine.  AIUI, AMD-Vi does actually have a
-> > > 64-bit address space on the IOMMU, so to handle that case I'd expect
-> > > the simplest solution would be to track the and mapped iova high water
-> > > mark per container in vfio and truncate unmaps to that high water end
-> > > address.  Realistically we're probably not going to see iovas at the end
-> > > of the 64-bit address space, but we can come up with some other
-> > > workaround in the vfio code or update the kernel API if we do.  Thanks,  
-> > 
-> > Agree that high watermark can be a good solution for VT-d. I'll use
-> > that instead of 2^63-1. Though for AMD, if it supports 64bits, we may
-> > still need to solve existing issues in the future, since in that case
-> > the high watermark can be (hwaddr)-1 as well if guest specifies it.
-> > 
-> > (Though anyway I'm not sure when AMD vIOMMUs will be ready for device
-> >  assignment, so I don't think that's a big issue at least for now)
+> /* Single line comments may look like this */
 > 
-> Even with a true 64bit address space, it seems very unlikely we'd have
-> iovas at the very top of that address space.
+> /* Muli-line comments may
+>  * absolutely not look like this */
+> 
+>> +    if (!(vdev->features & VFIO_FEATURE_ENABLE_AER)) {
+>> +        pcie_add_capability(pdev, PCI_EXT_CAP_ID_ERR,
+>> +                            cap_ver, pos, size);
+>> +        return 0;
+>> +    }
+>> +
+>> +    dev_iter = pci_bridge_get_device(pdev->bus);
+>> +    if (!dev_iter) {
+>> +        goto error;
+>> +    }
+>> +
+>> +    while (dev_iter) {
+>> +        if (!pci_is_express(dev_iter)) {
+>> +            goto error;
+>> +        }
+>> +
+>> +        type = pcie_cap_get_type(dev_iter);
+>> +        if ((type != PCI_EXP_TYPE_ROOT_PORT &&
+>> +             type != PCI_EXP_TYPE_UPSTREAM &&
+>> +             type != PCI_EXP_TYPE_DOWNSTREAM)) {
+>> +            goto error;
+>> +        }
+>> +
+>> +        if (!dev_iter->exp.aer_cap) {
+>> +            goto error;
+>> +        }
+>> +
+>> +        dev_iter = pci_bridge_get_device(dev_iter->bus);
+>> +    }
+>> +
+>> +    errcap = vfio_pci_read_config(pdev, pos + PCI_ERR_CAP, 4);
+>> +    /*
+>> +     * The ability to record multiple headers is depending on
+>> +     * the state of the Multiple Header Recording Capable bit and
+>> +     * enabled by the Multiple Header Recording Enable bit.
+>> +     */
+>> +    if ((errcap & PCI_ERR_CAP_MHRC) &&
+>> +        (errcap & PCI_ERR_CAP_MHRE)) {
+>> +        pdev->exp.aer_log.log_max = PCIE_AER_LOG_MAX_DEFAULT;
+>> +    } else {
+>> +        pdev->exp.aer_log.log_max = 0;
+>> +    }
+>> +
+>> +    pcie_cap_deverr_init(pdev);
+>> +    return pcie_aer_init(pdev, cap_ver, pos, size);
+>> +
+>> +error:
+>> +    error_setg(errp, "vfio: Unable to enable AER for device %s, parent bus "
+>> +               "does not support AER signaling", vdev->vbasedev.name);
+>> +    return -1;
+> 
+> If we're only handling non-fatal errors, should we place the burden on
+> the user to know when to add the aer flag for the device or should we
+> just enable it opportunistically as available?
 
-Yes, especially if the IOVA is allocated inside kernel. However, since
-we are with DPDK these days, that's still possible?
+If we only handle non-fatal error, It make sense to me that we don't
+need aer property as a switch and enable aer opportunistically as
+available, it is no harm.
 
-I remembered that Jason has mentioned about OOM attacker for a tree -
-since we have a per-domain tree in kernel vfio, it's also possible
-that aggresive guest (DPDK user) doing special pattern of mapping that
-can let the tree grow into a very big one, finally exaust the host
-memory. Is this a problem as well?
+But considering that:
+1. non-fatal error support is incomplete AER functionality, so I think
+make it defaults to off is reasonable.
 
-> If we do, another idea
-> would be that iommus often have a reserved iova range for MSI mapping,
-> both VT-d and AMD-Vi do.  We know there would be no user iovas within
-> those ranges, so it would make a clean point to split a full 64-bit
-> unmap in two.  Hopefully we'll have reporting of that reserved range up
-> through vfio should/when we need something like that.
+2. we may support fatal error too in the future, that will bring the
+configuration restriction we used before. In this condition, make it
+defaults to off is your discussion result(I guess). If this is the
+finally choice, adopt it a little earlier is acceptable?
 
-Since we are at here... IIUC VT-d has reserved 0xfeeXXXXX for MSI, do
-we have protection in intel iommu driver that user should not use IOVA
-inside this range (I guess not?)? Though this is totally out of topic
-since even this is a problem, it'll be for intel-iommu driver's.
+3. from another perspective, if 'aer' property shows in the future once
+we support fatal-error too, would it seems that the 'aer' property is
+dedicated to fatal-error only?(of course we could make it as the switch
+of both error at that time)
 
-> We could
-> also simply track both the start and end of that mapping that sets the
-> high water mark, unmapping all except that, then that alone as two
-> separate ioctls.  I'm not too concerned that we'll be able to work
-> around it if we need to.  Thanks,
+> Should pcie_aer_init() be the one testing the topology?  It doesn't
+> seem vfio specific anymore.
+>
 
-Sure. Thanks,
+It does is not vfio specific, but I guess not. Question: could a
+aer-capable device plugged under certain (root/downstream)port that is
+not aer-capable? the answer I think is YES. If topology testing is done
+in pcie_aer_init(), that means the answer is NO.
 
--- peterx
+-- 
+Sincerely,
+Cao jin
