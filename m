@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUVWh-0008DF-Of
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:30:32 -0500
+	(envelope-from <famz@redhat.com>) id 1cUVYB-0000wt-Nm
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:32:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cUVWe-0003Qx-Lj
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:30:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42726)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cUVWe-0003QG-Fh
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:30:28 -0500
-Date: Fri, 20 Jan 2017 17:30:24 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170120093024.GN4914@pxdev.xzpeter.org>
-References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
-	<1484276800-26814-2-git-send-email-peterx@redhat.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190C14FD2@SHSMSX101.ccr.corp.intel.com>
-	<20170120085457.GI4914@pxdev.xzpeter.org>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190C150AD@SHSMSX101.ccr.corp.intel.com>
-	<20170120091143.GK4914@pxdev.xzpeter.org>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190C15137@SHSMSX101.ccr.corp.intel.com>
+	(envelope-from <famz@redhat.com>) id 1cUVYA-0004Cm-9h
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 04:32:03 -0500
+Date: Fri, 20 Jan 2017 17:31:51 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170120093151.GD29561@lemon>
+References: <20170119205134.50112-1-farman@linux.vnet.ibm.com>
+	<20170119205134.50112-4-farman@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190C15137@SHSMSX101.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 01/14] IOMMU: add option to enable
- VTD_CAP_CM to vIOMMU capility exposoed to guest
+In-Reply-To: <20170119205134.50112-4-farman@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: get max_transfer limit for
+ char (scsi-generic) devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>
+To: Eric Farman <farman@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-On Fri, Jan 20, 2017 at 09:20:01AM +0000, Tian, Kevin wrote:
-> > From: Peter Xu [mailto:peterx@redhat.com]
-> > Sent: Friday, January 20, 2017 5:12 PM
-> > 
-> > On Fri, Jan 20, 2017 at 08:59:01AM +0000, Tian, Kevin wrote:
-> > 
-> > [...]
-> > 
-> > > > > Also for hot-add
-> > > > > device path, some check of caching mode is required. If not set,
-> > > > > should we fail hot-add operation? I don't think we have such physical
-> > > > > platform with some devices behind IOMMU while others not.
-> > > >
-> > > > Could you explain in what case will we fail a hot plug?
-> > > >
-> > >
-> > > user enables intel-iommu, but don't set caching mode.
-> > >
-> > > Then later user hot-add a PCI device to the VM. Guest will assume
-> > > newly assigned device also behind the default vIOMMU, and thus
-> > > needs to setup IOVA mappings, which is then broken...
-> > 
-> > Is the newly added device a vfio-pci device? If so, we should hit
-> > this and VM will stops to work:
-> > 
-> >     if (!s->cache_mode_enabled && new & IOMMU_NOTIFIER_MAP) {
-> >         error_report("We need to set cache_mode=1 for intel-iommu to enable "
-> >                      "device assignment with IOMMU protection.");
-> >         exit(1);
-> >     }
+On Thu, 01/19 21:51, Eric Farman wrote:
+> Commit 6f607174 introduced a routine to get the maximum number
+> of bytes for a single I/O transfer for block devices, however
+> scsi generic devices are character devices, not block.  Add
+> a condition for this, such that scsi generic devices can view
+> the same data.
 > 
-> sorry I didn't found this code. In which code path is it hit?
-
-It's in patch 14/14 of this series.
-
+> Some tweaking of data is required, because the block and sg
+> ioctls return values in different scales (sectors versus
+> bytes).  So adjust hdev_get_max_transfer_length such that it
+> always returns a value in bytes.
 > 
-> > 
-> > I admit this is not user-friendly, and a better way may be that we
-> > disallow the hot-plug in that case, telling the user about the error,
-> > rather than crashing the VM. But, I think that can be a patch outside
-> > this series, considering (again) that this only affects advanced
-> > users.
-> > 
+> Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
+> ---
+>  block/file-posix.c    | 10 ++++++----
+>  include/block/block.h |  1 +
+>  2 files changed, 7 insertions(+), 4 deletions(-)
 > 
-> Crashing VM is bad.... but anyway, I'll leave maintainer to decide
-> whether they'd like it fixed now or later. :-)
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 2115155..94068ca 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -657,9 +657,11 @@ static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
+>      int max_sectors = 0;
+>      short max_sectors_short = 0;
+>      if (bs->sg && ioctl(fd, BLKSECTGET, &max_sectors) == 0) {
+> +        /* sg returns a value in bytes */
+>          return max_sectors;
 
-Sure. Thanks,
+The variable name is now misleading, maybe use "bytes" instead?
 
--- peterx
+>      } else if (!bs->sg && ioctl(fd, BLKSECTGET, &max_sectors_short) == 0) {
+> -        return max_sectors_short;
+> +        /* block returns a value in sectors */
+> +        return max_sectors_short << BDRV_SECTOR_BITS;
+>      } else {
+>          return -errno;
+>      }
+> @@ -674,10 +676,10 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+>      struct stat st;
+>  
+>      if (!fstat(s->fd, &st)) {
+> -        if (S_ISBLK(st.st_mode)) {
+> +        if (S_ISBLK(st.st_mode) || S_ISCHR(st.st_mode)) {
+>              int ret = hdev_get_max_transfer_length(bs, s->fd);
+> -            if (ret > 0 && ret <= BDRV_REQUEST_MAX_SECTORS) {
+> -                bs->bl.max_transfer = pow2floor(ret << BDRV_SECTOR_BITS);
+> +            if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+> +                bs->bl.max_transfer = pow2floor(ret);
+>              }
+>          }
+>      }
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 8b0dcda..4e81f20 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -116,6 +116,7 @@ typedef struct HDGeometry {
+>  
+>  #define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BITS, \
+>                                       INT_MAX >> BDRV_SECTOR_BITS)
+> +#define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS)
+>  
+>  /*
+>   * Allocation status flags
+> -- 
+> 2.8.4
+> 
+> 
