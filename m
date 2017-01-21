@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUnJg-0001di-R8
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 23:30:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1cUnJl-0001fK-En
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 23:30:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cUnJd-0003iS-JB
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 23:30:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47153)
+	(envelope-from <bounces@canonical.com>) id 1cUnJk-0003le-E6
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 23:30:21 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47331)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cUnJd-0003iF-De
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 23:30:13 -0500
+	id 1cUnJk-0003lW-89
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 23:30:20 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cUnJc-00005L-6N
-	for <qemu-devel@nongnu.org>; Sat, 21 Jan 2017 04:30:12 +0000
+	id 1cUnJj-00006f-CH
+	for <qemu-devel@nongnu.org>; Sat, 21 Jan 2017 04:30:19 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2E9C22E80C7
-	for <qemu-devel@nongnu.org>; Sat, 21 Jan 2017 04:30:12 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5A7552E80C0
+	for <qemu-devel@nongnu.org>; Sat, 21 Jan 2017 04:30:19 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 21 Jan 2017 04:17:34 -0000
-From: Launchpad Bug Tracker <1484925@bugs.launchpad.net>
-Reply-To: Bug 1484925 <1484925@bugs.launchpad.net>
+Date: Sat, 21 Jan 2017 04:17:33 -0000
+From: Launchpad Bug Tracker <744856@bugs.launchpad.net>
+Reply-To: Bug 744856 <744856@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20150814122340.5606.46979.malonedeb@gac.canonical.com>
-Message-Id: <20170121041734.20915.27899.malone@loganberry.canonical.com>
+References: <20110329092737.29142.71749.malonedeb@gandwana.canonical.com>
+Message-Id: <20170121041733.20915.83752.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1484925] Re: Segfault with custom vnc client
+Subject: [Qemu-devel] [Bug 744856] Re: can't boot when using more than 6
+ disks since qemu-kvm-0.13
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,51 +48,45 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1484925
+https://bugs.launchpad.net/bugs/744856
 
 Title:
-  Segfault with custom vnc client
+  can't boot when using more than 6 disks since qemu-kvm-0.13
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Hey,
+  It's not possible to pass more than 6 disks to a guest since qemu-kvm-0.1=
+3 (also tested with 0.14).
+  If I pass more than 6 disks (as shown below) the machine complains that t=
+heir is no bootable disk,
 
-  I'm using Citrix XenServer 6.5. I worte a script that uses noVNC to
-  connect to the rfb console via xapi. When I use GRML and try to boot
-  it, the QEMU process segfaults and kills my VM. This happens when the
-  screen resizes and the kernel is loading:
+  The problem occurs with virtio and without virtio.
 
-  recvfrom(3, "\3\1\0\0\0\0\2\200\1\220\3\0\2\200\0\0\0P\1\220", 4096, 0, N=
-ULL, NULL) =3D 20
-  --- SIGSEGV {si_signo=3DSIGSEGV, si_code=3DSEGV_MAPERR, si_addr=3D0xb2800=
-0} ---
+  eg.
 
-  I can see in the child process the following message, right before the pa=
-rent Segfaults:
-  read(4, "cirrus: blanking the screen line_offset=3D0 height=3D480\n", 53)=
- =3D 53
-
-  This issue only happens, when I have my custom php/novnc-client
-  connected. I also tried the nodejs/novnc package from xen-orchestra -
-  same result. Using the stock client from Citrix XenCenter it works
-  just fine. So I think it is related to noVNC. I hope this is just a
-  bug and not exploitable to force a VM to crash or execute code.
-
-  XenServer launches the qemu with the following command line:
-
-  qemu-dm-25 --syslog -d 25 -m 2048 -boot dc -serial pty -vcpus 1
-  -videoram 4 -vncunused -k en-us -vnc 127.0.0.1:1 -usb -usbdevice
-  tablet -net nic,vlan=3D0,macaddr=3D8a:43:e2:b1:57:df,model=3Drtl8139 -net
-  tap,vlan=3D0,bridge=3Dxenbr0,ifname=3Dtap25.0 -acpi -monitor pty
-
-  XenServer 6.5 is using the following version:
-  # /usr/lib64/xen/bin/qemu-dm -help
-  QEMU PC emulator version 0.10.2, Copyright (c) 2003-2008 Fabrice Bellard
-
-  Greetings
-  Uli St=C3=A4rk
+  /usr/bin/qemu-system-x86_64  --enable-kvm -boot c   -drive
+  file=3D/dev/vgr5/fs-01,if=3Dvirtio -drive file=3D/dev/vgr5/fs-
+  01_srv_workspace,if=3Dvirtio -drive file=3D/dev/vgr5/fs-
+  01_srv_media,if=3Dvirtio -drive file=3D/dev/vgr5/fs-
+  01_srv_company,if=3Dvirtio -drive file=3D/dev/vgr5/fs-01_srv_tmp,if=3Dvir=
+tio
+  -drive file=3D/dev/vgr5/fs-01_srv_download,if=3Dvirtio -drive
+  file=3D/dev/vgr5/fs-01_srv_share,if=3Dvirtio -drive file=3D/dev/vgr5/fs-
+  01_srv_backup,if=3Dvirtio -drive file=3D/dev/vgr5/fs-
+  01_srv_private,if=3Dvirtio -drive file=3D/dev/vgr5/fs-
+  01_srv_build,if=3Dvirtio -drive file=3D/dev/vgr5/fs-01_srv_dev,if=3Dvirtio
+  -drive file=3D/dev/vgr5/fs-01_srv_backup2,if=3Dvirtio -drive
+  file=3D/dev/vgr5/fs-01_srv_ftp,if=3Dvirtio  -cpu qemu64 -smp 2  -m 4G
+  -append root=3D/dev/vda -usbdevice tablet -net
+  nic,macaddr=3D90:e6:ba:9d:00:0,model=3De1000 -net
+  tap,ifname=3Dtap0,script=3D/usr/sbin/qemu-ifup,downscript=3D/usr/sbin/qem=
+u-
+  ifdown  -monitor unix:/var/run/kvm/fs-01/monitor,server,nowait
+  -pidfile /var/run/kvm/fs-01/pid  -k de -kernel
+  /srv/kvm/kernel/linux-2.6.38-gentoo -append root=3D/dev/vda -vnc :0
+  -name fs-01,process=3Dfs-01 -vga std
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1484925/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/744856/+subscriptions
