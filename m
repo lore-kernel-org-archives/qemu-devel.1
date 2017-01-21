@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <somlo@cmu.edu>) id 1cUknr-00030O-2l
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 20:49:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1cUnJg-0001di-R8
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 23:30:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <somlo@cmu.edu>) id 1cUknn-0008Lb-Vs
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 20:49:15 -0500
-Received: from smtp.andrew.cmu.edu ([128.2.105.202]:38479)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <somlo@cmu.edu>) id 1cUknn-0008Kj-QT
-	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 20:49:11 -0500
-Date: Fri, 20 Jan 2017 20:49:01 -0500
-From: "Gabriel L. Somlo" <somlo@cmu.edu>
-Message-ID: <20170121014901.GA21645@foober.ini.cmu.edu>
+	(envelope-from <bounces@canonical.com>) id 1cUnJd-0003iS-JB
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 23:30:16 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47153)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cUnJd-0003iF-De
+	for qemu-devel@nongnu.org; Fri, 20 Jan 2017 23:30:13 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cUnJc-00005L-6N
+	for <qemu-devel@nongnu.org>; Sat, 21 Jan 2017 04:30:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2E9C22E80C7
+	for <qemu-devel@nongnu.org>; Sat, 21 Jan 2017 04:30:12 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1484915417-10499-1-git-send-email-phil@philjordan.eu>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] hw/usb/dev-hid: Make usb-tablet
- work with OS X/macOS guests
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 21 Jan 2017 04:17:34 -0000
+From: Launchpad Bug Tracker <1484925@bugs.launchpad.net>
+Reply-To: Bug 1484925 <1484925@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150814122340.5606.46979.malonedeb@gac.canonical.com>
+Message-Id: <20170121041734.20915.27899.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1484925] Re: Segfault with custom vnc client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +37,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: phil@philjordan.eu, kraxel@redhat.com
 
-On Fri, Jan 20, 2017 at 13:30:15 +0100, phil@philjordan.eu wrote:
-> This series makes the Qemu usb-tablet work correctly with OS X/macOS guests without the need for a special guest driver.
-> 
->  * The usb-tablet should not have a boot protocol of 2. Other OSes seem to ignore this, but the IOHIDFamily driver stack chokes on it for anything but conventional (relative motion) mice.
->  * A "mac_compat" boolean option is added to the usb-tablet, which changes its report descriptor to specify a usage of 0x02 (mouse) instead of 0x01 (pointer). This is required for correct operation in the Mac HID driver stack.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-works like a charm on Sierra (10.12.1). Also tried it with
-Fedora-Workstation-Live-x86_64-25-1.3.iso, where it behaves
-identically with or without the mac_compat option. All tests
-used qemu in SDL/X11-client mode.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Tested-by: Gabriel Somlo <somlo@cmu.edu>
+-- =
 
-Thanks,
---Gabriel
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1484925
 
-> 
-> Changelog
-> =========
-> 
-> v1 -> v2:
->  * v1 Thread was "[PATCH] hw/usb/dev-hid: add a Mac guest compatibility option to usb-tablet"
->  * Always apply the boot protocol (bInterfaceProtocol) change to usb-tablet, not just when the Mac compatibility option is active. The original value of 0x02 was determined to be incorrect according to the spec anyway.
->  * As the boot protocol change is permanent, separate interface and device descriptor constants for the Mac/non-Mac variants of the tablet are no longer required, and have been removed.
-> 
-> Phil Dennis-Jordan (2):
->   hw/usb/dev-hid: set bInterfaceProtocol to 0x00 for usb-tablet
->   hw/usb/dev-hid: add a usb-tablet Mac guest compatibility option
-> 
->  hw/usb/dev-hid.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+Title:
+  Segfault with custom vnc client
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Hey,
+
+  I'm using Citrix XenServer 6.5. I worte a script that uses noVNC to
+  connect to the rfb console via xapi. When I use GRML and try to boot
+  it, the QEMU process segfaults and kills my VM. This happens when the
+  screen resizes and the kernel is loading:
+
+  recvfrom(3, "\3\1\0\0\0\0\2\200\1\220\3\0\2\200\0\0\0P\1\220", 4096, 0, N=
+ULL, NULL) =3D 20
+  --- SIGSEGV {si_signo=3DSIGSEGV, si_code=3DSEGV_MAPERR, si_addr=3D0xb2800=
+0} ---
+
+  I can see in the child process the following message, right before the pa=
+rent Segfaults:
+  read(4, "cirrus: blanking the screen line_offset=3D0 height=3D480\n", 53)=
+ =3D 53
+
+  This issue only happens, when I have my custom php/novnc-client
+  connected. I also tried the nodejs/novnc package from xen-orchestra -
+  same result. Using the stock client from Citrix XenCenter it works
+  just fine. So I think it is related to noVNC. I hope this is just a
+  bug and not exploitable to force a VM to crash or execute code.
+
+  XenServer launches the qemu with the following command line:
+
+  qemu-dm-25 --syslog -d 25 -m 2048 -boot dc -serial pty -vcpus 1
+  -videoram 4 -vncunused -k en-us -vnc 127.0.0.1:1 -usb -usbdevice
+  tablet -net nic,vlan=3D0,macaddr=3D8a:43:e2:b1:57:df,model=3Drtl8139 -net
+  tap,vlan=3D0,bridge=3Dxenbr0,ifname=3Dtap25.0 -acpi -monitor pty
+
+  XenServer 6.5 is using the following version:
+  # /usr/lib64/xen/bin/qemu-dm -help
+  QEMU PC emulator version 0.10.2, Copyright (c) 2003-2008 Fabrice Bellard
+
+  Greetings
+  Uli St=C3=A4rk
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1484925/+subscriptions
