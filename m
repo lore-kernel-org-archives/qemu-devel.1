@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jazeltq@gmail.com>) id 1cUtRi-000242-4J
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 06:02:59 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cUtbl-00049e-TS
+	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 06:13:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jazeltq@gmail.com>) id 1cUtRg-0005Zb-Vn
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 06:02:58 -0500
-From: jazeltq@gmail.com
-Date: Sat, 21 Jan 2017 18:59:49 +0800
-Message-Id: <20170121105949.15466-1-jazeltq@gmail.com>
-Subject: [Qemu-devel] [RFC v3] RBD: Add support readv,writev for rbd
+	(envelope-from <no-reply@patchew.org>) id 1cUtbi-0001tC-Q1
+	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 06:13:21 -0500
+Resent-Message-Id: <E1cUtbi-0001tC-Q1@eggs.gnu.org>
+Message-ID: <148499718699.28.5734417610995647444@b042e9bf0dd0>
+In-Reply-To: <20170121105949.15466-1-jazeltq@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 21 Jan 2017 03:13:08 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC v3] RBD: Add support readv,writev for rbd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,157 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jdurgin@redhat.com, jcody@redhat.com, jdillama@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, ceph-devel@vger.kernel.org, tianqing <tianqing@unitedstack.com>
+To: jazeltq@gmail.com
+Cc: famz@redhat.com, jdurgin@redhat.com, jcody@redhat.com, jdillama@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, tianqing@unitedstack.com, ceph-devel@vger.kernel.org, qemu-devel@nongnu.org
 
-From: tianqing <tianqing@unitedstack.com>
-
-Rbd can do readv and writev directly, so wo do not need to transform
-iov to buf or vice versa any more.
-
-Signed-off-by: tianqing <tianqing@unitedstack.com>
----
- block/rbd.c | 47 +++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 41 insertions(+), 6 deletions(-)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index a57b3e3..4add4dd 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -73,7 +73,12 @@ typedef struct RBDAIOCB {
-     BlockAIOCB common;
-     int64_t ret;
-     QEMUIOVector *qiov;
-+/* Note:
-+ * The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h.
-+ */
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     char *bounce;
-+#endif
-     RBDAIOCmd cmd;
-     int error;
-     struct BDRVRBDState *s;
-@@ -83,7 +88,9 @@ typedef struct RADOSCB {
-     RBDAIOCB *acb;
-     struct BDRVRBDState *s;
-     int64_t size;
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     char *buf;
-+#endif
-     int64_t ret;
- } RADOSCB;
- 
-@@ -426,11 +433,21 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
-         }
-     } else {
-         if (r < 0) {
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-             memset(rcb->buf, 0, rcb->size);
-+#else
-+            iov_memset(acb->qiov->iov, acb->qiov->niov, 0, 0, acb->qiov->size);
-+#endif
-             acb->ret = r;
-             acb->error = 1;
-         } else if (r < rcb->size) {
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-             memset(rcb->buf + r, 0, rcb->size - r);
-+#else
-+            iov_memset(acb->qiov->iov, acb->qiov->niov,
-+                       r, 0, acb->qiov->size - r);
-+#endif
-+
-             if (!acb->error) {
-                 acb->ret = rcb->size;
-             }
-@@ -441,10 +458,12 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
- 
-     g_free(rcb);
- 
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     if (acb->cmd == RBD_AIO_READ) {
-         qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
-     }
-     qemu_vfree(acb->bounce);
-+#endif
-     acb->common.cb(acb->common.opaque, (acb->ret > 0 ? 0 : acb->ret));
- 
-     qemu_aio_unref(acb);
-@@ -655,8 +674,10 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     RBDAIOCB *acb;
-     RADOSCB *rcb = NULL;
-     rbd_completion_t c;
--    char *buf;
-     int r;
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-+    char * buf = NULL; 
-+#endif
- 
-     BDRVRBDState *s = bs->opaque;
- 
-@@ -664,6 +685,8 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     acb->cmd = cmd;
-     acb->qiov = qiov;
-     assert(!qiov || qiov->size == size);
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-+    
-     if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
-         acb->bounce = NULL;
-     } else {
-@@ -672,19 +695,21 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-             goto failed;
-         }
-     }
--    acb->ret = 0;
--    acb->error = 0;
--    acb->s = s;
--
-     if (cmd == RBD_AIO_WRITE) {
-         qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
-     }
--
-     buf = acb->bounce;
-+#endif
-+    acb->ret = 0;
-+    acb->error = 0;
-+    acb->s = s;
- 
-     rcb = g_new(RADOSCB, 1);
-+
-     rcb->acb = acb;
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     rcb->buf = buf;
-+#endif
-     rcb->s = acb->s;
-     rcb->size = size;
-     r = rbd_aio_create_completion(rcb, (rbd_callback_t) rbd_finish_aiocb, &c);
-@@ -694,10 +719,18 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
- 
-     switch (cmd) {
-     case RBD_AIO_WRITE:
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-         r = rbd_aio_write(s->image, off, size, buf, c);
-+#else
-+        r = rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c);
-+#endif
-         break;
-     case RBD_AIO_READ:
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-         r = rbd_aio_read(s->image, off, size, buf, c);
-+#else
-+        r = rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c);
-+#endif
-         break;
-     case RBD_AIO_DISCARD:
-         r = rbd_aio_discard_wrapper(s->image, off, size, c);
-@@ -719,7 +752,9 @@ failed_completion:
-     rbd_aio_release(c);
- failed:
-     g_free(rcb);
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     qemu_vfree(acb->bounce);
-+#endif
-     qemu_aio_unref(acb);
-     return NULL;
- }
--- 
-1.8.3.1
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtSRkMgdjNdIFJCRDogQWRkIHN1cHBvcnQgcmVhZHYsd3JpdGV2IGZvciByYmQKTWVz
+c2FnZS1pZDogMjAxNzAxMjExMDU5NDkuMTU0NjYtMS1qYXplbHRxQGdtYWlsLmNvbQpUeXBlOiBz
+ZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
+PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgoj
+IFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9n
+IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
+ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
+PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
+ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
+VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY4MjY1ODMgUkJEOiBB
+ZGQgc3VwcG9ydCByZWFkdix3cml0ZXYgZm9yIHJiZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
+Y2tpbmcgUEFUQ0ggMS8xOiBSQkQ6IEFkZCBzdXBwb3J0IHJlYWR2LHdyaXRldiBmb3IgcmJkLi4u
+CkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM4MTogRklMRTogYmxvY2svcmJkLmM6Njc5Ogor
+ICAgIGNoYXIgKiBidWYgPSBOVUxMOyAkCgpFUlJPUjogImZvbyAqIGJhciIgc2hvdWxkIGJlICJm
+b28gKmJhciIKIzgxOiBGSUxFOiBibG9jay9yYmQuYzo2Nzk6CisgICAgY2hhciAqIGJ1ZiA9IE5V
+TEw7IAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzkxOiBGSUxFOiBibG9jay9yYmQuYzo2
+ODk6CisgICAgJAoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjYgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
