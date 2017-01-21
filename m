@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ale@clearmind.me>) id 1cUrIE-00054F-0G
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 03:45:03 -0500
+	(envelope-from <ale@clearmind.me>) id 1cUrIE-00054G-0H
+	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 03:45:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ale@clearmind.me>) id 1cUrI9-0002db-TM
+	(envelope-from <ale@clearmind.me>) id 1cUrIA-0002eH-Gi
 	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 03:45:01 -0500
-Received: from clearmind.me ([178.32.49.9]:60337)
+Received: from clearmind.me ([178.32.49.9]:34153)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ale@clearmind.me>) id 1cUrI9-0002a4-IJ
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 03:44:57 -0500
+	(Exim 4.71) (envelope-from <ale@clearmind.me>) id 1cUrIA-0002b0-6U
+	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 03:44:58 -0500
 From: Alessandro Di Federico <ale+qemu@clearmind.me>
-Date: Sat, 21 Jan 2017 09:45:57 +0100
-Message-Id: <20170121084600.5860-1-ale+qemu@clearmind.me>
+Date: Sat, 21 Jan 2017 09:45:58 +0100
+Message-Id: <20170121084600.5860-2-ale+qemu@clearmind.me>
+In-Reply-To: <20170121084600.5860-1-ale+qemu@clearmind.me>
+References: <20170121084600.5860-1-ale+qemu@clearmind.me>
 Sender: ale@clearmind.me
-Subject: [Qemu-devel] [RFC PATCH 0/3] Preparing the build system for libtcg
+Subject: [Qemu-devel] [RFC PATCH 1/3] Factor out {linux,bsd}-user/qemu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,169 +26,609 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This series of patches introduce a set of changes, mainly to the QEMU
-build system, to open the way to implementing "libtcg", i.e., using
-QEMU's tiny code generator frontends as a library.
-
-For the initial proposal, please see the related discussion:
-
-http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg04847.html
-
-The idea is to build a PIC version of QEMU embedding only what's
-required to use the TCG frontend (typically
-target/$arch/translate.c). To achieve this, some functions have been
-moved out of translate.c to reduce the coupling with the other object
-files.
-
-All the configurations available on Linux and FreeBSD still build fine
-(without warnings).
-
-The last commit also introduces the libtcg/ directory and a series of
-*-libtcg targets (similar to the *-{bsd,linux}-user) with the bare
-minimum skeleton for the actual implementation and some dummy references
-to some functions that in my previous implementation of libtcg were
-required, to make sure that all the required object files are linked in.
-
-I've verified that all the libtcg-$arch.so libraries have no pending
-symbols.
-
-This is the complete list of new targets available:
-
-aarch64-libtcg alpha-libtcg arm-libtcg armeb-libtcg cris-libtcg i386-libtcg m68k-libtcg microblaze-libtcg microblazeel-libtcg mips-libtcg mips64-libtcg mips64el-libtcg mipsel-libtcg mipsn32-libtcg mipsn32el-libtcg or32-libtcg ppc-libtcg ppc64-libtcg ppc64abi32-libtcg ppc64le-libtcg s390x-libtcg sh4-libtcg sh4eb-libtcg sparc-libtcg sparc32plus-libtcg sparc64-libtcg unicore32-libtcg x86_64-libtcg
-
-Bonus: to reduce the coupling among object files I've create a quick &
-dirty Python script to create a Graphviz graph of the various
-dependencies among the object files. Simply feed it with a set of object
-files, change the name of the "entry" object file (currently anything
-containing "libtcg") and it will print the .dot file:
-
-    python graph.py *.o > graph.dot
-    dot -Tsvg graph.dot > graph.svg
-
-You can find the script here:
-
-https://clearmind.me/downloads/graph.py
-
-Comments are very welcome.
-
-Alessandro Di Federico (3):
-  Factor out {linux,bsd}-user/qemu.h
-  *-user targets object files decoupling
-  Introduce libtcg infrastructure
-
- Makefile                                |   7 ++
- Makefile.target                         |  40 ++++++-
- bsd-user/qemu.h                         | 193 +-------------------------------
- configure                               |  20 ++++
- crypto/Makefile.objs                    |   2 +-
- default-configs/aarch64-libtcg.mak      |   0
- default-configs/alpha-libtcg.mak        |   0
- default-configs/arm-libtcg.mak          |   0
- default-configs/armeb-libtcg.mak        |   0
- default-configs/cris-libtcg.mak         |   0
- default-configs/i386-libtcg.mak         |   0
- default-configs/m68k-libtcg.mak         |   0
- default-configs/microblaze-libtcg.mak   |   0
- default-configs/microblazeel-libtcg.mak |   0
- default-configs/mips-libtcg.mak         |   0
- default-configs/mips64-libtcg.mak       |   0
- default-configs/mips64el-libtcg.mak     |   0
- default-configs/mipsel-libtcg.mak       |   0
- default-configs/mipsn32-libtcg.mak      |   0
- default-configs/mipsn32el-libtcg.mak    |   0
- default-configs/or32-libtcg.mak         |   0
- default-configs/ppc-libtcg.mak          |   1 +
- default-configs/ppc64-libtcg.mak        |   1 +
- default-configs/ppc64abi32-libtcg.mak   |   1 +
- default-configs/ppc64le-libtcg.mak      |   1 +
- default-configs/s390x-libtcg.mak        |   0
- default-configs/sh4-libtcg.mak          |   0
- default-configs/sh4eb-libtcg.mak        |   0
- default-configs/sparc-libtcg.mak        |   0
- default-configs/sparc32plus-libtcg.mak  |   0
- default-configs/sparc64-libtcg.mak      |   0
- default-configs/unicore32-libtcg.mak    |   0
- default-configs/x86_64-libtcg.mak       |   0
- exec.c                                  |   2 +
- hw/core/Makefile.objs                   |   5 +-
- include/exec/helper-gen.h               |  12 +-
- include/exec/helper-head.h              |   8 ++
- include/exec/helper-tcg.h               |  12 +-
- libtcg/Makefile.objs                    |   1 +
- libtcg/qemu.h                           |   6 +
- libtcg/tcg.c                            |  55 +++++++++
- libtcg/tcg.h                            |   0
- linux-user/qemu.h                       | 176 +----------------------------
- qemu-user-common.h                      | 180 +++++++++++++++++++++++++++++
- target/alpha/Makefile.objs              |   9 +-
- target/arm/Makefile.objs                |  22 +++-
- target/arm/cpu.c                        | 118 +++++++++++++++++++
- target/arm/cpu.h                        |  82 ++++++++++----
- target/arm/helper.c                     |  73 +-----------
- target/arm/translate-a64.c              |  54 ---------
- target/arm/translate.c                  |  97 ++++++----------
- target/arm/translate.h                  |   7 --
- target/cris/Makefile.objs               |  10 +-
- target/i386/Makefile.objs               |  14 ++-
- target/lm32/Makefile.objs               |  12 +-
- target/m68k/Makefile.objs               |   7 +-
- target/m68k/op_helper.c                 |  23 ++++
- target/m68k/translate.c                 |  23 ----
- target/microblaze/Makefile.objs         |  10 +-
- target/mips/Makefile.objs               |  11 +-
- target/mips/op_helper.c                 |   8 --
- target/mips/translate.c                 |   8 ++
- target/moxie/Makefile.objs              |   8 +-
- target/openrisc/Makefile.objs           |  11 +-
- target/ppc/Makefile.objs                |  18 +--
- target/ppc/gdbstub.c                    |  20 ----
- target/ppc/translate.c                  |   2 +
- target/ppc/translate_init.c             |  28 +++++
- target/s390x/Makefile.objs              |  16 ++-
- target/sh4/Makefile.objs                |   8 +-
- target/sparc/Makefile.objs              |  15 ++-
- target/tilegx/Makefile.objs             |   7 +-
- target/tricore/Makefile.objs            |   7 +-
- target/unicore32/Makefile.objs          |   8 +-
- target/unicore32/helper.c               |  68 +++++++++++
- target/unicore32/translate.c            |  68 -----------
- target/xtensa/Makefile.objs             |  14 ++-
- trace/Makefile.objs                     |   2 +-
- translate-all.c                         |   4 +-
- 79 files changed, 837 insertions(+), 778 deletions(-)
- create mode 100644 default-configs/aarch64-libtcg.mak
- create mode 100644 default-configs/alpha-libtcg.mak
- create mode 100644 default-configs/arm-libtcg.mak
- create mode 100644 default-configs/armeb-libtcg.mak
- create mode 100644 default-configs/cris-libtcg.mak
- create mode 100644 default-configs/i386-libtcg.mak
- create mode 100644 default-configs/m68k-libtcg.mak
- create mode 100644 default-configs/microblaze-libtcg.mak
- create mode 100644 default-configs/microblazeel-libtcg.mak
- create mode 100644 default-configs/mips-libtcg.mak
- create mode 100644 default-configs/mips64-libtcg.mak
- create mode 100644 default-configs/mips64el-libtcg.mak
- create mode 100644 default-configs/mipsel-libtcg.mak
- create mode 100644 default-configs/mipsn32-libtcg.mak
- create mode 100644 default-configs/mipsn32el-libtcg.mak
- create mode 100644 default-configs/or32-libtcg.mak
- create mode 100644 default-configs/ppc-libtcg.mak
- create mode 100644 default-configs/ppc64-libtcg.mak
- create mode 100644 default-configs/ppc64abi32-libtcg.mak
- create mode 100644 default-configs/ppc64le-libtcg.mak
- create mode 100644 default-configs/s390x-libtcg.mak
- create mode 100644 default-configs/sh4-libtcg.mak
- create mode 100644 default-configs/sh4eb-libtcg.mak
- create mode 100644 default-configs/sparc-libtcg.mak
- create mode 100644 default-configs/sparc32plus-libtcg.mak
- create mode 100644 default-configs/sparc64-libtcg.mak
- create mode 100644 default-configs/unicore32-libtcg.mak
- create mode 100644 default-configs/x86_64-libtcg.mak
- create mode 100644 libtcg/Makefile.objs
- create mode 100644 libtcg/qemu.h
- create mode 100644 libtcg/tcg.c
- create mode 100644 libtcg/tcg.h
+A quite large part of {linux,bsd}-user/qemu.h is shared, this patch
+introduces qemu-user-common.h which factors it out. This shared part is
+also the bare minimum required to build a linux-user-like target, and,
+in particular, it will be useful for the libtcg targets.
+---
+ bsd-user/qemu.h    | 193 +----------------------------------------------------
+ linux-user/qemu.h  | 176 +-----------------------------------------------
+ qemu-user-common.h | 180 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 182 insertions(+), 367 deletions(-)
  create mode 100644 qemu-user-common.h
 
+diff --git a/bsd-user/qemu.h b/bsd-user/qemu.h
+index 2b2b9184e0..b51319caf0 100644
+--- a/bsd-user/qemu.h
++++ b/bsd-user/qemu.h
+@@ -17,10 +17,8 @@
+ #ifndef QEMU_H
+ #define QEMU_H
+ 
+-
+-#include "cpu.h"
++#include "qemu-user-common.h"
+ #include "exec/exec-all.h"
+-#include "exec/cpu_ldst.h"
+ 
+ #undef DEBUG_REMAP
+ #ifdef DEBUG_REMAP
+@@ -217,195 +215,6 @@ void mmap_fork_end(int child);
+ /* main.c */
+ extern unsigned long x86_stack_size;
+ 
+-/* user access */
+-
+-#define VERIFY_READ 0
+-#define VERIFY_WRITE 1 /* implies read access */
+-
+-static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
+-{
+-    return page_check_range((target_ulong)addr, size,
+-                            (type == VERIFY_READ) ? PAGE_READ : (PAGE_READ | PAGE_WRITE)) == 0;
+-}
+-
+-/* NOTE __get_user and __put_user use host pointers and don't check access. */
+-/* These are usually used to access struct data members once the
+- * struct has been locked - usually with lock_user_struct().
+- */
+-#define __put_user(x, hptr)\
+-({\
+-    int size = sizeof(*hptr);\
+-    switch(size) {\
+-    case 1:\
+-        *(uint8_t *)(hptr) = (uint8_t)(typeof(*hptr))(x);\
+-        break;\
+-    case 2:\
+-        *(uint16_t *)(hptr) = tswap16((typeof(*hptr))(x));\
+-        break;\
+-    case 4:\
+-        *(uint32_t *)(hptr) = tswap32((typeof(*hptr))(x));\
+-        break;\
+-    case 8:\
+-        *(uint64_t *)(hptr) = tswap64((typeof(*hptr))(x));\
+-        break;\
+-    default:\
+-        abort();\
+-    }\
+-    0;\
+-})
+-
+-#define __get_user(x, hptr) \
+-({\
+-    int size = sizeof(*hptr);\
+-    switch(size) {\
+-    case 1:\
+-        x = (typeof(*hptr))*(uint8_t *)(hptr);\
+-        break;\
+-    case 2:\
+-        x = (typeof(*hptr))tswap16(*(uint16_t *)(hptr));\
+-        break;\
+-    case 4:\
+-        x = (typeof(*hptr))tswap32(*(uint32_t *)(hptr));\
+-        break;\
+-    case 8:\
+-        x = (typeof(*hptr))tswap64(*(uint64_t *)(hptr));\
+-        break;\
+-    default:\
+-        /* avoid warning */\
+-        x = 0;\
+-        abort();\
+-    }\
+-    0;\
+-})
+-
+-/* put_user()/get_user() take a guest address and check access */
+-/* These are usually used to access an atomic data type, such as an int,
+- * that has been passed by address.  These internally perform locking
+- * and unlocking on the data type.
+- */
+-#define put_user(x, gaddr, target_type)                                 \
+-({                                                                      \
+-    abi_ulong __gaddr = (gaddr);                                        \
+-    target_type *__hptr;                                                \
+-    abi_long __ret;                                                     \
+-    if ((__hptr = lock_user(VERIFY_WRITE, __gaddr, sizeof(target_type), 0))) { \
+-        __ret = __put_user((x), __hptr);                                \
+-        unlock_user(__hptr, __gaddr, sizeof(target_type));              \
+-    } else                                                              \
+-        __ret = -TARGET_EFAULT;                                         \
+-    __ret;                                                              \
+-})
+-
+-#define get_user(x, gaddr, target_type)                                 \
+-({                                                                      \
+-    abi_ulong __gaddr = (gaddr);                                        \
+-    target_type *__hptr;                                                \
+-    abi_long __ret;                                                     \
+-    if ((__hptr = lock_user(VERIFY_READ, __gaddr, sizeof(target_type), 1))) { \
+-        __ret = __get_user((x), __hptr);                                \
+-        unlock_user(__hptr, __gaddr, 0);                                \
+-    } else {                                                            \
+-        /* avoid warning */                                             \
+-        (x) = 0;                                                        \
+-        __ret = -TARGET_EFAULT;                                         \
+-    }                                                                   \
+-    __ret;                                                              \
+-})
+-
+-#define put_user_ual(x, gaddr) put_user((x), (gaddr), abi_ulong)
+-#define put_user_sal(x, gaddr) put_user((x), (gaddr), abi_long)
+-#define put_user_u64(x, gaddr) put_user((x), (gaddr), uint64_t)
+-#define put_user_s64(x, gaddr) put_user((x), (gaddr), int64_t)
+-#define put_user_u32(x, gaddr) put_user((x), (gaddr), uint32_t)
+-#define put_user_s32(x, gaddr) put_user((x), (gaddr), int32_t)
+-#define put_user_u16(x, gaddr) put_user((x), (gaddr), uint16_t)
+-#define put_user_s16(x, gaddr) put_user((x), (gaddr), int16_t)
+-#define put_user_u8(x, gaddr)  put_user((x), (gaddr), uint8_t)
+-#define put_user_s8(x, gaddr)  put_user((x), (gaddr), int8_t)
+-
+-#define get_user_ual(x, gaddr) get_user((x), (gaddr), abi_ulong)
+-#define get_user_sal(x, gaddr) get_user((x), (gaddr), abi_long)
+-#define get_user_u64(x, gaddr) get_user((x), (gaddr), uint64_t)
+-#define get_user_s64(x, gaddr) get_user((x), (gaddr), int64_t)
+-#define get_user_u32(x, gaddr) get_user((x), (gaddr), uint32_t)
+-#define get_user_s32(x, gaddr) get_user((x), (gaddr), int32_t)
+-#define get_user_u16(x, gaddr) get_user((x), (gaddr), uint16_t)
+-#define get_user_s16(x, gaddr) get_user((x), (gaddr), int16_t)
+-#define get_user_u8(x, gaddr)  get_user((x), (gaddr), uint8_t)
+-#define get_user_s8(x, gaddr)  get_user((x), (gaddr), int8_t)
+-
+-/* copy_from_user() and copy_to_user() are usually used to copy data
+- * buffers between the target and host.  These internally perform
+- * locking/unlocking of the memory.
+- */
+-abi_long copy_from_user(void *hptr, abi_ulong gaddr, size_t len);
+-abi_long copy_to_user(abi_ulong gaddr, void *hptr, size_t len);
+-
+-/* Functions for accessing guest memory.  The tget and tput functions
+-   read/write single values, byteswapping as necessary.  The lock_user function
+-   gets a pointer to a contiguous area of guest memory, but does not perform
+-   any byteswapping.  lock_user may return either a pointer to the guest
+-   memory, or a temporary buffer.  */
+-
+-/* Lock an area of guest memory into the host.  If copy is true then the
+-   host area will have the same contents as the guest.  */
+-static inline void *lock_user(int type, abi_ulong guest_addr, long len, int copy)
+-{
+-    if (!access_ok(type, guest_addr, len))
+-        return NULL;
+-#ifdef DEBUG_REMAP
+-    {
+-        void *addr;
+-        addr = g_malloc(len);
+-        if (copy)
+-            memcpy(addr, g2h(guest_addr), len);
+-        else
+-            memset(addr, 0, len);
+-        return addr;
+-    }
+-#else
+-    return g2h(guest_addr);
+-#endif
+-}
+-
+-/* Unlock an area of guest memory.  The first LEN bytes must be
+-   flushed back to guest memory. host_ptr = NULL is explicitly
+-   allowed and does nothing. */
+-static inline void unlock_user(void *host_ptr, abi_ulong guest_addr,
+-                               long len)
+-{
+-
+-#ifdef DEBUG_REMAP
+-    if (!host_ptr)
+-        return;
+-    if (host_ptr == g2h(guest_addr))
+-        return;
+-    if (len > 0)
+-        memcpy(g2h(guest_addr), host_ptr, len);
+-    g_free(host_ptr);
+-#endif
+-}
+-
+-/* Return the length of a string in target memory or -TARGET_EFAULT if
+-   access error. */
+-abi_long target_strlen(abi_ulong gaddr);
+-
+-/* Like lock_user but for null terminated strings.  */
+-static inline void *lock_user_string(abi_ulong guest_addr)
+-{
+-    abi_long len;
+-    len = target_strlen(guest_addr);
+-    if (len < 0)
+-        return NULL;
+-    return lock_user(VERIFY_READ, guest_addr, (long)(len + 1), 1);
+-}
+-
+-/* Helper macros for locking/unlocking a target struct.  */
+-#define lock_user_struct(type, host_ptr, guest_addr, copy)      \
+-    (host_ptr = lock_user(type, guest_addr, sizeof(*host_ptr), copy))
+-#define unlock_user_struct(host_ptr, guest_addr, copy)          \
+-    unlock_user(host_ptr, guest_addr, (copy) ? sizeof(*host_ptr) : 0)
+-
+ #if defined(CONFIG_USE_NPTL)
+ #include <pthread.h>
+ #endif
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index da73a01106..b56abb5942 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -2,9 +2,8 @@
+ #define QEMU_H
+ 
+ #include "hostdep.h"
+-#include "cpu.h"
++#include "qemu-user-common.h"
+ #include "exec/exec-all.h"
+-#include "exec/cpu_ldst.h"
+ 
+ #undef DEBUG_REMAP
+ #ifdef DEBUG_REMAP
+@@ -436,179 +435,6 @@ void mmap_fork_end(int child);
+ /* main.c */
+ extern unsigned long guest_stack_size;
+ 
+-/* user access */
+-
+-#define VERIFY_READ 0
+-#define VERIFY_WRITE 1 /* implies read access */
+-
+-static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
+-{
+-    return page_check_range((target_ulong)addr, size,
+-                            (type == VERIFY_READ) ? PAGE_READ : (PAGE_READ | PAGE_WRITE)) == 0;
+-}
+-
+-/* NOTE __get_user and __put_user use host pointers and don't check access.
+-   These are usually used to access struct data members once the struct has
+-   been locked - usually with lock_user_struct.  */
+-
+-/* Tricky points:
+-   - Use __builtin_choose_expr to avoid type promotion from ?:,
+-   - Invalid sizes result in a compile time error stemming from
+-     the fact that abort has no parameters.
+-   - It's easier to use the endian-specific unaligned load/store
+-     functions than host-endian unaligned load/store plus tswapN.  */
+-
+-#define __put_user_e(x, hptr, e)                                        \
+-  (__builtin_choose_expr(sizeof(*(hptr)) == 1, stb_p,                   \
+-   __builtin_choose_expr(sizeof(*(hptr)) == 2, stw_##e##_p,             \
+-   __builtin_choose_expr(sizeof(*(hptr)) == 4, stl_##e##_p,             \
+-   __builtin_choose_expr(sizeof(*(hptr)) == 8, stq_##e##_p, abort))))   \
+-     ((hptr), (x)), (void)0)
+-
+-#define __get_user_e(x, hptr, e)                                        \
+-  ((x) = (typeof(*hptr))(                                               \
+-   __builtin_choose_expr(sizeof(*(hptr)) == 1, ldub_p,                  \
+-   __builtin_choose_expr(sizeof(*(hptr)) == 2, lduw_##e##_p,            \
+-   __builtin_choose_expr(sizeof(*(hptr)) == 4, ldl_##e##_p,             \
+-   __builtin_choose_expr(sizeof(*(hptr)) == 8, ldq_##e##_p, abort))))   \
+-     (hptr)), (void)0)
+-
+-#ifdef TARGET_WORDS_BIGENDIAN
+-# define __put_user(x, hptr)  __put_user_e(x, hptr, be)
+-# define __get_user(x, hptr)  __get_user_e(x, hptr, be)
+-#else
+-# define __put_user(x, hptr)  __put_user_e(x, hptr, le)
+-# define __get_user(x, hptr)  __get_user_e(x, hptr, le)
+-#endif
+-
+-/* put_user()/get_user() take a guest address and check access */
+-/* These are usually used to access an atomic data type, such as an int,
+- * that has been passed by address.  These internally perform locking
+- * and unlocking on the data type.
+- */
+-#define put_user(x, gaddr, target_type)					\
+-({									\
+-    abi_ulong __gaddr = (gaddr);					\
+-    target_type *__hptr;						\
+-    abi_long __ret = 0;							\
+-    if ((__hptr = lock_user(VERIFY_WRITE, __gaddr, sizeof(target_type), 0))) { \
+-        __put_user((x), __hptr);				\
+-        unlock_user(__hptr, __gaddr, sizeof(target_type));		\
+-    } else								\
+-        __ret = -TARGET_EFAULT;						\
+-    __ret;								\
+-})
+-
+-#define get_user(x, gaddr, target_type)					\
+-({									\
+-    abi_ulong __gaddr = (gaddr);					\
+-    target_type *__hptr;						\
+-    abi_long __ret = 0;							\
+-    if ((__hptr = lock_user(VERIFY_READ, __gaddr, sizeof(target_type), 1))) { \
+-        __get_user((x), __hptr);				\
+-        unlock_user(__hptr, __gaddr, 0);				\
+-    } else {								\
+-        /* avoid warning */						\
+-        (x) = 0;							\
+-        __ret = -TARGET_EFAULT;						\
+-    }									\
+-    __ret;								\
+-})
+-
+-#define put_user_ual(x, gaddr) put_user((x), (gaddr), abi_ulong)
+-#define put_user_sal(x, gaddr) put_user((x), (gaddr), abi_long)
+-#define put_user_u64(x, gaddr) put_user((x), (gaddr), uint64_t)
+-#define put_user_s64(x, gaddr) put_user((x), (gaddr), int64_t)
+-#define put_user_u32(x, gaddr) put_user((x), (gaddr), uint32_t)
+-#define put_user_s32(x, gaddr) put_user((x), (gaddr), int32_t)
+-#define put_user_u16(x, gaddr) put_user((x), (gaddr), uint16_t)
+-#define put_user_s16(x, gaddr) put_user((x), (gaddr), int16_t)
+-#define put_user_u8(x, gaddr)  put_user((x), (gaddr), uint8_t)
+-#define put_user_s8(x, gaddr)  put_user((x), (gaddr), int8_t)
+-
+-#define get_user_ual(x, gaddr) get_user((x), (gaddr), abi_ulong)
+-#define get_user_sal(x, gaddr) get_user((x), (gaddr), abi_long)
+-#define get_user_u64(x, gaddr) get_user((x), (gaddr), uint64_t)
+-#define get_user_s64(x, gaddr) get_user((x), (gaddr), int64_t)
+-#define get_user_u32(x, gaddr) get_user((x), (gaddr), uint32_t)
+-#define get_user_s32(x, gaddr) get_user((x), (gaddr), int32_t)
+-#define get_user_u16(x, gaddr) get_user((x), (gaddr), uint16_t)
+-#define get_user_s16(x, gaddr) get_user((x), (gaddr), int16_t)
+-#define get_user_u8(x, gaddr)  get_user((x), (gaddr), uint8_t)
+-#define get_user_s8(x, gaddr)  get_user((x), (gaddr), int8_t)
+-
+-/* copy_from_user() and copy_to_user() are usually used to copy data
+- * buffers between the target and host.  These internally perform
+- * locking/unlocking of the memory.
+- */
+-abi_long copy_from_user(void *hptr, abi_ulong gaddr, size_t len);
+-abi_long copy_to_user(abi_ulong gaddr, void *hptr, size_t len);
+-
+-/* Functions for accessing guest memory.  The tget and tput functions
+-   read/write single values, byteswapping as necessary.  The lock_user function
+-   gets a pointer to a contiguous area of guest memory, but does not perform
+-   any byteswapping.  lock_user may return either a pointer to the guest
+-   memory, or a temporary buffer.  */
+-
+-/* Lock an area of guest memory into the host.  If copy is true then the
+-   host area will have the same contents as the guest.  */
+-static inline void *lock_user(int type, abi_ulong guest_addr, long len, int copy)
+-{
+-    if (!access_ok(type, guest_addr, len))
+-        return NULL;
+-#ifdef DEBUG_REMAP
+-    {
+-        void *addr;
+-        addr = g_malloc(len);
+-        if (copy)
+-            memcpy(addr, g2h(guest_addr), len);
+-        else
+-            memset(addr, 0, len);
+-        return addr;
+-    }
+-#else
+-    return g2h(guest_addr);
+-#endif
+-}
+-
+-/* Unlock an area of guest memory.  The first LEN bytes must be
+-   flushed back to guest memory. host_ptr = NULL is explicitly
+-   allowed and does nothing. */
+-static inline void unlock_user(void *host_ptr, abi_ulong guest_addr,
+-                               long len)
+-{
+-
+-#ifdef DEBUG_REMAP
+-    if (!host_ptr)
+-        return;
+-    if (host_ptr == g2h(guest_addr))
+-        return;
+-    if (len > 0)
+-        memcpy(g2h(guest_addr), host_ptr, len);
+-    g_free(host_ptr);
+-#endif
+-}
+-
+-/* Return the length of a string in target memory or -TARGET_EFAULT if
+-   access error. */
+-abi_long target_strlen(abi_ulong gaddr);
+-
+-/* Like lock_user but for null terminated strings.  */
+-static inline void *lock_user_string(abi_ulong guest_addr)
+-{
+-    abi_long len;
+-    len = target_strlen(guest_addr);
+-    if (len < 0)
+-        return NULL;
+-    return lock_user(VERIFY_READ, guest_addr, (long)(len + 1), 1);
+-}
+-
+-/* Helper macros for locking/unlocking a target struct.  */
+-#define lock_user_struct(type, host_ptr, guest_addr, copy)	\
+-    (host_ptr = lock_user(type, guest_addr, sizeof(*host_ptr), copy))
+-#define unlock_user_struct(host_ptr, guest_addr, copy)		\
+-    unlock_user(host_ptr, guest_addr, (copy) ? sizeof(*host_ptr) : 0)
+-
+ #include <pthread.h>
+ 
+ /* Include target-specific struct and function definitions;
+diff --git a/qemu-user-common.h b/qemu-user-common.h
+new file mode 100644
+index 0000000000..349dd72fff
+--- /dev/null
++++ b/qemu-user-common.h
+@@ -0,0 +1,180 @@
++#ifndef QEMU_USER_COMMON_H
++#define QEMU_USER_COMMON_H
++
++#include "cpu.h"
++#include "exec/cpu_ldst.h"
++
++/* user access */
++
++#define VERIFY_READ 0
++#define VERIFY_WRITE 1 /* implies read access */
++
++static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
++{
++    return page_check_range((target_ulong)addr, size,
++                            (type == VERIFY_READ) ? PAGE_READ : (PAGE_READ | PAGE_WRITE)) == 0;
++}
++
++/* NOTE __get_user and __put_user use host pointers and don't check access.
++   These are usually used to access struct data members once the struct has
++   been locked - usually with lock_user_struct.  */
++
++/* Tricky points:
++   - Use __builtin_choose_expr to avoid type promotion from ?:,
++   - Invalid sizes result in a compile time error stemming from
++     the fact that abort has no parameters.
++   - It's easier to use the endian-specific unaligned load/store
++     functions than host-endian unaligned load/store plus tswapN.  */
++
++#define __put_user_e(x, hptr, e)                                        \
++  (__builtin_choose_expr(sizeof(*(hptr)) == 1, stb_p,                   \
++   __builtin_choose_expr(sizeof(*(hptr)) == 2, stw_##e##_p,             \
++   __builtin_choose_expr(sizeof(*(hptr)) == 4, stl_##e##_p,             \
++   __builtin_choose_expr(sizeof(*(hptr)) == 8, stq_##e##_p, abort))))   \
++     ((hptr), (x)), (void)0)
++
++#define __get_user_e(x, hptr, e)                                        \
++  ((x) = (typeof(*hptr))(                                               \
++   __builtin_choose_expr(sizeof(*(hptr)) == 1, ldub_p,                  \
++   __builtin_choose_expr(sizeof(*(hptr)) == 2, lduw_##e##_p,            \
++   __builtin_choose_expr(sizeof(*(hptr)) == 4, ldl_##e##_p,             \
++   __builtin_choose_expr(sizeof(*(hptr)) == 8, ldq_##e##_p, abort))))   \
++     (hptr)), (void)0)
++
++#ifdef TARGET_WORDS_BIGENDIAN
++# define __put_user(x, hptr)  __put_user_e(x, hptr, be)
++# define __get_user(x, hptr)  __get_user_e(x, hptr, be)
++#else
++# define __put_user(x, hptr)  __put_user_e(x, hptr, le)
++# define __get_user(x, hptr)  __get_user_e(x, hptr, le)
++#endif
++
++/* put_user()/get_user() take a guest address and check access */
++/* These are usually used to access an atomic data type, such as an int,
++ * that has been passed by address.  These internally perform locking
++ * and unlocking on the data type.
++ */
++#define put_user(x, gaddr, target_type)					\
++({									\
++    abi_ulong __gaddr = (gaddr);					\
++    target_type *__hptr;						\
++    abi_long __ret = 0;							\
++    if ((__hptr = lock_user(VERIFY_WRITE, __gaddr, sizeof(target_type), 0))) { \
++        __put_user((x), __hptr);				\
++        unlock_user(__hptr, __gaddr, sizeof(target_type));		\
++    } else								\
++        __ret = -TARGET_EFAULT;						\
++    __ret;								\
++})
++
++#define get_user(x, gaddr, target_type)					\
++({									\
++    abi_ulong __gaddr = (gaddr);					\
++    target_type *__hptr;						\
++    abi_long __ret = 0;							\
++    if ((__hptr = lock_user(VERIFY_READ, __gaddr, sizeof(target_type), 1))) { \
++        __get_user((x), __hptr);				\
++        unlock_user(__hptr, __gaddr, 0);				\
++    } else {								\
++        /* avoid warning */						\
++        (x) = 0;							\
++        __ret = -TARGET_EFAULT;						\
++    }									\
++    __ret;								\
++})
++
++#define put_user_ual(x, gaddr) put_user((x), (gaddr), abi_ulong)
++#define put_user_sal(x, gaddr) put_user((x), (gaddr), abi_long)
++#define put_user_u64(x, gaddr) put_user((x), (gaddr), uint64_t)
++#define put_user_s64(x, gaddr) put_user((x), (gaddr), int64_t)
++#define put_user_u32(x, gaddr) put_user((x), (gaddr), uint32_t)
++#define put_user_s32(x, gaddr) put_user((x), (gaddr), int32_t)
++#define put_user_u16(x, gaddr) put_user((x), (gaddr), uint16_t)
++#define put_user_s16(x, gaddr) put_user((x), (gaddr), int16_t)
++#define put_user_u8(x, gaddr)  put_user((x), (gaddr), uint8_t)
++#define put_user_s8(x, gaddr)  put_user((x), (gaddr), int8_t)
++
++#define get_user_ual(x, gaddr) get_user((x), (gaddr), abi_ulong)
++#define get_user_sal(x, gaddr) get_user((x), (gaddr), abi_long)
++#define get_user_u64(x, gaddr) get_user((x), (gaddr), uint64_t)
++#define get_user_s64(x, gaddr) get_user((x), (gaddr), int64_t)
++#define get_user_u32(x, gaddr) get_user((x), (gaddr), uint32_t)
++#define get_user_s32(x, gaddr) get_user((x), (gaddr), int32_t)
++#define get_user_u16(x, gaddr) get_user((x), (gaddr), uint16_t)
++#define get_user_s16(x, gaddr) get_user((x), (gaddr), int16_t)
++#define get_user_u8(x, gaddr)  get_user((x), (gaddr), uint8_t)
++#define get_user_s8(x, gaddr)  get_user((x), (gaddr), int8_t)
++
++/* copy_from_user() and copy_to_user() are usually used to copy data
++ * buffers between the target and host.  These internally perform
++ * locking/unlocking of the memory.
++ */
++abi_long copy_from_user(void *hptr, abi_ulong gaddr, size_t len);
++abi_long copy_to_user(abi_ulong gaddr, void *hptr, size_t len);
++
++/* Functions for accessing guest memory.  The tget and tput functions
++   read/write single values, byteswapping as necessary.  The lock_user function
++   gets a pointer to a contiguous area of guest memory, but does not perform
++   any byteswapping.  lock_user may return either a pointer to the guest
++   memory, or a temporary buffer.  */
++
++/* Lock an area of guest memory into the host.  If copy is true then the
++   host area will have the same contents as the guest.  */
++static inline void *lock_user(int type, abi_ulong guest_addr, long len, int copy)
++{
++    if (!access_ok(type, guest_addr, len))
++        return NULL;
++#ifdef DEBUG_REMAP
++    {
++        void *addr;
++        addr = g_malloc(len);
++        if (copy)
++            memcpy(addr, g2h(guest_addr), len);
++        else
++            memset(addr, 0, len);
++        return addr;
++    }
++#else
++    return g2h(guest_addr);
++#endif
++}
++
++/* Unlock an area of guest memory.  The first LEN bytes must be
++   flushed back to guest memory. host_ptr = NULL is explicitly
++   allowed and does nothing. */
++static inline void unlock_user(void *host_ptr, abi_ulong guest_addr,
++                               long len)
++{
++
++#ifdef DEBUG_REMAP
++    if (!host_ptr)
++        return;
++    if (host_ptr == g2h(guest_addr))
++        return;
++    if (len > 0)
++        memcpy(g2h(guest_addr), host_ptr, len);
++    g_free(host_ptr);
++#endif
++}
++
++/* Return the length of a string in target memory or -TARGET_EFAULT if
++   access error. */
++abi_long target_strlen(abi_ulong gaddr);
++
++/* Like lock_user but for null terminated strings.  */
++static inline void *lock_user_string(abi_ulong guest_addr)
++{
++    abi_long len;
++    len = target_strlen(guest_addr);
++    if (len < 0)
++        return NULL;
++    return lock_user(VERIFY_READ, guest_addr, (long)(len + 1), 1);
++}
++
++/* Helper macros for locking/unlocking a target struct.  */
++#define lock_user_struct(type, host_ptr, guest_addr, copy)	\
++    (host_ptr = lock_user(type, guest_addr, sizeof(*host_ptr), copy))
++#define unlock_user_struct(host_ptr, guest_addr, copy)		\
++    unlock_user(host_ptr, guest_addr, (copy) ? sizeof(*host_ptr) : 0)
++
++#endif /* QEMU_USER_COMMON_H */
 -- 
 2.11.0
