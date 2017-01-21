@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cUukO-0005tO-Vq
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 07:26:25 -0500
+	(envelope-from <jazeltq@gmail.com>) id 1cUvad-0004P2-Mr
+	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 08:20:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cUukJ-00084F-Ax
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 07:26:20 -0500
-Received: from [2a01:4f8:140:52e5::2] (port=46501 helo=latin.grep.be)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cUukJ-000807-4u
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 07:26:15 -0500
-Date: Sat, 21 Jan 2017 13:25:50 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20170121122550.qzm4u7lnzj3nxsmf@grep.be>
-References: <20161214150840.10899-1-alex@alex.org.uk>
-	<442dcfe4-8704-2898-655e-da383a0caf76@virtuozzo.com>
-	<220990D0-ACB6-4F25-BADF-63898FE71BED@alex.org.uk>
-	<0654e27f-9c2f-993c-befd-1f1e8e75aabf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0654e27f-9c2f-993c-befd-1f1e8e75aabf@redhat.com>
-Subject: Re: [Qemu-devel] [Nbd]  [PATCH] Further tidy-up on block status
+	(envelope-from <jazeltq@gmail.com>) id 1cUvac-0000wd-4L
+	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 08:20:19 -0500
+From: jazeltq@gmail.com
+Date: Sat, 21 Jan 2017 21:19:09 +0800
+Message-Id: <20170121131909.17230-1-jazeltq@gmail.com>
+In-Reply-To: <148499718699.28.5734417610995647444@b042e9bf0dd0>
+References: <148499718699.28.5734417610995647444@b042e9bf0dd0>
+Subject: [Qemu-devel] [RFC v4] RBD: Add support readv,writev for rbd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +19,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Alex Bligh <alex@alex.org.uk>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V . Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
+To: jdurgin@redhat.com, jcody@redhat.com, jdillama@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, ceph-devel@vger.kernel.org, tianqing <tianqing@unitedstack.com>
 
-On Fri, Jan 20, 2017 at 01:35:10PM -0600, Eric Blake wrote:
-> On 01/20/2017 12:00 PM, Alex Bligh wrote:
-> > 
-> >> On 20 Jan 2017, at 17:04, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-> >>
-> >> About extents: is 32bit length enough? We will have to send 4096 for empty 16tb disk..
-> > 
-> > The nbd protocol uniformly uses 32 bit lengths (for better or for worse). This is baked into the specification heavily.
-> > 
-> > I'm not sure sending 4,096 items for an empty 16TB disk is any great hardship to be honest.
-> 
-> If it truly matters, an idea that has already been floated on the list
-> is to add a new NBD_CMD_FLAG_SCALE (or some other spelling) that states
-> that a particular command is sending lengths scaled by a particular
-> factor (by the block size? obviously it would have to be better
-> specified).  Under this idea, the scaling factor would allow you to
-> report larger extents for fewer back-and-forth operations, but it gets
-> tricky if the scaling is allowed to get larger than the minimum
-> granularity between extent changes.
+From: tianqing <tianqing@unitedstack.com>
 
-Right, but people objected to it on grounds of it being too complicated
-(which I think was a fair point).
+Rbd can do readv and writev directly, so wo do not need to transform
+iov to buf or vice versa any more.
 
-> The other idea that has been floated is a way to report whether the
-> entire export is known to be all-zero content at the time the client
-> connects, which would trade 4096+ queries (you'd actually have to do
-> more than 4096 queries, since length is < 4G, not <= 4G) with a single
-> piece of information at the time the client connects.
+Signed-off-by: tianqing <tianqing@unitedstack.com>
+---
+ block/rbd.c | 47 +++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 6 deletions(-)
 
-That's pretty special-case, and I objected to it on those grounds :-)
-
-However, I don't think there's anything necessarily wrong in changing
-the size of the length field in the reply header of the
-NBD_REPLY_TYPE_BLOCK_STATUS packet. That way, combined with the fact
-that we'd already stated that a server may send more information than
-was requested, a client could ask for metadata on an export, and if the
-extent is the whole size of the export, the server could say so in a
-single reply for all export sizes.
-
-I suppose it'd be slightly odd to have the request use 32-bit lengths
-and the response be expressed in 64-bit ones, but I suppose that's the
-price we pay to remain a backwards compatible and not too complicated a
-protocol.
-
-> Either way, discussion on such enhancements are probably worth a new
-> thread.
-
-Sure.
-
+diff --git a/block/rbd.c b/block/rbd.c
+index a57b3e3..0cbd9e3 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -73,7 +73,12 @@ typedef struct RBDAIOCB {
+     BlockAIOCB common;
+     int64_t ret;
+     QEMUIOVector *qiov;
++/* Note:
++ * The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h.
++ */
++#ifndef LIBRBD_SUPPORTS_IOVEC
+     char *bounce;
++#endif
+     RBDAIOCmd cmd;
+     int error;
+     struct BDRVRBDState *s;
+@@ -83,7 +88,9 @@ typedef struct RADOSCB {
+     RBDAIOCB *acb;
+     struct BDRVRBDState *s;
+     int64_t size;
++#ifndef LIBRBD_SUPPORTS_IOVEC
+     char *buf;
++#endif
+     int64_t ret;
+ } RADOSCB;
+ 
+@@ -426,11 +433,21 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+         }
+     } else {
+         if (r < 0) {
++#ifndef LIBRBD_SUPPORTS_IOVEC
+             memset(rcb->buf, 0, rcb->size);
++#else
++            iov_memset(acb->qiov->iov, acb->qiov->niov, 0, 0, acb->qiov->size);
++#endif
+             acb->ret = r;
+             acb->error = 1;
+         } else if (r < rcb->size) {
++#ifndef LIBRBD_SUPPORTS_IOVEC
+             memset(rcb->buf + r, 0, rcb->size - r);
++#else
++            iov_memset(acb->qiov->iov, acb->qiov->niov,
++                       r, 0, acb->qiov->size - r);
++#endif
++
+             if (!acb->error) {
+                 acb->ret = rcb->size;
+             }
+@@ -441,10 +458,12 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+ 
+     g_free(rcb);
+ 
++#ifndef LIBRBD_SUPPORTS_IOVEC
+     if (acb->cmd == RBD_AIO_READ) {
+         qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
+     }
+     qemu_vfree(acb->bounce);
++#endif
+     acb->common.cb(acb->common.opaque, (acb->ret > 0 ? 0 : acb->ret));
+ 
+     qemu_aio_unref(acb);
+@@ -655,8 +674,10 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+     RBDAIOCB *acb;
+     RADOSCB *rcb = NULL;
+     rbd_completion_t c;
+-    char *buf;
+     int r;
++#ifndef LIBRBD_SUPPORTS_IOVEC
++    char *buf = NULL;
++#endif
+ 
+     BDRVRBDState *s = bs->opaque;
+ 
+@@ -664,6 +685,8 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+     acb->cmd = cmd;
+     acb->qiov = qiov;
+     assert(!qiov || qiov->size == size);
++#ifndef LIBRBD_SUPPORTS_IOVEC
++
+     if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
+         acb->bounce = NULL;
+     } else {
+@@ -672,19 +695,21 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+             goto failed;
+         }
+     }
+-    acb->ret = 0;
+-    acb->error = 0;
+-    acb->s = s;
+-
+     if (cmd == RBD_AIO_WRITE) {
+         qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
+     }
+-
+     buf = acb->bounce;
++#endif
++    acb->ret = 0;
++    acb->error = 0;
++    acb->s = s;
+ 
+     rcb = g_new(RADOSCB, 1);
++
+     rcb->acb = acb;
++#ifndef LIBRBD_SUPPORTS_IOVEC
+     rcb->buf = buf;
++#endif
+     rcb->s = acb->s;
+     rcb->size = size;
+     r = rbd_aio_create_completion(rcb, (rbd_callback_t) rbd_finish_aiocb, &c);
+@@ -694,10 +719,18 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+ 
+     switch (cmd) {
+     case RBD_AIO_WRITE:
++#ifndef LIBRBD_SUPPORTS_IOVEC
+         r = rbd_aio_write(s->image, off, size, buf, c);
++#else
++        r = rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c);
++#endif
+         break;
+     case RBD_AIO_READ:
++#ifndef LIBRBD_SUPPORTS_IOVEC
+         r = rbd_aio_read(s->image, off, size, buf, c);
++#else
++        r = rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c);
++#endif
+         break;
+     case RBD_AIO_DISCARD:
+         r = rbd_aio_discard_wrapper(s->image, off, size, c);
+@@ -719,7 +752,9 @@ failed_completion:
+     rbd_aio_release(c);
+ failed:
+     g_free(rcb);
++#ifndef LIBRBD_SUPPORTS_IOVEC
+     qemu_vfree(acb->bounce);
++#endif
+     qemu_aio_unref(acb);
+     return NULL;
+ }
 -- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+2.10.2
