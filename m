@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cV8YV-0000PX-4Q
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 22:11:00 -0500
+	(envelope-from <kevin.tian@intel.com>) id 1cV9yy-0002Xg-Ms
+	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 23:42:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cV8YR-0004PO-Up
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 22:10:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36974)
+	(envelope-from <kevin.tian@intel.com>) id 1cV9yv-000219-J9
+	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 23:42:24 -0500
+Received: from mga11.intel.com ([192.55.52.93]:39423)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cV8YR-0004PI-Oy
-	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 22:10:55 -0500
-Date: Sun, 22 Jan 2017 11:10:51 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170122031051.GE13810@pxdev.xzpeter.org>
-References: <1484968585.26205.2.camel@gmail.com>
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1cV9yv-00020N-9q
+	for qemu-devel@nongnu.org; Sat, 21 Jan 2017 23:42:21 -0500
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Sun, 22 Jan 2017 04:42:13 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190C16A18@SHSMSX101.ccr.corp.intel.com>
+References: <1484276800-26814-1-git-send-email-peterx@redhat.com>
+	<1484276800-26814-3-git-send-email-peterx@redhat.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190C14F86@SHSMSX101.ccr.corp.intel.com>
+	<20170120090506.GJ4914@pxdev.xzpeter.org>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190C15103@SHSMSX101.ccr.corp.intel.com>
+	<20170120092736.GM4914@pxdev.xzpeter.org>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190C1525C@SHSMSX101.ccr.corp.intel.com>
+	<20170120100426.GO4914@pxdev.xzpeter.org>
+In-Reply-To: <20170120100426.GO4914@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1484968585.26205.2.camel@gmail.com>
-Subject: Re: [Qemu-devel] Nested PCI passthrough
+Subject: Re: [Qemu-devel] [PATCH RFC v3 02/14] intel_iommu: simplify irq
+ region translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: fassl <superfassl@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>
 
-On Sat, Jan 21, 2017 at 04:16:25AM +0100, fassl wrote:
-> Hello,
-> 
-> i am trying to pass through a graphic card to a guest within a guest.
-> So far i can see a text console within the target vm which says
-> "radeon: ring 0 test failed", so it times out in radeon_vce_ring_test
-> function. I am using qemu 2.8.50 at revision
-> 0f6bcf68a99efdc531b209551f2b760b0bdcc554.
-> 
-> The relevant lowermost host arguments are:
-> -machine pc-q35-2.8,accel=kvm,kernel-irqchip=split
-> -device intel-iommu,intremap=on,eim=on
-> 
-> If i dont set the x-vga flag for the passed through device in the
-> lowermost host the VM within the VM does not reset(?) the device during
-> shutdown and the screen freezes. If i do, the screen goes black and no
-> signal is going to the screen anymore and i can restart the target VM
-> without the whole machine freezing. (one has to set
-> CONFIG_VFIO_PCI_VGA=y in the kernel of the first VM, or call
-> pci_register_vga to get this)
-> 
-> Also with irqchip=split the first vm cannot shutdown gracefully and
-> crashes during shutdown.
-> 
-> I also can see some IRTE vector and trigger mode inconsistencies, can
-> they cause this?
-
-This should not be related. Even you don't passthrough devices, they
-should be possibly there as well as long as you are running Linux
-inside guest (of course, you should have enabled IOMMU_DEBUG).
-
--- peterx
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlk
+YXksIEphbnVhcnkgMjAsIDIwMTcgNjowNCBQTQ0KPiANCj4gT24gRnJpLCBKYW4gMjAsIDIwMTcg
+YXQgMDk6NTI6MDFBTSArMDAwMCwgVGlhbiwgS2V2aW4gd3JvdGU6DQo+IA0KPiBbLi4uXQ0KPiAN
+Cj4gPiBidHcgd2hhdCBhYm91dCBndWVzdCBzZXR1cHMgYSB2YWxpZCBtYXBwaW5nIGF0IDB4RkVF
+eF94eHh4IGluDQo+ID4gaXRzIHJlbWFwcGluZyBzdHJ1Y3R1cmUsIHdoaWNoIGlzIHRoZW4gcHJv
+Z3JhbW1lZCB0byB2aXJ0dWFsDQo+ID4gZGV2aWNlIGFzIERNQSBkZXN0aW5hdGlvbj8gVGhlbiB3
+aGVuIGVtdWxhdGluZyB0aGF0IHZpcnR1YWwgRE1BLA0KPiA+IHZ0ZF9kb19pb21tdV90cmFuc2xh
+dGUgc2hvdWxkIHNpbXBseSByZXR1cm4gKG1heWJlIHRocm93IG91dA0KPiA+IGEgd2FybmluZyBm
+b3IgZGlhZ25vc3RpYyBwdXJwb3NlKSBpbnN0ZWFkIG9mIGFzc2VydCBoZXJlLg0KPiA+DQo+ID4g
+VlQtZCBzcGVjIGRlZmluZXMgYXMgYmVsb3c6DQo+ID4NCj4gPiAJU29mdHdhcmUgbXVzdCBlbnN1
+cmUgdGhlIHNlY29uZC1sZXZlbCBwYWdpbmctc3RydWN0dXJlIGVudHJpZXMNCj4gPiAJYXJlIHBy
+b2dyYW1tZWQgbm90IHRvIHJlbWFwIGlucHV0IGFkZHJlc3NlcyB0byB0aGUgaW50ZXJydXB0DQo+
+ID4gCWFkZHJlc3MgcmFuZ2UuIEhhcmR3YXJlIGJlaGF2aW9yIGlzIHVuZGVmaW5lZCBmb3IgbWVt
+b3J5DQo+ID4gCXJlcXVlc3RzIHJlbWFwcGVkIHRvIHRoZSBpbnRlcnJ1cHQgYWRkcmVzcyByYW5n
+ZS4NCj4gDQo+IFRoYW5rcyBmb3IgdGhpcyByZWZlcmVuY2UuIFRoYXQncyBzb21ldGhpbmcgSSB3
+YXMgY3VyaW91cyBhYm91dC4NCj4gDQo+ID4NCj4gPiBJIGRvbid0IHRoaW5rICJoYXJkd2FyZSBi
+ZWhhdmlvciBpcyB1bmRlZmluZWQiIGlzIGVxdWFsIHRvICJhc3NlcnQNCj4gPiB0aHVzIGtpbGwg
+Vk0iLi4uDQo+IA0KPiBJIGRvbid0IHRoaW5rIGl0IHdpbGwga2lsbCB0aGUgVk0uIEFmdGVyIHdl
+IGhhdmUgdGhlIE1TSSByZWdpb24sIGl0DQo+IHNob3VsZCBqdXN0IHVzZSB0aGF0IElSIHJlZ2lv
+biBmb3IgZXZlcnl0aGluZyAocmVhZC93cml0ZS90cmFuc2xhdGUpLg0KPiBTbyBpaXVjIHdoZW4g
+YW55b25lIHNldHVwcyBJT1ZBIG1hcHBpbmcgd2l0aGluIHJhbmdlIDB4ZmVleHh4eHgsIHRoZW4N
+Cj4gYSBETUEgd2lsbCB0cmlnZ2VyIGFuIGludGVycnVwdCAocmF0aGVyIHRoYW4gbWVtb3J5IG1v
+dmVzKSwgYnV0IGluDQo+IG1vc3QgY2FzZXMgdGhlIGludGVycnVwdCB3aWxsIGJlIGlsbGVnYWwg
+c2luY2UgZWl0aGVyIHRoZSBkYXRhIGlzDQo+IGludmFsaWQgKGUuZy4sIG5vbi16ZXJvIHJlc2Vy
+dmVkIGJpdHMsIG9yIFNJRCB2ZXJpZmljYXRpb24gZmFpbHVyZSksDQo+IGZ1cnRoZXIgaXQgc2hv
+dWxkIHRyaWdnZXIgYSB2SU9NTVUgZmF1bHQgKHRob3VnaCBJUiBmYXVsdCByZXBvcnRpbmcgaXMN
+Cj4gc3RpbGwgaW5jb21wbGV0ZSwgdGhhdCdzIG15IG5leHQgdGhpbmcgdG8gZG8gYWZ0ZXIgdGhp
+cyBzZXJpZXMpLg0KPiANCg0KWWVzLCB5b3UncmUgcmlnaHQgaGVyZS4gU29ycnkgZm9yIGJvdGhl
+cmluZyB3aXRoIG15IHdyb25nIHVuZGVyc3RhbmRpbmcuIDotKQ0KDQpUaGFua3MNCktldmluDQo=
