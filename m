@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cVJvr-0001Rd-Vn
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 10:19:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1cVO0V-0007kt-Vv
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 14:40:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cVJvo-0006yh-KA
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 10:19:51 -0500
-Received: from mail.weilnetz.de ([37.221.199.173]:39244)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cVJvo-0006yG-Db
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 10:19:48 -0500
-References: <54F1DEE8.3010903@weilnetz.de>
-	<20150302221228.GC4114@stefanha-thinkpad.redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <3763fa56-5bba-b060-6ee8-120c9cc50dbb@weilnetz.de>
-Date: Sun, 22 Jan 2017 16:19:43 +0100
+	(envelope-from <bounces@canonical.com>) id 1cVO0R-0007Zo-2r
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 14:40:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52107)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cVO0Q-0007ZZ-T1
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 14:40:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cVO0N-00082M-Dv
+	for <qemu-devel@nongnu.org>; Sun, 22 Jan 2017 19:40:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 43E4B2E80C8
+	for <qemu-devel@nongnu.org>; Sun, 22 Jan 2017 19:40:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20150302221228.GC4114@stefanha-thinkpad.redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU website (wiki) improvements
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 22 Jan 2017 19:34:34 -0000
+From: dcb <1658506@bugs.launchpad.net>
+Reply-To: Bug 1658506 <1658506@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170122193434.14023.61016.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1658506] [NEW]
+ qemu/hw/intc/arm_gicv3_cpuif.c:2433: bad expression ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-On 03/02/15 23:12, Stefan Hajnoczi wrote:
-> On Sat, Feb 28, 2015 at 04:29:44PM +0100, Stefan Weil wrote:
->> * It does not support secure access (https), so each login is insecure.
->>   Can we get a free server certificate?
->
-> This is on my todo list.  I'm travelling right now but will work on it
-> over the coming weeks.
->
-> There are some gotchas:
->
-> 1. qemu.org vs qemu-project.org.  Unless we get a SNI certificate, the
->    certificate will only be valid for one or the other.  Users will get
->    an untrusted certificate message if they go to the other domain name.
->
-> 2. We use subdomains, so a wildcard certificate is necessary.  That's
->    not always offered for free so I need to compare the certificate
->    vendors.
->
-> Stefan
+Public bug reported:
 
+qemu/hw/intc/arm_gicv3_cpuif.c:2433]: (style) Expression '(X &
+0x2000000000000000) =3D=3D 0x1' is always false.
 
-Although this discussion thread is rather old, its subject
-still applies.
+Source code is
 
-In the meantime there are free certificates available.
-We could add https support with a certificate from
-https://letsencrypt.org/. As long as there is only a
-small number of host names (*), I'd simply add them all
-to the primary certificate. In addition, SNI certificates
-for the different names can be installed.
+           ((lr & ICH_LR_EL2_HW) =3D=3D 1 || (lr & ICH_LR_EL2_EOI) =3D=3D 0=
+)) {
 
-I can help with the installation if that is needed.
+Maybe better code
 
-Stefan
+           ((lr & ICH_LR_EL2_HW) !=3D 0 || (lr & ICH_LR_EL2_EOI) =3D=3D 0))=
+ {
 
-(*)
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-qemu.org
-qemu.osuosl.org
-qemu-project.org
-wiki.qemu.org
-wiki.qemu-project.org
-www.qemu.org
-www.qemu-project.org
+-- =
 
-Are there more host names used?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1658506
+
+Title:
+  qemu/hw/intc/arm_gicv3_cpuif.c:2433: bad expression ?
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu/hw/intc/arm_gicv3_cpuif.c:2433]: (style) Expression '(X &
+  0x2000000000000000) =3D=3D 0x1' is always false.
+
+  Source code is
+
+             ((lr & ICH_LR_EL2_HW) =3D=3D 1 || (lr & ICH_LR_EL2_EOI) =3D=3D=
+ 0))
+  {
+
+  Maybe better code
+
+             ((lr & ICH_LR_EL2_HW) !=3D 0 || (lr & ICH_LR_EL2_EOI) =3D=3D 0=
+))
+  {
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1658506/+subscriptions
