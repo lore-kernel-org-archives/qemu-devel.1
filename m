@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cVE4f-0003M8-52
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 04:04:33 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cVE6R-0004Lf-2p
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 04:06:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cVE4c-0005PT-2q
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 04:04:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56620)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cVE4b-0005Ok-UQ
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 04:04:30 -0500
-Date: Sun, 22 Jan 2017 17:04:25 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170122090425.GB26526@pxdev.xzpeter.org>
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-19-git-send-email-peterx@redhat.com>
-	<490bbb84-213b-1b2a-5a1b-fa42a5c6a359@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1cVE6N-00060X-V4
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 04:06:23 -0500
+Resent-Message-Id: <E1cVE6N-00060X-V4@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21410)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cVE6N-0005zO-NF
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 04:06:19 -0500
+Message-ID: <148507596881.56.9046967533735337442@b042e9bf0dd0>
+In-Reply-To: <CY1PR17MB031324368F190B92EFA547ACDB730@CY1PR17MB0313.namprd17.prod.outlook.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <490bbb84-213b-1b2a-5a1b-fa42a5c6a359@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v4 18/20] intel_iommu: enable vfio
- devices
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 22 Jan 2017 01:06:10 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] util/envlist: Fix 2 bugs in envlist_setenv
+ and envlist_unsetenv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: chaojianhu@hotmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, jasowang@redhat.com, ppandit@redhat.com
 
-On Sun, Jan 22, 2017 at 04:08:04PM +0800, Jason Wang wrote:
-
-[...]
-
-> >+static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-> >+                                           uint16_t domain_id, hwaddr addr,
-> >+                                           uint8_t am)
-> >+{
-> >+    IntelIOMMUNotifierNode *node;
-> >+    VTDContextEntry ce;
-> >+    int ret;
-> >+
-> >+    QLIST_FOREACH(node, &(s->notifiers_list), next) {
-> >+        VTDAddressSpace *vtd_as = node->vtd_as;
-> >+        ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-> >+                                       vtd_as->devfn, &ce);
-> >+        if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-> >+            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SIZE,
-> >+                          vtd_page_invalidate_notify_hook,
-> >+                          (void *)&vtd_as->iommu, true);
-> 
-> Why not simply trigger the notifier here? (or is this vfio required?)
-
-Because we may only want to notify part of the region - we are with
-mask here, but not exact size.
-
-Consider this: guest (with caching mode) maps 12K memory (4K*3 pages),
-the mask will be extended to 16K in the guest. In that case, we need
-to explicitly go over the page entry to know that the 4th page should
-not be notified.
-
-> 
-> >+        }
-> >+    }
-> >+}
-> >+
-> >  static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
-> >                                        hwaddr addr, uint8_t am)
-> >  {
-> >@@ -1215,6 +1243,7 @@ static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
-> >      info.addr = addr;
-> >      info.mask = ~((1 << am) - 1);
-> >      g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page, &info);
-> >+    vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
-> 
-> I think it's better to squash DSI and GLOBAL invalidation into this patch,
-> otherwise the patch is buggy.
-
-I can do this. Thanks,
-
--- peterx
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSF0gdXRpbC9lbnZsaXN0OiBGaXggMiBidWdzIGluIGVudmxpc3Rfc2V0ZW52
+IGFuZCBlbnZsaXN0X3Vuc2V0ZW52Ck1lc3NhZ2UtaWQ6IENZMVBSMTdNQjAzMTMyNDM2OEYxOTBC
+OTJFRkE1NDdBQ0RCNzMwQENZMVBSMTdNQjAzMTMubmFtcHJkMTcucHJvZC5vdXRsb29rLmNvbQpU
+eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
+YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
+ZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
+aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChn
+aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
+IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
+Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
+MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjNkMGMyNjAg
+dXRpbC9lbnZsaXN0OiBGaXggMiBidWdzIGluIGVudmxpc3Rfc2V0ZW52IGFuZCBlbnZsaXN0X3Vu
+c2V0ZW52Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHV0aWwvZW52
+bGlzdDogRml4IDIgYnVncyBpbiBlbnZsaXN0X3NldGVudiBhbmQgZW52bGlzdF91bnNldGVudi4u
+LgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyOTogRklMRTogdXRp
+bC9lbnZsaXN0LmM6MTMzOgorXklzdHJ1Y3QgZW52bGlzdF9lbnRyeSAqZW50cnkgPSBOVUxMLCAq
+ZW50cnlfb2xkID0gTlVMTDskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
+YWJzCiM0MDogRklMRTogdXRpbC9lbnZsaXN0LmM6MTUwOgorXklmb3IgKGVudHJ5X29sZCA9IGVu
+dmxpc3QtPmVsX2VudHJpZXMubGhfZmlyc3Q7IGVudHJ5X29sZCAhPSBOVUxMOyQKCkVSUk9SOiBj
+b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQxOiBGSUxFOiB1dGlsL2Vudmxpc3Qu
+YzoxNTE6CiteSSAgICBlbnRyeV9vbGQgPSBlbnRyeV9vbGQtPmV2X2xpbmsubGVfbmV4dCkgeyQK
+CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQyOiBGSUxFOiB1dGls
+L2Vudmxpc3QuYzoxNTI6CiteSV5JaWYgKHN0cm5jbXAoZW50cnlfb2xkLT5ldl92YXIsIGVudiwg
+ZW52bmFtZV9sZW4pID09IDApJAoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBh
+bGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNDI6IEZJTEU6IHV0aWwvZW52bGlzdC5jOjE1MjoK
+KwkJaWYgKHN0cm5jbXAoZW50cnlfb2xkLT5ldl92YXIsIGVudiwgZW52bmFtZV9sZW4pID09IDAp
+ClsuLi5dCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2MTogRklM
+RTogdXRpbC9lbnZsaXN0LmM6MTYzOgorXklpZiAoZW50cnlfb2xkICE9IE5VTEwpIHskCgpFUlJP
+UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2MjogRklMRTogdXRpbC9lbnZs
+aXN0LmM6MTY0OgorXkleSVFMSVNUX1JFTU9WRShlbnRyeV9vbGQsIGV2X2xpbmspOyQKCkVSUk9S
+OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzYzOiBGSUxFOiB1dGlsL2Vudmxp
+c3QuYzoxNjU6CiteSV5JZnJlZSgoY2hhciAqKWVudHJ5X29sZC0+ZXZfdmFyKTskCgpFUlJPUjog
+Y29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2NDogRklMRTogdXRpbC9lbnZsaXN0
+LmM6MTY2OgorXkleSWZyZWUoZW50cnlfb2xkKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
+IG5ldmVyIHVzZSB0YWJzCiM2NTogRklMRTogdXRpbC9lbnZsaXN0LmM6MTY3OgorXkl9IGVsc2Ug
+eyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY2OiBGSUxFOiB1
+dGlsL2Vudmxpc3QuYzoxNjg6CiteSV5JZW52bGlzdC0+ZWxfY291bnQrKzskCgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2NzogRklMRTogdXRpbC9lbnZsaXN0LmM6
+MTY5OgorXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzY6
+IEZJTEU6IHV0aWwvZW52bGlzdC5jOjE4OToKK15JZW52bmFtZV9sZW4gPSBzdHJsZW4oZW52KTsk
+CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3NzogRklMRTogdXRp
+bC9lbnZsaXN0LmM6MTkwOgorXklpZigwID09IGVudm5hbWVfbGVuKSQKCkVSUk9SOiBzcGFjZSBy
+ZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygnCiM3NzogRklMRTogdXRpbC9l
+bnZsaXN0LmM6MTkwOgorCWlmKDAgPT0gZW52bmFtZV9sZW4pCgpFUlJPUjogYnJhY2VzIHt9IGFy
+ZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM3NzogRklMRTogdXRp
+bC9lbnZsaXN0LmM6MTkwOgorCWlmKDAgPT0gZW52bmFtZV9sZW4pClsuLi5dCgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3ODogRklMRTogdXRpbC9lbnZsaXN0LmM6
+MTkxOgorXkleSXJldHVybiAoRUlOVkFMKTskCgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0
+aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM3ODogRklMRTogdXRpbC9lbnZsaXN0
+LmM6MTkxOgorCQlyZXR1cm4gKEVJTlZBTCk7Cgp0b3RhbDogMTggZXJyb3JzLCAwIHdhcm5pbmdz
+LCA2MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+Cgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
+ZWxpc3RzLm9yZw==
