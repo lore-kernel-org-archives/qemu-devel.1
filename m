@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cVdbo-0002BX-Et
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:20:32 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cVdgB-0005w4-4Z
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:25:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cVdbn-0001wd-9Y
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:20:28 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:5940 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cVdbm-0001wL-TJ
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:20:27 -0500
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <1f949d1d-9069-9195-ee45-23fc153ec5cb@virtuozzo.com>
-Date: Mon, 23 Jan 2017 15:20:12 +0300
+	(envelope-from <atar4qemu@gmail.com>) id 1cVdg8-0003cS-En
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:24:58 -0500
 MIME-Version: 1.0
-In-Reply-To: <1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/21] backup: move from done_bitmap to
- copy_bitmap
+In-Reply-To: <1485164923-17736-4-git-send-email-armbru@redhat.com>
+References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
+	<1485164923-17736-4-git-send-email-armbru@redhat.com>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Mon, 23 Jan 2017 13:24:33 +0100
+Message-ID: <CACXAS8DMFsmEx0_px3SuJiOjPqhhkp2kKf7DA2GYP_PeWjnXsQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 3/6] hw: Default -drive to if=none instead
+ of ide when ide cannot work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +23,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com, jcody@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 
-23.12.2016 17:28, Vladimir Sementsov-Ogievskiy wrote:
-> Use HBitmap copy_bitmap instead of done_bitmap. This is needed to unify
-> backup loop for full/incremental modes in future patches.
+On Mon, Jan 23, 2017 at 10:48 AM, Markus Armbruster <armbru@redhat.com> wrote:
+> Block backends defined with -drive if=ide are meant to be picked up by
+> machine initialization code: a suitable frontend gets created and
+> wired up automatically.
 >
-> We reset bit of the copy_bitmap immediately after checking it in
-> backup_do_cow(). It is safe, because all other intersecting requests
-> will wait for our request finish anyway.
+> if=ide drives not picked up that way can still be used with -device as
+> if they had if=none, but that's unclean and best avoided.  Unused ones
+> produce an "Orphaned drive without device" warning.
 >
-> The other difference is that in case of error we will have zeroed bit in
-> copy_bitmap, when in done_bitmap we have not set bit.
+> -drive parameter "if" is optional, and the default depends on the
+> machine type.  If a machine type doesn't specify a default, the
+> default is "ide".
+>
+> Many machine types implicitly default to if=ide that way, even though
+> they don't actually have an IDE controller.  This makes no sense.
+>
+> Change the implicit default to if=none.  Affected machines:
+>
+> * all targets: none
+> * aarch64/arm: akita ast2500 canon cheetah collie connex imx25
+>   integratorcp kzm lm3s6965evb lm3s811evb mainstone musicpal n800 n810
+>   netduino2 nuri palmetto realview romulus sabrelite smdkc210 sx1 sx1
+>   verdex z2
+> * cris: axis-dev88
+> * i386/x86_64: xenpv
+> * lm32: lm32-evr lm32-uclinux milkymist
+> * m68k: an5206 dummy mcf5208evb
+> * microblaze/microblazeel: petalogix-ml605 petalogix-s3adsp1800
+> * mips/mips64/mips64el/mipsel: mipssim
+> * moxie: moxiesim
+> * or32: or32-sim
+> * ppc/ppc64/ppcemb: bamboo ref405ep taihu virtex-ml507
+> * ppc/ppc64: mpc8544ds ppce500
+> * sh4/sh4eb: shix
+> * sparc: leon3_generic
+> * sparc64: niagara
 
-This sentence is unrelated. It actually relates to old my mistake (not 
-published versions), which is fixed here. Really, in case of error I set 
-bit in copy_bitmap back, to correspond to old behavior with done_bitmap.
+The sparc64: niagara part,
 
+Acked-By: Artyom Tarasenko <atar4qemu@gmail.com>
+
+> * tricore: tricore_testboard
+> * unicore32: puv3
+> * xtensa/xtensaeb: kc705 lx200 lx60 ml605 sim
 >
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> None of these machines have an IDE controller, let alone code to
+> honor if=ide.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-arm@nongnu.org
+> Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: xen-devel@lists.xensource.com
+> Cc: Michael Walle <michael@walle.cc>
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> Cc: Anthony Green <green@moxielogic.com>
+> Cc: Jia Liu <proljc@gmail.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: qemu-ppc@nongnu.org
+> Cc: Magnus Damm <magnus.damm@gmail.com>
+> Cc: Fabien Chouteau <chouteau@adacore.com>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
+> Cc: Max Filippov <jcmvbkbc@gmail.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   block/backup.c | 17 ++++++++++-------
->   1 file changed, 10 insertions(+), 7 deletions(-)
+>  include/sysemu/blockdev.h | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
 >
-> diff --git a/block/backup.c b/block/backup.c
-> index ea38733..6b27e55 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -39,11 +39,12 @@ typedef struct BackupBlockJob {
->       BlockdevOnError on_target_error;
->       CoRwlock flush_rwlock;
->       uint64_t sectors_read;
-> -    unsigned long *done_bitmap;
->       int64_t cluster_size;
->       bool compress;
->       NotifierWithReturn before_write;
->       QLIST_HEAD(, CowRequest) inflight_reqs;
-> +
-> +    HBitmap *copy_bitmap;
->   } BackupBlockJob;
->   
->   /* Size of a cluster in sectors, instead of bytes. */
-> @@ -115,10 +116,11 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->       cow_request_begin(&cow_request, job, start, end);
->   
->       for (; start < end; start++) {
-> -        if (test_bit(start, job->done_bitmap)) {
-> +        if (!hbitmap_get(job->copy_bitmap, start)) {
->               trace_backup_do_cow_skip(job, start);
->               continue; /* already copied */
->           }
-> +        hbitmap_reset(job->copy_bitmap, start, 1);
->   
->           trace_backup_do_cow_process(job, start);
->   
-> @@ -141,6 +143,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->               if (error_is_read) {
->                   *error_is_read = true;
->               }
-> +            hbitmap_set(job->copy_bitmap, start, 1);
->               goto out;
->           }
->   
-> @@ -157,11 +160,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->               if (error_is_read) {
->                   *error_is_read = false;
->               }
-> +            hbitmap_set(job->copy_bitmap, start, 1);
->               goto out;
->           }
->   
-> -        set_bit(start, job->done_bitmap);
-> -
->           /* Publish progress, guest I/O counts as progress too.  Note that the
->            * offset field is an opaque progress value, it is not a disk offset.
->            */
-> @@ -271,7 +273,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
->       }
->   
->       len = DIV_ROUND_UP(backup_job->common.len, backup_job->cluster_size);
-> -    bitmap_zero(backup_job->done_bitmap, len);
-> +    hbitmap_set(backup_job->copy_bitmap, 0, len);
->   }
->   
->   void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
-> @@ -450,7 +452,8 @@ static void coroutine_fn backup_run(void *opaque)
->       start = 0;
->       end = DIV_ROUND_UP(job->common.len, job->cluster_size);
->   
-> -    job->done_bitmap = bitmap_new(end);
-> +    job->copy_bitmap = hbitmap_alloc(end, 0);
-> +    hbitmap_set(job->copy_bitmap, 0, end);
->   
->       job->before_write.notify = backup_before_write_notify;
->       bdrv_add_before_write_notifier(bs, &job->before_write);
-> @@ -524,7 +527,7 @@ static void coroutine_fn backup_run(void *opaque)
->       /* wait until pending backup_do_cow() calls have completed */
->       qemu_co_rwlock_wrlock(&job->flush_rwlock);
->       qemu_co_rwlock_unlock(&job->flush_rwlock);
-> -    g_free(job->done_bitmap);
-> +    hbitmap_free(job->copy_bitmap);
->   
->       data = g_malloc(sizeof(*data));
->       data->ret = ret;
+> diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+> index 16432f3..351a039 100644
+> --- a/include/sysemu/blockdev.h
+> +++ b/include/sysemu/blockdev.h
+> @@ -19,12 +19,11 @@ void blockdev_auto_del(BlockBackend *blk);
+>  typedef enum {
+>      IF_DEFAULT = -1,            /* for use with drive_add() only */
+>      /*
+> -     * IF_IDE must be zero, because we want MachineClass member
+> -     * block_default_type to default-initialize to IF_IDE
+> +     * IF_NONE must be zero, because we want MachineClass member
+> +     * block_default_type to default-initialize to IF_NONE
+>       */
+> -    IF_IDE = 0,
+> -    IF_NONE,
+> -    IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
+> +    IF_NONE = 0,
+> +    IF_IDE, IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
+>      IF_COUNT
+>  } BlockInterfaceType;
+>
+> --
+> 2.7.4
+>
+
 
 
 -- 
-Best regards,
-Vladimir
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
