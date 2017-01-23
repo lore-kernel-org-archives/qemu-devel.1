@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cVi3C-0005vI-Nh
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 12:05:03 -0500
+	(envelope-from <quintela@redhat.com>) id 1cViBU-0000ig-HM
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 12:13:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cVi3B-0001Jj-V8
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 12:05:02 -0500
-Date: Mon, 23 Jan 2017 19:04:55 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170123190257-mutt-send-email-mst@kernel.org>
-References: <1485132904-17632-1-git-send-email-zhaoshenglong@huawei.com>
-	<20170123180247-mutt-send-email-mst@kernel.org>
-	<49fcc1e0-f439-9212-25f1-9b8dce6462cc@redhat.com>
+	(envelope-from <quintela@redhat.com>) id 1cViBR-0003m1-B6
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 12:13:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56786)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cViBR-0003lt-4u
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 12:13:33 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 32BA74E4F6
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 17:13:33 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20161026185053.GI6456@work-vm> (David Alan Gilbert's message of
+	"Wed, 26 Oct 2016 19:50:53 +0100")
+References: <1477078935-7182-1-git-send-email-quintela@redhat.com>
+	<1477078935-7182-8-git-send-email-quintela@redhat.com>
+	<20161026185053.GI6456@work-vm>
+Reply-To: quintela@redhat.com
+Date: Mon, 23 Jan 2017 18:13:29 +0100
+Message-ID: <87lgu1bsxy.fsf@emacs.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <49fcc1e0-f439-9212-25f1-9b8dce6462cc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V2] virtio: Fix no interrupt when not
- creating msi controller
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 07/13] migration: create ram_multifd_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +35,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
 
-On Mon, Jan 23, 2017 at 05:46:47PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 23/01/2017 17:07, Michael S. Tsirkin wrote:
-> > On Mon, Jan 23, 2017 at 08:55:04AM +0800, Shannon Zhao wrote:
-> >> From: Shannon Zhao <shannon.zhao@linaro.org>
-> >>
-> >> For ARM virt machine, if we use virt-2.7 which will not create ITS node,
-> >> the virtio-net can not recieve interrupts so it can't get ip address
-> >> through dhcp.
-> >> This fixes commit 83d768b(virtio: set ISR on dataplane notifications).
-> >>
-> >> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> > 
-> > Paolo, could you comment on this pls?
-> 
-> For virtio-blk, my patch moved the setting of ISR from
-> virtio_queue_guest_notifier_read to virtio_notify_irqfd.  This is
-> because the irqfd emulation only needs to trigger the interrupt.
-> Setting the ISR should have been done elsewhere.
-> 
-> Can vhost set ISR (I thought it couldn't)?  If so, it seems like ARM was
-> relying on QEMU's irqfd emulation, as a work around for vhost not
-> setting ISR.  But this only works if irqfd is directed to QEMU and not
-> to KVM.  So if vhost cannot set ISR, I think vhost should be disabled
-> unless MSI is active.
-> 
-> Am I missing something?
-> 
-> Paolo
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> The function still don't use multifd, but we have simplified
+>> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
+>> counter and a new flag for this type of pages.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-vhost doesn't set ISR ATM.  Without MSI we are always bouncing
-interrupts through QEMU in particular in order to set ISR.
+>> +static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
+>> +                            bool last_stage, uint64_t *bytes_transferred)
+>> +{
+>> +    int pages;
+>> +    uint8_t *p;
+>> +    RAMBlock *block = pss->block;
+>> +    ram_addr_t offset = pss->offset;
+>> +
+>> +    p = block->host + offset;
+>> +
+>> +    if (block == last_sent_block) {
+>> +        offset |= RAM_SAVE_FLAG_CONTINUE;
+>> +    }
+>> +    pages = save_zero_page(f, block, offset, p, bytes_transferred);
+>> +    if (pages == -1) {
+>> +        *bytes_transferred +=
+>> +            save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+>> +        qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
+>> +        *bytes_transferred += TARGET_PAGE_SIZE;
+>> +        pages = 1;
+>> +        acct_info.norm_pages++;
+>> +        acct_info.multifd_pages++;
+>
+> The acct_info is now updated simultaneously from multiple
+> threads?
 
-Disabling vhost when user requested it was what we did
-at some point but this just confused people.
+No.  This is still done from the migration thread.
 
-
-> > 
-> >> ---
-> >> V2: Factor out a common function instead of duplicating code
-> >> ---
-> >>  hw/virtio/virtio.c | 11 ++++++++---
-> >>  1 file changed, 8 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> >> index aa4f38f..00e8f74 100644
-> >> --- a/hw/virtio/virtio.c
-> >> +++ b/hw/virtio/virtio.c
-> >> @@ -1441,6 +1441,12 @@ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
-> >>      event_notifier_set(&vq->guest_notifier);
-> >>  }
-> >>  
-> >> +static void virtio_irq(VirtQueue *vq)
-> >> +{
-> >> +    virtio_set_isr(vq->vdev, 0x1);
-> >> +    virtio_notify_vector(vq->vdev, vq->vector);
-> >> +}
-> >> +
-> >>  void virtio_notify(VirtIODevice *vdev, VirtQueue *vq)
-> >>  {
-> >>      if (!virtio_should_notify(vdev, vq)) {
-> >> @@ -1448,8 +1454,7 @@ void virtio_notify(VirtIODevice *vdev, VirtQueue *vq)
-> >>      }
-> >>  
-> >>      trace_virtio_notify(vdev, vq);
-> >> -    virtio_set_isr(vq->vdev, 0x1);
-> >> -    virtio_notify_vector(vdev, vq->vector);
-> >> +    virtio_irq(vq);
-> >>  }
-> >>  
-> >>  void virtio_notify_config(VirtIODevice *vdev)
-> >> @@ -2082,7 +2087,7 @@ static void virtio_queue_guest_notifier_read(EventNotifier *n)
-> >>  {
-> >>      VirtQueue *vq = container_of(n, VirtQueue, guest_notifier);
-> >>      if (event_notifier_test_and_clear(n)) {
-> >> -        virtio_notify_vector(vq->vdev, vq->vector);
-> >> +        virtio_irq(vq);
-> >>      }
-> >>  }
-> >>  
-> >> -- 
-> >> 2.0.4
-> >>
+Later, Juan.
