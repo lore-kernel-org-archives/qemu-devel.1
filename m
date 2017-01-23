@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cVh5f-000199-Rf
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:03:33 -0500
+	(envelope-from <mst@redhat.com>) id 1cVh9w-0004Wi-2Q
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:07:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cVh5b-0007hD-9g
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:03:31 -0500
-Resent-Message-Id: <E1cVh5b-0007hD-9g@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21391)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cVh5b-0007g4-1u
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:03:27 -0500
-Message-ID: <148518739693.56.12407051583748682941@b042e9bf0dd0>
-In-Reply-To: <1485186641-12220-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <mst@redhat.com>) id 1cVh9v-0000f3-7h
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:07:56 -0500
+Date: Mon, 23 Jan 2017 18:07:48 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170123180247-mutt-send-email-mst@kernel.org>
+References: <1485132904-17632-1-git-send-email-zhaoshenglong@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 23 Jan 2017 08:03:18 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/2 V13] fsdev: add IO throttle support to
- fsdev devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485132904-17632-1-git-send-email-zhaoshenglong@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH V2] virtio: Fix no interrupt when not
+ creating msi controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pradeepkiruvale@gmail.com
-Cc: famz@redhat.com, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, berto@igalia.com, pradeep.jagadeesh@huawei.com, qemu-devel@nongnu.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, christoffer.dall@linaro.org
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8yIFYxM10gZnNkZXY6IGFkZCBJTyB0aHJvdHRs
-ZSBzdXBwb3J0IHRvIGZzZGV2IGRldmljZXMKTWVzc2FnZS1pZDogMTQ4NTE4NjY0MS0xMjIyMC0x
-LWdpdC1zZW5kLWVtYWlsLXByYWRlZXAuamFnYWRlZXNoQGh1YXdlaS5jb20KCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
-IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9u
-cwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
-ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
-QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
-ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
-LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
-ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjc2ODZkYzggdGhyb3R0bGU6IGZhY3RvciBvdXQgZHVw
-bGljYXRlIGNvZGUKNzU2ODYxNCBmc2RldjogYWRkIElPIHRocm90dGxlIHN1cHBvcnQgdG8gZnNk
-ZXYgZGV2aWNlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yOiBmc2Rl
-djogYWRkIElPIHRocm90dGxlIHN1cHBvcnQgdG8gZnNkZXYgZGV2aWNlcy4uLgpDaGVja2luZyBQ
-QVRDSCAyLzI6IHRocm90dGxlOiBmYWN0b3Igb3V0IGR1cGxpY2F0ZSBjb2RlLi4uCkVSUk9SOiBN
-YWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRv
-IC0gd2hpbGUgbG9vcAojMjI4OiBGSUxFOiBpbmNsdWRlL3FlbXUvdGhyb3R0bGUtb3B0aW9ucy5o
-OjEzOgorI2RlZmluZSBUSFJPVFRMRV9PUFRTIFwKKyAgICAgICAgICB7IFwKKyAgICAgICAgICAg
-IC5uYW1lID0gInRocm90dGxpbmcuaW9wcy10b3RhbCIsXAorICAgICAgICAgICAgLnR5cGUgPSBR
-RU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGltaXQgdG90YWwgSS9PIG9w
-ZXJhdGlvbnMgcGVyIHNlY29uZCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUg
-PSAidGhyb3R0bGluZy5pb3BzLXJlYWQiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRf
-TlVNQkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gImxpbWl0IHJlYWQgb3BlcmF0aW9ucyBwZXIg
-c2Vjb25kIixcCisgICAgICAgIH0seyBcCisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5n
-LmlvcHMtd3JpdGUiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAg
-ICAgICAgICAgIC5oZWxwID0gImxpbWl0IHdyaXRlIG9wZXJhdGlvbnMgcGVyIHNlY29uZCIsXAor
-ICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUgPSAidGhyb3R0bGluZy5icHMtdG90YWwi
-LFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAgIC5o
-ZWxwID0gImxpbWl0IHRvdGFsIGJ5dGVzIHBlciBzZWNvbmQiLFwKKyAgICAgICAgfSx7IFwKKyAg
-ICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcuYnBzLXJlYWQiLFwKKyAgICAgICAgICAgIC50
-eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gImxpbWl0IHJlYWQg
-Ynl0ZXMgcGVyIHNlY29uZCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUgPSAi
-dGhyb3R0bGluZy5icHMtd3JpdGUiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVN
-QkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gImxpbWl0IHdyaXRlIGJ5dGVzIHBlciBzZWNvbmQi
-LFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcuaW9wcy10
-b3RhbC1tYXgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAg
-ICAgICAgIC5oZWxwID0gIkkvTyBvcGVyYXRpb25zIGJ1cnN0IixcCisgICAgICAgIH0seyBcCisg
-ICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmlvcHMtcmVhZC1tYXgiLFwKKyAgICAgICAg
-ICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gIkkvTyBv
-cGVyYXRpb25zIHJlYWQgYnVyc3QiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1l
-ID0gInRocm90dGxpbmcuaW9wcy13cml0ZS1tYXgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVN
-VV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gIkkvTyBvcGVyYXRpb25zIHdyaXRl
-IGJ1cnN0IixcCisgICAgICAgIH0seyBcCisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5n
-LmJwcy10b3RhbC1tYXgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwK
-KyAgICAgICAgICAgIC5oZWxwID0gInRvdGFsIGJ5dGVzIGJ1cnN0IixcCisgICAgICAgIH0seyBc
-CisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmJwcy1yZWFkLW1heCIsXAorICAgICAg
-ICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAidG90
-YWwgYnl0ZXMgcmVhZCBidXJzdCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUg
-PSAidGhyb3R0bGluZy5icHMtd3JpdGUtbWF4IixcCisgICAgICAgICAgICAudHlwZSA9IFFFTVVf
-T1BUX05VTUJFUixcCisgICAgICAgICAgICAuaGVscCA9ICJ0b3RhbCBieXRlcyB3cml0ZSBidXJz
-dCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUgPSAidGhyb3R0bGluZy5pb3Bz
-LXRvdGFsLW1heC1sZW5ndGgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVS
-LFwKKyAgICAgICAgICAgIC5oZWxwID0gImxlbmd0aCBvZiB0aGUgaW9wcy10b3RhbC1tYXggYnVy
-c3QgcGVyaW9kLCBpbiBzZWNvbmRzIixcCisgICAgICAgIH0seyBcCisgICAgICAgICAgICAubmFt
-ZSA9ICJ0aHJvdHRsaW5nLmlvcHMtcmVhZC1tYXgtbGVuZ3RoIixcCisgICAgICAgICAgICAudHlw
-ZSA9IFFFTVVfT1BUX05VTUJFUixcCisgICAgICAgICAgICAuaGVscCA9ICJsZW5ndGggb2YgdGhl
-IGlvcHMtcmVhZC1tYXggYnVyc3QgcGVyaW9kLCBpbiBzZWNvbmRzIixcCisgICAgICAgIH0seyBc
-CisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmlvcHMtd3JpdGUtbWF4LWxlbmd0aCIs
-XAorICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhl
-bHAgPSAibGVuZ3RoIG9mIHRoZSBpb3BzLXdyaXRlLW1heCBidXJzdCBwZXJpb2QsIGluIHNlY29u
-ZHMiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcuYnBz
-LXRvdGFsLW1heC1sZW5ndGgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVS
-LFwKKyAgICAgICAgICAgIC5oZWxwID0gImxlbmd0aCBvZiB0aGUgYnBzLXRvdGFsLW1heCBidXJz
-dCBwZXJpb2QsIGluIHNlY29uZHMiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1l
-ID0gInRocm90dGxpbmcuYnBzLXJlYWQtbWF4LWxlbmd0aCIsXAorICAgICAgICAgICAgLnR5cGUg
-PSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGVuZ3RoIG9mIHRoZSBi
-cHMtcmVhZC1tYXggYnVyc3QgcGVyaW9kLCBpbiBzZWNvbmRzIixcCisgICAgICAgIH0seyBcCisg
-ICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmJwcy13cml0ZS1tYXgtbGVuZ3RoIixcCisg
-ICAgICAgICAgICAudHlwZSA9IFFFTVVfT1BUX05VTUJFUixcCisgICAgICAgICAgICAuaGVscCA9
-ICJsZW5ndGggb2YgdGhlIGJwcy13cml0ZS1tYXggYnVyc3QgcGVyaW9kLCBpbiBzZWNvbmRzIixc
-CisgICAgICAgIH0seyBcCisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmlvcHMtc2l6
-ZSIsXAorICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAg
-LmhlbHAgPSAid2hlbiBsaW1pdGluZyBieSBpb3BzIG1heCBzaXplIG9mIGFuIEkvTyBpbiBieXRl
-cyIsXAorICAgICAgICB9CgpFUlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0
-b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDI3OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Mon, Jan 23, 2017 at 08:55:04AM +0800, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> For ARM virt machine, if we use virt-2.7 which will not create ITS node,
+> the virtio-net can not recieve interrupts so it can't get ip address
+> through dhcp.
+> This fixes commit 83d768b(virtio: set ISR on dataplane notifications).
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+
+Paolo, could you comment on this pls?
+
+
+> ---
+> V2: Factor out a common function instead of duplicating code
+> ---
+>  hw/virtio/virtio.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index aa4f38f..00e8f74 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -1441,6 +1441,12 @@ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
+>      event_notifier_set(&vq->guest_notifier);
+>  }
+>  
+> +static void virtio_irq(VirtQueue *vq)
+> +{
+> +    virtio_set_isr(vq->vdev, 0x1);
+> +    virtio_notify_vector(vq->vdev, vq->vector);
+> +}
+> +
+>  void virtio_notify(VirtIODevice *vdev, VirtQueue *vq)
+>  {
+>      if (!virtio_should_notify(vdev, vq)) {
+> @@ -1448,8 +1454,7 @@ void virtio_notify(VirtIODevice *vdev, VirtQueue *vq)
+>      }
+>  
+>      trace_virtio_notify(vdev, vq);
+> -    virtio_set_isr(vq->vdev, 0x1);
+> -    virtio_notify_vector(vdev, vq->vector);
+> +    virtio_irq(vq);
+>  }
+>  
+>  void virtio_notify_config(VirtIODevice *vdev)
+> @@ -2082,7 +2087,7 @@ static void virtio_queue_guest_notifier_read(EventNotifier *n)
+>  {
+>      VirtQueue *vq = container_of(n, VirtQueue, guest_notifier);
+>      if (event_notifier_test_and_clear(n)) {
+> -        virtio_notify_vector(vq->vdev, vq->vector);
+> +        virtio_irq(vq);
+>      }
+>  }
+>  
+> -- 
+> 2.0.4
+> 
