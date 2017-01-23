@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cVgoM-0005J4-PJ
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:45:39 -0500
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1cVgtn-00089w-6y
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:51:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cVgoJ-00026W-L7
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:45:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46968)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cVgoJ-00026R-9P
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:45:35 -0500
-References: <1485180414-11601-1-git-send-email-pradeep.jagadeesh@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <62cb8baf-bed7-84d2-c3f2-89b448829a09@redhat.com>
-Date: Mon, 23 Jan 2017 09:45:30 -0600
-MIME-Version: 1.0
-In-Reply-To: <1485180414-11601-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="poTlWsukg8OQDVXMvDvM6NPoeXOI3Hq2a"
-Subject: Re: [Qemu-devel] [PATCH V13] throttle: removed duplicate throtlle
- code from block and fsdev files
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1cVgtk-0003yj-4h
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:51:15 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35934)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
+	id 1cVgtj-0003xu-UO
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:51:12 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r126so27338303wmr.3
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 07:51:11 -0800 (PST)
+From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Date: Mon, 23 Jan 2017 10:50:39 -0500
+Message-Id: <1485186641-12220-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: [Qemu-devel] [PATCH 0/2 V13] fsdev: add IO throttle support to
+ fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
+To: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---poTlWsukg8OQDVXMvDvM6NPoeXOI3Hq2a
-From: Eric Blake <eblake@redhat.com>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Alberto Garcia <berto@igalia.com>,
- Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
-Message-ID: <62cb8baf-bed7-84d2-c3f2-89b448829a09@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V13] throttle: removed duplicate throtlle
- code from block and fsdev files
-References: <1485180414-11601-1-git-send-email-pradeep.jagadeesh@huawei.com>
-In-Reply-To: <1485180414-11601-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This patch set adds the IO throttling functionality to fsdev/9p devices.
+So far cgroups were used for throttling IO opertions on the fsdev/9p devices.
+It is difficult to use cgroups for throttling because we have to set up 
+cgroups externally before we start the qemu process.
+Qemu provides the throttling apis for implementing the throttling. 
+Block devices already make use of these APIs for throtting the IO operations.
+So, we use the same APIs to enable the throttling functionality for
+fsdevices.As of now the feature is enabled only on 9p-local driver.
 
-On 01/23/2017 08:06 AM, Pradeep Jagadeesh wrote:
+This feature can be used as shown in the below example:
 
-Subject line is long and misspelled; I suggest:
+-fsdev local,id=sdb1,path=PATH_TO_DEVICE,security_model=none,writeout=immediate,
+ throttling.bps-read=4194304,throttling.bps-write=4194304  -device
+ virtio-9p-pci,fsdev=sdb1,mount_tag=sdb1
 
-throttle: factor out duplicate code
+The main advantages are:
+ 
+- Easy to use because the throttling options are part of qemu cli options
+- Provides a uniform way of using throttling options across block and
+    fsdev/9p devices
+- No need to setup cgroup to provide throttling functionality for the fsdev
+  devices.
+- Removes the redundant throttling code that was present in block and fsdev
+  files
 
-> This removes the redundant throttle code that was present in
-> block and fsdev device files. Now the common code is moved
-> to a single file.
->=20
-> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-> ---
+Missing features:
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+-QMP support
+-Throttling support for other fsdev/9p drivers.
 
+Thanks,
+Pradeep
 
---poTlWsukg8OQDVXMvDvM6NPoeXOI3Hq2a
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Pradeep Jagadeesh (2):
+  fsdev: add IO throttle support to fsdev devices
+  throttle: removed duplicate throtlle code from block and fsdev files
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+ blockdev.c                      |  81 ++-------------------------
+ fsdev/Makefile.objs             |   2 +-
+ fsdev/file-op-9p.h              |   3 +
+ fsdev/qemu-fsdev-opts.c         |   3 +
+ fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++++++++++++++++
+ fsdev/qemu-fsdev-throttle.h     |  39 +++++++++++++
+ hw/9pfs/9p-local.c              |   8 +++
+ hw/9pfs/9p.c                    |   5 ++
+ hw/9pfs/cofile.c                |   2 +
+ include/qemu/throttle-options.h |  92 +++++++++++++++++++++++++++++++
+ 10 files changed, 275 insertions(+), 78 deletions(-)
+ create mode 100644 fsdev/qemu-fsdev-throttle.c
+ create mode 100644 fsdev/qemu-fsdev-throttle.h
+ create mode 100644 include/qemu/throttle-options.h
 
-iQEcBAEBCAAGBQJYhiUaAAoJEKeha0olJ0NqsfgH/3fiO9O4b/ysllhPe3P83RC9
-4ZZJy4Sm3cmoETwKaweW6w0DDbz5Mt60vvOkR7n19YE2tjP3Z/g1e+4+6R2L2mXb
-Wh6XqBoZZLCZA1t28O+BjSadKuT32i7G82fDFoHdcahsKIfElLlFz5L9OVgls6zE
-I8ALSn6HqRyUO1ygHGzmhR1Y5BeaIKzJgRI1/O7V6/zgOfkVASVm6ounm7nRZ75l
-MOiHms6qb7+bHR/C8Qs7z4n+88PMG43CL8ZMLoLxqHjbbMb521wveBausYBGno8h
-3JcWDaSIOAxbwcxEE0e0uMxnXour15V3NPzFiBy5JVACMMWbPzK448TeiprQobs=
-=rglc
------END PGP SIGNATURE-----
-
---poTlWsukg8OQDVXMvDvM6NPoeXOI3Hq2a--
+-- 
+1.8.3.1
