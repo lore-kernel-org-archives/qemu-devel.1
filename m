@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cVakp-0004bl-Be
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:17:36 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cValm-00054a-IK
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:18:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cVakm-0004GS-5w
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:17:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cVakm-0004Fv-08
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:17:32 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6239D5144A
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 09:17:31 +0000 (UTC)
-Date: Mon, 23 Jan 2017 09:17:26 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170123091725.GB2098@work-vm>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cValj-0004dA-Da
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:18:34 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35456)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cValj-0004ZP-7A
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:18:31 -0500
+Received: by mail-wm0-x243.google.com with SMTP id d140so24939577wmd.2
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 01:18:29 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 References: <1485069471-3680-1-git-send-email-pagupta@redhat.com>
+	<20170123054052.GA1679@amit-lp.rh>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4ef4f8ad-d492-0276-3c30-e51fe3445a08@redhat.com>
+Date: Mon, 23 Jan 2017 10:18:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485069471-3680-1-git-send-email-pagupta@redhat.com>
+In-Reply-To: <20170123054052.GA1679@amit-lp.rh>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] Change name of live migration thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,45 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com
+To: Amit Shah <amit.shah@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 
-* Pankaj Gupta (pagupta@redhat.com) wrote:
-> Change the name of live migration thread from 'migration' 
-> to 'qemu_vm_migration' to identify it clearly. 'migration'
-> is a generic word and kernel also has  tasks for process
-> migration with the name 'migration/cpu#'.
+
+
+On 23/01/2017 06:40, Amit Shah wrote:
+> On (Sun) 22 Jan 2017 [12:47:51], Pankaj Gupta wrote:
+>> Change the name of live migration thread from 'migration' 
+>> to 'qemu_vm_migration' to identify it clearly. 'migration'
+>> is a generic word and kernel also has  tasks for process
+>> migration with the name 'migration/cpu#'.
 > 
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> ---
->  migration/migration.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Makes sense.
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index f498ab8..6ebd606 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1969,7 +1969,7 @@ void migrate_fd_connect(MigrationState *s)
->      }
->  
->      migrate_compress_threads_create();
-> -    qemu_thread_create(&s->thread, "migration", migration_thread, s,
-> +    qemu_thread_create(&s->thread, "qemu_vm_migration", migration_thread, s,
->                         QEMU_THREAD_JOINABLE);
+> Reviewed-by: Amit Shah <amit.shah@redhat.com>
 
-Are you sure that works?  For me it doesn't change the name.
+It's a bit ugly that no other thread name has qemu in it, and the limit
+is 15 characters---which is more than "qemu_vm_migration"'s length.  So
+maybe "live_migration" or "migrate" would be better.
 
-There's a maximum length that I think is somewhere around 16 characters and that
-name is too long.
+Spaces vs. underscores are also inconsistent.  A patch to fix that would
+be helpful!
 
-Changing it to "qemu_migration" seems to work.
-
-Dave
-
->      s->migration_thread_running = true;
->  }
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
