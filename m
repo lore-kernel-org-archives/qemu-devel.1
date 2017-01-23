@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cVdgB-0005w4-4Z
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:25:00 -0500
+	(envelope-from <famz@redhat.com>) id 1cVdmd-0003Yo-AO
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:31:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cVdg8-0003cS-En
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:24:58 -0500
-MIME-Version: 1.0
-In-Reply-To: <1485164923-17736-4-git-send-email-armbru@redhat.com>
-References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
-	<1485164923-17736-4-git-send-email-armbru@redhat.com>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Mon, 23 Jan 2017 13:24:33 +0100
-Message-ID: <CACXAS8DMFsmEx0_px3SuJiOjPqhhkp2kKf7DA2GYP_PeWjnXsQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 3/6] hw: Default -drive to if=none instead
- of ide when ide cannot work
+	(envelope-from <famz@redhat.com>) id 1cVdmc-0005lt-9J
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:31:39 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 23 Jan 2017 20:30:40 +0800
+Message-Id: <20170123123056.30383-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v12 00/16] block: Image locking series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +17,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On Mon, Jan 23, 2017 at 10:48 AM, Markus Armbruster <armbru@redhat.com> wrote:
-> Block backends defined with -drive if=ide are meant to be picked up by
-> machine initialization code: a suitable frontend gets created and
-> wired up automatically.
->
-> if=ide drives not picked up that way can still be used with -device as
-> if they had if=none, but that's unclean and best avoided.  Unused ones
-> produce an "Orphaned drive without device" warning.
->
-> -drive parameter "if" is optional, and the default depends on the
-> machine type.  If a machine type doesn't specify a default, the
-> default is "ide".
->
-> Many machine types implicitly default to if=ide that way, even though
-> they don't actually have an IDE controller.  This makes no sense.
->
-> Change the implicit default to if=none.  Affected machines:
->
-> * all targets: none
-> * aarch64/arm: akita ast2500 canon cheetah collie connex imx25
->   integratorcp kzm lm3s6965evb lm3s811evb mainstone musicpal n800 n810
->   netduino2 nuri palmetto realview romulus sabrelite smdkc210 sx1 sx1
->   verdex z2
-> * cris: axis-dev88
-> * i386/x86_64: xenpv
-> * lm32: lm32-evr lm32-uclinux milkymist
-> * m68k: an5206 dummy mcf5208evb
-> * microblaze/microblazeel: petalogix-ml605 petalogix-s3adsp1800
-> * mips/mips64/mips64el/mipsel: mipssim
-> * moxie: moxiesim
-> * or32: or32-sim
-> * ppc/ppc64/ppcemb: bamboo ref405ep taihu virtex-ml507
-> * ppc/ppc64: mpc8544ds ppce500
-> * sh4/sh4eb: shix
-> * sparc: leon3_generic
-> * sparc64: niagara
+v12: Fix test cases on old systems that doesn't have F_OFD_SETLK, such as RHEL
+     6. [Patchew]
+     Trim the commit message of patch 15 to avoid bitrotting.
 
-The sparc64: niagara part,
+v11: Move lock bytes from 1-2 to 0x10-0x12. [Daniel]
 
-Acked-By: Artyom Tarasenko <atar4qemu@gmail.com>
+v10: While we still don't have comprehensive propagation mechanism that will be
+provided by new op blocker system for "permissive modes", the locking enabled
+by default is regardlessly useful and long overdue. So I think we should merge
+this for 2.9 and build user options on top later when the op blocker API
+settles.
 
-> * tricore: tricore_testboard
-> * unicore32: puv3
-> * xtensa/xtensaeb: kc705 lx200 lx60 ml605 sim
->
-> None of these machines have an IDE controller, let alone code to
-> honor if=ide.
->
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-arm@nongnu.org
-> Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: xen-devel@lists.xensource.com
-> Cc: Michael Walle <michael@walle.cc>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Cc: Anthony Green <green@moxielogic.com>
-> Cc: Jia Liu <proljc@gmail.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: qemu-ppc@nongnu.org
-> Cc: Magnus Damm <magnus.damm@gmail.com>
-> Cc: Fabien Chouteau <chouteau@adacore.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
-> Cc: Max Filippov <jcmvbkbc@gmail.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/sysemu/blockdev.h | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
->
-> diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
-> index 16432f3..351a039 100644
-> --- a/include/sysemu/blockdev.h
-> +++ b/include/sysemu/blockdev.h
-> @@ -19,12 +19,11 @@ void blockdev_auto_del(BlockBackend *blk);
->  typedef enum {
->      IF_DEFAULT = -1,            /* for use with drive_add() only */
->      /*
-> -     * IF_IDE must be zero, because we want MachineClass member
-> -     * block_default_type to default-initialize to IF_IDE
-> +     * IF_NONE must be zero, because we want MachineClass member
-> +     * block_default_type to default-initialize to IF_NONE
->       */
-> -    IF_IDE = 0,
-> -    IF_NONE,
-> -    IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
-> +    IF_NONE = 0,
-> +    IF_IDE, IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
->      IF_COUNT
->  } BlockInterfaceType;
->
-> --
-> 2.7.4
->
+Address comments from Max and Eric:
+  - Use F_OFD_GETLK instead of opening r/w for ro images. [Max]
+  - Lock both bytes exclusively for non-shared write. [Max]
+  - Spell fixes. [Eric]
+  - Fix test matrix. [Max]
+  - Comment tweaks. [Max]
+  - Return code cleanups. [Max]
+  - Don't abuse "disable_lock" for migration. [Max]
+  - Use bs->exact_filename instead of bs->filename. [Max]
+  - Force protect qcow2 concurrent write.
+  - Fix indentation. [Max]
+  - Always use re-open for lockfd instead of dup. [Max]
+  - Fall through to "abort" where "prepare" failed. [Max]
+  - Fix option handling in raw_reopen_handle_lock. [Max]
+  - Use "error_abort" in commit and abort. [Max]
+  - Fix cleanup of raw_reopen_handle_lock() failure. [Max]
+  - Add a patch for qcow2 to mask BDRV_O_SHARE_RW if r/w.
+  - Rebase and fix new more cases that will be broken by "lock by default".
 
+Fam Zheng (16):
+  osdep: Add qemu_lock_fd and qemu_unlock_fd
+  block: Define BDRV_O_SHARE_RW
+  qemu-io: Set "share-rw" flag together with read-only
+  qemu-img: Set "share-rw" flag in read-only commands
+  block: Set "share-rw" flag in drive-backup when sync=none
+  iotests: 055: Don't attach the drive to vm for drive-backup
+  iotests: 030: Read-only open image for getting map
+  iotests: 087: Don't attach test image twice
+  iotests: 085: Avoid image locking conflict
+  iotests: 091: Quit QEMU before checking image
+  iotests: 172: Use separate images for multiple devices
+  tests: Use null-co:// instead of /dev/null as the dummy image
+  tests: Disable image lock in test-replication
+  file-posix: Implement image locking
+  qcow2: Force "no other writer" lock on bs->file
+  tests: Add test-image-lock
 
+ block/file-posix.c         | 681 ++++++++++++++++++++++++++++++++++++++++++++-
+ block/qcow2.c              |  11 +
+ blockdev.c                 |   3 +
+ include/block/block.h      |   2 +
+ include/qemu/osdep.h       |   3 +
+ qemu-img.c                 |  10 +-
+ qemu-io.c                  |   2 +
+ tests/Makefile.include     |   2 +
+ tests/drive_del-test.c     |   2 +-
+ tests/nvme-test.c          |   2 +-
+ tests/qemu-iotests/030     |   4 +-
+ tests/qemu-iotests/055     |  32 ++-
+ tests/qemu-iotests/085     |  32 ++-
+ tests/qemu-iotests/085.out |   3 +-
+ tests/qemu-iotests/087     |   6 +-
+ tests/qemu-iotests/091     |   2 +
+ tests/qemu-iotests/172     |  53 ++--
+ tests/qemu-iotests/172.out |  50 ++--
+ tests/test-image-lock.c    | 206 ++++++++++++++
+ tests/test-replication.c   |   9 +-
+ tests/usb-hcd-uhci-test.c  |   2 +-
+ tests/usb-hcd-xhci-test.c  |   2 +-
+ tests/virtio-blk-test.c    |   2 +-
+ tests/virtio-scsi-test.c   |   4 +-
+ util/osdep.c               |  48 ++++
+ 25 files changed, 1076 insertions(+), 97 deletions(-)
+ create mode 100644 tests/test-image-lock.c
 
 -- 
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+2.9.3
