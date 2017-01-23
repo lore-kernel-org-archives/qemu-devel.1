@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cVVd7-0006VF-Nu
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 22:49:19 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cVW6e-0002uZ-Jx
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 23:19:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cVVd2-0001EE-VD
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 22:49:17 -0500
-Received: from mga04.intel.com ([192.55.52.120]:35432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cVVd2-0001Du-KS
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 22:49:12 -0500
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Mon, 23 Jan 2017 03:49:06 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F739175F99@shsmsx102.ccr.corp.intel.com>
-References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
-	<CAJ+F1C+WV7OhxpYb3RgmtRjXU7_kfygr2jh2cawYwZq8MMrJGQ@mail.gmail.com>
-	<79bc9757-3ba0-87c3-3502-a25a30e304a3@siemens.com>
-	<286AC319A985734F985F78AFA26841F73916DDD2@shsmsx102.ccr.corp.intel.com>
-	<58a51a88-967d-bdc7-dc0b-e3e501ecccd3@siemens.com>
-	<286AC319A985734F985F78AFA26841F7391716D9@shsmsx102.ccr.corp.intel.com>
-	<778e7730-8ece-9cc4-000c-9ced0b29d503@siemens.com>
-In-Reply-To: <778e7730-8ece-9cc4-000c-9ced0b29d503@siemens.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cVW6c-00005v-WC
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 23:19:48 -0500
+Message-ID: <1485145172.8172.14.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Mon, 23 Jan 2017 15:19:32 +1100
+In-Reply-To: <20170117043734.GH15853@umbus>
+References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
+	<1484288903-18807-6-git-send-email-sjitindarsingh@gmail.com>
+	<20170116214030.GG15853@umbus> <1484614111.2028.14.camel@gmail.com>
+	<20170117043734.GH15853@umbus>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 05/17] target/ppc/POWER9: Adapt LPCR
+ handling for POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,121 +26,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>, =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Jailhouse <jailhouse-dev@googlegroups.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
 
-T24gU2F0dXJkYXksIEphbnVhcnkgMjEsIDIwMTcgMTI6MzggQU0sIEphbiBLaXN6a2Egd3JvdGU6
-DQo+IE9uIDIwMTctMDEtMjAgMTI6NTQsIFdhbmcsIFdlaSBXIHdyb3RlOg0KPiA+IE9uIFR1ZXNk
-YXksIEphbnVhcnkgMTcsIDIwMTcgNTo0NiBQTSwgSmFuIEtpc3prYSB3cm90ZToNCj4gPj4gT24g
-MjAxNy0wMS0xNyAxMDoxMywgV2FuZywgV2VpIFcgd3JvdGU6DQo+ID4+PiBIaSBKYW4sDQo+ID4+
-Pg0KPiA+Pj4gT24gTW9uZGF5LCBKYW51YXJ5IDE2LCAyMDE3IDk6MTAgUE0sIEphbiBLaXN6a2Eg
-d3JvdGU6DQo+ID4+Pj4gT24gMjAxNy0wMS0xNiAxMzo0MSwgTWFyYy1BbmRyw6kgTHVyZWF1IHdy
-b3RlOg0KPiA+Pj4+PiBPbiBNb24sIEphbiAxNiwgMjAxNyBhdCAxMjozNyBQTSBKYW4gS2lzemth
-DQo+ID4+Pj4+IDxqYW4ua2lzemthQHNpZW1lbnMuY29tIDxtYWlsdG86amFuLmtpc3prYUBzaWVt
-ZW5zLmNvbT4+IHdyb3RlOg0KPiA+Pj4+PiAgICAgc29tZSBvZiB5b3UgbWF5IGtub3cgdGhhdCB3
-ZSBhcmUgdXNpbmcgYSBzaGFyZWQgbWVtb3J5IGRldmljZQ0KPiA+Pj4+PiBzaW1pbGFyDQo+ID4+
-IHRvDQo+ID4+Pj4+ICAgICBpdnNobWVtIGluIHRoZSBwYXJ0aXRpb25pbmcgaHlwZXJ2aXNvciBK
-YWlsaG91c2UgWzFdLg0KPiA+Pj4+Pg0KPiA+Pj4+PiAgICAgV2Ugc3RhcnRlZCBhcyBiZWluZyBj
-b21wYXRpYmxlIHRvIHRoZSBvcmlnaW5hbCBpdnNobWVtIHRoYXQgUUVNVQ0KPiA+Pj4+PiAgICAg
-aW1wbGVtZW50cywgYnV0IHdlIHF1aWNrbHkgZGV2aWF0ZWQgaW4gc29tZSBkZXRhaWxzLCBhbmQg
-aW4gdGhlIHJlY2VudA0KPiA+Pj4+PiAgICAgbW9udGhzIGV2ZW4gbW9yZS4gU29tZSBvZiB0aGUg
-ZGV2aWF0aW9ucyBhcmUgcmVsYXRlZCB0byBtYWtpbmcgdGhlDQo+ID4+Pj4+ICAgICBpbXBsZW1l
-bnRhdGlvbiBzaW1wbGVyLiBUaGUgbmV3IGl2c2htZW0gdGFrZXMgPDUwMCBMb0MgLSBKYWlsaG91
-c2UNCj4gaXMNCj4gPj4+Pj4gICAgIGFpbWluZyBhdCBzYWZldHkgY3JpdGljYWwgc3lzdGVtcyBh
-bmQsIHRoZXJlZm9yZSwgYSBzbWFsbCBjb2RlIGJhc2UuDQo+ID4+Pj4+ICAgICBPdGhlciBjaGFu
-Z2VzIGFkZHJlc3MgZGVmaWNpdHMgaW4gdGhlIG9yaWdpbmFsIGRlc2lnbiwgbGlrZSBtaXNzaW5n
-DQo+ID4+Pj4+ICAgICBsaWZlLWN5Y2xlIG1hbmFnZW1lbnQuDQo+ID4+Pj4+DQo+ID4+Pj4+ICAg
-ICBOb3cgdGhlIHF1ZXN0aW9uIGlzIGlmIHRoZXJlIGlzIGludGVyZXN0IGluIGRlZmluaW5nIGEg
-Y29tbW9uIG5ldw0KPiA+Pj4+PiAgICAgcmV2aXNpb24gb2YgdGhpcyBkZXZpY2UgYW5kIG1heWJl
-IGFsc28gb2Ygc29tZSBwcm90b2NvbHMgdXNlZCBvbiB0b3AsDQo+ID4+Pj4+ICAgICBzdWNoIGFz
-IHZpcnR1YWwgbmV0d29yayBsaW5rcy4gSWRlYWxseSwgdGhpcyB3b3VsZCBlbmFibGUgdXMgdG8g
-c2hhcmUNCj4gPj4+Pj4gICAgIExpbnV4IGRyaXZlcnMuIFdlIHdpbGwgZGVmaW5pdGVseSBnbyBm
-b3IgdXBzdHJlYW1pbmcgYXQgbGVhc3QgYSBuZXR3b3JrDQo+ID4+Pj4+ICAgICBkcml2ZXIgc3Vj
-aCBhcyBbMl0sIGEgVUlPIGRyaXZlciBhbmQgbWF5YmUgYWxzbyBhIHNlcmlhbCBwb3J0L2NvbnNv
-bGUuDQo+ID4+Pj4+DQo+ID4+Pj4+DQo+ID4+Pj4+IFRoaXMgc291bmRzIGxpa2UgZHVwbGljYXRp
-bmcgZWZmb3J0cyBkb25lIHdpdGggdmlydGlvIGFuZCB2aG9zdC1wY2kuDQo+ID4+Pj4+IEhhdmUg
-eW91IGxvb2tlZCBhdCBXZWkgV2FuZyBwcm9wb3NhbD8NCj4gPj4+Pg0KPiA+Pj4+IEkgZGlkbid0
-IGZvbGxvdyBpdCByZWNlbnRseSwgYnV0IHRoZSBvcmlnaW5hbCBjb25jZXB0IHdhcyBhYm91dA0K
-PiA+Pj4+IGludHJvZHVjaW5nIGFuIElPTU1VIG1vZGVsIHRvIHRoZSBwaWN0dXJlLCBhbmQgdGhh
-dCdzDQo+ID4+Pj4gY29tcGxleGl0eS13aXNlIGEgbm8tZ28gZm9yIHVzICh3ZSBjYW4gZG8gdGhp
-cyB3aG9sZSB0aGluZyBpbiBsZXNzDQo+ID4+Pj4gdGhhbiA1MDAgbGluZXMsIGV2ZW4gdmlydGlv
-IGl0c2VsZiBpcyBtb3JlIGNvbXBsZXgpLiBJSVVDLCB0aGUNCj4gPj4+PiBhbHRlcm5hdGl2ZSB0
-byBhbiBJT01NVSBpcyBtYXBwaW5nIHRoZSB3aG9sZSBmcm9udGVuZCBWTSBtZW1vcnkNCj4gPj4+
-PiBpbnRvIHRoZSBiYWNrZW5kIFZNIC0NCj4gPj4gdGhhdCdzIHNlY3VyaXR5L3NhZmV0eS13aXNl
-IGFuIGFic29sdXRlIG5vLWdvLg0KPiA+Pj4NCj4gPj4+IFRob3VnaCB0aGUgdmlydGlvIGJhc2Vk
-IHNvbHV0aW9uIG1pZ2h0IGJlIGNvbXBsZXggZm9yIHlvdSwgYSBiaWcNCj4gPj4+IGFkdmFudGFn
-ZSBpcw0KPiA+PiB0aGF0IHdlIGhhdmUgbG90cyBvZiBwZW9wbGUgd29ya2luZyB0byBpbXByb3Zl
-IHZpcnRpby4gRm9yIGV4YW1wbGUsDQo+ID4+IHRoZSB1cGNvbWluZyB2aXJ0aW8gMS4xIGhhcyB2
-cmluZyBpbXByb3ZlbWVudCwgd2UgY2FuIGVhc2lseSB1cGdyYWRlDQo+ID4+IGFsbCB0aGUgdmly
-dGlvIGJhc2VkIHNvbHV0aW9ucywgc3VjaCBhcyB2aG9zdC1wY2ksIHRvIHRha2UgYWR2YW50YWdl
-DQo+ID4+IG9mIHRoaXMgaW1wcm92ZW1lbnQuIEZyb20gdGhlIGxvbmcgdGVybSBwZXJzcGVjdGl2
-ZSwgSSB0aGluayB0aGlzIGtpbmQgb2YNCj4gY29tcGxleGl0eSBpcyB3b3J0aHdoaWxlLg0KPiA+
-Pg0KPiA+PiBXZSB3aWxsIGFkb3B0IHZpcnRpbyAxLjEgcmluZyBmb3JtYXRzLiBUaGF0J3Mgb25l
-IHJlYXNvbiB3aHkgdGhlcmUgaXMNCj4gPj4gYWxzbyBzdGlsbCBhIGJpZGlyZWN0aW9uYWwgc2hh
-cmVkIG1lbW9yeSByZWdpb246IHRvIGhvc3QgdGhlIG5ldw0KPiA+PiBkZXNjcmlwdG9ycyAod2hp
-bGUga2VlcGluZyB0aGUgcGF5bG9hZCBzYWZlbHkgaW4gdGhlIHVuaWRpcmVjdGlvbmFsIHJlZ2lv
-bnMpLg0KPiA+DQo+ID4gVGhlIHZyaW5nIGV4YW1wbGUgSSBnYXZlIG1pZ2h0IGJlIGNvbmZ1c2lu
-Zywgc29ycnkgYWJvdXQgIHRoYXQuIE15IHBvaW50IGlzDQo+IHRoYXQgZXZlcnkgcGFydCBvZiB2
-aXJ0aW8gaXMgZ2V0dGluZyBtYXR1cmVkIGFuZCBpbXByb3ZlZCBmcm9tIHRpbWUgdG8gdGltZS4N
-Cj4gUGVyc29uYWxseSwgaGF2aW5nIGEgbmV3IGRldmljZSBkZXZlbG9wZWQgYW5kIG1haW50YWlu
-ZWQgaW4gYW4gYWN0aXZlIGFuZA0KPiBwb3B1bGFyIG1vZGVsIGlzIGhlbHBmdWwuIEFsc28sIGFz
-IG5ldyBmZWF0dXJlcyBiZWluZyBncmFkdWFsbHkgYWRkZWQgaW4gdGhlDQo+IGZ1dHVyZSwgYSBz
-aW1wbGUgZGV2aWNlIGNvdWxkIGJlY29tZSBjb21wbGV4Lg0KPiANCj4gV2UgY2FuJ3QgYWZmb3Jk
-IGJlY29taW5nIG1vcmUgY29tcGxleCwgdGhhdCBpcyB0aGUgd2hvbGUgcG9pbnQuDQo+IENvbXBs
-ZXhpdHkgc2hhbGwgZ28gaW50byB0aGUgZ3Vlc3QsIG5vdCB0aGUgaHlwZXJ2aXNvciwgd2hlbiBp
-dCBpcyByZWFsbHkgbmVlZGVkLg0KPiANCj4gPg0KPiA+IEhhdmluZyBhIHRoZW9yZXRpY2FsIGFu
-YWx5c2lzIG9uIHRoZSBwZXJmb3JtYW5jZToNCj4gPiBUaGUgdHJhZGl0aW9uYWwgc2hhcmVkIG1l
-bW9yeSBtZWNoYW5pc20sIHNoYXJpbmcgYW4gaW50ZXJtZWRpYXRlIG1lbW9yeSwNCj4gcmVxdWly
-ZXMgMiBjb3BpZXMgdG8gZ2V0IHRoZSBwYWNrZXQgdHJhbnNtaXR0ZWQuIEl0J3Mgbm90IGp1c3Qg
-b25lIG1vcmUgY29weQ0KPiBjb21wYXJlZCB0byB0aGUgMS1jb3B5IHNvbHV0aW9uLCBJIHRoaW5r
-IHNvbWUgbW9yZSB0aGluZ3Mgd2UgbWF5IG5lZWQgdG8gdGFrZQ0KPiBpbnRvIGFjY291bnQ6DQo+
-IA0KPiAxLWNvcHkgKCtwb3RlbnRpYWwgdHJhbnNmZXJzIHRvIHVzZXJzcGFjZSwgYnV0IHRoYXQn
-cyB0aGUgc2FtZSBmb3INCj4gZXZlcnlvbmUpIGlzIGNvbmNlcHR1YWxseSBwb3NzaWJsZSwgZGVm
-aW5pdGVseSB1bmRlciBzdGFja3MgbGlrZSBEUERLLg0KPiBIb3dldmVyLCBMaW51eCBza2JzIGFy
-ZSBjdXJyZW50bHkgbm90IHByZXBhcmVkIGZvciBwaWNraW5nIHVwIHNobWVtLWJhY2tlZA0KPiBw
-YWNrZXRzLCB3ZSBhbHJlYWR5IGxvb2tlZCBpbnRvIHRoaXMuIExpa2VseSBhZGRyZXNzYWJsZSwg
-dGhvdWdoLg0KDQpOb3Qgc3VyZSBob3cgZGlmZmljdWx0IGl0IHdvdWxkIGJlIHRvIGdldCB0aGF0
-IGNoYW5nZSB1cHN0cmVhbS1lZCB0byB0aGUga2VybmVsLCBidXQgbG9va2luZyBmb3J3YXJkIHRv
-IHNlZWluZyB5b3VyIHNvbHV0aW9ucy4NCiANCj4gPiAxKSB0aGVyZSBhcmUgZXh0cmEgcmluZyBv
-cGVyYXRpb24gb3ZlcmhlYWQgIG9uIGJvdGggdGhlIHNlbmRpbmcgYW5kDQo+ID4gcmVjZWl2aW5n
-IHNpZGUgdG8gYWNjZXNzIHRoZSBzaGFyZWQgbWVtb3J5IChpLmUuIElWU0hNRU0pOw0KPiA+IDIp
-IGV4dHJhIHByb3RvY29sIHRvIHVzZSB0aGUgc2hhcmVkIG1lbW9yeTsNCj4gPiAzKSB0aGUgcGll
-Y2Ugb2YgYWxsb2NhdGVkIHNoYXJlZCBtZW1vcnkgZnJvbSB0aGUgaG9zdCA9IEMobiwyKSwgd2hl
-cmUgbiBpcyB0aGUNCj4gbnVtYmVyIG9mIFZNcy4gTGlrZSBmb3IgMjAgVk1zIHdobyB3YW50IHRv
-IHRhbGsgdG8gZWFjaCBvdGhlciwgdGhlcmUgd2lsbCBiZQ0KPiAxOTAgcGllY2VzIG9mIG1lbW9y
-eSBhbGxvY2F0ZWQgZnJvbSB0aGUgaG9zdC4NCj4gDQo+IFdlbGwsIG9ubHkgaWYgYWxsIFZNcyBu
-ZWVkIHRvIHRhbGsgdG8gYWxsIG90aGVycyBkaXJlY3RseS4gT24gcmVhbCBzZXR1cHMsIHlvdSB3
-b3VsZA0KPiBhZGQgZGlyZWN0IGxpbmtzIGZvciBoZWF2eSB0cmFmZmljIGFuZCBvdGhlcndpc2Ug
-ZG8gc29mdHdhcmUgc3dpdGNoaW5nLiBNb3Jlb3ZlciwNCj4gdGhvc2UgbGlua3Mgd291bGQgb25s
-eSBoYXZlIHRvIGJlIGJhY2tlZCBieSBwaHlzaWNhbCBtZW1vcnkgaW4gc3RhdGljIHNldHVwcyBh
-bGwNCj4gdGhlIHRpbWUuDQo+IA0KPiBBbHNvLCB3ZSBkaWRuJ3QgY29tcGxldGVseSBydWxlIG91
-dCBhIHNobWVtIGJ1cyB3aXRoIG11bHRpcGxlIHBlZXJzIGNvbm5lY3RlZC4NCj4gVGhhdCdzIGp1
-c3QgbG9va2luZyBmb3IgYSBzdHJvbmcgdXNlIGNhc2UgLSBhbmQgdGhlbiBhIHJvYnVzdCBkZXNp
-Z24sIG9mIGNvdXJzZS4NCj4gDQo+ID4NCj4gPiBUaGF0IGJlaW5nIHNhaWQsIGlmIHBlb3BsZSBy
-ZWFsbHkgd2FudCB0aGUgMi1jb3B5IHNvbHV0aW9uLCB3ZSBjYW4gYWxzbyBoYXZlDQo+IHZob3N0
-LXBjaSBzdXBwb3J0IGl0IHRoYXQgd2F5IGFzIGEgbmV3IGZlYXR1cmUgKG5vdCBzdXJlIGlmIHlv
-dSB3b3VsZCBiZQ0KPiBpbnRlcmVzdGVkIGluIGNvbGxhYm9yYXRpbmcgb24gdGhlIHByb2plY3Qp
-Og0KPiA+IFdpdGggdGhlIG5ldyBmZWF0dXJlIGFkZGVkLCB0aGUgbWFzdGVyIFZNIHNlbmRzIG9u
-bHkgYSBwaWVjZSBvZiBtZW1vcnkNCj4gKGVxdWl2YWxlbnQgdG8gSVZTSE1FTSwgYnV0IGFsbG9j
-YXRlZCBieSB0aGUgZ3Vlc3QpIHRvIHRoZSBzbGF2ZSBvdmVyIHZob3N0LXVzZXINCj4gcHJvdG9j
-b2wsIGFuZCB0aGUgdmhvc3QtcGNpIGRldmljZSBvbiB0aGUgc2xhdmUgc2lkZSBvbmx5IGhvc3Rz
-IHRoYXQgcGllY2Ugb2YNCj4gc2hhcmVkIG1lbW9yeS4NCj4gDQo+IEknbSBhbGwgaW4gZm9yIHNv
-bWV0aGluZyB0aGF0IGFsbG93cyB0byBzdHJpcCBkb3duIHZob3N0LXBjaSB0byBzb21ldGhpbmcg
-dGhhdCAtDQo+IHdoaWxlIHN0YXlpbmcgc2VjdXJlIC0gaXMgc2ltcGxlIGFuZCAvYWxzby8gYWxs
-b3dzIHN0YXRpYyBjb25maWd1cmF0aW9ucy4gQnV0IEknbQ0KPiBub3QgeWV0IHNlZWluZyB0aGF0
-IHRoaXMgd291bGQgc3RpbGwgYmUgdmlydGlvIG9yIHZob3N0LXBjaS4NCj4gDQo+IFdoYXQgd291
-bGQgYmUgdGhlIG1pbmltYWwgdmlhYmxlIHZob3N0LXBjaSBkZXZpY2Ugc2V0IGZyb20geW91ciBQ
-T1Y/DQoNCkZvciB0aGUgc3RhdGljIGNvbmZpZ3VyYXRpb24gb3B0aW9uLCBJIHRoaW5rIGl0IG1h
-aW5seSBuZWVkcyB0aGUgZGV2aWNlIGVtdWxhdGlvbiBwYXJ0IG9mIHRoZSBjdXJyZW50IGltcGxl
-bWVudGF0aW9uLCB3aGljaCBoYXMgfjUwMCBMT0MgY3VycmVudGx5LiBUaGlzIHdvdWxkIGFsc28g
-bmVlZCB0byBhZGQgYSBuZXcgZmVhdHVyZSB0byB2aXJ0aW9fbmV0LCB0byBsZXQgdGhlIHZpcnRp
-b19uZXQgZHJpdmVyIHVzZSB0aGUgSVZTSE1FTSwgYW5kIHNhbWUgZm9yIHRoZSB2aG9zdC1wY2kg
-ZGV2aWNlLg0KDQpJIHRoaW5rIG1vc3QgcGFydCBvZiB0aGUgdmhvc3QtdXNlciBwcm90b2NvbCBj
-YW4gYmUgYnlwYXNzZWQgZm9yIHRoaXMgdXNhZ2UsIGJlY2F1c2UgdGhlIGRldmljZSBmZWF0dXJl
-IGJpdHMgZG9u4oCZdCBuZWVkIHRvIGJlIG5lZ290aWF0ZWQgYmV0d2VlbiB0aGUgdHdvIGRldmlj
-ZXMsIHRoZSBtZW1vcnkgYW5kIHZyaW5nIGluZm8gZG9lc27igJl0IG5lZWQgdG8gYmUgdHJhbnNm
-ZXJyZWQuIFRvIHN1cHBvcnQgaW50ZXJydXB0LCB3ZSBtYXkgc3RpbGwgbmVlZCB2aG9zdC11c2Vy
-IHRvIHNoYXJlIGlycWZkLg0KDQo+IFdoYXQgd291bGQgaGF2ZSB0byBiZSBwcm92aWRlZCBieSB0
-aGUgaHlwZXJ2aXNvciBmb3IgdGhhdD8NCj4gDQoNCldlIGRvbuKAmXQgbmVlZCBhbnkgc3VwcG9y
-dCBmcm9tIEtWTSwgZm9yIHRoZSBxZW11IHBhcnQgc3VwcG9ydCwgcGxlYXNlIHNlZSBhYm92ZS4N
-Cg0KQmVzdCwNCldlaQ0KDQo=
+On Tue, 2017-01-17 at 15:37 +1100, David Gibson wrote:
+> On Tue, Jan 17, 2017 at 11:48:31AM +1100, Suraj Jitindar Singh wrote:
+> > 
+> > On Tue, 2017-01-17 at 08:40 +1100, David Gibson wrote:
+> > > 
+> > > On Fri, Jan 13, 2017 at 05:28:11PM +1100, Suraj Jitindar Singh
+> > > wrote:
+> > > > 
+> > > > 
+> > > > The logical partitioning control register controls a threads
+> > > > operation
+> > > > based on the partition it is currently executing. Add new
+> > > > definitions and
+> > > > update the mask used when writing to the LPCR based on the
+> > > > POWER9
+> > > > spec.
+> > > > 
+> > > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> > > > ---
+> > > >  target/ppc/cpu.h            | 20 +++++++++++++++++++-
+> > > >  target/ppc/mmu-hash64.c     |  8 ++++++++
+> > > >  target/ppc/translate_init.c | 24 ++++++++++++++++++------
+> > > >  3 files changed, 45 insertions(+), 7 deletions(-)
+> > > > 
+> > > > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> > > > index afb7ddb..0ab49b3 100644
+> > > > --- a/target/ppc/cpu.h
+> > > > +++ b/target/ppc/cpu.h
+> > > > @@ -379,15 +379,22 @@ struct ppc_slb_t {
+> > > >  #define LPCR_ISL          (1ull << (63 - 2))
+> > > >  #define LPCR_KBV          (1ull << (63 - 3))
+> > > >  #define LPCR_DPFD_SHIFT   (63 - 11)
+> > > > -#define LPCR_DPFD         (0x3ull << LPCR_DPFD_SHIFT)
+> > > > +#define LPCR_DPFD         (0x7ull << LPCR_DPFD_SHIFT)
+> > > Changing this define effectively changes the valid LPCR mask for
+> > > existing POWER8 and POWER7 models, which is not what you want, I
+> > > think.
+> > I should have explained this better in the commit message, this has
+> > always been a 3 bit field (at least in POWER7-9) so the mask has
+> > just
+> > always been wrong. Afaik fixing this up won't really change
+> > anything -
+> > it relates to data stream prefetch depth.
+> > 
+> > I realise this should probably be a separate patch though, or
+> > atleast
+> > mentioned in the commit message.
+> Right, yes.  Please make the bugfix a separate patch with the
+> explanation in the commit message.
+> 
+> > 
+> > > 
+> > > 
+> > > > 
+> > > > 
+> > > >  #define LPCR_VRMASD_SHIFT (63 - 16)
+> > > >  #define LPCR_VRMASD       (0x1full << LPCR_VRMASD_SHIFT)
+> > > > +/* P9: Power-saving mode Exit Cause Enable (Upper Section)
+> > > > Mask */
+> > > > +#define LPCR_PECE_U_SHIFT (63 - 19)
+> > > > +#define LPCR_PECE_U_MASK  (0x7ull << LPCR_PECE_U_SHIFT)
+> > > > +#define LPCR_HVEE         (1ull << (63 - 17)) /* Hypervisor
+> > > > Virt
+> > > > Exit Enable */
+> > > >  #define LPCR_RMLS_SHIFT   (63 - 37)
+> > > >  #define LPCR_RMLS         (0xfull << LPCR_RMLS_SHIFT)
+> > > >  #define LPCR_ILE          (1ull << (63 - 38))
+> > > >  #define LPCR_AIL_SHIFT    (63 - 40)      /* Alternate
+> > > > interrupt
+> > > > location */
+> > > >  #define LPCR_AIL          (3ull << LPCR_AIL_SHIFT)
+> > > > +#define LPCR_UPRT         (1ull << (63 - 41)) /* Use Process
+> > > > Table
+> > > > */
+> > > > +#define LPCR_EVIRT        (1ull << (63 - 42)) /* Enhanced
+> > > > Virtualisation */
+> > > >  #define LPCR_ONL          (1ull << (63 - 45))
+> > > > +#define LPCR_LD           (1ull << (63 - 46)) /* Large
+> > > > Decrementer
+> > > > */
+> > > >  #define LPCR_P7_PECE0     (1ull << (63 - 49))
+> > > >  #define LPCR_P7_PECE1     (1ull << (63 - 50))
+> > > >  #define LPCR_P7_PECE2     (1ull << (63 - 51))
+> > > > @@ -396,11 +403,22 @@ struct ppc_slb_t {
+> > > >  #define LPCR_P8_PECE2     (1ull << (63 - 49))
+> > > >  #define LPCR_P8_PECE3     (1ull << (63 - 50))
+> > > >  #define LPCR_P8_PECE4     (1ull << (63 - 51))
+> > > > +/* P9: Power-saving mode Exit Cause Enable (Lower Section)
+> > > > Mask */
+> > > > +#define LPCR_PECE_L_SHIFT (63 - 51)
+> > > > +#define LPCR_PECE_L_MASK  (0x1full << LPCR_PECE_L_SHIFT)
+> > > > +#define LPCR_PDEE         (1ull << (63 - 47)) /* Privileged
+> > > > Doorbell Exit EN */
+> > > > +#define LPCR_HDEE         (1ull << (63 - 48)) /* Hyperv
+> > > > Doorbell
+> > > > Exit Enable */
+> > > > +#define LPCR_EEE          (1ull << (63 - 49)) /* External Exit
+> > > > Enable        */
+> > > > +#define LPCR_DEE          (1ull << (63 - 50)) /* Decrementer
+> > > > Exit
+> > > > Enable     */
+> > > > +#define LPCR_OEE          (1ull << (63 - 51)) /* Other Exit
+> > > > Enable           */
+> > > >  #define LPCR_MER          (1ull << (63 - 52))
+> > > > +#define LPCR_GTSE         (1ull << (63 - 53)) /* Guest
+> > > > Translation
+> > > > Shootdown */
+> > > >  #define LPCR_TC           (1ull << (63 - 54))
+> > > > +#define LPCR_HEIC         (1ull << (63 - 59)) /* HV Extern
+> > > > Interrupt Control */
+> > > >  #define LPCR_LPES0        (1ull << (63 - 60))
+> > > >  #define LPCR_LPES1        (1ull << (63 - 61))
+> > > >  #define LPCR_RMI          (1ull << (63 - 62))
+> > > > +#define LPCR_HVICE        (1ull << (63 - 62)) /* HV
+> > > > Virtualisation
+> > > > Int Enable */
+> > > >  #define LPCR_HDICE        (1ull << (63 - 63))
+> > > >  
+> > > >  #define msr_sf   ((env->msr >> MSR_SF)   & 1)
+> > > > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> > > > index fdb7a78..3a2acb8 100644
+> > > > --- a/target/ppc/mmu-hash64.c
+> > > > +++ b/target/ppc/mmu-hash64.c
+> > > > @@ -1050,6 +1050,14 @@ void helper_store_lpcr(CPUPPCState *env,
+> > > > target_ulong val)
+> > > >                        LPCR_P8_PECE2 | LPCR_P8_PECE3 |
+> > > > LPCR_P8_PECE4 |
+> > > >                        LPCR_MER | LPCR_TC | LPCR_LPES0 |
+> > > > LPCR_HDICE);
+> > > >          break;
+> > > > +    case POWERPC_MMU_3_00: /* P9 */
+> > > > +        lpcr = val & (LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
+> > > > LPCR_DPFD
+> > > > > 
+> > > > > 
+> > > > +                      (LPCR_PECE_U_MASK & LPCR_HVEE) |
+> > > > LPCR_ILE |
+> > > > LPCR_AIL |
+> > > > +                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL |
+> > > > +                      (LPCR_PECE_L_MASK & (LPCR_PDEE |
+> > > > LPCR_HDEE |
+> > > > LPCR_EEE |
+> > > > +                      LPCR_DEE | LPCR_OEE)) | LPCR_MER |
+> > > > LPCR_GTSE
+> > > > > 
+> > > > > LPCR_TC |
+> > > > +                      LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE |
+> > > > LPCR_HDICE);
+> > > > +        break;
+> > > >      default:
+> > > >          ;
+> > > >      }
+> > > > diff --git a/target/ppc/translate_init.c
+> > > > b/target/ppc/translate_init.c
+> > > > index 2402eef..a1994d3 100644
+> > > > --- a/target/ppc/translate_init.c
+> > > > +++ b/target/ppc/translate_init.c
+> > > > @@ -8887,12 +8887,24 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu)
+> > > >      lpcr->default_value &= ~LPCR_RMLS;
+> > > >      lpcr->default_value |= 1ull << LPCR_RMLS_SHIFT;
+> > > >  
+> > > > -    /* P7 and P8 has slightly different PECE bits, mostly
+> > > > because
+> > > > P8 adds
+> > > > -     * bit 47 and 48 which are reserved on P7. Here we set
+> > > > them
+> > > > all, which
+> > > > -     * will work as expected for both implementations
+> > > > -     */
+> > > > -    lpcr->default_value |= LPCR_P8_PECE0 | LPCR_P8_PECE1 |
+> > > > LPCR_P8_PECE2 |
+> > > > -                           LPCR_P8_PECE3 | LPCR_P8_PECE4;
+> > > > +    switch (env->mmu_model) {
+> > > I'm not sure of mmu_model is conceptually the right thing to
+> > > switch
+> > > on, although I guess it will work in practice.
+> > Well we need something to indicate our default value, which is
+> > dictated
+> > by the cpu model, and given that a cpu model correlates to a mmu
+> > model
+> > I can't think of a better option.
+> Yeah, I guess it's probably reasonable.  We can always change it
+> later
+> if we need to.
+I mean I can add another mmu flag to indicate that the mmu supports ISA
+v3.00 features, POWERPC_MMU_V3 or something. This could be useful in
+the likely event that future mmus also support the new features and
+want to display support for them.
+
+e.g.
+
+#define POWERPC_MMU_V3 0x00100000
+
+POWERPC_MMU_3_00       = ... | POWERPC_MMU_V3;
+
+if (env->mmu_model & POWERPC_MMU_V3) {
+    // ISA v3.00 specific stuffs
+}
+
+Not sure if this makes more sense than just checking the mmu_model
+directly as I currently am, I guess it'll be necessary eventually for
+the next mmu model for us to be able to claim v3.00 support.
+
+Thoughts?
+> 
+> > 
+> > > 
+> > > 
+> > > > 
+> > > > 
+> > > > +    case POWERPC_MMU_3_00:
+> > > > +        /* By default we choose legacy mode and switch to new
+> > > > hash
+> > > > or radix
+> > > > +         * when a register process table hcall is made. So
+> > > > disable
+> > > > process
+> > > > +         * tables and guest translation shootdown by default
+> > > > +         */
+> > > > +        lpcr->default_value &= ~(LPCR_UPRT | LPCR_GTSE);
+> > > > +        lpcr->default_value |= LPCR_PDEE | LPCR_HDEE |
+> > > > LPCR_EEE |
+> > > > LPCR_DEE |
+> > > > +                               LPCR_OEE;
+> > > > +        break;
+> > > > +    default:
+> > > > +        /* P7 and P8 has slightly different PECE bits, mostly
+> > > > because P8 adds
+> > > > +         * bit 47 and 48 which are reserved on P7. Here we set
+> > > > them all, which
+> > > > +         * will work as expected for both implementations
+> > > > +         */
+> > > > +        lpcr->default_value |= LPCR_P8_PECE0 | LPCR_P8_PECE1 |
+> > > > LPCR_P8_PECE2 |
+> > > > +                               LPCR_P8_PECE3 | LPCR_P8_PECE4;
+> > > > +    }
+> > > >  
+> > > >      /* We should be followed by a CPU reset but update the
+> > > > active
+> > > > value
+> > > >       * just in case...
