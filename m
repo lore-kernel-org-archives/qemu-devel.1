@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVfZy-0000w8-KS
+	(envelope-from <berrange@redhat.com>) id 1cVfZx-0000vE-1b
 	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVfZx-0006JQ-N5
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57396)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVfZx-0006JD-HY
+	(envelope-from <berrange@redhat.com>) id 1cVfZv-0006J1-Vz
 	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVfZv-0006Iv-Pw
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:39 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 23 Jan 2017 14:26:25 +0000
-Message-Id: <20170123142629.11110-5-berrange@redhat.com>
+Date: Mon, 23 Jan 2017 14:26:24 +0000
+Message-Id: <20170123142629.11110-4-berrange@redhat.com>
 In-Reply-To: <20170123142629.11110-1-berrange@redhat.com>
 References: <20170123142629.11110-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 4/8] io: add ability to associate an opaque
- "result" with with a task
+Subject: [Qemu-devel] [PULL v1 3/8] io: fix typo in docs for QIOTask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +26,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Currently there is no data associated with a successful
-task completion. This adds an opaque pointer to the task
-to store an arbitrary result.
+The GDestroyNotify parameter is already a pointer, so does
+not need a '*' suffix on the type.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- include/io/task.h | 27 +++++++++++++++++++++++++++
- io/task.c         | 20 ++++++++++++++++++++
- 2 files changed, 47 insertions(+)
+ include/io/task.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/include/io/task.h b/include/io/task.h
-index 1407747..ece1372 100644
+index c268eb0..1407747 100644
 --- a/include/io/task.h
 +++ b/include/io/task.h
-@@ -240,6 +240,33 @@ void qio_task_abort(QIOTask *task,
- 
- 
- /**
-+ * qio_task_set_result_pointer:
-+ * @task: the task struct
-+ * @result: pointer to the result data
-+ *
-+ * Associate an opaque result with the task,
-+ * which can later be retrieved with the
-+ * qio_task_get_result_pointer() method
-+ *
-+ */
-+void qio_task_set_result_pointer(QIOTask *task,
-+                                 gpointer result,
-+                                 GDestroyNotify notify);
-+
-+
-+/**
-+ * qio_task_get_result_pointer:
-+ * @task: the task struct
-+ *
-+ * Retrieve the opaque result data associated
-+ * with the task, if any.
-+ *
-+ * Returns: the task result, or NULL
-+ */
-+gpointer qio_task_get_result_pointer(QIOTask *task);
-+
-+
-+/**
-  * qio_task_get_source:
-  * @task: the task struct
+@@ -49,7 +49,7 @@ typedef int (*QIOTaskWorker)(QIOTask *task,
+  *  void myobject_operation(QMyObject *obj,
+  *                          QIOTaskFunc *func,
+  *                          gpointer opaque,
+- *                          GDestroyNotify *notify);
++ *                          GDestroyNotify notify);
+  *   </programlisting>
+  * </example>
   *
-diff --git a/io/task.c b/io/task.c
-index a763990..675e196 100644
---- a/io/task.c
-+++ b/io/task.c
-@@ -29,6 +29,8 @@ struct QIOTask {
-     QIOTaskFunc func;
-     gpointer opaque;
-     GDestroyNotify destroy;
-+    gpointer result;
-+    GDestroyNotify destroyResult;
- };
- 
- 
-@@ -57,6 +59,9 @@ static void qio_task_free(QIOTask *task)
-     if (task->destroy) {
-         task->destroy(task->opaque);
-     }
-+    if (task->destroyResult) {
-+        task->destroyResult(task->result);
-+    }
-     object_unref(task->source);
- 
-     g_free(task);
-@@ -154,6 +159,21 @@ void qio_task_abort(QIOTask *task,
- }
- 
- 
-+void qio_task_set_result_pointer(QIOTask *task,
-+                                 gpointer result,
-+                                 GDestroyNotify destroy)
-+{
-+    task->result = result;
-+    task->destroyResult = destroy;
-+}
-+
-+
-+gpointer qio_task_get_result_pointer(QIOTask *task)
-+{
-+    return task->result;
-+}
-+
-+
- Object *qio_task_get_source(QIOTask *task)
- {
-     return task->source;
+@@ -67,7 +67,7 @@ typedef int (*QIOTaskWorker)(QIOTask *task,
+  *    void myobject_operation(QMyObject *obj,
+  *                            QIOTaskFunc *func,
+  *                            gpointer opaque,
+- *                            GDestroyNotify *notify)
++ *                            GDestroyNotify notify)
+  *    {
+  *      QIOTask *task;
+  *
+@@ -154,7 +154,7 @@ typedef int (*QIOTaskWorker)(QIOTask *task,
+  *                               SocketAddress *addr,
+  *                               QIOTaskFunc *func,
+  *                               gpointer opaque,
+- *                               GDestroyNotify *notify)
++ *                               GDestroyNotify notify)
+  *    {
+  *      QIOTask *task;
+  *      SocketAddress *addrCopy;
 -- 
 2.9.3
