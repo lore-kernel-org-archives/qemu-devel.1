@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cVc56-0003N7-68
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:42:36 -0500
+	(envelope-from <famz@redhat.com>) id 1cVcE3-0005V2-CM
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:51:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cVc52-0001L7-7d
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:42:36 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:33667)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cVc52-0001L2-0b
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:42:32 -0500
-Received: by mail-wm0-x235.google.com with SMTP id d140so32648299wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 02:42:31 -0800 (PST)
-Date: Mon, 23 Jan 2017 10:42:28 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170123104228.GG29186@stefanha-x1.localdomain>
-References: <CAAKRE72RN=DvVqxYMba5KdnWQ+jrAXTpxQc7Qdgiymu6oByosg@mail.gmail.com>
-	<20170118102942.GA5284@stefanha-x1.localdomain>
-	<CAAKRE70s=Cdk9xedS3xavOj9_TMRa4ZNvZqVw8jqVxVMDCM7Vg@mail.gmail.com>
-	<CAJSP0QUU3CgJdX6p-vAQAyAeQio3Br7grUFBRrT-N0s2F6X58g@mail.gmail.com>
-	<CAAKRE72fjOwKs6V8MMOB-9WWv1vYidKYt3QSTZAoxEboXq2f5g@mail.gmail.com>
+	(envelope-from <famz@redhat.com>) id 1cVcDz-0003Xp-PR
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:51:51 -0500
+Date: Mon, 23 Jan 2017 18:51:37 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170123105137.GA28257@lemon.Home>
+References: <20161216052040.53067-1-haoqf@linux.vnet.ibm.com>
+	<20161216052040.53067-2-haoqf@linux.vnet.ibm.com>
+	<7428bd3f-0cc8-f42f-a2bd-442c2c6ffbef@linux.vnet.ibm.com>
+	<20170116052600.GA16076@lemon>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8S1fMsFYqgBC+BN/"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAKRE72fjOwKs6V8MMOB-9WWv1vYidKYt3QSTZAoxEboXq2f5g@mail.gmail.com>
-Subject: Re: [Qemu-devel] VM Hung issue
+In-Reply-To: <20170116052600.GA16076@lemon>
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] block/vmdk: Fix the endian problem
+ of buf_len and lba
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Umar Draz <unix.co@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: liujing <liujbjl@linux.vnet.ibm.com>, kwolf@redhat.com, mreitz@redhat.com
+Cc: borntraeger@de.ibm.com, qemu-stable@nongnu.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, "cornelia.huck@de.ibm.com QingFeng Hao" <haoqf@linux.vnet.ibm.com>
 
+On Mon, 01/16 13:26, Fam Zheng wrote:
+> On Mon, 01/16 10:38, liujing wrote:
+> > Dears,
+> > 
+> > We would like to know if this patch will be pulled
+> > 
+> > into upstream or what else we need to do for it?
+> > 
+> > Because for upstream, the qemu-iotests case 055 still failed.
+> 
+> Kevin, would you like to take this or should I do it?
 
---8S1fMsFYqgBC+BN/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Adding Max since he's taking care of the other VMDK fix I posted.
 
-On Thu, Jan 19, 2017 at 10:22:57PM +0500, Umar Draz wrote:
-> Yes the display is blank, and network also not responding, it means vm
-> somewhere hung.
-
-Try "gstack $PID_OF_QEMU" when the VM is hung.  This will output a
-backtrace for all threads in QEMU.  You might need to install the gdb
-package to get gstack.
-
-Please post the backtrace.  Maybe we'll be able to identify a deadlock
-or other bug.
-
-Stefan
-
---8S1fMsFYqgBC+BN/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYhd4UAAoJEJykq7OBq3PIMDUIALZmQTl1T+F8KQyAVBjMdyP8
-QLAH9msd9uK35uSkw3f46VVJ+QlFtusZQZBS7PFjIxglwWdjmrU/KGcKcU2k03tj
-L+psSN4TvwqDETIG7Qz9UqO1MQDHMB/mltyZ9wMb8tMP+X3K0xawMVgmte9sQf2g
-kglAkYvajE7+mwXF9JLd2hHTIcNduSXmC5NgyWwUxueiBTDMUpVRYSd+yx5R/cCR
-i5HeQ6j3xlUC5mkKHIk3m5xD8gsos6XU/soygU0S+Q4lrM/MMtQedab/Z9Krdcbq
-HJ1fUA+zZhCDbiE17WXydZIGmgUiWQMJ621e7RzbfiN8shPfovXvCH5vT+e1g+A=
-=I2VA
------END PGP SIGNATURE-----
-
---8S1fMsFYqgBC+BN/--
+Fam
