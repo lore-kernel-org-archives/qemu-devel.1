@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVjaf-0003sn-29
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:43:42 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cVjfz-0005Dm-GQ
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:49:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVjaa-0004CD-F4
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:43:41 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36766)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cVjaa-0004C5-AU
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:43:36 -0500
-Received: by mail-qt0-x243.google.com with SMTP id l7so19277237qtd.3
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 10:43:36 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
-	<1484644078-21312-2-git-send-email-batuzovk@ispras.ru>
-	<4d351b53-8724-b245-0077-942de1bebd66@twiddle.net>
-	<alpine.DEB.2.11.1701191515580.1724@bulbul.intra.ispras.ru>
-	<7178d6dd-4252-ad60-e1f0-51acffcd393c@twiddle.net>
-	<d3ca01a3-b8ed-93fd-235a-bd9b3adad838@ispras.ru>
-	<7f9b740e-20d5-2a6e-eaba-ffef5851e754@twiddle.net>
-	<alpine.DEB.2.11.1701231246360.2026@bulbul.intra.ispras.ru>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <0b0b1136-ada6-f30e-a6b9-90263d55e7da@twiddle.net>
-Date: Mon, 23 Jan 2017 10:43:31 -0800
+	(envelope-from <alex.williamson@redhat.com>) id 1cVjfv-0005jD-VK
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:49:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56552)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cVjfv-0005j5-MY
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:49:07 -0500
+Date: Mon, 23 Jan 2017 11:49:05 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170123114905.4936508d@t450s.home>
+In-Reply-To: <1484917736-32056-3-git-send-email-peterx@redhat.com>
+References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
+	<1484917736-32056-3-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.11.1701231246360.2026@bulbul.intra.ispras.ru>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/18] tcg: add support for 128bit vector
- type
+Subject: Re: [Qemu-devel] [PATCH RFC v4 02/20] vfio: introduce
+ vfio_get_vaddr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,48 +29,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirill Batuzov <batuzovk@ispras.ru>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com
 
-On 01/23/2017 02:30 AM, Kirill Batuzov wrote:
-> Because 4 adds on 4 i32 registers work good only when the size of
-> vector elements matches the size of scalar variables we use for
-> representation of a vector. add_i16x8 will not be that great if we use
-> 4 i32 variables: each will need to be split into two values, processed
-> independently and merged back afterwards.
+On Fri, 20 Jan 2017 21:08:38 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-Certainly.  But that's pretty much exactly how they are processed now.  Usually
-via a helper function that accepts an i64 input as a pair of i32 arguments.
+> A cleanup for vfio_iommu_map_notify(). Should have no functional change,
+> just to make the function shorter and easier to understand.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 38 insertions(+), 20 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 174f351..ce55dff 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+>             section->offset_within_address_space & (1ULL << 63);
+>  }
+>  
+> -static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> +static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+> +                           bool *read_only)
+>  {
+> -    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+> -    VFIOContainer *container = giommu->container;
+> -    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+>      MemoryRegion *mr;
+>      hwaddr xlat;
+>      hwaddr len = iotlb->addr_mask + 1;
+> -    void *vaddr;
+> -    int ret;
+> -
+> -    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+> -                                iova, iova + iotlb->addr_mask);
+> -
+> -    if (iotlb->target_as != &address_space_memory) {
+> -        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> -                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+> -        return;
+> -    }
+> +    bool ret = false;
+> +    bool writable = iotlb->perm & IOMMU_WO;
+>  
+>      /*
+>       * The IOMMU TLB entry we have just covers translation through
+> @@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      rcu_read_lock();
+>      mr = address_space_translate(&address_space_memory,
+>                                   iotlb->translated_addr,
+> -                                 &xlat, &len, iotlb->perm & IOMMU_WO);
+> +                                 &xlat, &len, writable);
+>      if (!memory_region_is_ram(mr)) {
+>          error_report("iommu map to non memory area %"HWADDR_PRIx"",
+>                       xlat);
+>          goto out;
+>      }
+> +
+>      /*
+>       * Translation truncates length to the IOMMU page size,
+>       * check that it did not truncate too much.
+> @@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>          goto out;
+>      }
+>  
+> +    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> +    *read_only = !writable || mr->readonly;
+> +    ret = true;
+> +
+> +out:
+> +    rcu_read_unlock();
+> +    return ret;
+> +}
+> +
+> +static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> +{
+> +    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+> +    VFIOContainer *container = giommu->container;
+> +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> +    bool read_only;
+> +    void *vaddr;
+> +    int ret;
+> +
+> +    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+> +                                iova, iova + iotlb->addr_mask);
+> +
+> +    if (iotlb->target_as != &address_space_memory) {
+> +        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+> +        return;
+> +    }
+> +
+> +    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
+> +        return;
+> +    }
+> +
+>      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> -        vaddr = memory_region_get_ram_ptr(mr) + xlat;
+>          ret = vfio_dma_map(container, iova,
+>                             iotlb->addr_mask + 1, vaddr,
+> -                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
+> +                           read_only);
 
-> Scalar variables lack primitives to work with them as vectors of shorter
-> values. This is one of the reasons I added v64 type instead of using i64
-> for 64-bit vector operations. And this is the reason I'm so opposed to
-> using them to represent vector types if vector registers are not
-> supported by host. Handling vector operations with element size that
-> does not match representation will be complicated, may require special
-> handling for different operations and will produce a lot of if-s in code.
+Is it really valid to move the map ioctl out of the rcu read lock?
+We're making use of vaddr, which is directly a property of a
+MemoryRegion which may have now disappeared.  With the lock released,
+could an unmap race the map resulting in the wrong ordering?  As noted
+previously, there are some subtle changes here, we do the
+memory_region_get_ram_ptr() translation on both map and unmap (fixed in
+next patch) and then pull map out of the rcu lock.  I'm not sure the
+extra function is worthwhile or really has no functional change.
+Thanks,
 
-A lot of if's?  I've no idea what you're talking about.
+Alex
 
-A v64 type makes sense because generally we're going to allocate them to a
-different register set than i64.  That said, i64 is perfectly adequate for
-implementing add_i8x8:
-
-  t0  = in1 & 0x7f7f7f7f7f7f7f7f
-  t1  = in0 + t0;
-  t2  = in1 & 0x8080808080808080
-  out = t1 ^ t2
-
-This is less expensive than addition by pieces if there are at least 4 pieces.
-
-> The method I'm proposing can handle any operation regardless of
-> representation. This includes handling situation where host supports
-> vector registers but does not support required operation (for example 
-> SSE/AVX does not support multiplication of vectors of 8-bit values).
-
-Not for nothing but it's trivial to expand with punpcklbw, punpckhbw, pmullw,
-pand, packuswb.  That said, if an expansion gets too complicated, it's still
-better to move it into a helper than expand 16 * (load, op, store).
-
-
-r~
+>          if (ret) {
+>              error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+>                           "0x%"HWADDR_PRIx", %p) = %d (%m)",
+> @@ -357,8 +377,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>                           iotlb->addr_mask + 1, ret);
+>          }
+>      }
+> -out:
+> -    rcu_read_unlock();
+>  }
+>  
+>  static void vfio_listener_region_add(MemoryListener *listener,
