@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVbF7-0006Qk-Ij
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:48:54 -0500
+	(envelope-from <armbru@redhat.com>) id 1cVbF9-0006SO-3V
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:48:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVbF6-0003sP-ND
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:48:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1cVbF8-0003tD-8h
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:48:55 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 23 Jan 2017 10:48:37 +0100
-Message-Id: <1485164923-17736-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/6] More sensible default for -drive interface
- type
+Date: Mon, 23 Jan 2017 10:48:41 +0100
+Message-Id: <1485164923-17736-5-git-send-email-armbru@redhat.com>
+In-Reply-To: <1485164923-17736-1-git-send-email-armbru@redhat.com>
+References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH 4/6] hw: Default -drive to if=none instead of
+ scsi when scsi cannot work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,55 +21,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm@nongnu.org
 
-Block backends defined with -drive if=T, T!=none are meant to be
-picked up by machine initialization code: a suitable frontend gets
-created and wired up automatically.
+Block backends defined with -drive if=scsi are meant to be picked up
+by machine initialization code: a suitable frontend gets created and
+wired up automatically.
 
-if=T drives not picked up that way can still be used with -device as
-if they had if=none, but that's unclean and best avoided.  Unused ones
-produce an "Orphaned drive without device" warning.
+if=scsi drives not picked up that way can still be used with -device
+as if they had if=none, but that's unclean and best avoided.  Unused
+ones produce an "Orphaned drive without device" warning.
 
-Many machine types default to if=ide, even though they don't actually
-have an IDE controller.  A few default to if=scsi, even though they
-lack a SCSI HBA.  Change their default to if=none.
+A few machine types default to if=scsi, even though they don't
+actually have a SCSI HBA.  This makes no sense.  Change their default
+to if=none.  Affected machines:
 
-While their, fix handling of index and unit for a few boards with AHCI
-controllers, and stop auto-creating the thoroughly obsolete lsi SCSI
-HBAs for new PC machine types.
+* aarch64/arm: realview-pbx-a9 vexpress-a9 vexpress-a15 xilinx-zynq-a9
 
-Markus Armbruster (6):
-  hw: Default -drive to if=ide explicitly where it works
-  hw/arm/cubieboard hw/arm/xlnx-ep108: Fix units_per_default_bus
-  hw: Default -drive to if=none instead of ide when ide cannot work
-  hw: Default -drive to if=none instead of scsi when scsi cannot work
-  hw/arm/highbank: Default -drive to if=ide instead of if=scsi
-  hw/i386/i386: Stop auto-creating lsi53c895a SCSI HBAs
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-arm@nongnu.org
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/arm/realview.c    | 1 -
+ hw/arm/vexpress.c    | 1 -
+ hw/arm/xilinx_zynq.c | 1 -
+ 3 files changed, 3 deletions(-)
 
- hw/alpha/dp264.c          |  1 +
- hw/arm/cubieboard.c       |  4 ++++
- hw/arm/highbank.c         |  8 ++++++--
- hw/arm/realview.c         |  1 -
- hw/arm/spitz.c            |  3 +++
- hw/arm/tosa.c             |  1 +
- hw/arm/vexpress.c         |  1 -
- hw/arm/xilinx_zynq.c      |  1 -
- hw/arm/xlnx-ep108.c       |  6 ++++++
- hw/i386/pc.c              |  1 +
- hw/i386/pc_piix.c         | 15 ++++++++++++++-
- hw/i386/pc_q35.c          |  7 ++++++-
- hw/mips/mips_fulong2e.c   |  1 +
- hw/mips/mips_malta.c      |  1 +
- hw/mips/mips_r4k.c        |  1 +
- hw/ppc/mac_newworld.c     |  1 +
- hw/ppc/mac_oldworld.c     |  1 +
- hw/ppc/prep.c             |  1 +
- hw/sh4/r2d.c              |  1 +
- hw/sparc64/sun4u.c        |  2 ++
- include/hw/i386/pc.h      |  3 +++
- include/sysemu/blockdev.h |  9 ++++-----
- 22 files changed, 58 insertions(+), 12 deletions(-)
-
+diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+index 8eafcca..8c11c7a 100644
+--- a/hw/arm/realview.c
++++ b/hw/arm/realview.c
+@@ -443,7 +443,6 @@ static void realview_pbx_a9_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "ARM RealView Platform Baseboard Explore for Cortex-A9";
+     mc->init = realview_pbx_a9_init;
+-    mc->block_default_type = IF_SCSI;
+     mc->max_cpus = 4;
+ }
+ 
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index 58760f4..5756470 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -751,7 +751,6 @@ static void vexpress_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "ARM Versatile Express";
+     mc->init = vexpress_common_init;
+-    mc->block_default_type = IF_SCSI;
+     mc->max_cpus = 4;
+ }
+ 
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 7dac20d..3985356 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -323,7 +323,6 @@ static void zynq_machine_init(MachineClass *mc)
+ {
+     mc->desc = "Xilinx Zynq Platform Baseboard for Cortex-A9";
+     mc->init = zynq_init;
+-    mc->block_default_type = IF_SCSI;
+     mc->max_cpus = 1;
+     mc->no_sdcard = 1;
+ }
 -- 
 2.7.4
