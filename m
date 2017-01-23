@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVUCv-0007lC-Ci
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:12 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cVUCu-0007kX-HJ
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVUCu-0004u9-2w
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:09 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35570)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cVUCt-0004u3-Um
+	(envelope-from <rth7680@gmail.com>) id 1cVUCs-0004tw-V8
 	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:08 -0500
-Received: by mail-qt0-x241.google.com with SMTP id f4so14077140qte.2
-	for <qemu-devel@nongnu.org>; Sun, 22 Jan 2017 18:18:07 -0800 (PST)
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33802)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cVUCs-0004tr-Qr
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:06 -0500
+Received: by mail-qt0-x241.google.com with SMTP id a29so14086916qtb.1
+	for <qemu-devel@nongnu.org>; Sun, 22 Jan 2017 18:18:06 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Sun, 22 Jan 2017 18:17:33 -0800
-Message-Id: <20170123021748.13170-12-rth@twiddle.net>
+Date: Sun, 22 Jan 2017 18:17:32 -0800
+Message-Id: <20170123021748.13170-11-rth@twiddle.net>
 In-Reply-To: <20170123021748.13170-1-rth@twiddle.net>
 References: <20170123021748.13170-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 11/26] linux-user: Add HPPA target_syscall.h
+Subject: [Qemu-devel] [PULL 10/26] linux-user: Add HPPA termbits.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,256 +29,236 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Which is primarily a re-definition of errno numbers.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- linux-user/hppa/target_syscall.h | 237 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 237 insertions(+)
- create mode 100644 linux-user/hppa/target_syscall.h
+ linux-user/hppa/termbits.h | 219 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 219 insertions(+)
+ create mode 100644 linux-user/hppa/termbits.h
 
-diff --git a/linux-user/hppa/target_syscall.h b/linux-user/hppa/target_syscall.h
+diff --git a/linux-user/hppa/termbits.h b/linux-user/hppa/termbits.h
 new file mode 100644
-index 0000000..ac18a9c
+index 0000000..e9633ef
 --- /dev/null
-+++ b/linux-user/hppa/target_syscall.h
-@@ -0,0 +1,237 @@
-+#ifndef HPPA_TARGET_SYSCALL_H
-+#define HPPA_TARGET_SYSCALL_H
++++ b/linux-user/hppa/termbits.h
+@@ -0,0 +1,219 @@
++/* from asm/termbits.h */
 +
-+struct target_pt_regs {
-+    target_ulong gr[32];
-+    uint64_t     fr[32];
-+    target_ulong sr[8];
-+    target_ulong iasq[2];
-+    target_ulong iaoq[2];
-+    target_ulong cr27;
-+    target_ulong __pad0;
-+    target_ulong orig_r28;
-+    target_ulong ksp;
-+    target_ulong kpc;
-+    target_ulong sar;
-+    target_ulong iir;
-+    target_ulong isr;
-+    target_ulong ior;
-+    target_ulong ipsw;
++#define TARGET_NCCS 19
++
++struct target_termios {
++    unsigned int c_iflag;               /* input mode flags */
++    unsigned int c_oflag;               /* output mode flags */
++    unsigned int c_cflag;               /* control mode flags */
++    unsigned int c_lflag;               /* local mode flags */
++    unsigned char c_line;                    /* line discipline */
++    unsigned char c_cc[TARGET_NCCS];                /* control characters */
 +};
 +
-+#define UNAME_MACHINE "hppa"
-+#define UNAME_MINIMUM_RELEASE "2.6.32"
-+#define TARGET_CLONE_BACKWARDS
-+#define TARGET_MINSIGSTKSZ       2048
-+#define TARGET_MLOCKALL_MCL_CURRENT 1
-+#define TARGET_MLOCKALL_MCL_FUTURE  2
++/* c_iflag bits */
++#define TARGET_IGNBRK  0000001
++#define TARGET_BRKINT  0000002
++#define TARGET_IGNPAR  0000004
++#define TARGET_PARMRK  0000010
++#define TARGET_INPCK   0000020
++#define TARGET_ISTRIP  0000040
++#define TARGET_INLCR   0000100
++#define TARGET_IGNCR   0000200
++#define TARGET_ICRNL   0000400
++#define TARGET_IUCLC   0001000
++#define TARGET_IXON    0002000
++#define TARGET_IXANY   0004000
++#define TARGET_IXOFF   0010000
++#define TARGET_IMAXBEL 0040000
++#define TARGET_IUTF8   0100000
 +
-+#undef  TARGET_ENOMSG
-+#define TARGET_ENOMSG          35
-+#undef  TARGET_EIDRM
-+#define TARGET_EIDRM           36
-+#undef  TARGET_ECHRNG
-+#define TARGET_ECHRNG          37
-+#undef  TARGET_EL2NSYNC
-+#define TARGET_EL2NSYNC        38
-+#undef  TARGET_EL3HLT
-+#define TARGET_EL3HLT          39
-+#undef  TARGET_EL3RST
-+#define TARGET_EL3RST          40
-+#undef  TARGET_ELNRNG
-+#define TARGET_ELNRNG          41
-+#undef  TARGET_EUNATCH
-+#define TARGET_EUNATCH         42
-+#undef  TARGET_ENOCSI
-+#define TARGET_ENOCSI          43
-+#undef  TARGET_EL2HLT
-+#define TARGET_EL2HLT          44
-+#undef  TARGET_EDEADLK
-+#define TARGET_EDEADLK         45
-+#undef  TARGET_ENOLCK
-+#define TARGET_ENOLCK          46
-+#undef  TARGET_EILSEQ
-+#define TARGET_EILSEQ          47
++/* c_oflag bits */
++#define TARGET_OPOST   0000001
++#define TARGET_OLCUC   0000002
++#define TARGET_ONLCR   0000004
++#define TARGET_OCRNL   0000010
++#define TARGET_ONOCR   0000020
++#define TARGET_ONLRET  0000040
++#define TARGET_OFILL   0000100
++#define TARGET_OFDEL   0000200
++#define TARGET_NLDLY   0000400
++#define   TARGET_NL0   0000000
++#define   TARGET_NL1   0000400
++#define TARGET_CRDLY   0003000
++#define   TARGET_CR0   0000000
++#define   TARGET_CR1   0001000
++#define   TARGET_CR2   0002000
++#define   TARGET_CR3   0003000
++#define TARGET_TABDLY  0014000
++#define   TARGET_TAB0  0000000
++#define   TARGET_TAB1  0004000
++#define   TARGET_TAB2  0010000
++#define   TARGET_TAB3  0014000
++#define   TARGET_XTABS 0014000
++#define TARGET_BSDLY   0020000
++#define   TARGET_BS0   0000000
++#define   TARGET_BS1   0020000
++#define TARGET_VTDLY   0040000
++#define   TARGET_VT0   0000000
++#define   TARGET_VT1   0040000
++#define TARGET_FFDLY   0100000
++#define   TARGET_FF0   0000000
++#define   TARGET_FF1   0100000
 +
-+#undef  TARGET_ENONET
-+#define TARGET_ENONET          50
-+#undef  TARGET_ENODATA
-+#define TARGET_ENODATA         51
-+#undef  TARGET_ETIME
-+#define TARGET_ETIME           52
-+#undef  TARGET_ENOSR
-+#define TARGET_ENOSR           53
-+#undef  TARGET_ENOSTR
-+#define TARGET_ENOSTR          54
-+#undef  TARGET_ENOPKG
-+#define TARGET_ENOPKG          55
++/* c_cflag bit meaning */
++#define TARGET_CBAUD   0010017
++#define  TARGET_B0     0000000         /* hang up */
++#define  TARGET_B50    0000001
++#define  TARGET_B75    0000002
++#define  TARGET_B110   0000003
++#define  TARGET_B134   0000004
++#define  TARGET_B150   0000005
++#define  TARGET_B200   0000006
++#define  TARGET_B300   0000007
++#define  TARGET_B600   0000010
++#define  TARGET_B1200  0000011
++#define  TARGET_B1800  0000012
++#define  TARGET_B2400  0000013
++#define  TARGET_B4800  0000014
++#define  TARGET_B9600  0000015
++#define  TARGET_B19200 0000016
++#define  TARGET_B38400 0000017
++#define TARGET_EXTA B19200
++#define TARGET_EXTB B38400
++#define TARGET_CSIZE   0000060
++#define   TARGET_CS5   0000000
++#define   TARGET_CS6   0000020
++#define   TARGET_CS7   0000040
++#define   TARGET_CS8   0000060
++#define TARGET_CSTOPB  0000100
++#define TARGET_CREAD   0000200
++#define TARGET_PARENB  0000400
++#define TARGET_PARODD  0001000
++#define TARGET_HUPCL   0002000
++#define TARGET_CLOCAL  0004000
++#define TARGET_CBAUDEX 0010000
++#define  TARGET_B57600  0010001
++#define  TARGET_B115200 0010002
++#define  TARGET_B230400 0010003
++#define  TARGET_B460800 0010004
++#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
++#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
++#define TARGET_CRTSCTS   020000000000  /* flow control */
 +
-+#undef  TARGET_ENOLINK
-+#define TARGET_ENOLINK         57
-+#undef  TARGET_EADV
-+#define TARGET_EADV            58
-+#undef  TARGET_ESRMNT
-+#define TARGET_ESRMNT          59
-+#undef  TARGET_ECOMM
-+#define TARGET_ECOMM           60
-+#undef  TARGET_EPROTO
-+#define TARGET_EPROTO          61
++/* c_lflag bits */
++#define TARGET_ISIG    0000001
++#define TARGET_ICANON  0000002
++#define TARGET_XCASE   0000004
++#define TARGET_ECHO    0000010
++#define TARGET_ECHOE   0000020
++#define TARGET_ECHOK   0000040
++#define TARGET_ECHONL  0000100
++#define TARGET_NOFLSH  0000200
++#define TARGET_TOSTOP  0000400
++#define TARGET_ECHOCTL 0001000
++#define TARGET_ECHOPRT 0002000
++#define TARGET_ECHOKE  0004000
++#define TARGET_FLUSHO  0010000
++#define TARGET_PENDIN  0040000
++#define TARGET_IEXTEN  0100000
 +
-+#undef  TARGET_EMULTIHOP
-+#define TARGET_EMULTIHOP       64
++/* c_cc character offsets */
++#define TARGET_VINTR    0
++#define TARGET_VQUIT    1
++#define TARGET_VERASE   2
++#define TARGET_VKILL    3
++#define TARGET_VEOF     4
++#define TARGET_VTIME    5
++#define TARGET_VMIN     6
++#define TARGET_VSWTC    7
++#define TARGET_VSTART   8
++#define TARGET_VSTOP    9
++#define TARGET_VSUSP    10
++#define TARGET_VEOL     11
++#define TARGET_VREPRINT 12
++#define TARGET_VDISCARD 13
++#define TARGET_VWERASE  14
++#define TARGET_VLNEXT   15
++#define TARGET_VEOL2    16
 +
-+#undef  TARGET_EDOTDOT
-+#define TARGET_EDOTDOT         66
-+#undef  TARGET_EBADMSG
-+#define TARGET_EBADMSG         67
-+#undef  TARGET_EUSERS
-+#define TARGET_EUSERS          68
-+#undef  TARGET_EDQUOT
-+#define TARGET_EDQUOT          69
-+#undef  TARGET_ESTALE
-+#define TARGET_ESTALE          70
-+#undef  TARGET_EREMOTE
-+#define TARGET_EREMOTE         71
-+#undef  TARGET_EOVERFLOW
-+#define TARGET_EOVERFLOW       72
++/* ioctls */
 +
-+#undef  TARGET_EBADE
-+#define TARGET_EBADE           160
-+#undef  TARGET_EBADR
-+#define TARGET_EBADR           161
-+#undef  TARGET_EXFULL
-+#define TARGET_EXFULL          162
-+#undef  TARGET_ENOANO
-+#define TARGET_ENOANO          163
-+#undef  TARGET_EBADRQC
-+#define TARGET_EBADRQC         164
-+#undef  TARGET_EBADSLT
-+#define TARGET_EBADSLT         165
-+#undef  TARGET_EBFONT
-+#define TARGET_EBFONT          166
-+#undef  TARGET_ENOTUNIQ
-+#define TARGET_ENOTUNIQ        167
-+#undef  TARGET_EBADFD
-+#define TARGET_EBADFD          168
-+#undef  TARGET_EREMCHG
-+#define TARGET_EREMCHG         169
-+#undef  TARGET_ELIBACC
-+#define TARGET_ELIBACC         170
-+#undef  TARGET_ELIBBAD
-+#define TARGET_ELIBBAD         171
-+#undef  TARGET_ELIBSCN
-+#define TARGET_ELIBSCN         172
-+#undef  TARGET_ELIBMAX
-+#define TARGET_ELIBMAX         173
-+#undef  TARGET_ELIBEXEC
-+#define TARGET_ELIBEXEC        174
-+#undef  TARGET_ERESTART
-+#define TARGET_ERESTART        175
-+#undef  TARGET_ESTRPIPE
-+#define TARGET_ESTRPIPE        176
-+#undef  TARGET_EUCLEAN
-+#define TARGET_EUCLEAN         177
-+#undef  TARGET_ENOTNAM
-+#define TARGET_ENOTNAM         178
-+#undef  TARGET_ENAVAIL
-+#define TARGET_ENAVAIL         179
-+#undef  TARGET_EISNAM
-+#define TARGET_EISNAM          180
-+#undef  TARGET_EREMOTEIO
-+#define TARGET_EREMOTEIO       181
-+#undef  TARGET_ENOMEDIUM
-+#define TARGET_ENOMEDIUM       182
-+#undef  TARGET_EMEDIUMTYPE
-+#define TARGET_EMEDIUMTYPE     183
-+#undef  TARGET_ENOKEY
-+#define TARGET_ENOKEY          184
-+#undef  TARGET_EKEYEXPIRED
-+#define TARGET_EKEYEXPIRED     185
-+#undef  TARGET_EKEYREVOKED
-+#define TARGET_EKEYREVOKED     186
-+#undef  TARGET_EKEYREJECTED
-+#define TARGET_EKEYREJECTED    187
++#define TARGET_TCGETS           TARGET_IOR('T', 16, struct target_termios)
++#define TARGET_TCSETS           TARGET_IOW('T', 17, struct target_termios)
++#define TARGET_TCSETSW          TARGET_IOW('T', 18, struct target_termios)
++#define TARGET_TCSETSF          TARGET_IOW('T', 19, struct target_termios)
++#define TARGET_TCGETA           TARGET_IOR('T', 1, struct target_termios)
++#define TARGET_TCSETA           TARGET_IOW('T', 2, struct target_termios)
++#define TARGET_TCSETAW          TARGET_IOW('T', 3, struct target_termios)
++#define TARGET_TCSETAF          TARGET_IOW('T', 4, struct target_termios)
++#define TARGET_TCSBRK           TARGET_IO('T', 5)
++#define TARGET_TCXONC           TARGET_IO('T', 6)
++#define TARGET_TCFLSH           TARGET_IO('T', 7)
 +
-+/* Never used in linux.  */
-+/* #define TARGET_ENOSYM          215 */
-+#undef  TARGET_ENOTSOCK
-+#define TARGET_ENOTSOCK        216
-+#undef  TARGET_EDESTADDRREQ
-+#define TARGET_EDESTADDRREQ    217
-+#undef  TARGET_EMSGSIZE
-+#define TARGET_EMSGSIZE        218
-+#undef  TARGET_EPROTOTYPE
-+#define TARGET_EPROTOTYPE      219
-+#undef  TARGET_ENOPROTOOPT
-+#define TARGET_ENOPROTOOPT     220
-+#undef  TARGET_EPROTONOSUPPORT
-+#define TARGET_EPROTONOSUPPORT 221
-+#undef  TARGET_ESOCKTNOSUPPORT
-+#define TARGET_ESOCKTNOSUPPORT 222
-+#undef  TARGET_EOPNOTSUPP
-+#define TARGET_EOPNOTSUPP      223
-+#undef  TARGET_EPFNOSUPPORT
-+#define TARGET_EPFNOSUPPORT    224
-+#undef  TARGET_EAFNOSUPPORT
-+#define TARGET_EAFNOSUPPORT    225
-+#undef  TARGET_EADDRINUSE
-+#define TARGET_EADDRINUSE      226
-+#undef  TARGET_EADDRNOTAVAIL
-+#define TARGET_EADDRNOTAVAIL   227
-+#undef  TARGET_ENETDOWN
-+#define TARGET_ENETDOWN        228
-+#undef  TARGET_ENETUNREACH
-+#define TARGET_ENETUNREACH     229
-+#undef  TARGET_ENETRESET
-+#define TARGET_ENETRESET       230
-+#undef  TARGET_ECONNABORTED
-+#define TARGET_ECONNABORTED    231
-+#undef  TARGET_ECONNRESET
-+#define TARGET_ECONNRESET      232
-+#undef  TARGET_ENOBUFS
-+#define TARGET_ENOBUFS         233
-+#undef  TARGET_EISCONN
-+#define TARGET_EISCONN         234
-+#undef  TARGET_ENOTCONN
-+#define TARGET_ENOTCONN        235
-+#undef  TARGET_ESHUTDOWN
-+#define TARGET_ESHUTDOWN       236
-+#undef  TARGET_ETOOMANYREFS
-+#define TARGET_ETOOMANYREFS    237
-+#undef  TARGET_ETIMEDOUT
-+#define TARGET_ETIMEDOUT       238
-+#undef  TARGET_ECONNREFUSED
-+#define TARGET_ECONNREFUSED    239
-+#define TARGET_EREMOTERELEASE  240
-+#undef  TARGET_EHOSTDOWN
-+#define TARGET_EHOSTDOWN       241
-+#undef  TARGET_EHOSTUNREACH
-+#define TARGET_EHOSTUNREACH    242
++#define TARGET_TIOCEXCL         0x540C
++#define TARGET_TIOCNXCL         0x540D
++#define TARGET_TIOCSCTTY        0x540E
++#define TARGET_TIOCGPGRP        TARGET_IOR('T', 30, int)
++#define TARGET_TIOCSPGRP        TARGET_IOW('T', 29, int)
++#define TARGET_TIOCOUTQ         0x5411
++#define TARGET_TIOCSTI          0x5412
++#define TARGET_TIOCGWINSZ       0x5413
++#define TARGET_TIOCSWINSZ       0x5414
++#define TARGET_TIOCMGET         0x5415
++#define TARGET_TIOCMBIS         0x5416
++#define TARGET_TIOCMBIC         0x5417
++#define TARGET_TIOCMSET         0x5418
++#define TARGET_TIOCGSOFTCAR     0x5419
++#define TARGET_TIOCSSOFTCAR     0x541A
++#define TARGET_FIONREAD         0x541B
++#define TARGET_TIOCINQ          TARGET_FIONREAD
++#define TARGET_TIOCLINUX        0x541C
++#define TARGET_TIOCCONS         0x541D
++#define TARGET_TIOCGSERIAL      0x541E
++#define TARGET_TIOCSSERIAL      0x541F
++#define TARGET_TIOCPKT          0x5420
++#define TARGET_FIONBIO          0x5421
++#define TARGET_TIOCNOTTY        0x5422
++#define TARGET_TIOCSETD         0x5423
++#define TARGET_TIOCGETD         0x5424
++#define TARGET_TCSBRKP          0x5425 /* Needed for POSIX tcsendbreak() */
++#define TARGET_TIOCTTYGSTRUCT   0x5426 /* For debugging only */
++#define TARGET_TIOCSBRK         0x5427 /* BSD compatibility */
++#define TARGET_TIOCCBRK         0x5428 /* BSD compatibility */
++#define TARGET_TIOCGSID         TARGET_IOR('T', 20, int)
++#define TARGET_TIOCGPTN         TARGET_IOR('T', 0x30, unsigned int)
++        /* Get Pty Number (of pty-mux device) */
++#define TARGET_TIOCSPTLCK       TARGET_IOW('T', 0x31, int)
++        /* Lock/unlock Pty */
 +
-+#undef  TARGET_EALREADY
-+#define TARGET_EALREADY        244
-+#undef  TARGET_EINPROGRESS
-+#define TARGET_EINPROGRESS     245
-+#undef  TARGET_ENOTEMPTY
-+#define TARGET_ENOTEMPTY       247
-+#undef  TARGET_ENAMETOOLONG
-+#define TARGET_ENAMETOOLONG    248
-+#undef  TARGET_ELOOP
-+#define TARGET_ELOOP           249
-+#undef  TARGET_ENOSYS
-+#define TARGET_ENOSYS          251
++#define TARGET_FIONCLEX         0x5450  /* these numbers need to be adjusted. */
++#define TARGET_FIOCLEX          0x5451
++#define TARGET_FIOASYNC         0x5452
++#define TARGET_TIOCSERCONFIG    0x5453
++#define TARGET_TIOCSERGWILD     0x5454
++#define TARGET_TIOCSERSWILD     0x5455
++#define TARGET_TIOCGLCKTRMIOS   0x5456
++#define TARGET_TIOCSLCKTRMIOS   0x5457
++#define TARGET_TIOCSERGSTRUCT   0x5458 /* For debugging only */
++#define TARGET_TIOCSERGETLSR    0x5459 /* Get line status register */
++#define TARGET_TIOCSERGETMULTI  0x545A /* Get multiport config  */
++#define TARGET_TIOCSERSETMULTI  0x545B /* Set multiport config */
 +
-+#undef  TARGET_ECANCELED
-+#define TARGET_ECANCELED       253
++#define TARGET_TIOCMIWAIT      0x545C  /* wait for a change on serial */
++#define TARGET_TIOCGICOUNT     0x545D
++#define TARGET_FIOQSIZE        0x5460
++#define TARGET_TIOCSTART       0x5461
++#define TARGET_TIOCSTOP        0x5462
++#define TARGET_TIOCSLTC        0x5462
 +
-+#undef  TARGET_EOWNERDEAD
-+#define TARGET_EOWNERDEAD      254
-+#undef  TARGET_ENOTRECOVERABLE
-+#define TARGET_ENOTRECOVERABLE 255
++/* Used for packet mode */
++#define TARGET_TIOCPKT_DATA              0
++#define TARGET_TIOCPKT_FLUSHREAD         1
++#define TARGET_TIOCPKT_FLUSHWRITE        2
++#define TARGET_TIOCPKT_STOP              4
++#define TARGET_TIOCPKT_START             8
++#define TARGET_TIOCPKT_NOSTOP           16
++#define TARGET_TIOCPKT_DOSTOP           32
 +
-+#undef  TARGET_ERFKILL
-+#define TARGET_ERFKILL         256
-+#undef  TARGET_EHWPOISON
-+#define TARGET_EHWPOISON       257
-+
-+#endif /* HPPA_TARGET_SYSCALL_H */
++#define TARGET_TIOCSER_TEMT    0x01 /* Transmitter physically empty */
 -- 
 2.9.3
