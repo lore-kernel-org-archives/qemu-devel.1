@@ -1,14 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVdmd-0003Yo-AO
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:31:40 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cVdmx-0003w3-99
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:32:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVdmc-0005lt-9J
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:31:39 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Mon, 23 Jan 2017 20:30:40 +0800
-Message-Id: <20170123123056.30383-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 00/16] block: Image locking series
+	(envelope-from <kraxel@redhat.com>) id 1cVdmw-0005tW-FS
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:31:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cVdmw-0005tJ-9m
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:31:58 -0500
+Message-ID: <1485174715.2149.22.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 23 Jan 2017 13:31:55 +0100
+In-Reply-To: <20170121014901.GA21645@foober.ini.cmu.edu>
+References: <20170121014901.GA21645@foober.ini.cmu.edu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] hw/usb/dev-hid: Make usb-tablet
+ work with OS X/macOS guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,85 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>
+To: "Gabriel L. Somlo" <somlo@cmu.edu>
+Cc: qemu-devel@nongnu.org, phil@philjordan.eu
 
-v12: Fix test cases on old systems that doesn't have F_OFD_SETLK, such as RHEL
-     6. [Patchew]
-     Trim the commit message of patch 15 to avoid bitrotting.
+  Hi,
 
-v11: Move lock bytes from 1-2 to 0x10-0x12. [Daniel]
+> works like a charm on Sierra (10.12.1). Also tried it with
+> Fedora-Workstation-Live-x86_64-25-1.3.iso, where it behaves
+> identically with or without the mac_compat option. All tests
+> used qemu in SDL/X11-client mode.
+>=20
+> Tested-by: Gabriel Somlo <somlo@cmu.edu>
 
-v10: While we still don't have comprehensive propagation mechanism that will be
-provided by new op blocker system for "permissive modes", the locking enabled
-by default is regardlessly useful and long overdue. So I think we should merge
-this for 2.9 and build user options on top later when the op blocker API
-settles.
+Cool.  Given that windows  guests are happy with the change too and
+vmware doing the same I think we don't need a config option for this one
+too.
 
-Address comments from Max and Eric:
-  - Use F_OFD_GETLK instead of opening r/w for ro images. [Max]
-  - Lock both bytes exclusively for non-shared write. [Max]
-  - Spell fixes. [Eric]
-  - Fix test matrix. [Max]
-  - Comment tweaks. [Max]
-  - Return code cleanups. [Max]
-  - Don't abuse "disable_lock" for migration. [Max]
-  - Use bs->exact_filename instead of bs->filename. [Max]
-  - Force protect qcow2 concurrent write.
-  - Fix indentation. [Max]
-  - Always use re-open for lockfd instead of dup. [Max]
-  - Fall through to "abort" where "prepare" failed. [Max]
-  - Fix option handling in raw_reopen_handle_lock. [Max]
-  - Use "error_abort" in commit and abort. [Max]
-  - Fix cleanup of raw_reopen_handle_lock() failure. [Max]
-  - Add a patch for qcow2 to mask BDRV_O_SHARE_RW if r/w.
-  - Rebase and fix new more cases that will be broken by "lock by default".
-
-Fam Zheng (16):
-  osdep: Add qemu_lock_fd and qemu_unlock_fd
-  block: Define BDRV_O_SHARE_RW
-  qemu-io: Set "share-rw" flag together with read-only
-  qemu-img: Set "share-rw" flag in read-only commands
-  block: Set "share-rw" flag in drive-backup when sync=none
-  iotests: 055: Don't attach the drive to vm for drive-backup
-  iotests: 030: Read-only open image for getting map
-  iotests: 087: Don't attach test image twice
-  iotests: 085: Avoid image locking conflict
-  iotests: 091: Quit QEMU before checking image
-  iotests: 172: Use separate images for multiple devices
-  tests: Use null-co:// instead of /dev/null as the dummy image
-  tests: Disable image lock in test-replication
-  file-posix: Implement image locking
-  qcow2: Force "no other writer" lock on bs->file
-  tests: Add test-image-lock
-
- block/file-posix.c         | 681 ++++++++++++++++++++++++++++++++++++++++++++-
- block/qcow2.c              |  11 +
- blockdev.c                 |   3 +
- include/block/block.h      |   2 +
- include/qemu/osdep.h       |   3 +
- qemu-img.c                 |  10 +-
- qemu-io.c                  |   2 +
- tests/Makefile.include     |   2 +
- tests/drive_del-test.c     |   2 +-
- tests/nvme-test.c          |   2 +-
- tests/qemu-iotests/030     |   4 +-
- tests/qemu-iotests/055     |  32 ++-
- tests/qemu-iotests/085     |  32 ++-
- tests/qemu-iotests/085.out |   3 +-
- tests/qemu-iotests/087     |   6 +-
- tests/qemu-iotests/091     |   2 +
- tests/qemu-iotests/172     |  53 ++--
- tests/qemu-iotests/172.out |  50 ++--
- tests/test-image-lock.c    | 206 ++++++++++++++
- tests/test-replication.c   |   9 +-
- tests/usb-hcd-uhci-test.c  |   2 +-
- tests/usb-hcd-xhci-test.c  |   2 +-
- tests/virtio-blk-test.c    |   2 +-
- tests/virtio-scsi-test.c   |   4 +-
- util/osdep.c               |  48 ++++
- 25 files changed, 1076 insertions(+), 97 deletions(-)
- create mode 100644 tests/test-image-lock.c
-
--- 
-2.9.3
+cheers,
+  Gerd
