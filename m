@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVkNw-0005To-0Q
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:34:37 -0500
+	(envelope-from <bounces@canonical.com>) id 1cVkP8-0006JV-T4
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:35:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVkNr-0003U5-3r
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:34:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55508)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cVkNq-0003To-UF
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:34:31 -0500
-Date: Mon, 23 Jan 2017 12:34:29 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170123123429.1a07f156@t450s.home>
-In-Reply-To: <20170123025449.GE26526@pxdev.xzpeter.org>
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-16-git-send-email-peterx@redhat.com>
-	<f2cceaa6-b3cf-9ed1-2c9c-f9222a0ab7ce@redhat.com>
-	<20170122085118.GA26526@pxdev.xzpeter.org>
-	<c7265d9c-54e9-f4a2-003d-85c4416c1651@redhat.com>
-	<20170123025449.GE26526@pxdev.xzpeter.org>
+	(envelope-from <bounces@canonical.com>) id 1cVkP3-0003qs-Ux
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:35:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cVkP3-0003qe-N1
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:35:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cVkP2-0001wz-8b
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 19:35:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1EEE32E80C3
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 19:35:44 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v4 15/20] intel_iommu: provide its own
- replay() callback
+Date: Mon, 23 Jan 2017 19:27:58 -0000
+From: ChristianEhrhardt <1626972@bugs.launchpad.net>
+Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
+Message-Id: <20170123192758.20152.13155.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
+ change for security drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +37,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Mon, 23 Jan 2017 10:54:49 +0800
-Peter Xu <peterx@redhat.com> wrote:
+Ping - we have the next fix for Xenial in the queue - all others are
+released now, has this one "baked" enough for Xenial SRU to migrate?
 
-> On Mon, Jan 23, 2017 at 09:48:48AM +0800, Jason Wang wrote:
-> >=20
-> >=20
-> > On 2017=E5=B9=B401=E6=9C=8822=E6=97=A5 16:51, Peter Xu wrote: =20
-> > >On Sun, Jan 22, 2017 at 03:56:10PM +0800, Jason Wang wrote:
-> > >
-> > >[...]
-> > > =20
-> > >>>+/**
-> > >>>+ * vtd_page_walk_level - walk over specific level for IOVA range
-> > >>>+ *
-> > >>>+ * @addr: base GPA addr to start the walk
-> > >>>+ * @start: IOVA range start address
-> > >>>+ * @end: IOVA range end address (start <=3D addr < end)
-> > >>>+ * @hook_fn: hook func to be called when detected page
-> > >>>+ * @private: private data to be passed into hook func
-> > >>>+ * @read: whether parent level has read permission
-> > >>>+ * @write: whether parent level has write permission
-> > >>>+ * @skipped: accumulated skipped ranges =20
-> > >>What's the usage for this parameter? Looks like it was never used in =
-this
-> > >>series. =20
-> > >This was for debugging purpose before, and I kept it in case one day
-> > >it can be used again, considering that will not affect much on the
-> > >overall performance. =20
-> >=20
-> > I think we usually do not keep debugging codes outside debug macros. =20
->=20
-> I'll remove it.
+-- =
 
-While you're at it, what's the value in using a void* private rather
-than just passing around an IOMMUNotifier*.  Seems like unnecessary
-abstraction.  Thanks,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1626972
 
-Alex
+Title:
+  QEMU memfd_create fallback mechanism change for security drivers
+
+Status in Ubuntu Cloud Archive:
+  Invalid
+Status in Ubuntu Cloud Archive mitaka series:
+  Fix Committed
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Fix Committed
+Status in qemu source package in Yakkety:
+  Fix Released
+Status in qemu source package in Zesty:
+  Fix Released
+
+Bug description:
+  [Impact]
+
+   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
+   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
+   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
+
+  [Test Case]
+
+   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
+   * Try to live-migration from one to another. =
+
+   * Apparmor will block creation of /tmp/memfd-XXX files.
+
+  [Regression Potential]
+
+   Pros:
+   * Exhaustively tested this.
+   * Worked with upstream on this fix. =
+
+   * I'm implementing new vhost log mechanism for upstream.
+   * One line change to a blocker that is already broken.
+
+   Cons:
+   * To break live migration in other circumstances. =
+
+
+  [Other Info]
+
+   * Christian Ehrhardt has been following this.
+
+  ORIGINAL DESCRIPTION:
+
+  When libvirt starts using apparmor, and creating apparmor profiles for
+  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
+  and upstream also) uses a fallback mechanism for creating shared
+  memory for live-migrations. This fall back mechanism, on kernels 3.13
+  - that don't have memfd_create() system-call, try to create files on
+  /tmp/ directory and fails.. causing live-migration not to work.
+
+  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
+  can't live migrate.
+
+  From qemu 2.5, logic is on :
+
+  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
+ int *fd)
+  {
+  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
+els
+
+  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
+  }
+
+  And you can see the errors:
+
+  From the host trying to send the virtual machine:
+
+  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Migration operation has aborted
+  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Live Migration failure: internal error: unable to execute QEMU command 'mi=
+grate': Migration disabled: failed to allocate shared memory
+
+  From the host trying to receive the virtual machine:
+
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
+289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
+5 comm=3D"apparmor_parser"
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
+289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
+289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
+=3D12613 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
+289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
+rser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
+289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
+2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
+5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
+07 ouid=3D107
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
+289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
+u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
+289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
+"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
+=3D0
+
+  When leaving libvirt without apparmor capabilities (thus not confining
+  virtual machines on compute nodes, the live migration works as
+  expected, so, clearly, apparmor is stepping into the live migration).
+  I'm sure that virtual machines have to be confined and that this isn't
+  the desired behaviour...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
