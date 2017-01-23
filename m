@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cVare-0008Oo-OF
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:24:40 -0500
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1cVb51-0002rZ-9V
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:38:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cVard-0006Z1-FQ
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:24:38 -0500
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:36060)
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1cVb4x-0001Tf-DZ
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:38:27 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36701)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cVard-0006Yh-A8
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:24:37 -0500
-Received: by mail-it0-x242.google.com with SMTP id o138so9524504ito.3
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 01:24:35 -0800 (PST)
+	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
+	id 1cVb4w-0001TB-VM
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:38:23 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r126so25016831wmr.3
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 01:38:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAE519-kc6j8jZCq2o5SrxP1a8W9H3P3YB+P_c2vQox0rH+eckQ@mail.gmail.com>
-References: <CAE519-k8poR3Qi99rg__9hYWS2ACw8a=3S+cx4s1xJW6QDFSjA@mail.gmail.com>
-	<20170112141417.GB14042@stefanha-x1.localdomain>
-	<CAE519-k2TdnntRLKK=2p2tOg2Nxrd+kfwyuUJBWXa2QBnMKh0A@mail.gmail.com>
-	<CAJSP0QXrVtqkwxnokqf=d+RLx0yT55iuLcxs1ovuJc6bZCsbiw@mail.gmail.com>
-	<CAE519-kab+PFnq98eO=G+M4dXZsPNQcBHzB=JLMXGJAKNiqZoA@mail.gmail.com>
-	<CAJSP0QWG_qBnAMHZ86bVJmPkL=Sxh3WJWs6ZdBaLcrTZihojXw@mail.gmail.com>
-	<CAE519-=U4YwENeuJHPfRLGuECZMdkUb9NV0BHXw5nCpXCmb41g@mail.gmail.com>
-	<CAJSP0QW7t+nqDN6Gg5wZjJq=OWhaJhd_HX6PZ3K+ZwZ=Xi911w@mail.gmail.com>
-	<CAE519-=qJqkshtHgGNZ1sQ6prJHfaLrikE+B7vNpZ5WESBZBXg@mail.gmail.com>
-	<CAJSP0QWf6yNQ0BVjdXcSPT+wv3aQoefC5GUdcbGW+5iShXB8xA@mail.gmail.com>
-	<CAE519-kc6j8jZCq2o5SrxP1a8W9H3P3YB+P_c2vQox0rH+eckQ@mail.gmail.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 23 Jan 2017 09:24:34 +0000
-Message-ID: <CAJSP0QV71O7nGMJUR0pCTKoRc7NnkRszsdiZN+0MGShkns3E6Q@mail.gmail.com>
+In-Reply-To: <20170123103207.66049731@bahia.lan>
+References: <1484240245-10625-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20170123103207.66049731@bahia.lan>
+From: Pradeep Kiruvale <pradeepkiruvale@gmail.com>
+Date: Mon, 23 Jan 2017 10:38:21 +0100
+Message-ID: <CAJ2SuLkycpBrstLf6DMdVW+g_mY1NTdbyO3EaoW8aR+6vmTk1Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Question about io mode & cache mode
+Subject: Re: [Qemu-devel] [PATCH V12] fsdev: add IO throttle support to
+ fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,107 +30,496 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: morgenlette madeBy <sgh8183@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Claudio Fontana <claudio.fontana@huawei.com>
 
-On Mon, Jan 23, 2017 at 8:59 AM, morgenlette madeBy <sgh8183@gmail.com> wrote:
+On 23 January 2017 at 10:32, Greg Kurz <groug@kaod.org> wrote:
 
-Please keep qemu-devel@nongnu.org CCed so the discussion stays on the
-mailing list where others can follow it.
-
-> I am sorry to bother you.
+> On Thu, 12 Jan 2017 11:57:25 -0500
+> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
 >
-> so, Where is the part that I have to check additionally?
+> > Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+> > ---
+> >  fsdev/Makefile.objs         |   2 +-
+> >  fsdev/file-op-9p.h          |   3 ++
+> >  fsdev/qemu-fsdev-opts.c     |  77 ++++++++++++++++++++++++++++-
+> >  fsdev/qemu-fsdev-throttle.c | 118 ++++++++++++++++++++++++++++++
+> ++++++++++++++
+> >  fsdev/qemu-fsdev-throttle.h |  39 +++++++++++++++
+> >  hw/9pfs/9p-local.c          |   8 +++
+> >  hw/9pfs/9p.c                |   4 ++
+> >  hw/9pfs/cofile.c            |   2 +
+> >  8 files changed, 251 insertions(+), 2 deletions(-)
+> >  create mode 100644 fsdev/qemu-fsdev-throttle.c
+> >  create mode 100644 fsdev/qemu-fsdev-throttle.h
+> >
+> > This adds the support for the 9p-local driver.
+> > For now this functionality can be enabled only through qemu cli options.
+> > QMP interface and support to other drivers need further extensions.
+> > To make it simple for other drivers, the throttle code has been put in
+> > separate files.
+> >
+>
+> These lines ^^ are supposed to be the commit changelog: they should
+> appear above your SoB.
+>
 
-Failing syscalls can be debugged using kernel function graph tracing:
-https://www.kernel.org/doc/Documentation/trace/ftrace.txt
+You mean, I should put above "Signed of By" right?
 
-It shows you the code path executed by the kernel.  You can
-cross-reference the kernel source to see why an error return path is
-being taken.
+-Pradeep
 
-There are other approaches, like adding printks to the kernel.
 
-Before you embark on any of this, it might be a good idea to write a
-tiny test program that opens the file exactly the same way you are
-doing it in QEMU.  See if it fails in the same way.
-
-Stefan
-
-> On Mon, Jan 23, 2017 at 5:31 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->>
->> On Mon, Jan 23, 2017 at 7:43 AM, morgenlette madeBy <sgh8183@gmail.com>
->> wrote:
->> > I am using Centos 7.
->> >
->> > So I set up SELinux=disabled...
->> >
->> > /dev/mydev is operated by root and its permission is 0777.
->> >
->> > 6 S root      3221     1 14  80   0 - 409221 poll_s 16:40 ?
->> > 00:00:14
->> > /usr/libexec/qemu-kvm -name centos6.5-1 -S -machine
->> > pc-i440fx-rhel7.0.0,accel=kvm,usb=off -cpu
->> > SandyBridge,+vme,+f16c,+rdrand,+fsgsbase,+smep,+erms -m 1024 -realtime
->> > mlock=off -smp 1,sockets=1,cores=1,threads=1 -uuid
->> > c1878d8a-0902-42f1-9c20-509302412f45 -no-user-config -nodefaults
->> > -chardev
->> >
->> > socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-1-centos6.5-1/monitor.sock,server,nowait
->> > -mon chardev=charmonitor,id=monitor,mode=control -rtc
->> > base=utc,driftfix=slew
->> > -global kvm-pit.lost_tick_policy=discard -no-hpet -no-shutdown -global
->> > PIIX4_PM.disable_s3=1 -global PIIX4_PM.disable_s4=1 -boot strict=on
->> > -device
->> > ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x6.0x7 -device
->> >
->> > ich9-usb-uhci1,masterbus=usb.0,firstport=0,bus=pci.0,multifunction=on,addr=0x6
->> > -device
->> > ich9-usb-uhci2,masterbus=usb.0,firstport=2,bus=pci.0,addr=0x6.0x1
->> > -device
->> > ich9-usb-uhci3,masterbus=usb.0,firstport=4,bus=pci.0,addr=0x6.0x2
->> > -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x5 -drive
->> >
->> > file=/var/lib/libvirt/images/centos6.5-1.qcow2,format=qcow2,if=none,id=drive-virtio-disk0
->> > -device
->> >
->> > virtio-blk-pci,scsi=off,bus=pci.0,addr=0x7,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1
->> > -drive if=none,id=drive-ide0-0-0,readonly=on -device
->> > ide-cd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0 -netdev
->> > tap,fd=26,id=hostnet0,vhost=on,vhostfd=28 -device
->> >
->> > virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:f2:d9:fa,bus=pci.0,addr=0x3
->> > -chardev pty,id=charserial0 -device
->> > isa-serial,chardev=charserial0,id=serial0 -chardev
->> >
->> > socket,id=charchannel0,path=/var/lib/libvirt/qemu/channel/target/domain-1-centos6.5-1/org.qemu.guest_agent.0,server,nowait
->> > -device
->> >
->> > virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=org.qemu.guest_agent.0
->> > -chardev spicevmc,id=charchannel1,name=vdagent -device
->> >
->> > virtserialport,bus=virtio-serial0.0,nr=2,chardev=charchannel1,id=channel1,name=com.redhat.spice.0
->> > -device usb-tablet,id=input0,bus=usb.0,port=1 -spice
->> >
->> > port=5900,addr=127.0.0.1,disable-ticketing,image-compression=off,seamless-migration=on
->> > -vga qxl -global qxl-vga.ram_size=67108864 -global
->> > qxl-vga.vram_size=67108864 -global qxl-vga.vgamem_mb=16 -device
->> > intel-hda,id=sound0,bus=pci.0,addr=0x4 -device
->> > hda-duplex,id=sound0-codec0,bus=sound0.0,cad=0 -chardev
->> > spicevmc,id=charredir0,name=usbredir -device
->> > usb-redir,chardev=charredir0,id=redir0,bus=usb.0,port=2 -chardev
->> > spicevmc,id=charredir1,name=usbredir -device
->> > usb-redir,chardev=charredir1,id=redir1,bus=usb.0,port=3 -device
->> > virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x8 -msg timestamp=on
->> >
->> > QEMU file is also operated by root.
->> >
->> > I can't understand what is problem...
->> >
->> > In qemu, is open function disabled???
->>
->> No, it is not.
->>
->> Stefan
+> > v1 -> v2:
+> >
+> > -Fixed FsContext redeclaration issue
+> > -Removed couple of function declarations from 9p-throttle.h
+> > -Fixed some of the .help messages
+> >
+> > v2 -> v3:
+> >
+> > -Addressed follwing comments by Claudio Fontana
+> >  -Removed redundant memset calls in fsdev_throttle_configure_iolimits
+> function
+> >  -Checking throttle structure validity before initializing other
+> structures
+> >   in fsdev_throttle_configure_iolimits
+> >
+> > -Addressed following comments by Greg Kurz
+> >  -Moved the code from 9pfs directory to fsdev directory, because the
+> throttling
+> >   is for the fsdev devices.Renamed the files and functions to fsdev_
+> from 9pfs_
+> >  -Renamed throttling cli options to throttling.*, as in QMP cli options
+> >  -Removed some of the unwanted .h files from qemu-fsdev-throttle.[ch]
+> >  -Using throttle_enabled() function to set the thottle enabled flag for
+> fsdev.
+> >
+> > v3 -> v4:
+> >
+> > -Addressed following comments by Alberto Garcia
+> >  -Removed the unwanted locking and other data structures in
+> qemu-fsdev-throttle.[ch]
+> >
+> > -Addressed following comments by Greg Kurz
+> >  -Removed fsdev_iolimitsenable/disable functions, instead using
+> throttle_enabled function
+> >
+> > v4 -> V5:
+> >  -Fixed the issue with the larger block size accounting.
+> >  (i.e, when the 9pfs mounted using msize=xxx option)
+> >
+> > V5 -> V6:
+> > -Addressed the comments by Alberto Garcia
+> >  -Removed the fsdev_throttle_timer_cb()
+> >  -Simplified the  fsdev_throttle_schedule_next_request() as suggested
+> >
+> > V6 -> V7:
+> > -Addressed the comments by Alberto Garcia
+> >  -changed the  fsdev_throttle_schedule_next_request() as suggested
+> >
+> > v7 -> v8:
+> > -Addressed comments by Alberto Garcia
+> >  -Fixed some indentation issues and split the configure_io_limit function
+> >  -Inlined throttle_timer_check code
+> >
+> > V8 -> v9:
+> > -Addressed the comments by Greg Kurz
+> >  -Inlined the fsdev_throttle_schedule_next_request() code into
+> >   fsdev_co_throttle_request ()
+> >
+> > v9 -> v10:
+> > -Addressed the comments by alberto garcia
+> >  -fixed the indentation issues and minor issues
+> >
+> > v10 -> v11:
+> > -Addressed the comments by alberto garcia
+> >  -renamed err variable to errp issues
+> >
+> > v11 -> v12:
+> > -Addressed the comments by Greg Kurz
+> >   -fixed the missing throttle_config_init() function call
+> >
+> > diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+> > index 1b120a4..659df6e 100644
+> > --- a/fsdev/Makefile.objs
+> > +++ b/fsdev/Makefile.objs
+> > @@ -5,7 +5,7 @@ common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+> >  else
+> >  common-obj-y = qemu-fsdev-dummy.o
+> >  endif
+> > -common-obj-y += qemu-fsdev-opts.o
+> > +common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
+> >
+> >  # Toplevel always builds this; targets without virtio will put it in
+> >  # common-obj-y
+> > diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
+> > index a56dc84..0844a40 100644
+> > --- a/fsdev/file-op-9p.h
+> > +++ b/fsdev/file-op-9p.h
+> > @@ -17,6 +17,7 @@
+> >  #include <dirent.h>
+> >  #include <utime.h>
+> >  #include <sys/vfs.h>
+> > +#include "qemu-fsdev-throttle.h"
+> >
+> >  #define SM_LOCAL_MODE_BITS    0600
+> >  #define SM_LOCAL_DIR_MODE_BITS    0700
+> > @@ -74,6 +75,7 @@ typedef struct FsDriverEntry {
+> >      char *path;
+> >      int export_flags;
+> >      FileOperations *ops;
+> > +    FsThrottle fst;
+> >  } FsDriverEntry;
+> >
+> >  typedef struct FsContext
+> > @@ -83,6 +85,7 @@ typedef struct FsContext
+> >      int export_flags;
+> >      struct xattr_operations **xops;
+> >      struct extended_ops exops;
+> > +    FsThrottle *fst;
+> >      /* fs driver specific data */
+> >      void *private;
+> >  } FsContext;
+> > diff --git a/fsdev/qemu-fsdev-opts.c b/fsdev/qemu-fsdev-opts.c
+> > index 1dd8c7a..385423f0 100644
+> > --- a/fsdev/qemu-fsdev-opts.c
+> > +++ b/fsdev/qemu-fsdev-opts.c
+> > @@ -37,8 +37,83 @@ static QemuOptsList qemu_fsdev_opts = {
+> >          }, {
+> >              .name = "sock_fd",
+> >              .type = QEMU_OPT_NUMBER,
+> > +        }, {
+> > +            .name = "throttling.iops-total",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "limit total I/O operations per second",
+> > +        }, {
+> > +            .name = "throttling.iops-read",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "limit read operations per second",
+> > +        }, {
+> > +            .name = "throttling.iops-write",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "limit write operations per second",
+> > +        }, {
+> > +            .name = "throttling.bps-total",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "limit total bytes per second",
+> > +        }, {
+> > +            .name = "throttling.bps-read",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "limit read bytes per second",
+> > +        }, {
+> > +            .name = "throttling.bps-write",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "limit write bytes per second",
+> > +        }, {
+> > +            .name = "throttling.iops-total-max",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "I/O operations burst",
+> > +        }, {
+> > +            .name = "throttling.iops-read-max",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "I/O operations read burst",
+> > +        }, {
+> > +            .name = "throttling.iops-write-max",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "I/O operations write burst",
+> > +        }, {
+> > +            .name = "throttling.bps-total-max",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "total bytes burst",
+> > +        }, {
+> > +            .name = "throttling.bps-read-max",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "total bytes read burst",
+> > +        }, {
+> > +            .name = "throttling.bps-write-max",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "total bytes write burst",
+> > +        }, {
+> > +            .name = "throttling.iops-total-max-length",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "length of the iops-total-max burst period, in
+> seconds",
+> > +        }, {
+> > +            .name = "throttling.iops-read-max-length",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "length of the iops-read-max burst period, in
+> seconds",
+> > +        }, {
+> > +            .name = "throttling.iops-write-max-length",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "length of the iops-write-max burst period, in
+> seconds",
+> > +        }, {
+> > +            .name = "throttling.bps-total-max-length",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "length of the bps-total-max burst period, in
+> seconds",
+> > +        }, {
+> > +            .name = "throttling.bps-read-max-length",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "length of the bps-read-max burst period, in
+> seconds",
+> > +        }, {
+> > +            .name = "throttling.bps-write-max-length",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "length of the bps-write-max burst period, in
+> seconds",
+> > +        }, {
+> > +            .name = "throttling.iops-size",
+> > +            .type = QEMU_OPT_NUMBER,
+> > +            .help = "when limiting by iops max size of an I/O in bytes",
+> >          },
+> > -
+> >          { /*End of list */ }
+> >      },
+> >  };
+> > diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
+> > new file mode 100644
+> > index 0000000..feb9af3
+> > --- /dev/null
+> > +++ b/fsdev/qemu-fsdev-throttle.c
+> > @@ -0,0 +1,118 @@
+> > +/*
+> > + * Fsdev Throttle
+> > + *
+> > + * Copyright (C) 2016 Huawei Technologies Duesseldorf GmbH
+> > + *
+> > + * Author: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * (at your option) any later version.
+> > + *
+> > + * See the COPYING file in the top-level directory for details.
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qemu/error-report.h"
+> > +#include "qemu-fsdev-throttle.h"
+> > +#include "qemu/iov.h"
+> > +
+> > +static void fsdev_throttle_read_timer_cb(void *opaque)
+> > +{
+> > +    FsThrottle *fst = opaque;
+> > +    qemu_co_enter_next(&fst->throttled_reqs[false]);
+> > +}
+> > +
+> > +static void fsdev_throttle_write_timer_cb(void *opaque)
+> > +{
+> > +    FsThrottle *fst = opaque;
+> > +    qemu_co_enter_next(&fst->throttled_reqs[true]);
+> > +}
+> > +
+> > +void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error
+> **errp)
+> > +{
+> > +    throttle_config_init(&fst->cfg);
+> > +    fst->cfg.buckets[THROTTLE_BPS_TOTAL].avg =
+> > +        qemu_opt_get_number(opts, "throttling.bps-total", 0);
+> > +    fst->cfg.buckets[THROTTLE_BPS_READ].avg  =
+> > +        qemu_opt_get_number(opts, "throttling.bps-read", 0);
+> > +    fst->cfg.buckets[THROTTLE_BPS_WRITE].avg =
+> > +        qemu_opt_get_number(opts, "throttling.bps-write", 0);
+> > +    fst->cfg.buckets[THROTTLE_OPS_TOTAL].avg =
+> > +        qemu_opt_get_number(opts, "throttling.iops-total", 0);
+> > +    fst->cfg.buckets[THROTTLE_OPS_READ].avg =
+> > +        qemu_opt_get_number(opts, "throttling.iops-read", 0);
+> > +    fst->cfg.buckets[THROTTLE_OPS_WRITE].avg =
+> > +        qemu_opt_get_number(opts, "throttling.iops-write", 0);
+> > +
+> > +    fst->cfg.buckets[THROTTLE_BPS_TOTAL].max =
+> > +        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+> > +    fst->cfg.buckets[THROTTLE_BPS_READ].max  =
+> > +        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+> > +    fst->cfg.buckets[THROTTLE_BPS_WRITE].max =
+> > +        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+> > +    fst->cfg.buckets[THROTTLE_OPS_TOTAL].max =
+> > +        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+> > +    fst->cfg.buckets[THROTTLE_OPS_READ].max =
+> > +        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+> > +    fst->cfg.buckets[THROTTLE_OPS_WRITE].max =
+> > +        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+> > +
+> > +    fst->cfg.buckets[THROTTLE_BPS_TOTAL].burst_length =
+> > +        qemu_opt_get_number(opts, "throttling.bps-total-max-length",
+> 1);
+> > +    fst->cfg.buckets[THROTTLE_BPS_READ].burst_length  =
+> > +        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
+> > +    fst->cfg.buckets[THROTTLE_BPS_WRITE].burst_length =
+> > +        qemu_opt_get_number(opts, "throttling.bps-write-max-length",
+> 1);
+> > +    fst->cfg.buckets[THROTTLE_OPS_TOTAL].burst_length =
+> > +        qemu_opt_get_number(opts, "throttling.iops-total-max-length",
+> 1);
+> > +    fst->cfg.buckets[THROTTLE_OPS_READ].burst_length =
+> > +        qemu_opt_get_number(opts, "throttling.iops-read-max-length",
+> 1);
+> > +    fst->cfg.buckets[THROTTLE_OPS_WRITE].burst_length =
+> > +        qemu_opt_get_number(opts, "throttling.iops-write-max-length",
+> 1);
+> > +    fst->cfg.op_size =
+> > +        qemu_opt_get_number(opts, "throttling.iops-size", 0);
+> > +
+> > +    throttle_is_valid(&fst->cfg, errp);
+> > +}
+> > +
+> > +void fsdev_throttle_init(FsThrottle *fst)
+> > +{
+> > +    if (throttle_enabled(&fst->cfg)) {
+> > +        throttle_init(&fst->ts);
+> > +        throttle_timers_init(&fst->tt,
+> > +                             qemu_get_aio_context(),
+> > +                             QEMU_CLOCK_REALTIME,
+> > +                             fsdev_throttle_read_timer_cb,
+> > +                             fsdev_throttle_write_timer_cb,
+> > +                             fst);
+> > +        throttle_config(&fst->ts, &fst->tt, &fst->cfg);
+> > +        qemu_co_queue_init(&fst->throttled_reqs[0]);
+> > +        qemu_co_queue_init(&fst->throttled_reqs[1]);
+> > +    }
+> > +}
+> > +
+> > +void coroutine_fn fsdev_co_throttle_request(FsThrottle *fst, bool
+> is_write,
+> > +                                            struct iovec *iov, int
+> iovcnt)
+> > +{
+> > +    if (throttle_enabled(&fst->cfg)) {
+> > +        if (throttle_schedule_timer(&fst->ts, &fst->tt, is_write) ||
+> > +            !qemu_co_queue_empty(&fst->throttled_reqs[is_write])) {
+> > +            qemu_co_queue_wait(&fst->throttled_reqs[is_write]);
+> > +        }
+> > +
+> > +        throttle_account(&fst->ts, is_write, iov_size(iov, iovcnt));
+> > +
+> > +        if (!qemu_co_queue_empty(&fst->throttled_reqs[is_write]) &&
+> > +            !throttle_schedule_timer(&fst->ts, &fst->tt, is_write)) {
+> > +            qemu_co_queue_next(&fst->throttled_reqs[is_write]);
+> > +        }
+> > +    }
+> > +}
+> > +
+> > +void fsdev_throttle_cleanup(FsThrottle *fst)
+> > +{
+> > +    if (throttle_enabled(&fst->cfg)) {
+> > +        throttle_timers_destroy(&fst->tt);
+> > +    }
+> > +}
+> > diff --git a/fsdev/qemu-fsdev-throttle.h b/fsdev/qemu-fsdev-throttle.h
+> > new file mode 100644
+> > index 0000000..e418643
+> > --- /dev/null
+> > +++ b/fsdev/qemu-fsdev-throttle.h
+> > @@ -0,0 +1,39 @@
+> > +/*
+> > + * Fsdev Throttle
+> > + *
+> > + * Copyright (C) 2016 Huawei Technologies Duesseldorf GmbH
+> > + *
+> > + * Author: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * (at your option) any later version.
+> > + *
+> > + * See the COPYING file in the top-level directory for details.
+> > + *
+> > + */
+> > +
+> > +#ifndef _FSDEV_THROTTLE_H
+> > +#define _FSDEV_THROTTLE_H
+> > +
+> > +#include "block/aio.h"
+> > +#include "qemu/main-loop.h"
+> > +#include "qemu/coroutine.h"
+> > +#include "qapi/error.h"
+> > +#include "qemu/throttle.h"
+> > +
+> > +typedef struct FsThrottle {
+> > +    ThrottleState ts;
+> > +    ThrottleTimers tt;
+> > +    ThrottleConfig cfg;
+> > +    CoQueue      throttled_reqs[2];
+> > +} FsThrottle;
+> > +
+> > +void fsdev_throttle_parse_opts(QemuOpts *, FsThrottle *, Error **);
+> > +
+> > +void fsdev_throttle_init(FsThrottle *);
+> > +
+> > +void coroutine_fn fsdev_co_throttle_request(FsThrottle *, bool ,
+> > +                                            struct iovec *, int);
+> > +
+> > +void fsdev_throttle_cleanup(FsThrottle *);
+> > +#endif /* _FSDEV_THROTTLE_H */
+> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> > index 845675e..828348d 100644
+> > --- a/hw/9pfs/9p-local.c
+> > +++ b/hw/9pfs/9p-local.c
+> > @@ -1209,6 +1209,7 @@ static int local_parse_opts(QemuOpts *opts, struct
+> FsDriverEntry *fse)
+> >  {
+> >      const char *sec_model = qemu_opt_get(opts, "security_model");
+> >      const char *path = qemu_opt_get(opts, "path");
+> > +    Error *err = NULL;
+> >
+> >      if (!sec_model) {
+> >          error_report("Security model not specified, local fs needs
+> security model");
+> > @@ -1237,6 +1238,13 @@ static int local_parse_opts(QemuOpts *opts,
+> struct FsDriverEntry *fse)
+> >          error_report("fsdev: No path specified");
+> >          return -1;
+> >      }
+> > +
+> > +    fsdev_throttle_parse_opts(opts, &fse->fst, &err);
+> > +    if (err) {
+> > +        error_reportf_err(err, "Throttle configuration is not valid: ");
+> > +        return -1;
+> > +    }
+> > +
+> >      fse->path = g_strdup(path);
+> >
+> >      return 0;
+> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > index fa58877..bdbc345 100644
+> > --- a/hw/9pfs/9p.c
+> > +++ b/hw/9pfs/9p.c
+> > @@ -3520,6 +3520,10 @@ int v9fs_device_realize_common(V9fsState *s,
+> Error **errp)
+> >          error_setg(errp, "share path %s is not a directory", fse->path);
+> >          goto out;
+> >      }
+> > +
+> > +    s->ctx.fst = &fse->fst;
+> > +    fsdev_throttle_init(s->ctx.fst);
+> > +
+> >      v9fs_path_free(&path);
+> >
+> >      rc = 0;
+> > diff --git a/hw/9pfs/cofile.c b/hw/9pfs/cofile.c
+> > index 120e267..88791bc 100644
+> > --- a/hw/9pfs/cofile.c
+> > +++ b/hw/9pfs/cofile.c
+> > @@ -247,6 +247,7 @@ int coroutine_fn v9fs_co_pwritev(V9fsPDU *pdu,
+> V9fsFidState *fidp,
+> >      if (v9fs_request_cancelled(pdu)) {
+> >          return -EINTR;
+> >      }
+> > +    fsdev_co_throttle_request(s->ctx.fst, true, iov, iovcnt);
+> >      v9fs_co_run_in_worker(
+> >          {
+> >              err = s->ops->pwritev(&s->ctx, &fidp->fs, iov, iovcnt,
+> offset);
+> > @@ -266,6 +267,7 @@ int coroutine_fn v9fs_co_preadv(V9fsPDU *pdu,
+> V9fsFidState *fidp,
+> >      if (v9fs_request_cancelled(pdu)) {
+> >          return -EINTR;
+> >      }
+> > +    fsdev_co_throttle_request(s->ctx.fst, false, iov, iovcnt);
+> >      v9fs_co_run_in_worker(
+> >          {
+> >              err = s->ops->preadv(&s->ctx, &fidp->fs, iov, iovcnt,
+> offset);
 >
 >
