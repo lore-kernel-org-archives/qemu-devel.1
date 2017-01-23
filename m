@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cVo1o-0003DF-KV
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 18:28:01 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cVo1q-0003ET-Fz
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 18:28:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cVo1n-0005x6-Fa
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 18:28:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46212)
+	(envelope-from <ehabkost@redhat.com>) id 1cVo1p-0005xn-HV
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 18:28:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55082)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cVo1n-0005wo-7G
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 18:27:59 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cVo1p-0005xX-Bu
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 18:28:01 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 23 Jan 2017 21:27:27 -0200
-Message-Id: <20170123232738.20796-3-ehabkost@redhat.com>
+Date: Mon, 23 Jan 2017 21:27:28 -0200
+Message-Id: <20170123232738.20796-4-ehabkost@redhat.com>
 In-Reply-To: <20170123232738.20796-1-ehabkost@redhat.com>
 References: <20170123232738.20796-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 02/13] i386: Remove AMD feature flag aliases
- from Opteron models
+Subject: [Qemu-devel] [PULL 03/13] i386: Return migration-safe field on
+ query-cpu-definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,118 +27,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-When CPU vendor is set to AMD, the AMD feature alias bits on
-CPUID[0x80000001].EDX are already automatically copied from CPUID[1].EDX
-on x86_cpu_realizefn(). When CPU vendor is Intel, those bits are
-reserved and should be zero. On either case, those bits shouldn't be set
-in the CPU model table.
-
-Commit 726a8ff68677d8d5fba17eb0ffb85076bfb598dc removed those
-bits from most CPU models, but the Opteron_* entries still have
-them. Remove the alias bits from Opteron_* too.
-
-Add an assert() to x86_register_cpudef_type() to ensure we don't
-make the same mistake again.
+Return the migration-safe field on query-cpu-definitions. All CPU
+models in x86 are migration-safe except "host".
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170113190057.6327-1-ehabkost@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20170116181212.31565-1-ehabkost@redhat.com>
+Acked-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 46 ++++++++++++----------------------------------
- 1 file changed, 12 insertions(+), 34 deletions(-)
+ target/i386/cpu-qom.h | 2 ++
+ target/i386/cpu.c     | 3 +++
+ 2 files changed, 5 insertions(+)
 
+diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+index 7c9a07ae65..8cd607e9a2 100644
+--- a/target/i386/cpu-qom.h
++++ b/target/i386/cpu-qom.h
+@@ -48,6 +48,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
+  * X86CPUClass:
+  * @cpu_def: CPU model definition
+  * @kvm_required: Whether CPU model requires KVM to be enabled.
++ * @migration_safe: See CpuDefinitionInfo::migration_safe
+  * @parent_realize: The parent class' realize handler.
+  * @parent_reset: The parent class' reset handler.
+  *
+@@ -62,6 +63,7 @@ typedef struct X86CPUClass {
+     X86CPUDefinition *cpu_def;
+ 
+     bool kvm_required;
++    bool migration_safe;
+ 
+     /* Optional description of CPU model.
+      * If unavailable, cpu_def->model_id is used */
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b6c8c5d65b..0e5ecb3a0f 100644
+index 0e5ecb3a0f..cff23e129d 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1339,12 +1339,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .features[FEAT_1_ECX] =
-             CPUID_EXT_SSE3,
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
--            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
--            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
--            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
--            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
--            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-         .xlevel = 0x80000008,
-         .model_id = "AMD Opteron 240 (Gen 1 Class Opteron)",
-     },
-@@ -1365,13 +1360,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_CX16 | CPUID_EXT_SSE3,
-         /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM | CPUID_EXT2_FXSR |
--            CPUID_EXT2_MMX | CPUID_EXT2_NX | CPUID_EXT2_PSE36 |
--            CPUID_EXT2_PAT | CPUID_EXT2_CMOV | CPUID_EXT2_MCA |
--            CPUID_EXT2_PGE | CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL |
--            CPUID_EXT2_APIC | CPUID_EXT2_CX8 | CPUID_EXT2_MCE |
--            CPUID_EXT2_PAE | CPUID_EXT2_MSR | CPUID_EXT2_TSC | CPUID_EXT2_PSE |
--            CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-         .xlevel = 0x80000008,
-@@ -1395,13 +1384,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_SSE3,
-         /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM | CPUID_EXT2_FXSR |
--            CPUID_EXT2_MMX | CPUID_EXT2_NX | CPUID_EXT2_PSE36 |
--            CPUID_EXT2_PAT | CPUID_EXT2_CMOV | CPUID_EXT2_MCA |
--            CPUID_EXT2_PGE | CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL |
--            CPUID_EXT2_APIC | CPUID_EXT2_CX8 | CPUID_EXT2_MCE |
--            CPUID_EXT2_PAE | CPUID_EXT2_MSR | CPUID_EXT2_TSC | CPUID_EXT2_PSE |
--            CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
-             CPUID_EXT3_ABM | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-@@ -1428,13 +1411,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_SSE3,
-         /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM |
--            CPUID_EXT2_PDPE1GB | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
--            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
--            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
--            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
--            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
--            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
-             CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
-@@ -1464,13 +1442,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
-         /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM |
--            CPUID_EXT2_PDPE1GB | CPUID_EXT2_FXSR | CPUID_EXT2_MMX |
--            CPUID_EXT2_NX | CPUID_EXT2_PSE36 | CPUID_EXT2_PAT |
--            CPUID_EXT2_CMOV | CPUID_EXT2_MCA | CPUID_EXT2_PGE |
--            CPUID_EXT2_MTRR | CPUID_EXT2_SYSCALL | CPUID_EXT2_APIC |
--            CPUID_EXT2_CX8 | CPUID_EXT2_MCE | CPUID_EXT2_PAE | CPUID_EXT2_MSR |
--            CPUID_EXT2_TSC | CPUID_EXT2_PSE | CPUID_EXT2_DE | CPUID_EXT2_FPU,
-+            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_TBM | CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
-             CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
-@@ -2395,6 +2368,11 @@ static void x86_register_cpudef_type(X86CPUDefinition *def)
-         .class_data = def,
-     };
+@@ -2209,6 +2209,8 @@ static void x86_cpu_definition_entry(gpointer data, gpointer user_data)
+     x86_cpu_class_check_missing_features(cc, &info->unavailable_features);
+     info->has_unavailable_features = true;
+     info->q_typename = g_strdup(object_class_get_name(oc));
++    info->migration_safe = cc->migration_safe;
++    info->has_migration_safe = true;
  
-+    /* AMD aliases are handled at runtime based on CPUID vendor, so
-+     * they shouldn't be set on the CPU model table.
-+     */
-+    assert(!(def->features[FEAT_8000_0001_EDX] & CPUID_EXT2_AMD_ALIASES));
-+
-     type_register(&ti);
-     g_free(typename);
+     entry = g_malloc0(sizeof(*entry));
+     entry->value = info;
+@@ -2356,6 +2358,7 @@ static void x86_cpu_cpudef_class_init(ObjectClass *oc, void *data)
+     X86CPUClass *xcc = X86_CPU_CLASS(oc);
+ 
+     xcc->cpu_def = cpudef;
++    xcc->migration_safe = true;
  }
+ 
+ static void x86_register_cpudef_type(X86CPUDefinition *def)
 -- 
 2.11.0.259.g40922b1
