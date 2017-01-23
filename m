@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVbF8-0006S6-Nr
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:48:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1cVbFF-0006aA-UF
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:49:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVbF7-0003sm-D8
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:48:54 -0500
+	(envelope-from <armbru@redhat.com>) id 1cVbFE-0003uZ-Kd
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:49:01 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 23 Jan 2017 10:48:43 +0100
-Message-Id: <1485164923-17736-7-git-send-email-armbru@redhat.com>
+Date: Mon, 23 Jan 2017 10:48:40 +0100
+Message-Id: <1485164923-17736-4-git-send-email-armbru@redhat.com>
 In-Reply-To: <1485164923-17736-1-git-send-email-armbru@redhat.com>
 References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
- lsi53c895a SCSI HBAs
+Subject: [Qemu-devel] [PATCH 3/6] hw: Default -drive to if=none instead of
+ ide when ide cannot work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,196 +21,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xensource.com, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Magnus Damm <magnus.damm@gmail.com>, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>
 
-The PC machines (pc-q35-* pc-i440fx-* pc-* isapc xenfv) automatically
-create lsi53c895a SCSI HBAs and SCSI devices to honor -drive if=scsi.
-For giggles, try -drive if=scsi,bus=25,media=cdrom --- this makes QEMU
-create 25 of them.
+Block backends defined with -drive if=ide are meant to be picked up by
+machine initialization code: a suitable frontend gets created and
+wired up automatically.
 
-The lsi53c895a is thoroughly obsolete (PCI Ultra2 SCSI, ca. 2000), and
-currently has no maintainer in QEMU.  megasas is a better choice,
-except for old OSes, which lack drivers. virtio-scsi is a much better
-choice when you have a driver, but only (newish) Linux comes with one
-in the box.  There is no good default that works for all guests.
+if=ide drives not picked up that way can still be used with -device as
+if they had if=none, but that's unclean and best avoided.  Unused ones
+produce an "Orphaned drive without device" warning.
 
-Instead of supplying the not-so-good default just because we've always
-supplied it, make the user pick, by not creating any SCSI HBAs for
--drive if=scsi.  The user now needs to create the SCSI HBA himself
-with -device.  The SCSI devices will still be created automatically.
+-drive parameter "if" is optional, and the default depends on the
+machine type.  If a machine type doesn't specify a default, the
+default is "ide".
 
-For backward compatibility, keep the traditional behavior for old
-machine types.
+Many machine types implicitly default to if=ide that way, even though
+they don't actually have an IDE controller.  This makes no sense.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
+Change the implicit default to if=none.  Affected machines:
+
+* all targets: none
+* aarch64/arm: akita ast2500 canon cheetah collie connex imx25
+  integratorcp kzm lm3s6965evb lm3s811evb mainstone musicpal n800 n810
+  netduino2 nuri palmetto realview romulus sabrelite smdkc210 sx1 sx1
+  verdex z2
+* cris: axis-dev88
+* i386/x86_64: xenpv
+* lm32: lm32-evr lm32-uclinux milkymist
+* m68k: an5206 dummy mcf5208evb
+* microblaze/microblazeel: petalogix-ml605 petalogix-s3adsp1800
+* mips/mips64/mips64el/mipsel: mipssim
+* moxie: moxiesim
+* or32: or32-sim
+* ppc/ppc64/ppcemb: bamboo ref405ep taihu virtex-ml507
+* ppc/ppc64: mpc8544ds ppce500
+* sh4/sh4eb: shix
+* sparc: leon3_generic
+* sparc64: niagara
+* tricore: tricore_testboard
+* unicore32: puv3
+* xtensa/xtensaeb: kc705 lx200 lx60 ml605 sim
+
+None of these machines have an IDE controller, let alone code to
+honor if=ide.
+
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org
+Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: xen-devel@lists.xensource.com
+Cc: Michael Walle <michael@walle.cc>
+Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Anthony Green <green@moxielogic.com>
+Cc: Jia Liu <proljc@gmail.com>
+Cc: Alexander Graf <agraf@suse.de>
+Cc: qemu-ppc@nongnu.org
+Cc: Magnus Damm <magnus.damm@gmail.com>
+Cc: Fabien Chouteau <chouteau@adacore.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/i386/pc_piix.c    | 15 ++++++++++++++-
- hw/i386/pc_q35.c     |  7 ++++++-
- include/hw/i386/pc.h |  3 +++
- 3 files changed, 23 insertions(+), 2 deletions(-)
+ include/sysemu/blockdev.h | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 9f102aa..35e92e4 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -292,7 +292,7 @@ static void pc_init1(MachineState *machine,
-                                  PC_MACHINE_ACPI_DEVICE_PROP, &error_abort);
-     }
+diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+index 16432f3..351a039 100644
+--- a/include/sysemu/blockdev.h
++++ b/include/sysemu/blockdev.h
+@@ -19,12 +19,11 @@ void blockdev_auto_del(BlockBackend *blk);
+ typedef enum {
+     IF_DEFAULT = -1,            /* for use with drive_add() only */
+     /*
+-     * IF_IDE must be zero, because we want MachineClass member
+-     * block_default_type to default-initialize to IF_IDE
++     * IF_NONE must be zero, because we want MachineClass member
++     * block_default_type to default-initialize to IF_NONE
+      */
+-    IF_IDE = 0,
+-    IF_NONE,
+-    IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
++    IF_NONE = 0,
++    IF_IDE, IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
+     IF_COUNT
+ } BlockInterfaceType;
  
--    if (pcmc->pci_enabled) {
-+    if (pcmc->pci_enabled && pcmc->legacy_lsi_hba_auto_create) {
-         pc_pci_device_init(pci_bus);
-     }
- 
-@@ -449,9 +449,12 @@ DEFINE_I440FX_MACHINE(v2_9, "pc-i440fx-2.9", NULL,
- 
- static void pc_i440fx_2_8_machine_options(MachineClass *m)
- {
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_2_9_machine_options(m);
-     m->is_default = 0;
-     m->alias = NULL;
-+    pcmc->legacy_lsi_hba_auto_create = true;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
- }
- 
-@@ -472,6 +475,7 @@ DEFINE_I440FX_MACHINE(v2_7, "pc-i440fx-2.7", NULL,
- static void pc_i440fx_2_6_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_2_7_machine_options(m);
-     pcmc->legacy_cpu_hotplug = true;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
-@@ -484,6 +488,7 @@ DEFINE_I440FX_MACHINE(v2_6, "pc-i440fx-2.6", NULL,
- static void pc_i440fx_2_5_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_2_6_machine_options(m);
-     pcmc->save_tsc_khz = false;
-     m->legacy_fw_cfg_order = 1;
-@@ -497,6 +502,7 @@ DEFINE_I440FX_MACHINE(v2_5, "pc-i440fx-2.5", NULL,
- static void pc_i440fx_2_4_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_2_5_machine_options(m);
-     m->hw_version = "2.4.0";
-     pcmc->broken_reserved_end = true;
-@@ -521,6 +527,7 @@ DEFINE_I440FX_MACHINE(v2_3, "pc-i440fx-2.3", pc_compat_2_3,
- static void pc_i440fx_2_2_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_2_3_machine_options(m);
-     m->hw_version = "2.2.0";
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_2);
-@@ -534,6 +541,7 @@ DEFINE_I440FX_MACHINE(v2_2, "pc-i440fx-2.2", pc_compat_2_2,
- static void pc_i440fx_2_1_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_2_2_machine_options(m);
-     m->hw_version = "2.1.0";
-     m->default_display = NULL;
-@@ -550,6 +558,7 @@ DEFINE_I440FX_MACHINE(v2_1, "pc-i440fx-2.1", pc_compat_2_1,
- static void pc_i440fx_2_0_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_2_1_machine_options(m);
-     m->hw_version = "2.0.0";
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_0);
-@@ -582,6 +591,7 @@ DEFINE_I440FX_MACHINE(v2_0, "pc-i440fx-2.0", pc_compat_2_0,
- static void pc_i440fx_1_7_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_2_0_machine_options(m);
-     m->hw_version = "1.7.0";
-     m->default_machine_opts = NULL;
-@@ -599,6 +609,7 @@ DEFINE_I440FX_MACHINE(v1_7, "pc-i440fx-1.7", pc_compat_1_7,
- static void pc_i440fx_1_6_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_1_7_machine_options(m);
-     m->hw_version = "1.6.0";
-     m->rom_file_has_mr = false;
-@@ -858,6 +869,7 @@ DEFINE_I440FX_MACHINE(v0_14, "pc-0.14", pc_compat_1_2,
- static void pc_i440fx_0_13_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_0_14_machine_options(m);
-     m->hw_version = "0.13";
-     SET_MACHINE_COMPAT(m, PC_COMPAT_0_13);
-@@ -1084,6 +1096,7 @@ void igd_passthrough_isa_bridge_create(PCIBus *bus, uint16_t gpu_dev_id)
- static void isapc_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     m->desc = "ISA-only PC";
-     m->max_cpus = 1;
-     m->option_rom_has_mr = true;
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index dd792a8..571565d 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -266,7 +266,7 @@ static void pc_q35_init(MachineState *machine)
-     /* the rest devices to which pci devfn is automatically assigned */
-     pc_vga_init(isa_bus, host_bus);
-     pc_nic_init(isa_bus, host_bus);
--    if (pcmc->pci_enabled) {
-+    if (pcmc->pci_enabled && pcmc->legacy_lsi_hba_auto_create) {
-         pc_pci_device_init(host_bus);
-     }
- 
-@@ -312,8 +312,11 @@ DEFINE_Q35_MACHINE(v2_9, "pc-q35-2.9", NULL,
- 
- static void pc_q35_2_8_machine_options(MachineClass *m)
- {
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_q35_2_9_machine_options(m);
-     m->alias = NULL;
-+    pcmc->legacy_lsi_hba_auto_create = true;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
- }
- 
-@@ -333,6 +336,7 @@ DEFINE_Q35_MACHINE(v2_7, "pc-q35-2.7", NULL,
- static void pc_q35_2_6_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_q35_2_7_machine_options(m);
-     pcmc->legacy_cpu_hotplug = true;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
-@@ -356,6 +360,7 @@ DEFINE_Q35_MACHINE(v2_5, "pc-q35-2.5", NULL,
- static void pc_q35_2_4_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_q35_2_5_machine_options(m);
-     m->hw_version = "2.4.0";
-     pcmc->broken_reserved_end = true;
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 230e9e7..991b87b 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -152,6 +152,9 @@ struct PCMachineClass {
-     bool save_tsc_khz;
-     /* generate legacy CPU hotplug AML */
-     bool legacy_cpu_hotplug;
-+
-+    /* Whether to auto-create lsi53c895a SCSI HBAs */
-+    bool legacy_lsi_hba_auto_create;
- };
- 
- #define TYPE_PC_MACHINE "generic-pc-machine"
 -- 
 2.7.4
