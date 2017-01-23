@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVk6A-0003ZA-4A
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:16:15 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cVk7R-0004WI-UF
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:17:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVk66-0006Qi-Nk
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:16:14 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
-	<1485164923-17736-7-git-send-email-armbru@redhat.com>
-	<2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com>
-Date: Mon, 23 Jan 2017 20:16:03 +0100
-In-Reply-To: <2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com> (Paolo
-	Bonzini's message of "Mon, 23 Jan 2017 17:48:32 +0100")
-Message-ID: <877f5l1tak.fsf@dusky.pond.sub.org>
+	(envelope-from <rth7680@gmail.com>) id 1cVk7Q-0006aX-3c
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:17:33 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34618)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cVk7P-0006aN-W5
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:17:32 -0500
+Received: by mail-qt0-x241.google.com with SMTP id a29so19449509qtb.1
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 11:17:31 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170119170507.16185-1-alex.bennee@linaro.org>
+	<20170119170507.16185-18-alex.bennee@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <f78c3bdc-6cd9-1f3d-fe7c-1e39bd6f8a86@twiddle.net>
+Date: Mon, 23 Jan 2017 11:17:27 -0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
- lsi53c895a SCSI HBAs
+In-Reply-To: <20170119170507.16185-18-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 17/27] cputlb: atomically update tlb
+ fields used by tlb_reset_dirty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+Cc: peter.maydell@linaro.org, claudio.fontana@huawei.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, jan.kiszka@siemens.com, mark.burton@greensocs.com, serge.fdrv@gmail.com, pbonzini@redhat.com, bamvor.zhangjian@linaro.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 01/19/2017 09:04 AM, Alex Bennée wrote:
+> The main use case for tlb_reset_dirty is to set the TLB_NOTDIRTY flags
+> in TLB entries to force the slow-path on writes. This is used to mark
+> page ranges containing code which has been translated so it can be
+> invalidated if written to. To do this safely we need to ensure the TLB
+> entries in question for all vCPUs are updated before we attempt to run
+> the code otherwise a race could be introduced.
+> 
+> To achieve this we atomically set the flag in tlb_reset_dirty_range and
+> take care when setting it when the TLB entry is filled.
+> 
+> On 32 bit systems attempting to emulate 64 bit guests we don't even
+> bother as we might not have the atomic primitives available. MTTCG is
+> disabled in this case and can't be forced on. The copy_tlb_helper
+> function helps keep the atomic semantics in one place to avoid
+> confusion.
+> 
+> The dirty helper function is made static as it isn't used outside of
+> cputlb.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-> On 23/01/2017 10:48, Markus Armbruster wrote:
->> The PC machines (pc-q35-* pc-i440fx-* pc-* isapc xenfv) automatically
->> create lsi53c895a SCSI HBAs and SCSI devices to honor -drive if=scsi.
->> For giggles, try -drive if=scsi,bus=25,media=cdrom --- this makes QEMU
->> create 25 of them.
->> 
->> The lsi53c895a is thoroughly obsolete (PCI Ultra2 SCSI, ca. 2000), and
->> currently has no maintainer in QEMU.  megasas is a better choice,
->> except for old OSes, which lack drivers. virtio-scsi is a much better
->> choice when you have a driver, but only (newish) Linux comes with one
->> in the box.  There is no good default that works for all guests.
->> 
->> Instead of supplying the not-so-good default just because we've always
->> supplied it, make the user pick, by not creating any SCSI HBAs for
->> -drive if=scsi.  The user now needs to create the SCSI HBA himself
->> with -device.  The SCSI devices will still be created automatically.
->> 
->> For backward compatibility, keep the traditional behavior for old
->> machine types.
->
-> It would print an "orphaned device" message, right?
-
-Yes.
-
-Before this patch, you can't get an "orhpaned" warning for if=scsi with
-a PC machine.
-
-After this patch, you get one for every if=scsi with new PC machine
-types.
-
->                                                      Could we change
-> those messages to errors
-
-Fine with me, but when it comes to arguing for backward compatibility of
-our byzantine command line, I'm kind of like a lethargic public defender
-with an overly deep relationship to Bourbon.  "Your honor, sure capital
-punishment is called for?  Yes?  Okay then."
-
-I vaguely recall discussing the topic with Peter (cc'ed).  If memory
-serves, one concern was breaking usage of -device with -drive lacking
-if=...  Works fine (no warning) with machines that don't pick up drives
-with their default block interface type, i.e. most of them.  But PATCH 3
-changes their default to if=none, so that usage wouldn't actually break.
-What would break is -device with -drive if=T, where T is not none and
-not picked up by the board.  Such usage is certainly questionable[*],
-but it's questionable enough for us to break it?
-
->                          and then drop PC if=scsi support altogether?
-
-Different backward compatibility question: here we break usage of
-if=scsi with PC machine types.  Legacy way to do things, but it's
-documented in qemu.1.  Are we happy to break it?
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
 
-[*] Here's my review of a prior attempt to outlaw it:
-http://lists.gnu.org/archive/html/qemu-devel/2015-06/msg03334.html
+r~
