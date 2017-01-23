@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVmGh-0004CK-1T
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 16:35:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1cVjJ5-00088G-8k
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:25:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVmGd-0003ei-RW
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 16:35:15 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43530)
+	(envelope-from <bounces@canonical.com>) id 1cVjIz-0007X2-ER
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:25:31 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59652)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cVmGd-0003eZ-Lg
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 16:35:11 -0500
+	id 1cVjIz-0007Wp-7v
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:25:25 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cVmGc-0000hc-Lb
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 21:35:10 +0000
+	id 1cVjIy-00060m-6A
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 18:25:24 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A19532E80C1
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 21:35:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 081DA2E80C2
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 18:25:24 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Jan 2017 21:20:18 -0000
-From: Thomas Huth <645662@bugs.launchpad.net>
-Reply-To: Bug 645662 <645662@bugs.launchpad.net>
+Date: Mon, 23 Jan 2017 18:06:52 -0000
+From: "mike@papersolve.com" <mike@papersolve.com>
+Reply-To: Bug 1622547 <1622547@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20100923002702.20683.97345.malonedeb@soybean.canonical.com>
-Message-Id: <20170123212018.21087.21932.malone@gac.canonical.com>
+References: <20160912101319.11954.40146.malonedeb@gac.canonical.com>
+Message-Id: <20170123180652.26859.44055.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 645662] Re: Python 3.1.2 math errors with Qemu
- 0.12.5
+Subject: [Qemu-devel] [Bug 1622547] Re: qemu-system-sparc fatal error Trap
+ 0x29 on Solaris 2.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,72 +39,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Looks like your test code from comment #1 still prints out a wrong
-value, so the bug has apparently not been fixed by the FPU updates...
+This still fails for me even when using that CPU option.  But it only
+fails with my just-compiled QEMU 2.8.0, NOT my distribution-provided
+QEMU 2.6.1.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Triaged
+mike@ossy ~/qemu> sudo /usr/local/bin/qemu-system-sparc -bios ./ss20_v2.25_=
+rom -M SS-20 -nographic -boot d -hda ./sol26_36G.disk -m 512 -cdrom /mymedi=
+a/Disk\ Sets/Solaris_2.6_SPARC/Solaris_2.6_Software_05_98.iso -serial telne=
+t:0.0.0.0:3000,server -smp 2,cores=3D2 -cpu "TI SuperSparc 60" -net nic -ne=
+t bridge,br=3Dbr0
+QEMU 2.8.0 monitor - type 'help' for more information
+(qemu) QEMU waiting for connection on: disconnected:telnet:0.0.0.0:3000,ser=
+ver
+qemu: fatal: Trap 0x29 while interrupts disabled, Error state
+pc: 0000e754  npc: 0000e758
+%g0-7: 00000000 00010d88 00000000 00000000 00000000 00000000 00000000 00000=
+000
+%o0-7: f1201e20 ffffffff 00000000 ffffffff ffffffff ffffffff ffffffff 00011=
+a38 =
+
+%l0-7: f1201e20 0000e754 0000e758 00000029 00000300 00003c1c 00000000 fffff=
+fff =
+
+%i0-7: 00013848 00000029 00000099 00000000 0edfe200 ffffffff ffffff40 00011=
+a38 =
+
+%f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+psr: 404010c5 (icc: -Z-- SPE: SP-) wim: 00000000
+fsr: 00000000 y: 00000000
+
+fish: =E2=80=9Csudo /usr/local/bin/qemu-system=E2=80=A6=E2=80=9D terminated=
+ by signal SIGABRT
+(Abort)
+
+
+In the other window:
+mike@ossy ~/qemu> telnet localhost 3000
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+
+Power-ON Reset
+Connection closed by foreign host.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/645662
+https://bugs.launchpad.net/bugs/1622547
 
 Title:
-  Python 3.1.2 math errors with Qemu 0.12.5
+  qemu-system-sparc fatal error Trap 0x29 on Solaris 2.6
 
 Status in QEMU:
-  Triaged
+  Invalid
 
 Bug description:
-  When doing the regression tests for Python 3.1.2 with Qemu 0.12.5, (Linux=
- version 2.6.26-2-686 (Debian 2.6.26-25lenny1)),
-  gcc (Debian 4.3.2-1.1) 4.3.2, Python compiled from sources within qemu,
-  3 math tests fail, apparently because the floating point unit is buggy. Q=
-meu was compiled from original sources
-  on Debian Lenny with kernel  2.6.34.6 from kernel.org, gcc  (Debian 4.3.2=
--1.1) 4.3. =
+  When trying to install Solaris 2.6 from original CDROM, qemu fail with
+  the following error :
 
+  qemu: fatal: Trap 0x29 while interrupts disabled, Error state
+  pc: f0041280  npc: f0041284
+  %g0-7: 00000000 f0281800 08000000 ffffffff 00000000 f0243b88 00000001 f02=
+44020
+  %o0-7: 40400ce2 40400ce2 00000000 404000e2 f0243b88 00000000 f023ffd8 f00=
+57914 =
 
-  Regression testing errors:
+  %l0-7: 40000cc2 f009645c f0096460 00000002 00000209 00000004 00000007 f02=
+3ff90 =
 
-  test_cmath
-  test test_cmath failed -- Traceback (most recent call last):
-    File "/root/tools/python3/Python-3.1.2/Lib/test/test_cmath.py", line 36=
-4, in
-      self.fail(error_message)
-  AssertionError: acos0034: acos(complex(-1.0000000000000002, 0.0))
-  Expected: complex(3.141592653589793, -2.1073424255447014e-08)
-  Received: complex(3.141592653589793, -2.1073424338879928e-08)
-  Received value insufficiently close to expected value.
+  %i0-7: 00000042 404000e3 00000000 404000e3 e0000000 f028192a f0240038 f00=
+96448 =
 
-  =
+  %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  psr: 40400cc2 (icc: -Z-- SPE: SP-) wim: 00000002
+  fsr: 00000000 y: 00000000
 
-  test_float
-  test test_float failed -- Traceback (most recent call last):
-    File "/root/tools/python3/Python-3.1.2/Lib/test/test_float.py", line 47=
-9, in
-      self.assertEqual(s, repr(float(s)))
-  AssertionError: '8.72293771110361e+25' !=3D '8.722937711103609e+25'
+  The command line was :
 
-  =
+  qemu-system-sparc -nographic -bios ./openbios-sparc32 -M SS-20 -hda
+  ./36G.disk -m 512 -cdrom Solaris_2.6_Software_05_98.img -boot d
+  -serial telnet:0.0.0.0:3000,server -smp 2,cores=3D2 -monitor null
 
-  test_math
-  test test_math failed -- multiple errors occurred; run in verbose mode fo=
-r deta
+  It fails with a similar output when using bios ss20_v2.25_rom.
 
-  =3D>
+  =E2=96=B6 qemu-system-sparc --version
+  QEMU emulator version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and =
+the QEMU Project developers
 
-  runtests.sh -v test_math
-
-  le01:~/tools/python3/Python-3.1.2# ./runtests.sh -v test_math
-  test_math BAD
-   1 BAD
-   0 GOOD
-   0 SKIPPED
-   1 total
-  le01:~/tools/python3/Python-3.1.2#
+  =E2=96=B6 uname -a
+  Linux xxx 4.7.1-1-ARCH #1 SMP PREEMPT Wed Aug 17 08:13:35 CEST 2016 x86_6=
+4 GNU/Linux
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/645662/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1622547/+subscriptions
