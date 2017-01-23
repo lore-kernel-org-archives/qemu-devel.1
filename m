@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cVXEn-0003IL-3x
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:32:18 -0500
+	(envelope-from <jcody@redhat.com>) id 1cVXH2-0004Jo-Eb
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cVXEi-0008EU-6P
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:32:17 -0500
-Received: from [59.151.112.132] (port=64791 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cVXEh-0008Dk-6R
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:32:12 -0500
-References: <1484467275-27919-1-git-send-email-douly.fnst@cn.fujitsu.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <bc1253f4-51f9-9e74-a3d9-288f4a01e299@cn.fujitsu.com>
-Date: Mon, 23 Jan 2017 13:31:59 +0800
+	(envelope-from <jcody@redhat.com>) id 1cVXH1-0000Ra-Hg
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:34:36 -0500
+Date: Mon, 23 Jan 2017 00:34:26 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170123053426.GA2814@localhost.localdomain>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1484467275-27919-1-git-send-email-douly.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/2] block/qapi: refactor and optimize
- the qmp_query_blockstats()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 01/21] backup: move from done_bitmap to
+ copy_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +24,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com, mreitz@redhat.com
-Cc: stefanha@redhat.com, kwolf@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-Hi, Markus
+On Fri, Dec 23, 2016 at 05:28:44PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> Use HBitmap copy_bitmap instead of done_bitmap. This is needed to unify
+> backup loop for full/incremental modes in future patches.
+> 
+> We reset bit of the copy_bitmap immediately after checking it in
+> backup_do_cow(). It is safe, because all other intersecting requests
+> will wait for our request finish anyway.
+> 
+> The other difference is that in case of error we will have zeroed bit in
+> copy_bitmap, when in done_bitmap we have not set bit.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/backup.c b/block/backup.c
+> index ea38733..6b27e55 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -39,11 +39,12 @@ typedef struct BackupBlockJob {
+>      BlockdevOnError on_target_error;
+>      CoRwlock flush_rwlock;
+>      uint64_t sectors_read;
+> -    unsigned long *done_bitmap;
+>      int64_t cluster_size;
+>      bool compress;
+>      NotifierWithReturn before_write;
+>      QLIST_HEAD(, CowRequest) inflight_reqs;
+> +
+> +    HBitmap *copy_bitmap;
+>  } BackupBlockJob;
+>  
+>  /* Size of a cluster in sectors, instead of bytes. */
+> @@ -115,10 +116,11 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+>      cow_request_begin(&cow_request, job, start, end);
+>  
+>      for (; start < end; start++) {
+> -        if (test_bit(start, job->done_bitmap)) {
+> +        if (!hbitmap_get(job->copy_bitmap, start)) {
+>              trace_backup_do_cow_skip(job, start);
+>              continue; /* already copied */
+>          }
+> +        hbitmap_reset(job->copy_bitmap, start, 1);
+>  
+>          trace_backup_do_cow_process(job, start);
+>  
+> @@ -141,6 +143,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+>              if (error_is_read) {
+>                  *error_is_read = true;
+>              }
+> +            hbitmap_set(job->copy_bitmap, start, 1);
+>              goto out;
+>          }
+>  
+> @@ -157,11 +160,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+>              if (error_is_read) {
+>                  *error_is_read = false;
+>              }
+> +            hbitmap_set(job->copy_bitmap, start, 1);
+>              goto out;
+>          }
+>  
+> -        set_bit(start, job->done_bitmap);
+> -
+>          /* Publish progress, guest I/O counts as progress too.  Note that the
+>           * offset field is an opaque progress value, it is not a disk offset.
+>           */
+> @@ -271,7 +273,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
+>      }
+>  
+>      len = DIV_ROUND_UP(backup_job->common.len, backup_job->cluster_size);
+> -    bitmap_zero(backup_job->done_bitmap, len);
+> +    hbitmap_set(backup_job->copy_bitmap, 0, len);
+>  }
+>  
+>  void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
+> @@ -450,7 +452,8 @@ static void coroutine_fn backup_run(void *opaque)
+>      start = 0;
+>      end = DIV_ROUND_UP(job->common.len, job->cluster_size);
+>  
+> -    job->done_bitmap = bitmap_new(end);
+> +    job->copy_bitmap = hbitmap_alloc(end, 0);
+> +    hbitmap_set(job->copy_bitmap, 0, end);
+>  
+>      job->before_write.notify = backup_before_write_notify;
+>      bdrv_add_before_write_notifier(bs, &job->before_write);
+> @@ -524,7 +527,7 @@ static void coroutine_fn backup_run(void *opaque)
+>      /* wait until pending backup_do_cow() calls have completed */
+>      qemu_co_rwlock_wrlock(&job->flush_rwlock);
+>      qemu_co_rwlock_unlock(&job->flush_rwlock);
+> -    g_free(job->done_bitmap);
+> +    hbitmap_free(job->copy_bitmap);
+>  
+>      data = g_malloc(sizeof(*data));
+>      data->ret = ret;
+> -- 
+> 1.8.3.1
+>
 
-Here is the non-RFC patch.
-Any suggestions are welcome. :)
-
-Thanks,
-	Liyang.
-
-At 01/15/2017 04:01 PM, Dou Liyang wrote:
-> Change log v3 -> v4:
->  1. Develop these into the non-RFC patches.
->  2. Fix some comments.
->  3. do declarations first.
->
-> Change log v2 -> v3:
->  1. Remove the unnecessary code for the bdrv_next_node().
->  2. Remove the change of the locking rules.
->     Even if this change can improve the performance, but it may
->     effect the consistency.
->
-> The Qemu uses the qmp_query_blockstats() function to get the
-> blockstats. As the function has been changed several times, it
-> becomes more complex and longer.
->
-> For the multi-disks guest, if we want to execute I/O operations
-> and this function at the same time. we can use the dataplane
-> feature to hold I/O performance does not drop. But, Normally
-> without this feature, How to reduce the decline in performance?
->
-> These patches refactor the qmp_query_blockstats() to make the
-> code easier to follow, and shorter as follows:
->
-> From:
->
-> +--------------+      +---------------------+
->  | 1            |      | 4.                  |
->  |next_query_bds|      |bdrv_query_bds_stats +---+
->  |              |      |                     |   |
->  +--------^-----+      +-------------^-------+   |
->           |                          |           |
-> +---------+----------+      +--------+-------+   |
-> | 0.                 |      | 2.             |   |
-> |qmp_query_blockstats+------>bdrv_query_stats<----
-> |                    |      |                |
-> +--------------------+      +--------+-------+
->                                      |
->                        +-------------v-------+
->                        | 3.                  |
->                        |bdrv_query_blk_stats |
->                        |                     |
->                        +---------------------+
->
-> To:
->
->                                     +--------------+
->                                     |              |
->                            +--------v-----------+  |
->                        +--->  3.                |  |
-> +-------------------+  |   |bdrv_query_bds_stats+--+
-> | 1.                +--+   |                    |
-> |                   +      +--------------------+
-> |qmp_query_blockstats--+
-> |                   |  |
-> +-------------------+  |   +--------------------+
->                        |   | 2.                 |
->                        +--->                    |
->                            |bdrv_query_blk_stats|
->                            |                    |
->                            +--------------------+
->
->
-> They also optimize the fuction by reducing its running time.
->
-> 1. The function running time
->
-> the time it takes(ns) in each requests:
-> the disk numbers     | 10    | 500
-> -------------------------------------
-> before these patches | 19429 | 667722
-> after these patches  | 18536 | 627945
->
-> 2. For the performance
-> used the dd command likes this to test:
-> dd if=date_1.dat of=date_2.dat conv=fsync oflag=direct bs=1k count=100k.
->
-> the I/O performance is degraded(%) during the monitor:
-> the disk numbers     | 10    | 500
-> -------------------------------------
-> before these patches | 1.3   | 14.2
-> after these patches  | 1.0   | 11.3
->
-> Dou Liyang (2):
->   block/qapi: reduce the coupling between the bdrv_query_stats and
->     bdrv_query_bds_stats
->   block/qapi: reduce the execution time of qmp_query_blockstats
->
->  block/qapi.c | 95 ++++++++++++++++++++++++++----------------------------------
->  1 file changed, 41 insertions(+), 54 deletions(-)
->
+Reviewed-by: Jeff Cody <jcody@redhat.com>
