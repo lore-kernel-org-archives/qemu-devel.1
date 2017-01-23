@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVfYM-00087p-OO
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:25:06 -0500
+	(envelope-from <berrange@redhat.com>) id 1cVfZt-0000nV-Iw
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVfYL-0005wM-UR
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:25:02 -0500
-Received: from mail-ua0-x22f.google.com ([2607:f8b0:400c:c08::22f]:34113)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cVfYL-0005wG-P2
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:25:01 -0500
-Received: by mail-ua0-x22f.google.com with SMTP id 35so110757385uak.1
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 06:25:01 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CACXAS8COsHWMAqoQTDqs6zh=-f0_u7posLQ1nUe6TKRfBaBSEg@mail.gmail.com>
-References: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
-	<1484779123-18968-31-git-send-email-atar4qemu@gmail.com>
-	<CAFEAcA8=gKjbo9YaRAzGHi-tP6AWY08ps_tEPOSzpNFXBC6M+Q@mail.gmail.com>
-	<CACXAS8COsHWMAqoQTDqs6zh=-f0_u7posLQ1nUe6TKRfBaBSEg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Jan 2017 14:24:40 +0000
-Message-ID: <CAFEAcA8cS8DMbHsVU8oWVtB1JsSQJGi1igyFZVMcuzXXjpVkEQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 30/30] target-sparc: fix up niagara machine
+	(envelope-from <berrange@redhat.com>) id 1cVfZs-0006Hz-5c
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40262)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVfZr-0006Hu-W0
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:36 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Mon, 23 Jan 2017 14:26:22 +0000
+Message-Id: <20170123142629.11110-2-berrange@redhat.com>
+In-Reply-To: <20170123142629.11110-1-berrange@redhat.com>
+References: <20170123142629.11110-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PULL v1 1/8] sockets: add ability to disable DNS
+ resolution for InetSocketAddress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 23 January 2017 at 14:10, Artyom Tarasenko <atar4qemu@gmail.com> wrote:
-> On Mon, Jan 23, 2017 at 1:40 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> I see that 'make check' now warns:
->>   GTESTER check-qtest-sparc64
->> Could not open option rom 'nvram1': No such file or directory
->> Could not open option rom '1up-md.bin': No such file or directory
->> Could not open option rom '1up-hv.bin': No such file or directory
->> Could not open option rom 'reset.bin': No such file or directory
->> Could not open option rom 'q.bin': No such file or directory
->> Could not open option rom 'openboot.bin': No such file or directory
->>
->> (though the tests still pass).
->>
->> Could we either ship these images in pc-bios if they're
->> necessary, or not complain that they don't exist if they're
->> not necessary, please?
->
-> I wonder what would be the best option  here. The images are
-> necessary, so the last option - not complaining - can be misleading
-> for a user.
+Add a 'numeric' flag to the InetSocketAddress struct to allow the
+caller to indicate that DNS should be skipped for the host/port
+fields. This is useful if the caller knows the address is already
+numeric and wants to guarantee no (potentially blocking) DNS
+lookups are attempted.
 
-If they're actually necessary then perhaps we should refuse
-to start entirely?
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qapi-schema.json    | 5 +++++
+ util/qemu-sockets.c | 3 +++
+ 2 files changed, 8 insertions(+)
 
-> Concerning shipping them.
-> Pros:
-> - the images are obviously freely distributable (the link above).
-> - the corresponding source code was open-sourced by Sun under various
-> licenses (GPL for hypervisor, BSD for openboot).
-> Cons:
-> - there is no exact tag the the OpenSPARC source tree which would
-> correspond to the binaries.
-> - building them is tricky, because it requires Solaris 9 / SPARC.
->
-> What do you think would be a better option?
-
-One thing we could do is only warn if !qtest_enabled().
-We do this for some other boards that otherwise fail entirely
-when their BIOS image is not present. This is sufficient for
-the qtest checks which don't actually try to run code on the
-guest, but merely interact with it via the qtest protocol.
-
-We do ship some other ROMs that are only buildable on the
-right host hardware, so it's not impossible, but I don't know
-the details of our rules about what we put in pc-bios/.
-
-thanks
--- PMM
+diff --git a/qapi-schema.json b/qapi-schema.json
+index ddc8783..ac55f4a 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3983,6 +3983,10 @@
+ #
+ # @port: port part of the address, or lowest port if @to is present
+ #
++# @numeric: #optional true if the host/port are guaranteed to be numeric,
++#           false if name resolution should be attempted. Defaults to false.
++#           (Since 2.9)
++#
+ # @to: highest port to try
+ #
+ # @ipv4: whether to accept IPv4 addresses, default try both IPv4 and IPv6
+@@ -3997,6 +4001,7 @@
+   'data': {
+     'host': 'str',
+     'port': 'str',
++    '*numeric':  'bool',
+     '*to': 'uint16',
+     '*ipv4': 'bool',
+     '*ipv6': 'bool' } }
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index fe1d07a..d63b011 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -141,6 +141,9 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+ 
+     memset(&ai,0, sizeof(ai));
+     ai.ai_flags = AI_PASSIVE;
++    if (saddr->has_numeric && saddr->numeric) {
++        ai.ai_flags |= AI_NUMERICHOST | AI_NUMERICSERV;
++    }
+     ai.ai_family = inet_ai_family_from_address(saddr, &err);
+     ai.ai_socktype = SOCK_STREAM;
+ 
+-- 
+2.9.3
