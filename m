@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cVdST-0002HI-F1
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:10:55 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cVdbo-0002BX-Et
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:20:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cVdSO-0005Cb-7O
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:10:49 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:27502 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cVdbn-0001wd-9Y
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:20:28 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:5940 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cVdSN-00059A-S1
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:10:44 -0500
+	id 1cVdbm-0001wL-TJ
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:20:27 -0500
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 23 Jan 2017 15:10:29 +0300
-Message-Id: <20170123121036.4823-18-vsementsov@virtuozzo.com>
-In-Reply-To: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 17/24] qmp: add autoload parameter to
- block-dirty-bitmap-add
+Message-ID: <1f949d1d-9069-9195-ee45-23fc153ec5cb@virtuozzo.com>
+Date: Mon, 23 Jan 2017 15:20:12 +0300
+MIME-Version: 1.0
+In-Reply-To: <1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/21] backup: move from done_bitmap to
+ copy_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +30,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
+Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com, jcody@redhat.com
 
-Optional. Default is false.
+23.12.2016 17:28, Vladimir Sementsov-Ogievskiy wrote:
+> Use HBitmap copy_bitmap instead of done_bitmap. This is needed to unify
+> backup loop for full/incremental modes in future patches.
+>
+> We reset bit of the copy_bitmap immediately after checking it in
+> backup_do_cow(). It is safe, because all other intersecting requests
+> will wait for our request finish anyway.
+>
+> The other difference is that in case of error we will have zeroed bit in
+> copy_bitmap, when in done_bitmap we have not set bit.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- blockdev.c            | 18 ++++++++++++++++--
- docs/qmp-commands.txt |  4 ++++
- qapi/block-core.json  |  6 +++++-
- 3 files changed, 25 insertions(+), 3 deletions(-)
+This sentence is unrelated. It actually relates to old my mistake (not 
+published versions), which is fixed here. Really, in case of error I set 
+bit in copy_bitmap back, to correspond to old behavior with done_bitmap.
 
-diff --git a/blockdev.c b/blockdev.c
-index 40605faccc..e32ac69e4b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1968,6 +1968,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
-     qmp_block_dirty_bitmap_add(action->node, action->name,
-                                action->has_granularity, action->granularity,
-                                action->has_persistent, action->persistent,
-+                               action->has_autoload, action->autoload,
-                                &local_err);
- 
-     if (!local_err) {
-@@ -2698,6 +2699,7 @@ out:
- void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-                                 bool has_granularity, uint32_t granularity,
-                                 bool has_persistent, bool persistent,
-+                                bool has_autoload, bool autoload,
-                                 Error **errp)
- {
-     AioContext *aio_context;
-@@ -2731,6 +2733,15 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-     if (!has_persistent) {
-         persistent = false;
-     }
-+    if (!has_autoload) {
-+        autoload = false;
-+    }
-+
-+    if (has_autoload && !persistent) {
-+        error_setg(errp, "Autoload flag must be used only for persistent "
-+                         "bitmaps");
-+        goto out;
-+    }
- 
-     if (persistent &&
-         !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
-@@ -2739,10 +2750,13 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-     }
- 
-     bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
--    if (bitmap != NULL) {
--        bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
-+    if (bitmap == NULL) {
-+        goto out;
-     }
- 
-+    bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
-+    bdrv_dirty_bitmap_set_autoload(bitmap, autoload);
-+
-  out:
-     aio_context_release(aio_context);
- }
-diff --git a/docs/qmp-commands.txt b/docs/qmp-commands.txt
-index ef0245d0df..62469c06da 100644
---- a/docs/qmp-commands.txt
-+++ b/docs/qmp-commands.txt
-@@ -1018,6 +1018,10 @@ Arguments:
- - "persistent": bitmap will be saved to the corresponding block device image
-                 file on its close. For now only Qcow2 disks support persistent
-                 bitmaps. (json-bool, optional, default false) (Since 2.9)
-+- "autoload": the bitmap will be automatically loaded when the image it is
-+              stored in is opened. This flag may only be specified for
-+              persistent bitmaps (json-bool, optional, default false)
-+              (Since 2.9)
- 
- Example:
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index b6a255395a..2c0aa1f44d 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1235,11 +1235,15 @@
- #              corresponding block device image file on its close. Default is
- #              false. (Since 2.9)
- #
-+# @autoload: #optional the bitmap will be automatically loaded when the image
-+#            it is stored in is opened. This flag may only be specified for
-+#            persistent bitmaps. Default is false. (Since 2.9)
-+#
- # Since: 2.4
- ##
- { 'struct': 'BlockDirtyBitmapAdd',
-   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
--            '*persistent': 'bool' } }
-+            '*persistent': 'bool', '*autoload': 'bool' } }
- 
- ##
- # @block-dirty-bitmap-add:
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/backup.c | 17 ++++++++++-------
+>   1 file changed, 10 insertions(+), 7 deletions(-)
+>
+> diff --git a/block/backup.c b/block/backup.c
+> index ea38733..6b27e55 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -39,11 +39,12 @@ typedef struct BackupBlockJob {
+>       BlockdevOnError on_target_error;
+>       CoRwlock flush_rwlock;
+>       uint64_t sectors_read;
+> -    unsigned long *done_bitmap;
+>       int64_t cluster_size;
+>       bool compress;
+>       NotifierWithReturn before_write;
+>       QLIST_HEAD(, CowRequest) inflight_reqs;
+> +
+> +    HBitmap *copy_bitmap;
+>   } BackupBlockJob;
+>   
+>   /* Size of a cluster in sectors, instead of bytes. */
+> @@ -115,10 +116,11 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+>       cow_request_begin(&cow_request, job, start, end);
+>   
+>       for (; start < end; start++) {
+> -        if (test_bit(start, job->done_bitmap)) {
+> +        if (!hbitmap_get(job->copy_bitmap, start)) {
+>               trace_backup_do_cow_skip(job, start);
+>               continue; /* already copied */
+>           }
+> +        hbitmap_reset(job->copy_bitmap, start, 1);
+>   
+>           trace_backup_do_cow_process(job, start);
+>   
+> @@ -141,6 +143,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+>               if (error_is_read) {
+>                   *error_is_read = true;
+>               }
+> +            hbitmap_set(job->copy_bitmap, start, 1);
+>               goto out;
+>           }
+>   
+> @@ -157,11 +160,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+>               if (error_is_read) {
+>                   *error_is_read = false;
+>               }
+> +            hbitmap_set(job->copy_bitmap, start, 1);
+>               goto out;
+>           }
+>   
+> -        set_bit(start, job->done_bitmap);
+> -
+>           /* Publish progress, guest I/O counts as progress too.  Note that the
+>            * offset field is an opaque progress value, it is not a disk offset.
+>            */
+> @@ -271,7 +273,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
+>       }
+>   
+>       len = DIV_ROUND_UP(backup_job->common.len, backup_job->cluster_size);
+> -    bitmap_zero(backup_job->done_bitmap, len);
+> +    hbitmap_set(backup_job->copy_bitmap, 0, len);
+>   }
+>   
+>   void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
+> @@ -450,7 +452,8 @@ static void coroutine_fn backup_run(void *opaque)
+>       start = 0;
+>       end = DIV_ROUND_UP(job->common.len, job->cluster_size);
+>   
+> -    job->done_bitmap = bitmap_new(end);
+> +    job->copy_bitmap = hbitmap_alloc(end, 0);
+> +    hbitmap_set(job->copy_bitmap, 0, end);
+>   
+>       job->before_write.notify = backup_before_write_notify;
+>       bdrv_add_before_write_notifier(bs, &job->before_write);
+> @@ -524,7 +527,7 @@ static void coroutine_fn backup_run(void *opaque)
+>       /* wait until pending backup_do_cow() calls have completed */
+>       qemu_co_rwlock_wrlock(&job->flush_rwlock);
+>       qemu_co_rwlock_unlock(&job->flush_rwlock);
+> -    g_free(job->done_bitmap);
+> +    hbitmap_free(job->copy_bitmap);
+>   
+>       data = g_malloc(sizeof(*data));
+>       data->ret = ret;
+
+
 -- 
-2.11.0
+Best regards,
+Vladimir
