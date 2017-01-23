@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVkVG-0000qw-Dz
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:42:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1cVkYr-0002mk-Lk
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:45:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVkVF-0005Ka-7Y
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:42:10 -0500
-Received: from mail-ua0-x22c.google.com ([2607:f8b0:400c:c08::22c]:33484)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cVkVF-0005KT-3a
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:42:09 -0500
-Received: by mail-ua0-x22c.google.com with SMTP id i68so117847976uad.0
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 11:42:08 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cVkYn-0006Nc-N5
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:45:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48386)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cVkYn-0006NL-Gu
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:45:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cVkYl-0003Ep-Tm
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 19:45:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DF0682E80C4
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 19:45:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAF++6APW69OBEzfUaWXK-kXLY5euu8aJjvFrYzwFT1tes-W=gA@mail.gmail.com>
-References: <CAF++6APW69OBEzfUaWXK-kXLY5euu8aJjvFrYzwFT1tes-W=gA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Jan 2017 19:41:48 +0000
-Message-ID: <CAFEAcA-aEA9cNzd6cJchrdojyX7xKr4eOKECkMEen=fhGucCPA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] changeset b0cb0a66d broken - missing
- QEMU_OPTION_enable_hax
+Date: Mon, 23 Jan 2017 19:32:37 -0000
+From: Thomas Huth <1253777@bugs.launchpad.net>
+Reply-To: Bug 1253777 <1253777@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131121204609.27303.82489.malonedeb@gac.canonical.com>
+Message-Id: <20170123193237.14567.84429.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1253777] Re: OpenBSD VM running on OpenBSD host
+ has sleep calls taking twice as long as they should
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Hanley <jhanley@dgtlrift.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Vincent Palatin <vpalatin@chromium.org>
+To: qemu-devel@nongnu.org
 
-On 23 January 2017 at 19:32, James Hanley <jhanley@dgtlrift.com> wrote:
-> Changeset fails to compile:
->
-> qemu/vl.c:3683:18: error: =E2=80=98QEMU_OPTION_enable_hax=E2=80=99 undecl=
-ared (first use in
-> this function)
->              case QEMU_OPTION_enable_hax:
->                   ^
-> I assume that there is details in
->
-> ./qemu-options.def
-> ./qemu-options.hx
->
-> that were not included with the commit?
+What does comment #5 mean? Is this issue now fixed with the latest
+version of QEMU?
 
-Your source tree probably has a stale qemu-options.def in it
-from an attempt to do an in-tree build at some point in the
-past (and now you are doing out-of-tree builds). If you do a
-'make distclean' in the source tree this will get rid of the
-stale junk and the build should work. (Or you can just git
-clone a fresh tree; or attempt to more carefully remove
-individual stale stuff, but that risks leaving some other
-stale file around.)
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-(The change to qemu-options.hx is sufficient, because we
-generate qemu-options.def from it in the build tree; but
-if you have a stale .def file in the source tree then
-gcc will pick that one up before the one in the build tree;
-which works until something requires a change that postdates
-the stale stuff.)
+-- =
 
-thanks
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1253777
+
+Title:
+  OpenBSD VM running on OpenBSD host has sleep calls taking twice as
+  long as they should
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Running a script like
+
+  while [ 1 ]
+  do
+    date
+    sleep 1
+  done
+
+  on the VM will result in the (correct) date being displayed, but it is
+  displayed only every two (!) seconds.  We have also noticed that if we
+  connect to the VM's console using VNC, and move the mouse pointer
+  constantly in the VNC window, the script runs normally with updates
+  every second!  Note that the script doesn't have to be running on the
+  VM's console - it's also possible to (say) ssh to the VM from a
+  separate machine and run the script and it will display the '2 second'
+  issue, but as soon as you move the mouse pointer constantly in the VNC
+  console window the script starts behaving normally with updates every
+  second.
+
+  I have only seen this bug when running an OpenBSD VM on an OpenBSD
+  host.  Running an OpenBSD VM on a Linux host does not exhibit the
+  problem for me.  I also belive (am told) that a Linux VM running on an
+  OpenBSD host does not exhibit the problem.
+
+  I have been using the OpenBSD 5.4 64 bit distro which comes with qemu
+  1.5.1 in a package, however I tried compiling qemu 1.6.1 and that has
+  the same bug.  In fact older OpenBSD distros have the same issue -
+  going back to OpenBSD distros from two years ago still have the
+  problem.  This is not a 'new' bug recently introduced.
+
+  Initially I wondered if it could be traced to an incorrectly set
+  command line option, but I've since gone through many of the options
+  in the man page simply trying different values (eg. different CPU
+  types ( -cpu) , different emulated PC (-M)) but so far the problem
+  remains.
+
+  I'm quite happy to run tests in order to track this bug down better.
+  We use qemu running on OpenBSD extensively and find it very useful!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1253777/+subscriptions
