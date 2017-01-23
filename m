@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVfa8-0001Dv-Ty
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:56 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cVfqq-0003fD-99
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:44:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVfa5-0006NA-Ub
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59748)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVfa5-0006Mx-MT
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:26:49 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 23 Jan 2017 14:26:29 +0000
-Message-Id: <20170123142629.11110-9-berrange@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1cVfqk-0002qY-Vg
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:44:08 -0500
+Resent-Message-Id: <E1cVfqk-0002qY-Vg@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21486)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cVfqk-0002oH-M7
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 09:44:02 -0500
+Message-ID: <148518263494.56.6758874215598215958@b042e9bf0dd0>
 In-Reply-To: <20170123142629.11110-1-berrange@redhat.com>
-References: <20170123142629.11110-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 8/8] io: introduce a DNS resolver API
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 23 Jan 2017 06:43:56 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL v1 0/8] Merge io/ 2017-01-23
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,582 +28,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: berrange@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Currently DNS resolution is done automatically as part
-of the creation of a QIOChannelSocket object instance.
-This works ok for network clients where you just end
-up a single network socket, but for servers, the results
-of DNS resolution may require creation of multiple
-sockets.
-
-Introducing a DNS resolver API allows DNS resolution
-to be separated from the socket object creation. This
-will make it practical to create multiple QIOChannelSocket
-instances for servers.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- include/io/dns-resolver.h | 228 ++++++++++++++++++++++++++++++++++++++
- include/qemu/sockets.h    |   2 +
- io/Makefile.objs          |   1 +
- io/dns-resolver.c         | 272 ++++++++++++++++++++++++++++++++++++++++++++++
- util/qemu-sockets.c       |   4 +-
- 5 files changed, 505 insertions(+), 2 deletions(-)
- create mode 100644 include/io/dns-resolver.h
- create mode 100644 io/dns-resolver.c
-
-diff --git a/include/io/dns-resolver.h b/include/io/dns-resolver.h
-new file mode 100644
-index 0000000..2f69c08
---- /dev/null
-+++ b/include/io/dns-resolver.h
-@@ -0,0 +1,228 @@
-+/*
-+ * QEMU DNS resolver
-+ *
-+ * Copyright (c) 2016-2017 Red Hat, Inc.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef QIO_DNS_RESOLVER_H
-+#define QIO_DNS_RESOLVER_H
-+
-+#include "qemu-common.h"
-+#include "qom/object.h"
-+#include "io/task.h"
-+
-+#define TYPE_QIO_DNS_RESOLVER "qio-dns-resolver"
-+#define QIO_DNS_RESOLVER(obj)                                    \
-+    OBJECT_CHECK(QIODNSResolver, (obj), TYPE_QIO_DNS_RESOLVER)
-+#define QIO_DNS_RESOLVER_CLASS(klass)                                    \
-+    OBJECT_CLASS_CHECK(QIODNSResolverClass, klass, TYPE_QIO_DNS_RESOLVER)
-+#define QIO_DNS_RESOLVER_GET_CLASS(obj)                                  \
-+    OBJECT_GET_CLASS(QIODNSResolverClass, obj, TYPE_QIO_DNS_RESOLVER)
-+
-+typedef struct QIODNSResolver QIODNSResolver;
-+typedef struct QIODNSResolverClass QIODNSResolverClass;
-+
-+/**
-+ * QIODNSResolver:
-+ *
-+ * The QIODNSResolver class provides a framework for doing
-+ * DNS resolution on SocketAddress objects, independently
-+ * of socket creation.
-+ *
-+ * <example>
-+ *   <title>Resolving addresses synchronously</title>
-+ *   <programlisting>
-+ *    int mylisten(SocketAddress *addr, Error **errp) {
-+ *      QIODNSResolver *resolver = qio_dns_resolver_get_instance();
-+ *      SocketAddress **rawaddrs = NULL;
-+ *      size_t nrawaddrs = 0;
-+ *      Error *err = NULL;
-+ *      QIOChannel **socks = NULL;
-+ *      size_t nsocks = 0;
-+ *
-+ *      if (qio_dns_resolver_lookup_sync(dns, addr, &nrawaddrs,
-+ *                                       &rawaddrs, errp) < 0) {
-+ *          return -1;
-+ *      }
-+ *
-+ *      for (i = 0; i < nrawaddrs; i++) {
-+ *         QIOChannel *sock = qio_channel_new();
-+ *         Error *local_err = NULL;
-+ *         qio_channel_listen_sync(sock, rawaddrs[i], &local_err);
-+ *         if (local_err) {
-+ *            error_propagate(&err, local_err);
-+ *         } else {
-+ *            socks = g_renew(QIOChannelSocket *, socks, nsocks + 1);
-+ *            socks[nsocks++] = sock;
-+ *         }
-+ *         qapi_free_SocketAddress(rawaddrs[i]);
-+ *      }
-+ *      g_free(rawaddrs);
-+ *
-+ *      if (nsocks == 0) {
-+ *         error_propagate(errp, err);
-+ *      } else {
-+ *         error_free(err);
-+ *      }
-+ *   }
-+ *   </programlisting>
-+ * </example>
-+ *
-+ * <example>
-+ *   <title>Resolving addresses asynchronously</title>
-+ *   <programlisting>
-+ *    typedef struct MyListenData {
-+ *       Error *err;
-+ *       QIOChannelSocket **socks;
-+ *       size_t nsocks;
-+ *    } MyListenData;
-+ *
-+ *    void mylistenresult(QIOTask *task, void *opaque) {
-+ *      MyListenData *data = opaque;
-+ *      QIODNSResolver *resolver =
-+ *         QIO_DNS_RESOLVER(qio_task_get_source(task);
-+ *      SocketAddress **rawaddrs = NULL;
-+ *      size_t nrawaddrs = 0;
-+ *      Error *err = NULL;
-+ *
-+ *      if (qio_task_propagate_error(task, &data->err)) {
-+ *         return;
-+ *      }
-+ *
-+ *      qio_dns_resolver_lookup_result(resolver, task,
-+ *                                     &nrawaddrs, &rawaddrs);
-+ *
-+ *      for (i = 0; i < nrawaddrs; i++) {
-+ *         QIOChannel *sock = qio_channel_new();
-+ *         Error *local_err = NULL;
-+ *         qio_channel_listen_sync(sock, rawaddrs[i], &local_err);
-+ *         if (local_err) {
-+ *            error_propagate(&err, local_err);
-+ *         } else {
-+ *            socks = g_renew(QIOChannelSocket *, socks, nsocks + 1);
-+ *            socks[nsocks++] = sock;
-+ *         }
-+ *         qapi_free_SocketAddress(rawaddrs[i]);
-+ *      }
-+ *      g_free(rawaddrs);
-+ *
-+ *      if (nsocks == 0) {
-+ *         error_propagate(&data->err, err);
-+ *      } else {
-+ *         error_free(err);
-+ *      }
-+ *    }
-+ *
-+ *    void mylisten(SocketAddress *addr, MyListenData *data) {
-+ *      QIODNSResolver *resolver = qio_dns_resolver_get_instance();
-+ *      qio_dns_resolver_lookup_async(dns, addr,
-+ *                                    mylistenresult, data, NULL);
-+ *    }
-+ *   </programlisting>
-+ * </example>
-+ */
-+struct QIODNSResolver {
-+    Object parent;
-+};
-+
-+struct QIODNSResolverClass {
-+    ObjectClass parent;
-+};
-+
-+
-+/**
-+ * qio_dns_resolver_get_instance:
-+ *
-+ * Get the singleton dns resolver instance. The caller
-+ * does not own a reference on the returned object.
-+ *
-+ * Returns: the single dns resolver instance
-+ */
-+QIODNSResolver *qio_dns_resolver_get_instance(void);
-+
-+/**
-+ * qio_dns_resolver_lookup_sync:
-+ * @resolver: the DNS resolver instance
-+ * @addr: the address to resolve
-+ * @naddr: pointer to hold number of resolved addresses
-+ * @addrs: pointer to hold resolved addresses
-+ * @errp: pointer to NULL initialized error object
-+ *
-+ * This will attempt to resolve the address provided
-+ * in @addr. If resolution succeeds, @addrs will be filled
-+ * with all the resolved addresses. @naddrs will specify
-+ * the number of entries allocated in @addrs. The caller
-+ * is responsible for freeing each entry in @addrs, as
-+ * well as @addrs itself. @naddrs is guaranteed to be
-+ * greater than zero on success.
-+ *
-+ * DNS resolution will be done synchronously so execution
-+ * of the caller may be blocked for an arbitrary length
-+ * of time.
-+ *
-+ * Returns: 0 if resolution was successful, -1 on error
-+ */
-+int qio_dns_resolver_lookup_sync(QIODNSResolver *resolver,
-+                                 SocketAddress *addr,
-+                                 size_t *naddrs,
-+                                 SocketAddress ***addrs,
-+                                 Error **errp);
-+
-+/**
-+ * qio_dns_resolver_lookup_async:
-+ * @resolver: the DNS resolver instance
-+ * @addr: the address to resolve
-+ * @func: the callback to invoke on lookup completion
-+ * @opaque: data blob to pass to @func
-+ * @notify: the callback to free @opaque, or NULL
-+ *
-+ * This will attempt to resolve the address provided
-+ * in @addr. The callback @func will be invoked when
-+ * resolution has either completed or failed. On
-+ * success, the @func should call the method
-+ * qio_dns_resolver_lookup_result() to obtain the
-+ * results.
-+ *
-+ * DNS resolution will be done asynchronously so execution
-+ * of the caller will not be blocked.
-+ */
-+void qio_dns_resolver_lookup_async(QIODNSResolver *resolver,
-+                                   SocketAddress *addr,
-+                                   QIOTaskFunc func,
-+                                   gpointer opaque,
-+                                   GDestroyNotify notify);
-+
-+/**
-+ * qio_dns_resolver_lookup_result:
-+ * @resolver: the DNS resolver instance
-+ * @task: the task object to get results for
-+ * @naddr: pointer to hold number of resolved addresses
-+ * @addrs: pointer to hold resolved addresses
-+ *
-+ * This method should be called from the callback passed
-+ * to qio_dns_resolver_lookup_async() in order to obtain
-+ * results.  @addrs will be filled with all the resolved
-+ * addresses. @naddrs will specify the number of entries
-+ * allocated in @addrs. The caller is responsible for
-+ * freeing each entry in @addrs, as well as @addrs itself.
-+ */
-+void qio_dns_resolver_lookup_result(QIODNSResolver *resolver,
-+                                    QIOTask *task,
-+                                    size_t *naddrs,
-+                                    SocketAddress ***addrs);
-+
-+#endif /* QIO_DNS_RESOLVER_H */
-diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-index 5589e68..5f1bab9 100644
---- a/include/qemu/sockets.h
-+++ b/include/qemu/sockets.h
-@@ -32,6 +32,8 @@ int socket_set_fast_reuse(int fd);
-  */
- typedef void NonBlockingConnectHandler(int fd, Error *err, void *opaque);
- 
-+int inet_ai_family_from_address(InetSocketAddress *addr,
-+                                Error **errp);
- InetSocketAddress *inet_parse(const char *str, Error **errp);
- int inet_connect(const char *str, Error **errp);
- int inet_connect_saddr(InetSocketAddress *saddr, Error **errp,
-diff --git a/io/Makefile.objs b/io/Makefile.objs
-index 9d8337d..12983cc 100644
---- a/io/Makefile.objs
-+++ b/io/Makefile.objs
-@@ -7,4 +7,5 @@ io-obj-y += channel-tls.o
- io-obj-y += channel-watch.o
- io-obj-y += channel-websock.o
- io-obj-y += channel-util.o
-+io-obj-y += dns-resolver.o
- io-obj-y += task.o
-diff --git a/io/dns-resolver.c b/io/dns-resolver.c
-new file mode 100644
-index 0000000..cf2b1c5
---- /dev/null
-+++ b/io/dns-resolver.c
-@@ -0,0 +1,272 @@
-+/*
-+ * QEMU DNS resolver
-+ *
-+ * Copyright (c) 2016 Red Hat, Inc.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "io/dns-resolver.h"
-+#include "qapi/clone-visitor.h"
-+#include "qemu/sockets.h"
-+#include "qapi/error.h"
-+#include "qemu/cutils.h"
-+
-+
-+static QIODNSResolver *instance;
-+static pthread_once_t instance_init = PTHREAD_ONCE_INIT;
-+
-+static void qio_dns_resolve_init_instance(void)
-+{
-+    instance = QIO_DNS_RESOLVER(object_new(TYPE_QIO_DNS_RESOLVER));
-+}
-+
-+QIODNSResolver *qio_dns_resolver_get_instance(void)
-+{
-+    pthread_once(&instance_init, qio_dns_resolve_init_instance);
-+    return instance;
-+}
-+
-+static int qio_dns_resolver_lookup_sync_inet(QIODNSResolver *resolver,
-+                                             SocketAddress *addr,
-+                                             size_t *naddrs,
-+                                             SocketAddress ***addrs,
-+                                             Error **errp)
-+{
-+    struct addrinfo ai, *res, *e;
-+    InetSocketAddress *iaddr = addr->u.inet.data;
-+    char port[33];
-+    char uaddr[INET6_ADDRSTRLEN + 1];
-+    char uport[33];
-+    int rc;
-+    Error *err = NULL;
-+    size_t i;
-+
-+    *naddrs = 0;
-+    *addrs = NULL;
-+
-+    memset(&ai, 0, sizeof(ai));
-+    ai.ai_flags = AI_PASSIVE;
-+    if (iaddr->has_numeric && iaddr->numeric) {
-+        ai.ai_flags |= AI_NUMERICHOST | AI_NUMERICSERV;
-+    }
-+    ai.ai_family = inet_ai_family_from_address(iaddr, &err);
-+    ai.ai_socktype = SOCK_STREAM;
-+
-+    if (err) {
-+        error_propagate(errp, err);
-+        return -1;
-+    }
-+
-+    if (iaddr->host == NULL) {
-+        error_setg(errp, "host not specified");
-+        return -1;
-+    }
-+    if (iaddr->port != NULL) {
-+        pstrcpy(port, sizeof(port), iaddr->port);
-+    } else {
-+        port[0] = '\0';
-+    }
-+
-+    rc = getaddrinfo(strlen(iaddr->host) ? iaddr->host : NULL,
-+                     strlen(port) ? port : NULL, &ai, &res);
-+    if (rc != 0) {
-+        error_setg(errp, "address resolution failed for %s:%s: %s",
-+                   iaddr->host, port, gai_strerror(rc));
-+        return -1;
-+    }
-+
-+    for (e = res; e != NULL; e = e->ai_next) {
-+        (*naddrs)++;
-+    }
-+
-+    *addrs = g_new0(SocketAddress *, *naddrs);
-+
-+    /* create socket + bind */
-+    for (i = 0, e = res; e != NULL; i++, e = e->ai_next) {
-+        SocketAddress *newaddr = g_new0(SocketAddress, 1);
-+        InetSocketAddress *newiaddr = g_new0(InetSocketAddress, 1);
-+        newaddr->u.inet.data = newiaddr;
-+        newaddr->type = SOCKET_ADDRESS_KIND_INET;
-+
-+        getnameinfo((struct sockaddr *)e->ai_addr, e->ai_addrlen,
-+                    uaddr, INET6_ADDRSTRLEN, uport, 32,
-+                    NI_NUMERICHOST | NI_NUMERICSERV);
-+
-+        *newiaddr = (InetSocketAddress){
-+            .host = g_strdup(uaddr),
-+            .port = g_strdup(uport),
-+            .has_numeric = true,
-+            .numeric = true,
-+            .has_to = iaddr->has_to,
-+            .to = iaddr->to,
-+            .has_ipv4 = false,
-+            .has_ipv6 = false,
-+        };
-+
-+        (*addrs)[i] = newaddr;
-+    }
-+    freeaddrinfo(res);
-+    return 0;
-+}
-+
-+
-+static int qio_dns_resolver_lookup_sync_nop(QIODNSResolver *resolver,
-+                                            SocketAddress *addr,
-+                                            size_t *naddrs,
-+                                            SocketAddress ***addrs,
-+                                            Error **errp)
-+{
-+    *naddrs = 1;
-+    *addrs = g_new0(SocketAddress *, 1);
-+    (*addrs)[0] = QAPI_CLONE(SocketAddress, addr);
-+
-+    return 0;
-+}
-+
-+
-+int qio_dns_resolver_lookup_sync(QIODNSResolver *resolver,
-+                                 SocketAddress *addr,
-+                                 size_t *naddrs,
-+                                 SocketAddress ***addrs,
-+                                 Error **errp)
-+{
-+    switch (addr->type) {
-+    case SOCKET_ADDRESS_KIND_INET:
-+        return qio_dns_resolver_lookup_sync_inet(resolver,
-+                                                 addr,
-+                                                 naddrs,
-+                                                 addrs,
-+                                                 errp);
-+
-+    case SOCKET_ADDRESS_KIND_UNIX:
-+    case SOCKET_ADDRESS_KIND_VSOCK:
-+        return qio_dns_resolver_lookup_sync_nop(resolver,
-+                                                addr,
-+                                                naddrs,
-+                                                addrs,
-+                                                errp);
-+
-+    default:
-+        error_setg(errp, "Unknown socket address kind");
-+        return -1;
-+    }
-+}
-+
-+
-+struct QIODNSResolverLookupData {
-+    SocketAddress *addr;
-+    SocketAddress **addrs;
-+    size_t naddrs;
-+};
-+
-+
-+static void qio_dns_resolver_lookup_data_free(gpointer opaque)
-+{
-+    struct QIODNSResolverLookupData *data = opaque;
-+    size_t i;
-+
-+    qapi_free_SocketAddress(data->addr);
-+    for (i = 0; i < data->naddrs; i++) {
-+        qapi_free_SocketAddress(data->addrs[i]);
-+    }
-+
-+    g_free(data->addrs);
-+    g_free(data);
-+}
-+
-+
-+static void qio_dns_resolver_lookup_worker(QIOTask *task,
-+                                           gpointer opaque)
-+{
-+    QIODNSResolver *resolver = QIO_DNS_RESOLVER(qio_task_get_source(task));
-+    struct QIODNSResolverLookupData *data = opaque;
-+    Error *err = NULL;
-+
-+    qio_dns_resolver_lookup_sync(resolver,
-+                                 data->addr,
-+                                 &data->naddrs,
-+                                 &data->addrs,
-+                                 &err);
-+    if (err) {
-+        qio_task_set_error(task, err);
-+    } else {
-+        qio_task_set_result_pointer(task, opaque, NULL);
-+    }
-+
-+    object_unref(OBJECT(resolver));
-+}
-+
-+
-+void qio_dns_resolver_lookup_async(QIODNSResolver *resolver,
-+                                   SocketAddress *addr,
-+                                   QIOTaskFunc func,
-+                                   gpointer opaque,
-+                                   GDestroyNotify notify)
-+{
-+    QIOTask *task;
-+    struct QIODNSResolverLookupData *data =
-+        g_new0(struct QIODNSResolverLookupData, 1);
-+
-+    data->addr = QAPI_CLONE(SocketAddress, addr);
-+
-+    task = qio_task_new(OBJECT(resolver), func, opaque, notify);
-+
-+    qio_task_run_in_thread(task,
-+                           qio_dns_resolver_lookup_worker,
-+                           data,
-+                           qio_dns_resolver_lookup_data_free);
-+}
-+
-+
-+void qio_dns_resolver_lookup_result(QIODNSResolver *resolver,
-+                                    QIOTask *task,
-+                                    size_t *naddrs,
-+                                    SocketAddress ***addrs)
-+{
-+    struct QIODNSResolverLookupData *data =
-+        qio_task_get_result_pointer(task);
-+    size_t i;
-+
-+    *naddrs = 0;
-+    *addrs = NULL;
-+    if (!data) {
-+        return;
-+    }
-+
-+    *naddrs = data->naddrs;
-+    *addrs = g_new0(SocketAddress *, data->naddrs);
-+    for (i = 0; i < data->naddrs; i++) {
-+        (*addrs)[i] = QAPI_CLONE(SocketAddress, data->addrs[i]);
-+    }
-+}
-+
-+
-+static const TypeInfo qio_dns_resolver_info = {
-+    .parent = TYPE_OBJECT,
-+    .name = TYPE_QIO_DNS_RESOLVER,
-+    .instance_size = sizeof(QIODNSResolver),
-+    .class_size = sizeof(QIODNSResolverClass),
-+};
-+
-+
-+static void qio_dns_resolver_register_types(void)
-+{
-+    type_register_static(&qio_dns_resolver_info);
-+}
-+
-+
-+type_init(qio_dns_resolver_register_types);
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index d63b011..6a0cc24 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -110,8 +110,8 @@ NetworkAddressFamily inet_netfamily(int family)
-  * outside scope of this method and not currently handled by
-  * callers at all.
-  */
--static int inet_ai_family_from_address(InetSocketAddress *addr,
--                                       Error **errp)
-+int inet_ai_family_from_address(InetSocketAddress *addr,
-+                                Error **errp)
- {
-     if (addr->has_ipv6 && addr->has_ipv4 &&
-         !addr->ipv6 && !addr->ipv4) {
--- 
-2.9.3
+SGksCgpZb3VyIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+CgpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIHYxIDAvOF0gTWVyZ2Ug
+aW8vIDIwMTctMDEtMjMKTWVzc2FnZS1pZDogMjAxNzAxMjMxNDI2MjkuMTExMTAtMS1iZXJyYW5n
+ZUByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnNldCAt
+ZQpnaXQgc3VibW9kdWxlIHVwZGF0ZSAtLWluaXQgZHRjCiMgTGV0IGRvY2tlciB0ZXN0cyBkdW1w
+IGVudmlyb25tZW50IGluZm8KZXhwb3J0IFNIT1dfRU5WPTEKZXhwb3J0IEo9MTYKbWFrZSBkb2Nr
+ZXItdGVzdC1xdWlja0BjZW50b3M2Cm1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhCm1ha2Ug
+ZG9ja2VyLXRlc3QtYnVpbGRAbWluLWdsaWIKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
+L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0
+Y2hldy8yMDE3MDEyMzE0MjYyOS4xMTExMC0xLWJlcnJhbmdlQHJlZGhhdC5jb20gLT4gcGF0Y2hl
+dy8yMDE3MDEyMzE0MjYyOS4xMTExMC0xLWJlcnJhbmdlQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0JwoyNTA3ZjkyIGlvOiBpbnRyb2R1Y2UgYSBETlMgcmVzb2x2ZXIg
+QVBJCmE5MDQxYjEgaW86IHJlbW92ZSBFcnJvciBwYXJhbWV0ZXIgZnJvbSBRSU9UYXNrIHRocmVh
+ZCB3b3JrZXIKYjE1MzAzNSBpbzogY2hhbmdlIHRoZSBRSU9UYXNrIGNhbGxiYWNrIHNpZ25hdHVy
+ZQo0N2ZiODhjIGlvOiBhZGQgYWJpbGl0eSB0byBhc3NvY2lhdGUgYW4gZXJyb3Igd2l0aCBhIHRh
+c2sKMThjYWZjYSBpbzogYWRkIGFiaWxpdHkgdG8gYXNzb2NpYXRlIGFuIG9wYXF1ZSAicmVzdWx0
+IiB3aXRoIHdpdGggYSB0YXNrCmNkNzk2Y2EgaW86IGZpeCB0eXBvIGluIGRvY3MgZm9yIFFJT1Rh
+c2sKNWJkNWMwNyBpbzogc3RvcCBpbmNyZW1lbnRpbmcgcmVmZXJlbmNlIGluIHFpb190YXNrX2dl
+dF9zb3VyY2UKZGNmZTBkOCBzb2NrZXRzOiBhZGQgYWJpbGl0eSB0byBkaXNhYmxlIEROUyByZXNv
+bHV0aW9uIGZvciBJbmV0U29ja2V0QWRkcmVzcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KU3VibW9k
+dWxlICdkdGMnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9kdGMuZ2l0KSByZWdpc3RlcmVk
+IGZvciBwYXRoICdkdGMnCkNsb25pbmcgaW50byAnZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRj
+JzogY2hlY2tlZCBvdXQgJzY1Y2M0ZDI3NDhhMmMyZTZmMjdmMWNmMzllMDdhNWRiYWJkODBlYmYn
+CiAgQlVJTEQgICBjZW50b3M2Cm1ha2VbMV06IEVudGVyaW5nIGRpcmVjdG9yeSBgL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLTRodmFxd3BjL3NyYycKICBBUkNISVZFIHFlbXUudGd6CiAgQVJD
+SElWRSBkdGMudGd6CiAgQ09QWSAgICBSVU5ORVIKICAgIFJVTiB0ZXN0LXF1aWNrIGluIHFlbXU6
+Y2VudG9zNiAKUGFja2FnZXMgaW5zdGFsbGVkOgpTREwtZGV2ZWwtMS4yLjE0LTcuZWw2XzcuMS54
+ODZfNjQKY2NhY2hlLTMuMS42LTIuZWw2Lng4Nl82NAplcGVsLXJlbGVhc2UtNi04Lm5vYXJjaApn
+Y2MtNC40LjctMTcuZWw2Lng4Nl82NApnaXQtMS43LjEtNC5lbDZfNy4xLng4Nl82NApnbGliMi1k
+ZXZlbC0yLjI4LjgtNS5lbDYueDg2XzY0CmxpYmZkdC1kZXZlbC0xLjQuMC0xLmVsNi54ODZfNjQK
+bWFrZS0zLjgxLTIzLmVsNi54ODZfNjQKcGFja2FnZSBnKysgaXMgbm90IGluc3RhbGxlZApwaXht
+YW4tZGV2ZWwtMC4zMi44LTEuZWw2Lng4Nl82NAp0YXItMS4yMy0xNS5lbDZfOC54ODZfNjQKemxp
+Yi1kZXZlbC0xLjIuMy0yOS5lbDYueDg2XzY0CgpFbnZpcm9ubWVudCB2YXJpYWJsZXM6ClBBQ0tB
+R0VTPWxpYmZkdC1kZXZlbCBjY2FjaGUgICAgIHRhciBnaXQgbWFrZSBnY2MgZysrICAgICB6bGli
+LWRldmVsIGdsaWIyLWRldmVsIFNETC1kZXZlbCBwaXhtYW4tZGV2ZWwgICAgIGVwZWwtcmVsZWFz
+ZQpIT1NUTkFNRT1jMTZkNjM3ZWQ0YWUKVEVSTT14dGVybQpNQUtFRkxBR1M9IC1qMTYKSElTVFNJ
+WkU9MTAwMApKPTE2ClVTRVI9cm9vdApDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZQpFWFRSQV9D
+T05GSUdVUkVfT1BUUz0KVj0KU0hPV19FTlY9MQpNQUlMPS92YXIvc3Bvb2wvbWFpbC9yb290ClBB
+VEg9L3Vzci9saWIvY2NhY2hlOi91c3IvbGliNjQvY2NhY2hlOi91c3IvbG9jYWwvc2JpbjovdXNy
+L2xvY2FsL2JpbjovdXNyL3NiaW46L3Vzci9iaW46L3NiaW46L2JpbgpQV0Q9LwpMQU5HPWVuX1VT
+LlVURi04ClRBUkdFVF9MSVNUPQpISVNUQ09OVFJPTD1pZ25vcmVkdXBzClNITFZMPTEKSE9NRT0v
+cm9vdApURVNUX0RJUj0vdG1wL3FlbXUtdGVzdApMT0dOQU1FPXJvb3QKTEVTU09QRU49fHwvdXNy
+L2Jpbi9sZXNzcGlwZS5zaCAlcwpGRUFUVVJFUz0gZHRjCkRFQlVHPQpHX0JST0tFTl9GSUxFTkFN
+RVM9MQpDQ0FDSEVfSEFTSERJUj0KXz0vdXNyL2Jpbi9lbnYKCkNvbmZpZ3VyZSBvcHRpb25zOgot
+LWVuYWJsZS13ZXJyb3IgLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0LXNvZnRt
+bXUgLS1wcmVmaXg9L3Zhci90bXAvcWVtdS1idWlsZC9pbnN0YWxsCk5vIEMrKyBjb21waWxlciBh
+dmFpbGFibGU7IGRpc2FibGluZyBDKysgc3BlY2lmaWMgb3B0aW9uYWwgY29kZQpJbnN0YWxsIHBy
+ZWZpeCAgICAvdmFyL3RtcC9xZW11LWJ1aWxkL2luc3RhbGwKQklPUyBkaXJlY3RvcnkgICAgL3Zh
+ci90bXAvcWVtdS1idWlsZC9pbnN0YWxsL3NoYXJlL3FlbXUKYmluYXJ5IGRpcmVjdG9yeSAgL3Zh
+ci90bXAvcWVtdS1idWlsZC9pbnN0YWxsL2JpbgpsaWJyYXJ5IGRpcmVjdG9yeSAvdmFyL3RtcC9x
+ZW11LWJ1aWxkL2luc3RhbGwvbGliCm1vZHVsZSBkaXJlY3RvcnkgIC92YXIvdG1wL3FlbXUtYnVp
+bGQvaW5zdGFsbC9saWIvcWVtdQpsaWJleGVjIGRpcmVjdG9yeSAvdmFyL3RtcC9xZW11LWJ1aWxk
+L2luc3RhbGwvbGliZXhlYwppbmNsdWRlIGRpcmVjdG9yeSAvdmFyL3RtcC9xZW11LWJ1aWxkL2lu
+c3RhbGwvaW5jbHVkZQpjb25maWcgZGlyZWN0b3J5ICAvdmFyL3RtcC9xZW11LWJ1aWxkL2luc3Rh
+bGwvZXRjCmxvY2FsIHN0YXRlIGRpcmVjdG9yeSAgIC92YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFs
+bC92YXIKTWFudWFsIGRpcmVjdG9yeSAgL3Zhci90bXAvcWVtdS1idWlsZC9pbnN0YWxsL3NoYXJl
+L21hbgpFTEYgaW50ZXJwIHByZWZpeCAvdXNyL2duZW11bC9xZW11LSVNClNvdXJjZSBwYXRoICAg
+ICAgIC90bXAvcWVtdS10ZXN0L3NyYwpDIGNvbXBpbGVyICAgICAgICBjYwpIb3N0IEMgY29tcGls
+ZXIgICBjYwpDKysgY29tcGlsZXIgICAgICAKT2JqZWN0aXZlLUMgY29tcGlsZXIgY2MKQVJGTEFH
+UyAgICAgICAgICAgcnYKQ0ZMQUdTICAgICAgICAgICAgLU8yIC1VX0ZPUlRJRllfU09VUkNFIC1E
+X0ZPUlRJRllfU09VUkNFPTIgLWcgClFFTVVfQ0ZMQUdTICAgICAgIC1JL3Vzci9pbmNsdWRlL3Bp
+eG1hbi0xICAgIC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9n
+bGliLTIuMC9pbmNsdWRlICAgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURfR05VX1NPVVJDRSAt
+RF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90
+eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21p
+c3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2
+ICAtV2VuZGlmLWxhYmVscyAtV21pc3NpbmctaW5jbHVkZS1kaXJzIC1XZW1wdHktYm9keSAtV25l
+c3RlZC1leHRlcm5zIC1XZm9ybWF0LXNlY3VyaXR5IC1XZm9ybWF0LXkyayAtV2luaXQtc2VsZiAt
+V2lnbm9yZWQtcXVhbGlmaWVycyAtV29sZC1zdHlsZS1kZWNsYXJhdGlvbiAtV29sZC1zdHlsZS1k
+ZWZpbml0aW9uIC1XdHlwZS1saW1pdHMgLWZzdGFjay1wcm90ZWN0b3ItYWxsCkxERkxBR1MgICAg
+ICAgICAgIC1XbCwtLXdhcm4tY29tbW9uIC1XbCwteixyZWxybyAtV2wsLXosbm93IC1waWUgLW02
+NCAtZyAKbWFrZSAgICAgICAgICAgICAgbWFrZQppbnN0YWxsICAgICAgICAgICBpbnN0YWxsCnB5
+dGhvbiAgICAgICAgICAgIHB5dGhvbiAtQgpzbWJkICAgICAgICAgICAgICAvdXNyL3NiaW4vc21i
+ZAptb2R1bGUgc3VwcG9ydCAgICBubwpob3N0IENQVSAgICAgICAgICB4ODZfNjQKaG9zdCBiaWcg
+ZW5kaWFuICAgbm8KdGFyZ2V0IGxpc3QgICAgICAgeDg2XzY0LXNvZnRtbXUgYWFyY2g2NC1zb2Z0
+bW11CnRjZyBkZWJ1ZyBlbmFibGVkIG5vCmdwcm9mIGVuYWJsZWQgICAgIG5vCnNwYXJzZSBlbmFi
+bGVkICAgIG5vCnN0cmlwIGJpbmFyaWVzICAgIHllcwpwcm9maWxlciAgICAgICAgICBubwpzdGF0
+aWMgYnVpbGQgICAgICBubwpwaXhtYW4gICAgICAgICAgICBzeXN0ZW0KU0RMIHN1cHBvcnQgICAg
+ICAgeWVzICgxLjIuMTQpCkdUSyBzdXBwb3J0ICAgICAgIG5vIApHVEsgR0wgc3VwcG9ydCAgICBu
+bwpWVEUgc3VwcG9ydCAgICAgICBubyAKVExTIHByaW9yaXR5ICAgICAgTk9STUFMCkdOVVRMUyBz
+dXBwb3J0ICAgIG5vCkdOVVRMUyBybmQgICAgICAgIG5vCmxpYmdjcnlwdCAgICAgICAgIG5vCmxp
+YmdjcnlwdCBrZGYgICAgIG5vCm5ldHRsZSAgICAgICAgICAgIG5vIApuZXR0bGUga2RmICAgICAg
+ICBubwpsaWJ0YXNuMSAgICAgICAgICBubwpjdXJzZXMgc3VwcG9ydCAgICBubwp2aXJnbCBzdXBw
+b3J0ICAgICBubwpjdXJsIHN1cHBvcnQgICAgICBubwptaW5ndzMyIHN1cHBvcnQgICBubwpBdWRp
+byBkcml2ZXJzICAgICBvc3MKQmxvY2sgd2hpdGVsaXN0IChydykgCkJsb2NrIHdoaXRlbGlzdCAo
+cm8pIApWaXJ0RlMgc3VwcG9ydCAgICBubwpWTkMgc3VwcG9ydCAgICAgICB5ZXMKVk5DIFNBU0wg
+c3VwcG9ydCAgbm8KVk5DIEpQRUcgc3VwcG9ydCAgbm8KVk5DIFBORyBzdXBwb3J0ICAgbm8KeGVu
+IHN1cHBvcnQgICAgICAgbm8KYnJsYXBpIHN1cHBvcnQgICAgbm8KYmx1ZXogIHN1cHBvcnQgICAg
+bm8KRG9jdW1lbnRhdGlvbiAgICAgbm8KUElFICAgICAgICAgICAgICAgeWVzCnZkZSBzdXBwb3J0
+ICAgICAgIG5vCm5ldG1hcCBzdXBwb3J0ICAgIG5vCkxpbnV4IEFJTyBzdXBwb3J0IG5vCkFUVFIv
+WEFUVFIgc3VwcG9ydCB5ZXMKSW5zdGFsbCBibG9icyAgICAgeWVzCktWTSBzdXBwb3J0ICAgICAg
+IHllcwpIQVggc3VwcG9ydCAgICAgICBubwpSRE1BIHN1cHBvcnQgICAgICBubwpUQ0cgaW50ZXJw
+cmV0ZXIgICBubwpmZHQgc3VwcG9ydCAgICAgICB5ZXMKcHJlYWR2IHN1cHBvcnQgICAgeWVzCmZk
+YXRhc3luYyAgICAgICAgIHllcwptYWR2aXNlICAgICAgICAgICB5ZXMKcG9zaXhfbWFkdmlzZSAg
+ICAgeWVzCmxpYmNhcC1uZyBzdXBwb3J0IG5vCnZob3N0LW5ldCBzdXBwb3J0IHllcwp2aG9zdC1z
+Y3NpIHN1cHBvcnQgeWVzCnZob3N0LXZzb2NrIHN1cHBvcnQgeWVzClRyYWNlIGJhY2tlbmRzICAg
+IGxvZwpzcGljZSBzdXBwb3J0ICAgICBubyAKcmJkIHN1cHBvcnQgICAgICAgbm8KeGZzY3RsIHN1
+cHBvcnQgICAgbm8Kc21hcnRjYXJkIHN1cHBvcnQgbm8KbGlidXNiICAgICAgICAgICAgbm8KdXNi
+IG5ldCByZWRpciAgICAgbm8KT3BlbkdMIHN1cHBvcnQgICAgbm8KT3BlbkdMIGRtYWJ1ZnMgICAg
+bm8KbGliaXNjc2kgc3VwcG9ydCAgbm8KbGlibmZzIHN1cHBvcnQgICAgbm8KYnVpbGQgZ3Vlc3Qg
+YWdlbnQgeWVzClFHQSBWU1Mgc3VwcG9ydCAgIG5vClFHQSB3MzIgZGlzayBpbmZvIG5vClFHQSBN
+U0kgc3VwcG9ydCAgIG5vCnNlY2NvbXAgc3VwcG9ydCAgIG5vCmNvcm91dGluZSBiYWNrZW5kIHVj
+b250ZXh0CmNvcm91dGluZSBwb29sICAgIHllcwpkZWJ1ZyBzdGFjayB1c2FnZSBubwpHbHVzdGVy
+RlMgc3VwcG9ydCBubwpBcmNoaXBlbGFnbyBzdXBwb3J0IG5vCmdjb3YgICAgICAgICAgICAgIGdj
+b3YKZ2NvdiBlbmFibGVkICAgICAgbm8KVFBNIHN1cHBvcnQgICAgICAgeWVzCmxpYnNzaDIgc3Vw
+cG9ydCAgIG5vClRQTSBwYXNzdGhyb3VnaCAgIHllcwpRT00gZGVidWdnaW5nICAgICB5ZXMKbHpv
+IHN1cHBvcnQgICAgICAgbm8Kc25hcHB5IHN1cHBvcnQgICAgbm8KYnppcDIgc3VwcG9ydCAgICAg
+bm8KTlVNQSBob3N0IHN1cHBvcnQgbm8KdGNtYWxsb2Mgc3VwcG9ydCAgbm8KamVtYWxsb2Mgc3Vw
+cG9ydCAgbm8KYXZ4MiBvcHRpbWl6YXRpb24gbm8KcmVwbGljYXRpb24gc3VwcG9ydCB5ZXMKICBH
+RU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1kZXZpY2VzLm1hay50bXAKICBHRU4gICAgIGFh
+cmNoNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsudG1wCiAgR0VOICAgICBjb25maWctaG9z
+dC5oCiAgR0VOICAgICBxZW11LW9wdGlvbnMuZGVmCiAgR0VOICAgICBxbXAtY29tbWFuZHMuaAog
+IEdFTiAgICAgcWFwaS10eXBlcy5oCiAgR0VOICAgICBxYXBpLXZpc2l0LmgKICBHRU4gICAgIHFh
+cGktZXZlbnQuaAogIEdFTiAgICAgcW1wLWludHJvc3BlY3QuaAogIEdFTiAgICAgbW9kdWxlX2Js
+b2NrLmgKICBHRU4gICAgIHRlc3RzL3Rlc3QtcWFwaS10eXBlcy5oCiAgR0VOICAgICB0ZXN0cy90
+ZXN0LXFtcC1jb21tYW5kcy5oCiAgR0VOICAgICB0ZXN0cy90ZXN0LXFhcGktdmlzaXQuaAogIEdF
+TiAgICAgdGVzdHMvdGVzdC1xYXBpLWV2ZW50LmgKICBHRU4gICAgIHRlc3RzL3Rlc3QtcW1wLWlu
+dHJvc3BlY3QuaAogIEdFTiAgICAgdHJhY2UvZ2VuZXJhdGVkLXRyYWNlcnMuaAogIEdFTiAgICAg
+eDg2XzY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFrCiAgR0VOICAgICBhYXJjaDY0LXNvZnRt
+bXUvY29uZmlnLWRldmljZXMubWFrCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtdGNnLXRyYWNl
+cnMuaAogIEdFTiAgICAgdHJhY2UvZ2VuZXJhdGVkLWhlbHBlcnMtd3JhcHBlcnMuaAogIEdFTiAg
+ICAgdHJhY2UvZ2VuZXJhdGVkLWhlbHBlcnMuaAogIEdFTiAgICAgY29uZmlnLWFsbC1kZXZpY2Vz
+Lm1hawogIENDICAgICAgdGVzdHMvcWVtdS1pb3Rlc3RzL3NvY2tldF9zY21faGVscGVyLm8KICBH
+RU4gICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS10eXBlcy5oCiAgR0VOICAgICBxZ2Ev
+cWFwaS1nZW5lcmF0ZWQvcWdhLXFhcGktdmlzaXQuaAogIEdFTiAgICAgcWdhL3FhcGktZ2VuZXJh
+dGVkL3FnYS1xbXAtY29tbWFuZHMuaAogIEdFTiAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1x
+YXBpLXR5cGVzLmMKICBHRU4gICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS12aXNpdC5j
+CiAgR0VOICAgICBxYXBpLXZpc2l0LmMKICBHRU4gICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2Et
+cW1wLW1hcnNoYWwuYwogIEdFTiAgICAgcW1wLWludHJvc3BlY3QuYwogIEdFTiAgICAgcWFwaS10
+eXBlcy5jCiAgR0VOICAgICBxYXBpLWV2ZW50LmMKICBDQyAgICAgIHFhcGkvcWFwaS12aXNpdC1j
+b3JlLm8KICBDQyAgICAgIHFhcGkvcWFwaS1kZWFsbG9jLXZpc2l0b3IubwogIENDICAgICAgcWFw
+aS9xb2JqZWN0LWlucHV0LXZpc2l0b3IubwogIENDICAgICAgcWFwaS9xb2JqZWN0LW91dHB1dC12
+aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvcW1wLXJlZ2lzdHJ5Lm8KICBDQyAgICAgIHFhcGkvcW1w
+LWRpc3BhdGNoLm8KICBDQyAgICAgIHFhcGkvc3RyaW5nLWlucHV0LXZpc2l0b3IubwogIENDICAg
+ICAgcWFwaS9zdHJpbmctb3V0cHV0LXZpc2l0b3IubwogIENDICAgICAgcWFwaS9xbXAtZXZlbnQu
+bwogIENDICAgICAgcWFwaS9vcHRzLXZpc2l0b3IubwogIENDICAgICAgcWFwaS9xYXBpLXV0aWwu
+bwogIENDICAgICAgcWFwaS9xYXBpLWNsb25lLXZpc2l0b3IubwogIENDICAgICAgcW9iamVjdC9x
+bnVsbC5vCiAgQ0MgICAgICBxb2JqZWN0L3FpbnQubwogIENDICAgICAgcW9iamVjdC9xc3RyaW5n
+Lm8KICBDQyAgICAgIHFvYmplY3QvcWRpY3QubwogIENDICAgICAgcW9iamVjdC9xbGlzdC5vCiAg
+Q0MgICAgICBxb2JqZWN0L3FmbG9hdC5vCiAgQ0MgICAgICBxb2JqZWN0L3Fib29sLm8KICBDQyAg
+ICAgIHFvYmplY3QvcWpzb24ubwogIENDICAgICAgcW9iamVjdC9xb2JqZWN0Lm8KICBDQyAgICAg
+IHFvYmplY3QvanNvbi1sZXhlci5vCiAgQ0MgICAgICBxb2JqZWN0L2pzb24tc3RyZWFtZXIubwog
+IENDICAgICAgcW9iamVjdC9qc29uLXBhcnNlci5vCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQt
+dHJhY2Vycy5jCiAgQ0MgICAgICB0cmFjZS9jb250cm9sLm8KICBDQyAgICAgIHRyYWNlL3FtcC5v
+CiAgQ0MgICAgICB1dGlsL29zZGVwLm8KICBDQyAgICAgIHV0aWwvY3V0aWxzLm8KICBDQyAgICAg
+IHV0aWwvdW5pY29kZS5vCiAgQ0MgICAgICB1dGlsL3FlbXUtdGltZXItY29tbW9uLm8KICBDQyAg
+ICAgIHV0aWwvYnVmZmVyaXN6ZXJvLm8KICBDQyAgICAgIHV0aWwvbG9ja2NudC5vCiAgQ0MgICAg
+ICB1dGlsL2NvbXBhdGZkLm8KICBDQyAgICAgIHV0aWwvZXZlbnRfbm90aWZpZXItcG9zaXgubwog
+IENDICAgICAgdXRpbC9tbWFwLWFsbG9jLm8KICBDQyAgICAgIHV0aWwvb3NsaWItcG9zaXgubwog
+IENDICAgICAgdXRpbC9xZW11LW9wZW5wdHkubwogIENDICAgICAgdXRpbC9xZW11LXRocmVhZC1w
+b3NpeC5vCiAgQ0MgICAgICB1dGlsL21lbWZkLm8KICBDQyAgICAgIHV0aWwvZW52bGlzdC5vCiAg
+Q0MgICAgICB1dGlsL3BhdGgubwogIENDICAgICAgdXRpbC9tb2R1bGUubwogIENDICAgICAgdXRp
+bC9iaXRtYXAubwogIENDICAgICAgdXRpbC9iaXRvcHMubwogIENDICAgICAgdXRpbC9maWZvOC5v
+CiAgQ0MgICAgICB1dGlsL2hiaXRtYXAubwogIENDICAgICAgdXRpbC9hY2wubwogIENDICAgICAg
+dXRpbC9lcnJvci5vCiAgQ0MgICAgICB1dGlsL3FlbXUtZXJyb3IubwogIENDICAgICAgdXRpbC9p
+ZC5vCiAgQ0MgICAgICB1dGlsL2lvdi5vCiAgQ0MgICAgICB1dGlsL3FlbXUtY29uZmlnLm8KICBD
+QyAgICAgIHV0aWwvcWVtdS1zb2NrZXRzLm8KICBDQyAgICAgIHV0aWwvdXJpLm8KICBDQyAgICAg
+IHV0aWwvbm90aWZ5Lm8KICBDQyAgICAgIHV0aWwvcWVtdS1vcHRpb24ubwogIENDICAgICAgdXRp
+bC9xZW11LXByb2dyZXNzLm8KICBDQyAgICAgIHV0aWwvaGV4ZHVtcC5vCiAgQ0MgICAgICB1dGls
+L2NyYzMyYy5vCiAgQ0MgICAgICB1dGlsL3V1aWQubwogIENDICAgICAgdXRpbC90aHJvdHRsZS5v
+CiAgQ0MgICAgICB1dGlsL2dldGF1eHZhbC5vCiAgQ0MgICAgICB1dGlsL3JlYWRsaW5lLm8KICBD
+QyAgICAgIHV0aWwvcmN1Lm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRpbmUubwogIENDICAg
+ICAgdXRpbC9xZW11LWNvcm91dGluZS1sb2NrLm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRp
+bmUtaW8ubwogIENDICAgICAgdXRpbC9xZW11LWNvcm91dGluZS1zbGVlcC5vCiAgQ0MgICAgICB1
+dGlsL2Nvcm91dGluZS11Y29udGV4dC5vCiAgQ0MgICAgICB1dGlsL2J1ZmZlci5vCiAgQ0MgICAg
+ICB1dGlsL3RpbWVkLWF2ZXJhZ2UubwogIENDICAgICAgdXRpbC9iYXNlNjQubwogIENDICAgICAg
+dXRpbC9sb2cubwogIENDICAgICAgdXRpbC9xZGlzdC5vCiAgQ0MgICAgICB1dGlsL3FodC5vCiAg
+Q0MgICAgICB1dGlsL3JhbmdlLm8KICBDQyAgICAgIGNyeXB0by9wYmtkZi1zdHViLm8KICBDQyAg
+ICAgIHN0dWJzL2FyY2gtcXVlcnktY3B1LWRlZi5vCiAgQ0MgICAgICBzdHVicy9hcmNoLXF1ZXJ5
+LWNwdS1tb2RlbC1leHBhbnNpb24ubwogIENDICAgICAgc3R1YnMvYXJjaC1xdWVyeS1jcHUtbW9k
+ZWwtY29tcGFyaXNvbi5vCiAgQ0MgICAgICBzdHVicy9hcmNoLXF1ZXJ5LWNwdS1tb2RlbC1iYXNl
+bGluZS5vCiAgQ0MgICAgICBzdHVicy9iZHJ2LW5leHQtbW9uaXRvci1vd25lZC5vCiAgQ0MgICAg
+ICBzdHVicy9ibGstY29tbWl0LWFsbC5vCiAgQ0MgICAgICBzdHVicy9ibG9ja2Rldi1jbG9zZS1h
+bGwtYmRydi1zdGF0ZXMubwogIENDICAgICAgc3R1YnMvY2xvY2std2FycC5vCiAgQ0MgICAgICBz
+dHVicy9jcHUtZ2V0LWNsb2NrLm8KICBDQyAgICAgIHN0dWJzL2NwdS1nZXQtaWNvdW50Lm8KICBD
+QyAgICAgIHN0dWJzL2R1bXAubwogIENDICAgICAgc3R1YnMvZXJyb3ItcHJpbnRmLm8KICBDQyAg
+ICAgIHN0dWJzL2Zkc2V0Lm8KICBDQyAgICAgIHN0dWJzL2dkYnN0dWIubwogIENDICAgICAgc3R1
+YnMvaW90aHJlYWQubwogIENDICAgICAgc3R1YnMvZ2V0LXZtLW5hbWUubwogIENDICAgICAgc3R1
+YnMvaW90aHJlYWQtbG9jay5vCiAgQ0MgICAgICBzdHVicy9pcy1kYWVtb25pemVkLm8KICBDQyAg
+ICAgIHN0dWJzL21hY2hpbmUtaW5pdC1kb25lLm8KICBDQyAgICAgIHN0dWJzL21pZ3ItYmxvY2tl
+ci5vCiAgQ0MgICAgICBzdHVicy9tb25pdG9yLm8KICBDQyAgICAgIHN0dWJzL25vdGlmeS1ldmVu
+dC5vCiAgQ0MgICAgICBzdHVicy9xdGVzdC5vCiAgQ0MgICAgICBzdHVicy9yZXBsYXkubwogIEND
+ICAgICAgc3R1YnMvcnVuc3RhdGUtY2hlY2subwogIENDICAgICAgc3R1YnMvc2V0LWZkLWhhbmRs
+ZXIubwogIENDICAgICAgc3R1YnMvc2xpcnAubwogIENDICAgICAgc3R1YnMvc3lzYnVzLm8KICBD
+QyAgICAgIHN0dWJzL3RyYWNlLWNvbnRyb2wubwogIENDICAgICAgc3R1YnMvdXVpZC5vCiAgQ0Mg
+ICAgICBzdHVicy92bS1zdG9wLm8KICBDQyAgICAgIHN0dWJzL3Ztc3RhdGUubwogIENDICAgICAg
+c3R1YnMvcW1wX3BjX2RpbW1fZGV2aWNlX2xpc3QubwogIENDICAgICAgc3R1YnMvdGFyZ2V0LW1v
+bml0b3ItZGVmcy5vCiAgQ0MgICAgICBzdHVicy90YXJnZXQtZ2V0LW1vbml0b3ItZGVmLm8KICBD
+QyAgICAgIHN0dWJzL3BjX21hZHRfY3B1X2VudHJ5Lm8KICBDQyAgICAgIGNvbnRyaWIvaXZzaG1l
+bS1jbGllbnQvaXZzaG1lbS1jbGllbnQubwogIENDICAgICAgY29udHJpYi9pdnNobWVtLWNsaWVu
+dC9tYWluLm8KICBDQyAgICAgIGNvbnRyaWIvaXZzaG1lbS1zZXJ2ZXIvaXZzaG1lbS1zZXJ2ZXIu
+bwogIENDICAgICAgY29udHJpYi9pdnNobWVtLXNlcnZlci9tYWluLm8KICBDQyAgICAgIHFlbXUt
+bmJkLm8KICBDQyAgICAgIGFzeW5jLm8KICBDQyAgICAgIHRocmVhZC1wb29sLm8KICBDQyAgICAg
+IGJsb2NrLm8KICBDQyAgICAgIGJsb2Nram9iLm8KICBDQyAgICAgIG1haW4tbG9vcC5vCiAgQ0Mg
+ICAgICBpb2hhbmRsZXIubwogIENDICAgICAgcWVtdS10aW1lci5vCiAgQ0MgICAgICBhaW8tcG9z
+aXgubwogIENDICAgICAgcWVtdS1pby1jbWRzLm8KICBDQyAgICAgIHJlcGxpY2F0aW9uLm8KICBD
+QyAgICAgIGJsb2NrL3Jhdy1mb3JtYXQubwogIENDICAgICAgYmxvY2svcWNvdy5vCiAgQ0MgICAg
+ICBibG9jay92ZGkubwogIENDICAgICAgYmxvY2svdm1kay5vCiAgQ0MgICAgICBibG9jay9jbG9v
+cC5vCiAgQ0MgICAgICBibG9jay9ib2Nocy5vCiAgQ0MgICAgICBibG9jay92cGMubwogIENDICAg
+ICAgYmxvY2svdnZmYXQubwogIENDICAgICAgYmxvY2svZG1nLm8KICBDQyAgICAgIGJsb2NrL3Fj
+b3cyLm8KICBDQyAgICAgIGJsb2NrL3Fjb3cyLXJlZmNvdW50Lm8KICBDQyAgICAgIGJsb2NrL3Fj
+b3cyLWNsdXN0ZXIubwogIENDICAgICAgYmxvY2svcWNvdzItc25hcHNob3QubwogIENDICAgICAg
+YmxvY2svcWNvdzItY2FjaGUubwogIENDICAgICAgYmxvY2svcWVkLm8KICBDQyAgICAgIGJsb2Nr
+L3FlZC1nZW5jYi5vCiAgQ0MgICAgICBibG9jay9xZWQtbDItY2FjaGUubwogIENDICAgICAgYmxv
+Y2svcWVkLXRhYmxlLm8KICBDQyAgICAgIGJsb2NrL3FlZC1jbHVzdGVyLm8KICBDQyAgICAgIGJs
+b2NrL3FlZC1jaGVjay5vCiAgQ0MgICAgICBibG9jay92aGR4Lm8KICBDQyAgICAgIGJsb2NrL3Zo
+ZHgtZW5kaWFuLm8KICBDQyAgICAgIGJsb2NrL3ZoZHgtbG9nLm8KICBDQyAgICAgIGJsb2NrL3F1
+b3J1bS5vCiAgQ0MgICAgICBibG9jay9wYXJhbGxlbHMubwogIENDICAgICAgYmxvY2svYmxrZGVi
+dWcubwogIENDICAgICAgYmxvY2svYmxrdmVyaWZ5Lm8KICBDQyAgICAgIGJsb2NrL2Jsa3JlcGxh
+eS5vCiAgQ0MgICAgICBibG9jay9ibG9jay1iYWNrZW5kLm8KICBDQyAgICAgIGJsb2NrL3NuYXBz
+aG90Lm8KICBDQyAgICAgIGJsb2NrL3FhcGkubwogIENDICAgICAgYmxvY2svZmlsZS1wb3NpeC5v
+CiAgQ0MgICAgICBibG9jay9udWxsLm8KICBDQyAgICAgIGJsb2NrL21pcnJvci5vCiAgQ0MgICAg
+ICBibG9jay9jb21taXQubwogIENDICAgICAgYmxvY2svaW8ubwogIENDICAgICAgYmxvY2svdGhy
+b3R0bGUtZ3JvdXBzLm8KICBDQyAgICAgIGJsb2NrL25iZC5vCiAgQ0MgICAgICBibG9jay9uYmQt
+Y2xpZW50Lm8KICBDQyAgICAgIGJsb2NrL3NoZWVwZG9nLm8KICBDQyAgICAgIGJsb2NrL2FjY291
+bnRpbmcubwogIENDICAgICAgYmxvY2svZGlydHktYml0bWFwLm8KICBDQyAgICAgIGJsb2NrL3dy
+aXRlLXRocmVzaG9sZC5vCiAgQ0MgICAgICBibG9jay9iYWNrdXAubwogIENDICAgICAgYmxvY2sv
+cmVwbGljYXRpb24ubwogIENDICAgICAgYmxvY2svY3J5cHRvLm8KICBDQyAgICAgIG5iZC9zZXJ2
+ZXIubwogIENDICAgICAgbmJkL2NsaWVudC5vCiAgQ0MgICAgICBuYmQvY29tbW9uLm8KICBDQyAg
+ICAgIGNyeXB0by9pbml0Lm8KICBDQyAgICAgIGNyeXB0by9oYXNoLm8KICBDQyAgICAgIGNyeXB0
+by9oYXNoLWdsaWIubwogIENDICAgICAgY3J5cHRvL2htYWMubwogIENDICAgICAgY3J5cHRvL2ht
+YWMtZ2xpYi5vCiAgQ0MgICAgICBjcnlwdG8vYWVzLm8KICBDQyAgICAgIGNyeXB0by9kZXNyZmIu
+bwogIENDICAgICAgY3J5cHRvL2NpcGhlci5vCiAgQ0MgICAgICBjcnlwdG8vdGxzY3JlZHMubwog
+IENDICAgICAgY3J5cHRvL3Rsc2NyZWRzYW5vbi5vCiAgQ0MgICAgICBjcnlwdG8vdGxzY3JlZHN4
+NTA5Lm8KICBDQyAgICAgIGNyeXB0by90bHNzZXNzaW9uLm8KICBDQyAgICAgIGNyeXB0by9zZWNy
+ZXQubwogIENDICAgICAgY3J5cHRvL3JhbmRvbS1wbGF0Zm9ybS5vCiAgQ0MgICAgICBjcnlwdG8v
+cGJrZGYubwogIENDICAgICAgY3J5cHRvL2l2Z2VuLm8KICBDQyAgICAgIGNyeXB0by9pdmdlbi1l
+c3Npdi5vCiAgQ0MgICAgICBjcnlwdG8vaXZnZW4tcGxhaW4ubwogIENDICAgICAgY3J5cHRvL2l2
+Z2VuLXBsYWluNjQubwogIENDICAgICAgY3J5cHRvL2Fmc3BsaXQubwogIENDICAgICAgY3J5cHRv
+L3h0cy5vCiAgQ0MgICAgICBjcnlwdG8vYmxvY2subwogIENDICAgICAgY3J5cHRvL2Jsb2NrLXFj
+b3cubwogIENDICAgICAgY3J5cHRvL2Jsb2NrLWx1a3MubwogIENDICAgICAgaW8vY2hhbm5lbC5v
+CiAgQ0MgICAgICBpby9jaGFubmVsLWJ1ZmZlci5vCiAgQ0MgICAgICBpby9jaGFubmVsLWNvbW1h
+bmQubwogIENDICAgICAgaW8vY2hhbm5lbC1maWxlLm8KICBDQyAgICAgIGlvL2NoYW5uZWwtc29j
+a2V0Lm8KICBDQyAgICAgIGlvL2NoYW5uZWwtdGxzLm8KICBDQyAgICAgIGlvL2NoYW5uZWwtd2F0
+Y2gubwogIENDICAgICAgaW8vY2hhbm5lbC13ZWJzb2NrLm8KICBDQyAgICAgIGlvL2NoYW5uZWwt
+dXRpbC5vCiAgQ0MgICAgICBpby9kbnMtcmVzb2x2ZXIubwogIENDICAgICAgaW8vdGFzay5vCiAg
+Q0MgICAgICBxb20vb2JqZWN0Lm8KICBDQyAgICAgIHFvbS9jb250YWluZXIubwogIENDICAgICAg
+cW9tL3FvbS1xb2JqZWN0Lm8KICBDQyAgICAgIHFvbS9vYmplY3RfaW50ZXJmYWNlcy5vCiAgR0VO
+ICAgICBxZW11LWltZy1jbWRzLmgKICBDQyAgICAgIHFlbXUtaW8ubwogIENDICAgICAgcWVtdS1i
+cmlkZ2UtaGVscGVyLm8KICBDQyAgICAgIGJsb2NrZGV2Lm8KICBDQyAgICAgIGJsb2NrZGV2LW5i
+ZC5vCi90bXAvcWVtdS10ZXN0L3NyYy9pby9kbnMtcmVzb2x2ZXIuYzozMDogZXJyb3I6IOKAmFBU
+SFJFQURfT05DRV9JTklU4oCZIHVuZGVjbGFyZWQgaGVyZSAobm90IGluIGEgZnVuY3Rpb24pCi90
+bXAvcWVtdS10ZXN0L3NyYy9pby9kbnMtcmVzb2x2ZXIuYzogSW4gZnVuY3Rpb24g4oCYcWlvX2Ru
+c19yZXNvbHZlcl9nZXRfaW5zdGFuY2XigJk6Ci90bXAvcWVtdS10ZXN0L3NyYy9pby9kbnMtcmVz
+b2x2ZXIuYzozOTogd2FybmluZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCY
+cHRocmVhZF9vbmNl4oCZCi90bXAvcWVtdS10ZXN0L3NyYy9pby9kbnMtcmVzb2x2ZXIuYzozOTog
+d2FybmluZzogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiDigJhwdGhyZWFkX29uY2XigJkK
+bWFrZTogKioqIFtpby9kbnMtcmVzb2x2ZXIub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBm
+b3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDIK
+bWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC00
+aHZhcXdwYy9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczZdIEVy
+cm9yIDIKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
+MgoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QGZyZWVsaXN0cy5vcmc=
