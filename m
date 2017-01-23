@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVdmx-0003wr-SR
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:32:00 -0500
+	(envelope-from <famz@redhat.com>) id 1cVdmz-00040G-J3
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:32:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVdmx-0005tf-7m
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:31:59 -0500
+	(envelope-from <famz@redhat.com>) id 1cVdmy-0005u9-Lu
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:32:01 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Mon, 23 Jan 2017 20:30:42 +0800
-Message-Id: <20170123123056.30383-3-famz@redhat.com>
+Date: Mon, 23 Jan 2017 20:30:41 +0800
+Message-Id: <20170123123056.30383-2-famz@redhat.com>
 In-Reply-To: <20170123123056.30383-1-famz@redhat.com>
 References: <20170123123056.30383-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 02/16] block: Define BDRV_O_SHARE_RW
+Subject: [Qemu-devel] [PATCH v12 01/16] osdep: Add qemu_lock_fd and
+ qemu_unlock_fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,23 +23,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>
 
+They are wrappers of POSIX fcntl "file private locking", with a
+convenient "try lock" wrapper implemented with F_OFD_GETLK.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- include/block/block.h | 2 ++
- 1 file changed, 2 insertions(+)
+ include/qemu/osdep.h |  3 +++
+ util/osdep.c         | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 8b0dcda..243839d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -97,6 +97,8 @@ typedef struct HDGeometry {
-                                       select an appropriate protocol driver,
-                                       ignoring the format layer */
- #define BDRV_O_NO_IO       0x10000 /* don't initialize for I/O */
-+#define BDRV_O_SHARE_RW    0x20000 /* accept shared read-write from other users
-+                                      of the image */
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 689f253..e864fe8 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -297,6 +297,9 @@ int qemu_close(int fd);
+ #ifndef _WIN32
+ int qemu_dup(int fd);
+ #endif
++int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
++int qemu_unlock_fd(int fd, int64_t start, int64_t len);
++int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
  
- #define BDRV_O_CACHE_MASK  (BDRV_O_NOCACHE | BDRV_O_NO_FLUSH)
+ #if defined(__HAIKU__) && defined(__i386__)
+ #define FMT_pid "%ld"
+diff --git a/util/osdep.c b/util/osdep.c
+index 06fb1cf..3de4a18 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -140,6 +140,54 @@ static int qemu_parse_fdset(const char *param)
+ {
+     return qemu_parse_fd(param);
+ }
++
++static int qemu_lock_fcntl(int fd, int64_t start, int64_t len, int fl_type)
++{
++#ifdef F_OFD_SETLK
++    int ret;
++    struct flock fl = {
++        .l_whence = SEEK_SET,
++        .l_start  = start,
++        .l_len    = len,
++        .l_type   = fl_type,
++    };
++    ret = fcntl(fd, F_OFD_SETLK, &fl);
++    return ret == -1 ? -errno : 0;
++#else
++    return -ENOTSUP;
++#endif
++}
++
++int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive)
++{
++    return qemu_lock_fcntl(fd, start, len, exclusive ? F_WRLCK : F_RDLCK);
++}
++
++int qemu_unlock_fd(int fd, int64_t start, int64_t len)
++{
++    return qemu_lock_fcntl(fd, start, len, F_UNLCK);
++}
++
++int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive)
++{
++#ifdef F_OFD_SETLK
++    int ret;
++    struct flock fl = {
++        .l_whence = SEEK_SET,
++        .l_start  = start,
++        .l_len    = len,
++        .l_type   = exclusive ? F_WRLCK : F_RDLCK,
++    };
++    ret = fcntl(fd, F_OFD_GETLK, &fl);
++    if (ret == -1) {
++        return -errno;
++    } else {
++        return fl.l_type == F_UNLCK ? 0 : -EAGAIN;
++    }
++#else
++    return -ENOTSUP;
++#endif
++}
+ #endif
  
+ /*
 -- 
 2.9.3
