@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVixX-00062L-UL
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:03:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1cVizj-0007HI-6H
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:05:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVixT-00024t-Av
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:03:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cVixT-000247-2d
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:03:11 -0500
-Date: Mon, 23 Jan 2017 11:03:08 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170123110308.5d36ce87@t450s.home>
-In-Reply-To: <20170123033429.GF26526@pxdev.xzpeter.org>
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-19-git-send-email-peterx@redhat.com>
-	<490bbb84-213b-1b2a-5a1b-fa42a5c6a359@redhat.com>
-	<20170122090425.GB26526@pxdev.xzpeter.org>
-	<1dd223d1-dc02-bddc-02ea-78d267dd40a4@redhat.com>
-	<20170123033429.GF26526@pxdev.xzpeter.org>
+	(envelope-from <bounces@canonical.com>) id 1cVize-0002rL-LR
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:05:31 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54729)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cVize-0002rE-G5
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:05:26 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cVizd-0005S3-Hc
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 18:05:25 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 79FF82E80C2
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 18:05:25 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v4 18/20] intel_iommu: enable vfio
- devices
+Date: Mon, 23 Jan 2017 17:48:35 -0000
+From: Thomas Huth <1248168@bugs.launchpad.net>
+Reply-To: Bug 1248168 <1248168@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131105124713.24131.16100.malonedeb@gac.canonical.com>
+Message-Id: <20170123174837.14023.51031.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1248168] Re: MIPS,
+ self-modifying code and uncached memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,88 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Mon, 23 Jan 2017 11:34:29 +0800
-Peter Xu <peterx@redhat.com> wrote:
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> On Mon, Jan 23, 2017 at 09:55:39AM +0800, Jason Wang wrote:
-> >=20
-> >=20
-> > On 2017=E5=B9=B401=E6=9C=8822=E6=97=A5 17:04, Peter Xu wrote: =20
-> > >On Sun, Jan 22, 2017 at 04:08:04PM +0800, Jason Wang wrote:
-> > >
-> > >[...]
-> > > =20
-> > >>>+static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-> > >>>+                                           uint16_t domain_id, hwad=
-dr addr,
-> > >>>+                                           uint8_t am)
-> > >>>+{
-> > >>>+    IntelIOMMUNotifierNode *node;
-> > >>>+    VTDContextEntry ce;
-> > >>>+    int ret;
-> > >>>+
-> > >>>+    QLIST_FOREACH(node, &(s->notifiers_list), next) {
-> > >>>+        VTDAddressSpace *vtd_as =3D node->vtd_as;
-> > >>>+        ret =3D vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus=
-),
-> > >>>+                                       vtd_as->devfn, &ce);
-> > >>>+        if (!ret && domain_id =3D=3D VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-> > >>>+            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SI=
-ZE,
-> > >>>+                          vtd_page_invalidate_notify_hook,
-> > >>>+                          (void *)&vtd_as->iommu, true); =20
-> > >>Why not simply trigger the notifier here? (or is this vfio required?)=
- =20
-> > >Because we may only want to notify part of the region - we are with
-> > >mask here, but not exact size.
-> > >
-> > >Consider this: guest (with caching mode) maps 12K memory (4K*3 pages),
-> > >the mask will be extended to 16K in the guest. In that case, we need
-> > >to explicitly go over the page entry to know that the 4th page should
-> > >not be notified. =20
-> >=20
-> > I see. Then it was required by vfio only, I think we can add a fast pat=
-h for
-> > !CM in this case by triggering the notifier directly. =20
->=20
-> I noted this down (to be further investigated in my todo), but I don't
-> know whether this can work, due to the fact that I think it is still
-> legal that guest merge more than one PSIs into one. For example, I
-> don't know whether below is legal:
->=20
-> - guest invalidate page (0, 4k)
-> - guest map new page (4k, 8k)
-> - guest send single PSI of (0, 8k)
->=20
-> In that case, it contains both map/unmap, and looks like it didn't
-> disobay the spec as well?
+-- =
 
-The topic of mapping and invalidation granularity also makes me
-slightly concerned with the abstraction we use for the type1 IOMMU
-backend.  With the "v2" type1 configuration we currently use in QEMU,
-the user may only unmap with the same minimum granularity with which
-the original mapping was created.  For instance if an iommu notifier
-map request gets to vfio with an 8k range, the resulting mapping can
-only be removed by an invalidation covering the full range.  Trying to
-bisect that original mapping by only invalidating 4k of the range will
-generate an error.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1248168
 
-I would think (but please confirm), that when we're only tracking
-mappings generated by the guest OS that this works.  If the guest OS
-maps with 4k pages, we get map notifies for each of those 4k pages.  If
-they use 2MB pages, we get 2MB ranges and invalidations will come in
-the same granularity.
+Title:
+  MIPS, self-modifying code and uncached memory
 
-An area of concern though is the replay mechanism in QEMU, I'll need to
-look for it in the code, but replaying an IOMMU domain into a new
-container *cannot* coalesce mappings or else it limits the granularity
-with which we can later accept unmaps.  Take for instance a guest that
-has mapped a contiguous 2MB range with 4K pages.  They can unmap any 4K
-page within that range.  However if vfio gets a single 2MB mapping
-rather than 512 4K mappings, then the host IOMMU may use a hugepage
-mapping where our granularity is now 2MB.  Thanks,
+Status in QEMU:
+  Incomplete
 
-Alex
+Bug description:
+  Self-modifying code does not work properly in MIPS in uncached and
+  unmapped kseg1 memory region.
+
+  For example, when running this code I get unexpected behavior:
+
+     0:	e3000010 	b	0x390
+     4:	00000000 	nop
+  	...
+   380:	00701f40 	mfc0	ra,c0_epc
+   384:	0400e0bb 	swr	zero,4(ra)
+   388:	18000042 	eret
+   38c:	00000000 	nop
+   390:	25500000 	move	t2,zero
+   394:	02000b34 	li	t3,0x2
+   398:	23504b01 	subu	t2,t2,t3
+   39c:	e9003c0b 	j	0xcf003a4
+   3a0:	0a004a21 	addi	t2,t2,10
+   3a4:	ffff0010 	b	0x3a4
+   3a8:	00000000 	nop
+   3ac:	00000000 	nop
+
+    I expect that swr instruction in line 384 would change `addi	t2,t2,1`0 =
+to `nop`
+  This should work because no cache is used for this memory region.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1248168/+subscriptions
