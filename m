@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVdvz-0003T7-8f
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:41:20 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cVe2o-0001Mt-Ob
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:48:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVdvy-0008TN-9r
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:41:19 -0500
-Received: from mail-vk0-x234.google.com ([2607:f8b0:400c:c05::234]:35636)
+	(envelope-from <alex.bennee@linaro.org>) id 1cVe2k-0001sw-HL
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:48:22 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36983)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cVdvy-0008TI-3o
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:41:18 -0500
-Received: by mail-vk0-x234.google.com with SMTP id x75so89388704vke.2
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 04:41:17 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cVe2k-0001sf-AS
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:48:18 -0500
+Received: by mail-wm0-x232.google.com with SMTP id c206so153426573wme.0
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 04:48:18 -0800 (PST)
+References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
+	<CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
+	<87pojmjdep.fsf@dusky.pond.sub.org>
+	<CAFEAcA9nhd6x+PT5bG0=YqvmUdxJVFPZ6ACiv-2OKrDFJhrqzg@mail.gmail.com>
+	<87h94x99e4.fsf@dusky.pond.sub.org>
+	<CAFEAcA8vRw=13Lj_98A+3NovSeTg6e0xBopdz9EcdEeUMjjZow@mail.gmail.com>
+	<874m0x7ra2.fsf@dusky.pond.sub.org>
+	<CAFEAcA_txNPj6JNDavmCREse98XTkQgiFAqx5Vf8KCCu9V-6mQ@mail.gmail.com>
+	<878tq93guz.fsf@dusky.pond.sub.org>
+	<CAFEAcA-zV8RWCXMCbAHLMEM1oEw7CWT_aDrTc49Xv_wSnMeAyw@mail.gmail.com>
+	<CAFEAcA-fSJ5PfpKFaehruzjidBtmQP_435WLqgSLg=cQiETR8Q@mail.gmail.com>
+	<878tq5looy.fsf@dusky.pond.sub.org>
+	<CAFEAcA8ckibWjvDQGyBTGSGmrZQGUbojQmuHqnm=EPg=Vh7L1g@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA8ckibWjvDQGyBTGSGmrZQGUbojQmuHqnm=EPg=Vh7L1g@mail.gmail.com>
+Date: Mon, 23 Jan 2017 12:48:14 +0000
+Message-ID: <871svuaqnl.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1484779123-18968-31-git-send-email-atar4qemu@gmail.com>
-References: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
-	<1484779123-18968-31-git-send-email-atar4qemu@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Jan 2017 12:40:54 +0000
-Message-ID: <CAFEAcA8=gKjbo9YaRAzGHi-tP6AWY08ps_tEPOSzpNFXBC6M+Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 30/30] target-sparc: fix up niagara machine
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +41,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 18 January 2017 at 22:38, Artyom Tarasenko <atar4qemu@gmail.com> wrote:
-> Remove the Niagara stub implementation from sun4u.c and add a machine,
-> compatible with Legion simulator from the OpenSPARC T1 project.
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On 20 January 2017 at 15:46, Markus Armbruster <armbru@redhat.com> wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> On 17 January 2017 at 16:43, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>> In any case, applied this pullreq to master.
+>>>
+>>> Although it works fine on my OSX box (with warnings) it seems
+>>> to have broken the Travis OSX builds:
+>>> https://travis-ci.org/qemu/qemu/jobs/192750574
+>>>
+>>>   GEN     qemu-options.texi
+>>>   GEN     qemu-monitor.texi
+>>>   GEN     qemu-img-cmds.texi
+>>>   GEN     qemu-monitor-info.texi
+>>>   GEN     qemu-doc.txt
+>>> qemu-doc.texi:7: warning: unrecognized encoding name `UTF-8'.
+>>>   GEN     qemu-img.1
+>>> /Users/travis/build/qemu/qemu//qemu-options.texi:60: warning: unlikely
+>>> character [ in @var.
+>>> /Users/travis/build/qemu/qemu//qemu-options.texi:60: warning: unlikely
+>>> character ] in @var.
+>>> /Users/travis/build/qemu/qemu//qemu-options.texi:61: warning: unlikely
+>>> character [ in @var.
+>>> /Users/travis/build/qemu/qemu//qemu-options.texi:61: warning: unlikely
+>>> character ] in @var.
+>>> /Users/travis/build/qemu/qemu//qemu-options.texi:630: No matching `@end table'.
+>>> /Users/travis/build/qemu/qemu//qemu-doc.texi:1419: Cross reference to
+>>> nonexistent node `bt-hcis' (perhaps incorrect sectioning?).
+>>> makeinfo: Removing output file `qemu-doc.txt' due to errors; use
+>>> --force to preserve.
+>>> make: *** [qemu-doc.txt] Error 1
+>>
+>> @table and @end table are nested correctly in my generated
+>> qemu-options.texi, and @anchor{bt-hcis} is present.  Can you grab the
+>> offending qemu-options.texi for me?
 >
-> The machine uses the firmware supplied with the OpenSPARC T1 project,
-> http://download.oracle.com/technetwork/systems/opensparc/OpenSPARCT1_Arch.1.5.tar.bz2
-> in the directory S10image/, and is able to boot the supplied Solaris 10 image.
->
-> Note that for compatibility with the naming conventions for SPARC machines
-> the new machine name is lowercase niagara.
->
-> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Alex may know how to get objects out of a failed Travis build
+> (if it's possible at all).
 
-I see that 'make check' now warns:
-  GTESTER check-qtest-sparc64
-Could not open option rom 'nvram1': No such file or directory
-Could not open option rom '1up-md.bin': No such file or directory
-Could not open option rom '1up-hv.bin': No such file or directory
-Could not open option rom 'reset.bin': No such file or directory
-Could not open option rom 'q.bin': No such file or directory
-Could not open option rom 'openboot.bin': No such file or directory
+For the normal targets we can re-create builds at our leisure using the
+travis docker image. Unfortunately I'm not clear on how this works for
+the MacOSX build.
 
-(though the tests still pass).
+The best solution I can come up with is to tweak your build to dump the
+.text into stdout and then look on the Travis web-page as the build
+fails. I had a similar fall-back encoded when debugging the clang build,
+something like:
 
-Could we either ship these images in pc-bios if they're
-necessary, or not complain that they don't exist if they're
-not necessary, please?
+      before_script:
+        - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || cat config.log
 
-thanks
--- PMM
+So change your local .travis.yml to:
+
+    - env: CONFIG=""
+      os: osx
+      compiler: clang
+      script: make -j3 || cat qemu-options.texi
+
+and trigger a build with it.
+
+--
+Alex Bennée
