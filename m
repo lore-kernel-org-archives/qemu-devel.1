@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55332)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1cVgQY-0003Qn-OD
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:21:03 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55760)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peter.maydell@linaro.org>) id 1cVgTu-0004xk-8x
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:24:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1cVgQV-00047o-I9
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:21:02 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:52660 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cVgQV-00046T-92
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:20:59 -0500
-References: <1484843730-23848-1-git-send-email-pl@kamp.de>
-	<a9fa5294-acbe-a034-febb-a149dfe320f8@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <c79c63af-213e-43ec-d4da-2a6ec61762a3@kamp.de>
-Date: Mon, 23 Jan 2017 16:20:54 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cVgTt-00054F-C6
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:24:30 -0500
+Received: from mail-ua0-x22c.google.com ([2607:f8b0:400c:c08::22c]:34458)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cVgTt-00054A-5l
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 10:24:29 -0500
+Received: by mail-ua0-x22c.google.com with SMTP id 35so112134677uak.1
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 07:24:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a9fa5294-acbe-a034-febb-a149dfe320f8@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2] qemu-img: optimize
- is_allocated_sectors_min
+In-Reply-To: <CAFEAcA_NSRk3wj3iZvhTbR5hxyUVe_4V_dgow=-dPb7KPFCeLQ@mail.gmail.com>
+References: <20170123142629.11110-1-berrange@redhat.com>
+	<CAFEAcA_NSRk3wj3iZvhTbR5hxyUVe_4V_dgow=-dPb7KPFCeLQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Jan 2017 15:24:08 +0000
+Message-ID: <CAFEAcA9mrojabfsFfkw+Yb0jRUyB0gs6+SHeLu4sDku1gmfrRA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v1 0/8] Merge io/ 2017-01-23
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Am 21.01.2017 um 20:58 schrieb Max Reitz:
-> On 19.01.2017 17:35, Peter Lieven wrote:
->> the current implementation always splits requests if a buffer
->> begins or ends with zeroes independent of the length of the
->> zero area. Change this to really only split off zero areas
->> that have at least a length of 'min' bytes.
+On 23 January 2017 at 14:46, Peter Maydell <peter.maydell@linaro.org> wrote=
+:
+> On 23 January 2017 at 14:26, Daniel P. Berrange <berrange@redhat.com> wro=
+te:
+>> The following changes since commit 598cf1c805271564686f2d732b36f50c3c40d=
+cdd:
 >>
->> Signed-off-by: Peter Lieven <pl@kamp.de>
->> ---
->>   qemu-img.c | 44 ++++++++++++++------------------------------
->>   1 file changed, 14 insertions(+), 30 deletions(-)
-> That is because the idea is that you should delay the write operation as
-> much as possible. Say you have some empty space at the beginning of the
-> buffer and then some used space. Of course you should then only start
-> writing at the point where you actually have to write something. The
-> same goes for the end of the buffer. Why write zeroes when you can just
-> not do it?
+>>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into =
+staging (2017-01-20 16:42:07 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   git://github.com/berrange/qemu tags/pull-qio-2017-01-23-1
+>>
+>> for you to fetch changes up to 19f3cc22d364b57315e171090ee2e499b58775b4:
+>>
+>>   io: introduce a DNS resolver API (2017-01-23 11:28:09 +0000)
+>>
+>> ----------------------------------------------------------------
+>> Merge io/ 2017-01-23
+>>
+>> Daniel P. Berrange (8):
+>>   sockets: add ability to disable DNS resolution for InetSocketAddress
+>>   io: stop incrementing reference in qio_task_get_source
+>>   io: fix typo in docs for QIOTask
+>>   io: add ability to associate an opaque "result" with with a task
+>>   io: add ability to associate an error with a task
+>>   io: change the QIOTask callback signature
+>>   io: remove Error parameter from QIOTask thread worker
+>>   io: introduce a DNS resolver API
 >
-> On the other hand, it makes sense to not split a single write operation
-> into two just because there is some empty space in the middle. This is
-> because just writing that empty space may take less time than issuing
-> two operations, especially if that empty space is e.g. in the middle of
-> a qcow2 cluster anyway.
->
-> This is why empty space in the middle is treated differently than empty
-> space at the beginning or the end of the buffer.
->
-> Do you have a reason for changing this other than because it simplifies
-> the code? Which it does, admittedly, but I think the code does have a
-> reason for being how it is.
+> Fails to build, OSX:
 
-Hi Max,
+Also w32:
+/home/petmay01/linaro/qemu-for-merges/util/qemu-sockets.c: In function
+=E2=80=98inet_listen_saddr=E2=80=99:
+/home/petmay01/linaro/qemu-for-merges/util/qemu-sockets.c:145:41:
+error: =E2=80=98AI_NUMERICSERV=E2=80=99 undeclared (first use in this funct=
+ion)
+         ai.ai_flags |=3D AI_NUMERICHOST | AI_NUMERICSERV;
+                                         ^
+/home/petmay01/linaro/qemu-for-merges/util/qemu-sockets.c:145:41:
+note: each undeclared identifier is reported only once for each
+function it appears in
 
-thanks for looking into this. I was wrong about my analysis what was
-going on with a problem I tried to track down. After your explanation
-I think the current implementation is fine and it makes perfect sense
-to cut off leading and trailing zeroes.
 
-Peter
+thanks
+-- PMM
