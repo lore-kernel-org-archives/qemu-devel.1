@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cVWlS-0007fJ-Ju
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:01:59 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cVXEn-0003IL-3x
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cVWlR-0001Gj-F9
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:01:58 -0500
-Message-ID: <1485147704.8172.15.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Mon, 23 Jan 2017 16:01:44 +1100
-In-Reply-To: <1484613210.2028.3.camel@gmail.com>
-References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
-	<1484288903-18807-5-git-send-email-sjitindarsingh@gmail.com>
-	<20170116213617.GF15853@umbus> <1484613210.2028.3.camel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 04/17] target/ppc/POWER9: Add ISAv3.00
- MMU definition
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cVXEi-0008EU-6P
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:32:17 -0500
+Received: from [59.151.112.132] (port=64791 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cVXEh-0008Dk-6R
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:32:12 -0500
+References: <1484467275-27919-1-git-send-email-douly.fnst@cn.fujitsu.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <bc1253f4-51f9-9e74-a3d9-288f4a01e299@cn.fujitsu.com>
+Date: Mon, 23 Jan 2017 13:31:59 +0800
+MIME-Version: 1.0
+In-Reply-To: <1484467275-27919-1-git-send-email-douly.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/2] block/qapi: refactor and optimize
+ the qmp_query_blockstats()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,112 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
+To: armbru@redhat.com, mreitz@redhat.com
+Cc: stefanha@redhat.com, kwolf@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com
 
-On Tue, 2017-01-17 at 11:33 +1100, Suraj Jitindar Singh wrote:
-> On Tue, 2017-01-17 at 08:36 +1100, David Gibson wrote:
-> > 
-> > On Fri, Jan 13, 2017 at 05:28:10PM +1100, Suraj Jitindar Singh
-> > wrote:
-> > > 
-> > > 
-> > > POWER9 processors implement the mmu as defined in version 3.00 of
-> > > the ISA.
-> > > 
-> > > Add a definition for this mmu model and set the POWER9 cpu model
-> > > to
-> > > use
-> > > this mmu model.
-> > > 
-> > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > > ---
-> > >  target/ppc/cpu-qom.h        | 5 ++++-
-> > >  target/ppc/mmu_helper.c     | 2 ++
-> > >  target/ppc/translate_init.c | 3 +--
-> > >  3 files changed, 7 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> > > index d46c31a..1577cc8 100644
-> > > --- a/target/ppc/cpu-qom.h
-> > > +++ b/target/ppc/cpu-qom.h
-> > > @@ -86,10 +86,13 @@ enum powerpc_mmu_t {
-> > >      POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> > >                               | POWERPC_MMU_64K
-> > >                               | POWERPC_MMU_AMR | 0x00000004,
-> > > -    /* FIXME Add POWERPC_MMU_3_OO defines */
-> > >      /* Architecture 2.07 "degraded" (no 1T
-> > > segments)           */
-> > >      POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
-> > >                               | 0x00000004,
-> > > +    /* Architecture 3.00
-> > > variant                               */
-> > > +    POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> > > +                             | POWERPC_MMU_64K
-> > > +                             | POWERPC_MMU_AMR | 0x00000005,
-> > Hmm.  I guess it works for now, but I'm not really sure that having
-> > this include POWERPC_MMU_64 is a great idea.  The name is kind of
-> > misleading, but I'm pretty sure a number of places assume that the
-> > POWERPC_MMU_64 bitindicates a 64-bit *hash* MMU, which is no longer
-> > really the case.
-> Good catch, I didn't realise this assumption was made in the code.
-> 
-> There are some cases where this bit needs to be set for correct
-> behaviour but other places where, while it doesn't break anything, it
-> leads to incorrect code being called.
-> 
-> Time for me to investigate :)
-Actually, having looked through the code, I think we want this set. As
-far as I can tell it doesn't lead to anything we don't want happening.
-> > 
-> > 
-> > > 
-> > > 
-> > >  };
-> > >  
-> > >  /***************************************************************
-> > > **
-> > > ************/
-> > > diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> > > index d09fc0a..2ab4562 100644
-> > > --- a/target/ppc/mmu_helper.c
-> > > +++ b/target/ppc/mmu_helper.c
-> > > @@ -1935,6 +1935,7 @@ void ppc_tlb_invalidate_all(CPUPPCState
-> > > *env)
-> > >      case POWERPC_MMU_2_06a:
-> > >      case POWERPC_MMU_2_07:
-> > >      case POWERPC_MMU_2_07a:
-> > > +    case POWERPC_MMU_3_00:
-> > >  #endif /* defined(TARGET_PPC64) */
-> > >          env->tlb_need_flush = 0;
-> > >          tlb_flush(CPU(cpu), 1);
-> > > @@ -1974,6 +1975,7 @@ void ppc_tlb_invalidate_one(CPUPPCState
-> > > *env,
-> > > target_ulong addr)
-> > >      case POWERPC_MMU_2_06a:
-> > >      case POWERPC_MMU_2_07:
-> > >      case POWERPC_MMU_2_07a:
-> > > +    case POWERPC_MMU_3_00:
-> > >          /* tlbie invalidate TLBs for all segments */
-> > >          /* XXX: given the fact that there are too many segments
-> > > to
-> > > invalidate,
-> > >           *      and we still don't have a tlb_flush_mask(env, n,
-> > > mask) in QEMU,
-> > > diff --git a/target/ppc/translate_init.c
-> > > b/target/ppc/translate_init.c
-> > > index bfc1f24..2402eef 100644
-> > > --- a/target/ppc/translate_init.c
-> > > +++ b/target/ppc/translate_init.c
-> > > @@ -8838,8 +8838,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc,
-> > > void
-> > > *data)
-> > >                      (1ull << MSR_PMM) |
-> > >                      (1ull << MSR_RI) |
-> > >                      (1ull << MSR_LE);
-> > > -    /* Using 2.07 defines until new radix model is added. */
-> > > -    pcc->mmu_model = POWERPC_MMU_2_07;
-> > > +    pcc->mmu_model = POWERPC_MMU_3_00;
-> > >  #if defined(CONFIG_SOFTMMU)
-> > >      pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
-> > >      /* segment page size remain the same */
+Hi, Markus
+
+Here is the non-RFC patch.
+Any suggestions are welcome. :)
+
+Thanks,
+	Liyang.
+
+At 01/15/2017 04:01 PM, Dou Liyang wrote:
+> Change log v3 -> v4:
+>  1. Develop these into the non-RFC patches.
+>  2. Fix some comments.
+>  3. do declarations first.
+>
+> Change log v2 -> v3:
+>  1. Remove the unnecessary code for the bdrv_next_node().
+>  2. Remove the change of the locking rules.
+>     Even if this change can improve the performance, but it may
+>     effect the consistency.
+>
+> The Qemu uses the qmp_query_blockstats() function to get the
+> blockstats. As the function has been changed several times, it
+> becomes more complex and longer.
+>
+> For the multi-disks guest, if we want to execute I/O operations
+> and this function at the same time. we can use the dataplane
+> feature to hold I/O performance does not drop. But, Normally
+> without this feature, How to reduce the decline in performance?
+>
+> These patches refactor the qmp_query_blockstats() to make the
+> code easier to follow, and shorter as follows:
+>
+> From:
+>
+> +--------------+      +---------------------+
+>  | 1            |      | 4.                  |
+>  |next_query_bds|      |bdrv_query_bds_stats +---+
+>  |              |      |                     |   |
+>  +--------^-----+      +-------------^-------+   |
+>           |                          |           |
+> +---------+----------+      +--------+-------+   |
+> | 0.                 |      | 2.             |   |
+> |qmp_query_blockstats+------>bdrv_query_stats<----
+> |                    |      |                |
+> +--------------------+      +--------+-------+
+>                                      |
+>                        +-------------v-------+
+>                        | 3.                  |
+>                        |bdrv_query_blk_stats |
+>                        |                     |
+>                        +---------------------+
+>
+> To:
+>
+>                                     +--------------+
+>                                     |              |
+>                            +--------v-----------+  |
+>                        +--->  3.                |  |
+> +-------------------+  |   |bdrv_query_bds_stats+--+
+> | 1.                +--+   |                    |
+> |                   +      +--------------------+
+> |qmp_query_blockstats--+
+> |                   |  |
+> +-------------------+  |   +--------------------+
+>                        |   | 2.                 |
+>                        +--->                    |
+>                            |bdrv_query_blk_stats|
+>                            |                    |
+>                            +--------------------+
+>
+>
+> They also optimize the fuction by reducing its running time.
+>
+> 1. The function running time
+>
+> the time it takes(ns) in each requests:
+> the disk numbers     | 10    | 500
+> -------------------------------------
+> before these patches | 19429 | 667722
+> after these patches  | 18536 | 627945
+>
+> 2. For the performance
+> used the dd command likes this to test:
+> dd if=date_1.dat of=date_2.dat conv=fsync oflag=direct bs=1k count=100k.
+>
+> the I/O performance is degraded(%) during the monitor:
+> the disk numbers     | 10    | 500
+> -------------------------------------
+> before these patches | 1.3   | 14.2
+> after these patches  | 1.0   | 11.3
+>
+> Dou Liyang (2):
+>   block/qapi: reduce the coupling between the bdrv_query_stats and
+>     bdrv_query_bds_stats
+>   block/qapi: reduce the execution time of qmp_query_blockstats
+>
+>  block/qapi.c | 95 ++++++++++++++++++++++++++----------------------------------
+>  1 file changed, 41 insertions(+), 54 deletions(-)
+>
