@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cVhhL-0002nh-T0
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:42:29 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cVhiC-0003Mv-Al
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:43:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cVhhH-0003de-31
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:42:27 -0500
-Received: from mo69.mail-out.ovh.net ([178.32.228.69]:36883)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cVhhG-0003dP-PC
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:42:23 -0500
-Received: from player798.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 5088311164
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 17:42:21 +0100 (CET)
-Date: Mon, 23 Jan 2017 17:42:14 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170123174214.3a86cb92@bahia.lan>
-In-Reply-To: <3478b86e-7a32-5e92-58cc-1cfe7ccecb41@huawei.com>
-References: <1485186641-12220-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<148518739693.56.12407051583748682941@b042e9bf0dd0>
-	<20170123172254.345fbecb@bahia.lan>
-	<3478b86e-7a32-5e92-58cc-1cfe7ccecb41@huawei.com>
+	(envelope-from <dgilbert@redhat.com>) id 1cVhi8-0003uR-4t
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 11:43:20 -0500
+Date: Mon, 23 Jan 2017 16:43:05 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170123164304.GD14858@work-vm>
+References: <1484836667-26460-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170123134002.GB14858@work-vm> <58860B4B.6040401@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2 V13] fsdev: add IO throttle support to
- fsdev devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58860B4B.6040401@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: re-active images while
+ migration been canceled after inactive them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,187 +24,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Cc: pradeepkiruvale@gmail.com, qemu-devel@nongnu.org, famz@redhat.com, aneesh.kumar@linux.vnet.ibm.com, berto@igalia.com
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, amit.shah@redhat.com, quintela@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org
 
-On Mon, 23 Jan 2017 17:30:13 +0100
-Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com> wrote:
-
-> On 1/23/2017 5:22 PM, Greg Kurz wrote:
-> > On Mon, 23 Jan 2017 08:03:18 -0800 (PST)
-> > no-reply@patchew.org wrote:  
-> >> Hi,
-> >>
-> >> Your series seems to have some coding style problems. See output below for
-> >> more information:
-> >>  
-> >  
-> Ya, I observed signoff issue. I have created next version files.
-> I will send them tomorrow.
+* Hailiang Zhang (zhang.zhanghailiang@huawei.com) wrote:
+> On 2017/1/23 21:40, Dr. David Alan Gilbert wrote:
+> > * zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+> > > commit fe904ea8242cbae2d7e69c052c754b8f5f1ba1d6 fixed a case
+> > > which migration aborted QEMU because it didn't regain the control
+> > > of images while some errors happened.
+> > > 
+> > > Actually, there are another two cases can trigger the same error reports:
+> > > " bdrv_co_do_pwritev: Assertion `!(bs->open_flags & 0x0800)' failed",
+> > > 
+> > > Case 1, codes path:
+> > > migration_thread()
+> > >      migration_completion()
+> > >          bdrv_inactivate_all() ----------------> inactivate images
+> > >          qemu_savevm_state_complete_precopy()
+> > >              socket_writev_buffer() --------> error because destination fails
+> > >                  qemu_fflush() -------------------> set error on migration stream
+> > > -> qmp_migrate_cancel() ---------------------> user cancelled migration concurrently
+> > >      -> migrate_set_state() ------------------> set migrate CANCELLIN
+> > >      migration_completion() -----------------> go on to fail_invalidate
+> > > 	if (s->state == MIGRATION_STATUS_ACTIVE) -> Jump this branch
+> > > 
+> > > Case 2, codes path:
+> > > migration_thread()
+> > >      migration_completion()
+> > >          bdrv_inactivate_all() ----------------> inactivate images
+> > >      migreation_completion() finished
+> > > -> qmp_migrate_cancel() ---------------------> user cancelled migration concurrently
+> > >      qemu_mutex_lock_iothread();
+> > >      qemu_bh_schedule (s->cleanup_bh);
+> > > 
+> > > As we can see from above, qmp_migrate_cancel can slip in whenever
+> > > migration_thread does not hold the global lock. If this happens after
+> > > bdrv_inactive_all() been called, the above error reports will appear.
+> > > 
+> > > To prevent this, we can call bdrv_invalidate_cache_all() in qmp_migrate_cancel()
+> > > directly if we find images become inactive.
+> > > 
+> > > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > > ---
+> > > Hi,
+> > > 
+> > > I have sent another patch before to fix this problem, but didn't cover
+> > > all the scenes, and there are some discussions about this problem,
+> > > For more detail, please refer to
+> > > https://lists.gnu.org/archive/html/qemu-block/2016-12/msg00003.html
+> > > ---
+> > >   include/migration/migration.h |  3 +++
+> > >   migration/migration.c         | 13 +++++++++++++
+> > >   2 files changed, 16 insertions(+)
+> > > 
+> > > diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > > index c309d23..2d5b724 100644
+> > > --- a/include/migration/migration.h
+> > > +++ b/include/migration/migration.h
+> > > @@ -177,6 +177,9 @@ struct MigrationState
+> > >       /* Flag set once the migration thread is running (and needs joining) */
+> > >       bool migration_thread_running;
+> > > 
+> > > +    /* Flag set once the migration thread called bdrv_inactivate_all */
+> > > +    bool block_inactive;
+> > > +
+> > >       /* Queue of outstanding page requests from the destination */
+> > >       QemuMutex src_page_req_mutex;
+> > >       QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
+> > > diff --git a/migration/migration.c b/migration/migration.c
+> > > index f498ab8..9defb3e 100644
+> > > --- a/migration/migration.c
+> > > +++ b/migration/migration.c
+> > > @@ -1006,6 +1006,16 @@ static void migrate_fd_cancel(MigrationState *s)
+> > >       if (s->state == MIGRATION_STATUS_CANCELLING && f) {
+> > >           qemu_file_shutdown(f);
+> > >       }
+> > > +    if (s->state == MIGRATION_STATUS_CANCELLING && s->block_inactive) {
+> > > +        Error *local_err = NULL;
+> > > +
+> > > +        bdrv_invalidate_cache_all(&local_err);
+> > > +        if (local_err) {
+> > > +            error_report_err(local_err);
+> > > +        } else {
+> > > +            s->block_inactive = false;
+> > > +        }
+> > > +    }
+> > >   }
+> > > 
+> > >   void add_migration_state_change_notifier(Notifier *notify)
+> > > @@ -1705,6 +1715,7 @@ static void migration_completion(MigrationState *s, int current_active_state,
+> > >               if (ret >= 0) {
+> > >                   qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
+> > >                   qemu_savevm_state_complete_precopy(s->to_dst_file, false);
+> > > +                s->block_inactive = true;
+> > >               }
+> > >           }
+> > >           qemu_mutex_unlock_iothread();
+> > > @@ -1758,6 +1769,8 @@ fail_invalidate:
+> > >           bdrv_invalidate_cache_all(&local_err);
+> > >           if (local_err) {
+> > >               error_report_err(local_err);
+> > > +        } else {
+> > > +            s->block_inactive = false;
+> > >           }
+> > 
+> > I think the fe904 commit also add the problem that this bdrv_invalidate_cache_all
+> > is done outside the big lock (Stefan and Kevin tell me bdrv_* calls generally
+> > need the lock).
+> > 
 > 
-> But, I do not know how to solve the second warning.
-> i.e multi line macro issue.
+> Ha, you are right, I didn't noticed that all the time.
+
+I started thinking about it because I wondered about the bdrv_invalidate_cache_all 
+in fd_cancel racing against that one.
+
+> So should I just add the big lock there ? Is that enough?
+
+Yes, I think that should be fine.
+
+Dave
+
+> Thanks,
+> Hailiang
 > 
-
-As I had written in my mail:
-
-> > I guess your patch is ok here: checkpatch.pl is simply not smart enough to
-> > parse this.
-
-You can ignore this warning.
-
-Also, you had a positive review for patch 2/2:
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg04637.html
-
-You can add this line below your S-o-b.
-
-> -Pradeep
+> > Dave
+> > 
+> > >       }
+> > > 
+> > > --
+> > > 1.8.3.1
+> > > 
+> > > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> > .
+> > 
 > 
-> > Pradeep,
-> >
-> > One should usually take patchew's findings into account. See below.
-> >  
-> >> Type: series
-> >> Subject: [Qemu-devel] [PATCH 0/2 V13] fsdev: add IO throttle support to fsdev devices
-> >> Message-id: 1485186641-12220-1-git-send-email-pradeep.jagadeesh@huawei.com
-> >>
-> >> === TEST SCRIPT BEGIN ===
-> >> #!/bin/bash
-> >>
-> >> BASE=base
-> >> n=1
-> >> total=$(git log --oneline $BASE.. | wc -l)
-> >> failed=0
-> >>
-> >> # Useful git options
-> >> git config --local diff.renamelimit 0
-> >> git config --local diff.renames True
-> >>
-> >> commits="$(git log --format=%H --reverse $BASE..)"
-> >> for c in $commits; do
-> >>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
-> >>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
-> >>         failed=1
-> >>         echo
-> >>     fi
-> >>     n=$((n+1))
-> >> done
-> >>
-> >> exit $failed
-> >> === TEST SCRIPT END ===
-> >>
-> >> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> >> Switched to a new branch 'test'
-> >> 7686dc8 throttle: factor out duplicate code
-> >> 7568614 fsdev: add IO throttle support to fsdev devices
-> >>
-> >> === OUTPUT BEGIN ===
-> >> Checking PATCH 1/2: fsdev: add IO throttle support to fsdev devices...
-> >> Checking PATCH 2/2: throttle: factor out duplicate code...
-> >> ERROR: Macros with multiple statements should be enclosed in a do - while loop  
-> >
-> > I guess your patch is ok here: checkpatch.pl is simply not smart enough to
-> > parse this.
-> >  
-> >> #228: FILE: include/qemu/throttle-options.h:13:
-> >> +#define THROTTLE_OPTS \
-> >> +          { \
-> >> +            .name = "throttling.iops-total",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "limit total I/O operations per second",\
-> >> +        },{ \
-> >> +            .name = "throttling.iops-read",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "limit read operations per second",\
-> >> +        },{ \
-> >> +            .name = "throttling.iops-write",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "limit write operations per second",\
-> >> +        },{ \
-> >> +            .name = "throttling.bps-total",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "limit total bytes per second",\
-> >> +        },{ \
-> >> +            .name = "throttling.bps-read",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "limit read bytes per second",\
-> >> +        },{ \
-> >> +            .name = "throttling.bps-write",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "limit write bytes per second",\
-> >> +        },{ \
-> >> +            .name = "throttling.iops-total-max",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "I/O operations burst",\
-> >> +        },{ \
-> >> +            .name = "throttling.iops-read-max",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "I/O operations read burst",\
-> >> +        },{ \
-> >> +            .name = "throttling.iops-write-max",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "I/O operations write burst",\
-> >> +        },{ \
-> >> +            .name = "throttling.bps-total-max",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "total bytes burst",\
-> >> +        },{ \
-> >> +            .name = "throttling.bps-read-max",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "total bytes read burst",\
-> >> +        },{ \
-> >> +            .name = "throttling.bps-write-max",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "total bytes write burst",\
-> >> +        },{ \
-> >> +            .name = "throttling.iops-total-max-length",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "length of the iops-total-max burst period, in seconds",\
-> >> +        },{ \
-> >> +            .name = "throttling.iops-read-max-length",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "length of the iops-read-max burst period, in seconds",\
-> >> +        },{ \
-> >> +            .name = "throttling.iops-write-max-length",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "length of the iops-write-max burst period, in seconds",\
-> >> +        },{ \
-> >> +            .name = "throttling.bps-total-max-length",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "length of the bps-total-max burst period, in seconds",\
-> >> +        },{ \
-> >> +            .name = "throttling.bps-read-max-length",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "length of the bps-read-max burst period, in seconds",\
-> >> +        },{ \
-> >> +            .name = "throttling.bps-write-max-length",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "length of the bps-write-max burst period, in seconds",\
-> >> +        },{ \
-> >> +            .name = "throttling.iops-size",\
-> >> +            .type = QEMU_OPT_NUMBER,\
-> >> +            .help = "when limiting by iops max size of an I/O in bytes",\
-> >> +        }
-> >>
-> >> ERROR: Missing Signed-off-by: line(s)
-> >>  
-> >
-> > As Eric pointed out in another mail, all patches you send must have your
-> > Signed-off-by line.
-> >  
-> >> total: 2 errors, 0 warnings, 278 lines checked
-> >>
-> >> Your patch has style problems, please review.  If any of these errors
-> >> are false positives report them to the maintainer, see
-> >> CHECKPATCH in MAINTAINERS.
-> >>
-> >> === OUTPUT END ===
-> >>
-> >> Test command exited with code: 1
-> >>
-> >>
-> >> ---
-> >> Email generated automatically by Patchew [http://patchew.org/].
-> >> Please send your feedback to patchew-devel@freelists.org  
-> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
