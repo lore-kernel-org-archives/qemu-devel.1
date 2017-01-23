@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVk2r-0001Ih-KX
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:12:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1cVk6A-0003ZA-4A
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVk2o-0005lW-Ej
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:12:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49538)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cVk2o-0005lP-5b
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:12:46 -0500
-Date: Mon, 23 Jan 2017 12:12:44 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170123121244.78cc7e49@t450s.home>
-In-Reply-To: <1484917736-32056-11-git-send-email-peterx@redhat.com>
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-11-git-send-email-peterx@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1cVk66-0006Qi-Nk
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:16:14 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
+	<1485164923-17736-7-git-send-email-armbru@redhat.com>
+	<2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com>
+Date: Mon, 23 Jan 2017 20:16:03 +0100
+In-Reply-To: <2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com> (Paolo
+	Bonzini's message of "Mon, 23 Jan 2017 17:48:32 +0100")
+Message-ID: <877f5l1tak.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v4 10/20] memory: add section range
- info for IOMMU notifier
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
+ lsi53c895a SCSI HBAs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,139 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, 20 Jan 2017 21:08:46 +0800
-Peter Xu <peterx@redhat.com> wrote:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> In this patch, IOMMUNotifier.{start|end} are introduced to store section
-> information for a specific notifier. When notification occurs, we not
-> only check the notification type (MAP|UNMAP), but also check whether the
-> notified iova is in the range of specific IOMMU notifier, and skip those
-> notifiers if not in the listened range.
-> 
-> When removing an region, we need to make sure we removed the correct
-> VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
-> 
-> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
-> changelog (start from vt-d vfio enablement series v3):
-> v4:
-> - introduce memory_region_iommu_notifier_init() [Jason]
-> ---
->  hw/vfio/common.c      | 12 +++++++++---
->  hw/virtio/vhost.c     |  4 ++--
->  include/exec/memory.h | 19 ++++++++++++++++++-
->  memory.c              |  5 ++++-
->  4 files changed, 33 insertions(+), 7 deletions(-)
+> On 23/01/2017 10:48, Markus Armbruster wrote:
+>> The PC machines (pc-q35-* pc-i440fx-* pc-* isapc xenfv) automatically
+>> create lsi53c895a SCSI HBAs and SCSI devices to honor -drive if=scsi.
+>> For giggles, try -drive if=scsi,bus=25,media=cdrom --- this makes QEMU
+>> create 25 of them.
+>> 
+>> The lsi53c895a is thoroughly obsolete (PCI Ultra2 SCSI, ca. 2000), and
+>> currently has no maintainer in QEMU.  megasas is a better choice,
+>> except for old OSes, which lack drivers. virtio-scsi is a much better
+>> choice when you have a driver, but only (newish) Linux comes with one
+>> in the box.  There is no good default that works for all guests.
+>> 
+>> Instead of supplying the not-so-good default just because we've always
+>> supplied it, make the user pick, by not creating any SCSI HBAs for
+>> -drive if=scsi.  The user now needs to create the SCSI HBA himself
+>> with -device.  The SCSI devices will still be created automatically.
+>> 
+>> For backward compatibility, keep the traditional behavior for old
+>> machine types.
+>
+> It would print an "orphaned device" message, right?
+
+Yes.
+
+Before this patch, you can't get an "orhpaned" warning for if=scsi with
+a PC machine.
+
+After this patch, you get one for every if=scsi with new PC machine
+types.
+
+>                                                      Could we change
+> those messages to errors
+
+Fine with me, but when it comes to arguing for backward compatibility of
+our byzantine command line, I'm kind of like a lethargic public defender
+with an overly deep relationship to Bourbon.  "Your honor, sure capital
+punishment is called for?  Yes?  Okay then."
+
+I vaguely recall discussing the topic with Peter (cc'ed).  If memory
+serves, one concern was breaking usage of -device with -drive lacking
+if=...  Works fine (no warning) with machines that don't pick up drives
+with their default block interface type, i.e. most of them.  But PATCH 3
+changes their default to if=none, so that usage wouldn't actually break.
+What would break is -device with -drive if=T, where T is not none and
+not picked up by the board.  Such usage is certainly questionable[*],
+but it's questionable enough for us to break it?
+
+>                          and then drop PC if=scsi support altogether?
+
+Different backward compatibility question: here we break usage of
+if=scsi with PC machine types.  Legacy way to do things, but it's
+documented in qemu.1.  Are we happy to break it?
 
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-
-
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 4d90844..49dc035 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -471,8 +471,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
->          giommu->iommu_offset = section->offset_within_address_space -
->                                 section->offset_within_region;
->          giommu->container = container;
-> -        giommu->n.notify = vfio_iommu_map_notify;
-> -        giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
-> +        llend = int128_add(int128_make64(section->offset_within_region),
-> +                           section->size);
-> +        llend = int128_sub(llend, int128_one());
-> +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
-> +                            IOMMU_NOTIFIER_ALL,
-> +                            section->offset_within_region,
-> +                            int128_get64(llend));
->          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
->  
->          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
-> @@ -543,7 +548,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
->          VFIOGuestIOMMU *giommu;
->  
->          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
-> -            if (giommu->iommu == section->mr) {
-> +            if (giommu->iommu == section->mr &&
-> +                giommu->n.start == section->offset_within_region) {
->                  memory_region_unregister_iommu_notifier(giommu->iommu,
->                                                          &giommu->n);
->                  QLIST_REMOVE(giommu, giommu_next);
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 9cacf55..cc99c6a 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -1242,8 +1242,8 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
->          .priority = 10
->      };
->  
-> -    hdev->n.notify = vhost_iommu_unmap_notify;
-> -    hdev->n.notifier_flags = IOMMU_NOTIFIER_UNMAP;
-> +    iommu_notifier_init(&hdev->n, vhost_iommu_unmap_notify,
-> +                        IOMMU_NOTIFIER_UNMAP, 0, ~0ULL);
->  
->      if (hdev->migration_blocker == NULL) {
->          if (!(hdev->features & (0x1ULL << VHOST_F_LOG_ALL))) {
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index bec9756..ae4c9a9 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -81,13 +81,30 @@ typedef enum {
->  
->  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
->  
-> +struct IOMMUNotifier;
-> +typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
-> +                            IOMMUTLBEntry *data);
-> +
->  struct IOMMUNotifier {
-> -    void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
-> +    IOMMUNotify notify;
->      IOMMUNotifierFlag notifier_flags;
-> +    /* Notify for address space range start <= addr <= end */
-> +    hwaddr start;
-> +    hwaddr end;
->      QLIST_ENTRY(IOMMUNotifier) node;
->  };
->  typedef struct IOMMUNotifier IOMMUNotifier;
->  
-> +static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
-> +                                       IOMMUNotifierFlag flags,
-> +                                       hwaddr start, hwaddr end)
-> +{
-> +    n->notify = fn;
-> +    n->notifier_flags = flags;
-> +    n->start = start;
-> +    n->end = end;
-> +}
-> +
->  /* New-style MMIO accessors can indicate that the transaction failed.
->   * A zero (MEMTX_OK) response means success; anything else is a failure
->   * of some kind. The memory subsystem will bitwise-OR together results
-> diff --git a/memory.c b/memory.c
-> index 2bfc37f..89104b1 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1610,6 +1610,7 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
->  
->      /* We need to register for at least one bitfield */
->      assert(n->notifier_flags != IOMMU_NOTIFIER_NONE);
-> +    assert(n->start <= n->end);
->      QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
->      memory_region_update_iommu_notify_flags(mr);
->  }
-> @@ -1671,7 +1672,9 @@ void memory_region_notify_iommu(MemoryRegion *mr,
->      }
->  
->      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
-> -        if (iommu_notifier->notifier_flags & request_flags) {
-> +        if (iommu_notifier->notifier_flags & request_flags &&
-> +            iommu_notifier->start <= entry.iova &&
-> +            iommu_notifier->end >= entry.iova) {
->              iommu_notifier->notify(iommu_notifier, &entry);
->          }
->      }
+[*] Here's my review of a prior attempt to outlaw it:
+http://lists.gnu.org/archive/html/qemu-devel/2015-06/msg03334.html
