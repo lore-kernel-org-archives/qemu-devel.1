@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVkMy-00053K-Hh
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:33:37 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cVkNw-0005To-0Q
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVkMt-0003Cw-Kt
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:33:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40440)
+	(envelope-from <alex.williamson@redhat.com>) id 1cVkNr-0003U5-3r
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:34:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55508)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cVkMt-0003Ci-EX
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:33:31 -0500
-Date: Mon, 23 Jan 2017 12:33:29 -0700
+	id 1cVkNq-0003To-UF
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:34:31 -0500
+Date: Mon, 23 Jan 2017 12:34:29 -0700
 From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170123123329.2d9daa9c@t450s.home>
-In-Reply-To: <20170122085118.GA26526@pxdev.xzpeter.org>
+Message-ID: <20170123123429.1a07f156@t450s.home>
+In-Reply-To: <20170123025449.GE26526@pxdev.xzpeter.org>
 References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
 	<1484917736-32056-16-git-send-email-peterx@redhat.com>
 	<f2cceaa6-b3cf-9ed1-2c9c-f9222a0ab7ce@redhat.com>
 	<20170122085118.GA26526@pxdev.xzpeter.org>
+	<c7265d9c-54e9-f4a2-003d-85c4416c1651@redhat.com>
+	<20170123025449.GE26526@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH RFC v4 15/20] intel_iommu: provide its own
  replay() callback
 List-Id: <qemu-devel.nongnu.org>
@@ -32,33 +34,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com
+Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org
 
-On Sun, 22 Jan 2017 16:51:18 +0800
+On Mon, 23 Jan 2017 10:54:49 +0800
 Peter Xu <peterx@redhat.com> wrote:
 
-> On Sun, Jan 22, 2017 at 03:56:10PM +0800, Jason Wang wrote:
-> >   
-> > >+            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
-> > >+                                    entry.addr_mask, entry.perm);
-> > >+            if (hook_fn) {
-> > >+                ret = hook_fn(&entry, private);  
-> > 
-> > For better performance, we could try to merge adjacent mappings here. I
-> > think both vfio and vhost support this and it can save a lot of ioctls.  
-> 
-> Looks so, and this is in my todo list.
-> 
-> Do you mind I do it later after this series merged? I would really
-> appreciate if we can have this codes settled down first (considering
-> that this series has been dangling for half a year, or more, startint
-> from Aviv's series), and I am just afraid this will led to
-> unconvergence of this series (and I believe there are other places
-> that can be enhanced in the future as well).
+> On Mon, Jan 23, 2017 at 09:48:48AM +0800, Jason Wang wrote:
+> >=20
+> >=20
+> > On 2017=E5=B9=B401=E6=9C=8822=E6=97=A5 16:51, Peter Xu wrote: =20
+> > >On Sun, Jan 22, 2017 at 03:56:10PM +0800, Jason Wang wrote:
+> > >
+> > >[...]
+> > > =20
+> > >>>+/**
+> > >>>+ * vtd_page_walk_level - walk over specific level for IOVA range
+> > >>>+ *
+> > >>>+ * @addr: base GPA addr to start the walk
+> > >>>+ * @start: IOVA range start address
+> > >>>+ * @end: IOVA range end address (start <=3D addr < end)
+> > >>>+ * @hook_fn: hook func to be called when detected page
+> > >>>+ * @private: private data to be passed into hook func
+> > >>>+ * @read: whether parent level has read permission
+> > >>>+ * @write: whether parent level has write permission
+> > >>>+ * @skipped: accumulated skipped ranges =20
+> > >>What's the usage for this parameter? Looks like it was never used in =
+this
+> > >>series. =20
+> > >This was for debugging purpose before, and I kept it in case one day
+> > >it can be used again, considering that will not affect much on the
+> > >overall performance. =20
+> >=20
+> > I think we usually do not keep debugging codes outside debug macros. =20
+>=20
+> I'll remove it.
 
-NAK, we can't merge mappings per my comment on 18/20.  You're looking
-at an entirely new or at best revised version of the vfio IOMMU
-interface to do so.  vfio does not support invalidations at a smaller
-granularity than the original mapping.  Thanks,
+While you're at it, what's the value in using a void* private rather
+than just passing around an IOMMUNotifier*.  Seems like unnecessary
+abstraction.  Thanks,
 
 Alex
