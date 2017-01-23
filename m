@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cViuI-0004AR-RG
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 12:59:58 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cVixX-00062L-UL
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:03:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cViuG-0008WA-Mn
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 12:59:54 -0500
-Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:35201)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cViuG-0008VK-IN
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 12:59:52 -0500
-Received: by mail-yw0-x244.google.com with SMTP id 17so18085778ywk.2
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 09:59:50 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Mon, 23 Jan 2017 09:59:45 -0800
-Message-Id: <20170123175945.9260-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL v2 00/25] New hppa-linux target support
+	(envelope-from <alex.williamson@redhat.com>) id 1cVixT-00024t-Av
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:03:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49496)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cVixT-000247-2d
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:03:11 -0500
+Date: Mon, 23 Jan 2017 11:03:08 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170123110308.5d36ce87@t450s.home>
+In-Reply-To: <20170123033429.GF26526@pxdev.xzpeter.org>
+References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
+	<1484917736-32056-19-git-send-email-peterx@redhat.com>
+	<490bbb84-213b-1b2a-5a1b-fa42a5c6a359@redhat.com>
+	<20170122090425.GB26526@pxdev.xzpeter.org>
+	<1dd223d1-dc02-bddc-02ea-78d267dd40a4@redhat.com>
+	<20170123033429.GF26526@pxdev.xzpeter.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC v4 18/20] intel_iommu: enable vfio
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,119 +33,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, deller@gmx.de
+To: Peter Xu <peterx@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org
 
-Version 2: drop patch 6 which caused the IPV6 compilation errors on
-older systems.
+On Mon, 23 Jan 2017 11:34:29 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-I suspect that the systems simply do not have proper glibc support
-for IPV6.  One can debate whether we want to get these constants
-directly from <linux/*>, or whether we want to ifdef the support.
+> On Mon, Jan 23, 2017 at 09:55:39AM +0800, Jason Wang wrote:
+> >=20
+> >=20
+> > On 2017=E5=B9=B401=E6=9C=8822=E6=97=A5 17:04, Peter Xu wrote: =20
+> > >On Sun, Jan 22, 2017 at 04:08:04PM +0800, Jason Wang wrote:
+> > >
+> > >[...]
+> > > =20
+> > >>>+static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+> > >>>+                                           uint16_t domain_id, hwad=
+dr addr,
+> > >>>+                                           uint8_t am)
+> > >>>+{
+> > >>>+    IntelIOMMUNotifierNode *node;
+> > >>>+    VTDContextEntry ce;
+> > >>>+    int ret;
+> > >>>+
+> > >>>+    QLIST_FOREACH(node, &(s->notifiers_list), next) {
+> > >>>+        VTDAddressSpace *vtd_as =3D node->vtd_as;
+> > >>>+        ret =3D vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus=
+),
+> > >>>+                                       vtd_as->devfn, &ce);
+> > >>>+        if (!ret && domain_id =3D=3D VTD_CONTEXT_ENTRY_DID(ce.hi)) {
+> > >>>+            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SI=
+ZE,
+> > >>>+                          vtd_page_invalidate_notify_hook,
+> > >>>+                          (void *)&vtd_as->iommu, true); =20
+> > >>Why not simply trigger the notifier here? (or is this vfio required?)=
+ =20
+> > >Because we may only want to notify part of the region - we are with
+> > >mask here, but not exact size.
+> > >
+> > >Consider this: guest (with caching mode) maps 12K memory (4K*3 pages),
+> > >the mask will be extended to 16K in the guest. In that case, we need
+> > >to explicitly go over the page entry to know that the 4th page should
+> > >not be notified. =20
+> >=20
+> > I see. Then it was required by vfio only, I think we can add a fast pat=
+h for
+> > !CM in this case by triggering the notifier directly. =20
+>=20
+> I noted this down (to be further investigated in my todo), but I don't
+> know whether this can work, due to the fact that I think it is still
+> legal that guest merge more than one PSIs into one. For example, I
+> don't know whether below is legal:
+>=20
+> - guest invalidate page (0, 4k)
+> - guest map new page (4k, 8k)
+> - guest send single PSI of (0, 8k)
+>=20
+> In that case, it contains both map/unmap, and looks like it didn't
+> disobay the spec as well?
 
-However, let's improve that bit of linux-user in another patch set.
+The topic of mapping and invalidation granularity also makes me
+slightly concerned with the abstraction we use for the type1 IOMMU
+backend.  With the "v2" type1 configuration we currently use in QEMU,
+the user may only unmap with the same minimum granularity with which
+the original mapping was created.  For instance if an iommu notifier
+map request gets to vfio with an 8k range, the resulting mapping can
+only be removed by an invalidation covering the full range.  Trying to
+bisect that original mapping by only invalidating 4k of the range will
+generate an error.
 
+I would think (but please confirm), that when we're only tracking
+mappings generated by the guest OS that this works.  If the guest OS
+maps with 4k pages, we get map notifies for each of those 4k pages.  If
+they use 2MB pages, we get 2MB ranges and invalidations will come in
+the same granularity.
 
-r~
+An area of concern though is the replay mechanism in QEMU, I'll need to
+look for it in the code, but replaying an IOMMU domain into a new
+container *cannot* coalesce mappings or else it limits the granularity
+with which we can later accept unmaps.  Take for instance a guest that
+has mapped a contiguous 2MB range with 4K pages.  They can unmap any 4K
+page within that range.  However if vfio gets a single 2MB mapping
+rather than 512 4K mappings, then the host IOMMU may use a hugepage
+mapping where our granularity is now 2MB.  Thanks,
 
-
-The following changes since commit d1c82f7cc34443841095f490345f86c9d8baca34:
-
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20170120-v2' into staging (2017-01-20 15:53:58 +0000)
-
-are available in the git repository at:
-
-  git://github.com/rth7680/qemu.git tags/pull-hppa-20170123
-
-for you to fetch changes up to ebe9383caefd56d519e965a5d87bca29f0aeffe3:
-
-  target-hppa: Implement floating-point insns (2017-01-23 09:52:40 -0800)
-
-----------------------------------------------------------------
-hppa-linux target support
-
-----------------------------------------------------------------
-Helge Deller (3):
-      linux-user: Handle TIOCSTART and TIOCSTOP
-      linux-user: Add SIOCGPGRP, SIOCGSTAMP, SIOCGSTAMPNS
-      linux-user: Add some hppa ioctls
-
-Richard Henderson (22):
-      Revert "Remove remainders of HPPA backend"
-      linux-user: Support stack-grows-up in elfload.c
-      linux-user: Handle ERFKILL and EHWPOISON
-      linux-user: Add HPPA socket.h definitions
-      linux-user: Add HPPA syscall numbers
-      linux-user: Add HPPA termbits.h
-      linux-user: Add HPPA target_syscall.h
-      linux-user: Add HPPA definitions to syscall_defs.h
-      linux-user: Add HPPA target_structs.h
-      linux-user: Add HPPA target_signal.h and target_cpu.h
-      linux-user: Add HPPA signal handling
-      linux-user: Add HPPA startup and main loop
-      target-hppa: Add softfloat specializations
-      target-hppa: Add framework and enable compilation
-      target-hppa: Add nullification framework
-      target-hppa: Implement basic arithmetic
-      target-hppa: Implement branches
-      target-hppa: Implement linux-user gateway page
-      target-hppa: Implement shifts and deposits
-      target-hppa: Implement loads and stores
-      target-hppa: Implement system and memory-management insns
-      target-hppa: Implement floating-point insns
-
- MAINTAINERS                         |    6 +
- configure                           |    7 +-
- default-configs/hppa-linux-user.mak |    1 +
- disas.c                             |    2 +
- disas/Makefile.objs                 |    1 +
- disas/hppa.c                        | 2832 +++++++++++++++++++++++++
- fpu/softfloat-specialize.h          |   20 +-
- linux-user/alpha/target_syscall.h   |    2 +
- linux-user/elfload.c                |  259 ++-
- linux-user/errno_defs.h             |    3 +
- linux-user/hppa/sockbits.h          |   97 +
- linux-user/hppa/syscall_nr.h        |  353 ++++
- linux-user/hppa/target_cpu.h        |   35 +
- linux-user/hppa/target_signal.h     |   29 +
- linux-user/hppa/target_structs.h    |   54 +
- linux-user/hppa/target_syscall.h    |  237 +++
- linux-user/hppa/termbits.h          |  219 ++
- linux-user/ioctls.h                 |    8 +
- linux-user/main.c                   |  185 +-
- linux-user/mips/target_syscall.h    |    5 +
- linux-user/mips64/target_syscall.h  |    5 +
- linux-user/qemu.h                   |    3 +
- linux-user/signal.c                 |  191 +-
- linux-user/socket.h                 |    2 +
- linux-user/syscall.c                |   12 +
- linux-user/syscall_defs.h           |  154 +-
- linux-user/syscall_types.h          |    6 +
- target/hppa/Makefile.objs           |    1 +
- target/hppa/cpu-qom.h               |   52 +
- target/hppa/cpu.c                   |  164 ++
- target/hppa/cpu.h                   |  144 ++
- target/hppa/gdbstub.c               |  111 +
- target/hppa/helper.c                |  137 ++
- target/hppa/helper.h                |   66 +
- target/hppa/op_helper.c             |  570 +++++
- target/hppa/translate.c             | 3946 +++++++++++++++++++++++++++++++++++
- 36 files changed, 9842 insertions(+), 77 deletions(-)
- create mode 100644 default-configs/hppa-linux-user.mak
- create mode 100644 disas/hppa.c
- create mode 100644 linux-user/hppa/sockbits.h
- create mode 100644 linux-user/hppa/syscall_nr.h
- create mode 100644 linux-user/hppa/target_cpu.h
- create mode 100644 linux-user/hppa/target_signal.h
- create mode 100644 linux-user/hppa/target_structs.h
- create mode 100644 linux-user/hppa/target_syscall.h
- create mode 100644 linux-user/hppa/termbits.h
- create mode 100644 target/hppa/Makefile.objs
- create mode 100644 target/hppa/cpu-qom.h
- create mode 100644 target/hppa/cpu.c
- create mode 100644 target/hppa/cpu.h
- create mode 100644 target/hppa/gdbstub.c
- create mode 100644 target/hppa/helper.c
- create mode 100644 target/hppa/helper.h
- create mode 100644 target/hppa/op_helper.c
- create mode 100644 target/hppa/translate.c
+Alex
