@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVUDE-0007yY-Ut
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:31 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cVUDI-00082o-JH
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVUDC-0004y7-BX
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:28 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35609)
+	(envelope-from <rth7680@gmail.com>) id 1cVUDE-0004yr-Sg
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:32 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36680)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cVUDC-0004xz-4v
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:26 -0500
-Received: by mail-qt0-x242.google.com with SMTP id f4so14078180qte.2
-	for <qemu-devel@nongnu.org>; Sun, 22 Jan 2017 18:18:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cVUDE-0004yh-Mb
+	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 21:18:28 -0500
+Received: by mail-qt0-x244.google.com with SMTP id l7so14117436qtd.3
+	for <qemu-devel@nongnu.org>; Sun, 22 Jan 2017 18:18:28 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Sun, 22 Jan 2017 18:17:46 -0800
-Message-Id: <20170123021748.13170-25-rth@twiddle.net>
+Date: Sun, 22 Jan 2017 18:17:48 -0800
+Message-Id: <20170123021748.13170-27-rth@twiddle.net>
 In-Reply-To: <20170123021748.13170-1-rth@twiddle.net>
 References: <20170123021748.13170-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 24/26] target-hppa: Implement loads and stores
+Subject: [Qemu-devel] [PULL 26/26] target-hppa: Implement floating-point
+ insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,802 +32,1279 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/hppa/helper.h    |   3 +
- target/hppa/op_helper.c |  78 ++++++
- target/hppa/translate.c | 618 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 699 insertions(+)
+ target/hppa/helper.h    |  55 ++++
+ target/hppa/op_helper.c | 394 ++++++++++++++++++++++++++
+ target/hppa/translate.c | 728 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 1177 insertions(+)
 
 diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index ecff17c..88db719 100644
+index d51cf6d..789f07f 100644
 --- a/target/hppa/helper.h
 +++ b/target/hppa/helper.h
-@@ -2,4 +2,7 @@ DEF_HELPER_2(excp, noreturn, env, int)
- DEF_HELPER_FLAGS_2(tsv, TCG_CALL_NO_WG, void, env, tl)
- DEF_HELPER_FLAGS_2(tcond, TCG_CALL_NO_WG, void, env, tl)
+@@ -9,3 +9,58 @@ DEF_HELPER_FLAGS_1(probe_r, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_1(probe_w, TCG_CALL_NO_RWG_SE, tl, tl)
  
-+DEF_HELPER_FLAGS_3(stby_b, TCG_CALL_NO_WG, void, env, tl, tl)
-+DEF_HELPER_FLAGS_3(stby_e, TCG_CALL_NO_WG, void, env, tl, tl)
-+
  DEF_HELPER_FLAGS_1(loaded_fr0, TCG_CALL_NO_RWG, void, env)
++
++DEF_HELPER_FLAGS_2(fsqrt_s, TCG_CALL_NO_RWG, f32, env, f32)
++DEF_HELPER_FLAGS_2(frnd_s, TCG_CALL_NO_RWG, f32, env, f32)
++DEF_HELPER_FLAGS_3(fadd_s, TCG_CALL_NO_RWG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fsub_s, TCG_CALL_NO_RWG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fmpy_s, TCG_CALL_NO_RWG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fdiv_s, TCG_CALL_NO_RWG, f32, env, f32, f32)
++
++DEF_HELPER_FLAGS_2(fsqrt_d, TCG_CALL_NO_RWG, f64, env, f64)
++DEF_HELPER_FLAGS_2(frnd_d, TCG_CALL_NO_RWG, f64, env, f64)
++DEF_HELPER_FLAGS_3(fadd_d, TCG_CALL_NO_RWG, f64, env, f64, f64)
++DEF_HELPER_FLAGS_3(fsub_d, TCG_CALL_NO_RWG, f64, env, f64, f64)
++DEF_HELPER_FLAGS_3(fmpy_d, TCG_CALL_NO_RWG, f64, env, f64, f64)
++DEF_HELPER_FLAGS_3(fdiv_d, TCG_CALL_NO_RWG, f64, env, f64, f64)
++
++DEF_HELPER_FLAGS_2(fcnv_s_d, TCG_CALL_NO_RWG, f64, env, f32)
++DEF_HELPER_FLAGS_2(fcnv_d_s, TCG_CALL_NO_RWG, f32, env, f64)
++
++DEF_HELPER_FLAGS_2(fcnv_w_s, TCG_CALL_NO_RWG, f32, env, s32)
++DEF_HELPER_FLAGS_2(fcnv_dw_s, TCG_CALL_NO_RWG, f32, env, s64)
++DEF_HELPER_FLAGS_2(fcnv_w_d, TCG_CALL_NO_RWG, f64, env, s32)
++DEF_HELPER_FLAGS_2(fcnv_dw_d, TCG_CALL_NO_RWG, f64, env, s64)
++
++DEF_HELPER_FLAGS_2(fcnv_s_w, TCG_CALL_NO_RWG, s32, env, f32)
++DEF_HELPER_FLAGS_2(fcnv_d_w, TCG_CALL_NO_RWG, s32, env, f64)
++DEF_HELPER_FLAGS_2(fcnv_s_dw, TCG_CALL_NO_RWG, s64, env, f32)
++DEF_HELPER_FLAGS_2(fcnv_d_dw, TCG_CALL_NO_RWG, s64, env, f64)
++
++DEF_HELPER_FLAGS_2(fcnv_t_s_w, TCG_CALL_NO_RWG, s32, env, f32)
++DEF_HELPER_FLAGS_2(fcnv_t_d_w, TCG_CALL_NO_RWG, s32, env, f64)
++DEF_HELPER_FLAGS_2(fcnv_t_s_dw, TCG_CALL_NO_RWG, s64, env, f32)
++DEF_HELPER_FLAGS_2(fcnv_t_d_dw, TCG_CALL_NO_RWG, s64, env, f64)
++
++DEF_HELPER_FLAGS_2(fcnv_uw_s, TCG_CALL_NO_RWG, f32, env, i32)
++DEF_HELPER_FLAGS_2(fcnv_udw_s, TCG_CALL_NO_RWG, f32, env, i64)
++DEF_HELPER_FLAGS_2(fcnv_uw_d, TCG_CALL_NO_RWG, f64, env, i32)
++DEF_HELPER_FLAGS_2(fcnv_udw_d, TCG_CALL_NO_RWG, f64, env, i64)
++
++DEF_HELPER_FLAGS_2(fcnv_s_uw, TCG_CALL_NO_RWG, i32, env, f32)
++DEF_HELPER_FLAGS_2(fcnv_d_uw, TCG_CALL_NO_RWG, i32, env, f64)
++DEF_HELPER_FLAGS_2(fcnv_s_udw, TCG_CALL_NO_RWG, i64, env, f32)
++DEF_HELPER_FLAGS_2(fcnv_d_udw, TCG_CALL_NO_RWG, i64, env, f64)
++
++DEF_HELPER_FLAGS_2(fcnv_t_s_uw, TCG_CALL_NO_RWG, i32, env, f32)
++DEF_HELPER_FLAGS_2(fcnv_t_d_uw, TCG_CALL_NO_RWG, i32, env, f64)
++DEF_HELPER_FLAGS_2(fcnv_t_s_udw, TCG_CALL_NO_RWG, i64, env, f32)
++DEF_HELPER_FLAGS_2(fcnv_t_d_udw, TCG_CALL_NO_RWG, i64, env, f64)
++
++DEF_HELPER_FLAGS_5(fcmp_s, TCG_CALL_NO_RWG, void, env, f32, f32, i32, i32)
++DEF_HELPER_FLAGS_5(fcmp_d, TCG_CALL_NO_RWG, void, env, f64, f64, i32, i32)
++
++DEF_HELPER_FLAGS_4(fmpyfadd_s, TCG_CALL_NO_RWG, i32, env, i32, i32, i32)
++DEF_HELPER_FLAGS_4(fmpynfadd_s, TCG_CALL_NO_RWG, i32, env, i32, i32, i32)
++DEF_HELPER_FLAGS_4(fmpyfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++DEF_HELPER_FLAGS_4(fmpynfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
 diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index f36ce74..0aa5fb9 100644
+index 670e600..c05c0d5 100644
 --- a/target/hppa/op_helper.c
 +++ b/target/hppa/op_helper.c
-@@ -21,6 +21,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
-+#include "exec/cpu_ldst.h"
- 
- void QEMU_NORETURN HELPER(excp)(CPUHPPAState *env, int excp)
+@@ -174,3 +174,397 @@ void cpu_hppa_loaded_fr0(CPUHPPAState *env)
  {
-@@ -54,6 +55,83 @@ void HELPER(tcond)(CPUHPPAState *env, target_ulong cond)
-     }
+     helper_loaded_fr0(env);
  }
- 
-+static void atomic_store_3(CPUHPPAState *env, target_ulong addr, uint32_t val,
-+                           uint32_t mask, uintptr_t ra)
-+{
-+    uint32_t old, new, cmp;
 +
-+#ifdef CONFIG_USER_ONLY
-+    uint32_t *haddr = g2h(addr - 1);
-+    old = *haddr;
-+    while (1) {
-+        new = (old & ~mask) | (val & mask);
-+        cmp = atomic_cmpxchg(haddr, old, new);
-+        if (cmp == old) {
-+            return;
-+        }
-+        old = cmp;
++#define CONVERT_BIT(X, SRC, DST)        \
++    ((SRC) > (DST)                      \
++     ? (X) / ((SRC) / (DST)) & (DST)    \
++     : ((X) & (SRC)) * ((DST) / (SRC)))
++
++static void update_fr0_op(CPUHPPAState *env, uintptr_t ra)
++{
++    uint32_t soft_exp = get_float_exception_flags(&env->fp_status);
++    uint32_t hard_exp = 0;
++    uint32_t shadow = env->fr0_shadow;
++
++    if (likely(soft_exp == 0)) {
++        env->fr[0] = (uint64_t)shadow << 32;
++        return;
 +    }
-+#else
-+#error "Not implemented."
-+#endif
++    set_float_exception_flags(0, &env->fp_status);
++
++    hard_exp |= CONVERT_BIT(soft_exp, float_flag_inexact,   1u << 0);
++    hard_exp |= CONVERT_BIT(soft_exp, float_flag_underflow, 1u << 1);
++    hard_exp |= CONVERT_BIT(soft_exp, float_flag_overflow,  1u << 2);
++    hard_exp |= CONVERT_BIT(soft_exp, float_flag_divbyzero, 1u << 3);
++    hard_exp |= CONVERT_BIT(soft_exp, float_flag_invalid,   1u << 4);
++    shadow |= hard_exp << (32 - 5);
++    env->fr0_shadow = shadow;
++    env->fr[0] = (uint64_t)shadow << 32;
++
++    if (hard_exp & shadow) {
++        dynexcp(env, EXCP_SIGFPE, ra);
++    }
 +}
 +
-+void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ulong val)
++float32 HELPER(fsqrt_s)(CPUHPPAState *env, float32 arg)
 +{
-+    uintptr_t ra = GETPC();
++    float32 ret = float32_sqrt(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
 +
-+    switch (addr & 3) {
-+    case 3:
-+        cpu_stb_data_ra(env, addr, val, ra);
++float32 HELPER(frnd_s)(CPUHPPAState *env, float32 arg)
++{
++    float32 ret = float32_round_to_int(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fadd_s)(CPUHPPAState *env, float32 a, float32 b)
++{
++    float32 ret = float32_add(a, b, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fsub_s)(CPUHPPAState *env, float32 a, float32 b)
++{
++    float32 ret = float32_sub(a, b, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fmpy_s)(CPUHPPAState *env, float32 a, float32 b)
++{
++    float32 ret = float32_mul(a, b, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fdiv_s)(CPUHPPAState *env, float32 a, float32 b)
++{
++    float32 ret = float32_div(a, b, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fsqrt_d)(CPUHPPAState *env, float64 arg)
++{
++    float64 ret = float64_sqrt(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(frnd_d)(CPUHPPAState *env, float64 arg)
++{
++    float64 ret = float64_round_to_int(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fadd_d)(CPUHPPAState *env, float64 a, float64 b)
++{
++    float64 ret = float64_add(a, b, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fsub_d)(CPUHPPAState *env, float64 a, float64 b)
++{
++    float64 ret = float64_sub(a, b, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fmpy_d)(CPUHPPAState *env, float64 a, float64 b)
++{
++    float64 ret = float64_mul(a, b, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fdiv_d)(CPUHPPAState *env, float64 a, float64 b)
++{
++    float64 ret = float64_div(a, b, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fcnv_s_d)(CPUHPPAState *env, float32 arg)
++{
++    float64 ret = float32_to_float64(arg, &env->fp_status);
++    ret = float64_maybe_silence_nan(ret, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fcnv_d_s)(CPUHPPAState *env, float64 arg)
++{
++    float32 ret = float64_to_float32(arg, &env->fp_status);
++    ret = float32_maybe_silence_nan(ret, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fcnv_w_s)(CPUHPPAState *env, int32_t arg)
++{
++    float32 ret = int32_to_float32(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fcnv_dw_s)(CPUHPPAState *env, int64_t arg)
++{
++    float32 ret = int64_to_float32(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fcnv_w_d)(CPUHPPAState *env, int32_t arg)
++{
++    float64 ret = int32_to_float64(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fcnv_dw_d)(CPUHPPAState *env, int64_t arg)
++{
++    float64 ret = int64_to_float64(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++int32_t HELPER(fcnv_s_w)(CPUHPPAState *env, float32 arg)
++{
++    int32_t ret = float32_to_int32(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++int32_t HELPER(fcnv_d_w)(CPUHPPAState *env, float64 arg)
++{
++    int32_t ret = float64_to_int32(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++int64_t HELPER(fcnv_s_dw)(CPUHPPAState *env, float32 arg)
++{
++    int64_t ret = float32_to_int64(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++int64_t HELPER(fcnv_d_dw)(CPUHPPAState *env, float64 arg)
++{
++    int64_t ret = float64_to_int64(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++int32_t HELPER(fcnv_t_s_w)(CPUHPPAState *env, float32 arg)
++{
++    int32_t ret = float32_to_int32_round_to_zero(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++int32_t HELPER(fcnv_t_d_w)(CPUHPPAState *env, float64 arg)
++{
++    int32_t ret = float64_to_int32_round_to_zero(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++int64_t HELPER(fcnv_t_s_dw)(CPUHPPAState *env, float32 arg)
++{
++    int64_t ret = float32_to_int64_round_to_zero(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++int64_t HELPER(fcnv_t_d_dw)(CPUHPPAState *env, float64 arg)
++{
++    int64_t ret = float64_to_int64_round_to_zero(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fcnv_uw_s)(CPUHPPAState *env, uint32_t arg)
++{
++    float32 ret = uint32_to_float32(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fcnv_udw_s)(CPUHPPAState *env, uint64_t arg)
++{
++    float32 ret = uint64_to_float32(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fcnv_uw_d)(CPUHPPAState *env, uint32_t arg)
++{
++    float64 ret = uint32_to_float64(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fcnv_udw_d)(CPUHPPAState *env, uint64_t arg)
++{
++    float64 ret = uint64_to_float64(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++uint32_t HELPER(fcnv_s_uw)(CPUHPPAState *env, float32 arg)
++{
++    uint32_t ret = float32_to_uint32(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++uint32_t HELPER(fcnv_d_uw)(CPUHPPAState *env, float64 arg)
++{
++    uint32_t ret = float64_to_uint32(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++uint64_t HELPER(fcnv_s_udw)(CPUHPPAState *env, float32 arg)
++{
++    uint64_t ret = float32_to_uint64(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++uint64_t HELPER(fcnv_d_udw)(CPUHPPAState *env, float64 arg)
++{
++    uint64_t ret = float64_to_uint64(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++uint32_t HELPER(fcnv_t_s_uw)(CPUHPPAState *env, float32 arg)
++{
++    uint32_t ret = float32_to_uint32_round_to_zero(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++uint32_t HELPER(fcnv_t_d_uw)(CPUHPPAState *env, float64 arg)
++{
++    uint32_t ret = float64_to_uint32_round_to_zero(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++uint64_t HELPER(fcnv_t_s_udw)(CPUHPPAState *env, float32 arg)
++{
++    uint64_t ret = float32_to_uint64_round_to_zero(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++uint64_t HELPER(fcnv_t_d_udw)(CPUHPPAState *env, float64 arg)
++{
++    uint64_t ret = float64_to_uint64_round_to_zero(arg, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++static void update_fr0_cmp(CPUHPPAState *env, uint32_t y, uint32_t c, int r)
++{
++    uint32_t shadow = env->fr0_shadow;
++
++    switch (r) {
++    case float_relation_greater:
++        c = extract32(c, 4, 1);
 +        break;
-+    case 2:
-+        cpu_stw_data_ra(env, addr, val, ra);
++    case float_relation_less:
++        c = extract32(c, 3, 1);
 +        break;
-+    case 1:
-+        /* The 3 byte store must appear atomic.  */
-+        if (parallel_cpus) {
-+            atomic_store_3(env, addr, val, 0x00ffffffu, ra);
-+        } else {
-+            cpu_stb_data_ra(env, addr, val >> 16, ra);
-+            cpu_stw_data_ra(env, addr + 1, val, ra);
-+        }
++    case float_relation_equal:
++        c = extract32(c, 2, 1);
++        break;
++    case float_relation_unordered:
++        c = extract32(c, 1, 1);
 +        break;
 +    default:
-+        cpu_stl_data_ra(env, addr, val, ra);
-+        break;
++        g_assert_not_reached();
 +    }
++
++    if (y) {
++        /* targeted comparison */
++        /* set fpsr[ca[y - 1]] to current compare */
++        shadow = deposit32(shadow, 21 - (y - 1), 1, c);
++    } else {
++        /* queued comparison */
++        /* shift cq right by one place */
++        shadow = deposit32(shadow, 11, 10, extract32(shadow, 12, 10));
++        /* move fpsr[c] to fpsr[cq[0]] */
++        shadow = deposit32(shadow, 21, 1, extract32(shadow, 26, 1));
++        /* set fpsr[c] to current compare */
++        shadow = deposit32(shadow, 26, 1, c);
++    }
++
++    env->fr0_shadow = shadow;
++    env->fr[0] = (uint64_t)shadow << 32;
 +}
 +
-+void HELPER(stby_e)(CPUHPPAState *env, target_ulong addr, target_ulong val)
++void HELPER(fcmp_s)(CPUHPPAState *env, float32 a, float32 b,
++                    uint32_t y, uint32_t c)
 +{
-+    uintptr_t ra = GETPC();
-+
-+    switch (addr & 3) {
-+    case 3:
-+        /* The 3 byte store must appear atomic.  */
-+        if (parallel_cpus) {
-+            atomic_store_3(env, addr - 3, val, 0xffffff00u, ra);
-+        } else {
-+            cpu_stw_data_ra(env, addr - 3, val >> 16, ra);
-+            cpu_stb_data_ra(env, addr - 1, val >> 8, ra);
-+        }
-+        break;
-+    case 2:
-+        cpu_stw_data_ra(env, addr - 2, val >> 16, ra);
-+        break;
-+    case 1:
-+        cpu_stb_data_ra(env, addr - 1, val >> 24, ra);
-+        break;
-+    default:
-+        /* Nothing is stored, but protection is checked and the
-+           cacheline is marked dirty.  */
-+#ifndef CONFIG_USER_ONLY
-+        probe_write(env, addr, cpu_mmu_index(env, 0), ra);
-+#endif
-+        break;
++    int r;
++    if (c & 1) {
++        r = float32_compare(a, b, &env->fp_status);
++    } else {
++        r = float32_compare_quiet(a, b, &env->fp_status);
 +    }
++    update_fr0_op(env, GETPC());
++    update_fr0_cmp(env, y, c, r);
 +}
 +
- void HELPER(loaded_fr0)(CPUHPPAState *env)
- {
-     uint32_t shadow = env->fr[0] >> 32;
++void HELPER(fcmp_d)(CPUHPPAState *env, float64 a, float64 b,
++                    uint32_t y, uint32_t c)
++{
++    int r;
++    if (c & 1) {
++        r = float64_compare(a, b, &env->fp_status);
++    } else {
++        r = float64_compare_quiet(a, b, &env->fp_status);
++    }
++    update_fr0_op(env, GETPC());
++    update_fr0_cmp(env, y, c, r);
++}
++
++float32 HELPER(fmpyfadd_s)(CPUHPPAState *env, float32 a, float32 b, float32 c)
++{
++    float32 ret = float32_muladd(a, b, c, 0, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float32 HELPER(fmpynfadd_s)(CPUHPPAState *env, float32 a, float32 b, float32 c)
++{
++    float32 ret = float32_muladd(a, b, c, float_muladd_negate_product,
++                                 &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fmpyfadd_d)(CPUHPPAState *env, float64 a, float64 b, float64 c)
++{
++    float64 ret = float64_muladd(a, b, c, 0, &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
++
++float64 HELPER(fmpynfadd_d)(CPUHPPAState *env, float64 a, float64 b, float64 c)
++{
++    float64 ret = float64_muladd(a, b, c, float_muladd_negate_product,
++                                 &env->fp_status);
++    update_fr0_op(env, GETPC());
++    return ret;
++}
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 093a65e..1973777 100644
+index cfdb9ee..4d243f7 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -278,6 +278,45 @@ static void save_gpr(DisasContext *ctx, unsigned reg, TCGv t)
-     }
+@@ -85,6 +85,12 @@ typedef struct DisasInsn {
+                         const struct DisasInsn *f);
+     union {
+         void (*f_ttt)(TCGv, TCGv, TCGv);
++        void (*f_weww)(TCGv_i32, TCGv_env, TCGv_i32, TCGv_i32);
++        void (*f_dedd)(TCGv_i64, TCGv_env, TCGv_i64, TCGv_i64);
++        void (*f_wew)(TCGv_i32, TCGv_env, TCGv_i32);
++        void (*f_ded)(TCGv_i64, TCGv_env, TCGv_i64);
++        void (*f_wed)(TCGv_i32, TCGv_env, TCGv_i64);
++        void (*f_dew)(TCGv_i64, TCGv_env, TCGv_i32);
+     };
+ } DisasInsn;
+ 
+@@ -295,6 +301,28 @@ static TCGv_i32 load_frw_i32(unsigned rt)
+     return ret;
  }
  
-+#ifdef HOST_WORDS_BIGENDIAN
-+# define HI_OFS  0
-+# define LO_OFS  4
-+#else
-+# define HI_OFS  4
-+# define LO_OFS  0
-+#endif
-+
-+static TCGv_i32 load_frw_i32(unsigned rt)
++static TCGv_i32 load_frw0_i32(unsigned rt)
 +{
-+    TCGv_i32 ret = tcg_temp_new_i32();
-+    tcg_gen_ld_i32(ret, cpu_env,
-+                   offsetof(CPUHPPAState, fr[rt & 31])
-+                   + (rt & 32 ? LO_OFS : HI_OFS));
-+    return ret;
++    if (rt == 0) {
++        return tcg_const_i32(0);
++    } else {
++        return load_frw_i32(rt);
++    }
 +}
 +
-+static void save_frw_i32(unsigned rt, TCGv_i32 val)
++static TCGv_i64 load_frw0_i64(unsigned rt)
 +{
-+    tcg_gen_st_i32(val, cpu_env,
-+                   offsetof(CPUHPPAState, fr[rt & 31])
-+                   + (rt & 32 ? LO_OFS : HI_OFS));
++    if (rt == 0) {
++        return tcg_const_i64(0);
++    } else {
++        TCGv_i64 ret = tcg_temp_new_i64();
++        tcg_gen_ld32u_i64(ret, cpu_env,
++                          offsetof(CPUHPPAState, fr[rt & 31])
++                          + (rt & 32 ? LO_OFS : HI_OFS));
++        return ret;
++    }
 +}
 +
-+#undef HI_OFS
-+#undef LO_OFS
-+
-+static TCGv_i64 load_frd(unsigned rt)
-+{
-+    TCGv_i64 ret = tcg_temp_new_i64();
-+    tcg_gen_ld_i64(ret, cpu_env, offsetof(CPUHPPAState, fr[rt]));
-+    return ret;
-+}
-+
-+static void save_frd(unsigned rt, TCGv_i64 val)
-+{
-+    tcg_gen_st_i64(val, cpu_env, offsetof(CPUHPPAState, fr[rt]));
-+}
-+
- /* Skip over the implementation of an insn that has been nullified.
-    Use this when the insn is too complex for a conditional move.  */
- static void nullify_over(DisasContext *ctx)
-@@ -471,6 +510,16 @@ static target_long assemble_16(uint32_t insn)
-     return low_sextract(insn, 0, 14);
+ static void save_frw_i32(unsigned rt, TCGv_i32 val)
+ {
+     tcg_gen_st_i32(val, cpu_env,
+@@ -312,6 +340,15 @@ static TCGv_i64 load_frd(unsigned rt)
+     return ret;
  }
  
-+static target_long assemble_16a(uint32_t insn)
++static TCGv_i64 load_frd0(unsigned rt)
 +{
-+    /* Take the name from PA2.0, which produces a 14-bit shifted number
-+       only with wide mode; otherwise a 12-bit shifted number.  Since we
-+       don't implement wide mode, this is always the 12-bit number.  */
-+    target_ulong x = -(target_ulong)(insn & 1);
-+    x = (x << 11) | extract32(insn, 2, 11);
-+    return x << 2;
++    if (rt == 0) {
++        return tcg_const_i64(0);
++    } else {
++        return load_frd(rt);
++    }
 +}
 +
- static target_long assemble_17(uint32_t insn)
+ static void save_frd(unsigned rt, TCGv_i64 val)
+ {
+     tcg_gen_st_i64(val, cpu_env, offsetof(CPUHPPAState, fr[rt]));
+@@ -494,6 +531,35 @@ static target_long low_sextract(uint32_t val, int pos, int len)
+     return x;
+ }
+ 
++static unsigned assemble_rt64(uint32_t insn)
++{
++    unsigned r1 = extract32(insn, 6, 1);
++    unsigned r0 = extract32(insn, 0, 5);
++    return r1 * 32 + r0;
++}
++
++static unsigned assemble_ra64(uint32_t insn)
++{
++    unsigned r1 = extract32(insn, 7, 1);
++    unsigned r0 = extract32(insn, 21, 5);
++    return r1 * 32 + r0;
++}
++
++static unsigned assemble_rb64(uint32_t insn)
++{
++    unsigned r1 = extract32(insn, 12, 1);
++    unsigned r0 = extract32(insn, 16, 5);
++    return r1 * 32 + r0;
++}
++
++static unsigned assemble_rc64(uint32_t insn)
++{
++    unsigned r2 = extract32(insn, 8, 1);
++    unsigned r1 = extract32(insn, 13, 3);
++    unsigned r0 = extract32(insn, 9, 2);
++    return r2 * 32 + r1 * 4 + r0;
++}
++
+ static target_long assemble_12(uint32_t insn)
  {
      target_ulong x = -(target_ulong)(insn & 1);
-@@ -941,6 +990,234 @@ static ExitStatus do_unit(DisasContext *ctx, unsigned rt, TCGv in1,
-     return NO_EXIT;
+@@ -1218,6 +1284,110 @@ static ExitStatus do_fstored(DisasContext *ctx, unsigned rt, unsigned rb,
+     return nullify_end(ctx, NO_EXIT);
  }
  
-+/* Emit a memory load.  The modify parameter should be
-+ * < 0 for pre-modify,
-+ * > 0 for post-modify,
-+ * = 0 for no base register update.
-+ */
-+static void do_load_32(DisasContext *ctx, TCGv_i32 dest, unsigned rb,
-+                       unsigned rx, int scale, target_long disp,
-+                       int modify, TCGMemOp mop)
-+{
-+    TCGv addr, base;
-+
-+    /* Caller uses nullify_over/nullify_end.  */
-+    assert(ctx->null_cond.c == TCG_COND_NEVER);
-+
-+    addr = tcg_temp_new();
-+    base = load_gpr(ctx, rb);
-+
-+    /* Note that RX is mutually exclusive with DISP.  */
-+    if (rx) {
-+        tcg_gen_shli_tl(addr, cpu_gr[rx], scale);
-+        tcg_gen_add_tl(addr, addr, base);
-+    } else {
-+        tcg_gen_addi_tl(addr, base, disp);
-+    }
-+
-+    if (modify == 0) {
-+        tcg_gen_qemu_ld_i32(dest, addr, MMU_USER_IDX, mop);
-+    } else {
-+        tcg_gen_qemu_ld_i32(dest, (modify < 0 ? addr : base),
-+                            MMU_USER_IDX, mop);
-+        save_gpr(ctx, rb, addr);
-+    }
-+    tcg_temp_free(addr);
-+}
-+
-+static void do_load_64(DisasContext *ctx, TCGv_i64 dest, unsigned rb,
-+                       unsigned rx, int scale, target_long disp,
-+                       int modify, TCGMemOp mop)
-+{
-+    TCGv addr, base;
-+
-+    /* Caller uses nullify_over/nullify_end.  */
-+    assert(ctx->null_cond.c == TCG_COND_NEVER);
-+
-+    addr = tcg_temp_new();
-+    base = load_gpr(ctx, rb);
-+
-+    /* Note that RX is mutually exclusive with DISP.  */
-+    if (rx) {
-+        tcg_gen_shli_tl(addr, cpu_gr[rx], scale);
-+        tcg_gen_add_tl(addr, addr, base);
-+    } else {
-+        tcg_gen_addi_tl(addr, base, disp);
-+    }
-+
-+    if (modify == 0) {
-+        tcg_gen_qemu_ld_i64(dest, addr, MMU_USER_IDX, mop);
-+    } else {
-+        tcg_gen_qemu_ld_i64(dest, (modify < 0 ? addr : base),
-+                            MMU_USER_IDX, mop);
-+        save_gpr(ctx, rb, addr);
-+    }
-+    tcg_temp_free(addr);
-+}
-+
-+static void do_store_32(DisasContext *ctx, TCGv_i32 src, unsigned rb,
-+                        unsigned rx, int scale, target_long disp,
-+                        int modify, TCGMemOp mop)
-+{
-+    TCGv addr, base;
-+
-+    /* Caller uses nullify_over/nullify_end.  */
-+    assert(ctx->null_cond.c == TCG_COND_NEVER);
-+
-+    addr = tcg_temp_new();
-+    base = load_gpr(ctx, rb);
-+
-+    /* Note that RX is mutually exclusive with DISP.  */
-+    if (rx) {
-+        tcg_gen_shli_tl(addr, cpu_gr[rx], scale);
-+        tcg_gen_add_tl(addr, addr, base);
-+    } else {
-+        tcg_gen_addi_tl(addr, base, disp);
-+    }
-+
-+    tcg_gen_qemu_st_i32(src, (modify <= 0 ? addr : base), MMU_USER_IDX, mop);
-+
-+    if (modify != 0) {
-+        save_gpr(ctx, rb, addr);
-+    }
-+    tcg_temp_free(addr);
-+}
-+
-+static void do_store_64(DisasContext *ctx, TCGv_i64 src, unsigned rb,
-+                        unsigned rx, int scale, target_long disp,
-+                        int modify, TCGMemOp mop)
-+{
-+    TCGv addr, base;
-+
-+    /* Caller uses nullify_over/nullify_end.  */
-+    assert(ctx->null_cond.c == TCG_COND_NEVER);
-+
-+    addr = tcg_temp_new();
-+    base = load_gpr(ctx, rb);
-+
-+    /* Note that RX is mutually exclusive with DISP.  */
-+    if (rx) {
-+        tcg_gen_shli_tl(addr, cpu_gr[rx], scale);
-+        tcg_gen_add_tl(addr, addr, base);
-+    } else {
-+        tcg_gen_addi_tl(addr, base, disp);
-+    }
-+
-+    tcg_gen_qemu_st_i64(src, (modify <= 0 ? addr : base), MMU_USER_IDX, mop);
-+
-+    if (modify != 0) {
-+        save_gpr(ctx, rb, addr);
-+    }
-+    tcg_temp_free(addr);
-+}
-+
-+#if TARGET_LONG_BITS == 64
-+#define do_load_tl  do_load_64
-+#define do_store_tl do_store_64
-+#else
-+#define do_load_tl  do_load_32
-+#define do_store_tl do_store_32
-+#endif
-+
-+static ExitStatus do_load(DisasContext *ctx, unsigned rt, unsigned rb,
-+                          unsigned rx, int scale, target_long disp,
-+                          int modify, TCGMemOp mop)
-+{
-+    TCGv dest;
-+
-+    nullify_over(ctx);
-+
-+    if (modify == 0) {
-+        /* No base register update.  */
-+        dest = dest_gpr(ctx, rt);
-+    } else {
-+        /* Make sure if RT == RB, we see the result of the load.  */
-+        dest = get_temp(ctx);
-+    }
-+    do_load_tl(ctx, dest, rb, rx, scale, disp, modify, mop);
-+    save_gpr(ctx, rt, dest);
-+
-+    return nullify_end(ctx, NO_EXIT);
-+}
-+
-+static ExitStatus do_floadw(DisasContext *ctx, unsigned rt, unsigned rb,
-+                            unsigned rx, int scale, target_long disp,
-+                            int modify)
++static ExitStatus do_fop_wew(DisasContext *ctx, unsigned rt, unsigned ra,
++                             void (*func)(TCGv_i32, TCGv_env, TCGv_i32))
 +{
 +    TCGv_i32 tmp;
 +
 +    nullify_over(ctx);
++    tmp = load_frw0_i32(ra);
 +
-+    tmp = tcg_temp_new_i32();
-+    do_load_32(ctx, tmp, rb, rx, scale, disp, modify, MO_TEUL);
++    func(tmp, cpu_env, tmp);
++
 +    save_frw_i32(rt, tmp);
 +    tcg_temp_free_i32(tmp);
-+
-+    if (rt == 0) {
-+        gen_helper_loaded_fr0(cpu_env);
-+    }
-+
 +    return nullify_end(ctx, NO_EXIT);
 +}
 +
-+static ExitStatus do_floadd(DisasContext *ctx, unsigned rt, unsigned rb,
-+                            unsigned rx, int scale, target_long disp,
-+                            int modify)
++static ExitStatus do_fop_wed(DisasContext *ctx, unsigned rt, unsigned ra,
++                             void (*func)(TCGv_i32, TCGv_env, TCGv_i64))
++{
++    TCGv_i32 dst;
++    TCGv_i64 src;
++
++    nullify_over(ctx);
++    src = load_frd(ra);
++    dst = tcg_temp_new_i32();
++
++    func(dst, cpu_env, src);
++
++    tcg_temp_free_i64(src);
++    save_frw_i32(rt, dst);
++    tcg_temp_free_i32(dst);
++    return nullify_end(ctx, NO_EXIT);
++}
++
++static ExitStatus do_fop_ded(DisasContext *ctx, unsigned rt, unsigned ra,
++                             void (*func)(TCGv_i64, TCGv_env, TCGv_i64))
 +{
 +    TCGv_i64 tmp;
 +
 +    nullify_over(ctx);
++    tmp = load_frd0(ra);
 +
-+    tmp = tcg_temp_new_i64();
-+    do_load_64(ctx, tmp, rb, rx, scale, disp, modify, MO_TEQ);
++    func(tmp, cpu_env, tmp);
++
 +    save_frd(rt, tmp);
 +    tcg_temp_free_i64(tmp);
-+
-+    if (rt == 0) {
-+        gen_helper_loaded_fr0(cpu_env);
-+    }
-+
 +    return nullify_end(ctx, NO_EXIT);
 +}
 +
-+static ExitStatus do_store(DisasContext *ctx, unsigned rt, unsigned rb,
-+                           target_long disp, int modify, TCGMemOp mop)
++static ExitStatus do_fop_dew(DisasContext *ctx, unsigned rt, unsigned ra,
++                             void (*func)(TCGv_i64, TCGv_env, TCGv_i32))
 +{
++    TCGv_i32 src;
++    TCGv_i64 dst;
++
 +    nullify_over(ctx);
-+    do_store_tl(ctx, load_gpr(ctx, rt), rb, 0, 0, disp, modify, mop);
++    src = load_frw0_i32(ra);
++    dst = tcg_temp_new_i64();
++
++    func(dst, cpu_env, src);
++
++    tcg_temp_free_i32(src);
++    save_frd(rt, dst);
++    tcg_temp_free_i64(dst);
 +    return nullify_end(ctx, NO_EXIT);
 +}
 +
-+static ExitStatus do_fstorew(DisasContext *ctx, unsigned rt, unsigned rb,
-+                             unsigned rx, int scale, target_long disp,
-+                             int modify)
++static ExitStatus do_fop_weww(DisasContext *ctx, unsigned rt,
++                              unsigned ra, unsigned rb,
++                              void (*func)(TCGv_i32, TCGv_env,
++                                           TCGv_i32, TCGv_i32))
 +{
-+    TCGv_i32 tmp;
++    TCGv_i32 a, b;
 +
 +    nullify_over(ctx);
++    a = load_frw0_i32(ra);
++    b = load_frw0_i32(rb);
 +
-+    tmp = load_frw_i32(rt);
-+    do_store_32(ctx, tmp, rb, rx, scale, disp, modify, MO_TEUL);
-+    tcg_temp_free_i32(tmp);
++    func(a, cpu_env, a, b);
 +
++    tcg_temp_free_i32(b);
++    save_frw_i32(rt, a);
++    tcg_temp_free_i32(a);
 +    return nullify_end(ctx, NO_EXIT);
 +}
 +
-+static ExitStatus do_fstored(DisasContext *ctx, unsigned rt, unsigned rb,
-+                             unsigned rx, int scale, target_long disp,
-+                             int modify)
++static ExitStatus do_fop_dedd(DisasContext *ctx, unsigned rt,
++                              unsigned ra, unsigned rb,
++                              void (*func)(TCGv_i64, TCGv_env,
++                                           TCGv_i64, TCGv_i64))
 +{
-+    TCGv_i64 tmp;
++    TCGv_i64 a, b;
 +
 +    nullify_over(ctx);
++    a = load_frd0(ra);
++    b = load_frd0(rb);
 +
-+    tmp = load_frd(rt);
-+    do_store_64(ctx, tmp, rb, rx, scale, disp, modify, MO_TEQ);
-+    tcg_temp_free_i64(tmp);
++    func(a, cpu_env, a, b);
 +
++    tcg_temp_free_i64(b);
++    save_frd(rt, a);
++    tcg_temp_free_i64(a);
 +    return nullify_end(ctx, NO_EXIT);
 +}
 +
  /* Emit an unconditional branch to a direct target, which may or may not
     have already had nullification handled.  */
  static ExitStatus do_dbranch(DisasContext *ctx, target_ulong dest,
-@@ -1547,6 +1824,149 @@ static ExitStatus trans_cmpiclr(DisasContext *ctx, uint32_t insn)
-     return nullify_end(ctx, ret);
- }
+@@ -2893,6 +3063,554 @@ static const DisasInsn table_branch[] = {
+     { 0xe800d000u, 0xfc00dffcu, trans_bve },
+ };
  
-+static ExitStatus trans_ld_idx_i(DisasContext *ctx, uint32_t insn,
++static ExitStatus trans_fop_wew_0c(DisasContext *ctx, uint32_t insn,
++                                   const DisasInsn *di)
++{
++    unsigned rt = extract32(insn, 0, 5);
++    unsigned ra = extract32(insn, 21, 5);
++    return do_fop_wew(ctx, rt, ra, di->f_wew);
++}
++
++static ExitStatus trans_fop_wew_0e(DisasContext *ctx, uint32_t insn,
++                                   const DisasInsn *di)
++{
++    unsigned rt = assemble_rt64(insn);
++    unsigned ra = assemble_ra64(insn);
++    return do_fop_wew(ctx, rt, ra, di->f_wew);
++}
++
++static ExitStatus trans_fop_ded(DisasContext *ctx, uint32_t insn,
++                                const DisasInsn *di)
++{
++    unsigned rt = extract32(insn, 0, 5);
++    unsigned ra = extract32(insn, 21, 5);
++    return do_fop_ded(ctx, rt, ra, di->f_ded);
++}
++
++static ExitStatus trans_fop_wed_0c(DisasContext *ctx, uint32_t insn,
++                                   const DisasInsn *di)
++{
++    unsigned rt = extract32(insn, 0, 5);
++    unsigned ra = extract32(insn, 21, 5);
++    return do_fop_wed(ctx, rt, ra, di->f_wed);
++}
++
++static ExitStatus trans_fop_wed_0e(DisasContext *ctx, uint32_t insn,
++                                   const DisasInsn *di)
++{
++    unsigned rt = assemble_rt64(insn);
++    unsigned ra = extract32(insn, 21, 5);
++    return do_fop_wed(ctx, rt, ra, di->f_wed);
++}
++
++static ExitStatus trans_fop_dew_0c(DisasContext *ctx, uint32_t insn,
++                                   const DisasInsn *di)
++{
++    unsigned rt = extract32(insn, 0, 5);
++    unsigned ra = extract32(insn, 21, 5);
++    return do_fop_dew(ctx, rt, ra, di->f_dew);
++}
++
++static ExitStatus trans_fop_dew_0e(DisasContext *ctx, uint32_t insn,
++                                   const DisasInsn *di)
++{
++    unsigned rt = extract32(insn, 0, 5);
++    unsigned ra = assemble_ra64(insn);
++    return do_fop_dew(ctx, rt, ra, di->f_dew);
++}
++
++static ExitStatus trans_fop_weww_0c(DisasContext *ctx, uint32_t insn,
++                                    const DisasInsn *di)
++{
++    unsigned rt = extract32(insn, 0, 5);
++    unsigned rb = extract32(insn, 16, 5);
++    unsigned ra = extract32(insn, 21, 5);
++    return do_fop_weww(ctx, rt, ra, rb, di->f_weww);
++}
++
++static ExitStatus trans_fop_weww_0e(DisasContext *ctx, uint32_t insn,
++                                    const DisasInsn *di)
++{
++    unsigned rt = assemble_rt64(insn);
++    unsigned rb = assemble_rb64(insn);
++    unsigned ra = assemble_ra64(insn);
++    return do_fop_weww(ctx, rt, ra, rb, di->f_weww);
++}
++
++static ExitStatus trans_fop_dedd(DisasContext *ctx, uint32_t insn,
 +                                 const DisasInsn *di)
 +{
 +    unsigned rt = extract32(insn, 0, 5);
-+    unsigned m = extract32(insn, 5, 1);
-+    unsigned sz = extract32(insn, 6, 2);
-+    unsigned a = extract32(insn, 13, 1);
-+    int disp = low_sextract(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+    int modify = (m ? (a ? -1 : 1) : 0);
-+    TCGMemOp mop = MO_TE | sz;
-+
-+    return do_load(ctx, rt, rb, 0, 0, disp, modify, mop);
++    unsigned rb = extract32(insn, 16, 5);
++    unsigned ra = extract32(insn, 21, 5);
++    return do_fop_dedd(ctx, rt, ra, rb, di->f_dedd);
 +}
 +
-+static ExitStatus trans_ld_idx_x(DisasContext *ctx, uint32_t insn,
-+                                 const DisasInsn *di)
++static void gen_fcpy_s(TCGv_i32 dst, TCGv_env unused, TCGv_i32 src)
 +{
-+    unsigned rt = extract32(insn, 0, 5);
-+    unsigned m = extract32(insn, 5, 1);
-+    unsigned sz = extract32(insn, 6, 2);
-+    unsigned u = extract32(insn, 13, 1);
-+    unsigned rx = extract32(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+    TCGMemOp mop = MO_TE | sz;
-+
-+    return do_load(ctx, rt, rb, rx, u ? sz : 0, 0, m, mop);
++    tcg_gen_mov_i32(dst, src);
 +}
 +
-+static ExitStatus trans_st_idx_i(DisasContext *ctx, uint32_t insn,
-+                                 const DisasInsn *di)
++static void gen_fcpy_d(TCGv_i64 dst, TCGv_env unused, TCGv_i64 src)
 +{
-+    int disp = low_sextract(insn, 0, 5);
-+    unsigned m = extract32(insn, 5, 1);
-+    unsigned sz = extract32(insn, 6, 2);
-+    unsigned a = extract32(insn, 13, 1);
-+    unsigned rr = extract32(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+    int modify = (m ? (a ? -1 : 1) : 0);
-+    TCGMemOp mop = MO_TE | sz;
-+
-+    return do_store(ctx, rr, rb, disp, modify, mop);
++    tcg_gen_mov_i64(dst, src);
 +}
 +
-+static ExitStatus trans_ldcw(DisasContext *ctx, uint32_t insn,
-+                             const DisasInsn *di)
++static void gen_fabs_s(TCGv_i32 dst, TCGv_env unused, TCGv_i32 src)
 +{
-+    unsigned rt = extract32(insn, 0, 5);
-+    unsigned m = extract32(insn, 5, 1);
-+    unsigned i = extract32(insn, 12, 1);
-+    unsigned au = extract32(insn, 13, 1);
-+    unsigned rx = extract32(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+    TCGMemOp mop = MO_TEUL | MO_ALIGN_16;
-+    TCGv zero, addr, base, dest;
-+    int modify, disp = 0, scale = 0;
++    tcg_gen_andi_i32(dst, src, INT32_MAX);
++}
++
++static void gen_fabs_d(TCGv_i64 dst, TCGv_env unused, TCGv_i64 src)
++{
++    tcg_gen_andi_i64(dst, src, INT64_MAX);
++}
++
++static void gen_fneg_s(TCGv_i32 dst, TCGv_env unused, TCGv_i32 src)
++{
++    tcg_gen_xori_i32(dst, src, INT32_MIN);
++}
++
++static void gen_fneg_d(TCGv_i64 dst, TCGv_env unused, TCGv_i64 src)
++{
++    tcg_gen_xori_i64(dst, src, INT64_MIN);
++}
++
++static void gen_fnegabs_s(TCGv_i32 dst, TCGv_env unused, TCGv_i32 src)
++{
++    tcg_gen_ori_i32(dst, src, INT32_MIN);
++}
++
++static void gen_fnegabs_d(TCGv_i64 dst, TCGv_env unused, TCGv_i64 src)
++{
++    tcg_gen_ori_i64(dst, src, INT64_MIN);
++}
++
++static ExitStatus do_fcmp_s(DisasContext *ctx, unsigned ra, unsigned rb,
++                            unsigned y, unsigned c)
++{
++    TCGv_i32 ta, tb, tc, ty;
 +
 +    nullify_over(ctx);
 +
-+    /* ??? Share more code with do_load and do_load_{32,64}.  */
++    ta = load_frw0_i32(ra);
++    tb = load_frw0_i32(rb);
++    ty = tcg_const_i32(y);
++    tc = tcg_const_i32(c);
 +
-+    if (i) {
-+        modify = (m ? (au ? -1 : 1) : 0);
-+        disp = low_sextract(rx, 0, 5);
-+        rx = 0;
-+    } else {
-+        modify = m;
-+        if (au) {
-+            scale = mop & MO_SIZE;
-+        }
-+    }
-+    if (modify) {
-+        /* Base register modification.  Make sure if RT == RB, we see
-+           the result of the load.  */
-+        dest = get_temp(ctx);
-+    } else {
-+        dest = dest_gpr(ctx, rt);
-+    }
++    gen_helper_fcmp_s(cpu_env, ta, tb, ty, tc);
 +
-+    addr = tcg_temp_new();
-+    base = load_gpr(ctx, rb);
-+    if (rx) {
-+        tcg_gen_shli_tl(addr, cpu_gr[rx], scale);
-+        tcg_gen_add_tl(addr, addr, base);
-+    } else {
-+        tcg_gen_addi_tl(addr, base, disp);
-+    }
-+
-+    zero = tcg_const_tl(0);
-+    tcg_gen_atomic_xchg_tl(dest, (modify <= 0 ? addr : base),
-+                           zero, MMU_USER_IDX, mop);
-+    if (modify) {
-+        save_gpr(ctx, rb, addr);
-+    }
-+    save_gpr(ctx, rt, dest);
++    tcg_temp_free_i32(ta);
++    tcg_temp_free_i32(tb);
++    tcg_temp_free_i32(ty);
++    tcg_temp_free_i32(tc);
 +
 +    return nullify_end(ctx, NO_EXIT);
 +}
 +
-+static ExitStatus trans_stby(DisasContext *ctx, uint32_t insn,
-+                             const DisasInsn *di)
++static ExitStatus trans_fcmp_s_0c(DisasContext *ctx, uint32_t insn,
++                                  const DisasInsn *di)
 +{
-+    target_long disp = low_sextract(insn, 0, 5);
-+    unsigned m = extract32(insn, 5, 1);
-+    unsigned a = extract32(insn, 13, 1);
-+    unsigned rt = extract32(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+    TCGv addr, val;
++    unsigned c = extract32(insn, 0, 5);
++    unsigned y = extract32(insn, 13, 3);
++    unsigned rb = extract32(insn, 16, 5);
++    unsigned ra = extract32(insn, 21, 5);
++    return do_fcmp_s(ctx, ra, rb, y, c);
++}
++
++static ExitStatus trans_fcmp_s_0e(DisasContext *ctx, uint32_t insn,
++                                  const DisasInsn *di)
++{
++    unsigned c = extract32(insn, 0, 5);
++    unsigned y = extract32(insn, 13, 3);
++    unsigned rb = assemble_rb64(insn);
++    unsigned ra = assemble_ra64(insn);
++    return do_fcmp_s(ctx, ra, rb, y, c);
++}
++
++static ExitStatus trans_fcmp_d(DisasContext *ctx, uint32_t insn,
++                               const DisasInsn *di)
++{
++    unsigned c = extract32(insn, 0, 5);
++    unsigned y = extract32(insn, 13, 3);
++    unsigned rb = extract32(insn, 16, 5);
++    unsigned ra = extract32(insn, 21, 5);
++    TCGv_i64 ta, tb;
++    TCGv_i32 tc, ty;
 +
 +    nullify_over(ctx);
 +
-+    addr = tcg_temp_new();
-+    if (m || disp == 0) {
-+        tcg_gen_mov_tl(addr, load_gpr(ctx, rb));
-+    } else {
-+        tcg_gen_addi_tl(addr, load_gpr(ctx, rb), disp);
-+    }
-+    val = load_gpr(ctx, rt);
++    ta = load_frd0(ra);
++    tb = load_frd0(rb);
++    ty = tcg_const_i32(y);
++    tc = tcg_const_i32(c);
 +
-+    if (a) {
-+        gen_helper_stby_e(cpu_env, addr, val);
-+    } else {
-+        gen_helper_stby_b(cpu_env, addr, val);
-+    }
++    gen_helper_fcmp_d(cpu_env, ta, tb, ty, tc);
 +
-+    if (m) {
-+        tcg_gen_addi_tl(addr, addr, disp);
-+        tcg_gen_andi_tl(addr, addr, ~3);
-+        save_gpr(ctx, rb, addr);
-+    }
-+    tcg_temp_free(addr);
++    tcg_temp_free_i64(ta);
++    tcg_temp_free_i64(tb);
++    tcg_temp_free_i32(ty);
++    tcg_temp_free_i32(tc);
 +
 +    return nullify_end(ctx, NO_EXIT);
 +}
 +
-+static const DisasInsn table_index_mem[] = {
-+    { 0x0c001000u, 0xfc001300, trans_ld_idx_i }, /* LD[BHWD], im */
-+    { 0x0c000000u, 0xfc001300, trans_ld_idx_x }, /* LD[BHWD], rx */
-+    { 0x0c001200u, 0xfc001300, trans_st_idx_i }, /* ST[BHWD] */
-+    { 0x0c0001c0u, 0xfc0003c0, trans_ldcw },
-+    { 0x0c001300u, 0xfc0013c0, trans_stby },
++static ExitStatus trans_ftest_t(DisasContext *ctx, uint32_t insn,
++                                const DisasInsn *di)
++{
++    unsigned y = extract32(insn, 13, 3);
++    unsigned cbit = (y ^ 1) - 1;
++    TCGv t;
++
++    nullify_over(ctx);
++
++    t = tcg_temp_new();
++    tcg_gen_ld32u_tl(t, cpu_env, offsetof(CPUHPPAState, fr0_shadow));
++    tcg_gen_extract_tl(t, t, 21 - cbit, 1);
++    ctx->null_cond = cond_make_0(TCG_COND_NE, t);
++    tcg_temp_free(t);
++
++    return nullify_end(ctx, NO_EXIT);
++}
++
++static ExitStatus trans_ftest_q(DisasContext *ctx, uint32_t insn,
++                                const DisasInsn *di)
++{
++    unsigned c = extract32(insn, 0, 5);
++    int mask;
++    bool inv = false;
++    TCGv t;
++
++    nullify_over(ctx);
++
++    t = tcg_temp_new();
++    tcg_gen_ld32u_tl(t, cpu_env, offsetof(CPUHPPAState, fr0_shadow));
++
++    switch (c) {
++    case 0: /* simple */
++        tcg_gen_andi_tl(t, t, 0x4000000);
++        ctx->null_cond = cond_make_0(TCG_COND_NE, t);
++        goto done;
++    case 2: /* rej */
++        inv = true;
++        /* fallthru */
++    case 1: /* acc */
++        mask = 0x43ff800;
++        break;
++    case 6: /* rej8 */
++        inv = true;
++        /* fallthru */
++    case 5: /* acc8 */
++        mask = 0x43f8000;
++        break;
++    case 9: /* acc6 */
++        mask = 0x43e0000;
++        break;
++    case 13: /* acc4 */
++        mask = 0x4380000;
++        break;
++    case 17: /* acc2 */
++        mask = 0x4200000;
++        break;
++    default:
++        return gen_illegal(ctx);
++    }
++    if (inv) {
++        TCGv c = load_const(ctx, mask);
++        tcg_gen_or_tl(t, t, c);
++        ctx->null_cond = cond_make(TCG_COND_EQ, t, c);
++    } else {
++        tcg_gen_andi_tl(t, t, mask);
++        ctx->null_cond = cond_make_0(TCG_COND_EQ, t);
++    }
++ done:
++    return nullify_end(ctx, NO_EXIT);
++}
++
++static ExitStatus trans_xmpyu(DisasContext *ctx, uint32_t insn,
++                              const DisasInsn *di)
++{
++    unsigned rt = extract32(insn, 0, 5);
++    unsigned rb = assemble_rb64(insn);
++    unsigned ra = assemble_ra64(insn);
++    TCGv_i64 a, b;
++
++    nullify_over(ctx);
++
++    a = load_frw0_i64(ra);
++    b = load_frw0_i64(rb);
++    tcg_gen_mul_i64(a, a, b);
++    save_frd(rt, a);
++    tcg_temp_free_i64(a);
++    tcg_temp_free_i64(b);
++
++    return nullify_end(ctx, NO_EXIT);
++}
++
++#define FOP_DED  trans_fop_ded, .f_ded
++#define FOP_DEDD trans_fop_dedd, .f_dedd
++
++#define FOP_WEW  trans_fop_wew_0c, .f_wew
++#define FOP_DEW  trans_fop_dew_0c, .f_dew
++#define FOP_WED  trans_fop_wed_0c, .f_wed
++#define FOP_WEWW trans_fop_weww_0c, .f_weww
++
++static const DisasInsn table_float_0c[] = {
++    /* floating point class zero */
++    { 0x30004000, 0xfc1fffe0, FOP_WEW = gen_fcpy_s },
++    { 0x30006000, 0xfc1fffe0, FOP_WEW = gen_fabs_s },
++    { 0x30008000, 0xfc1fffe0, FOP_WEW = gen_helper_fsqrt_s },
++    { 0x3000a000, 0xfc1fffe0, FOP_WEW = gen_helper_frnd_s },
++    { 0x3000c000, 0xfc1fffe0, FOP_WEW = gen_fneg_s },
++    { 0x3000e000, 0xfc1fffe0, FOP_WEW = gen_fnegabs_s },
++
++    { 0x30004800, 0xfc1fffe0, FOP_DED = gen_fcpy_d },
++    { 0x30006800, 0xfc1fffe0, FOP_DED = gen_fabs_d },
++    { 0x30008800, 0xfc1fffe0, FOP_DED = gen_helper_fsqrt_d },
++    { 0x3000a800, 0xfc1fffe0, FOP_DED = gen_helper_frnd_d },
++    { 0x3000c800, 0xfc1fffe0, FOP_DED = gen_fneg_d },
++    { 0x3000e800, 0xfc1fffe0, FOP_DED = gen_fnegabs_d },
++
++    /* floating point class three */
++    { 0x30000600, 0xfc00ffe0, FOP_WEWW = gen_helper_fadd_s },
++    { 0x30002600, 0xfc00ffe0, FOP_WEWW = gen_helper_fsub_s },
++    { 0x30004600, 0xfc00ffe0, FOP_WEWW = gen_helper_fmpy_s },
++    { 0x30006600, 0xfc00ffe0, FOP_WEWW = gen_helper_fdiv_s },
++
++    { 0x30000e00, 0xfc00ffe0, FOP_DEDD = gen_helper_fadd_d },
++    { 0x30002e00, 0xfc00ffe0, FOP_DEDD = gen_helper_fsub_d },
++    { 0x30004e00, 0xfc00ffe0, FOP_DEDD = gen_helper_fmpy_d },
++    { 0x30006e00, 0xfc00ffe0, FOP_DEDD = gen_helper_fdiv_d },
++
++    /* floating point class one */
++    /* float/float */
++    { 0x30000a00, 0xfc1fffe0, FOP_WED = gen_helper_fcnv_d_s },
++    { 0x30002200, 0xfc1fffe0, FOP_DEW = gen_helper_fcnv_s_d },
++    /* int/float */
++    { 0x30008200, 0xfc1fffe0, FOP_WEW = gen_helper_fcnv_w_s },
++    { 0x30008a00, 0xfc1fffe0, FOP_WED = gen_helper_fcnv_dw_s },
++    { 0x3000a200, 0xfc1fffe0, FOP_DEW = gen_helper_fcnv_w_d },
++    { 0x3000aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_dw_d },
++    /* float/int */
++    { 0x30010200, 0xfc1fffe0, FOP_WEW = gen_helper_fcnv_s_w },
++    { 0x30010a00, 0xfc1fffe0, FOP_WED = gen_helper_fcnv_d_w },
++    { 0x30012200, 0xfc1fffe0, FOP_DEW = gen_helper_fcnv_s_dw },
++    { 0x30012a00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_d_dw },
++    /* float/int truncate */
++    { 0x30018200, 0xfc1fffe0, FOP_WEW = gen_helper_fcnv_t_s_w },
++    { 0x30018a00, 0xfc1fffe0, FOP_WED = gen_helper_fcnv_t_d_w },
++    { 0x3001a200, 0xfc1fffe0, FOP_DEW = gen_helper_fcnv_t_s_dw },
++    { 0x3001aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_t_d_dw },
++    /* uint/float */
++    { 0x30028200, 0xfc1fffe0, FOP_WEW = gen_helper_fcnv_uw_s },
++    { 0x30028a00, 0xfc1fffe0, FOP_WED = gen_helper_fcnv_udw_s },
++    { 0x3002a200, 0xfc1fffe0, FOP_DEW = gen_helper_fcnv_uw_d },
++    { 0x3002aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_udw_d },
++    /* float/uint */
++    { 0x30030200, 0xfc1fffe0, FOP_WEW = gen_helper_fcnv_s_uw },
++    { 0x30030a00, 0xfc1fffe0, FOP_WED = gen_helper_fcnv_d_uw },
++    { 0x30032200, 0xfc1fffe0, FOP_DEW = gen_helper_fcnv_s_udw },
++    { 0x30032a00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_d_udw },
++    /* float/uint truncate */
++    { 0x30038200, 0xfc1fffe0, FOP_WEW = gen_helper_fcnv_t_s_uw },
++    { 0x30038a00, 0xfc1fffe0, FOP_WED = gen_helper_fcnv_t_d_uw },
++    { 0x3003a200, 0xfc1fffe0, FOP_DEW = gen_helper_fcnv_t_s_udw },
++    { 0x3003aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_t_d_udw },
++
++    /* floating point class two */
++    { 0x30000400, 0xfc001fe0, trans_fcmp_s_0c },
++    { 0x30000c00, 0xfc001fe0, trans_fcmp_d },
++    { 0x30002420, 0xffffffe0, trans_ftest_q },
++    { 0x30000420, 0xffff1fff, trans_ftest_t },
++
++    /* FID.  Note that ra == rt == 0, which via fcpy puts 0 into fr0.
++       This is machine/revision == 0, which is reserved for simulator.  */
++    { 0x30000000, 0xffffffff, FOP_WEW = gen_fcpy_s },
 +};
 +
- static ExitStatus trans_ldil(DisasContext *ctx, uint32_t insn)
- {
-     unsigned rt = extract32(insn, 21, 5);
-@@ -1594,6 +2014,160 @@ static ExitStatus trans_ldo(DisasContext *ctx, uint32_t insn)
-     return NO_EXIT;
- }
- 
-+static ExitStatus trans_load(DisasContext *ctx, uint32_t insn,
-+                             bool is_mod, TCGMemOp mop)
-+{
-+    unsigned rb = extract32(insn, 21, 5);
-+    unsigned rt = extract32(insn, 16, 5);
-+    target_long i = assemble_16(insn);
++#undef FOP_WEW
++#undef FOP_DEW
++#undef FOP_WED
++#undef FOP_WEWW
++#define FOP_WEW  trans_fop_wew_0e, .f_wew
++#define FOP_DEW  trans_fop_dew_0e, .f_dew
++#define FOP_WED  trans_fop_wed_0e, .f_wed
++#define FOP_WEWW trans_fop_weww_0e, .f_weww
 +
-+    return do_load(ctx, rt, rb, 0, 0, i, is_mod ? (i < 0 ? -1 : 1) : 0, mop);
++static const DisasInsn table_float_0e[] = {
++    /* floating point class zero */
++    { 0x38004000, 0xfc1fff20, FOP_WEW = gen_fcpy_s },
++    { 0x38006000, 0xfc1fff20, FOP_WEW = gen_fabs_s },
++    { 0x38008000, 0xfc1fff20, FOP_WEW = gen_helper_fsqrt_s },
++    { 0x3800a000, 0xfc1fff20, FOP_WEW = gen_helper_frnd_s },
++    { 0x3800c000, 0xfc1fff20, FOP_WEW = gen_fneg_s },
++    { 0x3800e000, 0xfc1fff20, FOP_WEW = gen_fnegabs_s },
++
++    { 0x38004800, 0xfc1fffe0, FOP_DED = gen_fcpy_d },
++    { 0x38006800, 0xfc1fffe0, FOP_DED = gen_fabs_d },
++    { 0x38008800, 0xfc1fffe0, FOP_DED = gen_helper_fsqrt_d },
++    { 0x3800a800, 0xfc1fffe0, FOP_DED = gen_helper_frnd_d },
++    { 0x3800c800, 0xfc1fffe0, FOP_DED = gen_fneg_d },
++    { 0x3800e800, 0xfc1fffe0, FOP_DED = gen_fnegabs_d },
++
++    /* floating point class three */
++    { 0x38000600, 0xfc00ef20, FOP_WEWW = gen_helper_fadd_s },
++    { 0x38002600, 0xfc00ef20, FOP_WEWW = gen_helper_fsub_s },
++    { 0x38004600, 0xfc00ef20, FOP_WEWW = gen_helper_fmpy_s },
++    { 0x38006600, 0xfc00ef20, FOP_WEWW = gen_helper_fdiv_s },
++
++    { 0x38000e00, 0xfc00ffe0, FOP_DEDD = gen_helper_fadd_d },
++    { 0x38002e00, 0xfc00ffe0, FOP_DEDD = gen_helper_fsub_d },
++    { 0x38004e00, 0xfc00ffe0, FOP_DEDD = gen_helper_fmpy_d },
++    { 0x38006e00, 0xfc00ffe0, FOP_DEDD = gen_helper_fdiv_d },
++
++    { 0x38004700, 0xfc00ef60, trans_xmpyu },
++
++    /* floating point class one */
++    /* float/float */
++    { 0x38000a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_d_s },
++    { 0x38002200, 0xfc1fffc0, FOP_DEW = gen_helper_fcnv_s_d },
++    /* int/float */
++    { 0x38008200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_w_s },
++    { 0x38008a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_dw_s },
++    { 0x3800a200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_w_d },
++    { 0x3800aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_dw_d },
++    /* float/int */
++    { 0x38010200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_s_w },
++    { 0x38010a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_d_w },
++    { 0x38012200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_s_dw },
++    { 0x38012a00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_d_dw },
++    /* float/int truncate */
++    { 0x38018200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_t_s_w },
++    { 0x38018a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_t_d_w },
++    { 0x3801a200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_t_s_dw },
++    { 0x3801aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_t_d_dw },
++    /* uint/float */
++    { 0x38028200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_uw_s },
++    { 0x38028a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_udw_s },
++    { 0x3802a200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_uw_d },
++    { 0x3802aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_udw_d },
++    /* float/uint */
++    { 0x38030200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_s_uw },
++    { 0x38030a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_d_uw },
++    { 0x38032200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_s_udw },
++    { 0x38032a00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_d_udw },
++    /* float/uint truncate */
++    { 0x38038200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_t_s_uw },
++    { 0x38038a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_t_d_uw },
++    { 0x3803a200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_t_s_udw },
++    { 0x3803aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_t_d_udw },
++
++    /* floating point class two */
++    { 0x38000400, 0xfc000f60, trans_fcmp_s_0e },
++    { 0x38000c00, 0xfc001fe0, trans_fcmp_d },
++};
++
++#undef FOP_WEW
++#undef FOP_DEW
++#undef FOP_WED
++#undef FOP_WEWW
++#undef FOP_DED
++#undef FOP_DEDD
++
++/* Convert the fmpyadd single-precision register encodings to standard.  */
++static inline int fmpyadd_s_reg(unsigned r)
++{
++    return (r & 16) * 2 + 16 + (r & 15);
 +}
 +
-+static ExitStatus trans_load_w(DisasContext *ctx, uint32_t insn)
++static ExitStatus trans_fmpyadd(DisasContext *ctx, uint32_t insn, bool is_sub)
 +{
-+    unsigned rb = extract32(insn, 21, 5);
-+    unsigned rt = extract32(insn, 16, 5);
-+    target_long i = assemble_16a(insn);
-+    unsigned ext2 = extract32(insn, 1, 2);
++    unsigned tm = extract32(insn, 0, 5);
++    unsigned f = extract32(insn, 5, 1);
++    unsigned ra = extract32(insn, 6, 5);
++    unsigned ta = extract32(insn, 11, 5);
++    unsigned rm2 = extract32(insn, 16, 5);
++    unsigned rm1 = extract32(insn, 21, 5);
 +
-+    switch (ext2) {
-+    case 0:
-+    case 1:
-+        /* FLDW without modification.  */
-+        return do_floadw(ctx, ext2 * 32 + rt, rb, 0, 0, i, 0);
-+    case 2:
-+        /* LDW with modification.  Note that the sign of I selects
-+           post-dec vs pre-inc.  */
-+        return do_load(ctx, rt, rb, 0, 0, i, (i < 0 ? 1 : -1), MO_TEUL);
-+    default:
-+        return gen_illegal(ctx);
-+    }
-+}
++    nullify_over(ctx);
 +
-+static ExitStatus trans_fload_mod(DisasContext *ctx, uint32_t insn)
-+{
-+    target_long i = assemble_16a(insn);
-+    unsigned t1 = extract32(insn, 1, 1);
-+    unsigned a = extract32(insn, 2, 1);
-+    unsigned t0 = extract32(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+
-+    /* FLDW with modification.  */
-+    return do_floadw(ctx, t1 * 32 + t0, rb, 0, 0, i, (a ? -1 : 1));
-+}
-+
-+static ExitStatus trans_store(DisasContext *ctx, uint32_t insn,
-+                              bool is_mod, TCGMemOp mop)
-+{
-+    unsigned rb = extract32(insn, 21, 5);
-+    unsigned rt = extract32(insn, 16, 5);
-+    target_long i = assemble_16(insn);
-+
-+    return do_store(ctx, rt, rb, i, is_mod ? (i < 0 ? -1 : 1) : 0, mop);
-+}
-+
-+static ExitStatus trans_store_w(DisasContext *ctx, uint32_t insn)
-+{
-+    unsigned rb = extract32(insn, 21, 5);
-+    unsigned rt = extract32(insn, 16, 5);
-+    target_long i = assemble_16a(insn);
-+    unsigned ext2 = extract32(insn, 1, 2);
-+
-+    switch (ext2) {
-+    case 0:
-+    case 1:
-+        /* FSTW without modification.  */
-+        return do_fstorew(ctx, ext2 * 32 + rt, rb, 0, 0, i, 0);
-+    case 2:
-+        /* LDW with modification.  */
-+        return do_store(ctx, rt, rb, i, (i < 0 ? 1 : -1), MO_TEUL);
-+    default:
-+        return gen_illegal(ctx);
-+    }
-+}
-+
-+static ExitStatus trans_fstore_mod(DisasContext *ctx, uint32_t insn)
-+{
-+    target_long i = assemble_16a(insn);
-+    unsigned t1 = extract32(insn, 1, 1);
-+    unsigned a = extract32(insn, 2, 1);
-+    unsigned t0 = extract32(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+
-+    /* FSTW with modification.  */
-+    return do_fstorew(ctx, t1 * 32 + t0, rb, 0, 0, i, (a ? -1 : 1));
-+}
-+
-+static ExitStatus trans_copr_w(DisasContext *ctx, uint32_t insn)
-+{
-+    unsigned t0 = extract32(insn, 0, 5);
-+    unsigned m = extract32(insn, 5, 1);
-+    unsigned t1 = extract32(insn, 6, 1);
-+    unsigned ext3 = extract32(insn, 7, 3);
-+    /* unsigned cc = extract32(insn, 10, 2); */
-+    unsigned i = extract32(insn, 12, 1);
-+    unsigned ua = extract32(insn, 13, 1);
-+    unsigned rx = extract32(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+    unsigned rt = t1 * 32 + t0;
-+    int modify = (m ? (ua ? -1 : 1) : 0);
-+    int disp, scale;
-+
-+    if (i == 0) {
-+        scale = (ua ? 2 : 0);
-+        disp = 0;
-+        modify = m;
++    /* Independent multiply & add/sub, with undefined behaviour
++       if outputs overlap inputs.  */
++    if (f == 0) {
++        tm = fmpyadd_s_reg(tm);
++        ra = fmpyadd_s_reg(ra);
++        ta = fmpyadd_s_reg(ta);
++        rm2 = fmpyadd_s_reg(rm2);
++        rm1 = fmpyadd_s_reg(rm1);
++        do_fop_weww(ctx, tm, rm1, rm2, gen_helper_fmpy_s);
++        do_fop_weww(ctx, ta, ta, ra,
++                    is_sub ? gen_helper_fsub_s : gen_helper_fadd_s);
 +    } else {
-+        disp = low_sextract(rx, 0, 5);
-+        scale = 0;
-+        rx = 0;
-+        modify = (m ? (ua ? -1 : 1) : 0);
++        do_fop_dedd(ctx, tm, rm1, rm2, gen_helper_fmpy_d);
++        do_fop_dedd(ctx, ta, ta, ra,
++                    is_sub ? gen_helper_fsub_d : gen_helper_fadd_d);
 +    }
 +
-+    switch (ext3) {
-+    case 0: /* FLDW */
-+        return do_floadw(ctx, rt, rb, rx, scale, disp, modify);
-+    case 4: /* FSTW */
-+        return do_fstorew(ctx, rt, rb, rx, scale, disp, modify);
-+    }
-+    return gen_illegal(ctx);
++    return nullify_end(ctx, NO_EXIT);
 +}
 +
-+static ExitStatus trans_copr_dw(DisasContext *ctx, uint32_t insn)
++static ExitStatus trans_fmpyfadd_s(DisasContext *ctx, uint32_t insn,
++                                   const DisasInsn *di)
++{
++    unsigned rt = assemble_rt64(insn);
++    unsigned neg = extract32(insn, 5, 1);
++    unsigned rm1 = assemble_ra64(insn);
++    unsigned rm2 = assemble_rb64(insn);
++    unsigned ra3 = assemble_rc64(insn);
++    TCGv_i32 a, b, c;
++
++    nullify_over(ctx);
++    a = load_frw0_i32(rm1);
++    b = load_frw0_i32(rm2);
++    c = load_frw0_i32(ra3);
++
++    if (neg) {
++        gen_helper_fmpynfadd_s(a, cpu_env, a, b, c);
++    } else {
++        gen_helper_fmpyfadd_s(a, cpu_env, a, b, c);
++    }
++
++    tcg_temp_free_i32(b);
++    tcg_temp_free_i32(c);
++    save_frw_i32(rt, a);
++    tcg_temp_free_i32(a);
++    return nullify_end(ctx, NO_EXIT);
++}
++
++static ExitStatus trans_fmpyfadd_d(DisasContext *ctx, uint32_t insn,
++                                   const DisasInsn *di)
 +{
 +    unsigned rt = extract32(insn, 0, 5);
-+    unsigned m = extract32(insn, 5, 1);
-+    unsigned ext4 = extract32(insn, 6, 4);
-+    /* unsigned cc = extract32(insn, 10, 2); */
-+    unsigned i = extract32(insn, 12, 1);
-+    unsigned ua = extract32(insn, 13, 1);
-+    unsigned rx = extract32(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+    int modify = (m ? (ua ? -1 : 1) : 0);
-+    int disp, scale;
++    unsigned neg = extract32(insn, 5, 1);
++    unsigned rm1 = extract32(insn, 21, 5);
++    unsigned rm2 = extract32(insn, 16, 5);
++    unsigned ra3 = assemble_rc64(insn);
++    TCGv_i64 a, b, c;
 +
-+    if (i == 0) {
-+        scale = (ua ? 3 : 0);
-+        disp = 0;
-+        modify = m;
++    nullify_over(ctx);
++    a = load_frd0(rm1);
++    b = load_frd0(rm2);
++    c = load_frd0(ra3);
++
++    if (neg) {
++        gen_helper_fmpynfadd_d(a, cpu_env, a, b, c);
 +    } else {
-+        disp = low_sextract(rx, 0, 5);
-+        scale = 0;
-+        rx = 0;
-+        modify = (m ? (ua ? -1 : 1) : 0);
++        gen_helper_fmpyfadd_d(a, cpu_env, a, b, c);
 +    }
 +
-+    switch (ext4) {
-+    case 0: /* FLDD */
-+        return do_floadd(ctx, rt, rb, rx, scale, disp, modify);
-+    case 8: /* FSTD */
-+        return do_fstored(ctx, rt, rb, rx, scale, disp, modify);
-+    default:
-+        return gen_illegal(ctx);
-+    }
++    tcg_temp_free_i64(b);
++    tcg_temp_free_i64(c);
++    save_frd(rt, a);
++    tcg_temp_free_i64(a);
++    return nullify_end(ctx, NO_EXIT);
 +}
 +
- static ExitStatus trans_cmpb(DisasContext *ctx, uint32_t insn,
-                              bool is_true, bool is_imm, bool is_dw)
++static const DisasInsn table_fp_fused[] = {
++    { 0xb8000000u, 0xfc000800u, trans_fmpyfadd_s },
++    { 0xb8000800u, 0xfc0019c0u, trans_fmpyfadd_d }
++};
++
+ static ExitStatus translate_table_int(DisasContext *ctx, uint32_t insn,
+                                       const DisasInsn table[], size_t n)
  {
-@@ -2139,12 +2713,44 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
-     switch (opc) {
-     case 0x02:
+@@ -2921,6 +3639,8 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
          return translate_table(ctx, insn, table_arith_log);
-+    case 0x03:
-+        return translate_table(ctx, insn, table_index_mem);
+     case 0x03:
+         return translate_table(ctx, insn, table_index_mem);
++    case 0x06:
++        return trans_fmpyadd(ctx, insn, false);
      case 0x08:
          return trans_ldil(ctx, insn);
-+    case 0x09:
-+        return trans_copr_w(ctx, insn);
-     case 0x0A:
+     case 0x09:
+@@ -2929,8 +3649,12 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
          return trans_addil(ctx, insn);
-+    case 0x0B:
-+        return trans_copr_dw(ctx, insn);
+     case 0x0B:
+         return trans_copr_dw(ctx, insn);
++    case 0x0C:
++        return translate_table(ctx, insn, table_float_0c);
      case 0x0D:
          return trans_ldo(ctx, insn);
-+
-+    case 0x10:
-+        return trans_load(ctx, insn, false, MO_UB);
-+    case 0x11:
-+        return trans_load(ctx, insn, false, MO_TEUW);
-+    case 0x12:
-+        return trans_load(ctx, insn, false, MO_TEUL);
-+    case 0x13:
-+        return trans_load(ctx, insn, true, MO_TEUL);
-+    case 0x16:
-+        return trans_fload_mod(ctx, insn);
-+    case 0x17:
-+        return trans_load_w(ctx, insn);
-+    case 0x18:
-+        return trans_store(ctx, insn, false, MO_UB);
-+    case 0x19:
-+        return trans_store(ctx, insn, false, MO_TEUW);
-+    case 0x1A:
-+        return trans_store(ctx, insn, false, MO_TEUL);
-+    case 0x1B:
-+        return trans_store(ctx, insn, true, MO_TEUL);
-+    case 0x1E:
-+        return trans_fstore_mod(ctx, insn);
-+    case 0x1F:
-+        return trans_store_w(ctx, insn);
-+
-     case 0x20:
-         return trans_cmpb(ctx, insn, true, false, false);
-     case 0x21:
-@@ -2172,6 +2778,7 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
++    case 0x0E:
++        return translate_table(ctx, insn, table_float_0e);
+ 
+     case 0x10:
+         return trans_load(ctx, insn, false, MO_UB);
+@@ -2969,6 +3693,8 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
+         return trans_cmpiclr(ctx, insn);
+     case 0x25:
+         return trans_subi(ctx, insn);
++    case 0x26:
++        return trans_fmpyadd(ctx, insn, true);
+     case 0x27:
+         return trans_cmpb(ctx, insn, true, false, true);
+     case 0x28:
+@@ -2982,6 +3708,8 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
+     case 0x2C:
+     case 0x2D:
          return trans_addi(ctx, insn);
++    case 0x2E:
++        return translate_table(ctx, insn, table_fp_fused);
      case 0x2F:
          return trans_cmpb(ctx, insn, false, false, true);
-+
-     case 0x30:
-     case 0x31:
-         return trans_bb(ctx, insn);
-@@ -2189,6 +2796,17 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
-         return trans_be(ctx, insn, true);
-     case 0x3A:
-         return translate_table(ctx, insn, table_branch);
-+
-+    case 0x04: /* spopn */
-+    case 0x05: /* diag */
-+    case 0x0F: /* product specific */
-+        break;
-+
-+    case 0x07: /* unassigned */
-+    case 0x15: /* unassigned */
-+    case 0x1D: /* unassigned */
-+    case 0x37: /* unassigned */
-+    case 0x3F: /* unassigned */
-     default:
-         break;
-     }
+ 
 -- 
 2.9.3
