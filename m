@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cVdMS-0000AB-LM
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:04:37 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cVdSR-0002H4-Jp
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:10:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cVdMN-0001re-Pj
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:04:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39768)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cVdSN-0005Av-Hv
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:10:47 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:33639 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cVdMN-0001rN-Ku
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:04:31 -0500
-Message-ID: <1485173068.2149.20.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 23 Jan 2017 13:04:28 +0100
-In-Reply-To: <CAJ+F1CLeTaXgja-g_00LmxxiVSDZK5DeHStXPfgpcMNeLYX7Pw@mail.gmail.com>
-References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
-	<20170118160332.13390-24-marcandre.lureau@redhat.com>
-	<1484814026.15364.15.camel@redhat.com>
-	<CAJ+F1CLeTaXgja-g_00LmxxiVSDZK5DeHStXPfgpcMNeLYX7Pw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 23/25] console: make screendump async
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cVdSN-00057z-5L
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 07:10:43 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 23 Jan 2017 15:10:13 +0300
+Message-Id: <20170123121036.4823-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20170123121036.4823-1-vsementsov@virtuozzo.com>
+References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 01/24] specs/qcow2: fix bitmap granularity
+ qemu-specific note
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-  Hi,
->=20
-> If you only ref, you could have the image being modified while it is
-> being saved asynchronously, this could result in tearing artefacts,
-> no?
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+---
+ docs/specs/qcow2.txt | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Yes, but you have that problem _anyway_.  screendump qmp command can run
-in parallel to guest vcpu, so it can race with guest display updates
-today.  Assuming they happen as simple framebuffer writes and therefore
-don't involve vmexit + grabbing big qemu lock.
-
-cheers,
-  Gerd
+diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
+index 80cdfd0e91..dda53dd2a3 100644
+--- a/docs/specs/qcow2.txt
++++ b/docs/specs/qcow2.txt
+@@ -472,8 +472,7 @@ Structure of a bitmap directory entry:
+              17:    granularity_bits
+                     Granularity bits. Valid values: 0 - 63.
+ 
+-                    Note: Qemu currently doesn't support granularity_bits
+-                    greater than 31.
++                    Note: Qemu currently supports only values 9 - 31.
+ 
+                     Granularity is calculated as
+                         granularity = 1 << granularity_bits
+-- 
+2.11.0
