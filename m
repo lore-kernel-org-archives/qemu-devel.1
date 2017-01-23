@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cVW6e-0002uZ-Jx
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 23:19:50 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cVWlS-0007fJ-Ju
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:01:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cVW6c-00005v-WC
-	for qemu-devel@nongnu.org; Sun, 22 Jan 2017 23:19:48 -0500
-Message-ID: <1485145172.8172.14.camel@gmail.com>
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cVWlR-0001Gj-F9
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 00:01:58 -0500
+Message-ID: <1485147704.8172.15.camel@gmail.com>
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Mon, 23 Jan 2017 15:19:32 +1100
-In-Reply-To: <20170117043734.GH15853@umbus>
+Date: Mon, 23 Jan 2017 16:01:44 +1100
+In-Reply-To: <1484613210.2028.3.camel@gmail.com>
 References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
-	<1484288903-18807-6-git-send-email-sjitindarsingh@gmail.com>
-	<20170116214030.GG15853@umbus> <1484614111.2028.14.camel@gmail.com>
-	<20170117043734.GH15853@umbus>
+	<1484288903-18807-5-git-send-email-sjitindarsingh@gmail.com>
+	<20170116213617.GF15853@umbus> <1484613210.2028.3.camel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 05/17] target/ppc/POWER9: Adapt LPCR
- handling for POWER9
+Subject: Re: [Qemu-devel] [RFC PATCH 04/17] target/ppc/POWER9: Add ISAv3.00
+ MMU definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,244 +28,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
 
-On Tue, 2017-01-17 at 15:37 +1100, David Gibson wrote:
-> On Tue, Jan 17, 2017 at 11:48:31AM +1100, Suraj Jitindar Singh wrote:
+On Tue, 2017-01-17 at 11:33 +1100, Suraj Jitindar Singh wrote:
+> On Tue, 2017-01-17 at 08:36 +1100, David Gibson wrote:
 > > 
-> > On Tue, 2017-01-17 at 08:40 +1100, David Gibson wrote:
+> > On Fri, Jan 13, 2017 at 05:28:10PM +1100, Suraj Jitindar Singh
+> > wrote:
 > > > 
-> > > On Fri, Jan 13, 2017 at 05:28:11PM +1100, Suraj Jitindar Singh
-> > > wrote:
-> > > > 
-> > > > 
-> > > > The logical partitioning control register controls a threads
-> > > > operation
-> > > > based on the partition it is currently executing. Add new
-> > > > definitions and
-> > > > update the mask used when writing to the LPCR based on the
-> > > > POWER9
-> > > > spec.
-> > > > 
-> > > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > > > ---
-> > > >  target/ppc/cpu.h            | 20 +++++++++++++++++++-
-> > > >  target/ppc/mmu-hash64.c     |  8 ++++++++
-> > > >  target/ppc/translate_init.c | 24 ++++++++++++++++++------
-> > > >  3 files changed, 45 insertions(+), 7 deletions(-)
-> > > > 
-> > > > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> > > > index afb7ddb..0ab49b3 100644
-> > > > --- a/target/ppc/cpu.h
-> > > > +++ b/target/ppc/cpu.h
-> > > > @@ -379,15 +379,22 @@ struct ppc_slb_t {
-> > > >  #define LPCR_ISL          (1ull << (63 - 2))
-> > > >  #define LPCR_KBV          (1ull << (63 - 3))
-> > > >  #define LPCR_DPFD_SHIFT   (63 - 11)
-> > > > -#define LPCR_DPFD         (0x3ull << LPCR_DPFD_SHIFT)
-> > > > +#define LPCR_DPFD         (0x7ull << LPCR_DPFD_SHIFT)
-> > > Changing this define effectively changes the valid LPCR mask for
-> > > existing POWER8 and POWER7 models, which is not what you want, I
-> > > think.
-> > I should have explained this better in the commit message, this has
-> > always been a 3 bit field (at least in POWER7-9) so the mask has
-> > just
-> > always been wrong. Afaik fixing this up won't really change
-> > anything -
-> > it relates to data stream prefetch depth.
-> > 
-> > I realise this should probably be a separate patch though, or
-> > atleast
-> > mentioned in the commit message.
-> Right, yes.  Please make the bugfix a separate patch with the
-> explanation in the commit message.
+> > > 
+> > > POWER9 processors implement the mmu as defined in version 3.00 of
+> > > the ISA.
+> > > 
+> > > Add a definition for this mmu model and set the POWER9 cpu model
+> > > to
+> > > use
+> > > this mmu model.
+> > > 
+> > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> > > ---
+> > >  target/ppc/cpu-qom.h        | 5 ++++-
+> > >  target/ppc/mmu_helper.c     | 2 ++
+> > >  target/ppc/translate_init.c | 3 +--
+> > >  3 files changed, 7 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> > > index d46c31a..1577cc8 100644
+> > > --- a/target/ppc/cpu-qom.h
+> > > +++ b/target/ppc/cpu-qom.h
+> > > @@ -86,10 +86,13 @@ enum powerpc_mmu_t {
+> > >      POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+> > >                               | POWERPC_MMU_64K
+> > >                               | POWERPC_MMU_AMR | 0x00000004,
+> > > -    /* FIXME Add POWERPC_MMU_3_OO defines */
+> > >      /* Architecture 2.07 "degraded" (no 1T
+> > > segments)           */
+> > >      POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
+> > >                               | 0x00000004,
+> > > +    /* Architecture 3.00
+> > > variant                               */
+> > > +    POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+> > > +                             | POWERPC_MMU_64K
+> > > +                             | POWERPC_MMU_AMR | 0x00000005,
+> > Hmm.  I guess it works for now, but I'm not really sure that having
+> > this include POWERPC_MMU_64 is a great idea.  The name is kind of
+> > misleading, but I'm pretty sure a number of places assume that the
+> > POWERPC_MMU_64 bitindicates a 64-bit *hash* MMU, which is no longer
+> > really the case.
+> Good catch, I didn't realise this assumption was made in the code.
 > 
-> > 
-> > > 
-> > > 
-> > > > 
-> > > > 
-> > > >  #define LPCR_VRMASD_SHIFT (63 - 16)
-> > > >  #define LPCR_VRMASD       (0x1full << LPCR_VRMASD_SHIFT)
-> > > > +/* P9: Power-saving mode Exit Cause Enable (Upper Section)
-> > > > Mask */
-> > > > +#define LPCR_PECE_U_SHIFT (63 - 19)
-> > > > +#define LPCR_PECE_U_MASK  (0x7ull << LPCR_PECE_U_SHIFT)
-> > > > +#define LPCR_HVEE         (1ull << (63 - 17)) /* Hypervisor
-> > > > Virt
-> > > > Exit Enable */
-> > > >  #define LPCR_RMLS_SHIFT   (63 - 37)
-> > > >  #define LPCR_RMLS         (0xfull << LPCR_RMLS_SHIFT)
-> > > >  #define LPCR_ILE          (1ull << (63 - 38))
-> > > >  #define LPCR_AIL_SHIFT    (63 - 40)      /* Alternate
-> > > > interrupt
-> > > > location */
-> > > >  #define LPCR_AIL          (3ull << LPCR_AIL_SHIFT)
-> > > > +#define LPCR_UPRT         (1ull << (63 - 41)) /* Use Process
-> > > > Table
-> > > > */
-> > > > +#define LPCR_EVIRT        (1ull << (63 - 42)) /* Enhanced
-> > > > Virtualisation */
-> > > >  #define LPCR_ONL          (1ull << (63 - 45))
-> > > > +#define LPCR_LD           (1ull << (63 - 46)) /* Large
-> > > > Decrementer
-> > > > */
-> > > >  #define LPCR_P7_PECE0     (1ull << (63 - 49))
-> > > >  #define LPCR_P7_PECE1     (1ull << (63 - 50))
-> > > >  #define LPCR_P7_PECE2     (1ull << (63 - 51))
-> > > > @@ -396,11 +403,22 @@ struct ppc_slb_t {
-> > > >  #define LPCR_P8_PECE2     (1ull << (63 - 49))
-> > > >  #define LPCR_P8_PECE3     (1ull << (63 - 50))
-> > > >  #define LPCR_P8_PECE4     (1ull << (63 - 51))
-> > > > +/* P9: Power-saving mode Exit Cause Enable (Lower Section)
-> > > > Mask */
-> > > > +#define LPCR_PECE_L_SHIFT (63 - 51)
-> > > > +#define LPCR_PECE_L_MASK  (0x1full << LPCR_PECE_L_SHIFT)
-> > > > +#define LPCR_PDEE         (1ull << (63 - 47)) /* Privileged
-> > > > Doorbell Exit EN */
-> > > > +#define LPCR_HDEE         (1ull << (63 - 48)) /* Hyperv
-> > > > Doorbell
-> > > > Exit Enable */
-> > > > +#define LPCR_EEE          (1ull << (63 - 49)) /* External Exit
-> > > > Enable        */
-> > > > +#define LPCR_DEE          (1ull << (63 - 50)) /* Decrementer
-> > > > Exit
-> > > > Enable     */
-> > > > +#define LPCR_OEE          (1ull << (63 - 51)) /* Other Exit
-> > > > Enable           */
-> > > >  #define LPCR_MER          (1ull << (63 - 52))
-> > > > +#define LPCR_GTSE         (1ull << (63 - 53)) /* Guest
-> > > > Translation
-> > > > Shootdown */
-> > > >  #define LPCR_TC           (1ull << (63 - 54))
-> > > > +#define LPCR_HEIC         (1ull << (63 - 59)) /* HV Extern
-> > > > Interrupt Control */
-> > > >  #define LPCR_LPES0        (1ull << (63 - 60))
-> > > >  #define LPCR_LPES1        (1ull << (63 - 61))
-> > > >  #define LPCR_RMI          (1ull << (63 - 62))
-> > > > +#define LPCR_HVICE        (1ull << (63 - 62)) /* HV
-> > > > Virtualisation
-> > > > Int Enable */
-> > > >  #define LPCR_HDICE        (1ull << (63 - 63))
-> > > >  
-> > > >  #define msr_sf   ((env->msr >> MSR_SF)   & 1)
-> > > > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> > > > index fdb7a78..3a2acb8 100644
-> > > > --- a/target/ppc/mmu-hash64.c
-> > > > +++ b/target/ppc/mmu-hash64.c
-> > > > @@ -1050,6 +1050,14 @@ void helper_store_lpcr(CPUPPCState *env,
-> > > > target_ulong val)
-> > > >                        LPCR_P8_PECE2 | LPCR_P8_PECE3 |
-> > > > LPCR_P8_PECE4 |
-> > > >                        LPCR_MER | LPCR_TC | LPCR_LPES0 |
-> > > > LPCR_HDICE);
-> > > >          break;
-> > > > +    case POWERPC_MMU_3_00: /* P9 */
-> > > > +        lpcr = val & (LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
-> > > > LPCR_DPFD
-> > > > > 
-> > > > > 
-> > > > +                      (LPCR_PECE_U_MASK & LPCR_HVEE) |
-> > > > LPCR_ILE |
-> > > > LPCR_AIL |
-> > > > +                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL |
-> > > > +                      (LPCR_PECE_L_MASK & (LPCR_PDEE |
-> > > > LPCR_HDEE |
-> > > > LPCR_EEE |
-> > > > +                      LPCR_DEE | LPCR_OEE)) | LPCR_MER |
-> > > > LPCR_GTSE
-> > > > > 
-> > > > > LPCR_TC |
-> > > > +                      LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE |
-> > > > LPCR_HDICE);
-> > > > +        break;
-> > > >      default:
-> > > >          ;
-> > > >      }
-> > > > diff --git a/target/ppc/translate_init.c
-> > > > b/target/ppc/translate_init.c
-> > > > index 2402eef..a1994d3 100644
-> > > > --- a/target/ppc/translate_init.c
-> > > > +++ b/target/ppc/translate_init.c
-> > > > @@ -8887,12 +8887,24 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu)
-> > > >      lpcr->default_value &= ~LPCR_RMLS;
-> > > >      lpcr->default_value |= 1ull << LPCR_RMLS_SHIFT;
-> > > >  
-> > > > -    /* P7 and P8 has slightly different PECE bits, mostly
-> > > > because
-> > > > P8 adds
-> > > > -     * bit 47 and 48 which are reserved on P7. Here we set
-> > > > them
-> > > > all, which
-> > > > -     * will work as expected for both implementations
-> > > > -     */
-> > > > -    lpcr->default_value |= LPCR_P8_PECE0 | LPCR_P8_PECE1 |
-> > > > LPCR_P8_PECE2 |
-> > > > -                           LPCR_P8_PECE3 | LPCR_P8_PECE4;
-> > > > +    switch (env->mmu_model) {
-> > > I'm not sure of mmu_model is conceptually the right thing to
-> > > switch
-> > > on, although I guess it will work in practice.
-> > Well we need something to indicate our default value, which is
-> > dictated
-> > by the cpu model, and given that a cpu model correlates to a mmu
-> > model
-> > I can't think of a better option.
-> Yeah, I guess it's probably reasonable.  We can always change it
-> later
-> if we need to.
-I mean I can add another mmu flag to indicate that the mmu supports ISA
-v3.00 features, POWERPC_MMU_V3 or something. This could be useful in
-the likely event that future mmus also support the new features and
-want to display support for them.
-
-e.g.
-
-#define POWERPC_MMU_V3 0x00100000
-
-POWERPC_MMU_3_00       = ... | POWERPC_MMU_V3;
-
-if (env->mmu_model & POWERPC_MMU_V3) {
-    // ISA v3.00 specific stuffs
-}
-
-Not sure if this makes more sense than just checking the mmu_model
-directly as I currently am, I guess it'll be necessary eventually for
-the next mmu model for us to be able to claim v3.00 support.
-
-Thoughts?
+> There are some cases where this bit needs to be set for correct
+> behaviour but other places where, while it doesn't break anything, it
+> leads to incorrect code being called.
 > 
+> Time for me to investigate :)
+Actually, having looked through the code, I think we want this set. As
+far as I can tell it doesn't lead to anything we don't want happening.
+> > 
 > > 
 > > > 
 > > > 
-> > > > 
-> > > > 
-> > > > +    case POWERPC_MMU_3_00:
-> > > > +        /* By default we choose legacy mode and switch to new
-> > > > hash
-> > > > or radix
-> > > > +         * when a register process table hcall is made. So
-> > > > disable
-> > > > process
-> > > > +         * tables and guest translation shootdown by default
-> > > > +         */
-> > > > +        lpcr->default_value &= ~(LPCR_UPRT | LPCR_GTSE);
-> > > > +        lpcr->default_value |= LPCR_PDEE | LPCR_HDEE |
-> > > > LPCR_EEE |
-> > > > LPCR_DEE |
-> > > > +                               LPCR_OEE;
-> > > > +        break;
-> > > > +    default:
-> > > > +        /* P7 and P8 has slightly different PECE bits, mostly
-> > > > because P8 adds
-> > > > +         * bit 47 and 48 which are reserved on P7. Here we set
-> > > > them all, which
-> > > > +         * will work as expected for both implementations
-> > > > +         */
-> > > > +        lpcr->default_value |= LPCR_P8_PECE0 | LPCR_P8_PECE1 |
-> > > > LPCR_P8_PECE2 |
-> > > > +                               LPCR_P8_PECE3 | LPCR_P8_PECE4;
-> > > > +    }
-> > > >  
-> > > >      /* We should be followed by a CPU reset but update the
-> > > > active
-> > > > value
-> > > >       * just in case...
+> > >  };
+> > >  
+> > >  /***************************************************************
+> > > **
+> > > ************/
+> > > diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+> > > index d09fc0a..2ab4562 100644
+> > > --- a/target/ppc/mmu_helper.c
+> > > +++ b/target/ppc/mmu_helper.c
+> > > @@ -1935,6 +1935,7 @@ void ppc_tlb_invalidate_all(CPUPPCState
+> > > *env)
+> > >      case POWERPC_MMU_2_06a:
+> > >      case POWERPC_MMU_2_07:
+> > >      case POWERPC_MMU_2_07a:
+> > > +    case POWERPC_MMU_3_00:
+> > >  #endif /* defined(TARGET_PPC64) */
+> > >          env->tlb_need_flush = 0;
+> > >          tlb_flush(CPU(cpu), 1);
+> > > @@ -1974,6 +1975,7 @@ void ppc_tlb_invalidate_one(CPUPPCState
+> > > *env,
+> > > target_ulong addr)
+> > >      case POWERPC_MMU_2_06a:
+> > >      case POWERPC_MMU_2_07:
+> > >      case POWERPC_MMU_2_07a:
+> > > +    case POWERPC_MMU_3_00:
+> > >          /* tlbie invalidate TLBs for all segments */
+> > >          /* XXX: given the fact that there are too many segments
+> > > to
+> > > invalidate,
+> > >           *      and we still don't have a tlb_flush_mask(env, n,
+> > > mask) in QEMU,
+> > > diff --git a/target/ppc/translate_init.c
+> > > b/target/ppc/translate_init.c
+> > > index bfc1f24..2402eef 100644
+> > > --- a/target/ppc/translate_init.c
+> > > +++ b/target/ppc/translate_init.c
+> > > @@ -8838,8 +8838,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc,
+> > > void
+> > > *data)
+> > >                      (1ull << MSR_PMM) |
+> > >                      (1ull << MSR_RI) |
+> > >                      (1ull << MSR_LE);
+> > > -    /* Using 2.07 defines until new radix model is added. */
+> > > -    pcc->mmu_model = POWERPC_MMU_2_07;
+> > > +    pcc->mmu_model = POWERPC_MMU_3_00;
+> > >  #if defined(CONFIG_SOFTMMU)
+> > >      pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
+> > >      /* segment page size remain the same */
