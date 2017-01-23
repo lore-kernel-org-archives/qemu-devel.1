@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVbam-0003bi-38
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:11:17 -0500
+	(envelope-from <mans@mansr.com>) id 1cVbeR-000501-A4
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:15:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVbai-0001Zs-4X
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:11:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42841)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cVbah-0001Zn-V8
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:11:12 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cVbag-0002ya-3K
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 10:11:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 13BF02E8199
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 10:11:08 +0000 (UTC)
+	(envelope-from <mans@mansr.com>) id 1cVbeO-0002RU-4d
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:15:03 -0500
+Received: from unicorn.mansr.com ([81.2.72.234]:41076)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mans@mansr.com>) id 1cVbeN-0002R6-Uj
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:15:00 -0500
+From: =?iso-8859-1?Q?M=E5ns_Rullg=E5rd?= <mans@mansr.com>
+References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
+	<CAJ+F1C+WV7OhxpYb3RgmtRjXU7_kfygr2jh2cawYwZq8MMrJGQ@mail.gmail.com>
+	<79bc9757-3ba0-87c3-3502-a25a30e304a3@siemens.com>
+	<286AC319A985734F985F78AFA26841F73916DDD2@shsmsx102.ccr.corp.intel.com>
+	<58a51a88-967d-bdc7-dc0b-e3e501ecccd3@siemens.com>
+	<286AC319A985734F985F78AFA26841F7391716D9@shsmsx102.ccr.corp.intel.com>
+	<778e7730-8ece-9cc4-000c-9ced0b29d503@siemens.com>
+	<286AC319A985734F985F78AFA26841F739175F99@shsmsx102.ccr.corp.intel.com>
+Date: Mon, 23 Jan 2017 10:14:53 +0000
+In-Reply-To: <286AC319A985734F985F78AFA26841F739175F99@shsmsx102.ccr.corp.intel.com>
+	(Wei W. Wang's message of "Mon, 23 Jan 2017 03:49:06 +0000")
+Message-ID: <yw1xvat6hyle.fsf@unicorn.mansr.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Jan 2017 09:57:38 -0000
-From: Kai Cong <1658634@bugs.launchpad.net>
-Reply-To: Bug 1658634 <1658634@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170123095738.20994.7212.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1658634] [NEW] Can't get correct display with
- latest QEMU and OVMF BIOS
+Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,46 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Jailhouse <jailhouse-dev@googlegroups.com>, Markus Armbruster <armbru@redhat.com>
 
-Public bug reported:
+"Wang, Wei W" <wei.w.wang@intel.com> writes:
 
-I tried to install a Ubuntu 16.04.1 Desktop 64bits with latest QEMU and OVM=
-F UEFI BIOS, however I can't get correct display output with default vga co=
-nfiguration (-vga std). However, qemu works with a couple of different conf=
-igurations:
-1. "-vga cirrus" + "-bios OVMF.fd": works
-2. "-vga std" + non-UEFI bios: works
+> On Saturday, January 21, 2017 12:38 AM, Jan Kiszka wrote:
+>> On 2017-01-20 12:54, Wang, Wei W wrote:
+>>> Having a theoretical analysis on the performance: The traditional
+>>> shared memory mechanism, sharing an intermediate memory, requires 2
+>>> copies to get the packet transmitted. It's not just one more copy
+>>> compared to the 1-copy solution, I think some more things we may
+>>> need to take into account:
+>>=20
+>> 1-copy (+potential transfers to userspace, but that's the same for
+>> everyone) is conceptually possible, definitely under stacks like
+>> DPDK.  However, Linux skbs are currently not prepared for picking up
+>> shmem-backed packets, we already looked into this. Likely
+>> addressable, though.
+>
+> Not sure how difficult it would be to get that change upstream-ed to
+> the kernel, but looking forward to seeing your solutions.
 
-The same error with QEMU 2.8.0 release. Everything works well on
-2.7.0/1.
+The problem is that the shared memory mapping doesn't have a struct page
+as required by lots of networking code.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1658634
-
-Title:
-  Can't get correct display with latest QEMU and OVMF BIOS
-
-Status in QEMU:
-  New
-
-Bug description:
-  I tried to install a Ubuntu 16.04.1 Desktop 64bits with latest QEMU and O=
-VMF UEFI BIOS, however I can't get correct display output with default vga =
-configuration (-vga std). However, qemu works with a couple of different co=
-nfigurations:
-  1. "-vga cirrus" + "-bios OVMF.fd": works
-  2. "-vga std" + non-UEFI bios: works
-
-  The same error with QEMU 2.8.0 release. Everything works well on
-  2.7.0/1.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1658634/+subscriptions
+--=20
+M=E5ns Rullg=E5rd
