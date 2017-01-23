@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cVZ8L-0005FW-1a
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 02:33:49 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cVZOV-0005MW-I1
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 02:50:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cVZ8K-0006pB-4h
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 02:33:45 -0500
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:35027)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cVZ8J-0006p1-V9
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 02:33:44 -0500
-Received: by mail-pf0-x22e.google.com with SMTP id f144so39243830pfa.2
-	for <qemu-devel@nongnu.org>; Sun, 22 Jan 2017 23:33:43 -0800 (PST)
-From: ben@skyportsystems.com
-Date: Sun, 22 Jan 2017 23:32:51 -0800
-Message-Id: <d696071bf823396b55c43418cc38c160bf47385d.1485155611.git.ben@skyportsystems.com>
-In-Reply-To: <cover.1485155611.git.ben@skyportsystems.com>
-References: <cover.1485155611.git.ben@skyportsystems.com>
-In-Reply-To: <cover.1485155611.git.ben@skyportsystems.com>
-References: <cover.1485155611.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v3 5/6] qmp/hmp: add set-vm-generation-id
- commands
+	(envelope-from <dovgaluk@ispras.ru>) id 1cVZOR-0003dX-ML
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 02:50:27 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:34596)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cVZOR-0003dA-Fl
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 02:50:23 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <000301d259dc$f9d097c0$ed71c740$@ru>
+	<000601d25a95$12b1b9f0$38152dd0$@ru>
+	<20161220102126.GE5602@stefanha-x1.localdomain>
+	<002501d25ab1$af024b00$0d06e100$@ru>
+	<CAJSP0QXm9ssLC5C+gV_agkEW_fdUY=NWBMvHqMh55UhYTR276g@mail.gmail.com>
+	<000301d25b4f$20018440$60048cc0$@ru>
+	<CAJSP0QW1pOcthcEt16Pp5xQu3miUh2Leq3kn3yvQqWqhi1P=QQ@mail.gmail.com>
+	<000801d26bd9$dca56db0$95f04910$@ru> <87o9zd3jta.fsf@linaro.org>
+	<000e01d26caa$dfdb3150$9f9193f0$@ru> <87mveleiw8.fsf@linaro.org>
+In-Reply-To: <87mveleiw8.fsf@linaro.org>
+Date: Mon, 23 Jan 2017 10:50:22 +0300
+Message-ID: <000c01d2754d$59a4cd70$0cee6850$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] qemu-2.8-rc4 is broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +36,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>
+To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+Cc: 'Stefan Hajnoczi' <stefanha@gmail.com>, 'qemu-devel' <qemu-devel@nongnu.org>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+>=20
+> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> >
+> > Sorry, this is another problem which occurs only in icount replay =
+mode:
+> > 1. cpu_handle_exception tries to force exception when is cannot =
+occur due to
+> >    running out all the planned instructions:
+> >     } else if (replay_has_exception()
+> >                && cpu->icount_decr.u16.low + cpu->icount_extra =
+=3D=3D 0) {
+> >         /* try to cause an exception pending in the log */
+> >         cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
+> >         *ret =3D -1;
+> >         return true;
+> >
+> > 2. tb_find calls tb_gen_code, which cannot allocate new translation =
+block
+> >    and calls tb_flush (which only queues the flushing) and =
+cpu_loop_exit
+> > 3. cpu_loop_exit returns to infinite loop of cpu_exec and the =
+condition
+> >             if (cpu_handle_exception(cpu, &ret)) {
+> >                 break;
+> >             }
+> >    is checked again causing an infinite loop.
+> >
+> > TB cache is not flushed because we never execute that break and real =
+work of tb_flush
+> > is made outside this loop.
+>=20
+> I think what we need is a:
+>=20
+>=20
+>   if (cpu->exit_request)
+>     break;
 
-Add set-vm-generation-id command to set Virtual Machine
-Generation ID counter.
+Where this exit_request is supposed to be set?
 
-QMP command example:
-    { "execute": "set-vm-generation-id",
-          "arguments": {
-              "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-          }
-    }
+>=20
+> before the cpu_handle_exception() call to ensure any queued work gets
+> processed first. Can you give me you current command line so I can
+> reproduce this and check the fix works?
 
-HMP command example:
-    set-vm-generation-id guid=324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
+I solved the problem using following patch:
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Ben Warren <ben@skyportsystems.com>
----
- hmp-commands.hx  | 13 +++++++++++++
- hmp.c            | 12 ++++++++++++
- hmp.h            |  1 +
- qapi-schema.json | 11 +++++++++++
- stubs/vmgenid.c  |  6 ++++++
- 5 files changed, 43 insertions(+)
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -451,6 +451,10 @@ static inline bool cpu_handle_exception(CPUState =
+*cpu, int *ret)
+ #ifndef CONFIG_USER_ONLY
+     } else if (replay_has_exception()
+                && cpu->icount_decr.u16.low + cpu->icount_extra =3D=3D =
+0) {
++        /* Break the execution loop in case of running out of TB cache.
++           This is needed to make flushing of the TB cache, because
++           real flush is queued to be executed outside the cpu loop. */
++        cpu->exception_index =3D EXCP_INTERRUPT;
+         /* try to cause an exception pending in the log */
+         cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
+         *ret =3D -1;
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 8819281..56744aa 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1775,5 +1775,18 @@ ETEXI
-     },
- 
- STEXI
-+@item set-vm-generation-id @var{uuid}
-+Set Virtual Machine Generation ID counter to @var{guid}
-+ETEXI
-+
-+    {
-+        .name       = "set-vm-generation-id",
-+        .args_type  = "guid:s",
-+        .params     = "guid",
-+        .help       = "Set Virtual Machine Generation ID counter",
-+        .cmd = hmp_set_vm_generation_id,
-+    },
-+
-+STEXI
- @end table
- ETEXI
-diff --git a/hmp.c b/hmp.c
-index c2280e0..3a4db8b 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2573,3 +2573,15 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
-     }
-     qapi_free_GuidInfo(info);
- }
-+
-+void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
-+{
-+    Error *errp = NULL;
-+    const char *guid = qdict_get_str(qdict, "guid");
-+
-+    qmp_set_vm_generation_id(guid, &errp);
-+    if (errp) {
-+        hmp_handle_error(mon, &errp);
-+        return;
-+    }
-+}
-diff --git a/hmp.h b/hmp.h
-index 799fd37..e0ac1e8 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -138,5 +138,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
- void hmp_info_dump(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
-+void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
- 
- #endif
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 0eb3964..eddb5a9 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -6041,3 +6041,14 @@
- # Since 2.9
- ##
- { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
-+
-+##
-+# @set-vm-generation-id:
-+#
-+# Set Virtual Machine Generation ID
-+#
-+# @guid: new GUID to set as Virtual Machine Generation ID
-+#
-+# Since 2.9
-+##
-+{ 'command': 'set-vm-generation-id', 'data': {'guid': 'str'} }
-diff --git a/stubs/vmgenid.c b/stubs/vmgenid.c
-index 8c448ac..d25d41b 100644
---- a/stubs/vmgenid.c
-+++ b/stubs/vmgenid.c
-@@ -6,3 +6,9 @@ GuidInfo *qmp_query_vm_generation_id(Error **errp)
-     error_setg(errp, "this command is not currently supported");
-     return NULL;
- }
-+
-+void qmp_set_vm_generation_id(const char *guid, Error **errp)
-+{
-+    error_setg(errp, "this command is not currently supported");
-+    return;
-+}
--- 
-2.10.1 (Apple Git-78)
+Pavel Dovgalyuk
