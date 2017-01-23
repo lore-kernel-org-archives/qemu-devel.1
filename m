@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1cVanh-0006To-QE
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:20:35 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cVare-0008Oo-OF
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:24:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1cVane-00059W-Jx
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:20:33 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35730)
+	(envelope-from <stefanha@gmail.com>) id 1cVard-0006Z1-FQ
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:24:38 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:36060)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1cVane-00058x-8K
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:20:30 -0500
-Received: by mail-wm0-x241.google.com with SMTP id d140so24952147wmd.2
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 01:20:27 -0800 (PST)
-From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Mon, 23 Jan 2017 04:19:55 -0500
-Message-Id: <1485163195-17547-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH V1] throttle:Removed duplicate throtlle code
- from block and 9p files
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cVard-0006Yh-A8
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 04:24:37 -0500
+Received: by mail-it0-x242.google.com with SMTP id o138so9524504ito.3
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 01:24:35 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAE519-kc6j8jZCq2o5SrxP1a8W9H3P3YB+P_c2vQox0rH+eckQ@mail.gmail.com>
+References: <CAE519-k8poR3Qi99rg__9hYWS2ACw8a=3S+cx4s1xJW6QDFSjA@mail.gmail.com>
+	<20170112141417.GB14042@stefanha-x1.localdomain>
+	<CAE519-k2TdnntRLKK=2p2tOg2Nxrd+kfwyuUJBWXa2QBnMKh0A@mail.gmail.com>
+	<CAJSP0QXrVtqkwxnokqf=d+RLx0yT55iuLcxs1ovuJc6bZCsbiw@mail.gmail.com>
+	<CAE519-kab+PFnq98eO=G+M4dXZsPNQcBHzB=JLMXGJAKNiqZoA@mail.gmail.com>
+	<CAJSP0QWG_qBnAMHZ86bVJmPkL=Sxh3WJWs6ZdBaLcrTZihojXw@mail.gmail.com>
+	<CAE519-=U4YwENeuJHPfRLGuECZMdkUb9NV0BHXw5nCpXCmb41g@mail.gmail.com>
+	<CAJSP0QW7t+nqDN6Gg5wZjJq=OWhaJhd_HX6PZ3K+ZwZ=Xi911w@mail.gmail.com>
+	<CAE519-=qJqkshtHgGNZ1sQ6prJHfaLrikE+B7vNpZ5WESBZBXg@mail.gmail.com>
+	<CAJSP0QWf6yNQ0BVjdXcSPT+wv3aQoefC5GUdcbGW+5iShXB8xA@mail.gmail.com>
+	<CAE519-kc6j8jZCq2o5SrxP1a8W9H3P3YB+P_c2vQox0rH+eckQ@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Mon, 23 Jan 2017 09:24:34 +0000
+Message-ID: <CAJSP0QV71O7nGMJUR0pCTKoRc7NnkRszsdiZN+0MGShkns3E6Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Question about io mode & cache mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,318 +37,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+To: morgenlette madeBy <sgh8183@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-This will allow other subsystems (i.e. fsdev) to implement throttling
-without duplicating the command line options.
+On Mon, Jan 23, 2017 at 8:59 AM, morgenlette madeBy <sgh8183@gmail.com> wrote:
 
-Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
----
- blockdev.c                      | 80 ++---------------------------------
- fsdev/qemu-fsdev-opts.c         | 80 ++---------------------------------
- include/qemu/throttle-options.h | 93 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 101 insertions(+), 152 deletions(-)
- create mode 100644 include/qemu/throttle-options.h
+Please keep qemu-devel@nongnu.org CCed so the discussion stays on the
+mailing list where others can follow it.
 
-There is some code duplication around the command line options. This patch
-is a first proposal to reduce the duplication.
+> I am sorry to bother you.
+>
+> so, Where is the part that I have to check additionally?
 
-diff --git a/blockdev.c b/blockdev.c
-index 245e1e1..1da6b7e 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -52,6 +52,7 @@
- #include "sysemu/arch_init.h"
- #include "qemu/cutils.h"
- #include "qemu/help_option.h"
-+#include "qemu/throttle-options.h"
- 
- static QTAILQ_HEAD(, BlockDriverState) monitor_bdrv_states =
-     QTAILQ_HEAD_INITIALIZER(monitor_bdrv_states);
-@@ -4000,82 +4001,9 @@ QemuOptsList qemu_common_drive_opts = {
-             .type = QEMU_OPT_BOOL,
-             .help = "open drive file as read-only",
-         },{
--            .name = "throttling.iops-total",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit total I/O operations per second",
--        },{
--            .name = "throttling.iops-read",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit read operations per second",
--        },{
--            .name = "throttling.iops-write",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit write operations per second",
--        },{
--            .name = "throttling.bps-total",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit total bytes per second",
--        },{
--            .name = "throttling.bps-read",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit read bytes per second",
--        },{
--            .name = "throttling.bps-write",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit write bytes per second",
--        },{
--            .name = "throttling.iops-total-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "I/O operations burst",
--        },{
--            .name = "throttling.iops-read-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "I/O operations read burst",
--        },{
--            .name = "throttling.iops-write-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "I/O operations write burst",
--        },{
--            .name = "throttling.bps-total-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "total bytes burst",
--        },{
--            .name = "throttling.bps-read-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "total bytes read burst",
--        },{
--            .name = "throttling.bps-write-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "total bytes write burst",
--        },{
--            .name = "throttling.iops-total-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the iops-total-max burst period, in seconds",
--        },{
--            .name = "throttling.iops-read-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the iops-read-max burst period, in seconds",
--        },{
--            .name = "throttling.iops-write-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the iops-write-max burst period, in seconds",
--        },{
--            .name = "throttling.bps-total-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the bps-total-max burst period, in seconds",
--        },{
--            .name = "throttling.bps-read-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the bps-read-max burst period, in seconds",
--        },{
--            .name = "throttling.bps-write-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the bps-write-max burst period, in seconds",
--        },{
--            .name = "throttling.iops-size",
--            .type = QEMU_OPT_NUMBER,
--            .help = "when limiting by iops max size of an I/O in bytes",
--        },{
-+        },
-+           THROTTLE_OPTS
-+        {
-             .name = "throttling.group",
-             .type = QEMU_OPT_STRING,
-             .help = "name of the block throttling group",
-diff --git a/fsdev/qemu-fsdev-opts.c b/fsdev/qemu-fsdev-opts.c
-index 385423f0..13597a3 100644
---- a/fsdev/qemu-fsdev-opts.c
-+++ b/fsdev/qemu-fsdev-opts.c
-@@ -9,6 +9,7 @@
- #include "qemu/config-file.h"
- #include "qemu/option.h"
- #include "qemu/module.h"
-+#include "qemu/throttle-options.h"
- 
- static QemuOptsList qemu_fsdev_opts = {
-     .name = "fsdev",
-@@ -37,83 +38,10 @@ static QemuOptsList qemu_fsdev_opts = {
-         }, {
-             .name = "sock_fd",
-             .type = QEMU_OPT_NUMBER,
--        }, {
--            .name = "throttling.iops-total",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit total I/O operations per second",
--        }, {
--            .name = "throttling.iops-read",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit read operations per second",
--        }, {
--            .name = "throttling.iops-write",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit write operations per second",
--        }, {
--            .name = "throttling.bps-total",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit total bytes per second",
--        }, {
--            .name = "throttling.bps-read",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit read bytes per second",
--        }, {
--            .name = "throttling.bps-write",
--            .type = QEMU_OPT_NUMBER,
--            .help = "limit write bytes per second",
--        }, {
--            .name = "throttling.iops-total-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "I/O operations burst",
--        }, {
--            .name = "throttling.iops-read-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "I/O operations read burst",
--        }, {
--            .name = "throttling.iops-write-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "I/O operations write burst",
--        }, {
--            .name = "throttling.bps-total-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "total bytes burst",
--        }, {
--            .name = "throttling.bps-read-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "total bytes read burst",
--        }, {
--            .name = "throttling.bps-write-max",
--            .type = QEMU_OPT_NUMBER,
--            .help = "total bytes write burst",
--        }, {
--            .name = "throttling.iops-total-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the iops-total-max burst period, in seconds",
--        }, {
--            .name = "throttling.iops-read-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the iops-read-max burst period, in seconds",
--        }, {
--            .name = "throttling.iops-write-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the iops-write-max burst period, in seconds",
--        }, {
--            .name = "throttling.bps-total-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the bps-total-max burst period, in seconds",
--        }, {
--            .name = "throttling.bps-read-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the bps-read-max burst period, in seconds",
--        }, {
--            .name = "throttling.bps-write-max-length",
--            .type = QEMU_OPT_NUMBER,
--            .help = "length of the bps-write-max burst period, in seconds",
--        }, {
--            .name = "throttling.iops-size",
--            .type = QEMU_OPT_NUMBER,
--            .help = "when limiting by iops max size of an I/O in bytes",
-         },
-+
-+        THROTTLE_OPTS
-+
-         { /*End of list */ }
-     },
- };
-diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
-new file mode 100644
-index 0000000..a2fb817
---- /dev/null
-+++ b/include/qemu/throttle-options.h
-@@ -0,0 +1,93 @@
-+/*
-+ * QEMU throttling command line options
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.
-+ *
-+ * See the COPYING file in the top-level directory for details.
-+ *
-+ */
-+
-+#ifndef THROTTLE_OPTIONS_H
-+#define THROTTLE_OPTIONS_H
-+
-+#define THROTTLE_OPTS \
-+        { \
-+            .name = "throttling.iops-total",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "limit total I/O operations per second",\
-+        },{ \
-+            .name = "throttling.iops-read",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "limit read operations per second",\
-+        },{ \
-+            .name = "throttling.iops-write",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "limit write operations per second",\
-+        },{ \
-+            .name = "throttling.bps-total",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "limit total bytes per second",\
-+        },{ \
-+            .name = "throttling.bps-read",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "limit read bytes per second",\
-+        },{ \
-+            .name = "throttling.bps-write",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "limit write bytes per second",\
-+        },{ \
-+            .name = "throttling.iops-total-max",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "I/O operations burst",\
-+        },{ \
-+            .name = "throttling.iops-read-max",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "I/O operations read burst",\
-+        },{ \
-+            .name = "throttling.iops-write-max",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "I/O operations write burst",\
-+        },{ \
-+            .name = "throttling.bps-total-max",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "total bytes burst",\
-+        },{ \
-+            .name = "throttling.bps-read-max",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "total bytes read burst",\
-+        },{ \
-+            .name = "throttling.bps-write-max",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "total bytes write burst",\
-+        },{ \
-+            .name = "throttling.iops-total-max-length",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "length of the iops-total-max burst period, in seconds",\
-+        },{ \
-+            .name = "throttling.iops-read-max-length",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "length of the iops-read-max burst period, in seconds",\
-+        },{ \
-+            .name = "throttling.iops-write-max-length",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "length of the iops-write-max burst period, in seconds",\
-+        },{ \
-+            .name = "throttling.bps-total-max-length",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "length of the bps-total-max burst period, in seconds",\
-+        },{ \
-+            .name = "throttling.bps-read-max-length",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "length of the bps-read-max burst period, in seconds",\
-+        },{ \
-+            .name = "throttling.bps-write-max-length",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "length of the bps-write-max burst period, in seconds",\
-+        },{ \
-+            .name = "throttling.iops-size",\
-+            .type = QEMU_OPT_NUMBER,\
-+            .help = "when limiting by iops max size of an I/O in bytes",\
-+        },
-+
-+#endif
--- 
-1.8.3.1
+Failing syscalls can be debugged using kernel function graph tracing:
+https://www.kernel.org/doc/Documentation/trace/ftrace.txt
+
+It shows you the code path executed by the kernel.  You can
+cross-reference the kernel source to see why an error return path is
+being taken.
+
+There are other approaches, like adding printks to the kernel.
+
+Before you embark on any of this, it might be a good idea to write a
+tiny test program that opens the file exactly the same way you are
+doing it in QEMU.  See if it fails in the same way.
+
+Stefan
+
+> On Mon, Jan 23, 2017 at 5:31 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>>
+>> On Mon, Jan 23, 2017 at 7:43 AM, morgenlette madeBy <sgh8183@gmail.com>
+>> wrote:
+>> > I am using Centos 7.
+>> >
+>> > So I set up SELinux=disabled...
+>> >
+>> > /dev/mydev is operated by root and its permission is 0777.
+>> >
+>> > 6 S root      3221     1 14  80   0 - 409221 poll_s 16:40 ?
+>> > 00:00:14
+>> > /usr/libexec/qemu-kvm -name centos6.5-1 -S -machine
+>> > pc-i440fx-rhel7.0.0,accel=kvm,usb=off -cpu
+>> > SandyBridge,+vme,+f16c,+rdrand,+fsgsbase,+smep,+erms -m 1024 -realtime
+>> > mlock=off -smp 1,sockets=1,cores=1,threads=1 -uuid
+>> > c1878d8a-0902-42f1-9c20-509302412f45 -no-user-config -nodefaults
+>> > -chardev
+>> >
+>> > socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-1-centos6.5-1/monitor.sock,server,nowait
+>> > -mon chardev=charmonitor,id=monitor,mode=control -rtc
+>> > base=utc,driftfix=slew
+>> > -global kvm-pit.lost_tick_policy=discard -no-hpet -no-shutdown -global
+>> > PIIX4_PM.disable_s3=1 -global PIIX4_PM.disable_s4=1 -boot strict=on
+>> > -device
+>> > ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x6.0x7 -device
+>> >
+>> > ich9-usb-uhci1,masterbus=usb.0,firstport=0,bus=pci.0,multifunction=on,addr=0x6
+>> > -device
+>> > ich9-usb-uhci2,masterbus=usb.0,firstport=2,bus=pci.0,addr=0x6.0x1
+>> > -device
+>> > ich9-usb-uhci3,masterbus=usb.0,firstport=4,bus=pci.0,addr=0x6.0x2
+>> > -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x5 -drive
+>> >
+>> > file=/var/lib/libvirt/images/centos6.5-1.qcow2,format=qcow2,if=none,id=drive-virtio-disk0
+>> > -device
+>> >
+>> > virtio-blk-pci,scsi=off,bus=pci.0,addr=0x7,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1
+>> > -drive if=none,id=drive-ide0-0-0,readonly=on -device
+>> > ide-cd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0 -netdev
+>> > tap,fd=26,id=hostnet0,vhost=on,vhostfd=28 -device
+>> >
+>> > virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:f2:d9:fa,bus=pci.0,addr=0x3
+>> > -chardev pty,id=charserial0 -device
+>> > isa-serial,chardev=charserial0,id=serial0 -chardev
+>> >
+>> > socket,id=charchannel0,path=/var/lib/libvirt/qemu/channel/target/domain-1-centos6.5-1/org.qemu.guest_agent.0,server,nowait
+>> > -device
+>> >
+>> > virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=org.qemu.guest_agent.0
+>> > -chardev spicevmc,id=charchannel1,name=vdagent -device
+>> >
+>> > virtserialport,bus=virtio-serial0.0,nr=2,chardev=charchannel1,id=channel1,name=com.redhat.spice.0
+>> > -device usb-tablet,id=input0,bus=usb.0,port=1 -spice
+>> >
+>> > port=5900,addr=127.0.0.1,disable-ticketing,image-compression=off,seamless-migration=on
+>> > -vga qxl -global qxl-vga.ram_size=67108864 -global
+>> > qxl-vga.vram_size=67108864 -global qxl-vga.vgamem_mb=16 -device
+>> > intel-hda,id=sound0,bus=pci.0,addr=0x4 -device
+>> > hda-duplex,id=sound0-codec0,bus=sound0.0,cad=0 -chardev
+>> > spicevmc,id=charredir0,name=usbredir -device
+>> > usb-redir,chardev=charredir0,id=redir0,bus=usb.0,port=2 -chardev
+>> > spicevmc,id=charredir1,name=usbredir -device
+>> > usb-redir,chardev=charredir1,id=redir1,bus=usb.0,port=3 -device
+>> > virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x8 -msg timestamp=on
+>> >
+>> > QEMU file is also operated by root.
+>> >
+>> > I can't understand what is problem...
+>> >
+>> > In qemu, is open function disabled???
+>>
+>> No, it is not.
+>>
+>> Stefan
+>
+>
