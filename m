@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVjo0-0000eI-FB
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:57:29 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cVjoh-0001B3-5u
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVjnx-0008TZ-6S
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:57:28 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35512)
+	(envelope-from <rth7680@gmail.com>) id 1cVjoY-0000YL-TR
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:58:11 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34710)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cVjnx-0008Sj-2N
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:57:25 -0500
-Received: by mail-qt0-x241.google.com with SMTP id f4so19322266qte.2
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 10:57:24 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cVjoY-0000XY-Pq
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 13:58:02 -0500
+Received: by mail-qt0-x244.google.com with SMTP id a29so19327258qtb.1
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 10:58:02 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20170119170507.16185-1-alex.bennee@linaro.org>
-	<20170119170507.16185-3-alex.bennee@linaro.org>
+	<20170119170507.16185-4-alex.bennee@linaro.org>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <3424cc87-fe1f-321d-8afe-39a579a76b36@twiddle.net>
-Date: Mon, 23 Jan 2017 10:57:20 -0800
+Message-ID: <31e2d0be-264e-1464-9021-34d16fb278f5@twiddle.net>
+Date: Mon, 23 Jan 2017 10:57:42 -0800
 MIME-Version: 1.0
-In-Reply-To: <20170119170507.16185-3-alex.bennee@linaro.org>
+In-Reply-To: <20170119170507.16185-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 02/27] mttcg: translate-all: Enable
- locking debug in a debug build
+Subject: Re: [Qemu-devel] [PATCH v7 03/27] mttcg: Add missing
+ tb_lock/unlock() in cpu_exec_step()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,18 +37,16 @@ Cc: peter.maydell@linaro.org, claudio.fontana@huawei.com, Peter Crosthwaite <cro
 On 01/19/2017 09:04 AM, Alex Bennée wrote:
 > From: Pranith Kumar <bobby.prani@gmail.com>
 > 
-> Enable tcg lock debug asserts in a debug build by default instead of
-> relying on DEBUG_LOCKING. None of the other DEBUG_* macros have
-> asserts, so this patch removes DEBUG_LOCKING and enable these asserts
-> in a debug build.
+> The recent patch enabling lock assertions uncovered the missing lock
+> acquisition in cpu_exec_step(). This patch adds them.
 > 
 > CC: Richard Henderson <rth@twiddle.net>
+> CC: Alex Bennée <alex.bennee@linaro.org>
 > Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> [AJB: tweak ifdefs so can be early in series]
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  translate-all.c | 52 ++++++++++++++++------------------------------------
->  1 file changed, 16 insertions(+), 36 deletions(-)
+>  cpu-exec.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 
