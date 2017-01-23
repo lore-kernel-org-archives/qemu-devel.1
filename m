@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVjxZ-0006EB-F7
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:07:24 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1cVjy4-0006X3-I6
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:07:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cVjxY-0003qZ-8B
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:07:21 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35077)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1cVjy1-0004RX-CJ
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:07:52 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36314)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cVjxY-0003qO-4X
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:07:20 -0500
-Received: by mail-qt0-x243.google.com with SMTP id f4so19385050qte.2
-	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 11:07:20 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170119170507.16185-1-alex.bennee@linaro.org>
-	<20170119170507.16185-15-alex.bennee@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ba083303-3123-00ab-66fc-bc1c9c764bbe@twiddle.net>
-Date: Mon, 23 Jan 2017 11:07:15 -0800
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1cVjy1-0004Qj-4w
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 14:07:49 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r126so28596643wmr.3
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 11:07:47 -0800 (PST)
+Reply-To: marcel@redhat.com
+References: <1484859633-24889-1-git-send-email-mst@redhat.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <f6751d6e-9cbe-6b28-abc1-8d13efea2e3e@gmail.com>
+Date: Mon, 23 Jan 2017 21:07:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170119170507.16185-15-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 14/27] cputlb: tweak
- qemu_ram_addr_from_host_nofail reporting
+In-Reply-To: <1484859633-24889-1-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pci: mark ROMs read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
-Cc: peter.maydell@linaro.org, claudio.fontana@huawei.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, jan.kiszka@siemens.com, mark.burton@greensocs.com, serge.fdrv@gmail.com, pbonzini@redhat.com, bamvor.zhangjian@linaro.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>
 
-On 01/19/2017 09:04 AM, Alex Bennée wrote:
-> This moves the helper function closer to where it is called and updates
-> the error message to report via error_report instead of the deprecated
-> fprintf.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On 01/19/2017 11:00 PM, Michael S. Tsirkin wrote:
+> Looks like we didn't mark PCI ROMs as RO allowing
+> mischief such as guests writing there.
+> Further, e.g. vhost gets confused trying to allocate
+> enough space to log writes there. Fix it up.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
->  cputlb.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
+>  hw/pci/pci.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 637d545..eaac185 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -2199,7 +2199,7 @@ static void pci_add_option_rom(PCIDevice *pdev, bool is_default_rom,
+>          snprintf(name, sizeof(name), "%s.rom", object_get_typename(OBJECT(pdev)));
+>      }
+>      pdev->has_rom = true;
+> -    memory_region_init_ram(&pdev->rom, OBJECT(pdev), name, size, &error_fatal);
+> +    memory_region_init_rom(&pdev->rom, OBJECT(pdev), name, size, &error_fatal);
+>      vmstate_register_ram(&pdev->rom, &pdev->qdev);
+>      ptr = memory_region_get_ram_ptr(&pdev->rom);
+>      load_image(path, ptr);
+>
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
 
-r~
+Thanks,
+Marcel
