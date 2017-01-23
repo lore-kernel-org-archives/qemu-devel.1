@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cVbsb-0002Ot-GO
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:29:42 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cVbtd-0003Bs-Fw
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:30:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cVbsa-0006O3-8d
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:29:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55962)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cVbsa-0006NR-33
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:29:40 -0500
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-20-git-send-email-peterx@redhat.com>
-	<e1b09efe-0201-a746-9aa9-62f798a222f9@redhat.com>
-	<20170122090958.GC26526@pxdev.xzpeter.org>
-	<33026fc1-3649-0d33-2bf1-6260daedfe03@redhat.com>
-	<20170123073020.GI26526@pxdev.xzpeter.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9900f41e-8ac7-2567-353f-371d41364263@redhat.com>
-Date: Mon, 23 Jan 2017 18:29:32 +0800
+	(envelope-from <batuzovk@ispras.ru>) id 1cVbtY-0006ii-Gq
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:30:45 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:57850 helo=smtp.ispras.ru)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <batuzovk@ispras.ru>) id 1cVbtY-0006hq-4X
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:30:40 -0500
+Date: Mon, 23 Jan 2017 13:30:37 +0300 (MSK)
+From: Kirill Batuzov <batuzovk@ispras.ru>
+In-Reply-To: <7f9b740e-20d5-2a6e-eaba-ffef5851e754@twiddle.net>
+Message-ID: <alpine.DEB.2.11.1701231246360.2026@bulbul.intra.ispras.ru>
+References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
+	<1484644078-21312-2-git-send-email-batuzovk@ispras.ru>
+	<4d351b53-8724-b245-0077-942de1bebd66@twiddle.net>
+	<alpine.DEB.2.11.1701191515580.1724@bulbul.intra.ispras.ru>
+	<7178d6dd-4252-ad60-e1f0-51acffcd393c@twiddle.net>
+	<d3ca01a3-b8ed-93fd-235a-bd9b3adad838@ispras.ru>
+	<7f9b740e-20d5-2a6e-eaba-ffef5851e754@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170123073020.GI26526@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v4 19/20] intel_iommu: unmap existing
- pages before replay
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 01/18] tcg: add support for 128bit vector
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
+On Sat, 21 Jan 2017, Richard Henderson wrote:
 
-
-On 2017=E5=B9=B401=E6=9C=8823=E6=97=A5 15:30, Peter Xu wrote:
-> On Mon, Jan 23, 2017 at 09:57:23AM +0800, Jason Wang wrote:
->>
->> On 2017=E5=B9=B401=E6=9C=8822=E6=97=A5 17:09, Peter Xu wrote:
->>> On Sun, Jan 22, 2017 at 04:13:32PM +0800, Jason Wang wrote:
->>>> On 2017=E5=B9=B401=E6=9C=8820=E6=97=A5 21:08, Peter Xu wrote:
->>>>> Previous replay works for domain switch only if the original domain=
- does
->>>>> not have mapped pages. For example, if we switch domain from A to B=
-, it
->>>>> will only work if A has no existing mapping. If there is, then ther=
-e's
->>>>> problem - current replay didn't make sure the old mappings are clea=
-red
->>>>> before replaying the new one.
->>>> I'm not quite sure this is needed. I thought the only thing we need =
-to do is
->>>> stop DMA of device during the moving? Or is there an example that wi=
-ll cause
->>>> trouble?
->>> I think this patch is essential.
->>>
->>> Example:
->>>
->>> - device D1 moved to domain A, domain A has no mapping
->>> - map page P1 in domain A, so D1 will have a mapping of page P1
->>> - create domain B with mapping P2
->>> - move D1 from domain A to domain B
->>>
->>> Here if we don't unmap existing pages in domain A (P1),
->> I thought driver should do this work instead of device, because only d=
-river
->> knows whether or not iova is still needed?
-> Do you mean "device driver" above?
+> On 01/19/2017 08:54 AM, Kirill Batuzov wrote:
+> > 
+> > Wrappers issue emulation code instead of operation if it is not supported by
+> > host.
+> > 
+> > tcg_gen_add_i32x4 looks like this:
+> > 
+> > if (TCG_TARGET_HAS_add_i32x4) {
+> >     tcg_gen_op3_v128(INDEX_op_add_i32x4, args[0], args[1], args[2]);
+> > } else {
+> >     for (i = 0; i < 4; i++) {
+> >         tcg_gen_ld_i32(...);
+> >         tcg_gen_ld_i32(...);
+> >         tcg_gen_add_i32(...);
+> >         tcg_gen_st_i32(...);
+> >     }
+> > }
+> 
+> To me that begs the question of why you wouldn't issue 4 adds on 4 i32
+> registers instead.
 >
-> I don't know whether I understood the question above, but the problem
-> should be there no matter which one is managing iova?
->
-> Thanks,
->
-> -- peterx
 
-Yes, I misread the code, this is in fact triggered by guest.
+Because 4 adds on 4 i32 registers work good only when the size of
+vector elements matches the size of scalar variables we use for
+representation of a vector. add_i16x8 will not be that great if we use
+4 i32 variables: each will need to be split into two values, processed
+independently and merged back afterwards. And when we create variable we
+do not know which operations will be performed on it.
 
-Thanks
+Scalar variables lack primitives to work with them as vectors of shorter
+values. This is one of the reasons I added v64 type instead of using i64
+for 64-bit vector operations. And this is the reason I'm so opposed to
+using them to represent vector types if vector registers are not
+supported by host. Handling vector operations with element size that
+does not match representation will be complicated, may require special
+handling for different operations and will produce a lot of if-s in code.
+
+The method I'm proposing can handle any operation regardless of
+representation. This includes handling situation where host supports
+vector registers but does not support required operation (for example 
+SSE/AVX does not support multiplication of vectors of 8-bit values).
+
+-- 
+Kirill
