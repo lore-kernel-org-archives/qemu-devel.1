@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cVc2x-0001rF-Rq
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:40:24 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cVc56-0003N7-68
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:42:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cVc2t-0000rb-Sg
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:40:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60446)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cVc2t-0000rK-Nh
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:40:19 -0500
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-20-git-send-email-peterx@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <cddf837c-24ca-b6f2-67cf-256e6b1e0bec@redhat.com>
-Date: Mon, 23 Jan 2017 18:40:12 +0800
+	(envelope-from <stefanha@gmail.com>) id 1cVc52-0001L7-7d
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:42:36 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:33667)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cVc52-0001L2-0b
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:42:32 -0500
+Received: by mail-wm0-x235.google.com with SMTP id d140so32648299wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 02:42:31 -0800 (PST)
+Date: Mon, 23 Jan 2017 10:42:28 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170123104228.GG29186@stefanha-x1.localdomain>
+References: <CAAKRE72RN=DvVqxYMba5KdnWQ+jrAXTpxQc7Qdgiymu6oByosg@mail.gmail.com>
+	<20170118102942.GA5284@stefanha-x1.localdomain>
+	<CAAKRE70s=Cdk9xedS3xavOj9_TMRa4ZNvZqVw8jqVxVMDCM7Vg@mail.gmail.com>
+	<CAJSP0QUU3CgJdX6p-vAQAyAeQio3Br7grUFBRrT-N0s2F6X58g@mail.gmail.com>
+	<CAAKRE72fjOwKs6V8MMOB-9WWv1vYidKYt3QSTZAoxEboXq2f5g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1484917736-32056-20-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v4 19/20] intel_iommu: unmap existing
- pages before replay
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="8S1fMsFYqgBC+BN/"
+Content-Disposition: inline
+In-Reply-To: <CAAKRE72fjOwKs6V8MMOB-9WWv1vYidKYt3QSTZAoxEboXq2f5g@mail.gmail.com>
+Subject: Re: [Qemu-devel] VM Hung issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Umar Draz <unix.co@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
 
+--8S1fMsFYqgBC+BN/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 2017=E5=B9=B401=E6=9C=8820=E6=97=A5 21:08, Peter Xu wrote:
->   static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
->   {
->       memory_region_notify_one((IOMMUNotifier *)private, entry);
-> @@ -2711,13 +2768,16 @@ static void vtd_iommu_replay(MemoryRegion *mr, =
-IOMMUNotifier *n)
->  =20
->       if (vtd_dev_to_context_entry(s, bus_n, vtd_as->devfn, &ce) =3D=3D=
- 0) {
->           /*
-> -         * Scanned a valid context entry, walk over the pages and
-> -         * notify when needed.
-> +         * Scanned a valid context entry, we first make sure to remove
-> +         * all existing mappings in old domain, by sending UNMAP to
-> +         * all the notifiers. Then, we walk over the pages and notify
-> +         * with existing mapped new entries in the new domain.
->            */
+On Thu, Jan 19, 2017 at 10:22:57PM +0500, Umar Draz wrote:
+> Yes the display is blank, and network also not responding, it means vm
+> somewhere hung.
 
-A question is what if the context cache was invalidated but the device=20
-were not moved to a new domain. Then the code here does not do anything=20
-I believe? I think we should move vtd_address_space_unmap() in the=20
-context entry invalidation processing.
+Try "gstack $PID_OF_QEMU" when the VM is hung.  This will output a
+backtrace for all threads in QEMU.  You might need to install the gdb
+package to get gstack.
 
-Thanks
+Please post the backtrace.  Maybe we'll be able to identify a deadlock
+or other bug.
 
->           trace_vtd_replay_ce_valid(bus_n, PCI_SLOT(vtd_as->devfn),
->                                     PCI_FUNC(vtd_as->devfn),
->                                     VTD_CONTEXT_ENTRY_DID(ce.hi),
->                                     ce.hi, ce.lo);
-> +        vtd_address_space_unmap(vtd_as, n);
->           vtd_page_walk(&ce, 0, ~0, vtd_replay_hook, (void *)n, false);
->       } else {
->           trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
-> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_inter=
-n
+Stefan
+
+--8S1fMsFYqgBC+BN/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYhd4UAAoJEJykq7OBq3PIMDUIALZmQTl1T+F8KQyAVBjMdyP8
+QLAH9msd9uK35uSkw3f46VVJ+QlFtusZQZBS7PFjIxglwWdjmrU/KGcKcU2k03tj
+L+psSN4TvwqDETIG7Qz9UqO1MQDHMB/mltyZ9wMb8tMP+X3K0xawMVgmte9sQf2g
+kglAkYvajE7+mwXF9JLd2hHTIcNduSXmC5NgyWwUxueiBTDMUpVRYSd+yx5R/cCR
+i5HeQ6j3xlUC5mkKHIk3m5xD8gsos6XU/soygU0S+Q4lrM/MMtQedab/Z9Krdcbq
+HJ1fUA+zZhCDbiE17WXydZIGmgUiWQMJ621e7RzbfiN8shPfovXvCH5vT+e1g+A=
+=I2VA
+-----END PGP SIGNATURE-----
+
+--8S1fMsFYqgBC+BN/--
