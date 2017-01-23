@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1cVcL1-0008Dx-Sx
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:59:04 -0500
+	(envelope-from <pagupta@redhat.com>) id 1cVcRj-0001Ut-Cs
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 06:06:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1cVcKy-0005Y7-OY
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:59:04 -0500
-Received: from mx6-phx2.redhat.com ([209.132.183.39]:43379)
+	(envelope-from <pagupta@redhat.com>) id 1cVcRg-0006yx-5O
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 06:05:59 -0500
+Received: from mx4-phx2.redhat.com ([209.132.183.25]:54044)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1cVcKy-0005Xp-FP
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 05:59:00 -0500
-Date: Mon, 23 Jan 2017 05:58:57 -0500 (EST)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1cVcRf-0006yi-SE
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 06:05:56 -0500
+Date: Mon, 23 Jan 2017 06:05:54 -0500 (EST)
 From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <79146319.14895991.1485169137641.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170123091725.GB2098@work-vm>
+Message-ID: <535965022.14896900.1485169554749.JavaMail.zimbra@redhat.com>
+In-Reply-To: <4ef4f8ad-d492-0276-3c30-e51fe3445a08@redhat.com>
 References: <1485069471-3680-1-git-send-email-pagupta@redhat.com>
-	<20170123091725.GB2098@work-vm>
+	<20170123054052.GA1679@amit-lp.rh>
+	<4ef4f8ad-d492-0276-3c30-e51fe3445a08@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -27,54 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, amit shah <amit.shah@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Amit Shah <amit.shah@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 
+Hi Paolo,
 
-Hi Dave,
-
-> > Change the name of live migration thread from 'migration'
-> > to 'qemu_vm_migration' to identify it clearly. 'migration'
-> > is a generic word and kernel also has  tasks for process
-> > migration with the name 'migration/cpu#'.
+> > On (Sun) 22 Jan 2017 [12:47:51], Pankaj Gupta wrote:
+> >> Change the name of live migration thread from 'migration'
+> >> to 'qemu_vm_migration' to identify it clearly. 'migration'
+> >> is a generic word and kernel also has  tasks for process
+> >> migration with the name 'migration/cpu#'.
 > > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> >  migration/migration.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > Makes sense.
 > > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index f498ab8..6ebd606 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1969,7 +1969,7 @@ void migrate_fd_connect(MigrationState *s)
-> >      }
-> >  
-> >      migrate_compress_threads_create();
-> > -    qemu_thread_create(&s->thread, "migration", migration_thread, s,
-> > +    qemu_thread_create(&s->thread, "qemu_vm_migration", migration_thread,
-> > s,
-> >                         QEMU_THREAD_JOINABLE);
+> > Reviewed-by: Amit Shah <amit.shah@redhat.com>
 > 
-> Are you sure that works?  For me it doesn't change the name.
-> 
-> There's a maximum length that I think is somewhere around 16 characters and
-> that
-> name is too long.
-> 
-> Changing it to "qemu_migration" seems to work.
+> It's a bit ugly that no other thread name has qemu in it, and the limit
+> is 15 characters---which is more than "qemu_vm_migration"'s length.  So
+> maybe "live_migration" or "migrate" would be better.
 
-Thanks for pointing out.
-I will send a v2.
+Thanks for the suggestion.
+"live_migration" seems like good option.
+> 
+> Spaces vs. underscores are also inconsistent.  A patch to fix that would
+> be helpful!
 
+Sure, will do that.
 > 
-> Dave
-> 
-> >      s->migration_thread_running = true;
-> >  }
-> > --
-> > 2.7.4
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Paolo
 > 
