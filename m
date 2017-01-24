@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cVvLy-00068N-QV
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:19 -0500
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cVvM8-0006GL-MO
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cVvLx-0005m5-Rb
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:18 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:38544)
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cVvM3-0005my-Er
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:28 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:38566)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cVvLx-0005ly-Kh
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:17 -0500
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cVvM3-0005mq-7M
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:23 -0500
 From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Tue, 24 Jan 2017 10:17:19 +0300
-Message-ID: <20170124071719.4572.92155.stgit@PASHA-ISP>
+Date: Tue, 24 Jan 2017 10:17:24 +0300
+Message-ID: <20170124071724.4572.85855.stgit@PASHA-ISP>
 In-Reply-To: <20170124071654.4572.41407.stgit@PASHA-ISP>
 References: <20170124071654.4572.41407.stgit@PASHA-ISP>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v7 04/14] icount: exit cpu loop on expire
+Subject: [Qemu-devel] [PATCH v7 05/14] apic: save apic_delivered flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +29,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, dovgaluk@ispras.ru, kraxel@redhat.com, pbonzini@redhat.com
 
-This patch adds check to break cpu loop when icount expires without
-setting the TB_EXIT_ICOUNT_EXPIRED flag. It happens when there is no
-available translated blocks and all instructions were executed.
-In icount replay mode unnecessary tb_find will be called (which may
-cause an exception) and execution will be non-deterministic.
+This patch implements saving/restoring of static apic_delivered variable.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- cpu-exec.c |   15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ hw/intc/apic_common.c           |   32 ++++++++++++++++++++++++++++++++
+ include/hw/i386/apic_internal.h |    2 ++
+ 2 files changed, 34 insertions(+)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 79a2167..e603da4 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -582,9 +582,6 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-                 cpu_exec_nocache(cpu, insns_left, *last_tb, false);
-                 align_clocks(sc, cpu);
-             }
--            cpu->exception_index = EXCP_INTERRUPT;
--            *last_tb = NULL;
--            cpu_loop_exit(cpu);
-         }
-         break;
- #endif
-@@ -638,6 +635,18 @@ int cpu_exec(CPUState *cpu)
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index d78c885..ac6cc67 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -384,6 +384,24 @@ static bool apic_common_sipi_needed(void *opaque)
+     return s->wait_for_sipi != 0;
+ }
  
-             for(;;) {
-                 cpu_handle_interrupt(cpu, &last_tb);
-+                /* icount has expired, we need to break the execution loop.
-+                   This check is needed before tb_find to make execution
-+                   deterministic - tb_find may cause an exception
-+                   while translating the code from non-mapped page. */
-+                if (use_icount && ((cpu->icount_extra == 0
-+                                    && cpu->icount_decr.u16.low == 0)
-+                                || (int32_t)cpu->icount_decr.u32 < 0)) {
-+                    if (cpu->exception_index == -1) {
-+                        cpu->exception_index = EXCP_INTERRUPT;
-+                    }
-+                    cpu_loop_exit(cpu);
-+                }
-                 tb = tb_find(cpu, last_tb, tb_exit);
-                 cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
-                 /* Try to align the host and virtual clocks
++static bool apic_irq_delivered_needed(void *opaque)
++{
++    return true;
++}
++
++static void apic_irq_delivered_pre_save(void *opaque)
++{
++    APICCommonState *s = APIC_COMMON(opaque);
++    s->apic_irq_delivered = apic_irq_delivered;
++}
++
++static int apic_irq_delivered_post_load(void *opaque, int version_id)
++{
++    APICCommonState *s = APIC_COMMON(opaque);
++    apic_irq_delivered = s->apic_irq_delivered;
++    return 0;
++}
++
+ static const VMStateDescription vmstate_apic_common_sipi = {
+     .name = "apic_sipi",
+     .version_id = 1,
+@@ -396,6 +414,19 @@ static const VMStateDescription vmstate_apic_common_sipi = {
+     }
+ };
+ 
++static const VMStateDescription vmstate_apic_irq_delivered = {
++    .name = "apic_irq_delivered",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = apic_irq_delivered_needed,
++    .pre_save = apic_irq_delivered_pre_save,
++    .post_load = apic_irq_delivered_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_INT32(apic_irq_delivered, APICCommonState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_apic_common = {
+     .name = "apic",
+     .version_id = 3,
+@@ -430,6 +461,7 @@ static const VMStateDescription vmstate_apic_common = {
+     },
+     .subsections = (const VMStateDescription*[]) {
+         &vmstate_apic_common_sipi,
++        &vmstate_apic_irq_delivered,
+         NULL
+     }
+ };
+diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_internal.h
+index 1209eb4..20ad28c 100644
+--- a/include/hw/i386/apic_internal.h
++++ b/include/hw/i386/apic_internal.h
+@@ -189,6 +189,8 @@ struct APICCommonState {
+     DeviceState *vapic;
+     hwaddr vapic_paddr; /* note: persistence via kvmvapic */
+     bool legacy_instance_id;
++
++    int apic_irq_delivered; /* for saving static variable */
+ };
+ 
+ typedef struct VAPICState {
