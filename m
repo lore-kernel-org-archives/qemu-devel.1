@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cW00P-0001qJ-75
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:15:22 -0500
+	(envelope-from <berrange@redhat.com>) id 1cW00U-0001w5-To
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:15:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cW00M-0004ER-1s
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:15:21 -0500
-References: <20170124095350.16679-1-stefanha@redhat.com>
-	<20170124120431.GB13714@lemon.Home>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1c28bff5-4a36-5343-801c-dd4f891cf307@redhat.com>
-Date: Tue, 24 Jan 2017 13:15:03 +0100
+	(envelope-from <berrange@redhat.com>) id 1cW00T-0004Fc-QK
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:15:26 -0500
+Date: Tue, 24 Jan 2017 12:15:17 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170124121517.GJ14563@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170103182801.9638-1-berrange@redhat.com>
+	<20170103182801.9638-3-berrange@redhat.com>
+	<b1934b89-173d-9622-5cd6-4ec938fd011c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170124120431.GB13714@lemon.Home>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] aio-posix: honor is_external in AioContext
- polling
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b1934b89-173d-9622-5cd6-4ec938fd011c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 02/15] block: add ability to set a
+ prefix for opt names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-
-
-On 24/01/2017 13:04, Fam Zheng wrote:
+On Mon, Jan 16, 2017 at 08:31:55PM +0100, Max Reitz wrote:
+> On 03.01.2017 19:27, Daniel P. Berrange wrote:
+> > When integrating the crypto support with qcow/qcow2, we don't
+> > want to use the bare LUKS option names "hash-alg", "key-secret",
+> > etc. We want to namespace them "luks-hash-alg", "luks-key-secret"
+> > so that they don't clash with any general qcow options at a later
+> > date.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >  block/crypto.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++--------
+> >  block/crypto.h |  42 +++++++++++-----------
+> >  2 files changed, 118 insertions(+), 34 deletions(-)
+> > 
+> > diff --git a/block/crypto.c b/block/crypto.c
+> > index d281de6..1037c70 100644
+> > --- a/block/crypto.c
+> > +++ b/block/crypto.c
 > 
-> All in all I think we should skip external handlers regardless of
-> aio_disable_external(), or even skip try_poll_mode, in nested aio_poll()'s. The
-> reasons are 1) many nested aio_poll()'s don't have bdrv_drained_begin, so this
-> check is not sufficient [...] bdrv_flush()
-> spin longer than necessary, if not forever, when the guest keeps submitting more
-> requests with ioeventfd.
+> [...]
+> 
+> > +static int block_crypto_copy_value(void *opaque, const char *name,
+> > +                                   const char *value, Error **errp)
+> > +{
+> > +    struct BlockCryptoCopyData *data = opaque;
+> > +
+> > +    if (g_str_has_prefix(name, data->prefix)) {
+> > +        Error *local_err = NULL;
+> > +        const char *newname = name + strlen(data->prefix);
+> 
+> strstart() would be shorter:
+> 
+> const char *newname;
+> 
+> if (strstart(name, data->prefix, &newname)) {
+>     /* ... */
+> }
+
+Ah, didn't know that function existed.
+
+> 
+> > +
+> > +        qemu_opt_set(data->opts, newname, value, &local_err);
+> > +        if (local_err) {
+> > +            error_propagate(errp, local_err);
+> > +            return 1;
+> 
+> I'd prefer -1, because 0/1 looks more like false/true to me, which in
+> turn looks like failure/success.
+
+Yes, that makes more sense.
 
 
-I'm not sure I understand why this is related.  aio_poll() only tries
-poll mode once, so bdrv_flush would only spin until the fsync is complete.
-
-Nested aio_polls don't have bdrv_drained_begin because draining matters
-over the whole section where you need atomicity (e.g. taking a live
-snapshot).  It doesn't matter for single I/O operation.
-
-Paolo
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
