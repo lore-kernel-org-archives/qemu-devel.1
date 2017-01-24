@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cVy2Q-0006Bx-D4
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:09:26 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cVy2o-0006Vj-UZ
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:09:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cVy2I-0001R0-9r
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:09:18 -0500
-Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:33922)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cVy2i-0001V5-EP
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:09:42 -0500
+Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:35076)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cVy2H-0001Qe-Ud
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:09:10 -0500
-Received: by mail-yw0-x244.google.com with SMTP id v73so19874865ywg.1
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 02:09:08 -0800 (PST)
+	id 1cVy2i-0001V1-4a
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:09:36 -0500
+Received: by mail-yw0-x244.google.com with SMTP id l16so23775ywb.2
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 02:09:36 -0800 (PST)
 MIME-Version: 1.0
 References: <20170121084600.5860-1-ale+qemu@clearmind.me>
-	<20170121084600.5860-4-ale+qemu@clearmind.me>
-In-Reply-To: <20170121084600.5860-4-ale+qemu@clearmind.me>
+	<20170121084600.5860-3-ale+qemu@clearmind.me>
+In-Reply-To: <20170121084600.5860-3-ale+qemu@clearmind.me>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 24 Jan 2017 10:08:56 +0000
-Message-ID: <CAJ+F1C+G2Ud8BzDPdTmT8hg6BZ-QcAQSpxHbYGhgPkrcrwTY4Q@mail.gmail.com>
+Date: Tue, 24 Jan 2017 10:09:25 +0000
+Message-ID: <CAJ+F1C+B1Ncoh57a1cHUKfum1DVNs3-WbzgbaRSEmqiuxnYJ7w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 3/3] Introduce libtcg infrastructure
+Subject: Re: [Qemu-devel] [RFC PATCH 2/3] *-user targets object files
+ decoupling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,1267 +33,970 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alessandro Di Federico <ale+qemu@clearmind.me>, qemu-devel@nongnu.org
 
-Hi
-
-On Sat, Jan 21, 2017 at 12:46 PM Alessandro Di Federico <
+On Sat, Jan 21, 2017 at 12:49 PM Alessandro Di Federico <
 ale+qemu@clearmind.me> wrote:
 
-> [This is a draft patch is for review purposes only]
->
-> * Extend the build system to build libtcg-$arch.so dynamic libraries.
->
-
-It would be nice to link qemu-user with it, it could be done later.
-
-* Introduce --enable-libtcg and --disable-libtcg the *-libtcg target,
->   similar to *-linux-user and *-bsd-user, since it enables
->   CONFIG_USER_ONLY, but uses only the TCG frontends (in particular the
->   various /target/$arch/translate.c).
-> * If there's at least a *-libtcg, compile everything as position
->   independent code.
->
-
-why not limit it to libtcg code?
-
-
-> * In case we're building libtcg, install the output binary in the
->   $PREFIX/lib directory instead of $PREFIX/bin.
->
-
-If it's installed globally, I think we have to deal with versioning, common
-prefix, and list of visible symbols.
-
-* Reduce the number of object files linked into libtcg-$arch.so to the
->   minimum.
-> * Install the tcg.h header to use libtcg.
-> * Create libtcg/, with a draft function referencing the functions that
->   libtcg would use.
->
-
-What's the plan with this tcg.c? Shouldn't the functions be stubs or
-library user callbacks?
-
-What is test() doing?
-
-Please add a libtcg test under tests/ (even minimal, like a basic
-translate/dump).
-
-
+Move some functions around in target/$arch/*.c to reduce the coupling
+among the various compilation unit. In particular, we want to make the
+various translate.c as much standalone as possible, so that they will be
+easily employed by libtcg.
 ---
->  Makefile                                |  7 +++++
->  Makefile.target                         | 40 +++++++++++++++++++++---
->  configure                               | 20 ++++++++++++
->  crypto/Makefile.objs                    |  2 +-
->  default-configs/aarch64-libtcg.mak      |  0
->  default-configs/alpha-libtcg.mak        |  0
->  default-configs/arm-libtcg.mak          |  0
->  default-configs/armeb-libtcg.mak        |  0
->  default-configs/cris-libtcg.mak         |  0
->  default-configs/i386-libtcg.mak         |  0
->  default-configs/m68k-libtcg.mak         |  0
->  default-configs/microblaze-libtcg.mak   |  0
->  default-configs/microblazeel-libtcg.mak |  0
->  default-configs/mips-libtcg.mak         |  0
->  default-configs/mips64-libtcg.mak       |  0
->  default-configs/mips64el-libtcg.mak     |  0
->  default-configs/mipsel-libtcg.mak       |  0
->  default-configs/mipsn32-libtcg.mak      |  0
->  default-configs/mipsn32el-libtcg.mak    |  0
->  default-configs/or32-libtcg.mak         |  0
->  default-configs/ppc-libtcg.mak          |  1 +
->  default-configs/ppc64-libtcg.mak        |  1 +
->  default-configs/ppc64abi32-libtcg.mak   |  1 +
->  default-configs/ppc64le-libtcg.mak      |  1 +
->  default-configs/s390x-libtcg.mak        |  0
->  default-configs/sh4-libtcg.mak          |  0
->  default-configs/sh4eb-libtcg.mak        |  0
->  default-configs/sparc-libtcg.mak        |  0
->  default-configs/sparc32plus-libtcg.mak  |  0
->  default-configs/sparc64-libtcg.mak      |  0
->  default-configs/unicore32-libtcg.mak    |  0
->  default-configs/x86_64-libtcg.mak       |  0
->  hw/core/Makefile.objs                   |  5 ++-
->  include/exec/helper-gen.h               | 12 +++----
->  include/exec/helper-head.h              |  8 +++++
->  include/exec/helper-tcg.h               | 12 +++----
->  libtcg/Makefile.objs                    |  1 +
->  libtcg/qemu.h                           |  6 ++++
->  libtcg/tcg.c                            | 55
-> +++++++++++++++++++++++++++++++++
->  libtcg/tcg.h                            |  0
->  target/alpha/Makefile.objs              |  9 ++++--
->  target/arm/Makefile.objs                | 22 +++++++++----
->  target/cris/Makefile.objs               | 10 ++++--
->  target/i386/Makefile.objs               | 14 ++++++---
->  target/lm32/Makefile.objs               | 12 +++++--
->  target/m68k/Makefile.objs               |  7 ++++-
->  target/microblaze/Makefile.objs         | 10 ++++--
->  target/mips/Makefile.objs               | 11 +++++--
->  target/moxie/Makefile.objs              |  8 ++++-
->  target/openrisc/Makefile.objs           | 11 +++++--
->  target/ppc/Makefile.objs                | 18 +++++------
->  target/ppc/translate.c                  |  2 ++
->  target/ppc/translate_init.c             |  8 +++++
->  target/s390x/Makefile.objs              | 16 +++++++---
->  target/sh4/Makefile.objs                |  8 ++++-
->  target/sparc/Makefile.objs              | 15 ++++++---
->  target/tilegx/Makefile.objs             |  7 ++++-
->  target/tricore/Makefile.objs            |  7 ++++-
->  target/unicore32/Makefile.objs          |  8 +++--
->  target/xtensa/Makefile.objs             | 14 ++++++---
->  trace/Makefile.objs                     |  2 +-
->  translate-all.c                         |  4 ++-
->  62 files changed, 322 insertions(+), 73 deletions(-)
->  create mode 100644 default-configs/aarch64-libtcg.mak
->  create mode 100644 default-configs/alpha-libtcg.mak
->  create mode 100644 default-configs/arm-libtcg.mak
->  create mode 100644 default-configs/armeb-libtcg.mak
->  create mode 100644 default-configs/cris-libtcg.mak
->  create mode 100644 default-configs/i386-libtcg.mak
->  create mode 100644 default-configs/m68k-libtcg.mak
->  create mode 100644 default-configs/microblaze-libtcg.mak
->  create mode 100644 default-configs/microblazeel-libtcg.mak
->  create mode 100644 default-configs/mips-libtcg.mak
->  create mode 100644 default-configs/mips64-libtcg.mak
->  create mode 100644 default-configs/mips64el-libtcg.mak
->  create mode 100644 default-configs/mipsel-libtcg.mak
->  create mode 100644 default-configs/mipsn32-libtcg.mak
->  create mode 100644 default-configs/mipsn32el-libtcg.mak
->  create mode 100644 default-configs/or32-libtcg.mak
->  create mode 100644 default-configs/ppc-libtcg.mak
->  create mode 100644 default-configs/ppc64-libtcg.mak
->  create mode 100644 default-configs/ppc64abi32-libtcg.mak
->  create mode 100644 default-configs/ppc64le-libtcg.mak
->  create mode 100644 default-configs/s390x-libtcg.mak
->  create mode 100644 default-configs/sh4-libtcg.mak
->  create mode 100644 default-configs/sh4eb-libtcg.mak
->  create mode 100644 default-configs/sparc-libtcg.mak
->  create mode 100644 default-configs/sparc32plus-libtcg.mak
->  create mode 100644 default-configs/sparc64-libtcg.mak
->  create mode 100644 default-configs/unicore32-libtcg.mak
->  create mode 100644 default-configs/x86_64-libtcg.mak
->  create mode 100644 libtcg/Makefile.objs
->  create mode 100644 libtcg/qemu.h
->  create mode 100644 libtcg/tcg.c
->  create mode 100644 libtcg/tcg.h
->
-> diff --git a/Makefile b/Makefile
-> index 1a8bfb225c..0e6925e04f 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -26,7 +26,14 @@ endif
->
->  CONFIG_SOFTMMU :=3D $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
->  CONFIG_USER_ONLY :=3D $(if $(filter %-user,$(TARGET_DIRS)),y)
-> +CONFIG_LIBTCG :=3D $(if $(filter %-libtcg,$(TARGET_DIRS)),y)
->  CONFIG_ALL=3Dy
-> +
-> +# If there's at least a *-libtcg target we need to build everything with
-> -fPIC
-> +ifeq ($(CONFIG_LIBTCG),y)
-> +QEMU_CFLAGS+=3D-fPIC
-> +endif
-> +
->  -include config-all-devices.mak
->  -include config-all-disas.mak
->
-> diff --git a/Makefile.target b/Makefile.target
-> index 8ae82cb311..6e3df541e0 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -15,10 +15,23 @@ QEMU_CFLAGS +=3D -I..
-> -I$(SRC_PATH)/target/$(TARGET_BASE_ARCH) -DNEED_CPU_H
->
->  QEMU_CFLAGS+=3D-I$(SRC_PATH)/include
->
-> +# By default install in bindir
-> +PROGS_INSTALL_DIR :=3D $(bindir)
-> +
->  ifdef CONFIG_USER_ONLY
-> +ifdef CONFIG_LIBTCG
-> +# libtcg
-> +QEMU_PROG=3Dlibtcg-$(TARGET_NAME)$(DSOSUF)
-> +QEMU_PROG_BUILD =3D $(QEMU_PROG)
-> +QEMU_CFLAGS+=3D-fPIC
-> +
-> +# Change the install directory
-> +PROGS_INSTALL_DIR :=3D $(libdir)
->
+ exec.c                       |   2 +
+ target/arm/cpu.c             | 118
++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/cpu.h             |  82 ++++++++++++++++++++++--------
+ target/arm/helper.c          |  73 +-------------------------
+ target/arm/translate-a64.c   |  54 --------------------
+ target/arm/translate.c       |  97 ++++++++++++-----------------------
+ target/arm/translate.h       |   7 ---
+ target/m68k/op_helper.c      |  23 +++++++++
+ target/m68k/translate.c      |  23 ---------
+ target/mips/op_helper.c      |   8 ---
+ target/mips/translate.c      |   8 +++
+ target/ppc/gdbstub.c         |  20 --------
+ target/ppc/translate_init.c  |  20 ++++++++
+ target/unicore32/helper.c    |  68 +++++++++++++++++++++++++
+ target/unicore32/translate.c |  68 -------------------------
+ 15 files changed, 333 insertions(+), 338 deletions(-)
 
-okay, we may want to rename it to something like QEMU_BUILD perhaps
+diff --git a/exec.c b/exec.c
+index 47835c1dc1..66f8187281 100644
+--- a/exec.c
++++ b/exec.c
+@@ -672,9 +672,11 @@ void cpu_exec_unrealizefn(CPUState *cpu)
+     if (cc->vmsd !=3D NULL) {
+         vmstate_unregister(NULL, cc->vmsd, cpu);
+     }
++#ifndef CONFIG_USER_ONLY
+     if (qdev_get_vmsd(DEVICE(cpu)) =3D=3D NULL) {
+         vmstate_unregister(NULL, &vmstate_cpu_common, cpu);
+     }
++#endif
 
 
-> +else
->  # user emulator name
->  QEMU_PROG=3Dqemu-$(TARGET_NAME)
->  QEMU_PROG_BUILD =3D $(QEMU_PROG)
-> +endif
->  else
->  # system emulator name
->  QEMU_PROG=3Dqemu-system-$(TARGET_NAME)$(EXESUF)
-> @@ -85,17 +98,20 @@ all: $(PROGS) stap
->
->  #########################################################
->  # cpu emulator library
-> -obj-y =3D exec.o translate-all.o cpu-exec.o
-> +obj-y =3D exec.o translate-all.o
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu-exec.o
-> +obj-y +=3D tcg-runtime.o
-> +obj-y +=3D fpu/softfloat.o
-> +endif
->  obj-y +=3D translate-common.o
->  obj-y +=3D cpu-exec-common.o
->  obj-y +=3D tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
->  obj-$(CONFIG_TCG_INTERPRETER) +=3D tci.o
->  obj-y +=3D tcg/tcg-common.o
->  obj-$(CONFIG_TCG_INTERPRETER) +=3D disas/tci.o
-> -obj-y +=3D fpu/softfloat.o
->  obj-y +=3D target/$(TARGET_BASE_ARCH)/
->  obj-y +=3D disas.o
-> -obj-y +=3D tcg-runtime.o
->  obj-$(call notempty,$(TARGET_XML_FILES)) +=3D gdbstub-xml.o
->  obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
->
-> @@ -133,6 +149,19 @@ obj-y +=3D gdbstub.o user-exec.o
->  endif #CONFIG_BSD_USER
->
->  #########################################################
-> +# libtcg target
-> +
-> +ifdef CONFIG_LIBTCG
-> +
-> +QEMU_CFLAGS+=3D-I$(SRC_PATH)/libtcg
-> +
-> +obj-y +=3D libtcg/
-> +
-> +QEMU_LDFLAGS+=3D-shared
-> +
-> +endif #CONFIG_LIBTCG
-> +
-> +#########################################################
->  # System emulator target
->  ifdef CONFIG_SOFTMMU
->  obj-y +=3D arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o num=
-a.o
-> @@ -220,8 +249,11 @@ ifdef CONFIG_TRACE_SYSTEMTAP
->  endif
->
->  install: all
-> +ifdef CONFIG_LIBTINYCODE
-> +       $(INSTALL_DATA) $(SRC_PATH)/tcg/tcg-opc.h $(SRC_PATH)/libtcg/tcg.=
-h
-> "$(DESTDIR)$(includedir)"
-> +endif
->
+Shouldn't this #ifndef block also include the vmsd vmstate_unregister()
+above? That would be matching cpu_exec_realizefn() #ifndef.
 
-LIBTINYCODE/LIBTCG?
+ }
+
+ void cpu_exec_initfn(CPUState *cpu)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index f5cb30af6c..f0af5d5d7d 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -238,6 +238,124 @@ static void arm_cpu_reset(CPUState *s)
+     hw_watchpoint_update_all(cpu);
+ }
+
++static void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
++                                   fprintf_function cpu_fprintf, int flags=
+)
++{
++    ARMCPU *cpu =3D ARM_CPU(cs);
++    CPUARMState *env =3D &cpu->env;
++    uint32_t psr =3D pstate_read(env);
++    int i;
++    int el =3D arm_current_el(env);
++    const char *ns_status;
++
++    cpu_fprintf(f, "PC=3D%016"PRIx64"  SP=3D%016"PRIx64"\n",
++            env->pc, env->xregs[31]);
++    for (i =3D 0; i < 31; i++) {
++        cpu_fprintf(f, "X%02d=3D%016"PRIx64, i, env->xregs[i]);
++        if ((i % 4) =3D=3D 3) {
++            cpu_fprintf(f, "\n");
++        } else {
++            cpu_fprintf(f, " ");
++        }
++    }
++
++    if (arm_feature(env, ARM_FEATURE_EL3) && el !=3D 3) {
++        ns_status =3D env->cp15.scr_el3 & SCR_NS ? "NS " : "S ";
++    } else {
++        ns_status =3D "";
++    }
++
++    cpu_fprintf(f, "\nPSTATE=3D%08x %c%c%c%c %sEL%d%c\n",
++                psr,
++                psr & PSTATE_N ? 'N' : '-',
++                psr & PSTATE_Z ? 'Z' : '-',
++                psr & PSTATE_C ? 'C' : '-',
++                psr & PSTATE_V ? 'V' : '-',
++                ns_status,
++                el,
++                psr & PSTATE_SP ? 'h' : 't');
++
++    if (flags & CPU_DUMP_FPU) {
++        int numvfpregs =3D 32;
++        for (i =3D 0; i < numvfpregs; i +=3D 2) {
++            uint64_t vlo =3D float64_val(env->vfp.regs[i * 2]);
++            uint64_t vhi =3D float64_val(env->vfp.regs[(i * 2) + 1]);
++            cpu_fprintf(f, "q%02d=3D%016" PRIx64 ":%016" PRIx64 " ",
++                        i, vhi, vlo);
++            vlo =3D float64_val(env->vfp.regs[(i + 1) * 2]);
++            vhi =3D float64_val(env->vfp.regs[((i + 1) * 2) + 1]);
++            cpu_fprintf(f, "q%02d=3D%016" PRIx64 ":%016" PRIx64 "\n",
++                        i + 1, vhi, vlo);
++        }
++        cpu_fprintf(f, "FPCR: %08x  FPSR: %08x\n",
++                    vfp_get_fpcr(env), vfp_get_fpsr(env));
++    }
++}
++
++static const char *cpu_mode_names[16] =3D {
++  "usr", "fiq", "irq", "svc", "???", "???", "mon", "abt",
++  "???", "???", "hyp", "und", "???", "???", "???", "sys"
++};
++
++void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function
+cpu_fprintf,
++                        int flags)
++{
++    ARMCPU *cpu =3D ARM_CPU(cs);
++    CPUARMState *env =3D &cpu->env;
++    int i;
++    uint32_t psr;
++    const char *ns_status;
++
++    if (is_a64(env)) {
++        aarch64_cpu_dump_state(cs, f, cpu_fprintf, flags);
++        return;
++    }
++
++    for(i=3D0;i<16;i++) {
++        cpu_fprintf(f, "R%02d=3D%08x", i, env->regs[i]);
++        if ((i % 4) =3D=3D 3)
++            cpu_fprintf(f, "\n");
++        else
++            cpu_fprintf(f, " ");
++    }
++    psr =3D cpsr_read(env);
++
++    if (arm_feature(env, ARM_FEATURE_EL3) &&
++        (psr & CPSR_M) !=3D ARM_CPU_MODE_MON) {
++        ns_status =3D env->cp15.scr_el3 & SCR_NS ? "NS " : "S ";
++    } else {
++        ns_status =3D "";
++    }
++
++    cpu_fprintf(f, "PSR=3D%08x %c%c%c%c %c %s%s%d\n",
++                psr,
++                psr & (1 << 31) ? 'N' : '-',
++                psr & (1 << 30) ? 'Z' : '-',
++                psr & (1 << 29) ? 'C' : '-',
++                psr & (1 << 28) ? 'V' : '-',
++                psr & CPSR_T ? 'T' : 'A',
++                ns_status,
++                cpu_mode_names[psr & 0xf], (psr & 0x10) ? 32 : 26);
++
++    if (flags & CPU_DUMP_FPU) {
++        int numvfpregs =3D 0;
++        if (arm_feature(env, ARM_FEATURE_VFP)) {
++            numvfpregs +=3D 16;
++        }
++        if (arm_feature(env, ARM_FEATURE_VFP3)) {
++            numvfpregs +=3D 16;
++        }
++        for (i =3D 0; i < numvfpregs; i++) {
++            uint64_t v =3D float64_val(env->vfp.regs[i]);
++            cpu_fprintf(f, "s%02d=3D%08x s%02d=3D%08x d%02d=3D%016" PRIx64=
+ "\n",
++                        i * 2, (uint32_t)v,
++                        i * 2 + 1, (uint32_t)(v >> 32),
++                        i, v);
++        }
++        cpu_fprintf(f, "FPSCR: %08x\n",
+(int)env->vfp.xregs[ARM_VFP_FPSCR]);
++    }
++}
++
+ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ {
+     CPUClass *cc =3D CPU_GET_CLASS(cs);
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index ab119e62ab..3d3bf26f4e 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1012,7 +1012,6 @@ static inline void xpsr_write(CPUARMState *env,
+uint32_t val, uint32_t mask)
+ #define SCR_AARCH64_MASK      (0x3fff & ~SCR_NET)
+
+ /* Return the current FPSCR value.  */
+-uint32_t vfp_get_fpscr(CPUARMState *env);
+ void vfp_set_fpscr(CPUARMState *env, uint32_t val);
+
+ /* For A64 the FPSCR is split into two logically distinct registers,
+@@ -1021,27 +1020,6 @@ void vfp_set_fpscr(CPUARMState *env, uint32_t val);
+  */
+ #define FPSR_MASK 0xf800009f
+ #define FPCR_MASK 0x07f79f00
+-static inline uint32_t vfp_get_fpsr(CPUARMState *env)
+-{
+-    return vfp_get_fpscr(env) & FPSR_MASK;
+-}
+-
+-static inline void vfp_set_fpsr(CPUARMState *env, uint32_t val)
+-{
+-    uint32_t new_fpscr =3D (vfp_get_fpscr(env) & ~FPSR_MASK) | (val &
+FPSR_MASK);
+-    vfp_set_fpscr(env, new_fpscr);
+-}
+-
+-static inline uint32_t vfp_get_fpcr(CPUARMState *env)
+-{
+-    return vfp_get_fpscr(env) & FPCR_MASK;
+-}
+-
+-static inline void vfp_set_fpcr(CPUARMState *env, uint32_t val)
+-{
+-    uint32_t new_fpscr =3D (vfp_get_fpscr(env) & ~FPCR_MASK) | (val &
+FPCR_MASK);
+-    vfp_set_fpscr(env, new_fpscr);
+-}
+
+ enum arm_cpu_mode {
+   ARM_CPU_MODE_USR =3D 0x10,
+@@ -1128,6 +1106,66 @@ enum arm_features {
+     ARM_FEATURE_VBAR, /* has cp15 VBAR */
+ };
+
++/* VFP support.  We follow the convention used for VFP instructions:
++   Single precision routines have a "s" suffix, double precision a
++   "d" suffix.  */
++
++/* Convert host exception flags to vfp form.  */
++static inline int vfp_exceptbits_from_host(int host_bits)
++{
++    int target_bits =3D 0;
++
++    if (host_bits & float_flag_invalid)
++        target_bits |=3D 1;
++    if (host_bits & float_flag_divbyzero)
++        target_bits |=3D 2;
++    if (host_bits & float_flag_overflow)
++        target_bits |=3D 4;
++    if (host_bits & (float_flag_underflow | float_flag_output_denormal))
++        target_bits |=3D 8;
++    if (host_bits & float_flag_inexact)
++        target_bits |=3D 0x10;
++    if (host_bits & float_flag_input_denormal)
++        target_bits |=3D 0x80;
++    return target_bits;
++}
++
++static inline uint32_t vfp_get_fpscr(CPUARMState *env)
++{
++    int i;
++    uint32_t fpscr;
++
++    fpscr =3D (env->vfp.xregs[ARM_VFP_FPSCR] & 0xffc8ffff)
++            | (env->vfp.vec_len << 16)
++            | (env->vfp.vec_stride << 20);
++    i =3D get_float_exception_flags(&env->vfp.fp_status);
++    i |=3D get_float_exception_flags(&env->vfp.standard_fp_status);
++    fpscr |=3D vfp_exceptbits_from_host(i);
++    return fpscr;
++}
++
++static inline uint32_t vfp_get_fpsr(CPUARMState *env)
++{
++    return vfp_get_fpscr(env) & FPSR_MASK;
++}
++
++static inline void vfp_set_fpsr(CPUARMState *env, uint32_t val)
++{
++    uint32_t new_fpscr =3D (vfp_get_fpscr(env) & ~FPSR_MASK) | (val &
+FPSR_MASK);
++    vfp_set_fpscr(env, new_fpscr);
++}
++
++static inline uint32_t vfp_get_fpcr(CPUARMState *env)
++{
++    return vfp_get_fpscr(env) & FPCR_MASK;
++}
++
++static inline void vfp_set_fpcr(CPUARMState *env, uint32_t val)
++{
++    uint32_t new_fpscr =3D (vfp_get_fpscr(env) & ~FPCR_MASK) | (val &
+FPCR_MASK);
++    vfp_set_fpscr(env, new_fpscr);
++}
++
+ static inline int arm_feature(CPUARMState *env, int feature)
+ {
+     return (env->features & (1ULL << feature)) !=3D 0;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 8dcabbf576..2ec50b94fc 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5514,11 +5514,6 @@ void define_arm_cp_regs_with_opaque(ARMCPU *cpu,
+     }
+ }
+
+-const ARMCPRegInfo *get_arm_cp_reginfo(GHashTable *cpregs, uint32_t
+encoded_cp)
+-{
+-    return g_hash_table_lookup(cpregs, &encoded_cp);
+-}
+-
+ void arm_cp_write_ignore(CPUARMState *env, const ARMCPRegInfo *ri,
+                          uint64_t value)
+ {
+@@ -8664,47 +8659,9 @@ uint32_t HELPER(sel_flags)(uint32_t flags, uint32_t
+a, uint32_t b)
+     return (a & mask) | (b & ~mask);
+ }
+
+-/* VFP support.  We follow the convention used for VFP instructions:
+-   Single precision routines have a "s" suffix, double precision a
+-   "d" suffix.  */
+-
+-/* Convert host exception flags to vfp form.  */
+-static inline int vfp_exceptbits_from_host(int host_bits)
+-{
+-    int target_bits =3D 0;
+-
+-    if (host_bits & float_flag_invalid)
+-        target_bits |=3D 1;
+-    if (host_bits & float_flag_divbyzero)
+-        target_bits |=3D 2;
+-    if (host_bits & float_flag_overflow)
+-        target_bits |=3D 4;
+-    if (host_bits & (float_flag_underflow | float_flag_output_denormal))
+-        target_bits |=3D 8;
+-    if (host_bits & float_flag_inexact)
+-        target_bits |=3D 0x10;
+-    if (host_bits & float_flag_input_denormal)
+-        target_bits |=3D 0x80;
+-    return target_bits;
+-}
+-
+ uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
+ {
+-    int i;
+-    uint32_t fpscr;
+-
+-    fpscr =3D (env->vfp.xregs[ARM_VFP_FPSCR] & 0xffc8ffff)
+-            | (env->vfp.vec_len << 16)
+-            | (env->vfp.vec_stride << 20);
+-    i =3D get_float_exception_flags(&env->vfp.fp_status);
+-    i |=3D get_float_exception_flags(&env->vfp.standard_fp_status);
+-    fpscr |=3D vfp_exceptbits_from_host(i);
+-    return fpscr;
+-}
+-
+-uint32_t vfp_get_fpscr(CPUARMState *env)
+-{
+-    return HELPER(vfp_get_fpscr)(env);
++    return vfp_get_fpscr(env);
+ }
+
+ /* Convert vfp exception flags to target form.  */
+@@ -9577,34 +9534,6 @@ float64 HELPER(rintd)(float64 x, void *fp_status)
+     return ret;
+ }
+
+-/* Convert ARM rounding mode to softfloat */
+-int arm_rmode_to_sf(int rmode)
+-{
+-    switch (rmode) {
+-    case FPROUNDING_TIEAWAY:
+-        rmode =3D float_round_ties_away;
+-        break;
+-    case FPROUNDING_ODD:
+-        /* FIXME: add support for TIEAWAY and ODD */
+-        qemu_log_mask(LOG_UNIMP, "arm: unimplemented rounding mode: %d\n",
+-                      rmode);
+-    case FPROUNDING_TIEEVEN:
+-    default:
+-        rmode =3D float_round_nearest_even;
+-        break;
+-    case FPROUNDING_POSINF:
+-        rmode =3D float_round_up;
+-        break;
+-    case FPROUNDING_NEGINF:
+-        rmode =3D float_round_down;
+-        break;
+-    case FPROUNDING_ZERO:
+-        rmode =3D float_round_to_zero;
+-        break;
+-    }
+-    return rmode;
+-}
+-
+ /* CRC helpers.
+  * The upper bytes of val (above the number specified by 'bytes') must hav=
+e
+  * been zeroed out by the caller.
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index f673d939e1..56333c6dd5 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -118,60 +118,6 @@ static inline ARMMMUIdx
+get_a64_user_mem_index(DisasContext *s)
+     }
+ }
+
+-void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
+-                            fprintf_function cpu_fprintf, int flags)
+-{
+-    ARMCPU *cpu =3D ARM_CPU(cs);
+-    CPUARMState *env =3D &cpu->env;
+-    uint32_t psr =3D pstate_read(env);
+-    int i;
+-    int el =3D arm_current_el(env);
+-    const char *ns_status;
+-
+-    cpu_fprintf(f, "PC=3D%016"PRIx64"  SP=3D%016"PRIx64"\n",
+-            env->pc, env->xregs[31]);
+-    for (i =3D 0; i < 31; i++) {
+-        cpu_fprintf(f, "X%02d=3D%016"PRIx64, i, env->xregs[i]);
+-        if ((i % 4) =3D=3D 3) {
+-            cpu_fprintf(f, "\n");
+-        } else {
+-            cpu_fprintf(f, " ");
+-        }
+-    }
+-
+-    if (arm_feature(env, ARM_FEATURE_EL3) && el !=3D 3) {
+-        ns_status =3D env->cp15.scr_el3 & SCR_NS ? "NS " : "S ";
+-    } else {
+-        ns_status =3D "";
+-    }
+-
+-    cpu_fprintf(f, "\nPSTATE=3D%08x %c%c%c%c %sEL%d%c\n",
+-                psr,
+-                psr & PSTATE_N ? 'N' : '-',
+-                psr & PSTATE_Z ? 'Z' : '-',
+-                psr & PSTATE_C ? 'C' : '-',
+-                psr & PSTATE_V ? 'V' : '-',
+-                ns_status,
+-                el,
+-                psr & PSTATE_SP ? 'h' : 't');
+-
+-    if (flags & CPU_DUMP_FPU) {
+-        int numvfpregs =3D 32;
+-        for (i =3D 0; i < numvfpregs; i +=3D 2) {
+-            uint64_t vlo =3D float64_val(env->vfp.regs[i * 2]);
+-            uint64_t vhi =3D float64_val(env->vfp.regs[(i * 2) + 1]);
+-            cpu_fprintf(f, "q%02d=3D%016" PRIx64 ":%016" PRIx64 " ",
+-                        i, vhi, vlo);
+-            vlo =3D float64_val(env->vfp.regs[(i + 1) * 2]);
+-            vhi =3D float64_val(env->vfp.regs[((i + 1) * 2) + 1]);
+-            cpu_fprintf(f, "q%02d=3D%016" PRIx64 ":%016" PRIx64 "\n",
+-                        i + 1, vhi, vlo);
+-        }
+-        cpu_fprintf(f, "FPCR: %08x  FPSR: %08x\n",
+-                    vfp_get_fpcr(env), vfp_get_fpsr(env));
+-    }
+-}
+-
+ void gen_a64_set_pc_im(uint64_t val)
+ {
+     tcg_gen_movi_i64(cpu_pc, val);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 0ad9070b45..a82557eb39 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -2971,6 +2971,34 @@ static int handle_vminmaxnm(uint32_t insn, uint32_t
+rd, uint32_t rn,
+     return 0;
+ }
+
++/* Convert ARM rounding mode to softfloat */
++int arm_rmode_to_sf(int rmode)
++{
++    switch (rmode) {
++    case FPROUNDING_TIEAWAY:
++        rmode =3D float_round_ties_away;
++        break;
++    case FPROUNDING_ODD:
++        /* FIXME: add support for TIEAWAY and ODD */
++        qemu_log_mask(LOG_UNIMP, "arm: unimplemented rounding mode: %d\n",
++                      rmode);
++    case FPROUNDING_TIEEVEN:
++    default:
++        rmode =3D float_round_nearest_even;
++        break;
++    case FPROUNDING_POSINF:
++        rmode =3D float_round_up;
++        break;
++    case FPROUNDING_NEGINF:
++        rmode =3D float_round_down;
++        break;
++    case FPROUNDING_ZERO:
++        rmode =3D float_round_to_zero;
++        break;
++    }
++    return rmode;
++}
++
+ static int handle_vrint(uint32_t insn, uint32_t rd, uint32_t rm, uint32_t
+dp,
+                         int rounding)
+ {
+@@ -7399,6 +7427,11 @@ static int disas_neon_data_insn(DisasContext *s,
+uint32_t insn)
+     return 0;
+ }
+
++const ARMCPRegInfo *get_arm_cp_reginfo(GHashTable *cpregs, uint32_t
+encoded_cp)
++{
++    return g_hash_table_lookup(cpregs, &encoded_cp);
++}
++
+ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
+ {
+     int cpnum, is64, crn, crm, opc1, opc2, isread, rt, rt2;
+@@ -11976,70 +12009,6 @@ done_generating:
+     tb->icount =3D num_insns;
+ }
+
+-static const char *cpu_mode_names[16] =3D {
+-  "usr", "fiq", "irq", "svc", "???", "???", "mon", "abt",
+-  "???", "???", "hyp", "und", "???", "???", "???", "sys"
+-};
+-
+-void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function
+cpu_fprintf,
+-                        int flags)
+-{
+-    ARMCPU *cpu =3D ARM_CPU(cs);
+-    CPUARMState *env =3D &cpu->env;
+-    int i;
+-    uint32_t psr;
+-    const char *ns_status;
+-
+-    if (is_a64(env)) {
+-        aarch64_cpu_dump_state(cs, f, cpu_fprintf, flags);
+-        return;
+-    }
+-
+-    for(i=3D0;i<16;i++) {
+-        cpu_fprintf(f, "R%02d=3D%08x", i, env->regs[i]);
+-        if ((i % 4) =3D=3D 3)
+-            cpu_fprintf(f, "\n");
+-        else
+-            cpu_fprintf(f, " ");
+-    }
+-    psr =3D cpsr_read(env);
+-
+-    if (arm_feature(env, ARM_FEATURE_EL3) &&
+-        (psr & CPSR_M) !=3D ARM_CPU_MODE_MON) {
+-        ns_status =3D env->cp15.scr_el3 & SCR_NS ? "NS " : "S ";
+-    } else {
+-        ns_status =3D "";
+-    }
+-
+-    cpu_fprintf(f, "PSR=3D%08x %c%c%c%c %c %s%s%d\n",
+-                psr,
+-                psr & (1 << 31) ? 'N' : '-',
+-                psr & (1 << 30) ? 'Z' : '-',
+-                psr & (1 << 29) ? 'C' : '-',
+-                psr & (1 << 28) ? 'V' : '-',
+-                psr & CPSR_T ? 'T' : 'A',
+-                ns_status,
+-                cpu_mode_names[psr & 0xf], (psr & 0x10) ? 32 : 26);
+-
+-    if (flags & CPU_DUMP_FPU) {
+-        int numvfpregs =3D 0;
+-        if (arm_feature(env, ARM_FEATURE_VFP)) {
+-            numvfpregs +=3D 16;
+-        }
+-        if (arm_feature(env, ARM_FEATURE_VFP3)) {
+-            numvfpregs +=3D 16;
+-        }
+-        for (i =3D 0; i < numvfpregs; i++) {
+-            uint64_t v =3D float64_val(env->vfp.regs[i]);
+-            cpu_fprintf(f, "s%02d=3D%08x s%02d=3D%08x d%02d=3D%016" PRIx64=
+ "\n",
+-                        i * 2, (uint32_t)v,
+-                        i * 2 + 1, (uint32_t)(v >> 32),
+-                        i, v);
+-        }
+-        cpu_fprintf(f, "FPSCR: %08x\n",
+(int)env->vfp.xregs[ARM_VFP_FPSCR]);
+-    }
+-}
+-
+ void restore_state_to_opc(CPUARMState *env, TranslationBlock *tb,
+                           target_ulong *data)
+ {
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 285e96f087..6b93b35a3b 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -125,8 +125,6 @@ static inline int default_exception_el(DisasContext *s)
+ void a64_translate_init(void);
+ void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb);
+ void gen_a64_set_pc_im(uint64_t val);
+-void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
+-                            fprintf_function cpu_fprintf, int flags);
+ #else
+ static inline void a64_translate_init(void)
+ {
+@@ -140,11 +138,6 @@ static inline void gen_a64_set_pc_im(uint64_t val)
+ {
+ }
+
+-static inline void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
+-                                          fprintf_function cpu_fprintf,
+-                                          int flags)
+-{
+-}
+ #endif
+
+ void arm_test_cc(DisasCompare *cmp, int cc);
+diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+index e56b815d73..059061e6e8 100644
+--- a/target/m68k/op_helper.c
++++ b/target/m68k/op_helper.c
+@@ -148,6 +148,29 @@ static inline void
+do_interrupt_m68k_hardirq(CPUM68KState *env)
+ }
+ #endif
+
++void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function
+cpu_fprintf,
++                         int flags)
++{
++    M68kCPU *cpu =3D M68K_CPU(cs);
++    CPUM68KState *env =3D &cpu->env;
++    int i;
++    uint16_t sr;
++    CPU_DoubleU u;
++    for (i =3D 0; i < 8; i++)
++      {
++        u.d =3D env->fregs[i];
++        cpu_fprintf(f, "D%d =3D %08x   A%d =3D %08x   F%d =3D %08x%08x (%1=
+2g)\n",
++                    i, env->dregs[i], i, env->aregs[i],
++                    i, u.l.upper, u.l.lower, *(double *)&u.d);
++      }
++    cpu_fprintf (f, "PC =3D %08x   ", env->pc);
++    sr =3D env->sr | cpu_m68k_get_ccr(env);
++    cpu_fprintf(f, "SR =3D %04x %c%c%c%c%c ", sr, (sr & CCF_X) ? 'X' : '-'=
+,
++                (sr & CCF_N) ? 'N' : '-', (sr & CCF_Z) ? 'Z' : '-',
++                (sr & CCF_V) ? 'V' : '-', (sr & CCF_C) ? 'C' : '-');
++    cpu_fprintf (f, "FPRESULT =3D %12g\n", *(double *)&env->fp_result);
++}
++
+ bool m68k_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ {
+     M68kCPU *cpu =3D M68K_CPU(cs);
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 53293173c5..e0d055c3fe 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -4725,29 +4725,6 @@ void gen_intermediate_code(CPUM68KState *env,
+TranslationBlock *tb)
+     tb->icount =3D num_insns;
+ }
+
+-void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function
+cpu_fprintf,
+-                         int flags)
+-{
+-    M68kCPU *cpu =3D M68K_CPU(cs);
+-    CPUM68KState *env =3D &cpu->env;
+-    int i;
+-    uint16_t sr;
+-    CPU_DoubleU u;
+-    for (i =3D 0; i < 8; i++)
+-      {
+-        u.d =3D env->fregs[i];
+-        cpu_fprintf(f, "D%d =3D %08x   A%d =3D %08x   F%d =3D %08x%08x (%1=
+2g)\n",
+-                    i, env->dregs[i], i, env->aregs[i],
+-                    i, u.l.upper, u.l.lower, *(double *)&u.d);
+-      }
+-    cpu_fprintf (f, "PC =3D %08x   ", env->pc);
+-    sr =3D env->sr | cpu_m68k_get_ccr(env);
+-    cpu_fprintf(f, "SR =3D %04x %c%c%c%c%c ", sr, (sr & CCF_X) ? 'X' : '-'=
+,
+-                (sr & CCF_N) ? 'N' : '-', (sr & CCF_Z) ? 'Z' : '-',
+-                (sr & CCF_V) ? 'V' : '-', (sr & CCF_C) ? 'C' : '-');
+-    cpu_fprintf (f, "FPRESULT =3D %12g\n", *(double *)&env->fp_result);
+-}
+-
+ void restore_state_to_opc(CPUM68KState *env, TranslationBlock *tb,
+                           target_ulong *data)
+ {
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 7af4c2f084..4965b912ef 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -2454,14 +2454,6 @@ void mips_cpu_unassigned_access(CPUState *cs, hwaddr
+addr,
+ #define FP_TO_INT32_OVERFLOW 0x7fffffff
+ #define FP_TO_INT64_OVERFLOW 0x7fffffffffffffffULL
+
+-/* convert MIPS rounding mode in FCR31 to IEEE library */
+-unsigned int ieee_rm[] =3D {
+-    float_round_nearest_even,
+-    float_round_to_zero,
+-    float_round_up,
+-    float_round_down
+-};
+-
+ target_ulong helper_cfc1(CPUMIPSState *env, uint32_t reg)
+ {
+     target_ulong arg1 =3D 0;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 57b824ff2d..697b2a2079 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -36,6 +36,14 @@
+ #include "trace-tcg.h"
+ #include "exec/log.h"
+
++/* convert MIPS rounding mode in FCR31 to IEEE library */
++unsigned int ieee_rm[] =3D {
++    float_round_nearest_even,
++    float_round_to_zero,
++    float_round_up,
++    float_round_down
++};
++
+ #define MIPS_DEBUG_DISAS 0
+
+ /* MIPS major opcodes */
+diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
+index 7a338136a8..4f74946ec9 100644
+--- a/target/ppc/gdbstub.c
++++ b/target/ppc/gdbstub.c
+@@ -84,26 +84,6 @@ static int ppc_gdb_register_len(int n)
+     }
+ }
+
+-/* We need to present the registers to gdb in the "current" memory
+ordering.
+-   For user-only mode we get this for free; TARGET_WORDS_BIGENDIAN is set
+to
+-   the proper ordering for the binary, and cannot be changed.
+-   For system mode, TARGET_WORDS_BIGENDIAN is always set, and we must chec=
+k
+-   the current mode of the chip to see if we're running in little-endian.
+*/
+-void ppc_maybe_bswap_register(CPUPPCState *env, uint8_t *mem_buf, int len)
+-{
+-#ifndef CONFIG_USER_ONLY
+-    if (!msr_le) {
+-        /* do nothing */
+-    } else if (len =3D=3D 4) {
+-        bswap32s((uint32_t *)mem_buf);
+-    } else if (len =3D=3D 8) {
+-        bswap64s((uint64_t *)mem_buf);
+-    } else {
+-        g_assert_not_reached();
+-    }
+-#endif
+-}
+-
+ /* Old gdb always expects FP registers.  Newer (xml-aware) gdb only
+  * expects whatever the target description contains.  Due to a
+  * historical mishap the FP registers appear in between core integer
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 626e03186c..74e3339bd8 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -9462,6 +9462,26 @@ static bool avr_need_swap(CPUPPCState *env)
+ #endif
+ }
+
++/* We need to present the registers to gdb in the "current" memory
+ordering.
++   For user-only mode we get this for free; TARGET_WORDS_BIGENDIAN is set
+to
++   the proper ordering for the binary, and cannot be changed.
++   For system mode, TARGET_WORDS_BIGENDIAN is always set, and we must chec=
+k
++   the current mode of the chip to see if we're running in little-endian.
+*/
++void ppc_maybe_bswap_register(CPUPPCState *env, uint8_t *mem_buf, int len)
++{
++#ifndef CONFIG_USER_ONLY
++    if (!msr_le) {
++        /* do nothing */
++    } else if (len =3D=3D 4) {
++        bswap32s((uint32_t *)mem_buf);
++    } else if (len =3D=3D 8) {
++        bswap64s((uint64_t *)mem_buf);
++    } else {
++        g_assert_not_reached();
++    }
++#endif
++}
++
+ static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
+index d603bde237..42e753a5ea 100644
+--- a/target/unicore32/helper.c
++++ b/target/unicore32/helper.c
+@@ -247,6 +247,74 @@ int uc32_cpu_handle_mmu_fault(CPUState *cs, vaddr
+address,
+ }
+ #endif
+
++static const char *cpu_mode_names[16] =3D {
++    "USER", "REAL", "INTR", "PRIV", "UM14", "UM15", "UM16", "TRAP",
++    "UM18", "UM19", "UM1A", "EXTN", "UM1C", "UM1D", "UM1E", "SUSR"
++};
++
++#undef UCF64_DUMP_STATE
++#ifdef UCF64_DUMP_STATE
++static void cpu_dump_state_ucf64(CPUUniCore32State *env, FILE *f,
++        fprintf_function cpu_fprintf, int flags)
++{
++    int i;
++    union {
++        uint32_t i;
++        float s;
++    } s0, s1;
++    CPU_DoubleU d;
++    /* ??? This assumes float64 and double have the same layout.
++       Oh well, it's only debug dumps.  */
++    union {
++        float64 f64;
++        double d;
++    } d0;
++
++    for (i =3D 0; i < 16; i++) {
++        d.d =3D env->ucf64.regs[i];
++        s0.i =3D d.l.lower;
++        s1.i =3D d.l.upper;
++        d0.f64 =3D d.d;
++        cpu_fprintf(f, "s%02d=3D%08x(%8g) s%02d=3D%08x(%8g)",
++                    i * 2, (int)s0.i, s0.s,
++                    i * 2 + 1, (int)s1.i, s1.s);
++        cpu_fprintf(f, " d%02d=3D%" PRIx64 "(%8g)\n",
++                    i, (uint64_t)d0.f64, d0.d);
++    }
++    cpu_fprintf(f, "FPSCR: %08x\n",
+(int)env->ucf64.xregs[UC32_UCF64_FPSCR]);
++}
++#else
++#define cpu_dump_state_ucf64(env, file, pr, flags)      do { } while (0)
++#endif
++
++void uc32_cpu_dump_state(CPUState *cs, FILE *f,
++                         fprintf_function cpu_fprintf, int flags)
++{
++    UniCore32CPU *cpu =3D UNICORE32_CPU(cs);
++    CPUUniCore32State *env =3D &cpu->env;
++    int i;
++    uint32_t psr;
++
++    for (i =3D 0; i < 32; i++) {
++        cpu_fprintf(f, "R%02d=3D%08x", i, env->regs[i]);
++        if ((i % 4) =3D=3D 3) {
++            cpu_fprintf(f, "\n");
++        } else {
++            cpu_fprintf(f, " ");
++        }
++    }
++    psr =3D cpu_asr_read(env);
++    cpu_fprintf(f, "PSR=3D%08x %c%c%c%c %s\n",
++                psr,
++                psr & (1 << 31) ? 'N' : '-',
++                psr & (1 << 30) ? 'Z' : '-',
++                psr & (1 << 29) ? 'C' : '-',
++                psr & (1 << 28) ? 'V' : '-',
++                cpu_mode_names[psr & 0xf]);
++
++    cpu_dump_state_ucf64(env, f, cpu_fprintf, flags);
++}
++
+ bool uc32_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ {
+     if (interrupt_request & CPU_INTERRUPT_HARD) {
+diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
+index 514d460408..92300671a7 100644
+--- a/target/unicore32/translate.c
++++ b/target/unicore32/translate.c
+@@ -2036,74 +2036,6 @@ done_generating:
+     tb->icount =3D num_insns;
+ }
+
+-static const char *cpu_mode_names[16] =3D {
+-    "USER", "REAL", "INTR", "PRIV", "UM14", "UM15", "UM16", "TRAP",
+-    "UM18", "UM19", "UM1A", "EXTN", "UM1C", "UM1D", "UM1E", "SUSR"
+-};
+-
+-#undef UCF64_DUMP_STATE
+-#ifdef UCF64_DUMP_STATE
+-static void cpu_dump_state_ucf64(CPUUniCore32State *env, FILE *f,
+-        fprintf_function cpu_fprintf, int flags)
+-{
+-    int i;
+-    union {
+-        uint32_t i;
+-        float s;
+-    } s0, s1;
+-    CPU_DoubleU d;
+-    /* ??? This assumes float64 and double have the same layout.
+-       Oh well, it's only debug dumps.  */
+-    union {
+-        float64 f64;
+-        double d;
+-    } d0;
+-
+-    for (i =3D 0; i < 16; i++) {
+-        d.d =3D env->ucf64.regs[i];
+-        s0.i =3D d.l.lower;
+-        s1.i =3D d.l.upper;
+-        d0.f64 =3D d.d;
+-        cpu_fprintf(f, "s%02d=3D%08x(%8g) s%02d=3D%08x(%8g)",
+-                    i * 2, (int)s0.i, s0.s,
+-                    i * 2 + 1, (int)s1.i, s1.s);
+-        cpu_fprintf(f, " d%02d=3D%" PRIx64 "(%8g)\n",
+-                    i, (uint64_t)d0.f64, d0.d);
+-    }
+-    cpu_fprintf(f, "FPSCR: %08x\n",
+(int)env->ucf64.xregs[UC32_UCF64_FPSCR]);
+-}
+-#else
+-#define cpu_dump_state_ucf64(env, file, pr, flags)      do { } while (0)
+-#endif
+-
+-void uc32_cpu_dump_state(CPUState *cs, FILE *f,
+-                         fprintf_function cpu_fprintf, int flags)
+-{
+-    UniCore32CPU *cpu =3D UNICORE32_CPU(cs);
+-    CPUUniCore32State *env =3D &cpu->env;
+-    int i;
+-    uint32_t psr;
+-
+-    for (i =3D 0; i < 32; i++) {
+-        cpu_fprintf(f, "R%02d=3D%08x", i, env->regs[i]);
+-        if ((i % 4) =3D=3D 3) {
+-            cpu_fprintf(f, "\n");
+-        } else {
+-            cpu_fprintf(f, " ");
+-        }
+-    }
+-    psr =3D cpu_asr_read(env);
+-    cpu_fprintf(f, "PSR=3D%08x %c%c%c%c %s\n",
+-                psr,
+-                psr & (1 << 31) ? 'N' : '-',
+-                psr & (1 << 30) ? 'Z' : '-',
+-                psr & (1 << 29) ? 'C' : '-',
+-                psr & (1 << 28) ? 'V' : '-',
+-                cpu_mode_names[psr & 0xf]);
+-
+-    cpu_dump_state_ucf64(env, f, cpu_fprintf, flags);
+-}
+-
+ void restore_state_to_opc(CPUUniCore32State *env, TranslationBlock *tb,
+                           target_ulong *data)
+ {
+--
+2.11.0
 
 
->  ifneq ($(PROGS),)
-> -       $(call install-prog,$(PROGS),$(DESTDIR)$(bindir))
-> +       $(call install-prog,$(PROGS),$(DESTDIR)$(PROGS_INSTALL_DIR))
->  endif
->  ifdef CONFIG_TRACE_SYSTEMTAP
->         $(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset"
-> diff --git a/configure b/configure
-> index 86f5214dd0..352a74cec8 100755
-> --- a/configure
-> +++ b/configure
-> @@ -265,6 +265,7 @@ cocoa=3D"no"
->  softmmu=3D"yes"
->  linux_user=3D"no"
->  bsd_user=3D"no"
-> +libtcg=3D"no"
->  aix=3D"no"
->  blobs=3D"yes"
->  pkgversion=3D""
-> @@ -676,6 +677,7 @@ Haiku)
->    audio_possible_drivers=3D"oss alsa sdl pa"
->    linux=3D"yes"
->    linux_user=3D"yes"
-> +  libtcg=3D"yes"
->    kvm=3D"yes"
->    vhost_net=3D"yes"
->    vhost_scsi=3D"yes"
-> @@ -969,6 +971,10 @@ for opt do
->    ;;
->    --enable-bsd-user) bsd_user=3D"yes"
->    ;;
-> +  --disable-libtcg) libtcg=3D"no"
-> +  ;;
-> +  --enable-libtcg) libtcg=3D"yes"
-> +  ;;
->    --enable-pie) pie=3D"yes"
->    ;;
->    --disable-pie) pie=3D"no"
-> @@ -1245,6 +1251,7 @@ EXTRA_CFLAGS=3D"$CPU_CFLAGS $EXTRA_CFLAGS"
->  if [ "$ARCH" =3D "unknown" ]; then
->    bsd_user=3D"no"
->    linux_user=3D"no"
-> +  libtcg=3D"no"
->  fi
->
->  default_target_list=3D""
-> @@ -1260,6 +1267,9 @@ fi
->  if [ "$bsd_user" =3D "yes" ]; then
->      mak_wilds=3D"${mak_wilds} $source_path/default-configs/*-bsd-user.ma=
-k"
->  fi
-> +if [ "$libtcg" =3D "yes" ]; then
-> +    mak_wilds=3D"${mak_wilds} $source_path/default-configs/*-libtcg.mak"
-> +fi
->
->  for config in $mak_wilds; do
->      default_target_list=3D"${default_target_list} $(basename "$config"
-> .mak)"
-> @@ -1401,6 +1411,7 @@ disabled with --disable-FEATURE, default is enabled
-> if available:
->    tcmalloc        tcmalloc support
->    jemalloc        jemalloc support
->    replication     replication support
-> +  libtcg          standalone TCG library
->
->  NOTE: The object files are built at the place where configure is launche=
-d
->  EOF
-> @@ -5112,6 +5123,7 @@ echo "tcmalloc support  $tcmalloc"
->  echo "jemalloc support  $jemalloc"
->  echo "avx2 optimization $avx2_opt"
->  echo "replication support $replication"
-> +echo "libtcg enabled    $libtcg"
->
->  if test "$sdl_too_old" =3D "yes"; then
->  echo "-> Your SDL version is too old - please upgrade to have SDL suppor=
-t"
-> @@ -5853,6 +5865,7 @@ target_softmmu=3D"no"
->  target_user_only=3D"no"
->  target_linux_user=3D"no"
->  target_bsd_user=3D"no"
-> +target_libtcg=3D"no"
->  case "$target" in
->    ${target_name}-softmmu)
->      target_softmmu=3D"yes"
-> @@ -5871,6 +5884,10 @@ case "$target" in
->      target_user_only=3D"yes"
->      target_bsd_user=3D"yes"
->      ;;
-> +  ${target_name}-libtcg)
-> +    target_user_only=3D"yes"
-> +    target_libtcg=3D"yes"
-> +    ;;
->    *)
->      error_exit "Target '$target' not recognised"
->      exit 1
-> @@ -6063,6 +6080,9 @@ fi
->  if test "$target_linux_user" =3D "yes" ; then
->    echo "CONFIG_LINUX_USER=3Dy" >> $config_target_mak
->  fi
-> +if test "$target_libtcg" =3D "yes" ; then
-> +  echo "CONFIG_LIBTCG=3Dy" >> $config_target_mak
-> +fi
->  list=3D""
->  if test ! -z "$gdb_xml_files" ; then
->    for x in $gdb_xml_files; do
-> diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-> index 1f749f2087..2f654db9af 100644
-> --- a/crypto/Makefile.objs
-> +++ b/crypto/Makefile.objs
-> @@ -7,7 +7,7 @@ crypto-obj-y +=3D hmac.o
->  crypto-obj-$(CONFIG_NETTLE) +=3D hmac-nettle.o
->  crypto-obj-$(CONFIG_GCRYPT_HMAC) +=3D hmac-gcrypt.o
->  crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) +=3D
-> hmac-glib.o
-> -crypto-obj-y +=3D aes.o
-> +crypto-obj-$(call lnot,$(CONFIG_LIBTCG)) +=3D aes.o
->
-
-why that change?
-
-
->  crypto-obj-y +=3D desrfb.o
->  crypto-obj-y +=3D cipher.o
->  crypto-obj-y +=3D tlscreds.o
-> diff --git a/default-configs/aarch64-libtcg.mak
-> b/default-configs/aarch64-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/alpha-libtcg.mak
-> b/default-configs/alpha-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/arm-libtcg.mak
-> b/default-configs/arm-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/armeb-libtcg.mak
-> b/default-configs/armeb-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/cris-libtcg.mak
-> b/default-configs/cris-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/i386-libtcg.mak
-> b/default-configs/i386-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/m68k-libtcg.mak
-> b/default-configs/m68k-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/microblaze-libtcg.mak
-> b/default-configs/microblaze-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/microblazeel-libtcg.mak
-> b/default-configs/microblazeel-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/mips-libtcg.mak
-> b/default-configs/mips-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/mips64-libtcg.mak
-> b/default-configs/mips64-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/mips64el-libtcg.mak
-> b/default-configs/mips64el-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/mipsel-libtcg.mak
-> b/default-configs/mipsel-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/mipsn32-libtcg.mak
-> b/default-configs/mipsn32-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/mipsn32el-libtcg.mak
-> b/default-configs/mipsn32el-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/or32-libtcg.mak
-> b/default-configs/or32-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/ppc-libtcg.mak
-> b/default-configs/ppc-libtcg.mak
-> new file mode 100644
-> index 0000000000..7235c56d55
-> --- /dev/null
-> +++ b/default-configs/ppc-libtcg.mak
-> @@ -0,0 +1 @@
-> +CONFIG_LIBDECNUMBER=3Dy
-> diff --git a/default-configs/ppc64-libtcg.mak
-> b/default-configs/ppc64-libtcg.mak
-> new file mode 100644
-> index 0000000000..7235c56d55
-> --- /dev/null
-> +++ b/default-configs/ppc64-libtcg.mak
-> @@ -0,0 +1 @@
-> +CONFIG_LIBDECNUMBER=3Dy
-> diff --git a/default-configs/ppc64abi32-libtcg.mak
-> b/default-configs/ppc64abi32-libtcg.mak
-> new file mode 100644
-> index 0000000000..7235c56d55
-> --- /dev/null
-> +++ b/default-configs/ppc64abi32-libtcg.mak
-> @@ -0,0 +1 @@
-> +CONFIG_LIBDECNUMBER=3Dy
-> diff --git a/default-configs/ppc64le-libtcg.mak
-> b/default-configs/ppc64le-libtcg.mak
-> new file mode 100644
-> index 0000000000..7235c56d55
-> --- /dev/null
-> +++ b/default-configs/ppc64le-libtcg.mak
-> @@ -0,0 +1 @@
-> +CONFIG_LIBDECNUMBER=3Dy
-> diff --git a/default-configs/s390x-libtcg.mak
-> b/default-configs/s390x-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/sh4-libtcg.mak
-> b/default-configs/sh4-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/sh4eb-libtcg.mak
-> b/default-configs/sh4eb-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/sparc-libtcg.mak
-> b/default-configs/sparc-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/sparc32plus-libtcg.mak
-> b/default-configs/sparc32plus-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/sparc64-libtcg.mak
-> b/default-configs/sparc64-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/unicore32-libtcg.mak
-> b/default-configs/unicore32-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/default-configs/x86_64-libtcg.mak
-> b/default-configs/x86_64-libtcg.mak
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index a4c94e522d..a58d7c404c 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -1,11 +1,14 @@
->  # core qdev-related obj files, also used by *-user:
-> -common-obj-y +=3D qdev.o qdev-properties.o
-> +common-obj-y +=3D qdev-properties.o
-> +#ifndef CONFIG_LIBTCG
-> +common-obj-y +=3D qdev.o
->  common-obj-y +=3D bus.o
->  common-obj-y +=3D fw-path-provider.o
->  # irq.o needed for qdev GPIO handling:
->  common-obj-y +=3D irq.o
->  common-obj-y +=3D hotplug.o
->  obj-y +=3D nmi.o
-> +#endif
->
->  common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
->  common-obj-$(CONFIG_XILINX_AXI) +=3D stream.o
-> diff --git a/include/exec/helper-gen.h b/include/exec/helper-gen.h
-> index 8239ffc77c..ac290180b3 100644
-> --- a/include/exec/helper-gen.h
-> +++ b/include/exec/helper-gen.h
-> @@ -9,7 +9,7 @@
->  #define DEF_HELPER_FLAGS_0(name, flags, ret)                            =
-\
->  static inline void glue(gen_helper_, name)(dh_retvar_decl0(ret))        =
-\
->  {                                                                       =
-\
-> -  tcg_gen_callN(&tcg_ctx, HELPER(name), dh_retvar(ret), 0, NULL);       =
-\
-> +  tcg_gen_callN(&tcg_ctx, HELPER_REF(name), dh_retvar(ret), 0, NULL);   =
-\
->  }
->
->  #define DEF_HELPER_FLAGS_1(name, flags, ret, t1)                        =
-\
-> @@ -17,7 +17,7 @@ static inline void glue(gen_helper_,
-> name)(dh_retvar_decl(ret)          \
->      dh_arg_decl(t1, 1))                                                 =
-\
->  {                                                                       =
-\
->    TCGArg args[1] =3D { dh_arg(t1, 1) };                                 =
-  \
-> -  tcg_gen_callN(&tcg_ctx, HELPER(name), dh_retvar(ret), 1, args);       =
-\
-> +  tcg_gen_callN(&tcg_ctx, HELPER_REF(name), dh_retvar(ret), 1, args);   =
-\
->  }
->
->  #define DEF_HELPER_FLAGS_2(name, flags, ret, t1, t2)                    =
-\
-> @@ -25,7 +25,7 @@ static inline void glue(gen_helper_,
-> name)(dh_retvar_decl(ret)          \
->      dh_arg_decl(t1, 1), dh_arg_decl(t2, 2))                             =
-\
->  {                                                                       =
-\
->    TCGArg args[2] =3D { dh_arg(t1, 1), dh_arg(t2, 2) };                  =
-  \
-> -  tcg_gen_callN(&tcg_ctx, HELPER(name), dh_retvar(ret), 2, args);       =
-\
-> +  tcg_gen_callN(&tcg_ctx, HELPER_REF(name), dh_retvar(ret), 2, args);   =
-\
->  }
->
->  #define DEF_HELPER_FLAGS_3(name, flags, ret, t1, t2, t3)                =
-\
-> @@ -33,7 +33,7 @@ static inline void glue(gen_helper_,
-> name)(dh_retvar_decl(ret)          \
->      dh_arg_decl(t1, 1), dh_arg_decl(t2, 2), dh_arg_decl(t3, 3))         =
-\
->  {                                                                       =
-\
->    TCGArg args[3] =3D { dh_arg(t1, 1), dh_arg(t2, 2), dh_arg(t3, 3) };   =
-  \
-> -  tcg_gen_callN(&tcg_ctx, HELPER(name), dh_retvar(ret), 3, args);       =
-\
-> +  tcg_gen_callN(&tcg_ctx, HELPER_REF(name), dh_retvar(ret), 3, args);   =
-\
->  }
->
->  #define DEF_HELPER_FLAGS_4(name, flags, ret, t1, t2, t3, t4)            =
-\
-> @@ -43,7 +43,7 @@ static inline void glue(gen_helper_,
-> name)(dh_retvar_decl(ret)          \
->  {                                                                       =
-\
->    TCGArg args[4] =3D { dh_arg(t1, 1), dh_arg(t2, 2),                    =
-  \
->                       dh_arg(t3, 3), dh_arg(t4, 4) };                    =
-\
-> -  tcg_gen_callN(&tcg_ctx, HELPER(name), dh_retvar(ret), 4, args);       =
-\
-> +  tcg_gen_callN(&tcg_ctx, HELPER_REF(name), dh_retvar(ret), 4, args);   =
-\
->  }
->
->  #define DEF_HELPER_FLAGS_5(name, flags, ret, t1, t2, t3, t4, t5)        =
-\
-> @@ -53,7 +53,7 @@ static inline void glue(gen_helper_,
-> name)(dh_retvar_decl(ret)          \
->  {                                                                       =
-\
->    TCGArg args[5] =3D { dh_arg(t1, 1), dh_arg(t2, 2), dh_arg(t3, 3),     =
-  \
->                       dh_arg(t4, 4), dh_arg(t5, 5) };                    =
-\
-> -  tcg_gen_callN(&tcg_ctx, HELPER(name), dh_retvar(ret), 5, args);       =
-\
-> +  tcg_gen_callN(&tcg_ctx, HELPER_REF(name), dh_retvar(ret), 5, args);   =
-\
->  }
->
->  #include "helper.h"
-> diff --git a/include/exec/helper-head.h b/include/exec/helper-head.h
-> index 1cfc43b9ff..fa68de92db 100644
-> --- a/include/exec/helper-head.h
-> +++ b/include/exec/helper-head.h
-> @@ -20,6 +20,14 @@
->
->  #define HELPER(name) glue(helper_, name)
->
-> +/* In libtcg we don't want helpers, therefore we leave these fields empt=
-y
-> so
-> +   that we don't needlessly introduce a dependency towards the helper. *=
-/
-> +#ifdef CONFIG_LIBTCG
-> +# define HELPER_REF(helper) (0)
-> +#else
-> +# define HELPER_REF(helper) (HELPER(helper))
-> +#endif
-> +
->  #define GET_TCGV_i32 GET_TCGV_I32
->  #define GET_TCGV_i64 GET_TCGV_I64
->  #define GET_TCGV_ptr GET_TCGV_PTR
-> diff --git a/include/exec/helper-tcg.h b/include/exec/helper-tcg.h
-> index bb9287727c..ebc7b45d1a 100644
-> --- a/include/exec/helper-tcg.h
-> +++ b/include/exec/helper-tcg.h
-> @@ -7,30 +7,30 @@
->  #include "exec/helper-head.h"
->
->  #define DEF_HELPER_FLAGS_0(NAME, FLAGS, ret) \
-> -  { .func =3D HELPER(NAME), .name =3D #NAME, .flags =3D FLAGS, \
-> +  { .func =3D HELPER_REF(NAME), .name =3D #NAME, .flags =3D FLAGS, \
->      .sizemask =3D dh_sizemask(ret, 0) },
->
->  #define DEF_HELPER_FLAGS_1(NAME, FLAGS, ret, t1) \
-> -  { .func =3D HELPER(NAME), .name =3D #NAME, .flags =3D FLAGS, \
-> +  { .func =3D HELPER_REF(NAME), .name =3D #NAME, .flags =3D FLAGS, \
->      .sizemask =3D dh_sizemask(ret, 0) | dh_sizemask(t1, 1) },
->
->  #define DEF_HELPER_FLAGS_2(NAME, FLAGS, ret, t1, t2) \
-> -  { .func =3D HELPER(NAME), .name =3D #NAME, .flags =3D FLAGS, \
-> +  { .func =3D HELPER_REF(NAME), .name =3D #NAME, .flags =3D FLAGS, \
->      .sizemask =3D dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
->      | dh_sizemask(t2, 2) },
->
->  #define DEF_HELPER_FLAGS_3(NAME, FLAGS, ret, t1, t2, t3) \
-> -  { .func =3D HELPER(NAME), .name =3D #NAME, .flags =3D FLAGS, \
-> +  { .func =3D HELPER_REF(NAME), .name =3D #NAME, .flags =3D FLAGS, \
->      .sizemask =3D dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
->      | dh_sizemask(t2, 2) | dh_sizemask(t3, 3) },
->
->  #define DEF_HELPER_FLAGS_4(NAME, FLAGS, ret, t1, t2, t3, t4) \
-> -  { .func =3D HELPER(NAME), .name =3D #NAME, .flags =3D FLAGS, \
-> +  { .func =3D HELPER_REF(NAME), .name =3D #NAME, .flags =3D FLAGS, \
->      .sizemask =3D dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
->      | dh_sizemask(t2, 2) | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) },
->
->  #define DEF_HELPER_FLAGS_5(NAME, FLAGS, ret, t1, t2, t3, t4, t5) \
-> -  { .func =3D HELPER(NAME), .name =3D #NAME, .flags =3D FLAGS, \
-> +  { .func =3D HELPER_REF(NAME), .name =3D #NAME, .flags =3D FLAGS, \
->      .sizemask =3D dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
->      | dh_sizemask(t2, 2) | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) \
->      | dh_sizemask(t5, 5) },
-> diff --git a/libtcg/Makefile.objs b/libtcg/Makefile.objs
-> new file mode 100644
-> index 0000000000..a1e7720ce3
-> --- /dev/null
-> +++ b/libtcg/Makefile.objs
-> @@ -0,0 +1 @@
-> +obj-y +=3D tcg.o
-> diff --git a/libtcg/qemu.h b/libtcg/qemu.h
-> new file mode 100644
-> index 0000000000..cc2131493a
-> --- /dev/null
-> +++ b/libtcg/qemu.h
-> @@ -0,0 +1,6 @@
-> +#ifndef QEMU_H
-> +#define QEMU_H
-> +
-> +#include "qemu-user-common.h"
-> +
-> +#endif /* QEMU_H */
-> diff --git a/libtcg/tcg.c b/libtcg/tcg.c
-> new file mode 100644
-> index 0000000000..f1ce37c77b
-> --- /dev/null
-> +++ b/libtcg/tcg.c
-> @@ -0,0 +1,55 @@
-> +#include "qemu/osdep.h"
-> +#include "qemu.h"
-> +#include "exec/exec-all.h"
-> +#include "qemu/cutils.h"
-> +
-> +unsigned long guest_base;
-> +int singlestep;
-> +
-> +void mmap_lock(void)
-> +{
-> +    abort();
-> +}
-> +
-> +void mmap_unlock(void)
-> +{
-> +    abort();
-> +}
-> +
-> +bool qemu_cpu_is_self(CPUState *cpu)
-> +{
-> +    abort();
-> +}
-> +
-> +void qemu_cpu_kick(CPUState *cpu)
-> +{
-> +    abort();
-> +}
-> +
-> +#include "disas/disas.h"
-> +#include "cpu.h"
-> +
-> +void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
-> +                  tb_page_addr_t phys_page2);
-> +
-> +void test(void);
-> +void test(void) {
-> +  void *x =3D target_disas;
-> +  x =3D &guest_base;
-> +  x =3D &tcg_exec_init;
-> +  x =3D &module_call_init;
-> +  // cpu_init("");
-> +#ifdef TARGET_X86_64
-> +  X86_CPU(cpu_generic_init(TYPE_X86_CPU, ""));
-> +#endif
-> +  x =3D &cpu_reset;
-> +  x =3D &qemu_set_log;
-> +  x =3D &g_hash_table_foreach;
-> +  x =3D &get_page_addr_code;
-> +  x =3D &tcg_func_start;
-> +  x =3D &gen_intermediate_code;
-> +  x =3D &tb_link_page;
-> +  // x =3D &target_mmap;
-> +  x =3D &cpu_get_tb_cpu_state;
-> +  (void) x;
-> +}
-> diff --git a/libtcg/tcg.h b/libtcg/tcg.h
-> new file mode 100644
-> index 0000000000..e69de29bb2
->
-
-What is this empty file for?
-
-
-> diff --git a/target/alpha/Makefile.objs b/target/alpha/Makefile.objs
-> index 63664629f6..5ee1bacf27 100644
-> --- a/target/alpha/Makefile.objs
-> +++ b/target/alpha/Makefile.objs
-> @@ -1,4 +1,9 @@
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D machine.o
-> -obj-y +=3D translate.o helper.o cpu.o
-> -obj-y +=3D int_helper.o fpu_helper.o vax_helper.o sys_helper.o mem_helpe=
-r.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o int_helper.o fpu_helper.o vax_helper.o sys_helper.o
-> mem_helper.o
->  obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
-> index 847fb52ee0..75a6fc637a 100644
-> --- a/target/arm/Makefile.objs
-> +++ b/target/arm/Makefile.objs
-> @@ -1,12 +1,22 @@
-> -obj-y +=3D arm-semi.o
-> +obj-y +=3D translate.o
-> +obj-$(TARGET_AARCH64) +=3D translate-a64.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D machine.o psci.o arch_dump.o monitor.o
-> +obj-$(CONFIG_SOFTMMU) +=3D arm-powerctl.o
->  obj-$(CONFIG_KVM) +=3D kvm.o
->  obj-$(call land,$(CONFIG_KVM),$(call lnot,$(TARGET_AARCH64))) +=3D kvm32=
-.o
->  obj-$(call land,$(CONFIG_KVM),$(TARGET_AARCH64)) +=3D kvm64.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-$(TARGET_AARCH64) +=3D cpu64.o
-> +
-> +obj-y +=3D helper.o op_helper.o neon_helper.o iwmmxt_helper.o
-> crypto_helper.o
-> +obj-$(TARGET_AARCH64) +=3D helper-a64.o
-> +
-> +obj-y +=3D arm-semi.o
->  obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
-> -obj-y +=3D translate.o op_helper.o helper.o cpu.o
-> -obj-y +=3D neon_helper.o iwmmxt_helper.o
-> +
->  obj-y +=3D gdbstub.o
-> -obj-$(TARGET_AARCH64) +=3D cpu64.o translate-a64.o helper-a64.o gdbstub6=
-4.o
-> -obj-y +=3D crypto_helper.o
-> -obj-$(CONFIG_SOFTMMU) +=3D arm-powerctl.o
-> +obj-$(TARGET_AARCH64) +=3D gdbstub64.o
-> +endif
-> diff --git a/target/cris/Makefile.objs b/target/cris/Makefile.objs
-> index 7779227fc4..1270edca79 100644
-> --- a/target/cris/Makefile.objs
-> +++ b/target/cris/Makefile.objs
-> @@ -1,3 +1,9 @@
-> -obj-y +=3D translate.o op_helper.o helper.o cpu.o
-> -obj-y +=3D gdbstub.o
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D mmu.o machine.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o op_helper.o
-> +obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-> index b223d7932b..6653f1c9dd 100644
-> --- a/target/i386/Makefile.objs
-> +++ b/target/i386/Makefile.objs
-> @@ -1,7 +1,13 @@
-> -obj-y +=3D translate.o helper.o cpu.o bpt_helper.o
-> -obj-y +=3D excp_helper.o fpu_helper.o cc_helper.o int_helper.o svm_helpe=
-r.o
-> -obj-y +=3D smm_helper.o misc_helper.o mem_helper.o seg_helper.o mpx_help=
-er.o
-> -obj-y +=3D gdbstub.o
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D machine.o arch_memory_mapping.o arch_dump.o
-> monitor.o
->  obj-$(CONFIG_KVM) +=3D kvm.o hyperv.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o bpt_helper.o int_helper.o misc_helper.o mem_helper.o=
- \
-> +         excp_helper.o fpu_helper.o cc_helper.o svm_helper.o smm_helper.=
-o
-> \
-> +         seg_helper.o mpx_helper.o
->  obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
-> +obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/lm32/Makefile.objs b/target/lm32/Makefile.objs
-> index c3e1bd6bd6..737a6b252d 100644
-> --- a/target/lm32/Makefile.objs
-> +++ b/target/lm32/Makefile.objs
-> @@ -1,4 +1,10 @@
-> -obj-y +=3D translate.o op_helper.o helper.o cpu.o
-> -obj-y +=3D gdbstub.o
-> -obj-y +=3D lm32-semi.o
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D machine.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o op_helper.o
-> +obj-y +=3D lm32-semi.o
-> +obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/m68k/Makefile.objs b/target/m68k/Makefile.objs
-> index 02cf616a78..9f1bd5de59 100644
-> --- a/target/m68k/Makefile.objs
-> +++ b/target/m68k/Makefile.objs
-> @@ -1,3 +1,8 @@
-> +obj-y +=3D translate.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o op_helper.o
->  obj-y +=3D m68k-semi.o
-> -obj-y +=3D translate.o op_helper.o helper.o cpu.o
->  obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/microblaze/Makefile.objs
-> b/target/microblaze/Makefile.objs
-> index f3d7b44c89..898ddbcb0e 100644
-> --- a/target/microblaze/Makefile.objs
-> +++ b/target/microblaze/Makefile.objs
-> @@ -1,3 +1,9 @@
-> -obj-y +=3D translate.o op_helper.o helper.o cpu.o
-> -obj-y +=3D gdbstub.o
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D mmu.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o op_helper.o
-> +obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/mips/Makefile.objs b/target/mips/Makefile.objs
-> index bc5ed8511f..d7eae8b9c5 100644
-> --- a/target/mips/Makefile.objs
-> +++ b/target/mips/Makefile.objs
-> @@ -1,4 +1,11 @@
-> -obj-y +=3D translate.o dsp_helper.o op_helper.o lmi_helper.o helper.o cp=
-u.o
-> -obj-y +=3D gdbstub.o msa_helper.o mips-semi.o
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D machine.o
->  obj-$(CONFIG_KVM) +=3D kvm.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D dsp_helper.o op_helper.o lmi_helper.o helper.o msa_helper.o
-> +obj-y +=3D mips-semi.o
-> +obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/moxie/Makefile.objs b/target/moxie/Makefile.objs
-> index 6381d4d636..5afe63852d 100644
-> --- a/target/moxie/Makefile.objs
-> +++ b/target/moxie/Makefile.objs
-> @@ -1,2 +1,8 @@
-> -obj-y +=3D translate.o helper.o machine.o cpu.o machine.o
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D mmu.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o machine.o
-> +obj-y +=3D helper.o
-> +endif
-> diff --git a/target/openrisc/Makefile.objs b/target/openrisc/Makefile.obj=
-s
-> index 397d01650e..ea466e9224 100644
-> --- a/target/openrisc/Makefile.objs
-> +++ b/target/openrisc/Makefile.objs
-> @@ -1,5 +1,10 @@
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D machine.o
-> -obj-y +=3D cpu.o exception.o interrupt.o mmu.o translate.o
-> -obj-y +=3D exception_helper.o fpu_helper.o int_helper.o \
-> -         interrupt_helper.o mmu_helper.o sys_helper.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o exception.o interrupt.o mmu.o
-> +obj-y +=3D exception_helper.o fpu_helper.o int_helper.o interrupt_helper=
-.o \
-> +         mmu_helper.o sys_helper.o
->  obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
-> index e667e69701..0b179acd0e 100644
-> --- a/target/ppc/Makefile.objs
-> +++ b/target/ppc/Makefile.objs
-> @@ -1,17 +1,17 @@
-> -obj-y +=3D cpu-models.o
->  obj-y +=3D translate.o
-> +obj-y +=3D cpu-models.o
-> +
->  ifeq ($(CONFIG_SOFTMMU),y)
-> -obj-y +=3D machine.o mmu_helper.o mmu-hash32.o monitor.o
-> +obj-y +=3D machine.o mmu-hash32.o monitor.o
-> +obj-y +=3D mmu_helper.o
->  obj-$(TARGET_PPC64) +=3D mmu-hash64.o arch_dump.o
->  endif
-> +
->  obj-$(CONFIG_KVM) +=3D kvm.o
->  obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
-> -obj-y +=3D dfp_helper.o
-> -obj-y +=3D excp_helper.o
-> -obj-y +=3D fpu_helper.o
-> -obj-y +=3D int_helper.o
-> -obj-y +=3D timebase_helper.o
-> -obj-y +=3D misc_helper.o
-> -obj-y +=3D mem_helper.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D int_helper.o dfp_helper.o timebase_helper.o mem_helper.o
-> misc_helper.o fpu_helper.o excp_helper.o
->  obj-$(CONFIG_USER_ONLY) +=3D user_only_helper.o
->  obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 59e9552d2b..bc9363e9e2 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -6766,6 +6766,7 @@ GEN_HANDLER2_E(trechkpt, "trechkpt", 0x1F, 0x0E,
-> 0x1F, 0x03FFF800, \
->  #include "helper_regs.h"
->  #include "translate_init.c"
->
-> +#ifndef CONFIG_LIBTCG
->
->  /***********************************************************************=
-******/
->  /* Misc PowerPC helpers */
->  void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function
-> cpu_fprintf,
-> @@ -6932,6 +6933,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f,
-> fprintf_function cpu_fprintf,
->  #undef RGPL
->  #undef RFPL
->  }
-> +#endif
->
->  void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
->                               fprintf_function cpu_fprintf, int flags)
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 74e3339bd8..7919ebe700 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -9453,6 +9453,7 @@ static void dump_ppc_insns (CPUPPCState *env)
->  }
->  #endif
->
-> +#ifndef CONFIG_LIBTCG
->  static bool avr_need_swap(CPUPPCState *env)
->  {
->  #ifdef HOST_WORDS_BIGENDIAN
-> @@ -9638,6 +9639,7 @@ static int gdb_set_vsx_reg(CPUPPCState *env, uint8_=
-t
-> *mem_buf, int n)
->      }
->      return 0;
->  }
-> +#endif
->
->  static int ppc_fixup_cpu(PowerPCCPU *cpu)
->  {
-> @@ -9740,6 +9742,7 @@ static void ppc_cpu_realizefn(DeviceState *dev,
-> Error **errp)
->      }
->      init_ppc_proc(cpu);
->
-> +#ifndef CONFIG_LIBTCG
->      if (pcc->insns_flags & PPC_FLOAT) {
->          gdb_register_coprocessor(cs, gdb_get_float_reg, gdb_set_float_re=
-g,
->                                   33, "power-fpu.xml", 0);
-> @@ -9756,6 +9759,7 @@ static void ppc_cpu_realizefn(DeviceState *dev,
-> Error **errp)
->          gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
->                                   32, "power-vsx.xml", 0);
->      }
-> +#endif
->
->      qemu_init_vcpu(cs);
->
-> @@ -10564,11 +10568,14 @@ static void ppc_cpu_class_init(ObjectClass *oc,
-> void *data)
->
->      cc->class_by_name =3D ppc_cpu_class_by_name;
->      cc->has_work =3D ppc_cpu_has_work;
-> +#ifndef CONFIG_LIBTCG
->      cc->do_interrupt =3D ppc_cpu_do_interrupt;
->      cc->cpu_exec_interrupt =3D ppc_cpu_exec_interrupt;
->      cc->dump_state =3D ppc_cpu_dump_state;
-> +#endif
->      cc->dump_statistics =3D ppc_cpu_dump_statistics;
->      cc->set_pc =3D ppc_cpu_set_pc;
-> +#ifndef CONFIG_LIBTCG
->      cc->gdb_read_register =3D ppc_cpu_gdb_read_register;
->      cc->gdb_write_register =3D ppc_cpu_gdb_write_register;
->  #ifdef CONFIG_USER_ONLY
-> @@ -10580,6 +10587,7 @@ static void ppc_cpu_class_init(ObjectClass *oc,
-> void *data)
->      cc->write_elf64_note =3D ppc64_cpu_write_elf64_note;
->  #endif
->  #endif
-> +#endif
->      cc->cpu_exec_enter =3D ppc_cpu_exec_enter;
->
->      cc->gdb_num_core_regs =3D 71;
-> diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
-> index c573633bd1..97986fca4e 100644
-> --- a/target/s390x/Makefile.objs
-> +++ b/target/s390x/Makefile.objs
-> @@ -1,9 +1,17 @@
-> -obj-y +=3D translate.o helper.o cpu.o interrupt.o
-> -obj-y +=3D int_helper.o fpu_helper.o cc_helper.o mem_helper.o misc_helpe=
-r.o
-> -obj-y +=3D gdbstub.o cpu_models.o cpu_features.o
-> -obj-$(CONFIG_SOFTMMU) +=3D machine.o ioinst.o arch_dump.o mmu_helper.o
-> +obj-y +=3D translate.o
-> +
-> +obj-$(CONFIG_SOFTMMU) +=3D machine.o ioinst.o arch_dump.o
-> +obj-$(CONFIG_SOFTMMU) +=3D mmu_helper.o
->  obj-$(CONFIG_KVM) +=3D kvm.o
->
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o interrupt.o
-> +obj-y +=3D helper.o int_helper.o fpu_helper.o cc_helper.o mem_helper.o \
-> +         misc_helper.o
-> +obj-y +=3D cpu_models.o cpu_features.o
-> +obj-y +=3D gdbstub.o
-> +endif
-> +
->  # build and run feature list generator
->  feat-src =3D $(SRC_PATH)/target/$(TARGET_BASE_ARCH)/
->  feat-dst =3D $(BUILD_DIR)/$(TARGET_DIR)
-> diff --git a/target/sh4/Makefile.objs b/target/sh4/Makefile.objs
-> index 2c25d96e65..cfbc95fd46 100644
-> --- a/target/sh4/Makefile.objs
-> +++ b/target/sh4/Makefile.objs
-> @@ -1,3 +1,9 @@
-> -obj-y +=3D translate.o op_helper.o helper.o cpu.o
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D monitor.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o op_helper.o
->  obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/sparc/Makefile.objs b/target/sparc/Makefile.objs
-> index ec905698c5..fa824d541c 100644
-> --- a/target/sparc/Makefile.objs
-> +++ b/target/sparc/Makefile.objs
-> @@ -1,7 +1,14 @@
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D machine.o monitor.o
-> -obj-y +=3D translate.o helper.o cpu.o
-> -obj-y +=3D fop_helper.o cc_helper.o win_helper.o mmu_helper.o ldst_helpe=
-r.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +
-> +obj-y +=3D helper.o fop_helper.o cc_helper.o win_helper.o mmu_helper.o \
-> +         ldst_helper.o
->  obj-$(TARGET_SPARC) +=3D int32_helper.o
-> -obj-$(TARGET_SPARC64) +=3D int64_helper.o
-> -obj-$(TARGET_SPARC64) +=3D vis_helper.o
-> +obj-$(TARGET_SPARC64) +=3D int64_helper.o vis_helper.o
-> +
->  obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/target/tilegx/Makefile.objs b/target/tilegx/Makefile.objs
-> index 0db778f407..ddf2e41c51 100644
-> --- a/target/tilegx/Makefile.objs
-> +++ b/target/tilegx/Makefile.objs
-> @@ -1 +1,6 @@
-> -obj-y +=3D cpu.o translate.o helper.o simd_helper.o
-> +obj-y +=3D translate.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o simd_helper.o
-> +endif
-> diff --git a/target/tricore/Makefile.objs b/target/tricore/Makefile.objs
-> index 7a05670718..9b12c51db0 100644
-> --- a/target/tricore/Makefile.objs
-> +++ b/target/tricore/Makefile.objs
-> @@ -1 +1,6 @@
-> -obj-y +=3D translate.o helper.o cpu.o op_helper.o fpu_helper.o
-> +obj-y +=3D translate.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o op_helper.o fpu_helper.o
-> +endif
-> diff --git a/target/unicore32/Makefile.objs
-> b/target/unicore32/Makefile.objs
-> index 6b41b1e9ef..c936429f94 100644
-> --- a/target/unicore32/Makefile.objs
-> +++ b/target/unicore32/Makefile.objs
-> @@ -1,4 +1,8 @@
-> -obj-y +=3D translate.o op_helper.o helper.o cpu.o
-> -obj-y +=3D ucf64_helper.o
-> +obj-y +=3D translate.o
->
->  obj-$(CONFIG_SOFTMMU) +=3D softmmu.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o op_helper.o ucf64_helper.o
-> +endif
-> diff --git a/target/xtensa/Makefile.objs b/target/xtensa/Makefile.objs
-> index 481de91973..393a12caea 100644
-> --- a/target/xtensa/Makefile.objs
-> +++ b/target/xtensa/Makefile.objs
-> @@ -1,7 +1,11 @@
-> -obj-y +=3D xtensa-semi.o
-> -obj-y +=3D core-dc232b.o
-> -obj-y +=3D core-dc233c.o
-> -obj-y +=3D core-fsf.o
-> +obj-y +=3D translate.o
-> +
->  obj-$(CONFIG_SOFTMMU) +=3D monitor.o
-> -obj-y +=3D translate.o op_helper.o helper.o cpu.o
-> +
-> +ifndef CONFIG_LIBTCG
-> +obj-y +=3D cpu.o
-> +obj-y +=3D helper.o op_helper.o
-> +obj-y +=3D xtensa-semi.o
-> +obj-y +=3D core-dc232b.o core-dc233c.o core-fsf.o
->  obj-y +=3D gdbstub.o
-> +endif
-> diff --git a/trace/Makefile.objs b/trace/Makefile.objs
-> index 1e1ce7479d..a6874d769b 100644
-> --- a/trace/Makefile.objs
-> +++ b/trace/Makefile.objs
-> @@ -118,7 +118,7 @@ $(obj)/generated-helpers.c-timestamp:
-> $(BUILD_DIR)/trace-events-all $(BUILD_DIR)
->
->  $(obj)/generated-helpers.o: $(obj)/generated-helpers.c
->
-> -target-obj-y +=3D generated-helpers.o
-> +target-obj-$(call lnot,$(CONFIG_LIBTCG)) +=3D generated-helpers.o
->
->
->  $(obj)/generated-tcg-tracers.h: $(obj)/generated-tcg-tracers.h-timestamp
-> diff --git a/translate-all.c b/translate-all.c
-> index 20262938bb..c952271651 100644
-> --- a/translate-all.c
-> +++ b/translate-all.c
-> @@ -1239,7 +1239,9 @@ static inline void tb_alloc_page(TranslationBlock
-> *tb,
->   *
->   * Called with mmap_lock held for user-mode emulation.
->   */
-> -static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
-> +void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
-> +                  tb_page_addr_t phys_page2);
-> +void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
->                           tb_page_addr_t phys_page2)
->  {
->      uint32_t h;
-> --
-> 2.11.0
->
->
-> --
+--=20
 Marc-Andr=C3=A9 Lureau
