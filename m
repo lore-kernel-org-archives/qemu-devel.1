@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cW6Zz-0000el-SB
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:16:32 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cW6a0-0000fA-4y
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:16:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cW6Zy-0000dJ-P2
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:16:31 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cW6Zy-0000dQ-SD
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:16:32 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jan 2017 19:16:14 +0000
-Message-Id: <1485285380-10565-5-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 24 Jan 2017 19:16:12 +0000
+Message-Id: <1485285380-10565-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1485285380-10565-1-git-send-email-peter.maydell@linaro.org>
 References: <1485285380-10565-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 04/10] armv7m: implement CCR, CFSR, HFSR, DFSR,
- BFAR, and MMFAR
+Subject: [Qemu-devel] [PATCH 02/10] armv7m_nvic: keep a pointer to the CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +24,93 @@ Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 
 From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-Implement the v7M system registers CCR, CFSR, HFSR, DFSR, BFAR and
-MMFAR.  For the moment these simply read as written (with some basic
-handling of RAZ/WI bits and W1C semantics).
+Many NVIC operations access the CPU state, so store a pointer in
+struct nvic_state rather than fetching it via qemu_get_cpu() every
+time we need it.
+
+As with the arm_gicv3_common code, we currently just call
+qemu_get_cpu() in the NVIC's realize method, but in future we might
+want to use a QOM property to pass the CPU to the NVIC.
+
+This imposes an ordering requirement that the CPU is
+realized before the NVIC, but that is always true since
+both are dealt with in armv7m_init().
 
 Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-[PMM: drop warning about setting unimplemented CCR bits;
- tweak commit message; add DFSR]
+[PMM: Use qemu_get_cpu(0) rather than first_cpu; expand
+ commit message]
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/armv7m_nvic.c | 42 ++++++++++++++++++++++++++++++++----------
- 1 file changed, 32 insertions(+), 10 deletions(-)
+ hw/intc/armv7m_nvic.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 81dcb83..60e72d7 100644
+index 06d8db6..81dcb83 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -228,8 +228,7 @@ static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
-         /* TODO: Implement SLEEPONEXIT.  */
-         return 0;
-     case 0xd14: /* Configuration Control.  */
--        /* TODO: Implement Configuration Control bits.  */
--        return 0;
-+        return cpu->env.v7m.ccr;
-     case 0xd24: /* System Handler Status.  */
-         val = 0;
-         if (s->gic.irq_state[ARMV7M_EXCP_MEM].active) val |= (1 << 0);
-@@ -248,16 +247,19 @@ static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
-         if (s->gic.irq_state[ARMV7M_EXCP_USAGE].enabled) val |= (1 << 18);
+@@ -23,6 +23,7 @@
+ 
+ typedef struct {
+     GICState gic;
++    ARMCPU *cpu;
+     struct {
+         uint32_t control;
+         uint32_t reload;
+@@ -155,7 +156,7 @@ void armv7m_nvic_complete_irq(void *opaque, int irq)
+ 
+ static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
+ {
+-    ARMCPU *cpu;
++    ARMCPU *cpu = s->cpu;
+     uint32_t val;
+     int irq;
+ 
+@@ -187,11 +188,9 @@ static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
+     case 0x1c: /* SysTick Calibration Value.  */
+         return 10000;
+     case 0xd00: /* CPUID Base.  */
+-        cpu = ARM_CPU(qemu_get_cpu(0));
+         return cpu->midr;
+     case 0xd04: /* Interrupt Control State.  */
+         /* VECTACTIVE */
+-        cpu = ARM_CPU(qemu_get_cpu(0));
+         val = cpu->env.v7m.exception;
+         if (val == 1023) {
+             val = 0;
+@@ -222,7 +221,6 @@ static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
+             val |= (1 << 31);
          return val;
-     case 0xd28: /* Configurable Fault Status.  */
--        /* TODO: Implement Fault Status.  */
--        qemu_log_mask(LOG_UNIMP, "Configurable Fault Status unimplemented\n");
--        return 0;
-+        return cpu->env.v7m.cfsr;
-     case 0xd2c: /* Hard Fault Status.  */
-+        return cpu->env.v7m.hfsr;
-     case 0xd30: /* Debug Fault Status.  */
--    case 0xd34: /* Mem Manage Address.  */
-+        return cpu->env.v7m.dfsr;
-+    case 0xd34: /* MMFAR MemManage Fault Address */
-+        return cpu->env.v7m.mmfar;
-     case 0xd38: /* Bus Fault Address.  */
-+        return cpu->env.v7m.bfar;
-     case 0xd3c: /* Aux Fault Status.  */
-         /* TODO: Implement fault status registers.  */
--        qemu_log_mask(LOG_UNIMP, "Fault status registers unimplemented\n");
-+        qemu_log_mask(LOG_UNIMP,
-+                      "Aux Fault status registers unimplemented\n");
-         return 0;
-     case 0xd40: /* PFR0.  */
-         return 0x00000030;
-@@ -366,9 +368,19 @@ static void nvic_writel(nvic_state *s, uint32_t offset, uint32_t value)
+     case 0xd08: /* Vector Table Offset.  */
+-        cpu = ARM_CPU(qemu_get_cpu(0));
+         return cpu->env.v7m.vecbase;
+     case 0xd0c: /* Application Interrupt/Reset Control.  */
+         return 0xfa050000;
+@@ -296,7 +294,7 @@ static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
+ 
+ static void nvic_writel(nvic_state *s, uint32_t offset, uint32_t value)
+ {
+-    ARMCPU *cpu;
++    ARMCPU *cpu = s->cpu;
+     uint32_t oldval;
+     switch (offset) {
+     case 0x10: /* SysTick Control and Status.  */
+@@ -349,7 +347,6 @@ static void nvic_writel(nvic_state *s, uint32_t offset, uint32_t value)
          }
          break;
-     case 0xd10: /* System Control.  */
--    case 0xd14: /* Configuration Control.  */
-         /* TODO: Implement control registers.  */
--        qemu_log_mask(LOG_UNIMP, "NVIC: SCR and CCR unimplemented\n");
-+        qemu_log_mask(LOG_UNIMP, "NVIC: SCR unimplemented\n");
-+        break;
-+    case 0xd14: /* Configuration Control.  */
-+        /* Enforce RAZ/WI on reserved and must-RAZ/WI bits */
-+        value &= (R_V7M_CCR_STKALIGN_MASK |
-+                  R_V7M_CCR_BFHFNMIGN_MASK |
-+                  R_V7M_CCR_DIV_0_TRP_MASK |
-+                  R_V7M_CCR_UNALIGN_TRP_MASK |
-+                  R_V7M_CCR_USERSETMPEND_MASK |
-+                  R_V7M_CCR_NONBASETHRDENA_MASK);
-+
-+        cpu->env.v7m.ccr = value;
+     case 0xd08: /* Vector Table Offset.  */
+-        cpu = ARM_CPU(qemu_get_cpu(0));
+         cpu->env.v7m.vecbase = value & 0xffffff80;
          break;
-     case 0xd24: /* System Handler Control.  */
-         /* TODO: Real hardware allows you to set/clear the active bits
-@@ -378,13 +390,23 @@ static void nvic_writel(nvic_state *s, uint32_t offset, uint32_t value)
-         s->gic.irq_state[ARMV7M_EXCP_USAGE].enabled = (value & (1 << 18)) != 0;
-         break;
-     case 0xd28: /* Configurable Fault Status.  */
-+        cpu->env.v7m.cfsr &= ~value; /* W1C */
-+        break;
-     case 0xd2c: /* Hard Fault Status.  */
-+        cpu->env.v7m.hfsr &= ~value; /* W1C */
-+        break;
-     case 0xd30: /* Debug Fault Status.  */
-+        cpu->env.v7m.dfsr &= ~value; /* W1C */
-+        break;
-     case 0xd34: /* Mem Manage Address.  */
-+        cpu->env.v7m.mmfar = value;
-+        return;
-     case 0xd38: /* Bus Fault Address.  */
-+        cpu->env.v7m.bfar = value;
-+        return;
-     case 0xd3c: /* Aux Fault Status.  */
-         qemu_log_mask(LOG_UNIMP,
--                      "NVIC: fault status registers unimplemented\n");
-+                      "NVIC: Aux fault status registers unimplemented\n");
-         break;
-     case 0xf00: /* Software Triggered Interrupt Register */
-         if ((value & 0x1ff) < s->num_irq) {
+     case 0xd0c: /* Application Interrupt/Reset Control.  */
+@@ -495,6 +492,8 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+     NVICClass *nc = NVIC_GET_CLASS(s);
+     Error *local_err = NULL;
+ 
++    s->cpu = ARM_CPU(qemu_get_cpu(0));
++    assert(s->cpu);
+     /* The NVIC always has only one CPU */
+     s->gic.num_cpu = 1;
+     /* Tell the common code we're an NVIC */
 -- 
 2.7.4
