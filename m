@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cVxWQ-0002je-Gi
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:36:15 -0500
+	(envelope-from <berrange@redhat.com>) id 1cVxWc-0002tR-Pa
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:36:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cVxWP-00088l-H4
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:36:14 -0500
-References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
-	<1479837270-79005-4-git-send-email-vsementsov@virtuozzo.com>
-	<87mvegajzv.fsf@emacs.mitica>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <7890fa87-faa1-fd99-e8c8-76b51f039ad6@virtuozzo.com>
-Date: Tue, 24 Jan 2017 12:35:57 +0300
+	(envelope-from <berrange@redhat.com>) id 1cVxWa-0008Bu-SY
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:36:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60778)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVxWa-0008Bc-MZ
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:36:24 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D120B3B721
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:36:24 +0000 (UTC)
+Date: Tue, 24 Jan 2017 09:36:19 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170124093619.GC14563@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170120164322.21851-1-pbonzini@redhat.com>
+	<20170120164322.21851-7-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87mvegajzv.fsf@emacs.mitica>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/17] migration: split common postcopy out
- of ram postcopy
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170120164322.21851-7-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 06/17] io: make qio_channel_yield aware of
+ AioContexts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +35,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
 
-24.01.2017 12:24, Juan Quintela wrote:
-> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
->> Split common postcopy staff from ram postcopy staff.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/migration/migration.h |  1 +
->>   migration/migration.c         | 39 +++++++++++++++++++++++++++------------
->>   migration/postcopy-ram.c      |  4 +++-
->>   migration/savevm.c            | 31 ++++++++++++++++++++++---------
->>   4 files changed, 53 insertions(+), 22 deletions(-)
->>
-> Hi
->
-> {
->>       MigrationState *s;
->> @@ -1587,9 +1592,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
->>        * need to tell the destination to throw any pages it's already received
->>        * that are dirty
->>        */
->> -    if (ram_postcopy_send_discard_bitmap(ms)) {
->> -        error_report("postcopy send discard bitmap failed");
->> -        goto fail;
->> +    if (migrate_postcopy_ram()) {
->> +        if (ram_postcopy_send_discard_bitmap(ms)) {
->> +            error_report("postcopy send discard bitmap failed");
->> +            goto fail;
->> +        }
-> I will have preffered that for the ram commands, to embed the
-> migrate_postocpy_ram() check inside them, but that is taste, and
-> everyone has its own O:-)
->
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index e436cb2..c8a71c8 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -73,7 +73,7 @@ static struct mig_cmd_args {
->>       [MIG_CMD_INVALID]          = { .len = -1, .name = "INVALID" },
->>       [MIG_CMD_OPEN_RETURN_PATH] = { .len =  0, .name = "OPEN_RETURN_PATH" },
->>       [MIG_CMD_PING]             = { .len = sizeof(uint32_t), .name = "PING" },
->> -    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = 16, .name = "POSTCOPY_ADVISE" },
->> +    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = -1, .name = "POSTCOPY_ADVISE" },
->>       [MIG_CMD_POSTCOPY_LISTEN]  = { .len =  0, .name = "POSTCOPY_LISTEN" },
->>       [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
->>       [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
->> @@ -827,12 +827,17 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
->>   /* Send prior to any postcopy transfer */
->>   void qemu_savevm_send_postcopy_advise(QEMUFile *f)
->>   {
->> -    uint64_t tmp[2];
->> -    tmp[0] = cpu_to_be64(getpagesize());
->> -    tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
->> +    if (migrate_postcopy_ram()) {
->> +        uint64_t tmp[2];
->> +        tmp[0] = cpu_to_be64(getpagesize());
->> +        tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
->>   
->> -    trace_qemu_savevm_send_postcopy_advise();
->> -    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
->> +        trace_qemu_savevm_send_postcopy_advise();
->> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE,
->> +                                 16, (uint8_t *)tmp);
->> +    } else {
->> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 0, NULL);
->> +    }
->>   }
->>   
->>   /* Sent prior to starting the destination running in postcopy, discard pages
-> I haven't yet figured out why you are reusing this command with a
-> different number of parameters.
-> For this to pass, I need that Dave comment on this.
->
-> So,
->
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
->
-> conditioned that Dave agrees with this.
+On Fri, Jan 20, 2017 at 05:43:11PM +0100, Paolo Bonzini wrote:
+> Support separate coroutines for reading and writing, and place the
+> read/write handlers on the AioContext that the QIOChannel is registered
+> with.
+> 
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>         v1->v2:
+>         improved qio_channel_set_aio_context docs, renamed to
+>                 qio_channel_attach_aio_context [Daniel, Stefan]
+>         fixed pasto in "io: make qio_channel_yield aware of AioContexts"
+> 
+>  include/io/channel.h | 47 ++++++++++++++++++++++++++--
+>  io/channel.c         | 86 +++++++++++++++++++++++++++++++++++++++-------------
+>  2 files changed, 109 insertions(+), 24 deletions(-)
 
-These parameters are unrelated if ram postcopy is disabled. So, I should 
-be better to have a possibility of skipping them, then to send unneeded 
-numbers and write separate code to read them from the stream (rewriting 
-loadvm_postcopy_handle_advise to just read these two numbers and do 
-nothing about ram postcopy for this case).
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
+Regards,
+Daniel
 -- 
-Best regards,
-Vladimir
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
