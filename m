@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW2S8-0002va-3z
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:09 -0500
+	(envelope-from <berrange@redhat.com>) id 1cW2S9-0002wr-E9
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW2S6-0002Bi-Rr
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:08 -0500
+	(envelope-from <berrange@redhat.com>) id 1cW2S8-0002Cg-2W
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:09 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 24 Jan 2017 14:51:36 +0000
-Message-Id: <20170124145152.22980-2-berrange@redhat.com>
+Date: Tue, 24 Jan 2017 14:51:37 +0000
+Message-Id: <20170124145152.22980-3-berrange@redhat.com>
 In-Reply-To: <20170124145152.22980-1-berrange@redhat.com>
 References: <20170124145152.22980-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/17] block: expose crypto option names /
- defs to other drivers
+Subject: [Qemu-devel] [PATCH v2 02/17] block: add ability to set a prefix
+ for opt names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,214 +23,303 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The block/crypto.c defines a set of QemuOpts that provide
-parameters for encryption. This will also be needed by
-the qcow/qcow2 integration, so expose the relevant pieces
-in a new block/crypto.h header.
+When integrating the crypto support with qcow/qcow2, we don't
+want to use the bare LUKS option names "hash-alg", "key-secret",
+etc. We want to namespace them "luks-hash-alg", "luks-key-secret"
+so that they don't clash with any general qcow options at a later
+date.
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- block/crypto.c | 61 +++++++--------------------------------
- block/crypto.h | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 102 insertions(+), 50 deletions(-)
- create mode 100644 block/crypto.h
+ block/crypto.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++++--------
+ block/crypto.h |  42 +++++++++++-----------
+ 2 files changed, 119 insertions(+), 34 deletions(-)
 
 diff --git a/block/crypto.c b/block/crypto.c
-index 7aa7eb5..d281de6 100644
+index d281de6..876eabc 100644
 --- a/block/crypto.c
 +++ b/block/crypto.c
-@@ -26,14 +26,7 @@
- #include "qapi/opts-visitor.h"
+@@ -27,6 +27,7 @@
  #include "qapi-visit.h"
  #include "qapi/error.h"
--
--#define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
--#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
--#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
--#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG "ivgen-alg"
--#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG "ivgen-hash-alg"
--#define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
--#define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
-+#include "block/crypto.h"
+ #include "block/crypto.h"
++#include "qemu/cutils.h"
  
  typedef struct BlockCrypto BlockCrypto;
  
-@@ -135,11 +128,7 @@ static QemuOptsList block_crypto_runtime_opts_luks = {
+@@ -128,7 +129,7 @@ static QemuOptsList block_crypto_runtime_opts_luks = {
      .name = "crypto",
      .head = QTAILQ_HEAD_INITIALIZER(block_crypto_runtime_opts_luks.head),
      .desc = {
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
--            .type = QEMU_OPT_STRING,
--            .help = "ID of the secret that provides the encryption key",
--        },
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
+-        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET(""),
          { /* end of list */ }
      },
  };
-@@ -154,47 +143,19 @@ static QemuOptsList block_crypto_create_opts_luks = {
+@@ -143,31 +144,101 @@ static QemuOptsList block_crypto_create_opts_luks = {
              .type = QEMU_OPT_SIZE,
              .help = "Virtual disk size"
          },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
--            .type = QEMU_OPT_STRING,
--            .help = "ID of the secret that provides the encryption key",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of encryption cipher algorithm",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of encryption cipher mode",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of IV generator algorithm",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of IV generator hash algorithm",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of encryption hash algorithm",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,
--            .type = QEMU_OPT_NUMBER,
--            .help = "Time to spend in PBKDF in milliseconds",
--        },
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME,
+-        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
+-        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG,
+-        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE,
+-        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG,
+-        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG,
+-        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG,
+-        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET(""),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG(""),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE(""),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG(""),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG(""),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG(""),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME(""),
          { /* end of list */ }
      },
  };
  
++static QemuOptsList empty_opts = {
++    .name = "crypto-empty",
++    .merge_lists = false,
++    .head = QTAILQ_HEAD_INITIALIZER(empty_opts.head),
++    .desc = {
++        /* no elements => accept any params */
++        { /* end of list */ }
++    },
++};
++
++
++struct BlockCryptoCopyData {
++    QemuOpts *opts;
++    const char *prefix;
++};
++
++static int block_crypto_copy_value(void *opaque, const char *name,
++                                   const char *value, Error **errp)
++{
++    struct BlockCryptoCopyData *data = opaque;
++    const char *newname;
++
++    if (strstart(name, data->prefix, &newname)) {
++        Error *local_err = NULL;
++
++        qemu_opt_set(data->opts, newname, value, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return -1;
++        }
++    }
++
++    return 0;
++}
++
++/*
++ * Create a copy of @opts containing only the fields with
++ * a prefix of @prefix, stripping the prefix in the returned
++ * opts
++ */
++static QemuOpts *
++block_crypto_copy_opts(QemuOpts *opts,
++                       const char *prefix,
++                       Error **errp)
++{
++    struct BlockCryptoCopyData data = {
++        .opts = qemu_opts_create(&empty_opts, NULL, false, errp),
++        .prefix = prefix
++    };
++    if (!data.opts) {
++        return NULL;
++    }
++
++    if (qemu_opt_foreach(opts, block_crypto_copy_value, &data, errp) < 0) {
++        qemu_opts_del(data.opts);
++        return NULL;
++    }
++
++    return data.opts;
++}
  
--static QCryptoBlockOpenOptions *
-+QCryptoBlockOpenOptions *
+ QCryptoBlockOpenOptions *
  block_crypto_open_opts_init(QCryptoBlockFormat format,
                              QemuOpts *opts,
++                            const char *prefix,
                              Error **errp)
-@@ -240,7 +201,7 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
+ {
+-    Visitor *v;
++    Visitor *v = NULL;
+     QCryptoBlockOpenOptions *ret = NULL;
+     Error *local_err = NULL;
++    QemuOpts *newopts = NULL;
+ 
+     ret = g_new0(QCryptoBlockOpenOptions, 1);
+     ret->format = format;
+ 
+-    v = opts_visitor_new(opts);
++    if (prefix != NULL) {
++        newopts = block_crypto_copy_opts(opts, prefix, &local_err);
++        if (local_err) {
++            goto out;
++        }
++        v = opts_visitor_new(newopts);
++    } else {
++        v = opts_visitor_new(opts);
++    }
+ 
+     visit_start_struct(v, NULL, NULL, 0, &local_err);
+     if (local_err) {
+@@ -196,6 +267,7 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
+         qapi_free_QCryptoBlockOpenOptions(ret);
+         ret = NULL;
+     }
++    qemu_opts_del(newopts);
+     visit_free(v);
+     return ret;
  }
- 
- 
--static QCryptoBlockCreateOptions *
-+QCryptoBlockCreateOptions *
+@@ -204,16 +276,26 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
+ QCryptoBlockCreateOptions *
  block_crypto_create_opts_init(QCryptoBlockFormat format,
                                QemuOpts *opts,
++                              const char *prefix,
                                Error **errp)
+ {
+-    Visitor *v;
++    Visitor *v = NULL;
+     QCryptoBlockCreateOptions *ret = NULL;
+     Error *local_err = NULL;
++    QemuOpts *newopts = NULL;
+ 
+     ret = g_new0(QCryptoBlockCreateOptions, 1);
+     ret->format = format;
+ 
+-    v = opts_visitor_new(opts);
++    if (prefix != NULL) {
++        newopts = block_crypto_copy_opts(opts, prefix, &local_err);
++        if (local_err) {
++            goto out;
++        }
++        v = opts_visitor_new(newopts);
++    } else {
++        v = opts_visitor_new(opts);
++    }
+ 
+     visit_start_struct(v, NULL, NULL, 0, &local_err);
+     if (local_err) {
+@@ -242,6 +324,7 @@ block_crypto_create_opts_init(QCryptoBlockFormat format,
+         qapi_free_QCryptoBlockCreateOptions(ret);
+         ret = NULL;
+     }
++    qemu_opts_del(newopts);
+     visit_free(v);
+     return ret;
+ }
+@@ -268,7 +351,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+         goto cleanup;
+     }
+ 
+-    open_opts = block_crypto_open_opts_init(format, opts, errp);
++    open_opts = block_crypto_open_opts_init(format, opts, NULL, errp);
+     if (!open_opts) {
+         goto cleanup;
+     }
+@@ -312,7 +395,7 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+         .filename = filename,
+     };
+ 
+-    create_opts = block_crypto_create_opts_init(format, opts, errp);
++    create_opts = block_crypto_create_opts_init(format, opts, NULL, errp);
+     if (!create_opts) {
+         return -1;
+     }
 diff --git a/block/crypto.h b/block/crypto.h
-new file mode 100644
-index 0000000..e42f20e
---- /dev/null
+index e42f20e..e70e2f0 100644
+--- a/block/crypto.h
 +++ b/block/crypto.h
-@@ -0,0 +1,91 @@
-+/*
-+ * QEMU block full disk encryption
-+ *
-+ * Copyright (c) 2015-2016 Red Hat, Inc.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef BLOCK_CRYPTO_H__
-+#define BLOCK_CRYPTO_H__
-+
-+#define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
-+#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
-+#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
-+#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG "ivgen-alg"
-+#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG "ivgen-hash-alg"
-+#define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
-+#define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET                            \
-+    {                                                                   \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,                       \
-+        .type = QEMU_OPT_STRING,                                        \
-+        .help = "ID of the secret that provides the keyslot passphrase", \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG               \
+@@ -29,51 +29,51 @@
+ #define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
+ #define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
+ 
+-#define BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET                            \
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET(prefix)                    \
+     {                                                                   \
+-        .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,                       \
++        .name = prefix BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,                \
+         .type = QEMU_OPT_STRING,                                        \
+         .help = "ID of the secret that provides the keyslot passphrase", \
+     }
+ 
+-#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG               \
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG(prefix)       \
+     {                                                      \
+-        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,          \
++        .name = prefix BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,   \
+         .type = QEMU_OPT_STRING,                           \
+         .help = "Name of encryption cipher algorithm",     \
+     }
+ 
+-#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE         \
+-    {                                                 \
+-        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,    \
+-        .type = QEMU_OPT_STRING,                      \
+-        .help = "Name of encryption cipher mode",     \
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE(prefix)      \
 +    {                                                      \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,          \
++        .name = prefix BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,  \
 +        .type = QEMU_OPT_STRING,                           \
-+        .help = "Name of encryption cipher algorithm",     \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE         \
-+    {                                                 \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,    \
-+        .type = QEMU_OPT_STRING,                      \
-+        .help = "Name of encryption cipher mode",     \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG           \
-+    {                                                 \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG,      \
-+        .type = QEMU_OPT_STRING,                      \
-+        .help = "Name of IV generator algorithm",     \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG                \
-+    {                                                           \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,           \
-+        .type = QEMU_OPT_STRING,                                \
-+        .help = "Name of IV generator hash algorithm",          \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG               \
-+    {                                                    \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,          \
-+        .type = QEMU_OPT_STRING,                         \
-+        .help = "Name of encryption hash algorithm",     \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME                   \
-+    {                                                         \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,              \
-+        .type = QEMU_OPT_NUMBER,                              \
-+        .help = "Time to spend in PBKDF in milliseconds",     \
-+    }
-+
-+QCryptoBlockCreateOptions *
-+block_crypto_create_opts_init(QCryptoBlockFormat format,
-+                              QemuOpts *opts,
-+                              Error **errp);
-+
-+QCryptoBlockOpenOptions *
-+block_crypto_open_opts_init(QCryptoBlockFormat format,
-+                            QemuOpts *opts,
-+                            Error **errp);
-+
-+#endif /* BLOCK_CRYPTO_H__ */
++        .help = "Name of encryption cipher mode",          \
+     }
+ 
+-#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG           \
+-    {                                                 \
+-        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG,      \
+-        .type = QEMU_OPT_STRING,                      \
+-        .help = "Name of IV generator algorithm",     \
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG(prefix)     \
++    {                                                   \
++        .name = prefix BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG, \
++        .type = QEMU_OPT_STRING,                        \
++        .help = "Name of IV generator algorithm",       \
+     }
+ 
+-#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG                \
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG(prefix)        \
+     {                                                           \
+-        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,           \
++        .name = prefix BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,    \
+         .type = QEMU_OPT_STRING,                                \
+         .help = "Name of IV generator hash algorithm",          \
+     }
+ 
+-#define BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG               \
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG(prefix)       \
+     {                                                    \
+-        .name = BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,          \
++        .name = prefix BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,   \
+         .type = QEMU_OPT_STRING,                         \
+         .help = "Name of encryption hash algorithm",     \
+     }
+ 
+-#define BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME                   \
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME(prefix)           \
+     {                                                         \
+-        .name = BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,              \
++        .name = prefix BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,       \
+         .type = QEMU_OPT_NUMBER,                              \
+         .help = "Time to spend in PBKDF in milliseconds",     \
+     }
+@@ -81,11 +81,13 @@
+ QCryptoBlockCreateOptions *
+ block_crypto_create_opts_init(QCryptoBlockFormat format,
+                               QemuOpts *opts,
++                              const char *prefix,
+                               Error **errp);
+ 
+ QCryptoBlockOpenOptions *
+ block_crypto_open_opts_init(QCryptoBlockFormat format,
+                             QemuOpts *opts,
++                            const char *prefix,
+                             Error **errp);
+ 
+ #endif /* BLOCK_CRYPTO_H__ */
 -- 
 2.9.3
