@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cVvig-0006cJ-OT
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:40:47 -0500
+	(envelope-from <groug@kaod.org>) id 1cVvjX-0007Cf-58
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:41:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cVvid-00043X-JT
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:40:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:20793)
+	(envelope-from <groug@kaod.org>) id 1cVvjU-0004ED-1Q
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:41:39 -0500
+Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:38961)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cVvid-00041r-Dk
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:40:43 -0500
-Date: Tue, 24 Jan 2017 15:40:39 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170124074039.GB16400@pxdev.xzpeter.org>
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<20170123175422-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cVvjT-0004Du-RV
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:41:35 -0500
+Received: from player798.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 13CD2EC97
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 08:41:33 +0100 (CET)
+Date: Tue, 24 Jan 2017 08:41:28 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170124084128.2a9a14ca@bahia.lan>
+In-Reply-To: <alpine.DEB.2.10.1701231200240.10192@sstabellini-ThinkPad-X260>
+References: <148500887769.19567.3784247823786701992.stgit@bahia.lan>
+	<alpine.DEB.2.10.1701231200240.10192@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170123175422-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH RFC v4 00/20] VT-d: vfio enablement and
- misc enhances
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix offset error in v9fs_xattr_read()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On Mon, Jan 23, 2017 at 05:55:51PM +0200, Michael S. Tsirkin wrote:
-> On Fri, Jan 20, 2017 at 09:08:36PM +0800, Peter Xu wrote:
-> > This is v4 of vt-d vfio enablement series.
+On Mon, 23 Jan 2017 12:20:57 -0800 (PST)
+Stefano Stabellini <sstabellini@kernel.org> wrote:
+
+> On Sat, 21 Jan 2017, Greg Kurz wrote:
+> > The current code tries to copy `read_count' bytes starting at offset
+> > `offset' from a `read_count`-sized iovec. This causes v9fs_pack() to
+> > fail with ENOBUFS.
 > > 
-> > Sorry that v4 growed to 20 patches. Some newly added patches (which
-> > are quite necessary):
+> > Since the PDU iovec is already partially filled with `offset' bytes,
+> > let's skip them when creating `qiov_full' and have v9fs_pack() to
+> > copy the whole of it. Moreover, this is consistent with the other
+> > places where v9fs_init_qiov_from_pdu() is called.
 > > 
-> > [01/20] vfio: trace map/unmap for notify as well
-> > [02/20] vfio: introduce vfio_get_vaddr()
-> > [03/20] vfio: allow to notify unmap for very large region
-> > 
-> >   Patches from RFC series:
-> > 
-> >   "[PATCH RFC 0/3] vfio: allow to notify unmap for very big region"
-> > 
-> >   Which is required by patch [19/20].
-> > 
-> > [11/20] memory: provide IOMMU_NOTIFIER_FOREACH macro
-> > 
-> >   A helper only.
-> > 
-> > [19/20] intel_iommu: unmap existing pages before replay
-> > 
-> >   This solves Alex's concern that there might have existing mappings
-> >   in previous domain when replay happens.
-> > 
-> > [20/20] intel_iommu: replay even with DSI/GLOBAL inv desc
-> > 
-> >   This solves Jason/Kevin's concern by handling DSI/GLOBAL
-> >   invalidations as well.
-> > 
-> > Each individual patch will have more detailed explanation on itself.
-> > Please refer to each of them.
-> > 
-> > Here I did separate work on patch 19/20 rather than squashing them
-> > into patch 18 for easier modification and review. I prefer we have
-> > them separately so we can see each problem separately, after all,
-> > patch 18 survives in most use cases. Please let me know if we want to
-> > squash them in some way. I can respin when necessary.
-> > 
-> > Besides the big things, lots of tiny tweaks as well. Here's the
-> > changelog.
+> > This fixes commit "bcb8998fac16 9pfs: call v9fs_init_qiov_from_pdu
+> > before v9fs_pack".  
 > 
-> It would be nice to add to the log
-> - known issues / missing features, if any
+> Sorry about that!
+> 
+> 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/9p.c |    4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > index fa58877570f6..f0eef1a3ef53 100644
+> > --- a/hw/9pfs/9p.c
+> > +++ b/hw/9pfs/9p.c
+> > @@ -1685,8 +1685,8 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
+> >      }
+> >      offset += err;
+> >  
+> > -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, 0, read_count, false);
+> > -    err = v9fs_pack(qiov_full.iov, qiov_full.niov, offset,
+> > +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);  
+> 
+> v9fs_init_qiov_from_pdu calls init_in_iov_from_pdu passing read_count as
+> size argument. offset is not passed to init_in_iov_from_pdu, it is only
+> used to initialized qiov_full.
+> 
+> In other words, don't we need to:
+> 
+>     v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count + offset, false);
+> 
+> To make sure that qiov_full has "read_count + offset" bytes in it, and
+> qiov_full is initialized skipping the first "offset" bytes?
+> 
 
-Sure. Will add them in next post.
+If we do that then qemu_iovec_concat() will skip offset bytes and then copy
+read_count + offset bytes or am I missing something ?
 
-> - are there patches ready to be merged here?
->   if yes pls post them without the rfc tag
-
-The series (since V1) should have passed compilation test and simple
-functional test (though only with my tiny C program to torture it).
-Since I have got lots of review comments, and looks like the whole
-thing is acceptable in general, I'll repost with a non-rfc version
-with some tweaks upon this one.
-
-Michael, please feel free to pick any of them which you think are
-applicable and safe (e.g., the iommu cleanups).
-
-Thanks,
-
--- peterx
+> 
+> > +    err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
+> >                      ((char *)fidp->fs.xattr.value) + off,
+> >                      read_count);
+> >      qemu_iovec_destroy(&qiov_full);
+> >   
