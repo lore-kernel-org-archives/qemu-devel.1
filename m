@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cW0jM-0001Hz-BC
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 08:01:54 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cW0js-0001kr-JP
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 08:02:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cW0jL-0000qI-Lc
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 08:01:48 -0500
-References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
-	<1485164923-17736-7-git-send-email-armbru@redhat.com>
-	<2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com>
-	<877f5l1tak.fsf@dusky.pond.sub.org>
-	<3512807d-d04e-50fa-9fcf-d1d5ba8ac350@redhat.com>
-	<87r33saa6p.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1cW0jo-00017x-TQ
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 08:02:20 -0500
+References: <1485262161-18543-1-git-send-email-pl@kamp.de>
+	<e09fbf16-a5ba-ed74-791c-875d8c846203@redhat.com>
+	<f803154c-3197-6bf7-cca4-023c20facc95@kamp.de>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4cd45561-60e9-2cd2-e317-880ba9eb2f86@redhat.com>
-Date: Tue, 24 Jan 2017 14:01:38 +0100
+Message-ID: <ff74b56e-1135-087a-2249-100921e42b7b@redhat.com>
+Date: Tue, 24 Jan 2017 14:02:07 +0100
 MIME-Version: 1.0
-In-Reply-To: <87r33saa6p.fsf@dusky.pond.sub.org>
+In-Reply-To: <f803154c-3197-6bf7-cca4-023c20facc95@kamp.de>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
- lsi53c895a SCSI HBAs
+Subject: Re: [Qemu-devel] [PATCH] block/iscsi: statically link
+ qemu_iscsi_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org
 
 
 
-On 24/01/2017 13:56, Markus Armbruster wrote:
-> So, what do we want to deprecate?
+On 24/01/2017 13:53, Peter Lieven wrote:
+> Am 24.01.2017 um 13:52 schrieb Paolo Bonzini:
+>>
+>> On 24/01/2017 13:49, Peter Lieven wrote:
+>>> +#ifdef CONFIG_LIBISCSI
+>> The #ifdef is not needed here.
 > 
-> I think the onboard SCSI HBA adopting if=scsi drives should stay,
-> because it matches what we do for other interface types.  Unless we
-> wanted to deprecate interface types other than none entirely.
+> Right, can you drop it or shall I send a V2?
 
-Yes, of course.
-
-> What about realview and versatile auto-creating lsi53c895a?
-
-That should go.
-
-> What about pseries auto-creating spapr-vscsi?
-
-That should stay I think.  The discriminant being that spapr-vscsi
-devices actually are likely to have drivers in the guests.
-
-> What about cold-plug of HBAs auto-creating SCSI devices?  You proposed
-> deprecating it for PC types, but it's currently independent of the
-> machine type.  Deprecate it for all types?  If not, add a flag to
-> MachineClass so we can deprecate it just for PC types?
-
-I need --verbose for this, sorry.
+Can do.
 
 Paolo
+
+> Peter
+> 
+>>
+>> Paolo
+>>
+>>> +static QemuOptsList qemu_iscsi_opts = {
+>>> +    .name = "iscsi",
+>>> +    .head = QTAILQ_HEAD_INITIALIZER(qemu_iscsi_opts.head),
+>>> +    .desc = {
+>>> +        {
+>>> +            .name = "user",
+>>> +            .type = QEMU_OPT_STRING,
+>>> +            .help = "username for CHAP authentication to target",
+>>> +        },{
+>>> +            .name = "password",
+>>> +            .type = QEMU_OPT_STRING,
+>>> +            .help = "password for CHAP authentication to target",
+>>> +        },{
+>>> +            .name = "password-secret",
+>>> +            .type = QEMU_OPT_STRING,
+>>> +            .help = "ID of the secret providing password for CHAP "
+>>> +                    "authentication to target",
+>>> +        },{
+>>> +            .name = "header-digest",
+>>> +            .type = QEMU_OPT_STRING,
+>>> +            .help = "HeaderDigest setting. "
+>>> +                    "{CRC32C|CRC32C-NONE|NONE-CRC32C|NONE}",
+>>> +        },{
+>>> +            .name = "initiator-name",
+>>> +            .type = QEMU_OPT_STRING,
+>>> +            .help = "Initiator iqn name to use when connecting",
+>>> +        },{
+>>> +            .name = "timeout",
+>>> +            .type = QEMU_OPT_NUMBER,
+>>> +            .help = "Request timeout in seconds (default 0 = no
+>>> timeout)",
+>>> +        },
+>>> +        { /* end of list */ }
+>>> +    },
+>>> +};
+>>> +
+>>> +static void iscsi_block_opts_init(void)
+>>> +{
+>>> +    qemu_add_opts(&qemu_iscsi_opts);
+>>> +}
+>>> +
+>>> +block_init(iscsi_block_opts_init);
+>>> +#endif
+> 
+> 
