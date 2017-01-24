@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVxHg-0006tl-T6
+	(envelope-from <bounces@canonical.com>) id 1cVxHg-0006tk-T4
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVxHe-00043C-6x
+	(envelope-from <bounces@canonical.com>) id 1cVxHd-000432-Mj
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:21:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47702)
+Received: from indium.canonical.com ([91.189.90.7]:47690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cVxHe-00042v-2E
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:20:58 -0500
+	id 1cVxHd-00042t-Gn
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:20:57 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cVxHb-0000Ng-IR
+	id 1cVxHb-0000Ni-5U
 	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:55 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B409A2E80D4
+	by loganberry.canonical.com (Postfix) with ESMTP id 365CF2E80CA
 	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Jan 2017 09:09:08 -0000
+Date: Tue, 24 Jan 2017 09:06:56 -0000
 From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
 Reply-To: Bug 1658634 <1658634@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170123095738.20994.7212.malonedeb@gac.canonical.com>
-Message-Id: <20170124090908.2186.15499.malone@soybean.canonical.com>
+Message-Id: <20170124090656.12428.9471.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1658634] Re: Can't get correct display with
  latest QEMU and OVMF BIOS
@@ -39,28 +39,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-For reference, this is my script:
+I downloaded "ubuntu-16.04.1-desktop-amd64.iso" (MD5:
+17643c29e3c4609818f26becf76d29a3), and I can reproduce the issue -- the
+grub2 display is corrupt. (I didn't even look further than that.) I also
+confirm that it works fine with the same firmware, but using QEMU 2.7.
 
-ISO=3Dubuntu-16.04.1-desktop-amd64.iso
-CODE=3DOVMF_CODE.fd
-TMPL=3DOVMF_VARS.fd
+Here's the result of the bisection:
 
-cp $TMPL vars.fd
+cd958edb1fae85d0c7d1e1acbff82d22724e8d64 is the first bad commit
+commit cd958edb1fae85d0c7d1e1acbff82d22724e8d64
+Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Date:   Fri Aug 26 13:47:11 2016 +0400
 
-qemu-system-x86_64 \
-  -m 1024 \
-  -M pc,accel=3Dkvm \
-  -device VGA \
-  -drive if=3Dpflash,readonly,format=3Draw,file=3D$CODE \
-  -drive if=3Dpflash,format=3Draw,file=3Dvars.fd \
-  -drive id=3Dcdrom,if=3Dnone,readonly,format=3Draw,file=3D$ISO \
-  -device virtio-scsi-pci,id=3Dscsi0 \
-  -device scsi-cd,bus=3Dscsi0.0,drive=3Dcdrom,bootindex=3D0 \
-  -debugcon file:debug.log \
-  -global isa-debugcon.iobase=3D0x402 \
-  -chardev stdio,signal=3Doff,mux=3Don,id=3Dchar0 \
-  -mon chardev=3Dchar0,mode=3Dreadline,default \
-  -serial chardev:char0
+    console: skip same-size resize
+    =
+
+    virtio-gpu does a set-scanout at each frame (it might be a driver
+    regression). qemu_console_resize() recreate a surface even if the size
+    didn't change, and this shows up in profiling reports because the
+    surface is cleared. With this patch, I get a +15-20% glmark2
+    improvement.
+    =
+
+    Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+    Message-id: 20160826094711.14470-1-marcandre.lureau@redhat.com
+    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+If I revert this commit on top of current master -- it reverts cleanly
+-- then the grub2 screen displays fine again.
+
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
 -- =
 
