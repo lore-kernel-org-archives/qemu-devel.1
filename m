@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cW3cd-0001Lu-DX
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:07:04 -0500
+	(envelope-from <lvivier@redhat.com>) id 1cW3iO-00047W-Vx
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:13:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cW3ca-0005Yt-8h
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:07:03 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cW3ca-0005YM-1G
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:07:00 -0500
-Received: by mail-wm0-x243.google.com with SMTP id c85so35557305wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 08:06:59 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170120170757.30308-1-pbonzini@redhat.com>
-	<20170120170757.30308-4-pbonzini@redhat.com>
-	<20170124123031.GC17221@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4b7fe6d3-f9f5-641c-706a-b7f782c5b213@redhat.com>
-Date: Tue, 24 Jan 2017 17:06:57 +0100
+	(envelope-from <lvivier@redhat.com>) id 1cW3iL-0008Fy-4y
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:13:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51292)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cW3iK-0008FU-WC
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:12:57 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 013CA7FE96
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 16:12:56 +0000 (UTC)
+References: <1484859633-24889-1-git-send-email-mst@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <f8cdfb09-b074-ad88-afe7-3d76ad3dcd7e@redhat.com>
+Date: Tue, 24 Jan 2017 17:12:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170124123031.GC17221@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1484859633-24889-1-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/7] virtio: use address_space_map/unmap to
- access descriptors
+Subject: Re: [Qemu-devel] [PATCH] pci: mark ROMs read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mst@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>
 
-
-
-On 24/01/2017 13:30, Stefan Hajnoczi wrote:
-> On Fri, Jan 20, 2017 at 06:07:53PM +0100, Paolo Bonzini wrote:
->> @@ -455,10 +455,18 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
->>              goto err;
->>          }
->>  
->> -        desc_pa = vq->vring.desc;
->> -        vring_desc_read(vdev, &desc, desc_pa, i);
->> +        len = max * sizeof(VRingDesc);
->> +        desc_ptr = address_space_map(vdev->dma_as, vq->vring.desc, &len, false);
->> +        if (len < max * sizeof(VRingDesc)) {
->> +            virtio_error(vdev, "Cannot map descriptor ring");
->> +            goto err;
->> +        }
->> +
->> +        vring_desc_read(vdev, &desc, desc_ptr, i);
->>  
->>          if (desc.flags & VRING_DESC_F_INDIRECT) {
->> +            address_space_unmap(vdev->dma_as, desc_ptr, len, false, 0);
+On 19/01/2017 22:00, Michael S. Tsirkin wrote:
+> Looks like we didn't mark PCI ROMs as RO allowing
+> mischief such as guests writing there.
+> Further, e.g. vhost gets confused trying to allocate
+> enough space to log writes there. Fix it up.
 > 
-> Missing "dest_ptr = NULL" to prevent double unmap if the next goto err
-> is taken.
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  hw/pci/pci.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->> @@ -689,18 +706,33 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
->>      }
->>  
->>      i = head;
->> -    vring_desc_read(vdev, &desc, desc_pa, i);
->> +
->> +    len = max * sizeof(VRingDesc);
->> +    desc_ptr = address_space_map(vdev->dma_as, vq->vring.desc, &len, false);
->> +    if (len < max * sizeof(VRingDesc)) {
->> +        virtio_error(vdev, "Cannot map descriptor ring");
->> +        return NULL;
-> 
-> desc_ptr still needs to be unmapped if non-NULL.  The same applies
-> below in virtqueue_pop().
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 637d545..eaac185 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -2199,7 +2199,7 @@ static void pci_add_option_rom(PCIDevice *pdev, bool is_default_rom,
+>          snprintf(name, sizeof(name), "%s.rom", object_get_typename(OBJECT(pdev)));
+>      }
+>      pdev->has_rom = true;
+> -    memory_region_init_ram(&pdev->rom, OBJECT(pdev), name, size, &error_fatal);
+> +    memory_region_init_rom(&pdev->rom, OBJECT(pdev), name, size, &error_fatal);
+>      vmstate_register_ram(&pdev->rom, &pdev->qdev);
+>      ptr = memory_region_get_ram_ptr(&pdev->rom);
+>      load_image(path, ptr);
 > 
 
-I'll redo this patch to look a lot more like 4/7.
-
-Paolo
+Tested-by: Laurent Vivier <lvivier@redhat.com>
