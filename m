@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cVxL5-0001XS-6B
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:24:32 -0500
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1cVxLS-0001sl-Kz
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:24:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cVxL4-00050b-A4
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:24:31 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1479837270-79005-4-git-send-email-vsementsov@virtuozzo.com>
-	(Vladimir Sementsov-Ogievskiy's message of "Tue, 22 Nov 2016 20:54:16
-	+0300")
-References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
-	<1479837270-79005-4-git-send-email-vsementsov@virtuozzo.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 24 Jan 2017 10:24:20 +0100
-Message-ID: <87mvegajzv.fsf@emacs.mitica>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 03/17] migration: split common postcopy out
- of ram postcopy
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1cVxLP-000541-FG
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:24:54 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35639)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
+	id 1cVxLP-00053f-8p
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:24:51 -0500
+Received: by mail-wm0-x241.google.com with SMTP id d140so33298715wmd.2
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 01:24:49 -0800 (PST)
+From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Date: Tue, 24 Jan 2017 04:24:06 -0500
+Message-Id: <1485249848-13854-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: [Qemu-devel] [PATCH 0/2 v14] fsdev: add IO throttle support to
+ fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-> Split common postcopy staff from ram postcopy staff.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/migration/migration.h |  1 +
->  migration/migration.c         | 39 +++++++++++++++++++++++++++------------
->  migration/postcopy-ram.c      |  4 +++-
->  migration/savevm.c            | 31 ++++++++++++++++++++++---------
->  4 files changed, 53 insertions(+), 22 deletions(-)
->
+This patch set adds the IO throttling functionality to fsdev/9p devices.
+So far cgroups were used for throttling IO opertions on the fsdev/9p devices.
+It is difficult to use cgroups for throttling because we have to set up 
+cgroups externally before we start the qemu process.
+Qemu provides the throttling apis for implementing the throttling. 
+Block devices already make use of these APIs for throtting the IO operations.
+So, we use the same APIs to enable the throttling functionality for
+fsdevices.As of now the feature is enabled only on 9p-local driver.
 
-Hi
+This feature can be used as shown in the below example:
 
-{
->      MigrationState *s;
-> @@ -1587,9 +1592,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
->       * need to tell the destination to throw any pages it's already received
->       * that are dirty
->       */
-> -    if (ram_postcopy_send_discard_bitmap(ms)) {
-> -        error_report("postcopy send discard bitmap failed");
-> -        goto fail;
-> +    if (migrate_postcopy_ram()) {
-> +        if (ram_postcopy_send_discard_bitmap(ms)) {
-> +            error_report("postcopy send discard bitmap failed");
-> +            goto fail;
-> +        }
+-fsdev local,id=sdb1,path=PATH_TO_DEVICE,security_model=none,writeout=immediate,
+ throttling.bps-read=4194304,throttling.bps-write=4194304  -device
+ virtio-9p-pci,fsdev=sdb1,mount_tag=sdb1
 
-I will have preffered that for the ram commands, to embed the
-migrate_postocpy_ram() check inside them, but that is taste, and
-everyone has its own O:-)
+The main advantages are:
+ 
+- Easy to use because the throttling options are part of qemu cli options
+- Provides a uniform way of using throttling options across block and
+    fsdev/9p devices
+- No need to setup cgroup to provide throttling functionality for the fsdev
+  devices.
+- Removes the redundant throttling code that was present in block and fsdev
+  files
 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index e436cb2..c8a71c8 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -73,7 +73,7 @@ static struct mig_cmd_args {
->      [MIG_CMD_INVALID]          = { .len = -1, .name = "INVALID" },
->      [MIG_CMD_OPEN_RETURN_PATH] = { .len =  0, .name = "OPEN_RETURN_PATH" },
->      [MIG_CMD_PING]             = { .len = sizeof(uint32_t), .name = "PING" },
-> -    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = 16, .name = "POSTCOPY_ADVISE" },
-> +    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = -1, .name = "POSTCOPY_ADVISE" },
->      [MIG_CMD_POSTCOPY_LISTEN]  = { .len =  0, .name = "POSTCOPY_LISTEN" },
->      [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
->      [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
-> @@ -827,12 +827,17 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
->  /* Send prior to any postcopy transfer */
->  void qemu_savevm_send_postcopy_advise(QEMUFile *f)
->  {
-> -    uint64_t tmp[2];
-> -    tmp[0] = cpu_to_be64(getpagesize());
-> -    tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
-> +    if (migrate_postcopy_ram()) {
-> +        uint64_t tmp[2];
-> +        tmp[0] = cpu_to_be64(getpagesize());
-> +        tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
->  
-> -    trace_qemu_savevm_send_postcopy_advise();
-> -    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
-> +        trace_qemu_savevm_send_postcopy_advise();
-> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE,
-> +                                 16, (uint8_t *)tmp);
-> +    } else {
-> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 0, NULL);
-> +    }
->  }
->  
->  /* Sent prior to starting the destination running in postcopy, discard pages
+Missing features:
 
-I haven't yet figured out why you are reusing this command with a
-different number of parameters.
-For this to pass, I need that Dave comment on this.
+-QMP support
+-Throttling support for other fsdev/9p drivers.
 
-So,
+Thanks,
+Pradeep
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Pradeep Jagadeesh (2):
+  fsdev: add IO throttle support to fsdev devices
+  throttle: removed duplicate throtlle code from block and fsdev files
 
-conditioned that Dave agrees with this.
+ blockdev.c                      |  81 ++-------------------------
+ fsdev/Makefile.objs             |   2 +-
+ fsdev/file-op-9p.h              |   3 +
+ fsdev/qemu-fsdev-opts.c         |   3 +
+ fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++++++++++++++++
+ fsdev/qemu-fsdev-throttle.h     |  39 +++++++++++++
+ hw/9pfs/9p-local.c              |   8 +++
+ hw/9pfs/9p.c                    |   5 ++
+ hw/9pfs/cofile.c                |   2 +
+ include/qemu/throttle-options.h |  92 +++++++++++++++++++++++++++++++
+ 10 files changed, 275 insertions(+), 78 deletions(-)
+ create mode 100644 fsdev/qemu-fsdev-throttle.c
+ create mode 100644 fsdev/qemu-fsdev-throttle.h
+ create mode 100644 include/qemu/throttle-options.h
+
+-- 
+1.8.3.1
