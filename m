@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cVyeo-0007cM-Qo
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:48:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cVyfo-0008T2-3H
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cVyek-000524-0k
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:48:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43714)
+	(envelope-from <pbonzini@redhat.com>) id 1cVyfj-0005By-A1
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:50:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34066)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cVyej-000511-QY
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:48:53 -0500
-Message-ID: <1485254930.32716.23.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 24 Jan 2017 11:48:50 +0100
-In-Reply-To: <237b1da5-532d-afd6-84ad-6adc5bd97291@redhat.com>
-References: <58871f9b.d635240a.4cda6.5322@mx.google.com>
-	<237b1da5-532d-afd6-84ad-6adc5bd97291@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] cirrus: fix oob access issue
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cVyfj-0005Bm-2f
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:49:55 -0500
+References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
+	<CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
+	<87pojmjdep.fsf@dusky.pond.sub.org>
+	<CAFEAcA9nhd6x+PT5bG0=YqvmUdxJVFPZ6ACiv-2OKrDFJhrqzg@mail.gmail.com>
+	<87h94x99e4.fsf@dusky.pond.sub.org>
+	<CAFEAcA8vRw=13Lj_98A+3NovSeTg6e0xBopdz9EcdEeUMjjZow@mail.gmail.com>
+	<874m0x7ra2.fsf@dusky.pond.sub.org>
+	<CAFEAcA_txNPj6JNDavmCREse98XTkQgiFAqx5Vf8KCCu9V-6mQ@mail.gmail.com>
+	<878tq93guz.fsf@dusky.pond.sub.org>
+	<CAFEAcA-zV8RWCXMCbAHLMEM1oEw7CWT_aDrTc49Xv_wSnMeAyw@mail.gmail.com>
+	<CAFEAcA-fSJ5PfpKFaehruzjidBtmQP_435WLqgSLg=cQiETR8Q@mail.gmail.com>
+	<87mvegu6m4.fsf@dusky.pond.sub.org> <87fuk8hira.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b8d282de-7660-3305-7984-8a2301bc17f3@redhat.com>
+Date: Tue, 24 Jan 2017 11:49:51 +0100
+MIME-Version: 1.0
+In-Reply-To: <87fuk8hira.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +37,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org, ghoffman@redhat.com, liqiang6-s@360.cn
+To: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <mlureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-> > diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-> > index 379910d..7ddd289 100644
-> > --- a/hw/display/cirrus_vga.c
-> > +++ b/hw/display/cirrus_vga.c
-> > @@ -277,7 +277,8 @@ static bool blit_region_is_unsafe(struct CirrusVGAS=
-tate *s,
-> >      }
-> >      if (pitch < 0) {
-> >          int64_t min =3D addr
-> > -            + ((int64_t)s->cirrus_blt_height-1) * pitch;
-> > +            + ((int64_t)s->cirrus_blt_height-1) * pitch
-> > +            - s->cirrus_blt_width;
-> >          int32_t max =3D addr
-> >              + s->cirrus_blt_width;
-> >          if (min < 0 || max > s->vga.vram_size) {
-> >=20
->=20
-> I believe this is incorrect. In this case (AFAIR), "addr" points to the
-> left-most pixel (=3D lowest address) of the bottom line (=3D highest
-> address).
 
-If I read the code correctly it is backwards *both* x and y axis, so
-addr is the right-most pixel of the bottom line.
 
-cheers,
-  Gerd
+On 24/01/2017 11:09, Markus Armbruster wrote:
+> * commit f8bab10 build-sys: add txt documentation rules
+
+This could be the culprit...
+
+Paolo
