@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cW71y-0000MM-9c
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:45:27 -0500
+	(envelope-from <mst@redhat.com>) id 1cW73D-0001CU-MV
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:46:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cW71x-00054V-EJ
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:45:26 -0500
-Received: from mail-ua0-x22c.google.com ([2607:f8b0:400c:c08::22c]:33690)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cW71x-000544-8x
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:45:25 -0500
-Received: by mail-ua0-x22c.google.com with SMTP id i68so142111177uad.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 11:45:25 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1cW739-0005Rt-7M
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:46:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cW739-0005Rg-1k
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:46:39 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E17176EE
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 19:46:39 +0000 (UTC)
+Date: Tue, 24 Jan 2017 21:46:37 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170124214541-mutt-send-email-mst@kernel.org>
+References: <20170124180420.12430-1-pbonzini@redhat.com>
+	<148528238622.27.17897890473229610195@eba24e3a0d7f>
 MIME-Version: 1.0
-In-Reply-To: <649a4b6e-2c7f-cf2c-5fb2-9213aaffd34a@twiddle.net>
-References: <1485285380-10565-1-git-send-email-peter.maydell@linaro.org>
-	<1485285380-10565-6-git-send-email-peter.maydell@linaro.org>
-	<649a4b6e-2c7f-cf2c-5fb2-9213aaffd34a@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jan 2017 19:45:03 +0000
-Message-ID: <CAFEAcA8hZKk429b_sdtQb5bT7ymjBAqbcokpOL-oc2Vi8zUbyQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 05/10] armv7m: honour CCR.STACKALIGN on
- exception entry
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <148528238622.27.17897890473229610195@eba24e3a0d7f>
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] virtio: use MemoryRegionCache for
+ descriptors and rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +34,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Liviu Ionescu <ilg@livius.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com
 
-On 24 January 2017 at 19:33, Richard Henderson <rth@twiddle.net> wrote:
-> On 01/24/2017 11:16 AM, Peter Maydell wrote:
->> The CCR.STACKALIGN bit controls whether the CPU is supposed to force
->> 8-alignment of the stack pointer on entry to the exception handler.
->
-> 8...
->
->> +    /* Align stack pointer if the guest wants that */
->> +    if ((env->regs[13] & 4) && (env->v7m.ccr & R_V7M_CCR_STKALIGN_MASK)) {
->
-> 4...
->
->>          env->regs[13] -= 4;
->
-> Not alignment.  "&= -4"?
+On Tue, Jan 24, 2017 at 10:26:27AM -0800, no-reply@patchew.org wrote:
+> qemu-system-x86_64: /tmp/qemu-test/src/exec.c:3180: address_space_translate_cached: Assertion `addr < cache->len && *plen <= cache->len - addr' failed.
+> make: *** [check-tests/test-qga] Error 1
+> make: *** Waiting for unfinished jobs....
 
-We know SP is always at least a multiple of 4. If it's already
-a multiple of 8 then (sp & 4) will be false and we leave sp alone.
-Otherwise it's a multiple of 4 but not 8, and subtracting 4
-makes it 8 aligned (and we set the saved-XPSR bit to indicate
-that we need to undo that on exception exit).
+Interesting.
 
-You could maybe rephrase the code to look a bit closer to the
-v7M ARM ARM pseudocode, but the way it's written now isn't wrong,
-so since this patch is only trying to say "do this if STKALIGN
-is set rather than all the time" just adjusting the if conditional
-seemed the best thing to me.
-
-(The pseudocode checks for "do we need to align" with
-"SP<2> AND forcealign", and does the alignment by
-ANDing with a mask constructed with "NOT(ZeroExtend(forcealign:'00',32))".
-So we do the check the same way it does, but use a subtract
-rather than an AND-NOT. (Since we know that bit 2 must be set
-then subtracting 4 and masking that bit to 0 are the same thing.)
-
-thanks
--- PMM
+-- 
+MST
