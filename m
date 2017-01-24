@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVxHg-0006tm-Tk
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:21:04 -0500
+	(envelope-from <quintela@redhat.com>) id 1cVxL5-0001XS-6B
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:24:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVxHe-00043O-9c
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:21:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47706)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cVxHe-00042x-43
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:20:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cVxHc-0000Lf-0k
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2C3952E80E0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:55 +0000 (UTC)
+	(envelope-from <quintela@redhat.com>) id 1cVxL4-00050b-A4
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:24:31 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1479837270-79005-4-git-send-email-vsementsov@virtuozzo.com>
+	(Vladimir Sementsov-Ogievskiy's message of "Tue, 22 Nov 2016 20:54:16
+	+0300")
+References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479837270-79005-4-git-send-email-vsementsov@virtuozzo.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 24 Jan 2017 10:24:20 +0100
+Message-ID: <87mvegajzv.fsf@emacs.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Jan 2017 09:12:24 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-Reply-To: Bug 1658634 <1658634@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170123095738.20994.7212.malonedeb@gac.canonical.com>
-Message-Id: <20170124091224.12494.69692.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1658634] Re: Can't get correct display with
- latest QEMU and OVMF BIOS
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 03/17] migration: split common postcopy out
+ of ram postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-Added Marc-Andr=C3=A9 and Gerd to the CC list.
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+> Split common postcopy staff from ram postcopy staff.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/migration/migration.h |  1 +
+>  migration/migration.c         | 39 +++++++++++++++++++++++++++------------
+>  migration/postcopy-ram.c      |  4 +++-
+>  migration/savevm.c            | 31 ++++++++++++++++++++++---------
+>  4 files changed, 53 insertions(+), 22 deletions(-)
+>
 
--- =
+Hi
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1658634
+{
+>      MigrationState *s;
+> @@ -1587,9 +1592,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+>       * need to tell the destination to throw any pages it's already received
+>       * that are dirty
+>       */
+> -    if (ram_postcopy_send_discard_bitmap(ms)) {
+> -        error_report("postcopy send discard bitmap failed");
+> -        goto fail;
+> +    if (migrate_postcopy_ram()) {
+> +        if (ram_postcopy_send_discard_bitmap(ms)) {
+> +            error_report("postcopy send discard bitmap failed");
+> +            goto fail;
+> +        }
 
-Title:
-  Can't get correct display with latest QEMU and OVMF BIOS
+I will have preffered that for the ram commands, to embed the
+migrate_postocpy_ram() check inside them, but that is taste, and
+everyone has its own O:-)
 
-Status in QEMU:
-  Confirmed
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index e436cb2..c8a71c8 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -73,7 +73,7 @@ static struct mig_cmd_args {
+>      [MIG_CMD_INVALID]          = { .len = -1, .name = "INVALID" },
+>      [MIG_CMD_OPEN_RETURN_PATH] = { .len =  0, .name = "OPEN_RETURN_PATH" },
+>      [MIG_CMD_PING]             = { .len = sizeof(uint32_t), .name = "PING" },
+> -    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = 16, .name = "POSTCOPY_ADVISE" },
+> +    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = -1, .name = "POSTCOPY_ADVISE" },
+>      [MIG_CMD_POSTCOPY_LISTEN]  = { .len =  0, .name = "POSTCOPY_LISTEN" },
+>      [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
+>      [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
+> @@ -827,12 +827,17 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
+>  /* Send prior to any postcopy transfer */
+>  void qemu_savevm_send_postcopy_advise(QEMUFile *f)
+>  {
+> -    uint64_t tmp[2];
+> -    tmp[0] = cpu_to_be64(getpagesize());
+> -    tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
+> +    if (migrate_postcopy_ram()) {
+> +        uint64_t tmp[2];
+> +        tmp[0] = cpu_to_be64(getpagesize());
+> +        tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
+>  
+> -    trace_qemu_savevm_send_postcopy_advise();
+> -    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
+> +        trace_qemu_savevm_send_postcopy_advise();
+> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE,
+> +                                 16, (uint8_t *)tmp);
+> +    } else {
+> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 0, NULL);
+> +    }
+>  }
+>  
+>  /* Sent prior to starting the destination running in postcopy, discard pages
 
-Bug description:
-  I tried to install a Ubuntu 16.04.1 Desktop 64bits with latest QEMU and O=
-VMF UEFI BIOS, however I can't get correct display output with default vga =
-configuration (-vga std). However, qemu works with a couple of different co=
-nfigurations:
-  1. "-vga cirrus" + "-bios OVMF.fd": works
-  2. "-vga std" + non-UEFI bios: works
+I haven't yet figured out why you are reusing this command with a
+different number of parameters.
+For this to pass, I need that Dave comment on this.
 
-  The same error with QEMU 2.8.0 release. Everything works well on
-  2.7.0/1.
+So,
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1658634/+subscriptions
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+conditioned that Dave agrees with this.
