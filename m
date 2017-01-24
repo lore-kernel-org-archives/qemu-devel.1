@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cW0Q8-00005U-SS
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:41:57 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cW0QO-0000Ii-5A
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:42:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cW0Q7-0003Wf-Sb
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:41:56 -0500
-Received: from mail-io0-x236.google.com ([2607:f8b0:4001:c06::236]:33481)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cW0Q7-0003WT-Lc
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:41:55 -0500
-Received: by mail-io0-x236.google.com with SMTP id v96so70849125ioi.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 04:41:53 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1cW0QJ-0003Yn-Mv
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:42:12 -0500
+Resent-Message-Id: <E1cW0QJ-0003Yn-Mv@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21368)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cW0QJ-0003YX-EI
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:42:07 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1485257020-18542-1-git-send-email-paul.durrant@citrix.com>
+Message-ID: <148526167936.27.5459984639880089309@eba24e3a0d7f>
 MIME-Version: 1.0
-Sender: vpalatin@google.com
-In-Reply-To: <20170124092820.23832-1-cornelia.huck@de.ibm.com>
-References: <20170124092820.23832-1-cornelia.huck@de.ibm.com>
-From: Vincent Palatin <vpalatin@chromium.org>
-Date: Tue, 24 Jan 2017 13:41:32 +0100
-Message-ID: <CAP_ceTwZW-13b7wtnWZ3kGbERuqMfXO1DswyTP-PS4OXeHuEFQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] s390x/kvm: include hw_accel.h instead of
- kvm.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 24 Jan 2017 04:41:20 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/3] xen-platform: disk unplug modifications
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, jfrei@linux.vnet.ibm.com, Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>
+To: paul.durrant@citrix.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
 
-On Tue, Jan 24, 2017 at 10:28 AM, Cornelia Huck
-<cornelia.huck@de.ibm.com> wrote:
->
-> Commit b394662 ("kvm: move cpu synchronization code") switched
-> to hw_accel.h instead of kvm.h, but missed s390x, resulting in
->
->   CC      s390x-softmmu/target/s390x/kvm.o
-> /home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98kvm_sclp_s=
-ervice_call=E2=80=99:
-> /home/cohuck/git/qemu/target/s390x/kvm.c:1034:5: error: implicit declarat=
-ion of function =E2=80=98cpu_synchronize_state=E2=80=99 [-Werror=3Dimplicit=
--function-declaration]
->      cpu_synchronize_state(CPU(cpu));
->      ^
-> /home/cohuck/git/qemu/target/s390x/kvm.c:1034:5: error: nested extern dec=
-laration of =E2=80=98cpu_synchronize_state=E2=80=99 [-Werror=3Dnested-exter=
-ns]
-> /home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98sigp_initi=
-al_cpu_reset=E2=80=99:
-> /home/cohuck/git/qemu/target/s390x/kvm.c:1628:5: error: implicit declarat=
-ion of function =E2=80=98cpu_synchronize_post_reset=E2=80=99 [-Werror=3Dimp=
-licit-function-declaration]
->      cpu_synchronize_post_reset(cs);
->      ^
-> /home/cohuck/git/qemu/target/s390x/kvm.c:1628:5: error: nested extern dec=
-laration of =E2=80=98cpu_synchronize_post_reset=E2=80=99 [-Werror=3Dnested-=
-externs]
-> /home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98sigp_set_p=
-refix=E2=80=99:
-> /home/cohuck/git/qemu/target/s390x/kvm.c:1665:5: error: implicit declarat=
-ion of function =E2=80=98cpu_synchronize_post_init=E2=80=99 [-Werror=3Dimpl=
-icit-function-declaration]
->      cpu_synchronize_post_init(cs);
->      ^
-> /home/cohuck/git/qemu/target/s390x/kvm.c:1665:5: error: nested extern dec=
-laration of =E2=80=98cpu_synchronize_post_init=E2=80=99 [-Werror=3Dnested-e=
-xterns]
-> cc1: all warnings being treated as errors
-> /home/cohuck/git/qemu/rules.mak:64: recipe for target 'target/s390x/kvm.o=
-' failed
->
-> Fix this.
->
-> Fixes: b394662 ("kvm: move cpu synchronization code")
-> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-
-
-Acked-by: Vincent Palatin <vpalatin@chromium.org>
-
-Sorry for the miss.
-
-
->
-> ---
->  target/s390x/kvm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 3ac29f92b3..5ad0acbc82 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -32,7 +32,7 @@
->  #include "qemu/error-report.h"
->  #include "qemu/timer.h"
->  #include "sysemu/sysemu.h"
-> -#include "sysemu/kvm.h"
-> +#include "sysemu/hw_accel.h"
->  #include "hw/hw.h"
->  #include "sysemu/device_tree.h"
->  #include "qapi/qmp/qjson.h"
-> --
-> 2.11.0
->
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSB4ZW4tcGxhdGZvcm06IGRpc2sgdW5wbHVn
+IG1vZGlmaWNhdGlvbnMKTWVzc2FnZS1pZDogMTQ4NTI1NzAyMC0xODU0Mi0xLWdpdC1zZW5kLWVt
+YWlsLXBhdWwuZHVycmFudEBjaXRyaXguY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZv
+ciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAk
+KGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0t
+Zm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVu
+CiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25l
+CgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
+cGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg1MjU3
+MDIwLTE4NTQyLTEtZ2l0LXNlbmQtZW1haWwtcGF1bC5kdXJyYW50QGNpdHJpeC5jb20gLT4gcGF0
+Y2hldy8xNDg1MjU3MDIwLTE4NTQyLTEtZ2l0LXNlbmQtZW1haWwtcGF1bC5kdXJyYW50QGNpdHJp
+eC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkYmFiNmEwIHhlbi1wbGF0Zm9y
+bTogYWRkIG1pc3NpbmcgZGlzayB1bnBsdWcgb3B0aW9uCmE2MDYzYzcgeGVuLXBsYXRmb3JtOiBh
+ZGQgc3VwcG9ydCBmb3IgdW5wbHVnZ2luZyBOVk1lIGRpc2tzLi4uCjNlOGMyNmQgeGVuLXBsYXRm
+b3JtOiByZS1zdHJ1Y3R1cmUgdW5wbHVnX2Rpc2tzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVj
+a2luZyBQQVRDSCAxLzM6IHhlbi1wbGF0Zm9ybTogcmUtc3RydWN0dXJlIHVucGx1Z19kaXNrcy4u
+LgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
+dGVtZW50CiMzNjogRklMRTogaHcvaTM4Ni94ZW4veGVuX3BsYXRmb3JtLmM6MTEzOgorICAgIGlm
+ICghc3RyY21wKGQtPm5hbWUsICJ4ZW4tcGNpLXBhc3N0aHJvdWdoIikpClsuLi5dCgp0b3RhbDog
+MSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMzogeGVuLXBsYXRmb3JtOiBh
+ZGQgc3VwcG9ydCBmb3IgdW5wbHVnZ2luZyBOVk1lIGRpc2tzLi4uLi4uCkNoZWNraW5nIFBBVENI
+IDMvMzogeGVuLXBsYXRmb3JtOiBhZGQgbWlzc2luZyBkaXNrIHVucGx1ZyBvcHRpb24uLi4KPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
+cy5vcmc=
