@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVxXm-0003yN-IY
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:37:39 -0500
+	(envelope-from <berrange@redhat.com>) id 1cVxYu-00050L-Rc
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:38:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVxXl-0000DC-Lo
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:37:38 -0500
-Date: Tue, 24 Jan 2017 17:36:43 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170124093643.GA14811@lemon.Home>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-9-git-send-email-vsementsov@virtuozzo.com>
-	<20170124075949.GD27126@lemon.Home>
-	<22f99aae-0968-286f-186c-0eaefadbe649@virtuozzo.com>
+	(envelope-from <berrange@redhat.com>) id 1cVxYs-0000V8-3f
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:38:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44938)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVxYr-0000Uq-UA
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:38:46 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 14A5F7E9C5
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:38:46 +0000 (UTC)
+Date: Tue, 24 Jan 2017 09:38:40 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170124093840.GD14563@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170120164322.21851-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <22f99aae-0968-286f-186c-0eaefadbe649@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 08/21] backup: skip unallocated clusters
- for full mode
+In-Reply-To: <20170120164322.21851-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/17] aio_context_acquire/release pushdown, part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com, jcody@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha@redhat.com
 
-On Tue, 01/24 12:18, Vladimir Sementsov-Ogievskiy wrote:
-> 24.01.2017 10:59, Fam Zheng wrote:
-> > On Fri, 12/23 17:28, Vladimir Sementsov-Ogievskiy wrote:
-> > > diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-> > > index 1d3fd04..388b7b2 100755
-> > > --- a/tests/qemu-iotests/055
-> > > +++ b/tests/qemu-iotests/055
-> > > @@ -30,6 +30,7 @@ target_img = os.path.join(iotests.test_dir, 'target.img')
-> > >   blockdev_target_img = os.path.join(iotests.test_dir, 'blockdev-target.img')
-> > >   image_len = 64 * 1024 * 1024 # MB
-> > > +pause_write = '3M'
-> > >   def setUpModule():
-> > >       qemu_img('create', '-f', iotests.imgfmt, test_img, str(image_len))
-> > > @@ -39,6 +40,7 @@ def setUpModule():
-> > >       qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xd5 1M 32k', test_img)
-> > >       qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xdc 32M 124k', test_img)
-> > >       qemu_io('-f', iotests.imgfmt, '-c', 'write -P0x33 67043328 64k', test_img)
-> > > +    qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xdc 40M ' + pause_write, test_img)
-> > What does this iotest change do?
+On Fri, Jan 20, 2017 at 05:43:05PM +0100, Paolo Bonzini wrote:
+> This series pushes down aio_context_acquire/release to the point
+> where we can actually reason on using different fine-grained mutexes.
 > 
-> Without this backup block-job finishes before the next query to it from test
-> and test fails. This is a wide problem I suffer of on the way of backup
-> improvement and it should have better solution then adjusting amount of data
-> being copied...
+> The main infrastructure is introduced in patch 1.  The new API aio_co_wake
+> starts a coroutine with aio_context_acquire/release protection, which
+> requires tracking each coroutine's "home" AioContext.  aio_co_schedule
+> instead takes care of moving a sleeping coroutine to a different
+> AioContext, also ensuring that it runs under aio_context_acquire/release.
+> This is useful to implement bdrv_set_aio_context, as a simpler alternative
+> to bottom halves.  Even though one-shot BHs are already simpler than
+> what we had before, after this patch aio_co_wake and aio_co_schedule
+> save you from having to do aio_context_acquire/release explicitly.
+> 
+> After patch 2 to 4, which are just small preparatory changes, patches
+> 5 to 8 provide an example of how to use the new API.  In particular patch
+> 5 to 7 implement a new organization of coroutines in the NBD client,
+> which allows not blocking on partial reply header reads.
 
-You can use blkdebug to pause I/O before querying the block job, or simply
-throttle it down.
+FYI, I added my S-o-B to the two io: patches, so when this series is ready
+just include them in your main pull request - no need for me to take those
+io: patches separately.
 
-Fam
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
