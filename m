@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cVyDC-0007Kj-9w
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:20:27 -0500
+	(envelope-from <lersek@redhat.com>) id 1cVyGM-0001l6-SO
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:23:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cVyD8-0004Gs-9t
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:20:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50120)
+	(envelope-from <lersek@redhat.com>) id 1cVyGM-0005Zi-0m
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:23:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cVyD8-0004Gm-4R
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:20:22 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 24 Jan 2017 11:20:17 +0100
-Message-Id: <1485253217-7405-1-git-send-email-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cVyGL-0005ZK-Qn
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:23:41 -0500
+References: <58871f9b.d635240a.4cda6.5322@mx.google.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <237b1da5-532d-afd6-84ad-6adc5bd97291@redhat.com>
+Date: Tue, 24 Jan 2017 11:23:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] console: fix console resize
+In-Reply-To: <58871f9b.d635240a.4cda6.5322@mx.google.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] cirrus: fix oob access issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, 1658634@bugs.launchpad.net, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org, ghoffman@redhat.com
+Cc: liqiang6-s@360.cn
 
-Only skip surface reallocation in case the old surface was created using
-qemu_alloc_display (via qemu_create_displaysurface) too, otherwise we
-might end up with a DisplaySurface with the wrong backing storage.
+On 01/24/17 10:34, Li Qiang wrote:
+> From: Li Qiang <liqiang6-s@360.cn>
+> 
+> When doing bitblt copy in backward mode, minus the blt width first
+> to avoid an oob access issue.
+> 
+> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+> ---
+>  hw/display/cirrus_vga.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+> index 379910d..7ddd289 100644
+> --- a/hw/display/cirrus_vga.c
+> +++ b/hw/display/cirrus_vga.c
+> @@ -277,7 +277,8 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+>      }
+>      if (pitch < 0) {
+>          int64_t min = addr
+> -            + ((int64_t)s->cirrus_blt_height-1) * pitch;
+> +            + ((int64_t)s->cirrus_blt_height-1) * pitch
+> +            - s->cirrus_blt_width;
+>          int32_t max = addr
+>              + s->cirrus_blt_width;
+>          if (min < 0 || max > s->vga.vram_size) {
+> 
 
-Cc: 1658634@bugs.launchpad.net
-Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Fixes: cd958edb1fae85d0c7d1e1acbff82d22724e8d64
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/console.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I believe this is incorrect. In this case (AFAIR), "addr" points to the
+left-most pixel (= lowest address) of the bottom line (= highest
+address). This is why "max" is calculated the way it is -- to get the
+max address, just move to the right side of the same bottom line.
 
-diff --git a/ui/console.c b/ui/console.c
-index b9575f2..67c65b7 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -2121,7 +2121,7 @@ void qemu_console_resize(QemuConsole *s, int width,=
- int height)
-=20
-     assert(s->console_type =3D=3D GRAPHIC_CONSOLE);
-=20
--    if (s->surface &&
-+    if (s->surface && (surface->flags & QEMU_ALLOCATED_FLAG) &&
-         pixman_image_get_width(s->surface->image) =3D=3D width &&
-         pixman_image_get_height(s->surface->image) =3D=3D height) {
-         return;
---=20
-1.8.3.1
+Which then also means, in order to get the top left corner, you just
+need to subtract an integral multiple of the stride (you are already on
+the left side). Since the pitch is negative here, that means adding an
+integral multiple of the pitch.
+
+Finally, for a single-line blt, the bottom line is the only line, in
+which case we pitch multiplier should be (1 - 1) == 0.
+
+I think the code is correct as-is.
+
+Thanks
+Laszlo
