@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cW2P0-0000hE-4p
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:48:55 -0500
+	(envelope-from <berrange@redhat.com>) id 1cW2S8-0002va-3z
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cW2Oz-0001Jm-5L
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:48:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46370)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cW2Oy-0001JK-WA
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:48:53 -0500
-Date: Tue, 24 Jan 2017 16:48:49 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170124164751-mutt-send-email-mst@kernel.org>
-References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
-	<20170124114910.GD16400@pxdev.xzpeter.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170124114910.GD16400@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v5 00/18] VT-d: vfio enablement and misc
- enhances
+	(envelope-from <berrange@redhat.com>) id 1cW2S6-0002Bi-Rr
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:08 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue, 24 Jan 2017 14:51:36 +0000
+Message-Id: <20170124145152.22980-2-berrange@redhat.com>
+In-Reply-To: <20170124145152.22980-1-berrange@redhat.com>
+References: <20170124145152.22980-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/17] block: expose crypto option names /
+ defs to other drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +20,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Tue, Jan 24, 2017 at 07:49:10PM +0800, Peter Xu wrote:
-> On Tue, Jan 24, 2017 at 06:25:53PM +0800, Peter Xu wrote:
-> > This is v5 of vt-d vfio enablement series.
-> > 
-> > Most of the changes in v5 is not functionally, but related to
-> > comments, error_report()s, debugging, squashing patches, etc. (which
-> > are confirmed changes in v4), besides a tiny tweak when unmapping a
-> > whole address space (please see below changelog). There are still
-> > discussions in v4 thread, we can just continue there (or here), and
-> > from this version I'll remove RFC tag.
-> > 
-> > I didn't rebase to master since current master failed to build on my
-> > laptop (with a "vl.c/hax..." error), however this series should be
-> > okay to be applied cleanly upon it.
-> 
-> Sorry I forgot to append the todo list (please help adding in in case
-> I missed anything):
-> 
-> - don't need to notify IOTLB (psi/gsi/global) invalidations to devices
->   that with ATS enabled
-> - investigate when guest map page while mask contains existing mapped
->   pages (e.g. map 12k-16k first, then map 0-12k)
-> - coalesce unmap during page walk (currently, we send it once per
->   page)
-> - when do PSI for unmap, whether we can send one notify directly
->   instead of walking over the page table?
-> 
-> Above does not contain those that are still during discussion. And,
-> some of the entries still need tests to further prove it's
-> feasibility.
-> 
-> Thanks,
-> 
-> -- peterx
+The block/crypto.c defines a set of QemuOpts that provide
+parameters for encryption. This will also be needed by
+the qcow/qcow2 integration, so expose the relevant pieces
+in a new block/crypto.h header.
 
-While valid I don't think above need to block merging.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ block/crypto.c | 61 +++++++--------------------------------
+ block/crypto.h | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 102 insertions(+), 50 deletions(-)
+ create mode 100644 block/crypto.h
 
+diff --git a/block/crypto.c b/block/crypto.c
+index 7aa7eb5..d281de6 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -26,14 +26,7 @@
+ #include "qapi/opts-visitor.h"
+ #include "qapi-visit.h"
+ #include "qapi/error.h"
+-
+-#define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
+-#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
+-#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
+-#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG "ivgen-alg"
+-#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG "ivgen-hash-alg"
+-#define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
+-#define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
++#include "block/crypto.h"
+ 
+ typedef struct BlockCrypto BlockCrypto;
+ 
+@@ -135,11 +128,7 @@ static QemuOptsList block_crypto_runtime_opts_luks = {
+     .name = "crypto",
+     .head = QTAILQ_HEAD_INITIALIZER(block_crypto_runtime_opts_luks.head),
+     .desc = {
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
+-            .type = QEMU_OPT_STRING,
+-            .help = "ID of the secret that provides the encryption key",
+-        },
++        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
+         { /* end of list */ }
+     },
+ };
+@@ -154,47 +143,19 @@ static QemuOptsList block_crypto_create_opts_luks = {
+             .type = QEMU_OPT_SIZE,
+             .help = "Virtual disk size"
+         },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
+-            .type = QEMU_OPT_STRING,
+-            .help = "ID of the secret that provides the encryption key",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of encryption cipher algorithm",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of encryption cipher mode",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of IV generator algorithm",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of IV generator hash algorithm",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of encryption hash algorithm",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,
+-            .type = QEMU_OPT_NUMBER,
+-            .help = "Time to spend in PBKDF in milliseconds",
+-        },
++        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME,
+         { /* end of list */ }
+     },
+ };
+ 
+ 
+-static QCryptoBlockOpenOptions *
++QCryptoBlockOpenOptions *
+ block_crypto_open_opts_init(QCryptoBlockFormat format,
+                             QemuOpts *opts,
+                             Error **errp)
+@@ -240,7 +201,7 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
+ }
+ 
+ 
+-static QCryptoBlockCreateOptions *
++QCryptoBlockCreateOptions *
+ block_crypto_create_opts_init(QCryptoBlockFormat format,
+                               QemuOpts *opts,
+                               Error **errp)
+diff --git a/block/crypto.h b/block/crypto.h
+new file mode 100644
+index 0000000..e42f20e
+--- /dev/null
++++ b/block/crypto.h
+@@ -0,0 +1,91 @@
++/*
++ * QEMU block full disk encryption
++ *
++ * Copyright (c) 2015-2016 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef BLOCK_CRYPTO_H__
++#define BLOCK_CRYPTO_H__
++
++#define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
++#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
++#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
++#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG "ivgen-alg"
++#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG "ivgen-hash-alg"
++#define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
++#define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET                            \
++    {                                                                   \
++        .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,                       \
++        .type = QEMU_OPT_STRING,                                        \
++        .help = "ID of the secret that provides the keyslot passphrase", \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG               \
++    {                                                      \
++        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,          \
++        .type = QEMU_OPT_STRING,                           \
++        .help = "Name of encryption cipher algorithm",     \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE         \
++    {                                                 \
++        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,    \
++        .type = QEMU_OPT_STRING,                      \
++        .help = "Name of encryption cipher mode",     \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG           \
++    {                                                 \
++        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG,      \
++        .type = QEMU_OPT_STRING,                      \
++        .help = "Name of IV generator algorithm",     \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG                \
++    {                                                           \
++        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,           \
++        .type = QEMU_OPT_STRING,                                \
++        .help = "Name of IV generator hash algorithm",          \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG               \
++    {                                                    \
++        .name = BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,          \
++        .type = QEMU_OPT_STRING,                         \
++        .help = "Name of encryption hash algorithm",     \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME                   \
++    {                                                         \
++        .name = BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,              \
++        .type = QEMU_OPT_NUMBER,                              \
++        .help = "Time to spend in PBKDF in milliseconds",     \
++    }
++
++QCryptoBlockCreateOptions *
++block_crypto_create_opts_init(QCryptoBlockFormat format,
++                              QemuOpts *opts,
++                              Error **errp);
++
++QCryptoBlockOpenOptions *
++block_crypto_open_opts_init(QCryptoBlockFormat format,
++                            QemuOpts *opts,
++                            Error **errp);
++
++#endif /* BLOCK_CRYPTO_H__ */
 -- 
-MST
+2.9.3
