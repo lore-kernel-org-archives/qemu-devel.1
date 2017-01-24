@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW2SU-0003Hu-6p
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1cW2ST-0003Gk-M3
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW2ST-0002KH-8C
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:30 -0500
+	(envelope-from <berrange@redhat.com>) id 1cW2SQ-0002JT-R8
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:29 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 24 Jan 2017 14:51:45 +0000
-Message-Id: <20170124145152.22980-11-berrange@redhat.com>
+Date: Tue, 24 Jan 2017 14:51:42 +0000
+Message-Id: <20170124145152.22980-8-berrange@redhat.com>
 In-Reply-To: <20170124145152.22980-1-berrange@redhat.com>
 References: <20170124145152.22980-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 10/17] qcow2: make qcow2_encrypt_sectors
- encrypt in place
+Subject: [Qemu-devel] [PATCH v2 07/17] iotests: fix 097 when run with qcow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +22,497 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Instead of requiring separate input/output buffers for
-encrypting data, change qcow2_encrypt_sectors() to assume
-use of a single buffer, encrypting in place. The current
-callers all used the same buffer for input/output already.
+The previous commit:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+  commit a3e1505daec31ef56f0489f8c8fff1b8e4ca92bd
+  Author: Eric Blake <eblake@redhat.com>
+  Date:   Mon Dec 5 09:49:34 2016 -0600
+
+    qcow2: Don't strand clusters near 2G intervals during commit
+
+extended the 097 test case so that it did two passes, once
+with an internal snapshot, once without.
+
+qcow (v1) does not support internal snapshots, so this change
+broke test 097 when run against qcow.
+
+This splits 097 in two, creating a new 173 that tests the
+internal snapshot codepath, effectively putting 097 back
+to its content before the above commit.
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- block/qcow2-cluster.c | 17 ++++++-----------
- block/qcow2.c         |  4 ++--
- block/qcow2.h         |  3 +--
- 3 files changed, 9 insertions(+), 15 deletions(-)
+ tests/qemu-iotests/097     |  10 +---
+ tests/qemu-iotests/097.out | 125 ++------------------------------------------
+ tests/qemu-iotests/173     | 126 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/173.out | 119 ++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 5 files changed, 251 insertions(+), 130 deletions(-)
+ create mode 100755 tests/qemu-iotests/173
+ create mode 100644 tests/qemu-iotests/173.out
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 928c1e2..907e869 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -346,11 +346,9 @@ static int count_contiguous_clusters_by_type(int nb_clusters,
- }
+diff --git a/tests/qemu-iotests/097 b/tests/qemu-iotests/097
+index 4c33e80..1d28aff 100755
+--- a/tests/qemu-iotests/097
++++ b/tests/qemu-iotests/097
+@@ -56,26 +56,19 @@ _supported_os Linux
+ #  3: Two-layer backing chain, commit to lower backing file
+ #     (in this case, the top image will implicitly stay unchanged)
+ #
+-# Each pass is run twice, since qcow2 has different code paths for cleaning
+-# an image depending on whether it has a snapshot.
+-#
+ # 020 already tests committing, so this only tests whether image chains are
+ # working properly and that all images above the base are emptied; therefore,
+ # no complicated patterns are necessary.  Check near the 2G mark, as qcow2
+ # has been buggy at that boundary in the past.
+ for i in 0 1 2 3; do
+-for j in 0 1; do
  
- /* The crypt function is compatible with the linux cryptoloop
--   algorithm for < 4 GB images. NOTE: out_buf == in_buf is
--   supported */
-+   algorithm for < 4 GB images. */
- int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
--                          uint8_t *out_buf, const uint8_t *in_buf,
--                          int nb_sectors, bool enc,
-+                          uint8_t *buf, int nb_sectors, bool enc,
-                           Error **errp)
- {
-     union {
-@@ -370,14 +368,12 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
-         }
-         if (enc) {
-             ret = qcrypto_cipher_encrypt(s->cipher,
--                                         in_buf,
--                                         out_buf,
-+                                         buf, buf,
-                                          512,
-                                          errp);
-         } else {
-             ret = qcrypto_cipher_decrypt(s->cipher,
--                                         in_buf,
--                                         out_buf,
-+                                         buf, buf,
-                                          512,
-                                          errp);
-         }
-@@ -385,8 +381,7 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
-             return -1;
-         }
-         sector_num++;
--        in_buf += 512;
--        out_buf += 512;
-+        buf += 512;
-     }
-     return 0;
- }
-@@ -434,7 +429,7 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
-         assert(s->cipher);
-         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
-         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
--        if (qcow2_encrypt_sectors(s, sector, iov.iov_base, iov.iov_base,
-+        if (qcow2_encrypt_sectors(s, sector, iov.iov_base,
-                                   bytes >> BDRV_SECTOR_BITS, true, &err) < 0) {
-             ret = -EIO;
-             error_free(err);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 96fb8a8..3c14c86 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1530,7 +1530,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-                 Error *err = NULL;
-                 if (qcow2_encrypt_sectors(s, offset >> BDRV_SECTOR_BITS,
--                                          cluster_data, cluster_data,
-+                                          cluster_data,
-                                           cur_bytes >> BDRV_SECTOR_BITS,
-                                           false, &err) < 0) {
-                     error_free(err);
-@@ -1626,7 +1626,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-             qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
+ echo
+-echo "=== Test pass $i.$j ==="
++echo "=== Test pass $i ==="
+ echo
  
-             if (qcow2_encrypt_sectors(s, offset >> BDRV_SECTOR_BITS,
--                                      cluster_data, cluster_data,
-+                                      cluster_data,
-                                       cur_bytes >>BDRV_SECTOR_BITS,
-                                       true, &err) < 0) {
-                 error_free(err);
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 1823414..033d8c0 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -530,8 +530,7 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
- int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index);
- int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset);
- int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
--                          uint8_t *out_buf, const uint8_t *in_buf,
--                          int nb_sectors, bool enc, Error **errp);
-+                          uint8_t *buf, int nb_sectors, bool enc, Error **errp);
+ TEST_IMG="$TEST_IMG.base" _make_test_img 2100M
+ TEST_IMG="$TEST_IMG.itmd" _make_test_img -b "$TEST_IMG.base" 2100M
+ _make_test_img -b "$TEST_IMG.itmd" 2100M
+-if [ $j -eq 0 ]; then
+-    $QEMU_IMG snapshot -c snap "$TEST_IMG"
+-fi
  
- int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-                              unsigned int *bytes, uint64_t *cluster_offset);
+ $QEMU_IO -c 'write -P 1 0x7ffd0000 192k' "$TEST_IMG.base" | _filter_qemu_io
+ $QEMU_IO -c 'write -P 2 0x7ffe0000 128k' "$TEST_IMG.itmd" | _filter_qemu_io
+@@ -121,7 +114,6 @@ $QEMU_IMG map "$TEST_IMG.itmd" | _filter_qemu_img_map
+ $QEMU_IMG map "$TEST_IMG" | _filter_qemu_img_map
+ 
+ done
+-done
+ 
+ 
+ # success, all done
+diff --git a/tests/qemu-iotests/097.out b/tests/qemu-iotests/097.out
+index 8106cc9..81fc225 100644
+--- a/tests/qemu-iotests/097.out
++++ b/tests/qemu-iotests/097.out
+@@ -1,6 +1,6 @@
+ QA output created by 097
+ 
+-=== Test pass 0.0 ===
++=== Test pass 0 ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
+ Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
+@@ -29,66 +29,7 @@ Offset          Length          File
+ 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+ 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
+ 
+-=== Test pass 0.1 ===
+-
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
+-Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
+-wrote 196608/196608 bytes at offset 2147287040
+-192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote 131072/131072 bytes at offset 2147352576
+-128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote 65536/65536 bytes at offset 2147418112
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Image committed.
+-read 196608/196608 bytes at offset 2147287040
+-192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147287040
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147352576
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147418112
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Offset          Length          File
+-0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
+-Offset          Length          File
+-0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+-0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
+-Offset          Length          File
+-0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+-0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
+-
+-=== Test pass 1.0 ===
+-
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
+-Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
+-wrote 196608/196608 bytes at offset 2147287040
+-192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote 131072/131072 bytes at offset 2147352576
+-128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote 65536/65536 bytes at offset 2147418112
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Image committed.
+-read 196608/196608 bytes at offset 2147287040
+-192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147287040
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147352576
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147418112
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Offset          Length          File
+-0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
+-Offset          Length          File
+-0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+-0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
+-Offset          Length          File
+-0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+-0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
+-0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
+-
+-=== Test pass 1.1 ===
++=== Test pass 1 ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
+ Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
+@@ -118,7 +59,7 @@ Offset          Length          File
+ 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
+ 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
+ 
+-=== Test pass 2.0 ===
++=== Test pass 2 ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
+ Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
+@@ -148,65 +89,7 @@ Offset          Length          File
+ 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
+ 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
+ 
+-=== Test pass 2.1 ===
+-
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
+-Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
+-wrote 196608/196608 bytes at offset 2147287040
+-192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote 131072/131072 bytes at offset 2147352576
+-128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote 65536/65536 bytes at offset 2147418112
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Image committed.
+-read 196608/196608 bytes at offset 2147287040
+-192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147287040
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147352576
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147418112
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Offset          Length          File
+-0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
+-Offset          Length          File
+-0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+-0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
+-Offset          Length          File
+-0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+-0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
+-0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
+-
+-=== Test pass 3.0 ===
+-
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
+-Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
+-wrote 196608/196608 bytes at offset 2147287040
+-192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote 131072/131072 bytes at offset 2147352576
+-128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote 65536/65536 bytes at offset 2147418112
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Image committed.
+-read 65536/65536 bytes at offset 2147287040
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147352576
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 65536/65536 bytes at offset 2147418112
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Offset          Length          File
+-0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
+-Offset          Length          File
+-0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+-0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
+-Offset          Length          File
+-0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+-0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
+-0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
+-
+-=== Test pass 3.1 ===
++=== Test pass 3 ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
+ Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
+diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
+new file mode 100755
+index 0000000..9a70a87
+--- /dev/null
++++ b/tests/qemu-iotests/173
+@@ -0,0 +1,126 @@
++#!/bin/bash
++#
++# Commit changes into backing chains and empty the top image if the
++# backing image is not explicitly specified.
++#
++# Variant of 097, which includes snapshots to test different codepath
++# in qcow2
++#
++# Copyright (C) 2014 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=mreitz@redhat.com
++
++seq="$(basename $0)"
++echo "QA output created by $seq"
++
++here="$PWD"
++status=1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++    _rm_test_img "$TEST_IMG.itmd"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.pattern
++
++# Any format supporting backing files and bdrv_make_empty
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++
++# Four passes:
++#  0: Two-layer backing chain, commit to upper backing file (implicitly)
++#     (in this case, the top image will be emptied)
++#  1: Two-layer backing chain, commit to upper backing file (explicitly)
++#     (in this case, the top image will implicitly stay unchanged)
++#  2: Two-layer backing chain, commit to upper backing file (implicitly with -d)
++#     (in this case, the top image will explicitly stay unchanged)
++#  3: Two-layer backing chain, commit to lower backing file
++#     (in this case, the top image will implicitly stay unchanged)
++#
++# 020 already tests committing, so this only tests whether image chains are
++# working properly and that all images above the base are emptied; therefore,
++# no complicated patterns are necessary.  Check near the 2G mark, as qcow2
++# has been buggy at that boundary in the past.
++for i in 0 1 2 3; do
++
++echo
++echo "=== Test pass $i ==="
++echo
++
++TEST_IMG="$TEST_IMG.base" _make_test_img 2100M
++TEST_IMG="$TEST_IMG.itmd" _make_test_img -b "$TEST_IMG.base" 2100M
++_make_test_img -b "$TEST_IMG.itmd" 2100M
++$QEMU_IMG snapshot -c snap "$TEST_IMG"
++
++$QEMU_IO -c 'write -P 1 0x7ffd0000 192k' "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c 'write -P 2 0x7ffe0000 128k' "$TEST_IMG.itmd" | _filter_qemu_io
++$QEMU_IO -c 'write -P 3 0x7fff0000 64k' "$TEST_IMG" | _filter_qemu_io
++
++if [ $i -lt 3 ]; then
++    if [ $i == 0 ]; then
++        # -b "$TEST_IMG.itmd" should be the default (that is, committing to the
++        # first backing file in the chain)
++        $QEMU_IMG commit "$TEST_IMG"
++    elif [ $i == 1 ]; then
++        # explicitly specify the commit target (this should imply -d)
++        $QEMU_IMG commit -b "$TEST_IMG.itmd" "$TEST_IMG"
++    else
++        # do not explicitly specify the commit target, but use -d to leave the
++        # top image unchanged
++        $QEMU_IMG commit -d "$TEST_IMG"
++    fi
++
++    # Bottom should be unchanged
++    $QEMU_IO -c 'read -P 1 0x7ffd0000 192k' "$TEST_IMG.base" | _filter_qemu_io
++
++    # Intermediate should contain changes from top
++    $QEMU_IO -c 'read -P 1 0x7ffd0000 64k' "$TEST_IMG.itmd" | _filter_qemu_io
++    $QEMU_IO -c 'read -P 2 0x7ffe0000 64k' "$TEST_IMG.itmd" | _filter_qemu_io
++    $QEMU_IO -c 'read -P 3 0x7fff0000 64k' "$TEST_IMG.itmd" | _filter_qemu_io
++
++    # And in pass 0, the top image should be empty, whereas in both other passes
++    # it should be unchanged (which is both checked by qemu-img map)
++else
++    $QEMU_IMG commit -b "$TEST_IMG.base" "$TEST_IMG"
++
++    # Bottom should contain all changes
++    $QEMU_IO -c 'read -P 1 0x7ffd0000 64k' "$TEST_IMG.base" | _filter_qemu_io
++    $QEMU_IO -c 'read -P 2 0x7ffe0000 64k' "$TEST_IMG.base" | _filter_qemu_io
++    $QEMU_IO -c 'read -P 3 0x7fff0000 64k' "$TEST_IMG.base" | _filter_qemu_io
++
++    # Both top and intermediate should be unchanged
++fi
++
++$QEMU_IMG map "$TEST_IMG.base" | _filter_qemu_img_map
++$QEMU_IMG map "$TEST_IMG.itmd" | _filter_qemu_img_map
++$QEMU_IMG map "$TEST_IMG" | _filter_qemu_img_map
++
++done
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/173.out b/tests/qemu-iotests/173.out
+new file mode 100644
+index 0000000..5d16a11
+--- /dev/null
++++ b/tests/qemu-iotests/173.out
+@@ -0,0 +1,119 @@
++QA output created by 173
++
++=== Test pass 0 ===
++
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
++Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
++wrote 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 2147352576
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Image committed.
++read 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147287040
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147352576
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++
++=== Test pass 1 ===
++
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
++Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
++wrote 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 2147352576
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Image committed.
++read 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147287040
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147352576
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
++0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
++
++=== Test pass 2 ===
++
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
++Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
++wrote 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 2147352576
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Image committed.
++read 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147287040
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147352576
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
++0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
++
++=== Test pass 3 ===
++
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
++Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
++wrote 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 2147352576
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Image committed.
++read 65536/65536 bytes at offset 2147287040
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147352576
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
++0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 866c1a0..f5d7bc8 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -165,3 +165,4 @@
+ 170 rw auto quick
+ 171 rw auto quick
+ 172 auto
++173 rw auto backing
 -- 
 2.9.3
