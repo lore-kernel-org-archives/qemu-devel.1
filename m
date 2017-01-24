@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVxHg-0006tk-T4
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:21:02 -0500
+	(envelope-from <bounces@canonical.com>) id 1cVxHg-0006tm-Tk
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:21:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVxHd-000432-Mj
+	(envelope-from <bounces@canonical.com>) id 1cVxHe-00043O-9c
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:21:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47690)
+Received: from indium.canonical.com ([91.189.90.7]:47706)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cVxHd-00042t-Gn
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:20:57 -0500
+	id 1cVxHe-00042x-43
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:20:58 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cVxHb-0000Ni-5U
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:55 +0000
+	id 1cVxHc-0000Lf-0k
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 365CF2E80CA
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2C3952E80E0
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Jan 2017 09:06:56 -0000
+Date: Tue, 24 Jan 2017 09:12:24 -0000
 From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
 Reply-To: Bug 1658634 <1658634@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170123095738.20994.7212.malonedeb@gac.canonical.com>
-Message-Id: <20170124090656.12428.9471.malone@gac.canonical.com>
+Message-Id: <20170124091224.12494.69692.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1658634] Re: Can't get correct display with
  latest QEMU and OVMF BIOS
@@ -39,37 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I downloaded "ubuntu-16.04.1-desktop-amd64.iso" (MD5:
-17643c29e3c4609818f26becf76d29a3), and I can reproduce the issue -- the
-grub2 display is corrupt. (I didn't even look further than that.) I also
-confirm that it works fine with the same firmware, but using QEMU 2.7.
-
-Here's the result of the bisection:
-
-cd958edb1fae85d0c7d1e1acbff82d22724e8d64 is the first bad commit
-commit cd958edb1fae85d0c7d1e1acbff82d22724e8d64
-Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Date:   Fri Aug 26 13:47:11 2016 +0400
-
-    console: skip same-size resize
-    =
-
-    virtio-gpu does a set-scanout at each frame (it might be a driver
-    regression). qemu_console_resize() recreate a surface even if the size
-    didn't change, and this shows up in profiling reports because the
-    surface is cleared. With this patch, I get a +15-20% glmark2
-    improvement.
-    =
-
-    Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-    Message-id: 20160826094711.14470-1-marcandre.lureau@redhat.com
-    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-If I revert this commit on top of current master -- it reverts cleanly
--- then the grub2 screen displays fine again.
-
-** Changed in: qemu
-       Status: New =3D> Confirmed
+Added Marc-Andr=C3=A9 and Gerd to the CC list.
 
 -- =
 
