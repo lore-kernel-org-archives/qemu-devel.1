@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cVxZ5-00059C-7q
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:39:00 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cVxZv-0005ox-4J
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:39:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cVxZ0-0000Xe-8q
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:38:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cVxZ0-0000XU-3e
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:38:54 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 466CA3A76B2
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:38:54 +0000 (UTC)
-References: <20170120164322.21851-1-pbonzini@redhat.com>
-	<20170120164322.21851-7-pbonzini@redhat.com>
-	<20170124093619.GC14563@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e4da0456-32eb-0a26-07d3-46c7c9dfa4fd@redhat.com>
-Date: Tue, 24 Jan 2017 10:38:51 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170124093619.GC14563@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/17] io: make qio_channel_yield aware of
- AioContexts
+	(envelope-from <mjt@tls.msk.ru>) id 1cVxZn-0000hu-6V
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:39:51 -0500
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Tue, 24 Jan 2017 12:39:05 +0300
+Message-Id: <b26a6a65fd0b46a18a9d23ef3867b5e9d3a5469c.1485250702.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
+References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
+References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
+Subject: [Qemu-devel] [PULL 01/31] doc: don't mention -memory, it is -m
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +21,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
 
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+---
+ qemu-options.hx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-On 24/01/2017 10:36, Daniel P. Berrange wrote:
-> On Fri, Jan 20, 2017 at 05:43:11PM +0100, Paolo Bonzini wrote:
->> Support separate coroutines for reading and writing, and place the
->> read/write handlers on the AioContext that the QIOChannel is registered
->> with.
->>
->> Cc: Daniel P. Berrange <berrange@redhat.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>         v1->v2:
->>         improved qio_channel_set_aio_context docs, renamed to
->>                 qio_channel_attach_aio_context [Daniel, Stefan]
->>         fixed pasto in "io: make qio_channel_yield aware of AioContexts"
->>
->>  include/io/channel.h | 47 ++++++++++++++++++++++++++--
->>  io/channel.c         | 86 +++++++++++++++++++++++++++++++++++++++-------------
->>  2 files changed, 109 insertions(+), 24 deletions(-)
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-
-I suppose you mean either Reviewed-by or Acked-by? :)
-
-Anyway, thanks for the reviews!
-
-Paolo
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 80df526..232f737 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -250,7 +250,7 @@ use is discouraged as it may be removed from future versions.
+ ETEXI
+ 
+ DEF("m", HAS_ARG, QEMU_OPTION_m,
+-    "-m[emory] [size=]megs[,slots=n,maxmem=size]\n"
++    "-m [size=]megs[,slots=n,maxmem=size]\n"
+     "                configure guest RAM\n"
+     "                size: initial amount of guest memory\n"
+     "                slots: number of hotplug slots (default: none)\n"
+-- 
+2.1.4
