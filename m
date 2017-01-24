@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cW64D-0006o8-4T
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:43:42 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cW68B-0001Gi-Li
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:47:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cW64C-0005bW-94
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:43:41 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
-	<1485164923-17736-7-git-send-email-armbru@redhat.com>
-	<2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com>
-	<877f5l1tak.fsf@dusky.pond.sub.org>
-	<3512807d-d04e-50fa-9fcf-d1d5ba8ac350@redhat.com>
-	<87r33saa6p.fsf@dusky.pond.sub.org>
-	<4cd45561-60e9-2cd2-e317-880ba9eb2f86@redhat.com>
-	<87fuk82x48.fsf@dusky.pond.sub.org>
-	<CAFEAcA_oBmrMGsuT8=a51eOkBDQ-Rrr4tAhi5oMGxMzb-PiVwg@mail.gmail.com>
-	<6d55bfe0-20f3-d153-910b-7c28fd74f6ab@redhat.com>
-	<CAFEAcA_Ugd+4C8yoaWbK7nR+U3NOzJPHQKmg_47kC40qdq9qgA@mail.gmail.com>
-Date: Tue, 24 Jan 2017 19:43:32 +0100
-In-Reply-To: <CAFEAcA_Ugd+4C8yoaWbK7nR+U3NOzJPHQKmg_47kC40qdq9qgA@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 24 Jan 2017 17:58:38 +0000")
-Message-ID: <8737g8z4bv.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
- lsi53c895a SCSI HBAs
+	(envelope-from <dgilbert@redhat.com>) id 1cW689-0006n0-HP
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:47:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cW689-0006mP-Bm
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:47:45 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7366F341ACA
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 18:47:45 +0000 (UTC)
+Received: from dgilbert-t530.redhat.com (ovpn-116-204.ams2.redhat.com
+	[10.36.116.204])
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v0OIlhUn020536
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 13:47:44 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue, 24 Jan 2017 18:47:28 +0000
+Message-Id: <20170124184742.1639-2-dgilbert@redhat.com>
+In-Reply-To: <20170124184742.1639-1-dgilbert@redhat.com>
+References: <20170124184742.1639-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 01/15] MAINTAINERS: Add myself as a migration
+ submaintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +35,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> On 24 January 2017 at 17:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> But is really lsi53c895a the best we can provide for
->> versatilepb/versatileab/realview-eb/realview-eb-mpcore? Could virtio-pci
->> work well too?...
->
-> I assume that people will still have legacy kernel images
-> which include the LSI drivers but not the virtio-pci drivers.
-> versatilepb in particular is pretty widely used as an example
-> ARM QEMU system (it was the sanest one before virt came along),
-> so there's a good chance of breaking a bunch of tutorials
-> and old images if you stop creating LSI devices.
->
-> More generally, I'd rather not spend any time at all messing
-> about with these old board models if they're not actually broken.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Amit Shah <amit.shah@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <20170124100437.18200-1-dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-Okay, I'll keep adding lsi devices for if=scsi drives with these four
-machine types.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6a3df66..e41271c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1420,6 +1420,7 @@ F: scripts/checkpatch.pl
+ Migration
+ M: Juan Quintela <quintela@redhat.com>
+ M: Amit Shah <amit.shah@redhat.com>
++M: Dr. David Alan Gilbert <dgilbert@redhat.com>
+ S: Maintained
+ F: include/migration/
+ F: migration/
+-- 
+2.9.3
