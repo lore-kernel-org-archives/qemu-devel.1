@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cW46J-00026R-1G
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:37:44 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cW4Bt-0005SU-Az
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:43:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cW46F-00071y-4n
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:37:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36328)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cW46E-00071U-Uv
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:37:39 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E82BDC04BD30
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 16:37:38 +0000 (UTC)
-Date: Tue, 24 Jan 2017 18:37:36 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170124183634-mutt-send-email-mst@kernel.org>
-References: <20170120170757.30308-1-pbonzini@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cW4Bp-0000fP-Dt
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:43:29 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38665)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cW4Bp-0000ev-6p
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:43:25 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id r144so218326343wme.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 08:43:24 -0800 (PST)
+References: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
+	<1484937883-1068-4-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1484937883-1068-4-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 24 Jan 2017 16:43:22 +0000
+Message-ID: <87tw8o9zo5.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170120170757.30308-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] virtio: use MemoryRegionCache for
- descriptors and rings
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/6] armv7m: Explicit error for
+ bad vector table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>, patches@linaro.org
 
-On Fri, Jan 20, 2017 at 06:07:50PM +0100, Paolo Bonzini wrote:
-> Patch posted during 2.8 hard freeze.  Quick measurements give a 10%
-> performance improvement on various virtio-blk benchmarks, but the machine
-> I used seems to love my patches particularly today!
-> 
-> Paolo
 
-Looks nice to me. I'll apply patch 1 as you are
-still tweaking the rest of the series.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> Paolo Bonzini (7):
->   virtio: make virtio_should_notify static
->   virtio: add virtio_*_phys_cached
->   virtio: use address_space_map/unmap to access descriptors
->   virtio: use MemoryRegionCache to access descriptors
->   virtio: add MemoryListener to cache ring translations
->   virtio: use VRingMemoryRegionCaches for descriptor ring
->   virtio: use VRingMemoryRegionCaches for avail and used rings
-> 
->  hw/net/virtio-net.c               |  14 +-
->  hw/virtio/virtio.c                | 322 ++++++++++++++++++++++++++++++--------
->  include/hw/virtio/virtio-access.h |  52 ++++++
->  include/hw/virtio/virtio.h        |   2 +-
->  4 files changed, 322 insertions(+), 68 deletions(-)
-> 
-> -- 
-> 2.9.3
+> From: Michael Davidsaver <mdavidsaver@gmail.com>
+>
+> Give an explicit error and abort when a load
+> from the vector table fails. Architecturally this
+> should HardFault (which will then immediately
+> fail to load the HardFault vector and go into Lockup).
+> Since we don't model Lockup, just report this guest
+> error via cpu_abort(). This is more helpful than the
+> previous behaviour of reading a zero, which is the
+> address of the reset stack pointer and not a sensible
+> location to jump to.
+
+Word wrap has gone a little aggressive in the commit message ;-)
+
+>
+> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> [PMM: expanded commit message]
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 26 +++++++++++++++++++++++++-
+>  1 file changed, 25 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index ad23de3..8edb08c 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6014,6 +6014,30 @@ static void arm_log_exception(int idx)
+>      }
+>  }
+>
+> +static uint32_t arm_v7m_load_vector(ARMCPU *cpu)
+> +
+> +{
+> +    CPUState *cs = CPU(cpu);
+> +    CPUARMState *env = &cpu->env;
+> +    MemTxResult result;
+> +    hwaddr vec = env->v7m.vecbase + env->v7m.exception * 4;
+> +    uint32_t addr;
+> +
+> +    addr = address_space_ldl(cs->as, vec,
+> +                             MEMTXATTRS_UNSPECIFIED, &result);
+> +    if (result != MEMTX_OK) {
+> +        /* Architecturally this should cause a HardFault setting HSFR.VECTTBL,
+> +         * which would then be immediately followed by our failing to load
+> +         * the entry vector for that HardFault, which is a Lockup case.
+> +         * Since we don't model Lockup, we just report this guest error
+> +         * via cpu_abort().
+> +         */
+> +        cpu_abort(cs, "Failed to read from exception vector table "
+> +                  "entry %08x\n", (unsigned)vec);
+> +    }
+> +    return addr;
+> +}
+> +
+>  void arm_v7m_cpu_do_interrupt(CPUState *cs)
+>  {
+>      ARMCPU *cpu = ARM_CPU(cs);
+> @@ -6095,7 +6119,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+>      /* Clear IT bits */
+>      env->condexec_bits = 0;
+>      env->regs[14] = lr;
+> -    addr = ldl_phys(cs->as, env->v7m.vecbase + env->v7m.exception * 4);
+> +    addr = arm_v7m_load_vector(cpu);
+>      env->regs[15] = addr & 0xfffffffe;
+>      env->thumb = addr & 1;
+>  }
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+--
+Alex Bennée
