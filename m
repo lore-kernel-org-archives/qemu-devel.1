@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVvkV-00085P-Ha
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:42:40 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cVvlA-0000Em-0j
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:43:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVvkS-0004Tp-EX
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:42:39 -0500
-References: <1484927639-3841-1-git-send-email-thuth@redhat.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <0c562336-31a8-5347-1123-810543563fd5@msgid.tls.msk.ru>
-Date: Tue, 24 Jan 2017 10:42:27 +0300
+	(envelope-from <no-reply@patchew.org>) id 1cVvl1-00051v-If
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:43:19 -0500
+Resent-Message-Id: <E1cVvl1-00051v-If@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21385)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cVvl1-0004zx-7w
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:43:11 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170124071654.4572.41407.stgit@PASHA-ISP>
+Message-ID: <148524378599.27.14951489771456908223@eba24e3a0d7f>
 MIME-Version: 1.0
-In-Reply-To: <1484927639-3841-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=windows-1251
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/isa/isa-bus: Set category of the
- "isabus-bridge" device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 23 Jan 2017 23:43:07 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v7 00/14] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: pavel.dovgaluk@ispras.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
 
-20.01.2017 18:53, Thomas Huth wrote:
-> It has "bridge" in its name, so it should be in the category
-> DEVICE_CATEGORY_BRIDGE.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/isa/isa-bus.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-> index 9d07b11..0ffbc8d 100644
-> --- a/hw/isa/isa-bus.c
-> +++ b/hw/isa/isa-bus.c
-> @@ -219,6 +219,7 @@ static void isabus_bridge_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->  
-> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->      dc->fw_name = "isa";
->  }
-
-Does it have any effect on the guest?
-ISA is an old thing...
-
-Thanks,
-
-/mjt
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMDAvMTRdIHJlcGxheSBhZGRpdGlvbnMKTWVz
+c2FnZS1pZDogMjAxNzAxMjQwNzE2NTQuNDU3Mi40MTQwNy5zdGdpdEBQQVNIQS1JU1AKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
+aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQg
+b3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
+IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
+a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
+ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
+IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
+cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0
+ZV0gICAgICBwYXRjaGV3LzE0ODUyMDcxNDEtMTk0MS0xLWdpdC1zZW5kLWVtYWlsLXF1aW50ZWxh
+QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNDg1MjA3MTQxLTE5NDEtMS1naXQtc2VuZC1lbWFpbC1x
+dWludGVsYUByZWRoYXQuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxNjA5MDgx
+NDUxNTguMzA3MjAtMS1wYXVsLmJ1cnRvbkBpbWd0ZWMuY29tIC0+IHBhdGNoZXcvMjAxNjA5MDgx
+NDUxNTguMzA3MjAtMS1wYXVsLmJ1cnRvbkBpbWd0ZWMuY29tCiAqIFtuZXcgdGFnXSAgICAgICAg
+IHBhdGNoZXcvMjAxNzAxMjQwNzE2NTQuNDU3Mi40MTQwNy5zdGdpdEBQQVNIQS1JU1AgLT4gcGF0
+Y2hldy8yMDE3MDEyNDA3MTY1NC40NTcyLjQxNDA3LnN0Z2l0QFBBU0hBLUlTUApTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjAxOTFiM2MgcmVwbGF5OiBhZGQgcmVjb3JkL3JlcGxheSBm
+b3IgYXVkaW8gcGFzc3Rocm91Z2gKY2E1MzJjNSBhdWRpbzogbWFrZSBhdWRpbyBwb2xsIHRpbWVy
+IGRldGVybWluaXN0aWMKODY5MDQwOCByZXBsYXk6IGRpc2FibGUgZGVmYXVsdCBzbmFwc2hvdCBm
+b3IgcmVjb3JkL3JlcGxheQoyZDExMTMxIGJsa3JlcGxheTogY3JlYXRlIHRlbXBvcmFyeSBvdmVy
+bGF5IGZvciB1bmRlcmxheWluZyBkZXZpY2VzCjdkNDcxYjEgYmxvY2s6IGltcGxlbWVudCBiZHJ2
+X3NuYXBzaG90X2dvdG8gZm9yIGJsa3JlcGxheQplYWI4ZWY1IHJlcGxheTogc2F2ZS9sb2FkIGlu
+aXRpYWwgc3RhdGUKODcwZmJmMSBzYXZldm06IGFkZCBwdWJsaWMgc2F2ZV92bXN0YXRlIGZ1bmN0
+aW9uCmFmZjdkMDIgaW50ZWdyYXRvcmNwOiBhZGRpbmcgdm1zdGF0ZSBmb3Igc2F2ZS9yZXN0b3Jl
+CmY2MDQ4MDMgcmVwbGF5OiBkb24ndCB1c2UgcnRjIGNsb2NrIG9uIGxvYWR2bSBwaGFzZQpiMDFi
+OWYyIGFwaWM6IHNhdmUgYXBpY19kZWxpdmVyZWQgZmxhZwowNmI0Mzg0IGljb3VudDogZXhpdCBj
+cHUgbG9vcCBvbiBleHBpcmUKODk5NWEwMSByZXBsYXk6IGV4Y2VwdGlvbiByZXBsYXkgZml4CjFk
+ZTJiNjMgcmVwbGF5OiBpbXByb3ZlIGludGVycnVwdCBoYW5kbGluZwo4NGI5MDQ5IGljb3VudDog
+dXBkYXRlIGluc3RydWN0aW9uIGNvdW50ZXIgb24gYXBpYyBwYXRjaGluZwoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xNDogaWNvdW50OiB1cGRhdGUgaW5zdHJ1Y3Rpb24g
+Y291bnRlciBvbiBhcGljIHBhdGNoaW5nLi4uCkNoZWNraW5nIFBBVENIIDIvMTQ6IHJlcGxheTog
+aW1wcm92ZSBpbnRlcnJ1cHQgaGFuZGxpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xNDogcmVwbGF5
+OiBleGNlcHRpb24gcmVwbGF5IGZpeC4uLgpDaGVja2luZyBQQVRDSCA0LzE0OiBpY291bnQ6IGV4
+aXQgY3B1IGxvb3Agb24gZXhwaXJlLi4uCkNoZWNraW5nIFBBVENIIDUvMTQ6IGFwaWM6IHNhdmUg
+YXBpY19kZWxpdmVyZWQgZmxhZy4uLgpDaGVja2luZyBQQVRDSCA2LzE0OiByZXBsYXk6IGRvbid0
+IHVzZSBydGMgY2xvY2sgb24gbG9hZHZtIHBoYXNlLi4uCkNoZWNraW5nIFBBVENIIDcvMTQ6IGlu
+dGVncmF0b3JjcDogYWRkaW5nIHZtc3RhdGUgZm9yIHNhdmUvcmVzdG9yZS4uLgpDaGVja2luZyBQ
+QVRDSCA4LzE0OiBzYXZldm06IGFkZCBwdWJsaWMgc2F2ZV92bXN0YXRlIGZ1bmN0aW9uLi4uCkNo
+ZWNraW5nIFBBVENIIDkvMTQ6IHJlcGxheTogc2F2ZS9sb2FkIGluaXRpYWwgc3RhdGUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTAvMTQ6IGJsb2NrOiBpbXBsZW1lbnQgYmRydl9zbmFwc2hvdF9nb3RvIGZv
+ciBibGtyZXBsYXkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTQ6IGJsa3JlcGxheTogY3JlYXRlIHRl
+bXBvcmFyeSBvdmVybGF5IGZvciB1bmRlcmxheWluZyBkZXZpY2VzLi4uCkNoZWNraW5nIFBBVENI
+IDEyLzE0OiByZXBsYXk6IGRpc2FibGUgZGVmYXVsdCBzbmFwc2hvdCBmb3IgcmVjb3JkL3JlcGxh
+eS4uLgpDaGVja2luZyBQQVRDSCAxMy8xNDogYXVkaW86IG1ha2UgYXVkaW8gcG9sbCB0aW1lciBk
+ZXRlcm1pbmlzdGljLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24g
+bmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzIzOiBGSUxFOiBhdWRpby9hdWRpby5jOjEx
+MTY6CisgICAgICAgICAgICB0aW1lcl9tb2QgKHMtPnRzLAoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCAxMiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgpDaGVja2luZyBQQVRDSCAxNC8xNDogcmVwbGF5OiBhZGQgcmVjb3JkL3JlcGxheSBm
+b3IgYXVkaW8gcGFzc3Rocm91Z2guLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
+dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNDE6IEZJTEU6IGF1ZGlvL2F1
+ZGlvLmM6MTQ2MDoKKyAgICAgICAgICAgIGNhcHR1cmVkID0gaHctPnBjbV9vcHMtPnJ1bl9pbiAo
+aHcpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxOTAgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
