@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cW3tc-0000SN-NW
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:24:38 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cW3uu-0001Wx-Ej
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:25:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cW3tX-0003QQ-P0
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:24:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56974)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cW3tX-0003QM-GA
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:24:31 -0500
-Date: Tue, 24 Jan 2017 09:24:29 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170124092429.241a4eaf@t450s.home>
-In-Reply-To: <20170124072215.GN26526@pxdev.xzpeter.org>
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-19-git-send-email-peterx@redhat.com>
-	<490bbb84-213b-1b2a-5a1b-fa42a5c6a359@redhat.com>
-	<20170122090425.GB26526@pxdev.xzpeter.org>
-	<1dd223d1-dc02-bddc-02ea-78d267dd40a4@redhat.com>
-	<20170123033429.GF26526@pxdev.xzpeter.org>
-	<20170123110308.5d36ce87@t450s.home>
-	<20170124072215.GN26526@pxdev.xzpeter.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1cW3up-0003eX-FN
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:25:56 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:37431)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cW3up-0003eE-5E
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:25:51 -0500
+Received: by mail-wm0-x233.google.com with SMTP id c206so217927539wme.0
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 08:25:51 -0800 (PST)
+References: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
+	<1484937883-1068-2-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1484937883-1068-2-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 24 Jan 2017 16:25:47 +0000
+Message-ID: <87wpdka0hg.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v4 18/20] intel_iommu: enable vfio
- devices
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/6] armv7m: MRS/MSR: handle
+ unprivileged access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,155 +31,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>, patches@linaro.org
 
-On Tue, 24 Jan 2017 15:22:15 +0800
-Peter Xu <peterx@redhat.com> wrote:
 
-> On Mon, Jan 23, 2017 at 11:03:08AM -0700, Alex Williamson wrote:
-> > On Mon, 23 Jan 2017 11:34:29 +0800
-> > Peter Xu <peterx@redhat.com> wrote:
-> >  =20
-> > > On Mon, Jan 23, 2017 at 09:55:39AM +0800, Jason Wang wrote: =20
-> > > >=20
-> > > >=20
-> > > > On 2017=E5=B9=B401=E6=9C=8822=E6=97=A5 17:04, Peter Xu wrote:   =20
-> > > > >On Sun, Jan 22, 2017 at 04:08:04PM +0800, Jason Wang wrote:
-> > > > >
-> > > > >[...]
-> > > > >   =20
-> > > > >>>+static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-> > > > >>>+                                           uint16_t domain_id, =
-hwaddr addr,
-> > > > >>>+                                           uint8_t am)
-> > > > >>>+{
-> > > > >>>+    IntelIOMMUNotifierNode *node;
-> > > > >>>+    VTDContextEntry ce;
-> > > > >>>+    int ret;
-> > > > >>>+
-> > > > >>>+    QLIST_FOREACH(node, &(s->notifiers_list), next) {
-> > > > >>>+        VTDAddressSpace *vtd_as =3D node->vtd_as;
-> > > > >>>+        ret =3D vtd_dev_to_context_entry(s, pci_bus_num(vtd_as-=
->bus),
-> > > > >>>+                                       vtd_as->devfn, &ce);
-> > > > >>>+        if (!ret && domain_id =3D=3D VTD_CONTEXT_ENTRY_DID(ce.h=
-i)) {
-> > > > >>>+            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAG=
-E_SIZE,
-> > > > >>>+                          vtd_page_invalidate_notify_hook,
-> > > > >>>+                          (void *)&vtd_as->iommu, true);   =20
-> > > > >>Why not simply trigger the notifier here? (or is this vfio requir=
-ed?)   =20
-> > > > >Because we may only want to notify part of the region - we are with
-> > > > >mask here, but not exact size.
-> > > > >
-> > > > >Consider this: guest (with caching mode) maps 12K memory (4K*3 pag=
-es),
-> > > > >the mask will be extended to 16K in the guest. In that case, we ne=
-ed
-> > > > >to explicitly go over the page entry to know that the 4th page sho=
-uld
-> > > > >not be notified.   =20
-> > > >=20
-> > > > I see. Then it was required by vfio only, I think we can add a fast=
- path for
-> > > > !CM in this case by triggering the notifier directly.   =20
-> > >=20
-> > > I noted this down (to be further investigated in my todo), but I don't
-> > > know whether this can work, due to the fact that I think it is still
-> > > legal that guest merge more than one PSIs into one. For example, I
-> > > don't know whether below is legal:
-> > >=20
-> > > - guest invalidate page (0, 4k)
-> > > - guest map new page (4k, 8k)
-> > > - guest send single PSI of (0, 8k)
-> > >=20
-> > > In that case, it contains both map/unmap, and looks like it didn't
-> > > disobay the spec as well? =20
-> >=20
-> > The topic of mapping and invalidation granularity also makes me
-> > slightly concerned with the abstraction we use for the type1 IOMMU
-> > backend.  With the "v2" type1 configuration we currently use in QEMU,
-> > the user may only unmap with the same minimum granularity with which
-> > the original mapping was created.  For instance if an iommu notifier
-> > map request gets to vfio with an 8k range, the resulting mapping can
-> > only be removed by an invalidation covering the full range.  Trying to
-> > bisect that original mapping by only invalidating 4k of the range will
-> > generate an error. =20
->=20
-> I see. Then this will be an strict requirement that we cannot do
-> coalescing during page walk, at least for mappings.
->=20
-> I didn't notice this before, but luckily current series is following
-> the rule above - we are basically doing the mapping in the unit of
-> pages. Normally, we should always be mapping with 4K pages, only if
-> guest provides huge pages in the VT-d page table, would we notify map
-> with >4K, though of course it can be either 2M/1G but never other
-> values.
->=20
-> The point is, guest should be aware of the existance of the above huge
-> pages, so it won't unmap (for example) a single 4k region within a 2M
-> huge page range. It'll either keep the huge page, or unmap the whole
-> huge page. In that sense, we are quite safe.
->=20
-> (for my own curiousity and out of topic: could I ask why we can't do
->  that? e.g., we map 4K*2 pages, then we unmap the first 4K page?)
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-You understand why we can't do this in the hugepage case, right?  A
-hugepage means that at least one entire level of the page table is
-missing and that in order to unmap a subsection of it, we actually need
-to replace it with a new page table level, which cannot be done
-atomically relative to the rest of the PTEs in that entry.  Now what if
-we don't assume that hugepages are only the Intel defined 2MB & 1GB?
-AMD-Vi supports effectively arbitrary power of two page table entries.
-So what if we've passed a 2x 4K mapping where the physical pages were
-contiguous and vfio passed it as a direct 8K mapping to the IOMMU and
-the IOMMU has native support for 8K mappings.  We're in a similar
-scenario as the 2MB page, different page table layout though.
+> From: Michael Davidsaver <mdavidsaver@gmail.com>
+>
+> The MRS and MSR instruction handling has a number of flaws:
+>  * unprivileged accesses should only be able to read
+>    CONTROL and the xPSR subfields, and only write APSR
+>    (others RAZ/WI)
+>  * privileged access should not be able to write xPSR
+>    subfields other than APSR
+>  * accesses to unimplemented registers should log as
+>    guest errors, not abort QEMU
+>
+> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> [PMM: rewrote commit message]
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 79 +++++++++++++++++++++++++----------------------------
+>  1 file changed, 37 insertions(+), 42 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 7111c8c..ad23de3 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -8243,23 +8243,32 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
+>
+>  uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+>  {
+> -    ARMCPU *cpu = arm_env_get_cpu(env);
+> +    uint32_t mask;
+> +    unsigned el = arm_current_el(env);
+> +
+> +    /* First handle registers which unprivileged can read */
+> +
+> +    switch (reg) {
+> +    case 0 ... 7: /* xPSR sub-fields */
 
-> > I would think (but please confirm), that when we're only tracking
-> > mappings generated by the guest OS that this works.  If the guest OS
-> > maps with 4k pages, we get map notifies for each of those 4k pages.  If
-> > they use 2MB pages, we get 2MB ranges and invalidations will come in
-> > the same granularity. =20
->=20
-> I would agree (I haven't thought of a case that this might be a
-> problem).
->=20
-> >=20
-> > An area of concern though is the replay mechanism in QEMU, I'll need to
-> > look for it in the code, but replaying an IOMMU domain into a new
-> > container *cannot* coalesce mappings or else it limits the granularity
-> > with which we can later accept unmaps. Take for instance a guest that
-> > has mapped a contiguous 2MB range with 4K pages.  They can unmap any 4K
-> > page within that range.  However if vfio gets a single 2MB mapping
-> > rather than 512 4K mappings, then the host IOMMU may use a hugepage
-> > mapping where our granularity is now 2MB.  Thanks, =20
->=20
-> Is this the answer of my above question (which is for my own
-> curiosity)? If so, that'll kind of explain.
->=20
-> If it's just because vfio is smart enough on automatically using huge
-> pages when applicable (I believe it's for performance's sake), not
-> sure whether we can introduce a ioctl() to setup the iova_pgsizes
-> bitmap, as long as it is a subset of supported iova_pgsizes (from
-> VFIO_IOMMU_GET_INFO) - then when people wants to get rid of above
-> limitation, they can explicitly set the iova_pgsizes to only allow 4K
-> pages.
->=20
-> But, of course, this series can live well without it at least for now.
+This reads a little confusingly compared to the pseudo-code in the ARM
+ARM. Would it be clearer if we just went:
 
-Yes, this is part of how vfio transparently makes use of hugepages in
-the IOMMU, we effectively disregard the supported page sizes bitmap
-(it's useless for anything other than determining the minimum page size
-anyway), and instead pass through the largest range of iovas which are
-physically contiguous.  The IOMMU driver can then make use of hugepages
-where available.  The VFIO_IOMMU_MAP_DMA ioctl does include a flags
-field where we could appropriate a bit to indicate map with minimum
-granularity, but that would not be as simple as triggering the
-disable_hugepages mapping path because the type1 driver would also need
-to flag the internal vfio_dma as being bisectable, if not simply
-converted to multiple vfio_dma structs internally.  Thanks,
+  switch(extract32(reg, 3, 5)) {
+    case 0: /* xPSR */
+    ...
+    case 1: /* SP */
+    ...
+    case 2: /* Priority Mask or CONTROL.. */
+    ...
+  }
 
-Alex
+?
+
+> +        mask = 0;
+> +        if ((reg & 1) && el) {
+> +            mask |= 0x000001ff; /* IPSR (unpriv. reads as zero) */
+
+As B5.2.2 doesn't imply any particular access limit perhaps the comment
+should read /* ISPR (reads as zero when not in exception) */
+
+> +        }
+> +        if (!(reg & 4)) {
+> +            mask |= 0xf8000000; /* APSR */
+> +        }
+> +        /* EPSR reads as zero */
+> +        return xpsr_read(env) & mask;
+> +        break;
+> +    case 20: /* CONTROL */
+> +        return env->v7m.control;
+
+I'm fairly sure this was meant to be 0x20 and either way the result is
+gated by current privilege.
+
+> +    }
+> +
+> +    if (el == 0) {
+> +        return 0; /* unprivileged reads others as zero */
+> +    }
+>
+>      switch (reg) {
+> -    case 0: /* APSR */
+> -        return xpsr_read(env) & 0xf8000000;
+> -    case 1: /* IAPSR */
+> -        return xpsr_read(env) & 0xf80001ff;
+> -    case 2: /* EAPSR */
+> -        return xpsr_read(env) & 0xff00fc00;
+> -    case 3: /* xPSR */
+> -        return xpsr_read(env) & 0xff00fdff;
+> -    case 5: /* IPSR */
+> -        return xpsr_read(env) & 0x000001ff;
+> -    case 6: /* EPSR */
+> -        return xpsr_read(env) & 0x0700fc00;
+> -    case 7: /* IEPSR */
+> -        return xpsr_read(env) & 0x0700edff;
+>      case 8: /* MSP */
+>          return env->v7m.current_sp ? env->v7m.other_sp : env->regs[13];
+>      case 9: /* PSP */
+> @@ -8271,40 +8280,26 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+>          return env->v7m.basepri;
+>      case 19: /* FAULTMASK */
+>          return (env->daif & PSTATE_F) != 0;
+> -    case 20: /* CONTROL */
+> -        return env->v7m.control;
+>      default:
+> -        /* ??? For debugging only.  */
+> -        cpu_abort(CPU(cpu), "Unimplemented system register read (%d)\n", reg);
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to read unknown special"
+> +                                       " register %d\n", reg);
+>          return 0;
+>      }
+>  }
+>
+>  void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
+>  {
+> -    ARMCPU *cpu = arm_env_get_cpu(env);
+> +    if (arm_current_el(env) == 0 && reg > 7) {
+> +        /* only xPSR sub-fields may be written by unprivileged */
+> +        return;
+> +    }
+>
+>      switch (reg) {
+> -    case 0: /* APSR */
+> -        xpsr_write(env, val, 0xf8000000);
+> -        break;
+> -    case 1: /* IAPSR */
+> -        xpsr_write(env, val, 0xf8000000);
+> -        break;
+> -    case 2: /* EAPSR */
+> -        xpsr_write(env, val, 0xfe00fc00);
+> -        break;
+> -    case 3: /* xPSR */
+> -        xpsr_write(env, val, 0xfe00fc00);
+> -        break;
+> -    case 5: /* IPSR */
+> -        /* IPSR bits are readonly.  */
+> -        break;
+> -    case 6: /* EPSR */
+> -        xpsr_write(env, val, 0x0600fc00);
+> -        break;
+> -    case 7: /* IEPSR */
+> -        xpsr_write(env, val, 0x0600fc00);
+> +    case 0 ... 7: /* xPSR sub-fields */
+> +        /* only APSR is actually writable */
+> +        if (reg & 4) {
+> +            xpsr_write(env, val, 0xf8000000); /* APSR */
+> +        }
+
+I assuming insn<10> selects a different helper....
+
+>          break;
+>      case 8: /* MSP */
+>          if (env->v7m.current_sp)
+> @@ -8345,8 +8340,8 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
+>          switch_v7m_sp(env, (val & 2) != 0);
+>          break;
+>      default:
+> -        /* ??? For debugging only.  */
+> -        cpu_abort(CPU(cpu), "Unimplemented system register write (%d)\n", reg);
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to write unknown special"
+> +                                       " register %d\n", reg);
+>          return;
+>      }
+>  }
+
+
+--
+Alex Bennée
