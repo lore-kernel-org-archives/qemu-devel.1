@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVzjc-0003A5-DQ
+	(envelope-from <berrange@redhat.com>) id 1cVzjc-00039y-Bj
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:58:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVzjb-0005PO-KV
+	(envelope-from <berrange@redhat.com>) id 1cVzjb-0005PJ-JF
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:58:00 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 24 Jan 2017 11:57:43 +0000
-Message-Id: <20170124115748.21473-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/5] Improve I/O tests coverage of LUKS
+Date: Tue, 24 Jan 2017 11:57:44 +0000
+Message-Id: <20170124115748.21473-2-berrange@redhat.com>
+In-Reply-To: <20170124115748.21473-1-berrange@redhat.com>
+References: <20170124115748.21473-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/5] iotests: skip 159 & 170 with luks format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,47 +22,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The main goal of this series is to get the I/O tests passing
-100% with LUKS when run with './check -luks'. It also adds a
-few more combinations to the LUKS/dmcrypt interoperability
-test.
+While the qemu-img dd command does accept --image-opts
+this is not sufficient to make it work with the LUKS
+image yet. This is because bdrv_create() still always
+requires the non-image-opts syntax.
 
-To make LUKS testing not quite as slow, we drop the PBKDF
-iteration count down to a very small value. This doesn't
-remove all overhead, as formatting the volume will always
-measure PBKDF timing over a 1 second interval.
+Thus we must skip 159/170 with luks for now
 
-Changed in v3:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ tests/qemu-iotests/159 | 2 +-
+ tests/qemu-iotests/170 | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
- - Fix some typos in commit message(s) (Eric)
-
-Changed in v2:
-
- - Split off patch that change check.time recording since
-   it was not a direct dependancy
- - Skip new 159 & 170 tests which don't work due to qemu-img
-   dd limitations
-
-Daniel P. Berrange (5):
-  iotests: skip 159 & 170 with luks format
-  iotests: fix remainining tests to work with LUKS
-  iotests: reduce PBKDF iterations when testing LUKS
-  iotests: add more LUKS hash combination tests
-  iotests: chown LUKS device before qemu-io launches
-
- tests/qemu-iotests/033           |   16 +-
- tests/qemu-iotests/120           |   25 +-
- tests/qemu-iotests/140           |   15 +-
- tests/qemu-iotests/145           |   18 +-
- tests/qemu-iotests/149           |   26 +-
- tests/qemu-iotests/149.out       | 1002 ++++++++++++++++++++++++++++----------
- tests/qemu-iotests/157           |   17 +-
- tests/qemu-iotests/157.out       |   16 +-
- tests/qemu-iotests/159           |    2 +-
- tests/qemu-iotests/170           |    2 +-
- tests/qemu-iotests/common.filter |    3 +-
- tests/qemu-iotests/common.rc     |    3 +
- 12 files changed, 847 insertions(+), 298 deletions(-)
-
+diff --git a/tests/qemu-iotests/159 b/tests/qemu-iotests/159
+index 825f05f..7636865 100755
+--- a/tests/qemu-iotests/159
++++ b/tests/qemu-iotests/159
+@@ -37,7 +37,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.filter
+ . ./common.pattern
+ 
+-_supported_fmt generic
++_supported_fmt raw qcow qcow2 qed
+ _supported_proto file
+ _supported_os Linux
+ 
+diff --git a/tests/qemu-iotests/170 b/tests/qemu-iotests/170
+index 5b335db..6bd1c37 100755
+--- a/tests/qemu-iotests/170
++++ b/tests/qemu-iotests/170
+@@ -37,7 +37,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.filter
+ . ./common.pattern
+ 
+-_supported_fmt generic
++_supported_fmt raw qcow qcow2 qed
+ _supported_proto file
+ _supported_os Linux
+ 
 -- 
 2.9.3
