@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cVwak-0001Fs-V9
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:36:42 -0500
+	(envelope-from <quintela@redhat.com>) id 1cVwbP-0001dO-JA
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:37:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cVwah-0004Fu-TS
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:36:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42532)
+	(envelope-from <quintela@redhat.com>) id 1cVwbM-0004bC-HX
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:37:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41596)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cVwah-0004Fo-NV
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:36:35 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cVwbM-0004b4-C1
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:37:16 -0500
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1484566314-3987-3-git-send-email-ashijeetacharya@gmail.com>
-	(Ashijeet Acharya's message of "Mon, 16 Jan 2017 17:01:51 +0530")
+In-Reply-To: <1484566314-3987-6-git-send-email-ashijeetacharya@gmail.com>
+	(Ashijeet Acharya's message of "Mon, 16 Jan 2017 17:01:54 +0530")
 References: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
-	<1484566314-3987-3-git-send-email-ashijeetacharya@gmail.com>
+	<1484566314-3987-6-git-send-email-ashijeetacharya@gmail.com>
 Reply-To: quintela@redhat.com
-Date: Tue, 24 Jan 2017 09:36:30 +0100
-Message-ID: <878tq0c0s1.fsf@emacs.mitica>
+Date: Tue, 24 Jan 2017 09:37:12 +0100
+Message-ID: <874m0oc0qv.fsf@emacs.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 2/5] migration: Add a new option to
- enable only-migratable
+Subject: Re: [Qemu-devel] [PATCH v6 5/5] migration: Fail migration blocker
+ for --only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,13 +33,12 @@ To: Ashijeet Acharya <ashijeetacharya@gmail.com>
 Cc: dgilbert@redhat.com, jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 Ashijeet Acharya <ashijeetacharya@gmail.com> wrote:
-> Add a new option "--only-migratable" in qemu which will allow to add
-> only those devices which will not fail qemu after migration. Devices
-> set with the flag 'unmigratable' cannot be added when this option will
-> be used.
+> migrate_add_blocker should rightly fail if the '--only-migratable'
+> option was specified and the device in use should not be able to
+> perform the action which results in an unmigratable VM.
+>
+> Make migrate_add_blocker return -EACCES in this case.
 >
 > Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-
-I don't comment on the block code, as I don't know it well enough.
