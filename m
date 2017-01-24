@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW005-0001Sx-Gu
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:15:02 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cW00P-0001qJ-75
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:15:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW004-00045q-8Q
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:15:01 -0500
-Date: Tue, 24 Jan 2017 12:14:49 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170124121449.GI14563@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170103182801.9638-1-berrange@redhat.com>
-	<20170103182801.9638-5-berrange@redhat.com>
-	<3a4e16b4-b0a2-b732-cc6d-c61f0842c188@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cW00M-0004ER-1s
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:15:21 -0500
+References: <20170124095350.16679-1-stefanha@redhat.com>
+	<20170124120431.GB13714@lemon.Home>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1c28bff5-4a36-5343-801c-dd4f891cf307@redhat.com>
+Date: Tue, 24 Jan 2017 13:15:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3a4e16b4-b0a2-b732-cc6d-c61f0842c188@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 04/15] qcow: require image size to be >
- 1 for new images
+In-Reply-To: <20170124120431.GB13714@lemon.Home>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] aio-posix: honor is_external in AioContext
+ polling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +24,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
 
-On Mon, Jan 16, 2017 at 08:41:15PM +0100, Max Reitz wrote:
-> On 03.01.2017 19:27, Daniel P. Berrange wrote:
-> > The qcow driver refuses to open images which are less than
-> > 2 bytes in size, but will happily create such images. Add
-> > a check in the create path to avoid this discrepancy.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  block/qcow.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/block/qcow.c b/block/qcow.c
-> > index 7540f43..8133fda 100644
-> > --- a/block/qcow.c
-> > +++ b/block/qcow.c
-> > @@ -799,6 +799,12 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-> >      /* Read out options */
-> >      total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-> >                            BDRV_SECTOR_SIZE);
-> > +    if (total_size <= 1) {
-> > +        error_setg(errp, "Image size is too small (must be at least 2 bytes)");
-> > +        ret = -EINVAL;
-> > +        goto cleanup;
-> > +    }
-> > +
+
+
+On 24/01/2017 13:04, Fam Zheng wrote:
 > 
-> Given the ROUND_UP() before, I can't see how total_size can be 1, but I
-> can see how it can be 0. Since that is covered by this condition:
-> 
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> All in all I think we should skip external handlers regardless of
+> aio_disable_external(), or even skip try_poll_mode, in nested aio_poll()'s. The
+> reasons are 1) many nested aio_poll()'s don't have bdrv_drained_begin, so this
+> check is not sufficient [...] bdrv_flush()
+> spin longer than necessary, if not forever, when the guest keeps submitting more
+> requests with ioeventfd.
 
-I'll switch to == 0 none the less
 
+I'm not sure I understand why this is related.  aio_poll() only tries
+poll mode once, so bdrv_flush would only spin until the fsync is complete.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Nested aio_polls don't have bdrv_drained_begin because draining matters
+over the whole section where you need atomicity (e.g. taking a live
+snapshot).  It doesn't matter for single I/O operation.
+
+Paolo
