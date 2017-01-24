@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cW588-0004dQ-Rq
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:44:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cW5Kh-0001lL-61
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:56:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cW57a-0003cp-Kn
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:43:40 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
-	<1485164923-17736-7-git-send-email-armbru@redhat.com>
-	<2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com>
-	<877f5l1tak.fsf@dusky.pond.sub.org>
-	<3512807d-d04e-50fa-9fcf-d1d5ba8ac350@redhat.com>
-	<87r33saa6p.fsf@dusky.pond.sub.org>
-	<4cd45561-60e9-2cd2-e317-880ba9eb2f86@redhat.com>
-	<87fuk82x48.fsf@dusky.pond.sub.org>
-	<CAFEAcA_oBmrMGsuT8=a51eOkBDQ-Rrr4tAhi5oMGxMzb-PiVwg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6d55bfe0-20f3-d153-910b-7c28fd74f6ab@redhat.com>
-Date: Tue, 24 Jan 2017 18:40:53 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cW5Kg-00059i-Em
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:56:39 -0500
+Received: from mail-vk0-x22d.google.com ([2607:f8b0:400c:c05::22d]:33127)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cW5Kg-00059I-A5
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:56:38 -0500
+Received: by mail-vk0-x22d.google.com with SMTP id k127so117000073vke.0
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:56:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_oBmrMGsuT8=a51eOkBDQ-Rrr4tAhi5oMGxMzb-PiVwg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
- lsi53c895a SCSI HBAs
+In-Reply-To: <20170124192723-mutt-send-email-mst@kernel.org>
+References: <CAF++6APW69OBEzfUaWXK-kXLY5euu8aJjvFrYzwFT1tes-W=gA@mail.gmail.com>
+	<CAFEAcA-aEA9cNzd6cJchrdojyX7xKr4eOKECkMEen=fhGucCPA@mail.gmail.com>
+	<20170124192723-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Jan 2017 17:56:17 +0000
+Message-ID: <CAFEAcA8tuP_O=HJ6f1=-H1tz_c+ZUw-OOK=WS362XKt-qcvu3g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] changeset b0cb0a66d broken - missing
+ QEMU_OPTION_enable_hax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: James Hanley <jhanley@dgtlrift.com>, Vincent Palatin <vpalatin@chromium.org>, qemu-devel <qemu-devel@nongnu.org>
 
+On 24 January 2017 at 17:28, Michael S. Tsirkin <mst@redhat.com> wrote:
+> Maybe we should change the include order to always prefer
+> the build tree files if there?
 
+If we can do that it would be nice.
 
-On 24/01/2017 18:24, Peter Maydell wrote:
-> On 24 January 2017 at 17:20, Markus Armbruster <armbru@redhat.com> wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>
->>> On 24/01/2017 13:56, Markus Armbruster wrote:
->>>> So, what do we want to deprecate?
->>>>
->>>> I think the onboard SCSI HBA adopting if=scsi drives should stay,
->>>> because it matches what we do for other interface types.  Unless we
->>>> wanted to deprecate interface types other than none entirely.
->>>
->>> Yes, of course.
->>>
->>>> What about realview and versatile auto-creating lsi53c895a?
->>>
->>> That should go.
->>
->> Peter, do you agree?
-> 
-> I'm not sure what you're suggesting deprecation of -- will
-> command lines like
->  "qemu-system-arm -M versatilepb -hda somedisk.qcow2"
-> still work (ie auto-create the LSI scsi adaptor and plug
-> the disk into it) ?
+> An alternative is to do what Linux does, create a
+> file in tree when doing a build, and then make an
+> out of tree one fail and suggest distclean.
 
-No, I was confusing with the boards that Markus is fixing in patch 4.
-But is really lsi53c895a the best we can provide for
-versatilepb/versatileab/realview-eb/realview-eb-mpcore? Could virtio-pci
-work well too?...
+We already try to do that -- Makefile looks for
+config-host.mak in the source tree and suggests a
+rune involving distclean. The check isn't perfect,
+though (and nor is the Linux kernel's -- I lost an
+hour or so the other week to a problem that turned
+out to be stale junk in the kernel source tree that I
+fixed with a 'make mrproper').
 
-Paolo
+thanks
+-- PMM
