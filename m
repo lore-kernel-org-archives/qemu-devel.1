@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cW3uu-0001Wx-Ej
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:25:57 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cW3y5-0004Jr-PI
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:29:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cW3up-0003eX-FN
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:25:56 -0500
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:37431)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cW3up-0003eE-5E
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:25:51 -0500
-Received: by mail-wm0-x233.google.com with SMTP id c206so217927539wme.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 08:25:51 -0800 (PST)
-References: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
-	<1484937883-1068-2-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1484937883-1068-2-git-send-email-peter.maydell@linaro.org>
-Date: Tue, 24 Jan 2017 16:25:47 +0000
-Message-ID: <87wpdka0hg.fsf@linaro.org>
+	(envelope-from <alex.williamson@redhat.com>) id 1cW3xz-0004Ur-MY
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:29:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59558)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cW3xz-0004Ug-Es
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:29:07 -0500
+Date: Tue, 24 Jan 2017 09:29:05 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170124092905.41832531@t450s.home>
+In-Reply-To: <1485253571-19058-3-git-send-email-peterx@redhat.com>
+References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
+	<1485253571-19058-3-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/6] armv7m: MRS/MSR: handle
- unprivileged access
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 02/18] vfio: introduce vfio_get_vaddr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,173 +28,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>, patches@linaro.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
 
+On Tue, 24 Jan 2017 18:25:55 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> From: Michael Davidsaver <mdavidsaver@gmail.com>
->
-> The MRS and MSR instruction handling has a number of flaws:
->  * unprivileged accesses should only be able to read
->    CONTROL and the xPSR subfields, and only write APSR
->    (others RAZ/WI)
->  * privileged access should not be able to write xPSR
->    subfields other than APSR
->  * accesses to unimplemented registers should log as
->    guest errors, not abort QEMU
->
-> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> [PMM: rewrote commit message]
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> A cleanup for vfio_iommu_map_notify(). Should have no functional change,
+> just to make the function shorter and easier to understand.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  target/arm/helper.c | 79 +++++++++++++++++++++++++----------------------------
->  1 file changed, 37 insertions(+), 42 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 7111c8c..ad23de3 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -8243,23 +8243,32 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
->
->  uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
->  {
-> -    ARMCPU *cpu = arm_env_get_cpu(env);
-> +    uint32_t mask;
-> +    unsigned el = arm_current_el(env);
-> +
-> +    /* First handle registers which unprivileged can read */
-> +
-> +    switch (reg) {
-> +    case 0 ... 7: /* xPSR sub-fields */
-
-This reads a little confusingly compared to the pseudo-code in the ARM
-ARM. Would it be clearer if we just went:
-
-  switch(extract32(reg, 3, 5)) {
-    case 0: /* xPSR */
-    ...
-    case 1: /* SP */
-    ...
-    case 2: /* Priority Mask or CONTROL.. */
-    ...
-  }
-
-?
-
-> +        mask = 0;
-> +        if ((reg & 1) && el) {
-> +            mask |= 0x000001ff; /* IPSR (unpriv. reads as zero) */
-
-As B5.2.2 doesn't imply any particular access limit perhaps the comment
-should read /* ISPR (reads as zero when not in exception) */
-
-> +        }
-> +        if (!(reg & 4)) {
-> +            mask |= 0xf8000000; /* APSR */
-> +        }
-> +        /* EPSR reads as zero */
-> +        return xpsr_read(env) & mask;
-> +        break;
-> +    case 20: /* CONTROL */
-> +        return env->v7m.control;
-
-I'm fairly sure this was meant to be 0x20 and either way the result is
-gated by current privilege.
-
-> +    }
-> +
-> +    if (el == 0) {
-> +        return 0; /* unprivileged reads others as zero */
-> +    }
->
->      switch (reg) {
-> -    case 0: /* APSR */
-> -        return xpsr_read(env) & 0xf8000000;
-> -    case 1: /* IAPSR */
-> -        return xpsr_read(env) & 0xf80001ff;
-> -    case 2: /* EAPSR */
-> -        return xpsr_read(env) & 0xff00fc00;
-> -    case 3: /* xPSR */
-> -        return xpsr_read(env) & 0xff00fdff;
-> -    case 5: /* IPSR */
-> -        return xpsr_read(env) & 0x000001ff;
-> -    case 6: /* EPSR */
-> -        return xpsr_read(env) & 0x0700fc00;
-> -    case 7: /* IEPSR */
-> -        return xpsr_read(env) & 0x0700edff;
->      case 8: /* MSP */
->          return env->v7m.current_sp ? env->v7m.other_sp : env->regs[13];
->      case 9: /* PSP */
-> @@ -8271,40 +8280,26 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
->          return env->v7m.basepri;
->      case 19: /* FAULTMASK */
->          return (env->daif & PSTATE_F) != 0;
-> -    case 20: /* CONTROL */
-> -        return env->v7m.control;
->      default:
-> -        /* ??? For debugging only.  */
-> -        cpu_abort(CPU(cpu), "Unimplemented system register read (%d)\n", reg);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to read unknown special"
-> +                                       " register %d\n", reg);
->          return 0;
->      }
+>  hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 38 insertions(+), 20 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 174f351..ce55dff 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+>             section->offset_within_address_space & (1ULL << 63);
 >  }
->
->  void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
+>  
+> -static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> +static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+> +                           bool *read_only)
 >  {
-> -    ARMCPU *cpu = arm_env_get_cpu(env);
-> +    if (arm_current_el(env) == 0 && reg > 7) {
-> +        /* only xPSR sub-fields may be written by unprivileged */
+> -    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+> -    VFIOContainer *container = giommu->container;
+> -    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+>      MemoryRegion *mr;
+>      hwaddr xlat;
+>      hwaddr len = iotlb->addr_mask + 1;
+> -    void *vaddr;
+> -    int ret;
+> -
+> -    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+> -                                iova, iova + iotlb->addr_mask);
+> -
+> -    if (iotlb->target_as != &address_space_memory) {
+> -        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> -                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+> -        return;
+> -    }
+> +    bool ret = false;
+> +    bool writable = iotlb->perm & IOMMU_WO;
+>  
+>      /*
+>       * The IOMMU TLB entry we have just covers translation through
+> @@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      rcu_read_lock();
+>      mr = address_space_translate(&address_space_memory,
+>                                   iotlb->translated_addr,
+> -                                 &xlat, &len, iotlb->perm & IOMMU_WO);
+> +                                 &xlat, &len, writable);
+>      if (!memory_region_is_ram(mr)) {
+>          error_report("iommu map to non memory area %"HWADDR_PRIx"",
+>                       xlat);
+>          goto out;
+>      }
+> +
+>      /*
+>       * Translation truncates length to the IOMMU page size,
+>       * check that it did not truncate too much.
+> @@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>          goto out;
+>      }
+>  
+> +    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> +    *read_only = !writable || mr->readonly;
+> +    ret = true;
+> +
+> +out:
+> +    rcu_read_unlock();
+> +    return ret;
+> +}
+> +
+> +static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> +{
+> +    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+> +    VFIOContainer *container = giommu->container;
+> +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> +    bool read_only;
+> +    void *vaddr;
+> +    int ret;
+> +
+> +    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+> +                                iova, iova + iotlb->addr_mask);
+> +
+> +    if (iotlb->target_as != &address_space_memory) {
+> +        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
 > +        return;
 > +    }
->
->      switch (reg) {
-> -    case 0: /* APSR */
-> -        xpsr_write(env, val, 0xf8000000);
-> -        break;
-> -    case 1: /* IAPSR */
-> -        xpsr_write(env, val, 0xf8000000);
-> -        break;
-> -    case 2: /* EAPSR */
-> -        xpsr_write(env, val, 0xfe00fc00);
-> -        break;
-> -    case 3: /* xPSR */
-> -        xpsr_write(env, val, 0xfe00fc00);
-> -        break;
-> -    case 5: /* IPSR */
-> -        /* IPSR bits are readonly.  */
-> -        break;
-> -    case 6: /* EPSR */
-> -        xpsr_write(env, val, 0x0600fc00);
-> -        break;
-> -    case 7: /* IEPSR */
-> -        xpsr_write(env, val, 0x0600fc00);
-> +    case 0 ... 7: /* xPSR sub-fields */
-> +        /* only APSR is actually writable */
-> +        if (reg & 4) {
-> +            xpsr_write(env, val, 0xf8000000); /* APSR */
-> +        }
-
-I assuming insn<10> selects a different helper....
-
->          break;
->      case 8: /* MSP */
->          if (env->v7m.current_sp)
-> @@ -8345,8 +8340,8 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
->          switch_v7m_sp(env, (val & 2) != 0);
->          break;
->      default:
-> -        /* ??? For debugging only.  */
-> -        cpu_abort(CPU(cpu), "Unimplemented system register write (%d)\n", reg);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to write unknown special"
-> +                                       " register %d\n", reg);
->          return;
+> +
+> +    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
+> +        return;
+> +    }
+> +
+>      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> -        vaddr = memory_region_get_ram_ptr(mr) + xlat;
+>          ret = vfio_dma_map(container, iova,
+>                             iotlb->addr_mask + 1, vaddr,
+> -                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
+> +                           read_only);
+>          if (ret) {
+>              error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+>                           "0x%"HWADDR_PRIx", %p) = %d (%m)",
+> @@ -357,8 +377,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>                           iotlb->addr_mask + 1, ret);
+>          }
 >      }
+> -out:
+> -    rcu_read_unlock();
+
+The comment from v4 still needs input from Paolo, is it valid to make
+use of vaddr (based on address_space_translate ->
+memory_region_get_ram_ptr) outside of the rcu read lock or could future
+BQL reduction efforts allow this to race?
+
 >  }
-
-
---
-Alex Bennée
+>  
+>  static void vfio_listener_region_add(MemoryListener *listener,
