@@ -1,14 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cVyks-0005Cr-Jn
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:55:15 -0500
+	(envelope-from <quintela@redhat.com>) id 1cVyo5-000844-Jm
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:58:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cVykn-0006Zw-Oj
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:55:14 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 24 Jan 2017 11:55:07 +0100
-Message-Id: <1485255307-11799-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] target/ppc: Remove unused POWERPC_FAMILY(POWER)
+	(envelope-from <quintela@redhat.com>) id 1cVynz-0007Fn-SH
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:58:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cVynz-0007EZ-Ms
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:58:27 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9D8C080471
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:58:27 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170124100437.18200-1-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Tue, 24 Jan 2017 10:04:37 +0000")
+References: <20170124100437.18200-1-dgilbert@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 24 Jan 2017 11:58:22 +0100
+Message-ID: <87wpdk912p.fsf@emacs.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add myself as a migration
+ submaintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,49 +34,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
 
-We do not support POWER1 CPUs in QEMU, so it does not make sense
-to keep this stub around.
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- target/ppc/translate_init.c | 22 ----------------------
- 1 file changed, 22 deletions(-)
-
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 19ef250..70333c5 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -5217,28 +5217,6 @@ POWERPC_FAMILY(e5500)(ObjectClass *oc, void *data)
- 
- /* Non-embedded PowerPC                                                      */
- 
--/* POWER : same as 601, without mfmsr, mfsr                                  */
--POWERPC_FAMILY(POWER)(ObjectClass *oc, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(oc);
--    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
--
--    dc->desc = "POWER";
--    /* pcc->insns_flags = XXX_TODO; */
--    /* POWER RSC (from RAD6000) */
--    pcc->msr_mask = (1ull << MSR_EE) |
--                    (1ull << MSR_PR) |
--                    (1ull << MSR_FP) |
--                    (1ull << MSR_ME) |
--                    (1ull << MSR_FE0) |
--                    (1ull << MSR_SE) |
--                    (1ull << MSR_DE) |
--                    (1ull << MSR_AL) |
--                    (1ull << MSR_EP) |
--                    (1ull << MSR_IR) |
--                    (1ull << MSR_DR);
--}
--
- #define POWERPC_MSRR_601     (0x0000000000001040ULL)
- 
- static void init_proc_601 (CPUPPCState *env)
--- 
-1.8.3.1
+Reviewed-by: Juan Quintela <quintela@redhat.com>
