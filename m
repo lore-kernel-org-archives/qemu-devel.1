@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVyrR-0002bB-TH
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:02:06 -0500
+	(envelope-from <berrange@redhat.com>) id 1cVyrW-0002fa-Ta
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVyrO-0008P2-3D
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:02:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57534)
+	(envelope-from <berrange@redhat.com>) id 1cVyrW-0008RB-41
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:02:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVyrN-0008Or-RC
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:01:58 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVyrV-0008Qt-VJ
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:02:06 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 24 Jan 2017 11:01:43 +0000
-Message-Id: <20170124110151.937-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/8] Switch all subdirs over to modular
- trace.h file
+Date: Tue, 24 Jan 2017 11:01:47 +0000
+Message-Id: <20170124110151.937-5-berrange@redhat.com>
+In-Reply-To: <20170124110151.937-1-berrange@redhat.com>
+References: <20170124110151.937-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 4/8] trace: move hw/i386/xen events to
+ correct subdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +27,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This is the final part of my trace events refactoring.
+The trace-events for a given source file should generally
+always live in the same directory as the source file.
 
-Previously we merged code that split trace-events up
-into one file per sub-directory. We also merged code
-to the code-generator that enables us to generate
-and use multiple independant sets of trace events.
-
-This is the final glue that makes use of these two
-earlier changes, so that we actually generate a
-separate trace.h & trace.c file per sub-directory.
-
-The result is that when adding a new trace event to
-a file, only files in that sub-directory get rebuilt.
-Theoretically the build is faster too, since each
-source file includes a much smaller trace.h that
-only contains probes relevant to it. In reality this
-speed benefit is probably marginal & lost in the noise.
-
-This patch series has massively changed since v2.
-
- - It no longer modifies the Makefile.objs rules in each
-   sub-directory. A bit of magic in the top level
-   Makefile.objs file lets us generate all the needed
-   rules from one place
-
- - It sticks with bare "trace.h" includes instead of adding
-   sub-dir prefix "hw/block/trace.h". To achieve this we
-   had to rename the trace.h to trace-root.h in the top
-   level directory to avoid ambiguity in places where a
-   file needs to include the top-level instead of local
-   trace.h
-
-Daniel P. Berrange (8):
-  make: move top level dir to end of include search path
-  trace: move hw/block/dataplane events to correct subdir
-  trace: move hw/xen events to correct subdir
-  trace: move hw/i386/xen events to correct subdir
-  trace: move setting of group name into Makefiles
-  trace: switch to modular code generation for sub-directories
-  trace: update docs to reflect new code generation approach
-  trace: improve error reporting when parsing simpletrace header
-
- .gitignore                                |  22 +++--
- Makefile                                  | 156 ++++++++++++++++++++++++++----
- Makefile.objs                             |  99 ++++++++++---------
- Makefile.target                           |  10 +-
- aio-posix.c                               |   2 +-
- balloon.c                                 |   2 +-
- block.c                                   |   2 +-
- blockdev-nbd.c                            |   1 -
- blockdev.c                                |   2 +-
- blockjob.c                                |   1 -
- cpu-exec.c                                |   2 +-
- dma-helpers.c                             |   2 +-
- docs/tracing.txt                          |  55 ++++++++---
- exec.c                                    |   2 +-
- hw/block/dataplane/trace-events           |   6 ++
- hw/block/trace-events                     |   5 -
- hw/i386/trace-events                      |   7 --
- hw/i386/xen/trace-events                  |   6 ++
- hw/net/fsl_etsec/etsec.c                  |   1 -
- hw/xen/trace-events                       |  13 +++
- include/exec/cpu_ldst_template.h          |   2 +-
- include/exec/cpu_ldst_useronly_template.h |   2 +-
- include/hw/xen/xen_common.h               |   2 +-
- include/trace.h                           |   6 --
- ioport.c                                  |   2 +-
- kvm-all.c                                 |   2 +-
- memory.c                                  |   2 +-
- monitor.c                                 |   2 +-
- qom/cpu.c                                 |   2 +-
- rules.mak                                 |  17 ++--
- scripts/simpletrace.py                    |  10 +-
- scripts/tracetool.py                      |  31 +++---
- scripts/tracetool/backend/dtrace.py       |   7 +-
- scripts/tracetool/backend/simple.py       |   1 -
- scripts/tracetool/backend/ust.py          |   7 +-
- scripts/tracetool/format/c.py             |   7 +-
- scripts/tracetool/format/tcg_h.py         |   6 +-
- scripts/tracetool/format/tcg_helper_c.py  |   6 +-
- scripts/tracetool/format/ust_events_c.py  |   2 +-
- scripts/tracetool/format/ust_events_h.py  |   7 +-
- spice-qemu-char.c                         |   2 +-
- tests/Makefile.include                    |   2 +-
- thread-pool.c                             |   2 +-
- trace-events                              |  10 --
- trace/Makefile.objs                       |  93 ++----------------
- trace/control-target.c                    |   2 +-
- trace/control.c                           |   2 +-
- trace/ftrace.c                            |   2 +-
- trace/simple.c                            |   1 -
- translate-all.c                           |   2 +-
- vl.c                                      |   2 +-
- xen-hvm.c                                 |   2 +-
- xen-mapcache.c                            |   2 +-
- 53 files changed, 385 insertions(+), 258 deletions(-)
- create mode 100644 hw/block/dataplane/trace-events
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ Makefile.objs            | 1 +
+ hw/i386/trace-events     | 7 -------
+ hw/i386/xen/trace-events | 6 ++++++
+ 3 files changed, 7 insertions(+), 7 deletions(-)
  create mode 100644 hw/i386/xen/trace-events
- create mode 100644 hw/xen/trace-events
- delete mode 100644 include/trace.h
 
+diff --git a/Makefile.objs b/Makefile.objs
+index 9ac11e7..6abe0b9 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -144,6 +144,7 @@ trace-events-y += hw/sd/trace-events
+ trace-events-y += hw/isa/trace-events
+ trace-events-y += hw/mem/trace-events
+ trace-events-y += hw/i386/trace-events
++trace-events-y += hw/i386/xen/trace-events
+ trace-events-y += hw/9pfs/trace-events
+ trace-events-y += hw/ppc/trace-events
+ trace-events-y += hw/pci/trace-events
+diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+index d2b4973..a3568ee 100644
+--- a/hw/i386/trace-events
++++ b/hw/i386/trace-events
+@@ -1,12 +1,5 @@
+ # See docs/tracing.txt for syntax documentation.
+ 
+-# hw/i386/xen/xen_platform.c
+-xen_platform_log(char *s) "xen platform: %s"
+-
+-# hw/i386/xen/xen_pvdevice.c
+-xen_pv_mmio_read(uint64_t addr) "WARNING: read from Xen PV Device MMIO space (address %"PRIx64")"
+-xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (address %"PRIx64")"
+-
+ # hw/i386/x86-iommu.c
+ x86_iommu_iec_notify(bool global, uint32_t index, uint32_t mask) "Notify IEC invalidation: global=%d index=%" PRIu32 " mask=%" PRIu32
+ 
+diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
+new file mode 100644
+index 0000000..321fe60
+--- /dev/null
++++ b/hw/i386/xen/trace-events
+@@ -0,0 +1,6 @@
++# hw/i386/xen/xen_platform.c
++xen_platform_log(char *s) "xen platform: %s"
++
++# hw/i386/xen/xen_pvdevice.c
++xen_pv_mmio_read(uint64_t addr) "WARNING: read from Xen PV Device MMIO space (address %"PRIx64")"
++xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (address %"PRIx64")"
 -- 
 2.9.3
