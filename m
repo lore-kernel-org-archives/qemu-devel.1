@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cVzkP-0003pD-Vb
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:58:53 -0500
+	(envelope-from <famz@redhat.com>) id 1cVzq6-0000Vd-1j
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cVzkE-0005hq-Lh
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:58:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54164)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cVzkE-0005hT-GJ
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:58:38 -0500
-References: <1484921496-11257-1-git-send-email-phil@philjordan.eu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6ce45588-a312-aff1-6e7a-e54e29d4882c@redhat.com>
-Date: Tue, 24 Jan 2017 12:58:34 +0100
+	(envelope-from <famz@redhat.com>) id 1cVzq4-0008V4-Ra
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:04:42 -0500
+Date: Tue, 24 Jan 2017 20:04:31 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170124120431.GB13714@lemon.Home>
+References: <20170124095350.16679-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1484921496-11257-1-git-send-email-phil@philjordan.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] x86-kvm: Fix Mac guest timekeeping
- by exposing TSC frequency in CPUID
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170124095350.16679-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] aio-posix: honor is_external in AioContext
+ polling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +23,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phil Dennis-Jordan <phil@philjordan.eu>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
 
+On Tue, 01/24 09:53, Stefan Hajnoczi wrote:
+> AioHandlers marked ->is_external must be skipped when aio_node_check()
+> fails.  bdrv_drained_begin() needs this to prevent dataplane from
+> submitting new I/O requests while another thread accesses the device and
+> relies on it being quiesced.
+> 
+> This patch fixes the following segfault:
+> 
+>   Program terminated with signal SIGSEGV, Segmentation fault.
+>   #0  0x00005577f6127dad in bdrv_io_plug (bs=0x5577f7ae52f0) at qemu/block/io.c:2650
+>   2650            bdrv_io_plug(child->bs);
+>   [Current thread is 1 (Thread 0x7ff5c4bd1c80 (LWP 10917))]
+>   (gdb) bt
+>   #0  0x00005577f6127dad in bdrv_io_plug (bs=0x5577f7ae52f0) at qemu/block/io.c:2650
+>   #1  0x00005577f6114363 in blk_io_plug (blk=0x5577f7b8ba20) at qemu/block/block-backend.c:1561
+>   #2  0x00005577f5d4091d in virtio_blk_handle_vq (s=0x5577f9ada030, vq=0x5577f9b3d2a0) at qemu/hw/block/virtio-blk.c:589
+>   #3  0x00005577f5d4240d in virtio_blk_data_plane_handle_output (vdev=0x5577f9ada030, vq=0x5577f9b3d2a0) at qemu/hw/block/dataplane/virtio-blk.c:158
+>   #4  0x00005577f5d88acd in virtio_queue_notify_aio_vq (vq=0x5577f9b3d2a0) at qemu/hw/virtio/virtio.c:1304
+>   #5  0x00005577f5d8aaaf in virtio_queue_host_notifier_aio_poll (opaque=0x5577f9b3d308) at qemu/hw/virtio/virtio.c:2134
+>   #6  0x00005577f60ca077 in run_poll_handlers_once (ctx=0x5577f79ddbb0) at qemu/aio-posix.c:493
+>   #7  0x00005577f60ca268 in try_poll_mode (ctx=0x5577f79ddbb0, blocking=true) at qemu/aio-posix.c:569
+>   #8  0x00005577f60ca331 in aio_poll (ctx=0x5577f79ddbb0, blocking=true) at qemu/aio-posix.c:601
+>   #9  0x00005577f612722a in bdrv_flush (bs=0x5577f7c20970) at qemu/block/io.c:2403
+>   #10 0x00005577f60c1b2d in bdrv_close (bs=0x5577f7c20970) at qemu/block.c:2322
+>   #11 0x00005577f60c20e7 in bdrv_delete (bs=0x5577f7c20970) at qemu/block.c:2465
+>   #12 0x00005577f60c3ecf in bdrv_unref (bs=0x5577f7c20970) at qemu/block.c:3425
+>   #13 0x00005577f60bf951 in bdrv_root_unref_child (child=0x5577f7a2de70) at qemu/block.c:1361
+>   #14 0x00005577f6112162 in blk_remove_bs (blk=0x5577f7b8ba20) at qemu/block/block-backend.c:491
+>   #15 0x00005577f6111b1b in blk_remove_all_bs () at qemu/block/block-backend.c:245
+>   #16 0x00005577f60c1db6 in bdrv_close_all () at qemu/block.c:2382
+>   #17 0x00005577f5e60cca in main (argc=20, argv=0x7ffea6eb8398, envp=0x7ffea6eb8440) at qemu/vl.c:4684
+> 
+> The key thing is that bdrv_close() uses bdrv_drained_begin() and
+> virtio_queue_host_notifier_aio_poll() must not be called.
+> 
+> Thanks to Fam Zheng <famz@redhat.com> for identifying the root cause of
+> this crash.
+> 
+> Reported-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  aio-posix.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/aio-posix.c b/aio-posix.c
+> index 9453d83..a8d7090 100644
+> --- a/aio-posix.c
+> +++ b/aio-posix.c
+> @@ -508,7 +508,8 @@ static bool run_poll_handlers_once(AioContext *ctx)
+>  
+>      QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
+>          if (!node->deleted && node->io_poll &&
+> -                node->io_poll(node->opaque)) {
+> +            aio_node_check(ctx, node->is_external) &&
+> +            node->io_poll(node->opaque)) {
+>              progress = true;
+>          }
+>  
+> -- 
+> 2.9.3
+> 
+> 
 
+The patch is not wrong and I believe it is enough to fix the crash, however it's
+not enough...
 
-On 20/01/2017 15:11, Phil Dennis-Jordan wrote:
-> Darwin/OS X/macOS for x86-64 uses the TSC for timekeeping; it normally calibrates this by querying various clock frequency scaling MSRs. Details depend on the exact CPU model detected. The local APIC timer frequency is extracted from (EFI) firmware. Virtualisation environments including Qemu/KVM don't expose those MSRs to guests, and in any case the host and guest CPUs' MSRs may not match up. To solve this, the xnu kernel queries CPUID leaf 0x40000010 for the TSC and APIC timers if leaf 0x40000000 suggests that this leaf exists, which is the case when running inside VMWare (Fusion). This patch series replicates the behaviour of these CPUID leaves for Qemu/KVM via a new x86 CPU option, "vmware-cpuid-freq."
-> 
-> The option is activated by default on 2.9 and newer pc (PIIX and Q35) machine variants, if the TSC is stable and known (invtsc or user-specified).
-> 
-> Changelog
-> ========
-> 
-> v1 -> v2
->  * The v1 thread was "[PATCH] x86-KVM: Supply TSC and APIC clock rates to guest like VMWare"
->  * The option has been renamed as suggested in the v1 discussion.
->  * It now checks that either invtsc or a user-specified TSC clock rate are active before activating leaf 0x40000010.
->  * CPUID leaf 0x40000000 exposed by KVM will only reference 0x40000010 if all preconditions are met and the functionality is actually active.
->  * No more error message if preconditions are not met.
->  * cpuid_data.cpuid.nent update/cpuid_find_entry bug fixed.
->  * 2 extra patches included, one for setting up PC machine version 2.8/2.9 compatibility configurations, the second for enabling the new option in version 2.9+ PIIX/q35 configurations by default, while leaving it disabled for 2.8 or older machines.
-> 
-> Phil Dennis-Jordan (3):
->   x86-KVM: Supply TSC and APIC clock rates to guest like VMWare
->   pc: Add 2.9 machine type
->   pc: Enable vmware-cpuid-freq CPU option for 2.9+ machine types
-> 
->  hw/i386/pc_piix.c    | 13 ++++++++++++-
->  hw/i386/pc_q35.c     | 12 +++++++++++-
->  include/hw/i386/pc.h |  6 ++++++
->  target/i386/cpu.c    |  1 +
->  target/i386/cpu.h    |  4 ++++
->  target/i386/kvm.c    | 36 ++++++++++++++++++++++++++++++------
->  6 files changed, 64 insertions(+), 8 deletions(-)
-> 
+All in all I think we should skip external handlers regardless of
+aio_disable_external(), or even skip try_poll_mode, in nested aio_poll()'s. The
+reasons are 1) many nested aio_poll()'s don't have bdrv_drained_begin, so this
+check is not sufficient; 2) aio_poll() on qemu_aio_context doesn't look at
+ioeventfd before, but this was changed by adding try_poll_mode(), which is not
+very correct.
 
-Looks good, thanks!  Queued patches 1 and 3 for 2.9 (patch 2 is in already).
+These two factors combined together make it possible for bdrv_flush() etc to
+spin longer than necessary, if not forever, when the guest keeps submitting more
+requests with ioeventfd.
 
-Paolo
+Fam
