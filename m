@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVwPb-0007Id-UB
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:25:09 -0500
+	(envelope-from <quintela@redhat.com>) id 1cVwak-0001Fs-V9
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:36:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVwPY-0001a2-PM
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:25:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49766)
+	(envelope-from <quintela@redhat.com>) id 1cVwah-0004Fu-TS
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:36:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cVwPY-0001Zr-JQ
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:25:04 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1485206573-32452-1-git-send-email-atar4qemu@gmail.com>
-Date: Tue, 24 Jan 2017 09:25:01 +0100
-In-Reply-To: <1485206573-32452-1-git-send-email-atar4qemu@gmail.com> (Artyom
-	Tarasenko's message of "Mon, 23 Jan 2017 22:22:53 +0100")
-Message-ID: <87k29kx3tu.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cVwah-0004Fo-NV
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:36:35 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1484566314-3987-3-git-send-email-ashijeetacharya@gmail.com>
+	(Ashijeet Acharya's message of "Mon, 16 Jan 2017 17:01:51 +0530")
+References: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
+	<1484566314-3987-3-git-send-email-ashijeetacharya@gmail.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 24 Jan 2017 09:36:30 +0100
+Message-ID: <878tq0c0s1.fsf@emacs.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] niagara: check if a serial port is
- available
+Subject: Re: [Qemu-devel] [PATCH v6 2/5] migration: Add a new option to
+ enable only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +29,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: dgilbert@redhat.com, jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Your series lacks threading: the patches don't carry In-Reply-To and
-References headers.  The easiest way to fix that is sending them with
-git-send-email --thread.  You should be able to omit --thread; it's the
-default unless configured otherwise.
-
-Artyom Tarasenko <atar4qemu@gmail.com> writes:
-
-> Reported-by:Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-> ---
->  hw/sparc64/niagara.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+Ashijeet Acharya <ashijeetacharya@gmail.com> wrote:
+> Add a new option "--only-migratable" in qemu which will allow to add
+> only those devices which will not fail qemu after migration. Devices
+> set with the flag 'unmigratable' cannot be added when this option will
+> be used.
 >
-> diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-> index e945b5a..a14724f 100644
-> --- a/hw/sparc64/niagara.c
-> +++ b/hw/sparc64/niagara.c
-> @@ -154,9 +154,10 @@ static void niagara_init(MachineState *machine)
->              exit(1);
->          }
->      }
-> -    serial_mm_init(sysmem, NIAGARA_UART_BASE, 0, NULL, 115200,
-> -                   serial_hds[0], DEVICE_BIG_ENDIAN);
-> -
-> +    if (serial_hds[0]) {
-> +        serial_mm_init(sysmem, NIAGARA_UART_BASE, 0, NULL, 115200,
-> +                       serial_hds[0], DEVICE_BIG_ENDIAN);
-> +    }
->      empty_slot_init(NIAGARA_IOBBASE, NIAGARA_IOBSIZE);
->      sun4v_rtc_init(NIAGARA_RTC_BASE);
->  }
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+I don't comment on the block code, as I don't know it well enough.
