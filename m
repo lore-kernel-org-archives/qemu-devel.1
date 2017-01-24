@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cVy73-00023x-Su
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:14:07 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cVy7c-0002Xh-Od
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:14:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cVy71-0002QL-8X
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:14:05 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:9334 helo=relay.sw.ru)
+	(envelope-from <imammedo@redhat.com>) id 1cVy7a-0002Z1-2r
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:14:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cVy70-0002Pj-SR
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:14:03 -0500
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-9-git-send-email-vsementsov@virtuozzo.com>
-	<20170124075949.GD27126@lemon.Home>
-	<22f99aae-0968-286f-186c-0eaefadbe649@virtuozzo.com>
-	<20170124093643.GA14811@lemon.Home>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f38c92ff-9f18-e03f-a756-e44f6ca22dde@virtuozzo.com>
-Date: Tue, 24 Jan 2017 13:13:47 +0300
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cVy7Z-0002Yn-TN
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:14:38 -0500
+Date: Tue, 24 Jan 2017 11:14:35 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170124111435.68a519e1@nial.brq.redhat.com>
+In-Reply-To: <20170123180632.28942-3-ehabkost@redhat.com>
+References: <20170123180632.28942-1-ehabkost@redhat.com>
+	<20170123180632.28942-3-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170124093643.GA14811@lemon.Home>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/21] backup: skip unallocated clusters
- for full mode
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-options: Rewrite -numa
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com, jcody@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-24.01.2017 12:36, Fam Zheng wrote:
-> On Tue, 01/24 12:18, Vladimir Sementsov-Ogievskiy wrote:
->> 24.01.2017 10:59, Fam Zheng wrote:
->>> On Fri, 12/23 17:28, Vladimir Sementsov-Ogievskiy wrote:
->>>> diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
->>>> index 1d3fd04..388b7b2 100755
->>>> --- a/tests/qemu-iotests/055
->>>> +++ b/tests/qemu-iotests/055
->>>> @@ -30,6 +30,7 @@ target_img = os.path.join(iotests.test_dir, 'target.img')
->>>>    blockdev_target_img = os.path.join(iotests.test_dir, 'blockdev-target.img')
->>>>    image_len = 64 * 1024 * 1024 # MB
->>>> +pause_write = '3M'
->>>>    def setUpModule():
->>>>        qemu_img('create', '-f', iotests.imgfmt, test_img, str(image_len))
->>>> @@ -39,6 +40,7 @@ def setUpModule():
->>>>        qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xd5 1M 32k', test_img)
->>>>        qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xdc 32M 124k', test_img)
->>>>        qemu_io('-f', iotests.imgfmt, '-c', 'write -P0x33 67043328 64k', test_img)
->>>> +    qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xdc 40M ' + pause_write, test_img)
->>> What does this iotest change do?
->> Without this backup block-job finishes before the next query to it from test
->> and test fails. This is a wide problem I suffer of on the way of backup
->> improvement and it should have better solution then adjusting amount of data
->> being copied...
-> You can use blkdebug to pause I/O before querying the block job, or simply
-> throttle it down.
->
-> Fam
+On Mon, 23 Jan 2017 16:06:32 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-throttling down is not better I thing then just copying additional 3M, 
-it is environment-dependent hack too. And we can't use throttling in all 
-tests - throttling should be itself tested separately.
+> Rewrite the -numa documentation to clarify what exactly it does.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-In the other thread there was an idea to not delete block jobs on their 
-finish, but maintain them in some 'finished' state. This will be great 
-for the case and will be generic.
-
--- 
-Best regards,
-Vladimir
+> ---
+>  qemu-options.hx | 38 ++++++++++++++++++++++++++++----------
+>  1 file changed, 28 insertions(+), 10 deletions(-)
+> 
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 780528d6ad..a2c5d6668d 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -125,16 +125,34 @@ STEXI
+>  @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+>  @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+>  @findex -numa
+> -Simulate a multi node NUMA system. If @samp{mem}, @samp{memdev}
+> -and @samp{cpus} are omitted, resources are split equally. Also, note
+> -that the -@option{numa} option doesn't allocate any of the specified
+> -resources. That is, it just assigns existing resources to NUMA nodes. This
+> -means that one still has to use the @option{-m}, @option{-smp} options
+> -to allocate RAM and VCPUs respectively, and possibly @option{-object}
+> -to specify the memory backend for the @samp{memdev} suboption.
+> -
+> -@samp{mem} and @samp{memdev} are mutually exclusive.  Furthermore, if one
+> -node uses @samp{memdev}, all of them have to use it.
+> +Define a NUMA node and assign RAM and VCPUs to it.
+> +
+> +@var{firstcpu} and @var{lastcpu} are CPU indexes. Each
+> +@samp{cpus} option represent a contiguous range of CPU indexes
+> +(or a single VCPU if @var{lastcpu} is omitted). A non-contiguous
+> +set of VCPUs can be represented by providing multiple @samp{cpus}
+> +options. If @samp{cpus} is omitted on all nodes, VCPUs are automatically
+> +split between them.
+> +
+> +For example, the following option assigns VCPUs 0, 1, 2 and 5 to
+> +a NUMA node:
+> +@example
+> +-numa node,cpus=0-2,cpus=5
+> +@end example
+> +
+> +@samp{mem} assigns a given RAM amount to a node. @samp{memdev}
+> +assigns RAM from a given memory backend device to a node. If
+> +@samp{mem} and @samp{memdev} are omitted in all nodes, RAM is
+> +split equally between them.
+> +
+> +@samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
+> +if one node uses @samp{memdev}, all of them have to use it.
+> +
+> +Note that the -@option{numa} option doesn't allocate any of the
+> +specified resources, it just assigns existing resources to NUMA
+> +nodes. This means that one still has to use the @option{-m},
+> +@option{-smp} options to allocate RAM and VCPUs respectively.
+> +
+>  ETEXI
+>  
+>  DEF("add-fd", HAS_ARG, QEMU_OPTION_add_fd,
