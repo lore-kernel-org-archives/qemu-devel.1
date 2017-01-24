@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40904)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=8ff6=ZG=redhat.com=mst@kernel.org>)
-	id 1cW9hs-0008BG-NF
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:53 -0500
+	id 1cW9ht-0008CK-Oh
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=8ff6=ZG=redhat.com=mst@kernel.org>)
-	id 1cW9hp-0005tI-IV
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:52 -0500
-Received: from mail.kernel.org ([198.145.29.136]:37320)
+	id 1cW9hs-0005u7-VP
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:53 -0500
+Received: from mail.kernel.org ([198.145.29.136]:37346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=8ff6=ZG=redhat.com=mst@kernel.org>)
-	id 1cW9hp-0005tA-8V
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:49 -0500
-Date: Wed, 25 Jan 2017 00:36:44 +0200
+	id 1cW9hs-0005tp-P5
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:52 -0500
+Date: Wed, 25 Jan 2017 00:36:47 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485297322-10595-10-git-send-email-mst@redhat.com>
+Message-ID: <1485297322-10595-11-git-send-email-mst@redhat.com>
 References: <1485297322-10595-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485297322-10595-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 09/16] hw/pcie: Introduce Generic PCI Express
- Root Port
+Subject: [Qemu-devel] [PULL 10/16] hw/i386: check if nvdimm is enabled
+ before plugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,149 +31,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Andrea Bolognani <abologna@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Haozhong Zhang <haozhong.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Marcel Apfelbaum <marcel@redhat.com>
+From: Haozhong Zhang <haozhong.zhang@intel.com>
 
-The Generic Root Port behaves almost the same as the
-Intel's IOH device with id 3420, without having
-Intel specific attributes.
+The missing of 'nvdimm' in the machine type option '-M' means NVDIMM
+is disabled. QEMU should refuse to plug any NVDIMM device in this case
+and report the misconfiguration.
 
-The device has two purposes:
- (1) Can be used on both X86 and ARM machines.
- (2) It will allow us to tweak the behaviour
-    (e.g add vendor-specific PCI capabilities)
-     - something that obviously cannot be done
-       on a known device.
+The behavior of NVDIMM on unsupported platform (HW/FW) is vendor
+specific. For some vendors, it's undefined and the platform may do
+anything. Thus, I think QEMU is free to choose the implementation.
+Aborting QEMU (i.e. refusing to boot) is the easiest one.
 
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+Reported-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-Id: 20170112110928.GF4621@stefanha-x1.localdomain
+Message-Id: 20170111093630.2088-1-stefanha@redhat.com
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Tested-by: Andrea Bolognani <abologna@redhat.com>
+Reviewed-by: Xiao Guangrong <guangrong.xiao@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/hw/pci/pci.h               |  1 +
- hw/pci-bridge/gen_pcie_root_port.c | 88 ++++++++++++++++++++++++++++++++++++++
- hw/pci-bridge/Makefile.objs        |  2 +-
- 3 files changed, 90 insertions(+), 1 deletion(-)
- create mode 100644 hw/pci-bridge/gen_pcie_root_port.c
+ hw/i386/pc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index 772692f..cbc1fdf 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -96,6 +96,7 @@
- #define PCI_DEVICE_ID_REDHAT_PXB         0x0009
- #define PCI_DEVICE_ID_REDHAT_BRIDGE_SEAT 0x000a
- #define PCI_DEVICE_ID_REDHAT_PXB_PCIE    0x000b
-+#define PCI_DEVICE_ID_REDHAT_PCIE_RP     0x000c
- #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index c949cf0..47984c8 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1708,6 +1708,11 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+     }
  
- #define FMT_PCIBUS                      PRIx64
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-new file mode 100644
-index 0000000..42bbe34
---- /dev/null
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -0,0 +1,88 @@
-+/*
-+ * Generic PCI Express Root Port emulation
-+ *
-+ * Copyright (C) 2017 Red Hat Inc
-+ *
-+ * Authors:
-+ *   Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/pci/msix.h"
-+#include "hw/pci/pcie_port.h"
-+
-+#define TYPE_GEN_PCIE_ROOT_PORT                "pcie-root-port"
-+
-+#define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
-+#define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
-+
-+static uint8_t gen_rp_aer_vector(const PCIDevice *d)
-+{
-+    return 0;
-+}
-+
-+static int gen_rp_interrupts_init(PCIDevice *d, Error **errp)
-+{
-+    int rc;
-+
-+    rc = msix_init_exclusive_bar(d, GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR, 0);
-+
-+    if (rc < 0) {
-+        assert(rc == -ENOTSUP);
-+        error_setg(errp, "Unable to init msix vectors");
-+    } else {
-+        msix_vector_use(d, 0);
-+    }
-+
-+    return rc;
-+}
-+
-+static void gen_rp_interrupts_uninit(PCIDevice *d)
-+{
-+    msix_uninit_exclusive_bar(d);
-+}
-+
-+static const VMStateDescription vmstate_rp_dev = {
-+    .name = "pcie-root-port",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .post_load = pcie_cap_slot_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCIE_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot),
-+        VMSTATE_STRUCT(parent_obj.parent_obj.parent_obj.exp.aer_log,
-+                       PCIESlot, 0, vmstate_pcie_aer_log, PCIEAERLog),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+    PCIERootPortClass *rpc = PCIE_ROOT_PORT_CLASS(klass);
-+
-+    k->vendor_id = PCI_VENDOR_ID_REDHAT;
-+    k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_RP;
-+    dc->desc = "PCI Express Root Port";
-+    dc->vmsd = &vmstate_rp_dev;
-+    rpc->aer_vector = gen_rp_aer_vector;
-+    rpc->interrupts_init = gen_rp_interrupts_init;
-+    rpc->interrupts_uninit = gen_rp_interrupts_uninit;
-+    rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
-+}
-+
-+static const TypeInfo gen_rp_dev_info = {
-+    .name          = TYPE_GEN_PCIE_ROOT_PORT,
-+    .parent        = TYPE_PCIE_ROOT_PORT,
-+    .class_init    = gen_rp_dev_class_init,
-+};
-+
-+ static void gen_rp_register_types(void)
-+ {
-+    type_register_static(&gen_rp_dev_info);
-+ }
-+ type_init(gen_rp_register_types)
-diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
-index 4f2039f..85e8e39 100644
---- a/hw/pci-bridge/Makefile.objs
-+++ b/hw/pci-bridge/Makefile.objs
-@@ -1,6 +1,6 @@
- common-obj-y += pci_bridge_dev.o
- common-obj-y += pci_expander_bridge.o
--common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o
-+common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
- common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
- common-obj-$(CONFIG_IOH3420) += ioh3420.o
- common-obj-$(CONFIG_I82801B11) += i82801b11.o
+     if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
++        if (!pcms->acpi_nvdimm_state.is_enabled) {
++            error_setg(&local_err,
++                       "nvdimm is not enabled: missing 'nvdimm' in '-M'");
++            goto out;
++        }
+         nvdimm_plug(&pcms->acpi_nvdimm_state);
+     }
+ 
 -- 
 MST
