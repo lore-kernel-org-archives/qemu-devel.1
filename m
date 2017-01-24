@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVzcr-0004kG-Rc
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:51:03 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cVzdY-0005Mp-6O
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:51:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVzcn-0001js-Rb
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:51:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cVzcn-0001iv-K4
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:50:57 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cVzck-0000B5-Vz
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 11:50:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 33B042E81A7
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 11:50:52 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1cVzdU-00029B-57
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:51:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58094)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cVzdT-00028m-TX
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:51:40 -0500
+Date: Tue, 24 Jan 2017 11:51:33 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170124115133.GC20224@work-vm>
+References: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Jan 2017 11:41:12 -0000
-From: Rafael David Tinoco <rafael.tinoco@canonical.com>
-Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
-Message-Id: <20170124114112.5640.60798.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
- change for security drivers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484566314-3987-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/5] Introduce a new --only-migratable
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,142 +27,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Thanks Christian! Will do!!
+* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> Previously posted series patches:
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg02324.html
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg01277.html
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg00320.html
+> http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg02391.html
+> http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg02062.html
+> 
+> This series adds a new command line option "--only-migratable" which will only
+> allow addition of those devices to a QEMU instance which are migratable and do
+> not abruptly fail QEMU after migration.
 
--- =
+Queued.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1626972
+Dave
 
-Title:
-  QEMU memfd_create fallback mechanism change for security drivers
-
-Status in Ubuntu Cloud Archive:
-  Invalid
-Status in Ubuntu Cloud Archive mitaka series:
-  Fix Committed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Fix Committed
-Status in qemu source package in Yakkety:
-  Fix Released
-Status in qemu source package in Zesty:
-  Fix Released
-
-Bug description:
-  [Impact]
-
-   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
-   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
-   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
-
-  [Test Case]
-
-   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
-   * Try to live-migration from one to another. =
-
-   * Apparmor will block creation of /tmp/memfd-XXX files.
-
-  [Regression Potential]
-
-   Pros:
-   * Exhaustively tested this.
-   * Worked with upstream on this fix. =
-
-   * I'm implementing new vhost log mechanism for upstream.
-   * One line change to a blocker that is already broken.
-
-   Cons:
-   * To break live migration in other circumstances. =
-
-
-  [Other Info]
-
-   * Christian Ehrhardt has been following this.
-
-  ORIGINAL DESCRIPTION:
-
-  When libvirt starts using apparmor, and creating apparmor profiles for
-  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
-  and upstream also) uses a fallback mechanism for creating shared
-  memory for live-migrations. This fall back mechanism, on kernels 3.13
-  - that don't have memfd_create() system-call, try to create files on
-  /tmp/ directory and fails.. causing live-migration not to work.
-
-  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
-  can't live migrate.
-
-  From qemu 2.5, logic is on :
-
-  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
- int *fd)
-  {
-  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
-els
-
-  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
-  }
-
-  And you can see the errors:
-
-  From the host trying to send the virtual machine:
-
-  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
--8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
-1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
- Migration operation has aborted
-  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
--8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
-1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
- Live Migration failure: internal error: unable to execute QEMU command 'mi=
-grate': Migration disabled: failed to allocate shared memory
-
-  From the host trying to receive the virtual machine:
-
-  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
-289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
-nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
-5 comm=3D"apparmor_parser"
-  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
-289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
-nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
-289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
-=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
-=3D12613 comm=3D"apparmor_parser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
-289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
-=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
-rser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
-289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
-5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
-07 ouid=3D107
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
-289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
-afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
-u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
-289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
-afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
-"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
-=3D0
-
-  When leaving libvirt without apparmor capabilities (thus not confining
-  virtual machines on compute nodes, the live migration works as
-  expected, so, clearly, apparmor is stepping into the live migration).
-  I'm sure that virtual machines have to be confined and that this isn't
-  the desired behaviour...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
+> Patch 1 is a preparatory patch to remove an undesirable comment and make patchew
+> happy.
+> 
+> Patch 2 adds the new option "-only-migratable".
+> 
+> Patch 3 adds compatibility for various "device adding" options for both via
+> command line and hotplug methods.
+> 
+> Patch 4 helps to fail the migration blocker if the migration is already in
+> progress and thus cannot be blocked.
+> Note: This patch was originally written by John Snow and I have only made few
+> changes.
+> 
+> Patch 5 handles the special case of devices which become unmigratable
+> dynamically by making call to "migrate_add_blocker". Here we fail the
+> migration blocker if --only-migratable was specified.
+> Eg: 9pfs fails to mount the filesystem.
+> 
+> Note: I have not been able to test and compile the ARM drivers for KVM. They
+> are:
+> hw/intc/arm_gic_kvm.c
+> hw/intc/arm_gicv3_its_kvm.c
+> hw/intc/arm_gicv3_kvm.c
+> 
+> Changes in v6:
+> -make Error *local_err = NULL at some places
+> -free reason at call sites
+> -rebase
+> -pass error_copy(reason) in error_propagate()
+> 
+> Changes in v5:
+> -drop =0 for global variable (Dave)
+> -print error message if klass=NULL (Dave)
+> -deal with migration blocker before pdu_marshal (Greg)
+> -call migrate_add_blocker before kvm_create_device (Dave)
+> -fix typo in subject line for 4/4 (Eric)
+> -fix error_free in migrate_add_blocker (Dave)
+> -make migrate_add_blocker to deal with error messages itself (Peter, Greg, Dave)
+> 
+> Changes in v4:
+> - drop diff in 9pfs for patch 4/4
+> - call clunk_fid() after freeing migration_blocker
+> - drop ret and use err directly
+> 
+> Changes in v3:
+> - set s->root_fid after migrate_add_blocker
+> - free migration_blocker inside v9fs_attach()
+> - change back ret<0 to just ret
+> - free local_err
+> 
+> Changes in v2:
+> - change the documentation for the new option
+> - add a NULL check for ObjectClass
+> - break patch 3 into patch 3 and 4
+> - use error_append_hint
+> - return -EACCES for only-migratable
+> - fix the error messages
+> 
+> Ashijeet Acharya (5):
+>   block/vvfat: Remove the undesirable comment
+>   migration: Add a new option to enable only-migratable
+>   migration: Allow "device add" options to only add migratable devices
+>   migration: disallow migrate_add_blocker during migration
+>   migration: Fail migration blocker for --only-migratable
+> 
+>  block/qcow.c                  |  8 +++++++-
+>  block/vdi.c                   |  8 +++++++-
+>  block/vhdx.c                  | 17 +++++++++++------
+>  block/vmdk.c                  |  9 ++++++++-
+>  block/vpc.c                   | 11 ++++++++---
+>  block/vvfat.c                 | 20 ++++++++++++--------
+>  hw/9pfs/9p.c                  | 33 +++++++++++++++++++++-----------
+>  hw/display/virtio-gpu.c       | 32 ++++++++++++++++++-------------
+>  hw/intc/arm_gic_kvm.c         | 17 +++++++++++------
+>  hw/intc/arm_gicv3_its_kvm.c   | 20 +++++++++++++-------
+>  hw/intc/arm_gicv3_kvm.c       | 19 ++++++++++++-------
+>  hw/misc/ivshmem.c             | 14 ++++++++++----
+>  hw/scsi/vhost-scsi.c          | 25 ++++++++++++++++++------
+>  hw/usb/bus.c                  | 19 +++++++++++++++++++
+>  hw/virtio/vhost.c             |  8 +++++++-
+>  include/migration/migration.h | 10 +++++++++-
+>  migration/migration.c         | 44 +++++++++++++++++++++++++++++++++++++++++--
+>  qdev-monitor.c                |  9 +++++++++
+>  qemu-options.hx               |  9 +++++++++
+>  stubs/migr-blocker.c          |  3 ++-
+>  target/i386/kvm.c             | 16 +++++++++++++---
+>  vl.c                          |  4 ++++
+>  22 files changed, 273 insertions(+), 82 deletions(-)
+> 
+> -- 
+> 2.6.2
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
