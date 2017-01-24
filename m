@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVyrf-0002mo-60
+	(envelope-from <berrange@redhat.com>) id 1cVyrf-0002me-1g
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:02:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVyre-0008TQ-Dr
+	(envelope-from <berrange@redhat.com>) id 1cVyrc-0008T4-E1
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:02:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57620)
+Received: from mx1.redhat.com ([209.132.183.28]:49770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVyre-0008TI-81
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:02:14 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVyrc-0008So-5j
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:02:12 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 24 Jan 2017 11:01:51 +0000
-Message-Id: <20170124110151.937-9-berrange@redhat.com>
+Date: Tue, 24 Jan 2017 11:01:50 +0000
+Message-Id: <20170124110151.937-8-berrange@redhat.com>
 In-Reply-To: <20170124110151.937-1-berrange@redhat.com>
 References: <20170124110151.937-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 8/8] trace: improve error reporting when
- parsing simpletrace header
+Subject: [Qemu-devel] [PATCH v3 7/8] trace: update docs to reflect new code
+ generation approach
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +27,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-When loading a simpletrace binary file we just report
-"Not a valid trace file!" which is not very helpful. Report
-exactly which field we found to be invalid.
+Describe use of per-subdir trace events files and how it impacts
+code generation.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- scripts/simpletrace.py | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ docs/tracing.txt | 55 ++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 44 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/simpletrace.py b/scripts/simpletrace.py
-index 4ca903d..4c99004 100755
---- a/scripts/simpletrace.py
-+++ b/scripts/simpletrace.py
-@@ -73,10 +73,14 @@ def read_record(edict, idtoname, fobj):
- def read_trace_header(fobj):
-     """Read and verify trace file header"""
-     header = read_header(fobj, log_header_fmt)
--    if header is None or \
--       header[0] != header_event_id or \
--       header[1] != header_magic:
-+    if header is None:
-         raise ValueError('Not a valid trace file!')
-+    if header[0] != header_event_id:
-+        raise ValueError('Not a valid trace file, header id %d != %d' %
-+                         (header[0], header_event_id))
-+    if header[1] != header_magic:
-+        raise ValueError('Not a valid trace file, header magic %d != %d' %
-+                         (header[1], header_magic))
+diff --git a/docs/tracing.txt b/docs/tracing.txt
+index f351998a..e14bb6d 100644
+--- a/docs/tracing.txt
++++ b/docs/tracing.txt
+@@ -27,18 +27,44 @@ for debugging, profiling, and observing execution.
  
-     log_version = header[2]
-     if log_version not in [0, 2, 3, 4]:
+ == Trace events ==
+ 
+-Each directory in the source tree can declare a set of static trace events
+-in a "trace-events" file. Each trace event declaration names the event, its
+-arguments, and the format string which can be used for pretty-printing:
++=== Sub-directory setup ===
+ 
+-    qemu_vmalloc(size_t size, void *ptr) "size %zu ptr %p"
+-    qemu_vfree(void *ptr) "ptr %p"
+-
+-All "trace-events" files must be listed in the "trace-event-y" make variable
+-in the top level Makefile.objs. During build the individual files are combined
+-to create a "trace-events-all" file, which is processed by the "tracetool"
+-script during build to generate code for the trace events. The
+-"trace-events-all" file is also installed into "/usr/share/qemu".
++Each directory in the source tree can declare a set of static trace events
++in a local "trace-events" file. All directories which contain "trace-events"
++files must be listed in the "trace-events-subdirs" make variable in the top
++level Makefile.objs. During build, the "trace-events" file in each listed
++subdirectory will be processed by the "tracetool" script to generate code for
++the trace events.
++
++The individual "trace-events" files are merged into a "trace-events-all" file,
++which is also installed into "/usr/share/qemu" with the name "trace-events".
++This merged file is to be used by the "simpletrace.py" script to later analyse
++traces in the simpletrace data format.
++
++In the sub-directory the following files will be automatically generated
++
++ - trace.c - the trace event state declarations
++ - trace.h - the trace event enums and probe functions
++ - trace-dtrace.h - DTrace event probe specification
++ - trace-dtrace.dtrace - DTrace event probe helper declaration
++ - trace-dtrace.o - binary DTrace provider (generated by dtrace)
++ - trace-ust.h - UST event probe helper declarations
++
++Source files in the sub-directory should #include the local 'trace.h' file,
++without any sub-directory path prefix. eg io/channel-buffer.c would do
++
++  #include "trace.h"
++
++To access the 'io/trace.h' file. While it is possible to include a trace.h
++file from outside a source files' own sub-directory, this is discouraged in
++general. It is strongly preferred that all events be declared directly in
++the sub-directory that uses them. The only exception is where there are some
++shared trace events defined in the top level directory trace-events file.
++The top level directory generates trace files with a filename prefix of
++"trace-root" instead of just "trace". This is to avoid ambiguity between
++a trace.h in the current directory, vs the top level directory.
++
++=== Using trace events ===
+ 
+ Trace events are invoked directly from source code like this:
+ 
+@@ -83,6 +109,13 @@ Format strings should reflect the types defined in the trace event.  Take
+ special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
+ respectively.  This ensures portability between 32- and 64-bit platforms.
+ 
++Each event declaration will start with the event name, then its arguments,
++finally a format string for pretty-printing. For example:
++
++    qemu_vmalloc(size_t size, void *ptr) "size %zu ptr %p"
++    qemu_vfree(void *ptr) "ptr %p"
++
++
+ === Hints for adding new trace events ===
+ 
+ 1. Trace state changes in the code.  Interesting points in the code usually
 -- 
 2.9.3
