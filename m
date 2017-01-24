@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cVxFc-0005TG-7p
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:18:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1cVxHg-0006tl-T6
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cVxFb-0003Qx-CK
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:18:52 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1479837270-79005-8-git-send-email-vsementsov@virtuozzo.com>
-	(Vladimir Sementsov-Ogievskiy's message of "Tue, 22 Nov 2016 20:54:20
-	+0300")
-References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
-	<1479837270-79005-8-git-send-email-vsementsov@virtuozzo.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 24 Jan 2017 10:18:42 +0100
-Message-ID: <87tw8oak99.fsf@emacs.mitica>
+	(envelope-from <bounces@canonical.com>) id 1cVxHe-00043C-6x
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:21:00 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47702)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cVxHe-00042v-2E
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:20:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cVxHb-0000Ng-IR
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B409A2E80D4
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:20:54 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 07/17] qapi: add dirty-bitmaps migration
- capability
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 24 Jan 2017 09:09:08 -0000
+From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
+Reply-To: Bug 1658634 <1658634@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170123095738.20994.7212.malonedeb@gac.canonical.com>
+Message-Id: <20170124090908.2186.15499.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1658634] Re: Can't get correct display with
+ latest QEMU and OVMF BIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,12 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: qemu-devel@nongnu.org
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+For reference, this is my script:
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+ISO=3Dubuntu-16.04.1-desktop-amd64.iso
+CODE=3DOVMF_CODE.fd
+TMPL=3DOVMF_VARS.fd
+
+cp $TMPL vars.fd
+
+qemu-system-x86_64 \
+  -m 1024 \
+  -M pc,accel=3Dkvm \
+  -device VGA \
+  -drive if=3Dpflash,readonly,format=3Draw,file=3D$CODE \
+  -drive if=3Dpflash,format=3Draw,file=3Dvars.fd \
+  -drive id=3Dcdrom,if=3Dnone,readonly,format=3Draw,file=3D$ISO \
+  -device virtio-scsi-pci,id=3Dscsi0 \
+  -device scsi-cd,bus=3Dscsi0.0,drive=3Dcdrom,bootindex=3D0 \
+  -debugcon file:debug.log \
+  -global isa-debugcon.iobase=3D0x402 \
+  -chardev stdio,signal=3Doff,mux=3Don,id=3Dchar0 \
+  -mon chardev=3Dchar0,mode=3Dreadline,default \
+  -serial chardev:char0
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1658634
+
+Title:
+  Can't get correct display with latest QEMU and OVMF BIOS
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  I tried to install a Ubuntu 16.04.1 Desktop 64bits with latest QEMU and O=
+VMF UEFI BIOS, however I can't get correct display output with default vga =
+configuration (-vga std). However, qemu works with a couple of different co=
+nfigurations:
+  1. "-vga cirrus" + "-bios OVMF.fd": works
+  2. "-vga std" + non-UEFI bios: works
+
+  The same error with QEMU 2.8.0 release. Everything works well on
+  2.7.0/1.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1658634/+subscriptions
