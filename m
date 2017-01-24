@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cVz6k-0000Co-3B
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:17:50 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cVz7N-0000ka-JQ
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:18:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cVz6j-0005II-6B
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:17:50 -0500
-References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
-	<1485164923-17736-7-git-send-email-armbru@redhat.com>
-	<2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com>
-	<877f5l1tak.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3512807d-d04e-50fa-9fcf-d1d5ba8ac350@redhat.com>
-Date: Tue, 24 Jan 2017 12:17:40 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cVz7M-0005nG-Jp
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:18:29 -0500
+Received: from mail-vk0-x22a.google.com ([2607:f8b0:400c:c05::22a]:34438)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cVz7M-0005n0-F5
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:18:28 -0500
+Received: by mail-vk0-x22a.google.com with SMTP id r136so109682386vke.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 03:18:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <877f5l1tak.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
- lsi53c895a SCSI HBAs
+In-Reply-To: <20170121084600.5860-2-ale+qemu@clearmind.me>
+References: <20170121084600.5860-1-ale+qemu@clearmind.me>
+	<20170121084600.5860-2-ale+qemu@clearmind.me>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Jan 2017 11:18:07 +0000
+Message-ID: <CAFEAcA-52cjhLWWVGQ0qPeF3uKA67-ZBk=EQT2ARL1tjATWMkQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC PATCH 1/3] Factor out {linux, bsd}-user/qemu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Alessandro Di Federico <ale+qemu@clearmind.me>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 21 January 2017 at 08:45, Alessandro Di Federico
+<ale+qemu@clearmind.me> wrote:
+> A quite large part of {linux,bsd}-user/qemu.h is shared, this patch
+> introduces qemu-user-common.h which factors it out. This shared part is
+> also the bare minimum required to build a linux-user-like target, and,
+> in particular, it will be useful for the libtcg targets.
+> ---
+>  bsd-user/qemu.h    | 193 +----------------------------------------------------
+>  linux-user/qemu.h  | 176 +-----------------------------------------------
+>  qemu-user-common.h | 180 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 182 insertions(+), 367 deletions(-)
+>  create mode 100644 qemu-user-common.h
 
+So my issue with this is that currently linux-user is pretty
+well maintained and tested, but bsd-user is basically unmaintained
+and not even compile tested. So it's convenient to have bsd-user
+code be basically its own distinct standalone thing, because
+then when we fix linux-user we don't have to care too much
+about whether bsd-user might be accidentally broken by our
+changes.
 
-On 23/01/2017 20:16, Markus Armbruster wrote:
->>                                                      Could we change
->> those messages to errors
-> 
-> Fine with me, but when it comes to arguing for backward compatibility of
-> our byzantine command line, I'm kind of like a lethargic public defender
-> with an overly deep relationship to Bourbon.  "Your honor, sure capital
-> punishment is called for?  Yes?  Okay then."
-> 
-> I vaguely recall discussing the topic with Peter (cc'ed).  If memory
-> serves, one concern was breaking usage of -device with -drive lacking
-> if=...  Works fine (no warning) with machines that don't pick up drives
-> with their default block interface type, i.e. most of them.  But PATCH 3
-> changes their default to if=none, so that usage wouldn't actually break.
+If we had more active testing of bsd-user I'd be a bit keener
+about removing some of the code duplication.
 
-I think that tips the scale in favor of having errors.
-
-> What would break is -device with -drive if=T, where T is not none and
-> not picked up by the board.  Such usage is certainly questionable[*],
-> but it's questionable enough for us to break it?
-> 
->>                          and then drop PC if=scsi support altogether?
-> 
-> Different backward compatibility question: here we break usage of
-> if=scsi with PC machine types.  Legacy way to do things, but it's
-> documented in qemu.1.  Are we happy to break it?
-
-That usage is wrong after this patch, since it mentions
-qemu-system-i386.  So it's documented, but almost useless and the
-example is not exactly correct.  Let's deprecate it in 2.9 and remove in
-2.10.
-
-Paolo
+thanks
+-- PMM
