@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cVzAo-0003ii-BF
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:22:03 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cVzCA-0004vy-Ak
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:23:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cVzAl-0006m0-5j
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:22:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39718)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cVzAk-0006lj-Vs
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:21:59 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 223A33A768A
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 11:21:59 +0000 (UTC)
-Date: Tue, 24 Jan 2017 11:21:54 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170124112154.GA20224@work-vm>
-References: <20170124100437.18200-1-dgilbert@redhat.com>
-	<87wpdk912p.fsf@emacs.mitica>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cVzC9-000786-ID
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:23:26 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
+	<20170122142959.GA12419@lemon.Home>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ff2fd02a-09ea-a28f-eb6e-e1858efff552@redhat.com>
+Date: Tue, 24 Jan 2017 12:23:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wpdk912p.fsf@emacs.mitica>
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add myself as a migration
- submaintainer
+In-Reply-To: <20170122142959.GA12419@lemon.Home>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] scsi-generic and BLKSECTGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,19 +24,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
+To: Fam Zheng <famz@redhat.com>, Eric Farman <farman@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+
+On 22/01/2017 15:29, Fam Zheng wrote:
+> On Fri, 01/20 17:25, Eric Farman wrote:
+>> Changes:
+>>  v2->v3:
+>>   - Move byte/sector conversions to patch 2 [Fam Zheng]
+>>   - Rename "max_sectors" when holding a byte value [Fam Zheng]
+>>  v1->v2:
+>>   - Patch 3, make hdev_get_max_transfer_length return bytes [Fam Zheng]
 > 
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
 
-Thanks, in that case I'll queue it.
+Looks good, who's merging this? :)
 
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
