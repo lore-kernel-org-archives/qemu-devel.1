@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=8ff6=ZG=redhat.com=mst@kernel.org>)
-	id 1cW9iH-0000DV-6p
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:37:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1cWA9o-0003wV-LZ
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 18:05:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=8ff6=ZG=redhat.com=mst@kernel.org>)
-	id 1cW9iG-00060S-2z
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:37:17 -0500
-Received: from mail.kernel.org ([198.145.29.136]:37542)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <SRS0=8ff6=ZG=redhat.com=mst@kernel.org>)
-	id 1cW9iF-0005zw-T2
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:37:16 -0500
-Date: Wed, 25 Jan 2017 00:37:10 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485297322-10595-17-git-send-email-mst@redhat.com>
-References: <1485297322-10595-1-git-send-email-mst@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cWA9k-00057P-MU
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 18:05:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48822)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cWA9k-00057J-Gp
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 18:05:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cWA9i-0000jV-Vq
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 23:05:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EC4192E80AF
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 23:05:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1485297322-10595-1-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/16] vhost-user: delete chardev on cleanup
+Date: Tue, 24 Jan 2017 22:59:50 -0000
+From: Kai Cong <1658634@bugs.launchpad.net>
+Reply-To: Bug 1658634 <1658634@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170123095738.20994.7212.malonedeb@gac.canonical.com>
+Message-Id: <20170124225950.5452.7928.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1658634] Re: Can't get correct display with
+ latest QEMU and OVMF BIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +38,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+It works well on my side with the patch. Thanks!
 
-Remove the chardev implicitly when cleaning up the netdev. This
-prevents from reusing the chardev since it would be in an incorrect
-state with the slave.
+-- =
 
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1256618
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1658634
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- net/vhost-user.c | 3 +++
- 1 file changed, 3 insertions(+)
+Title:
+  Can't get correct display with latest QEMU and OVMF BIOS
 
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index 7aff77e..179939f 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -151,7 +151,10 @@ static void vhost_user_cleanup(NetClientState *nc)
-         s->vhost_net =3D NULL;
-     }
-     if (nc->queue_index =3D=3D 0) {
-+        CharDriverState *chr =3D qemu_chr_fe_get_driver(&s->chr);
-+
-         qemu_chr_fe_deinit(&s->chr);
-+        qemu_chr_delete(chr);
-     }
-=20
-     qemu_purge_queued_packets(nc);
---=20
-MST
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  I tried to install a Ubuntu 16.04.1 Desktop 64bits with latest QEMU and O=
+VMF UEFI BIOS, however I can't get correct display output with default vga =
+configuration (-vga std). However, qemu works with a couple of different co=
+nfigurations:
+  1. "-vga cirrus" + "-bios OVMF.fd": works
+  2. "-vga std" + non-UEFI bios: works
+
+  The same error with QEMU 2.8.0 release. Everything works well on
+  2.7.0/1.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1658634/+subscriptions
