@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxoU-0001g3-FE
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:54:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cVxpA-0002Hr-Q0
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:55:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxoQ-0005iq-Et
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:54:54 -0500
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Tue, 24 Jan 2017 12:39:07 +0300
-Message-Id: <7f473c284e9811e3ac5dfcae1f858bac5ade1066.1485250702.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 03/31] README: Add linux to macOS build info
+	(envelope-from <peter.maydell@linaro.org>) id 1cVxp9-0005vB-Uk
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:55:36 -0500
+Received: from mail-vk0-x22c.google.com ([2607:f8b0:400c:c05::22c]:34330)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cVxp9-0005v5-Jn
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:55:35 -0500
+Received: by mail-vk0-x22c.google.com with SMTP id r136so108530824vke.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 01:55:35 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <87pojcx3zd.fsf@dusky.pond.sub.org>
+References: <1485206518-32403-1-git-send-email-atar4qemu@gmail.com>
+	<CAFEAcA860sYR6svwKMtjjoknfkVK=-Ch8vat_ywPyyvjtsr=MA@mail.gmail.com>
+	<CAFEAcA-VKUKcCJ2a7Zx_rnWDQTUjbuu4ztXS1AqtmqSQnktVuQ@mail.gmail.com>
+	<87pojcx3zd.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Jan 2017 09:55:14 +0000
+Message-ID: <CAFEAcA8CKZRcGSCrtBvPykh2Z4wCXyHd3ct=wk8jV=dh1uMp1g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 1/2] niagara: fail if a firmware file is
+ missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,32 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+On 24 January 2017 at 08:21, Markus Armbruster <armbru@redhat.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>> PS: doesn't this break 'make check' if the rom files
+>> are missing?
+>
+> Yes, it does.  Obvious incremental fix appended.  It still prints
+> rom_add_file()'s message.  Swap the operands of && to get rid of it.
 
-The README lists the URLs for the wiki pages describing
-how to build on Linux and Windows; add the equivalent
-link for building on macOS.
+Yes, we should do this with
+ (!qtest_enabled && rom_add_file_fixed(file, addr, -1))
+to avoid printing the warnings in the make check output.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
----
- README | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/README b/README
-index bd8060a..cb60d05 100644
---- a/README
-+++ b/README
-@@ -45,6 +45,7 @@ of other UNIX targets. The simple steps to build QEMU are:
- Additional information can also be found online via the QEMU website:
- 
-   http://qemu-project.org/Hosts/Linux
-+  http://qemu-project.org/Hosts/Mac
-   http://qemu-project.org/Hosts/W32
- 
- 
--- 
-2.1.4
+thanks
+-- PMM
