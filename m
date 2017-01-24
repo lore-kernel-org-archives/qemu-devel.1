@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVw1I-00085W-Qt
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:00:01 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cVw1z-0008WJ-5g
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:00:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVw1I-0002UJ-2X
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:00:00 -0500
-Date: Tue, 24 Jan 2017 15:59:49 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170124075949.GD27126@lemon.Home>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-9-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cVw1y-0002xF-0y
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 03:00:43 -0500
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Tue, 24 Jan 2017 15:59:52 +0800
+Message-ID: <1485244792-11248-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1482503344-6424-9-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 08/21] backup: skip unallocated clusters
- for full mode
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] migration: re-active images while migration
+ been canceled after inactive them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +20,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com, jcody@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, dgilbert@redhat.com, amit.shah@redhat.com, quintela@redhat.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-On Fri, 12/23 17:28, Vladimir Sementsov-Ogievskiy wrote:
-> diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-> index 1d3fd04..388b7b2 100755
-> --- a/tests/qemu-iotests/055
-> +++ b/tests/qemu-iotests/055
-> @@ -30,6 +30,7 @@ target_img = os.path.join(iotests.test_dir, 'target.img')
->  blockdev_target_img = os.path.join(iotests.test_dir, 'blockdev-target.img')
->  
->  image_len = 64 * 1024 * 1024 # MB
-> +pause_write = '3M'
->  
->  def setUpModule():
->      qemu_img('create', '-f', iotests.imgfmt, test_img, str(image_len))
-> @@ -39,6 +40,7 @@ def setUpModule():
->      qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xd5 1M 32k', test_img)
->      qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xdc 32M 124k', test_img)
->      qemu_io('-f', iotests.imgfmt, '-c', 'write -P0x33 67043328 64k', test_img)
-> +    qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xdc 40M ' + pause_write, test_img)
+commit fe904ea8242cbae2d7e69c052c754b8f5f1ba1d6 fixed a case
+which migration aborted QEMU because it didn't regain the control
+of images while some errors happened.
 
-What does this iotest change do?
+Actually, there are another two cases can trigger the same error reports:
+" bdrv_co_do_pwritev: Assertion `!(bs->open_flags & 0x0800)' failed",
 
-Fam
+Case 1, codes path:
+migration_thread()
+    migration_completion()
+        bdrv_inactivate_all() ----------------> inactivate images
+        qemu_savevm_state_complete_precopy()
+            socket_writev_buffer() --------> error because destination fails
+                qemu_fflush() ----------------> set error on migration stream
+-> qmp_migrate_cancel() ----------------> user cancelled migration concurrently
+    -> migrate_set_state() ------------------> set migrate CANCELLIN
+    migration_completion() -----------------> go on to fail_invalidate
+	if (s->state == MIGRATION_STATUS_ACTIVE) -> Jump this branch
 
->  
->  def tearDownModule():
->      os.remove(test_img)
-> -- 
-> 1.8.3.1
-> 
+Case 2, codes path:
+migration_thread()
+    migration_completion()
+        bdrv_inactivate_all() ----------------> inactivate images
+    migreation_completion() finished
+-> qmp_migrate_cancel() ---------------> user cancelled migration concurrently
+    qemu_mutex_lock_iothread();
+    qemu_bh_schedule (s->cleanup_bh);
+
+As we can see from above, qmp_migrate_cancel can slip in whenever
+migration_thread does not hold the global lock. If this happens after
+bdrv_inactive_all() been called, the above error reports will appear.
+
+To prevent this, we can call bdrv_invalidate_cache_all() in qmp_migrate_cancel()
+directly if we find images become inactive.
+
+Besides, bdrv_invalidate_cache_all() in migration_completion() doesn't have the
+protection of big lock, fix it by add the missing qemu_mutex_lock_iothread();
+
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+---
+v2:
+ - Fix a bug introduced by commit fe904 which didn't get big lock
+   before call bdrv_invalidate_cache_all. (Suggested by Dave)
+---
+ include/migration/migration.h |  3 +++
+ migration/migration.c         | 15 +++++++++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index c309d23..2d5b724 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -177,6 +177,9 @@ struct MigrationState
+     /* Flag set once the migration thread is running (and needs joining) */
+     bool migration_thread_running;
+ 
++    /* Flag set once the migration thread called bdrv_inactivate_all */
++    bool block_inactive;
++
+     /* Queue of outstanding page requests from the destination */
+     QemuMutex src_page_req_mutex;
+     QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
+diff --git a/migration/migration.c b/migration/migration.c
+index f498ab8..5b50afe 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1006,6 +1006,16 @@ static void migrate_fd_cancel(MigrationState *s)
+     if (s->state == MIGRATION_STATUS_CANCELLING && f) {
+         qemu_file_shutdown(f);
+     }
++    if (s->state == MIGRATION_STATUS_CANCELLING && s->block_inactive) {
++        Error *local_err = NULL;
++
++        bdrv_invalidate_cache_all(&local_err);
++        if (local_err) {
++            error_report_err(local_err);
++        } else {
++            s->block_inactive = false;
++        }
++    }
+ }
+ 
+ void add_migration_state_change_notifier(Notifier *notify)
+@@ -1705,6 +1715,7 @@ static void migration_completion(MigrationState *s, int current_active_state,
+             if (ret >= 0) {
+                 qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
+                 qemu_savevm_state_complete_precopy(s->to_dst_file, false);
++                s->block_inactive = true;
+             }
+         }
+         qemu_mutex_unlock_iothread();
+@@ -1755,10 +1766,14 @@ fail_invalidate:
+     if (s->state == MIGRATION_STATUS_ACTIVE) {
+         Error *local_err = NULL;
+ 
++        qemu_mutex_lock_iothread();
+         bdrv_invalidate_cache_all(&local_err);
+         if (local_err) {
+             error_report_err(local_err);
++        } else {
++            s->block_inactive = false;
+         }
++        qemu_mutex_unlock_iothread();
+     }
+ 
+ fail:
+-- 
+1.8.3.1
