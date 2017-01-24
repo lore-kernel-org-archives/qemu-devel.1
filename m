@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cW1g0-00026g-LX
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:02:25 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cW1kE-0004fc-Sy
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:06:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cW1fz-0003Xm-OC
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:02:24 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48259)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cW1fz-0003WA-IA
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:02:23 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jan 2017 14:02:18 +0000
-Message-Id: <1485266538-10119-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] Makefile: Add qemu-doc.txt to distclean and
- dependencies
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cW1kC-0004mS-8G
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:06:46 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:58339)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cW1kB-0004lw-LK
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:06:44 -0500
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Tue, 24 Jan 2017 22:05:45 +0800
+Message-ID: <1485266748-15340-1-git-send-email-zhang.zhanghailiang@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 0/3] colo-compare: Preparing work for combining
+ with COLO frame
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org, jasowang@redhat.com
+Cc: zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, eddie.dong@intel.com, Xu Quan <xuquan8@huawei.com>
 
-When qemu-doc.txt was added as a new output format in
-commit f8bab10b4c3f, it was not added to either the
-list of files to remove in distclean or to the dependency
-line that forces qemu-options.texi to be built before
-attempting to build qemu-doc.*.
+Hi,
 
-In particular, the missing dependency meant that on
-some platforms (notably OSX hosts) we would try to
-build qemu-doc.txt before qemu-options.texi had been
-fully written out, and then makeinfo would complain
-about missing cross-reference targets.
+This series is some preparing works for integrating colo-compare into COLO
+frame.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+It is based on patch '[PATCH] colo-compare: sort TCP packet queue by sequence number'
+http://patchwork.ozlabs.org/patch/718955/ 
 
-diff --git a/Makefile b/Makefile
-index 9f8968d..c166d2d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -393,7 +393,7 @@ distclean: clean
- 	rm -f qemu-doc.info qemu-doc.aux qemu-doc.cp qemu-doc.cps
- 	rm -f qemu-doc.fn qemu-doc.fns qemu-doc.info qemu-doc.ky qemu-doc.kys
- 	rm -f qemu-doc.log qemu-doc.pdf qemu-doc.pg qemu-doc.toc qemu-doc.tp
--	rm -f qemu-doc.vr
-+	rm -f qemu-doc.vr qemu-doc.txt
- 	rm -f config.log
- 	rm -f linux-headers/asm
- 	rm -f qemu-ga-qapi.texi qemu-qapi.texi
-@@ -590,7 +590,7 @@ info: qemu-doc.info docs/qemu-qmp-ref.info docs/qemu-ga-ref.info
- pdf: qemu-doc.pdf docs/qemu-qmp-ref.pdf docs/qemu-ga-ref.pdf
- txt: qemu-doc.txt docs/qemu-qmp-ref.txt docs/qemu-ga-ref.txt
- 
--qemu-doc.html qemu-doc.info qemu-doc.pdf: \
-+qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
- 	qemu-img.texi qemu-nbd.texi qemu-options.texi qemu-option-trace.texi \
- 	qemu-monitor.texi qemu-img-cmds.texi qemu-ga.texi \
- 	qemu-monitor-info.texi
+Please review and any commits are welcomed.
+
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Amit Shah <amit.shah@redhat.com>
+Cc: Dr. David Alan Gilbert (git) <dgilbert@redhat.com>
+Cc: eddie.dong@intel.com
+Cc: Xu Quan <xuquan8@huawei.com>
+
+
+Zhang Chen (1):
+  colo-compare: add API to flush all queued packets while do checkpoint
+
+zhanghailiang (2):
+  colo-compare: reconstruct the mutex lock usage
+  colo-compare: use notifier to notify inconsistent packets comparing
+
+ net/colo-compare.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++------
+ net/colo-compare.h |  22 +++++++++++
+ net/colo.c         |   2 +
+ net/colo.h         |   2 +
+ 4 files changed, 119 insertions(+), 12 deletions(-)
+ create mode 100644 net/colo-compare.h
+
 -- 
-2.7.4
+1.8.3.1
