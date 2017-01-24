@@ -1,32 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cW6ZI-00005K-G5
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:15:49 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cW6Zv-0000ZU-Da
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:16:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cW6ZF-0000LA-50
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:15:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60520)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cW6ZE-0000L2-T2
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:15:45 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EC3297E9F1
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 19:15:44 +0000 (UTC)
-References: <20170124095332.23955-1-berrange@redhat.com>
-	<20170124095332.23955-9-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0dda8b6d-b305-1e97-1cc7-89b06eebc735@redhat.com>
-Date: Tue, 24 Jan 2017 13:15:42 -0600
-MIME-Version: 1.0
-In-Reply-To: <20170124095332.23955-9-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="sivhNqRaRu5UBw2uOvalkcDwqfI45OMOw"
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] ui: add ability to specify multiple
- VNC listen addresses
+	(envelope-from <pm215@archaic.org.uk>) id 1cW6Zu-0000ZD-EQ
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:16:27 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Jan 2017 19:16:11 +0000
+Message-Id: <1485285380-10565-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1485285380-10565-1-git-send-email-peter.maydell@linaro.org>
+References: <1485285380-10565-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 01/10] target/arm: Drop IS_M() macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,80 +19,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Liviu Ionescu <ilg@livius.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sivhNqRaRu5UBw2uOvalkcDwqfI45OMOw
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <0dda8b6d-b305-1e97-1cc7-89b06eebc735@redhat.com>
-Subject: Re: [PATCH v2 8/8] ui: add ability to specify multiple VNC listen
- addresses
-References: <20170124095332.23955-1-berrange@redhat.com>
- <20170124095332.23955-9-berrange@redhat.com>
-In-Reply-To: <20170124095332.23955-9-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+We only use the IS_M() macro in two places, and it's a bit of a
+namespace grab to put in cpu.h.  Drop it in favour of just explicitly
+calling arm_feature() in the places where it was used.
 
-On 01/24/2017 03:53 AM, Daniel P. Berrange wrote:
-> This change allows the listen address and websocket address
-> options for -vnc to be repeated. This causes the VNC server
-> to listen on multiple addresses. e.g.
->=20
->  $ $QEMU -vnc vnc=3Dlocalhost:1,vnc=3Dunix:/tmp/vnc,\
->               websocket=3D127.0.0.1:8080,websocket=3D[::]:8081
->=20
-> results in listening on
->=20
-> 127.0.0.1:5901, 127.0.0.1:8080, ::1:5901, :::8081 & /tmp/vnc
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  ui/vnc.c | 198 +++++++++++++++++++++++++++++++++++++++++++------------=
---------
->  1 file changed, 135 insertions(+), 63 deletions(-)
->=20
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/cpu.h    | 6 ------
+ target/arm/cpu.c    | 2 +-
+ target/arm/helper.c | 2 +-
+ 3 files changed, 2 insertions(+), 8 deletions(-)
 
-> @@ -3835,7 +3901,9 @@ void vnc_display_open(const char *id, Error **err=
-p)
->          return;
->      }
-> =20
-> -    if (vnc_display_get_addresses(opts, &saddr, &wsaddr, errp) < 0) {
-> +    if (vnc_display_get_addresses(opts, &saddr, &nsaddr,
-> +                                  &wsaddr, &nwsaddr, errp) < 0) {
-> +        g_printerr("failing\n");
->          goto fail;
-
-Leftover debugging?
-
-Otherwise looks okay, so with that line gone,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---sivhNqRaRu5UBw2uOvalkcDwqfI45OMOw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYh6feAAoJEKeha0olJ0NqTaMIAKA7f2ErlnJjXPsucCDeimDf
-FzUsNawQMY7E7Lgaxb3NrqkgrVMCl/RJPh9x5gj7+3xDBTN5ssNiVjMFE/t0qLKK
-mfZwWqZxsccsb69Lxe9q4OaJWdLLmSpLw/VhKEvzF61ZiTOlyojZ+xCFi58Wwe7K
-uGl1RRGrlxQ3vdONCmsbYzYc2z1MjQEgE+Dd/284dTu6jeBZ5YqLvUkcvA+3XN9D
-8FtzNgFHMN9CgVVFbxf9yb1yyAfYt9Dbvago32/DmsRv/zZEVQkHvE3L1d3AwAub
-kLb6QZKTTITX8Qc/tXbY5HPegggFO+rzRo8eu7UnXGiG1Xc144rsxwqlimsrAlw=
-=/WRQ
------END PGP SIGNATURE-----
-
---sivhNqRaRu5UBw2uOvalkcDwqfI45OMOw--
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 521c11b..b2cc329 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1762,12 +1762,6 @@ bool write_list_to_cpustate(ARMCPU *cpu);
+  */
+ bool write_cpustate_to_list(ARMCPU *cpu);
+ 
+-/* Does the core conform to the "MicroController" profile. e.g. Cortex-M3.
+-   Note the M in older cores (eg. ARM7TDMI) stands for Multiply. These are
+-   conventional cores (ie. Application or Realtime profile).  */
+-
+-#define IS_M(env) arm_feature(env, ARM_FEATURE_M)
+-
+ #define ARM_CPUID_TI915T      0x54029152
+ #define ARM_CPUID_TI925T      0x54029252
+ 
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 9075989..6395d5a 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -182,7 +182,7 @@ static void arm_cpu_reset(CPUState *s)
+     /* On ARMv7-M the CPSR_I is the value of the PRIMASK register, and is
+      * clear at reset. Initial SP and PC are loaded from ROM.
+      */
+-    if (IS_M(env)) {
++    if (arm_feature(env, ARM_FEATURE_M)) {
+         uint32_t initial_msp; /* Loaded from 0x0 */
+         uint32_t initial_pc; /* Loaded from 0x4 */
+         uint8_t *rom;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index cfbc622..ce7e43b 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6695,7 +6695,7 @@ void arm_cpu_do_interrupt(CPUState *cs)
+     CPUARMState *env = &cpu->env;
+     unsigned int new_el = env->exception.target_el;
+ 
+-    assert(!IS_M(env));
++    assert(!arm_feature(env, ARM_FEATURE_M));
+ 
+     arm_log_exception(cs->exception_index);
+     qemu_log_mask(CPU_LOG_INT, "...from EL%d to EL%d\n", arm_current_el(env),
+-- 
+2.7.4
