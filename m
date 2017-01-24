@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxem-00021K-Ja
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:44:53 -0500
+	(envelope-from <famz@redhat.com>) id 1cVxhP-0004Yw-8r
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:47:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxei-0002co-Kc
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:44:52 -0500
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Tue, 24 Jan 2017 12:39:32 +0300
-Message-Id: <8c171da885807f7b534bdcde6757cd35b2969816.1485250702.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 28/31] gdbstub.c: fix GDB connection segfault
- caused by empty machines
+	(envelope-from <famz@redhat.com>) id 1cVxhO-0003Ez-Eg
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:47:35 -0500
+Date: Tue, 24 Jan 2017 17:46:29 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170124094629.GB14811@lemon.Home>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-3-git-send-email-vsementsov@virtuozzo.com>
+	<20170124070938.GB27126@lemon.Home>
+	<ecdbc4c4-f908-9895-2ff8-0129dbaa41d4@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ecdbc4c4-f908-9895-2ff8-0129dbaa41d4@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 02/21] backup: init copy_bitmap from
+ sync_bitmap for incremental
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,60 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ziyue Yang <yzylivezh@hotmail.com>, qemu-trivial@nongnu.org, Ziyue Yang <skiver.cloud.yzy@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com, jcody@redhat.com
 
-From: Ziyue Yang <yzylivezh@hotmail.com>
+On Tue, 01/24 12:00, Vladimir Sementsov-Ogievskiy wrote:
+> > >   static void coroutine_fn backup_run(void *opaque)
+> > >   {
+> > >       BackupBlockJob *job = opaque;
+> > > @@ -453,20 +481,22 @@ static void coroutine_fn backup_run(void *opaque)
+> > >       end = DIV_ROUND_UP(job->common.len, job->cluster_size);
+> > >       job->copy_bitmap = hbitmap_alloc(end, 0);
+> > > -    hbitmap_set(job->copy_bitmap, 0, end);
+> > >       job->before_write.notify = backup_before_write_notify;
+> > >       bdrv_add_before_write_notifier(bs, &job->before_write);
+> > >       if (job->sync_mode == MIRROR_SYNC_MODE_NONE) {
+> > > +        hbitmap_set(job->copy_bitmap, 0, end);
+> > This is confusing. It seems job->copy_bitmap is actually a superset of clusters
+> > to copy instead of the exact one?  Because "none" mode doesn't need blanket copy
+> > - only overwritten clusters are copied...
+> 
+> We can't guess, what clusters should be copied finally in none mode. None
+> mode is done by allowing only notifier handling and no linear copying. But
+> notifier handling will copy only clusters marked in copy_bitmap, so I set it
+> from 0 to end.
 
-This patch is to fix the segmentation fault caused by attaching
-GDB to a QEMU instance initialized with "-M none" option.
-
-The bug can be reproduced by
-
-> ./qemu-system-x86_64 -M none -nographic -S -s
-
-and attach a GDB to it by
-
-> gdb -ex 'target remote :1234
-
-The segmentation fault was originally caused by trying to read
-the information about CPU when communicating with GDB. However,
-it's impossible for any control flow to exist on an empty machine,
-nor can CPU's be hot plugged to an empty machine later by QOM
-commands. So I think simply disabling GDB connections on empty
-machines makes sense.
-
-Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
----
- gdbstub.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/gdbstub.c b/gdbstub.c
-index de9b62b..27e0923 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -18,6 +18,7 @@
-  */
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qemu/error-report.h"
- #include "qemu/cutils.h"
- #include "cpu.h"
- #ifdef CONFIG_USER_ONLY
-@@ -1732,6 +1733,12 @@ int gdbserver_start(const char *device)
-     CharDriverState *mon_chr;
-     ChardevCommon common = { 0 };
- 
-+    if (!first_cpu) {
-+        error_report("gdbstub: meaningless to attach gdb to a "
-+                     "machine without any CPU.");
-+        return -1;
-+    }
-+
-     if (!device)
-         return -1;
-     if (strcmp(device, "none") != 0) {
--- 
-2.1.4
+Yes, that's how I understand it too, what I dislike is this bit of inconsistency
+with it: "allowed to copy bitmap" here versus "planned to copy" in other modes.
+I don't know how to improve that, but I think at least the specialty of none
+mode could be mentioned in the comment of copy_bitmap.
