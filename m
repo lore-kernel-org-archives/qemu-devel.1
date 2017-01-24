@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cWARU-0001Mb-FW
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 18:24:01 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1cWApP-0000Ox-3s
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 18:48:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cWARR-0001Ro-BS
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 18:24:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59843)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cWARR-0001RX-1d
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 18:23:57 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0ONIhMq113250
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 18:23:55 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 286aq4ngyh-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 18:23:55 -0500
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 24 Jan 2017 18:23:54 -0500
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 25 Jan 2017 00:23:49 +0100
+	(envelope-from <sstabellini@kernel.org>) id 1cWApM-0001By-1v
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 18:48:43 -0500
+Received: from mail.kernel.org ([198.145.29.136]:44724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cWApL-0001Bn-O2
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 18:48:39 -0500
+Date: Tue, 24 Jan 2017 15:48:31 -0800 (PST)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1485266747-4694-2-git-send-email-paul.durrant@citrix.com>
+Message-ID: <alpine.DEB.2.10.1701241519320.10192@sstabellini-ThinkPad-X260>
+References: <1485266747-4694-1-git-send-email-paul.durrant@citrix.com>
+	<1485266747-4694-2-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <148530022936.13158.7140713668400986309.stgit@bahia>
-Subject: [Qemu-devel] [PATCH v2] 9pfs: fix offset error in v9fs_xattr_read()
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] xen-platform: re-structure
+ unplug_disks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,49 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, olaf@aepfle.de
 
-The current code tries to copy `read_count' bytes starting at offset
-`offset' from a `read_count`-sized iovec. This causes v9fs_pack() to
-fail with ENOBUFS.
+On Tue, 24 Jan 2017, Paul Durrant wrote:
+> The current code is poorly structured and potentially leads to multiple
+> config space reads when one is sufficient. Also the UNPLUG_ALL_IDE_DISKS
+> flag is mis-named since it also results in SCSI disks being unplugged.
+> 
+> This patch renames the flag and re-structures the code to be more
+> efficient, and readable.
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-Since the PDU iovec is already partially filled with `offset' bytes,
-let's skip them when creating `qiov_full' and have v9fs_pack() to
-copy the whole of it. Moreover, this is consistent with the other
-places where v9fs_init_qiov_from_pdu() is called.
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 
-This fixes commit "bcb8998fac16 9pfs: call v9fs_init_qiov_from_pdu
-before v9fs_pack".
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v2: - pass size + skip to the init_in_iov_from_pdu callback
----
- hw/9pfs/9p.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index fa58877570f6..f22d39064f6b 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -1655,7 +1655,7 @@ static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
-     if (is_write) {
-         pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov);
-     } else {
--        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size);
-+        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size + skip);
-     }
- 
-     qemu_iovec_init_external(&elem, iov, niov);
-@@ -1685,8 +1685,8 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
-     }
-     offset += err;
- 
--    v9fs_init_qiov_from_pdu(&qiov_full, pdu, 0, read_count, false);
--    err = v9fs_pack(qiov_full.iov, qiov_full.niov, offset,
-+    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);
-+    err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
-                     ((char *)fidp->fs.xattr.value) + off,
-                     read_count);
-     qemu_iovec_destroy(&qiov_full);
+> ---
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> 
+> v2:
+> - Fix style issue
+> ---
+>  hw/i386/xen/xen_platform.c | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+> index 2e1e543..f50915f 100644
+> --- a/hw/i386/xen/xen_platform.c
+> +++ b/hw/i386/xen/xen_platform.c
+> @@ -88,7 +88,7 @@ static void log_writeb(PCIXenPlatformState *s, char val)
+>  }
+>  
+>  /* Xen Platform, Fixed IOPort */
+> -#define UNPLUG_ALL_IDE_DISKS 1
+> +#define UNPLUG_ALL_DISKS 1
+>  #define UNPLUG_ALL_NICS 2
+>  #define UNPLUG_AUX_IDE_DISKS 4
+>  
+> @@ -110,14 +110,21 @@ static void pci_unplug_nics(PCIBus *bus)
+>  static void unplug_disks(PCIBus *b, PCIDevice *d, void *o)
+>  {
+>      /* We have to ignore passthrough devices */
+> -    if (pci_get_word(d->config + PCI_CLASS_DEVICE) ==
+> -            PCI_CLASS_STORAGE_IDE
+> -            && strcmp(d->name, "xen-pci-passthrough") != 0) {
+> +    if (!strcmp(d->name, "xen-pci-passthrough")) {
+> +        return;
+> +    }
+> +
+> +    switch (pci_get_word(d->config + PCI_CLASS_DEVICE)) {
+> +    case PCI_CLASS_STORAGE_IDE:
+>          pci_piix3_xen_ide_unplug(DEVICE(d));
+> -    } else if (pci_get_word(d->config + PCI_CLASS_DEVICE) ==
+> -            PCI_CLASS_STORAGE_SCSI
+> -            && strcmp(d->name, "xen-pci-passthrough") != 0) {
+> +        break;
+> +
+> +    case PCI_CLASS_STORAGE_SCSI:
+>          object_unparent(OBJECT(d));
+> +        break;
+> +
+> +    default:
+> +        break;
+>      }
+>  }
+>  
+> @@ -134,9 +141,9 @@ static void platform_fixed_ioport_writew(void *opaque, uint32_t addr, uint32_t v
+>      case 0: {
+>          PCIDevice *pci_dev = PCI_DEVICE(s);
+>          /* Unplug devices.  Value is a bitmask of which devices to
+> -           unplug, with bit 0 the IDE devices, bit 1 the network
+> +           unplug, with bit 0 the disk devices, bit 1 the network
+>             devices, and bit 2 the non-primary-master IDE devices. */
+> -        if (val & UNPLUG_ALL_IDE_DISKS) {
+> +        if (val & UNPLUG_ALL_DISKS) {
+>              DPRINTF("unplug disks\n");
+>              pci_unplug_disks(pci_dev->bus);
+>          }
+> -- 
+> 2.1.4
+> 
