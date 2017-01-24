@@ -1,19 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVykY-0004px-NH
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:54:55 -0500
+	(envelope-from <thuth@redhat.com>) id 1cVyks-0005Cr-Jn
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:55:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVykU-0006Sp-Eb
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:54:54 -0500
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Tue, 24 Jan 2017 12:39:08 +0300
-Message-Id: <425d343b84d90455510ac7786703f93d0a786293.1485250702.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 04/31] Fix documentation and some comments
- (article, grammar)
+	(envelope-from <thuth@redhat.com>) id 1cVykn-0006Zw-Oj
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:55:14 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 24 Jan 2017 11:55:07 +0100
+Message-Id: <1485255307-11799-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] target/ppc: Remove unused POWERPC_FAMILY(POWER)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,80 +17,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
 
-From: Stefan Weil <sw@weilnetz.de>
+We do not support POWER1 CPUs in QEMU, so it does not make sense
+to keep this stub around.
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- arch_init.c     | 2 +-
- qemu-doc.texi   | 2 +-
- qemu-options.hx | 2 +-
- util/uri.c      | 4 ++--
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ target/ppc/translate_init.c | 22 ----------------------
+ 1 file changed, 22 deletions(-)
 
-diff --git a/arch_init.c b/arch_init.c
-index 6c4e287..13d6c56 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -85,7 +85,7 @@ const uint32_t arch_type = QEMU_ARCH;
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 19ef250..70333c5 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -5217,28 +5217,6 @@ POWERPC_FAMILY(e5500)(ObjectClass *oc, void *data)
  
- static struct defconfig_file {
-     const char *filename;
--    /* Indicates it is an user config file (disabled by -no-user-config) */
-+    /* Indicates it is a user config file (disabled by -no-user-config) */
-     bool userconfig;
- } default_config_files[] = {
-     { CONFIG_QEMU_CONFDIR "/qemu.conf",                   true },
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 0b2746f..3840585 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -1037,7 +1037,7 @@ qemu-system-i386 -iscsi initiator-name=iqn.qemu.test:my-initiator \
- @node disk_images_gluster
- @subsection GlusterFS disk images
+ /* Non-embedded PowerPC                                                      */
  
--GlusterFS is an user space distributed file system.
-+GlusterFS is a user space distributed file system.
+-/* POWER : same as 601, without mfmsr, mfsr                                  */
+-POWERPC_FAMILY(POWER)(ObjectClass *oc, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(oc);
+-    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
+-
+-    dc->desc = "POWER";
+-    /* pcc->insns_flags = XXX_TODO; */
+-    /* POWER RSC (from RAD6000) */
+-    pcc->msr_mask = (1ull << MSR_EE) |
+-                    (1ull << MSR_PR) |
+-                    (1ull << MSR_FP) |
+-                    (1ull << MSR_ME) |
+-                    (1ull << MSR_FE0) |
+-                    (1ull << MSR_SE) |
+-                    (1ull << MSR_DE) |
+-                    (1ull << MSR_AL) |
+-                    (1ull << MSR_EP) |
+-                    (1ull << MSR_IR) |
+-                    (1ull << MSR_DR);
+-}
+-
+ #define POWERPC_MSRR_601     (0x0000000000001040ULL)
  
- You can boot from the GlusterFS disk image with the command:
- @example
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 232f737..82b9991 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2589,7 +2589,7 @@ qemu-system-i386 --drive file=sheepdog://192.0.2.1:30000/MyVirtualMachine
- See also @url{http://http://www.osrg.net/sheepdog/}.
- 
- @item GlusterFS
--GlusterFS is an user space distributed file system.
-+GlusterFS is a user space distributed file system.
- QEMU supports the use of GlusterFS volumes for hosting VM disk images using
- TCP, Unix Domain Sockets and RDMA transport protocols.
- 
-diff --git a/util/uri.c b/util/uri.c
-index 70a9cbc..21b1828 100644
---- a/util/uri.c
-+++ b/util/uri.c
-@@ -342,7 +342,7 @@ rfc3986_parse_port(URI *uri, const char **str)
-  * @uri:  pointer to an URI structure
-  * @str:  the string to analyze
-  *
-- * Parse an user informations part and fills in the appropriate fields
-+ * Parse a user information part and fill in the appropriate fields
-  * of the @uri structure
-  *
-  * userinfo      = *( unreserved / pct-encoded / sub-delims / ":" )
-@@ -508,7 +508,7 @@ rfc3986_parse_authority(URI *uri, const char **str)
- 
-     cur = *str;
-     /*
--     * try to parse an userinfo and check for the trailing @
-+     * try to parse a userinfo and check for the trailing @
-      */
-     ret = rfc3986_parse_user_info(uri, &cur);
-     if ((ret != 0) || (*cur != '@'))
+ static void init_proc_601 (CPUPPCState *env)
 -- 
-2.1.4
+1.8.3.1
