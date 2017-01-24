@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVzco-0004hC-Pn
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:51:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1cVzcr-0004kG-Rc
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:51:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVzcn-0001jD-6S
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:50:58 -0500
-Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:34161)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cVzcn-0001ib-0y
+	(envelope-from <bounces@canonical.com>) id 1cVzcn-0001js-Rb
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:51:01 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cVzcn-0001iv-K4
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:50:57 -0500
-Received: by mail-vk0-x230.google.com with SMTP id r136so110134498vke.1
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 03:50:56 -0800 (PST)
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cVzck-0000B5-Vz
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 11:50:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 33B042E81A7
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 11:50:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1484758531-15093-2-git-send-email-clg@kaod.org>
-References: <1484758531-15093-1-git-send-email-clg@kaod.org>
-	<1484758531-15093-2-git-send-email-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jan 2017 11:50:35 +0000
-Message-ID: <CAFEAcA-nGU+4ddOGO-kJnbayvOy6cn9DA9ZXfT7w7-_grvgLVg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] wdt: Add Aspeed watchdog device model
+Date: Tue, 24 Jan 2017 11:41:12 -0000
+From: Rafael David Tinoco <rafael.tinoco@canonical.com>
+Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
+Message-Id: <20170124114112.5640.60798.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
+ change for security drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,220 +37,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>
+To: qemu-devel@nongnu.org
 
-On 18 January 2017 at 16:55, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> From: Joel Stanley <joel@jms.id.au>
->
-> The Aspeed SoC includes a set of watchdog timers using 32-bit
-> decrement counters, which can be based either on the APB clock or
-> a 1 MHz clock.
->
-> The watchdog timer is designed to prevent system deadlock and, in
-> general, it should be restarted before timeout. When a timeout occurs,
-> different types of signals can be generated, ARM reset, SOC reset,
-> System reset, CPU Interrupt, external signal or boot from alternate
-> block. The current model only performs the system reset function as
-> this is used by U-Boot and Linux.
->
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> [clg: - fixed compile breakage
->       - fixed io region size
->       - added watchdog_perform_action() on timer expiry
->       - wrote a commit log
->       - merged fixes from Andrew Jeffery to scale the reload value ]
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  hw/watchdog/Makefile.objs        |   1 +
->  hw/watchdog/wdt_aspeed.c         | 214 +++++++++++++++++++++++++++++++++=
-++++++
->  include/hw/watchdog/wdt_aspeed.h |  37 +++++++
->  3 files changed, 252 insertions(+)
->  create mode 100644 hw/watchdog/wdt_aspeed.c
->  create mode 100644 include/hw/watchdog/wdt_aspeed.h
->
-> diff --git a/hw/watchdog/Makefile.objs b/hw/watchdog/Makefile.objs
-> index 72e3ffd93c59..9589bed63a3d 100644
-> --- a/hw/watchdog/Makefile.objs
-> +++ b/hw/watchdog/Makefile.objs
-> @@ -2,3 +2,4 @@ common-obj-y +=3D watchdog.o
->  common-obj-$(CONFIG_WDT_IB6300ESB) +=3D wdt_i6300esb.o
->  common-obj-$(CONFIG_WDT_IB700) +=3D wdt_ib700.o
->  common-obj-$(CONFIG_WDT_DIAG288) +=3D wdt_diag288.o
-> +common-obj-$(CONFIG_ASPEED_SOC) +=3D wdt_aspeed.o
-> diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-> new file mode 100644
-> index 000000000000..96e62c54dc04
-> --- /dev/null
-> +++ b/hw/watchdog/wdt_aspeed.c
-> @@ -0,0 +1,214 @@
-> +/*
-> + * ASPEED Watchdog Controller
-> + *
-> + * Copyright (C) 2016-2017 IBM Corp.
-> + *
-> + * This code is licensed under the GPL version 2 or later. See the
-> + * COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/log.h"
-> +#include "sysemu/watchdog.h"
-> +#include "hw/sysbus.h"
-> +#include "qemu/timer.h"
-> +#include "hw/watchdog/wdt_aspeed.h"
-> +
-> +#define WDT_IO_REGION_SIZE      0x20
-> +
-> +#define WDT_STATUS              0x00
-> +#define WDT_RELOAD_VALUE        0x04
-> +#define WDT_RESTART             0x08
-> +#define WDT_CTRL                0x0C
-> +#define WDT_TIMEOUT_STATUS      0x10
-> +#define WDT_TIMEOUT_CLEAR       0x14
-> +#define WDT_RESET_WDITH         0x18
-> +
-> +#define WDT_RESTART_MAGIC       0x4755
-> +
-> +static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned si=
-ze)
-> +{
-> +    AspeedWDTState *s =3D ASPEED_WDT(opaque);
-> +
-> +    switch (offset) {
-> +    case WDT_STATUS:
-> +        return s->reg_status;
-> +    case WDT_RELOAD_VALUE:
-> +        return s->reg_reload_value;
-> +    case WDT_RESTART:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: read from write-only reg at offset 0x%"
-> +                      HWADDR_PRIx "\n", __func__, offset);
-> +        return 0;
-> +    case WDT_CTRL:
-> +        return s->reg_ctrl;
-> +    case WDT_TIMEOUT_STATUS:
-> +    case WDT_TIMEOUT_CLEAR:
-> +    case WDT_RESET_WDITH:
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "%s: uninmplemented read at offset 0x%" HWADDR_PRI=
-x "\n",
-> +                      __func__, offset);
-> +        return 0;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: Out-of-bounds read at offset 0x%" HWADDR_PRIx=
- "\n",
-> +                      __func__, offset);
-> +        return 0;
-> +    }
-> +
-> +}
-> +
-> +#define PCLK_HZ 24000000
-> +
-> +static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
-> +                             unsigned size)
-> +{
-> +    AspeedWDTState *s =3D ASPEED_WDT(opaque);
-> +    bool en =3D data & BIT(0);
-> +    bool pclk =3D !(data & BIT(4));
+Thanks Christian! Will do!!
 
-These are only valid for WDT_CTRL, right? That being so,
-initialising them up here is a bit odd.
+-- =
 
-> +
-> +    switch (offset) {
-> +    case WDT_STATUS:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: write to read-only reg at offset 0x%"
-> +                      HWADDR_PRIx "\n", __func__, offset);
-> +        break;
-> +    case WDT_RELOAD_VALUE:
-> +        s->reg_reload_value =3D data;
-> +        break;
-> +    case WDT_RESTART:
-> +        if ((data & 0xFFFF) =3D=3D 0x4755) {
-> +            uint32_t reload;
-> +
-> +            s->reg_status =3D s->reg_reload_value;
-> +
-> +            if (pclk) {
-> +                reload =3D muldiv64(s->reg_reload_value, NANOSECONDS_PER=
-_SECOND,
-> +                                  PCLK_HZ) ;
-> +            } else {
-> +                reload =3D s->reg_reload_value * 1000;
-> +            }
-> +
-> +            if (s->enabled) {
-> +                timer_mod(s->timer,
-> +                          qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + reload=
-);
-> +            }
-> +        }
-> +        break;
-> +    case WDT_CTRL:
-> +        if (en && !s->enabled) {
-> +            uint32_t reload;
-> +
-> +            if (pclk) {
-> +                reload =3D muldiv64(s->reg_reload_value, NANOSECONDS_PER=
-_SECOND,
-> +                                  PCLK_HZ);
-> +            } else {
-> +                reload =3D s->reg_reload_value * 1000;
-> +            }
-> +
-> +            s->enabled =3D true;
-> +            timer_mod(s->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + =
-reload);
-> +        } else if (!en && s->enabled) {
-> +            s->enabled =3D false;
-> +            timer_del(s->timer);
-> +        }
-> +        break;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1626972
 
-Shouldn't this write to s->reg_ctrl ?
+Title:
+  QEMU memfd_create fallback mechanism change for security drivers
 
-s->enabled seems to duplicate state also in s->reg_ctrl.
+Status in Ubuntu Cloud Archive:
+  Invalid
+Status in Ubuntu Cloud Archive mitaka series:
+  Fix Committed
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Fix Committed
+Status in qemu source package in Yakkety:
+  Fix Released
+Status in qemu source package in Zesty:
+  Fix Released
 
-> +    case WDT_TIMEOUT_STATUS:
-> +    case WDT_TIMEOUT_CLEAR:
-> +    case WDT_RESET_WDITH:
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "%s: uninmplemented write at offset 0x%" HWADDR_PR=
-Ix "\n",
-> +                      __func__, offset);
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: Out-of-bounds write at offset 0x%" HWADDR_PRI=
-x "\n",
-> +                      __func__, offset);
-> +    }
-> +    return;
-> +}
-> +
-> +static WatchdogTimerModel model =3D {
-> +    .wdt_name =3D TYPE_ASPEED_WDT,
-> +    .wdt_description =3D "aspeed watchdog device",
-> +};
-> +
-> +static const VMStateDescription vmstate_aspeed_wdt =3D {
-> +    .name =3D "vmstate_aspeed_wdt",
-> +    .version_id =3D 0,
-> +    .minimum_version_id =3D 0,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_TIMER_PTR(timer, AspeedWDTState),
-> +        VMSTATE_BOOL(enabled, AspeedWDTState),
+Bug description:
+  [Impact]
 
-This doesn't seem to have fields for most of the register state.
+   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
+   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
+   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
 
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
+  [Test Case]
 
-thanks
--- PMM
+   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
+   * Try to live-migration from one to another. =
+
+   * Apparmor will block creation of /tmp/memfd-XXX files.
+
+  [Regression Potential]
+
+   Pros:
+   * Exhaustively tested this.
+   * Worked with upstream on this fix. =
+
+   * I'm implementing new vhost log mechanism for upstream.
+   * One line change to a blocker that is already broken.
+
+   Cons:
+   * To break live migration in other circumstances. =
+
+
+  [Other Info]
+
+   * Christian Ehrhardt has been following this.
+
+  ORIGINAL DESCRIPTION:
+
+  When libvirt starts using apparmor, and creating apparmor profiles for
+  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
+  and upstream also) uses a fallback mechanism for creating shared
+  memory for live-migrations. This fall back mechanism, on kernels 3.13
+  - that don't have memfd_create() system-call, try to create files on
+  /tmp/ directory and fails.. causing live-migration not to work.
+
+  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
+  can't live migrate.
+
+  From qemu 2.5, logic is on :
+
+  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
+ int *fd)
+  {
+  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
+els
+
+  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
+  }
+
+  And you can see the errors:
+
+  From the host trying to send the virtual machine:
+
+  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Migration operation has aborted
+  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Live Migration failure: internal error: unable to execute QEMU command 'mi=
+grate': Migration disabled: failed to allocate shared memory
+
+  From the host trying to receive the virtual machine:
+
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
+289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
+5 comm=3D"apparmor_parser"
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
+289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
+289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
+=3D12613 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
+289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
+rser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
+289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
+2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
+5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
+07 ouid=3D107
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
+289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
+u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
+289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
+"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
+=3D0
+
+  When leaving libvirt without apparmor capabilities (thus not confining
+  virtual machines on compute nodes, the live migration works as
+  expected, so, clearly, apparmor is stepping into the live migration).
+  I'm sure that virtual machines have to be confined and that this isn't
+  the desired behaviour...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
