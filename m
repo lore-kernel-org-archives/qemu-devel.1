@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cVyPD-0001pQ-8e
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:32:52 -0500
+	(envelope-from <amit.shah@redhat.com>) id 1cVyPa-00027U-D8
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:33:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cVyPB-0008Sc-BF
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:32:51 -0500
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:35076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cVyPB-0008S8-6H
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:32:49 -0500
-Received: by mail-yw0-x242.google.com with SMTP id l16so68898ywb.2
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 02:32:49 -0800 (PST)
+	(envelope-from <amit.shah@redhat.com>) id 1cVyPX-0000M7-CS
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:33:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37370)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amit.shah@redhat.com>)
+	id 1cVyPX-0000LC-7V
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:33:11 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DC61A7FE91
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:33:10 +0000 (UTC)
+Date: Tue, 24 Jan 2017 16:03:04 +0530
+From: Amit Shah <amit.shah@redhat.com>
+Message-ID: <20170124103304.GB1679@amit-lp.rh>
+References: <1485178976-15225-1-git-send-email-pagupta@redhat.com>
 MIME-Version: 1.0
-References: <20170124043941.GA12671@tungsten.ozlabs.ibm.com>
-In-Reply-To: <20170124043941.GA12671@tungsten.ozlabs.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 24 Jan 2017 10:32:36 +0000
-Message-ID: <CAJ+F1C+fnnFtmjhf6eSS3aO+_fQmi-yETj0V7DmLb2Gb9Mi_WA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] update-linux-headers.sh fails on clean kernel dir
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485178976-15225-1-git-send-email-pagupta@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] migration: Change name of live
+ migration thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +34,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Bobroff <sam.bobroff@au1.ibm.com>, qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 
-Hi
+On (Mon) 23 Jan 2017 [19:12:56], Pankaj Gupta wrote:
+> Change the name of live migration thread from 'migration'
+> to 'live_migration' to identify it clearly. 'migration'
+> is a generic word and kernel also has  tasks for process
+> migration with the name 'migration/cpu#'.
+> 
+> 
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 
-On Tue, Jan 24, 2017 at 8:41 AM Sam Bobroff <sam.bobroff@au1.ibm.com> wrote=
-:
+Reviewed-by: Amit Shah <amit.shah@redhat.com>
 
-> Hi QEMU developers,
->
-> If I run scripts/update-linux-headers.sh from a clean checkout of QEMU
-> and point it at a clean checkout of a recent linux kernel (4.10-rc1 or
-> later), it fails:
->
-> $ scripts/update-linux-headers.sh ~/tmp/linux/
->
-> ...
->
-> scripts/Makefile.headersinst:62: *** Missing generated UAPI file
-> ./arch/arm/include/generated/uapi/asm/unistd-common.h.  Stop.
->
-> This seems to be because the script passes the arch to the kernel
-> makefile using "SRCARCH" rather than "ARCH".
->
-> (SRCARCH seems to be intended as an internal value, and setting it does
-> not propagate the setting to ARCH. Because ARCH is left empty, the
-> prerequisites that should generate unistd-common.h fail. If ARCH is set,
-> SRCARCH is set automatically and everything works.)
->
-> Changing the script to use "ARCH" seems to fixe the problem.
->
-
-That's also what Documentation/kbuild/headers_install.txt documents.
-
-
-> (Note: when testing this be careful: unistd-common.h is not removed by
-> "make clean" in the kernel directory.)
->
-> Does this seem correct?
->
-> Should I send a patch even though it's a very small change?
->
->
-I think so, thanks
-
-> Cheers,
-> Sam.
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+		Amit
