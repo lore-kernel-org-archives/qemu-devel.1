@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cVvjX-0007Cf-58
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:41:40 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cVvkV-00085P-Ha
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:42:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cVvjU-0004ED-1Q
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:41:39 -0500
-Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:38961)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cVvjT-0004Du-RV
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:41:35 -0500
-Received: from player798.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 13CD2EC97
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 08:41:33 +0100 (CET)
-Date: Tue, 24 Jan 2017 08:41:28 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170124084128.2a9a14ca@bahia.lan>
-In-Reply-To: <alpine.DEB.2.10.1701231200240.10192@sstabellini-ThinkPad-X260>
-References: <148500887769.19567.3784247823786701992.stgit@bahia.lan>
-	<alpine.DEB.2.10.1701231200240.10192@sstabellini-ThinkPad-X260>
+	(envelope-from <mjt@tls.msk.ru>) id 1cVvkS-0004Tp-EX
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:42:39 -0500
+References: <1484927639-3841-1-git-send-email-thuth@redhat.com>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <0c562336-31a8-5347-1123-810543563fd5@msgid.tls.msk.ru>
+Date: Tue, 24 Jan 2017 10:42:27 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1484927639-3841-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=windows-1251
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix offset error in v9fs_xattr_read()
+Subject: Re: [Qemu-devel] [PATCH] hw/isa/isa-bus: Set category of the
+ "isabus-bridge" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +23,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon, 23 Jan 2017 12:20:57 -0800 (PST)
-Stefano Stabellini <sstabellini@kernel.org> wrote:
+20.01.2017 18:53, Thomas Huth wrote:
+> It has "bridge" in its name, so it should be in the category
+> DEVICE_CATEGORY_BRIDGE.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/isa/isa-bus.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
+> index 9d07b11..0ffbc8d 100644
+> --- a/hw/isa/isa-bus.c
+> +++ b/hw/isa/isa-bus.c
+> @@ -219,6 +219,7 @@ static void isabus_bridge_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>      dc->fw_name = "isa";
+>  }
 
-> On Sat, 21 Jan 2017, Greg Kurz wrote:
-> > The current code tries to copy `read_count' bytes starting at offset
-> > `offset' from a `read_count`-sized iovec. This causes v9fs_pack() to
-> > fail with ENOBUFS.
-> > 
-> > Since the PDU iovec is already partially filled with `offset' bytes,
-> > let's skip them when creating `qiov_full' and have v9fs_pack() to
-> > copy the whole of it. Moreover, this is consistent with the other
-> > places where v9fs_init_qiov_from_pdu() is called.
-> > 
-> > This fixes commit "bcb8998fac16 9pfs: call v9fs_init_qiov_from_pdu
-> > before v9fs_pack".  
-> 
-> Sorry about that!
-> 
-> 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/9pfs/9p.c |    4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > index fa58877570f6..f0eef1a3ef53 100644
-> > --- a/hw/9pfs/9p.c
-> > +++ b/hw/9pfs/9p.c
-> > @@ -1685,8 +1685,8 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
-> >      }
-> >      offset += err;
-> >  
-> > -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, 0, read_count, false);
-> > -    err = v9fs_pack(qiov_full.iov, qiov_full.niov, offset,
-> > +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);  
-> 
-> v9fs_init_qiov_from_pdu calls init_in_iov_from_pdu passing read_count as
-> size argument. offset is not passed to init_in_iov_from_pdu, it is only
-> used to initialized qiov_full.
-> 
-> In other words, don't we need to:
-> 
->     v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count + offset, false);
-> 
-> To make sure that qiov_full has "read_count + offset" bytes in it, and
-> qiov_full is initialized skipping the first "offset" bytes?
-> 
+Does it have any effect on the guest?
+ISA is an old thing...
 
-If we do that then qemu_iovec_concat() will skip offset bytes and then copy
-read_count + offset bytes or am I missing something ?
+Thanks,
 
-> 
-> > +    err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
-> >                      ((char *)fidp->fs.xattr.value) + off,
-> >                      read_count);
-> >      qemu_iovec_destroy(&qiov_full);
-> >   
+/mjt
