@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cVy0y-0004uT-5k
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:07:49 -0500
+	(envelope-from <armbru@redhat.com>) id 1cVy2R-0006Cm-Ec
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:09:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cVy0u-00016u-RX
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:07:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60012)
+	(envelope-from <armbru@redhat.com>) id 1cVy2O-0001S9-5u
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:09:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cVy0u-00016L-In
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:07:44 -0500
-Date: Tue, 24 Jan 2017 11:07:38 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170124110738.1e7188fb@nial.brq.redhat.com>
-In-Reply-To: <20170123150349.GW3491@thinpad.lan.raisama.net>
-References: <1484759609-264075-1-git-send-email-imammedo@redhat.com>
-	<1484759609-264075-9-git-send-email-imammedo@redhat.com>
-	<20170118185713.GK3491@thinpad.lan.raisama.net>
-	<20170119160423.761d2c57@nial.brq.redhat.com>
-	<20170123065033.GD21081@in.ibm.com>
-	<20170123150349.GW3491@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cVy2N-0001Rv-Ts
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:09:16 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
+	<CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
+	<87pojmjdep.fsf@dusky.pond.sub.org>
+	<CAFEAcA9nhd6x+PT5bG0=YqvmUdxJVFPZ6ACiv-2OKrDFJhrqzg@mail.gmail.com>
+	<87h94x99e4.fsf@dusky.pond.sub.org>
+	<CAFEAcA8vRw=13Lj_98A+3NovSeTg6e0xBopdz9EcdEeUMjjZow@mail.gmail.com>
+	<874m0x7ra2.fsf@dusky.pond.sub.org>
+	<CAFEAcA_txNPj6JNDavmCREse98XTkQgiFAqx5Vf8KCCu9V-6mQ@mail.gmail.com>
+	<878tq93guz.fsf@dusky.pond.sub.org>
+	<CAFEAcA-zV8RWCXMCbAHLMEM1oEw7CWT_aDrTc49Xv_wSnMeAyw@mail.gmail.com>
+	<CAFEAcA-fSJ5PfpKFaehruzjidBtmQP_435WLqgSLg=cQiETR8Q@mail.gmail.com>
+	<87mvegu6m4.fsf@dusky.pond.sub.org>
+Date: Tue, 24 Jan 2017 11:09:13 +0100
+In-Reply-To: <87mvegu6m4.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Tue, 24 Jan 2017 10:53:07 +0100")
+Message-ID: <87fuk8hira.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 08/13] pc: add writeonly 'cpu' property to
- PCMachine
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, fanc.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, stefanha@redhat.com, izumi.taku@jp.fujitsu.com, vilanova@ac.upc.edu, peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, 23 Jan 2017 13:03:50 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Markus Armbruster <armbru@redhat.com> writes:
 
-> On Mon, Jan 23, 2017 at 12:20:33PM +0530, Bharata B Rao wrote:
-> > On Thu, Jan 19, 2017 at 04:04:23PM +0100, Igor Mammedov wrote:  
-> > > On Wed, 18 Jan 2017 16:57:13 -0200
-> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > >   
-> > > > On Wed, Jan 18, 2017 at 06:13:24PM +0100, Igor Mammedov wrote:  
-> > > > > it will allow generic numa code to set cpu to numa node mapping
-> > > > > in target independent manner in the next patch.
-> > > > > 
-> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > > ---
-> > > > >  hw/i386/pc.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > > > >  1 file changed, 56 insertions(+)
-> > > > > 
-> > > > > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > > > > index f8ea635..1d33a5e 100644
-> > > > > --- a/hw/i386/pc.c
-> > > > > +++ b/hw/i386/pc.c
-> > > > > @@ -2201,6 +2201,56 @@ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
-> > > > >      pcms->pit = value;
-> > > > >  }
-> > > > >  
-> > > > > +static void pc_machine_set_cpu(Object *obj, Visitor *v, const char *name,
-> > > > > +                               void *opaque, Error **errp)
-> > > > > +{
-> > > > > +    uint32_t apic_id;
-> > > > > +    X86CPUTopoInfo topo;
-> > > > > +    CPUArchId *cpu_slot;
-> > > > > +    Error *local_err = NULL;
-> > > > > +    CpuInstanceProperties *cpu_props = NULL;
-> > > > > +    PCMachineState *pcms = PC_MACHINE(obj);
-> > > > > +    MachineClass *mc = MACHINE_GET_CLASS(obj);
-> > > > > +
-> > > > > +    visit_type_CpuInstanceProperties(v, name, &cpu_props, &local_err);
-> > > > > +    if (local_err) {
-> > > > > +        goto out;
-> > > > > +    }
-> > > > > +
-> > > > > +    if (!cpu_props->has_node_id) {
-> > > > > +        error_setg(&local_err, "node-id property is not specified");
-> > > > > +        goto out;
-> > > > > +    }
-> > > > > +
-> > > > > +    /*
-> > > > > +     * make sure that possible_cpus is initialized
-> > > > > +     * as property setter might be called before machine init is called
-> > > > > +     */
-> > > > > +    mc->possible_cpu_arch_ids(MACHINE(obj));
-> > > > > +
-> > > > > +    topo.pkg_id = cpu_props->socket_id;
-> > > > > +    topo.core_id = cpu_props->core_id;
-> > > > > +    topo.smt_id = cpu_props->thread_id;
-> > > > > +    apic_id = apicid_from_topo_ids(smp_cores, smp_threads, &topo);
-> > > > > +    cpu_slot = pc_find_cpu_slot(pcms, apic_id, NULL);    
-> > > > 
-> > > > If we make TYPE_MACHINE provide an API to query CPU slots, e.g.:
-> > > >   CPUArchId *machine_find_cpu_slot(MachineState *m, CpuInstanceProperties *props)  
-> > > so if there is no objections, 
-> > > I'll move possible_cpus to MachineState
-> > > and add to MachineClass above callback so target machine
-> > > would be able to provide arch specific lookup function.
-> > > it should work for both x86 and ARM.  
-> > 
-> > The need for possible_cpus in MachineState for sPAPR isn't immediately
-> > apparent to me. In the context of this new numa "cpu" property, PC target
-> > seems to use possible_cpus to store and later lookup the numa node id for
-> > a given CPU. Wondering if that could be achieved w/o needing possible_cpus
-> > in MachineState ?  
-> 
-> We need to save the node ID for not-yet-plugged CPUs somewhere,
-> and the existing numa_info[].node_cpu field is cpu_index-based so
-> it needs to be replaced. A MachineState field would allow us to
-> do that in a generic way.
-I'm trying to quickly hack SPAPR code to use possible_cpus
-to show how it would be used. But using the same possible_cpus
-across targets have as minimum a benefit of uniform approach
-and possibly more code sharing.
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> On 17 January 2017 at 16:43, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> In any case, applied this pullreq to master.
+>>
+>> Although it works fine on my OSX box (with warnings) it seems
+>> to have broken the Travis OSX builds:
+>> https://travis-ci.org/qemu/qemu/jobs/192750574
+>>
+>>   GEN     qemu-options.texi
+>>   GEN     qemu-monitor.texi
+>>   GEN     qemu-img-cmds.texi
+>>   GEN     qemu-monitor-info.texi
+>>   GEN     qemu-doc.txt
+>> qemu-doc.texi:7: warning: unrecognized encoding name `UTF-8'.
+>>   GEN     qemu-img.1
+>> /Users/travis/build/qemu/qemu//qemu-options.texi:60: warning: unlikely
+>> character [ in @var.
+>> /Users/travis/build/qemu/qemu//qemu-options.texi:60: warning: unlikely
+>> character ] in @var.
+>> /Users/travis/build/qemu/qemu//qemu-options.texi:61: warning: unlikely
+>> character [ in @var.
+>> /Users/travis/build/qemu/qemu//qemu-options.texi:61: warning: unlikely
+>> character ] in @var.
+>> /Users/travis/build/qemu/qemu//qemu-options.texi:630: No matching `@end table'.
+>> /Users/travis/build/qemu/qemu//qemu-doc.texi:1419: Cross reference to
+>> nonexistent node `bt-hcis' (perhaps incorrect sectioning?).
+>> makeinfo: Removing output file `qemu-doc.txt' due to errors; use
+>> --force to preserve.
+>> make: *** [qemu-doc.txt] Error 1
+>
+> Are you *sure* this series causes the failure?
+>
+> I generated qemu-options.texi for every merge commit since v2.8.0, and
+> the only one that changes it is commit 598cf1c "Merge remote-tracking
+> branch 'remotes/bonzini/tags/for-upstream' into staging".  I then
+> examined the commits in that merge, and the ones that affect
+> qemu-options.texi are:
+>
+> * commit 43f187a hxtool: emit Texinfo headings as @subsection
+> * commit b0cb0a6 Plumb the HAXM-based hardware acceleration support
+>
+> Could you kick off Travis builds to confirm or deny these commits cause
+> the OS X trouble?
+
+Different tack: perhaps it's the way we run makeinfo.  Commits touching
+that:
+
+* commit 56e8bdd build-sys: add qapi doc generation targets
+* commit f8bab10 build-sys: add txt documentation rules
+* commit e9ee06b build-sys: use --no-split for info
+
+Travis builds, please?
+
+Of course, if you got a Mac outside Travis that also fails, trying there
+would be quicker.
