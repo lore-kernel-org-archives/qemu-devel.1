@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVzqF-0000fP-QR
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:04:53 -0500
+	(envelope-from <famz@redhat.com>) id 1cVzvL-0005Nu-Pf
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:10:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVzqC-000068-Hv
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:04:51 -0500
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Tue, 24 Jan 2017 12:39:30 +0300
-Message-Id: <7bebc948e2ffaf0786c973bde6b9ea2bfe2271ed.1485250702.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
+	(envelope-from <famz@redhat.com>) id 1cVzvL-0002LM-0W
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:10:07 -0500
+Date: Tue, 24 Jan 2017 20:09:57 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170124120957.GC13714@lemon.Home>
+References: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
+	<20170122142959.GA12419@lemon.Home>
+	<ff2fd02a-09ea-a28f-eb6e-e1858efff552@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 26/31] Drop duplicate display option
- documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ff2fd02a-09ea-a28f-eb6e-e1858efff552@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] scsi-generic and BLKSECTGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@gnu.org>, qemu-trivial@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Michael Tokarev <mjt@tls.msk.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>, mreitz@redhat.com, kwolf@redhat.com
+Cc: Eric Farman <farman@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-From: Samuel Thibault <samuel.thibault@gnu.org>
+On Tue, 01/24 12:23, Paolo Bonzini wrote:
+> 
+> 
+> On 22/01/2017 15:29, Fam Zheng wrote:
+> > On Fri, 01/20 17:25, Eric Farman wrote:
+> >> Changes:
+> >>  v2->v3:
+> >>   - Move byte/sector conversions to patch 2 [Fam Zheng]
+> >>   - Rename "max_sectors" when holding a byte value [Fam Zheng]
+> >>  v1->v2:
+> >>   - Patch 3, make hdev_get_max_transfer_length return bytes [Fam Zheng]
+> > 
+> > Reviewed-by: Fam Zheng <famz@redhat.com>
+> 
+> Looks good, who's merging this? :)
 
-The curses and none possibilities are already documented on a separate li=
-ne,
-so documenting it on the sdl line was both unneeded and confusing.
+All I know is not me :) Adding Kevin and Max who maintain block/file-posix.c.
 
-Introduced in commit f04ec5afbb7d60a56863add800fd90ceee66f362
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
----
- qemu-options.hx | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 84b7bd9..659b88d 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -926,7 +926,7 @@ ETEXI
-=20
- DEF("display", HAS_ARG, QEMU_OPTION_display,
-     "-display sdl[,frame=3Don|off][,alt_grab=3Don|off][,ctrl_grab=3Don|o=
-ff]\n"
--    "            [,window_close=3Don|off][,gl=3Don|off]|curses|none|\n"
-+    "            [,window_close=3Don|off][,gl=3Don|off]\n"
-     "-display gtk[,grab_on_hover=3Don|off][,gl=3Don|off]|\n"
-     "-display vnc=3D<display>[,<optargs>]\n"
-     "-display curses\n"
---=20
-2.1.4
+Fam
