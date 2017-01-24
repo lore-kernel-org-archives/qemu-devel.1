@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1cW34j-0003Ng-TC
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:32:06 -0500
+	(envelope-from <w.bumiller@proxmox.com>) id 1cW38R-00050u-Or
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:35:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1cW34f-0003IO-V0
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:32:01 -0500
-Received: from proxmox.maurer-it.com ([212.186.127.180]:45266)
+	(envelope-from <w.bumiller@proxmox.com>) id 1cW38N-0004te-Ot
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:35:51 -0500
+Received: from proxmox.maurer-it.com ([212.186.127.180]:24365)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
-	id 1cW34f-0003Hm-H3
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:31:57 -0500
-Date: Tue, 24 Jan 2017 16:31:43 +0100
+	id 1cW38N-0004tO-Bb
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:35:47 -0500
 From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Message-ID: <20170124153143.GA29823@olga.wb>
-References: <58871f9b.d635240a.4cda6.5322@mx.google.com>
-	<237b1da5-532d-afd6-84ad-6adc5bd97291@redhat.com>
-	<1485254930.32716.23.camel@redhat.com>
-	<b269fc2b-e211-cc70-0b7e-da6b3180df88@redhat.com>
-	<1485260998.32716.45.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485260998.32716.45.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] cirrus: fix oob access issue
+Date: Tue, 24 Jan 2017 16:35:38 +0100
+Message-Id: <1485272138-23249-1-git-send-email-w.bumiller@proxmox.com>
+Subject: [Qemu-devel] [PATCH v2] cirrus: allow zero source pitch in pattern
+ fill rops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,184 +23,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, liqiang6-s@360.cn, ghoffman@redhat.com, Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, Jan 24, 2017 at 01:29:58PM +0100, Gerd Hoffmann wrote:
-> > >>>      if (pitch < 0) {
-> > >>>          int64_t min = addr
-> > >>> -            + ((int64_t)s->cirrus_blt_height-1) * pitch;
-> > >>> +            + ((int64_t)s->cirrus_blt_height-1) * pitch
-> > >>> +            - s->cirrus_blt_width;
-> > >>>          int32_t max = addr
-> > >>>              + s->cirrus_blt_width;
-> > >>>          if (min < 0 || max > s->vga.vram_size) {
-> > >>>
-> > >>
-> > >> I believe this is incorrect. In this case (AFAIR), "addr" points to the
-> > >> left-most pixel (= lowest address) of the bottom line (= highest
-> > >> address).
-> > > 
-> > > If I read the code correctly it is backwards *both* x and y axis, so
-> > > addr is the right-most pixel of the bottom line.
-> > 
-> > What is "max" then? If "addr" is the right-most pixel of the bottom
-> > line, then "max" has the highest address just past the rectangle, and
-> > then adding anything non-negative to it makes no sense.
-> 
-> That is (with the patch applied) inconsistent indeed.  We must either
-> subtract s->cirrus_blt_width from min (addr == right-most), or add it to
-> max (addr == left-most), but certainly not both.
-> 
-> > ... Really as I remember it from the downstream review, the pitch is
-> > negative (bottom-up), but the horizontal direction remains left to right.
-> 
-> Looking at cirrus_vga_rop.h I see:
->  - cirrus_bitblt_rop_fwd_*() increment src and dst while walking the
->    scanline, and
->  - cirrus_bitblt_rop_bkwd_*() decrement src and dst ...
-> 
-> I still think x axis goes backwards too and therefore addr is the
-> right-most pixel.
+The rops used by cirrus_bitblt_common_patterncopy only use
+the destination pitch, so the source pitch shoul allowed to
+be zero and the blit with used for the range check around the
+source address.
 
-I agree.
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+---
+I'd also like someone to take a look at cirrus_colorexpand_{,transp_}*
+in the cirrus_vga_rop2.h header for verification since with them not
+using srcpitch I'd like to be sure using the width for the pitch check
+is truly safe enough. It seems obvious really (unless you read the
+code ;-) ), but anyway, here's my analysis:
 
-Seeing how I've already been reading through that code I thought I'd
-go over it again and too would say both min and max need to be adapted:
+They iterate through src via `*src++` which is used both in the outer
+y-loop as well as well as in a condition within the x loop. At first
+this means we potentially go through `with*height + height` bytes.
 
+Looking at DEPTH=8 (as it produces the longest loop per row and is
+easy to read ;-) ) with fabricated dstskipleft and srcskipleft values
+as described in the comments (they depend on one another though, so
+we're making it a bit worse than it actually is...) the code for a row
+becomes:
+  = for each row:
+  |  bitmask = 0x80 >> srcskipleft;      // assume bitmask = 0;
+  |  bits = *src++ ^ bits_xor;           // bumps src
+  |  (...)
+  |  for (x = dstskipleft; x < bltwidth; x++) { // assume x starts at 0
+  |      if ((bitmask & 0xff) == 0) {
+  |          bitmask = 0x80;
+  |          bits = *src++ ^ bits_xor;   // bumps src
+  |      }
+  |  (...)
+  |      bitmask >>= 1;
+  |  }
+
+The inner loop performs the *src++ for every 8th pixel only.
+So we index src at most by: bltheight + bltheight*(ceil(bltwidth/8))
+or (bltheight * (1 + ceil(bltwidth/8))).
+This is usually covered by width*height when looking at it in a
+simplified `(width/8)*height` way, but it would seem as though
+width=1 is a dangerous case when the bitmask is initialized as 0
+as we'd be going through height*2 instead of height*1 src pixels.
+Note however that the values for srcskipleft and dstskipleft have a
+relationship: In one part of the code dstskipleft is at least
+srcskipleft*8 (meaning either both are 0 and bitmask is initialized to
+0x80 so the inner *src++ is never executed) or, if bitmask is 0 due to
+srcskipleft being 8, dstskipleft > 0 so the inner loop is not executed
+due to width being only 1 and x starting at dstskipleft.
+In the other function the DEPTH==24 case says: srcskipleft = dstskipleft/3
+So if the bitmask is initialized to 0 then x also must start at
+something >= width and the inner loop is not executed either.
+So basically it's impossible for both assumptions made in the code
+snippet's comments to be true at the same time.
+
+>From this I infer that instead of my patch from the other day where I
+disabled the src check on a zero src pitch entirely (which I can only
+attribute to temporary insanity caused by reading through this code
+in the first place ;-) ) a zero source pitch should instead -
+obviously - simply assume a pitch equal to the width.
+(And after writing that last sentence of this paragraph I feel quite
+paranoid, or stupid?)
+
+ hw/display/cirrus_vga.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index 379910d..331fc65 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -272,9 +272,6 @@ static void cirrus_update_memory_access(CirrusVGAState *s);
+ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+                                   int32_t pitch, int32_t addr)
+ {
+-    if (!pitch) {
+-        return true;
+-    }
      if (pitch < 0) {
          int64_t min = addr
              + ((int64_t)s->cirrus_blt_height-1) * pitch;
-+            - s->cirrus_blt_width;
-         int32_t max = addr
--            + s->cirrus_blt_width;
-         if (min < 0 || max > s->vga.vram_size) {
-
-
-Here's the rest of my analysis in case anyone's interested (mostly to
-justify the first part of this mail):
-
--) Sign of the blit width/height & pitch values at the beginning:
-
-    |    s->cirrus_blt_width = (s->vga.gr[0x20] | (s->vga.gr[0x21] << 8)) + 1;
-    |    s->cirrus_blt_height = (s->vga.gr[0x22] | (s->vga.gr[0x23] << 8)) + 1;
-    |    s->cirrus_blt_dstpitch = (s->vga.gr[0x24] | (s->vga.gr[0x25] << 8));
-    |    s->cirrus_blt_srcpitch = (s->vga.gr[0x26] | (s->vga.gr[0x27] << 8));
-
-   vga.gr is an uint8_t[]
-
-==> all values are positive at this point
-
--) Backward blits invert the sign:
-
-    |    if (s->cirrus_blt_mode & CIRRUS_BLTMODE_BACKWARDS) {
-    |        s->cirrus_blt_dstpitch = -s->cirrus_blt_dstpitch;
-    |        s->cirrus_blt_srcpitch = -s->cirrus_blt_srcpitch;
-
-
-Starting with the simple one:
-
--) Forward blits from cirrus_vga_rop.h:
-   Width (which is positive) is subtracted from the pitch (which
-   is also positive), turning srcpitch and dstpitch into values
-   representing the remaining bytes after the current row.
-   The pattern below repeats for all functions:
-
-      |static void
-      |glue(cirrus_bitblt_rop_fwd_, ROP_NAME)(CirrusVGAState *s,
-      |                             uint8_t *dst,const uint8_t *src,
-      |                             int dstpitch,int srcpitch,
-      |                             int bltwidth,int bltheight)
-      |{
-      |    int x,y;
-      |    dstpitch -= bltwidth;
-      |    srcpitch -= bltwidth;
-      |
-      |    if (bltheight > 1 && (dstpitch < 0 || srcpitch < 0)) {
-      |        return;
-      |    }
-      |
-      |    for (y = 0; y < bltheight; y++) {
-      |        for (x = 0; x < bltwidth; x++) {
-      |            ROP_OP(dst, *src);
-      |            dst++;
-      |            src++;
-      |        }
-      |        dst += dstpitch;
-      |        src += srcpitch;
-      |    }
-      |}
-
-   The first access to src/dst is unmodified, so the lowest accessed
-   address is the initial address.
-
-   Some functions iterate through pairs:
-      |   for (x = 0; x < bltwidth; x+=2) {
-      |      p1 = *dst;
-      |      p2 = *(dst+1);
-   Since the loop uses `x += 2` this `+1` should not go out of bounds
-   provided the width is even (which if not the case should at least
-   have an even pitch value).
-
-Conclusion for forward blits:
-   We use (start + pitch * (height-1) + width) which seems obvious for
-   the main pattern but we also need to assert that the 2nd example
-   above cannot access an additional byte with *(dst+1) after this
-   value. This seems to be okay: for an odd width eg. 5, the highest
-   x value the loop body is executed with will be 4, and we access
-   4+1=5 at most.
-
--) Backward blits form cirrus_vga_rop.h:
-   (Pitch is negative, width is positive.)
-   They "add" the width to the pitch (essentially reducing its length),
-   turning the 'dstpitch' and 'srcpitch' variables - as with forward
-   blits - into values representing only the *remaining* bytes "in
-   front of" the data in the current row.
-   The pattern:
-
-      |glue(cirrus_bitblt_rop_bkwd_, ROP_NAME)(CirrusVGAState *s,
-      |                                        uint8_t *dst,const uint8_t *src,
-      |                                        int dstpitch,int srcpitch,
-      |                                        int bltwidth,int bltheight)
-      |{
-      |    int x,y;
-      |    dstpitch += bltwidth;
-      |    srcpitch += bltwidth;
-      |    for (y = 0; y < bltheight; y++) {
-      |        for (x = 0; x < bltwidth; x++) {
-      |            ROP_OP(dst, *src);
-      |            dst--;
-      |            src--;
-      |        }
-      |        dst += dstpitch;
-      |        src += srcpitch;
-      |    }
-      |}
-
-   Pitch is negative, first value touched is 'dst' and 'src'
-   unmodified. The same pattern is used throughout the rest of the
-   header.
-
-   As far as I can see the 'bkwd' ops only ever subtract from the
-   addresses (note that in `X += Xpitch`, Xpitch is negative), and
-   like with forward blits we have at most a 'src-1' (not +1 this
-   time) access in a loop body where we iterate over pairs, so the
-   same reasoning holds here.
-
-Conclusion for backward blits:
-   1) We should use: (addr + (height-1)*pitch - width) but originally
-      missed the `-with` part there.
-
-   2) The maximum value should actually be `addr` itself as far as I
-      can tell, so the `+ s->cirrus_blt_width` for max should be
-      dropped.
-
-
-The functions in cirrus_vga_rop2.h are a bitmore complex. The safety
-checks *may* even be too strict in some cases but I haven't seen any
-aftefacts coming from too strong *range* checks (only the zero pitch
-check for which I sent a patch yesterday which I need to make a v2 for
-now :|).
-(Too strict in the pattern functions which clamp the source offsets
-with bitands, but I really don't feel like looking deep enough into
-this to make the checks even lighter :p)
+@@ -294,8 +291,11 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+     return false;
+ }
+ 
+-static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
++static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only,
++                           bool zero_src_pitch_ok)
+ {
++    int32_t check_pitch;
++
+     /* should be the case, see cirrus_bitblt_start */
+     assert(s->cirrus_blt_width > 0);
+     assert(s->cirrus_blt_height > 0);
+@@ -304,6 +304,10 @@ static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
+         return true;
+     }
+ 
++    if (!s->cirrus_blt_dstpitch) {
++        return true;
++    }
++
+     if (blit_region_is_unsafe(s, s->cirrus_blt_dstpitch,
+                               s->cirrus_blt_dstaddr & s->cirrus_addr_mask)) {
+         return true;
+@@ -311,7 +315,13 @@ static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
+     if (dst_only) {
+         return false;
+     }
+-    if (blit_region_is_unsafe(s, s->cirrus_blt_srcpitch,
++
++    check_pitch = s->cirrus_blt_srcpitch;
++    if (!zero_src_pitch_ok && !check_pitch) {
++        check_pitch = s->cirrus_blt_width;
++    }
++
++    if (blit_region_is_unsafe(s, check_pitch,
+                               s->cirrus_blt_srcaddr & s->cirrus_addr_mask)) {
+         return true;
+     }
+@@ -676,8 +686,9 @@ static int cirrus_bitblt_common_patterncopy(CirrusVGAState * s,
+ 
+     dst = s->vga.vram_ptr + (s->cirrus_blt_dstaddr & s->cirrus_addr_mask);
+ 
+-    if (blit_is_unsafe(s, false))
++    if (blit_is_unsafe(s, false, true)) {
+         return 0;
++    }
+ 
+     (*s->cirrus_rop) (s, dst, src,
+                       s->cirrus_blt_dstpitch, 0,
+@@ -694,7 +705,7 @@ static int cirrus_bitblt_solidfill(CirrusVGAState *s, int blt_rop)
+ {
+     cirrus_fill_t rop_func;
+ 
+-    if (blit_is_unsafe(s, true)) {
++    if (blit_is_unsafe(s, true, true)) {
+         return 0;
+     }
+     rop_func = cirrus_fill[rop_to_index[blt_rop]][s->cirrus_blt_pixelwidth - 1];
+@@ -798,7 +809,7 @@ static int cirrus_do_copy(CirrusVGAState *s, int dst, int src, int w, int h)
+ 
+ static int cirrus_bitblt_videotovideo_copy(CirrusVGAState * s)
+ {
+-    if (blit_is_unsafe(s, false))
++    if (blit_is_unsafe(s, false, false))
+         return 0;
+ 
+     return cirrus_do_copy(s, s->cirrus_blt_dstaddr - s->vga.start_addr,
+-- 
+2.1.4
