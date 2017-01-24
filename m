@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVxOA-0004KZ-OX
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:27:43 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cVxP2-000537-F0
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:28:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cVxO6-0005bi-PH
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:27:42 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1484927639-3841-1-git-send-email-thuth@redhat.com>
-	<0c562336-31a8-5347-1123-810543563fd5@msgid.tls.msk.ru>
-	<15b9c04d-23e3-2166-c2e0-7b5a963350c1@redhat.com>
-Date: Tue, 24 Jan 2017 10:27:35 +0100
-In-Reply-To: <15b9c04d-23e3-2166-c2e0-7b5a963350c1@redhat.com> (Thomas Huth's
-	message of "Tue, 24 Jan 2017 08:48:37 +0100")
-Message-ID: <87r33su7so.fsf@dusky.pond.sub.org>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cVxOt-0005nJ-Fn
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:28:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35248
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cVxOt-0005n9-9p
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:28:27 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0O8wjrN049585
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 04:28:25 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 285vey7deq-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 04:28:25 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 24 Jan 2017 09:28:24 -0000
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Tue, 24 Jan 2017 10:28:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] hw/isa/isa-bus: Set category of the
- "isabus-bridge" device
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20170124092820.23832-1-cornelia.huck@de.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] s390x/kvm: include hw_accel.h instead of kvm.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +39,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, vpalatin@chromium.org, sw@weilnetz.de, pbonzini@redhat.com, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-Thomas Huth <thuth@redhat.com> writes:
+Commit b394662 ("kvm: move cpu synchronization code") switched
+to hw_accel.h instead of kvm.h, but missed s390x, resulting in
 
-> On 24.01.2017 08:42, Michael Tokarev wrote:
->> 20.01.2017 18:53, Thomas Huth wrote:
->>> It has "bridge" in its name, so it should be in the category
->>> DEVICE_CATEGORY_BRIDGE.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  hw/isa/isa-bus.c | 1 +
->>>  1 file changed, 1 insertion(+)
->>>
->>> diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
->>> index 9d07b11..0ffbc8d 100644
->>> --- a/hw/isa/isa-bus.c
->>> +++ b/hw/isa/isa-bus.c
->>> @@ -219,6 +219,7 @@ static void isabus_bridge_class_init(ObjectClass *klass, void *data)
->>>  {
->>>      DeviceClass *dc = DEVICE_CLASS(klass);
->>>  
->>> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->>>      dc->fw_name = "isa";
->>>  }
->> 
->> Does it have any effect on the guest?
->> ISA is an old thing...
->
-> No, as far as I know, this is just used in qdev_print_devinfos() to
-> print out the devices in nice categories when you start QEMU with
-> "-device ?". Devices that do not have a category bit set show up in the
-> "Uncategorized" section - which tends to get overcrowded if the devices
-> are not sorted into proper categories.
+  CC      s390x-softmmu/target/s390x/kvm.o
+/home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98kvm_sclp_s=
+ervice_call=E2=80=99:
+/home/cohuck/git/qemu/target/s390x/kvm.c:1034:5: error: implicit declarat=
+ion of function =E2=80=98cpu_synchronize_state=E2=80=99 [-Werror=3Dimplic=
+it-function-declaration]
+     cpu_synchronize_state(CPU(cpu));
+     ^
+/home/cohuck/git/qemu/target/s390x/kvm.c:1034:5: error: nested extern dec=
+laration of =E2=80=98cpu_synchronize_state=E2=80=99 [-Werror=3Dnested-ext=
+erns]
+/home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98sigp_initi=
+al_cpu_reset=E2=80=99:
+/home/cohuck/git/qemu/target/s390x/kvm.c:1628:5: error: implicit declarat=
+ion of function =E2=80=98cpu_synchronize_post_reset=E2=80=99 [-Werror=3Di=
+mplicit-function-declaration]
+     cpu_synchronize_post_reset(cs);
+     ^
+/home/cohuck/git/qemu/target/s390x/kvm.c:1628:5: error: nested extern dec=
+laration of =E2=80=98cpu_synchronize_post_reset=E2=80=99 [-Werror=3Dneste=
+d-externs]
+/home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98sigp_set_p=
+refix=E2=80=99:
+/home/cohuck/git/qemu/target/s390x/kvm.c:1665:5: error: implicit declarat=
+ion of function =E2=80=98cpu_synchronize_post_init=E2=80=99 [-Werror=3Dim=
+plicit-function-declaration]
+     cpu_synchronize_post_init(cs);
+     ^
+/home/cohuck/git/qemu/target/s390x/kvm.c:1665:5: error: nested extern dec=
+laration of =E2=80=98cpu_synchronize_post_init=E2=80=99 [-Werror=3Dnested=
+-externs]
+cc1: all warnings being treated as errors
+/home/cohuck/git/qemu/rules.mak:64: recipe for target 'target/s390x/kvm.o=
+' failed
 
-It's definitely the only effect of dc->categories.
+Fix this.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Fixes: b394662 ("kvm: move cpu synchronization code")
+Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+---
+ target/s390x/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 3ac29f92b3..5ad0acbc82 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -32,7 +32,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "hw/hw.h"
+ #include "sysemu/device_tree.h"
+ #include "qapi/qmp/qjson.h"
+--=20
+2.11.0
