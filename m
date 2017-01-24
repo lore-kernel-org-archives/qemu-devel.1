@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cVydA-0006Ki-Bz
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:47:20 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cVyeo-0007cM-Qo
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:48:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cVyd9-00047X-DT
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:47:16 -0500
-Date: Tue, 24 Jan 2017 10:47:03 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170124104703.GB2220@work-vm>
-References: <1485244792-11248-1-git-send-email-zhang.zhanghailiang@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485244792-11248-1-git-send-email-zhang.zhanghailiang@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v2] migration: re-active images while
- migration been canceled after inactive them
+	(envelope-from <kraxel@redhat.com>) id 1cVyek-000524-0k
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:48:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cVyej-000511-QY
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 05:48:53 -0500
+Message-ID: <1485254930.32716.23.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 24 Jan 2017 11:48:50 +0100
+In-Reply-To: <237b1da5-532d-afd6-84ad-6adc5bd97291@redhat.com>
+References: <58871f9b.d635240a.4cda6.5322@mx.google.com>
+	<237b1da5-532d-afd6-84ad-6adc5bd97291@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] cirrus: fix oob access issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,124 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, amit.shah@redhat.com, quintela@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org, ghoffman@redhat.com, liqiang6-s@360.cn
 
-* zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
-> commit fe904ea8242cbae2d7e69c052c754b8f5f1ba1d6 fixed a case
-> which migration aborted QEMU because it didn't regain the control
-> of images while some errors happened.
-> 
-> Actually, there are another two cases can trigger the same error reports:
-> " bdrv_co_do_pwritev: Assertion `!(bs->open_flags & 0x0800)' failed",
-> 
-> Case 1, codes path:
-> migration_thread()
->     migration_completion()
->         bdrv_inactivate_all() ----------------> inactivate images
->         qemu_savevm_state_complete_precopy()
->             socket_writev_buffer() --------> error because destination fails
->                 qemu_fflush() ----------------> set error on migration stream
-> -> qmp_migrate_cancel() ----------------> user cancelled migration concurrently
->     -> migrate_set_state() ------------------> set migrate CANCELLIN
->     migration_completion() -----------------> go on to fail_invalidate
-> 	if (s->state == MIGRATION_STATUS_ACTIVE) -> Jump this branch
-> 
-> Case 2, codes path:
-> migration_thread()
->     migration_completion()
->         bdrv_inactivate_all() ----------------> inactivate images
->     migreation_completion() finished
-> -> qmp_migrate_cancel() ---------------> user cancelled migration concurrently
->     qemu_mutex_lock_iothread();
->     qemu_bh_schedule (s->cleanup_bh);
-> 
-> As we can see from above, qmp_migrate_cancel can slip in whenever
-> migration_thread does not hold the global lock. If this happens after
-> bdrv_inactive_all() been called, the above error reports will appear.
-> 
-> To prevent this, we can call bdrv_invalidate_cache_all() in qmp_migrate_cancel()
-> directly if we find images become inactive.
-> 
-> Besides, bdrv_invalidate_cache_all() in migration_completion() doesn't have the
-> protection of big lock, fix it by add the missing qemu_mutex_lock_iothread();
-> 
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+> > index 379910d..7ddd289 100644
+> > --- a/hw/display/cirrus_vga.c
+> > +++ b/hw/display/cirrus_vga.c
+> > @@ -277,7 +277,8 @@ static bool blit_region_is_unsafe(struct CirrusVGAS=
+tate *s,
+> >      }
+> >      if (pitch < 0) {
+> >          int64_t min =3D addr
+> > -            + ((int64_t)s->cirrus_blt_height-1) * pitch;
+> > +            + ((int64_t)s->cirrus_blt_height-1) * pitch
+> > +            - s->cirrus_blt_width;
+> >          int32_t max =3D addr
+> >              + s->cirrus_blt_width;
+> >          if (min < 0 || max > s->vga.vram_size) {
+> >=20
+>=20
+> I believe this is incorrect. In this case (AFAIR), "addr" points to the
+> left-most pixel (=3D lowest address) of the bottom line (=3D highest
+> address).
 
-Yes, I think tht's better:
+If I read the code correctly it is backwards *both* x and y axis, so
+addr is the right-most pixel of the bottom line.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
-> v2:
->  - Fix a bug introduced by commit fe904 which didn't get big lock
->    before call bdrv_invalidate_cache_all. (Suggested by Dave)
-> ---
->  include/migration/migration.h |  3 +++
->  migration/migration.c         | 15 +++++++++++++++
->  2 files changed, 18 insertions(+)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index c309d23..2d5b724 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -177,6 +177,9 @@ struct MigrationState
->      /* Flag set once the migration thread is running (and needs joining) */
->      bool migration_thread_running;
->  
-> +    /* Flag set once the migration thread called bdrv_inactivate_all */
-> +    bool block_inactive;
-> +
->      /* Queue of outstanding page requests from the destination */
->      QemuMutex src_page_req_mutex;
->      QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
-> diff --git a/migration/migration.c b/migration/migration.c
-> index f498ab8..5b50afe 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1006,6 +1006,16 @@ static void migrate_fd_cancel(MigrationState *s)
->      if (s->state == MIGRATION_STATUS_CANCELLING && f) {
->          qemu_file_shutdown(f);
->      }
-> +    if (s->state == MIGRATION_STATUS_CANCELLING && s->block_inactive) {
-> +        Error *local_err = NULL;
-> +
-> +        bdrv_invalidate_cache_all(&local_err);
-> +        if (local_err) {
-> +            error_report_err(local_err);
-> +        } else {
-> +            s->block_inactive = false;
-> +        }
-> +    }
->  }
->  
->  void add_migration_state_change_notifier(Notifier *notify)
-> @@ -1705,6 +1715,7 @@ static void migration_completion(MigrationState *s, int current_active_state,
->              if (ret >= 0) {
->                  qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
->                  qemu_savevm_state_complete_precopy(s->to_dst_file, false);
-> +                s->block_inactive = true;
->              }
->          }
->          qemu_mutex_unlock_iothread();
-> @@ -1755,10 +1766,14 @@ fail_invalidate:
->      if (s->state == MIGRATION_STATUS_ACTIVE) {
->          Error *local_err = NULL;
->  
-> +        qemu_mutex_lock_iothread();
->          bdrv_invalidate_cache_all(&local_err);
->          if (local_err) {
->              error_report_err(local_err);
-> +        } else {
-> +            s->block_inactive = false;
->          }
-> +        qemu_mutex_unlock_iothread();
->      }
->  
->  fail:
-> -- 
-> 1.8.3.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+cheers,
+  Gerd
