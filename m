@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cW4qB-0002Mc-MW
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:25:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cW4rW-0003K6-6h
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:26:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cW4qA-0000ln-MU
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:25:07 -0500
-Received: from mail-vk0-x234.google.com ([2607:f8b0:400c:c05::234]:34495)
+	(envelope-from <peter.maydell@linaro.org>) id 1cW4rV-0001Qg-Ct
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:26:30 -0500
+Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:34299)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cW4qA-0000kV-JI
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:25:06 -0500
-Received: by mail-vk0-x234.google.com with SMTP id r136so116678278vke.1
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:25:06 -0800 (PST)
+	id 1cW4rV-0001QK-8L
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:26:29 -0500
+Received: by mail-ua0-x22e.google.com with SMTP id 35so139134141uak.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:26:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87fuk82x48.fsf@dusky.pond.sub.org>
-References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
-	<1485164923-17736-7-git-send-email-armbru@redhat.com>
-	<2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com>
-	<877f5l1tak.fsf@dusky.pond.sub.org>
-	<3512807d-d04e-50fa-9fcf-d1d5ba8ac350@redhat.com>
-	<87r33saa6p.fsf@dusky.pond.sub.org>
-	<4cd45561-60e9-2cd2-e317-880ba9eb2f86@redhat.com>
-	<87fuk82x48.fsf@dusky.pond.sub.org>
+In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
+References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jan 2017 17:24:45 +0000
-Message-ID: <CAFEAcA_oBmrMGsuT8=a51eOkBDQ-Rrr4tAhi5oMGxMzb-PiVwg@mail.gmail.com>
+Date: Tue, 24 Jan 2017 17:26:08 +0000
+Message-ID: <CAFEAcA-eXHbKc081aVe5MxXpTTvdYE++TU61iYLboSAtFYTknQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
- lsi53c895a SCSI HBAs
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/31] Trivial patches for 2017-01-24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On 24 January 2017 at 17:20, Markus Armbruster <armbru@redhat.com> wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
+On 24 January 2017 at 09:39, Michael Tokarev <mjt@tls.msk.ru> wrote:
+> Hi!
+> This is a next trivial-patches pull request after a long while.
+> We had a new release (2.8), new year holidays and other stuff.
+> So here we go now with whatever has been collected so far.
 >
->> On 24/01/2017 13:56, Markus Armbruster wrote:
->>> So, what do we want to deprecate?
->>>
->>> I think the onboard SCSI HBA adopting if=scsi drives should stay,
->>> because it matches what we do for other interface types.  Unless we
->>> wanted to deprecate interface types other than none entirely.
->>
->> Yes, of course.
->>
->>> What about realview and versatile auto-creating lsi53c895a?
->>
->> That should go.
+> Please consider applying.
 >
-> Peter, do you agree?
+> Thanks,
+>
+> /mjt
+>
+> The following changes since commit 3879284d6517dc22529395bdb259f4183b5891=
+27:
+>
+>   Merge remote-tracking branch 'remotes/berrange/tags/pull-qio-2017-01-23=
+-2' into staging (2017-01-23 15:59:09 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
+>
+> for you to fetch changes up to bed534dd4032446750ad3e7a806c24d81bc5851b:
+>
+>   hw/isa/isa-bus: Set category of the "isabus-bridge" device (2017-01-24 =
+12:38:03 +0300)
+>
+> ----------------------------------------------------------------
+> trivial patches for 2017-01-24
+>
+> ----------------------------------------------------------------
 
-I'm not sure what you're suggesting deprecation of -- will
-command lines like
- "qemu-system-arm -M versatilepb -hda somedisk.qcow2"
-still work (ie auto-create the LSI scsi adaptor and plug
-the disk into it) ?
+This failed to build, all targets:
+
+/home/petmay01/linaro/qemu-for-merges/arch_init.c:95:5: error: no
+previous prototype for =E2=80=98qemu_read_default_config_files=E2=80=99
+[-Werror=3Dmissing-prototypes]
+
+I suspect this may be the result of merge conflicts getting
+wrongly resolved -- can you rebase and resend, please?
 
 thanks
 -- PMM
