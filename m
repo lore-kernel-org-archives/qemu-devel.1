@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxoU-0001g6-FW
+	(envelope-from <mjt@tls.msk.ru>) id 1cVxoU-0001g5-FK
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxoQ-0005in-Eb
+	(envelope-from <mjt@tls.msk.ru>) id 1cVxoQ-0005iw-FH
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:54:54 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Tue, 24 Jan 2017 12:39:26 +0300
-Message-Id: <693cd2e4aaa0c4c642f363a4915d1584aeadd88b.1485250702.git.mjt@msgid.tls.msk.ru>
+Date: Tue, 24 Jan 2017 12:39:34 +0300
+Message-Id: <b3cc4b39748a42e7bb541f6c596884d2b7c7b017.1485250702.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 22/31] util/mmap-alloc: check parameter before
- using
+Subject: [Qemu-devel] [PULL 30/31] usb: Set category and description of the
+ MTP device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +23,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+It's a storage device, so let's classify it accordingly. And
+while we're at it, also add a short description for people who
+do not know what MTP means.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- util/mmap-alloc.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ hw/usb/dev-mtp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 5a85aa3..d713a72 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -12,6 +12,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/mmap-alloc.h"
-+#include "qemu/host-utils.h"
- 
- #define HUGETLBFS_MAGIC       0x958458f6
- 
-@@ -61,18 +62,18 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
- #else
-     void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
- #endif
--    size_t offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
-+    size_t offset;
-     void *ptr1;
- 
-     if (ptr == MAP_FAILED) {
-         return MAP_FAILED;
-     }
- 
--    /* Make sure align is a power of 2 */
--    assert(!(align & (align - 1)));
-+    assert(is_power_of_2(align));
-     /* Always align to host page size */
-     assert(align >= getpagesize());
- 
-+    offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
-     ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
-                 MAP_FIXED |
-                 (fd == -1 ? MAP_ANONYMOUS : 0) |
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 809dcf5..94c2e94 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1580,6 +1580,8 @@ static void usb_mtp_class_initfn(ObjectClass *klass, void *data)
+     uc->handle_reset   = usb_mtp_handle_reset;
+     uc->handle_control = usb_mtp_handle_control;
+     uc->handle_data    = usb_mtp_handle_data;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->desc = "USB Media Transfer Protocol device";
+     dc->fw_name = "mtp";
+     dc->vmsd = &vmstate_usb_mtp;
+     dc->props = mtp_properties;
 -- 
 2.1.4
