@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caliborn@SDF.ORG>) id 1cW6ez-00059v-BF
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:21:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cW6ih-0000Dc-Gm
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:25:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caliborn@SDF.ORG>) id 1cW6ev-0002BM-Vw
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:21:41 -0500
-Date: Tue, 24 Jan 2017 18:56:32 +0000 (UTC)
-From: Valentin Plotkin <caliborn@SDF.ORG>
-Message-ID: <Pine.NEB.4.64.1701241855380.2138@sdf.lonestar.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cW6ig-0003OT-Jd
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:25:31 -0500
+Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:34580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cW6ig-0003OP-FB
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 14:25:30 -0500
+Received: by mail-vk0-x230.google.com with SMTP id r136so119158565vke.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 11:25:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: [Qemu-devel] [PATCH] PPC: MMU compatibility check.
+In-Reply-To: <20170124150823.30162-1-cornelia.huck@de.ibm.com>
+References: <20170124150823.30162-1-cornelia.huck@de.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Jan 2017 19:25:08 +0000
+Message-ID: <CAFEAcA-eqcoJ91w4Y4-kGfe0uB8UZ_h0A20WJU-ft8hPbX15Bg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/2] s390x fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,87 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Jens Freimann <jfrei@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 24 January 2017 at 15:08, Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+> The following changes since commit 48cef39bf39846ce4aaf79d4a2ae620373b3e181:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-hppa-20170123' into staging (2017-01-24 09:52:42 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20170124
+>
+> for you to fetch changes up to 0cf4d747cb8d053e6a6161aadfd3531fa1a62be1:
+>
+>   s390x/kvm: fix cmma reset for KVM (2017-01-24 15:47:31 +0100)
+>
+> ----------------------------------------------------------------
+> Two s390x fixes: One for the kvm.c build failure, and one for a bug
+> that might cause random guest crashes with zeroed out pages on host
+> kernels with working cmma (< 4.6 and likely >= 4.10).
+>
+> ----------------------------------------------------------------
+>
+> Christian Borntraeger (1):
+>   s390x/kvm: fix cmma reset for KVM
+>
+> Cornelia Huck (1):
+>   s390x/kvm: include hw_accel.h instead of kvm.h
+>
+>  target/s390x/kvm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
+Applied, thanks.
 
-Hi everyone,
-
-I looked at the "qemu-system-ppc -nographic -cpu G2leGP3 -M ppce500" on 
-the BiteSizedTasks page. The segfault was caused by machine initialization 
-code which expected a certain MMU model, checked, so unused SPR were read, 
-returning zeros. bamboo and virtex machines are affected as well, but it 
-doesn't always cause segfault, usually running into unmapped memory and 
-failing somewhat more nicely.
-
-I added the checks. It would be possible to add support for other MMU 
-models, but I'm not sure if there is any point (would any guest OS support 
-mutually exclusive CPU and machine)?
-
----
-  hw/ppc/e500.c          | 5 +++++
-  hw/ppc/ppc440_bamboo.c | 5 +++++
-  hw/ppc/virtex_ml507.c  | 5 +++++
-  3 files changed, 15 insertions(+)
-
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index cf8b122..cd352f6 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -631,6 +631,11 @@ static uint64_t mmubooke_initial_mapsize(CPUPPCState 
-*env)
-
-  static void mmubooke_create_initial_mapping(CPUPPCState *env)
-  {
-+    if(env->mmu_model!=POWERPC_MMU_BOOKE206){
-+        fprintf(stderr,"MMU model %i not supported by this machine.\n", 
-env->mmu_model);
-+        exit(-1);
-+    }
-+
-      ppcmas_tlb_t *tlb = booke206_get_tlbm(env, 1, 0, 0);
-      hwaddr size;
-      int ps;
-diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-index 5c535b1..61e7028 100644
---- a/hw/ppc/ppc440_bamboo.c
-+++ b/hw/ppc/ppc440_bamboo.c
-@@ -124,6 +124,11 @@ static void 
-mmubooke_create_initial_mapping(CPUPPCState *env,
-                                       target_ulong va,
-                                       hwaddr pa)
-  {
-+    if(env->mmu_model!=POWERPC_MMU_BOOKE){
-+        fprintf(stderr,"MMU model %i not supported by this machine.\n", 
-env->mmu_model);
-+        exit(-1);
-+    }
-+
-      ppcemb_tlb_t *tlb = &env->tlb.tlbe[0];
-
-      tlb->attr = 0;
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index b97d966..4041ff3 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -69,6 +69,11 @@ static void mmubooke_create_initial_mapping(CPUPPCState 
-*env,
-                                       target_ulong va,
-                                       hwaddr pa)
-  {
-+    if(env->mmu_model!=POWERPC_MMU_BOOKE){
-+        fprintf(stderr,"MMU model %i not supported by this machine.\n", 
-env->mmu_model);
-+        exit(-1);
-+    }
-+
-      ppcemb_tlb_t *tlb = &env->tlb.tlbe[0];
-
-      tlb->attr = 0;
--- 
-2.5.5
-
-Valentin Plotkin
-caliborn@sdf.org
-SDF Public Access UNIX System - http://sdf.org
+-- PMM
