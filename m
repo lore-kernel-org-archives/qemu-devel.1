@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVzq6-0000Vd-1j
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:04:43 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cVzqF-0000fM-QE
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:04:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVzq4-0008V4-Ra
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:04:42 -0500
-Date: Tue, 24 Jan 2017 20:04:31 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170124120431.GB13714@lemon.Home>
-References: <20170124095350.16679-1-stefanha@redhat.com>
+	(envelope-from <mjt@tls.msk.ru>) id 1cVzqC-00006T-IR
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:04:51 -0500
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Tue, 24 Jan 2017 12:39:14 +0300
+Message-Id: <35109e5b912c2c6658e9f6873da9c9f193a7083e.1485250702.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
+References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
+References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170124095350.16679-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] aio-posix: honor is_external in AioContext
- polling
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 10/31] object: make some funcs static
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,84 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-On Tue, 01/24 09:53, Stefan Hajnoczi wrote:
-> AioHandlers marked ->is_external must be skipped when aio_node_check()
-> fails.  bdrv_drained_begin() needs this to prevent dataplane from
-> submitting new I/O requests while another thread accesses the device and
-> relies on it being quiesced.
-> 
-> This patch fixes the following segfault:
-> 
->   Program terminated with signal SIGSEGV, Segmentation fault.
->   #0  0x00005577f6127dad in bdrv_io_plug (bs=0x5577f7ae52f0) at qemu/block/io.c:2650
->   2650            bdrv_io_plug(child->bs);
->   [Current thread is 1 (Thread 0x7ff5c4bd1c80 (LWP 10917))]
->   (gdb) bt
->   #0  0x00005577f6127dad in bdrv_io_plug (bs=0x5577f7ae52f0) at qemu/block/io.c:2650
->   #1  0x00005577f6114363 in blk_io_plug (blk=0x5577f7b8ba20) at qemu/block/block-backend.c:1561
->   #2  0x00005577f5d4091d in virtio_blk_handle_vq (s=0x5577f9ada030, vq=0x5577f9b3d2a0) at qemu/hw/block/virtio-blk.c:589
->   #3  0x00005577f5d4240d in virtio_blk_data_plane_handle_output (vdev=0x5577f9ada030, vq=0x5577f9b3d2a0) at qemu/hw/block/dataplane/virtio-blk.c:158
->   #4  0x00005577f5d88acd in virtio_queue_notify_aio_vq (vq=0x5577f9b3d2a0) at qemu/hw/virtio/virtio.c:1304
->   #5  0x00005577f5d8aaaf in virtio_queue_host_notifier_aio_poll (opaque=0x5577f9b3d308) at qemu/hw/virtio/virtio.c:2134
->   #6  0x00005577f60ca077 in run_poll_handlers_once (ctx=0x5577f79ddbb0) at qemu/aio-posix.c:493
->   #7  0x00005577f60ca268 in try_poll_mode (ctx=0x5577f79ddbb0, blocking=true) at qemu/aio-posix.c:569
->   #8  0x00005577f60ca331 in aio_poll (ctx=0x5577f79ddbb0, blocking=true) at qemu/aio-posix.c:601
->   #9  0x00005577f612722a in bdrv_flush (bs=0x5577f7c20970) at qemu/block/io.c:2403
->   #10 0x00005577f60c1b2d in bdrv_close (bs=0x5577f7c20970) at qemu/block.c:2322
->   #11 0x00005577f60c20e7 in bdrv_delete (bs=0x5577f7c20970) at qemu/block.c:2465
->   #12 0x00005577f60c3ecf in bdrv_unref (bs=0x5577f7c20970) at qemu/block.c:3425
->   #13 0x00005577f60bf951 in bdrv_root_unref_child (child=0x5577f7a2de70) at qemu/block.c:1361
->   #14 0x00005577f6112162 in blk_remove_bs (blk=0x5577f7b8ba20) at qemu/block/block-backend.c:491
->   #15 0x00005577f6111b1b in blk_remove_all_bs () at qemu/block/block-backend.c:245
->   #16 0x00005577f60c1db6 in bdrv_close_all () at qemu/block.c:2382
->   #17 0x00005577f5e60cca in main (argc=20, argv=0x7ffea6eb8398, envp=0x7ffea6eb8440) at qemu/vl.c:4684
-> 
-> The key thing is that bdrv_close() uses bdrv_drained_begin() and
-> virtio_queue_host_notifier_aio_poll() must not be called.
-> 
-> Thanks to Fam Zheng <famz@redhat.com> for identifying the root cause of
-> this crash.
-> 
-> Reported-by: Alberto Garcia <berto@igalia.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  aio-posix.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/aio-posix.c b/aio-posix.c
-> index 9453d83..a8d7090 100644
-> --- a/aio-posix.c
-> +++ b/aio-posix.c
-> @@ -508,7 +508,8 @@ static bool run_poll_handlers_once(AioContext *ctx)
->  
->      QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
->          if (!node->deleted && node->io_poll &&
-> -                node->io_poll(node->opaque)) {
-> +            aio_node_check(ctx, node->is_external) &&
-> +            node->io_poll(node->opaque)) {
->              progress = true;
->          }
->  
-> -- 
-> 2.9.3
-> 
-> 
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The patch is not wrong and I believe it is enough to fix the crash, however it's
-not enough...
+There is no need to have those functions as public API.
 
-All in all I think we should skip external handlers regardless of
-aio_disable_external(), or even skip try_poll_mode, in nested aio_poll()'s. The
-reasons are 1) many nested aio_poll()'s don't have bdrv_drained_begin, so this
-check is not sufficient; 2) aio_poll() on qemu_aio_context doesn't look at
-ioeventfd before, but this was changed by adding try_poll_mode(), which is not
-very correct.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+---
+ include/qom/object.h | 24 ------------------------
+ qom/object.c         |  4 ++--
+ 2 files changed, 2 insertions(+), 26 deletions(-)
 
-These two factors combined together make it possible for bdrv_flush() etc to
-spin longer than necessary, if not forever, when the guest keeps submitting more
-requests with ioeventfd.
-
-Fam
+diff --git a/include/qom/object.h b/include/qom/object.h
+index c5e6fc1..cd0f412 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -587,18 +587,6 @@ struct InterfaceClass
+ Object *object_new(const char *typename);
+=20
+ /**
+- * object_new_with_type:
+- * @type: The type of the object to instantiate.
+- *
+- * This function will initialize a new object using heap allocated memor=
+y.
+- * The returned object has a reference count of 1, and will be freed whe=
+n
+- * the last reference is dropped.
+- *
+- * Returns: The newly allocated and instantiated object.
+- */
+-Object *object_new_with_type(Type type);
+-
+-/**
+  * object_new_with_props:
+  * @typename:  The name of the type of the object to instantiate.
+  * @parent: the parent object
+@@ -727,18 +715,6 @@ int object_set_propv(Object *obj,
+                      va_list vargs);
+=20
+ /**
+- * object_initialize_with_type:
+- * @data: A pointer to the memory to be used for the object.
+- * @size: The maximum size available at @data for the object.
+- * @type: The type of the object to instantiate.
+- *
+- * This function will initialize an object.  The memory for the object s=
+hould
+- * have already been allocated.  The returned object has a reference cou=
+nt of 1,
+- * and will be finalized when the last reference is dropped.
+- */
+-void object_initialize_with_type(void *data, size_t size, Type type);
+-
+-/**
+  * object_initialize:
+  * @obj: A pointer to the memory to be used for the object.
+  * @size: The maximum size available at @obj for the object.
+diff --git a/qom/object.c b/qom/object.c
+index 760fafb..eb4bc92 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -357,7 +357,7 @@ static void object_post_init_with_type(Object *obj, T=
+ypeImpl *ti)
+     }
+ }
+=20
+-void object_initialize_with_type(void *data, size_t size, TypeImpl *type=
+)
++static void object_initialize_with_type(void *data, size_t size, TypeImp=
+l *type)
+ {
+     Object *obj =3D data;
+=20
+@@ -473,7 +473,7 @@ static void object_finalize(void *data)
+     }
+ }
+=20
+-Object *object_new_with_type(Type type)
++static Object *object_new_with_type(Type type)
+ {
+     Object *obj;
+=20
+--=20
+2.1.4
