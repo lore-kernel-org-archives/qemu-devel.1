@@ -1,36 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cVxP2-000537-F0
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:28:37 -0500
+	(envelope-from <quintela@redhat.com>) id 1cVxQD-00064G-Fc
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:29:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cVxOt-0005nJ-Fn
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:28:36 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35248
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cVxOt-0005n9-9p
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:28:27 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0O8wjrN049585
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 04:28:25 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 285vey7deq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 04:28:25 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 24 Jan 2017 09:28:24 -0000
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Tue, 24 Jan 2017 10:28:20 +0100
+	(envelope-from <quintela@redhat.com>) id 1cVxQC-0006Ol-Ne
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:29:49 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1479837270-79005-10-git-send-email-vsementsov@virtuozzo.com>
+	(Vladimir Sementsov-Ogievskiy's message of "Tue, 22 Nov 2016 20:54:22
+	+0300")
+References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479837270-79005-10-git-send-email-vsementsov@virtuozzo.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 24 Jan 2017 10:29:38 +0100
+Message-ID: <87inp4ajr1.fsf@emacs.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20170124092820.23832-1-cornelia.huck@de.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] s390x/kvm: include hw_accel.h instead of kvm.h
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 09/17] migration: include
+ migrate_dirty_bitmaps in migrate_postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,67 +26,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, vpalatin@chromium.org, sw@weilnetz.de, pbonzini@redhat.com, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-Commit b394662 ("kvm: move cpu synchronization code") switched
-to hw_accel.h instead of kvm.h, but missed s390x, resulting in
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+> Enable postcopy if dirty bitmap migration is endabled.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-  CC      s390x-softmmu/target/s390x/kvm.o
-/home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98kvm_sclp_s=
-ervice_call=E2=80=99:
-/home/cohuck/git/qemu/target/s390x/kvm.c:1034:5: error: implicit declarat=
-ion of function =E2=80=98cpu_synchronize_state=E2=80=99 [-Werror=3Dimplic=
-it-function-declaration]
-     cpu_synchronize_state(CPU(cpu));
-     ^
-/home/cohuck/git/qemu/target/s390x/kvm.c:1034:5: error: nested extern dec=
-laration of =E2=80=98cpu_synchronize_state=E2=80=99 [-Werror=3Dnested-ext=
-erns]
-/home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98sigp_initi=
-al_cpu_reset=E2=80=99:
-/home/cohuck/git/qemu/target/s390x/kvm.c:1628:5: error: implicit declarat=
-ion of function =E2=80=98cpu_synchronize_post_reset=E2=80=99 [-Werror=3Di=
-mplicit-function-declaration]
-     cpu_synchronize_post_reset(cs);
-     ^
-/home/cohuck/git/qemu/target/s390x/kvm.c:1628:5: error: nested extern dec=
-laration of =E2=80=98cpu_synchronize_post_reset=E2=80=99 [-Werror=3Dneste=
-d-externs]
-/home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98sigp_set_p=
-refix=E2=80=99:
-/home/cohuck/git/qemu/target/s390x/kvm.c:1665:5: error: implicit declarat=
-ion of function =E2=80=98cpu_synchronize_post_init=E2=80=99 [-Werror=3Dim=
-plicit-function-declaration]
-     cpu_synchronize_post_init(cs);
-     ^
-/home/cohuck/git/qemu/target/s390x/kvm.c:1665:5: error: nested extern dec=
-laration of =E2=80=98cpu_synchronize_post_init=E2=80=99 [-Werror=3Dnested=
--externs]
-cc1: all warnings being treated as errors
-/home/cohuck/git/qemu/rules.mak:64: recipe for target 'target/s390x/kvm.o=
-' failed
-
-Fix this.
-
-Fixes: b394662 ("kvm: move cpu synchronization code")
-Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
----
- target/s390x/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 3ac29f92b3..5ad0acbc82 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -32,7 +32,7 @@
- #include "qemu/error-report.h"
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "hw/hw.h"
- #include "sysemu/device_tree.h"
- #include "qapi/qmp/qjson.h"
---=20
-2.11.0
+Reviewed-by: Juan Quintela <quintela@redhat.com>
