@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cW5SF-0006D7-Oj
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:28 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cW5SI-0006Fd-EL
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cW5SC-000093-Pt
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:27 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36568)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cW5SH-0000Ab-Au
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:30 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35396)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cW5SC-00008w-Jw
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:24 -0500
-Received: by mail-wm0-x243.google.com with SMTP id r126so36415608wmr.3
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:04:24 -0800 (PST)
+	id 1cW5SH-0000AN-2N
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:29 -0500
+Received: by mail-wm0-x242.google.com with SMTP id d140so36533110wmd.2
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:04:28 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 24 Jan 2017 19:04:14 +0100
-Message-Id: <20170124180420.12430-3-pbonzini@redhat.com>
+Date: Tue, 24 Jan 2017 19:04:18 +0100
+Message-Id: <20170124180420.12430-7-pbonzini@redhat.com>
 In-Reply-To: <20170124180420.12430-1-pbonzini@redhat.com>
 References: <20170124180420.12430-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/8] virtio: add virtio_*_phys_cached
+Subject: [Qemu-devel] [PATCH 6/8] virtio: add MemoryListener to cache ring
+ translations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +31,194 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, stefanha@redhat.com
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The cached translations are RCU-protected to allow efficient use
+when processing virtqueues.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/hw/virtio/virtio-access.h | 52 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+        v1->v2: fix memory leak on error [Stefan]
 
-diff --git a/include/hw/virtio/virtio-access.h b/include/hw/virtio/virtio-access.h
-index 91ae14d..2e92074 100644
---- a/include/hw/virtio/virtio-access.h
-+++ b/include/hw/virtio/virtio-access.h
-@@ -156,6 +156,58 @@ static inline uint16_t virtio_tswap16(VirtIODevice *vdev, uint16_t s)
- #endif
+ hw/virtio/virtio.c         | 92 ++++++++++++++++++++++++++++++++++++++++++++--
+ include/hw/virtio/virtio.h |  1 +
+ 2 files changed, 90 insertions(+), 3 deletions(-)
+
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index c8ba20d..548a3c7 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -60,6 +60,13 @@ typedef struct VRingUsed
+     VRingUsedElem ring[0];
+ } VRingUsed;
+ 
++typedef struct VRingMemoryRegionCaches {
++    struct rcu_head rcu;
++    MemoryRegionCache desc;
++    MemoryRegionCache avail;
++    MemoryRegionCache used;
++} VRingMemoryRegionCaches;
++
+ typedef struct VRing
+ {
+     unsigned int num;
+@@ -68,6 +75,7 @@ typedef struct VRing
+     hwaddr desc;
+     hwaddr avail;
+     hwaddr used;
++    VRingMemoryRegionCaches *caches;
+ } VRing;
+ 
+ struct VirtQueue
+@@ -104,6 +112,47 @@ struct VirtQueue
+     QLIST_ENTRY(VirtQueue) node;
+ };
+ 
++static void virtio_free_region_cache(VRingMemoryRegionCaches *caches)
++{
++    address_space_cache_destroy(&caches->desc);
++    address_space_cache_destroy(&caches->avail);
++    address_space_cache_destroy(&caches->used);
++    g_free(caches);
++}
++
++static void virtio_init_region_cache(VirtIODevice *vdev, int n)
++{
++    VirtQueue *vq = &vdev->vq[n];
++    VRingMemoryRegionCaches *old = vq->vring.caches;
++    VRingMemoryRegionCaches *new;
++    hwaddr addr, size;
++    int event_size;
++
++    event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
++
++    addr = vq->vring.desc;
++    if (!addr) {
++        return;
++    }
++    new = g_new0(VRingMemoryRegionCaches, 1);
++    size = virtio_queue_get_desc_size(vdev, n);
++    address_space_cache_init(&new->desc, vdev->dma_as,
++                             addr, size, false);
++
++    size = virtio_queue_get_used_size(vdev, n) + event_size;
++    address_space_cache_init(&new->used, vdev->dma_as,
++                             vq->vring.used, size, true);
++
++    size = virtio_queue_get_avail_size(vdev, n) + event_size;
++    address_space_cache_init(&new->avail, vdev->dma_as,
++                             vq->vring.avail, size, false);
++
++    atomic_rcu_set(&vq->vring.caches, new);
++    if (old) {
++        call_rcu(old, virtio_free_region_cache, rcu);
++    }
++}
++
+ /* virt queue functions */
+ void virtio_queue_update_rings(VirtIODevice *vdev, int n)
+ {
+@@ -117,6 +166,7 @@ void virtio_queue_update_rings(VirtIODevice *vdev, int n)
+     vring->used = vring_align(vring->avail +
+                               offsetof(VRingAvail, ring[vring->num]),
+                               vring->align);
++    virtio_init_region_cache(vdev, n);
  }
  
-+static inline uint16_t virtio_lduw_phys_cached(VirtIODevice *vdev,
-+                                               MemoryRegionCache *cache,
-+                                               hwaddr pa)
-+{
-+    if (virtio_access_is_big_endian(vdev)) {
-+        return lduw_be_phys_cached(cache, pa);
-+    }
-+    return lduw_le_phys_cached(cache, pa);
-+}
-+
-+static inline uint32_t virtio_ldl_phys_cached(VirtIODevice *vdev,
-+                                              MemoryRegionCache *cache,
-+                                              hwaddr pa)
-+{
-+    if (virtio_access_is_big_endian(vdev)) {
-+        return ldl_be_phys_cached(cache, pa);
-+    }
-+    return ldl_le_phys_cached(cache, pa);
-+}
-+
-+static inline uint64_t virtio_ldq_phys_cached(VirtIODevice *vdev,
-+                                              MemoryRegionCache *cache,
-+                                              hwaddr pa)
-+{
-+    if (virtio_access_is_big_endian(vdev)) {
-+        return ldq_be_phys_cached(cache, pa);
-+    }
-+    return ldq_le_phys_cached(cache, pa);
-+}
-+
-+static inline void virtio_stw_phys_cached(VirtIODevice *vdev,
-+                                          MemoryRegionCache *cache,
-+                                          hwaddr pa, uint16_t value)
-+{
-+    if (virtio_access_is_big_endian(vdev)) {
-+        stw_be_phys_cached(cache, pa, value);
-+    } else {
-+        stw_le_phys_cached(cache, pa, value);
-+    }
-+}
-+
-+static inline void virtio_stl_phys_cached(VirtIODevice *vdev,
-+                                          MemoryRegionCache *cache,
-+                                          hwaddr pa, uint32_t value)
-+{
-+    if (virtio_access_is_big_endian(vdev)) {
-+        stl_be_phys_cached(cache, pa, value);
-+    } else {
-+        stl_le_phys_cached(cache, pa, value);
-+    }
-+}
-+
- static inline void virtio_tswap16s(VirtIODevice *vdev, uint16_t *s)
+ static void vring_desc_read(VirtIODevice *vdev, VRingDesc *desc,
+@@ -1264,6 +1314,7 @@ void virtio_queue_set_rings(VirtIODevice *vdev, int n, hwaddr desc,
+     vdev->vq[n].vring.desc = desc;
+     vdev->vq[n].vring.avail = avail;
+     vdev->vq[n].vring.used = used;
++    virtio_init_region_cache(vdev, n);
+ }
+ 
+ void virtio_queue_set_num(VirtIODevice *vdev, int n, int num)
+@@ -1975,9 +2026,6 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+ void virtio_cleanup(VirtIODevice *vdev)
  {
-     *s = virtio_tswap16(vdev, *s);
+     qemu_del_vm_change_state_handler(vdev->vmstate);
+-    g_free(vdev->config);
+-    g_free(vdev->vq);
+-    g_free(vdev->vector_queues);
+ }
+ 
+ static void virtio_vmstate_change(void *opaque, int running, RunState state)
+@@ -2238,6 +2286,19 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+     }
+ }
+ 
++static void virtio_memory_listener_commit(MemoryListener *listener)
++{
++    VirtIODevice *vdev = container_of(listener, VirtIODevice, listener);
++    int i;
++
++    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
++        if (vdev->vq[i].vring.num == 0) {
++            break;
++        }
++        virtio_init_region_cache(vdev, i);
++    }
++}
++
+ static void virtio_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -2260,6 +2321,9 @@ static void virtio_device_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
+     }
++
++    vdev->listener.commit = virtio_memory_listener_commit;
++    memory_listener_register(&vdev->listener, vdev->dma_as);
+ }
+ 
+ static void virtio_device_unrealize(DeviceState *dev, Error **errp)
+@@ -2282,6 +2346,27 @@ static void virtio_device_unrealize(DeviceState *dev, Error **errp)
+     vdev->bus_name = NULL;
+ }
+ 
++static void virtio_device_instance_finalize(Object *obj)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(obj);
++    int i;
++
++    memory_listener_unregister(&vdev->listener);
++    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
++        VRingMemoryRegionCaches *caches;
++        if (vdev->vq[i].vring.num == 0) {
++            break;
++        }
++        caches = atomic_read(&vdev->vq[i].vring.caches);
++        atomic_set(&vdev->vq[i].vring.caches, NULL);
++        virtio_free_region_cache(caches);
++    }
++
++    g_free(vdev->config);
++    g_free(vdev->vq);
++    g_free(vdev->vector_queues);
++}
++
+ static Property virtio_properties[] = {
+     DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
+     DEFINE_PROP_END_OF_LIST(),
+@@ -2408,6 +2493,7 @@ static const TypeInfo virtio_device_info = {
+     .parent = TYPE_DEVICE,
+     .instance_size = sizeof(VirtIODevice),
+     .class_init = virtio_device_class_init,
++    .instance_finalize = virtio_device_instance_finalize,
+     .abstract = true,
+     .class_size = sizeof(VirtioDeviceClass),
+ };
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 525da24..f1b2673 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -85,6 +85,7 @@ struct VirtIODevice
+     uint32_t generation;
+     int nvectors;
+     VirtQueue *vq;
++    MemoryListener listener;
+     uint16_t device_id;
+     bool vm_running;
+     bool broken; /* device in invalid state, needs reset */
 -- 
 2.9.3
