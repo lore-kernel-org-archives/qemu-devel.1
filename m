@@ -1,28 +1,55 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVskg-0007AG-3h
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:30:39 -0500
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cVsuY-0000Pz-S2
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:40:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cVskc-0007PS-UE
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:30:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cVskc-0007PC-IK
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:30:34 -0500
-Date: Mon, 23 Jan 2017 21:30:31 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170123213031.24f757d0@t450s.home>
-In-Reply-To: <20170124032818.GJ26526@pxdev.xzpeter.org>
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-3-git-send-email-peterx@redhat.com>
-	<20170123114905.4936508d@t450s.home>
-	<20170124032818.GJ26526@pxdev.xzpeter.org>
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cVsuV-0001Ke-Nw
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:40:50 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57709)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
+	id 1cVsuV-0001KL-ER
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:40:47 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0O4dTNo038014
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 23:40:45 -0500
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 285ee51v80-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 23 Jan 2017 23:40:45 -0500
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
+	Tue, 24 Jan 2017 14:40:42 +1000
+Received: from d23relay10.au.ibm.com (d23relay10.au.ibm.com [9.190.26.77])
+	by d23dlp03.au.ibm.com (Postfix) with ESMTP id 540F43578053
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 15:40:39 +1100 (EST)
+Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
+	by d23relay10.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v0O4eVfw15401094
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 15:40:39 +1100
+Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
+	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v0O4e6WS011316
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 15:40:06 +1100
+Received: from ozlabs.au.ibm.com (ozlabs.au.ibm.com [9.192.253.14])
+	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVin) with ESMTP id
+	v0O4e6Dm010579
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 15:40:06 +1100
+Received: from tungsten.ozlabs.ibm.com (haven.au.ibm.com [9.192.254.114])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by ozlabs.au.ibm.com (Postfix) with ESMTPSA id 4FEB2A0193
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 15:39:42 +1100 (AEDT)
+Date: Tue, 24 Jan 2017 15:39:41 +1100
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v4 02/20] vfio: introduce
- vfio_get_vaddr()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Message-Id: <20170124043941.GA12671@tungsten.ozlabs.ibm.com>
+Subject: [Qemu-devel] update-linux-headers.sh fails on clean kernel dir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,153 +58,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On Tue, 24 Jan 2017 11:28:18 +0800
-Peter Xu <peterx@redhat.com> wrote:
+Hi QEMU developers,
 
-> On Mon, Jan 23, 2017 at 11:49:05AM -0700, Alex Williamson wrote:
-> > On Fri, 20 Jan 2017 21:08:38 +0800
-> > Peter Xu <peterx@redhat.com> wrote:
-> >   
-> > > A cleanup for vfio_iommu_map_notify(). Should have no functional change,
-> > > just to make the function shorter and easier to understand.
-> > > 
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
-> > >  1 file changed, 38 insertions(+), 20 deletions(-)
-> > > 
-> > > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > > index 174f351..ce55dff 100644
-> > > --- a/hw/vfio/common.c
-> > > +++ b/hw/vfio/common.c
-> > > @@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
-> > >             section->offset_within_address_space & (1ULL << 63);
-> > >  }
-> > >  
-> > > -static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > > +static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-> > > +                           bool *read_only)
-> > >  {
-> > > -    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-> > > -    VFIOContainer *container = giommu->container;
-> > > -    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-> > >      MemoryRegion *mr;
-> > >      hwaddr xlat;
-> > >      hwaddr len = iotlb->addr_mask + 1;
-> > > -    void *vaddr;
-> > > -    int ret;
-> > > -
-> > > -    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
-> > > -                                iova, iova + iotlb->addr_mask);
-> > > -
-> > > -    if (iotlb->target_as != &address_space_memory) {
-> > > -        error_report("Wrong target AS \"%s\", only system memory is allowed",
-> > > -                     iotlb->target_as->name ? iotlb->target_as->name : "none");
-> > > -        return;
-> > > -    }
-> > > +    bool ret = false;
-> > > +    bool writable = iotlb->perm & IOMMU_WO;
-> > >  
-> > >      /*
-> > >       * The IOMMU TLB entry we have just covers translation through
-> > > @@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > >      rcu_read_lock();
-> > >      mr = address_space_translate(&address_space_memory,
-> > >                                   iotlb->translated_addr,
-> > > -                                 &xlat, &len, iotlb->perm & IOMMU_WO);
-> > > +                                 &xlat, &len, writable);
-> > >      if (!memory_region_is_ram(mr)) {
-> > >          error_report("iommu map to non memory area %"HWADDR_PRIx"",
-> > >                       xlat);
-> > >          goto out;
-> > >      }
-> > > +
-> > >      /*
-> > >       * Translation truncates length to the IOMMU page size,
-> > >       * check that it did not truncate too much.
-> > > @@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > >          goto out;
-> > >      }
-> > >  
-> > > +    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> > > +    *read_only = !writable || mr->readonly;
-> > > +    ret = true;
-> > > +
-> > > +out:
-> > > +    rcu_read_unlock();
-> > > +    return ret;
-> > > +}
-> > > +
-> > > +static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > > +{
-> > > +    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-> > > +    VFIOContainer *container = giommu->container;
-> > > +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-> > > +    bool read_only;
-> > > +    void *vaddr;
-> > > +    int ret;
-> > > +
-> > > +    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
-> > > +                                iova, iova + iotlb->addr_mask);
-> > > +
-> > > +    if (iotlb->target_as != &address_space_memory) {
-> > > +        error_report("Wrong target AS \"%s\", only system memory is allowed",
-> > > +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-> > > +        return;
-> > > +    }
-> > > +
-> > >      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
-> > > -        vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> > >          ret = vfio_dma_map(container, iova,
-> > >                             iotlb->addr_mask + 1, vaddr,
-> > > -                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
-> > > +                           read_only);  
-> > 
-> > Is it really valid to move the map ioctl out of the rcu read lock?
-> > We're making use of vaddr, which is directly a property of a
-> > MemoryRegion which may have now disappeared.  With the lock released,
-> > could an unmap race the map resulting in the wrong ordering?  As noted
-> > previously, there are some subtle changes here, we do the
-> > memory_region_get_ram_ptr() translation on both map and unmap (fixed in
-> > next patch) and then pull map out of the rcu lock.  I'm not sure the
-> > extra function is worthwhile or really has no functional change.
-> > Thanks,  
-> 
-> Thanks for raising this question up.
-> 
-> IIUC this function can be triggered by three cases (this is for x86, I
-> suppose the rule should be same for all platforms):
-> 
-> - memory hot add/remove
-> - a PSI (page selective invalidation) for a newly mapped io page
-> - a domain switch (needs a iommu replay)
-> 
-> IMHO all these places are protected by the QBL (both 2nd/3rd cases
-> should be invoked in VT-d IOMMU MMIO write to queue invalidation
-> registers)? And I thought BQL should be regarded as a write lock even
-> stronger than RCU read lock?
-> 
-> If I understand it correctly above, looks like we should be safe here
-> as long as we are always with BQL? And, if so, do we really need RCU
-> read protection here?
-> 
-> Please kindly correct if I missed anything.
+If I run scripts/update-linux-headers.sh from a clean checkout of QEMU
+and point it at a clean checkout of a recent linux kernel (4.10-rc1 or
+later), it fails:
 
-Note that this code is originally used on power systems, David Gibson
-will also need to review whether the SPAPR IOMMU can handle the
-relaxed unmap in patch 03/20.  I suspect you're right about current
-usage vs BQL, but I wonder how that plays into the long term plans for
-the BQL and whether the intention of 41063e1 was to standardize all
-address_space_translate() callers regardless of any one caller's BQL
-usage.
+$ scripts/update-linux-headers.sh ~/tmp/linux/
 
-Paolo, what do you think?  Thanks,
+...
 
-Alex
+scripts/Makefile.headersinst:62: *** Missing generated UAPI file ./arch/arm/include/generated/uapi/asm/unistd-common.h.  Stop.
+
+This seems to be because the script passes the arch to the kernel
+makefile using "SRCARCH" rather than "ARCH".
+
+(SRCARCH seems to be intended as an internal value, and setting it does
+not propagate the setting to ARCH. Because ARCH is left empty, the
+prerequisites that should generate unistd-common.h fail. If ARCH is set,
+SRCARCH is set automatically and everything works.)
+
+Changing the script to use "ARCH" seems to fixe the problem.
+
+(Note: when testing this be careful: unistd-common.h is not removed by
+"make clean" in the kernel directory.)
+
+Does this seem correct?
+
+Should I send a patch even though it's a very small change?
+
+Cheers,
+Sam.
