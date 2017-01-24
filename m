@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40888)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=8ff6=ZG=redhat.com=mst@kernel.org>)
-	id 1cW9hn-00086H-PA
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:48 -0500
+	id 1cW9hs-0008BG-NF
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=8ff6=ZG=redhat.com=mst@kernel.org>)
-	id 1cW9hm-0005se-Jn
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:47 -0500
-Received: from mail.kernel.org ([198.145.29.136]:37294)
+	id 1cW9hp-0005tI-IV
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:52 -0500
+Received: from mail.kernel.org ([198.145.29.136]:37320)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=8ff6=ZG=redhat.com=mst@kernel.org>)
-	id 1cW9hm-0005sS-9A
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:46 -0500
-Date: Wed, 25 Jan 2017 00:36:41 +0200
+	id 1cW9hp-0005tA-8V
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 17:36:49 -0500
+Date: Wed, 25 Jan 2017 00:36:44 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485297322-10595-9-git-send-email-mst@redhat.com>
+Message-ID: <1485297322-10595-10-git-send-email-mst@redhat.com>
 References: <1485297322-10595-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485297322-10595-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 08/16] hw/ioh3420: derive from PCI Express Root
- Port base class
+Subject: [Qemu-devel] [PULL 09/16] hw/pcie: Introduce Generic PCI Express
+ Root Port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,183 +31,149 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
 From: Marcel Apfelbaum <marcel@redhat.com>
 
-Preserve only Intel specific details.
+The Generic Root Port behaves almost the same as the
+Intel's IOH device with id 3420, without having
+Intel specific attributes.
+
+The device has two purposes:
+ (1) Can be used on both X86 and ARM machines.
+ (2) It will allow us to tweak the behaviour
+    (e.g add vendor-specific PCI capabilities)
+     - something that obviously cannot be done
+       on a known device.
 
 Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Andrea Bolognani <abologna@redhat.com>
 ---
- hw/pci-bridge/ioh3420.c | 121 ++++++------------------------------------------
- 1 file changed, 15 insertions(+), 106 deletions(-)
+ include/hw/pci/pci.h               |  1 +
+ hw/pci-bridge/gen_pcie_root_port.c | 88 ++++++++++++++++++++++++++++++++++++++
+ hw/pci-bridge/Makefile.objs        |  2 +-
+ 3 files changed, 90 insertions(+), 1 deletion(-)
+ create mode 100644 hw/pci-bridge/gen_pcie_root_port.c
 
-diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
-index 84b7946..571ffe5 100644
---- a/hw/pci-bridge/ioh3420.c
-+++ b/hw/pci-bridge/ioh3420.c
-@@ -61,119 +61,28 @@ static uint8_t ioh3420_aer_vector(const PCIDevice *d)
-     return 0;
- }
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 772692f..cbc1fdf 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -96,6 +96,7 @@
+ #define PCI_DEVICE_ID_REDHAT_PXB         0x0009
+ #define PCI_DEVICE_ID_REDHAT_BRIDGE_SEAT 0x000a
+ #define PCI_DEVICE_ID_REDHAT_PXB_PCIE    0x000b
++#define PCI_DEVICE_ID_REDHAT_PCIE_RP     0x000c
+ #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
  
--static void ioh3420_aer_vector_update(PCIDevice *d)
-+static int ioh3420_interrupts_init(PCIDevice *d, Error **errp)
- {
--    pcie_aer_root_set_vector(d, ioh3420_aer_vector(d));
--}
--
--static void ioh3420_write_config(PCIDevice *d,
--                                   uint32_t address, uint32_t val, int len)
--{
--    uint32_t root_cmd =
--        pci_get_long(d->config + d->exp.aer_cap + PCI_ERR_ROOT_COMMAND);
--
--    pci_bridge_write_config(d, address, val, len);
--    ioh3420_aer_vector_update(d);
--    pcie_cap_slot_write_config(d, address, val, len);
--    pcie_aer_write_config(d, address, val, len);
--    pcie_aer_root_write_config(d, address, val, len, root_cmd);
--}
--
--static void ioh3420_reset(DeviceState *qdev)
--{
--    PCIDevice *d = PCI_DEVICE(qdev);
--
--    ioh3420_aer_vector_update(d);
--    pcie_cap_root_reset(d);
--    pcie_cap_deverr_reset(d);
--    pcie_cap_slot_reset(d);
--    pcie_cap_arifwd_reset(d);
--    pcie_aer_root_reset(d);
--    pci_bridge_reset(qdev);
--    pci_bridge_disable_base_limit(d);
--}
--
--static int ioh3420_initfn(PCIDevice *d)
--{
--    PCIEPort *p = PCIE_PORT(d);
--    PCIESlot *s = PCIE_SLOT(d);
-     int rc;
--    Error *err = NULL;
--
--    pci_config_set_interrupt_pin(d->config, 1);
--    pci_bridge_initfn(d, TYPE_PCIE_BUS);
--    pcie_port_init_reg(d);
--
--    rc = pci_bridge_ssvid_init(d, IOH_EP_SSVID_OFFSET,
--                               IOH_EP_SSVID_SVID, IOH_EP_SSVID_SSID);
--    if (rc < 0) {
--        goto err_bridge;
--    }
-+    Error *local_err = NULL;
- 
-     rc = msi_init(d, IOH_EP_MSI_OFFSET, IOH_EP_MSI_NR_VECTOR,
-                   IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
--                  IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT, &err);
-+                  IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
-+                  &local_err);
-     if (rc < 0) {
-         assert(rc == -ENOTSUP);
--        error_report_err(err);
--        goto err_bridge;
-+        error_propagate(errp, local_err);
-     }
- 
--    rc = pcie_cap_init(d, IOH_EP_EXP_OFFSET, PCI_EXP_TYPE_ROOT_PORT, p->port);
--    if (rc < 0) {
--        goto err_msi;
--    }
--
--    pcie_cap_arifwd_init(d);
--    pcie_cap_deverr_init(d);
--    pcie_cap_slot_init(d, s->slot);
--    pcie_cap_root_init(d);
--
--    pcie_chassis_create(s->chassis);
--    rc = pcie_chassis_add_slot(s);
--    if (rc < 0) {
--        goto err_pcie_cap;
--    }
--
--    rc = pcie_aer_init(d, PCI_ERR_VER, IOH_EP_AER_OFFSET,
--                       PCI_ERR_SIZEOF, &err);
--    if (rc < 0) {
--        error_report_err(err);
--        goto err;
--    }
--    pcie_aer_root_init(d);
--    ioh3420_aer_vector_update(d);
--
--    return 0;
--
--err:
--    pcie_chassis_del_slot(s);
--err_pcie_cap:
--    pcie_cap_exit(d);
--err_msi:
--    msi_uninit(d);
--err_bridge:
--    pci_bridge_exitfn(d);
-     return rc;
- }
- 
--static void ioh3420_exitfn(PCIDevice *d)
-+static void ioh3420_interrupts_uninit(PCIDevice *d)
- {
--    PCIESlot *s = PCIE_SLOT(d);
--
--    pcie_aer_exit(d);
--    pcie_chassis_del_slot(s);
--    pcie_cap_exit(d);
-     msi_uninit(d);
--    pci_bridge_exitfn(d);
- }
- 
--static Property ioh3420_props[] = {
--    DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
--                    QEMU_PCIE_SLTCAP_PCP_BITNR, true),
--    DEFINE_PROP_END_OF_LIST()
--};
--
- static const VMStateDescription vmstate_ioh3420 = {
-     .name = "ioh-3240-express-root-port",
-     .version_id = 1,
-@@ -191,25 +100,25 @@ static void ioh3420_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ #define FMT_PCIBUS                      PRIx64
+diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+new file mode 100644
+index 0000000..42bbe34
+--- /dev/null
++++ b/hw/pci-bridge/gen_pcie_root_port.c
+@@ -0,0 +1,88 @@
++/*
++ * Generic PCI Express Root Port emulation
++ *
++ * Copyright (C) 2017 Red Hat Inc
++ *
++ * Authors:
++ *   Marcel Apfelbaum <marcel@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/pci/msix.h"
++#include "hw/pci/pcie_port.h"
++
++#define TYPE_GEN_PCIE_ROOT_PORT                "pcie-root-port"
++
++#define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
++#define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
++
++static uint8_t gen_rp_aer_vector(const PCIDevice *d)
++{
++    return 0;
++}
++
++static int gen_rp_interrupts_init(PCIDevice *d, Error **errp)
++{
++    int rc;
++
++    rc = msix_init_exclusive_bar(d, GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR, 0);
++
++    if (rc < 0) {
++        assert(rc == -ENOTSUP);
++        error_setg(errp, "Unable to init msix vectors");
++    } else {
++        msix_vector_use(d, 0);
++    }
++
++    return rc;
++}
++
++static void gen_rp_interrupts_uninit(PCIDevice *d)
++{
++    msix_uninit_exclusive_bar(d);
++}
++
++static const VMStateDescription vmstate_rp_dev = {
++    .name = "pcie-root-port",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .post_load = pcie_cap_slot_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCIE_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot),
++        VMSTATE_STRUCT(parent_obj.parent_obj.parent_obj.exp.aer_log,
++                       PCIESlot, 0, vmstate_pcie_aer_log, PCIEAERLog),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
 +    PCIERootPortClass *rpc = PCIE_ROOT_PORT_CLASS(klass);
- 
--    k->is_express = 1;
--    k->is_bridge = 1;
--    k->config_write = ioh3420_write_config;
--    k->init = ioh3420_initfn;
--    k->exit = ioh3420_exitfn;
-     k->vendor_id = PCI_VENDOR_ID_INTEL;
-     k->device_id = PCI_DEVICE_ID_IOH_EPORT;
-     k->revision = PCI_DEVICE_ID_IOH_REV;
--    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->desc = "Intel IOH device id 3420 PCIE Root Port";
--    dc->reset = ioh3420_reset;
-     dc->vmsd = &vmstate_ioh3420;
--    dc->props = ioh3420_props;
-+    rpc->aer_vector = ioh3420_aer_vector;
-+    rpc->interrupts_init = ioh3420_interrupts_init;
-+    rpc->interrupts_uninit = ioh3420_interrupts_uninit;
-+    rpc->exp_offset = IOH_EP_EXP_OFFSET;
-+    rpc->aer_offset = IOH_EP_AER_OFFSET;
-+    rpc->ssvid_offset = IOH_EP_SSVID_OFFSET;
-+    rpc->ssid = IOH_EP_SSVID_SSID;
- }
- 
- static const TypeInfo ioh3420_info = {
-     .name          = "ioh3420",
--    .parent        = TYPE_PCIE_SLOT,
++
++    k->vendor_id = PCI_VENDOR_ID_REDHAT;
++    k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_RP;
++    dc->desc = "PCI Express Root Port";
++    dc->vmsd = &vmstate_rp_dev;
++    rpc->aer_vector = gen_rp_aer_vector;
++    rpc->interrupts_init = gen_rp_interrupts_init;
++    rpc->interrupts_uninit = gen_rp_interrupts_uninit;
++    rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
++}
++
++static const TypeInfo gen_rp_dev_info = {
++    .name          = TYPE_GEN_PCIE_ROOT_PORT,
 +    .parent        = TYPE_PCIE_ROOT_PORT,
-     .class_init    = ioh3420_class_init,
- };
- 
++    .class_init    = gen_rp_dev_class_init,
++};
++
++ static void gen_rp_register_types(void)
++ {
++    type_register_static(&gen_rp_dev_info);
++ }
++ type_init(gen_rp_register_types)
+diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+index 4f2039f..85e8e39 100644
+--- a/hw/pci-bridge/Makefile.objs
++++ b/hw/pci-bridge/Makefile.objs
+@@ -1,6 +1,6 @@
+ common-obj-y += pci_bridge_dev.o
+ common-obj-y += pci_expander_bridge.o
+-common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o
++common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
+ common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
+ common-obj-$(CONFIG_IOH3420) += ioh3420.o
+ common-obj-$(CONFIG_I82801B11) += i82801b11.o
 -- 
 MST
