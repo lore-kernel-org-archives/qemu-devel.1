@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVvMJ-0006O6-06
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:40 -0500
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cVvML-0006Ph-CB
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cVvMI-0005z8-3S
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:38 -0500
-Date: Tue, 24 Jan 2017 15:17:26 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170124071726.GC27126@lemon.Home>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-4-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cVvMK-00060e-8X
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:41 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:38624)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cVvMJ-00060L-Te
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:17:40 -0500
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Date: Tue, 24 Jan 2017 10:17:41 +0300
+Message-ID: <20170124071741.4572.13714.stgit@PASHA-ISP>
+In-Reply-To: <20170124071654.4572.41407.stgit@PASHA-ISP>
+References: <20170124071654.4572.41407.stgit@PASHA-ISP>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1482503344-6424-4-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 03/21] backup: improve non-dirty bits
- progress processing
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v7 08/14] savevm: add public save_vmstate
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +27,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, jsnow@redhat.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, dovgaluk@ispras.ru, kraxel@redhat.com, pbonzini@redhat.com
 
-On Fri, 12/23 17:28, Vladimir Sementsov-Ogievskiy wrote:
-> Set fake progress for non-dirty clusters in copy_bitmap initialization,
-> to:
-> 1. set progress in the same place where corresponding clusters are
-> consumed from copy_bitmap (or not initialized, as here)
-> 2. earlier progress information for user
-> 3. simplify the code
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/backup.c | 18 +++---------------
->  1 file changed, 3 insertions(+), 15 deletions(-)
-> 
-> diff --git a/block/backup.c b/block/backup.c
-> index 621b1c0..f1f87f6 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -383,7 +383,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
->      int64_t sector;
->      int64_t cluster;
->      int64_t end;
-> -    int64_t last_cluster = -1;
->      int64_t sectors_per_cluster = cluster_size_sectors(job);
->      BdrvDirtyBitmapIter *dbi;
->  
-> @@ -395,12 +394,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
->      while ((sector = bdrv_dirty_iter_next(dbi)) != -1) {
->          cluster = sector / sectors_per_cluster;
->  
-> -        /* Fake progress updates for any clusters we skipped */
-> -        if (cluster != last_cluster + 1) {
-> -            job->common.offset += ((cluster - last_cluster - 1) *
-> -                                   job->cluster_size);
-> -        }
-> -
->          for (end = cluster + clusters_per_iter; cluster < end; cluster++) {
->              do {
->                  if (yield_and_check(job)) {
-> @@ -422,14 +415,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
->          if (granularity < job->cluster_size) {
->              bdrv_set_dirty_iter(dbi, cluster * sectors_per_cluster);
->          }
-> -
-> -        last_cluster = cluster - 1;
-> -    }
-> -
-> -    /* Play some final catchup with the progress meter */
-> -    end = DIV_ROUND_UP(job->common.len, job->cluster_size);
-> -    if (last_cluster + 1 < end) {
-> -        job->common.offset += ((end - last_cluster - 1) * job->cluster_size);
->      }
->  
->  out:
-> @@ -462,6 +447,9 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
->          bdrv_set_dirty_iter(dbi, (cluster + cl_gran) * sectors_per_cluster);
->      }
->  
-> +    job->common.offset = job->common.len -
-> +                         hbitmap_count(job->copy_bitmap) * job->cluster_size;
-> +
->      bdrv_dirty_iter_free(dbi);
->  }
+This patch introduces save_vmstate function to allow saving and loading
+vmstates from the replay module.
 
-Is this effectively moving the progress reporting from cluster copying to dirty
-bitmap initialization? If so the progress will stay "100%" once
-backup_incremental_init_copy_bitmap returns, but the backup has merely started.
-I don't think this is a good idea.
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+---
+ include/sysemu/sysemu.h |    1 +
+ migration/savevm.c      |   33 ++++++++++++++++++++++-----------
+ 2 files changed, 23 insertions(+), 11 deletions(-)
 
-Fam
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index cccde56..4cdba34 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -75,6 +75,7 @@ void qemu_add_machine_init_done_notifier(Notifier *notify);
+ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+ 
+ void hmp_savevm(Monitor *mon, const QDict *qdict);
++int save_vmstate(Monitor *mon, const char *name);
+ int load_vmstate(const char *name);
+ void hmp_delvm(Monitor *mon, const QDict *qdict);
+ void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index f9c06e9..1e69225 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2039,38 +2039,40 @@ int qemu_loadvm_state(QEMUFile *f)
+     return ret;
+ }
+ 
+-void hmp_savevm(Monitor *mon, const QDict *qdict)
++int save_vmstate(Monitor *mon, const char *name)
+ {
+     BlockDriverState *bs, *bs1;
+     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+-    int ret;
++    int ret = -1;
+     QEMUFile *f;
+     int saved_vm_running;
+     uint64_t vm_state_size;
+     qemu_timeval tv;
+     struct tm tm;
+-    const char *name = qdict_get_try_str(qdict, "name");
+     Error *local_err = NULL;
+     AioContext *aio_context;
+ 
+     if (!bdrv_all_can_snapshot(&bs)) {
+         monitor_printf(mon, "Device '%s' is writable but does not "
+                        "support snapshots.\n", bdrv_get_device_name(bs));
+-        return;
++        return ret;
+     }
+ 
+     /* Delete old snapshots of the same name */
+-    if (name && bdrv_all_delete_snapshot(name, &bs1, &local_err) < 0) {
+-        error_reportf_err(local_err,
+-                          "Error while deleting snapshot on device '%s': ",
+-                          bdrv_get_device_name(bs1));
+-        return;
++    if (name) {
++        ret = bdrv_all_delete_snapshot(name, &bs1, &local_err);
++        if (ret < 0) {
++            error_reportf_err(local_err,
++                              "Error while deleting snapshot on device '%s': ",
++                              bdrv_get_device_name(bs1));
++            return ret;
++        }
+     }
+ 
+     bs = bdrv_all_find_vmstate_bs();
+     if (bs == NULL) {
+         monitor_printf(mon, "No block device can accept snapshots\n");
+-        return;
++        return ret;
+     }
+     aio_context = bdrv_get_aio_context(bs);
+ 
+@@ -2079,7 +2081,7 @@ void hmp_savevm(Monitor *mon, const QDict *qdict)
+     ret = global_state_store();
+     if (ret) {
+         monitor_printf(mon, "Error saving global state\n");
+-        return;
++        return ret;
+     }
+     vm_stop(RUN_STATE_SAVE_VM);
+ 
+@@ -2125,13 +2127,22 @@ void hmp_savevm(Monitor *mon, const QDict *qdict)
+     if (ret < 0) {
+         monitor_printf(mon, "Error while creating snapshot on '%s'\n",
+                        bdrv_get_device_name(bs));
++        goto the_end;
+     }
+ 
++    ret = 0;
++
+  the_end:
+     aio_context_release(aio_context);
+     if (saved_vm_running) {
+         vm_start();
+     }
++    return ret;
++}
++
++void hmp_savevm(Monitor *mon, const QDict *qdict)
++{
++    save_vmstate(mon, qdict_get_try_str(qdict, "name"));
+ }
+ 
+ void qmp_xen_save_devices_state(const char *filename, Error **errp)
