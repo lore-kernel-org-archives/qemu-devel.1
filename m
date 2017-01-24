@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVxpA-0002Hr-Q0
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:55:37 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cVxsC-0005UM-RK
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:58:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVxp9-0005vB-Uk
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:55:36 -0500
-Received: from mail-vk0-x22c.google.com ([2607:f8b0:400c:c05::22c]:34330)
+	(envelope-from <liq3ea@gmail.com>) id 1cVxs9-0006cA-4f
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:58:44 -0500
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:34519)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cVxp9-0005v5-Jn
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:55:35 -0500
-Received: by mail-vk0-x22c.google.com with SMTP id r136so108530824vke.1
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 01:55:35 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <87pojcx3zd.fsf@dusky.pond.sub.org>
-References: <1485206518-32403-1-git-send-email-atar4qemu@gmail.com>
-	<CAFEAcA860sYR6svwKMtjjoknfkVK=-Ch8vat_ywPyyvjtsr=MA@mail.gmail.com>
-	<CAFEAcA-VKUKcCJ2a7Zx_rnWDQTUjbuu4ztXS1AqtmqSQnktVuQ@mail.gmail.com>
-	<87pojcx3zd.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jan 2017 09:55:14 +0000
-Message-ID: <CAFEAcA8CKZRcGSCrtBvPykh2Z4wCXyHd3ct=wk8jV=dh1uMp1g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 1/2] niagara: fail if a firmware file is
- missing
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cVxs8-0006c5-Vu
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:58:41 -0500
+Received: by mail-io0-x243.google.com with SMTP id c80so17982663iod.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 01:58:40 -0800 (PST)
+Message-ID: <5887254f.863a240a.2c122.5500@mx.google.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 24 Jan 2017 01:58:34 -0800
+Subject: [Qemu-devel] [PATCH] cirrus: fix oob access issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +23,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>
+To: kraxel@redhat.com, qemu-devel@nongnu.org
+Cc: liqiang6-s@360.cn
 
-On 24 January 2017 at 08:21, Markus Armbruster <armbru@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->> PS: doesn't this break 'make check' if the rom files
->> are missing?
->
-> Yes, it does.  Obvious incremental fix appended.  It still prints
-> rom_add_file()'s message.  Swap the operands of && to get rid of it.
+From: Li Qiang <liqiang6-s@360.cn>
 
-Yes, we should do this with
- (!qtest_enabled && rom_add_file_fixed(file, addr, -1))
-to avoid printing the warnings in the make check output.
+When doing bitblt copy in backward mode, we should minus the
+blt width first just like the adding in the forward mode. This
+can avoid the oob access of the front of vga's vram.
 
-thanks
--- PMM
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+---
+ hw/display/cirrus_vga.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index 379910d..fa56730 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -277,7 +277,8 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+     }
+     if (pitch < 0) {
+         int64_t min = addr
+-            + ((int64_t)s->cirrus_blt_height-1) * pitch;
++            + ((int64_t)s->cirrus_blt_height - 1) * pitch
++            - s->cirrus_blt_width;
+         int32_t max = addr
+             + s->cirrus_blt_width;
+         if (min < 0 || max > s->vga.vram_size) {
+-- 
+1.8.3.1
