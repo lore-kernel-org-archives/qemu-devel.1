@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cW7RI-0005Wt-Hr
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 15:11:37 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cW7TK-00074H-4N
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 15:13:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cW7RE-0005XU-GS
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 15:11:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cW7RE-0005X9-7X
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 15:11:32 -0500
-References: <20170124110151.937-1-berrange@redhat.com>
-	<20170124110151.937-2-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c070ecd4-77e9-f4fd-fab6-c51b50220aa2@redhat.com>
-Date: Tue, 24 Jan 2017 14:11:29 -0600
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cW7TG-0006Ot-4w
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 15:13:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60205
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cW7TG-0006Oj-0V
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 15:13:38 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0OJx2K1086042
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 15:13:37 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28681y8pxk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 15:13:36 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 24 Jan 2017 13:13:36 -0700
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170124110151.937-2-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BcDWmBJcD6FAis1jF79OhNklQ9TVJ98KE"
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] make: move top level dir to end of
- include search path
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170124173619.GB28745@redhat.com>
+References: <1485272673-5877-1-git-send-email-zdai@linux.vnet.ibm.com>
+	<20170124173619.GB28745@redhat.com>
+Date: Tue, 24 Jan 2017 14:13:26 -0600
+Message-Id: <148528880653.9117.349083961199603729@loki>
+Subject: Re: [Qemu-devel] [PATCH 1/1] Migration: libvirt live migration over
+ RDMA of ipv6 addr failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,157 +43,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, David Dai <zdai@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, zdai@us.ibm.com, quintela@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BcDWmBJcD6FAis1jF79OhNklQ9TVJ98KE
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Llu=c3=ads_Vilanova?=
- <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <c070ecd4-77e9-f4fd-fab6-c51b50220aa2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] make: move top level dir to end of
- include search path
-References: <20170124110151.937-1-berrange@redhat.com>
- <20170124110151.937-2-berrange@redhat.com>
-In-Reply-To: <20170124110151.937-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Quoting Daniel P. Berrange (2017-01-24 11:36:19)
+> On Tue, Jan 24, 2017 at 09:44:33AM -0600, David Dai wrote:
+> > Using libvirt to do live migration over RDMA via ip v6 address failed. =
 
-On 01/24/2017 05:01 AM, Daniel P. Berrange wrote:
-> Currently the search path is
+> > For example:
+> > # virsh migrate  --live --migrateuri rdma://[deba::2222]:49152  \
+> >               rhel73_host1_guest1 qemu+ssh://[deba::2222]/system --verb=
+ose
+> > root@deba::2222's password:
+> > error: internal error: unable to execute QEMU command 'migrate': RDMA E=
+RROR:  =
+
+> >                   could not rdma_getaddrinfo address deba
+> > =
+
+> > As we can see, the ip v6 address used by rdma_getaddrinfo() has only "d=
+eba" =
+
+> > part. It should be "deba::2222".
+> > =
+
+> > 1) According to rfc 3986, a literal ip v6 address should be enclosed =
+
+> > in '[' and ']'.
+> > When using virsh command to do live migration via ip v6 addresss, user
+> > will input the ip v6 address with brackets (i.e. rdma://[deba::2222]:49=
+152).
+> > libvirt will parse command line option by calling virURIParse(). =
+
+> > Inside it calls virStringStripIPv6Brackets() to strip off the brackets.
+> > The uri passed in to virURIParse()  is:
+> >    "uri =3D rdma://[deba::2222]:49152"
+> > Inside virURIParse() routine, it will strip off the bracket '[' and ']'=
+ if
+> > it's ip v6 address. Then save the ip v6 address in this format "deba::2=
+222" =
+
+> > in the virURI->server field, and to be passed to qemu.
+> > =
+
+> > 2) At the beginning of migration, in qemu's qemu_rdma_data_init(host_po=
+rt) =
+
+> > routine, it calls inet_parse(host_port) routine to parse the ip v6 addr=
+ess and =
+
+> > port string obtained from libvirt.
+> > The input string host_port passed to qemu_rdma_data_init() can be:
+> >     "hostname:port", or
+> >     "ipv4address:port", or
+> >     "[ipv6address]:port" (i.e "[deba::2222]:49152"), or
+> >     "ipv6address:port" (i.e "deba::2222:49152").
+> > Existing qemu api inet_parse() can handle the above first 3 cases prope=
+rly,  =
+
+> > but didn't handle the last case ("ipv6address:port") correctly.
+> > In this live migration over rdma via ip v6 address case, the server ip =
+v6 =
+
+> > address obtained from libvirt doesn't contain the brackets '[' and ']' =
+
+> > (i.e. "deba::2222:49152"). It caused inet_parse() to parse only "deba" =
+part, =
+
+> > and stopped at the 1st colon ':'. As the result, the subsequent =
+
+> > rdma_getaddrinfo() with ip address "deba" will fail.
+> > =
+
+> > If we don't strip off brackets '[' and ']' for an ip v6 address in libv=
+irt's =
+
+> > virURIParse(), it will cause libvirt ipv6 ssh authentication failure.
+> > =
+
+> > NOTE:
+> > If using libvirt to do live migration over TCP via ip v6 address:
+> > # virsh migrate  --live --migrateuri tcp://[deba::2222]:49152  \
+> >               rhel73_host1_guest1 qemu+ssh://[deba::2222]/system --verb=
+ose
+> > It works fine.
+> > In migrateuri of tcp case, libvirt will call virNetSocketNewConnectTCP()
+> > directly to connect to remote "deba::2222:49152" after it strips off
+> > the bracket '[' and ']' for an ip v6 address. =
+
+> > On qemu side, fd_start_outgoing_migration() will be called to do migrat=
+ion.
+> > It doesn't call inet_parse(). So we don't see issue in tcp case.
+> > =
+
+> > Solution:
+> > I choose to fix the code in qemu's inet_parse() routine to parse the
+> > ip v6 addresss w/o brackets properly (i.e. "deba::2222:49152" format).
+> =
+
+> That is not right - "deba::222:49152" is *not* a valid address. It
+> is mandatory to use [] when providing a numeric IPv6 address. So
+> there's nothing broken in QEMU here - libvirt needs fixing to pass
+> correct data to QEMU
+
+It's worth noting that inet_parse() is still somewhat broken in that
+instead of rejecting "deba::2222:49152" it erroneously treats it as
+an ipv4 address and passes it up the stack as host/port deba/<null>.
+
+> =
+
+> Regards,
+> Daniel
+> -- =
+
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
+/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.or=
+g :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
+/ :|
 >=20
->   1. source dir corresponding to input file (implicit by compiler)
->   2. top level build dir
->   3. top level source dir
->   4. top level source include/ dir
->   5. source dir corresponding to input file
->   6. build dir corresponding to output file
->=20
-> This causes a semantic difference in behaviour for builds
-> where srcdir =3D=3D builddir vs srcdir !=3D builddir, because
-> item 5 moves from end to start, when srcdir =3D=3D builddir.
-
-Rather, item 5 is a no-op (because it duplicated 1), and item 6 moves
-from the end to the beginning when srcdir =3D=3D builddir
-
->=20
-> As a general rule we also want to move to have all shared
-> headers in the include/ dir, so move that ahead of the
-> top level dirs in the search order.
-
-Wait - are you proposing that you swap 4 to occur earlier than 2/3?...
-
->=20
-> Thus we now have:
->=20
->   1. source dir corresponding to input file
->   2. build dir corresponding to output file
->   3. top level build dir
->   4. top level source dir
->   5. top level source include/ dir
-
-=2E..because this doesn't match that swap, and I don't see it in the patc=
-h
-body (but I may have missed it; I'm not as strong at reviewing make as I
-am at C)
-
->=20
-> and items 1+2 and 4+5 collapse into a single dir when srcdir=3D=3Dbuild=
-dir
-
-Isn't that items 3+4 (not 4+5) that collapse?
-
-> so overall order remains the same.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  rules.mak | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
-
-
->=20
-> diff --git a/rules.mak b/rules.mak
-> index d5c516c..e09aabe 100644
-> --- a/rules.mak
-> +++ b/rules.mak
-> @@ -26,8 +26,10 @@ QEMU_CXXFLAGS =3D -D__STDC_LIMIT_MACROS $(filter-out=
- -Wstrict-prototypes -Wmissing
->  # Flags for dependency generation
->  QEMU_DGFLAGS +=3D -MMD -MP -MT $@ -MF $(@D)/$(*F).d
-> =20
-> -# Same as -I$(SRC_PATH) -I., but for the nested source/object director=
-ies
-> -QEMU_INCLUDES +=3D -I$(<D) -I$(@D)
-
-In particular, this is the old code for 5 and 6,
-
-> +# Compiler searches the source file dir first, but in vpath builds
-> +# we need to make it search the build dir too, before any other
-> +# explicit search paths.
-> +QEMU_LOCAL_INCLUDES =3D -I$(BUILD_DIR)/$(@D)
-
-while this is the new code for 2, plus documentation that 1 is implicit.
-
-> =20
->  WL_U :=3D -Wl,-u,
->  find-symbols =3D $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
-> @@ -61,7 +63,7 @@ expand-objs =3D $(strip $(sort $(filter %.o,$1)) \
->                    $(filter-out %.o %.mo,$1))
-> =20
->  %.o: %.c
-> -	$(call quiet-command,$(CC) $(QEMU_INCLUDES) $(QEMU_CFLAGS) $(QEMU_DGF=
-LAGS) $(CFLAGS) $($@-cflags) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
-> +	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) $(=
-QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) -c -o $@ $<,"CC","$(T=
-ARGET_DIR)$@")
-
-And the pre-pending of QEMU_LOCAL_INCLUDES is what changes the position
-of the local directory from last to first, thus delaying the top level
-dir to the end, but I don't see top/include/ moving.
-
-These are now some long lines; is it worth taking the time to add \ line
-splitting for legibility, either in this patch or as an add-on?
-
-> @@ -359,6 +361,7 @@ define unnest-vars
->                  $(eval $(o:%.mo=3D%$(DSOSUF)): module-common.o $($o-ob=
-js)),
->                  $(error $o added in $v but $o-objs is not set)))
->          $(shell mkdir -p ./ $(sort $(dir $($v))))
-> +        $(shell cd $(BUILD_DIR) && mkdir -p ./ $(sort $(dir $($v))))
->          # Include all the .d files
-
-Okay, this change makes sense (make sure all the build directories exist
-in time; no-op for in-tree build, but helpful for VPATH), but seems
-unrelated to the commit message.  Rebase snafu?
-
-It looks like you're on the right track, but there's enough
-discrepancies between the commit message and actual change that I'd
-prefer a v4 before I grant R-b.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---BcDWmBJcD6FAis1jF79OhNklQ9TVJ98KE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYh7TxAAoJEKeha0olJ0Nqg64H/3eamSjUnSU5bbXmpwa4nLP1
-82GWhInGS4CIOBqQqMHYUxUGkfv2F9tAKKb15vrSiOFzF7bjgtPgnBViTue0FYwc
-NmPUySxtPwyn2EQ4jPFYI5kC8Hk9Q8I/DOu0T5baxJUia4QditYASljo3pGkFk9+
-H3zyurAQvDHT15cgcQZFFgnk8qpuS7mFIqye8O2c0jU849FEFiN8TCCIlK/8loiC
-bzw1qn3GevOEpJ3NQ+oiiHZlDocSflrjBOw2GZTAeilGKXdgSPDxqMse8mZFnwog
-/TmGdiryA4cmTt+VvaVq+uy3nnxTF7UdWtmXNNIvTdvKN3eGzJtYGoPPvKIRwXg=
-=O2hN
------END PGP SIGNATURE-----
-
---BcDWmBJcD6FAis1jF79OhNklQ9TVJ98KE--
