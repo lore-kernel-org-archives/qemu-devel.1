@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cVvaC-0001JT-Qv
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:32:02 -0500
+	(envelope-from <peterx@redhat.com>) id 1cVvig-0006cJ-OT
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:40:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cVva9-0001ME-Lq
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:32:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35642)
+	(envelope-from <peterx@redhat.com>) id 1cVvid-00043X-JT
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:40:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:20793)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cVva9-0001M2-Fw
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:31:57 -0500
-Date: Tue, 24 Jan 2017 15:31:53 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cVvid-00041r-Dk
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 02:40:43 -0500
+Date: Tue, 24 Jan 2017 15:40:39 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170124073152.GA16400@pxdev.xzpeter.org>
+Message-ID: <20170124074039.GB16400@pxdev.xzpeter.org>
 References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-20-git-send-email-peterx@redhat.com>
-	<cddf837c-24ca-b6f2-67cf-256e6b1e0bec@redhat.com>
+	<20170123175422-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cddf837c-24ca-b6f2-67cf-256e6b1e0bec@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v4 19/20] intel_iommu: unmap existing
- pages before replay
+In-Reply-To: <20170123175422-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH RFC v4 00/20] VT-d: vfio enablement and
+ misc enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-On Mon, Jan 23, 2017 at 06:40:12PM +0800, Jason Wang wrote:
->=20
->=20
-> On 2017=E5=B9=B401=E6=9C=8820=E6=97=A5 21:08, Peter Xu wrote:
-> >  static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
-> >  {
-> >      memory_region_notify_one((IOMMUNotifier *)private, entry);
-> >@@ -2711,13 +2768,16 @@ static void vtd_iommu_replay(MemoryRegion *mr,=
- IOMMUNotifier *n)
-> >      if (vtd_dev_to_context_entry(s, bus_n, vtd_as->devfn, &ce) =3D=3D=
- 0) {
-> >          /*
-> >-         * Scanned a valid context entry, walk over the pages and
-> >-         * notify when needed.
-> >+         * Scanned a valid context entry, we first make sure to remov=
-e
-> >+         * all existing mappings in old domain, by sending UNMAP to
-> >+         * all the notifiers. Then, we walk over the pages and notify
-> >+         * with existing mapped new entries in the new domain.
-> >           */
->=20
-> A question is what if the context cache was invalidated but the device =
-were
-> not moved to a new domain. Then the code here does not do anything I
-> believe?
+On Mon, Jan 23, 2017 at 05:55:51PM +0200, Michael S. Tsirkin wrote:
+> On Fri, Jan 20, 2017 at 09:08:36PM +0800, Peter Xu wrote:
+> > This is v4 of vt-d vfio enablement series.
+> > 
+> > Sorry that v4 growed to 20 patches. Some newly added patches (which
+> > are quite necessary):
+> > 
+> > [01/20] vfio: trace map/unmap for notify as well
+> > [02/20] vfio: introduce vfio_get_vaddr()
+> > [03/20] vfio: allow to notify unmap for very large region
+> > 
+> >   Patches from RFC series:
+> > 
+> >   "[PATCH RFC 0/3] vfio: allow to notify unmap for very big region"
+> > 
+> >   Which is required by patch [19/20].
+> > 
+> > [11/20] memory: provide IOMMU_NOTIFIER_FOREACH macro
+> > 
+> >   A helper only.
+> > 
+> > [19/20] intel_iommu: unmap existing pages before replay
+> > 
+> >   This solves Alex's concern that there might have existing mappings
+> >   in previous domain when replay happens.
+> > 
+> > [20/20] intel_iommu: replay even with DSI/GLOBAL inv desc
+> > 
+> >   This solves Jason/Kevin's concern by handling DSI/GLOBAL
+> >   invalidations as well.
+> > 
+> > Each individual patch will have more detailed explanation on itself.
+> > Please refer to each of them.
+> > 
+> > Here I did separate work on patch 19/20 rather than squashing them
+> > into patch 18 for easier modification and review. I prefer we have
+> > them separately so we can see each problem separately, after all,
+> > patch 18 survives in most use cases. Please let me know if we want to
+> > squash them in some way. I can respin when necessary.
+> > 
+> > Besides the big things, lots of tiny tweaks as well. Here's the
+> > changelog.
+> 
+> It would be nice to add to the log
+> - known issues / missing features, if any
 
-Yes, it'll unmap all the stuffs and remap them all. I think that's my
-intention, and can we really avoid this?
+Sure. Will add them in next post.
 
-> I think we should move vtd_address_space_unmap() in the context
-> entry invalidation processing.
+> - are there patches ready to be merged here?
+>   if yes pls post them without the rfc tag
 
-IMHO we need this "whole umap" thing not only for context entry
-invalidation, but all the places that need this replay, no? For
-example, when we receive domain flush.
+The series (since V1) should have passed compilation test and simple
+functional test (though only with my tiny C program to torture it).
+Since I have got lots of review comments, and looks like the whole
+thing is acceptable in general, I'll repost with a non-rfc version
+with some tweaks upon this one.
+
+Michael, please feel free to pick any of them which you think are
+applicable and safe (e.g., the iommu cleanups).
 
 Thanks,
 
