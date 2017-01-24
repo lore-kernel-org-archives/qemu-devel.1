@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW2SB-0002yM-1o
+	(envelope-from <berrange@redhat.com>) id 1cW2SB-0002yf-AC
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW2S6-0002BU-Li
+	(envelope-from <berrange@redhat.com>) id 1cW2SA-0002DU-Fi
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:11 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 24 Jan 2017 14:51:35 +0000
-Message-Id: <20170124145152.22980-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 00/17] Convert QCow[2] to QCryptoBlock & add
- LUKS support
+Date: Tue, 24 Jan 2017 14:51:38 +0000
+Message-Id: <20170124145152.22980-4-berrange@redhat.com>
+In-Reply-To: <20170124145152.22980-1-berrange@redhat.com>
+References: <20170124145152.22980-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 03/17] qcow: document another weakness of
+ qcow AES encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,155 +23,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This series is a continuation of previous work to support LUKS in
-QEMU. The existing merged code supports LUKS as a standalone
-driver which can be layered over/under any other QEMU block device
-driver. This works well when using LUKS over protocol drivers (file,
-rbd, iscsi, etc, etc), but has some downsides when combined with
-format drivers like qcow2.
+Document that use of guest virtual sector numbers as the basis for
+the initialization vectors is a potential weakness, when combined
+with internal snapshots or multiple images using the same passphrase.
+This fixes the formatting of the itemized list too.
 
-If you layer LUKS under qcow2 (eg qcow2 -> luks -> file) then you
-cannot get any information about the qcow2 file without first
-decrypting it, as both the header and payload are encrypted.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qemu-img.texi | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-If you layer LUKS over qcow2 (eg luks -> qcow2 -> file) then you
-cannot distinguish between a qcow2 file where the guest has done
-LUKS encryption from a qcow2 file which qemu has done encryption.
-More seriously, when encrypting sectors the guest virtual sector
-is used as the input for deriving the initialization vectors.
-When internal snapshots are used, this means that multiple sectors
-in the qcow2 file may be encrypted with the same initialization
-vector. This is a security weakness when combined with certain
-cryptographic modes.
-
-Integrating LUKS natively into qcow2 allows us to combine the
-best aspects of both layering strategies above. In particular
-the header remains unecrypted, but initialization vectors are
-generated using physical sector numbers preserving security
-when snapshots are used. This is a change from previous postings
-of this work, where the IVs were (incorrectly) generated based
-on the virtual disk sector.
-
-In a previous posting of this work, Fam had suggested that we
-do integration by layering luks over qcow2, but having QEMU
-block layer automatically create the luks driver above qcow2
-based on the qcow2 header crypt_method field. This is not
-possible though, because such a scheme would suffer from the
-problem of IVs being generated from the virtual disk sector
-instead of physical disk sector. So having LUKS specific
-code in the qcow2 block driver is unavoidable. In comparison
-to the previous posting though, the amount of code in qcow2.c
-has been reduced by allowing re-use of code from block/crypto.c
-for handling QemuOpts -> QAPI conversion. So extra lines of
-code in qcow2 to support LUKS is < 200.
-
-I have also split the changes to qcow2 up into 2 patches. The
-first patch simply introduces use of the QCryptoBlock framework
-to qcow2 for the existing (deprecated) AES-CBC encryption method.
-The second patch wires up the LUKS support for qcow2. This makes
-it clearer which parts of the changes are related to plain code
-refactoring, vs enabling the new features. Specifically we can
-now see that the LUKS enablement in qcow2 has this footprint:
-
-Changed in v2:
-
- - Split qcow2 LUKS tests into separate patch
- - Split qcow2 LUKS spec addition into separate patch
- - Use strstart instead of g_str_has_prefix + pointer manipulation
- - Use -1 instead of 1 for error condition when iterating over opts
- - Fix formatting of qemu-img manpage for qcow2 AES flaws list
- - Fix writing zeros in qcow when encrypting sector
- - Don't overwrite input data buffer in qcow2 when encrypting data
- - Use TODO instead of XXX markers
- - Rename qcow2_change_encryption to qcow2_set_up_encryption
- - Add missing QEMU_IO_OPTIONS_NO_FMT variable to iotests
- - Explicitly fill crypto header unused space with zeros
- - Fix byte-swapping of crypto header in qcow2
- - Enforce crypto header offset is multiple of cluster size
- - Move setting of crypt_physical_offset flag
- - Fix docs for 'encryption-format' option
- - Deprecate legacy 'encryption' option
- - Drop redundant test scenarios
- - Use small file sizes for iotests
- - Drop pbkdf iteration time to 10ms during iotests
- - Use separate passphrase for top vs backing file in iotests
- - Mark 'encryption_key_missing@ field as deprecated
-
-Daniel P. Berrange (17):
-  block: expose crypto option names / defs to other drivers
-  block: add ability to set a prefix for opt names
-  qcow: document another weakness of qcow AES encryption
-  qcow: require image size to be > 1 for new images
-  iotests: skip 042 with qcow which dosn't support zero sized images
-  iotests: skip 048 with qcow which doesn't support resize
-  iotests: fix 097 when run with qcow
-  qcow: make encrypt_sectors encrypt in place
-  qcow: convert QCow to use QCryptoBlock for encryption
-  qcow2: make qcow2_encrypt_sectors encrypt in place
-  qcow2: convert QCow2 to use QCryptoBlock for encryption
-  qcow2: extend specification to cover LUKS encryption
-  qcow2: add support for LUKS encryption format
-  qcow2: add iotests to cover LUKS encryption support
-  iotests: enable tests 134 and 158 to work with qcow (v1)
-  block: rip out all traces of password prompting
-  block: remove all encryption handling APIs
-
- block.c                    |  77 +--------
- block/crypto.c             | 167 +++++++++++-------
- block/crypto.h             | 102 +++++++++++
- block/qapi.c               |   2 +-
- block/qcow.c               | 215 ++++++++++-------------
- block/qcow2-cluster.c      |  56 +-----
- block/qcow2-refcount.c     |  10 ++
- block/qcow2.c              | 414 ++++++++++++++++++++++++++++++++++++---------
- block/qcow2.h              |  18 +-
- blockdev.c                 |  37 +---
- docs/specs/qcow2.txt       |  96 +++++++++++
- hmp.c                      |  31 ----
- include/block/block.h      |   3 -
- include/block/block_int.h  |   1 -
- include/monitor/monitor.h  |   7 -
- include/qapi/error.h       |   1 -
- include/qemu/osdep.h       |   2 -
- monitor.c                  |  68 --------
- qapi-schema.json           |  10 +-
- qapi/block-core.json       |  35 +++-
- qapi/common.json           |   5 +-
- qemu-img.c                 |  31 ----
- qemu-img.texi              |  19 ++-
- qemu-io.c                  |  20 ---
- qmp.c                      |  12 +-
- tests/qemu-iotests/042     |   2 +-
- tests/qemu-iotests/048     |   2 +-
- tests/qemu-iotests/049     |   2 +-
- tests/qemu-iotests/049.out |   4 +-
- tests/qemu-iotests/082.out | 297 +++++++++++++++++++++++++++++---
- tests/qemu-iotests/087     |  37 +++-
- tests/qemu-iotests/087.out |  16 +-
- tests/qemu-iotests/097     |  10 +-
- tests/qemu-iotests/097.out | 125 +-------------
- tests/qemu-iotests/134     |  20 ++-
- tests/qemu-iotests/134.out |  10 +-
- tests/qemu-iotests/158     |  21 ++-
- tests/qemu-iotests/158.out |  14 +-
- tests/qemu-iotests/173     | 126 ++++++++++++++
- tests/qemu-iotests/173.out | 119 +++++++++++++
- tests/qemu-iotests/174     |  76 +++++++++
- tests/qemu-iotests/174.out |  19 +++
- tests/qemu-iotests/175     |  86 ++++++++++
- tests/qemu-iotests/175.out |  26 +++
- tests/qemu-iotests/common  |  10 +-
- tests/qemu-iotests/group   |   3 +
- util/oslib-posix.c         |  66 --------
- util/oslib-win32.c         |  24 ---
- 48 files changed, 1628 insertions(+), 926 deletions(-)
- create mode 100644 block/crypto.h
- create mode 100755 tests/qemu-iotests/173
- create mode 100644 tests/qemu-iotests/173.out
- create mode 100755 tests/qemu-iotests/174
- create mode 100644 tests/qemu-iotests/174.out
- create mode 100755 tests/qemu-iotests/175
- create mode 100644 tests/qemu-iotests/175.out
-
+diff --git a/qemu-img.texi b/qemu-img.texi
+index 174aae3..db4534b 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -544,16 +544,29 @@ The use of encryption in qcow and qcow2 images is considered to be flawed by
+ modern cryptography standards, suffering from a number of design problems:
+ 
+ @itemize @minus
+-@item The AES-CBC cipher is used with predictable initialization vectors based
++@item
++The AES-CBC cipher is used with predictable initialization vectors based
+ on the sector number. This makes it vulnerable to chosen plaintext attacks
+ which can reveal the existence of encrypted data.
+-@item The user passphrase is directly used as the encryption key. A poorly
++@item
++The user passphrase is directly used as the encryption key. A poorly
+ chosen or short passphrase will compromise the security of the encryption.
+-@item In the event of the passphrase being compromised there is no way to
++@item
++In the event of the passphrase being compromised there is no way to
+ change the passphrase to protect data in any qcow images. The files must
+ be cloned, using a different encryption passphrase in the new file. The
+ original file must then be securely erased using a program like shred,
+ though even this is ineffective with many modern storage technologies.
++@item
++Initialization vectors used to encrypt sectors are based on the
++guest virtual sector number, instead of the host physical sector. When
++a disk image has multiple internal snapshots this means that data in
++multiple physical sectors is encrypted with the same initialization
++vector. With the CBC mode, this opens the possibility of watermarking
++attacks if the attack can collect multiple sectors encrypted with the
++same IV and some predictable data. Having multiple qcow2 images with
++the same passphrase also exposes this weakness since the passphrase
++is directly used as the key.
+ @end itemize
+ 
+ Use of qcow / qcow2 encryption is thus strongly discouraged. Users are
 -- 
 2.9.3
