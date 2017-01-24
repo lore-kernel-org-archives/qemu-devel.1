@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVsWT-0004hE-V1
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:15:59 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cVskg-0007AG-3h
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:30:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cVsWO-0004vd-VZ
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:15:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55947)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cVsWO-0004vR-Pf
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:15:52 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cVsWN-00087h-SJ
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 04:15:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C023D2E80C3
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 04:15:51 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1cVskc-0007PS-UE
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:30:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50054)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cVskc-0007PC-IK
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:30:34 -0500
+Date: Mon, 23 Jan 2017 21:30:31 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170123213031.24f757d0@t450s.home>
+In-Reply-To: <20170124032818.GJ26526@pxdev.xzpeter.org>
+References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
+	<1484917736-32056-3-git-send-email-peterx@redhat.com>
+	<20170123114905.4936508d@t450s.home>
+	<20170124032818.GJ26526@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Jan 2017 04:04:51 -0000
-From: Kai Cong <1658634@bugs.launchpad.net>
-Reply-To: Bug 1658634 <1658634@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170123095738.20994.7212.malonedeb@gac.canonical.com>
-	<20170123125039.14311.37116.malone@soybean.canonical.com>
-Message-Id: <CAFskaerut+CJgmrY_QXT8zw+mm-vQ5Bg0f6ZVM5UCR3DgusH0Q@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1658634] Re: Can't get correct display with
- latest QEMU and OVMF BIOS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v4 02/20] vfio: introduce
+ vfio_get_vaddr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,93 +31,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
-Splash screen and UEFI shell were displayed correctly. Grub2 menu and
-Ubuntu login screen also appeared, however the display didn't seem right. I
-got very blurry output.
+On Tue, 24 Jan 2017 11:28:18 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-[image: Inline image 1]
+> On Mon, Jan 23, 2017 at 11:49:05AM -0700, Alex Williamson wrote:
+> > On Fri, 20 Jan 2017 21:08:38 +0800
+> > Peter Xu <peterx@redhat.com> wrote:
+> >   
+> > > A cleanup for vfio_iommu_map_notify(). Should have no functional change,
+> > > just to make the function shorter and easier to understand.
+> > > 
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
+> > >  1 file changed, 38 insertions(+), 20 deletions(-)
+> > > 
+> > > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > > index 174f351..ce55dff 100644
+> > > --- a/hw/vfio/common.c
+> > > +++ b/hw/vfio/common.c
+> > > @@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+> > >             section->offset_within_address_space & (1ULL << 63);
+> > >  }
+> > >  
+> > > -static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> > > +static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+> > > +                           bool *read_only)
+> > >  {
+> > > -    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+> > > -    VFIOContainer *container = giommu->container;
+> > > -    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> > >      MemoryRegion *mr;
+> > >      hwaddr xlat;
+> > >      hwaddr len = iotlb->addr_mask + 1;
+> > > -    void *vaddr;
+> > > -    int ret;
+> > > -
+> > > -    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+> > > -                                iova, iova + iotlb->addr_mask);
+> > > -
+> > > -    if (iotlb->target_as != &address_space_memory) {
+> > > -        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> > > -                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+> > > -        return;
+> > > -    }
+> > > +    bool ret = false;
+> > > +    bool writable = iotlb->perm & IOMMU_WO;
+> > >  
+> > >      /*
+> > >       * The IOMMU TLB entry we have just covers translation through
+> > > @@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> > >      rcu_read_lock();
+> > >      mr = address_space_translate(&address_space_memory,
+> > >                                   iotlb->translated_addr,
+> > > -                                 &xlat, &len, iotlb->perm & IOMMU_WO);
+> > > +                                 &xlat, &len, writable);
+> > >      if (!memory_region_is_ram(mr)) {
+> > >          error_report("iommu map to non memory area %"HWADDR_PRIx"",
+> > >                       xlat);
+> > >          goto out;
+> > >      }
+> > > +
+> > >      /*
+> > >       * Translation truncates length to the IOMMU page size,
+> > >       * check that it did not truncate too much.
+> > > @@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> > >          goto out;
+> > >      }
+> > >  
+> > > +    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> > > +    *read_only = !writable || mr->readonly;
+> > > +    ret = true;
+> > > +
+> > > +out:
+> > > +    rcu_read_unlock();
+> > > +    return ret;
+> > > +}
+> > > +
+> > > +static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> > > +{
+> > > +    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+> > > +    VFIOContainer *container = giommu->container;
+> > > +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> > > +    bool read_only;
+> > > +    void *vaddr;
+> > > +    int ret;
+> > > +
+> > > +    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+> > > +                                iova, iova + iotlb->addr_mask);
+> > > +
+> > > +    if (iotlb->target_as != &address_space_memory) {
+> > > +        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> > > +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
+> > > +        return;
+> > > +    }
+> > > +
+> > >      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> > > -        vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> > >          ret = vfio_dma_map(container, iova,
+> > >                             iotlb->addr_mask + 1, vaddr,
+> > > -                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
+> > > +                           read_only);  
+> > 
+> > Is it really valid to move the map ioctl out of the rcu read lock?
+> > We're making use of vaddr, which is directly a property of a
+> > MemoryRegion which may have now disappeared.  With the lock released,
+> > could an unmap race the map resulting in the wrong ordering?  As noted
+> > previously, there are some subtle changes here, we do the
+> > memory_region_get_ram_ptr() translation on both map and unmap (fixed in
+> > next patch) and then pull map out of the rcu lock.  I'm not sure the
+> > extra function is worthwhile or really has no functional change.
+> > Thanks,  
+> 
+> Thanks for raising this question up.
+> 
+> IIUC this function can be triggered by three cases (this is for x86, I
+> suppose the rule should be same for all platforms):
+> 
+> - memory hot add/remove
+> - a PSI (page selective invalidation) for a newly mapped io page
+> - a domain switch (needs a iommu replay)
+> 
+> IMHO all these places are protected by the QBL (both 2nd/3rd cases
+> should be invoked in VT-d IOMMU MMIO write to queue invalidation
+> registers)? And I thought BQL should be regarded as a write lock even
+> stronger than RCU read lock?
+> 
+> If I understand it correctly above, looks like we should be safe here
+> as long as we are always with BQL? And, if so, do we really need RCU
+> read protection here?
+> 
+> Please kindly correct if I missed anything.
 
-With QEMU 2.7.0 and the same OVMF.fd, everything works well.
+Note that this code is originally used on power systems, David Gibson
+will also need to review whether the SPAPR IOMMU can handle the
+relaxed unmap in patch 03/20.  I suspect you're right about current
+usage vs BQL, but I wonder how that plays into the long term plans for
+the BQL and whether the intention of 41063e1 was to standardize all
+address_space_translate() callers regardless of any one caller's BQL
+usage.
 
-Please let me know if anything is not clear.
+Paolo, what do you think?  Thanks,
 
-Thanks,
-Kai
-
-On Mon, Jan 23, 2017 at 4:50 AM, Laszlo Ersek (Red Hat) <lersek@redhat.com>
-wrote:
-
-> (1) What phase of the guest do you get invalid video output in? Do you
-> see the TianoCore splash screen? Does the grub2 menu appear?
->
-> (2) I cannot reproduce the issue (with a different guest OS anyway); I
-> just tried QEMU (at d1c82f7cc344) and OVMF (built from edk2 at
-> 7cf59c854f35), with stdvga; this combo works fine.
->
-> (3) Can you bisect QEMU from 2.7 through 2.8, using the same OVMF
-> binary?
->
-> (4) Side point: please *never* use "-bios OVMF.fd"; use two pflash chips
-> instead. Libvirt (strongly recommended) will do this for you.
->
-> Thanks.
->
-> --
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1658634
->
-> Title:
->   Can't get correct display with latest QEMU and OVMF BIOS
->
-> Status in QEMU:
->   New
->
-> Bug description:
->   I tried to install a Ubuntu 16.04.1 Desktop 64bits with latest QEMU and
-> OVMF UEFI BIOS, however I can't get correct display output with default v=
-ga
-> configuration (-vga std). However, qemu works with a couple of different
-> configurations:
->   1. "-vga cirrus" + "-bios OVMF.fd": works
->   2. "-vga std" + non-UEFI bios: works
->
->   The same error with QEMU 2.8.0 release. Everything works well on
->   2.7.0/1.
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1658634/+subscriptions
->
-
-
-** Attachment added: "image.png"
-   https://bugs.launchpad.net/bugs/1658634/+attachment/4808338/+files/image=
-.png
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1658634
-
-Title:
-  Can't get correct display with latest QEMU and OVMF BIOS
-
-Status in QEMU:
-  New
-
-Bug description:
-  I tried to install a Ubuntu 16.04.1 Desktop 64bits with latest QEMU and O=
-VMF UEFI BIOS, however I can't get correct display output with default vga =
-configuration (-vga std). However, qemu works with a couple of different co=
-nfigurations:
-  1. "-vga cirrus" + "-bios OVMF.fd": works
-  2. "-vga std" + non-UEFI bios: works
-
-  The same error with QEMU 2.8.0 release. Everything works well on
-  2.7.0/1.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1658634/+subscriptions
+Alex
