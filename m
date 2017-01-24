@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxem-00021J-JU
+	(envelope-from <mjt@tls.msk.ru>) id 1cVxem-00021Q-Jt
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:44:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxei-0002ci-Jz
+	(envelope-from <mjt@tls.msk.ru>) id 1cVxei-0002ct-Ki
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:44:52 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Tue, 24 Jan 2017 12:39:06 +0300
-Message-Id: <9b04d0e3c155ad318b40b0e01bf997faad51a9ca.1485250702.git.mjt@msgid.tls.msk.ru>
+Date: Tue, 24 Jan 2017 12:39:35 +0300
+Message-Id: <bed534dd4032446750ad3e7a806c24d81bc5851b.1485250702.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 02/31] hw/block/m25p80: Fix typo in local macro
- name
+Subject: [Qemu-devel] [PULL 31/31] hw/isa/isa-bus: Set category of the
+ "isabus-bridge" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +23,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Stefan Weil <sw@weilnetz.de>
+From: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
+It has "bridge" in its name, so it should be in the category
+DEVICE_CATEGORY_BRIDGE.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- hw/block/m25p80.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/isa/isa-bus.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index e904514..2d6eb46 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -147,7 +147,7 @@ typedef struct FlashPartInfo {
- #define CFG_DUMMY_CLK_LEN 4
- #define NVCFG_DUMMY_CLK_POS 12
- #define VCFG_DUMMY_CLK_POS 4
--#define EVCFG_OUT_DRIVER_STRENGHT_DEF 7
-+#define EVCFG_OUT_DRIVER_STRENGTH_DEF 7
- #define EVCFG_VPP_ACCELERATOR (1 << 3)
- #define EVCFG_RESET_HOLD_ENABLED (1 << 4)
- #define NVCFG_DUAL_IO_MASK (1 << 2)
-@@ -747,7 +747,7 @@ static void reset_memory(Flash *s)
-                             );
+diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
+index 9d07b11..0ffbc8d 100644
+--- a/hw/isa/isa-bus.c
++++ b/hw/isa/isa-bus.c
+@@ -219,6 +219,7 @@ static void isabus_bridge_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
-         s->enh_volatile_cfg = 0;
--        s->enh_volatile_cfg |= EVCFG_OUT_DRIVER_STRENGHT_DEF;
-+        s->enh_volatile_cfg |= EVCFG_OUT_DRIVER_STRENGTH_DEF;
-         s->enh_volatile_cfg |= EVCFG_VPP_ACCELERATOR;
-         s->enh_volatile_cfg |= EVCFG_RESET_HOLD_ENABLED;
-         if (s->nonvolatile_cfg & NVCFG_DUAL_IO_MASK) {
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->fw_name = "isa";
+ }
+ 
 -- 
 2.1.4
