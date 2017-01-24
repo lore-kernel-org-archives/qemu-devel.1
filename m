@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cW8AM-0008WM-3A
-	for Qemu-devel@nongnu.org; Tue, 24 Jan 2017 15:58:11 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cW8Q9-0007i6-PY
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 16:14:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cW8AJ-0003Gz-2a
-	for Qemu-devel@nongnu.org; Tue, 24 Jan 2017 15:58:10 -0500
-References: <20161220191523.5779-1-eblake@redhat.com>
-	<45d06e45-b8f5-d134-0345-4c493e970bdf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e9184ede-b112-8ab0-2c12-9bbd3b779b8c@redhat.com>
-Date: Tue, 24 Jan 2017 14:58:02 -0600
-MIME-Version: 1.0
-In-Reply-To: <45d06e45-b8f5-d134-0345-4c493e970bdf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QAPRf97U56mKlkKXJfIjbIiK0vVFG3GDa"
-Subject: Re: [Qemu-devel] [Qemu-block]  [PATCH v4 0/7] add blkdebug tests
+	(envelope-from <rth7680@gmail.com>) id 1cW8Q8-00084E-BU
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 16:14:29 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33215)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cW8Q8-00083h-5v
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 16:14:28 -0500
+Received: by mail-pg0-x242.google.com with SMTP id 194so17562584pgd.0
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 13:14:28 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Tue, 24 Jan 2017 13:14:24 -0800
+Message-Id: <20170124211424.2828-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL v2 0/7] Nios2 architecture support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: marex@denx.de, crwulff@gmail.com, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QAPRf97U56mKlkKXJfIjbIiK0vVFG3GDa
-From: Eric Blake <eblake@redhat.com>
-To: qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Qemu-devel@nongnu.org"
- <Qemu-devel@nongnu.org>
-Message-ID: <e9184ede-b112-8ab0-2c12-9bbd3b779b8c@redhat.com>
-Subject: Re: [Qemu-block] [Qemu-devel] [PATCH v4 0/7] add blkdebug tests
-References: <20161220191523.5779-1-eblake@redhat.com>
- <45d06e45-b8f5-d134-0345-4c493e970bdf@redhat.com>
-In-Reply-To: <45d06e45-b8f5-d134-0345-4c493e970bdf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-ping
-
-On 12/20/2016 01:19 PM, Eric Blake wrote:
-> [oops, I forgot cc's on the cover letter, even though the rest of the
-> series was properly broadcast]
->=20
-> On 12/20/2016 01:15 PM, Eric Blake wrote:
->> Based on Kevin's block-next branch:
->> http://repo.or.cz/qemu/kevin.git/shortlog/refs/heads/block-next
->>
->> Available as a tag at:
->> git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v4
->>
->> v3 was:
->> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00278.html
->>
->> Since then:
->> - Address comments from Max and Kevin
->>   - typo cleanups
->>   - no longer force 512-byte alignment
->>   - better naming
->> - Merge two series into one
->>
->> 001/7:[down] 'qcow2: Assert that cluster operations are aligned'
->> 002/7:[down] 'qcow2: Discard/zero clusters by byte count'
->> 003/7:[----] [--] 'blkdebug: Sanity check block layer guarantees'
->> 004/7:[0015] [FC] 'blkdebug: Add pass-through write_zero and discard s=
-upport'
->> 005/7:[0002] [FC] 'blkdebug: Simplify override logic'
->> 006/7:[0046] [FC] 'blkdebug: Add ability to override unmap geometries'=
-
->> 007/7:[0015] [FC] 'tests: Add coverage for recent block geometry fixes=
-'
->>
->> Eric Blake (7):
->>   qcow2: Assert that cluster operations are aligned
->>   qcow2: Discard/zero clusters by byte count
->>   blkdebug: Sanity check block layer guarantees
->>   blkdebug: Add pass-through write_zero and discard support
->>   blkdebug: Simplify override logic
->>   blkdebug: Add ability to override unmap geometries
->>   tests: Add coverage for recent block geometry fixes
->>
->>  qapi/block-core.json       |  24 +++++-
->>  block/qcow2.h              |   9 +-
->>  block/blkdebug.c           | 204 ++++++++++++++++++++++++++++++++++++=
-+++++++--
->>  block/qcow2-cluster.c      |  29 ++++---
->>  block/qcow2-snapshot.c     |   7 +-
->>  block/qcow2.c              |  21 ++---
->>  tests/qemu-iotests/173     | 114 +++++++++++++++++++++++++
->>  tests/qemu-iotests/173.out |  49 +++++++++++
->>  tests/qemu-iotests/group   |   1 +
->>  9 files changed, 413 insertions(+), 45 deletions(-)
->>  create mode 100755 tests/qemu-iotests/173
->>  create mode 100644 tests/qemu-iotests/173.out
->>
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Version 2: Use PRIx64 in patch 1 to fix a 32-bit build failure.
 
 
---QAPRf97U56mKlkKXJfIjbIiK0vVFG3GDa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+r~
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYh7/aAAoJEKeha0olJ0NqHdgH/RkOXfD205IwW/ItC19gF7jY
-tZDnwJmwRunYGzSFu3zinpl8e9W/06oXDYN0lfgDn6/gOlyqoVgA/Jh+5Opei+Yd
-rkZyYDe8ZBOYC9bmAE8ySanFGVgAY2nW0Ty15qo8i0bUWjgCvHqghq3RJL8oEXFY
-mBl9AacB/jgFuvplnVptfTczID/MrtwVcnjSzAEL1t3Gd6JdUAK3bkBJ5S9SabkE
-VywGq7aF2SERExG9Vc8MtsCOdcPpd3b5aPDFbp1KdQ3NI5ndgtr1obbdf1mFLT5s
-2hlBD8ZlidV4UadhJcG/Ioy4UrM0aNJnpZ7JdXA1ZbFN88akWTAzd39irCAkTPc=
-=amez
------END PGP SIGNATURE-----
+The following changes since commit a678502e4f7580a6f143f680404aaee57ac3f4b5:
 
---QAPRf97U56mKlkKXJfIjbIiK0vVFG3GDa--
+  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pull-request' into staging (2017-01-24 15:39:09 +0000)
+
+are available in the git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-nios-20170124
+
+for you to fetch changes up to e671711c9a8c1de540f035095e18458bc03968de:
+
+  nios2: Add support for Nios-II R1 (2017-01-24 13:10:36 -0800)
+
+----------------------------------------------------------------
+nios2 target support
+
+----------------------------------------------------------------
+Chris Wulff (3):
+      nios2: Add architecture emulation support
+      nios2: Add IIC interrupt controller emulation
+      nios2: Add periodic timer emulation
+
+Marek Vasut (4):
+      nios2: Add disas entries
+      nios2: Add usermode binaries emulation
+      nios2: Add Altera 10M50 GHRD emulation
+      nios2: Add support for Nios-II R1
+
+ MAINTAINERS                          |    8 +
+ arch_init.c                          |    2 +
+ configure                            |    5 +
+ default-configs/nios2-linux-user.mak |    1 +
+ default-configs/nios2-softmmu.mak    |    6 +
+ disas/Makefile.objs                  |    1 +
+ disas/nios2.c                        | 3534 ++++++++++++++++++++++++++++++++++
+ hw/intc/Makefile.objs                |    1 +
+ hw/intc/nios2_iic.c                  |  103 +
+ hw/nios2/10m50_devboard.c            |  126 ++
+ hw/nios2/Makefile.objs               |    1 +
+ hw/nios2/boot.c                      |  223 +++
+ hw/nios2/boot.h                      |   11 +
+ hw/nios2/cpu_pic.c                   |   70 +
+ hw/timer/Makefile.objs               |    1 +
+ hw/timer/altera_timer.c              |  237 +++
+ include/disas/bfd.h                  |    6 +
+ include/elf.h                        |    2 +
+ include/sysemu/arch_init.h           |    1 +
+ linux-user/elfload.c                 |   57 +
+ linux-user/main.c                    |  140 +-
+ linux-user/nios2/syscall_nr.h        |  329 ++++
+ linux-user/nios2/target_cpu.h        |   39 +
+ linux-user/nios2/target_signal.h     |   26 +
+ linux-user/nios2/target_structs.h    |   58 +
+ linux-user/nios2/target_syscall.h    |   37 +
+ linux-user/nios2/termbits.h          |  220 +++
+ linux-user/signal.c                  |  239 ++-
+ linux-user/syscall_defs.h            |    8 +-
+ qemu-doc.texi                        |    3 +
+ target/nios2/Makefile.objs           |    4 +
+ target/nios2/cpu.c                   |  237 +++
+ target/nios2/cpu.h                   |  272 +++
+ target/nios2/helper.c                |  313 +++
+ target/nios2/helper.h                |   27 +
+ target/nios2/mmu.c                   |  296 +++
+ target/nios2/mmu.h                   |   50 +
+ target/nios2/monitor.c               |   35 +
+ target/nios2/op_helper.c             |   47 +
+ target/nios2/translate.c             |  958 +++++++++
+ 40 files changed, 7727 insertions(+), 7 deletions(-)
+ create mode 100644 default-configs/nios2-linux-user.mak
+ create mode 100644 default-configs/nios2-softmmu.mak
+ create mode 100644 disas/nios2.c
+ create mode 100644 hw/intc/nios2_iic.c
+ create mode 100644 hw/nios2/10m50_devboard.c
+ create mode 100644 hw/nios2/Makefile.objs
+ create mode 100644 hw/nios2/boot.c
+ create mode 100644 hw/nios2/boot.h
+ create mode 100644 hw/nios2/cpu_pic.c
+ create mode 100644 hw/timer/altera_timer.c
+ create mode 100644 linux-user/nios2/syscall_nr.h
+ create mode 100644 linux-user/nios2/target_cpu.h
+ create mode 100644 linux-user/nios2/target_signal.h
+ create mode 100644 linux-user/nios2/target_structs.h
+ create mode 100644 linux-user/nios2/target_syscall.h
+ create mode 100644 linux-user/nios2/termbits.h
+ create mode 100644 target/nios2/Makefile.objs
+ create mode 100644 target/nios2/cpu.c
+ create mode 100644 target/nios2/cpu.h
+ create mode 100644 target/nios2/helper.c
+ create mode 100644 target/nios2/helper.h
+ create mode 100644 target/nios2/mmu.c
+ create mode 100644 target/nios2/mmu.h
+ create mode 100644 target/nios2/monitor.c
+ create mode 100644 target/nios2/op_helper.c
+ create mode 100644 target/nios2/translate.c
