@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cW2fO-0007kQ-L8
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:05:51 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cW2i8-0001un-Ur
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:08:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cW2fN-0001CA-LJ
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:05:50 -0500
-Date: Tue, 24 Jan 2017 17:05:42 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170124170514-mutt-send-email-mst@kernel.org>
-References: <1485132904-17632-1-git-send-email-zhaoshenglong@huawei.com>
-	<20170123180247-mutt-send-email-mst@kernel.org>
-	<49fcc1e0-f439-9212-25f1-9b8dce6462cc@redhat.com>
-	<20170123190257-mutt-send-email-mst@kernel.org>
-	<5760ee8c-f567-0dfd-456f-65f8957b22e2@redhat.com>
-	<20170124164204-mutt-send-email-mst@kernel.org>
-	<9a61e616-9bf8-b4ff-43b9-68f1c908b910@redhat.com>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cW2hz-0002oT-Cj
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:08:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38362
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cW2hz-0002na-61
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:08:31 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0OEoe94122494
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:08:30 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2867gm6akb-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:08:30 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 24 Jan 2017 15:08:28 -0000
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Tue, 24 Jan 2017 16:08:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9a61e616-9bf8-b4ff-43b9-68f1c908b910@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V2] virtio: Fix no interrupt when not
- creating msi controller
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Message-Id: <20170124150823.30162-1-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 0/2] s390x fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +39,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org
+To: peter.maydell@linaro.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-On Tue, Jan 24, 2017 at 04:00:55PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 24/01/2017 15:44, Michael S. Tsirkin wrote:
-> > On Tue, Jan 24, 2017 at 10:25:00AM +0100, Paolo Bonzini wrote:
-> >>
-> >>
-> >> On 23/01/2017 18:04, Michael S. Tsirkin wrote:
-> >>>> For virtio-blk, my patch moved the setting of ISR from
-> >>>> virtio_queue_guest_notifier_read to virtio_notify_irqfd.  This is
-> >>>> because the irqfd emulation only needs to trigger the interrupt.
-> >>>> Setting the ISR should have been done elsewhere.
-> >>>>
-> >>>> Can vhost set ISR (I thought it couldn't)?  If so, it seems like ARM was
-> >>>> relying on QEMU's irqfd emulation, as a work around for vhost not
-> >>>> setting ISR.  But this only works if irqfd is directed to QEMU and not
-> >>>> to KVM.  So if vhost cannot set ISR, I think vhost should be disabled
-> >>>> unless MSI is active.
-> >>>>
-> >>>> Am I missing something?
-> >>>
-> >>> vhost doesn't set ISR ATM.  Without MSI we are always bouncing
-> >>> interrupts through QEMU in particular in order to set ISR.
-> >>
-> >> Where is the code that disables KVM irqfd?
-> >
-> > This bit in virtio_pci_set_guest_notifiers does the trick I think:
-> > 
-> > 
-> >     bool with_irqfd = msix_enabled(&proxy->pci_dev) &&
-> >         kvm_msi_via_irqfd_enabled();
-> > 
-> > I don't think we ever used irqfd for level interrupts.
-> 
-> Ok, thanks!
-> 
-> So we have four cases:
-> 
-> - assign with emulated irqfd + ISR
-> - assign with emulated irqfd
-> - assign with irqfd
-> - deassign
-> 
-> Currently we don't distinguish the first two, so (which I don't like)
-> Shannon's patch ends up setting ISR twice.
+The following changes since commit 48cef39bf39846ce4aaf79d4a2ae620373b3e181:
 
-I don't see this yet - where is it set twice?
+  Merge remote-tracking branch 'remotes/rth/tags/pull-hppa-20170123' into staging (2017-01-24 09:52:42 +0000)
 
-> The only (ugly) solution
-> that comes to mind is making with_irqfd an enum...
-> 
-> Paolo
+are available in the git repository at:
+
+  git://github.com/cohuck/qemu tags/s390x-20170124
+
+for you to fetch changes up to 0cf4d747cb8d053e6a6161aadfd3531fa1a62be1:
+
+  s390x/kvm: fix cmma reset for KVM (2017-01-24 15:47:31 +0100)
+
+----------------------------------------------------------------
+Two s390x fixes: One for the kvm.c build failure, and one for a bug
+that might cause random guest crashes with zeroed out pages on host
+kernels with working cmma (< 4.6 and likely >= 4.10).
+
+----------------------------------------------------------------
+
+Christian Borntraeger (1):
+  s390x/kvm: fix cmma reset for KVM
+
+Cornelia Huck (1):
+  s390x/kvm: include hw_accel.h instead of kvm.h
+
+ target/s390x/kvm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+-- 
+2.11.0
