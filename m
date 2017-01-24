@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cW51U-0000PU-JY
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:36:49 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cW588-0004dQ-Rq
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:44:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cW51Q-0007AI-KL
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:36:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cW51Q-00079l-CP
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:36:44 -0500
-Date: Tue, 24 Jan 2017 17:36:39 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170124173638.GD2220@work-vm>
-References: <1485272673-5877-1-git-send-email-zdai@linux.vnet.ibm.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cW57a-0003cp-Kn
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 12:43:40 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
+	<1485164923-17736-7-git-send-email-armbru@redhat.com>
+	<2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com>
+	<877f5l1tak.fsf@dusky.pond.sub.org>
+	<3512807d-d04e-50fa-9fcf-d1d5ba8ac350@redhat.com>
+	<87r33saa6p.fsf@dusky.pond.sub.org>
+	<4cd45561-60e9-2cd2-e317-880ba9eb2f86@redhat.com>
+	<87fuk82x48.fsf@dusky.pond.sub.org>
+	<CAFEAcA_oBmrMGsuT8=a51eOkBDQ-Rrr4tAhi5oMGxMzb-PiVwg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6d55bfe0-20f3-d153-910b-7c28fd74f6ab@redhat.com>
+Date: Tue, 24 Jan 2017 18:40:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485272673-5877-1-git-send-email-zdai@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] Migration: libvirt live migration over
- RDMA of ipv6 addr failed
+In-Reply-To: <CAFEAcA_oBmrMGsuT8=a51eOkBDQ-Rrr4tAhi5oMGxMzb-PiVwg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
+ lsi53c895a SCSI HBAs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,132 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Dai <zdai@linux.vnet.ibm.com>, jdenemar@redhat.com, berrange@redhat.com
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, zdai@us.ibm.com, mdroth@linux.vnet.ibm.com, quintela@redhat.com
-
-* David Dai (zdai@linux.vnet.ibm.com) wrote:
-> Using libvirt to do live migration over RDMA via ip v6 address failed. 
-> For example:
-> # virsh migrate  --live --migrateuri rdma://[deba::2222]:49152  \
->               rhel73_host1_guest1 qemu+ssh://[deba::2222]/system --verbose
-> root@deba::2222's password:
-> error: internal error: unable to execute QEMU command 'migrate': RDMA ERROR:  
->                   could not rdma_getaddrinfo address deba
-> 
-> As we can see, the ip v6 address used by rdma_getaddrinfo() has only "deba" 
-> part. It should be "deba::2222".
-> 
-> 1) According to rfc 3986, a literal ip v6 address should be enclosed 
-> in '[' and ']'.
-> When using virsh command to do live migration via ip v6 addresss, user
-> will input the ip v6 address with brackets (i.e. rdma://[deba::2222]:49152).
-> libvirt will parse command line option by calling virURIParse(). 
-> Inside it calls virStringStripIPv6Brackets() to strip off the brackets.
-> The uri passed in to virURIParse()  is:
->    "uri = rdma://[deba::2222]:49152"
-> Inside virURIParse() routine, it will strip off the bracket '[' and ']' if
-> it's ip v6 address. Then save the ip v6 address in this format "deba::2222" 
-> in the virURI->server field, and to be passed to qemu.
-> 
-> 2) At the beginning of migration, in qemu's qemu_rdma_data_init(host_port) 
-> routine, it calls inet_parse(host_port) routine to parse the ip v6 address and 
-> port string obtained from libvirt.
-> The input string host_port passed to qemu_rdma_data_init() can be:
->     "hostname:port", or
->     "ipv4address:port", or
->     "[ipv6address]:port" (i.e "[deba::2222]:49152"), or
->     "ipv6address:port" (i.e "deba::2222:49152").
+To: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
 
-Hi David,
-  I'm ccing in some libvirt guys here; this might be a bug that
-libvirt should be leaving the []'s on when it calls qemu.
 
-Lets just check with Jiri and Dan (who I've added to the mail) to see what
-they thing libvirt should be doing here.
+On 24/01/2017 18:24, Peter Maydell wrote:
+> On 24 January 2017 at 17:20, Markus Armbruster <armbru@redhat.com> wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>
+>>> On 24/01/2017 13:56, Markus Armbruster wrote:
+>>>> So, what do we want to deprecate?
+>>>>
+>>>> I think the onboard SCSI HBA adopting if=scsi drives should stay,
+>>>> because it matches what we do for other interface types.  Unless we
+>>>> wanted to deprecate interface types other than none entirely.
+>>>
+>>> Yes, of course.
+>>>
+>>>> What about realview and versatile auto-creating lsi53c895a?
+>>>
+>>> That should go.
+>>
+>> Peter, do you agree?
+> 
+> I'm not sure what you're suggesting deprecation of -- will
+> command lines like
+>  "qemu-system-arm -M versatilepb -hda somedisk.qcow2"
+> still work (ie auto-create the LSI scsi adaptor and plug
+> the disk into it) ?
 
-Dave
+No, I was confusing with the boards that Markus is fixing in patch 4.
+But is really lsi53c895a the best we can provide for
+versatilepb/versatileab/realview-eb/realview-eb-mpcore? Could virtio-pci
+work well too?...
 
-> Existing qemu api inet_parse() can handle the above first 3 cases properly,  
-> but didn't handle the last case ("ipv6address:port") correctly.
-> In this live migration over rdma via ip v6 address case, the server ip v6 
-> address obtained from libvirt doesn't contain the brackets '[' and ']' 
-> (i.e. "deba::2222:49152"). It caused inet_parse() to parse only "deba" part, 
-> and stopped at the 1st colon ':'. As the result, the subsequent 
-> rdma_getaddrinfo() with ip address "deba" will fail.
-> 
-> If we don't strip off brackets '[' and ']' for an ip v6 address in libvirt's 
-> virURIParse(), it will cause libvirt ipv6 ssh authentication failure.
-> 
-> NOTE:
-> If using libvirt to do live migration over TCP via ip v6 address:
-> # virsh migrate  --live --migrateuri tcp://[deba::2222]:49152  \
->               rhel73_host1_guest1 qemu+ssh://[deba::2222]/system --verbose
-> It works fine.
-> In migrateuri of tcp case, libvirt will call virNetSocketNewConnectTCP()
-> directly to connect to remote "deba::2222:49152" after it strips off
-> the bracket '[' and ']' for an ip v6 address. 
-> On qemu side, fd_start_outgoing_migration() will be called to do migration.
-> It doesn't call inet_parse(). So we don't see issue in tcp case.
-> 
-> Solution:
-> I choose to fix the code in qemu's inet_parse() routine to parse the
-> ip v6 addresss w/o brackets properly (i.e. "deba::2222:49152" format).
-> 
-> Signed-off-by: David Dai <zdai@linux.vnet.ibm.com>
-> ---
->  util/qemu-sockets.c |   28 +++++++++++++++++++++++-----
->  1 files changed, 23 insertions(+), 5 deletions(-)
-> 
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index 7c120c4..e09191c 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -584,6 +584,8 @@ InetSocketAddress *inet_parse(const char *str, Error **errp)
->      char port[33];
->      int to;
->      int pos;
-> +    char *first_col_p = strchr(str, ':');
-> +    char *last_col_p = strrchr(str, ':');
->  
->      addr = g_new0(InetSocketAddress, 1);
->  
-> @@ -595,11 +597,27 @@ InetSocketAddress *inet_parse(const char *str, Error **errp)
->              error_setg(errp, "error parsing port in address '%s'", str);
->              goto fail;
->          }
-> -    } else if (str[0] == '[') {
-> -        /* IPv6 addr */
-> -        if (sscanf(str, "[%64[^]]]:%32[^,]%n", host, port, &pos) != 2) {
-> -            error_setg(errp, "error parsing IPv6 address '%s'", str);
-> -            goto fail;
-> +    } else if (first_col_p != last_col_p) {
-> +        if (str[0] != '[') {
-> +            /* IPv6 addr w/o brackets */
-> +            char *port_p;
-> +            char *comma_p;
-> +
-> +            pstrcpy(host, sizeof(host), str);
-> +            port_p = strrchr(host, ':');
-> +            *port_p++ = '\0';
-> +            pstrcpy(port, sizeof(port), port_p);
-> +            comma_p = strchr(port, ',');
-> +            if (comma_p != NULL) {
-> +                *comma_p = '\0';
-> +            }
-> +            pos = strlen(host) + strlen(port) + 1;
-> +        } else {
-> +            /* IPv6 addr with brackets */
-> +            if (2 != sscanf(str, "[%64[^]]]:%32[^,]%n", host, port, &pos)) {
-> +                error_setg(errp, "error parsing IPv6 address '%s'", str);
-> +                goto fail;
-> +            }
->          }
->          addr->ipv6 = addr->has_ipv6 = true;
->      } else {
-> -- 
-> 1.7.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
