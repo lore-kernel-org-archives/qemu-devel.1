@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cW0ab-0001dD-Us
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:52:46 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cW0b0-0001zG-SW
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:53:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cW0aa-0006M7-SQ
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:52:46 -0500
-References: <1485262161-18543-1-git-send-email-pl@kamp.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e09fbf16-a5ba-ed74-791c-875d8c846203@redhat.com>
-Date: Tue, 24 Jan 2017 13:52:37 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cW0aw-0006et-Vc
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:53:10 -0500
+Date: Tue, 24 Jan 2017 12:53:03 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170124125303.GJ17221@stefanha-x1.localdomain>
+References: <1485244792-11248-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1485262161-18543-1-git-send-email-pl@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block/iscsi: statically link
- qemu_iscsi_opts
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="J2uG6jHjFLimDtBY"
+Content-Disposition: inline
+In-Reply-To: <1485244792-11248-1-git-send-email-zhang.zhanghailiang@huawei.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] migration: re-active
+ images while migration been canceled after inactive them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, amit.shah@redhat.com
 
 
+--J2uG6jHjFLimDtBY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 24/01/2017 13:49, Peter Lieven wrote:
-> +#ifdef CONFIG_LIBISCSI
+On Tue, Jan 24, 2017 at 03:59:52PM +0800, zhanghailiang wrote:
+> commit fe904ea8242cbae2d7e69c052c754b8f5f1ba1d6 fixed a case
+> which migration aborted QEMU because it didn't regain the control
+> of images while some errors happened.
+>=20
+> Actually, there are another two cases can trigger the same error reports:
+> " bdrv_co_do_pwritev: Assertion `!(bs->open_flags & 0x0800)' failed",
+>=20
+> Case 1, codes path:
+> migration_thread()
+>     migration_completion()
+>         bdrv_inactivate_all() ----------------> inactivate images
+>         qemu_savevm_state_complete_precopy()
+>             socket_writev_buffer() --------> error because destination fa=
+ils
+>                 qemu_fflush() ----------------> set error on migration st=
+ream
+> -> qmp_migrate_cancel() ----------------> user cancelled migration concur=
+rently
+>     -> migrate_set_state() ------------------> set migrate CANCELLIN
+>     migration_completion() -----------------> go on to fail_invalidate
+> 	if (s->state =3D=3D MIGRATION_STATUS_ACTIVE) -> Jump this branch
+>=20
+> Case 2, codes path:
+> migration_thread()
+>     migration_completion()
+>         bdrv_inactivate_all() ----------------> inactivate images
+>     migreation_completion() finished
+> -> qmp_migrate_cancel() ---------------> user cancelled migration concurr=
+ently
+>     qemu_mutex_lock_iothread();
+>     qemu_bh_schedule (s->cleanup_bh);
+>=20
+> As we can see from above, qmp_migrate_cancel can slip in whenever
+> migration_thread does not hold the global lock. If this happens after
+> bdrv_inactive_all() been called, the above error reports will appear.
+>=20
+> To prevent this, we can call bdrv_invalidate_cache_all() in qmp_migrate_c=
+ancel()
+> directly if we find images become inactive.
+>=20
+> Besides, bdrv_invalidate_cache_all() in migration_completion() doesn't ha=
+ve the
+> protection of big lock, fix it by add the missing qemu_mutex_lock_iothrea=
+d();
+>=20
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> ---
+> v2:
+>  - Fix a bug introduced by commit fe904 which didn't get big lock
+>    before call bdrv_invalidate_cache_all. (Suggested by Dave)
+> ---
+>  include/migration/migration.h |  3 +++
+>  migration/migration.c         | 15 +++++++++++++++
+>  2 files changed, 18 insertions(+)
 
-The #ifdef is not needed here.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Paolo
+--J2uG6jHjFLimDtBY
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +static QemuOptsList qemu_iscsi_opts = {
-> +    .name = "iscsi",
-> +    .head = QTAILQ_HEAD_INITIALIZER(qemu_iscsi_opts.head),
-> +    .desc = {
-> +        {
-> +            .name = "user",
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "username for CHAP authentication to target",
-> +        },{
-> +            .name = "password",
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "password for CHAP authentication to target",
-> +        },{
-> +            .name = "password-secret",
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "ID of the secret providing password for CHAP "
-> +                    "authentication to target",
-> +        },{
-> +            .name = "header-digest",
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "HeaderDigest setting. "
-> +                    "{CRC32C|CRC32C-NONE|NONE-CRC32C|NONE}",
-> +        },{
-> +            .name = "initiator-name",
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "Initiator iqn name to use when connecting",
-> +        },{
-> +            .name = "timeout",
-> +            .type = QEMU_OPT_NUMBER,
-> +            .help = "Request timeout in seconds (default 0 = no timeout)",
-> +        },
-> +        { /* end of list */ }
-> +    },
-> +};
-> +
-> +static void iscsi_block_opts_init(void)
-> +{
-> +    qemu_add_opts(&qemu_iscsi_opts);
-> +}
-> +
-> +block_init(iscsi_block_opts_init);
-> +#endif
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYh04vAAoJEJykq7OBq3PIb78IAIzNohyYJQv0uLhrowK7IYSp
+Ombdv636B8oZrYDG76CK2vOJZLSVs1HxR9Q6w8EwPARry5zakvZv2Re72v4Wl3al
+w++tRXyJ1Vi6Fvv3aMmLekQmxrtVQtkOgqBV8jm9Ijifhgdf+ehRAlt3PANuhUgT
+JElRi1E8hhDUZJADswjloM8mz79pNABfaB47HW8nRSyAYJkw86xHO98U2arq/+CS
+FtACDlAv60b8d0Cf+xpBsSoXB0M0D4yiR1UJ6SjG9TU1dePClDb51wWSOXID/fp5
+H+pkzyWzl5SoiKnGEKfiomcnfQfNDkw5nAyqo/XS5Bp5kr4yypw/zEPVy3qxKcM=
+=pe5p
+-----END PGP SIGNATURE-----
+
+--J2uG6jHjFLimDtBY--
