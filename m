@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cW4CN-0005kx-K3
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:44:03 -0500
+	(envelope-from <prvs=19068b32a=roger.pau@citrix.com>)
+	id 1cW4Cs-00069p-EP
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:44:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cW4CM-0000lC-CC
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:43:59 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35052)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cW4CM-0000kz-3N
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:43:58 -0500
-Received: by mail-wm0-x234.google.com with SMTP id r126so191125695wmr.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 08:43:57 -0800 (PST)
-References: <1484937883-1068-1-git-send-email-peter.maydell@linaro.org>
-	<1484937883-1068-5-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1484937883-1068-5-git-send-email-peter.maydell@linaro.org>
-Date: Tue, 24 Jan 2017 16:43:55 +0000
-Message-ID: <87sho89zn8.fsf@linaro.org>
+	(envelope-from <prvs=19068b32a=roger.pau@citrix.com>)
+	id 1cW4Cp-0000qv-By
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:44:30 -0500
+Received: from smtp.eu.citrix.com ([185.25.65.24]:12019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=19068b32a=roger.pau@citrix.com>)
+	id 1cW4Cp-0000qf-2n
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 11:44:27 -0500
+Date: Tue, 24 Jan 2017 16:42:53 +0000
+From: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Message-ID: <20170124164253.jiva4zvk6fxewtsk@dhcp-3-221.uk.xensource.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 4/6] hw/registerfields.h: Pull
- FIELD etc macros out of hw/register.h
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Subject: [Qemu-devel] Commit 3a6c9 breaks QEMU on FreeBSD/Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,160 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>, patches@linaro.org
+To: Juergen Gross <jgross@suse.com>
+Cc: xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
 
+Hello,
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+The following commit:
 
-> hw/register.h provides macros like FIELD which make it easy to define
-> shift, mask and length constants for the fields within a register.
-> Unfortunately register.h also includes a lot of other things, some
-> of which will only compile in the softmmu build.
->
-> Pull the FIELD macro and friends out into a separate header file,
-> so they can be used in places like target/arm files which also
-> get built in the user-only configs.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/register.h       | 47 +----------------------------------
->  include/hw/registerfields.h | 60 +++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 61 insertions(+), 46 deletions(-)
->  create mode 100644 include/hw/registerfields.h
->
-> diff --git a/include/hw/register.h b/include/hw/register.h
-> index 8c12233..8bff5fb 100644
-> --- a/include/hw/register.h
-> +++ b/include/hw/register.h
-> @@ -13,6 +13,7 @@
->
->  #include "hw/qdev-core.h"
->  #include "exec/memory.h"
-> +#include "hw/registerfields.h"
->
->  typedef struct RegisterInfo RegisterInfo;
->  typedef struct RegisterAccessInfo RegisterAccessInfo;
-> @@ -206,50 +207,4 @@ RegisterInfoArray *register_init_block32(DeviceState *owner,
->
->  void register_finalize_block(RegisterInfoArray *r_array);
->
-> -/* Define constants for a 32 bit register */
-> -
-> -/* This macro will define A_FOO, for the byte address of a register
-> - * as well as R_FOO for the uint32_t[] register number (A_FOO / 4).
-> - */
-> -#define REG32(reg, addr)                                                  \
-> -    enum { A_ ## reg = (addr) };                                          \
-> -    enum { R_ ## reg = (addr) / 4 };
-> -
-> -/* Define SHIFT, LENGTH and MASK constants for a field within a register */
-> -
-> -/* This macro will define FOO_BAR_MASK, FOO_BAR_SHIFT and FOO_BAR_LENGTH
-> - * constants for field BAR in register FOO.
-> - */
-> -#define FIELD(reg, field, shift, length)                                  \
-> -    enum { R_ ## reg ## _ ## field ## _SHIFT = (shift)};                  \
-> -    enum { R_ ## reg ## _ ## field ## _LENGTH = (length)};                \
-> -    enum { R_ ## reg ## _ ## field ## _MASK =                             \
-> -                                        MAKE_64BIT_MASK(shift, length)};
-> -
-> -/* Extract a field from a register */
-> -#define FIELD_EX32(storage, reg, field)                                   \
-> -    extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,               \
-> -              R_ ## reg ## _ ## field ## _LENGTH)
-> -
-> -/* Extract a field from an array of registers */
-> -#define ARRAY_FIELD_EX32(regs, reg, field)                                \
-> -    FIELD_EX32((regs)[R_ ## reg], reg, field)
-> -
-> -/* Deposit a register field.
-> - * Assigning values larger then the target field will result in
-> - * compilation warnings.
-> - */
-> -#define FIELD_DP32(storage, reg, field, val) ({                           \
-> -    struct {                                                              \
-> -        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
-> -    } v = { .v = val };                                                   \
-> -    uint32_t d;                                                           \
-> -    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
-> -                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
-> -    d; })
-> -
-> -/* Deposit a field to array of registers.  */
-> -#define ARRAY_FIELD_DP32(regs, reg, field, val)                           \
-> -    (regs)[R_ ## reg] = FIELD_DP32((regs)[R_ ## reg], reg, field, val);
-> -
->  #endif
-> diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
-> new file mode 100644
-> index 0000000..af101d5
-> --- /dev/null
-> +++ b/include/hw/registerfields.h
-> @@ -0,0 +1,60 @@
-> +/*
-> + * Register Definition API: field macros
-> + *
-> + * Copyright (c) 2016 Xilinx Inc.
-> + * Copyright (c) 2013 Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef REGISTERFIELDS_H
-> +#define REGISTERFIELDS_H
-> +
-> +/* Define constants for a 32 bit register */
-> +
-> +/* This macro will define A_FOO, for the byte address of a register
-> + * as well as R_FOO for the uint32_t[] register number (A_FOO / 4).
-> + */
-> +#define REG32(reg, addr)                                                  \
-> +    enum { A_ ## reg = (addr) };                                          \
-> +    enum { R_ ## reg = (addr) / 4 };
-> +
-> +/* Define SHIFT, LENGTH and MASK constants for a field within a register */
-> +
-> +/* This macro will define FOO_BAR_MASK, FOO_BAR_SHIFT and FOO_BAR_LENGTH
-> + * constants for field BAR in register FOO.
-> + */
-> +#define FIELD(reg, field, shift, length)                                  \
-> +    enum { R_ ## reg ## _ ## field ## _SHIFT = (shift)};                  \
-> +    enum { R_ ## reg ## _ ## field ## _LENGTH = (length)};                \
-> +    enum { R_ ## reg ## _ ## field ## _MASK =                             \
-> +                                        MAKE_64BIT_MASK(shift, length)};
-> +
-> +/* Extract a field from a register */
-> +#define FIELD_EX32(storage, reg, field)                                   \
-> +    extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,               \
-> +              R_ ## reg ## _ ## field ## _LENGTH)
-> +
-> +/* Extract a field from an array of registers */
-> +#define ARRAY_FIELD_EX32(regs, reg, field)                                \
-> +    FIELD_EX32((regs)[R_ ## reg], reg, field)
-> +
-> +/* Deposit a register field.
-> + * Assigning values larger then the target field will result in
-> + * compilation warnings.
-> + */
-> +#define FIELD_DP32(storage, reg, field, val) ({                           \
-> +    struct {                                                              \
-> +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
-> +    } v = { .v = val };                                                   \
-> +    uint32_t d;                                                           \
-> +    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
-> +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
-> +    d; })
-> +
-> +/* Deposit a field to array of registers.  */
-> +#define ARRAY_FIELD_DP32(regs, reg, field, val)                           \
-> +    (regs)[R_ ## reg] = FIELD_DP32((regs)[R_ ## reg], reg, field, val);
-> +
-> +#endif
+commit 3a6c9172ac5951e6dac2b3f6cbce3cfccdec5894
+Author: Juergen Gross <jgross@suse.com>
+Date:   Tue Nov 22 07:10:58 2016 +0100
 
+xen: create qdev for each backend device
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Prevents me from running QEMU on FreeBSD/Xen, the following is printed on the
+QEMU log:
 
---
-Alex Bennée
+char device redirected to /dev/pts/2 (label serial0)
+xen be core: xen be core: can't open gnttab device
+can't open gnttab device
+xen be core: xen be core: can't open gnttab device
+can't open gnttab device
+
+# xl create -c ~/domain.cfg
+Parsing config from /root/domain.cfg
+libxl: error: libxl_dm.c:2201:device_model_spawn_outcome: Domain 32:domain 32 device model: spawn failed (rc=-3)
+libxl: error: libxl_create.c:1506:domcreate_devmodel_started: Domain 32:device model did not start: -3
+libxl: error: libxl_dm.c:2315:kill_device_model: Device Model already exited
+libxl: error: libxl.c:1572:libxl__destroy_domid: Domain 32:Non-existant domain
+libxl: error: libxl.c:1531:domain_destroy_callback: Domain 32:Unable to destroy guest
+libxl: error: libxl.c:1458:domain_destroy_cb: Domain 32:Destruction of domain failed
+# cat /var/log/xen/qemu-dm-domain.log
+char device redirected to /dev/pts/2 (label serial0)
+xen be core: xen be core: can't open gnttab device
+can't open gnttab device
+xen be core: xen be core: can't open gnttab device
+can't open gnttab device
+
+I'm not really familiar with any of that code, but I think that using
+qdev_init_nofail is wrong, since on FreeBSD/Xen for example we don't yet
+support the gnttab device, so initialization of the Xen Qdisk backend can fail
+(and possibly the same applies to Linux if someone decides to compile a kernel
+without the gnttab device). Yet QEMU can be used without the Qdisk backend.
+
+Roger.
