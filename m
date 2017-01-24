@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVz0J-00024d-LC
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:11:12 -0500
+	(envelope-from <famz@redhat.com>) id 1cVz1O-00044I-8z
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:12:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cVz0I-00030K-R3
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:11:11 -0500
-Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:32894)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cVz0I-0002zo-M4
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:11:10 -0500
-Received: by mail-vk0-x22f.google.com with SMTP id k127so109344856vke.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 03:11:09 -0800 (PST)
+	(envelope-from <famz@redhat.com>) id 1cVz1K-0003Ih-9I
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 06:12:18 -0500
+Date: Tue, 24 Jan 2017 19:12:07 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170124111207.GA13714@lemon.Home>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-9-git-send-email-vsementsov@virtuozzo.com>
+	<20170124075949.GD27126@lemon.Home>
+	<22f99aae-0968-286f-186c-0eaefadbe649@virtuozzo.com>
+	<20170124093643.GA14811@lemon.Home>
+	<f38c92ff-9f18-e03f-a756-e44f6ca22dde@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20170123175945.9260-1-rth@twiddle.net>
-References: <20170123175945.9260-1-rth@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jan 2017 11:10:48 +0000
-Message-ID: <CAFEAcA-v9abp43Ma1fG5a2rS6zFxU88cHrVotqGO8m6adSCz+Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 00/25] New hppa-linux target support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f38c92ff-9f18-e03f-a756-e44f6ca22dde@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 08/21] backup: skip unallocated clusters
+ for full mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, deller@gmx.de
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com, jcody@redhat.com
 
-On 23 January 2017 at 17:59, Richard Henderson <rth@twiddle.net> wrote:
-> Version 2: drop patch 6 which caused the IPV6 compilation errors on
-> older systems.
->
-> I suspect that the systems simply do not have proper glibc support
-> for IPV6.  One can debate whether we want to get these constants
-> directly from <linux/*>, or whether we want to ifdef the support.
->
-> However, let's improve that bit of linux-user in another patch set.
->
->
-> r~
->
->
-> The following changes since commit d1c82f7cc34443841095f490345f86c9d8baca34:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20170120-v2' into staging (2017-01-20 15:53:58 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-hppa-20170123
->
-> for you to fetch changes up to ebe9383caefd56d519e965a5d87bca29f0aeffe3:
->
->   target-hppa: Implement floating-point insns (2017-01-23 09:52:40 -0800)
->
-> ----------------------------------------------------------------
-> hppa-linux target support
->
+On Tue, 01/24 13:13, Vladimir Sementsov-Ogievskiy wrote:
+> 24.01.2017 12:36, Fam Zheng wrote:
+> > On Tue, 01/24 12:18, Vladimir Sementsov-Ogievskiy wrote:
+> > > 24.01.2017 10:59, Fam Zheng wrote:
+> > > > On Fri, 12/23 17:28, Vladimir Sementsov-Ogievskiy wrote:
+> > > > > diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
+> > > > > index 1d3fd04..388b7b2 100755
+> > > > > --- a/tests/qemu-iotests/055
+> > > > > +++ b/tests/qemu-iotests/055
+> > > > > @@ -30,6 +30,7 @@ target_img = os.path.join(iotests.test_dir, 'target.img')
+> > > > >    blockdev_target_img = os.path.join(iotests.test_dir, 'blockdev-target.img')
+> > > > >    image_len = 64 * 1024 * 1024 # MB
+> > > > > +pause_write = '3M'
+> > > > >    def setUpModule():
+> > > > >        qemu_img('create', '-f', iotests.imgfmt, test_img, str(image_len))
+> > > > > @@ -39,6 +40,7 @@ def setUpModule():
+> > > > >        qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xd5 1M 32k', test_img)
+> > > > >        qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xdc 32M 124k', test_img)
+> > > > >        qemu_io('-f', iotests.imgfmt, '-c', 'write -P0x33 67043328 64k', test_img)
+> > > > > +    qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xdc 40M ' + pause_write, test_img)
+> > > > What does this iotest change do?
+> > > Without this backup block-job finishes before the next query to it from test
+> > > and test fails. This is a wide problem I suffer of on the way of backup
+> > > improvement and it should have better solution then adjusting amount of data
+> > > being copied...
+> > You can use blkdebug to pause I/O before querying the block job, or simply
+> > throttle it down.
+> > 
+> > Fam
+> 
+> throttling down is not better I thing then just copying additional 3M, it is
+> environment-dependent hack too. And we can't use throttling in all tests -
+> throttling should be itself tested separately.
 
-Applied, thanks.
+Then maybe opt to blkdebug?
 
--- PMM
+I didn't mean the speed parameter of block jobs, but the block_set_io_throttle.
+It is not perfect, but still better than simply enlarging the data size, and
+is slightly simpler than blkdebug pause/resume.
+
+Fam
