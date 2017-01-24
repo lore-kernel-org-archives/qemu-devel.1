@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVxnN-0000jo-HF
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:53:47 -0500
+	(envelope-from <berrange@redhat.com>) id 1cVxnP-0000l6-B9
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:53:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cVxnM-0005S2-AY
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:53:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50634)
+	(envelope-from <berrange@redhat.com>) id 1cVxnO-0005Sa-2v
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:53:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46468)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVxnM-0005Rj-2z
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:53:44 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVxnN-0005SD-QC
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:53:45 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 30EC97FE8E
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:53:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E447A624A4
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:53:45 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 24 Jan 2017 09:53:26 +0000
-Message-Id: <20170124095332.23955-3-berrange@redhat.com>
+Date: Tue, 24 Jan 2017 09:53:27 +0000
+Message-Id: <20170124095332.23955-4-berrange@redhat.com>
 In-Reply-To: <20170124095332.23955-1-berrange@redhat.com>
 References: <20170124095332.23955-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/8] ui: fix reporting of VNC auth in
- query-vnc-servers
+Subject: [Qemu-devel] [PATCH v2 3/8] ui: refactor VncDisplay to allow
+ multiple listening sockets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,286 +33,260 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Currently the VNC authentication info is emitted at the
-top level of the query-vnc-servers data. This is wrong
-because the authentication scheme differs between plain
-and websockets when TLS is enabled. We should instead
-report auth against the individual servers. e.g.
+Currently there is only a single listener for plain VNC and
+a single listener for websockets VNC. This means that if
+getaddrinfo() returns multiple IP addresses, for a hostname,
+the VNC server can only listen on one of them. This is
+just bearable if listening on wildcard interface, or if
+the host only has a single network interface to listen on,
+but if there are multiple NICs and the VNC server needs
+to listen on 2 or more specific IP addresses, it can't be
+done.
 
-(QEMU) query-vnc-servers
-{
-    "return": [
-        {
-            "clients": [],
-            "id": "default",
-            "auth": "vencrypt",
-            "vencrypt": "x509-vnc",
-            "server": [
-                {
-                    "host": "127.0.0.1"
-                    "service": "5901",
-                    "websocket": false,
-                    "family": "ipv4",
-                    "auth": "vencrypt",
-                    "vencrypt": "x509-vnc"
-                },
-                {
-                    "host": "127.0.0.1",
-                    "service": "5902",
-                    "websocket": true,
-                    "family": "ipv4",
-                    "auth": "vnc"
-                }
-            ]
-        }
-    ]
-}
-
-This also future proofs the QMP schema so that we can
-cope with multiple VNC server instances, listening on
-different interfaces or ports, with different auth
-setup.
+This refactors the VncDisplay state so that it holds an
+array of listening sockets, but still only listens on
+one socket.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- qapi-schema.json | 28 ++++++++++++++++---
- ui/vnc.c         | 85 +++++++++++++++++++++++++++++++++-----------------------
- 2 files changed, 74 insertions(+), 39 deletions(-)
+ ui/vnc.c | 103 +++++++++++++++++++++++++++++++++++++++++----------------------
+ ui/vnc.h |  10 ++++---
+ 2 files changed, 73 insertions(+), 40 deletions(-)
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index ac55f4a..846bcb8 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -1506,7 +1506,8 @@
- #
- # The network connection information for server
- #
--# @auth: #optional, authentication method
-+# @auth: #optional, authentication method used for
-+#        the plain (non-websocket) VNC server
- #
- # Since: 2.1
- ##
-@@ -1597,6 +1598,25 @@
-             'tls-plain', 'x509-plain',
-             'tls-sasl',  'x509-sasl' ] }
- 
-+
-+##
-+# @VncServerInfo2:
-+#
-+# The network connection information for server
-+#
-+# @auth: The current authentication type used by the servers
-+#
-+# @vencrypt: #optional The vencrypt sub authentication type used by the
-+#            servers, only specified in case auth == vencrypt.
-+#
-+# Since: 2.9
-+##
-+{ 'struct': 'VncServerInfo2',
-+  'base': 'VncBasicInfo',
-+  'data': { 'auth'      : 'VncPrimaryAuth',
-+            '*vencrypt' : 'VncVencryptSubAuth' } }
-+
-+
- ##
- # @VncInfo2:
- #
-@@ -1612,9 +1632,9 @@
- # @clients: A list of @VncClientInfo of all currently connected clients.
- #           The list can be empty, for obvious reasons.
- #
--# @auth: The current authentication type used by the server
-+# @auth: The current authentication type used by the non-websockets servers
- #
--# @vencrypt: #optional The vencrypt sub authentication type used by the server,
-+# @vencrypt: #optional The vencrypt authentication type used by the servers,
- #            only specified in case auth == vencrypt.
- #
- # @display: #optional The display device the vnc server is linked to.
-@@ -1623,7 +1643,7 @@
- ##
- { 'struct': 'VncInfo2',
-   'data': { 'id'        : 'str',
--            'server'    : ['VncBasicInfo'],
-+            'server'    : ['VncServerInfo2'],
-             'clients'   : ['VncClientInfo'],
-             'auth'      : 'VncPrimaryAuth',
-             '*vencrypt' : 'VncVencryptSubAuth',
 diff --git a/ui/vnc.c b/ui/vnc.c
-index c82e476..bd81922 100644
+index bd81922..9b9682d 100644
 --- a/ui/vnc.c
 +++ b/ui/vnc.c
-@@ -429,12 +429,20 @@ out_error:
-     return NULL;
- }
- 
--static VncBasicInfoList *qmp_query_server_entry(QIOChannelSocket *ioc,
--                                                bool websocket,
--                                                VncBasicInfoList *prev)
-+
-+static void qmp_query_auth(int auth, int subauth,
-+                           VncPrimaryAuth *qmp_auth,
-+                           VncVencryptSubAuth *qmp_vencrypt,
-+                           bool *qmp_has_vencrypt);
-+
-+static VncServerInfo2List *qmp_query_server_entry(QIOChannelSocket *ioc,
-+                                                  bool websocket,
-+                                                  int auth,
-+                                                  int subauth,
-+                                                  VncServerInfo2List *prev)
- {
--    VncBasicInfoList *list;
--    VncBasicInfo *info;
-+    VncServerInfo2List *list;
-+    VncServerInfo2 *info;
+@@ -224,8 +224,12 @@ static VncServerInfo *vnc_server_info_get(VncDisplay *vd)
+     VncServerInfo *info;
      Error *err = NULL;
-     SocketAddress *addr;
  
-@@ -444,85 +452,91 @@ static VncBasicInfoList *qmp_query_server_entry(QIOChannelSocket *ioc,
-         return prev;
-     }
- 
--    info = g_new0(VncBasicInfo, 1);
--    vnc_init_basic_info(addr, info, &err);
-+    info = g_new0(VncServerInfo2, 1);
-+    vnc_init_basic_info(addr, qapi_VncServerInfo2_base(info), &err);
-     qapi_free_SocketAddress(addr);
-     if (err) {
--        qapi_free_VncBasicInfo(info);
-+        qapi_free_VncServerInfo2(info);
-         error_free(err);
-         return prev;
-     }
-     info->websocket = websocket;
- 
--    list = g_new0(VncBasicInfoList, 1);
-+    qmp_query_auth(auth, subauth, &info->auth,
-+                   &info->vencrypt, &info->has_vencrypt);
++    if (!vd->nlsock) {
++        return NULL;
++    }
 +
-+    list = g_new0(VncServerInfo2List, 1);
-     list->value = info;
-     list->next = prev;
-     return list;
- }
+     info = g_malloc0(sizeof(*info));
+-    vnc_init_basic_info_from_server_addr(vd->lsock,
++    vnc_init_basic_info_from_server_addr(vd->lsock[0],
+                                          qapi_VncServerInfo_base(info), &err);
+     info->has_auth = true;
+     info->auth = g_strdup(vnc_auth_name(vd));
+@@ -371,7 +375,7 @@ VncInfo *qmp_query_vnc(Error **errp)
+     VncDisplay *vd = vnc_display_find(NULL);
+     SocketAddress *addr = NULL;
  
--static void qmp_query_auth(VncDisplay *vd, VncInfo2 *info)
-+static void qmp_query_auth(int auth, int subauth,
-+                           VncPrimaryAuth *qmp_auth,
-+                           VncVencryptSubAuth *qmp_vencrypt,
-+                           bool *qmp_has_vencrypt)
- {
--    switch (vd->auth) {
-+    switch (auth) {
-     case VNC_AUTH_VNC:
--        info->auth = VNC_PRIMARY_AUTH_VNC;
-+        *qmp_auth = VNC_PRIMARY_AUTH_VNC;
-         break;
-     case VNC_AUTH_RA2:
--        info->auth = VNC_PRIMARY_AUTH_RA2;
-+        *qmp_auth = VNC_PRIMARY_AUTH_RA2;
-         break;
-     case VNC_AUTH_RA2NE:
--        info->auth = VNC_PRIMARY_AUTH_RA2NE;
-+        *qmp_auth = VNC_PRIMARY_AUTH_RA2NE;
-         break;
-     case VNC_AUTH_TIGHT:
--        info->auth = VNC_PRIMARY_AUTH_TIGHT;
-+        *qmp_auth = VNC_PRIMARY_AUTH_TIGHT;
-         break;
-     case VNC_AUTH_ULTRA:
--        info->auth = VNC_PRIMARY_AUTH_ULTRA;
-+        *qmp_auth = VNC_PRIMARY_AUTH_ULTRA;
-         break;
-     case VNC_AUTH_TLS:
--        info->auth = VNC_PRIMARY_AUTH_TLS;
-+        *qmp_auth = VNC_PRIMARY_AUTH_TLS;
-         break;
-     case VNC_AUTH_VENCRYPT:
--        info->auth = VNC_PRIMARY_AUTH_VENCRYPT;
--        info->has_vencrypt = true;
--        switch (vd->subauth) {
-+        *qmp_auth = VNC_PRIMARY_AUTH_VENCRYPT;
-+        *qmp_has_vencrypt = true;
-+        switch (subauth) {
-         case VNC_AUTH_VENCRYPT_PLAIN:
--            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_PLAIN;
-+            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_PLAIN;
-             break;
-         case VNC_AUTH_VENCRYPT_TLSNONE:
--            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_NONE;
-+            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_NONE;
-             break;
-         case VNC_AUTH_VENCRYPT_TLSVNC:
--            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_VNC;
-+            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_VNC;
-             break;
-         case VNC_AUTH_VENCRYPT_TLSPLAIN:
--            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_PLAIN;
-+            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_PLAIN;
-             break;
-         case VNC_AUTH_VENCRYPT_X509NONE:
--            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_NONE;
-+            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_NONE;
-             break;
-         case VNC_AUTH_VENCRYPT_X509VNC:
--            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_VNC;
-+            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_VNC;
-             break;
-         case VNC_AUTH_VENCRYPT_X509PLAIN:
--            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_PLAIN;
-+            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_PLAIN;
-             break;
-         case VNC_AUTH_VENCRYPT_TLSSASL:
--            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_SASL;
-+            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_SASL;
-             break;
-         case VNC_AUTH_VENCRYPT_X509SASL:
--            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_SASL;
-+            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_SASL;
-             break;
-         default:
--            info->has_vencrypt = false;
-+            *qmp_has_vencrypt = false;
-             break;
+-    if (vd == NULL || !vd->lsock) {
++    if (vd == NULL || !vd->nlsock) {
+         info->enabled = false;
+     } else {
+         info->enabled = true;
+@@ -384,7 +388,7 @@ VncInfo *qmp_query_vnc(Error **errp)
+             return info;
          }
-         break;
-     case VNC_AUTH_SASL:
--        info->auth = VNC_PRIMARY_AUTH_SASL;
-+        *qmp_auth = VNC_PRIMARY_AUTH_SASL;
-         break;
-     case VNC_AUTH_NONE:
-     default:
--        info->auth = VNC_PRIMARY_AUTH_NONE;
-+        *qmp_auth = VNC_PRIMARY_AUTH_NONE;
-         break;
-     }
- }
-@@ -538,7 +552,8 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+ 
+-        addr = qio_channel_socket_get_local_address(vd->lsock, errp);
++        addr = qio_channel_socket_get_local_address(vd->lsock[0], errp);
+         if (!addr) {
+             goto out_error;
+         }
+@@ -547,6 +551,7 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+     VncInfo2 *info;
+     VncDisplay *vd;
+     DeviceState *dev;
++    size_t i;
+ 
+     QTAILQ_FOREACH(vd, &vnc_displays, next) {
          info = g_new0(VncInfo2, 1);
-         info->id = g_strdup(vd->id);
-         info->clients = qmp_query_client_list(vd);
--        qmp_query_auth(vd, info);
-+        qmp_query_auth(vd->auth, vd->subauth, &info->auth,
-+                       &info->vencrypt, &info->has_vencrypt);
-         if (vd->dcl.con) {
-             dev = DEVICE(object_property_get_link(OBJECT(vd->dcl.con),
-                                                   "device", NULL));
-@@ -547,11 +562,11 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+@@ -560,13 +565,14 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+             info->has_display = true;
+             info->display = g_strdup(dev->id);
          }
-         if (vd->lsock != NULL) {
+-        if (vd->lsock != NULL) {
++        for (i = 0; i < vd->nlsock; i++) {
              info->server = qmp_query_server_entry(
--                vd->lsock, false, info->server);
-+                vd->lsock, false, vd->auth, vd->subauth, info->server);
+-                vd->lsock, false, vd->auth, vd->subauth, info->server);
++                vd->lsock[i], false, vd->auth, vd->subauth, info->server);
          }
-         if (vd->lwebsock != NULL) {
+-        if (vd->lwebsock != NULL) {
++        for (i = 0; i < vd->nlwebsock; i++) {
              info->server = qmp_query_server_entry(
--                vd->lwebsock, true, info->server);
-+                vd->lwebsock, true, vd->ws_auth, vd->ws_subauth, info->server);
+-                vd->lwebsock, true, vd->ws_auth, vd->ws_subauth, info->server);
++                vd->lwebsock[i], true, vd->ws_auth,
++                vd->ws_subauth, info->server);
          }
  
          item = g_new0(VncInfo2List, 1);
+@@ -3116,15 +3122,22 @@ static gboolean vnc_listen_io(QIOChannel *ioc,
+     VncDisplay *vd = opaque;
+     QIOChannelSocket *sioc = NULL;
+     Error *err = NULL;
++    bool isWebsock = false;
++    size_t i;
++
++    for (i = 0; i < vd->nlwebsock; i++) {
++        if (ioc == QIO_CHANNEL(vd->lwebsock[i])) {
++            isWebsock = true;
++            break;
++        }
++    }
+ 
+     sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc), &err);
+     if (sioc != NULL) {
+         qio_channel_set_name(QIO_CHANNEL(sioc),
+-                             ioc != QIO_CHANNEL(vd->lsock) ?
+-                             "vnc-ws-server" : "vnc-server");
++                             isWebsock ? "vnc-ws-server" : "vnc-server");
+         qio_channel_set_delay(QIO_CHANNEL(sioc), false);
+-        vnc_connect(vd, sioc, false,
+-                    ioc != QIO_CHANNEL(vd->lsock));
++        vnc_connect(vd, sioc, false, isWebsock);
+         object_unref(OBJECT(sioc));
+     } else {
+         /* client probably closed connection before we got there */
+@@ -3184,24 +3197,33 @@ void vnc_display_init(const char *id)
+ 
+ static void vnc_display_close(VncDisplay *vd)
+ {
++    size_t i;
+     if (!vd) {
+         return;
+     }
+     vd->is_unix = false;
+-    if (vd->lsock != NULL) {
+-        if (vd->lsock_tag) {
+-            g_source_remove(vd->lsock_tag);
++    for (i = 0; i < vd->nlsock; i++) {
++        if (vd->lsock_tag[i]) {
++            g_source_remove(vd->lsock_tag[i]);
+         }
+-        object_unref(OBJECT(vd->lsock));
+-        vd->lsock = NULL;
++        object_unref(OBJECT(vd->lsock[i]));
+     }
+-    if (vd->lwebsock != NULL) {
+-        if (vd->lwebsock_tag) {
+-            g_source_remove(vd->lwebsock_tag);
++    g_free(vd->lsock);
++    g_free(vd->lsock_tag);
++    vd->lsock = NULL;
++    vd->nlsock = 0;
++
++    for (i = 0; i < vd->nlwebsock; i++) {
++        if (vd->lwebsock_tag[i]) {
++            g_source_remove(vd->lwebsock_tag[i]);
+         }
+-        object_unref(OBJECT(vd->lwebsock));
+-        vd->lwebsock = NULL;
++        object_unref(OBJECT(vd->lwebsock[i]));
+     }
++    g_free(vd->lwebsock);
++    g_free(vd->lwebsock_tag);
++    vd->lwebsock = NULL;
++    vd->nlwebsock = 0;
++
+     vd->auth = VNC_AUTH_INVALID;
+     vd->subauth = VNC_AUTH_INVALID;
+     if (vd->tlscreds) {
+@@ -3248,7 +3270,11 @@ static void vnc_display_print_local_addr(VncDisplay *vd)
+     SocketAddress *addr;
+     Error *err = NULL;
+ 
+-    addr = qio_channel_socket_get_local_address(vd->lsock, &err);
++    if (!vd->nlsock) {
++        return;
++    }
++
++    addr = qio_channel_socket_get_local_address(vd->lsock[0], &err);
+     if (!addr) {
+         return;
+     }
+@@ -3808,8 +3834,6 @@ void vnc_display_open(const char *id, Error **errp)
+     if (reverse) {
+         /* connect to viewer */
+         QIOChannelSocket *sioc = NULL;
+-        vd->lsock = NULL;
+-        vd->lwebsock = NULL;
+         if (ws_enabled) {
+             error_setg(errp, "Cannot use websockets in reverse mode");
+             goto fail;
+@@ -3823,30 +3847,36 @@ void vnc_display_open(const char *id, Error **errp)
+         vnc_connect(vd, sioc, false, false);
+         object_unref(OBJECT(sioc));
+     } else {
+-        vd->lsock = qio_channel_socket_new();
+-        qio_channel_set_name(QIO_CHANNEL(vd->lsock), "vnc-listen");
+-        if (qio_channel_socket_listen_sync(vd->lsock, saddr, errp) < 0) {
++        vd->nlsock = 1;
++        vd->lsock = g_new0(QIOChannelSocket *, 1);
++        vd->lsock_tag = g_new0(guint, 1);
++
++        vd->lsock[0] = qio_channel_socket_new();
++        qio_channel_set_name(QIO_CHANNEL(vd->lsock[0]), "vnc-listen");
++        if (qio_channel_socket_listen_sync(vd->lsock[0], saddr, errp) < 0) {
+             goto fail;
+         }
+         vd->is_unix = saddr->type == SOCKET_ADDRESS_KIND_UNIX;
+ 
+         if (ws_enabled) {
+-            vd->lwebsock = qio_channel_socket_new();
+-            qio_channel_set_name(QIO_CHANNEL(vd->lwebsock), "vnc-ws-listen");
+-            if (qio_channel_socket_listen_sync(vd->lwebsock,
++            vd->nlwebsock = 1;
++            vd->lwebsock = g_new0(QIOChannelSocket *, 1);
++            vd->lwebsock_tag = g_new0(guint, 1);
++
++            vd->lwebsock[0] = qio_channel_socket_new();
++            qio_channel_set_name(QIO_CHANNEL(vd->lwebsock[0]), "vnc-ws-listen");
++            if (qio_channel_socket_listen_sync(vd->lwebsock[0],
+                                                wsaddr, errp) < 0) {
+-                object_unref(OBJECT(vd->lsock));
+-                vd->lsock = NULL;
+                 goto fail;
+             }
+         }
+ 
+-        vd->lsock_tag = qio_channel_add_watch(
+-            QIO_CHANNEL(vd->lsock),
++        vd->lsock_tag[0] = qio_channel_add_watch(
++            QIO_CHANNEL(vd->lsock[0]),
+             G_IO_IN, vnc_listen_io, vd, NULL);
+         if (ws_enabled) {
+-            vd->lwebsock_tag = qio_channel_add_watch(
+-                QIO_CHANNEL(vd->lwebsock),
++            vd->lwebsock_tag[0] = qio_channel_add_watch(
++                QIO_CHANNEL(vd->lwebsock[0]),
+                 G_IO_IN, vnc_listen_io, vd, NULL);
+         }
+     }
+@@ -3860,6 +3890,7 @@ void vnc_display_open(const char *id, Error **errp)
+     return;
+ 
+ fail:
++    vnc_display_close(vd);
+     qapi_free_SocketAddress(saddr);
+     qapi_free_SocketAddress(wsaddr);
+     ws_enabled = false;
+diff --git a/ui/vnc.h b/ui/vnc.h
+index d20b154..453695a 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -146,10 +146,12 @@ struct VncDisplay
+     int num_exclusive;
+     int connections_limit;
+     VncSharePolicy share_policy;
+-    QIOChannelSocket *lsock;
+-    guint lsock_tag;
+-    QIOChannelSocket *lwebsock;
+-    guint lwebsock_tag;
++    size_t nlsock;
++    QIOChannelSocket **lsock;
++    guint *lsock_tag;
++    size_t nlwebsock;
++    QIOChannelSocket **lwebsock;
++    guint *lwebsock_tag;
+     DisplaySurface *ds;
+     DisplayChangeListener dcl;
+     kbd_layout_t *kbd_layout;
 -- 
 2.9.3
