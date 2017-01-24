@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cVrmV-0005gV-JV
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 22:28:28 -0500
+	(envelope-from <peterx@redhat.com>) id 1cVsLy-0002sO-1B
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:05:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cVrmS-00075S-FW
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 22:28:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36130)
+	(envelope-from <peterx@redhat.com>) id 1cVsLu-0002TF-RI
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:05:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45600)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cVrmS-00074p-84
-	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 22:28:24 -0500
-Date: Tue, 24 Jan 2017 11:28:18 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cVsLu-0002Sz-M1
+	for qemu-devel@nongnu.org; Mon, 23 Jan 2017 23:05:02 -0500
+Date: Tue, 24 Jan 2017 12:04:57 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170124032818.GJ26526@pxdev.xzpeter.org>
+Message-ID: <20170124040457.GK26526@pxdev.xzpeter.org>
 References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-3-git-send-email-peterx@redhat.com>
-	<20170123114905.4936508d@t450s.home>
+	<1484917736-32056-16-git-send-email-peterx@redhat.com>
+	<f2cceaa6-b3cf-9ed1-2c9c-f9222a0ab7ce@redhat.com>
+	<20170122085118.GA26526@pxdev.xzpeter.org>
+	<c7265d9c-54e9-f4a2-003d-85c4416c1651@redhat.com>
+	<20170123025449.GE26526@pxdev.xzpeter.org>
+	<20170123123429.1a07f156@t450s.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170123114905.4936508d@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH RFC v4 02/20] vfio: introduce
- vfio_get_vaddr()
+In-Reply-To: <20170123123429.1a07f156@t450s.home>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC v4 15/20] intel_iommu: provide its own
+ replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,141 +35,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com
+Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org
 
-On Mon, Jan 23, 2017 at 11:49:05AM -0700, Alex Williamson wrote:
-> On Fri, 20 Jan 2017 21:08:38 +0800
+On Mon, Jan 23, 2017 at 12:34:29PM -0700, Alex Williamson wrote:
+> On Mon, 23 Jan 2017 10:54:49 +0800
 > Peter Xu <peterx@redhat.com> wrote:
-> 
-> > A cleanup for vfio_iommu_map_notify(). Should have no functional change,
-> > just to make the function shorter and easier to understand.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
-> >  1 file changed, 38 insertions(+), 20 deletions(-)
-> > 
-> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > index 174f351..ce55dff 100644
-> > --- a/hw/vfio/common.c
-> > +++ b/hw/vfio/common.c
-> > @@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
-> >             section->offset_within_address_space & (1ULL << 63);
-> >  }
-> >  
-> > -static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > +static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-> > +                           bool *read_only)
-> >  {
-> > -    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-> > -    VFIOContainer *container = giommu->container;
-> > -    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-> >      MemoryRegion *mr;
-> >      hwaddr xlat;
-> >      hwaddr len = iotlb->addr_mask + 1;
-> > -    void *vaddr;
-> > -    int ret;
-> > -
-> > -    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
-> > -                                iova, iova + iotlb->addr_mask);
-> > -
-> > -    if (iotlb->target_as != &address_space_memory) {
-> > -        error_report("Wrong target AS \"%s\", only system memory is allowed",
-> > -                     iotlb->target_as->name ? iotlb->target_as->name : "none");
-> > -        return;
-> > -    }
-> > +    bool ret = false;
-> > +    bool writable = iotlb->perm & IOMMU_WO;
-> >  
-> >      /*
-> >       * The IOMMU TLB entry we have just covers translation through
-> > @@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >      rcu_read_lock();
-> >      mr = address_space_translate(&address_space_memory,
-> >                                   iotlb->translated_addr,
-> > -                                 &xlat, &len, iotlb->perm & IOMMU_WO);
-> > +                                 &xlat, &len, writable);
-> >      if (!memory_region_is_ram(mr)) {
-> >          error_report("iommu map to non memory area %"HWADDR_PRIx"",
-> >                       xlat);
-> >          goto out;
-> >      }
-> > +
-> >      /*
-> >       * Translation truncates length to the IOMMU page size,
-> >       * check that it did not truncate too much.
-> > @@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >          goto out;
-> >      }
-> >  
-> > +    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> > +    *read_only = !writable || mr->readonly;
-> > +    ret = true;
-> > +
-> > +out:
-> > +    rcu_read_unlock();
-> > +    return ret;
-> > +}
-> > +
-> > +static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > +{
-> > +    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-> > +    VFIOContainer *container = giommu->container;
-> > +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-> > +    bool read_only;
-> > +    void *vaddr;
-> > +    int ret;
-> > +
-> > +    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
-> > +                                iova, iova + iotlb->addr_mask);
-> > +
-> > +    if (iotlb->target_as != &address_space_memory) {
-> > +        error_report("Wrong target AS \"%s\", only system memory is allowed",
-> > +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
-> > +        return;
-> > +    }
-> > +
-> > +    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-> > +        return;
-> > +    }
-> > +
-> >      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
-> > -        vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> >          ret = vfio_dma_map(container, iova,
-> >                             iotlb->addr_mask + 1, vaddr,
-> > -                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
-> > +                           read_only);
-> 
-> Is it really valid to move the map ioctl out of the rcu read lock?
-> We're making use of vaddr, which is directly a property of a
-> MemoryRegion which may have now disappeared.  With the lock released,
-> could an unmap race the map resulting in the wrong ordering?  As noted
-> previously, there are some subtle changes here, we do the
-> memory_region_get_ram_ptr() translation on both map and unmap (fixed in
-> next patch) and then pull map out of the rcu lock.  I'm not sure the
-> extra function is worthwhile or really has no functional change.
-> Thanks,
+>=20
+> > On Mon, Jan 23, 2017 at 09:48:48AM +0800, Jason Wang wrote:
+> > >=20
+> > >=20
+> > > On 2017=E5=B9=B401=E6=9C=8822=E6=97=A5 16:51, Peter Xu wrote: =20
+> > > >On Sun, Jan 22, 2017 at 03:56:10PM +0800, Jason Wang wrote:
+> > > >
+> > > >[...]
+> > > > =20
+> > > >>>+/**
+> > > >>>+ * vtd_page_walk_level - walk over specific level for IOVA rang=
+e
+> > > >>>+ *
+> > > >>>+ * @addr: base GPA addr to start the walk
+> > > >>>+ * @start: IOVA range start address
+> > > >>>+ * @end: IOVA range end address (start <=3D addr < end)
+> > > >>>+ * @hook_fn: hook func to be called when detected page
+> > > >>>+ * @private: private data to be passed into hook func
+> > > >>>+ * @read: whether parent level has read permission
+> > > >>>+ * @write: whether parent level has write permission
+> > > >>>+ * @skipped: accumulated skipped ranges =20
+> > > >>What's the usage for this parameter? Looks like it was never used=
+ in this
+> > > >>series. =20
+> > > >This was for debugging purpose before, and I kept it in case one d=
+ay
+> > > >it can be used again, considering that will not affect much on the
+> > > >overall performance. =20
+> > >=20
+> > > I think we usually do not keep debugging codes outside debug macros=
+. =20
+> >=20
+> > I'll remove it.
+>=20
+> While you're at it, what's the value in using a void* private rather
+> than just passing around an IOMMUNotifier*.  Seems like unnecessary
+> abstraction.  Thanks,
 
-Thanks for raising this question up.
+When handling PSIs (in continuous patches, not this one), we were
+passing in MemoryRegion* rather than IOMMUNotifier*:
 
-IIUC this function can be triggered by three cases (this is for x86, I
-suppose the rule should be same for all platforms):
+        vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SIZE,
+                        vtd_page_invalidate_notify_hook,
+                        (void *)&vtd_as->iommu, true);
 
-- memory hot add/remove
-- a PSI (page selective invalidation) for a newly mapped io page
-- a domain switch (needs a iommu replay)
-
-IMHO all these places are protected by the QBL (both 2nd/3rd cases
-should be invoked in VT-d IOMMU MMIO write to queue invalidation
-registers)? And I thought BQL should be regarded as a write lock even
-stronger than RCU read lock?
-
-If I understand it correctly above, looks like we should be safe here
-as long as we are always with BQL? And, if so, do we really need RCU
-read protection here?
-
-Please kindly correct if I missed anything.
-
-Thanks,
+So a void* might still be required. Thanks,
 
 -- peterx
