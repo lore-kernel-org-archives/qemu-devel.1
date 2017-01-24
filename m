@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cW5SF-0006D6-ON
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cW5SF-0006D9-PU
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cW5SB-00008l-Kn
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cW5SE-00009b-MZ
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:27 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33821)
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33154)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cW5SB-00008a-FF
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:23 -0500
-Received: by mail-wm0-x244.google.com with SMTP id c85so36299315wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:04:23 -0800 (PST)
+	id 1cW5SE-00009W-HE
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 13:04:26 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r144so36413323wme.0
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:04:26 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 24 Jan 2017 19:04:13 +0100
-Message-Id: <20170124180420.12430-2-pbonzini@redhat.com>
+Date: Tue, 24 Jan 2017 19:04:16 +0100
+Message-Id: <20170124180420.12430-5-pbonzini@redhat.com>
 In-Reply-To: <20170124180420.12430-1-pbonzini@redhat.com>
 References: <20170124180420.12430-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/8] virtio: make virtio_should_notify static
+Subject: [Qemu-devel] [PATCH 4/8] exec: make address_space_cache_destroy
+ idempotent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +31,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, stefanha@redhat.com
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Clear cache->mr so that address_space_cache_destroy does nothing
+the second time it is called.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/virtio/virtio.c         | 2 +-
- include/hw/virtio/virtio.h | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ exec.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index cc17b97..b1c5563 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1383,7 +1383,7 @@ static void virtio_set_isr(VirtIODevice *vdev, int value)
+diff --git a/exec.c b/exec.c
+index f2bed92..5de15cf 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3165,6 +3165,7 @@ void address_space_cache_destroy(MemoryRegionCache *cache)
+         xen_invalidate_map_cache_entry(cache->ptr);
      }
+     memory_region_unref(cache->mr);
++    cache->mr = NULL;
  }
  
--bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
-+static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
- {
-     uint16_t old, new;
-     bool v;
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 6523bac..525da24 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -182,7 +182,6 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
-                                unsigned int *out_bytes,
-                                unsigned max_in_bytes, unsigned max_out_bytes);
- 
--bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq);
- void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq);
- void virtio_notify(VirtIODevice *vdev, VirtQueue *vq);
- 
+ /* Called from RCU critical section.  This function has the same
 -- 
 2.9.3
