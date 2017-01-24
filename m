@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cW8fO-0006Vh-C7
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 16:30:15 -0500
+	(envelope-from <caliborn@SDF.ORG>) id 1cW8qz-00020j-75
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 16:42:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cW8fJ-0004Vd-Ff
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 16:30:14 -0500
-Received: from mail.kernel.org ([198.145.29.136]:54612)
+	(envelope-from <caliborn@SDF.ORG>) id 1cW8qu-0007T8-4F
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 16:42:13 -0500
+Received: from ol.sdf.org ([205.166.94.20]:64720 helo=mx.sdf.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cW8fJ-0004Ub-5E
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 16:30:09 -0500
-Date: Tue, 24 Jan 2017 13:30:02 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <alpine.DEB.2.10.1701241315310.10192@sstabellini-ThinkPad-X260>
-Message-ID: <alpine.DEB.2.10.1701241326560.10192@sstabellini-ThinkPad-X260>
-References: <20170124164253.jiva4zvk6fxewtsk@dhcp-3-221.uk.xensource.com>
-	<alpine.DEB.2.10.1701241315310.10192@sstabellini-ThinkPad-X260>
+	(Exim 4.71) (envelope-from <caliborn@SDF.ORG>) id 1cW8qb-0007Ql-ML
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 16:42:07 -0500
+Date: Tue, 24 Jan 2017 21:41:34 +0000 (UTC)
+From: Valentin Plotkin <caliborn@SDF.ORG>
+In-Reply-To: <4b93a2b8-097e-a502-875e-21ea394c617a@redhat.com>
+Message-ID: <Pine.NEB.4.64.1701242127070.28647@sdf.lonestar.org>
+References: <Pine.NEB.4.64.1701241855380.2138@sdf.lonestar.org>
+	<4b93a2b8-097e-a502-875e-21ea394c617a@redhat.com>
 MIME-Version: 1.0
-Content-ID: <alpine.DEB.2.10.1701241329230.10192@sstabellini-ThinkPad-X260>
-Content-Type: TEXT/PLAIN; CHARSET=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Commit 3a6c9 breaks QEMU on FreeBSD/Xen
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] PPC: MMU compatibility check.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +26,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Tue, 24 Jan 2017, Stefano Stabellini wrote:
-> On Tue, 24 Jan 2017, Roger Pau Monn=C3=A9 wrote:
-> > Hello,
-> >=20
-> > The following commit:
-> >=20
-> > commit 3a6c9172ac5951e6dac2b3f6cbce3cfccdec5894
-> > Author: Juergen Gross <jgross@suse.com>
-> > Date:   Tue Nov 22 07:10:58 2016 +0100
-> >=20
-> > xen: create qdev for each backend device
-> >=20
-> > Prevents me from running QEMU on FreeBSD/Xen, the following is printe=
-d on the
-> > QEMU log:
-> >=20
-> > char device redirected to /dev/pts/2 (label serial0)
-> > xen be core: xen be core: can't open gnttab device
-> > can't open gnttab device
-> > xen be core: xen be core: can't open gnttab device
-> > can't open gnttab device
-> >=20
-> > # xl create -c ~/domain.cfg
-> > Parsing config from /root/domain.cfg
-> > libxl: error: libxl_dm.c:2201:device_model_spawn_outcome: Domain 32:d=
-omain 32 device model: spawn failed (rc=3D-3)
-> > libxl: error: libxl_create.c:1506:domcreate_devmodel_started: Domain =
-32:device model did not start: -3
-> > libxl: error: libxl_dm.c:2315:kill_device_model: Device Model already=
- exited
-> > libxl: error: libxl.c:1572:libxl__destroy_domid: Domain 32:Non-exista=
-nt domain
-> > libxl: error: libxl.c:1531:domain_destroy_callback: Domain 32:Unable =
-to destroy guest
-> > libxl: error: libxl.c:1458:domain_destroy_cb: Domain 32:Destruction o=
-f domain failed
-> > # cat /var/log/xen/qemu-dm-domain.log
-> > char device redirected to /dev/pts/2 (label serial0)
-> > xen be core: xen be core: can't open gnttab device
-> > can't open gnttab device
-> > xen be core: xen be core: can't open gnttab device
-> > can't open gnttab device
-> >=20
-> > I'm not really familiar with any of that code, but I think that using
-> > qdev_init_nofail is wrong, since on FreeBSD/Xen for example we don't =
-yet
-> > support the gnttab device, so initialization of the Xen Qdisk backend=
- can fail
-> > (and possibly the same applies to Linux if someone decides to compile=
- a kernel
-> > without the gnttab device). Yet QEMU can be used without the Qdisk ba=
-ckend.
->=20
-> How did you manage to configure QEMU before? The configure script had
-> xc_gnttab_open calls in it up to Xen 4.6.
+On Tue, 24 Jan 2017, Thomas Huth wrote:
 
-I know the answer! Because the configure script only compiles the code,
-doesn't try to run it. xc_gnttab_open compiled correctly but returned
-error when executed. Is that right?
+> Date: Tue, 24 Jan 2017 21:32:44 +0100
+> From: Thomas Huth <thuth@redhat.com>
+> To: Valentin Plotkin <caliborn@SDF.ORG>, qemu-trivial@nongnu.org
+> Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+> Subject: Re: [Qemu-ppc] [PATCH] PPC: MMU compatibility check.
+> 
+> On 24.01.2017 19:56, Valentin Plotkin wrote:
+>>
+>> Hi everyone,
+>>
+>> I looked at the "qemu-system-ppc -nographic -cpu G2leGP3 -M ppce500" on
+>> the BiteSizedTasks page. The segfault was caused by machine
+>> initialization code which expected a certain MMU model, checked, so
+>> unused SPR were read, returning zeros. bamboo and virtex machines are
+>> affected as well, but it doesn't always cause segfault, usually running
+>> into unmapped memory and failing somewhat more nicely.
+>>
+>> I added the checks. It would be possible to add support for other MMU
+>> models, but I'm not sure if there is any point (would any guest OS
+>> support mutually exclusive CPU and machine)?
+>
+> Hi,
+>
+> great to have a fix for this crash! I don't think it make much sense to
+> add support for other MMU models here, so the simple checks should be
+> good enough.
+> However, your new code obviously does not follow the QEMU coding style.
+> Could you please run your patch through scripts/checkpatch.pl and fix
+> all issues that it reports? And when you resubmit, please make sure to
+> copy the maintainers on CC: as well (scripts/get_maintainers.pl is your
+> friend here).
+>
+> Thanks,
+>  Thomas
+>
+>
 
+Here is fengshuised version (at least I hope so). Thanks for guiding me.
 
-> I am happy to support a use case where the kernel doesn't have gntdev,
-> but it needs to be explicit: we need to detect it in the configure
-> script, then avoid the initialization of devices which require it.
+Signed-off-by: Valentin Plotkin <caliborn@sdf.org>
+---
+  hw/ppc/e500.c          | 6 ++++++
+  hw/ppc/ppc440_bamboo.c | 6 ++++++
+  hw/ppc/virtex_ml507.c  | 6 ++++++
+  3 files changed, 18 insertions(+)
 
-I would still prefer configure to be able to detect this case. If it
-cannot be made to detect it, then we can try to figure out a way to
-catch the initialization errors at run time.=20
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index cf8b122..683d9a9 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -631,6 +631,12 @@ static uint64_t mmubooke_initial_mapsize(CPUPPCState 
+*env)
+
+  static void mmubooke_create_initial_mapping(CPUPPCState *env)
+  {
++    if (env->mmu_model != POWERPC_MMU_BOOKE206) {
++        fprintf(stderr, "MMU model %i not supported by this machine.\n",
++            env->mmu_model);
++        exit(-1);
++    }
++
+      ppcmas_tlb_t *tlb = booke206_get_tlbm(env, 1, 0, 0);
+      hwaddr size;
+      int ps;
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index 5c535b1..793b758 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -124,6 +124,12 @@ static void 
+mmubooke_create_initial_mapping(CPUPPCState *env,
+                                       target_ulong va,
+                                       hwaddr pa)
+  {
++    if (env->mmu_model != POWERPC_MMU_BOOKE) {
++        fprintf(stderr, "MMU model %i not supported by this machine.\n",
++            env->mmu_model);
++        exit(-1);
++    }
++
+      ppcemb_tlb_t *tlb = &env->tlb.tlbe[0];
+
+      tlb->attr = 0;
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index b97d966..c01415c 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -69,6 +69,12 @@ static void mmubooke_create_initial_mapping(CPUPPCState 
+*env,
+                                       target_ulong va,
+                                       hwaddr pa)
+  {
++    if (env->mmu_model != POWERPC_MMU_BOOKE) {
++        fprintf(stderr, "MMU model %i not supported by this machine.\n",
++            env->mmu_model);
++        exit(-1);
++    }
++
+      ppcemb_tlb_t *tlb = &env->tlb.tlbe[0];
+
+      tlb->attr = 0;
+-- 
+2.5.5
+
+caliborn@sdf.org
+SDF Public Access UNIX System - http://sdf.org
