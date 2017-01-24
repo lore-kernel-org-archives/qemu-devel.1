@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cVxVh-0002CM-3J
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:35:30 -0500
+	(envelope-from <berrange@redhat.com>) id 1cVxVm-0002Ey-2s
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:35:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cVxVc-0007oT-4L
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:35:29 -0500
-References: <5878AF90.8020709@kamp.de>
-	<260873230.6154791.1484638426777.JavaMail.zimbra@oxygem.tv>
-	<20170117080326.dfjqzwstfxusuhgc@nora.maurer-it.com>
-	<b7f5dc23-6d72-4897-e9ca-6482acfb4c72@redhat.com>
-	<20170117112224.2st4wuivcbwuif2m@nora.maurer-it.com>
-	<196ac8f5-2fd7-37e9-d577-8177802d0fb4@redhat.com>
-	<40cbdb51-3dcc-35bc-bb99-6c85a47d20d0@redhat.com>
-	<20170118115050.6o2ut7wtfkuzy5oh@nora.maurer-it.com>
-	<20170118161941.g72fzppyyc3pdwkf@nora.maurer-it.com>
-	<5de45f2f-d83b-64d2-6406-dc09fd4c455f@redhat.com>
-	<20170119115958.zbpy42cmntwqfuas@nora.maurer-it.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <94844aea-70ca-6f8c-2194-baedac929f1e@redhat.com>
-Date: Tue, 24 Jan 2017 10:35:19 +0100
+	(envelope-from <berrange@redhat.com>) id 1cVxVk-0007rf-V5
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:35:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43920)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cVxVk-0007rW-PI
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:35:32 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EE40980508
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 09:35:32 +0000 (UTC)
+Date: Tue, 24 Jan 2017 09:35:27 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170124093527.GB14563@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170120164322.21851-1-pbonzini@redhat.com>
+	<20170120164322.21851-6-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170119115958.zbpy42cmntwqfuas@nora.maurer-it.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-stable] Data corruption in Qemu 2.7.1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170120164322.21851-6-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/17] io: add methods to set I/O handlers
+ on AioContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +35,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexandre DERUMIER <aderumier@odiso.com>, qemu-stable <qemu-stable@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
 
+On Fri, Jan 20, 2017 at 05:43:10PM +0100, Paolo Bonzini wrote:
+> This is in preparation for making qio_channel_yield work on
+> AioContexts other than the main one.
+> 
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>         v1->v2: removed QIOChannelRestart [Daniel]
+> 
+>  include/io/channel.h | 25 +++++++++++++++++++++++++
+>  io/channel-command.c | 13 +++++++++++++
+>  io/channel-file.c    | 11 +++++++++++
+>  io/channel-socket.c  | 16 +++++++++++-----
+>  io/channel-tls.c     | 12 ++++++++++++
+>  io/channel-watch.c   |  6 ++++++
+>  io/channel.c         | 11 +++++++++++
+>  7 files changed, 89 insertions(+), 5 deletions(-)
 
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-On 19/01/2017 12:59, Fabian Gr=FCnbichler wrote:
-> > I'm not sure how to fix it, unfortunately. :(
->=20
-> so this means either use non-transparent huge pages when using
-> scsi-block (haven't verified but should work?), or use aggressive THP
-> settings and/or always leave enough memory reserves? :-/ this is very
-> unfortunate IMHO (and probably also not a very realistic usage
-> scenario?)
-
-Yes, I agree.  Unfortunately there is no API in Linux that lets you
-verify how many segments an iov is split into.
-
-Paolo
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
