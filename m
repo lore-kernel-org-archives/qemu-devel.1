@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW2Sq-0003f2-1l
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:53 -0500
+	(envelope-from <berrange@redhat.com>) id 1cW2So-0003cl-CS
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cW2So-0002R8-4T
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:52 -0500
+	(envelope-from <berrange@redhat.com>) id 1cW2Si-0002Pg-VI
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 09:52:50 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 24 Jan 2017 14:51:52 +0000
-Message-Id: <20170124145152.22980-18-berrange@redhat.com>
+Date: Tue, 24 Jan 2017 14:51:48 +0000
+Message-Id: <20170124145152.22980-14-berrange@redhat.com>
 In-Reply-To: <20170124145152.22980-1-berrange@redhat.com>
 References: <20170124145152.22980-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 17/17] block: remove all encryption handling
- APIs
+Subject: [Qemu-devel] [PATCH v2 13/17] qcow2: add support for LUKS
+ encryption format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,324 +23,1187 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Now that all encryption keys must be provided upfront via
-the QCryptoSecret API and associated block driver properties
-there is no need for any explicit encryption handling APIs
-in the block layer. Encryption can be handled transparently
-within the block driver. We only retain an API for querying
-whether an image is encrypted or not, since that is a
-potentially useful piece of metadata to report to the user.
+This adds support for using LUKS as an encryption format
+with the qcow2 file. The use of the existing 'encryption=on'
+parameter is replaced by a new parameter 'encryption-format'
+which takes the values 'aes' or 'luks'. e.g.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+  # qemu-img create --object secret,data=123456,id=sec0 \
+       -f qcow2 -o encryption-format=luks,luks-key-secret=sec0 \
+       test.qcow2 10G
+
+results in the creation of an image using the LUKS format.
+Use of the legacy 'encryption=on' parameter still results
+in creation of the old qcow2 AES format, and is equivalent
+to the new 'encryption-format=aes'. e.g. the following are
+equivalent:
+
+  # qemu-img create --object secret,data=123456,id=sec0 \
+       -f qcow2 -o encryption=on,aes-key-secret=sec0 \
+       test.qcow2 10G
+
+ # qemu-img create --object secret,data=123456,id=sec0 \
+       -f qcow2 -o encryption-format=aes,aes-key-secret=sec0 \
+       test.qcow2 10G
+
+With the LUKS format it is necessary to store the LUKS
+partition header and key material in the QCow2 file. This
+data can be many MB in size, so cannot go into the QCow2
+header region directly. Thus the spec defines a FDE
+(Full Disk Encryption) header extension that specifies
+the offset of a set of clusters to hold the FDE headers,
+as well as the length of that region. The LUKS header is
+thus stored in these extra allocated clusters before the
+main image payload.
+
+Aside from all the cryptographic differences implied by
+use of the LUKS format, there is one further key difference
+between the use of legacy AES and LUKS encryption in qcow2.
+For LUKS, the initialiazation vectors are generated using
+the host physical sector as the input, rather than the
+guest virtual sector. This guarantees unique initialization
+vectors for all sectors when qcow2 internal snapshots are
+used, thus giving stronger protection against watermarking
+attacks.
+
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- block.c                   | 77 +----------------------------------------------
- block/crypto.c            |  1 -
- block/qapi.c              |  2 +-
- block/qcow.c              |  1 -
- block/qcow2.c             |  1 -
- blockdev.c                | 37 ++---------------------
- include/block/block.h     |  3 --
- include/block/block_int.h |  1 -
- include/qapi/error.h      |  1 -
- qapi/block-core.json      |  3 +-
- qapi/common.json          |  5 +--
- 11 files changed, 6 insertions(+), 126 deletions(-)
+ block/qcow2-cluster.c      |   4 +-
+ block/qcow2-refcount.c     |  10 ++
+ block/qcow2.c              | 265 ++++++++++++++++++++++++++++++++++++++------
+ block/qcow2.h              |  10 ++
+ qapi/block-core.json       |  11 +-
+ tests/qemu-iotests/082.out | 270 ++++++++++++++++++++++++++++++++++++++++-----
+ 6 files changed, 505 insertions(+), 65 deletions(-)
 
-diff --git a/block.c b/block.c
-index 39ddea3..27cca49 100644
---- a/block.c
-+++ b/block.c
-@@ -1865,15 +1865,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
-         goto close_and_fail;
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index a2103dc..866b122 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -383,7 +383,9 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
+ 
+     if (bs->encrypted) {
+         Error *err = NULL;
+-        int64_t sector = (src_cluster_offset + offset_in_cluster)
++        int64_t sector = (s->crypt_physical_offset ?
++                          (cluster_offset + offset_in_cluster) :
++                          (src_cluster_offset + offset_in_cluster))
+                          >> BDRV_SECTOR_BITS;
+         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index cbfb3fe..afa4636 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1843,6 +1843,16 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+         return ret;
      }
  
--    if (!bdrv_key_required(bs)) {
--        bdrv_parent_cb_change_media(bs, true);
--    } else if (!runstate_check(RUN_STATE_PRELAUNCH)
--               && !runstate_check(RUN_STATE_INMIGRATE)
--               && !runstate_check(RUN_STATE_PAUSED)) { /* HACK */
--        error_setg(errp,
--                   "Guest must be stopped for opening of encrypted image");
--        goto close_and_fail;
--    }
-+    bdrv_parent_cb_change_media(bs, true);
- 
-     QDECREF(options);
- 
-@@ -2354,7 +2346,6 @@ static void bdrv_close(BlockDriverState *bs)
-         bs->backing_format[0] = '\0';
-         bs->total_sectors = 0;
-         bs->encrypted = false;
--        bs->valid_key = false;
-         bs->sg = false;
-         QDECREF(bs->options);
-         QDECREF(bs->explicit_options);
-@@ -2723,72 +2714,6 @@ bool bdrv_is_encrypted(BlockDriverState *bs)
-     return bs->encrypted;
++    /* encryption */
++    if (s->crypto_header.length) {
++        ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
++                            s->crypto_header.offset,
++                            s->crypto_header.length);
++        if (ret < 0) {
++            return ret;
++        }
++    }
++
+     return check_refblocks(bs, res, fix, rebuild, refcount_table, nb_clusters);
  }
  
--bool bdrv_key_required(BlockDriverState *bs)
--{
--    BdrvChild *backing = bs->backing;
--
--    if (backing && backing->bs->encrypted && !backing->bs->valid_key) {
--        return true;
--    }
--    return (bs->encrypted && !bs->valid_key);
--}
--
--int bdrv_set_key(BlockDriverState *bs, const char *key)
--{
--    int ret;
--    if (bs->backing && bs->backing->bs->encrypted) {
--        ret = bdrv_set_key(bs->backing->bs, key);
--        if (ret < 0)
--            return ret;
--        if (!bs->encrypted)
--            return 0;
--    }
--    if (!bs->encrypted) {
--        return -EINVAL;
--    } else if (!bs->drv || !bs->drv->bdrv_set_key) {
--        return -ENOMEDIUM;
--    }
--    ret = bs->drv->bdrv_set_key(bs, key);
--    if (ret < 0) {
--        bs->valid_key = false;
--    } else if (!bs->valid_key) {
--        /* call the change callback now, we skipped it on open */
--        bs->valid_key = true;
--        bdrv_parent_cb_change_media(bs, true);
--    }
--    return ret;
--}
--
--/*
-- * Provide an encryption key for @bs.
-- * If @key is non-null:
-- *     If @bs is not encrypted, fail.
-- *     Else if the key is invalid, fail.
-- *     Else set @bs's key to @key, replacing the existing key, if any.
-- * If @key is null:
-- *     If @bs is encrypted and still lacks a key, fail.
-- *     Else do nothing.
-- * On failure, store an error object through @errp if non-null.
-- */
--void bdrv_add_key(BlockDriverState *bs, const char *key, Error **errp)
--{
--    if (key) {
--        if (!bdrv_is_encrypted(bs)) {
--            error_setg(errp, "Node '%s' is not encrypted",
--                      bdrv_get_device_or_node_name(bs));
--        } else if (bdrv_set_key(bs, key) < 0) {
--            error_setg(errp, QERR_INVALID_PASSWORD);
--        }
--    } else {
--        if (bdrv_key_required(bs)) {
--            error_set(errp, ERROR_CLASS_DEVICE_ENCRYPTED,
--                      "'%s' (%s) is encrypted",
--                      bdrv_get_device_or_node_name(bs),
--                      bdrv_get_encrypted_filename(bs));
--        }
--    }
--}
--
- const char *bdrv_get_format_name(BlockDriverState *bs)
- {
-     return bs->drv ? bs->drv->format_name : NULL;
-diff --git a/block/crypto.c b/block/crypto.c
-index 9201cb0..6d6bd90 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -381,7 +381,6 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
-     }
- 
-     bs->encrypted = true;
--    bs->valid_key = true;
- 
-     ret = 0;
-  cleanup:
-diff --git a/block/qapi.c b/block/qapi.c
-index a62e862..68cab56 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -45,7 +45,7 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
-     info->ro                     = bs->read_only;
-     info->drv                    = g_strdup(bs->drv->format_name);
-     info->encrypted              = bs->encrypted;
--    info->encryption_key_missing = bdrv_key_required(bs);
-+    info->encryption_key_missing = false;
- 
-     info->cache = g_new(BlockdevCacheInfo, 1);
-     *info->cache = (BlockdevCacheInfo) {
-diff --git a/block/qcow.c b/block/qcow.c
-index 9bec081..cf05449 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -209,7 +209,6 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-             goto fail;
-         }
-         bs->encrypted = true;
--        bs->valid_key = true;
-     }
-     s->cluster_bits = header.cluster_bits;
-     s->cluster_size = 1 << s->cluster_bits;
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 33f6bd4..6c457bc 100644
+index 6f5095b..33f6bd4 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -1144,7 +1144,6 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
-         }
+@@ -66,6 +66,7 @@ typedef struct {
+ #define  QCOW2_EXT_MAGIC_END 0
+ #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
+ #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
++#define  QCOW2_EXT_MAGIC_CRYPTO_HEADER 0x0537be77
  
-         bs->encrypted = true;
--        bs->valid_key = true;
-     }
- 
-     s->l2_bits = s->cluster_bits - 3; /* L2 is always one cluster */
-diff --git a/blockdev.c b/blockdev.c
-index 245e1e1..d6cf191 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -587,10 +587,6 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
- 
-         bs->detect_zeroes = detect_zeroes;
- 
--        if (bdrv_key_required(bs)) {
--            autostart = 0;
--        }
--
-         block_acct_init(blk_get_stats(blk), account_invalid, account_failed);
- 
-         if (!parse_stats_intervals(blk_get_stats(blk), interval_list, errp)) {
-@@ -2244,24 +2240,8 @@ void qmp_block_passwd(bool has_device, const char *device,
-                       bool has_node_name, const char *node_name,
-                       const char *password, Error **errp)
+ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
  {
--    Error *local_err = NULL;
--    BlockDriverState *bs;
--    AioContext *aio_context;
--
--    bs = bdrv_lookup_bs(has_device ? device : NULL,
--                        has_node_name ? node_name : NULL,
--                        &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
--    aio_context = bdrv_get_aio_context(bs);
--    aio_context_acquire(aio_context);
--
--    bdrv_add_key(bs, password, errp);
--
--    aio_context_release(aio_context);
-+    error_setg(errp,
-+               "Setting block passwords directly is no longer supported");
+@@ -80,6 +81,86 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
  }
  
- /*
-@@ -2556,12 +2536,6 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
+ 
++static ssize_t qcow2_crypto_hdr_read_func(QCryptoBlock *block, size_t offset,
++                                          uint8_t *buf, size_t buflen,
++                                          Error **errp, void *opaque)
++{
++    BlockDriverState *bs = opaque;
++    BDRVQcow2State *s = bs->opaque;
++    ssize_t ret;
++
++    if ((offset + buflen) > s->crypto_header.length) {
++        error_setg(errp, "Request for data outside of extension header");
++        return -1;
++    }
++
++    ret = bdrv_pread(bs->file,
++                     s->crypto_header.offset + offset, buf, buflen);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Could not read encryption header");
++        return -1;
++    }
++    return ret;
++}
++
++
++static ssize_t qcow2_crypto_hdr_init_func(QCryptoBlock *block, size_t headerlen,
++                                          Error **errp, void *opaque)
++{
++    BlockDriverState *bs = opaque;
++    BDRVQcow2State *s = bs->opaque;
++    int64_t ret;
++    int64_t clusterlen;
++
++    ret = qcow2_alloc_clusters(bs, headerlen);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret,
++                         "Cannot allocate cluster for LUKS header size %zu",
++                         headerlen);
++        return -1;
++    }
++
++    s->crypto_header.length = headerlen;
++    s->crypto_header.offset = ret;
++
++    /* Zero fill remaining space in cluster so it has predictable
++     * content in case of future spec changes */
++    clusterlen = size_to_clusters(s, headerlen) * s->cluster_size;
++    ret = bdrv_pwrite_zeroes(bs->file,
++                             ret + headerlen,
++                             clusterlen - headerlen, 0);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Could not zero fill encryption header");
++        return -1;
++    }
++
++    return ret;
++}
++
++
++static ssize_t qcow2_crypto_hdr_write_func(QCryptoBlock *block, size_t offset,
++                                           const uint8_t *buf, size_t buflen,
++                                           Error **errp, void *opaque)
++{
++    BlockDriverState *bs = opaque;
++    BDRVQcow2State *s = bs->opaque;
++    ssize_t ret;
++
++    if ((offset + buflen) > s->crypto_header.length) {
++        error_setg(errp, "Request for data outside of extension header");
++        return -1;
++    }
++
++    ret = bdrv_pwrite(bs->file,
++                      s->crypto_header.offset + offset, buf, buflen);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Could not read encryption header");
++        return -1;
++    }
++    return ret;
++}
++
++
+ /* 
+  * read qcow2 extension and fill bs
+  * start reading from start_offset
+@@ -89,7 +170,7 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
+  */
+ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+                                  uint64_t end_offset, void **p_feature_table,
+-                                 Error **errp)
++                                 int flags, Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     QCowExtension ext;
+@@ -165,6 +246,52 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+             }
+             break;
+ 
++        case QCOW2_EXT_MAGIC_CRYPTO_HEADER: {
++            unsigned int cflags = 0;
++            if (s->crypt_method_header != QCOW_CRYPT_LUKS) {
++                error_setg(errp, "CRYPTO header extension only "
++                           "expected with LUKS encryption method");
++                return -EINVAL;
++            }
++            if (ext.len != sizeof(Qcow2CryptoHeaderExtension)) {
++                error_setg(errp, "CRYPTO header extension size %u, "
++                           "but expected size %zu", ext.len,
++                           sizeof(Qcow2CryptoHeaderExtension));
++                return -EINVAL;
++            }
++
++            ret = bdrv_pread(bs->file, offset, &s->crypto_header, ext.len);
++            if (ret < 0) {
++                error_setg_errno(errp, -ret,
++                                 "Unable to read CRYPTO header extension");
++                return ret;
++            }
++            be64_to_cpus(&s->crypto_header.offset);
++            be64_to_cpus(&s->crypto_header.length);
++
++            if ((s->crypto_header.offset % s->cluster_size) != 0) {
++                error_setg(errp, "Encryption header offset '%" PRIu64 "' is "
++                           "not a multiple of cluster size '%u'",
++                           s->crypto_header.offset, s->cluster_size);
++                return -EINVAL;
++            }
++
++            if (flags & BDRV_O_NO_IO) {
++                cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
++            }
++            /* TODO how do we pass the same crypto opts down to the
++             * backing file by default, so we don't have to manually
++             * provide the same key-secret property against the full
++             * backing chain
++             */
++            s->crypto = qcrypto_block_open(s->crypto_opts,
++                                           qcow2_crypto_hdr_read_func,
++                                           bs, cflags, errp);
++            if (!s->crypto) {
++                return -EINVAL;
++            }
++        }   break;
++
+         default:
+             /* unknown magic - save it in case we need to rewrite the header */
+             {
+@@ -465,6 +592,7 @@ static QemuOptsList qcow2_runtime_opts = {
+             .help = "Clean unused cache entries after this time (in seconds)",
+         },
+         BLOCK_CRYPTO_OPT_DEF_QCOW_KEY_SECRET("aes-"),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET("luks-"),
+         { /* end of list */ }
+     },
+ };
+@@ -766,6 +894,11 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+             Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", errp);
+         break;
+ 
++    case QCOW_CRYPT_LUKS:
++        r->crypto_opts = block_crypto_open_opts_init(
++            Q_CRYPTO_BLOCK_FORMAT_LUKS, opts, "luks-", errp);
++        break;
++
+     default:
+         g_assert_not_reached();
+     }
+@@ -956,7 +1089,7 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+     if (s->incompatible_features & ~QCOW2_INCOMPAT_MASK) {
+         void *feature_table = NULL;
+         qcow2_read_extensions(bs, header.header_length, ext_end,
+-                              &feature_table, NULL);
++                              &feature_table, flags, NULL);
+         report_unsupported_feature(errp, feature_table,
+                                    s->incompatible_features &
+                                    ~QCOW2_INCOMPAT_MASK);
+@@ -988,12 +1121,6 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+     s->refcount_max = UINT64_C(1) << (s->refcount_bits - 1);
+     s->refcount_max += s->refcount_max - 1;
+ 
+-    if (header.crypt_method > QCOW_CRYPT_AES) {
+-        error_setg(errp, "Unsupported encryption method: %" PRIu32,
+-                   header.crypt_method);
+-        ret = -EINVAL;
+-        goto fail;
+-    }
+     s->crypt_method_header = header.crypt_method;
+     if (s->crypt_method_header) {
+         if (bdrv_uses_whitelist() &&
+@@ -1010,6 +1137,12 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+             goto fail;
+         }
+ 
++        if (s->crypt_method_header == QCOW_CRYPT_AES) {
++            s->crypt_physical_offset = false;
++        } else {
++            s->crypt_physical_offset = true;
++        }
++
+         bs->encrypted = true;
+         bs->valid_key = true;
+     }
+@@ -1138,25 +1271,36 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     /* read qcow2 extensions */
+     if (qcow2_read_extensions(bs, header.header_length, ext_end, NULL,
+-        &local_err)) {
++                              flags, &local_err)) {
+         error_propagate(errp, local_err);
+         ret = -EINVAL;
          goto fail;
      }
  
--    bdrv_add_key(medium_bs, NULL, &err);
--    if (err) {
--        error_propagate(errp, err);
--        goto fail;
+-    if (s->crypt_method_header == QCOW_CRYPT_AES) {
+-        unsigned int cflags = 0;
+-        if (flags & BDRV_O_NO_IO) {
+-            cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+-        }
+-        /* TODO how do we pass the same crypto opts down to the
+-         * backing file by default, so we don't have to manually
+-         * provide the same key-secret property against the full
+-         * backing chain
+-         */
+-        s->crypto = qcrypto_block_open(s->crypto_opts, NULL, NULL,
+-                                       cflags, errp);
+-        if (!s->crypto) {
++    /* qcow2_read_extension may have set up the crypto context
++     * if the crypt method needs a header region, some methods
++     * don't need header extensions, so must check here
++     */
++    if (s->crypt_method_header && !s->crypto) {
++        if (s->crypt_method_header == QCOW_CRYPT_AES) {
++            unsigned int cflags = 0;
++            if (flags & BDRV_O_NO_IO) {
++                cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
++            }
++            /* TODO how do we pass the same crypto opts down to the
++             * backing file by default, so we don't have to manually
++             * provide the same key-secret property against the full
++             * backing chain
++             */
++            s->crypto = qcrypto_block_open(s->crypto_opts, NULL, NULL,
++                                           cflags, errp);
++            if (!s->crypto) {
++                ret = -EINVAL;
++                goto fail;
++            }
++        } else if (!(flags & BDRV_O_NO_IO)) {
++            error_setg(errp, "Missing CRYPTO header for crypt method %d",
++                       s->crypt_method_header);
+             ret = -EINVAL;
+             goto fail;
+         }
+@@ -1535,7 +1679,9 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+                 Error *err = NULL;
+                 if (qcrypto_block_decrypt(s->crypto,
+-                                          offset >> BDRV_SECTOR_BITS,
++                                          (s->crypt_physical_offset ?
++                                           cluster_offset + offset_in_cluster :
++                                           offset) >> BDRV_SECTOR_BITS,
+                                           cluster_data,
+                                           cur_bytes,
+                                           &err) < 0) {
+@@ -1631,7 +1777,10 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
+             qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
+ 
+-            if (qcrypto_block_encrypt(s->crypto, offset >> BDRV_SECTOR_BITS,
++            if (qcrypto_block_encrypt(s->crypto,
++                                      (s->crypt_physical_offset ?
++                                       cluster_offset + offset_in_cluster :
++                                       offset) >> BDRV_SECTOR_BITS,
+                                       cluster_data,
+                                       cur_bytes, &err) < 0) {
+                 error_free(err);
+@@ -1929,6 +2078,22 @@ int qcow2_update_header(BlockDriverState *bs)
+         buflen -= ret;
+     }
+ 
++    /* Full disk encryption header pointer extension */
++    if (s->crypto_header.offset != 0) {
++        cpu_to_be64s(&s->crypto_header.offset);
++        cpu_to_be64s(&s->crypto_header.length);
++        ret = header_ext_add(buf, QCOW2_EXT_MAGIC_CRYPTO_HEADER,
++                             &s->crypto_header, sizeof(s->crypto_header),
++                             buflen);
++        be64_to_cpus(&s->crypto_header.offset);
++        be64_to_cpus(&s->crypto_header.length);
++        if (ret < 0) {
++            goto fail;
++        }
++        buf += ret;
++        buflen -= ret;
++    }
++
+     /* Feature table */
+     if (s->qcow_version >= 3) {
+         Qcow2Feature features[] = {
+@@ -2029,23 +2194,34 @@ static int qcow2_change_backing_file(BlockDriverState *bs,
+ 
+ 
+ static int qcow2_set_up_encryption(BlockDriverState *bs, QemuOpts *opts,
+-                                   Error **errp)
++                                   const char *format, Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     QCryptoBlockCreateOptions *cryptoopts = NULL;
+     QCryptoBlock *crypto = NULL;
+     int ret = -EINVAL;
+ 
+-    cryptoopts = block_crypto_create_opts_init(
+-        Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", errp);
++    if (g_str_equal(format, "luks")) {
++        cryptoopts = block_crypto_create_opts_init(
++            Q_CRYPTO_BLOCK_FORMAT_LUKS, opts, "luks-", errp);
++        s->crypt_method_header = QCOW_CRYPT_LUKS;
++    } else if (g_str_equal(format, "aes")) {
++        cryptoopts = block_crypto_create_opts_init(
++            Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", errp);
++        s->crypt_method_header = QCOW_CRYPT_AES;
++    } else {
++        error_setg(errp, "Unknown encryption format %s", format);
++        ret = -EINVAL;
++        goto out;
++    }
+     if (!cryptoopts) {
+         ret = -EINVAL;
+         goto out;
+     }
+-    s->crypt_method_header = QCOW_CRYPT_AES;
+ 
+     crypto = qcrypto_block_create(cryptoopts,
+-                                  NULL, NULL,
++                                  qcow2_crypto_hdr_init_func,
++                                  qcow2_crypto_hdr_write_func,
+                                   bs, errp);
+     if (!crypto) {
+         ret = -EINVAL;
+@@ -2134,6 +2310,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+ {
+     int cluster_bits;
+     QDict *options;
++    const char *encryption_format;
+ 
+     /* Calculate cluster_bits */
+     cluster_bits = ctz32(cluster_size);
+@@ -2337,8 +2514,15 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+     }
+ 
+     /* Want encryption? There you go. */
+-    if (flags & BLOCK_FLAG_ENCRYPT) {
+-        ret = qcow2_set_up_encryption(blk_bs(blk), opts, errp);
++    encryption_format = qemu_opt_get_del(opts, QCOW2_OPT_ENCRYPTION_FORMAT);
++    if (!encryption_format &&
++        qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
++        encryption_format = "aes";
++    }
++
++    if (encryption_format) {
++        ret = qcow2_set_up_encryption(blk_bs(blk), opts, encryption_format,
++                                      errp);
+         if (ret < 0) {
+             goto out;
+         }
+@@ -2404,9 +2588,6 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+                     BDRV_SECTOR_SIZE);
+     backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+     backing_fmt = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
+-    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
+-        flags |= BLOCK_FLAG_ENCRYPT;
 -    }
--
-     rc = do_open_tray(has_device ? device : NULL,
-                       has_id ? id : NULL,
-                       false, &err);
-@@ -3832,13 +3806,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+     cluster_size = qemu_opt_get_size_del(opts, BLOCK_OPT_CLUSTER_SIZE,
+                                          DEFAULT_CLUSTER_SIZE);
+     buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+@@ -3399,7 +3580,8 @@ static QemuOptsList qcow2_create_opts = {
+         {
+             .name = BLOCK_OPT_ENCRYPT,
+             .type = QEMU_OPT_BOOL,
+-            .help = "Encrypt the image",
++            .help = "Deprecated, use the " QCOW2_OPT_ENCRYPTION_FORMAT
++                    " option instead",
+             .def_value_str = "off"
+         },
+         {
+@@ -3426,7 +3608,20 @@ static QemuOptsList qcow2_create_opts = {
+             .help = "Width of a reference count entry in bits",
+             .def_value_str = "16"
+         },
++        {
++            .name = QCOW2_OPT_ENCRYPTION_FORMAT,
++            .type = QEMU_OPT_STRING,
++            .help = "Encryption data format 'luks' (recommended) or "
++                    "'aes' (deprecated)",
++        },
+         BLOCK_CRYPTO_OPT_DEF_QCOW_KEY_SECRET("aes-"),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET("luks-"),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("luks-"),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("luks-"),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("luks-"),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("luks-"),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("luks-"),
++        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("luks-"),
+         { /* end of list */ }
+     }
+ };
+diff --git a/block/qcow2.h b/block/qcow2.h
+index f4cb171..a4210ad 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -36,6 +36,7 @@
  
-     QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
+ #define QCOW_CRYPT_NONE 0
+ #define QCOW_CRYPT_AES  1
++#define QCOW_CRYPT_LUKS 2
  
--    if (bs && bdrv_key_required(bs)) {
--        QTAILQ_REMOVE(&monitor_bdrv_states, bs, monitor_list);
--        bdrv_unref(bs);
--        error_setg(errp, "blockdev-add doesn't support encrypted devices");
--        goto fail;
--    }
--
- fail:
-     visit_free(v);
- }
-diff --git a/include/block/block.h b/include/block/block.h
-index 8b0dcda..b18c113 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -412,9 +412,6 @@ BlockDriverState *bdrv_next(BdrvNextIterator *it);
+ #define QCOW_MAX_CRYPT_CLUSTERS 32
+ #define QCOW_MAX_SNAPSHOTS 65536
+@@ -97,6 +98,7 @@
+ #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
+ #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
+ #define QCOW2_OPT_CACHE_CLEAN_INTERVAL "cache-clean-interval"
++#define QCOW2_OPT_ENCRYPTION_FORMAT "encryption-format"
  
- BlockDriverState *bdrv_next_monitor_owned(BlockDriverState *bs);
- bool bdrv_is_encrypted(BlockDriverState *bs);
--bool bdrv_key_required(BlockDriverState *bs);
--int bdrv_set_key(BlockDriverState *bs, const char *key);
--void bdrv_add_key(BlockDriverState *bs, const char *key, Error **errp);
- void bdrv_iterate_format(void (*it)(void *opaque, const char *name),
-                          void *opaque);
- const char *bdrv_get_node_name(const BlockDriverState *bs);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 2d92d7e..5a4e0d9 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -435,7 +435,6 @@ struct BlockDriverState {
-     int open_flags; /* flags used to open the file, re-used for re-open */
-     bool read_only; /* if true, the media is read only */
-     bool encrypted; /* if true, the media is encrypted */
--    bool valid_key; /* if true, a valid encryption key has been set */
-     bool sg;        /* if true, the device is a /dev/sg* */
-     bool probed;    /* if true, format was probed rather than specified */
+ typedef struct QCowHeader {
+     uint32_t magic;
+@@ -163,6 +165,11 @@ typedef struct QCowSnapshot {
+ struct Qcow2Cache;
+ typedef struct Qcow2Cache Qcow2Cache;
  
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index 7e532d0..5d5e737 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -125,7 +125,6 @@
- typedef enum ErrorClass {
-     ERROR_CLASS_GENERIC_ERROR = QAPI_ERROR_CLASS_GENERICERROR,
-     ERROR_CLASS_COMMAND_NOT_FOUND = QAPI_ERROR_CLASS_COMMANDNOTFOUND,
--    ERROR_CLASS_DEVICE_ENCRYPTED = QAPI_ERROR_CLASS_DEVICEENCRYPTED,
-     ERROR_CLASS_DEVICE_NOT_ACTIVE = QAPI_ERROR_CLASS_DEVICENOTACTIVE,
-     ERROR_CLASS_DEVICE_NOT_FOUND = QAPI_ERROR_CLASS_DEVICENOTFOUND,
-     ERROR_CLASS_KVM_MISSING_CAP = QAPI_ERROR_CLASS_KVMMISSINGCAP,
++typedef struct Qcow2CryptoHeaderExtension {
++    uint64_t offset;
++    uint64_t length;
++} QEMU_PACKED Qcow2CryptoHeaderExtension;
++
+ typedef struct Qcow2UnknownHeaderExtension {
+     uint32_t magic;
+     uint32_t len;
+@@ -256,8 +263,11 @@ typedef struct BDRVQcow2State {
+ 
+     CoMutex lock;
+ 
++    Qcow2CryptoHeaderExtension crypto_header; /* QCow2 header extension */
+     QCryptoBlockOpenOptions *crypto_opts; /* Disk encryption runtime options */
+     QCryptoBlock *crypto; /* Disk encryption format driver */
++    bool crypt_physical_offset; /* Whether to use virtual or physical offset
++                                   for encryption initialization vector tweak */
+     uint32_t crypt_method_header;
+     uint64_t snapshots_offset;
+     int snapshots_size;
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d15c6a9..a29a5b4 100644
+index 4943942..d15c6a9 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -258,8 +258,7 @@
+@@ -2327,9 +2327,15 @@
+ #                         caches. The interval is in seconds. The default value
+ #                         is 0 and it disables this feature (since 2.5)
+ # @aes-key-secret:        #optional the ID of a QCryptoSecret object providing
+-#                         the AES decryption key (since 2.9). Mandatory for
++#                         the AES decryption key (since 2.9). Mandatory for AES
+ #                         encrypted images, except when doing a metadata-only
+ #                         probe of the image.
++#                         the AES decryption key (since 2.9) Mandatory except
++#                         when doing a metadata-only probe of the image.
++# @luks-key-secret:       #optional the ID of a QCryptoSecret object providing
++#                         the LUKS keyslot passphrase (since 2.9). Mandatory for
++#                         LUKS encrypted images, except when doing a metadata-
++#                         only probe of the image.
  #
- # @encrypted: true if the backing device is encrypted
- #
--# @encryption_key_missing: true if the backing device is encrypted but an
--#                          valid encryption key is missing
-+# @encryption_key_missing: Deprecated; always false
- #
- # @detect_zeroes: detect and optimize zero writes (Since 2.1)
- #
-diff --git a/qapi/common.json b/qapi/common.json
-index b626647..8355d5a 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -14,9 +14,6 @@
- #
- # @CommandNotFound: the requested command has not been found
- #
--# @DeviceEncrypted: the requested operation can't be fulfilled because the
--#                   selected device is encrypted
--#
- # @DeviceNotActive: a device has failed to be become active
- #
- # @DeviceNotFound: the requested device has not been found
-@@ -28,7 +25,7 @@
+ # Since: 1.7
  ##
- { 'enum': 'QapiErrorClass',
-   # Keep this in sync with ErrorClass in error.h
--  'data': [ 'GenericError', 'CommandNotFound', 'DeviceEncrypted',
-+  'data': [ 'GenericError', 'CommandNotFound',
-             'DeviceNotActive', 'DeviceNotFound', 'KVMMissingCap' ] }
+@@ -2344,7 +2350,8 @@
+             '*l2-cache-size': 'int',
+             '*refcount-cache-size': 'int',
+             '*cache-clean-interval': 'int',
+-            '*aes-key-secret': 'str' } }
++            '*aes-key-secret': 'str',
++            '*luks-key-secret': 'str' } }
  
  ##
+ # @BlockdevOptionsArchipelago:
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index f8dee34..953a1c9 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -48,12 +48,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: create -f qcow2 -o ? TEST_DIR/t.qcow2 128M
+@@ -62,12 +70,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: create -f qcow2 -o cluster_size=4k,help TEST_DIR/t.qcow2 128M
+@@ -76,12 +92,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: create -f qcow2 -o cluster_size=4k,? TEST_DIR/t.qcow2 128M
+@@ -90,12 +114,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: create -f qcow2 -o help,cluster_size=4k TEST_DIR/t.qcow2 128M
+@@ -104,12 +136,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: create -f qcow2 -o ?,cluster_size=4k TEST_DIR/t.qcow2 128M
+@@ -118,12 +158,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: create -f qcow2 -o cluster_size=4k -o help TEST_DIR/t.qcow2 128M
+@@ -132,12 +180,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: create -f qcow2 -o cluster_size=4k -o ? TEST_DIR/t.qcow2 128M
+@@ -146,12 +202,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg   Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 128M
+@@ -175,12 +239,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ 
+ Testing: create -o help
+ Supported options:
+@@ -238,12 +310,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: convert -O qcow2 -o ? TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+@@ -252,12 +332,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k,help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+@@ -266,12 +354,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k,? TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+@@ -280,12 +376,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: convert -O qcow2 -o help,cluster_size=4k TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+@@ -294,12 +398,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: convert -O qcow2 -o ?,cluster_size=4k TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+@@ -308,12 +420,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k -o help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+@@ -322,12 +442,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k -o ? TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+@@ -336,12 +464,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: convert -O qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+@@ -365,12 +501,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ 
+ Testing: convert -o help
+ Supported options:
+@@ -425,12 +569,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: amend -f qcow2 -o ? TEST_DIR/t.qcow2
+@@ -439,12 +591,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: amend -f qcow2 -o cluster_size=4k,help TEST_DIR/t.qcow2
+@@ -453,12 +613,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: amend -f qcow2 -o cluster_size=4k,? TEST_DIR/t.qcow2
+@@ -467,12 +635,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: amend -f qcow2 -o help,cluster_size=4k TEST_DIR/t.qcow2
+@@ -481,12 +657,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: amend -f qcow2 -o ?,cluster_size=4k TEST_DIR/t.qcow2
+@@ -495,12 +679,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: amend -f qcow2 -o cluster_size=4k -o help TEST_DIR/t.qcow2
+@@ -509,12 +701,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: amend -f qcow2 -o cluster_size=4k -o ? TEST_DIR/t.qcow2
+@@ -523,12 +723,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+ Testing: amend -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2
+@@ -554,12 +762,20 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Deprecated, use the encryption-format option instead
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
++encryption-format Encryption data format 'luks' (recommended) or 'aes' (deprecated)
+ aes-key-secret   ID of the secret that provides the AES encryption key
++luks-key-secret  ID of the secret that provides the keyslot passphrase
++luks-cipher-alg  Name of encryption cipher algorithm
++luks-cipher-mode Name of encryption cipher mode
++luks-ivgen-alg   Name of IV generator algorithm
++luks-ivgen-hash-alg Name of IV generator hash algorithm
++luks-hash-alg    Name of encryption hash algorithm
++luks-iter-time   Time to spend in PBKDF in milliseconds
+ 
+ Testing: convert -o help
+ Supported options:
 -- 
 2.9.3
