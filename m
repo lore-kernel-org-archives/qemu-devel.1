@@ -1,38 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cW2iC-0001yC-GI
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:08:55 -0500
+	(envelope-from <w.bumiller@proxmox.com>) id 1cW34j-0003Ng-TC
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:32:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cW2i2-0002sv-Po
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:08:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45518)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cW2i2-0002s9-Hw
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:08:34 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0OEnSD7103044
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:08:33 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 285jtvfeun-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 10:08:32 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 24 Jan 2017 15:08:30 -0000
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Tue, 24 Jan 2017 16:08:22 +0100
-In-Reply-To: <20170124150823.30162-1-cornelia.huck@de.ibm.com>
-References: <20170124150823.30162-1-cornelia.huck@de.ibm.com>
+	(envelope-from <w.bumiller@proxmox.com>) id 1cW34f-0003IO-V0
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:32:01 -0500
+Received: from proxmox.maurer-it.com ([212.186.127.180]:45266)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
+	id 1cW34f-0003Hm-H3
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 10:31:57 -0500
+Date: Tue, 24 Jan 2017 16:31:43 +0100
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Message-ID: <20170124153143.GA29823@olga.wb>
+References: <58871f9b.d635240a.4cda6.5322@mx.google.com>
+	<237b1da5-532d-afd6-84ad-6adc5bd97291@redhat.com>
+	<1485254930.32716.23.camel@redhat.com>
+	<b269fc2b-e211-cc70-0b7e-da6b3180df88@redhat.com>
+	<1485260998.32716.45.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20170124150823.30162-2-cornelia.huck@de.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/2] s390x/kvm: include hw_accel.h instead of
- kvm.h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485260998.32716.45.camel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] cirrus: fix oob access issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,68 +31,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, liqiang6-s@360.cn, ghoffman@redhat.com, Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org
 
-Commit b394662 ("kvm: move cpu synchronization code") switched
-to hw_accel.h instead of kvm.h, but missed s390x, resulting in
+On Tue, Jan 24, 2017 at 01:29:58PM +0100, Gerd Hoffmann wrote:
+> > >>>      if (pitch < 0) {
+> > >>>          int64_t min = addr
+> > >>> -            + ((int64_t)s->cirrus_blt_height-1) * pitch;
+> > >>> +            + ((int64_t)s->cirrus_blt_height-1) * pitch
+> > >>> +            - s->cirrus_blt_width;
+> > >>>          int32_t max = addr
+> > >>>              + s->cirrus_blt_width;
+> > >>>          if (min < 0 || max > s->vga.vram_size) {
+> > >>>
+> > >>
+> > >> I believe this is incorrect. In this case (AFAIR), "addr" points to the
+> > >> left-most pixel (= lowest address) of the bottom line (= highest
+> > >> address).
+> > > 
+> > > If I read the code correctly it is backwards *both* x and y axis, so
+> > > addr is the right-most pixel of the bottom line.
+> > 
+> > What is "max" then? If "addr" is the right-most pixel of the bottom
+> > line, then "max" has the highest address just past the rectangle, and
+> > then adding anything non-negative to it makes no sense.
+> 
+> That is (with the patch applied) inconsistent indeed.  We must either
+> subtract s->cirrus_blt_width from min (addr == right-most), or add it to
+> max (addr == left-most), but certainly not both.
+> 
+> > ... Really as I remember it from the downstream review, the pitch is
+> > negative (bottom-up), but the horizontal direction remains left to right.
+> 
+> Looking at cirrus_vga_rop.h I see:
+>  - cirrus_bitblt_rop_fwd_*() increment src and dst while walking the
+>    scanline, and
+>  - cirrus_bitblt_rop_bkwd_*() decrement src and dst ...
+> 
+> I still think x axis goes backwards too and therefore addr is the
+> right-most pixel.
 
-  CC      s390x-softmmu/target/s390x/kvm.o
-/home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98kvm_sclp_s=
-ervice_call=E2=80=99:
-/home/cohuck/git/qemu/target/s390x/kvm.c:1034:5: error: implicit declarat=
-ion of function =E2=80=98cpu_synchronize_state=E2=80=99 [-Werror=3Dimplic=
-it-function-declaration]
-     cpu_synchronize_state(CPU(cpu));
-     ^
-/home/cohuck/git/qemu/target/s390x/kvm.c:1034:5: error: nested extern dec=
-laration of =E2=80=98cpu_synchronize_state=E2=80=99 [-Werror=3Dnested-ext=
-erns]
-/home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98sigp_initi=
-al_cpu_reset=E2=80=99:
-/home/cohuck/git/qemu/target/s390x/kvm.c:1628:5: error: implicit declarat=
-ion of function =E2=80=98cpu_synchronize_post_reset=E2=80=99 [-Werror=3Di=
-mplicit-function-declaration]
-     cpu_synchronize_post_reset(cs);
-     ^
-/home/cohuck/git/qemu/target/s390x/kvm.c:1628:5: error: nested extern dec=
-laration of =E2=80=98cpu_synchronize_post_reset=E2=80=99 [-Werror=3Dneste=
-d-externs]
-/home/cohuck/git/qemu/target/s390x/kvm.c: In function =E2=80=98sigp_set_p=
-refix=E2=80=99:
-/home/cohuck/git/qemu/target/s390x/kvm.c:1665:5: error: implicit declarat=
-ion of function =E2=80=98cpu_synchronize_post_init=E2=80=99 [-Werror=3Dim=
-plicit-function-declaration]
-     cpu_synchronize_post_init(cs);
-     ^
-/home/cohuck/git/qemu/target/s390x/kvm.c:1665:5: error: nested extern dec=
-laration of =E2=80=98cpu_synchronize_post_init=E2=80=99 [-Werror=3Dnested=
--externs]
-cc1: all warnings being treated as errors
-/home/cohuck/git/qemu/rules.mak:64: recipe for target 'target/s390x/kvm.o=
-' failed
+I agree.
 
-Fix this.
+Seeing how I've already been reading through that code I thought I'd
+go over it again and too would say both min and max need to be adapted:
 
-Fixes: b394662 ("kvm: move cpu synchronization code")
-Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-Acked-by: Vincent Palatin <vpalatin@chromium.org>
----
- target/s390x/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+     if (pitch < 0) {
+         int64_t min = addr
+             + ((int64_t)s->cirrus_blt_height-1) * pitch;
++            - s->cirrus_blt_width;
+         int32_t max = addr
+-            + s->cirrus_blt_width;
+         if (min < 0 || max > s->vga.vram_size) {
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 3ac29f92b3..5ad0acbc82 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -32,7 +32,7 @@
- #include "qemu/error-report.h"
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "hw/hw.h"
- #include "sysemu/device_tree.h"
- #include "qapi/qmp/qjson.h"
---=20
-2.11.0
+
+Here's the rest of my analysis in case anyone's interested (mostly to
+justify the first part of this mail):
+
+-) Sign of the blit width/height & pitch values at the beginning:
+
+    |    s->cirrus_blt_width = (s->vga.gr[0x20] | (s->vga.gr[0x21] << 8)) + 1;
+    |    s->cirrus_blt_height = (s->vga.gr[0x22] | (s->vga.gr[0x23] << 8)) + 1;
+    |    s->cirrus_blt_dstpitch = (s->vga.gr[0x24] | (s->vga.gr[0x25] << 8));
+    |    s->cirrus_blt_srcpitch = (s->vga.gr[0x26] | (s->vga.gr[0x27] << 8));
+
+   vga.gr is an uint8_t[]
+
+==> all values are positive at this point
+
+-) Backward blits invert the sign:
+
+    |    if (s->cirrus_blt_mode & CIRRUS_BLTMODE_BACKWARDS) {
+    |        s->cirrus_blt_dstpitch = -s->cirrus_blt_dstpitch;
+    |        s->cirrus_blt_srcpitch = -s->cirrus_blt_srcpitch;
+
+
+Starting with the simple one:
+
+-) Forward blits from cirrus_vga_rop.h:
+   Width (which is positive) is subtracted from the pitch (which
+   is also positive), turning srcpitch and dstpitch into values
+   representing the remaining bytes after the current row.
+   The pattern below repeats for all functions:
+
+      |static void
+      |glue(cirrus_bitblt_rop_fwd_, ROP_NAME)(CirrusVGAState *s,
+      |                             uint8_t *dst,const uint8_t *src,
+      |                             int dstpitch,int srcpitch,
+      |                             int bltwidth,int bltheight)
+      |{
+      |    int x,y;
+      |    dstpitch -= bltwidth;
+      |    srcpitch -= bltwidth;
+      |
+      |    if (bltheight > 1 && (dstpitch < 0 || srcpitch < 0)) {
+      |        return;
+      |    }
+      |
+      |    for (y = 0; y < bltheight; y++) {
+      |        for (x = 0; x < bltwidth; x++) {
+      |            ROP_OP(dst, *src);
+      |            dst++;
+      |            src++;
+      |        }
+      |        dst += dstpitch;
+      |        src += srcpitch;
+      |    }
+      |}
+
+   The first access to src/dst is unmodified, so the lowest accessed
+   address is the initial address.
+
+   Some functions iterate through pairs:
+      |   for (x = 0; x < bltwidth; x+=2) {
+      |      p1 = *dst;
+      |      p2 = *(dst+1);
+   Since the loop uses `x += 2` this `+1` should not go out of bounds
+   provided the width is even (which if not the case should at least
+   have an even pitch value).
+
+Conclusion for forward blits:
+   We use (start + pitch * (height-1) + width) which seems obvious for
+   the main pattern but we also need to assert that the 2nd example
+   above cannot access an additional byte with *(dst+1) after this
+   value. This seems to be okay: for an odd width eg. 5, the highest
+   x value the loop body is executed with will be 4, and we access
+   4+1=5 at most.
+
+-) Backward blits form cirrus_vga_rop.h:
+   (Pitch is negative, width is positive.)
+   They "add" the width to the pitch (essentially reducing its length),
+   turning the 'dstpitch' and 'srcpitch' variables - as with forward
+   blits - into values representing only the *remaining* bytes "in
+   front of" the data in the current row.
+   The pattern:
+
+      |glue(cirrus_bitblt_rop_bkwd_, ROP_NAME)(CirrusVGAState *s,
+      |                                        uint8_t *dst,const uint8_t *src,
+      |                                        int dstpitch,int srcpitch,
+      |                                        int bltwidth,int bltheight)
+      |{
+      |    int x,y;
+      |    dstpitch += bltwidth;
+      |    srcpitch += bltwidth;
+      |    for (y = 0; y < bltheight; y++) {
+      |        for (x = 0; x < bltwidth; x++) {
+      |            ROP_OP(dst, *src);
+      |            dst--;
+      |            src--;
+      |        }
+      |        dst += dstpitch;
+      |        src += srcpitch;
+      |    }
+      |}
+
+   Pitch is negative, first value touched is 'dst' and 'src'
+   unmodified. The same pattern is used throughout the rest of the
+   header.
+
+   As far as I can see the 'bkwd' ops only ever subtract from the
+   addresses (note that in `X += Xpitch`, Xpitch is negative), and
+   like with forward blits we have at most a 'src-1' (not +1 this
+   time) access in a loop body where we iterate over pairs, so the
+   same reasoning holds here.
+
+Conclusion for backward blits:
+   1) We should use: (addr + (height-1)*pitch - width) but originally
+      missed the `-with` part there.
+
+   2) The maximum value should actually be `addr` itself as far as I
+      can tell, so the `+ s->cirrus_blt_width` for max should be
+      dropped.
+
+
+The functions in cirrus_vga_rop2.h are a bitmore complex. The safety
+checks *may* even be too strict in some cases but I haven't seen any
+aftefacts coming from too strong *range* checks (only the zero pitch
+check for which I sent a patch yesterday which I need to make a v2 for
+now :|).
+(Too strict in the pattern functions which clamp the source offsets
+with bitands, but I really don't feel like looking deep enough into
+this to make the checks even lighter :p)
