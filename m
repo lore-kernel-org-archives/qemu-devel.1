@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxoU-0001g1-Ee
+	(envelope-from <mjt@tls.msk.ru>) id 1cVxoU-0001g3-FE
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cVxoQ-0005j6-Gt
+	(envelope-from <mjt@tls.msk.ru>) id 1cVxoQ-0005iq-Et
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:54:54 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Tue, 24 Jan 2017 12:39:23 +0300
-Message-Id: <95d294e069dcfcde3ddeb0a965c8258f98f7dbe6.1485250702.git.mjt@msgid.tls.msk.ru>
+Date: Tue, 24 Jan 2017 12:39:07 +0300
+Message-Id: <7f473c284e9811e3ac5dfcae1f858bac5ade1066.1485250702.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
 References: <cover.1485250702.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 19/31] disas/cris.c: Fix Coverity warning about
- unchecked NULL
+Subject: [Qemu-devel] [PULL 03/31] README: Add linux to macOS build info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +26,27 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Michael T
 
 From: Peter Maydell <peter.maydell@linaro.org>
 
-Coverity (CID 1005689) warns that we don't check that
-spec_reg_info() returned non-NULL before dereferencing.
-Add the check, though as the comment notes this is
-a can't-really-happen case because the earlier constraint
-matching should have ruled out the "unknown reg" case.
+The README lists the URLs for the wiki pages describing
+how to build on Linux and Windows; add the equivalent
+link for building on macOS.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- disas/cris.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ README | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/disas/cris.c b/disas/cris.c
-index 08161d1..8a1daf9 100644
---- a/disas/cris.c
-+++ b/disas/cris.c
-@@ -2490,7 +2490,7 @@ print_with_operands (const struct cris_opcode *opcodep,
- 	const struct cris_spec_reg *sregp
- 	  = spec_reg_info ((insn >> 12) & 15, disdata->distype);
+diff --git a/README b/README
+index bd8060a..cb60d05 100644
+--- a/README
++++ b/README
+@@ -45,6 +45,7 @@ of other UNIX targets. The simple steps to build QEMU are:
+ Additional information can also be found online via the QEMU website:
  
--	if (sregp->name == NULL)
-+	if (sregp == NULL || sregp->name == NULL)
- 	  /* Should have been caught as a non-match earlier.  */
- 	  *tp++ = '?';
- 	else
+   http://qemu-project.org/Hosts/Linux
++  http://qemu-project.org/Hosts/Mac
+   http://qemu-project.org/Hosts/W32
+ 
+ 
 -- 
 2.1.4
