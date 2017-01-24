@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cW05v-0006sG-BE
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:21:07 -0500
+	(envelope-from <berrange@redhat.com>) id 1cW064-00070p-FM
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:21:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cW05s-0005yJ-8N
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:21:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53790)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cW05s-0005xz-2M
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:21:00 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1C9727FE94
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 12:21:00 +0000 (UTC)
-Date: Tue, 24 Jan 2017 12:20:55 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170124122055.GG20224@work-vm>
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-2-git-send-email-quintela@redhat.com>
-	<f77369a0-8818-0115-ec1b-13dcd0c594f2@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1cW061-00060O-Af
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 07:21:12 -0500
+Date: Tue, 24 Jan 2017 12:21:00 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170124122100.GK14563@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170103182801.9638-1-berrange@redhat.com>
+	<20170103182801.9638-9-berrange@redhat.com>
+	<5d05da0d-e0f5-5fa6-6bd2-5cecc1834124@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <f77369a0-8818-0115-ec1b-13dcd0c594f2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/17] migration: transform remained
- DPRINTF into trace_
+In-Reply-To: <5d05da0d-e0f5-5fa6-6bd2-5cecc1834124@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 08/15] qcow: make encrypt_sectors
+ encrypt in place
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +26,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, amit.shah@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 01/23/2017 03:32 PM, Juan Quintela wrote:
+On Mon, Jan 16, 2017 at 09:25:55PM +0100, Max Reitz wrote:
+> On 03.01.2017 19:27, Daniel P. Berrange wrote:
+> > Instead of requiring separate input/output buffers for
+> > encrypting data, change encrypt_sectors() to assume
+> > use of a single buffer, encrypting in place. One current
+> > caller all uses the same buffer for input/output already
 > 
-> In the subject: s/remained/remaining/
+> -all?
 > 
-> > So we can remove DPRINTF() macro
+> > and the other two callers are easily converted todo so.
+> 
+> s/todo/to do/
+> 
 > > 
-> > Signed-off-by: Juan Quintela <quintela@redhat.com>
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > > ---
-> >  migration/ram.c        | 18 ++++--------------
-> >  migration/trace-events |  4 ++++
-> >  2 files changed, 8 insertions(+), 14 deletions(-)
+> >  block/qcow.c | 36 +++++++++++-------------------------
+> >  1 file changed, 11 insertions(+), 25 deletions(-)
 > > 
-> > diff --git a/migration/ram.c b/migration/ram.c
-> > index a1c8089..ef8fadf 100644
-> > --- a/migration/ram.c
-> > +++ b/migration/ram.c
-> > @@ -45,14 +45,6 @@
-> >  #include "qemu/rcu_queue.h"
-> >  #include "migration/colo.h"
-> > 
-> > -#ifdef DEBUG_MIGRATION_RAM
-> > -#define DPRINTF(fmt, ...) \
-> > -    do { fprintf(stdout, "migration_ram: " fmt, ## __VA_ARGS__); } while (0)
-> > -#else
-> > -#define DPRINTF(fmt, ...) \
-> > -    do { } while (0)
+> > diff --git a/block/qcow.c b/block/qcow.c
+> > index 8133fda..bc9fa2f 100644
+> > --- a/block/qcow.c
+> > +++ b/block/qcow.c
+> > @@ -310,11 +310,10 @@ static int qcow_set_key(BlockDriverState *bs, const char *key)
+> >  }
+> >  
+> >  /* The crypt function is compatible with the linux cryptoloop
+> > -   algorithm for < 4 GB images. NOTE: out_buf == in_buf is
+> > -   supported */
+> > +   algorithm for < 4 GB images. */
+> >  static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
+> > -                           uint8_t *out_buf, const uint8_t *in_buf,
+> > -                           int nb_sectors, bool enc, Error **errp)
+> > +                           uint8_t *buf, int nb_sectors, bool enc,
+> > +                           Error **errp)
+> >  {
+> >      union {
+> >          uint64_t ll[2];
+> > @@ -333,14 +332,12 @@ static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
+> >          }
+> >          if (enc) {
+> >              ret = qcrypto_cipher_encrypt(s->cipher,
+> > -                                         in_buf,
+> > -                                         out_buf,
+> > +                                         buf, buf,
+> >                                           512,
+> >                                           errp);
+> >          } else {
+> >              ret = qcrypto_cipher_decrypt(s->cipher,
+> > -                                         in_buf,
+> > -                                         out_buf,
+> > +                                         buf, buf,
+> >                                           512,
+> >                                           errp);
+> >          }
+> > @@ -348,8 +345,7 @@ static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
+> >              return -1;
+> >          }
+> >          sector_num++;
+> > -        in_buf += 512;
+> > -        out_buf += 512;
+> > +        buf += 512;
+> >      }
+> >      return 0;
+> >  }
+> > @@ -469,13 +465,12 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
+> >                      uint64_t start_sect;
+> >                      assert(s->cipher);
+> >                      start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
+> > -                    memset(s->cluster_data + 512, 0x00, 512);
+> > +                    memset(s->cluster_data, 0x00, 512);
+> >                      for(i = 0; i < s->cluster_sectors; i++) {
+> >                          if (i < n_start || i >= n_end) {
+> >                              Error *err = NULL;
+> >                              if (encrypt_sectors(s, start_sect + i,
+> > -                                                s->cluster_data,
+> > -                                                s->cluster_data + 512, 1,
+> > +                                                s->cluster_data, 1,
+> >                                                  true, &err) < 0) {
+> >                                  error_free(err);
+> >                                  errno = EIO;
 > 
-> Yay - you're getting rid of the bitrot pattern in this file!
+> After the first iteration of the surrounding for () loop,
+> s->cluster_data is unlikely to still be filled with zeros -- but I
+> suspect the code intended to always write encrypted zeros.
+
+Yep, we must push the memset down a level.
+
+> > @@ -653,7 +648,7 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+> >              }
+> >              if (bs->encrypted) {
+> >                  assert(s->cipher);
+> > -                if (encrypt_sectors(s, sector_num, buf, buf,
+> > +                if (encrypt_sectors(s, sector_num, buf,
+> >                                      n, false, &err) < 0) {
+> >                      goto fail;
+> >                  }
+> > @@ -688,9 +683,7 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+> >      BDRVQcowState *s = bs->opaque;
+> >      int index_in_cluster;
+> >      uint64_t cluster_offset;
+> > -    const uint8_t *src_buf;
+> >      int ret = 0, n;
+> > -    uint8_t *cluster_data = NULL;
+> >      struct iovec hd_iov;
+> >      QEMUIOVector hd_qiov;
+> >      uint8_t *buf;
+> > @@ -728,21 +721,15 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+> >          if (bs->encrypted) {
+> >              Error *err = NULL;
+> >              assert(s->cipher);
+> > -            if (!cluster_data) {
+> > -                cluster_data = g_malloc0(s->cluster_size);
+> > -            }
+> > -            if (encrypt_sectors(s, sector_num, cluster_data, buf,
+> > +            if (encrypt_sectors(s, sector_num, buf,
 > 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> If qiov->niov == 1, buf is not copied from the I/O vector but just the
+> I/O vector base itself. Then, this will modify the data pointed to by
+> that vector. I don't think that is a good idea.
 
-This change doesn't need the rest of the series so,
-queued.
-(Fixed up 'remained')
-
-Dave
-
-> 
-> -- 
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
-> 
+Opps, yes, that is a bad idea. I'll force copying when bs->encrypted == true,
+regardless of qiov->niov value.
 
 
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
