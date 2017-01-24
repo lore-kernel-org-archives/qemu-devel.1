@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cVxjy-0006ZT-Kg
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:50:15 -0500
+	(envelope-from <armbru@redhat.com>) id 1cVxms-0000MY-Rs
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:53:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cVxju-0004Pw-Jo
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:50:14 -0500
-Resent-Message-Id: <E1cVxju-0004Pw-Jo@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21326)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cVxju-0004P8-Bj
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:50:10 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <58871f9b.d635240a.4cda6.5322@mx.google.com>
-Message-ID: <148525139963.27.2288529185359231587@eba24e3a0d7f>
+	(envelope-from <armbru@redhat.com>) id 1cVxmo-0005Jo-RI
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:53:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40320)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cVxmo-0005Jd-I8
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 04:53:10 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1484559200-2301-1-git-send-email-armbru@redhat.com>
+	<CAFEAcA_BBbHeQhWYf_qrL+TwxGT8w34SvUNG_gcNfpNnyaGCzg@mail.gmail.com>
+	<87pojmjdep.fsf@dusky.pond.sub.org>
+	<CAFEAcA9nhd6x+PT5bG0=YqvmUdxJVFPZ6ACiv-2OKrDFJhrqzg@mail.gmail.com>
+	<87h94x99e4.fsf@dusky.pond.sub.org>
+	<CAFEAcA8vRw=13Lj_98A+3NovSeTg6e0xBopdz9EcdEeUMjjZow@mail.gmail.com>
+	<874m0x7ra2.fsf@dusky.pond.sub.org>
+	<CAFEAcA_txNPj6JNDavmCREse98XTkQgiFAqx5Vf8KCCu9V-6mQ@mail.gmail.com>
+	<878tq93guz.fsf@dusky.pond.sub.org>
+	<CAFEAcA-zV8RWCXMCbAHLMEM1oEw7CWT_aDrTc49Xv_wSnMeAyw@mail.gmail.com>
+	<CAFEAcA-fSJ5PfpKFaehruzjidBtmQP_435WLqgSLg=cQiETR8Q@mail.gmail.com>
+Date: Tue, 24 Jan 2017 10:53:07 +0100
+In-Reply-To: <CAFEAcA-fSJ5PfpKFaehruzjidBtmQP_435WLqgSLg=cQiETR8Q@mail.gmail.com>
+	(Peter Maydell's message of "Fri, 20 Jan 2017 14:39:37 +0000")
+Message-ID: <87mvegu6m4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 24 Jan 2017 01:50:00 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] cirrus: fix oob access issue
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL v2 000/180] QAPI patches for 2017-01-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: liq3ea@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, ghoffman@redhat.com, liqiang6-s@360.cn
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGNpcnJ1czogZml4IG9vYiBhY2Nlc3MgaXNzdWUK
-TWVzc2FnZS1pZDogNTg4NzFmOWIuZDYzNTI0MGEuNGNkYTYuNTMyMkBteC5nb29nbGUuY29tCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFs
-PSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwg
-Z2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1h
-dD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAi
-Q2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYyku
-Li4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hv
-CiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
-ODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
-YWddICAgICAgICAgcGF0Y2hldy81ODg3MWY5Yi5kNjM1MjQwYS40Y2RhNi41MzIyQG14Lmdvb2ds
-ZS5jb20gLT4gcGF0Y2hldy81ODg3MWY5Yi5kNjM1MjQwYS40Y2RhNi41MzIyQG14Lmdvb2dsZS5j
-b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowODAzMzNjIGNpcnJ1czogZml4IG9v
-YiBhY2Nlc3MgaXNzdWUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTog
-Y2lycnVzOiBmaXggb29iIGFjY2VzcyBpc3N1ZS4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
-b3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzIxOiBGSUxFOiBody9kaXNwbGF5L2NpcnJ1c192Z2Eu
-YzoyODA6CisgICAgICAgICAgICArICgoaW50NjRfdClzLT5jaXJydXNfYmx0X2hlaWdodC0xKSAq
-IHBpdGNoCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRv
-dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On 17 January 2017 at 16:43, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> In any case, applied this pullreq to master.
+>
+> Although it works fine on my OSX box (with warnings) it seems
+> to have broken the Travis OSX builds:
+> https://travis-ci.org/qemu/qemu/jobs/192750574
+>
+>   GEN     qemu-options.texi
+>   GEN     qemu-monitor.texi
+>   GEN     qemu-img-cmds.texi
+>   GEN     qemu-monitor-info.texi
+>   GEN     qemu-doc.txt
+> qemu-doc.texi:7: warning: unrecognized encoding name `UTF-8'.
+>   GEN     qemu-img.1
+> /Users/travis/build/qemu/qemu//qemu-options.texi:60: warning: unlikely
+> character [ in @var.
+> /Users/travis/build/qemu/qemu//qemu-options.texi:60: warning: unlikely
+> character ] in @var.
+> /Users/travis/build/qemu/qemu//qemu-options.texi:61: warning: unlikely
+> character [ in @var.
+> /Users/travis/build/qemu/qemu//qemu-options.texi:61: warning: unlikely
+> character ] in @var.
+> /Users/travis/build/qemu/qemu//qemu-options.texi:630: No matching `@end table'.
+> /Users/travis/build/qemu/qemu//qemu-doc.texi:1419: Cross reference to
+> nonexistent node `bt-hcis' (perhaps incorrect sectioning?).
+> makeinfo: Removing output file `qemu-doc.txt' due to errors; use
+> --force to preserve.
+> make: *** [qemu-doc.txt] Error 1
+
+Are you *sure* this series causes the failure?
+
+I generated qemu-options.texi for every merge commit since v2.8.0, and
+the only one that changes it is commit 598cf1c "Merge remote-tracking
+branch 'remotes/bonzini/tags/for-upstream' into staging".  I then
+examined the commits in that merge, and the ones that affect
+qemu-options.texi are:
+
+* commit 43f187a hxtool: emit Texinfo headings as @subsection
+* commit b0cb0a6 Plumb the HAXM-based hardware acceleration support
+
+Could you kick off Travis builds to confirm or deny these commits cause
+the OS X trouble?
