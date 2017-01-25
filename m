@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWOR5-0008AG-KC
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:20:32 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cWOSH-0000WQ-Ba
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:21:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWOR2-0007bb-FF
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:20:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cWOR2-0007bP-9N
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:20:28 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6BA923B755
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 14:20:28 +0000 (UTC)
-Date: Wed, 25 Jan 2017 14:20:22 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170125142022.GD15529@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170125141426.23454-1-stefanha@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cWOSE-0007kN-6Y
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:21:45 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36141)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cWOSD-0007kD-Uv
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:21:42 -0500
+Received: by mail-wm0-x229.google.com with SMTP id c85so28515229wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 06:21:41 -0800 (PST)
+References: <20170119170507.16185-1-alex.bennee@linaro.org>
+	<20170119170507.16185-19-alex.bennee@linaro.org>
+	<3604b49c-6d3b-5525-9a26-8226f4d2f8c9@twiddle.net>
+	<87k29k9ozb.fsf@linaro.org>
+	<a70221e1-2dad-e531-e557-d723fe848157@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <a70221e1-2dad-e531-e557-d723fe848157@twiddle.net>
+Date: Wed, 25 Jan 2017 14:21:38 +0000
+Message-ID: <87h94n9q4t.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170125141426.23454-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] trace: clean up trace-events files
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 18/27] cputlb: introduce
+ tlb_flush_*_all_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org
-
-On Wed, Jan 25, 2017 at 02:14:26PM +0000, Stefan Hajnoczi wrote:
-> There are a number of unused trace events that
-> scripts/cleanup-trace-events.pl finds.  The "hw/vfio/pci-quirks.c"
-> filename was typoed and "qapi/qapi-visit-core.c" was missing the qapi/
-> directory prefix.
-> 
-> diff --git a/qapi/trace-events b/qapi/trace-events
-> index 2c5d3bc..82a0b73 100644
-> --- a/qapi/trace-events
-> +++ b/qapi/trace-events
-> @@ -1,4 +1,4 @@
-> -# qapi-visit-core.c
-> +# qapi/qapi-visit-core.c
->  visit_free(void *v) "v=%p"
->  visit_complete(void *v, void *opaque) "v=%p opaque=%p"
->  
-> @@ -15,7 +15,6 @@ visit_end_alternate(void *v, void *obj) "v=%p obj=%p"
->  
->  visit_optional(void *v, const char *name, bool *present) "v=%p name=%s present=%p"
->  
-> -visit_type_enum(void *v, const char *name, int *obj) "v=%p name=%s obj=%p"
-
-The actual bug is that the source file is mistakenly not calling this
-trace point - we shouldn't delete it - we should call it from the
-visit_type_enum() method
+To: Richard Henderson <rth@twiddle.net>
+Cc: mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org, claudio.fontana@huawei.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, jan.kiszka@siemens.com, mark.burton@greensocs.com, serge.fdrv@gmail.com, pbonzini@redhat.com, bamvor.zhangjian@linaro.org
 
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Richard Henderson <rth@twiddle.net> writes:
+
+> On 01/24/2017 12:34 PM, Alex Bennée wrote:
+>>
+>> Richard Henderson <rth@twiddle.net> writes:
+>>
+>>> On 01/19/2017 09:04 AM, Alex Bennée wrote:
+>>>> +/* flush_all_helper: run fn across all cpus
+>>>> + *
+>>>> + * If the wait flag is set then the src cpu's helper will be queued as
+>>>> + * "safe" work and the loop exited creating a synchronisation point
+>>>> + * where all queued work will be finished before execution starts
+>>>> + * again.
+>>>> + */
+>>>> +static void flush_all_helper(CPUState *src, bool wait,
+>>>> +                             run_on_cpu_func fn, run_on_cpu_data d)
+>>>> +{
+>>>> +    CPUState *cpu;
+>>>> +
+>>>> +    if (!wait) {
+>>>> +        CPU_FOREACH(cpu) {
+>>>> +            if (cpu != src) {
+>>>> +                async_run_on_cpu(cpu, fn, d);
+>>>> +            } else {
+>>>> +                g_assert(qemu_cpu_is_self(src));
+>>>> +                fn(src, d);
+>>>> +            }
+>>>> +        }
+>>>> +    } else {
+>>>> +        CPU_FOREACH(cpu) {
+>>>> +            if (cpu != src) {
+>>>> +                async_run_on_cpu(cpu, fn, d);
+>>>> +            } else {
+>>>> +                async_safe_run_on_cpu(cpu, fn, d);
+>>>> +            }
+>>>> +
+>>>> +        }
+>>>> +        cpu_loop_exit(src);
+>>>> +    }
+>>>> +}
+>>>
+>>> What's the rationale for not having the target do the exit itself?  Surely it
+>>> can tell, and simple end the TB after the insn.
+>>
+>> It's more for the global sync functionality. I wanted to keep all the
+>> guts of re-starting the loop with the correct async_safe_work all in one
+>> place with a defined API for the guests rather than have them all do it
+>> themselves.
+>>
+>> For the common case of not needing to sync across the cores I agree the
+>> guest is perfectly able to end the TB so its safe work completes next.
+>> In fact the ARM helper calls do exactly that.
+>
+> Hmm.  Would it make more sense to have two functions then, for wait and !wait?
+> That would allow the wait function be QEMU_NORETURN, which might make it a bit
+> more obvious about the interface contract.
+
+Seems fair. I was worried about multiplying out too many variants in the
+API but this seems a good reason to.
+
+--
+Alex Bennée
