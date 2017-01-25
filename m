@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caliborn@SDF.ORG>) id 1cWOuT-0002Ow-NS
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:50:54 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cWP2i-0006qf-2w
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:59:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caliborn@SDF.ORG>) id 1cWOuO-00006j-GA
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:50:53 -0500
-Received: from ol.sdf.org ([205.166.94.20]:64931 helo=mx.sdf.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <caliborn@SDF.ORG>) id 1cWOuN-00005Z-Si
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:50:48 -0500
-Date: Wed, 25 Jan 2017 14:50:30 +0000 (UTC)
-From: Valentin Plotkin <caliborn@SDF.ORG>
-Message-ID: <Pine.NEB.4.64.1701251446290.11466@sdf.lonestar.org>
+	(envelope-from <mreitz@redhat.com>) id 1cWP2h-0002Zr-6A
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:59:24 -0500
+References: <20170103160556.9895-1-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <eaccdf05-6575-0304-7f96-fa38853498dd@redhat.com>
+Date: Wed, 25 Jan 2017 15:59:13 +0100
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: [Qemu-devel] [PATCH v2] target-ppc: Add MMU model check for booke
- machines
+In-Reply-To: <20170103160556.9895-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NSjv3w8of0l0t6It6sXjXNsUlhXTQqPJS"
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: record separate timings per
+ format, protocol pair
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,78 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, Scott Wood <scottwood@freescale.com>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-Machines bamboo, e500 and virtex-ml507 assume a certain MMU model,
-otherwise resulting in unpredictable behavior. Add apropriate checks
-into *_init functions.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NSjv3w8of0l0t6It6sXjXNsUlhXTQqPJS
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <eaccdf05-6575-0304-7f96-fa38853498dd@redhat.com>
+Subject: Re: [PATCH v2] iotests: record separate timings per format,protocol
+ pair
+References: <20170103160556.9895-1-berrange@redhat.com>
+In-Reply-To: <20170103160556.9895-1-berrange@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Valentin <caliborn@sdf.org>
----
-  hw/ppc/e500.c          | 6 ++++++
-  hw/ppc/ppc440_bamboo.c | 6 ++++++
-  hw/ppc/virtex_ml507.c  | 7 +++++++
-  3 files changed, 19 insertions(+)
+On 03.01.2017 17:05, Daniel P. Berrange wrote:
+> The 'check' program records timings for each test that
+> is run. These timings are only valid, however, for a
+> particular format/protocol combination. So if frequently
+> running 'check' with a variety of different formats or
+> protocols, the times printed can be very misleading.
+>=20
+> Instead of having a single 'check.time' file, maintain
+> multiple 'check.time-$IMGPROTO-$IMGFMT' files.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+> Changed in v2:
+>=20
+>  - Use a separate file per format/protocol, instead of
+>    throwing away data each time format/protocol changes
+>    between runs (Eric)
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index cf8b122..5b1958c 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -827,6 +827,12 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-          env = &cpu->env;
-          cs = CPU(cpu);
+Thanks, applied to my block tree:
 
-+        if (env->mmu_model != POWERPC_MMU_BOOKE206) {
-+            fprintf(stderr, "MMU model %i not supported by this machine.\n",
-+                env->mmu_model);
-+            exit(1);
-+        }
-+
-          if (!firstenv) {
-              firstenv = env;
-          }
-diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-index 5c535b1..9d997bf 100644
---- a/hw/ppc/ppc440_bamboo.c
-+++ b/hw/ppc/ppc440_bamboo.c
-@@ -193,6 +193,12 @@ static void bamboo_init(MachineState *machine)
-      }
-      env = &cpu->env;
+https://github.com/XanClic/qemu/commits/block
 
-+    if (env->mmu_model != POWERPC_MMU_BOOKE) {
-+        fprintf(stderr, "MMU model %i not supported by this machine.\n",
-+            env->mmu_model);
-+        exit(1);
-+    }
-+
-      qemu_register_reset(main_cpu_reset, cpu);
-      ppc_booke_timers_init(cpu, 400000000, 0);
-      ppc_dcr_init(env, NULL, NULL);
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index b97d966..fdbcf22 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -221,6 +221,13 @@ static void virtex_init(MachineState *machine)
-
-      cpu = ppc440_init_xilinx(&ram_size, 1, machine->cpu_model, 400000000);
-      env = &cpu->env;
-+
-+    if (env->mmu_model != POWERPC_MMU_BOOKE) {
-+        fprintf(stderr, "MMU model %i not supported by this machine.\n",
-+            env->mmu_model);
-+        exit(1);
-+    }
-+
-      qemu_register_reset(main_cpu_reset, cpu);
-
-      memory_region_allocate_system_memory(phys_ram, NULL, "ram", ram_size);
--- 
-2.5.5
+Max
 
 
-This fixes 'qemu-system-ppc -nographic -cpu G2leGP3 -M ppce500; bug from
-BiteSizedTasks.
+--NSjv3w8of0l0t6It6sXjXNsUlhXTQqPJS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Version 2: fixed style, moved checks from mmubooke_create_initial_mapping
-to *_init. Thanks to Thomas Huth <thuth@redhat.com>.
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliIvUESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AHzoH/1IQEA43sz6O86Bvu6QRInA1VVdGlf+D
+xFl6qBbymtxIuvhKufqQy1aUBN+w/KFeyrEXduZX0ACv0ri52Q/TkwtEDzAAv13h
+Vqqe4gXCuKXhFfEZ+Zlsgc7SiXTvwEgJorAXUwRYGKG67ltviORPRhFKWACXrO37
+eZO1tX6xbWIUBoz/3vnM9ws4+02q+HTk1MnOJE7v+Iwse8stwzeQGz9goJP9f1D4
+tiSUkCKq6AbjY2JP/Ep+6Ed1wvs8L43j1hyhiUCPmxUzPzk2DP2ql6WAPcVi1duE
+Dfi5ohe2Ub/lERIQIMAyhCaEVZGEp9aUViXxScQLzCdI5moX4oZ9X8s=
+=0MgZ
+-----END PGP SIGNATURE-----
+
+--NSjv3w8of0l0t6It6sXjXNsUlhXTQqPJS--
