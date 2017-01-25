@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cWCcw-0003hF-Lu
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:00 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cWCcz-0003i8-C9
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cWCcs-0005MB-5t
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:43:58 -0500
-Received: from mail-yw0-x229.google.com ([2607:f8b0:4002:c05::229]:32955)
+	(envelope-from <ben@skyportsystems.com>) id 1cWCcy-0005Oc-NH
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:01 -0500
+Received: from mail-yw0-x231.google.com ([2607:f8b0:4002:c05::231]:34457)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cWCcs-0005M1-0W
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:43:54 -0500
-Received: by mail-yw0-x229.google.com with SMTP id u68so3012556ywg.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 17:43:53 -0800 (PST)
+	id 1cWCcy-0005OQ-Ia
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:00 -0500
+Received: by mail-yw0-x231.google.com with SMTP id w75so3588687ywg.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 17:44:00 -0800 (PST)
 From: ben@skyportsystems.com
-Date: Tue, 24 Jan 2017 17:43:21 -0800
-Message-Id: <01f010147f8faaf7bd7c4ea94a364a584f323b0a.1485308342.git.ben@skyportsystems.com>
+Date: Tue, 24 Jan 2017 17:43:26 -0800
+Message-Id: <5c6a8bfb4e36acec297d39e2381cb5ed022265f1.1485308342.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1485308342.git.ben@skyportsystems.com>
 References: <cover.1485308342.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1485308342.git.ben@skyportsystems.com>
 References: <cover.1485308342.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v4 2/9] linker-loader: Add new 'allocate and
- return address' cmd
+Subject: [Qemu-devel] [PATCH v4 7/9] PC: Support dynamic sysbus on pc_i440fx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,126 +33,25 @@ Cc: Ben Warren <ben@skyportsystems.com>
 
 From: Ben Warren <ben@skyportsystems.com>
 
-This adds a new linker-loader command to instruct the guest to allocate
-memory for a fw_cfg file and write the address back into another
-writeable fw_cfg file.  Knowing this address, QEMU can then write into
-guest memory at runtime.
+This allows pc_i440fx-based machines to add new devices such as VM Generation ID
+directly to the sysbus.
 
 Signed-off-by: Ben Warren <ben@skyportsystems.com>
 ---
- hw/acpi/bios-linker-loader.c         | 71 ++++++++++++++++++++++++++++++++++--
- include/hw/acpi/bios-linker-loader.h |  7 ++++
- 2 files changed, 75 insertions(+), 3 deletions(-)
+ hw/i386/pc_piix.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
-index d963ebe..1d991ba 100644
---- a/hw/acpi/bios-linker-loader.c
-+++ b/hw/acpi/bios-linker-loader.c
-@@ -78,6 +78,22 @@ struct BiosLinkerLoaderEntry {
-             uint32_t length;
-         } cksum;
- 
-+        /*
-+         * COMMAND_ALLOCATE_RETURN_ADDR - allocate a table from @alloc_ret_file
-+         * subject to @alloc_ret_align alignment (must be power of 2)
-+         * and @alloc_ret_zone (can be HIGH or FSEG) requirements.
-+         * Additionally, return the address of the allocation in
-+         * @addr_file.
-+         *
-+         * This may be used instead of COMMAND_ALLOCATE
-+         */
-+        struct {
-+            char alloc_ret_file[BIOS_LINKER_LOADER_FILESZ];
-+            uint32_t alloc_ret_align;
-+            uint8_t alloc_ret_zone;
-+            char alloc_ret_addr_file[BIOS_LINKER_LOADER_FILESZ];
-+        };
-+
-         /* padding */
-         char pad[124];
-     };
-@@ -85,9 +101,10 @@ struct BiosLinkerLoaderEntry {
- typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
- 
- enum {
--    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
--    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
--    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
-+    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
-+    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
-+    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
-+    BIOS_LINKER_LOADER_COMMAND_ALLOCATE_RET_ADDR = 0x4,
- };
- 
- enum {
-@@ -278,3 +295,51 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
- 
-     g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 9f102aa..c8ad99c 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -435,6 +435,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+     m->hot_add_cpu = pc_hot_add_cpu;
+     m->default_machine_opts = "firmware=bios-256k.bin";
+     m->default_display = "std";
++    m->has_dynamic_sysbus = true;
  }
-+
-+/*
-+ * bios_linker_loader_alloc_ret_addr: ask guest to load file into guest memory
-+ * and patch the address in another file
-+ *
-+ * @linker: linker object instance
-+ * @data_file: name of the file blob to be loaded
-+ * @file_blob: pointer to blob corresponding to @file_name
-+ * @alloc_align: required minimal alignment in bytes. Must be a power of 2.
-+ * @alloc_fseg: request allocation in FSEG zone (useful for the RSDP ACPI table)
-+ * @addr_file: destination file that will contain the address.
-+ *             This must already exist
-+ *
-+ * Note: this command must precede any other linker command that uses
-+ * the data file.
-+ */
-+void bios_linker_loader_alloc_ret_addr(BIOSLinker *linker,
-+                              const char *data_file,
-+                              GArray *file_blob,
-+                              uint32_t alloc_align,
-+                              bool alloc_fseg,
-+                              const char *addr_file)
-+{
-+    BiosLinkerLoaderEntry entry;
-+    BiosLinkerFileEntry d_file = { g_strdup(data_file), file_blob};
-+
-+    /* Address file is expected to already be loaded */
-+    const BiosLinkerFileEntry *a_file =
-+        bios_linker_find_file(linker, addr_file);
-+
-+    assert(!(alloc_align & (alloc_align - 1)));
-+    assert(a_file);
-+
-+    g_array_append_val(linker->file_list, d_file);
-+
-+    memset(&entry, 0, sizeof entry);
-+    strncpy(entry.alloc_ret_file, data_file,
-+            sizeof entry.alloc_ret_file - 1);
-+    strncpy(entry.alloc_ret_addr_file, addr_file,
-+            sizeof entry.alloc_ret_addr_file - 1);
-+    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_ALLOCATE_RET_ADDR);
-+    entry.alloc.align = cpu_to_le32(alloc_align);
-+    entry.alloc.zone = alloc_fseg ? BIOS_LINKER_LOADER_ALLOC_ZONE_FSEG :
-+                                    BIOS_LINKER_LOADER_ALLOC_ZONE_HIGH;
-+
-+    /* Alloc entries must come first, so prepend them */
-+    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
-+}
-diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
-index fa1e5d1..69953e6 100644
---- a/include/hw/acpi/bios-linker-loader.h
-+++ b/include/hw/acpi/bios-linker-loader.h
-@@ -26,5 +26,12 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
-                                     const char *src_file,
-                                     uint32_t src_offset);
  
-+void bios_linker_loader_alloc_ret_addr(BIOSLinker *linker,
-+                                       const char *data_file,
-+                                       GArray *file_blob,
-+                                       uint32_t alloc_align,
-+                                       bool alloc_fseg,
-+                                       const char *addr_file);
-+
- void bios_linker_loader_cleanup(BIOSLinker *linker);
- #endif
+ static void pc_i440fx_2_9_machine_options(MachineClass *m)
 -- 
 2.7.4
