@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=19161f0f8=roger.pau@citrix.com>)
-	id 1cWLOZ-0006cL-UK
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:05:45 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cWLP4-0006np-OA
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:06:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=19161f0f8=roger.pau@citrix.com>)
-	id 1cWLOV-0005Q4-Uw
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:05:43 -0500
-Received: from smtp.eu.citrix.com ([185.25.65.24]:58766)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=19161f0f8=roger.pau@citrix.com>)
-	id 1cWLOV-0005Pw-Fg
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:05:39 -0500
-Date: Wed, 25 Jan 2017 11:05:29 +0000
-From: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-Message-ID: <20170125110529.5rgu7xrh3gkoadog@dhcp-3-221.uk.xensource.com>
-References: <20170124164253.jiva4zvk6fxewtsk@dhcp-3-221.uk.xensource.com>
-	<alpine.DEB.2.10.1701241315310.10192@sstabellini-ThinkPad-X260>
-	<alpine.DEB.2.10.1701241326560.10192@sstabellini-ThinkPad-X260>
+	(envelope-from <pbonzini@redhat.com>) id 1cWLP0-0005aD-7K
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:06:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32786)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWLOz-0005ZZ-Vp
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:06:10 -0500
+References: <20170124071654.4572.41407.stgit@PASHA-ISP>
+	<20170124071719.4572.92155.stgit@PASHA-ISP>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <db455af4-4d66-d81f-4f4f-1ad47100dffe@redhat.com>
+Date: Wed, 25 Jan 2017 12:06:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <alpine.DEB.2.10.1701241326560.10192@sstabellini-ThinkPad-X260>
-Subject: Re: [Qemu-devel] Commit 3a6c9 breaks QEMU on FreeBSD/Xen
+In-Reply-To: <20170124071719.4572.92155.stgit@PASHA-ISP>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 04/14] icount: exit cpu loop on expire
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
 
-On Tue, Jan 24, 2017 at 01:30:02PM -0800, Stefano Stabellini wrote:
-> On Tue, 24 Jan 2017, Stefano Stabellini wrote:
-> > On Tue, 24 Jan 2017, Roger Pau Monné wrote:
-> > > Hello,
-> > > 
-> > > The following commit:
-> > > 
-> > > commit 3a6c9172ac5951e6dac2b3f6cbce3cfccdec5894
-> > > Author: Juergen Gross <jgross@suse.com>
-> > > Date:   Tue Nov 22 07:10:58 2016 +0100
-> > > 
-> > > xen: create qdev for each backend device
-> > > 
-> > > Prevents me from running QEMU on FreeBSD/Xen, the following is printed on the
-> > > QEMU log:
-> > > 
-> > > char device redirected to /dev/pts/2 (label serial0)
-> > > xen be core: xen be core: can't open gnttab device
-> > > can't open gnttab device
-> > > xen be core: xen be core: can't open gnttab device
-> > > can't open gnttab device
-> > > 
-> > > # xl create -c ~/domain.cfg
-> > > Parsing config from /root/domain.cfg
-> > > libxl: error: libxl_dm.c:2201:device_model_spawn_outcome: Domain 32:domain 32 device model: spawn failed (rc=-3)
-> > > libxl: error: libxl_create.c:1506:domcreate_devmodel_started: Domain 32:device model did not start: -3
-> > > libxl: error: libxl_dm.c:2315:kill_device_model: Device Model already exited
-> > > libxl: error: libxl.c:1572:libxl__destroy_domid: Domain 32:Non-existant domain
-> > > libxl: error: libxl.c:1531:domain_destroy_callback: Domain 32:Unable to destroy guest
-> > > libxl: error: libxl.c:1458:domain_destroy_cb: Domain 32:Destruction of domain failed
-> > > # cat /var/log/xen/qemu-dm-domain.log
-> > > char device redirected to /dev/pts/2 (label serial0)
-> > > xen be core: xen be core: can't open gnttab device
-> > > can't open gnttab device
-> > > xen be core: xen be core: can't open gnttab device
-> > > can't open gnttab device
-> > > 
-> > > I'm not really familiar with any of that code, but I think that using
-> > > qdev_init_nofail is wrong, since on FreeBSD/Xen for example we don't yet
-> > > support the gnttab device, so initialization of the Xen Qdisk backend can fail
-> > > (and possibly the same applies to Linux if someone decides to compile a kernel
-> > > without the gnttab device). Yet QEMU can be used without the Qdisk backend.
-> > 
-> > How did you manage to configure QEMU before? The configure script had
-> > xc_gnttab_open calls in it up to Xen 4.6.
-> 
-> I know the answer! Because the configure script only compiles the code,
-> doesn't try to run it. xc_gnttab_open compiled correctly but returned
-> error when executed. Is that right?
 
-Yes, I'm quite that's right. FreeBSD is using gnttab_unimp.c, which implements
-xengnttab_open, so compilation will not fail.
 
-> 
-> 
-> > I am happy to support a use case where the kernel doesn't have gntdev,
-> > but it needs to be explicit: we need to detect it in the configure
-> > script, then avoid the initialization of devices which require it.
-> 
-> I would still prefer configure to be able to detect this case. If it
-> cannot be made to detect it, then we can try to figure out a way to
-> catch the initialization errors at run time. 
+On 24/01/2017 08:17, Pavel Dovgalyuk wrote:
+> This patch adds check to break cpu loop when icount expires without
+> setting the TB_EXIT_ICOUNT_EXPIRED flag. It happens when there is no
+> available translated blocks and all instructions were executed.
+> In icount replay mode unnecessary tb_find will be called (which may
+> cause an exception) and execution will be non-deterministic.
+>=20
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> ---
+>  cpu-exec.c |   15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/cpu-exec.c b/cpu-exec.c
+> index 79a2167..e603da4 100644
+> --- a/cpu-exec.c
+> +++ b/cpu-exec.c
+> @@ -582,9 +582,6 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, =
+TranslationBlock *tb,
+>                  cpu_exec_nocache(cpu, insns_left, *last_tb, false);
+>                  align_clocks(sc, cpu);
+>              }
+> -            cpu->exception_index =3D EXCP_INTERRUPT;
+> -            *last_tb =3D NULL;
+> -            cpu_loop_exit(cpu);
+>          }
+>          break;
+>  #endif
+> @@ -638,6 +635,18 @@ int cpu_exec(CPUState *cpu)
+> =20
+>              for(;;) {
+>                  cpu_handle_interrupt(cpu, &last_tb);
+> +                /* icount has expired, we need to break the execution =
+loop.
+> +                   This check is needed before tb_find to make executi=
+on
+> +                   deterministic - tb_find may cause an exception
+> +                   while translating the code from non-mapped page. */
+> +                if (use_icount && ((cpu->icount_extra =3D=3D 0
+> +                                    && cpu->icount_decr.u16.low =3D=3D=
+ 0)
+> +                                || (int32_t)cpu->icount_decr.u32 < 0))=
+ {
+> +                    if (cpu->exception_index =3D=3D -1) {
+> +                        cpu->exception_index =3D EXCP_INTERRUPT;
+> +                    }
+> +                    cpu_loop_exit(cpu);
+> +                }
 
-I think it's better to simply fail to initialize Xen Qdisk at runtime, or else
-a xen-tools/QEMU compiled on a non-Xen environment won't get gnttab and as a
-consequence Xen Qdisk support enabled, and I think it's quite common for
-distros to compile Xen packages on non-Xen environments (where /dev/xen/gnttab
-is not available).
+Can this can be placed in cpu_handle_interrupt itself?  Also, can the
+cpu->exception_index !=3D -1 case happen?
 
-Roger.
+We really should add assertions on cpu->exception_index, maybe after
+cpu_handle_exception and cc->cpu_exec_interrupt returns true.  Without
+some idea of the invariants, I'm not competent enough to review this patc=
+h.
+
+Paolo
+
+>                  tb =3D tb_find(cpu, last_tb, tb_exit);
+>                  cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
+>                  /* Try to align the host and virtual clocks
+>=20
