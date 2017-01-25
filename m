@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=19118f87f=Andrew.Cooper3@citrix.com>)
-	id 1cWOhM-00012k-O6
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:37:21 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cWOj1-00026k-Ii
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:39:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=19118f87f=Andrew.Cooper3@citrix.com>)
-	id 1cWOhJ-0004jP-KV
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:37:20 -0500
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:18378
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=19118f87f=Andrew.Cooper3@citrix.com>)
-	id 1cWOhJ-0004j6-Ba
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:37:17 -0500
-References: <20161125153040.24477-1-anthony.perard@citrix.com>
-	<alpine.DEB.2.10.1611281013510.21858@sstabellini-ThinkPad-X260>
-	<20170125142933.GH1903@perard.uk.xensource.com>
-	<59f97822-c0be-e652-c458-e19516280c11@citrix.com>
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-Message-ID: <0a7f8467-454e-26e9-dd8e-8cc674d51a5b@citrix.com>
-Date: Wed, 25 Jan 2017 14:34:17 +0000
+	(envelope-from <stefanha@redhat.com>) id 1cWOiy-0005N0-EU
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:39:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cWOiy-0005Mo-4u
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:39:00 -0500
+Date: Wed, 25 Jan 2017 14:38:57 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170125143857.GN10664@stefanha-x1.localdomain>
+References: <20170124110151.937-1-berrange@redhat.com>
+	<20170124110151.937-7-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <59f97822-c0be-e652-c458-e19516280c11@citrix.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] MAINTAINERS: Update xen-devel
- mailing list address
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="hNG1vEeyG8BCaHbQ"
+Content-Disposition: inline
+In-Reply-To: <20170124110151.937-7-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] trace: switch to modular code
+ generation for sub-directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,21 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 25/01/17 14:32, Andrew Cooper wrote:
-> On 25/01/17 14:29, Anthony PERARD wrote:
->> On Mon, Nov 28, 2016 at 10:14:00AM -0800, Stefano Stabellini wrote:
->>> On Fri, 25 Nov 2016, Anthony PERARD wrote:
->>>> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
->>> Acked-by: Stefano Stabellini <sstabellini@kernel.org>
->> Hi,
->>
->> This patch has never been applied.
-> Queued.  Sorry for letting it fall through the cracks.
 
-Erm sorry, ignore me.  (I should have checked more carefully which git
-tree this was for.)
+--hNG1vEeyG8BCaHbQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-~Andrew
+On Tue, Jan 24, 2017 at 11:01:49AM +0000, Daniel P. Berrange wrote:
+> Introduce rules in the top level Makefile that are able to generate
+> trace.[ch] files in every subdirectory which has a trace-events file.
+>=20
+> The top level directory is handled specially, so instead of creating
+> trace.h, it creates trace-root.h. This allows sub-directories to
+> include the top level trace-root.h file, without ambiguity wrt to
+> the trace.g file in the current sub-dir.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  .gitignore                                |  22 +++--
+>  Makefile                                  | 156 ++++++++++++++++++++++++=
+++----
+>  Makefile.objs                             | 102 ++++++++++---------
+>  Makefile.target                           |   7 +-
+>  aio-posix.c                               |   2 +-
+>  balloon.c                                 |   2 +-
+>  block.c                                   |   2 +-
+>  blockdev-nbd.c                            |   1 -
+>  blockdev.c                                |   2 +-
+>  blockjob.c                                |   1 -
+>  cpu-exec.c                                |   2 +-
+>  dma-helpers.c                             |   2 +-
+>  exec.c                                    |   2 +-
+>  hw/net/fsl_etsec/etsec.c                  |   1 -
+>  include/exec/cpu_ldst_template.h          |   2 +-
+>  include/exec/cpu_ldst_useronly_template.h |   2 +-
+>  include/hw/xen/xen_common.h               |   2 +-
+>  include/trace.h                           |   6 --
+>  ioport.c                                  |   2 +-
+>  kvm-all.c                                 |   2 +-
+>  memory.c                                  |   2 +-
+>  monitor.c                                 |   2 +-
+>  qom/cpu.c                                 |   2 +-
+>  scripts/tracetool.py                      |   8 +-
+>  scripts/tracetool/backend/dtrace.py       |   7 +-
+>  scripts/tracetool/backend/simple.py       |   1 -
+>  scripts/tracetool/backend/ust.py          |   7 +-
+>  scripts/tracetool/format/c.py             |   7 +-
+>  scripts/tracetool/format/tcg_h.py         |   6 +-
+>  scripts/tracetool/format/tcg_helper_c.py  |   6 +-
+>  scripts/tracetool/format/ust_events_c.py  |   2 +-
+>  scripts/tracetool/format/ust_events_h.py  |   7 +-
+>  spice-qemu-char.c                         |   2 +-
+>  tests/Makefile.include                    |   2 +-
+>  thread-pool.c                             |   2 +-
+>  trace/Makefile.objs                       |  94 +-----------------
+>  trace/control-target.c                    |   2 +-
+>  trace/control.c                           |   2 +-
+>  trace/ftrace.c                            |   2 +-
+>  trace/simple.c                            |   1 -
+>  translate-all.c                           |   2 +-
+>  vl.c                                      |   2 +-
+>  xen-hvm.c                                 |   2 +-
+>  xen-mapcache.c                            |   2 +-
+>  44 files changed, 283 insertions(+), 209 deletions(-)
+>  delete mode 100644 include/trace.h
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--hNG1vEeyG8BCaHbQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYiLiBAAoJEJykq7OBq3PIl+kH/0f2cMSfQwIstDJY63k5FC9k
+s1LloytcltVK11Q/9ZLWtkbFXeUt2Cy1qUOFXSWum8Ob7anjpZ25+swaVmAkGEL0
+9VdMCxo1cP/flPZUMwmlSADYUcxK268j4XnVzLR5GujwuhZCN2YRn2H9AGl4AiOk
+tLbW33fNXvNTCKaZJOC8ZN33IT1iJ+AsS+IcOEJG4DyfS2nui/8EreJX/++9puGS
+c7HTpq3XzwqTK4kNN1ezVTxBhBb+ShbZ125IXLVrTMG4oIqeUI5o5qV3qdO2Hq80
+s2XJKOKu8V/2+3bp9m6bdtqX0dP3PEkgTlpCKB0ZBFqf51MsujPhoZOpUOgq9jY=
+=Ovoy
+-----END PGP SIGNATURE-----
+
+--hNG1vEeyG8BCaHbQ--
