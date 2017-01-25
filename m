@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cWOms-0004RX-HF
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:43:03 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cWOoE-0005Yd-Ub
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:44:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cWOmp-0006Ke-E6
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:43:02 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:64170)
+	(envelope-from <dgilbert@redhat.com>) id 1cWOoD-0006hg-Gp
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:44:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cWOmp-0006K3-2p
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:42:59 -0500
-References: <1485333658-23035-1-git-send-email-thuth@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <b04729a5-5dd7-ddef-0752-cf240aa88885@vivier.eu>
-Date: Wed, 25 Jan 2017 15:42:32 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cWOoD-0006hN-84
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:44:25 -0500
+Date: Wed, 25 Jan 2017 14:44:20 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170125144420.GE2096@work-vm>
+References: <20170124184742.1639-1-dgilbert@redhat.com>
+	<20170124184742.1639-3-dgilbert@redhat.com>
+	<20170125114620.GA9699@lemon.Home> <20170125120053.GA2096@work-vm>
+	<20170125131917.32df62ef.cornelia.huck@de.ibm.com>
+	<20170125132254.GB2096@work-vm>
+	<20170125152014.2ab6f901.cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1485333658-23035-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] null-machine: Add support for the
- "-kernel" parameter
+Content-Disposition: inline
+In-Reply-To: <20170125152014.2ab6f901.cornelia.huck@de.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 02/15] migration: extend VMStateInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +32,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Max Filippov <jcmvbkbc@gmail.com>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Jianjun Duan <duanj@linux.vnet.ibm.com>
 
-Le 25/01/2017 à 09:40, Thomas Huth a écrit :
-> We can have basic support for the "-kernel" parameter quite easily
-> by using the generic loader device. This should be enough for most
-> boards which do not need special machine-specific magic for loading
-> a kernel (and for those that need special magic, the generic "none"
-> machine is likely not suitable for using it as an instruction set
-> simulator board anyway).
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  PS: If we can't agree on using the generic loader here, I can also
->      prepare a patch instead that simply prints out an error message
->      if the user tried to use the "-kernel" parameter.
-> 
->  hw/core/null-machine.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> index 27c8369..866e699 100644
-> --- a/hw/core/null-machine.c
-> +++ b/hw/core/null-machine.c
-> @@ -5,6 +5,7 @@
->   *
->   * Authors:
->   *  Anthony Liguori   <aliguori@us.ibm.com>
-> + *  Thomas Huth       <thuth@redhat.com>
->   *
->   * This work is licensed under the terms of the GNU GPL, version 2 or later.
->   * See the COPYING file in the top-level directory.
-> @@ -16,6 +17,7 @@
->  #include "qemu/error-report.h"
->  #include "hw/hw.h"
->  #include "hw/boards.h"
-> +#include "hw/core/generic-loader.h"
->  #include "sysemu/sysemu.h"
->  #include "exec/address-spaces.h"
->  #include "cpu.h"
-> @@ -40,6 +42,18 @@ static void machine_none_init(MachineState *mch)
->          memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
->          memory_region_add_subregion(get_system_memory(), 0, ram);
->      }
-> +
-> +    /* Load kernel */
-> +    if (mch->kernel_filename) {
-> +        DeviceState *loader;
-> +
-> +        loader = qdev_create(sysbus_get_default(), TYPE_GENERIC_LOADER);
-> +        qdev_prop_set_string(loader, "file", mch->kernel_filename);
-> +        if (cpu) {
-> +            qdev_prop_set_uint32(loader, "cpu-num", cpu->cpu_index);
-> +        }
-> +        qdev_init_nofail(loader);
-> +    }
->  }
+* Cornelia Huck (cornelia.huck@de.ibm.com) wrote:
+> On Wed, 25 Jan 2017 13:22:55 +0000
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+>=20
+> > * Cornelia Huck (cornelia.huck@de.ibm.com) wrote:
+> > > On Wed, 25 Jan 2017 12:00:53 +0000
+> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > >=20
+> > > > * Fam Zheng (famz@redhat.com) wrote:
+> > > > > On Tue, 01/24 18:47, Dr. David Alan Gilbert (git) wrote:
+> > > > > > diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.=
+c
+> > > > > > index c313166..da8e4df 100644
+> > > > > > --- a/hw/intc/s390_flic_kvm.c
+> > > > > > +++ b/hw/intc/s390_flic_kvm.c
+> > > > > > @@ -286,7 +286,8 @@ static void kvm_s390_release_adapter_rout=
+es(S390FLICState *fs,
+> > > > > >   * increase until buffer is sufficient or maxium size is
+> > > > > >   * reached
+> > > > > >   */
+> > > > > > -static void kvm_flic_save(QEMUFile *f, void *opaque, size_t =
+size)
+> > > > > > +static int kvm_flic_save(QEMUFile *f, void *opaque, size_t s=
+ize,
+> > > > > > +                         VMStateField *field, QJSON *vmdesc)
+> > > > > >  {
+> > > > > >      KVMS390FLICState *flic =3D opaque;
+> > > > > >      int len =3D FLIC_SAVE_INITIAL_SIZE;
+> > > > > > @@ -319,6 +320,8 @@ static void kvm_flic_save(QEMUFile *f, vo=
+id *opaque, size_t size)
+> > > > > >                          count * sizeof(struct kvm_s390_irq))=
+;
+> > > > > >      }
+> > > > > >      g_free(buf);
+> > > > > > +
+> > > > > > +    return 0;
+> > > > > >  }
+> > > > >=20
+> > > > > This hunk left one 'return' behind in the function, which shoul=
+d have been
+> > > > > changed to 'return 0' as well, and now the compiler is not happ=
+y:
+> > > > >=20
+> > > > > /var/tmp/patchew-tester-tmp-itftfkl9/src/hw/intc/s390_flic_kvm.=
+c: In function =E2=80=98kvm_flic_save=E2=80=99:
+> > > > > /var/tmp/patchew-tester-tmp-itftfkl9/src/hw/intc/s390_flic_kvm.=
+c:306:9: error: =E2=80=98return=E2=80=99 with no value, in function retur=
+ning non-void [-Werror]
+> > > > >          return;
+> > > > >          ^~~~~~
+> > > > > /var/tmp/patchew-tester-tmp-itftfkl9/src/hw/intc/s390_flic_kvm.=
+c:289:12: note: declared here
+> > > > >  static int kvm_flic_save(QEMUFile *f, void *opaque, size_t siz=
+e,
+> > > > >             ^~~~~~~~~~~~~
+> > > > > cc1: all warnings being treated as errors
+> > > >=20
+> > > > OK, so it looks like that's a failure path, adding a return -ENOM=
+EM would seem to make
+> > > > sense there.
+> > >=20
+> > > Just saw this. I don't think we want -ENOMEM, as that would change =
+the
+> > > actual state being saved, no?
+> >=20
+> > But isn't that the intention of this function?
+> >=20
+> >     buf =3D g_try_malloc0(len);
+> >     if (!buf) {
+> >         /* Storing FLIC_FAILED into the count field here will cause t=
+he
+> >          * target system to fail when attempting to load irqs from th=
+e
+> >          * migration state */
+> >         error_report("flic: couldn't allocate memory");
+> >         qemu_put_be64(f, FLIC_FAILED);
+> >         return;
+> >     }
+> >=20
+> > What should happen on the destination - should the migration fail?
+> > If we want the migration to fail then we should now return an error
+> > status rather than 0, and then we see a failed migration on the sourc=
+e
+> > as well.
+>=20
+> Yes. There's also another error case below where we should return an
+> error instead of putting FLIC_FAILED, then.
+>=20
+> The problem is that this is rather hard to test: So I'd prefer to fix
+> the compile for now and introduce error return codes in a separate
+> patch.
 
-It seems you need to check "-cpu" is set otherwise we have a segfault in
-the loader:
+OK, that's fair.
 
-Thread 1 "qemu-system-m68" received signal SIGSEGV, Segmentation fault.
-...
-#0  0x000055555564e5f8 in generic_loader_realize (dev=<optimized out>,
-errp=0x7fffffffd900) at hw/core/generic-loader.c:141
+Dave
 
-140         if (!s->force_raw) {
-141             size = load_elf_as(s->file, NULL, NULL, &entry, NULL, NULL,
-142                                big_endian, 0, 0, 0, s->cpu->as);
-143
-
-(gdb) p s->cpu
-$2 = (CPUState *) 0x0
-
-Laurent
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
