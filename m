@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cWCcw-0003hC-Kp
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:01 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cWCd8-0003rA-KZ
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cWCcu-0005NU-Jl
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:43:58 -0500
-Received: from mail-yw0-x22f.google.com ([2607:f8b0:4002:c05::22f]:32960)
+	(envelope-from <ben@skyportsystems.com>) id 1cWCd3-0005Qt-Mo
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:10 -0500
+Received: from mail-yw0-x235.google.com ([2607:f8b0:4002:c05::235]:35298)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cWCcu-0005NP-E6
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:43:56 -0500
-Received: by mail-yw0-x22f.google.com with SMTP id u68so3012959ywg.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 17:43:56 -0800 (PST)
+	id 1cWCd3-0005PG-Gs
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:05 -0500
+Received: by mail-yw0-x235.google.com with SMTP id l19so177092913ywc.2
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 17:44:03 -0800 (PST)
 From: ben@skyportsystems.com
-Date: Tue, 24 Jan 2017 17:43:23 -0800
-Message-Id: <b9ead8f0965c42f78e73e17e461ef7f476ae4318.1485308342.git.ben@skyportsystems.com>
+Date: Tue, 24 Jan 2017 17:43:28 -0800
+Message-Id: <b4032bf140321b0b5fd8c0b7ff8e81e6da857dd0.1485308342.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1485308342.git.ben@skyportsystems.com>
 References: <cover.1485308342.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1485308342.git.ben@skyportsystems.com>
 References: <cover.1485308342.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v4 4/9] ACPI: Add Virtual Machine Generation ID
- support
+Subject: [Qemu-devel] [PATCH v4 9/9] tests: Add unit tests for the VM
+ Generation ID feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,390 +34,232 @@ Cc: Ben Warren <ben@skyportsystems.com>
 
 From: Ben Warren <ben@skyportsystems.com>
 
-This implements the VM Generation ID feature by passing a 128-bit
-GUID to the guest via a fw_cfg blob.
-Any time the GUID changes, and ACPI notify event is sent to the guest
+The following tests are implemented:
+* test that a GUID passed in by command line is propagated to the guest.
+* test that changing the GUID at runtime via the monitor is reflected in
+  the guest.
+* test that the "auto" argument to the GUID generates a different, and
+  correct GUID as seen by the guest.
 
-The user interface is a simple device with one parameter:
- - guid (string, must be "auto" or in UUID format
-   xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+  This patch is loosely based on a previous patch from:
+  Gal Hammer <ghammer@redhat.com>  and Igor Mammedov <imammedo@redhat.com>
 
 Signed-off-by: Ben Warren <ben@skyportsystems.com>
 ---
- default-configs/i386-softmmu.mak     |   1 +
- default-configs/x86_64-softmmu.mak   |   1 +
- hw/acpi/Makefile.objs                |   1 +
- hw/acpi/vmgenid.c                    | 244 +++++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c                 |   9 ++
- include/hw/acpi/acpi_dev_interface.h |   1 +
- include/hw/acpi/vmgenid.h            |  32 +++++
- 7 files changed, 289 insertions(+)
- create mode 100644 hw/acpi/vmgenid.c
- create mode 100644 include/hw/acpi/vmgenid.h
+ tests/Makefile.include |   2 +
+ tests/vmgenid-test.c   | 184 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 186 insertions(+)
+ create mode 100644 tests/vmgenid-test.c
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 0b51360..b2bccf6 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -56,3 +56,4 @@ CONFIG_IOH3420=y
- CONFIG_I82801B11=y
- CONFIG_SMBIOS=y
- CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
-+CONFIG_ACPI_VMGENID=y
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 7f89503..c6bd310 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -56,3 +56,4 @@ CONFIG_IOH3420=y
- CONFIG_I82801B11=y
- CONFIG_SMBIOS=y
- CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
-+CONFIG_ACPI_VMGENID=y
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 6acf798..11c35bc 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -5,6 +5,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
- common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
-+common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
- common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 22ea256..e2dcf15 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -239,6 +239,7 @@ check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
+ gcov-files-i386-y += hw/usb/hcd-xhci.c
+ check-qtest-i386-y += tests/pc-cpu-test$(EXESUF)
+ check-qtest-i386-y += tests/q35-test$(EXESUF)
++check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+ gcov-files-i386-y += hw/pci-host/q35.c
+ check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
+ ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
+@@ -715,6 +716,7 @@ tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem
+ tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o contrib/libvhost-user/libvhost-user.o $(test-util-obj-y)
+ tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
++tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o
  
- common-obj-y += acpi_interface.o
-diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+ 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
 new file mode 100644
-index 0000000..63cb039
+index 0000000..0f5ba07
 --- /dev/null
-+++ b/hw/acpi/vmgenid.c
-@@ -0,0 +1,244 @@
++++ b/tests/vmgenid-test.c
+@@ -0,0 +1,184 @@
 +/*
-+ *  Virtual Machine Generation ID Device
++ * QTest testcase for VM Generation ID
 + *
-+ *  Copyright (C) 2017 Skyport Systems.
-+ *
-+ *  Author: Ben Warren <ben@skyportsystems.com>
++ * Copyright (c) 2016 Red Hat, Inc.
++ * Copyright (c) 2017 Skyport Systems
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
-+ *
 + */
 +
++#include <glib.h>
++#include <string.h>
++#include <unistd.h>
 +#include "qemu/osdep.h"
-+#include "qmp-commands.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/acpi/aml-build.h"
-+#include "hw/acpi/vmgenid.h"
-+#include "hw/nvram/fw_cfg.h"
-+#include "sysemu/sysemu.h"
++#include "qemu/bitmap.h"
++#include "qemu/uuid.h"
++#include "hw/acpi/acpi-defs.h"
++#include "acpi-utils.h"
++#include "libqtest.h"
 +
-+Object *find_vmgenid_dev(Error **errp)
++#define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
++
++static uint64_t vgia;
++
++typedef struct {
++    AcpiTableHeader header;
++    gchar name_op;
++    gchar vgia[4];
++    gchar val_op;
++    uint64_t vgia_val;
++} QEMU_PACKED VgidTable;
++
++static uint64_t find_vgia(void)
 +{
-+    Object *obj = object_resolve_path_type("", VMGENID_DEVICE, NULL);
-+    if (!obj) {
-+        error_setg(errp, VMGENID_DEVICE " is not found");
-+    }
-+    return obj;
-+}
++    uint32_t off;
++    AcpiRsdpDescriptor rsdp_table;
++    uint32_t rsdt;
++    AcpiRsdtDescriptorRev1 rsdt_table;
++    int tables_nr;
++    uint32_t *tables;
++    AcpiTableHeader ssdt_table;
++    VgidTable vgid_table;
++    int i;
 +
-+void vmgenid_build_acpi(GArray *table_offsets, GArray *table_data,
-+         BIOSLinker *linker)
-+{
-+    Object *obj;
-+    VmGenIdState *s;
-+    GArray *guid, *vgia;
-+    Aml *ssdt, *dev, *scope, *method, *addr, *if_ctx;
-+    uint32_t vgia_offset;
++    /* First, find the RSDP */
++    for (off = 0xf0000; off < 0x100000; off += 0x10) {
++        uint8_t sig[] = "RSD PTR ";
 +
-+    obj = find_vmgenid_dev(NULL);
-+    if (!obj) {
-+        return;
-+    }
-+    s = VMGENID(obj);
-+
-+    acpi_add_table(table_offsets, table_data);
-+
-+    guid = g_array_new(false, true, sizeof(s->guid.data));
-+    g_array_append_val(guid, s->guid.data);
-+    vgia = g_array_new(false, true, sizeof(uint64_t));
-+    g_array_append_val(vgia, s->vgia);
-+
-+    /* Put this in a separate SSDT table */
-+    ssdt = init_aml_allocator();
-+
-+    /* Reserve space for header */
-+    acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
-+
-+    /* Storage for the GUID address */
-+    vgia_offset = table_data->len +
-+        build_append_named_qword(ssdt->buf, "VGIA");
-+    scope = aml_scope("\\_SB");
-+    dev = aml_device("VGEN");
-+    aml_append(dev, aml_name_decl("_HID", aml_string("QEMUVGID")));
-+    aml_append(dev, aml_name_decl("_CID", aml_string("VM_Gen_Counter")));
-+    aml_append(dev, aml_name_decl("_DDN", aml_string("VM_Gen_Counter")));
-+
-+    /* Simple status method to check that address is linked and non-zero */
-+    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
-+    addr = aml_local(0);
-+    aml_append(method, aml_store(aml_int(0xf), addr));
-+    if_ctx = aml_if(aml_equal(aml_name("VGIA"), aml_int(0)));
-+    aml_append(if_ctx, aml_store(aml_int(0), addr));
-+    aml_append(method, if_ctx);
-+    aml_append(method, aml_return(addr));
-+    aml_append(dev, method);
-+
-+    /* the ADDR method returns two 32-bit words representing the lower and
-+     * upper halves * of the physical address of the fw_cfg blob
-+     * (holding the GUID) */
-+    method = aml_method("ADDR", 0, AML_NOTSERIALIZED);
-+
-+    addr = aml_local(0);
-+    aml_append(method, aml_store(aml_package(2), addr));
-+
-+    aml_append(method, aml_store(aml_and(aml_name("VGIA"),
-+        aml_int(0xffffffff), NULL), aml_index(addr, aml_int(0))));
-+    aml_append(method, aml_store(aml_shiftright(aml_name("VGIA"),
-+        aml_int(32), NULL), aml_index(addr, aml_int(1))));
-+    aml_append(method, aml_return(addr));
-+
-+    aml_append(dev, method);
-+    aml_append(scope, dev);
-+    aml_append(ssdt, scope);
-+
-+    /* attach an ACPI notify */
-+    method = aml_method("\\_GPE._E05", 0, AML_NOTSERIALIZED);
-+    aml_append(method, aml_notify(aml_name("\\_SB.VGEN"), aml_int(0x80)));
-+    aml_append(ssdt, method);
-+
-+    g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
-+
-+    /* Allocate guest memory for the Address fw_cfg blob */
-+    bios_linker_loader_alloc(linker, VMGENID_ADDR_FW_CFG_FILE, vgia, 0,
-+                             false /* high memory */);
-+    /* Allocate guest memory for the GUID fw_cfg blob and return address */
-+    bios_linker_loader_alloc_ret_addr(linker, VMGENID_GUID_FW_CFG_FILE, guid,
-+                                      0, false, VMGENID_ADDR_FW_CFG_FILE);
-+    /* Patch address of GUID fw_cfg blob into the AML */
-+    bios_linker_loader_add_pointer(linker,
-+        ACPI_BUILD_TABLE_FILE, vgia_offset, sizeof(uint64_t),
-+        VMGENID_GUID_FW_CFG_FILE, 0);
-+
-+    build_header(linker, table_data,
-+        (void *)(table_data->data + table_data->len - ssdt->buf->len),
-+        "SSDT", ssdt->buf->len, 1, NULL, "VMGENID");
-+    free_aml_allocator();
-+}
-+
-+void vmgenid_add_fw_cfg(FWCfgState *s)
-+{
-+    Object *obj = find_vmgenid_dev(NULL);
-+    if (!obj) {
-+        return;
-+    }
-+    VmGenIdState *vms = VMGENID(obj);
-+    /* Create a read-only fw_cfg file for GUID */
-+    fw_cfg_add_file(s, VMGENID_GUID_FW_CFG_FILE, vms->guid.data,
-+        sizeof(vms->guid.data));
-+    /* Create a read-write fw_cfg file for Address */
-+    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, NULL, NULL,
-+                             &vms->vgia, sizeof(uint64_t), false);
-+}
-+
-+static void vmgenid_update_guest(VmGenIdState *s)
-+{
-+    Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, NULL);
-+    if (obj) {
-+
-+        /* Write the GUID to guest memory */
-+        if (s->vgia) {
-+            cpu_physical_memory_write(s->vgia, s->guid.data,
-+                                      sizeof(s->guid.data));
++        for (i = 0; i < sizeof sig - 1; ++i) {
++            sig[i] = readb(off + i);
 +        }
-+        /* Send _GPE.E05 event */
-+        acpi_send_event(DEVICE(obj), ACPI_VMGENID_CHANGE_STATUS);
++
++        if (!memcmp(sig, "RSD PTR ", sizeof sig)) {
++            break;
++        }
 +    }
-+}
++    g_assert_cmphex(off, <, 0x100000);
 +
-+static void vmgenid_set_guid(Object *obj, const char *value, Error **errp)
-+{
-+    VmGenIdState *s = VMGENID(obj);
++    /* Parse the RSDP header so we can find the RSDT */
++    ACPI_READ_FIELD(rsdp_table.signature, off);
++    ACPI_ASSERT_CMP64(rsdp_table.signature, "RSD PTR ");
 +
-+    if (!strncmp(value, "auto", 4)) {
-+        qemu_uuid_generate(&s->guid);
-+    } else if (qemu_uuid_parse(value, &s->guid) < 0) {
-+        error_setg(errp, "'%s." VMGENID_GUID
-+                   "': Failed to parse GUID string: %s",
-+                   object_get_typename(OBJECT(s)),
-+                   value);
-+        return;
++    ACPI_READ_FIELD(rsdp_table.checksum, off);
++    ACPI_READ_ARRAY(rsdp_table.oem_id, off);
++    ACPI_READ_FIELD(rsdp_table.revision, off);
++    ACPI_READ_FIELD(rsdp_table.rsdt_physical_address, off);
++
++    rsdt = rsdp_table.rsdt_physical_address;
++    /* read the header */
++    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
++    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
++
++    /* compute the table entries in rsdt */
++    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
++                sizeof(uint32_t);
++    g_assert_cmpint(tables_nr, >, 0);
++
++    /* get the addresses of the tables pointed by rsdt */
++    tables = g_new0(uint32_t, tables_nr);
++    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
++
++    for (i = 0; i < tables_nr; i++) {
++        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
++        if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
++            /* the first entry in the table should be VGIA
++             * That's all we need */
++            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
++            g_assert(vgid_table.name_op == 0x08);  /* name */
++            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
++            g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
++            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
++            g_assert(vgid_table.val_op == 0x0E);  /* qword */
++            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
++            return vgid_table.vgia_val;
++        }
 +    }
-+    /* Send the ACPI notify */
-+    vmgenid_update_guest(s);
-+}
-+
-+/* After restoring an image, we need to update the guest memory and notify
-+ * it of a potential change to VM Generation ID */
-+static int vmgenid_post_load(void *opaque, int version_id)
-+{
-+    VmGenIdState *s = opaque;
-+    vmgenid_update_guest(s);
 +    return 0;
 +}
 +
-+/* Store the VM Generation ID guest address as part of state info
-+ * This is necessary because BIOS will not run when a VM is restored
-+ * and so will not tell QEMU the guest address */
-+static const VMStateDescription vmstate_vmgenid = {
-+    .name = "vmgenid",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .post_load = vmgenid_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(vgia, VmGenIdState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static void vmgenid_initfn(Object *obj)
++static void vmgenid_read_guid(uint8_t *guid)
 +{
-+    VmGenIdState *s = VMGENID(obj);
++    int i;
 +
-+    object_property_add_str(obj, VMGENID_GUID, NULL, vmgenid_set_guid, NULL);
-+    s->vgia = 0;
-+}
-+
-+static void vmgenid_device_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->vmsd = &vmstate_vmgenid;
-+}
-+
-+static const TypeInfo vmgenid_device_info = {
-+    .name          = VMGENID_DEVICE,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(VmGenIdState),
-+    .instance_init = vmgenid_initfn,
-+    .class_init    = vmgenid_device_class_init,
-+};
-+
-+static void vmgenid_register_types(void)
-+{
-+    type_register_static(&vmgenid_device_info);
-+}
-+
-+type_init(vmgenid_register_types)
-+
-+GuidInfo *qmp_query_vm_generation_id(Error **errp)
-+{
-+    GuidInfo *info;
-+    VmGenIdState *vdev;
-+    Object *obj = find_vmgenid_dev(errp);
-+
-+    if (!obj) {
-+        return NULL;
++    if (vgia == 0) {
++        vgia = find_vgia();
 +    }
-+    vdev = VMGENID(obj);
-+    info = g_malloc0(sizeof(*info));
-+    info->guid = qemu_uuid_unparse_strdup(&vdev->guid);
-+    return info;
++    g_assert(vgia);
++
++    /* Read the GUID directly from guest memory */
++    for (i = 0; i < 16; i++) {
++        guid[i] = readb(vgia + i);
++    }
 +}
 +
-+void qmp_set_vm_generation_id(const char *guid, Error **errp)
++static void vmgenid_test(void)
 +{
-+    Object *obj = find_vmgenid_dev(errp);
-+
-+    if (!obj) {
-+        return;
-+    }
-+
-+    object_property_set_str(obj, guid, VMGENID_GUID, errp);
-+    return;
++    uint8_t measured[16];
++    QemuUUID expected;
++    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
++    vmgenid_read_guid(measured);
++    g_assert(memcmp(measured, expected.data, sizeof(measured)) == 0);
 +}
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 1c928ab..78b4da5 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -42,6 +42,7 @@
- #include "hw/acpi/memory_hotplug.h"
- #include "sysemu/tpm.h"
- #include "hw/acpi/tpm.h"
-+#include "hw/acpi/vmgenid.h"
- #include "sysemu/tpm_backend.h"
- #include "hw/timer/mc146818rtc_regs.h"
- #include "sysemu/numa.h"
-@@ -2653,6 +2654,10 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     acpi_add_table(table_offsets, tables_blob);
-     build_madt(tables_blob, tables->linker, pcms);
- 
-+    if (has_vmgenid()) {
-+        vmgenid_build_acpi(table_offsets, tables_blob, tables->linker);
-+    }
 +
-     if (misc.has_hpet) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_hpet(tables_blob, tables->linker);
-@@ -2859,6 +2864,10 @@ void acpi_setup(void)
-     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
-                     tables.tcpalog->data, acpi_data_len(tables.tcpalog));
- 
-+    if (has_vmgenid()) {
-+        vmgenid_add_fw_cfg(pcms->fw_cfg);
-+    }
-+
-     if (!pcmc->rsdp_in_ram) {
-         /*
-          * Keep for compatibility with old machine types.
-diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_dev_interface.h
-index 71d3c48..3c2e4e9 100644
---- a/include/hw/acpi/acpi_dev_interface.h
-+++ b/include/hw/acpi/acpi_dev_interface.h
-@@ -11,6 +11,7 @@ typedef enum {
-     ACPI_CPU_HOTPLUG_STATUS = 4,
-     ACPI_MEMORY_HOTPLUG_STATUS = 8,
-     ACPI_NVDIMM_HOTPLUG_STATUS = 16,
-+    ACPI_VMGENID_CHANGE_STATUS = 32,
- } AcpiEventStatusBits;
- 
- #define TYPE_ACPI_DEVICE_IF "acpi-device-interface"
-diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
-new file mode 100644
-index 0000000..e4ac6f8
---- /dev/null
-+++ b/include/hw/acpi/vmgenid.h
-@@ -0,0 +1,32 @@
-+#ifndef ACPI_VMGENID_H
-+#define ACPI_VMGENID_H
-+
-+#include "hw/acpi/bios-linker-loader.h"
-+#include "hw/sysbus.h"
-+#include "qemu/uuid.h"
-+
-+#define VMGENID_DEVICE           "vmgenid"
-+#define VMGENID_GUID             "guid"
-+#define VMGENID_GUID_FW_CFG_FILE      "etc/vmgenid"
-+#define VMGENID_ADDR_FW_CFG_FILE      "etc/vmgenid_addr"
-+
-+Object *find_vmgenid_dev(Error **errp);
-+void vmgenid_add_fw_cfg(FWCfgState *s);
-+void vmgenid_build_acpi(GArray *table_offsets, GArray *table_data,
-+                       BIOSLinker *linker);
-+
-+#define VMGENID(obj) OBJECT_CHECK(VmGenIdState, (obj), VMGENID_DEVICE)
-+
-+typedef struct VmGenIdState {
-+    SysBusDevice parent_obj;
-+    QemuUUID guid;
-+    uint64_t vgia;
-+
-+} VmGenIdState;
-+
-+static inline bool has_vmgenid(void)
++static void vmgenid_set_guid_test(void)
 +{
-+    return object_resolve_path_type("", VMGENID_DEVICE, NULL) != NULL;
++    QDict *response;
++    gchar *cmd;
++    uint8_t measured[16];
++    QemuUUID expected;
++    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
++    /* Change the GUID slightly */
++    expected.data[0] += 1;
++
++    cmd = g_strdup_printf("{ 'execute': 'qom-set', 'arguments': { "
++                   "'path': '/machine/peripheral/testvgid', "
++                   "'property': 'guid', 'value': '%s' } }",
++                   qemu_uuid_unparse_strdup(&expected));
++    response = qmp(cmd);
++    g_assert(qdict_haskey(response, "return"));
++    QDECREF(response);
++
++    vmgenid_read_guid(measured);
++    g_assert(memcmp(measured, expected.data, sizeof(measured)) == 0);
 +}
 +
-+#endif
++static void vmgenid_set_guid_auto_test(void)
++{
++    QDict *response;
++    QemuUUID measured;
++    QemuUUID expected;
++
++    /* Read the initial value */
++    vmgenid_read_guid(expected.data);
++
++    /* Setting to 'auto' generates a random GUID */
++    response = qmp("{ 'execute': 'qom-set', 'arguments': { "
++                   "'path': '/machine/peripheral/testvgid', "
++                   "'property': 'guid', 'value': 'auto' } }");
++
++    g_assert(qdict_haskey(response, "return"));
++    QDECREF(response);
++
++    vmgenid_read_guid(measured.data);
++    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) != 0);
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_start("-machine accel=tcg -device vmgenid,id=testvgid,"
++                "guid=" VGID_GUID);
++    qtest_add_func("/vmgenid/vmgenid", vmgenid_test);
++    qtest_add_func("/vmgenid/vmgenid/set-guid", vmgenid_set_guid_test);
++    qtest_add_func("/vmgenid/vmgenid/set-guid-auto",
++                   vmgenid_set_guid_auto_test);
++    ret = g_test_run();
++
++    qtest_end();
++
++    return ret;
++}
 -- 
 2.7.4
