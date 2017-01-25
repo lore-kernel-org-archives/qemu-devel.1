@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cWNbA-0007ix-JB
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:26:53 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cWNbn-0008F4-0G
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:27:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cWNb8-0000Eh-1E
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:26:52 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:52652)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cWNb7-0000EX-Pi
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:26:49 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170124071654.4572.41407.stgit@PASHA-ISP>
-	<20170124071713.4572.36636.stgit@PASHA-ISP>
-	<96675d3f-9d53-bde1-f6da-7cb0b1f41316@redhat.com>
-	<000501d276fb$fbcde7d0$f369b770$@ru>
-	<1683a32c-4ea8-c343-e972-095593819121@redhat.com>
-	<000601d276fe$e71b9140$b552b3c0$@ru>
-	<10ac3f7d-6ae8-4657-7135-d9a05b5a3d39@redhat.com>
-	<000901d27706$6f054090$4d0fc1b0$@ru>
-	<66b50426-1fc7-7730-1d5e-b7d4ad0e761b@redhat.com>
-In-Reply-To: <66b50426-1fc7-7730-1d5e-b7d4ad0e761b@redhat.com>
-Date: Wed, 25 Jan 2017 16:26:51 +0300
-Message-ID: <000b01d2770e$b0926f80$11b74e80$@ru>
+	(envelope-from <stefanha@redhat.com>) id 1cWNbk-0000Ov-DD
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:27:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39440)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cWNbk-0000Nc-8N
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:27:28 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 707413A76AB
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:27:28 +0000 (UTC)
+Date: Wed, 25 Jan 2017 13:27:25 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170125132725.GI10664@stefanha-x1.localdomain>
+References: <20170124180420.12430-1-pbonzini@redhat.com>
+	<20170124180420.12430-9-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v7 03/14] replay: exception replay fix
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DwoPkXS38qd3dnhB"
+Content-Disposition: inline
+In-Reply-To: <20170124180420.12430-9-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 8/8] virtio: use VRingMemoryRegionCaches
+ for avail and used rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +35,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 25/01/2017 13:27, Pavel Dovgalyuk wrote:
-> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> >> On 25/01/2017 12:33, Pavel Dovgalyuk wrote:
-> >>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> >>>> On 25/01/2017 12:12, Pavel Dovgalyuk wrote:
-> >>>>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> >>>>>> On 24/01/2017 08:17, Pavel Dovgalyuk wrote:
-> >>>>>>> @@ -451,6 +451,10 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
-> >>>>>>>  #ifndef CONFIG_USER_ONLY
-> >>>>>>>      } else if (replay_has_exception()
-> >>>>>>>                 && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
-> >>>>>>> +        /* Break the execution loop in case of running out of TB cache.
-> >>>>>>> +           This is needed to make flushing of the TB cache, because
-> >>>>>>> +           real flush is queued to be executed outside the cpu loop. */
-> >>>>>>> +        cpu->exception_index = EXCP_INTERRUPT;
-> >>>>>>>          /* try to cause an exception pending in the log */
-> >>>>>>>          cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
-> >>>>>>>          *ret = -1;
-> >>>>>>
-> >>>>>> Why is replay_has_exception() related to be running out of TB cache?
-> >>>>>
-> >>>>> It doesn't.
-> >>>>> Calling tb_find when there is not space in cache causes tb_flush and cpu_loop_exit.
-> >>>>> But execution loop will continue, because there is no reason to break it
-> >>>>> (like setting exception_index).
-> >>>>
-> >>>> What about setting cpu->exit_request?  queue_work_on_cpu calls
-> >>>> qemu_cpu_kick.
-> >>>
-> >>> cpu->exit_request does not checked in this loop.
-> >>> We have to add this checking somewhere then?
-> >>
-> >> It's checked by cpu_handle_interrupt.  Are you not reaching
-> >> cpu_handle_interrupt then?  Why?
-> >
-> > Execution doesn't reach cpu_handle_interrupt, because tb_find
-> > calls cpu_loop_exit. And the execution loop enters cpu_handle_exception again and again.
-> 
-> Perhaps tb_gen_code should set cpu->exception_index before calling
-> cpu_loop_exit.
 
-Maybe it would be better, because tb_gen_code is called in many other paths.
-I'll fix the patch.
+--DwoPkXS38qd3dnhB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Pavel Dovgalyuk
+On Tue, Jan 24, 2017 at 07:04:20PM +0100, Paolo Bonzini wrote:
+> The virtio-net change is necessary because it uses virtqueue_fill
+> and virtqueue_flush instead of the more convenient virtqueue_push.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>         v1->v2: improved and simplified error recovery
+>                 removed duplicate rcu_read_lock!
+>=20
+>  hw/net/virtio-net.c |  14 +++++-
+>  hw/virtio/virtio.c  | 130 ++++++++++++++++++++++++++++++++++++++--------=
+------
+>  2 files changed, 107 insertions(+), 37 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--DwoPkXS38qd3dnhB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYiKe9AAoJEJykq7OBq3PIRxkH/35q1n3hTqzPuxP6RtCuN50r
+BJAJmCU2V4w4Efcm8ak6oDGzSIodPJodI+8/91N2kGz6r5FpnW55KwYsEOj5CZy6
+4jC80WAkXvt+TBwc4E8BYBLG5tdCuSIgpA3LCocT0CVByenKFwY+TwBW5wplSKjW
+5X6dHgi3fUrPQ4JXI1Xb/x/QKNRfuBMS9yI4T9Su6YKq1QnYUTUJWpWkEhwSGoA4
+z5mCmXet6Loe3OdVLnbiHIBHngQQqEX4M18D6HpB561tjAol6sztXLssG1rEFm/u
+kB6DW+H8M6Rbxa6yoh3N2ulfxgTSSQCOpa0NXia+QtZYsJ2CBUp+CGqcweJkOFM=
+=bGd7
+-----END PGP SIGNATURE-----
+
+--DwoPkXS38qd3dnhB--
