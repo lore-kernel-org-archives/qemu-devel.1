@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWMG0-0001iF-4v
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:00:57 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cWMGB-0001oW-FQ
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWMFu-0007lY-Na
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:00:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54186)
+	(envelope-from <dgilbert@redhat.com>) id 1cWMG5-0007pe-Vh
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:01:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWMFu-0007lE-9I
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:00:50 -0500
-References: <20170124071654.4572.41407.stgit@PASHA-ISP>
-	<20170124071719.4572.92155.stgit@PASHA-ISP>
-	<db455af4-4d66-d81f-4f4f-1ad47100dffe@redhat.com>
-	<000701d27701$2a0aa8e0$7e1ffaa0$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <edb33598-ba1e-883b-ed61-61b7a50f8f0c@redhat.com>
-Date: Wed, 25 Jan 2017 13:00:46 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cWMG5-0007p1-Qd
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:01:01 -0500
+Date: Wed, 25 Jan 2017 12:00:53 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170125120053.GA2096@work-vm>
+References: <20170124184742.1639-1-dgilbert@redhat.com>
+	<20170124184742.1639-3-dgilbert@redhat.com>
+	<20170125114620.GA9699@lemon.Home>
 MIME-Version: 1.0
-In-Reply-To: <000701d27701$2a0aa8e0$7e1ffaa0$@ru>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 04/14] icount: exit cpu loop on expire
+Content-Disposition: inline
+In-Reply-To: <20170125114620.GA9699@lemon.Home>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 02/15] migration: extend VMStateInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
+To: Fam Zheng <famz@redhat.com>, cornelia.huck@de.ibm.com
+Cc: qemu-devel@nongnu.org, Jianjun Duan <duanj@linux.vnet.ibm.com>
 
+* Fam Zheng (famz@redhat.com) wrote:
+> On Tue, 01/24 18:47, Dr. David Alan Gilbert (git) wrote:
+> > diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+> > index c313166..da8e4df 100644
+> > --- a/hw/intc/s390_flic_kvm.c
+> > +++ b/hw/intc/s390_flic_kvm.c
+> > @@ -286,7 +286,8 @@ static void kvm_s390_release_adapter_routes(S390F=
+LICState *fs,
+> >   * increase until buffer is sufficient or maxium size is
+> >   * reached
+> >   */
+> > -static void kvm_flic_save(QEMUFile *f, void *opaque, size_t size)
+> > +static int kvm_flic_save(QEMUFile *f, void *opaque, size_t size,
+> > +                         VMStateField *field, QJSON *vmdesc)
+> >  {
+> >      KVMS390FLICState *flic =3D opaque;
+> >      int len =3D FLIC_SAVE_INITIAL_SIZE;
+> > @@ -319,6 +320,8 @@ static void kvm_flic_save(QEMUFile *f, void *opaq=
+ue, size_t size)
+> >                          count * sizeof(struct kvm_s390_irq));
+> >      }
+> >      g_free(buf);
+> > +
+> > +    return 0;
+> >  }
+>=20
+> This hunk left one 'return' behind in the function, which should have b=
+een
+> changed to 'return 0' as well, and now the compiler is not happy:
+>=20
+> /var/tmp/patchew-tester-tmp-itftfkl9/src/hw/intc/s390_flic_kvm.c: In fu=
+nction =E2=80=98kvm_flic_save=E2=80=99:
+> /var/tmp/patchew-tester-tmp-itftfkl9/src/hw/intc/s390_flic_kvm.c:306:9:=
+ error: =E2=80=98return=E2=80=99 with no value, in function returning non=
+-void [-Werror]
+>          return;
+>          ^~~~~~
+> /var/tmp/patchew-tester-tmp-itftfkl9/src/hw/intc/s390_flic_kvm.c:289:12=
+: note: declared here
+>  static int kvm_flic_save(QEMUFile *f, void *opaque, size_t size,
+>             ^~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
 
+OK, so it looks like that's a failure path, adding a return -ENOMEM would=
+ seem to make
+sense there.
 
-On 25/01/2017 12:50, Pavel Dovgalyuk wrote:
->>> +                /* icount has expired, we need to break the execution loop.
->>> +                   This check is needed before tb_find to make execution
->>> +                   deterministic - tb_find may cause an exception
->>> +                   while translating the code from non-mapped page. */
->>> +                if (use_icount && ((cpu->icount_extra == 0
->>> +                                    && cpu->icount_decr.u16.low == 0)
->>> +                                || (int32_t)cpu->icount_decr.u32 < 0)) {
->>> +                    if (cpu->exception_index == -1) {
->>> +                        cpu->exception_index = EXCP_INTERRUPT;
->>> +                    }
->>> +                    cpu_loop_exit(cpu);
->>> +                }
->> Can this can be placed in cpu_handle_interrupt itself?  
-> I guess it could. I placed it here because it doesn't related to interrupts.
+Do you have a way of build testing that on x86, or can it only be build
+tested on s390?
+(My build test included an s390x-softmmu build on x86-64).
 
-True, on the other hand neither is
-
-    if (unlikely(atomic_read(&cpu->exit_request) || replay_has_interrupt())) {
-        atomic_set(&cpu->exit_request, 0);
-        cpu->exception_index = EXCP_INTERRUPT;
-        cpu_loop_exit(cpu);
-    }
-
-Except for the replay_has_interrupt() that you added, but I don't understand
-that one either...
-
-Paolo
+Dave
+> Fam
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
