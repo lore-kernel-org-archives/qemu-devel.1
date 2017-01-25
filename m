@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cWIXD-0008T9-W7
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:02:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1cWIaM-0002V5-Jr
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:05:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cWIX8-0001pF-EC
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:02:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cWIX8-0001p5-6L
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:02:22 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C03B3DBC5
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 08:02:22 +0000 (UTC)
-References: <1485250969-5472-1-git-send-email-thuth@redhat.com>
-	<a144d9c8-8b55-d98a-45e9-d35d8db9a852@redhat.com>
-	<15a24b41-d104-4074-dcaa-9c53c7b018d5@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <6295b628-2a1c-2bef-aa21-eb752f450c9c@redhat.com>
-Date: Wed, 25 Jan 2017 16:02:16 +0800
+	(envelope-from <bounces@canonical.com>) id 1cWIa6-0003CS-4s
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:05:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41688)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cWIa5-0003BS-IZ
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:05:25 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cWIa3-0004XL-Lq
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 08:05:23 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9A8872E808D
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 08:05:23 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <15a24b41-d104-4074-dcaa-9c53c7b018d5@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net: Mark 'vlan' parameter as deprecated
+Date: Wed, 25 Jan 2017 07:49:39 -0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reply-To: Bug 1622547 <1622547@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160912101319.11954.40146.malonedeb@gac.canonical.com>
+Message-Id: <20170125074939.17055.53668.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1622547] Re: qemu-system-sparc fatal error Trap
+ 0x29 on Solaris 2.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+There were some improvements to TCG which I tested locally with quite a
+range of images (although I don't specifically have Solaris 2.6), and
+didn't see any regressions at the time.
 
+Does dropping the -smp argument help at all? Otherwise are you able to
+attempt a git bisect or send me a link to the image privately to test?
 
-On 2017=E5=B9=B401=E6=9C=8825=E6=97=A5 15:54, Thomas Huth wrote:
-> On 25.01.2017 08:50, Jason Wang wrote:
->>
->> On 2017=E5=B9=B401=E6=9C=8824=E6=97=A5 17:42, Thomas Huth wrote:
->>> The 'vlan' parameter is a continuous source of confusion for the user=
-s,
->>> many people mix it up with the more common term VLAN (the link layer
->>> packet encapsulation), and even if they realize that the QEMU 'vlan' =
-is
->>> rather some kind of network hub emulation, there is still a high risk
->>> that they configure their QEMU networking in a wrong way with this
->>> parameter (e.g. by hooking NICs together, so they get a 'loopback'
->>> between one and the other NIC).
->>> Thus at one point in time, we should finally get rid of the 'vlan'
->>> feature in QEMU. Let's do a first step in this direction by declaring
->>> the 'vlan' parameter as deprecated and informing the users to use the
->>> 'netdev' parameter instead.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>    net/net.c | 6 ++++++
->>>    1 file changed, 6 insertions(+)
->>>
->>> diff --git a/net/net.c b/net/net.c
->>> index 939fe31..fb7af3a 100644
->>> --- a/net/net.c
->>> +++ b/net/net.c
->>> @@ -970,6 +970,7 @@ static int net_client_init1(const void *object,
->>> bool is_netdev, Error **errp)
->>>        const Netdev *netdev;
->>>        const char *name;
->>>        NetClientState *peer =3D NULL;
->>> +    static bool vlan_warned;
->>>          if (is_netdev) {
->>>            netdev =3D object;
->>> @@ -1050,6 +1051,11 @@ static int net_client_init1(const void *object=
-,
->>> bool is_netdev, Error **errp)
->>>                !opts->u.nic.data->has_netdev) {
->>>                peer =3D net_hub_add_port(net->has_vlan ? net->vlan : =
-0,
->>> NULL);
->>>            }
->>> +
->>> +        if (net->has_vlan && !vlan_warned) {
->>> +            error_report("'vlan' is deprecated. Please use 'netdev'
->>> instead.");
->>> +            vlan_warned =3D true;
->>> +        }
->>>        }
->>>          if (net_client_init_fun[netdev->type](netdev, name, peer,
->>> errp) < 0) {
->> Looks good, but do really want only warn once? Consider we have monito=
-r
->> command e.g "host_net_add".
-> I don't mind ... I can remove the "vlan_warned" check, but then you'll
-> get a lot of error messages at once if you start QEMU with multiple
-> "-net" parameters that use "vlan=3D...". Is that ok for you? If yes, I'=
-ll
-> send an updated v2 of my patch without that "vlan_warned" check.
->
->   Thomas
->
+-- =
 
-You're right, this version looks better, applied to -net.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1622547
 
-Thanks
+Title:
+  qemu-system-sparc fatal error Trap 0x29 on Solaris 2.6
+
+Status in QEMU:
+  New
+
+Bug description:
+  When trying to install Solaris 2.6 from original CDROM, qemu fail with
+  the following error :
+
+  qemu: fatal: Trap 0x29 while interrupts disabled, Error state
+  pc: f0041280  npc: f0041284
+  %g0-7: 00000000 f0281800 08000000 ffffffff 00000000 f0243b88 00000001 f02=
+44020
+  %o0-7: 40400ce2 40400ce2 00000000 404000e2 f0243b88 00000000 f023ffd8 f00=
+57914 =
+
+  %l0-7: 40000cc2 f009645c f0096460 00000002 00000209 00000004 00000007 f02=
+3ff90 =
+
+  %i0-7: 00000042 404000e3 00000000 404000e3 e0000000 f028192a f0240038 f00=
+96448 =
+
+  %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  psr: 40400cc2 (icc: -Z-- SPE: SP-) wim: 00000002
+  fsr: 00000000 y: 00000000
+
+  The command line was :
+
+  qemu-system-sparc -nographic -bios ./openbios-sparc32 -M SS-20 -hda
+  ./36G.disk -m 512 -cdrom Solaris_2.6_Software_05_98.img -boot d
+  -serial telnet:0.0.0.0:3000,server -smp 2,cores=3D2 -monitor null
+
+  It fails with a similar output when using bios ss20_v2.25_rom.
+
+  =E2=96=B6 qemu-system-sparc --version
+  QEMU emulator version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and =
+the QEMU Project developers
+
+  =E2=96=B6 uname -a
+  Linux xxx 4.7.1-1-ARCH #1 SMP PREEMPT Wed Aug 17 08:13:35 CEST 2016 x86_6=
+4 GNU/Linux
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1622547/+subscriptions
