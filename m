@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cWQOQ-0004d7-VR
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:56 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cWQOQ-0004cw-P6
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cWQOP-0006Sv-Sx
+	(envelope-from <mreitz@redhat.com>) id 1cWQOP-0006Sp-MI
 	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59834)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cWQOP-0006Sg-Ja
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:53 -0500
-References: <20170125161417.31949-1-berrange@redhat.com>
-	<20170125161417.31949-2-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <27d30dd2-dd58-9157-3ed3-2e34c7aa0bd4@redhat.com>
-Date: Wed, 25 Jan 2017 10:25:51 -0600
+References: <20161216052040.53067-1-haoqf@linux.vnet.ibm.com>
+	<20161216052040.53067-2-haoqf@linux.vnet.ibm.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <be77cb51-c3ad-d7a0-9c85-cb7aeaed31b0@redhat.com>
+Date: Wed, 25 Jan 2017 17:25:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170125161417.31949-2-berrange@redhat.com>
+In-Reply-To: <20161216052040.53067-2-haoqf@linux.vnet.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="EFcwV9ogdomaQRsoQlbqBC5kgUqagTe2U"
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] make: move top level dir to end of
- include search path
+	boundary="jIp7lcqOiLJfnvHsOpdUckmUlNTpBCMkQ"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/1] block/vmdk: Fix the
+ endian problem of buf_len and lba
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-stable@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EFcwV9ogdomaQRsoQlbqBC5kgUqagTe2U
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <27d30dd2-dd58-9157-3ed3-2e34c7aa0bd4@redhat.com>
-Subject: Re: [PATCH v4 1/8] make: move top level dir to end of include search
- path
-References: <20170125161417.31949-1-berrange@redhat.com>
- <20170125161417.31949-2-berrange@redhat.com>
-In-Reply-To: <20170125161417.31949-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
+--jIp7lcqOiLJfnvHsOpdUckmUlNTpBCMkQ
+From: Max Reitz <mreitz@redhat.com>
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-stable@nongnu.org,
+ borntraeger@de.ibm.com, cornelia.huck@de.ibm.com
+Message-ID: <be77cb51-c3ad-d7a0-9c85-cb7aeaed31b0@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v3 1/1] block/vmdk: Fix the endian problem of
+ buf_len and lba
+References: <20161216052040.53067-1-haoqf@linux.vnet.ibm.com>
+ <20161216052040.53067-2-haoqf@linux.vnet.ibm.com>
+In-Reply-To: <20161216052040.53067-2-haoqf@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 01/25/2017 10:14 AM, Daniel P. Berrange wrote:
-
-> If there are generated headers files to be used by the migration
-> code in '$BUILD_DIR/migration', these will not be found by the
-> relative include, an absolute include is needed instead. This
-> has not been a problem so far, since nothing has been generating
-> headers in sub-dirs, but the trace code will shortly be doing
-> that. So it is needed to list '-I$(BUILD_DIR)/$(@D)' as well as
-> '-I$(@D)' to ensure both directories are searched when building
-> target dependant code. So the search order ends up being:
->=20
->   1. source dir corresponding to input file (implicit by compiler)
->   2. build dir corresponding to output file (absolute)
->   3. build dir corresponding to output file (relative to cwd)
->   4. top level build dir
->   5. top level source dir
->   6. top level source include/ dir
-
-Lots clearer than v3.
-
->=20
-> One final complication is that the absolute '-I$(BUILD_DIR)/$(@D)'
-> will sometimes end up pointing to a non-existant directory if
-> that sub-dir does not have any target-independant files to be
-> built. Rather than try to dynamically filter this, a simple
-> 'mkdir' ensures $(BUILD_DIR)/$(@D) is guaranteed to exist at
-> all times.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+On 16.12.2016 06:20, QingFeng Hao wrote:
+> The problem was triggered by qemu-iotests case 055. It failed when it
+> was comparing the compressed vmdk image with original test.img.
+>
+> The cause is that buf_len in vmdk_write_extent wasn't converted to
+> little-endian before it was stored to disk. But later vmdk_read_extent
+> read it and converted it from little-endian to cpu endian.
+> If the cpu is big-endian like s390, the problem will happen and
+> the data length read by vmdk_read_extent will become invalid!
+> The fix is to add the conversion in vmdk_write_extent, meanwhile,
+> repair the endianness problem of lba field which shall also be converte=
+d
+> to little-endian before storing to disk.
+>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
 > ---
->  rules.mak | 30 +++++++++++++++++++++++-------
->  1 file changed, 23 insertions(+), 7 deletions(-)
+>  block/vmdk.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Thanks, I've applied the patch to my block tree:
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+https://github.com/XanClic/qemu/commits/block
+
+Max
 
 
---EFcwV9ogdomaQRsoQlbqBC5kgUqagTe2U
+--jIp7lcqOiLJfnvHsOpdUckmUlNTpBCMkQ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYiNGPAAoJEKeha0olJ0NqkxAH/RpzU9pP7YmTlq4yGUdpvV0C
-Mp52LCMBiQY8lFUtzZPJ3Dk7i6fsm6hLzmZyZVwfxujydHMWTsvhPrFaaOmbWaeC
-/HTR5fXgdcdOsI/KmgePXcoL27Wv5LfKB471NH0qVLlzvcA9O6TN3BP4ru1hboDL
-4/WF6Ko6Bb0L4w3VJ6nfneYnaSapjJKygjLr7LsOA7Yy2Sg7pYaItV3+7yJzP7qs
-kgZwgokTN3CCBnAOuBEUXtkCZIJ5Dr3hECyRlMRRDh3YQ8eOxqs0oplNuiM1QdtX
-M/GVue3bIjlu4oIfR2uCM/uHz5QlA2qsvSs76CpK723Q8F+BPVYQqe6Vs57r4nE=
-=1IHR
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliI0YgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ARbEIAJsuUbHBW+It6HK5eDuWXQWc8aXUvL86
+rwx8tMOk60BGxg66Y0WYBcU11fY+/AJUkrojwKihjVgsn+3e6L5Xe7qjNXHVzI4D
+1a1PPEuLcyoc7Gb2KPRZK4zDwpueQpz4Tcz9K4ZXTl949fmzESsnjSAiYQSAVO2V
+BRbp0WAS8SFRLrHP0zU+NxbrnzEsx88Go7Z89o/93PFfgYjjVknrCY3ByABjWLJd
+1L+SpALLgLFMj9T+/kArL79ivIQJE9QE8D3oP0zjDAJ3ljohlHiJvP5Dk8iiYHeP
+hdNRSbODwFZK0E55k1JEOoOqn4uLBtInhINBCtNrkFiXBMMjMaSpRrE=
+=cI+E
 -----END PGP SIGNATURE-----
 
---EFcwV9ogdomaQRsoQlbqBC5kgUqagTe2U--
+--jIp7lcqOiLJfnvHsOpdUckmUlNTpBCMkQ--
