@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cWOSH-0000WQ-Ba
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:21:46 -0500
+	(envelope-from <mst@redhat.com>) id 1cWOXQ-0003SM-8F
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:27:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cWOSE-0007kN-6Y
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:21:45 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36141)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cWOSD-0007kD-Uv
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:21:42 -0500
-Received: by mail-wm0-x229.google.com with SMTP id c85so28515229wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 06:21:41 -0800 (PST)
-References: <20170119170507.16185-1-alex.bennee@linaro.org>
-	<20170119170507.16185-19-alex.bennee@linaro.org>
-	<3604b49c-6d3b-5525-9a26-8226f4d2f8c9@twiddle.net>
-	<87k29k9ozb.fsf@linaro.org>
-	<a70221e1-2dad-e531-e557-d723fe848157@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <a70221e1-2dad-e531-e557-d723fe848157@twiddle.net>
-Date: Wed, 25 Jan 2017 14:21:38 +0000
-Message-ID: <87h94n9q4t.fsf@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1cWOXN-0000Wd-3X
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:27:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43200)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cWOXM-0000W7-TX
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:27:01 -0500
+Date: Wed, 25 Jan 2017 16:26:59 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170125162554-mutt-send-email-mst@kernel.org>
+References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
+	<20170124114910.GD16400@pxdev.xzpeter.org>
+	<20170124164751-mutt-send-email-mst@kernel.org>
+	<20170125044837.GE5151@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 18/27] cputlb: introduce
- tlb_flush_*_all_cpus
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170125044837.GE5151@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v5 00/18] VT-d: vfio enablement and misc
+ enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org, claudio.fontana@huawei.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, jan.kiszka@siemens.com, mark.burton@greensocs.com, serge.fdrv@gmail.com, pbonzini@redhat.com, bamvor.zhangjian@linaro.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
+On Wed, Jan 25, 2017 at 12:48:37PM +0800, Peter Xu wrote:
+> On Tue, Jan 24, 2017 at 04:48:49PM +0200, Michael S. Tsirkin wrote:
+> > On Tue, Jan 24, 2017 at 07:49:10PM +0800, Peter Xu wrote:
+> > > On Tue, Jan 24, 2017 at 06:25:53PM +0800, Peter Xu wrote:
+> > > > This is v5 of vt-d vfio enablement series.
+> > > > 
+> > > > Most of the changes in v5 is not functionally, but related to
+> > > > comments, error_report()s, debugging, squashing patches, etc. (which
+> > > > are confirmed changes in v4), besides a tiny tweak when unmapping a
+> > > > whole address space (please see below changelog). There are still
+> > > > discussions in v4 thread, we can just continue there (or here), and
+> > > > from this version I'll remove RFC tag.
+> > > > 
+> > > > I didn't rebase to master since current master failed to build on my
+> > > > laptop (with a "vl.c/hax..." error), however this series should be
+> > > > okay to be applied cleanly upon it.
+> > > 
+> > > Sorry I forgot to append the todo list (please help adding in in case
+> > > I missed anything):
+> > > 
+> > > - don't need to notify IOTLB (psi/gsi/global) invalidations to devices
+> > >   that with ATS enabled
+> > > - investigate when guest map page while mask contains existing mapped
+> > >   pages (e.g. map 12k-16k first, then map 0-12k)
+> > > - coalesce unmap during page walk (currently, we send it once per
+> > >   page)
+> > > - when do PSI for unmap, whether we can send one notify directly
+> > >   instead of walking over the page table?
+> > > 
+> > > Above does not contain those that are still during discussion. And,
+> > > some of the entries still need tests to further prove it's
+> > > feasibility.
+> > > 
+> > > Thanks,
+> > > 
+> > > -- peterx
+> > 
+> > While valid I don't think above need to block merging.
+> 
+> Sorry for the delay of this series.
+> 
+> Looks like we still need to wait until we got explicit acks for vfio
+> patch 2-3 from Alex/Paolo/David since that'll be required by the
+> following series. (I'll address all Jason's new comments as well in
+> next post)
+> 
+> Do you like to merge the iommu cleanups first? Or you can also wait
+> for above to be confirmed, and I'll repost for a final version then
+> (if we don't have further comments).
+> 
+> Thanks,
+> 
+> -- peterx
 
-Richard Henderson <rth@twiddle.net> writes:
+I can do that. If you want me to, pls post just the patches
+that are ready separately.
 
-> On 01/24/2017 12:34 PM, Alex Bennée wrote:
->>
->> Richard Henderson <rth@twiddle.net> writes:
->>
->>> On 01/19/2017 09:04 AM, Alex Bennée wrote:
->>>> +/* flush_all_helper: run fn across all cpus
->>>> + *
->>>> + * If the wait flag is set then the src cpu's helper will be queued as
->>>> + * "safe" work and the loop exited creating a synchronisation point
->>>> + * where all queued work will be finished before execution starts
->>>> + * again.
->>>> + */
->>>> +static void flush_all_helper(CPUState *src, bool wait,
->>>> +                             run_on_cpu_func fn, run_on_cpu_data d)
->>>> +{
->>>> +    CPUState *cpu;
->>>> +
->>>> +    if (!wait) {
->>>> +        CPU_FOREACH(cpu) {
->>>> +            if (cpu != src) {
->>>> +                async_run_on_cpu(cpu, fn, d);
->>>> +            } else {
->>>> +                g_assert(qemu_cpu_is_self(src));
->>>> +                fn(src, d);
->>>> +            }
->>>> +        }
->>>> +    } else {
->>>> +        CPU_FOREACH(cpu) {
->>>> +            if (cpu != src) {
->>>> +                async_run_on_cpu(cpu, fn, d);
->>>> +            } else {
->>>> +                async_safe_run_on_cpu(cpu, fn, d);
->>>> +            }
->>>> +
->>>> +        }
->>>> +        cpu_loop_exit(src);
->>>> +    }
->>>> +}
->>>
->>> What's the rationale for not having the target do the exit itself?  Surely it
->>> can tell, and simple end the TB after the insn.
->>
->> It's more for the global sync functionality. I wanted to keep all the
->> guts of re-starting the loop with the correct async_safe_work all in one
->> place with a defined API for the guests rather than have them all do it
->> themselves.
->>
->> For the common case of not needing to sync across the cores I agree the
->> guest is perfectly able to end the TB so its safe work completes next.
->> In fact the ARM helper calls do exactly that.
->
-> Hmm.  Would it make more sense to have two functions then, for wait and !wait?
-> That would allow the wait function be QEMU_NORETURN, which might make it a bit
-> more obvious about the interface contract.
-
-Seems fair. I was worried about multiplying out too many variants in the
-API but this seems a good reason to.
-
---
-Alex Bennée
+-- 
+MST
