@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cWNnv-0000Z7-Rv
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:40:05 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cWNrS-0002K4-8w
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cWNnr-0004Vo-PH
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:40:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48964)
+	(envelope-from <stefanha@redhat.com>) id 1cWNrO-0005Xd-8Z
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:43:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cWNnr-0004Vc-HC
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:39:59 -0500
-References: <1485346353-23814-1-git-send-email-w.bumiller@proxmox.com>
-	<2ca4bdcc-cd12-f640-60f2-85f31dad32ad@redhat.com>
-	<1649081132.25.1485350546249@webmail.proxmox.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f78dffc6-1cc5-ecab-3b9b-47d0a96d772d@redhat.com>
-Date: Wed, 25 Jan 2017 14:39:56 +0100
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cWNrO-0005XE-21
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:43:38 -0500
+Date: Wed, 25 Jan 2017 13:43:34 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170125134334.GJ10664@stefanha-x1.localdomain>
+References: <20170124110151.937-1-berrange@redhat.com>
+	<20170124110151.937-3-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1649081132.25.1485350546249@webmail.proxmox.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cirrus: handle negative pitch in
- cirrus_invalidate_region()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+Hr//EUsa8//ouuB"
+Content-Disposition: inline
+In-Reply-To: <20170124110151.937-3-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] trace: move hw/block/dataplane
+ events to correct subdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wolfgang Bumiller <w.bumiller@proxmox.com>, qemu-devel@nongnu.org
-Cc: Li Qiang <liqiang6-s@360.cn>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 01/25/17 14:22, Wolfgang Bumiller wrote:
-> 
->> On January 25, 2017 at 1:35 PM Laszlo Ersek <lersek@redhat.com> wrote:
->>
->>
->> On 01/25/17 13:12, Wolfgang Bumiller wrote:
->>> cirrus_invalidate_region() calls memory_region_set_dirty()
->>> on a per-line basis, always ranging from off_begin to
->>> off_begin+bytesperline. With a negative pitch off_begin
->>> marks the top most used address and thus we need to do an
->>> initial shift backwards by bytesperline for negative
->>> pitches of backward blits, otherwise the first iteration
->>> covers the line going from the start offset forwards instead
->>> of backwards.
->>>
->>> Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
->>> ---
->>> I bumped the patch context to 4 lines to get it to include the
->>> memory_region_set_dirty() call which takes an unsigned length (`hwaddr
->>> size`) because I'm also not too happy about the masking going on there
->>> since it means off_cur_end may be less than off_cur, but if the range
->>> checks are finnaly correct I don't think this case could happen
->>> anymore? (A check shouldn't hurt though, or maybe an assert()?)
->>>
->>>  hw/display/cirrus_vga.c | 4 ++++
->>>  1 file changed, 4 insertions(+)
->>>
->>> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
->>> index b1a0773..af61981 100644
->>> --- a/hw/display/cirrus_vga.c
->>> +++ b/hw/display/cirrus_vga.c
->>> @@ -669,8 +669,12 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
->>>      int y;
->>>      int off_cur;
->>>      int off_cur_end;
->>>  
->>> +    if (off_pitch < 0) {
->>> +        off_begin -= bytesperline;
->>> +    }
->>> +
->>>      for (y = 0; y < lines; y++) {
->>>  	off_cur = off_begin;
->>>  	off_cur_end = (off_cur + bytesperline) & s->cirrus_addr_mask;
->>>          memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
->>>
->>
->> I think the adjustment is off by one. The loop body inherently considers
->> "off_cur" inclusive, and "off_cur_end" exclusive.
->>
->> When "off_pitch" is negative, and the initial "off_begin" value is an
->> "inclusive end", then by subtracting a full "bytesperline", you just go
->> to the "inclusive end" of the previous line. Whereas, you should go to
->> the address right above it, to the "inclusive start" of the *same* line.
->> (From bottom right to bottom left corner.)
-> 
-> Right, this again.
-> 
->> Therefore the decrement should be (bytesperline - bytesperpixel), IMO.
-> 
-> At this point we don't operate in a pixel byte group basis though, and
-> as far as I can see the backward blit functions are always byte-based
-> operations, so I think `bytesperpixel` can just be 1 here?
 
-ENOCLUE :/ Perhaps Gerd can answer?
+--+Hr//EUsa8//ouuB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->> Regarding assert(off_cur_end >= off_cur): not a bad idea, IMO.
-> 
-> I'll include it in v2.
-> 
-> 
+On Tue, Jan 24, 2017 at 11:01:45AM +0000, Daniel P. Berrange wrote:
+> The trace-events for a given source file should generally
+> always live in the same directory as the source file.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  Makefile.objs                   | 1 +
+>  hw/block/dataplane/trace-events | 6 ++++++
+>  hw/block/trace-events           | 5 -----
+>  3 files changed, 7 insertions(+), 5 deletions(-)
+>  create mode 100644 hw/block/dataplane/trace-events
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--+Hr//EUsa8//ouuB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYiKuFAAoJEJykq7OBq3PI58MH/1l2sjPi+d8DMaNQyQW4mL2W
+IwH5ZInzbPZvsP8D40snFZuU8E6bCJ9nI77YNiEDz058mkV7eK7RpLRxf+I8+ZQJ
+CsVsc8D/LalWiEFHPsAN1MTLoBUicvhl/GSliMO41n64bLnhQ4HHfZLaJM913B30
+UjbIlaEm0I9+OnhDxudk+cXzR5+FK0ggGLiFsgqlgvYDzaFa08VINSCVC+62cRTp
+EzukQ7pO9x4i5AGk7qiENmP1y+y755y5l+kvlV0b/lqW42tHa2ZWvs9W5V5m0Eww
+j8U2HCMCtdw4s0O6Dvfeo1I3UWTIqpcaAn98fFVZLckvuVU3hs/O6iBXRdWMoMc=
+=3ojP
+-----END PGP SIGNATURE-----
+
+--+Hr//EUsa8//ouuB--
