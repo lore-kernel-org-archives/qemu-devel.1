@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cWRow-0001w0-Pg
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:57:24 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cWRqk-0003fs-TG
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:59:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cWRov-0002hD-Mb
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:57:22 -0500
-Resent-Message-Id: <E1cWRov-0002hD-Mb@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <cover.1485365834.git.jcody@redhat.com>
-Message-ID: <148536702246.27.2525832131905647282@eba24e3a0d7f>
+	(envelope-from <mreitz@redhat.com>) id 1cWRqh-0003HX-1e
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:59:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1cWRqg-0003H8-PV
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:59:10 -0500
+References: <1485362572-7246-1-git-send-email-den@openvz.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1e511c84-c9fa-1d4e-8a73-e48c0b29a59a@redhat.com>
+Date: Wed, 25 Jan 2017 18:59:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 25 Jan 2017 09:57:04 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] iscsi: Add blockdev-add support
+In-Reply-To: <1485362572-7246-1-git-send-email-den@openvz.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fR8JFlkg23WDKm6SMTJppkd7IRHHM7cUT"
+Subject: Re: [Qemu-devel] [PATCH 1/1] block: add missed BDRV_O_NOCACHE when
+ block device is opened without file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +28,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jcody@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSBpc2NzaTogQWRkIGJsb2NrZGV2LWFk
-ZCBzdXBwb3J0Ck1lc3NhZ2UtaWQ6IGNvdmVyLjE0ODUzNjU4MzQuZ2l0Lmpjb2R5QHJlZGhhdC5j
-b20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEK
-dG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVz
-ZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBb
-bmV3IHRhZ10gICAgICAgICBwYXRjaGV3L2NvdmVyLjE0ODUzNjU4MzQuZ2l0Lmpjb2R5QHJlZGhh
-dC5jb20gLT4gcGF0Y2hldy9jb3Zlci4xNDg1MzY1ODM0LmdpdC5qY29keUByZWRoYXQuY29tClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjUxMDg1YyBRQVBJOiBGaXggYmxvY2tkZXYt
-YWRkIGV4YW1wbGUgZG9jdW1lbnRhdGlvbgpmM2JlNGI2IGlzY3NpOiBBZGQgYmxvY2tkZXYtYWRk
-IHN1cHBvcnQKNzE0YjVmOSBpc2NzaTogQWRkIHRpbWVvdXQgb3B0aW9uCmM1ZWU4OTUgaXNjc2k6
-IEFkZCBoZWFkZXItZGlnZXN0IG9wdGlvbgo4MDQ3Njk5IGlzY3NpOiBBZGQgaW5pdGlhdG9yLW5h
-bWUgb3B0aW9uCmE5ZTY4Y2EgaXNjc2k6IEhhbmRsZSAtaXNjc2kgdXNlci9wYXNzd29yZCBpbiBi
-ZHJ2X3BhcnNlX2ZpbGVuYW1lKCkKYzM4YmRhYiBpc2NzaTogU3BsaXQgVVJMIGludG8gaW5kaXZp
-ZHVhbCBvcHRpb25zCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzc6IGlz
-Y3NpOiBTcGxpdCBVUkwgaW50byBpbmRpdmlkdWFsIG9wdGlvbnMuLi4KRVJST1I6IHN3aXRjaCBh
-bmQgY2FzZSBzaG91bGQgYmUgYXQgdGhlIHNhbWUgaW5kZW50CiM1NjogRklMRTogYmxvY2svaXNj
-c2kuYzoxNjA4OgorICAgIHN3aXRjaCAoaXNjc2lfdXJsLT50cmFuc3BvcnQpIHsKKyAgICAgICAg
-Y2FzZSBUQ1BfVFJBTlNQT1JUOiAgICAgdHJhbnNwb3J0X25hbWUgPSAidGNwIjsgYnJlYWs7Cisg
-ICAgICAgIGNhc2UgSVNFUl9UUkFOU1BPUlQ6ICAgIHRyYW5zcG9ydF9uYW1lID0gImlzZXIiOyBi
-cmVhazsKKyAgICAgICAgZGVmYXVsdDoKCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3Vs
-ZCBiZSBvbiBuZXh0IGxpbmUKIzU3OiBGSUxFOiBibG9jay9pc2NzaS5jOjE2MDk6CisgICAgICAg
-IGNhc2UgVENQX1RSQU5TUE9SVDogICAgIHRyYW5zcG9ydF9uYW1lID0gInRjcCI7IGJyZWFrOwoK
-RVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojNTg6IEZJ
-TEU6IGJsb2NrL2lzY3NpLmM6MTYxMDoKKyAgICAgICAgY2FzZSBJU0VSX1RSQU5TUE9SVDogICAg
-dHJhbnNwb3J0X25hbWUgPSAiaXNlciI7IGJyZWFrOwoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5p
-bmdzLCAyODkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi83OiBpc2NzaTogSGFuZGxlIC1pc2NzaSB1c2VyL3Bhc3N3
-b3JkIGluIGJkcnZfcGFyc2VfZmlsZW5hbWUoKS4uLgpDaGVja2luZyBQQVRDSCAzLzc6IGlzY3Np
-OiBBZGQgaW5pdGlhdG9yLW5hbWUgb3B0aW9uLi4uCkNoZWNraW5nIFBBVENIIDQvNzogaXNjc2k6
-IEFkZCBoZWFkZXItZGlnZXN0IG9wdGlvbi4uLgpDaGVja2luZyBQQVRDSCA1Lzc6IGlzY3NpOiBB
-ZGQgdGltZW91dCBvcHRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNi83OiBpc2NzaTogQWRkIGJsb2Nr
-ZGV2LWFkZCBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDcvNzogUUFQSTogRml4IGJsb2NrZGV2
-LWFkZCBleGFtcGxlIGRvY3VtZW50YXRpb24uLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fR8JFlkg23WDKm6SMTJppkd7IRHHM7cUT
+From: Max Reitz <mreitz@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+Message-ID: <1e511c84-c9fa-1d4e-8a73-e48c0b29a59a@redhat.com>
+Subject: Re: [PATCH 1/1] block: add missed BDRV_O_NOCACHE when block device is
+ opened without file
+References: <1485362572-7246-1-git-send-email-den@openvz.org>
+In-Reply-To: <1485362572-7246-1-git-send-email-den@openvz.org>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+[CC-ing John]
+
+On 25.01.2017 17:42, Denis V. Lunev wrote:
+> Technically there is a problem when the guest DVD is created by libvirt=
+
+> with AIO mode 'native' on Linux. Current QEMU is unable to start the
+> domain configured as follows:
+>     <disk type=3D'file' device=3D'cdrom'>
+>       <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>=
+
+>       <target dev=3D'sdb' bus=3D'scsi'/>
+>       <readonly/>
+>     </disk>
+> The problem comes from the combination of 'cache' and 'io' options.
+>=20
+> 'io' option is common option and it is removed from block driver
+> specific options. 'cache' originally is not. The patch makes 'cache'
+> option common. This works fine as long as cdrom media insertion
+> later on.
+>=20
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Kevin Wolf <kwolf@redhat.com>
+> CC: Max Reitz <mreitz@redhat.com>
+> ---
+>  blockdev.c | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+
+There was a Red Hat BZ for this:
+
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1342999
+
+There is now a corresponding BZ for libvirt:
+
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1377321
+
+The gist is that it was determined to be a problem with libvirt.
+
+RHEL has a downstream commit to work around this issue by ignoring the
+cache mode set for empty CD-ROMs -- but that is only because that was
+simpler than fixing libvirt.
+
+(Note that it's ignoring the cache mode instead of actually evaluating it=
+=2E)
+
+> May be this has already discussed, but still. AIO=3Dnative for CDROM wi=
+thout
+> media seems important case.
+
+First, I personally don't find aio=3Dnative very important for CD-ROM
+drives. Yes, we shouldn't make IDE CD-ROM slower than necessary, but I
+don't think aio=3Dnative will make the difference between "Slow like
+CD-ROMs are in reality" and "As fast as virtio".
+
+Second, all this patch does is revert some changes done by commit
+91a097e7478940483e76d52217f05bc05b98d5a5, which was very deliberate.
+
+Third, you may then be asking for the recommended way to put an
+aio=3Dnative medium into a CD-ROM drive. Good thing you ask, because we
+have a way that we want to recommend but can't because it's still
+considered experimental:
+
+The BDS is added using blockdev-add, with all of the appropriate caching
+and aio options. Then it's inserted into the drive using the
+x-blockdev-insert-medium command, and the drive is closed using
+blockdev-close-tray.
+
+There are a couple of issues with this: First, blockdev-add and
+x-blockdev-insert-medium are still experimental. The good news are that
+I think the reason why the latter is experimental has actually
+disappeared and we can just drop the x- by now. The
+not-so-good-but-not-so-bad-either news are that we plan to get
+blockdev-add declared non-experimental for 2.9. Let's see how it goes.
+
+The other issue is that of course it's more cumbersome to use than a
+simple 'change' via HMP. I argue that if someone communicates with a VM
+by hand, they either have to deal with this added complexity or they
+cannot use aio=3Dnative for CD-ROM drives -- which, as I said, I don't
+think is too bad.
+
+However, there is a reason why you cannot set cache/aio for an empty
+drive and it's simply that it doesn't make sense.
+
+Max
+
+
+--fR8JFlkg23WDKm6SMTJppkd7IRHHM7cUT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliI52oSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AceUH/2m6xbQ7R2ycYSI7efcpjhZg3eZnR1ye
+Gh0Yv5lbYyOvpQ0XaJ7ZVHYlOop+/k4v+zz4VyZiBZNJ8zmF9HF/O4bRAPwF6Qx0
+bvJm2bvOqJpzTx4/P3F8Iun9qgCFHPIN3n5bNohc3x/KN4OKMws4n3bUCwHhqARL
+IO2BGLQFN6D9iV+diShKvFLXyEhtJa069i0pk9A+4d9sd7lowr9uPbVKBePhGFAI
+LxMKeOV4fBYGCIrGjSLn470j2Y3P7PDIDb2RWK8ka6jmWLajmVEApshbVmz3HULx
+Se6LNYQOEkpeWgv6iZ9EELsORKMJ7iE/tpPZ3PM0JOyIFJU2YXHg75M=
+=GJDC
+-----END PGP SIGNATURE-----
+
+--fR8JFlkg23WDKm6SMTJppkd7IRHHM7cUT--
