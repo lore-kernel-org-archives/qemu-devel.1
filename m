@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cWO5A-0005cV-P5
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:57:54 -0500
+	(envelope-from <bounces@canonical.com>) id 1cWO7H-0006zh-BM
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:00:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cWO57-0001Tt-Ex
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:57:52 -0500
-Resent-Message-Id: <E1cWO57-0001Tt-Ex@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21313)
+	(envelope-from <bounces@canonical.com>) id 1cWO7E-00026v-2r
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:00:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41564)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cWO57-0001Sj-5J
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:57:49 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1485352137-29367-1-git-send-email-w.bumiller@proxmox.com>
-Message-ID: <148535263256.27.11323953317104920284@eba24e3a0d7f>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cWO7D-00026k-TH
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:00:00 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cWO7C-0000lX-Qx
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:59:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BB2B22E80C2
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:59:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 25 Jan 2017 05:57:14 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] cirrus: handle negative pitch in
- cirrus_invalidate_region()
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Jan 2017 13:46:21 -0000
+From: "mike@papersolve.com" <mike@papersolve.com>
+Reply-To: Bug 1622547 <1622547@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160912101319.11954.40146.malonedeb@gac.canonical.com>
+Message-Id: <20170125134621.17212.43556.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1622547] Re: qemu-system-sparc fatal error Trap
+ 0x29 on Solaris 2.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: w.bumiller@proxmox.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, lersek@redhat.com, liqiang6-s@360.cn, kraxel@redhat.com
+To: qemu-devel@nongnu.org
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjJdIGNpcnJ1czogaGFuZGxlIG5lZ2F0aXZlIHBp
-dGNoIGluIGNpcnJ1c19pbnZhbGlkYXRlX3JlZ2lvbigpCk1lc3NhZ2UtaWQ6IDE0ODUzNTIxMzct
-MjkzNjctMS1naXQtc2VuZC1lbWFpbC13LmJ1bWlsbGVyQHByb3htb3guY29tCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxv
-ZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlv
-bnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
-dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
-UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
-ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
-ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
-dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAg
-ICAgcGF0Y2hldy8xNDg1MzUyMDgyLTE2ODMwLTEtZ2l0LXNlbmQtZW1haWwtZ3JvdWdAa2FvZC5v
-cmcgLT4gcGF0Y2hldy8xNDg1MzUyMDgyLTE2ODMwLTEtZ2l0LXNlbmQtZW1haWwtZ3JvdWdAa2Fv
-ZC5vcmcKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg1MzUyMTM3LTI5MzY3LTEtZ2l0
-LXNlbmQtZW1haWwtdy5idW1pbGxlckBwcm94bW94LmNvbSAtPiBwYXRjaGV3LzE0ODUzNTIxMzct
-MjkzNjctMS1naXQtc2VuZC1lbWFpbC13LmJ1bWlsbGVyQHByb3htb3guY29tCiAtIFt0YWcgdXBk
-YXRlXSAgICAgIHBhdGNoZXcvMjAxNzAxMjQxMTAxNTEuOTM3LTEtYmVycmFuZ2VAcmVkaGF0LmNv
-bSAtPiBwYXRjaGV3LzIwMTcwMTI0MTEwMTUxLjkzNy0xLWJlcnJhbmdlQHJlZGhhdC5jb20KIC0g
-W3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE3MDEyNDE4MDQyMC4xMjQzMC0xLXBib256aW5p
-QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDEyNDE4MDQyMC4xMjQzMC0xLXBib256aW5pQHJl
-ZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5M2U1MTI5IGNpcnJ1czog
-aGFuZGxlIG5lZ2F0aXZlIHBpdGNoIGluIGNpcnJ1c19pbnZhbGlkYXRlX3JlZ2lvbigpCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGNpcnJ1czogaGFuZGxlIG5lZ2F0
-aXZlIHBpdGNoIGluIGNpcnJ1c19pbnZhbGlkYXRlX3JlZ2lvbigpLi4uCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojMzE6IEZJTEU6IGh3L2Rpc3BsYXkv
-Y2lycnVzX3ZnYS5jOjY2NToKKyAgICAgICAgb2ZmX2JlZ2luIC09IGJ5dGVzcGVybGluZS0xOwog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IGNvZGUgaW5kZW50IHNo
-b3VsZCBuZXZlciB1c2UgdGFicwojMzc6IEZJTEU6IGh3L2Rpc3BsYXkvY2lycnVzX3ZnYS5jOjY3
-MToKK15JYXNzZXJ0KG9mZl9jdXJfZW5kID49IG9mZl9jdXIpOyQKCnRvdGFsOiAyIGVycm9ycywg
-MCB3YXJuaW5ncywgMTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Dropping SMP doesn't make a difference (I dropped it anyway since it doesn'=
+t make a second processor appear in the guest, and as I've learned it's cur=
+rently emulated in one thread anyway). You don't need an image, just the SP=
+ARCstation-20 ROM file which can be had from a variety of sources:
+910bd7306fcec38361fc4c3a2be50fa0  ss20_v2.25_rom
+and with no images listed:
+sudo /usr/src/qemu-2.8.0/build/sparc-softmmu/qemu-system-sparc -bios ./ss20=
+_v2.25_rom -M SS-20 -nographic -m 512 -cpu "TI SuperSparc 60" -net nic -net=
+ bridge,br=3Dbr0
+still get the error. I've never done a git bisect before but I've always wa=
+nted to, so I will try. :)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1622547
+
+Title:
+  qemu-system-sparc fatal error Trap 0x29 on Solaris 2.6
+
+Status in QEMU:
+  New
+
+Bug description:
+  When trying to install Solaris 2.6 from original CDROM, qemu fail with
+  the following error :
+
+  qemu: fatal: Trap 0x29 while interrupts disabled, Error state
+  pc: f0041280  npc: f0041284
+  %g0-7: 00000000 f0281800 08000000 ffffffff 00000000 f0243b88 00000001 f02=
+44020
+  %o0-7: 40400ce2 40400ce2 00000000 404000e2 f0243b88 00000000 f023ffd8 f00=
+57914 =
+
+  %l0-7: 40000cc2 f009645c f0096460 00000002 00000209 00000004 00000007 f02=
+3ff90 =
+
+  %i0-7: 00000042 404000e3 00000000 404000e3 e0000000 f028192a f0240038 f00=
+96448 =
+
+  %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  psr: 40400cc2 (icc: -Z-- SPE: SP-) wim: 00000002
+  fsr: 00000000 y: 00000000
+
+  The command line was :
+
+  qemu-system-sparc -nographic -bios ./openbios-sparc32 -M SS-20 -hda
+  ./36G.disk -m 512 -cdrom Solaris_2.6_Software_05_98.img -boot d
+  -serial telnet:0.0.0.0:3000,server -smp 2,cores=3D2 -monitor null
+
+  It fails with a similar output when using bios ss20_v2.25_rom.
+
+  =E2=96=B6 qemu-system-sparc --version
+  QEMU emulator version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and =
+the QEMU Project developers
+
+  =E2=96=B6 uname -a
+  Linux xxx 4.7.1-1-ARCH #1 SMP PREEMPT Wed Aug 17 08:13:35 CEST 2016 x86_6=
+4 GNU/Linux
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1622547/+subscriptions
