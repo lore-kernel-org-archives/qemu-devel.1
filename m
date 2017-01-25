@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cWHft-0002Su-91
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:07:25 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cWHqJ-00066A-Cj
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:18:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cWHfp-0000im-TH
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:07:21 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cWHqG-0003w2-7s
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:18:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59160)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cWHqG-0003u6-1Y
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:18:04 -0500
+Message-ID: <1485328680.29826.12.camel@redhat.com>
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 25 Jan 2017 08:07:05 +0100
-Message-Id: <1485328025-3783-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] cirrus: fix oob access issue (CVE-2017-TODO)
+Date: Wed, 25 Jan 2017 08:18:00 +0100
+In-Reply-To: <dba0324f-e6c1-04e0-da0f-0e06a87d0375@redhat.com>
+References: <58871f9b.d635240a.4cda6.5322@mx.google.com>
+	<237b1da5-532d-afd6-84ad-6adc5bd97291@redhat.com>
+	<1485254930.32716.23.camel@redhat.com>
+	<b269fc2b-e211-cc70-0b7e-da6b3180df88@redhat.com>
+	<1485260998.32716.45.camel@redhat.com> <20170124153143.GA29823@olga.wb>
+	<dba0324f-e6c1-04e0-da0f-0e06a87d0375@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] cirrus: fix oob access issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,49 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Li Qiang <liqiang6-s@360.cn>, qemu-stable@nongnu.org, P J P <ppandit@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Wolfgang Bumiller <w.bumiller@proxmox.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>, liqiang6-s@360.cn, ghoffman@redhat.com, Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org
 
-From: Li Qiang <liqiang6-s@360.cn>
+  Hi,
 
-When doing bitblt copy in backward mode, we should minus the
-blt width first just like the adding in the forward mode. This
-can avoid the oob access of the front of vga's vram.
+> > The negative pitch means (I think) that "addr" points to the lower
+> > left corner of the rectangle.
+> >
+> > The second part guarantees that the last blitted byte fits (lower
+> > right corner).
+>=20
+> To which Gerd responded "upper left". In retrospect I don't understand
+> why we didn't discuss that question further, as it now seems that we
+> were both wrong -- "addr" stands for bottom right, in the negative pitch
+> case.
 
-Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-Message-id: 5887254f.863a240a.2c122.5500@mx.google.com
+/me looks at d3532a0db02296e687711b8cdc7791924efccea0 and I can't
+remember I wrote that code :-o
 
-{ kraxel: with backward blits (negative pitch) addr is the topmost
-          address, so check it as-is against vram size ]
+And I can't remember the discussion either.
 
-Cc: qemu-stable@nongnu.org
-Cc: P J P <ppandit@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Fixes: d3532a0db02296e687711b8cdc7791924efccea0 (CVE-2014-8106)
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/cirrus_vga.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+The good thing is I probably looked more careful at the code because of
+that ...
 
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 379910d..b8c29a6 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -277,10 +277,9 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
-     }
-     if (pitch < 0) {
-         int64_t min = addr
--            + ((int64_t)s->cirrus_blt_height-1) * pitch;
--        int32_t max = addr
--            + s->cirrus_blt_width;
--        if (min < 0 || max > s->vga.vram_size) {
-+            + ((int64_t)s->cirrus_blt_height - 1) * pitch
-+            - s->cirrus_blt_width;
-+        if (min < 0 || addr > s->vga.vram_size) {
-             return true;
-         }
-     } else {
--- 
-1.8.3.1
+> Unfortunately, the original patch was meant to address the
+> then-embargoed CVE-2014-8106. Since we have a bug in that code (=3D a
+> security fix), this issue should have been reported privately as well,
+
+It has been reported privately first.  I've actually suggested to send
+it to the public list without embargo, given that we are moving away
+from cirrus so this is less critical than it used to be two years ago.
+Cirrus isn't the default display adapter any more in qemu, since years,
+and management apps (virt-manager, ovirt, ...) are following.
+
+cheers,
+  Gerd
