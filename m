@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWQ7e-0007MC-By
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:08:35 -0500
+	(envelope-from <thuth@redhat.com>) id 1cWQ9Y-0000CS-8M
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:10:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWQ7b-0001K3-2E
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:08:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50582)
+	(envelope-from <thuth@redhat.com>) id 1cWQ9U-00020N-St
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:10:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cWQ7a-0001It-Pu
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:08:30 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CAA317FB6A
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 16:08:29 +0000 (UTC)
-Date: Wed, 25 Jan 2017 16:08:24 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170125160824.GC29006@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170124110151.937-1-berrange@redhat.com>
-	<20170124110151.937-7-berrange@redhat.com>
-	<87d1fci916.fsf@frigg.lan>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cWQ9U-000208-LX
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:10:28 -0500
+References: <CAC2QTZY0SJczV9_e3TwJbEXwyuTQXDQesAP5W6U0JeYvsV5uQg@mail.gmail.com>
+	<c5202aa1-bf56-5d66-533a-a1e78a3eafa2@redhat.com>
+	<20170125110715.GB15529@redhat.com> <87lgtz5r0f.fsf@emacs.mitica>
+	<CAC2QTZaMTN5wnGrmTK-BKUP1F3fxuCpSMX7mCw2z0grcDhOJyA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fe189d26-df27-9a8e-6de3-6f53d92f5d2e@redhat.com>
+Date: Wed, 25 Jan 2017 17:10:24 +0100
 MIME-Version: 1.0
+In-Reply-To: <CAC2QTZaMTN5wnGrmTK-BKUP1F3fxuCpSMX7mCw2z0grcDhOJyA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87d1fci916.fsf@frigg.lan>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 6/8] trace: switch to modular code
- generation for sub-directories
+Subject: Re: [Qemu-devel] migration: QEMU aborts migration of "none" machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,90 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>, Juan Quintela <quintela@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Jan 24, 2017 at 08:53:57PM +0200, Llu=C3=ADs Vilanova wrote:
-> Daniel P Berrange writes:
+On 25.01.2017 13:58, Ashijeet Acharya wrote:
+> On Wed, Jan 25, 2017 at 4:46 PM, Juan Quintela <quintela@redhat.com> wr=
+ote:
+>> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>>> On Wed, Jan 25, 2017 at 11:53:06AM +0100, Thomas Huth wrote:
+>>>> On 25.01.2017 11:01, Ashijeet Acharya wrote:
+>>>>> Hi Thomas,
+>>>>>
+>>>>> I was able to reproduce the bug you encountered while trying to mig=
+rate
+>>>>> a "none" machine.
+>>>>>
+>>>>> After digging deep and debugging the problem with gdb, I found that
+>>>>> bitmap_new() is the function that crashes qemu as it always has
+>>>>> zero bits being passed to it.
+>>>>>
+>>>>> I had a discussion with Dave on the IRC yesterday and he suggested =
+the
+>>>>> reason of crash being the absence of RAM ( since machine is "none")
+>>>>> while attempting the migration.
+>>>>>
+>>>>> I am not sure what the ideal solution will be in this case; Do any =
+of
+>>>>> the maintainers have any suggestions or even a starting point which=
+ I
+>>>>> can ponder upon?
+>>>>
+>>>> I'm not that familiar with the migration code either, but maybe you
+>>>> could simply check for last_ram_offset() =3D=3D 0 at the beginning o=
+f
+>>>> ram_save_setup() and return with an error in that case?
+>>>
+>>> Do we actually need/want migration to succeed when RAM is 0 or vCPU
+>>> count is 0 ?  If not, then we could just register a migration blocker
+>>> during machine init
+>>
+>> Only use that I can see for that is to test that we have setup things
+>> correctly, but for that we could also use an stopped machine.  So, I
+>> don't know if it really makes sense.
+>>
+>> If the only problem is that bitmap_new(0) returns 0, we can try to fix
+>> that, no?
 >=20
-> > Introduce rules in the top level Makefile that are able to generate
-> > trace.[ch] files in every subdirectory which has a trace-events file.
->=20
-> > The top level directory is handled specially, so instead of creating
-> > trace.h, it creates trace-root.h. This allows sub-directories to
-> > include the top level trace-root.h file, without ambiguity wrt to
-> > the trace.g file in the current sub-dir.
->=20
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> [...]
-> > diff --git a/Makefile b/Makefile
-> > index 9f8968d..a8fa28a 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -56,25 +56,136 @@ GENERATED_SOURCES +=3D qmp-marshal.c qapi-types.=
-c qapi-visit.c qapi-event.c
-> >  GENERATED_HEADERS +=3D qmp-introspect.h
-> >  GENERATED_SOURCES +=3D qmp-introspect.c
-> =20
-> > -GENERATED_HEADERS +=3D trace/generated-tracers.h
-> > -ifeq ($(findstring dtrace,$(TRACE_BACKENDS)),dtrace)
-> > -GENERATED_HEADERS +=3D trace/generated-tracers-dtrace.h
-> > -endif
-> > -GENERATED_SOURCES +=3D trace/generated-tracers.c
-> > -
-> >  GENERATED_HEADERS +=3D trace/generated-tcg-tracers.h
-> =20
-> >  GENERATED_HEADERS +=3D trace/generated-helpers-wrappers.h
-> >  GENERATED_HEADERS +=3D trace/generated-helpers.h
-> >  GENERATED_SOURCES +=3D trace/generated-helpers.c
-> =20
-> > -ifeq ($(findstring ust,$(TRACE_BACKENDS)),ust)
-> > -GENERATED_HEADERS +=3D trace/generated-ust-provider.h
-> > -GENERATED_SOURCES +=3D trace/generated-ust.c
-> > +ifdef CONFIG_TRACE_UST
-> > +GENERATED_HEADERS +=3D trace-ust-all.h
-> > +GENERATED_SOURCES +=3D trace-ust-all.c
-> >  endif
-> =20
-> >  GENERATED_HEADERS +=3D module_block.h
-> =20
-> > +TRACE_HEADERS =3D trace-root.h $(trace-events-subdirs:%=3D%/trace.h)
-> > +TRACE_SOURCES =3D trace-root.c $(trace-events-subdirs:%=3D%/trace.c)
-> > +TRACE_DTRACE =3D
-> > +ifdef CONFIG_TRACE_DTRACE
-> > +TRACE_HEADERS +=3D trace-dtrace-root.h $(trace-events-subdirs:%=3D%/=
-trace-dtrace.h)
-> > +TRACE_DTRACE +=3D trace-dtrace-root.dtrace $(trace-events-subdirs:%=3D=
-%/trace-dtrace.dtrace)
-> > +endif
-> > +ifdef CONFIG_TRACE_UST
-> > +TRACE_HEADERS +=3D trace-ust-root.h $(trace-events-subdirs:%=3D%/tra=
-ce-ust.h)
-> > +endif
-> > +
-> > +GENERATED_HEADERS +=3D $(TRACE_HEADERS)
-> > +GENERATED_SOURCES +=3D $(TRACE_SOURCES)
-> > +
-> > +trace-group-name =3D $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/_/g=
-')
-> > +
-> > +%/trace.h: %/trace.h-timestamp
-> > +	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
-> > +%/trace.h-timestamp: $(SRC_PATH)/%/trace-events $(tracetool-y)
-> > +	$(call quiet-command,$(TRACETOOL) \
-> > +		--group=3D$(call trace-group-name,$@) \
->=20
-> Shouldn't you call trace-group-name with $*? To make sure it only conta=
-ins the
-> directories *below* SRC_PATH.
+> Yes, bitmap_new(0) aborts in this case. The only way I see to fix this
+> would be to error out rather than simply crashing?
+> Adding a migration blocker is one way too; although I am not aware of
+> the use cases of a "none" machine.
 
-$@ is a relative path already
+The "none" machine is - so far - only used for the testing framework
+(see the tests/ directory in the QEMU sources). With the upcoming QEMU
+2.9, it should also be possible to use it as a simple instruction set
+simulation board. But in both cases, we do not need migration for this
+machine, i.e. simply printing an error message (and refusing to migrate)
+instead of crashing should IMHO be OK here.
 
-Regards,
-Daniel
---=20
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
-/ :|
-|: http://libvirt.org              -o-             http://virt-manager.or=
-g :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
-/ :|
+ Thomas
