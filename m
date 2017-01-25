@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWQDO-0001uj-Sq
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:34 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWQDR-0001wY-Qa
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWQDN-0003Ue-W8
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38320)
+	(envelope-from <berrange@redhat.com>) id 1cWQDQ-0003V6-Rx
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38350)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cWQDN-0003UW-Ql
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:29 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cWQDQ-0003Uu-Je
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:32 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 25 Jan 2017 16:14:11 +0000
-Message-Id: <20170125161417.31949-3-berrange@redhat.com>
+Date: Wed, 25 Jan 2017 16:14:12 +0000
+Message-Id: <20170125161417.31949-4-berrange@redhat.com>
 In-Reply-To: <20170125161417.31949-1-berrange@redhat.com>
 References: <20170125161417.31949-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/8] trace: move hw/block/dataplane events
- to correct subdir
+Subject: [Qemu-devel] [PATCH v4 3/8] trace: move hw/xen events to correct
+ subdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,51 +33,63 @@ always live in the same directory as the source file.
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- Makefile.objs                   | 1 +
- hw/block/dataplane/trace-events | 6 ++++++
- hw/block/trace-events           | 5 -----
- 3 files changed, 7 insertions(+), 5 deletions(-)
- create mode 100644 hw/block/dataplane/trace-events
+ Makefile.objs       |  1 +
+ hw/xen/trace-events | 13 +++++++++++++
+ trace-events        | 10 ----------
+ 3 files changed, 14 insertions(+), 10 deletions(-)
+ create mode 100644 hw/xen/trace-events
 
 diff --git a/Makefile.objs b/Makefile.objs
-index 01cef86..babbc4e 100644
+index babbc4e..9ac11e7 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -125,6 +125,7 @@ trace-events-y += io/trace-events
- trace-events-y += migration/trace-events
- trace-events-y += block/trace-events
- trace-events-y += hw/block/trace-events
-+trace-events-y += hw/block/dataplane/trace-events
- trace-events-y += hw/char/trace-events
- trace-events-y += hw/intc/trace-events
- trace-events-y += hw/net/trace-events
-diff --git a/hw/block/dataplane/trace-events b/hw/block/dataplane/trace-events
+@@ -152,6 +152,7 @@ trace-events-y += hw/vfio/trace-events
+ trace-events-y += hw/acpi/trace-events
+ trace-events-y += hw/arm/trace-events
+ trace-events-y += hw/alpha/trace-events
++trace-events-y += hw/xen/trace-events
+ trace-events-y += ui/trace-events
+ trace-events-y += audio/trace-events
+ trace-events-y += net/trace-events
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
 new file mode 100644
-index 0000000..13f5dbb
+index 0000000..c4fb6f1
 --- /dev/null
-+++ b/hw/block/dataplane/trace-events
-@@ -0,0 +1,6 @@
++++ b/hw/xen/trace-events
+@@ -0,0 +1,13 @@
 +# See docs/tracing.txt for syntax documentation.
 +
-+# hw/block/dataplane/virtio-blk.c
-+virtio_blk_data_plane_start(void *s) "dataplane %p"
-+virtio_blk_data_plane_stop(void *s) "dataplane %p"
-+virtio_blk_data_plane_process_request(void *s, unsigned int out_num, unsigned int in_num, unsigned int head) "dataplane %p out_num %u in_num %u head %u"
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index d0dd94f..65e83dc 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -7,11 +7,6 @@ virtio_blk_handle_write(void *req, uint64_t sector, size_t nsectors) "req %p sec
- virtio_blk_handle_read(void *req, uint64_t sector, size_t nsectors) "req %p sector %"PRIu64" nsectors %zu"
- virtio_blk_submit_multireq(void *mrb, int start, int num_reqs, uint64_t offset, size_t size, bool is_write) "mrb %p start %d num_reqs %d offset %"PRIu64" size %zu is_write %d"
- 
--# hw/block/dataplane/virtio-blk.c
--virtio_blk_data_plane_start(void *s) "dataplane %p"
--virtio_blk_data_plane_stop(void *s) "dataplane %p"
--virtio_blk_data_plane_process_request(void *s, unsigned int out_num, unsigned int in_num, unsigned int head) "dataplane %p out_num %u in_num %u head %u"
--
- # hw/block/hd-geometry.c
- hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk %p LCHS %d %d %d"
- hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t secs, int trans) "blk %p CHS %u %u %u trans %d"
++# include/hw/xen/xen_common.h
++xen_default_ioreq_server(void) ""
++xen_ioreq_server_create(uint32_t id) "id: %u"
++xen_ioreq_server_destroy(uint32_t id) "id: %u"
++xen_ioreq_server_state(uint32_t id, bool enable) "id: %u: enable: %i"
++xen_map_mmio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
++xen_unmap_mmio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
++xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
++xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
++xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
++xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+diff --git a/trace-events b/trace-events
+index 839a9d0..05ac6ac 100644
+--- a/trace-events
++++ b/trace-events
+@@ -62,16 +62,6 @@ spice_vmc_event(int event) "spice vmc event %d"
+ # xen-hvm.c
+ xen_ram_alloc(unsigned long ram_addr, unsigned long size) "requested: %#lx, size %#lx"
+ xen_client_set_memory(uint64_t start_addr, unsigned long size, bool log_dirty) "%#"PRIx64" size %#lx, log_dirty %i"
+-xen_default_ioreq_server(void) ""
+-xen_ioreq_server_create(uint32_t id) "id: %u"
+-xen_ioreq_server_destroy(uint32_t id) "id: %u"
+-xen_ioreq_server_state(uint32_t id, bool enable) "id: %u: enable: %i"
+-xen_map_mmio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+-xen_unmap_mmio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+-xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+-xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+-xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+-xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ handle_ioreq(void *req, uint32_t type, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p type=%d dir=%d df=%d ptr=%d port=%#"PRIx64" data=%#"PRIx64" count=%d size=%d"
+ handle_ioreq_read(void *req, uint32_t type, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p read type=%d df=%d ptr=%d port=%#"PRIx64" data=%#"PRIx64" count=%d size=%d"
+ handle_ioreq_write(void *req, uint32_t type, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p write type=%d df=%d ptr=%d port=%#"PRIx64" data=%#"PRIx64" count=%d size=%d"
 -- 
 2.9.3
