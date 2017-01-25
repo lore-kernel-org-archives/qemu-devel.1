@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cWNeI-00021f-WB
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:30:08 -0500
+	(envelope-from <lersek@redhat.com>) id 1cWNnv-0000Z7-Rv
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:40:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cWNeI-0001Ig-8L
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:30:07 -0500
-Received: from mail-vk0-x229.google.com ([2607:f8b0:400c:c05::229]:34104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cWNeI-0001Hw-4y
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:30:06 -0500
-Received: by mail-vk0-x229.google.com with SMTP id r136so133561342vke.1
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 05:30:03 -0800 (PST)
+	(envelope-from <lersek@redhat.com>) id 1cWNnr-0004Vo-PH
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:40:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cWNnr-0004Vc-HC
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:39:59 -0500
+References: <1485346353-23814-1-git-send-email-w.bumiller@proxmox.com>
+	<2ca4bdcc-cd12-f640-60f2-85f31dad32ad@redhat.com>
+	<1649081132.25.1485350546249@webmail.proxmox.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f78dffc6-1cc5-ecab-3b9b-47d0a96d772d@redhat.com>
+Date: Wed, 25 Jan 2017 14:39:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <cover.1485289633.git.mjt@msgid.tls.msk.ru>
-References: <cover.1485289633.git.mjt@msgid.tls.msk.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 25 Jan 2017 13:29:42 +0000
-Message-ID: <CAFEAcA_GLZt4sUGasgd6YWcxHZUWA8DOBem-yqHYTVi6PJARVw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/31] Trivial patches for 2017-01-24
+In-Reply-To: <1649081132.25.1485350546249@webmail.proxmox.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] cirrus: handle negative pitch in
+ cirrus_invalidate_region()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Wolfgang Bumiller <w.bumiller@proxmox.com>, qemu-devel@nongnu.org
+Cc: Li Qiang <liqiang6-s@360.cn>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 24 January 2017 at 20:29, Michael Tokarev <mjt@tls.msk.ru> wrote:
-> Rebased, yes it was a trivial merge conflict (a trivial patch
-> changed comment in a removed section of a file). The same as
-> before, with the merge conflict fixed and an r-b added.
->
-> Not resending other stuff, just the cover letter.
->
-> Thanks,
->
-> /mjt
->
-> The following changes since commit a9e404600a9bd1e6a26431fc89e5069092e67f14:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20170124' into staging (2017-01-24 17:26:26 +0000)
->
-> are available in the git repository at:
->
->   git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
->
-> for you to fetch changes up to 5658ffa39aae034458231bc4abfee57637b88c6e:
->
->   hw/isa/isa-bus: Set category of the "isabus-bridge" device (2017-01-24 23:26:54 +0300)
->
-> ----------------------------------------------------------------
-> trivial patches for 2017-01-24
->
+On 01/25/17 14:22, Wolfgang Bumiller wrote:
+> 
+>> On January 25, 2017 at 1:35 PM Laszlo Ersek <lersek@redhat.com> wrote:
+>>
+>>
+>> On 01/25/17 13:12, Wolfgang Bumiller wrote:
+>>> cirrus_invalidate_region() calls memory_region_set_dirty()
+>>> on a per-line basis, always ranging from off_begin to
+>>> off_begin+bytesperline. With a negative pitch off_begin
+>>> marks the top most used address and thus we need to do an
+>>> initial shift backwards by bytesperline for negative
+>>> pitches of backward blits, otherwise the first iteration
+>>> covers the line going from the start offset forwards instead
+>>> of backwards.
+>>>
+>>> Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+>>> ---
+>>> I bumped the patch context to 4 lines to get it to include the
+>>> memory_region_set_dirty() call which takes an unsigned length (`hwaddr
+>>> size`) because I'm also not too happy about the masking going on there
+>>> since it means off_cur_end may be less than off_cur, but if the range
+>>> checks are finnaly correct I don't think this case could happen
+>>> anymore? (A check shouldn't hurt though, or maybe an assert()?)
+>>>
+>>>  hw/display/cirrus_vga.c | 4 ++++
+>>>  1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+>>> index b1a0773..af61981 100644
+>>> --- a/hw/display/cirrus_vga.c
+>>> +++ b/hw/display/cirrus_vga.c
+>>> @@ -669,8 +669,12 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
+>>>      int y;
+>>>      int off_cur;
+>>>      int off_cur_end;
+>>>  
+>>> +    if (off_pitch < 0) {
+>>> +        off_begin -= bytesperline;
+>>> +    }
+>>> +
+>>>      for (y = 0; y < lines; y++) {
+>>>  	off_cur = off_begin;
+>>>  	off_cur_end = (off_cur + bytesperline) & s->cirrus_addr_mask;
+>>>          memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
+>>>
+>>
+>> I think the adjustment is off by one. The loop body inherently considers
+>> "off_cur" inclusive, and "off_cur_end" exclusive.
+>>
+>> When "off_pitch" is negative, and the initial "off_begin" value is an
+>> "inclusive end", then by subtracting a full "bytesperline", you just go
+>> to the "inclusive end" of the previous line. Whereas, you should go to
+>> the address right above it, to the "inclusive start" of the *same* line.
+>> (From bottom right to bottom left corner.)
+> 
+> Right, this again.
+> 
+>> Therefore the decrement should be (bytesperline - bytesperpixel), IMO.
+> 
+> At this point we don't operate in a pixel byte group basis though, and
+> as far as I can see the backward blit functions are always byte-based
+> operations, so I think `bytesperpixel` can just be 1 here?
 
-Applied, thanks.
+ENOCLUE :/ Perhaps Gerd can answer?
 
--- PMM
+>> Regarding assert(off_cur_end >= off_cur): not a bad idea, IMO.
+> 
+> I'll include it in v2.
+> 
+> 
