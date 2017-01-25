@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cWRqk-0003fs-TG
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:59:16 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cWRtr-0006ZD-Tl
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:02:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cWRqh-0003HX-1e
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:59:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48652)
+	(envelope-from <pbonzini@redhat.com>) id 1cWRto-0004In-1M
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:02:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50178)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1cWRqg-0003H8-PV
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:59:10 -0500
-References: <1485362572-7246-1-git-send-email-den@openvz.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1e511c84-c9fa-1d4e-8a73-e48c0b29a59a@redhat.com>
-Date: Wed, 25 Jan 2017 18:59:06 +0100
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWRtn-0004Ib-S3
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:02:23 -0500
+References: <1477674916-6795-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<1477674916-6795-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<ac1ae748-c69c-e2df-d59f-aa5301674928@redhat.com>
+	<57aceabc-c3b8-fdd2-5b6b-69f45a0c8d4f@linux.vnet.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0607518e-04c1-3b68-0119-eb0ec70880e2@redhat.com>
+Date: Wed, 25 Jan 2017 19:02:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <1485362572-7246-1-git-send-email-den@openvz.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fR8JFlkg23WDKm6SMTJppkd7IRHHM7cUT"
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: add missed BDRV_O_NOCACHE when
- block device is opened without file
+In-Reply-To: <57aceabc-c3b8-fdd2-5b6b-69f45a0c8d4f@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] move vm_start to cpus.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fR8JFlkg23WDKm6SMTJppkd7IRHHM7cUT
-From: Max Reitz <mreitz@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
-Message-ID: <1e511c84-c9fa-1d4e-8a73-e48c0b29a59a@redhat.com>
-Subject: Re: [PATCH 1/1] block: add missed BDRV_O_NOCACHE when block device is
- opened without file
-References: <1485362572-7246-1-git-send-email-den@openvz.org>
-In-Reply-To: <1485362572-7246-1-git-send-email-den@openvz.org>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
-
-[CC-ing John]
-
-On 25.01.2017 17:42, Denis V. Lunev wrote:
-> Technically there is a problem when the guest DVD is created by libvirt=
-
-> with AIO mode 'native' on Linux. Current QEMU is unable to start the
-> domain configured as follows:
->     <disk type=3D'file' device=3D'cdrom'>
->       <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>=
-
->       <target dev=3D'sdb' bus=3D'scsi'/>
->       <readonly/>
->     </disk>
-> The problem comes from the combination of 'cache' and 'io' options.
->=20
-> 'io' option is common option and it is removed from block driver
-> specific options. 'cache' originally is not. The patch makes 'cache'
-> option common. This works fine as long as cdrom media insertion
-> later on.
->=20
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> ---
->  blockdev.c | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
-
-There was a Red Hat BZ for this:
-
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1342999
-
-There is now a corresponding BZ for libvirt:
-
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1377321
-
-The gist is that it was determined to be a problem with libvirt.
-
-RHEL has a downstream commit to work around this issue by ignoring the
-cache mode set for empty CD-ROMs -- but that is only because that was
-simpler than fixing libvirt.
-
-(Note that it's ignoring the cache mode instead of actually evaluating it=
-=2E)
-
-> May be this has already discussed, but still. AIO=3Dnative for CDROM wi=
-thout
-> media seems important case.
-
-First, I personally don't find aio=3Dnative very important for CD-ROM
-drives. Yes, we shouldn't make IDE CD-ROM slower than necessary, but I
-don't think aio=3Dnative will make the difference between "Slow like
-CD-ROMs are in reality" and "As fast as virtio".
-
-Second, all this patch does is revert some changes done by commit
-91a097e7478940483e76d52217f05bc05b98d5a5, which was very deliberate.
-
-Third, you may then be asking for the recommended way to put an
-aio=3Dnative medium into a CD-ROM drive. Good thing you ask, because we
-have a way that we want to recommend but can't because it's still
-considered experimental:
-
-The BDS is added using blockdev-add, with all of the appropriate caching
-and aio options. Then it's inserted into the drive using the
-x-blockdev-insert-medium command, and the drive is closed using
-blockdev-close-tray.
-
-There are a couple of issues with this: First, blockdev-add and
-x-blockdev-insert-medium are still experimental. The good news are that
-I think the reason why the latter is experimental has actually
-disappeared and we can just drop the x- by now. The
-not-so-good-but-not-so-bad-either news are that we plan to get
-blockdev-add declared non-experimental for 2.9. Let's see how it goes.
-
-The other issue is that of course it's more cumbersome to use than a
-simple 'change' via HMP. I argue that if someone communicates with a VM
-by hand, they either have to deal with this added complexity or they
-cannot use aio=3Dnative for CD-ROM drives -- which, as I said, I don't
-think is too bad.
-
-However, there is a reason why you cannot set cache/aio for an empty
-drive and it's simply that it doesn't make sense.
-
-Max
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: palves@redhat.com, borntraeger@de.ibm.com
 
 
---fR8JFlkg23WDKm6SMTJppkd7IRHHM7cUT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+On 25/01/2017 18:53, Claudio Imbrenda wrote:
+> On 25/01/17 11:21, Paolo Bonzini wrote:
+>>
+>>
+>> On 28/10/2016 19:15, Claudio Imbrenda wrote:
+>>> * moves the call to qemu_clock_enable away from resume_all_vcpus, and
+>>>   add an explicit call to it before each instance of resume_all_vcpus
+>>>   in the code.
+>>
+>> This change adds useless duplication, and isn't matched by a similar
+>> change to pause_all_vcpus.  You need to justify it; I suppose it is
+>> because the next patch will not call resume_all_cpus?
+> 
+> Actually it is because the next patch used to call resume_all_vcpus, and
+> we didn't want it to restart the clock too. But then I ended up not
+> using resume_all_vcpus.
+> 
+> And now I have actually no idea why we didn't want to restart the clock.
+> Maybe we should? After all some CPUs are running. I can patch
+> gdb_continue_partial to check if any CPU was actually restarted, and if
+> so start the clock.
+> 
+> So in the end it should still be correct, but the changes would be kept
+> small.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliI52oSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AceUH/2m6xbQ7R2ycYSI7efcpjhZg3eZnR1ye
-Gh0Yv5lbYyOvpQ0XaJ7ZVHYlOop+/k4v+zz4VyZiBZNJ8zmF9HF/O4bRAPwF6Qx0
-bvJm2bvOqJpzTx4/P3F8Iun9qgCFHPIN3n5bNohc3x/KN4OKMws4n3bUCwHhqARL
-IO2BGLQFN6D9iV+diShKvFLXyEhtJa069i0pk9A+4d9sd7lowr9uPbVKBePhGFAI
-LxMKeOV4fBYGCIrGjSLn470j2Y3P7PDIDb2RWK8ka6jmWLajmVEApshbVmz3HULx
-Se6LNYQOEkpeWgv6iZ9EELsORKMJ7iE/tpPZ3PM0JOyIFJU2YXHg75M=
-=GJDC
------END PGP SIGNATURE-----
+Yeah, this sounds like a good solution.  Thanks!
 
---fR8JFlkg23WDKm6SMTJppkd7IRHHM7cUT--
+Paolo
+
+>> Most of the callers of pause_all_vcpus/resume_all_vcpus don't let timers
+>> run, so the clock need not be disabled and enabled.  Maybe the right
+>> places to call qemu_clock_enable are cpu_disable_ticks and
+>> cpu_enable_ticks?  That should work for you.
+>>
+>> In that case, please make the first patch the qemu_clock_enable
+>> movement; the second patch the introduction of vm_prepare_start; the
+>> third patch the gdbstub change.
+>>
+>>> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+>>> index 3728a1e..5fa074b 100644
+>>> --- a/include/sysemu/cpus.h
+>>> +++ b/include/sysemu/cpus.h
+>>> @@ -5,6 +5,7 @@
+>>>  bool qemu_in_vcpu_thread(void);
+>>>  void qemu_init_cpu_loop(void);
+>>>  void resume_all_vcpus(void);
+>>> +void resume_some_vcpus(CPUState **cpus);
+>>>  void pause_all_vcpus(void);
+>>>  void cpu_stop_current(void);
+>>>  void cpu_ticks_init(void);
+>>
+>> This function doesn't exist.
+> 
+> oops.
+> 
+> 
+> Claudio
+> 
