@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cWHVE-00057X-4D
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 01:56:21 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cWHft-0002Su-91
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:07:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cWHVB-0006SZ-2R
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 01:56:20 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:29791)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cWHVA-0006Rx-AL
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 01:56:16 -0500
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Wed, 25 Jan 2017 14:54:01 +0800
-Message-ID: <1485327241-15104-3-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1485327241-15104-1-git-send-email-zhang.zhanghailiang@huawei.com>
-References: <1485327241-15104-1-git-send-email-zhang.zhanghailiang@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 2/2] savevm: Add new helpers to process the
- different stages of loadvm/savevm
+	(envelope-from <kraxel@redhat.com>) id 1cWHfp-0000im-TH
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:07:21 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 25 Jan 2017 08:07:05 +0100
+Message-Id: <1485328025-3783-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] cirrus: fix oob access issue (CVE-2017-TODO)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +18,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: amit.shah@redhat.com, quintela@redhat.com, dgilbert@redhat.com, xuquan8@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li
-	Zhijian <lizhijian@cn.fujitsu.com>
+Cc: Li Qiang <liqiang6-s@360.cn>, qemu-stable@nongnu.org, P J P <ppandit@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Wolfgang Bumiller <w.bumiller@proxmox.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-There are several stages during loadvm/savevm process. In different stage,
-migration incoming processes different types of sections.
-We want to control these stages more accuracy, it will benefit COLO
-performance, we don't have to save type of QEMU_VM_SECTION_START
-sections everytime while do checkpoint, besides, we want to separate
-the process of saving/loading memory and devices state.
+From: Li Qiang <liqiang6-s@360.cn>
 
-So we add three new helper functions: qemu_loadvm_state_begin(),
-qemu_load_device_state() and qemu_savevm_live_state() to achieve
-different process during migration.
+When doing bitblt copy in backward mode, we should minus the
+blt width first just like the adding in the forward mode. This
+can avoid the oob access of the front of vga's vram.
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+Message-id: 5887254f.863a240a.2c122.5500@mx.google.com
+
+{ kraxel: with backward blits (negative pitch) addr is the topmost
+          address, so check it as-is against vram size ]
+
+Cc: qemu-stable@nongnu.org
+Cc: P J P <ppandit@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Fixes: d3532a0db02296e687711b8cdc7791924efccea0 (CVE-2014-8106)
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/sysemu/sysemu.h |  4 ++++
- migration/savevm.c      | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+)
+ hw/display/cirrus_vga.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index ff8ffb5..d9214bf 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -126,7 +126,11 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
-                                            uint64_t *start_list,
-                                            uint64_t *length_list);
- 
-+void qemu_savevm_live_state(QEMUFile *f);
-+
- int qemu_loadvm_state(QEMUFile *f);
-+int qemu_loadvm_state_begin(QEMUFile *f);
-+int qemu_load_device_state(QEMUFile *f);
- 
- extern int autostart;
- 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 92b3d6c..04dee4f 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1264,6 +1264,13 @@ done:
-     return ret;
- }
- 
-+void qemu_savevm_live_state(QEMUFile *f)
-+{
-+    /* save QEMU_VM_SECTION_END section */
-+    qemu_savevm_state_complete_precopy(f, true);
-+    qemu_put_byte(f, QEMU_VM_EOF);
-+}
-+
- static int qemu_save_device_state(QEMUFile *f)
- {
-     SaveStateEntry *se;
-@@ -2064,6 +2071,40 @@ int qemu_loadvm_state(QEMUFile *f)
-     return ret;
- }
- 
-+int qemu_loadvm_state_begin(QEMUFile *f)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    Error *local_err = NULL;
-+    int ret;
-+
-+    if (qemu_savevm_state_blocked(&local_err)) {
-+        error_report_err(local_err);
-+        return -EINVAL;
-+    }
-+    /* Load QEMU_VM_SECTION_START section */
-+    ret = qemu_loadvm_state_main(f, mis);
-+    if (ret < 0) {
-+        error_report("Failed to loadvm begin work: %d", ret);
-+    }
-+    return ret;
-+}
-+
-+int qemu_load_device_state(QEMUFile *f)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    int ret;
-+
-+    /* Load QEMU_VM_SECTION_FULL section */
-+    ret = qemu_loadvm_state_main(f, mis);
-+    if (ret < 0) {
-+        error_report("Failed to load device state: %d", ret);
-+        return ret;
-+    }
-+
-+    cpu_synchronize_all_post_init();
-+    return 0;
-+}
-+
- void hmp_savevm(Monitor *mon, const QDict *qdict)
- {
-     BlockDriverState *bs, *bs1;
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index 379910d..b8c29a6 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -277,10 +277,9 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+     }
+     if (pitch < 0) {
+         int64_t min = addr
+-            + ((int64_t)s->cirrus_blt_height-1) * pitch;
+-        int32_t max = addr
+-            + s->cirrus_blt_width;
+-        if (min < 0 || max > s->vga.vram_size) {
++            + ((int64_t)s->cirrus_blt_height - 1) * pitch
++            - s->cirrus_blt_width;
++        if (min < 0 || addr > s->vga.vram_size) {
+             return true;
+         }
+     } else {
 -- 
 1.8.3.1
