@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cWNb2-0007Se-Aw
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:26:45 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cWNbA-0007ix-JB
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:26:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cWNaz-0000DU-Oa
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:26:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cWNaz-0000DL-Ik
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:26:41 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C36193D952
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:26:41 +0000 (UTC)
-Date: Wed, 25 Jan 2017 13:26:38 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170125132638.GH10664@stefanha-x1.localdomain>
-References: <20170124180420.12430-1-pbonzini@redhat.com>
-	<20170124180420.12430-8-pbonzini@redhat.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1cWNb8-0000Eh-1E
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:26:52 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:52652)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cWNb7-0000EX-Pi
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:26:49 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170124071654.4572.41407.stgit@PASHA-ISP>
+	<20170124071713.4572.36636.stgit@PASHA-ISP>
+	<96675d3f-9d53-bde1-f6da-7cb0b1f41316@redhat.com>
+	<000501d276fb$fbcde7d0$f369b770$@ru>
+	<1683a32c-4ea8-c343-e972-095593819121@redhat.com>
+	<000601d276fe$e71b9140$b552b3c0$@ru>
+	<10ac3f7d-6ae8-4657-7135-d9a05b5a3d39@redhat.com>
+	<000901d27706$6f054090$4d0fc1b0$@ru>
+	<66b50426-1fc7-7730-1d5e-b7d4ad0e761b@redhat.com>
+In-Reply-To: <66b50426-1fc7-7730-1d5e-b7d4ad0e761b@redhat.com>
+Date: Wed, 25 Jan 2017 16:26:51 +0300
+Message-ID: <000b01d2770e$b0926f80$11b74e80$@ru>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="54u2kuW9sGWg/X+X"
-Content-Disposition: inline
-In-Reply-To: <20170124180420.12430-8-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 7/8] virtio: use VRingMemoryRegionCaches
- for descriptor ring
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v7 03/14] replay: exception replay fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,34 +36,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
 
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 25/01/2017 13:27, Pavel Dovgalyuk wrote:
+> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >> On 25/01/2017 12:33, Pavel Dovgalyuk wrote:
+> >>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >>>> On 25/01/2017 12:12, Pavel Dovgalyuk wrote:
+> >>>>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >>>>>> On 24/01/2017 08:17, Pavel Dovgalyuk wrote:
+> >>>>>>> @@ -451,6 +451,10 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+> >>>>>>>  #ifndef CONFIG_USER_ONLY
+> >>>>>>>      } else if (replay_has_exception()
+> >>>>>>>                 && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
+> >>>>>>> +        /* Break the execution loop in case of running out of TB cache.
+> >>>>>>> +           This is needed to make flushing of the TB cache, because
+> >>>>>>> +           real flush is queued to be executed outside the cpu loop. */
+> >>>>>>> +        cpu->exception_index = EXCP_INTERRUPT;
+> >>>>>>>          /* try to cause an exception pending in the log */
+> >>>>>>>          cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
+> >>>>>>>          *ret = -1;
+> >>>>>>
+> >>>>>> Why is replay_has_exception() related to be running out of TB cache?
+> >>>>>
+> >>>>> It doesn't.
+> >>>>> Calling tb_find when there is not space in cache causes tb_flush and cpu_loop_exit.
+> >>>>> But execution loop will continue, because there is no reason to break it
+> >>>>> (like setting exception_index).
+> >>>>
+> >>>> What about setting cpu->exit_request?  queue_work_on_cpu calls
+> >>>> qemu_cpu_kick.
+> >>>
+> >>> cpu->exit_request does not checked in this loop.
+> >>> We have to add this checking somewhere then?
+> >>
+> >> It's checked by cpu_handle_interrupt.  Are you not reaching
+> >> cpu_handle_interrupt then?  Why?
+> >
+> > Execution doesn't reach cpu_handle_interrupt, because tb_find
+> > calls cpu_loop_exit. And the execution loop enters cpu_handle_exception again and again.
+> 
+> Perhaps tb_gen_code should set cpu->exception_index before calling
+> cpu_loop_exit.
 
---54u2kuW9sGWg/X+X
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Maybe it would be better, because tb_gen_code is called in many other paths.
+I'll fix the patch.
 
-On Tue, Jan 24, 2017 at 07:04:19PM +0100, Paolo Bonzini wrote:
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/virtio/virtio.c | 28 +++++++++++++---------------
->  1 file changed, 13 insertions(+), 15 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---54u2kuW9sGWg/X+X
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYiKeOAAoJEJykq7OBq3PIYlgH/2eQbzDnzWWwDmizGUhPSTPd
-lsu+uO8oD6NRUzjW5g/DIU1CE7OHAsQiV6Qwb8ZkB48iRT4xYyK1tppYUO0XY2aF
-xUS5lFkPMXHlSvY/DNyv2pK4PNSvz8NATN38PEFvZhsGzIP7cPkAoIdeVN91KGIM
-tfFcMCmQjCdQUivHuk1n3VeOyD8cizVVwiNgDRRHpFNv1Q9SAIHOPJSGJ1on4EoM
-SQVMh4jRoBq+Y3ZIyW/wIk9byp3NmQ1nROxCbKoHoCMyc9aUqBkv0UiZwIp7zQkP
-6cfpy+fRxTh26GijEp+oMkWTP6OHsQcLxzrKgJP9juoP9P2qoLakicUgDLLQ120=
-=8JlD
------END PGP SIGNATURE-----
-
---54u2kuW9sGWg/X+X--
+Pavel Dovgalyuk
