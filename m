@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cWFEK-00080e-1T
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:30:45 -0500
+	(envelope-from <peterx@redhat.com>) id 1cWFG4-0000hZ-9I
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:32:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cWFEG-00024W-Ke
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:30:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52846)
+	(envelope-from <peterx@redhat.com>) id 1cWFFz-0002VC-6z
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:32:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48394)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cWFEG-00024R-Bz
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:30:40 -0500
-References: <cover.1485308342.git.ben@skyportsystems.com>
-	<01f010147f8faaf7bd7c4ea94a364a584f323b0a.1485308342.git.ben@skyportsystems.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6550884f-e5f7-f99e-8d35-b6ff0697313f@redhat.com>
-Date: Wed, 25 Jan 2017 05:30:36 +0100
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWFFy-0002Tj-Vt
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:32:27 -0500
+Date: Wed, 25 Jan 2017 12:32:21 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170125043221.GD5151@pxdev.xzpeter.org>
+References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
+	<1485253571-19058-3-git-send-email-peterx@redhat.com>
+	<20170124092905.41832531@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <01f010147f8faaf7bd7c4ea94a364a584f323b0a.1485308342.git.ben@skyportsystems.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/9] linker-loader: Add new 'allocate
- and return address' cmd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170124092905.41832531@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH v5 02/18] vfio: introduce vfio_get_vaddr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,204 +28,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com
-Cc: qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On 01/25/17 02:43, ben@skyportsystems.com wrote:
-> From: Ben Warren <ben@skyportsystems.com>
+On Tue, Jan 24, 2017 at 09:29:05AM -0700, Alex Williamson wrote:
+> On Tue, 24 Jan 2017 18:25:55 +0800
+> Peter Xu <peterx@redhat.com> wrote:
 > 
-> This adds a new linker-loader command to instruct the guest to allocate
-> memory for a fw_cfg file and write the address back into another
-> writeable fw_cfg file.  Knowing this address, QEMU can then write into
-> guest memory at runtime.
+> > A cleanup for vfio_iommu_map_notify(). Should have no functional change,
+> > just to make the function shorter and easier to understand.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
+> >  1 file changed, 38 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index 174f351..ce55dff 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+> >             section->offset_within_address_space & (1ULL << 63);
+> >  }
+> >  
+> > -static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> > +static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+> > +                           bool *read_only)
+> >  {
+> > -    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+> > -    VFIOContainer *container = giommu->container;
+> > -    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> >      MemoryRegion *mr;
+> >      hwaddr xlat;
+> >      hwaddr len = iotlb->addr_mask + 1;
+> > -    void *vaddr;
+> > -    int ret;
+> > -
+> > -    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+> > -                                iova, iova + iotlb->addr_mask);
+> > -
+> > -    if (iotlb->target_as != &address_space_memory) {
+> > -        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> > -                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+> > -        return;
+> > -    }
+> > +    bool ret = false;
+> > +    bool writable = iotlb->perm & IOMMU_WO;
+> >  
+> >      /*
+> >       * The IOMMU TLB entry we have just covers translation through
+> > @@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> >      rcu_read_lock();
+> >      mr = address_space_translate(&address_space_memory,
+> >                                   iotlb->translated_addr,
+> > -                                 &xlat, &len, iotlb->perm & IOMMU_WO);
+> > +                                 &xlat, &len, writable);
+> >      if (!memory_region_is_ram(mr)) {
+> >          error_report("iommu map to non memory area %"HWADDR_PRIx"",
+> >                       xlat);
+> >          goto out;
+> >      }
+> > +
+> >      /*
+> >       * Translation truncates length to the IOMMU page size,
+> >       * check that it did not truncate too much.
+> > @@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> >          goto out;
+> >      }
+> >  
+> > +    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> > +    *read_only = !writable || mr->readonly;
+> > +    ret = true;
+> > +
+> > +out:
+> > +    rcu_read_unlock();
+> > +    return ret;
+> > +}
+> > +
+> > +static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> > +{
+> > +    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+> > +    VFIOContainer *container = giommu->container;
+> > +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> > +    bool read_only;
+> > +    void *vaddr;
+> > +    int ret;
+> > +
+> > +    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+> > +                                iova, iova + iotlb->addr_mask);
+> > +
+> > +    if (iotlb->target_as != &address_space_memory) {
+> > +        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> > +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+> > +        return;
+> > +    }
+> > +
+> > +    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
+> > +        return;
+> > +    }
+> > +
+> >      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> > -        vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> >          ret = vfio_dma_map(container, iova,
+> >                             iotlb->addr_mask + 1, vaddr,
+> > -                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
+> > +                           read_only);
+> >          if (ret) {
+> >              error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+> >                           "0x%"HWADDR_PRIx", %p) = %d (%m)",
+> > @@ -357,8 +377,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> >                           iotlb->addr_mask + 1, ret);
+> >          }
+> >      }
+> > -out:
+> > -    rcu_read_unlock();
 > 
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> ---
->  hw/acpi/bios-linker-loader.c         | 71 ++++++++++++++++++++++++++++++++++--
->  include/hw/acpi/bios-linker-loader.h |  7 ++++
->  2 files changed, 75 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
-> index d963ebe..1d991ba 100644
-> --- a/hw/acpi/bios-linker-loader.c
-> +++ b/hw/acpi/bios-linker-loader.c
-> @@ -78,6 +78,22 @@ struct BiosLinkerLoaderEntry {
->              uint32_t length;
->          } cksum;
->  
-> +        /*
-> +         * COMMAND_ALLOCATE_RETURN_ADDR - allocate a table from @alloc_ret_file
-> +         * subject to @alloc_ret_align alignment (must be power of 2)
-> +         * and @alloc_ret_zone (can be HIGH or FSEG) requirements.
-> +         * Additionally, return the address of the allocation in
-> +         * @addr_file.
-> +         *
-> +         * This may be used instead of COMMAND_ALLOCATE
-> +         */
-> +        struct {
-> +            char alloc_ret_file[BIOS_LINKER_LOADER_FILESZ];
-> +            uint32_t alloc_ret_align;
-> +            uint8_t alloc_ret_zone;
-> +            char alloc_ret_addr_file[BIOS_LINKER_LOADER_FILESZ];
-> +        };
-> +
->          /* padding */
->          char pad[124];
->      };
+> The comment from v4 still needs input from Paolo, is it valid to make
+> use of vaddr (based on address_space_translate ->
+> memory_region_get_ram_ptr) outside of the rcu read lock or could future
+> BQL reduction efforts allow this to race?
 
-(1) I remember that, when we discussed this command first, I provided
-you with an explicit list of fields, for the new command structure.
-Nonetheless, I suggest rephrasing both the comment block and the
-structure definition in terms of the existent COMMAND_ALLOCATE:
+Yes we should continue the discussion. Sorry for the inconvenient and
+misunderstanding (I was only trying to provide a non-rfc version of
+the series, in case Michael would like to pick up some cleanup any of
+the patches).
 
-- please give an actual struct tag to the structure that describes
-COMMAND_ALLOCATE,
-- reuse that type, as the first field, of the new structure,
-- only add the new, last "addr_file" field explicitly.
-  (This name is also simpler than "alloc_ret_addr_file".)
+I have similar question as well above - IIUC the RCU read lock
+protects us from not losing the references of memory objects, however
+in our case even after we release the lock, we are still using the
+backend ram (vaddr) since we have set it up inside kernel to build up
+the IO page table. After that, the kernel/device should be able to
+write to addresses of that backend ram any time. Is there possibly a
+window that kernel/device may write to that backend ram even after
+guest destroyed the memory objects (e.g., by memory unplug?) and its
+backend ram?
 
-(2) Furthermore, the new union member lacks a name. It should be called
-"alloc_ret_addr".
+Thanks,
 
-(3) The documentation can say something like,
-
-  COMMAND_ALLOCATE_RETURN_ADDR - perform the COMMAND_ALLOCATE request
-  described in @alloc_ret_addr.alloc, then write the resultant 8-byte
-  allocation address, in little-endian encoding, to the fw_cfg file
-  denoted by @alloc_ret_addr.addr_file.
-
-> @@ -85,9 +101,10 @@ struct BiosLinkerLoaderEntry {
->  typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
->  
->  enum {
-> -    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
-> -    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
-> -    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
-> +    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
-> +    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
-> +    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
-> +    BIOS_LINKER_LOADER_COMMAND_ALLOCATE_RET_ADDR = 0x4,
->  };
->  
->  enum {
-> @@ -278,3 +295,51 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
->  
->      g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
->  }
-> +
-> +/*
-> + * bios_linker_loader_alloc_ret_addr: ask guest to load file into guest memory
-> + * and patch the address in another file
-
-(4) I suggest: "and return the allocation address in another file".
-
-> + *
-> + * @linker: linker object instance
-> + * @data_file: name of the file blob to be loaded
-> + * @file_blob: pointer to blob corresponding to @file_name
-
-(5) You renamed @file_name to @data_file, but then the reference on the
-next line wasn't updated. I suggest the following names:
-
-@data_file_name
-@data_file_blob
-
-and consistent references.
-
-> + * @alloc_align: required minimal alignment in bytes. Must be a power of 2.
-> + * @alloc_fseg: request allocation in FSEG zone (useful for the RSDP ACPI table)
-> + * @addr_file: destination file that will contain the address.
-> + *             This must already exist
-
-(6) For consistency, I suggest @addr_file_name.
-
-> + *
-> + * Note: this command must precede any other linker command that uses
-> + * the data file.
-> + */
-> +void bios_linker_loader_alloc_ret_addr(BIOSLinker *linker,
-> +                              const char *data_file,
-> +                              GArray *file_blob,
-> +                              uint32_t alloc_align,
-> +                              bool alloc_fseg,
-> +                              const char *addr_file)
-
-(7) White space should be updated to line up the parameters with the
-opening paren.
-
-> +{
-> +    BiosLinkerLoaderEntry entry;
-> +    BiosLinkerFileEntry d_file = { g_strdup(data_file), file_blob};
-> +
-> +    /* Address file is expected to already be loaded */
-> +    const BiosLinkerFileEntry *a_file =
-> +        bios_linker_find_file(linker, addr_file);
-
-(8) That's incorrect. The fw_cfg file that receives the allocation
-address is to be written-to by the firmware; it doesn't need to be
-downloaded into any firmware-allocated array. Therefore we shouldn't try
-to enforce that @addr_file_name has been appended to "linker->file_list".
-
-The "a_file" variable can be dropped IMO.
-
-> +
-> +    assert(!(alloc_align & (alloc_align - 1)));
-> +    assert(a_file);
-> +
-> +    g_array_append_val(linker->file_list, d_file);
-
-(9) I think the assertion is worth preserving (from
-bios_linker_loader_alloc()) that the data file name doesn't exist yet.
-
-> +
-> +    memset(&entry, 0, sizeof entry);
-> +    strncpy(entry.alloc_ret_file, data_file,
-> +            sizeof entry.alloc_ret_file - 1);
-> +    strncpy(entry.alloc_ret_addr_file, addr_file,
-> +            sizeof entry.alloc_ret_addr_file - 1);
-> +    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_ALLOCATE_RET_ADDR);
-> +    entry.alloc.align = cpu_to_le32(alloc_align);
-> +    entry.alloc.zone = alloc_fseg ? BIOS_LINKER_LOADER_ALLOC_ZONE_FSEG :
-> +                                    BIOS_LINKER_LOADER_ALLOC_ZONE_HIGH;
-> +
-> +    /* Alloc entries must come first, so prepend them */
-> +    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
-> +}
-
-(10) The logic is messy here. The code mixes direct access to fields of
-the new, unnamed, union member structure -- see point (2) near the top
---, with access to fields of the "entry.alloc" union member that
-corresponds to COMMAND_ALLOCATE.
-
-Instead, please give an explicit name to the new union member (see (2)
-again), i.e., "alloc_ret_addr", and then refer to the following fields:
-
-- entry.alloc_ret_addr.alloc.file
-- entry.alloc_ret_addr.alloc.align
-- entry.alloc_ret_addr.alloc.zone
-- entry.alloc_ret_addr.addr_file
-
-You can of course use pointers to the sub-structures, for saving source
-code text.
-
-Thanks!
-Laszlo
-
-> diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
-> index fa1e5d1..69953e6 100644
-> --- a/include/hw/acpi/bios-linker-loader.h
-> +++ b/include/hw/acpi/bios-linker-loader.h
-> @@ -26,5 +26,12 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
->                                      const char *src_file,
->                                      uint32_t src_offset);
->  
-> +void bios_linker_loader_alloc_ret_addr(BIOSLinker *linker,
-> +                                       const char *data_file,
-> +                                       GArray *file_blob,
-> +                                       uint32_t alloc_align,
-> +                                       bool alloc_fseg,
-> +                                       const char *addr_file);
-> +
->  void bios_linker_loader_cleanup(BIOSLinker *linker);
->  #endif
-> 
+-- peterx
