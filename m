@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1cWMRR-00070W-NF
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:12:46 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cWMVx-0000hs-QD
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:17:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1cWMRN-0003C9-OK
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:12:45 -0500
-Received: from proxmox.maurer-it.com ([212.186.127.180]:53680)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
-	id 1cWMRN-0003AP-Gv
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:12:41 -0500
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Date: Wed, 25 Jan 2017 13:12:33 +0100
-Message-Id: <1485346353-23814-1-git-send-email-w.bumiller@proxmox.com>
-Subject: [Qemu-devel] [PATCH] cirrus: handle negative pitch in
- cirrus_invalidate_region()
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cWMVt-00048O-Ql
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:17:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55900)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cWMVt-00048I-GV
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:17:21 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0PCEAWH028648
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 07:17:20 -0500
+Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 286ua01h3v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 07:17:19 -0500
+Received: from localhost
+	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Wed, 25 Jan 2017 12:17:15 -0000
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Wed, 25 Jan 2017 13:17:10 +0100
+Message-Id: <20170125121710.13561-1-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PATCH] s390x/flic: fix compilation of kvm flic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +36,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Li Qiang <liqiang6-s@360.cn>, Laszlo Ersek <lersek@redhat.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, duanj@linux.vnet.ibm.com, dgilbert@redhat.com, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-cirrus_invalidate_region() calls memory_region_set_dirty()
-on a per-line basis, always ranging from off_begin to
-off_begin+bytesperline. With a negative pitch off_begin
-marks the top most used address and thus we need to do an
-initial shift backwards by bytesperline for negative
-pitches of backward blits, otherwise the first iteration
-covers the line going from the start offset forwards instead
-of backwards.
+2c21ee7 ("migration: extend VMStateInfo") missed a void -> int
+return conversion for kvm_flic_save().
 
-Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Fixes: 2c21ee7 ("migration: extend VMStateInfo")
+Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
-I bumped the patch context to 4 lines to get it to include the
-memory_region_set_dirty() call which takes an unsigned length (`hwaddr
-size`) because I'm also not too happy about the masking going on there
-since it means off_cur_end may be less than off_cur, but if the range
-checks are finnaly correct I don't think this case could happen
-anymore? (A check shouldn't hurt though, or maybe an assert()?)
+ hw/intc/s390_flic_kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- hw/display/cirrus_vga.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index b1a0773..af61981 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -669,8 +669,12 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
-     int y;
-     int off_cur;
-     int off_cur_end;
+diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+index da8e4dfab6..e86a84e49a 100644
+--- a/hw/intc/s390_flic_kvm.c
++++ b/hw/intc/s390_flic_kvm.c
+@@ -303,7 +303,7 @@ static int kvm_flic_save(QEMUFile *f, void *opaque, size_t size,
+          * migration state */
+         error_report("flic: couldn't allocate memory");
+         qemu_put_be64(f, FLIC_FAILED);
+-        return;
++        return 0;
+     }
  
-+    if (off_pitch < 0) {
-+        off_begin -= bytesperline;
-+    }
-+
-     for (y = 0; y < lines; y++) {
- 	off_cur = off_begin;
- 	off_cur_end = (off_cur + bytesperline) & s->cirrus_addr_mask;
-         memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
+     count = __get_all_irqs(flic, &buf, len);
 -- 
-2.1.4
+2.11.0
