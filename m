@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cWNRV-00009D-Gt
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:16:54 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cWNW9-00032M-3g
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:21:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cWNRU-0004sj-7C
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:16:53 -0500
-Date: Wed, 25 Jan 2017 13:16:44 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170125131644.GC10664@stefanha-x1.localdomain>
-References: <20170124095350.16679-1-stefanha@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cWNW6-0006Vr-G5
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:21:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54708)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWNW6-0006VQ-9l
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:21:38 -0500
+References: <20170124071654.4572.41407.stgit@PASHA-ISP>
+	<20170124071713.4572.36636.stgit@PASHA-ISP>
+	<96675d3f-9d53-bde1-f6da-7cb0b1f41316@redhat.com>
+	<000501d276fb$fbcde7d0$f369b770$@ru>
+	<1683a32c-4ea8-c343-e972-095593819121@redhat.com>
+	<000601d276fe$e71b9140$b552b3c0$@ru>
+	<10ac3f7d-6ae8-4657-7135-d9a05b5a3d39@redhat.com>
+	<000901d27706$6f054090$4d0fc1b0$@ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <66b50426-1fc7-7730-1d5e-b7d4ad0e761b@redhat.com>
+Date: Wed, 25 Jan 2017 14:21:32 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FsscpQKzF/jJk6ya"
-Content-Disposition: inline
-In-Reply-To: <20170124095350.16679-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] aio-posix: honor is_external in AioContext
- polling
+In-Reply-To: <000901d27706$6f054090$4d0fc1b0$@ru>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 03/14] replay: exception replay fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +33,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
 
 
---FsscpQKzF/jJk6ya
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 24, 2017 at 09:53:50AM +0000, Stefan Hajnoczi wrote:
-> AioHandlers marked ->is_external must be skipped when aio_node_check()
-> fails.  bdrv_drained_begin() needs this to prevent dataplane from
-> submitting new I/O requests while another thread accesses the device and
-> relies on it being quiesced.
->=20
-> This patch fixes the following segfault:
->=20
->   Program terminated with signal SIGSEGV, Segmentation fault.
->   #0  0x00005577f6127dad in bdrv_io_plug (bs=3D0x5577f7ae52f0) at qemu/bl=
-ock/io.c:2650
->   2650            bdrv_io_plug(child->bs);
->   [Current thread is 1 (Thread 0x7ff5c4bd1c80 (LWP 10917))]
->   (gdb) bt
->   #0  0x00005577f6127dad in bdrv_io_plug (bs=3D0x5577f7ae52f0) at qemu/bl=
-ock/io.c:2650
->   #1  0x00005577f6114363 in blk_io_plug (blk=3D0x5577f7b8ba20) at qemu/bl=
-ock/block-backend.c:1561
->   #2  0x00005577f5d4091d in virtio_blk_handle_vq (s=3D0x5577f9ada030, vq=
-=3D0x5577f9b3d2a0) at qemu/hw/block/virtio-blk.c:589
->   #3  0x00005577f5d4240d in virtio_blk_data_plane_handle_output (vdev=3D0=
-x5577f9ada030, vq=3D0x5577f9b3d2a0) at qemu/hw/block/dataplane/virtio-blk.c=
-:158
->   #4  0x00005577f5d88acd in virtio_queue_notify_aio_vq (vq=3D0x5577f9b3d2=
-a0) at qemu/hw/virtio/virtio.c:1304
->   #5  0x00005577f5d8aaaf in virtio_queue_host_notifier_aio_poll (opaque=
-=3D0x5577f9b3d308) at qemu/hw/virtio/virtio.c:2134
->   #6  0x00005577f60ca077 in run_poll_handlers_once (ctx=3D0x5577f79ddbb0)=
- at qemu/aio-posix.c:493
->   #7  0x00005577f60ca268 in try_poll_mode (ctx=3D0x5577f79ddbb0, blocking=
-=3Dtrue) at qemu/aio-posix.c:569
->   #8  0x00005577f60ca331 in aio_poll (ctx=3D0x5577f79ddbb0, blocking=3Dtr=
-ue) at qemu/aio-posix.c:601
->   #9  0x00005577f612722a in bdrv_flush (bs=3D0x5577f7c20970) at qemu/bloc=
-k/io.c:2403
->   #10 0x00005577f60c1b2d in bdrv_close (bs=3D0x5577f7c20970) at qemu/bloc=
-k.c:2322
->   #11 0x00005577f60c20e7 in bdrv_delete (bs=3D0x5577f7c20970) at qemu/blo=
-ck.c:2465
->   #12 0x00005577f60c3ecf in bdrv_unref (bs=3D0x5577f7c20970) at qemu/bloc=
-k.c:3425
->   #13 0x00005577f60bf951 in bdrv_root_unref_child (child=3D0x5577f7a2de70=
-) at qemu/block.c:1361
->   #14 0x00005577f6112162 in blk_remove_bs (blk=3D0x5577f7b8ba20) at qemu/=
-block/block-backend.c:491
->   #15 0x00005577f6111b1b in blk_remove_all_bs () at qemu/block/block-back=
-end.c:245
->   #16 0x00005577f60c1db6 in bdrv_close_all () at qemu/block.c:2382
->   #17 0x00005577f5e60cca in main (argc=3D20, argv=3D0x7ffea6eb8398, envp=
-=3D0x7ffea6eb8440) at qemu/vl.c:4684
->=20
-> The key thing is that bdrv_close() uses bdrv_drained_begin() and
-> virtio_queue_host_notifier_aio_poll() must not be called.
->=20
-> Thanks to Fam Zheng <famz@redhat.com> for identifying the root cause of
-> this crash.
->=20
-> Reported-by: Alberto Garcia <berto@igalia.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  aio-posix.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+On 25/01/2017 13:27, Pavel Dovgalyuk wrote:
+>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>> On 25/01/2017 12:33, Pavel Dovgalyuk wrote:
+>>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>>>> On 25/01/2017 12:12, Pavel Dovgalyuk wrote:
+>>>>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>>>>>> On 24/01/2017 08:17, Pavel Dovgalyuk wrote:
+>>>>>>> @@ -451,6 +451,10 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+>>>>>>>  #ifndef CONFIG_USER_ONLY
+>>>>>>>      } else if (replay_has_exception()
+>>>>>>>                 && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
+>>>>>>> +        /* Break the execution loop in case of running out of TB cache.
+>>>>>>> +           This is needed to make flushing of the TB cache, because
+>>>>>>> +           real flush is queued to be executed outside the cpu loop. */
+>>>>>>> +        cpu->exception_index = EXCP_INTERRUPT;
+>>>>>>>          /* try to cause an exception pending in the log */
+>>>>>>>          cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
+>>>>>>>          *ret = -1;
+>>>>>>
+>>>>>> Why is replay_has_exception() related to be running out of TB cache?
+>>>>>
+>>>>> It doesn't.
+>>>>> Calling tb_find when there is not space in cache causes tb_flush and cpu_loop_exit.
+>>>>> But execution loop will continue, because there is no reason to break it
+>>>>> (like setting exception_index).
+>>>>
+>>>> What about setting cpu->exit_request?  queue_work_on_cpu calls
+>>>> qemu_cpu_kick.
+>>>
+>>> cpu->exit_request does not checked in this loop.
+>>> We have to add this checking somewhere then?
+>>
+>> It's checked by cpu_handle_interrupt.  Are you not reaching
+>> cpu_handle_interrupt then?  Why?
+> 
+> Execution doesn't reach cpu_handle_interrupt, because tb_find 
+> calls cpu_loop_exit. And the execution loop enters cpu_handle_exception again and again.
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+Perhaps tb_gen_code should set cpu->exception_index before calling
+cpu_loop_exit.
 
-Stefan
+Paolo
 
---FsscpQKzF/jJk6ya
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYiKU8AAoJEJykq7OBq3PIjI0H/03c0AG6YR0LMLM9oVZCHyji
-qS8hvyd+5gBxkTxG0zlpp0VRHTuIeuU07mqhzr4aCiiLJPQ2tIgXmBNWDDR2t9Z1
-8vGgmX9jSXxhU1yEhvDPqh30TPFHrsDq1rNeq9SXIRm59moABB8c5Y5a9/QxCrLz
-wjAamrmu7YE0XGAEF3O3OERpnEoIhYJYz6SgRQQNk13piUIV1on+inGXcGgLjpQt
-9muZn0Lq3cGJ18vwAa2hAtcAvhsA2ocaI/x6JFbMkDo2yAAA8QJOk7jb+OKUI4rw
-DHCUPPw6WBBvZT+1LlhWR8zu0W2a2HGv5jBehQH+60XvXe4X6027iGvyIC3/0qU=
-=6twe
------END PGP SIGNATURE-----
-
---FsscpQKzF/jJk6ya--
+> Pavel Dovgalyuk
+> 
