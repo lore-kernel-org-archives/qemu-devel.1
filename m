@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWEXb-0003OL-8y
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 22:46:36 -0500
+	(envelope-from <lersek@redhat.com>) id 1cWEgQ-0006FH-MN
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 22:55:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWEXW-0007E4-Ew
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 22:46:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45258)
+	(envelope-from <lersek@redhat.com>) id 1cWEgL-0002Uf-Qn
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 22:55:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWEXW-0007De-7A
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 22:46:30 -0500
-Date: Wed, 25 Jan 2017 11:46:23 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170125034623.GA5151@pxdev.xzpeter.org>
-References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-17-git-send-email-peterx@redhat.com>
-	<d04e7a7e-1d30-69ec-4902-7b5a5cfba02e@redhat.com>
-	<20170124045242.GM26526@pxdev.xzpeter.org>
-	<db3cf882-5825-5bc5-f097-ea65298917a0@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cWEgL-0002UY-Dq
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 22:55:37 -0500
+References: <cover.1485308342.git.ben@skyportsystems.com>
+	<dabc5ffbb5b9d29e88087dcbe03b1ba0232c342c.1485308342.git.ben@skyportsystems.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <827795cf-5399-7092-267e-e912141931f3@redhat.com>
+Date: Wed, 25 Jan 2017 04:55:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <db3cf882-5825-5bc5-f097-ea65298917a0@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v4 16/20] intel_iommu: do replay when
- context invalidate
+In-Reply-To: <dabc5ffbb5b9d29e88087dcbe03b1ba0232c342c.1485308342.git.ben@skyportsystems.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/9] ACPI: Add a function for building
+ named qword entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
+To: ben@skyportsystems.com
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Wed, Jan 25, 2017 at 11:09:39AM +0800, Jason Wang wrote:
->=20
->=20
-> On 2017=E5=B9=B401=E6=9C=8824=E6=97=A5 12:52, Peter Xu wrote:
-> >On Mon, Jan 23, 2017 at 06:36:17PM +0800, Jason Wang wrote:
-> >>
-> >>On 2017=E5=B9=B401=E6=9C=8820=E6=97=A5 21:08, Peter Xu wrote:
-> >>>Before this one we only invalidate context cache when we receive con=
-text
-> >>>entry invalidations. However it's possible that the invalidation als=
-o
-> >>>contains a domain switch (only if cache-mode is enabled for vIOMMU).=
- In
-> >>>that case we need to notify all the registered components about the =
-new
-> >>>mapping.
-> >>>
-> >>>Signed-off-by: Peter Xu <peterx@redhat.com>
-> >>>---
-> >>>  hw/i386/intel_iommu.c | 10 ++++++++++
-> >>>  1 file changed, 10 insertions(+)
-> >>>
-> >>>diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> >>>index f9c5142..4b08b4d 100644
-> >>>--- a/hw/i386/intel_iommu.c
-> >>>+++ b/hw/i386/intel_iommu.c
-> >>>@@ -1146,6 +1146,16 @@ static void vtd_context_device_invalidate(Int=
-elIOMMUState *s,
-> >>>                  trace_vtd_inv_desc_cc_device(bus_n, VTD_PCI_SLOT(d=
-evfn_it),
-> >>>                                               VTD_PCI_FUNC(devfn_it=
-));
-> >>>                  vtd_as->context_cache_entry.context_cache_gen =3D =
-0;
-> >>>+                /*
-> >>>+                 * So a device is moving out of (or moving into) a
-> >>>+                 * domain, a replay() suites here to notify all the
-> >>>+                 * IOMMU_NOTIFIER_MAP registers about this change.
-> >>>+                 * This won't bring bad even if we have no such
-> >>>+                 * notifier registered - the IOMMU notification
-> >>>+                 * framework will skip MAP notifications if that
-> >>>+                 * happened.
-> >>>+                 */
-> >>>+                memory_region_iommu_replay_all(&vtd_as->iommu);
-> >>DSI and GLOBAL questions come back again or no need to care about the=
-m :) ?
-> >DSI/GLOBAL hanldings are in patch 20 (though it'll be squashed into 18
-> >in my next post). Is that what you mean above?
->=20
-> Seems not, I mean DSI/GLOBAL for context cache invalidation instead of =
-IOTLB
-> :)
+Hi Ben,
 
-Yes, I should possibly do the same thing for context cache global
-invalidations. IIUC context global invalidation should be a superset
-of iotlb invalidation, so maybe I'll add one more patch to call iotlb
-invalidation in context invalidation as well. Kevin/others, please
-correct me if I misunderstood the spec. Thanks,
+sorry about being late to reviewing this series. I hope I can now spend
+more time on it.
 
--- peterx
+- Please do not try to address my comments immediately. It's very
+possible (even likely) that Igor, MST and myself could have different
+opinions on things, so first please await agreement between your reviewers.
+
+- I think you should have CC'd Igor and Michael directly. I'm adding
+them to this reply; hopefully that will be enough for them to monitor
+this series.
+
+- I'll likely be unable to review everything with 100% coverage; so
+addressing (or sufficiently refuting) my comments might not guarantee
+that the next version will be merged at once.
+
+With all that said:
+
+On 01/25/17 02:43, ben@skyportsystems.com wrote:
+> From: Ben Warren <ben@skyportsystems.com>
+> 
+> This is initially used to patch a 64-bit address into the VM Generation ID SSDT
+
+(1) I think this commit message line is overlong; I think we wrap at 74
+chars or so. Not critical, but worth mentioning.
+
+> 
+> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> ---
+>  hw/acpi/aml-build.c         | 28 ++++++++++++++++++++++++++++
+>  include/hw/acpi/aml-build.h |  4 ++++
+>  2 files changed, 32 insertions(+)
+> 
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index b2a1e40..dc4edc2 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -285,6 +285,34 @@ build_append_named_dword(GArray *array, const char *name_format, ...)
+>      return offset;
+>  }
+>  
+> +/*
+> + * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a qword,
+> + * and return the offset to 0x00000000 for runtime patching.
+> + *
+> + * Warning: runtime patching is best avoided. Only use this as
+> + * a replacement for DataTableRegion (for guests that don't
+> + * support it).
+> + */
+
+(2) Since we're adding a qword (8-byte integer), the hexadecimal
+constant should have 16 nibbles: 0x0000000000000000. (After copying the
+comment from build_append_named_dword(), it should be actualized.)
+
+(3) Normally the functions in this file that create AML operators carry
+a note about the ACPI spec version and exact location that defines the
+operator. I see that commit f20354910893 ("acpi: add
+build_append_named_dword, returning an offset in buffer", 2016-03-01)
+missed that too.
+
+Unless this tradition has been willfully abandoned, I suggest that you
+add the right reference here, and also (in retrospect) to
+build_append_named_dword().
+
+> +int
+> +build_append_named_qword(GArray *array, const char *name_format, ...)
+> +{
+> +    int offset;
+> +    va_list ap;
+> +
+> +    build_append_byte(array, 0x08); /* NameOp */
+> +    va_start(ap, name_format);
+> +    build_append_namestringv(array, name_format, ap);
+> +    va_end(ap);
+> +
+> +    build_append_byte(array, 0x0E); /* QWordPrefix */
+> +
+> +    offset = array->len;
+> +    build_append_int_noprefix(array, 0x00000000, 8);
+
+(4) I guess the constant should be updated here too, for consistency
+with the comment.
+
+The rest looks okay. (I didn't verify 0x0E == QWordPrefix specifically,
+because an error there would break the functionality immediately, and
+you'd notice.)
+
+Thanks!
+Laszlo
+
+> +    assert(array->len == offset + 8);
+> +
+> +    return offset;
+> +}
+> +
+>  static GPtrArray *alloc_list;
+>  
+>  static Aml *aml_alloc(void)
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index 559326c..dbf63cf 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -385,6 +385,10 @@ int
+>  build_append_named_dword(GArray *array, const char *name_format, ...)
+>  GCC_FMT_ATTR(2, 3);
+>  
+> +int
+> +build_append_named_qword(GArray *array, const char *name_format, ...)
+> +GCC_FMT_ATTR(2, 3);
+> +
+>  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+>                         uint64_t len, int node, MemoryAffinityFlags flags);
+>  
+> 
