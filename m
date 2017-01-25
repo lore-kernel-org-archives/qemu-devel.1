@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cWJFY-0002dQ-SJ
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:48:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1cWJhU-0004N9-2z
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 04:17:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cWJFU-0001H8-Us
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:48:16 -0500
-Date: Wed, 25 Jan 2017 09:47:52 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20170125084752.4v2eb5qahk7oij6j@grep.be>
-References: <2EAE3C4F-58AF-4594-A284-A69D8BC3EA8F@alex.org.uk>
-	<CAJSP0QWXF2tS5q-BpmxR9ti0osjzZCFiRxdRDho4pDBLkD3UUQ@mail.gmail.com>
-	<CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
-	<90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
-	<20170114144500.oxoqvrn5x4sdfo74@grep.be>
-	<1ef924f8-1e58-fe54-dabc-06873a531412@redhat.com>
-	<20170118080126.nyldkjhxdsxd4u2b@grep.be>
-	<CAMxP3BTjBSQEhycavgyfWXEA6pTg=sxfHe5sf+nxVY9ejXWMXQ@mail.gmail.com>
-	<20170122114339.l3ijhy3uymsru4ed@grep.be>
-	<4a5a82d6-7d66-cfb4-bd42-cea596115f6f@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cWJhQ-0003ZT-Si
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 04:17:08 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53009)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cWJhQ-0003ZJ-N7
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 04:17:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cWJhP-0003JT-91
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 09:17:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 41A432E80C6
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 09:17:03 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4a5a82d6-7d66-cfb4-bd42-cea596115f6f@redhat.com>
-Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] How to online resize qemu disk
- with nbd protocol?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Jan 2017 09:01:57 -0000
+From: Thomas Huth <1254940@bugs.launchpad.net>
+Reply-To: Bug 1254940 <1254940@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131126015941.27755.36754.malonedeb@soybean.canonical.com>
+Message-Id: <20170125090157.5291.43479.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1254940] Re: qemu-KVM guest OS occurs many
+ ext3-fs errors after multiple forced shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,110 +37,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Bob Chen <a175818323@gmail.com>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hi Eric,
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-On Mon, Jan 23, 2017 at 08:54:48AM -0600, Eric Blake wrote:
-> On 01/22/2017 05:43 AM, Wouter Verhelst wrote:
-> > 
-> > Having given this some more thought, I'm not entirely sure anymore that
-> > an active resize from the NBD layer is necessarily a layering violation.
-> > There might be other cases where this is useful, and e.g., the Linux
-> > kernel also supports active resizes of block devices in some cases
-> > (e.g., LVM). We'll also need to define what happens in case the resize
-> > operation isn't possible for some reason (e.g., the size increase asks
-> > for more space than the server's storage has available).
-> > 
-> > I suggest the following semantics:
-> > 
-> > - Add a transmission flag to indicate resize is possible for
-> >   transmission phase (NBD_FLAG_SEND_RESIZE, flag 10). I don't see any
-> >   need for an NBD_OPT_RESIZE or some such; just the flag should suffice.
-> 
-> Except that in previous threads, you've argued that burning per-export
-> flags is rather expensive if it is instead soemthing that an NBD_OPT
-> exchange could enable.
+-- =
 
-True, but I also said that flags make it easy to teach the kernel about
-something, without requiring extra API calls.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1254940
 
-Since this is just a thing of "it can be sent, doesn't need more
-metadata than that", a flag seems appropriate.
+Title:
+  qemu-KVM guest OS occurs many ext3-fs errors after multiple forced
+  shutdown
 
-> On the other hand, I could definitely see it being a per-export
-> setting (not all exports have the ability to be resized), so it
-> doesn't hurt my feelings to burn a per-export flag on this bit of
-> information.
+Status in QEMU:
+  Incomplete
 
-There's that too, yes.
+Bug description:
+  Hi:
+  I met some filesysterm errors in a sles guest on KVM. My system environme=
+nt is:
+  HOST:
+  =C2=A0=C2=A0=C2=A0suse 10, the kernel version is 2.6.32.43
+  =C2=A0=C2=A0=C2=A0Qemu-KVM 1.2
+  =C2=A0=C2=A0=C2=A0Libvirt 1.0
+  guest OS:
+  =C2=A0=C2=A0=C2=A0suse 10, the kernel version is 2.6.32.43
+  VMs use a qcow2 disk.
 
-> > - NBD_CMD_RESIZE (command 7): resize the export. The "offset" field
-> >   contains the new size, "length" is reserved (why not the other way
-> >   around? offset is 64 bits, length is 32)
-> > - resize command can fail with:
-> >   EPERM: server configuration does not allow this resize, or
-> >   (optionally) other clients are using the same export and the request
-> >   was for a smaller size.
-> >   EIO: I/O error while trying to resize the device
-> >   ENOSPC: new export size requires more space than is available
-> >   ESHUTDOWN: server is shutting down
-> > 
-> > I've added an "extension-resize" branch with the above. If that works
-> > for you, then run with it. If not, just implement what you want and send
-> > updates as you go along.
-> 
-> You have at least one problem in there:
-> 
-> +    If the resize was successful, clients MAY now issue other requests
-> +    up to the new size as requested in the request header. If the new
-> +    size is larger than it was before the request, requests beyond the
-> +    new size but not beyond the old one MUST fail with ENOSPC.
-> 
-> You probably want "if the new size is _smaller_ than it was before", as
-> it is not possible to have requests beyond the new size but not beyond
-> the old if the new size is larger than the old.
+  Description of problem:
+  I have 20+ VMs with qcow2 disk, these VMs have been forced to shut down by
+  "virsh destroy" many times during and after VM installation.
+  When these vm reboot,dmesg show a ext3-fs mount error occurred on /usr/lo=
+cal
+  partion /dev/vda3:
+  =C2=A0=C2=A0=C2=A0=C2=A0EXT3-fs warning: mounting fs with errors, running=
+ e2fsck is recommendedand
+  when I wrote into partion /dev/vda3,some errors occurred in dmesg:
+  1.error (device vda3): ext3_free_blocks: Freeing blocks not in datazone -=
+ block
+  =3D 1869619311, count =3D 1error (device vda3): ext3_free_blocks_sb: bit =
+already
+  cleared for block 2178152error (device vda3): ext3_readdir: bad entry in
+  directory #1083501:
+  2.[347470.661893] attempt to access beyond end of device[347470.661896] v=
+da3:
+  rw=3D0, want=3D6870892952, limit=3D41945715[347470.661897] EXT3-fs error =
+(device
+  vda3): ext3_free_branches: Read failure, inode=3D1083508, block=3D8588616=
+18
+  3.EXT3-fs error (device vda3): ext3_new_block: block(4295028581) >=3D blo=
+cks
+  count(-1) - block_group =3D 1, es =3D=3D ffff88021b6c7400
 
-Ah, yes, thanks.
+  I suspect this fs-error is caused by multiple forced shutdown, but I can't
+  reproduce this bug now.
 
-I notice that that paragraph is also redundant with the next one. I'll
-fix that up tonight.
+  So if someone else encountered the same bugs(or fs errors) with me,
+  and what the reasons leads to these fs errors, is the qemu or KVM or
+  just my "rough" cmd.
 
-> I'm still thinking that allowing the client to query the current size is
-> useful.  Over the weekend, I was thinking of SEEK_SET/SEEK_END semantics
-> (SEEK_CUR doesn't really make sense, since we don't maintain a current
-> offset), and wondering if we could improve the command as follows:
-> 
-> If invoked without flags, it operates with SEEK_SET semantics (the
-> offset is the new requested size); if invoked with
-> NBD_CMD_FLAG_RELATIVE, it operates with SEEK_END semantics (the offset
-> is added to the existing size, and can be treated as a signed 64-bit
-> negative number to shrink).  Either way, on success, the command replies
-> with a structured reply containing the new 64-bit total size of the
-> disk.  This would require the reply to be a structured reply, and the
-> semantics of NBD_CMD_FLAG_RELATIVE with an offset of 0 becomes a way to
-> probe the existing disk size (thus enabling the server to resize without
-> client request, and perhaps used with some out-of-band means for the
-> client to know that it should query the server for an updated size).
+  Thanks in Advance
+  Regards
+  Ben
 
-That seems elegant, yes.
+  Steps to Reproduce:
+  I can't reproduce this bug now.
 
-> Also note that the server's reply of the current size may be slightly
-> different than what was requested by the client (that is, we should
-> allow the server to round the client's request up to an appropriate
-> granularity) - we should probably require that the server can only round
-> up (not down).
+  additional:
+  1.multiple forced shutdown during and after the vm installing
+  2.vm with qcow2 disk
+  3.different vm dmesg different errors in above error list(1/2/3)
 
-Probably works too, indeed.
-
-> Thoughts?
-
-I think there's merit in what you're suggesting. If you want to suggest
-wording too, I'm all ears :-)
-
--- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1254940/+subscriptions
