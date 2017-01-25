@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cWRV4-0008WE-Jh
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:36:51 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cWRVF-0000AG-4e
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:37:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cWRUz-0004Dd-M2
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:36:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cWRUz-0004Cy-8O
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:36:45 -0500
-Date: Wed, 25 Jan 2017 10:36:42 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170125103642.5f4232a9@t450s.home>
-In-Reply-To: <9ef03816-0bef-f54b-63fe-daf27eab4a40@redhat.com>
-References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
-	<1485253571-19058-3-git-send-email-peterx@redhat.com>
-	<20170124092905.41832531@t450s.home>
-	<9ef03816-0bef-f54b-63fe-daf27eab4a40@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 02/18] vfio: introduce vfio_get_vaddr()
+	(envelope-from <ben@skyportsystems.com>) id 1cWRVA-0004GQ-5J
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:37:01 -0500
+Received: from mail-pf0-x22d.google.com ([2607:f8b0:400e:c00::22d]:33727)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1cWRV9-0004GJ-O6
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:36:56 -0500
+Received: by mail-pf0-x22d.google.com with SMTP id y143so59673008pfb.0
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 09:36:55 -0800 (PST)
+From: Ben Warren <ben@skyportsystems.com>
+Message-Id: <29F9E21E-D768-47D8-8E7F-BBC9DC4F72DD@skyportsystems.com>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_C9716595-A9D3-4104-8B96-AD04B576B9E7";
+	protocol="application/pkcs7-signature"; micalg=sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Wed, 25 Jan 2017 09:36:52 -0800
+In-Reply-To: <827795cf-5399-7092-267e-e912141931f3@redhat.com>
+References: <cover.1485308342.git.ben@skyportsystems.com>
+	<dabc5ffbb5b9d29e88087dcbe03b1ba0232c342c.1485308342.git.ben@skyportsystems.com>
+	<827795cf-5399-7092-267e-e912141931f3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/9] ACPI: Add a function for building
+ named qword entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,148 +33,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, qemu-devel@nongnu.org, bd.aviv@gmail.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Wed, 25 Jan 2017 18:11:37 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> On 24/01/2017 17:29, Alex Williamson wrote:
-> > On Tue, 24 Jan 2017 18:25:55 +0800
-> > Peter Xu <peterx@redhat.com> wrote:
-> >   
-> >> A cleanup for vfio_iommu_map_notify(). Should have no functional change,
-> >> just to make the function shorter and easier to understand.
-> >>
-> >> Signed-off-by: Peter Xu <peterx@redhat.com>
-> >> ---
-> >>  hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
-> >>  1 file changed, 38 insertions(+), 20 deletions(-)
-> >>
-> >> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> >> index 174f351..ce55dff 100644
-> >> --- a/hw/vfio/common.c
-> >> +++ b/hw/vfio/common.c
-> >> @@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
-> >>             section->offset_within_address_space & (1ULL << 63);
-> >>  }
-> >>  
-> >> -static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >> +static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-> >> +                           bool *read_only)
-> >>  {
-> >> -    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-> >> -    VFIOContainer *container = giommu->container;
-> >> -    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-> >>      MemoryRegion *mr;
-> >>      hwaddr xlat;
-> >>      hwaddr len = iotlb->addr_mask + 1;
-> >> -    void *vaddr;
-> >> -    int ret;
-> >> -
-> >> -    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
-> >> -                                iova, iova + iotlb->addr_mask);
-> >> -
-> >> -    if (iotlb->target_as != &address_space_memory) {
-> >> -        error_report("Wrong target AS \"%s\", only system memory is allowed",
-> >> -                     iotlb->target_as->name ? iotlb->target_as->name : "none");
-> >> -        return;
-> >> -    }
-> >> +    bool ret = false;
-> >> +    bool writable = iotlb->perm & IOMMU_WO;
-> >>  
-> >>      /*
-> >>       * The IOMMU TLB entry we have just covers translation through
-> >> @@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >>      rcu_read_lock();
-> >>      mr = address_space_translate(&address_space_memory,
-> >>                                   iotlb->translated_addr,
-> >> -                                 &xlat, &len, iotlb->perm & IOMMU_WO);
-> >> +                                 &xlat, &len, writable);
-> >>      if (!memory_region_is_ram(mr)) {
-> >>          error_report("iommu map to non memory area %"HWADDR_PRIx"",
-> >>                       xlat);
-> >>          goto out;
-> >>      }
-> >> +
-> >>      /*
-> >>       * Translation truncates length to the IOMMU page size,
-> >>       * check that it did not truncate too much.
-> >> @@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >>          goto out;
-> >>      }
-> >>  
-> >> +    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> >> +    *read_only = !writable || mr->readonly;
-> >> +    ret = true;
-> >> +
-> >> +out:
-> >> +    rcu_read_unlock();
-> >> +    return ret;
-> >> +}
-> >> +
-> >> +static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >> +{
-> >> +    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-> >> +    VFIOContainer *container = giommu->container;
-> >> +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-> >> +    bool read_only;
-> >> +    void *vaddr;
-> >> +    int ret;
-> >> +
-> >> +    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
-> >> +                                iova, iova + iotlb->addr_mask);
-> >> +
-> >> +    if (iotlb->target_as != &address_space_memory) {
-> >> +        error_report("Wrong target AS \"%s\", only system memory is allowed",
-> >> +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-> >> +        return;
-> >> +    }
-> >> +
-> >>      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
-> >> -        vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> >>          ret = vfio_dma_map(container, iova,
-> >>                             iotlb->addr_mask + 1, vaddr,
-> >> -                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
-> >> +                           read_only);
-> >>          if (ret) {
-> >>              error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-> >>                           "0x%"HWADDR_PRIx", %p) = %d (%m)",
-> >> @@ -357,8 +377,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >>                           iotlb->addr_mask + 1, ret);
-> >>          }
-> >>      }
-> >> -out:
-> >> -    rcu_read_unlock();  
-> > 
-> > The comment from v4 still needs input from Paolo, is it valid to make
-> > use of vaddr (based on address_space_translate ->
-> > memory_region_get_ram_ptr) outside of the rcu read lock or could future
-> > BQL reduction efforts allow this to race?  
-> 
-> You need to keep a reference to the MemoryRegion if you do
-> rcu_read_unlock.  But it's simpler to call vfio_get_vaddr within
-> rcu_read_lock, and keep the lock/unlock in vfio_iommu_map_notify.
+--Apple-Mail=_C9716595-A9D3-4104-8B96-AD04B576B9E7
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Right, a memory_region_{un}ref() would be another option.
- 
-> You probably should also put a comment about why VFIO does *not* need to
-> keep a reference between vfio_dma_map and vfio_dma_unmap (which doesn't
-> sound easy to do either).  Would any well-behaved guest invalidate the
-> IOMMU page tables before a memory hot-unplug?
+Hi Laszlo,
 
-Hmm, we do take a reference in vfio_listener_region_add(), but this is
-of course to the iommu region not to the RAM region we're translating.
-In the non-vIOMMU case we would be holding a reference to the memory
-region backing a DMA mapping.  I would expect a well behaved guest to
-evacuate DMA mappings targeting a hotplug memory region before it gets
-ejected, but how much do we want to rely on well behaved guests.
-Perhaps we should be taking a reference for each mapping entry, though
-this makes Peter's plans to invalidate the entire address space much
-more difficult.  Thanks,
+> On Jan 24, 2017, at 7:55 PM, Laszlo Ersek <lersek@redhat.com> wrote:
+>=20
+> Hi Ben,
+>=20
+> sorry about being late to reviewing this series. I hope I can now =
+spend
+> more time on it.
+>=20
+> - Please do not try to address my comments immediately. It's very
+> possible (even likely) that Igor, MST and myself could have different
+> opinions on things, so first please await agreement between your =
+reviewers.
+>=20
+Thanks for the very detailed review.  I=E2=80=99ll give it a couple of =
+days and then start work on the suggested changes.
 
-Alex
+> - I think you should have CC'd Igor and Michael directly. I'm adding
+> them to this reply; hopefully that will be enough for them to monitor
+> this series.
+>=20
+> - I'll likely be unable to review everything with 100% coverage; so
+> addressing (or sufficiently refuting) my comments might not guarantee
+> that the next version will be merged at once.
+>=20
+> With all that said:
+>=20
+> On 01/25/17 02:43, ben@skyportsystems.com =
+<mailto:ben@skyportsystems.com> wrote:
+>> From: Ben Warren <ben@skyportsystems.com =
+<mailto:ben@skyportsystems.com>>
+>>=20
+>> This is initially used to patch a 64-bit address into the VM =
+Generation ID SSDT
+>=20
+> (1) I think this commit message line is overlong; I think we wrap at =
+74
+> chars or so. Not critical, but worth mentioning.
+>=20
+>>=20
+>> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+>> ---
+>> hw/acpi/aml-build.c         | 28 ++++++++++++++++++++++++++++
+>> include/hw/acpi/aml-build.h |  4 ++++
+>> 2 files changed, 32 insertions(+)
+>>=20
+>> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+>> index b2a1e40..dc4edc2 100644
+>> --- a/hw/acpi/aml-build.c
+>> +++ b/hw/acpi/aml-build.c
+>> @@ -285,6 +285,34 @@ build_append_named_dword(GArray *array, const =
+char *name_format, ...)
+>>     return offset;
+>> }
+>>=20
+>> +/*
+>> + * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a =
+qword,
+>> + * and return the offset to 0x00000000 for runtime patching.
+>> + *
+>> + * Warning: runtime patching is best avoided. Only use this as
+>> + * a replacement for DataTableRegion (for guests that don't
+>> + * support it).
+>> + */
+>=20
+> (2) Since we're adding a qword (8-byte integer), the hexadecimal
+> constant should have 16 nibbles: 0x0000000000000000. (After copying =
+the
+> comment from build_append_named_dword(), it should be actualized.)
+>=20
+> (3) Normally the functions in this file that create AML operators =
+carry
+> a note about the ACPI spec version and exact location that defines the
+> operator. I see that commit f20354910893 ("acpi: add
+> build_append_named_dword, returning an offset in buffer", 2016-03-01)
+> missed that too.
+>=20
+> Unless this tradition has been willfully abandoned, I suggest that you
+> add the right reference here, and also (in retrospect) to
+> build_append_named_dword().
+>=20
+>> +int
+>> +build_append_named_qword(GArray *array, const char *name_format, =
+...)
+>> +{
+>> +    int offset;
+>> +    va_list ap;
+>> +
+>> +    build_append_byte(array, 0x08); /* NameOp */
+>> +    va_start(ap, name_format);
+>> +    build_append_namestringv(array, name_format, ap);
+>> +    va_end(ap);
+>> +
+>> +    build_append_byte(array, 0x0E); /* QWordPrefix */
+>> +
+>> +    offset =3D array->len;
+>> +    build_append_int_noprefix(array, 0x00000000, 8);
+>=20
+> (4) I guess the constant should be updated here too, for consistency
+> with the comment.
+>=20
+> The rest looks okay. (I didn't verify 0x0E =3D=3D QWordPrefix =
+specifically,
+> because an error there would break the functionality immediately, and
+> you'd notice.)
+>=20
+> Thanks!
+> Laszlo
+>=20
+>> +    assert(array->len =3D=3D offset + 8);
+>> +
+>> +    return offset;
+>> +}
+>> +
+>> static GPtrArray *alloc_list;
+>>=20
+>> static Aml *aml_alloc(void)
+>> diff --git a/include/hw/acpi/aml-build.h =
+b/include/hw/acpi/aml-build.h
+>> index 559326c..dbf63cf 100644
+>> --- a/include/hw/acpi/aml-build.h
+>> +++ b/include/hw/acpi/aml-build.h
+>> @@ -385,6 +385,10 @@ int
+>> build_append_named_dword(GArray *array, const char *name_format, ...)
+>> GCC_FMT_ATTR(2, 3);
+>>=20
+>> +int
+>> +build_append_named_qword(GArray *array, const char *name_format, =
+...)
+>> +GCC_FMT_ATTR(2, 3);
+>> +
+>> void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t =
+base,
+>>                        uint64_t len, int node, MemoryAffinityFlags =
+flags);
+
+=E2=80=94Ben
+
+
+--Apple-Mail=_C9716595-A9D3-4104-8B96-AD04B576B9E7
+Content-Disposition: attachment;
+	filename=smime.p7s
+Content-Type: application/pkcs7-signature;
+	name=smime.p7s
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
+ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
+MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
+dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
+WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
+c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
+BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
+IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
+51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
+FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
+kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
+aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
+P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
+VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
+AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
+RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
+YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
+cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
+am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
+BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
+nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
+2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
+mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
+VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
+GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
+IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
+NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
+A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
+R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
+gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
+ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
+AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
+uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
+MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
+BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
+UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
+Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
+gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
+dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
+Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
+SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
+iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
+dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
+7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
+TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
+gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
+bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
+NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
+8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMTcwMTI1MTczNjUzWjAjBgkqhkiG9w0BCQQxFgQUXIQs8ZifPXJdVTVWus7WJsn3WbIw
+gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
+Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
+BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
+YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
+QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
+KoZIhvcNAQEBBQAEggEADNwQ7/2WsN2M2CIH8D8R1rAcG68pH1mVvQoD+4znZvPu5lee1Ef0QuA6
+rMlpZyxci0rv3idXql1yhy1DjqqzzcKBsnOTfJnQlvWuBfsdxcoA9BoqCF3LXbWNQFIkWgle6VTb
+/5m9iR/a3HeuRzfhZJwdIMqTqueSGGEYVQ2keDc8wSz0R1eg8G9CVPF6Q1yVzDp72nYvQqpR1V7d
+92bhhWbuW/GWU5w36iRkPnGw6s5QPSamGSQ+M7QOUDorbUMKMfb6+m+6RLGPOE9kd3ZOOnGu+Gtm
+/Iy1DPgUhl41Ed62m7RPQAw8dibZn8ndKuMw/0QK4IOD2OJ3NmayR473TAAAAAAAAA==
+--Apple-Mail=_C9716595-A9D3-4104-8B96-AD04B576B9E7--
