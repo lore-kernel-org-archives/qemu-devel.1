@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cWSYj-0004iM-4W
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:44:42 -0500
+	(envelope-from <marcel@redhat.com>) id 1cWSZw-0005PR-BV
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:45:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cWSYg-0001NJ-2h
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:44:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39310)
+	(envelope-from <marcel@redhat.com>) id 1cWSZv-0001jT-BK
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:45:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42086)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cWSYf-0001N8-Sw
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:44:38 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DF669C001690
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 18:44:37 +0000 (UTC)
-Date: Wed, 25 Jan 2017 13:44:35 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170125184435.GA1868@localhost.localdomain>
-References: <9a93d47ddba5f86d36cbdf884d86e2fa6f5542ae.1485364872.git.jcody@redhat.com>
-	<343adad0-1e18-5777-ad73-3d6fb7be8424@redhat.com>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cWSZv-0001iv-5R
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:45:55 -0500
+References: <1485297322-10595-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_TW1JK8DOHt-=kisvemGXjtuadJ+eH7L8NJwsQcQz8sw@mail.gmail.com>
+	<3958a41a-9b0e-4616-19dc-173824a87b31@gmail.com>
+	<CAFEAcA_T-bkoHCVS0ZkaReC8HE66R3XQg6ZOMPks=8mWYSx_cQ@mail.gmail.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <af7af918-62d2-2499-0dd0-3c7d18272ef2@redhat.com>
+Date: Wed, 25 Jan 2017 20:45:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <343adad0-1e18-5777-ad73-3d6fb7be8424@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: check full backing filename
- when searching protocol filenames
+In-Reply-To: <CAFEAcA_T-bkoHCVS0ZkaReC8HE66R3XQg6ZOMPks=8mWYSx_cQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/16] virtio, vhost, pci: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Jan 25, 2017 at 07:24:48PM +0100, Max Reitz wrote:
-> On 25.01.2017 18:22, Jeff Cody wrote:
-> > In bdrv_find_backing_image(), if we are searching an image for a backing
-> > file that contains a protocol, we currently only compare unmodified
-> > paths.
-> > 
-> > However, some management software will change the backing filename to be
-> > a relative filename in a path.  QEMU is able to handle this fine,
-> > because internally it will use path_combine to put together the full
-> > protocol URI.
-> > 
-> > However, this can lead to an inability to match an image during a QAPI
-> > command that needs to use bdrv_find_backing_image() to find the image,
-> > when it is searched by the full URI.
-> > 
-> > When searching for a protocol filename, if the straight comparison
-> > fails, this patch will also compare against the full backing filename to
-> > see if that is a match.
-> > 
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block.c | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> 
-> Thanks, applied to my block tree:
-> 
-> https://github.com/XanClic/qemu/commits/block
+On 01/25/2017 08:08 PM, Peter Maydell wrote:
+> On 25 January 2017 at 18:02, Marcel Apfelbaum
+> <marcel.apfelbaum@gmail.com> wrote:
+>> Strange, I re-based in the same day I posted and compiled just fine...
+>> However, I get the same error using today's master.
+>>
+>> I'll fix and re-post the series.
+>
+> mst has done a rebase of the pull request which I'll retry later.
 >
 
-Thanks!
+Understood, anyway the problem is that commit
+20daa90 (PCI/migration merge vmstate_pci_device and vmstate_pcie_device)
+removed the VMSTATE_PCIE_DEVICE macro.
 
-> 
-> How much would you mind writing an iotest?
+I'll re-post anyway and Michael can decide if he tweaks the macro name
+or use the updated series.
 
-I don't mind, I can do that.
+Thanks,
+Marcel
 
--Jeff
+
+> thanks
+> -- PMM
+>
