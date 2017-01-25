@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cWSFF-0005R5-LW
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:24:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cWSFd-0005ph-AV
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:24:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cWSFE-0003OL-Lg
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:24:33 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cWSFY-0003Qs-K6
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:24:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53164)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1cWSFY-0003Qb-BI
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 13:24:52 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 715EDC05AA76
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 18:24:52 +0000 (UTC)
 References: <9a93d47ddba5f86d36cbdf884d86e2fa6f5542ae.1485364872.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b77236d0-edde-3d14-4282-c61a7c7615af@redhat.com>
-Date: Wed, 25 Jan 2017 12:24:23 -0600
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <343adad0-1e18-5777-ad73-3d6fb7be8424@redhat.com>
+Date: Wed, 25 Jan 2017 19:24:48 +0100
 MIME-Version: 1.0
 In-Reply-To: <9a93d47ddba5f86d36cbdf884d86e2fa6f5542ae.1485364872.git.jcody@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="rBWI3SNBGjmkw8cGwqE2OmhpWd3RlWeqK"
+	boundary="DNiprKkmo1XIMFxrMKgx445Xp0wTJxq4s"
 Subject: Re: [Qemu-devel] [PATCH 1/1] block: check full backing filename
  when searching protocol filenames
 List-Id: <qemu-devel.nongnu.org>
@@ -25,22 +35,22 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu block <qemu-block@nongnu.org>
+Cc: kwolf@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rBWI3SNBGjmkw8cGwqE2OmhpWd3RlWeqK
-From: Eric Blake <eblake@redhat.com>
+--DNiprKkmo1XIMFxrMKgx445Xp0wTJxq4s
+From: Max Reitz <mreitz@redhat.com>
 To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu block <qemu-block@nongnu.org>
-Message-ID: <b77236d0-edde-3d14-4282-c61a7c7615af@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: check full backing filename when
- searching protocol filenames
+Cc: kwolf@redhat.com
+Message-ID: <343adad0-1e18-5777-ad73-3d6fb7be8424@redhat.com>
+Subject: Re: [PATCH 1/1] block: check full backing filename when searching
+ protocol filenames
 References: <9a93d47ddba5f86d36cbdf884d86e2fa6f5542ae.1485364872.git.jcody@redhat.com>
 In-Reply-To: <9a93d47ddba5f86d36cbdf884d86e2fa6f5542ae.1485364872.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 01/25/2017 11:22 AM, Jeff Cody wrote:
+On 25.01.2017 18:22, Jeff Cody wrote:
 > In bdrv_find_backing_image(), if we are searching an image for a backin=
 g
 > file that contains a protocol, we currently only compare unmodified
@@ -66,78 +76,31 @@ o
 >  block.c | 12 ++++++++++++
 >  1 file changed, 12 insertions(+)
 
-Does this overlap with Max' work on 'block: Fix some filename generation
-issues'?  But in isolation, it looks okay to me,
+Thanks, applied to my block tree:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/block.c b/block.c
-> index 39ddea3..a173afc 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3145,6 +3145,7 @@ BlockDriverState *bdrv_find_backing_image(BlockDr=
-iverState *bs,
->      int is_protocol =3D 0;
->      BlockDriverState *curr_bs =3D NULL;
->      BlockDriverState *retval =3D NULL;
-> +    Error *local_error =3D NULL;
-
-I might have scoped this...
-
-> =20
->      if (!bs || !bs->drv || !backing_file) {
->          return NULL;
-> @@ -3165,6 +3166,17 @@ BlockDriverState *bdrv_find_backing_image(BlockD=
-riverState *bs,
->                  retval =3D curr_bs->backing->bs;
->                  break;
->              }
-
-=2E..as the first line within the if that uses it. But no big deal.
-
-> +            /* Also check against the full backing filename for the im=
-age */
-> +            bdrv_get_full_backing_filename(curr_bs, backing_file_full,=
- PATH_MAX,
-> +                                           &local_error);
-> +            if (local_error =3D=3D NULL) {
-> +                if (strcmp(backing_file, backing_file_full) =3D=3D 0) =
-{
-> +                    retval =3D curr_bs->backing->bs;
-> +                    break;
-> +                }
-> +            } else {
-> +                error_free(local_error);
-> +            }
->          } else {
->              /* If not an absolute filename path, make it relative to t=
-he current
->               * image's filename path */
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+https://github.com/XanClic/qemu/commits/block
 
 
---rBWI3SNBGjmkw8cGwqE2OmhpWd3RlWeqK
+How much would you mind writing an iotest?
+
+Max
+
+
+--DNiprKkmo1XIMFxrMKgx445Xp0wTJxq4s
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYiO1XAAoJEKeha0olJ0Nqz+sIAJfnswZ5bmnvBz4R6o7ytte5
-dDdxkmvDaBdavy3C/f4MS640OzgmEpw7OC4xfDUEHs8y2h7/rmlHrFnK6QVUfZqd
-8dReC/Cq2OoIuLMEFcFS63iyn4DGovD46+EQzU6AODcSEUVTqdrnH1HVJZncAcj6
-vdxmQSGJ8RDzmmLTOrov1YEih7rgda8lZca7EOvmuM/gi4EtC5Ugwg0QvcZfMq1N
-5cJVLVO+o77qV5B8haIld2zr1TyFTkueTZKSU+YHVV5d4GaXEunUqOLogr+Mj5Vy
-g/UVbHFEZohnUxreFmyngY5L4KojiD5GRWOAh+IFLlYXnKHol/utfSB+Gl5SIjk=
-=NjFv
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliI7XASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A7H4H/3ZSMiWoCfZshxQG8OyZaB0NLaFFbGx5
++mx2gB+VpVvG9i2sqwYxgXQaa+7BHEtbbAh38zFxH6alj0O7tEhTdEkIgcYLAhWt
+MnzEuba9IaEgtzbEpJRLjh5lMuDHguTcpdQAtVDGwdEPToq7cQ1gtF62rww5glO8
+znb+EjLktCcYy58y5Cw6KuTZpH+TW5BaQXL6CtoApLRTSWgkzlWA3QoPjz6y/oQe
+gzhVDnTMP7wdOVihRLK7/qFSVyB5wyUCM9LBklI4FnKBSeKqiOYg/Ees97cYuKmM
+9dLArXZgAt8H3uUGetDPfpZrPrk3GyHBt1Uh+4vcINmEVvDCxlYoV8A=
+=juwx
 -----END PGP SIGNATURE-----
 
---rBWI3SNBGjmkw8cGwqE2OmhpWd3RlWeqK--
+--DNiprKkmo1XIMFxrMKgx445Xp0wTJxq4s--
