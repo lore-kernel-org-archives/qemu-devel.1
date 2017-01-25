@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cWRM6-0001ba-LQ
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:27:35 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cWRMd-0002W7-M7
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:28:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cWRM5-00011i-Pt
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:27:34 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36606)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cWRM5-00011P-Lu
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:27:33 -0500
-Received: by mail-qt0-x244.google.com with SMTP id l7so32449142qtd.3
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 09:27:33 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170113215720.29598-1-shorne@gmail.com>
-	<20170113220252.GE25986@lianli.shorne-pla.net>
-	<CAJBMM-sX4fGckYy-eNRdZ9dKamOoJoK2fQ4TLS80T5n6jCkpFg@mail.gmail.com>
-	<20170114080435.GF25986@lianli.shorne-pla.net>
-	<20170120163918.GD7836@lianli.shorne-pla.net>
-	<d27b7c60-a9fe-e92e-a937-d2d13b78f290@twiddle.net>
-	<20170124102625.GF7836@lianli.shorne-pla.net>
-	<01f7a18d-f4f5-18f3-0932-b32c06ad0b0c@twiddle.net>
-	<20170125123430.GG7836@lianli.shorne-pla.net>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <39f927aa-26fe-0e43-7c6b-efe1b70bc5fa@twiddle.net>
-Date: Wed, 25 Jan 2017 09:27:29 -0800
+	(envelope-from <no-reply@patchew.org>) id 1cWRMa-0001L9-D2
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:28:07 -0500
+Resent-Message-Id: <E1cWRMa-0001L9-D2@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21425)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cWRMa-0001K1-34
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:28:04 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1485365075-32702-1-git-send-email-phil@philjordan.eu>
+Message-ID: <148536527026.27.12814124354919992023@eba24e3a0d7f>
 MIME-Version: 1.0
-In-Reply-To: <20170125123430.GG7836@lianli.shorne-pla.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-openrisc: Fix exception handling
- status registers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 25 Jan 2017 09:27:51 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3] hw/usb/dev-hid: Improve guest
+ compatibility of usb-tablet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,42 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org, openrisc@lists.librecores.org
+To: phil@philjordan.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, somlo@cmu.edu, kraxel@redhat.com
 
-On 01/25/2017 04:34 AM, Stafford Horne wrote:
-> Hmm, I just tried your qemu branch and mine:
-> 
->   git@github.com:stffrdhrn/qemu.git or1k-fix-sigill
-> 
-> Both of them were able to boot fine.
-> 
-> The opencores,or1200-rtlsvn481 cpu node is in the or1ksim device tree
-> definition.  Are you sure your kernel config has this in it?
-> 
->   CONFIG_OPENRISC_BUILTIN_DTB="or1ksim"
-> 
-> Could you send your kernel config?
-> 
-> I have attached mine, just in case.  For next-20170124
-
-Curious.  The entire diff between our configs is just
-
---- ../or-config        2017-01-24 09:14:51.918059107 -0800
-+++ .config     2017-01-25 09:18:14.153999754 -0800
-@@ -18,7 +18,7 @@
- #
- CONFIG_BROKEN_ON_SMP=y
- CONFIG_INIT_ENV_ARG_LIMIT=32
--CONFIG_CROSS_COMPILE="or1k-linux-musl-"
-+CONFIG_CROSS_COMPILE="or1k-musl-linux-"
- # CONFIG_COMPILE_TEST is not set
- CONFIG_LOCALVERSION=""
- CONFIG_LOCALVERSION_AUTO=y
-
-So you're saying you *do* get serial port output?
-
-Perhaps you can just send me your kernel...
-
-
-r~
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjNdIGh3L3VzYi9kZXYtaGlkOiBJbXByb3ZlIGd1
+ZXN0IGNvbXBhdGliaWxpdHkgb2YgdXNiLXRhYmxldApNZXNzYWdlLWlkOiAxNDg1MzY1MDc1LTMy
+NzAyLTEtZ2l0LXNlbmQtZW1haWwtcGhpbEBwaGlsam9yZGFuLmV1Cgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
+ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
+L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0
+Y2hldy8xNDg1Mjk3MzIyLTEwNTk1LTEtZ2l0LXNlbmQtZW1haWwtbXN0QHJlZGhhdC5jb20gLT4g
+cGF0Y2hldy8xNDg1Mjk3MzIyLTEwNTk1LTEtZ2l0LXNlbmQtZW1haWwtbXN0QHJlZGhhdC5jb20K
+ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg1MzY1MDc1LTMyNzAyLTEtZ2l0LXNlbmQt
+ZW1haWwtcGhpbEBwaGlsam9yZGFuLmV1IC0+IHBhdGNoZXcvMTQ4NTM2NTA3NS0zMjcwMi0xLWdp
+dC1zZW5kLWVtYWlsLXBoaWxAcGhpbGpvcmRhbi5ldQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRj
+aGV3LzIwMTcwMTI0MTEwMTUxLjkzNy0xLWJlcnJhbmdlQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
+MDE3MDEyNDExMDE1MS45MzctMS1iZXJyYW5nZUByZWRoYXQuY29tCiAtIFt0YWcgdXBkYXRlXSAg
+ICAgIHBhdGNoZXcvMjAxNzAxMjUxMjE3MTAuMTM1NjEtMS1jb3JuZWxpYS5odWNrQGRlLmlibS5j
+b20gLT4gcGF0Y2hldy8yMDE3MDEyNTEyMTcxMC4xMzU2MS0xLWNvcm5lbGlhLmh1Y2tAZGUuaWJt
+LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmJkYmEyZTUgaHcvdXNiL2Rldi1o
+aWQ6IEltcHJvdmUgZ3Vlc3QgY29tcGF0aWJpbGl0eSBvZiB1c2ItdGFibGV0Cgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGh3L3VzYi9kZXYtaGlkOiBJbXByb3ZlIGd1
+ZXN0IGNvbXBhdGliaWxpdHkgb2YgdXNiLXRhYmxldC4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
+dWxkIG5ldmVyIHVzZSB0YWJzCiM0MzogRklMRTogaHcvdXNiL2Rldi1oaWQuYzo0OTA6CisgICAg
+MHgwOSwgMHgwMixeSV5JLyogVXNhZ2UgKE1vdXNlKSAqLyQKCnRvdGFsOiAxIGVycm9ycywgMCB3
+YXJuaW5ncywgMjQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
+ZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
+Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
+dmVsQGZyZWVsaXN0cy5vcmc=
