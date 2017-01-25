@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cWTtC-0004YJ-6Y
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:09:55 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cWULW-0005Wo-2P
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:39:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cWTt8-0005o4-5j
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:09:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59346)
+	(envelope-from <laurent@vivier.eu>) id 1cWULT-0007Ow-3J
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:39:10 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:58943)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cWTt7-0005nr-VN
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:09:50 -0500
-Date: Wed, 25 Jan 2017 13:09:47 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170125130947.2b0405f3@t450s.home>
-In-Reply-To: <da6d0ae9-a26b-a568-209b-fa2c94c62563@redhat.com>
-References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
-	<1485253571-19058-3-git-send-email-peterx@redhat.com>
-	<20170124092905.41832531@t450s.home>
-	<9ef03816-0bef-f54b-63fe-daf27eab4a40@redhat.com>
-	<20170125103642.5f4232a9@t450s.home>
-	<1ae1a5a1-2617-1862-ea1d-53f1383516d8@redhat.com>
-	<20170125113602.1ee76196@t450s.home>
-	<da6d0ae9-a26b-a568-209b-fa2c94c62563@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 02/18] vfio: introduce vfio_get_vaddr()
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cWULS-0007Oi-P5
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:39:07 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Wed, 25 Jan 2017 21:38:51 +0100
+Message-Id: <20170125203852.19254-2-laurent@vivier.eu>
+In-Reply-To: <20170125203852.19254-1-laurent@vivier.eu>
+References: <20170125203852.19254-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH 1/2] linux-user: add hppa magic numbers in
+ qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, qemu-devel@nongnu.org, bd.aviv@gmail.com
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Laurent Vivier <laurent@vivier.eu>
 
-On Wed, 25 Jan 2017 20:42:19 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+As we have now a linux-user HPPA target, we can add it to the list of
+supported targets in qemu-binfmt-conf.sh
 
-> On 25/01/2017 19:36, Alex Williamson wrote:
-> >> It depends of what happens if they aren't.  I think it's fine (see other
-> >> message), but taking a reference for each mapping entry isn't so easy
-> >> because the unmap case doesn't know the old memory region.  
-> > If we held a reference to the memory region from the mapping path and
-> > walk the IOMMU page table to generate the unmap, then we really should
-> > get to the same original memory region, right?  The vfio iommu notifier
-> > should only be mapping native page sizes of the IOMMU, 4k/2M/1G.  The
-> > problem is that it's a lot of overhead to flush the entire address
-> > space that way vs the single invalidation Peter is trying to enable
-> > here.  It's actually similar to how the type1 iommu works in the kernel
-> > though, we can unmap by iova because we ask the iommu for the iova->pfn
-> > translation in order to unpin the page.  
-> 
-> But in the kernel you can trust the IOMMU page tables because you build
-> them, here instead it's the guest's page tables that you'd walk, right?
-> You cannot trust the guest.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ scripts/qemu-binfmt-conf.sh | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Yes, you're right, we're not shadowing the vt-d page tables, we're
-working on the explicit invalidation model.  So there could be
-anything, or nothing in the page tables when we go to try to lookup the
-unref.  So clearly taking that reference without a shadow page table
-would be the wrong approach.  Thanks,
-
-Alex
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index de4d1c1..0f1aa63 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -1,9 +1,10 @@
+ #!/bin/sh
+-# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390 program execution by the kernel
++# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA
++# program execution by the kernel
+ 
+ qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
+ mips mipsel mipsn32 mipsn32el mips64 mips64el \
+-sh4 sh4eb s390x aarch64"
++sh4 sh4eb s390x aarch64 hppa"
+ 
+ i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+ i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+@@ -91,6 +92,10 @@ aarch64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x
+ aarch64_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ aarch64_family=arm
+ 
++hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x0f'
++hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
++hppa_family=hppa
++
+ qemu_get_family() {
+     cpu=${HOST_ARCH:-$(uname -m)}
+     case "$cpu" in
+-- 
+2.9.3
