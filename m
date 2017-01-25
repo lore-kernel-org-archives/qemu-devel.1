@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cWNYB-0004ao-0r
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:23:47 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cWNZU-0005ga-J6
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:25:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cWNY8-0007Sm-Da
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:23:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41738)
+	(envelope-from <stefanha@redhat.com>) id 1cWNZO-0008B8-Sy
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:25:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42232)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cWNY8-0007Sc-86
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:23:44 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cWNZO-0008Ao-NC
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:25:02 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6EB158124D
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:23:44 +0000 (UTC)
-Date: Wed, 25 Jan 2017 13:23:41 +0000
+	by mx1.redhat.com (Postfix) with ESMTPS id CEB6781235
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:25:02 +0000 (UTC)
+Date: Wed, 25 Jan 2017 13:24:58 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170125132341.GE10664@stefanha-x1.localdomain>
+Message-ID: <20170125132458.GF10664@stefanha-x1.localdomain>
 References: <20170124180420.12430-1-pbonzini@redhat.com>
-	<20170124180420.12430-5-pbonzini@redhat.com>
+	<20170124180420.12430-6-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="T6xhMxlHU34Bk0ad"
+	protocol="application/pgp-signature"; boundary="3yNHWXBV/QO9xKNm"
 Content-Disposition: inline
-In-Reply-To: <20170124180420.12430-5-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/8] exec: make address_space_cache_destroy
- idempotent
+In-Reply-To: <20170124180420.12430-6-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/8] virtio: use MemoryRegionCache to
+ access descriptors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,34 +39,38 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org, mst@redhat.com
 
 
---T6xhMxlHU34Bk0ad
+--3yNHWXBV/QO9xKNm
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 24, 2017 at 07:04:16PM +0100, Paolo Bonzini wrote:
+On Tue, Jan 24, 2017 at 07:04:17PM +0100, Paolo Bonzini wrote:
 > Clear cache->mr so that address_space_cache_destroy does nothing
 > the second time it is called.
 >=20
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  exec.c | 1 +
->  1 file changed, 1 insertion(+)
+>         v1->v2: rebased on new patch 3, rely on previous patch
+>=20
+>  hw/virtio/virtio.c    | 80 +++++++++++++++++++++++++--------------------=
+------
+>  include/exec/memory.h |  2 ++
+>  2 files changed, 41 insertions(+), 41 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---T6xhMxlHU34Bk0ad
+--3yNHWXBV/QO9xKNm
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYiKbdAAoJEJykq7OBq3PISFMH/1GJD0Eo8Z0vveShm+rgn0af
-zAWoFVsGOi44X5cQ2VAshrRvlhv1XGyEvtG5ZfVzC8HI7fhs25BX5fMqTC2YVXn7
-pnaR4mMSrAokpKTUpVAJgpmUoAJJlhyVHw2XBbw4Y3BGaA9bCaVGtVGdC2EJMKai
-ILGNvsKGsATSb+4b6mTLoSLEufFveqfltSW39JX2kTw4JxfdkFmUJvwzctGjIiPt
-qwIO5XxwJOv0Eaf46fo9uxEvwEcdv8wnoc8VmG11mCG5BbT/74rCDN069lqMvwPF
-W9flpDwPPuYcItQDmC88Y/9WBixr5dfwlqzFJcY76gvxkVH+79xjhK8UCld4E5M=
-=UAmB
+iQEcBAEBAgAGBQJYiKcqAAoJEJykq7OBq3PIc7QH/Ai7QDnKTBVmk6189Lf/lIod
+EjnXCP90HkqpZ5fKKUIapn6td6U9+BTy52r9aBPRv6c0I6EzlxUozvdK6z/o/yRj
+Ox71gqQhhoIHKSeZmU4CTVgTU/tjl+u8M3xI5cQofVg8U7eCRvpf3izgCIYyf03K
+1EhAbLGwCc/edh1LINIuvuvpnRKOrLQRBvvNft8glRap8QClUEkxVT/39Q9JhP9F
+t4wi46ojZxxo4JZodmqq9M3rNW6OVYg3/DN85h7Kz0WVPazTbPq2ysHlF7g6HWrS
+h2XaGjP9c9Rkcq3113tr0cZb+HAeCEzw6UWusyUUXoBT3OdHboqGsyGkYBW6sdM=
+=dKZI
 -----END PGP SIGNATURE-----
 
---T6xhMxlHU34Bk0ad--
+--3yNHWXBV/QO9xKNm--
