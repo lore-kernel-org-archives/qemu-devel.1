@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWOov-00068K-2i
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:45:09 -0500
+	(envelope-from <caliborn@SDF.ORG>) id 1cWOuT-0002Ow-NS
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:50:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWOou-0006p5-90
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:45:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51235)
+	(envelope-from <caliborn@SDF.ORG>) id 1cWOuO-00006j-GA
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:50:53 -0500
+Received: from ol.sdf.org ([205.166.94.20]:64931 helo=mx.sdf.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cWOou-0006o3-3d
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:45:08 -0500
-Date: Wed, 25 Jan 2017 14:45:03 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170125144502.GF2096@work-vm>
-References: <20170125121710.13561-1-cornelia.huck@de.ibm.com>
+	(Exim 4.71) (envelope-from <caliborn@SDF.ORG>) id 1cWOuN-00005Z-Si
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:50:48 -0500
+Date: Wed, 25 Jan 2017 14:50:30 +0000 (UTC)
+From: Valentin Plotkin <caliborn@SDF.ORG>
+Message-ID: <Pine.NEB.4.64.1701251446290.11466@sdf.lonestar.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170125121710.13561-1-cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/flic: fix compilation of kvm flic
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Subject: [Qemu-devel] [PATCH v2] target-ppc: Add MMU model check for booke
+ machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, duanj@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Scott Wood <scottwood@freescale.com>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
 
-* Cornelia Huck (cornelia.huck@de.ibm.com) wrote:
-> 2c21ee7 ("migration: extend VMStateInfo") missed a void -> int
-> return conversion for kvm_flic_save().
-> 
-> Fixes: 2c21ee7 ("migration: extend VMStateInfo")
-> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> ---
->  hw/intc/s390_flic_kvm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-> index da8e4dfab6..e86a84e49a 100644
-> --- a/hw/intc/s390_flic_kvm.c
-> +++ b/hw/intc/s390_flic_kvm.c
-> @@ -303,7 +303,7 @@ static int kvm_flic_save(QEMUFile *f, void *opaque, size_t size,
->           * migration state */
->          error_report("flic: couldn't allocate memory");
->          qemu_put_be64(f, FLIC_FAILED);
-> -        return;
-> +        return 0;
->      }
->  
->      count = __get_all_irqs(flic, &buf, len);
-> -- 
-> 2.11.0
+Machines bamboo, e500 and virtex-ml507 assume a certain MMU model,
+otherwise resulting in unpredictable behavior. Add apropriate checks
+into *_init functions.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Valentin <caliborn@sdf.org>
+---
+  hw/ppc/e500.c          | 6 ++++++
+  hw/ppc/ppc440_bamboo.c | 6 ++++++
+  hw/ppc/virtex_ml507.c  | 7 +++++++
+  3 files changed, 19 insertions(+)
 
-as discussed, sort out an error return value later.
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index cf8b122..5b1958c 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -827,6 +827,12 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+          env = &cpu->env;
+          cs = CPU(cpu);
 
-Dave
++        if (env->mmu_model != POWERPC_MMU_BOOKE206) {
++            fprintf(stderr, "MMU model %i not supported by this machine.\n",
++                env->mmu_model);
++            exit(1);
++        }
++
+          if (!firstenv) {
+              firstenv = env;
+          }
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index 5c535b1..9d997bf 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -193,6 +193,12 @@ static void bamboo_init(MachineState *machine)
+      }
+      env = &cpu->env;
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
++    if (env->mmu_model != POWERPC_MMU_BOOKE) {
++        fprintf(stderr, "MMU model %i not supported by this machine.\n",
++            env->mmu_model);
++        exit(1);
++    }
++
+      qemu_register_reset(main_cpu_reset, cpu);
+      ppc_booke_timers_init(cpu, 400000000, 0);
+      ppc_dcr_init(env, NULL, NULL);
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index b97d966..fdbcf22 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -221,6 +221,13 @@ static void virtex_init(MachineState *machine)
+
+      cpu = ppc440_init_xilinx(&ram_size, 1, machine->cpu_model, 400000000);
+      env = &cpu->env;
++
++    if (env->mmu_model != POWERPC_MMU_BOOKE) {
++        fprintf(stderr, "MMU model %i not supported by this machine.\n",
++            env->mmu_model);
++        exit(1);
++    }
++
+      qemu_register_reset(main_cpu_reset, cpu);
+
+      memory_region_allocate_system_memory(phys_ram, NULL, "ram", ram_size);
+-- 
+2.5.5
+
+
+This fixes 'qemu-system-ppc -nographic -cpu G2leGP3 -M ppce500; bug from
+BiteSizedTasks.
+
+Version 2: fixed style, moved checks from mmubooke_create_initial_mapping
+to *_init. Thanks to Thomas Huth <thuth@redhat.com>.
