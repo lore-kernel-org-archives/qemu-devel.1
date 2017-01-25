@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cWIgi-0005Np-V0
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:12:18 -0500
+	(envelope-from <w.bumiller@proxmox.com>) id 1cWIyB-0001D5-Hh
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:30:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cWIgf-0005D2-NL
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:12:16 -0500
-References: <Pine.NEB.4.64.1701241855380.2138@sdf.lonestar.org>
-	<4b93a2b8-097e-a502-875e-21ea394c617a@redhat.com>
-	<Pine.NEB.4.64.1701242127070.28647@sdf.lonestar.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3743fb8d-99cf-1016-facf-a5be3c0b0fdd@redhat.com>
-Date: Wed, 25 Jan 2017 09:12:07 +0100
+	(envelope-from <w.bumiller@proxmox.com>) id 1cWIy8-0002yE-DY
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:30:19 -0500
+Date: Wed, 25 Jan 2017 09:30:05 +0100
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Message-ID: <20170125083005.GA12762@olga.wb>
+References: <1485328025-3783-1-git-send-email-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <Pine.NEB.4.64.1701242127070.28647@sdf.lonestar.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] PPC: MMU compatibility check.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485328025-3783-1-git-send-email-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] cirrus: fix oob access issue
+ (CVE-2017-TODO)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +23,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Valentin Plotkin <caliborn@SDF.ORG>
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Li Qiang <liqiang6-s@360.cn>, qemu-stable@nongnu.org, P J P <ppandit@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 24.01.2017 22:41, Valentin Plotkin wrote:
-> On Tue, 24 Jan 2017, Thomas Huth wrote:
->=20
->> Date: Tue, 24 Jan 2017 21:32:44 +0100
->> From: Thomas Huth <thuth@redhat.com>
->> To: Valentin Plotkin <caliborn@SDF.ORG>, qemu-trivial@nongnu.org
->> Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
->> Subject: Re: [Qemu-ppc] [PATCH] PPC: MMU compatibility check.
->>
->> On 24.01.2017 19:56, Valentin Plotkin wrote:
->>>
->>> Hi everyone,
->>>
->>> I looked at the "qemu-system-ppc -nographic -cpu G2leGP3 -M ppce500" =
-on
->>> the BiteSizedTasks page. The segfault was caused by machine
->>> initialization code which expected a certain MMU model, checked, so
->>> unused SPR were read, returning zeros. bamboo and virtex machines are
->>> affected as well, but it doesn't always cause segfault, usually runni=
-ng
->>> into unmapped memory and failing somewhat more nicely.
->>>
->>> I added the checks. It would be possible to add support for other MMU
->>> models, but I'm not sure if there is any point (would any guest OS
->>> support mutually exclusive CPU and machine)?
->>
->> Hi,
->>
->> great to have a fix for this crash! I don't think it make much sense t=
-o
->> add support for other MMU models here, so the simple checks should be
->> good enough.
->> However, your new code obviously does not follow the QEMU coding style=
-.
->> Could you please run your patch through scripts/checkpatch.pl and fix
->> all issues that it reports? And when you resubmit, please make sure to
->> copy the maintainers on CC: as well (scripts/get_maintainers.pl is you=
-r
->> friend here).
->=20
-> Here is fengshuised version (at least I hope so). Thanks for guiding me=
-.
+On Wed, Jan 25, 2017 at 08:07:05AM +0100, Gerd Hoffmann wrote:
+> From: Li Qiang <liqiang6-s@360.cn>
+> 
+> When doing bitblt copy in backward mode, we should minus the
+> blt width first just like the adding in the forward mode. This
+> can avoid the oob access of the front of vga's vram.
+> 
+> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+> Message-id: 5887254f.863a240a.2c122.5500@mx.google.com
+> 
+> { kraxel: with backward blits (negative pitch) addr is the topmost
+>           address, so check it as-is against vram size ]
+> 
+> Cc: qemu-stable@nongnu.org
+> Cc: P J P <ppandit@redhat.com>
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
+> Fixes: d3532a0db02296e687711b8cdc7791924efccea0 (CVE-2014-8106)
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/display/cirrus_vga.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+> index 379910d..b8c29a6 100644
+> --- a/hw/display/cirrus_vga.c
+> +++ b/hw/display/cirrus_vga.c
+> @@ -277,10 +277,9 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+>      }
+>      if (pitch < 0) {
+>          int64_t min = addr
+> -            + ((int64_t)s->cirrus_blt_height-1) * pitch;
+> -        int32_t max = addr
+> -            + s->cirrus_blt_width;
+> -        if (min < 0 || max > s->vga.vram_size) {
+> +            + ((int64_t)s->cirrus_blt_height - 1) * pitch
+> +            - s->cirrus_blt_width;
+> +        if (min < 0 || addr > s->vga.vram_size) {
 
-Thanks, code looks better now!
-Now to get your patch included, you've got to send it in a separate
-mail, with only the patch description in it, i.e. not as a reply to
-another mail with the history of the mail thread. Reason for this is
-simply that the maintainers can pick up your patch with "git am" without
-having to edit things manually. Please see also
-http://qemu-project.org/Contribute/SubmitAPatch#Write_a_meaningful_commit=
-_message
-if you haven't read that page yet.
+Call me paranoid, but shouldn't this be '>='? Missed this yesterday
+apparently, correct me if I'm wrong:
+If VRAM goes from 0..7 it has a size of 8, and this would accept
+address 8 as it's not > size.
 
-Ah, and two more things that came to my mind:
+Note that for the blit functions themselves as well as
+blit_region_is_unsafe() the addresses are masked with cirrus_addr_mask.
+Like:
 
-1) Please use "exit(1)" (or "exit(EXIT_FAILURE)") instead of "exit(-1)",
-since that's the more common way to do that (since AFAIK the -1 will be
-cast to 255 at the shell level, which is just ugly).
+    if (blit_region_is_unsafe(s, s->cirrus_blt_dstpitch,
+                              s->cirrus_blt_dstaddr & s->cirrus_addr_mask)) {
 
-2) Maybe it would also be better to do the check right after the
-cpu_ppc_init() in the machine's init function already, instead of doing
-it in the mmubooke_create_initial_mapping() function? That way we could
-be sure that wrong CPUs are blocked right from the start.
+And eg. cirrus_bitblt_common_patterncopy() does:
 
- Thanks,
-  Thomas
+    dst = s->vga.vram_ptr + (s->cirrus_blt_dstaddr & s->cirrus_addr_mask);
+
+But it seems this is not always the case? (Also adding a negative pitch
+to this would then move in the wrong direction...)
+
+Also in cirrus_bitblt_common_patterncopy() there is a call:
+
+    cirrus_invalidate_region(s, s->cirrus_blt_dstaddr,
+                             s->cirrus_blt_dstpitch, s->cirrus_blt_width,
+                             s->cirrus_blt_height);
+
+This in turn takes the dstaddr's beginning as is and only masks the
+dst+pitch address like this:
+
+        off_cur = off_begin;
+        off_cur_end = (off_cur + bytesperline) & s->cirrus_addr_mask;
+        memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
+        off_begin += off_pitch;
+
+So the first memory_region_set_dirty() call would if I'm not mistaken
+get a bad address?
+
+Would it make sense to apply the masks in cirrus_bitblt_start() right
+after extracting them from s->vga.gr? Or to not mask the address inside
+blit_is_unafe()?
+
+>              return true;
+>          }
+>      } else {
+> -- 
+> 1.8.3.1
