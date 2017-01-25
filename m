@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWQS8-0008Rp-VY
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:29:46 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cWQX9-0003t7-Ki
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:34:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWQS7-0007Tf-Sk
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:29:45 -0500
-Date: Wed, 25 Jan 2017 16:29:32 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170125162932.GE29006@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170103182801.9638-1-berrange@redhat.com>
-	<e10208d6-ade6-f31d-83b1-12a12cff6e7f@redhat.com>
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cWQX8-0000uq-Oe
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:34:55 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:33206)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1cWQX8-0000uj-Jn
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:34:54 -0500
+Received: by mail-ot0-x241.google.com with SMTP id f9so24152113otd.0
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 08:34:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e10208d6-ade6-f31d-83b1-12a12cff6e7f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 00/15] Convert QCow[2] to QCryptoBlock &
- add LUKS support
+In-Reply-To: <fe189d26-df27-9a8e-6de3-6f53d92f5d2e@redhat.com>
+References: <CAC2QTZY0SJczV9_e3TwJbEXwyuTQXDQesAP5W6U0JeYvsV5uQg@mail.gmail.com>
+	<c5202aa1-bf56-5d66-533a-a1e78a3eafa2@redhat.com>
+	<20170125110715.GB15529@redhat.com> <87lgtz5r0f.fsf@emacs.mitica>
+	<CAC2QTZaMTN5wnGrmTK-BKUP1F3fxuCpSMX7mCw2z0grcDhOJyA@mail.gmail.com>
+	<fe189d26-df27-9a8e-6de3-6f53d92f5d2e@redhat.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Wed, 25 Jan 2017 22:04:53 +0530
+Message-ID: <CAC2QTZZ042AKg3SpCR9-RaFXkPBUFoH2ZGBhPFYTqJw+r+_FWQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] migration: QEMU aborts migration of "none" machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Jan 25, 2017 at 04:58:32PM +0100, Max Reitz wrote:
-> On 03.01.2017 19:27, Daniel P. Berrange wrote:
-> > This series is a continuation of previous work to support LUKS in
-> > QEMU. The existing merged code supports LUKS as a standalone
-> > driver which can be layered over/under any other QEMU block device
-> > driver. This works well when using LUKS over protocol drivers (file,
-> > rbd, iscsi, etc, etc), but has some downsides when combined with
-> > format drivers like qcow2.
-> 
-> When trying out whether compressed images are actually encrypted (which
-> they are not, as I wrote in my last reply to patch 12), I noticed that
-> the user interface still has some flaws:
+On Wed, Jan 25, 2017 at 9:40 PM, Thomas Huth <thuth@redhat.com> wrote:
+> On 25.01.2017 13:58, Ashijeet Acharya wrote:
+>> On Wed, Jan 25, 2017 at 4:46 PM, Juan Quintela <quintela@redhat.com> wrote:
+>>> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>>>> On Wed, Jan 25, 2017 at 11:53:06AM +0100, Thomas Huth wrote:
+>>>>> On 25.01.2017 11:01, Ashijeet Acharya wrote:
+>>>>>> Hi Thomas,
+>>>>>>
+>>>>>> I was able to reproduce the bug you encountered while trying to migrate
+>>>>>> a "none" machine.
+>>>>>>
+>>>>>> After digging deep and debugging the problem with gdb, I found that
+>>>>>> bitmap_new() is the function that crashes qemu as it always has
+>>>>>> zero bits being passed to it.
+>>>>>>
+>>>>>> I had a discussion with Dave on the IRC yesterday and he suggested the
+>>>>>> reason of crash being the absence of RAM ( since machine is "none")
+>>>>>> while attempting the migration.
+>>>>>>
+>>>>>> I am not sure what the ideal solution will be in this case; Do any of
+>>>>>> the maintainers have any suggestions or even a starting point which I
+>>>>>> can ponder upon?
+>>>>>
+>>>>> I'm not that familiar with the migration code either, but maybe you
+>>>>> could simply check for last_ram_offset() == 0 at the beginning of
+>>>>> ram_save_setup() and return with an error in that case?
+>>>>
+>>>> Do we actually need/want migration to succeed when RAM is 0 or vCPU
+>>>> count is 0 ?  If not, then we could just register a migration blocker
+>>>> during machine init
+>>>
+>>> Only use that I can see for that is to test that we have setup things
+>>> correctly, but for that we could also use an stopped machine.  So, I
+>>> don't know if it really makes sense.
+>>>
+>>> If the only problem is that bitmap_new(0) returns 0, we can try to fix
+>>> that, no?
+>>
+>> Yes, bitmap_new(0) aborts in this case. The only way I see to fix this
+>> would be to error out rather than simply crashing?
+>> Adding a migration blocker is one way too; although I am not aware of
+>> the use cases of a "none" machine.
+>
+> The "none" machine is - so far - only used for the testing framework
+> (see the tests/ directory in the QEMU sources). With the upcoming QEMU
+> 2.9, it should also be possible to use it as a simple instruction set
+> simulation board. But in both cases, we do not need migration for this
+> machine, i.e. simply printing an error message (and refusing to migrate)
+> instead of crashing should IMHO be OK here.
+>
 
-The original code explicitly forbids this combination
+Okay, I will write a patch to print an error message and if more
+suggestions come during that time, I will make the changes
+accordingly.
 
- "qemu-img: Compression and encryption not supported at the same time"
-
-but I guess we lost the error check due to changing to use
-encryption-format as the option name
-
-> One is that you actually can't convert to encrypted images any more, or
-> if you can, it doesn't seem obvious to me:
-> 
-> $ ./qemu-img convert -O qcow2 --object secret,id=sec0,data=12345 \
->     -o encryption-format=luks,luks-key-secret=sec0 \
->     foo.qcow2 bar.qcow2
-> qemu-img: Could not open 'bar.qcow2': Parameter 'key-secret' is required
-> for cipher
-> 
-> The issue is that you have to specify the key secret as a runtime
-> parameter in addition to the creation option. Not only is that a bit
-> cumbersome, but it's also impossible because --image-opts doesn't work
-> for the output image.
-
-Yeah, this is a problem I've not figured out a solutiuon for yet - it
-also affects the previously merged bare luks format code.
-
-Somehow qemu-img needs to know which create options are also required
-to be passed when opening the newly created image.
-
-Perhaps the BlockDriver struct needs a new callback like
-
-  bdrv_create_opts_to_runtime_opts(QemuOpts *copts, QemuOpts *ropts);
-
-> The second flaw is also visible above: The parameter is called
-> "luks-key-secret" here, not just "key-secret". The error message should
-> reflect that.
-
-This is hard to fix. The "luks-key-secret" parameter refers to the parameter
-at the block driver level. The error message though is coming from the crypto
-layer whose parameter genuinely is called "key-secret". Fixing it would
-require the block layer to pre-emptively check parmaeters, duplicating what
-the crypto layer does later, which I didn't really like the idea of.
-
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Ashijeet
+>  Thomas
+>
