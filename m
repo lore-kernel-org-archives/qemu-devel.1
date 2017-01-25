@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cWNCN-0008PD-Hy
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:01:18 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cWNEL-0001Ph-7E
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:03:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cWNCI-0007np-11
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:01:15 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:49764)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cWNCH-0007nL-RD
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:01:09 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170124071654.4572.41407.stgit@PASHA-ISP>
-	<20170124071724.4572.85855.stgit@PASHA-ISP>
-	<5500e05f-2923-3378-aa42-600cf0c4bf9b@redhat.com>
-	<000801d27701$7424d810$5c6e8830$@ru>
-	<1cab1a55-15cf-e9dc-f137-e55b613bd090@redhat.com>
-In-Reply-To: <1cab1a55-15cf-e9dc-f137-e55b613bd090@redhat.com>
-Date: Wed, 25 Jan 2017 16:01:11 +0300
-Message-ID: <000a01d2770b$1ab2d980$50188c80$@ru>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cWNEI-0000Dt-0G
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:03:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cWNEH-0000DZ-Rc
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:03:13 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E2BC283F3E
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:03:13 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 25 Jan 2017 17:03:06 +0400
+Message-Id: <20170125130308.16104-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v7 05/14] apic: save apic_delivered flag
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/2] qapi2texi: add type information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, kraxel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 25/01/2017 12:52, Pavel Dovgalyuk wrote:
-> >> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
-> >> On 24/01/2017 08:17, Pavel Dovgalyuk wrote:
-> >>> This patch implements saving/restoring of static apic_delivered variable.
-> >>>
-> >>> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> >>> ---
-> >>>  hw/intc/apic_common.c           |   32 ++++++++++++++++++++++++++++++++
-> >>>  include/hw/i386/apic_internal.h |    2 ++
-> >>>  2 files changed, 34 insertions(+)
-> >>>
-> >>> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-> >>> index d78c885..ac6cc67 100644
-> >>> --- a/hw/intc/apic_common.c
-> >>> +++ b/hw/intc/apic_common.c
-> >>> @@ -384,6 +384,24 @@ static bool apic_common_sipi_needed(void *opaque)
-> >>>      return s->wait_for_sipi != 0;
-> >>>  }
-> >>>
-> >>> +static bool apic_irq_delivered_needed(void *opaque)
-> >>> +{
-> >>> +    return true;
-> >>
-> >> Is it needed for CPUs except the first (or the last?)?
-> >>
-> >
-> > As this is global variable, it is needed only for one CPU.
-> > Do you mean that APIC state is saved for every CPU?
-> 
-> Yes, each CPU has its own APIC.
+The type information was dropped from v6 of the "qapi doc generation"
+series, since the syntax being used was still under discussion.
 
-How to link this data to a single CPU?
+However, the documentation without the type information is incomplete
+and you have to refer to the json schema for the details. With type
+information, you can hopefully only use the generated documentation.
 
-Pavel Dovgalyuk
+See the second patch summary for a short description of the syntax.
+
+Marc-Andr=C3=A9 Lureau (2):
+  qapi2texi: change texi formatters
+  qapi2texi: produce type information
+
+ scripts/qapi2texi.py | 114 ++++++++++++++++++++++++++++++++++++++-------=
+------
+ 1 file changed, 85 insertions(+), 29 deletions(-)
+
+--=20
+2.11.0.295.gd7dffce1c
