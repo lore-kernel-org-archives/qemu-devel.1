@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cWEgQ-0006FH-MN
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 22:55:43 -0500
+	(envelope-from <peterx@redhat.com>) id 1cWEp4-0000fm-I1
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:04:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cWEgL-0002Uf-Qn
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 22:55:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44928)
+	(envelope-from <peterx@redhat.com>) id 1cWEp0-0004i1-IV
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:04:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42868)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cWEgL-0002UY-Dq
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 22:55:37 -0500
-References: <cover.1485308342.git.ben@skyportsystems.com>
-	<dabc5ffbb5b9d29e88087dcbe03b1ba0232c342c.1485308342.git.ben@skyportsystems.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <827795cf-5399-7092-267e-e912141931f3@redhat.com>
-Date: Wed, 25 Jan 2017 04:55:32 +0100
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWEp0-0004hx-Bw
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:04:34 -0500
+Date: Wed, 25 Jan 2017 12:04:27 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170125040427.GB5151@pxdev.xzpeter.org>
+References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
+	<1484917736-32056-19-git-send-email-peterx@redhat.com>
+	<490bbb84-213b-1b2a-5a1b-fa42a5c6a359@redhat.com>
+	<20170122090425.GB26526@pxdev.xzpeter.org>
+	<1dd223d1-dc02-bddc-02ea-78d267dd40a4@redhat.com>
+	<20170123033429.GF26526@pxdev.xzpeter.org>
+	<20170123110308.5d36ce87@t450s.home>
+	<20170124072215.GN26526@pxdev.xzpeter.org>
+	<20170124092429.241a4eaf@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <dabc5ffbb5b9d29e88087dcbe03b1ba0232c342c.1485308342.git.ben@skyportsystems.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/9] ACPI: Add a function for building
- named qword entries
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170124092429.241a4eaf@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH RFC v4 18/20] intel_iommu: enable vfio
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,121 +35,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org
 
-Hi Ben,
+On Tue, Jan 24, 2017 at 09:24:29AM -0700, Alex Williamson wrote:
 
-sorry about being late to reviewing this series. I hope I can now spend
-more time on it.
+[...]
 
-- Please do not try to address my comments immediately. It's very
-possible (even likely) that Igor, MST and myself could have different
-opinions on things, so first please await agreement between your reviewers.
-
-- I think you should have CC'd Igor and Michael directly. I'm adding
-them to this reply; hopefully that will be enough for them to monitor
-this series.
-
-- I'll likely be unable to review everything with 100% coverage; so
-addressing (or sufficiently refuting) my comments might not guarantee
-that the next version will be merged at once.
-
-With all that said:
-
-On 01/25/17 02:43, ben@skyportsystems.com wrote:
-> From: Ben Warren <ben@skyportsystems.com>
+> > I see. Then this will be an strict requirement that we cannot do
+> > coalescing during page walk, at least for mappings.
+> > 
+> > I didn't notice this before, but luckily current series is following
+> > the rule above - we are basically doing the mapping in the unit of
+> > pages. Normally, we should always be mapping with 4K pages, only if
+> > guest provides huge pages in the VT-d page table, would we notify map
+> > with >4K, though of course it can be either 2M/1G but never other
+> > values.
+> > 
+> > The point is, guest should be aware of the existance of the above huge
+> > pages, so it won't unmap (for example) a single 4k region within a 2M
+> > huge page range. It'll either keep the huge page, or unmap the whole
+> > huge page. In that sense, we are quite safe.
+> > 
+> > (for my own curiousity and out of topic: could I ask why we can't do
+> >  that? e.g., we map 4K*2 pages, then we unmap the first 4K page?)
 > 
-> This is initially used to patch a 64-bit address into the VM Generation ID SSDT
+> You understand why we can't do this in the hugepage case, right?  A
+> hugepage means that at least one entire level of the page table is
+> missing and that in order to unmap a subsection of it, we actually need
+> to replace it with a new page table level, which cannot be done
+> atomically relative to the rest of the PTEs in that entry.  Now what if
+> we don't assume that hugepages are only the Intel defined 2MB & 1GB?
+> AMD-Vi supports effectively arbitrary power of two page table entries.
+> So what if we've passed a 2x 4K mapping where the physical pages were
+> contiguous and vfio passed it as a direct 8K mapping to the IOMMU and
+> the IOMMU has native support for 8K mappings.  We're in a similar
+> scenario as the 2MB page, different page table layout though.
 
-(1) I think this commit message line is overlong; I think we wrap at 74
-chars or so. Not critical, but worth mentioning.
+Thanks for the explaination. The AMD example is clear.
 
 > 
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> ---
->  hw/acpi/aml-build.c         | 28 ++++++++++++++++++++++++++++
->  include/hw/acpi/aml-build.h |  4 ++++
->  2 files changed, 32 insertions(+)
+> > > I would think (but please confirm), that when we're only tracking
+> > > mappings generated by the guest OS that this works.  If the guest OS
+> > > maps with 4k pages, we get map notifies for each of those 4k pages.  If
+> > > they use 2MB pages, we get 2MB ranges and invalidations will come in
+> > > the same granularity.  
+> > 
+> > I would agree (I haven't thought of a case that this might be a
+> > problem).
+> > 
+> > > 
+> > > An area of concern though is the replay mechanism in QEMU, I'll need to
+> > > look for it in the code, but replaying an IOMMU domain into a new
+> > > container *cannot* coalesce mappings or else it limits the granularity
+> > > with which we can later accept unmaps. Take for instance a guest that
+> > > has mapped a contiguous 2MB range with 4K pages.  They can unmap any 4K
+> > > page within that range.  However if vfio gets a single 2MB mapping
+> > > rather than 512 4K mappings, then the host IOMMU may use a hugepage
+> > > mapping where our granularity is now 2MB.  Thanks,  
+> > 
+> > Is this the answer of my above question (which is for my own
+> > curiosity)? If so, that'll kind of explain.
+> > 
+> > If it's just because vfio is smart enough on automatically using huge
+> > pages when applicable (I believe it's for performance's sake), not
+> > sure whether we can introduce a ioctl() to setup the iova_pgsizes
+> > bitmap, as long as it is a subset of supported iova_pgsizes (from
+> > VFIO_IOMMU_GET_INFO) - then when people wants to get rid of above
+> > limitation, they can explicitly set the iova_pgsizes to only allow 4K
+> > pages.
+> > 
+> > But, of course, this series can live well without it at least for now.
 > 
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index b2a1e40..dc4edc2 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -285,6 +285,34 @@ build_append_named_dword(GArray *array, const char *name_format, ...)
->      return offset;
->  }
->  
-> +/*
-> + * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a qword,
-> + * and return the offset to 0x00000000 for runtime patching.
-> + *
-> + * Warning: runtime patching is best avoided. Only use this as
-> + * a replacement for DataTableRegion (for guests that don't
-> + * support it).
-> + */
+> Yes, this is part of how vfio transparently makes use of hugepages in
+> the IOMMU, we effectively disregard the supported page sizes bitmap
+> (it's useless for anything other than determining the minimum page size
+> anyway), and instead pass through the largest range of iovas which are
+> physically contiguous.  The IOMMU driver can then make use of hugepages
+> where available.  The VFIO_IOMMU_MAP_DMA ioctl does include a flags
+> field where we could appropriate a bit to indicate map with minimum
+> granularity, but that would not be as simple as triggering the
+> disable_hugepages mapping path because the type1 driver would also need
+> to flag the internal vfio_dma as being bisectable, if not simply
+> converted to multiple vfio_dma structs internally.  Thanks,
 
-(2) Since we're adding a qword (8-byte integer), the hexadecimal
-constant should have 16 nibbles: 0x0000000000000000. (After copying the
-comment from build_append_named_dword(), it should be actualized.)
+I see, thanks!
 
-(3) Normally the functions in this file that create AML operators carry
-a note about the ACPI spec version and exact location that defines the
-operator. I see that commit f20354910893 ("acpi: add
-build_append_named_dword, returning an offset in buffer", 2016-03-01)
-missed that too.
-
-Unless this tradition has been willfully abandoned, I suggest that you
-add the right reference here, and also (in retrospect) to
-build_append_named_dword().
-
-> +int
-> +build_append_named_qword(GArray *array, const char *name_format, ...)
-> +{
-> +    int offset;
-> +    va_list ap;
-> +
-> +    build_append_byte(array, 0x08); /* NameOp */
-> +    va_start(ap, name_format);
-> +    build_append_namestringv(array, name_format, ap);
-> +    va_end(ap);
-> +
-> +    build_append_byte(array, 0x0E); /* QWordPrefix */
-> +
-> +    offset = array->len;
-> +    build_append_int_noprefix(array, 0x00000000, 8);
-
-(4) I guess the constant should be updated here too, for consistency
-with the comment.
-
-The rest looks okay. (I didn't verify 0x0E == QWordPrefix specifically,
-because an error there would break the functionality immediately, and
-you'd notice.)
-
-Thanks!
-Laszlo
-
-> +    assert(array->len == offset + 8);
-> +
-> +    return offset;
-> +}
-> +
->  static GPtrArray *alloc_list;
->  
->  static Aml *aml_alloc(void)
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 559326c..dbf63cf 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -385,6 +385,10 @@ int
->  build_append_named_dword(GArray *array, const char *name_format, ...)
->  GCC_FMT_ATTR(2, 3);
->  
-> +int
-> +build_append_named_qword(GArray *array, const char *name_format, ...)
-> +GCC_FMT_ATTR(2, 3);
-> +
->  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
->                         uint64_t len, int node, MemoryAffinityFlags flags);
->  
-> 
+-- peterx
