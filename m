@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cWULW-0005Wo-2P
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:39:10 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cWULb-0005YM-CV
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:39:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cWULT-0007Ow-3J
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:39:10 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:58943)
+	(envelope-from <laurent@vivier.eu>) id 1cWULY-0007RT-9i
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:39:15 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:53940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cWULS-0007Oi-P5
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:39:07 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cWULX-0007R3-VU
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:39:12 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 25 Jan 2017 21:38:51 +0100
-Message-Id: <20170125203852.19254-2-laurent@vivier.eu>
+Date: Wed, 25 Jan 2017 21:38:52 +0100
+Message-Id: <20170125203852.19254-3-laurent@vivier.eu>
 In-Reply-To: <20170125203852.19254-1-laurent@vivier.eu>
 References: <20170125203852.19254-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 1/2] linux-user: add hppa magic numbers in
- qemu-binfmt-conf.sh
+Subject: [Qemu-devel] [PATCH 2/2] linux-user: fix "apt-get update" on
+ linux-user hppa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +27,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Laurent Vivier <laurent@vivier.eu>
 
-As we have now a linux-user HPPA target, we can add it to the list of
-supported targets in qemu-binfmt-conf.sh
+apt-get was hanging on linux-user hppa.
 
+strace has shown the netlink data stream was not correctly byte swapped.
+
+It appears the fd translator function is unregistered just after it
+has been registered, so the translator function is not called.
+
+This patch removes the fd_trans_unregister() after the do_socket()
+in the TARGET_NR_socket case.
+
+This fd_trans_unregister() was added by commit
+    e36800c linux-user: add signalfd/signalfd4 syscalls
+when do_socket() was not registering any fd translator.
+And as now it is, we must remove this fd_trans_unregister() to keep them.
+
+Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- scripts/qemu-binfmt-conf.sh | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ linux-user/syscall.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index de4d1c1..0f1aa63 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -1,9 +1,10 @@
- #!/bin/sh
--# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390 program execution by the kernel
-+# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA
-+# program execution by the kernel
- 
- qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
- mips mipsel mipsn32 mipsn32el mips64 mips64el \
--sh4 sh4eb s390x aarch64"
-+sh4 sh4eb s390x aarch64 hppa"
- 
- i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
- i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-@@ -91,6 +92,10 @@ aarch64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x
- aarch64_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
- aarch64_family=arm
- 
-+hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x0f'
-+hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-+hppa_family=hppa
-+
- qemu_get_family() {
-     cpu=${HOST_ARCH:-$(uname -m)}
-     case "$cpu" in
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 11a311f..9be8e95 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -9343,7 +9343,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ #ifdef TARGET_NR_socket
+     case TARGET_NR_socket:
+         ret = do_socket(arg1, arg2, arg3);
+-        fd_trans_unregister(ret);
+         break;
+ #endif
+ #ifdef TARGET_NR_socketpair
 -- 
 2.9.3
