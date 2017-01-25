@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cWPJM-0004tJ-LY
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:16:38 -0500
+	(envelope-from <bounces@canonical.com>) id 1cWPNF-0007B5-Jk
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cWPJI-0000KF-Ji
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:16:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cWPJI-0000Jm-Af
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:16:32 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 997C47FB6C
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 15:16:31 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
-Date: Wed, 25 Jan 2017 16:16:28 +0100
-In-Reply-To: <20170118160332.13390-1-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 18 Jan 2017 20:03:07 +0400")
-Message-ID: <87o9yv890z.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1cWPNB-0001aj-84
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:20:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39741)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cWPNA-0001aX-Ve
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:20:33 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cWPN9-0003Lt-D9
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 15:20:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 622C92E80C7
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 15:20:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/25] qmp: add async command type
+Date: Wed, 25 Jan 2017 15:02:26 -0000
+From: Greg Sheremeta <1242765@bugs.launchpad.net>
+Reply-To: Bug 1242765 <1242765@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131021155451.28203.66085.malonedeb@gac.canonical.com>
+Message-Id: <20170125150226.8646.26001.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1242765] Re: USB passthrough to Windows 7 guest
+ fails with error -110, hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,275 +37,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
 
-Cc'ing block job people.
+You may close. It's since worked fine for me.
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Also the ticket is years old :D
 
-> Hi,
->
-> One of initial design goals of QMP was to have "asynchronous command
-> completion" (http://wiki.qemu.org/Features/QAPI). Unfortunately, that
-> goal was not fully achieved, and some broken bits left were removed
-> progressively until commit 65207c59d that removed async command
-> support.
+-- =
 
-Correct.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1242765
 
-QMP's initial design stipulated that commands are asynchronous.  The
-initial implementation made them all synchronous, with very few
-exceptions (buggy ones, to boot).  Naturally, clients relied on the
-actual rather than the theoretical behavior, i.e. on getting command
-replies synchronously, in order.
+Title:
+  USB passthrough to Windows 7 guest fails with error -110, hangs
 
-> Note that qmp events are asynchronous messages, and must be handled
-> appropriately by the client: dispatch both reply and events after a
-> command is sent for example.
+Status in QEMU:
+  Incomplete
 
-Yes.
+Bug description:
+  Description of problem:
 
-> The benefits of async commands that can be trade-off depending on the
-> requirements are:
->
-> 1) allow the command handler to re-enter the main loop if the command
-> cannot be handled synchronously, or if it is long-lasting. This is
-> currently not possible and make some bugs such as rhbz#1230527 tricky
-> (see below) to solve.  Furthermore, many QMP commands do IO and could
-> be considered 'slow' and blocking today.
->
-> 2) allow concurrent commands and events. This mainly implies hanlding
-> concurrency in qemu and out-of-order replies for the client. As noted
-> earlier, a good qmp client already has to handle dispatching of
-> received messages (reply and events).
+  Using a Sandisk Cruzer Fit 16GB USB thumb drive.
+  Using virt-manager on Fedora 19 host, and Windows 7 32 bit guest.
 
-We need to distingish two kinds of concurrency.  One, execution of QMP
-commands concurrently with other activities in QEMU, including other QMP
-monitors.  Two, executing multiple QMP commands concurrently in the same
-monitor, which obviously requires all but one of them to be
-asynchronous.
+  I set up a USB2 controller on Windows 7 guest in virt-manager. Windows
+  sees the USB drive and can open the file manager and correctly show
+  the files. I can copy a file from the thumb drive to the Fedora
+  desktop, and then play the file on the desktop. However, any attempt
+  to open a file directly on the thumb drive (example, play an MP3 using
+  Windows Media Player) results in guest hang and host kernel messages:
 
-> The traditional approach to solving the above in qemu is the following
-> scheme:
-> -> { "execute": "do-foo" }
-> <- { "return": {} }
-> <- { "event": "FOO_DONE" }
+  =
 
-... where the event may carry additional data, such as the command's
-true result.
+  Oct 19 21:15:35 localhost kernel: [187592.977839] usb 1-1.3: reset high-s=
+peed USB device number 13 using ehci-pci
+  Oct 19 21:15:40 localhost kernel: [187598.065274] usb 1-1.3: device descr=
+iptor read/all, error -110
+  Oct 19 21:15:40 localhost kernel: [187598.138167] usb 1-1.3: reset high-s=
+peed USB device number 13 using ehci-pci
+  Oct 19 21:15:56 localhost kernel: [187613.218119] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:16:11 localhost kernel: [187628.399275] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:16:11 localhost kernel: [187628.573355] usb 1-1.3: reset high-s=
+peed USB device number 13 using ehci-pci
+  Oct 19 21:16:16 localhost kernel: [187633.587778] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:16:21 localhost kernel: [187638.702244] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:16:21 localhost kernel: [187638.876201] usb 1-1.3: reset high-s=
+peed USB device number 13 using ehci-pci
+  Oct 19 21:16:26 localhost kernel: [187643.890642] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:16:31 localhost kernel: [187649.005071] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:16:31 localhost kernel: [187649.106188] usb 1-1.3: USB disconne=
+ct, device number 13
+  Oct 19 21:16:31 localhost kernel: [187649.178969] usb 1-1.3: new high-spe=
+ed USB device number 14 using ehci-pci
+  Oct 19 21:16:47 localhost kernel: [187664.258945] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:17:02 localhost kernel: [187679.440092] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:17:02 localhost kernel: [187679.614194] usb 1-1.3: new high-spe=
+ed USB device number 15 using ehci-pci
+  Oct 19 21:17:17 localhost kernel: [187694.694148] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:17:32 localhost kernel: [187709.875297] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:17:32 localhost kernel: [187710.049386] usb 1-1.3: new high-spe=
+ed USB device number 16 using ehci-pci
+  Oct 19 21:17:37 localhost kernel: [187715.063803] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:17:41 localhost kernel: [187719.005453] usb 1-1.3: device descr=
+iptor read/8, error -71
 
-> It has several flaws:
-> - FOO_DONE event has no semantic link with do-foo in the qapi
->   schema. It is not simple to generalize that pattern when writing
->   qmp clients. It makes documentation and usage harder.
-> - the FOO_DONE event has no clear association with the command that
->   triggered it: commands/events have to come up with additional
->   specific association schemes (ids, path etc)
+  After that -71 error, the thumb drive completely disappears from the
+  host, as if it is powered down.
 
-Valid points.  Emulating asynchronous commands with a synchronous
-command + event isn't quite as simple to specify as a native
-asynchronous command could be.
+  I read that -110 is supposedly a power issue. I can play media files
+  directly from the thumb drive on the host, so the power seems fine on
+  the host.
 
-> - FOO_DONE is broadcasted to all clients, but they may have no way to
->   interprete it or interest in it, or worse it may conflict with their
->   own commands.
+  =
 
-The part about "no interest" is valid in cases where the event signals
-completion of a job without side effects, because then only the job's
-initiator cares (the event has to carry a result for this to make
-sense).  But when the job has side effects, other clients may want to
-know, and broadcast is probably the right thing to do.
+  How reproducible:
+  always
 
-We deliberately broadcast events even though some clients may not care
-about some of them.  It's the stupidest solution that could possibly
-work.  Has never been a problem; clients simply ignore events they don't
-need.  If it becomes a problem, we can provide a mechanism to subscribe
-to events.  Adds some interface complexity to save a bit of bandwidth.
+  =
 
-The part about "conflict due to broadcast" is weak.  To create a
-conflict, the interface has to be misdesigned so that events can't be
-reliably connected back to their commands.  But then the conflict could
-just as well happen between commands issued by a single client.  I think
-the valid point here is that synchronous command + event offers an
-additional opportunity for screwing up at the command design level.
-Perhaps we should do something about it; more on that below.
+  Steps to reproduce:
+  1. use virt-manager, create a Windows 7 32 bit guest
+  2. in virt-manager, set Controller USB to USB2
+  3. on host, insert Sandisk Cruser Fit thumb drive FAT32 format, with an M=
+P3 file on it
+  4. in virt-manager, add a USB passthrough device and assign it to thumb d=
+rive
+  5. boot Windows 7 guest
+  6. verify that Windows 7 can see the thumb drive
+  7. use Windows Media Player to play MP3
 
-> - the arguably useless empty reply return
+  Actual results:
+  guest hangs, then host powers off thumb drive
 
-Valid point, but really, really minor.
+  Expected results:
+  The MP3 file should play :)
 
-> For some cases, it makes sense to use that scheme, or a more complete
-> one: to have an "handler" associated with an on-going operation, that
-> can be queried, modified, cancelled etc (block jobs etc).
+  =
 
-Block jobs provide ways to query status and properties, modify
-properties, pause, resume, cancel, and initiate synchronous completion.
+  Additional info:
 
-I suspect that we could use some of these "job control" features for
-pretty much any long-running activity.
+  Fedora 19
 
-Migration is such an activity, but uses its own job control interfaces.
+  Installed Packages
+  qemu-common.x86_64                                                2:1.4.2=
+-11.fc19                                           @updates
+  qemu-guest-agent.x86_64                                           2:1.4.2=
+-11.fc19                                           @updates
+  qemu-img.x86_64                                                   2:1.4.2=
+-11.fc19                                           @updates
+  qemu-kvm.x86_64                                                   2:1.4.2=
+-11.fc19                                           @updates
+  qemu-system-x86.x86_64                                            2:1.4.2=
+-11.fc19                                           @updates
+  virt-manager.noarch                                              0.10.0-3=
+.fc19                                              @updates
+  kernel.x86_64                                      3.11.1-200.fc19       =
+                               @updates
 
-We hope to unify both under a more generic "job" abstraction.
-
->                                                           Also, some
-> operations have a global side-effect, in which case that cmd+event
-> scheme is right, as all clients are listening for global events.
-
-Yes.
-
-> However, for the simple case where a client want to perform a "local
-> context" operation (dump, query etc), QAPI can easily do better
-> without resorting to this pattern: it can send the reply when the
-> operation is done. That would make QAPI schema, usage and
-> documentation more obvious.
-
-On the other hand, it creates a second, independent way to do
-asynchronous.
-
-Let me review the design space.
-
-1. Commands are asynchronous
-
-   We still need events to broadcast state changes of interest.
-
-   Commands that complete "quickly" will probably behave synchronously
-   anyway, because messing with threads or coroutines would be
-   inefficient and needlessly complex then.
-
-   Risk: clients that erroneously rely on synchronous behavior can work
-   in simple testing, yet break in entertaining ways under load, or when
-   a "quick" command becomes "slow" later on.  Not an argument against
-   this design, I'm merely pointing out an opportunity to screw up.  It
-   could make evolving de facto synchronous commands into asynchronous
-   ones impractical, though.
-
-   We still need job control.  A natural way to do it is to provide job
-   control for *any* asynchronous command, i.e. there's no separate
-   concept of "jobs", there are just commands that haven't completed,
-   yet.  Job control commands simply fail when the asynchronous command
-   they target doesn't support them.  I figure only select commands
-   support cancellation, for instance.
-
-   Of course, we could also do job control the way we do it now, with a
-   separate "job" concept.  You can't evolve a mere command into a job
-   then: if you start with a mere command, and it later turns out that
-   it can run for a very long time, and you need to be able to cancel
-   it, you have to start over: create a new command that creates a job.
-
-   While this feels like a perfectly sensible design to me, we can't
-   have it without a massive compatibility break.  Or can we?
-
-2. Commands are synchronous
-
-   This is what we have now.
-
-   Commands that may not complete "quickly" need to be split into a
-   command to kick off the job, and an event to signal completion and
-   transmit the result.
-
-   If we misjudge "quickly", we have to start over with a new command.
-   With 1., we can change the old command from synchronous to
-   asynchronous instead, but that risks breaking clients, which may
-   force us to start over anyway.
-
-   We currently lack a generic way to connect events back to their
-   commands, and instead leave the problem to each command/event pair to
-   solve.
-
-   A special case of the command+event pattern is "block jobs".  We'd
-   like to evolve them into general job abstraction.  Perhaps any
-   (non-deprecated) command/event combo could be an instance of this job
-   abstraction.  Such a job abstraction should certainly provide an
-   unambiguous connection between event and command.
-
-3. Both
-
-   Existing commands stay synchronous for compatibility.  New commands
-   that complete "quickly" are synchronous.  New commands that may not
-   complete "quickly" become asynchronous if job control isn't needed,
-   else they start jobs.  Having a single job abstraction for them would
-   be nice.
-
-   If we misjudge "quickly" or "no need for job control", we have to
-   start over with a new command.
-
-   I hope this is a fair description of what you're proposing, please
-   correct misunderstandings.
-
-   While I accept your assertion that the commands we can make
-   asynchronous would be a bit simpler than their synchronous command +
-   event equivalent, I'm afraid adding them to what we have now merely
-   moves the complexity around: three kinds of commands (quick,
-   command+event, async) instead of two.  Whether that's a net win is
-   unclear.  I doubt it.
-
-I'm pretty confident adding a suitable jobs abstraction can make 2. work
-reasonably well.
-
-I can't quite see how we can get from here to 1., but perhaps you can
-show us.
-
-I strongly dislike the lack of orthogonality in 3.
-
-> The following series implements an async solution, by introducing a
-> context associated with a command, it can:
-> - defer the return
-> - return only to the caller (no broadcasted event)
-> - return with the 'id' associated with the call (as originally intended)
-
-Context: 'id' is passed by the client with the command.
-
-As you mentioned elsewhere in this thread, 'id' could conceivably
-ambiguous with multiple QMP monitors.  One way to disambiguate is
-including a monitor-id that uniquely identifies the monitor where 'id'
-comes from.
-
-> - optionnally allow cancellation when the client is gone
-> - track on-going qapi command(s) per client
-
-Inching towards job control...
-
-> 1) existing qemu commands can be gradually replaced by async:true
-> variants when needed, and by carefully reviewing the concurrency
-> aspects.
-
-It's a behavioral change that can conceivably break clients, so
-"reviewing the concurrency aspects" includes reviewing all clients, I'm
-afraid.  I'm not saying it's impossible, but I'm not exactly looking
-forward to it.
-
->          The async:true commands marshaller helpers are splitted in
-> half, the calling and return functions. The command is called with a
-> QmpReturn context, that can return immediately or later, using the
-> generated return helper.
->
-> 2) allow concurrent commands when 'async' is negotiated. If the client
-> doesn't support 'async', then the monitor is suspended during command
-> execution (events are still sent). Effectively, async commands behave
-> like normal commands from client POV in this case, giving full
-> backward compatibility.
-
-Aha.  Okay, that makes it more practical.  Converting to async can break
-a client even when it claims to support async, but I guess it's less
-likely.
-
-> The screendump command is converted to an async:true version to solve
-> rhbz#1230527. The command shows basic cancellation (this could be
-> extended if needed). HMP remains sync, but it would be worth to make
-> it possible to call async:true qapi commands.
->
-> The last patch cleans up qmp_dispatch usage to have consistant checks
-> between qga & qemu, and simplify QmpClient/parser_feed usage.
-
-I'm afraid I lack the time to review your actual patches in a reasonable
-time frame; I really need to hunker down and deliver the QemuOpts / QAPI
-work I promised for 2.9, or else my block friends will be sad, Dan
-Berrange will be sad, and my manager will be sad, too.  This is
-unfortunate.  More so since your proposal has been pending for so long.
-My sincere apologies.
-
-Let's at least use the time to discuss the design, in particular how it
-relates to the work on evolving block jobs into a generic jobs
-abstraction.
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1242765/+subscriptions
