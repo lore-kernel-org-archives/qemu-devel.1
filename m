@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWFG4-0000hZ-9I
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:32:33 -0500
+	(envelope-from <peterx@redhat.com>) id 1cWFVm-00044Y-Rq
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:48:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWFFz-0002VC-6z
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:32:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48394)
+	(envelope-from <peterx@redhat.com>) id 1cWFVi-0005yR-Sk
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:48:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWFFy-0002Tj-Vt
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:32:27 -0500
-Date: Wed, 25 Jan 2017 12:32:21 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWFVi-0005yK-NJ
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:48:42 -0500
+Date: Wed, 25 Jan 2017 12:48:37 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170125043221.GD5151@pxdev.xzpeter.org>
+Message-ID: <20170125044837.GE5151@pxdev.xzpeter.org>
 References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
-	<1485253571-19058-3-git-send-email-peterx@redhat.com>
-	<20170124092905.41832531@t450s.home>
+	<20170124114910.GD16400@pxdev.xzpeter.org>
+	<20170124164751-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170124092905.41832531@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH v5 02/18] vfio: introduce vfio_get_vaddr()
+In-Reply-To: <20170124164751-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v5 00/18] VT-d: vfio enablement and misc
+ enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,140 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-On Tue, Jan 24, 2017 at 09:29:05AM -0700, Alex Williamson wrote:
-> On Tue, 24 Jan 2017 18:25:55 +0800
-> Peter Xu <peterx@redhat.com> wrote:
-> 
-> > A cleanup for vfio_iommu_map_notify(). Should have no functional change,
-> > just to make the function shorter and easier to understand.
+On Tue, Jan 24, 2017 at 04:48:49PM +0200, Michael S. Tsirkin wrote:
+> On Tue, Jan 24, 2017 at 07:49:10PM +0800, Peter Xu wrote:
+> > On Tue, Jan 24, 2017 at 06:25:53PM +0800, Peter Xu wrote:
+> > > This is v5 of vt-d vfio enablement series.
+> > > 
+> > > Most of the changes in v5 is not functionally, but related to
+> > > comments, error_report()s, debugging, squashing patches, etc. (which
+> > > are confirmed changes in v4), besides a tiny tweak when unmapping a
+> > > whole address space (please see below changelog). There are still
+> > > discussions in v4 thread, we can just continue there (or here), and
+> > > from this version I'll remove RFC tag.
+> > > 
+> > > I didn't rebase to master since current master failed to build on my
+> > > laptop (with a "vl.c/hax..." error), however this series should be
+> > > okay to be applied cleanly upon it.
 > > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/vfio/common.c | 58 +++++++++++++++++++++++++++++++++++++-------------------
-> >  1 file changed, 38 insertions(+), 20 deletions(-)
+> > Sorry I forgot to append the todo list (please help adding in in case
+> > I missed anything):
 > > 
-> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > index 174f351..ce55dff 100644
-> > --- a/hw/vfio/common.c
-> > +++ b/hw/vfio/common.c
-> > @@ -294,25 +294,14 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
-> >             section->offset_within_address_space & (1ULL << 63);
-> >  }
-> >  
-> > -static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > +static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-> > +                           bool *read_only)
-> >  {
-> > -    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-> > -    VFIOContainer *container = giommu->container;
-> > -    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-> >      MemoryRegion *mr;
-> >      hwaddr xlat;
-> >      hwaddr len = iotlb->addr_mask + 1;
-> > -    void *vaddr;
-> > -    int ret;
-> > -
-> > -    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
-> > -                                iova, iova + iotlb->addr_mask);
-> > -
-> > -    if (iotlb->target_as != &address_space_memory) {
-> > -        error_report("Wrong target AS \"%s\", only system memory is allowed",
-> > -                     iotlb->target_as->name ? iotlb->target_as->name : "none");
-> > -        return;
-> > -    }
-> > +    bool ret = false;
-> > +    bool writable = iotlb->perm & IOMMU_WO;
-> >  
-> >      /*
-> >       * The IOMMU TLB entry we have just covers translation through
-> > @@ -322,12 +311,13 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >      rcu_read_lock();
-> >      mr = address_space_translate(&address_space_memory,
-> >                                   iotlb->translated_addr,
-> > -                                 &xlat, &len, iotlb->perm & IOMMU_WO);
-> > +                                 &xlat, &len, writable);
-> >      if (!memory_region_is_ram(mr)) {
-> >          error_report("iommu map to non memory area %"HWADDR_PRIx"",
-> >                       xlat);
-> >          goto out;
-> >      }
-> > +
-> >      /*
-> >       * Translation truncates length to the IOMMU page size,
-> >       * check that it did not truncate too much.
-> > @@ -337,11 +327,41 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >          goto out;
-> >      }
-> >  
-> > +    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> > +    *read_only = !writable || mr->readonly;
-> > +    ret = true;
-> > +
-> > +out:
-> > +    rcu_read_unlock();
-> > +    return ret;
-> > +}
-> > +
-> > +static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > +{
-> > +    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-> > +    VFIOContainer *container = giommu->container;
-> > +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-> > +    bool read_only;
-> > +    void *vaddr;
-> > +    int ret;
-> > +
-> > +    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
-> > +                                iova, iova + iotlb->addr_mask);
-> > +
-> > +    if (iotlb->target_as != &address_space_memory) {
-> > +        error_report("Wrong target AS \"%s\", only system memory is allowed",
-> > +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
-> > +        return;
-> > +    }
-> > +
-> > +    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-> > +        return;
-> > +    }
-> > +
-> >      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
-> > -        vaddr = memory_region_get_ram_ptr(mr) + xlat;
-> >          ret = vfio_dma_map(container, iova,
-> >                             iotlb->addr_mask + 1, vaddr,
-> > -                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
-> > +                           read_only);
-> >          if (ret) {
-> >              error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-> >                           "0x%"HWADDR_PRIx", %p) = %d (%m)",
-> > @@ -357,8 +377,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> >                           iotlb->addr_mask + 1, ret);
-> >          }
-> >      }
-> > -out:
-> > -    rcu_read_unlock();
+> > - don't need to notify IOTLB (psi/gsi/global) invalidations to devices
+> >   that with ATS enabled
+> > - investigate when guest map page while mask contains existing mapped
+> >   pages (e.g. map 12k-16k first, then map 0-12k)
+> > - coalesce unmap during page walk (currently, we send it once per
+> >   page)
+> > - when do PSI for unmap, whether we can send one notify directly
+> >   instead of walking over the page table?
+> > 
+> > Above does not contain those that are still during discussion. And,
+> > some of the entries still need tests to further prove it's
+> > feasibility.
+> > 
+> > Thanks,
+> > 
+> > -- peterx
 > 
-> The comment from v4 still needs input from Paolo, is it valid to make
-> use of vaddr (based on address_space_translate ->
-> memory_region_get_ram_ptr) outside of the rcu read lock or could future
-> BQL reduction efforts allow this to race?
+> While valid I don't think above need to block merging.
 
-Yes we should continue the discussion. Sorry for the inconvenient and
-misunderstanding (I was only trying to provide a non-rfc version of
-the series, in case Michael would like to pick up some cleanup any of
-the patches).
+Sorry for the delay of this series.
 
-I have similar question as well above - IIUC the RCU read lock
-protects us from not losing the references of memory objects, however
-in our case even after we release the lock, we are still using the
-backend ram (vaddr) since we have set it up inside kernel to build up
-the IO page table. After that, the kernel/device should be able to
-write to addresses of that backend ram any time. Is there possibly a
-window that kernel/device may write to that backend ram even after
-guest destroyed the memory objects (e.g., by memory unplug?) and its
-backend ram?
+Looks like we still need to wait until we got explicit acks for vfio
+patch 2-3 from Alex/Paolo/David since that'll be required by the
+following series. (I'll address all Jason's new comments as well in
+next post)
+
+Do you like to merge the iommu cleanups first? Or you can also wait
+for above to be confirmed, and I'll repost for a final version then
+(if we don't have further comments).
 
 Thanks,
 
