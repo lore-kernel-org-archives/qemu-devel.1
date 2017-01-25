@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWQDR-0001wY-Qa
+	(envelope-from <berrange@redhat.com>) id 1cWQDV-0001zj-5u
 	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWQDQ-0003V6-Rx
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38350)
+	(envelope-from <berrange@redhat.com>) id 1cWQDT-0003VN-4Z
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cWQDQ-0003Uu-Je
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:32 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cWQDS-0003VG-UN
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:14:35 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 25 Jan 2017 16:14:12 +0000
-Message-Id: <20170125161417.31949-4-berrange@redhat.com>
+Date: Wed, 25 Jan 2017 16:14:13 +0000
+Message-Id: <20170125161417.31949-5-berrange@redhat.com>
 In-Reply-To: <20170125161417.31949-1-berrange@redhat.com>
 References: <20170125161417.31949-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 3/8] trace: move hw/xen events to correct
- subdir
+Subject: [Qemu-devel] [PATCH v4 4/8] trace: move hw/i386/xen events to
+ correct subdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +33,52 @@ always live in the same directory as the source file.
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- Makefile.objs       |  1 +
- hw/xen/trace-events | 13 +++++++++++++
- trace-events        | 10 ----------
- 3 files changed, 14 insertions(+), 10 deletions(-)
- create mode 100644 hw/xen/trace-events
+ Makefile.objs            | 1 +
+ hw/i386/trace-events     | 7 -------
+ hw/i386/xen/trace-events | 6 ++++++
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+ create mode 100644 hw/i386/xen/trace-events
 
 diff --git a/Makefile.objs b/Makefile.objs
-index babbc4e..9ac11e7 100644
+index 9ac11e7..6abe0b9 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -152,6 +152,7 @@ trace-events-y += hw/vfio/trace-events
- trace-events-y += hw/acpi/trace-events
- trace-events-y += hw/arm/trace-events
- trace-events-y += hw/alpha/trace-events
-+trace-events-y += hw/xen/trace-events
- trace-events-y += ui/trace-events
- trace-events-y += audio/trace-events
- trace-events-y += net/trace-events
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+@@ -144,6 +144,7 @@ trace-events-y += hw/sd/trace-events
+ trace-events-y += hw/isa/trace-events
+ trace-events-y += hw/mem/trace-events
+ trace-events-y += hw/i386/trace-events
++trace-events-y += hw/i386/xen/trace-events
+ trace-events-y += hw/9pfs/trace-events
+ trace-events-y += hw/ppc/trace-events
+ trace-events-y += hw/pci/trace-events
+diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+index d2b4973..a3568ee 100644
+--- a/hw/i386/trace-events
++++ b/hw/i386/trace-events
+@@ -1,12 +1,5 @@
+ # See docs/tracing.txt for syntax documentation.
+ 
+-# hw/i386/xen/xen_platform.c
+-xen_platform_log(char *s) "xen platform: %s"
+-
+-# hw/i386/xen/xen_pvdevice.c
+-xen_pv_mmio_read(uint64_t addr) "WARNING: read from Xen PV Device MMIO space (address %"PRIx64")"
+-xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (address %"PRIx64")"
+-
+ # hw/i386/x86-iommu.c
+ x86_iommu_iec_notify(bool global, uint32_t index, uint32_t mask) "Notify IEC invalidation: global=%d index=%" PRIu32 " mask=%" PRIu32
+ 
+diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
 new file mode 100644
-index 0000000..c4fb6f1
+index 0000000..321fe60
 --- /dev/null
-+++ b/hw/xen/trace-events
-@@ -0,0 +1,13 @@
-+# See docs/tracing.txt for syntax documentation.
++++ b/hw/i386/xen/trace-events
+@@ -0,0 +1,6 @@
++# hw/i386/xen/xen_platform.c
++xen_platform_log(char *s) "xen platform: %s"
 +
-+# include/hw/xen/xen_common.h
-+xen_default_ioreq_server(void) ""
-+xen_ioreq_server_create(uint32_t id) "id: %u"
-+xen_ioreq_server_destroy(uint32_t id) "id: %u"
-+xen_ioreq_server_state(uint32_t id, bool enable) "id: %u: enable: %i"
-+xen_map_mmio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
-+xen_unmap_mmio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
-+xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
-+xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
-+xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
-+xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
-diff --git a/trace-events b/trace-events
-index 839a9d0..05ac6ac 100644
---- a/trace-events
-+++ b/trace-events
-@@ -62,16 +62,6 @@ spice_vmc_event(int event) "spice vmc event %d"
- # xen-hvm.c
- xen_ram_alloc(unsigned long ram_addr, unsigned long size) "requested: %#lx, size %#lx"
- xen_client_set_memory(uint64_t start_addr, unsigned long size, bool log_dirty) "%#"PRIx64" size %#lx, log_dirty %i"
--xen_default_ioreq_server(void) ""
--xen_ioreq_server_create(uint32_t id) "id: %u"
--xen_ioreq_server_destroy(uint32_t id) "id: %u"
--xen_ioreq_server_state(uint32_t id, bool enable) "id: %u: enable: %i"
--xen_map_mmio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
--xen_unmap_mmio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
--xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
--xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
--xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
--xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
- handle_ioreq(void *req, uint32_t type, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p type=%d dir=%d df=%d ptr=%d port=%#"PRIx64" data=%#"PRIx64" count=%d size=%d"
- handle_ioreq_read(void *req, uint32_t type, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p read type=%d df=%d ptr=%d port=%#"PRIx64" data=%#"PRIx64" count=%d size=%d"
- handle_ioreq_write(void *req, uint32_t type, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p write type=%d df=%d ptr=%d port=%#"PRIx64" data=%#"PRIx64" count=%d size=%d"
++# hw/i386/xen/xen_pvdevice.c
++xen_pv_mmio_read(uint64_t addr) "WARNING: read from Xen PV Device MMIO space (address %"PRIx64")"
++xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (address %"PRIx64")"
 -- 
 2.9.3
