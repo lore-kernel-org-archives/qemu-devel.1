@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1cWNWy-0003cy-Ob
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:22:34 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cWNXP-0003wb-41
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:23:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1cWNWw-0006nQ-43
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:22:32 -0500
-Received: from proxmox.maurer-it.com ([212.186.127.180]:30923)
+	(envelope-from <stefanha@redhat.com>) id 1cWNXM-00072A-Gk
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:22:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35454)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
-	id 1cWNWv-0006mP-S1
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:22:30 -0500
-Date: Wed, 25 Jan 2017 14:22:26 +0100 (CET)
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Message-ID: <1649081132.25.1485350546249@webmail.proxmox.com>
-In-Reply-To: <2ca4bdcc-cd12-f640-60f2-85f31dad32ad@redhat.com>
-References: <1485346353-23814-1-git-send-email-w.bumiller@proxmox.com>
-	<2ca4bdcc-cd12-f640-60f2-85f31dad32ad@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cWNXM-00071u-B3
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:22:56 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 895304AE81
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:22:56 +0000 (UTC)
+Date: Wed, 25 Jan 2017 13:22:52 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170125132252.GD10664@stefanha-x1.localdomain>
+References: <20170124180420.12430-1-pbonzini@redhat.com>
+	<20170124180420.12430-4-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cirrus: handle negative pitch in
- cirrus_invalidate_region()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="EP0wieDxd4TSJjHq"
+Content-Disposition: inline
+In-Reply-To: <20170124180420.12430-4-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/8] virtio: use address_space_map/unmap to
+ access descriptors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +35,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>
-Cc: Li Qiang <liqiang6-s@360.cn>, Gerd Hoffmann <kraxel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
 
-> On January 25, 2017 at 1:35 PM Laszlo Ersek <lersek@redhat.com> wrote:
-> 
-> 
-> On 01/25/17 13:12, Wolfgang Bumiller wrote:
-> > cirrus_invalidate_region() calls memory_region_set_dirty()
-> > on a per-line basis, always ranging from off_begin to
-> > off_begin+bytesperline. With a negative pitch off_begin
-> > marks the top most used address and thus we need to do an
-> > initial shift backwards by bytesperline for negative
-> > pitches of backward blits, otherwise the first iteration
-> > covers the line going from the start offset forwards instead
-> > of backwards.
-> > 
-> > Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
-> > ---
-> > I bumped the patch context to 4 lines to get it to include the
-> > memory_region_set_dirty() call which takes an unsigned length (`hwaddr
-> > size`) because I'm also not too happy about the masking going on there
-> > since it means off_cur_end may be less than off_cur, but if the range
-> > checks are finnaly correct I don't think this case could happen
-> > anymore? (A check shouldn't hurt though, or maybe an assert()?)
-> > 
-> >  hw/display/cirrus_vga.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-> > index b1a0773..af61981 100644
-> > --- a/hw/display/cirrus_vga.c
-> > +++ b/hw/display/cirrus_vga.c
-> > @@ -669,8 +669,12 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
-> >      int y;
-> >      int off_cur;
-> >      int off_cur_end;
-> >  
-> > +    if (off_pitch < 0) {
-> > +        off_begin -= bytesperline;
-> > +    }
-> > +
-> >      for (y = 0; y < lines; y++) {
-> >  	off_cur = off_begin;
-> >  	off_cur_end = (off_cur + bytesperline) & s->cirrus_addr_mask;
-> >          memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
-> > 
-> 
-> I think the adjustment is off by one. The loop body inherently considers
-> "off_cur" inclusive, and "off_cur_end" exclusive.
-> 
-> When "off_pitch" is negative, and the initial "off_begin" value is an
-> "inclusive end", then by subtracting a full "bytesperline", you just go
-> to the "inclusive end" of the previous line. Whereas, you should go to
-> the address right above it, to the "inclusive start" of the *same* line.
-> (From bottom right to bottom left corner.)
+--EP0wieDxd4TSJjHq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Right, this again.
+On Tue, Jan 24, 2017 at 07:04:15PM +0100, Paolo Bonzini wrote:
+> @@ -689,18 +714,34 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+>      }
+> =20
+>      i =3D head;
+> -    vring_desc_read(vdev, &desc, desc_pa, i);
+> +
+> +    len =3D max * sizeof(VRingDesc);
+> +    vring_desc_ptr =3D address_space_map(vdev->dma_as, vq->vring.desc, &=
+len, false);
+> +    if (len < max * sizeof(VRingDesc)) {
+> +        virtio_error(vdev, "Cannot map descriptor ring");
+> +        return NULL;
 
-> Therefore the decrement should be (bytesperline - bytesperpixel), IMO.
+Missing address_space_unmap() if vring_desc_ptr is non-NULL.
 
-At this point we don't operate in a pixel byte group basis though, and
-as far as I can see the backward blit functions are always byte-based
-operations, so I think `bytesperpixel` can just be 1 here?
+--EP0wieDxd4TSJjHq
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> Regarding assert(off_cur_end >= off_cur): not a bad idea, IMO.
+-----BEGIN PGP SIGNATURE-----
 
-I'll include it in v2.
+iQEcBAEBAgAGBQJYiKasAAoJEJykq7OBq3PIHW0IAKALozImMucX71wVCIFvEbAm
+/UXczReyfbtlLLtdEbzD3tLLnFFMs83QW5J+4Lt3iAx0oBCH6HtWyPe1npzBsYnK
+hZuxq9zT/Mz/zLN4nIv5W0fNCm9tP42r0dEsSSDVq1w6IZDn+Mjykcl+am0gpt74
+nyBnAf6//UeL70Dg+Cyjw+OVKJ4QQfuXWe3wJWPC+HDMXDr2uh6E3UOVpPUytGhO
+/xisz8eTLLZJuBjAo5yyzFwogds8c2rMW87g4G4ZRBcQEv6Gf7+IhIfqd3Ra2Xeq
+yWL0xFFOYqtDd138Oie9tTuyK20j4loP8MisYbsCY8VgTOuP8wUsklkdb8u+Des=
+=x5Nu
+-----END PGP SIGNATURE-----
+
+--EP0wieDxd4TSJjHq--
