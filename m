@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cWPNF-0007B5-Jk
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:20:39 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cWPl6-0004YJ-8H
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:45:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cWPNB-0001aj-84
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:20:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39741)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cWPNA-0001aX-Ve
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:20:33 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cWPN9-0003Lt-D9
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 15:20:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 622C92E80C7
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 15:20:31 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1cWPl5-0000ev-BF
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 10:45:16 -0500
+References: <20170103182801.9638-1-berrange@redhat.com>
+	<20170103182801.9638-13-berrange@redhat.com>
+	<fdf48e56-2b65-b0cd-39da-010ca751cc02@redhat.com>
+	<20170124135848.GA28745@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5344f8c8-7869-24bc-7bbb-8ecc958f3ce5@redhat.com>
+Date: Wed, 25 Jan 2017 16:45:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Jan 2017 15:02:26 -0000
-From: Greg Sheremeta <1242765@bugs.launchpad.net>
-Reply-To: Bug 1242765 <1242765@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131021155451.28203.66085.malonedeb@gac.canonical.com>
-Message-Id: <20170125150226.8646.26001.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1242765] Re: USB passthrough to Windows 7 guest
- fails with error -110, hangs
+In-Reply-To: <20170124135848.GA28745@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="sdPOg0T7m0de7OB8lXrwTcssQKQo5WmHq"
+Subject: Re: [Qemu-devel] [PATCH v1 12/15] qcow2: add support for LUKS
+ encryption format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,134 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-You may close. It's since worked fine for me.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sdPOg0T7m0de7OB8lXrwTcssQKQo5WmHq
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <5344f8c8-7869-24bc-7bbb-8ecc958f3ce5@redhat.com>
+Subject: Re: [PATCH v1 12/15] qcow2: add support for LUKS encryption format
+References: <20170103182801.9638-1-berrange@redhat.com>
+ <20170103182801.9638-13-berrange@redhat.com>
+ <fdf48e56-2b65-b0cd-39da-010ca751cc02@redhat.com>
+ <20170124135848.GA28745@redhat.com>
+In-Reply-To: <20170124135848.GA28745@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Also the ticket is years old :D
+On 24.01.2017 14:58, Daniel P. Berrange wrote:
+> On Sat, Jan 21, 2017 at 07:57:45PM +0100, Max Reitz wrote:
+>> On 03.01.2017 19:27, Daniel P. Berrange wrote:
 
--- =
+[...]
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1242765
+>>> diff --git a/tests/qemu-iotests/174 b/tests/qemu-iotests/174
+>>> new file mode 100755
+>>> index 0000000..27d4870
+>>> --- /dev/null
+>>> +++ b/tests/qemu-iotests/174
+>>> +_supported_fmt qcow2
+>>> +_supported_proto generic
+>>> +_supported_os Linux
+>>> +
+>>> +
+>>> +size=3D128M
+>>> +
+>>> +SECRET=3D"secret,id=3Dsec0,data=3Dastrochicken"
+>>> +SECRETALT=3D"secret,id=3Dsec0,data=3Dplatypus"
+>>> +
+>>> +_make_test_img --object $SECRET -o "encryption-format=3Dluks,luks-ke=
+y-secret=3Dsec0" $size
+>>> +
+>>> +IMGSPEC=3D"driver=3D$IMGFMT,file.filename=3D$TEST_IMG,luks-key-secre=
+t=3Dsec0"
+>>> +
+>>> +QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
+>>> +
+>>> +echo
+>>> +echo "=3D=3D reading whole image =3D=3D"
+>>> +$QEMU_IO --object $SECRET -c "read 0 $size" --image-opts $IMGSPEC | =
+_filter_qemu_io | _filter_testdir
+>>
+>> Shouldn't "read -P 0 0 $size" work here, too?
+>=20
+> The underlying disk image contents will be zeros, but we'll then decryp=
+t
+> those zeros and get random garbage.
 
-Title:
-  USB passthrough to Windows 7 guest fails with error -110, hangs
+There are not disk image contents yet because you didn't use
+preallocation. qcow2_co_preadv() always returns 0 for unallocated
+clusters (without a backing file) and zero clusters.
 
-Status in QEMU:
-  Incomplete
+While looking at that place in qcow2_co_preadv(), I also noticed that
+compressed clusters are not encrypted. That looks like a flaw to me that
+the user should at least be warned about when invoking qemu-img convert
+with the -c option.
 
-Bug description:
-  Description of problem:
+(You can test this by converting a disk image to an encrypted compressed
+image (qemu-img convert with -c and -o encryption-format=3Dluks; note thi=
+s
+doesn't actually work unless you hack into qemu-img.c, I'll write a
+separate mail about this as a response to the cover letter) and then
+just set the crypt_method field to 0 and overwrite the disk encryption
+header extension type with 0. If all of the clusters could be compressed
+(which is the case if the original image was all filled with 42-bytes or
+something), then qemu-img compare will happily declare your image to be
+equal to the original, without requiring any key.)
 
-  Using a Sandisk Cruzer Fit 16GB USB thumb drive.
-  Using virt-manager on Fedora 19 host, and Windows 7 32 bit guest.
+> We could only use -P 0 if we explicitly fill with encrypted-zeros.
 
-  I set up a USB2 controller on Windows 7 guest in virt-manager. Windows
-  sees the USB drive and can open the file manager and correctly show
-  the files. I can copy a file from the thumb drive to the Fedora
-  desktop, and then play the file on the desktop. However, any attempt
-  to open a file directly on the thumb drive (example, play an MP3 using
-  Windows Media Player) results in guest hang and host kernel messages:
+Max
 
-  =
 
-  Oct 19 21:15:35 localhost kernel: [187592.977839] usb 1-1.3: reset high-s=
-peed USB device number 13 using ehci-pci
-  Oct 19 21:15:40 localhost kernel: [187598.065274] usb 1-1.3: device descr=
-iptor read/all, error -110
-  Oct 19 21:15:40 localhost kernel: [187598.138167] usb 1-1.3: reset high-s=
-peed USB device number 13 using ehci-pci
-  Oct 19 21:15:56 localhost kernel: [187613.218119] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:16:11 localhost kernel: [187628.399275] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:16:11 localhost kernel: [187628.573355] usb 1-1.3: reset high-s=
-peed USB device number 13 using ehci-pci
-  Oct 19 21:16:16 localhost kernel: [187633.587778] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:16:21 localhost kernel: [187638.702244] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:16:21 localhost kernel: [187638.876201] usb 1-1.3: reset high-s=
-peed USB device number 13 using ehci-pci
-  Oct 19 21:16:26 localhost kernel: [187643.890642] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:16:31 localhost kernel: [187649.005071] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:16:31 localhost kernel: [187649.106188] usb 1-1.3: USB disconne=
-ct, device number 13
-  Oct 19 21:16:31 localhost kernel: [187649.178969] usb 1-1.3: new high-spe=
-ed USB device number 14 using ehci-pci
-  Oct 19 21:16:47 localhost kernel: [187664.258945] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:17:02 localhost kernel: [187679.440092] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:17:02 localhost kernel: [187679.614194] usb 1-1.3: new high-spe=
-ed USB device number 15 using ehci-pci
-  Oct 19 21:17:17 localhost kernel: [187694.694148] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:17:32 localhost kernel: [187709.875297] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:17:32 localhost kernel: [187710.049386] usb 1-1.3: new high-spe=
-ed USB device number 16 using ehci-pci
-  Oct 19 21:17:37 localhost kernel: [187715.063803] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:17:41 localhost kernel: [187719.005453] usb 1-1.3: device descr=
-iptor read/8, error -71
+--sdPOg0T7m0de7OB8lXrwTcssQKQo5WmHq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  After that -71 error, the thumb drive completely disappears from the
-  host, as if it is powered down.
+-----BEGIN PGP SIGNATURE-----
 
-  I read that -110 is supposedly a power issue. I can play media files
-  directly from the thumb drive on the host, so the power seems fine on
-  the host.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliIyAASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AzSUIAIMl2AUBt49AFQFIpBJRuMMwuJXOI3F5
+gtiy8NB7ho8sipRNrojFPrfgDlIfrLBXkzbp+neajh32evgia5HyEYqlgThzk0he
+osIVm3KcwZErsRu5u0W/WfQIFhbMEzos+wr3zsiz5xbnTOD0Nl2goYcPlQSAwLZx
+XJtJ+YMiuRZlVCVDvI4BH7NSt5t0cRUVYo1TTezR/ECvKsF5d5mSrcCGL2sBl589
+JJzXoNIutGfadSb6U0uB0OIhZ2plNXMVZKqxfDjNT6TEU92MRtSt+XmaBWARxTAj
+HSNXhb6EZQSb40R4DaSOTjjDzrcpsBWOMujlvROx7v3995QiusZVuxg=
+=wAAC
+-----END PGP SIGNATURE-----
 
-  =
-
-  How reproducible:
-  always
-
-  =
-
-  Steps to reproduce:
-  1. use virt-manager, create a Windows 7 32 bit guest
-  2. in virt-manager, set Controller USB to USB2
-  3. on host, insert Sandisk Cruser Fit thumb drive FAT32 format, with an M=
-P3 file on it
-  4. in virt-manager, add a USB passthrough device and assign it to thumb d=
-rive
-  5. boot Windows 7 guest
-  6. verify that Windows 7 can see the thumb drive
-  7. use Windows Media Player to play MP3
-
-  Actual results:
-  guest hangs, then host powers off thumb drive
-
-  Expected results:
-  The MP3 file should play :)
-
-  =
-
-  Additional info:
-
-  Fedora 19
-
-  Installed Packages
-  qemu-common.x86_64                                                2:1.4.2=
--11.fc19                                           @updates
-  qemu-guest-agent.x86_64                                           2:1.4.2=
--11.fc19                                           @updates
-  qemu-img.x86_64                                                   2:1.4.2=
--11.fc19                                           @updates
-  qemu-kvm.x86_64                                                   2:1.4.2=
--11.fc19                                           @updates
-  qemu-system-x86.x86_64                                            2:1.4.2=
--11.fc19                                           @updates
-  virt-manager.noarch                                              0.10.0-3=
-.fc19                                              @updates
-  kernel.x86_64                                      3.11.1-200.fc19       =
-                               @updates
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1242765/+subscriptions
+--sdPOg0T7m0de7OB8lXrwTcssQKQo5WmHq--
