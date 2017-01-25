@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ale@clearmind.me>) id 1cWI96-0004I7-6b
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:37:33 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cWIDQ-0007yL-Vn
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:42:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ale@clearmind.me>) id 1cWI95-0000Zl-AP
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:37:32 -0500
-Received: from clearmind.me ([178.32.49.9]:50519)
+	(envelope-from <jasowang@redhat.com>) id 1cWIDM-0001y4-2k
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:42:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ale@clearmind.me>) id 1cWI95-0000ZG-3t
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:37:31 -0500
-Date: Wed, 25 Jan 2017 08:38:35 +0100
-From: Alessandro Di Federico <ale+qemu@clearmind.me>
-In-Reply-To: <CAFEAcA-52cjhLWWVGQ0qPeF3uKA67-ZBk=EQT2ARL1tjATWMkQ@mail.gmail.com>
-References: <20170121084600.5860-1-ale+qemu@clearmind.me>
-	<20170121084600.5860-2-ale+qemu@clearmind.me>
-	<CAFEAcA-52cjhLWWVGQ0qPeF3uKA67-ZBk=EQT2ARL1tjATWMkQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cWIDL-0001x3-QH
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:41:56 -0500
+References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
+	<1484917736-32056-19-git-send-email-peterx@redhat.com>
+	<490bbb84-213b-1b2a-5a1b-fa42a5c6a359@redhat.com>
+	<20170122090425.GB26526@pxdev.xzpeter.org>
+	<1dd223d1-dc02-bddc-02ea-78d267dd40a4@redhat.com>
+	<20170123033429.GF26526@pxdev.xzpeter.org>
+	<c3ec8e80-2d47-82c4-b38b-3cc487ea37c0@redhat.com>
+	<20170123124053.4b2c895f@t450s.home>
+	<b8f174d9-fb65-b093-cd5b-d36c92c69c5c@redhat.com>
+	<20170124183118.7ac7c0c6@t450s.home>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <da50890d-c65f-c6f2-5b89-18d56d401a4c@redhat.com>
+Date: Wed, 25 Jan 2017 15:41:48 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <E1cWIBq-0000iN-MH@clearmind.me>
-Sender: ale@clearmind.me
-Subject: Re: [Qemu-devel] [RFC PATCH 1/3] Factor out {linux, bsd}-user/qemu.h
+In-Reply-To: <20170124183118.7ac7c0c6@t450s.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC v4 18/20] intel_iommu: enable vfio
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +36,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
 
-On Tue, 24 Jan 2017 11:18:07 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> So my issue with this is that currently linux-user is pretty
-> well maintained and tested, but bsd-user is basically unmaintained
-> and not even compile tested. 
 
-I can say it compiles. I've tried to build it on FreeBSD 11. Didn't
-tested it though.
+On 2017=E5=B9=B401=E6=9C=8825=E6=97=A5 09:31, Alex Williamson wrote:
+> On Wed, 25 Jan 2017 09:19:25 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
+>
+>> On 2017=E5=B9=B401=E6=9C=8824=E6=97=A5 03:40, Alex Williamson wrote:
+>>> On Mon, 23 Jan 2017 18:23:44 +0800
+>>> Jason Wang<jasowang@redhat.com>  wrote:
+>>>  =20
+>>>> On 2017=E5=B9=B401=E6=9C=8823=E6=97=A5 11:34, Peter Xu wrote:
+>>>>> On Mon, Jan 23, 2017 at 09:55:39AM +0800, Jason Wang wrote:
+>>>>>> On 2017=E5=B9=B401=E6=9C=8822=E6=97=A5 17:04, Peter Xu wrote:
+>>>>>>> On Sun, Jan 22, 2017 at 04:08:04PM +0800, Jason Wang wrote:
+>>>>>>>
+>>>>>>> [...]
+>>>>>>>     =20
+>>>>>>>>> +static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *=
+s,
+>>>>>>>>> +                                           uint16_t domain_id,=
+ hwaddr addr,
+>>>>>>>>> +                                           uint8_t am)
+>>>>>>>>> +{
+>>>>>>>>> +    IntelIOMMUNotifierNode *node;
+>>>>>>>>> +    VTDContextEntry ce;
+>>>>>>>>> +    int ret;
+>>>>>>>>> +
+>>>>>>>>> +    QLIST_FOREACH(node, &(s->notifiers_list), next) {
+>>>>>>>>> +        VTDAddressSpace *vtd_as =3D node->vtd_as;
+>>>>>>>>> +        ret =3D vtd_dev_to_context_entry(s, pci_bus_num(vtd_as=
+->bus),
+>>>>>>>>> +                                       vtd_as->devfn, &ce);
+>>>>>>>>> +        if (!ret && domain_id =3D=3D VTD_CONTEXT_ENTRY_DID(ce.=
+hi)) {
+>>>>>>>>> +            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PA=
+GE_SIZE,
+>>>>>>>>> +                          vtd_page_invalidate_notify_hook,
+>>>>>>>>> +                          (void *)&vtd_as->iommu, true);
+>>>>>>>> Why not simply trigger the notifier here? (or is this vfio requi=
+red?)
+>>>>>>> Because we may only want to notify part of the region - we are wi=
+th
+>>>>>>> mask here, but not exact size.
+>>>>>>>
+>>>>>>> Consider this: guest (with caching mode) maps 12K memory (4K*3 pa=
+ges),
+>>>>>>> the mask will be extended to 16K in the guest. In that case, we n=
+eed
+>>>>>>> to explicitly go over the page entry to know that the 4th page sh=
+ould
+>>>>>>> not be notified.
+>>>>>> I see. Then it was required by vfio only, I think we can add a fas=
+t path for
+>>>>>> !CM in this case by triggering the notifier directly.
+>>>>> I noted this down (to be further investigated in my todo), but I do=
+n't
+>>>>> know whether this can work, due to the fact that I think it is stil=
+l
+>>>>> legal that guest merge more than one PSIs into one. For example, I
+>>>>> don't know whether below is legal:
+>>>>>
+>>>>> - guest invalidate page (0, 4k)
+>>>>> - guest map new page (4k, 8k)
+>>>>> - guest send single PSI of (0, 8k)
+>>>>>
+>>>>> In that case, it contains both map/unmap, and looks like it didn't
+>>>>> disobay the spec as well?
+>>>> Not sure I get your meaning, you mean just send single PSI instead o=
+f two?
+>>>>  =20
+>>>>>     =20
+>>>>>> Another possible issue is, consider (with CM) a 16K contiguous iov=
+a with the
+>>>>>> last page has already been mapped. In this case, if we want to map=
+ first
+>>>>>> three pages, when handling IOTLB invalidation, am would be 16K, th=
+en the
+>>>>>> last page will be mapped twice. Can this lead some issue?
+>>>>> I don't know whether guest has special handling of this kind of
+>>>>> request.
+>>>> This seems quite usual I think? E.g iommu_flush_iotlb_psi() did:
+>>>>
+>>>> static void iommu_flush_iotlb_psi(struct intel_iommu *iommu,
+>>>>                      struct dmar_domain *domain,
+>>>>                      unsigned long pfn, unsigned int pages,
+>>>>                      int ih, int map)
+>>>> {
+>>>>        unsigned int mask =3D ilog2(__roundup_pow_of_two(pages));
+>>>>        uint64_t addr =3D (uint64_t)pfn << VTD_PAGE_SHIFT;
+>>>>        u16 did =3D domain->iommu_did[iommu->seq_id];
+>>>> ...
+>>>>
+>>>>  =20
+>>>>> Besides, imho to completely solve this problem, we still need that
+>>>>> per-domain tree. Considering that currently the tree is inside vfio=
+, I
+>>>>> see this not a big issue as well.
+>>>> Another issue I found is: with this series, VFIO_IOMMU_MAP_DMA seems
+>>>> become guest trigger-able. And since VFIO allocate its own structure=
+ to
+>>>> record dma mapping, this seems open a window for evil guest to exhau=
+st
+>>>> host memory which is even worse.
+>>> You're thinking of pci-assign, vfio does page accounting such that a
+>>> user can only lock pages up to their locked memory limit.  Exposing t=
+he
+>>> mapping ioctl within the guest is not a different problem from exposi=
+ng
+>>> the ioctl to the host user from a vfio perspective.  Thanks,
+>>>
+>>> Alex
+>>>  =20
+>> Yes, but what if an evil guest that maps all iovas to the same gpa?
+> Doesn't matter, we'd account that gpa each time it's mapped, so
+> effectively the locked memory limit is equal to the iova size the user
+> can map.  Thanks,
+>
+> Alex
 
-> So it's convenient to have bsd-user code be basically its own
-> distinct standalone thing, because then when we fix linux-user we
-> don't have to care too much about whether bsd-user might be
-> accidentally broken by our changes.
-> 
-> If we had more active testing of bsd-user I'd be a bit keener
-> about removing some of the code duplication.
+I see. Good to know this.
 
-Currently, the code looks exactly the same to me. If we don't factor it
-out I'll have to make a third copy of it for libtcg, which is kinda
-annoying. I'm factoring out only a portion of the header, which
-probably doesn't change that much. If in the future there's some change
-we're not sure about we can keep it in the non-factored out part.
-
-I'll check if qemu-user for BSD has something in the testsuite.
-
---
-Alessandro Di Federico
-PhD student at Politecnico di Milano
+Thanks
