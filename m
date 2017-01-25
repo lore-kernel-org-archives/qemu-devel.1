@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWQHH-0006Wi-PX
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:18:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1cWQO1-0004GE-Dw
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWQHE-0004Ee-Kj
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:18:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50004)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cWQHE-0004EZ-By
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:18:28 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 975D4C04BD3E
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 16:18:28 +0000 (UTC)
-Date: Wed, 25 Jan 2017 16:18:23 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170125161823.GL2096@work-vm>
-References: <20170106182823.1960-1-dgilbert@redhat.com>
-	<20170106182823.1960-3-dgilbert@redhat.com>
-	<87wpdj79e9.fsf@emacs.mitica>
+	(envelope-from <bounces@canonical.com>) id 1cWQNy-0006Mv-6q
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:29 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54473)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cWQNx-0006Mq-T7
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:26 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cWQNw-0007HG-OV
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 16:25:24 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B352C2E80C3
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 16:25:24 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wpdj79e9.fsf@emacs.mitica>
-Subject: Re: [Qemu-devel] [PATCH 02/15] postcopy: Transmit ram size summary
- word
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Jan 2017 16:11:00 -0000
+From: Thomas Huth <1242765@bugs.launchpad.net>
+Reply-To: Bug 1242765 <1242765@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131021155451.28203.66085.malonedeb@gac.canonical.com>
+Message-Id: <20170125161101.17305.99819.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1242765] Re: USB passthrough to Windows 7 guest
+ fails with error -110, hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,152 +37,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > Replace the host page-size in the 'advise' command by a pagesize
-> > summary bitmap; if the VM is just using normal RAM then
-> > this will be exactly the same as before, however if they're using
-> > huge pages they'll be different, and thus:
-> >    a) Migration from/to old qemu's that don't understand huge pages
-> >       will fail early.
-> >    b) Migrations with different size RAMBlocks will also fail early.
-> >
-> > The previous block size check during RAM block transmission will also
-> > catch these cases, but this catches a good summary and should be
-> > clearer on a version mismatch.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  include/migration/migration.h |  1 +
-> >  migration/ram.c               | 17 +++++++++++++++++
-> >  migration/savevm.c            | 32 +++++++++++++++++++++-----------
-> >  3 files changed, 39 insertions(+), 11 deletions(-)
-> 
-> 
-> Hi
-> 
-> Why it is not enough with the previous patch where we compare than blocks
-> have the same page size in both ends?
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
-They catch it a bit late, especially since we add extra data to the migration
-stream; the 'advise' happens nice and early so catches it immediately.
+-- =
 
-> I assume that issuing an madvise for block with the correct page_size
-> would be enough, no?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1242765
 
-Unfortunately not; you can't explicitly switch pagesize via madvise,
-and unfortunately the hugetlbfs stuff doesn't do madvise DONTNEED, so you
-have to use an fallocate to do that job for that block.
+Title:
+  USB passthrough to Windows 7 guest fails with error -110, hangs
 
-Dave
+Status in QEMU:
+  Fix Released
 
-> Or I am missing something obvious?
-> 
-> Thanks, JUan.
-> 
-> >
-> > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> > index c309d23..0188bcf 100644
-> > --- a/include/migration/migration.h
-> > +++ b/include/migration/migration.h
-> > @@ -355,6 +355,7 @@ void global_state_store_running(void);
-> >  void flush_page_queue(MigrationState *ms);
-> >  int ram_save_queue_pages(MigrationState *ms, const char *rbname,
-> >                           ram_addr_t start, ram_addr_t len);
-> > +uint64_t ram_pagesize_summary(void);
-> >  
-> >  PostcopyState postcopy_state_get(void);
-> >  /* Set the state and return the old state */
-> > diff --git a/migration/ram.c b/migration/ram.c
-> > index 39998f5..40fe888 100644
-> > --- a/migration/ram.c
-> > +++ b/migration/ram.c
-> > @@ -608,6 +608,23 @@ static void migration_bitmap_sync_init(void)
-> >      iterations_prev = 0;
-> >  }
-> >  
-> > +/* Returns a summary bitmap of the page sizes of all RAMBlocks;
-> > + * for VMs with just normal pages this is equivalent to the
-> > + * host page size.  If it's got some huge pages then it's the OR
-> > + * of all the different page sizes.
-> > + */
-> > +uint64_t ram_pagesize_summary(void)
-> > +{
-> > +    RAMBlock *block;
-> > +    uint64_t summary = 0;
-> > +
-> > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> > +        summary |= block->page_size;
-> > +    }
-> > +
-> > +    return summary;
-> > +}
-> > +
-> >  static void migration_bitmap_sync(void)
-> >  {
-> >      RAMBlock *block;
-> > diff --git a/migration/savevm.c b/migration/savevm.c
-> > index 0363372..aaae044 100644
-> > --- a/migration/savevm.c
-> > +++ b/migration/savevm.c
-> > @@ -828,7 +828,7 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
-> >  void qemu_savevm_send_postcopy_advise(QEMUFile *f)
-> >  {
-> >      uint64_t tmp[2];
-> > -    tmp[0] = cpu_to_be64(getpagesize());
-> > +    tmp[0] = cpu_to_be64(ram_pagesize_summary());
-> >      tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
-> >  
-> >      trace_qemu_savevm_send_postcopy_advise();
-> > @@ -1305,7 +1305,7 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
-> >  static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-> >  {
-> >      PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
-> > -    uint64_t remote_hps, remote_tps;
-> > +    uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
-> >  
-> >      trace_loadvm_postcopy_handle_advise();
-> >      if (ps != POSTCOPY_INCOMING_NONE) {
-> > @@ -1317,17 +1317,27 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-> >          return -1;
-> >      }
-> >  
-> > -    remote_hps = qemu_get_be64(mis->from_src_file);
-> > -    if (remote_hps != getpagesize())  {
-> > +    remote_pagesize_summary = qemu_get_be64(mis->from_src_file);
-> > +    local_pagesize_summary = ram_pagesize_summary();
-> > +
-> > +    if (remote_pagesize_summary != local_pagesize_summary)  {
-> >          /*
-> > -         * Some combinations of mismatch are probably possible but it gets
-> > -         * a bit more complicated.  In particular we need to place whole
-> > -         * host pages on the dest at once, and we need to ensure that we
-> > -         * handle dirtying to make sure we never end up sending part of
-> > -         * a hostpage on it's own.
-> > +         * This detects two potential causes of mismatch:
-> > +         *   a) A mismatch in host page sizes
-> > +         *      Some combinations of mismatch are probably possible but it gets
-> > +         *      a bit more complicated.  In particular we need to place whole
-> > +         *      host pages on the dest at once, and we need to ensure that we
-> > +         *      handle dirtying to make sure we never end up sending part of
-> > +         *      a hostpage on it's own.
-> > +         *   b) The use of different huge page sizes on source/destination
-> > +         *      a more fine grain test is performed during RAM block migration
-> > +         *      but this test here causes a nice early clear failure, and
-> > +         *      also fails when passed to an older qemu that doesn't
-> > +         *      do huge pages.
-> >           */
-> > -        error_report("Postcopy needs matching host page sizes (s=%d d=%d)",
-> > -                     (int)remote_hps, getpagesize());
-> > +        error_report("Postcopy needs matching RAM page sizes (s=%" PRIx64
-> > +                                                             " d=%" PRIx64 ")",
-> > +                     remote_pagesize_summary, local_pagesize_summary);
-> >          return -1;
-> >      }
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Bug description:
+  Description of problem:
+
+  Using a Sandisk Cruzer Fit 16GB USB thumb drive.
+  Using virt-manager on Fedora 19 host, and Windows 7 32 bit guest.
+
+  I set up a USB2 controller on Windows 7 guest in virt-manager. Windows
+  sees the USB drive and can open the file manager and correctly show
+  the files. I can copy a file from the thumb drive to the Fedora
+  desktop, and then play the file on the desktop. However, any attempt
+  to open a file directly on the thumb drive (example, play an MP3 using
+  Windows Media Player) results in guest hang and host kernel messages:
+
+  =
+
+  Oct 19 21:15:35 localhost kernel: [187592.977839] usb 1-1.3: reset high-s=
+peed USB device number 13 using ehci-pci
+  Oct 19 21:15:40 localhost kernel: [187598.065274] usb 1-1.3: device descr=
+iptor read/all, error -110
+  Oct 19 21:15:40 localhost kernel: [187598.138167] usb 1-1.3: reset high-s=
+peed USB device number 13 using ehci-pci
+  Oct 19 21:15:56 localhost kernel: [187613.218119] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:16:11 localhost kernel: [187628.399275] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:16:11 localhost kernel: [187628.573355] usb 1-1.3: reset high-s=
+peed USB device number 13 using ehci-pci
+  Oct 19 21:16:16 localhost kernel: [187633.587778] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:16:21 localhost kernel: [187638.702244] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:16:21 localhost kernel: [187638.876201] usb 1-1.3: reset high-s=
+peed USB device number 13 using ehci-pci
+  Oct 19 21:16:26 localhost kernel: [187643.890642] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:16:31 localhost kernel: [187649.005071] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:16:31 localhost kernel: [187649.106188] usb 1-1.3: USB disconne=
+ct, device number 13
+  Oct 19 21:16:31 localhost kernel: [187649.178969] usb 1-1.3: new high-spe=
+ed USB device number 14 using ehci-pci
+  Oct 19 21:16:47 localhost kernel: [187664.258945] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:17:02 localhost kernel: [187679.440092] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:17:02 localhost kernel: [187679.614194] usb 1-1.3: new high-spe=
+ed USB device number 15 using ehci-pci
+  Oct 19 21:17:17 localhost kernel: [187694.694148] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:17:32 localhost kernel: [187709.875297] usb 1-1.3: device descr=
+iptor read/64, error -110
+  Oct 19 21:17:32 localhost kernel: [187710.049386] usb 1-1.3: new high-spe=
+ed USB device number 16 using ehci-pci
+  Oct 19 21:17:37 localhost kernel: [187715.063803] usb 1-1.3: device descr=
+iptor read/8, error -110
+  Oct 19 21:17:41 localhost kernel: [187719.005453] usb 1-1.3: device descr=
+iptor read/8, error -71
+
+  After that -71 error, the thumb drive completely disappears from the
+  host, as if it is powered down.
+
+  I read that -110 is supposedly a power issue. I can play media files
+  directly from the thumb drive on the host, so the power seems fine on
+  the host.
+
+  =
+
+  How reproducible:
+  always
+
+  =
+
+  Steps to reproduce:
+  1. use virt-manager, create a Windows 7 32 bit guest
+  2. in virt-manager, set Controller USB to USB2
+  3. on host, insert Sandisk Cruser Fit thumb drive FAT32 format, with an M=
+P3 file on it
+  4. in virt-manager, add a USB passthrough device and assign it to thumb d=
+rive
+  5. boot Windows 7 guest
+  6. verify that Windows 7 can see the thumb drive
+  7. use Windows Media Player to play MP3
+
+  Actual results:
+  guest hangs, then host powers off thumb drive
+
+  Expected results:
+  The MP3 file should play :)
+
+  =
+
+  Additional info:
+
+  Fedora 19
+
+  Installed Packages
+  qemu-common.x86_64                                                2:1.4.2=
+-11.fc19                                           @updates
+  qemu-guest-agent.x86_64                                           2:1.4.2=
+-11.fc19                                           @updates
+  qemu-img.x86_64                                                   2:1.4.2=
+-11.fc19                                           @updates
+  qemu-kvm.x86_64                                                   2:1.4.2=
+-11.fc19                                           @updates
+  qemu-system-x86.x86_64                                            2:1.4.2=
+-11.fc19                                           @updates
+  virt-manager.noarch                                              0.10.0-3=
+.fc19                                              @updates
+  kernel.x86_64                                      3.11.1-200.fc19       =
+                               @updates
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1242765/+subscriptions
