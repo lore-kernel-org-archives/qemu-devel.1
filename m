@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ale@clearmind.me>) id 1cWI91-00043v-WF
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:37:28 -0500
+	(envelope-from <ale@clearmind.me>) id 1cWI96-0004I7-6b
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ale@clearmind.me>) id 1cWI8x-0000ST-7H
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:37:28 -0500
-Received: from clearmind.me ([178.32.49.9]:49887)
+	(envelope-from <ale@clearmind.me>) id 1cWI95-0000Zl-AP
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:37:32 -0500
+Received: from clearmind.me ([178.32.49.9]:50519)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ale@clearmind.me>) id 1cWI8x-0000SJ-0f
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:37:23 -0500
-Date: Wed, 25 Jan 2017 08:38:28 +0100
+	(Exim 4.71) (envelope-from <ale@clearmind.me>) id 1cWI95-0000ZG-3t
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 02:37:31 -0500
+Date: Wed, 25 Jan 2017 08:38:35 +0100
 From: Alessandro Di Federico <ale+qemu@clearmind.me>
-In-Reply-To: <CAJ+F1C+B1Ncoh57a1cHUKfum1DVNs3-WbzgbaRSEmqiuxnYJ7w@mail.gmail.com>
+In-Reply-To: <CAFEAcA-52cjhLWWVGQ0qPeF3uKA67-ZBk=EQT2ARL1tjATWMkQ@mail.gmail.com>
 References: <20170121084600.5860-1-ale+qemu@clearmind.me>
-	<20170121084600.5860-3-ale+qemu@clearmind.me>
-	<CAJ+F1C+B1Ncoh57a1cHUKfum1DVNs3-WbzgbaRSEmqiuxnYJ7w@mail.gmail.com>
+	<20170121084600.5860-2-ale+qemu@clearmind.me>
+	<CAFEAcA-52cjhLWWVGQ0qPeF3uKA67-ZBk=EQT2ARL1tjATWMkQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E1cWIBi-0000iH-R3@clearmind.me>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <E1cWIBq-0000iN-MH@clearmind.me>
 Sender: ale@clearmind.me
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] *-user targets object files
- decoupling
+Subject: Re: [Qemu-devel] [RFC PATCH 1/3] Factor out {linux, bsd}-user/qemu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 24 Jan 2017 10:09:25 +0000
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+On Tue, 24 Jan 2017 11:18:07 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
->
-> diff --git a/exec.c b/exec.c
-> index 47835c1dc1..66f8187281 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -672,9 +672,11 @@ void cpu_exec_unrealizefn(CPUState *cpu)
->      if (cc->vmsd !=3D NULL) {
->          vmstate_unregister(NULL, cc->vmsd, cpu);
->      }
-> +#ifndef CONFIG_USER_ONLY
->      if (qdev_get_vmsd(DEVICE(cpu)) =3D=3D NULL) {
->          vmstate_unregister(NULL, &vmstate_cpu_common, cpu);
->      }
-> +#endif
->=20
->=20
-> Shouldn't this #ifndef block also include the vmsd
-> vmstate_unregister() above? That would be matching
-> cpu_exec_realizefn() #ifndef.
->=20
+> So my issue with this is that currently linux-user is pretty
+> well maintained and tested, but bsd-user is basically unmaintained
+> and not even compile tested. 
 
-IIRC the idea here was to break a depency introduced by
-"vmstate_cpu_common".
-I'll include the previous if statement in the `ifndef`.
+I can say it compiles. I've tried to build it on FreeBSD 11. Didn't
+tested it though.
 
-Let me know if I missed a comment on this patch.
+> So it's convenient to have bsd-user code be basically its own
+> distinct standalone thing, because then when we fix linux-user we
+> don't have to care too much about whether bsd-user might be
+> accidentally broken by our changes.
+> 
+> If we had more active testing of bsd-user I'd be a bit keener
+> about removing some of the code duplication.
+
+Currently, the code looks exactly the same to me. If we don't factor it
+out I'll have to make a third copy of it for libtcg, which is kinda
+annoying. I'm factoring out only a portion of the header, which
+probably doesn't change that much. If in the future there's some change
+we're not sure about we can keep it in the non-factored out part.
+
+I'll check if qemu-user for BSD has something in the testsuite.
 
 --
 Alessandro Di Federico
