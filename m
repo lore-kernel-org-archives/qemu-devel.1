@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWEp4-0000fm-I1
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:04:39 -0500
+	(envelope-from <peterx@redhat.com>) id 1cWEzp-00046p-LW
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:15:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWEp0-0004i1-IV
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:04:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42868)
+	(envelope-from <peterx@redhat.com>) id 1cWEzl-0007Sz-Hw
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:15:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWEp0-0004hx-Bw
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:04:34 -0500
-Date: Wed, 25 Jan 2017 12:04:27 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWEzl-0007Sh-BL
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 23:15:41 -0500
+Date: Wed, 25 Jan 2017 12:15:34 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170125040427.GB5151@pxdev.xzpeter.org>
+Message-ID: <20170125041534.GC5151@pxdev.xzpeter.org>
 References: <1484917736-32056-1-git-send-email-peterx@redhat.com>
-	<1484917736-32056-19-git-send-email-peterx@redhat.com>
-	<490bbb84-213b-1b2a-5a1b-fa42a5c6a359@redhat.com>
-	<20170122090425.GB26526@pxdev.xzpeter.org>
-	<1dd223d1-dc02-bddc-02ea-78d267dd40a4@redhat.com>
-	<20170123033429.GF26526@pxdev.xzpeter.org>
-	<20170123110308.5d36ce87@t450s.home>
-	<20170124072215.GN26526@pxdev.xzpeter.org>
-	<20170124092429.241a4eaf@t450s.home>
+	<1484917736-32056-20-git-send-email-peterx@redhat.com>
+	<cddf837c-24ca-b6f2-67cf-256e6b1e0bec@redhat.com>
+	<20170124073152.GA16400@pxdev.xzpeter.org>
+	<662d5e53-0e62-741f-ba71-32630b91ffd4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170124092429.241a4eaf@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH RFC v4 18/20] intel_iommu: enable vfio
- devices
+In-Reply-To: <662d5e53-0e62-741f-ba71-32630b91ffd4@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC v4 19/20] intel_iommu: unmap existing
+ pages before replay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,90 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
 
-On Tue, Jan 24, 2017 at 09:24:29AM -0700, Alex Williamson wrote:
+On Wed, Jan 25, 2017 at 11:11:30AM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2017=E5=B9=B401=E6=9C=8824=E6=97=A5 15:31, Peter Xu wrote:
+> >On Mon, Jan 23, 2017 at 06:40:12PM +0800, Jason Wang wrote:
+> >>On 2017=E5=B9=B401=E6=9C=8820=E6=97=A5 21:08, Peter Xu wrote:
+> >>>  static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
+> >>>  {
+> >>>      memory_region_notify_one((IOMMUNotifier *)private, entry);
+> >>>@@ -2711,13 +2768,16 @@ static void vtd_iommu_replay(MemoryRegion *m=
+r, IOMMUNotifier *n)
+> >>>      if (vtd_dev_to_context_entry(s, bus_n, vtd_as->devfn, &ce) =3D=
+=3D 0) {
+> >>>          /*
+> >>>-         * Scanned a valid context entry, walk over the pages and
+> >>>-         * notify when needed.
+> >>>+         * Scanned a valid context entry, we first make sure to rem=
+ove
+> >>>+         * all existing mappings in old domain, by sending UNMAP to
+> >>>+         * all the notifiers. Then, we walk over the pages and noti=
+fy
+> >>>+         * with existing mapped new entries in the new domain.
+> >>>           */
+> >>A question is what if the context cache was invalidated but the devic=
+e were
+> >>not moved to a new domain. Then the code here does not do anything I
+> >>believe?
+> >Yes, it'll unmap all the stuffs and remap them all. I think that's my
+> >intention, and can we really avoid this?
+> >
+> >>I think we should move vtd_address_space_unmap() in the context
+> >>entry invalidation processing.
+> >IMHO we need this "whole umap" thing not only for context entry
+> >invalidation, but all the places that need this replay, no? For
+> >example, when we receive domain flush.
+> >
+> >Thanks,
+> >
+> >-- peterx
+> >
+>=20
+> Consider the case that we move device from domain A to no domain. Looks=
+ like
+> current code did nothing since it can not get a valid context entry dur=
+ing
+> replay?
 
-[...]
-
-> > I see. Then this will be an strict requirement that we cannot do
-> > coalescing during page walk, at least for mappings.
-> > 
-> > I didn't notice this before, but luckily current series is following
-> > the rule above - we are basically doing the mapping in the unit of
-> > pages. Normally, we should always be mapping with 4K pages, only if
-> > guest provides huge pages in the VT-d page table, would we notify map
-> > with >4K, though of course it can be either 2M/1G but never other
-> > values.
-> > 
-> > The point is, guest should be aware of the existance of the above huge
-> > pages, so it won't unmap (for example) a single 4k region within a 2M
-> > huge page range. It'll either keep the huge page, or unmap the whole
-> > huge page. In that sense, we are quite safe.
-> > 
-> > (for my own curiousity and out of topic: could I ask why we can't do
-> >  that? e.g., we map 4K*2 pages, then we unmap the first 4K page?)
-> 
-> You understand why we can't do this in the hugepage case, right?  A
-> hugepage means that at least one entire level of the page table is
-> missing and that in order to unmap a subsection of it, we actually need
-> to replace it with a new page table level, which cannot be done
-> atomically relative to the rest of the PTEs in that entry.  Now what if
-> we don't assume that hugepages are only the Intel defined 2MB & 1GB?
-> AMD-Vi supports effectively arbitrary power of two page table entries.
-> So what if we've passed a 2x 4K mapping where the physical pages were
-> contiguous and vfio passed it as a direct 8K mapping to the IOMMU and
-> the IOMMU has native support for 8K mappings.  We're in a similar
-> scenario as the 2MB page, different page table layout though.
-
-Thanks for the explaination. The AMD example is clear.
-
-> 
-> > > I would think (but please confirm), that when we're only tracking
-> > > mappings generated by the guest OS that this works.  If the guest OS
-> > > maps with 4k pages, we get map notifies for each of those 4k pages.  If
-> > > they use 2MB pages, we get 2MB ranges and invalidations will come in
-> > > the same granularity.  
-> > 
-> > I would agree (I haven't thought of a case that this might be a
-> > problem).
-> > 
-> > > 
-> > > An area of concern though is the replay mechanism in QEMU, I'll need to
-> > > look for it in the code, but replaying an IOMMU domain into a new
-> > > container *cannot* coalesce mappings or else it limits the granularity
-> > > with which we can later accept unmaps. Take for instance a guest that
-> > > has mapped a contiguous 2MB range with 4K pages.  They can unmap any 4K
-> > > page within that range.  However if vfio gets a single 2MB mapping
-> > > rather than 512 4K mappings, then the host IOMMU may use a hugepage
-> > > mapping where our granularity is now 2MB.  Thanks,  
-> > 
-> > Is this the answer of my above question (which is for my own
-> > curiosity)? If so, that'll kind of explain.
-> > 
-> > If it's just because vfio is smart enough on automatically using huge
-> > pages when applicable (I believe it's for performance's sake), not
-> > sure whether we can introduce a ioctl() to setup the iova_pgsizes
-> > bitmap, as long as it is a subset of supported iova_pgsizes (from
-> > VFIO_IOMMU_GET_INFO) - then when people wants to get rid of above
-> > limitation, they can explicitly set the iova_pgsizes to only allow 4K
-> > pages.
-> > 
-> > But, of course, this series can live well without it at least for now.
-> 
-> Yes, this is part of how vfio transparently makes use of hugepages in
-> the IOMMU, we effectively disregard the supported page sizes bitmap
-> (it's useless for anything other than determining the minimum page size
-> anyway), and instead pass through the largest range of iovas which are
-> physically contiguous.  The IOMMU driver can then make use of hugepages
-> where available.  The VFIO_IOMMU_MAP_DMA ioctl does include a flags
-> field where we could appropriate a bit to indicate map with minimum
-> granularity, but that would not be as simple as triggering the
-> disable_hugepages mapping path because the type1 driver would also need
-> to flag the internal vfio_dma as being bisectable, if not simply
-> converted to multiple vfio_dma structs internally.  Thanks,
-
-I see, thanks!
+Right. I should do the "whole region unmap" thing even without a valid
+context entry. Will fix it in next post. Thanks,
 
 -- peterx
