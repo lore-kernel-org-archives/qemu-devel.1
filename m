@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWLP4-0006np-OA
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:06:15 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWLQD-0007zb-JM
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:07:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWLP0-0005aD-7K
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:06:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32786)
+	(envelope-from <berrange@redhat.com>) id 1cWLQ9-0005wM-55
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:07:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWLOz-0005ZZ-Vp
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:06:10 -0500
-References: <20170124071654.4572.41407.stgit@PASHA-ISP>
-	<20170124071719.4572.92155.stgit@PASHA-ISP>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <db455af4-4d66-d81f-4f4f-1ad47100dffe@redhat.com>
-Date: Wed, 25 Jan 2017 12:06:04 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cWLQ8-0005wC-Uu
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:07:21 -0500
+Date: Wed, 25 Jan 2017 11:07:15 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170125110715.GB15529@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAC2QTZY0SJczV9_e3TwJbEXwyuTQXDQesAP5W6U0JeYvsV5uQg@mail.gmail.com>
+	<c5202aa1-bf56-5d66-533a-a1e78a3eafa2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170124071719.4572.92155.stgit@PASHA-ISP>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 04/14] icount: exit cpu loop on expire
+Content-Disposition: inline
+In-Reply-To: <c5202aa1-bf56-5d66-533a-a1e78a3eafa2@redhat.com>
+Subject: Re: [Qemu-devel] migration: QEMU aborts migration of "none" machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Ashijeet Acharya <ashijeetacharya@gmail.com>, Juan Quintela <quintela@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On Wed, Jan 25, 2017 at 11:53:06AM +0100, Thomas Huth wrote:
+> On 25.01.2017 11:01, Ashijeet Acharya wrote:
+> > Hi Thomas,
+> > 
+> > I was able to reproduce the bug you encountered while trying to migrate
+> > a "none" machine.
+> > 
+> > After digging deep and debugging the problem with gdb, I found that
+> > bitmap_new() is the function that crashes qemu as it always has
+> > zero bits being passed to it.
+> > 
+> > I had a discussion with Dave on the IRC yesterday and he suggested the
+> > reason of crash being the absence of RAM ( since machine is "none")
+> > while attempting the migration.
+> > 
+> > I am not sure what the ideal solution will be in this case; Do any of
+> > the maintainers have any suggestions or even a starting point which I
+> > can ponder upon?
+> 
+> I'm not that familiar with the migration code either, but maybe you
+> could simply check for last_ram_offset() == 0 at the beginning of
+> ram_save_setup() and return with an error in that case?
 
+Do we actually need/want migration to succeed when RAM is 0 or vCPU
+count is 0 ?  If not, then we could just register a migration blocker
+during machine init
 
-On 24/01/2017 08:17, Pavel Dovgalyuk wrote:
-> This patch adds check to break cpu loop when icount expires without
-> setting the TB_EXIT_ICOUNT_EXPIRED flag. It happens when there is no
-> available translated blocks and all instructions were executed.
-> In icount replay mode unnecessary tb_find will be called (which may
-> cause an exception) and execution will be non-deterministic.
->=20
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> ---
->  cpu-exec.c |   15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
->=20
-> diff --git a/cpu-exec.c b/cpu-exec.c
-> index 79a2167..e603da4 100644
-> --- a/cpu-exec.c
-> +++ b/cpu-exec.c
-> @@ -582,9 +582,6 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, =
-TranslationBlock *tb,
->                  cpu_exec_nocache(cpu, insns_left, *last_tb, false);
->                  align_clocks(sc, cpu);
->              }
-> -            cpu->exception_index =3D EXCP_INTERRUPT;
-> -            *last_tb =3D NULL;
-> -            cpu_loop_exit(cpu);
->          }
->          break;
->  #endif
-> @@ -638,6 +635,18 @@ int cpu_exec(CPUState *cpu)
-> =20
->              for(;;) {
->                  cpu_handle_interrupt(cpu, &last_tb);
-> +                /* icount has expired, we need to break the execution =
-loop.
-> +                   This check is needed before tb_find to make executi=
-on
-> +                   deterministic - tb_find may cause an exception
-> +                   while translating the code from non-mapped page. */
-> +                if (use_icount && ((cpu->icount_extra =3D=3D 0
-> +                                    && cpu->icount_decr.u16.low =3D=3D=
- 0)
-> +                                || (int32_t)cpu->icount_decr.u32 < 0))=
- {
-> +                    if (cpu->exception_index =3D=3D -1) {
-> +                        cpu->exception_index =3D EXCP_INTERRUPT;
-> +                    }
-> +                    cpu_loop_exit(cpu);
-> +                }
-
-Can this can be placed in cpu_handle_interrupt itself?  Also, can the
-cpu->exception_index !=3D -1 case happen?
-
-We really should add assertions on cpu->exception_index, maybe after
-cpu_handle_exception and cc->cpu_exec_interrupt returns true.  Without
-some idea of the invariants, I'm not competent enough to review this patc=
-h.
-
-Paolo
-
->                  tb =3D tb_find(cpu, last_tb, tb_exit);
->                  cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
->                  /* Try to align the host and virtual clocks
->=20
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
