@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cWCcy-0003hX-8j
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:01 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cWCcx-0005OD-ET
+	(envelope-from <ben@skyportsystems.com>) id 1cWCcw-0003hF-Lu
 	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:44:00 -0500
-Received: from mail-yw0-x232.google.com ([2607:f8b0:4002:c05::232]:32968)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <ben@skyportsystems.com>) id 1cWCcs-0005MB-5t
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:43:58 -0500
+Received: from mail-yw0-x229.google.com ([2607:f8b0:4002:c05::229]:32955)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cWCcx-0005O8-Aj
-	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:43:59 -0500
-Received: by mail-yw0-x232.google.com with SMTP id u68so3013435ywg.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 17:43:59 -0800 (PST)
+	id 1cWCcs-0005M1-0W
+	for qemu-devel@nongnu.org; Tue, 24 Jan 2017 20:43:54 -0500
+Received: by mail-yw0-x229.google.com with SMTP id u68so3012556ywg.0
+	for <qemu-devel@nongnu.org>; Tue, 24 Jan 2017 17:43:53 -0800 (PST)
 From: ben@skyportsystems.com
-Date: Tue, 24 Jan 2017 17:43:25 -0800
-Message-Id: <3bce614f2babb3b4d3c7d9446223c389a28d1080.1485308342.git.ben@skyportsystems.com>
+Date: Tue, 24 Jan 2017 17:43:21 -0800
+Message-Id: <01f010147f8faaf7bd7c4ea94a364a584f323b0a.1485308342.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1485308342.git.ben@skyportsystems.com>
 References: <cover.1485308342.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1485308342.git.ben@skyportsystems.com>
 References: <cover.1485308342.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v4 6/9] qmp/hmp: add set-vm-generation-id
- commands
+Subject: [Qemu-devel] [PATCH v4 2/9] linker-loader: Add new 'allocate and
+ return address' cmd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +30,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>
+Cc: Ben Warren <ben@skyportsystems.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Ben Warren <ben@skyportsystems.com>
 
-Add set-vm-generation-id command to set Virtual Machine
-Generation ID counter.
+This adds a new linker-loader command to instruct the guest to allocate
+memory for a fw_cfg file and write the address back into another
+writeable fw_cfg file.  Knowing this address, QEMU can then write into
+guest memory at runtime.
 
-QMP command example:
-    { "execute": "set-vm-generation-id",
-          "arguments": {
-              "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-          }
-    }
-
-HMP command example:
-    set-vm-generation-id guid=324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Ben Warren <ben@skyportsystems.com>
 ---
- hmp-commands.hx  | 13 +++++++++++++
- hmp.c            | 12 ++++++++++++
- hmp.h            |  1 +
- qapi-schema.json | 11 +++++++++++
- stubs/vmgenid.c  |  6 ++++++
- 5 files changed, 43 insertions(+)
+ hw/acpi/bios-linker-loader.c         | 71 ++++++++++++++++++++++++++++++++++--
+ include/hw/acpi/bios-linker-loader.h |  7 ++++
+ 2 files changed, 75 insertions(+), 3 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 8819281..56744aa 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1775,5 +1775,18 @@ ETEXI
-     },
+diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+index d963ebe..1d991ba 100644
+--- a/hw/acpi/bios-linker-loader.c
++++ b/hw/acpi/bios-linker-loader.c
+@@ -78,6 +78,22 @@ struct BiosLinkerLoaderEntry {
+             uint32_t length;
+         } cksum;
  
- STEXI
-+@item set-vm-generation-id @var{uuid}
-+Set Virtual Machine Generation ID counter to @var{guid}
-+ETEXI
++        /*
++         * COMMAND_ALLOCATE_RETURN_ADDR - allocate a table from @alloc_ret_file
++         * subject to @alloc_ret_align alignment (must be power of 2)
++         * and @alloc_ret_zone (can be HIGH or FSEG) requirements.
++         * Additionally, return the address of the allocation in
++         * @addr_file.
++         *
++         * This may be used instead of COMMAND_ALLOCATE
++         */
++        struct {
++            char alloc_ret_file[BIOS_LINKER_LOADER_FILESZ];
++            uint32_t alloc_ret_align;
++            uint8_t alloc_ret_zone;
++            char alloc_ret_addr_file[BIOS_LINKER_LOADER_FILESZ];
++        };
 +
-+    {
-+        .name       = "set-vm-generation-id",
-+        .args_type  = "guid:s",
-+        .params     = "guid",
-+        .help       = "Set Virtual Machine Generation ID counter",
-+        .cmd = hmp_set_vm_generation_id,
-+    },
-+
-+STEXI
- @end table
- ETEXI
-diff --git a/hmp.c b/hmp.c
-index c2280e0..3a4db8b 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2573,3 +2573,15 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
-     }
-     qapi_free_GuidInfo(info);
+         /* padding */
+         char pad[124];
+     };
+@@ -85,9 +101,10 @@ struct BiosLinkerLoaderEntry {
+ typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
+ 
+ enum {
+-    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
+-    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
+-    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
++    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
++    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
++    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
++    BIOS_LINKER_LOADER_COMMAND_ALLOCATE_RET_ADDR = 0x4,
+ };
+ 
+ enum {
+@@ -278,3 +295,51 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+ 
+     g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
  }
 +
-+void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
++/*
++ * bios_linker_loader_alloc_ret_addr: ask guest to load file into guest memory
++ * and patch the address in another file
++ *
++ * @linker: linker object instance
++ * @data_file: name of the file blob to be loaded
++ * @file_blob: pointer to blob corresponding to @file_name
++ * @alloc_align: required minimal alignment in bytes. Must be a power of 2.
++ * @alloc_fseg: request allocation in FSEG zone (useful for the RSDP ACPI table)
++ * @addr_file: destination file that will contain the address.
++ *             This must already exist
++ *
++ * Note: this command must precede any other linker command that uses
++ * the data file.
++ */
++void bios_linker_loader_alloc_ret_addr(BIOSLinker *linker,
++                              const char *data_file,
++                              GArray *file_blob,
++                              uint32_t alloc_align,
++                              bool alloc_fseg,
++                              const char *addr_file)
 +{
-+    Error *errp = NULL;
-+    const char *guid = qdict_get_str(qdict, "guid");
++    BiosLinkerLoaderEntry entry;
++    BiosLinkerFileEntry d_file = { g_strdup(data_file), file_blob};
 +
-+    qmp_set_vm_generation_id(guid, &errp);
-+    if (errp) {
-+        hmp_handle_error(mon, &errp);
-+        return;
-+    }
++    /* Address file is expected to already be loaded */
++    const BiosLinkerFileEntry *a_file =
++        bios_linker_find_file(linker, addr_file);
++
++    assert(!(alloc_align & (alloc_align - 1)));
++    assert(a_file);
++
++    g_array_append_val(linker->file_list, d_file);
++
++    memset(&entry, 0, sizeof entry);
++    strncpy(entry.alloc_ret_file, data_file,
++            sizeof entry.alloc_ret_file - 1);
++    strncpy(entry.alloc_ret_addr_file, addr_file,
++            sizeof entry.alloc_ret_addr_file - 1);
++    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_ALLOCATE_RET_ADDR);
++    entry.alloc.align = cpu_to_le32(alloc_align);
++    entry.alloc.zone = alloc_fseg ? BIOS_LINKER_LOADER_ALLOC_ZONE_FSEG :
++                                    BIOS_LINKER_LOADER_ALLOC_ZONE_HIGH;
++
++    /* Alloc entries must come first, so prepend them */
++    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
 +}
-diff --git a/hmp.h b/hmp.h
-index 799fd37..e0ac1e8 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -138,5 +138,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
- void hmp_info_dump(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
-+void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
+diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
+index fa1e5d1..69953e6 100644
+--- a/include/hw/acpi/bios-linker-loader.h
++++ b/include/hw/acpi/bios-linker-loader.h
+@@ -26,5 +26,12 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+                                     const char *src_file,
+                                     uint32_t src_offset);
  
++void bios_linker_loader_alloc_ret_addr(BIOSLinker *linker,
++                                       const char *data_file,
++                                       GArray *file_blob,
++                                       uint32_t alloc_align,
++                                       bool alloc_fseg,
++                                       const char *addr_file);
++
+ void bios_linker_loader_cleanup(BIOSLinker *linker);
  #endif
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 413ac52..e2ed75c 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -6046,3 +6046,14 @@
- # Since 2.9
- ##
- { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
-+
-+##
-+# @set-vm-generation-id:
-+#
-+# Set Virtual Machine Generation ID
-+#
-+# @guid: new GUID to set as Virtual Machine Generation ID
-+#
-+# Since 2.9
-+##
-+{ 'command': 'set-vm-generation-id', 'data': {'guid': 'str'} }
-diff --git a/stubs/vmgenid.c b/stubs/vmgenid.c
-index 8c448ac..d25d41b 100644
---- a/stubs/vmgenid.c
-+++ b/stubs/vmgenid.c
-@@ -6,3 +6,9 @@ GuidInfo *qmp_query_vm_generation_id(Error **errp)
-     error_setg(errp, "this command is not currently supported");
-     return NULL;
- }
-+
-+void qmp_set_vm_generation_id(const char *guid, Error **errp)
-+{
-+    error_setg(errp, "this command is not currently supported");
-+    return;
-+}
 -- 
 2.7.4
