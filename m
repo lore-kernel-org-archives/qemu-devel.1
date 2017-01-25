@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cWQO1-0004GE-Dw
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1cWQOQ-0004d7-VR
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cWQNy-0006Mv-6q
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:29 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cWQNx-0006Mq-T7
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:26 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cWQNw-0007HG-OV
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 16:25:24 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B352C2E80C3
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 16:25:24 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1cWQOP-0006Sv-Sx
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cWQOP-0006Sg-Ja
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:25:53 -0500
+References: <20170125161417.31949-1-berrange@redhat.com>
+	<20170125161417.31949-2-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <27d30dd2-dd58-9157-3ed3-2e34c7aa0bd4@redhat.com>
+Date: Wed, 25 Jan 2017 10:25:51 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Jan 2017 16:11:00 -0000
-From: Thomas Huth <1242765@bugs.launchpad.net>
-Reply-To: Bug 1242765 <1242765@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131021155451.28203.66085.malonedeb@gac.canonical.com>
-Message-Id: <20170125161101.17305.99819.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1242765] Re: USB passthrough to Windows 7 guest
- fails with error -110, hangs
+In-Reply-To: <20170125161417.31949-2-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="EFcwV9ogdomaQRsoQlbqBC5kgUqagTe2U"
+Subject: Re: [Qemu-devel] [PATCH v4 1/8] make: move top level dir to end of
+ include search path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,133 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EFcwV9ogdomaQRsoQlbqBC5kgUqagTe2U
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <27d30dd2-dd58-9157-3ed3-2e34c7aa0bd4@redhat.com>
+Subject: Re: [PATCH v4 1/8] make: move top level dir to end of include search
+ path
+References: <20170125161417.31949-1-berrange@redhat.com>
+ <20170125161417.31949-2-berrange@redhat.com>
+In-Reply-To: <20170125161417.31949-2-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 01/25/2017 10:14 AM, Daniel P. Berrange wrote:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1242765
+> If there are generated headers files to be used by the migration
+> code in '$BUILD_DIR/migration', these will not be found by the
+> relative include, an absolute include is needed instead. This
+> has not been a problem so far, since nothing has been generating
+> headers in sub-dirs, but the trace code will shortly be doing
+> that. So it is needed to list '-I$(BUILD_DIR)/$(@D)' as well as
+> '-I$(@D)' to ensure both directories are searched when building
+> target dependant code. So the search order ends up being:
+>=20
+>   1. source dir corresponding to input file (implicit by compiler)
+>   2. build dir corresponding to output file (absolute)
+>   3. build dir corresponding to output file (relative to cwd)
+>   4. top level build dir
+>   5. top level source dir
+>   6. top level source include/ dir
 
-Title:
-  USB passthrough to Windows 7 guest fails with error -110, hangs
+Lots clearer than v3.
 
-Status in QEMU:
-  Fix Released
+>=20
+> One final complication is that the absolute '-I$(BUILD_DIR)/$(@D)'
+> will sometimes end up pointing to a non-existant directory if
+> that sub-dir does not have any target-independant files to be
+> built. Rather than try to dynamically filter this, a simple
+> 'mkdir' ensures $(BUILD_DIR)/$(@D) is guaranteed to exist at
+> all times.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  rules.mak | 30 +++++++++++++++++++++++-------
+>  1 file changed, 23 insertions(+), 7 deletions(-)
 
-Bug description:
-  Description of problem:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-  Using a Sandisk Cruzer Fit 16GB USB thumb drive.
-  Using virt-manager on Fedora 19 host, and Windows 7 32 bit guest.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-  I set up a USB2 controller on Windows 7 guest in virt-manager. Windows
-  sees the USB drive and can open the file manager and correctly show
-  the files. I can copy a file from the thumb drive to the Fedora
-  desktop, and then play the file on the desktop. However, any attempt
-  to open a file directly on the thumb drive (example, play an MP3 using
-  Windows Media Player) results in guest hang and host kernel messages:
 
-  =
+--EFcwV9ogdomaQRsoQlbqBC5kgUqagTe2U
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  Oct 19 21:15:35 localhost kernel: [187592.977839] usb 1-1.3: reset high-s=
-peed USB device number 13 using ehci-pci
-  Oct 19 21:15:40 localhost kernel: [187598.065274] usb 1-1.3: device descr=
-iptor read/all, error -110
-  Oct 19 21:15:40 localhost kernel: [187598.138167] usb 1-1.3: reset high-s=
-peed USB device number 13 using ehci-pci
-  Oct 19 21:15:56 localhost kernel: [187613.218119] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:16:11 localhost kernel: [187628.399275] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:16:11 localhost kernel: [187628.573355] usb 1-1.3: reset high-s=
-peed USB device number 13 using ehci-pci
-  Oct 19 21:16:16 localhost kernel: [187633.587778] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:16:21 localhost kernel: [187638.702244] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:16:21 localhost kernel: [187638.876201] usb 1-1.3: reset high-s=
-peed USB device number 13 using ehci-pci
-  Oct 19 21:16:26 localhost kernel: [187643.890642] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:16:31 localhost kernel: [187649.005071] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:16:31 localhost kernel: [187649.106188] usb 1-1.3: USB disconne=
-ct, device number 13
-  Oct 19 21:16:31 localhost kernel: [187649.178969] usb 1-1.3: new high-spe=
-ed USB device number 14 using ehci-pci
-  Oct 19 21:16:47 localhost kernel: [187664.258945] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:17:02 localhost kernel: [187679.440092] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:17:02 localhost kernel: [187679.614194] usb 1-1.3: new high-spe=
-ed USB device number 15 using ehci-pci
-  Oct 19 21:17:17 localhost kernel: [187694.694148] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:17:32 localhost kernel: [187709.875297] usb 1-1.3: device descr=
-iptor read/64, error -110
-  Oct 19 21:17:32 localhost kernel: [187710.049386] usb 1-1.3: new high-spe=
-ed USB device number 16 using ehci-pci
-  Oct 19 21:17:37 localhost kernel: [187715.063803] usb 1-1.3: device descr=
-iptor read/8, error -110
-  Oct 19 21:17:41 localhost kernel: [187719.005453] usb 1-1.3: device descr=
-iptor read/8, error -71
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  After that -71 error, the thumb drive completely disappears from the
-  host, as if it is powered down.
+iQEcBAEBCAAGBQJYiNGPAAoJEKeha0olJ0NqkxAH/RpzU9pP7YmTlq4yGUdpvV0C
+Mp52LCMBiQY8lFUtzZPJ3Dk7i6fsm6hLzmZyZVwfxujydHMWTsvhPrFaaOmbWaeC
+/HTR5fXgdcdOsI/KmgePXcoL27Wv5LfKB471NH0qVLlzvcA9O6TN3BP4ru1hboDL
+4/WF6Ko6Bb0L4w3VJ6nfneYnaSapjJKygjLr7LsOA7Yy2Sg7pYaItV3+7yJzP7qs
+kgZwgokTN3CCBnAOuBEUXtkCZIJ5Dr3hECyRlMRRDh3YQ8eOxqs0oplNuiM1QdtX
+M/GVue3bIjlu4oIfR2uCM/uHz5QlA2qsvSs76CpK723Q8F+BPVYQqe6Vs57r4nE=
+=1IHR
+-----END PGP SIGNATURE-----
 
-  I read that -110 is supposedly a power issue. I can play media files
-  directly from the thumb drive on the host, so the power seems fine on
-  the host.
-
-  =
-
-  How reproducible:
-  always
-
-  =
-
-  Steps to reproduce:
-  1. use virt-manager, create a Windows 7 32 bit guest
-  2. in virt-manager, set Controller USB to USB2
-  3. on host, insert Sandisk Cruser Fit thumb drive FAT32 format, with an M=
-P3 file on it
-  4. in virt-manager, add a USB passthrough device and assign it to thumb d=
-rive
-  5. boot Windows 7 guest
-  6. verify that Windows 7 can see the thumb drive
-  7. use Windows Media Player to play MP3
-
-  Actual results:
-  guest hangs, then host powers off thumb drive
-
-  Expected results:
-  The MP3 file should play :)
-
-  =
-
-  Additional info:
-
-  Fedora 19
-
-  Installed Packages
-  qemu-common.x86_64                                                2:1.4.2=
--11.fc19                                           @updates
-  qemu-guest-agent.x86_64                                           2:1.4.2=
--11.fc19                                           @updates
-  qemu-img.x86_64                                                   2:1.4.2=
--11.fc19                                           @updates
-  qemu-kvm.x86_64                                                   2:1.4.2=
--11.fc19                                           @updates
-  qemu-system-x86.x86_64                                            2:1.4.2=
--11.fc19                                           @updates
-  virt-manager.noarch                                              0.10.0-3=
-.fc19                                              @updates
-  kernel.x86_64                                      3.11.1-200.fc19       =
-                               @updates
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1242765/+subscriptions
+--EFcwV9ogdomaQRsoQlbqBC5kgUqagTe2U--
