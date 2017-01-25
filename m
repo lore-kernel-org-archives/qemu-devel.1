@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cWNwH-0006Ha-Dm
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:48:42 -0500
+	(envelope-from <w.bumiller@proxmox.com>) id 1cWNwi-0006eO-Eh
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:49:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cWNwE-0007EN-6L
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:48:41 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41441
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cWNwE-0007EE-12
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:48:38 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0PDmY1r031126
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 08:48:37 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 286rd5kppd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 08:48:37 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Wed, 25 Jan 2017 13:48:29 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 25 Jan 2017 14:48:02 +0100
-In-Reply-To: <1485352082-16830-1-git-send-email-groug@kaod.org>
-References: <1485352082-16830-1-git-send-email-groug@kaod.org>
-Message-Id: <1485352082-16830-6-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 5/5] 9pfs: fix offset error in v9fs_xattr_read()
+	(envelope-from <w.bumiller@proxmox.com>) id 1cWNwf-0007MW-5K
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:49:08 -0500
+Received: from proxmox.maurer-it.com ([212.186.127.180]:16700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
+	id 1cWNwe-0007MB-TA
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:49:05 -0500
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Wed, 25 Jan 2017 14:48:57 +0100
+Message-Id: <1485352137-29367-1-git-send-email-w.bumiller@proxmox.com>
+Subject: [Qemu-devel] [PATCH v2] cirrus: handle negative pitch in
+ cirrus_invalidate_region()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,49 +24,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Li Qiang <liqiang6-s@360.cn>, Laszlo Ersek <lersek@redhat.com>
 
-The current code tries to copy `read_count' bytes starting at offset
-`offset' from a `read_count`-sized iovec. This causes v9fs_pack() to
-fail with ENOBUFS.
+cirrus_invalidate_region() calls memory_region_set_dirty()
+on a per-line basis, always ranging from off_begin to
+off_begin+bytesperline. With a negative pitch off_begin
+marks the top most used address and thus we need to do an
+initial shift backwards by a line for negative pitches of
+backward blits, otherwise the first iteration covers the
+line going from the start offset forwards instead of
+backwards.
+Additionally since the start address is inclusive, if we
+shift by a full `bytesperline` we move to the first address
+*not* included in the blit, so we only shift by one less
+than bytesperline.
 
-Since the PDU iovec is already partially filled with `offset' bytes,
-let's skip them when creating `qiov_full' and have v9fs_pack() to
-copy the whole of it. Moreover, this is consistent with the other
-places where v9fs_init_qiov_from_pdu() is called.
-
-This fixes commit "bcb8998fac16 9pfs: call v9fs_init_qiov_from_pdu
-before v9fs_pack".
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
 ---
- hw/9pfs/9p.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Changes to v1:
+* Subtract only bytesperline-1 since the original address should be
+  included while the byte at `begin-bytesperline` is exclusive.
+* Added an assertion to ensure we don't call memory_region_set_dirty()
+  with a negative size since it takes unsigned parameters.
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index d2d028828294..138d8e825d28 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -1655,7 +1655,7 @@ static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
-     if (is_write) {
-         pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov);
-     } else {
--        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size);
-+        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size + skip);
-     }
+ @Gerd: Still unclear: is -1 enough or should this somehow deal with
+multiple depths? As far as I can see the backward blit functions
+are all only byte based, as opposed to the patternfill functions in
+cirrus_vga_rop2.h which have PUTPIXEL() macros for 8/16/24/32 bpp.
+CIRRUS_BLTMODE_BACKWARDS only references cirrus_bkwd_rop[16] and
+cirrus_bkwd_transp_rop[16][2] which only contain the bkwd rops
+from cirrus_vga_rop.h.
+
+ hw/display/cirrus_vga.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index b1a0773..755110f 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -670,9 +670,14 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
+     int off_cur;
+     int off_cur_end;
  
-     qemu_iovec_init_external(&elem, iov, niov);
-@@ -1685,8 +1685,8 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
++    if (off_pitch < 0) {
++        off_begin -= bytesperline-1;
++    }
++
+     for (y = 0; y < lines; y++) {
+ 	off_cur = off_begin;
+ 	off_cur_end = (off_cur + bytesperline) & s->cirrus_addr_mask;
++	assert(off_cur_end >= off_cur);
+         memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
+ 	off_begin += off_pitch;
      }
-     offset += err;
- 
--    v9fs_init_qiov_from_pdu(&qiov_full, pdu, 0, read_count, false);
--    err = v9fs_pack(qiov_full.iov, qiov_full.niov, offset,
-+    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);
-+    err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
-                     ((char *)fidp->fs.xattr.value) + off,
-                     read_count);
-     qemu_iovec_destroy(&qiov_full);
 -- 
-2.7.4
+2.1.4
