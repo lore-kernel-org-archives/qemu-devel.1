@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cWKuE-0006ab-1U
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:34:23 -0500
+	(envelope-from <lersek@redhat.com>) id 1cWKvy-0007un-Uz
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:36:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cWKuA-0001fe-Te
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:34:22 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33447)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cWKuA-0001cy-KI
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:34:18 -0500
-Received: by mail-wm0-x243.google.com with SMTP id r144so41634386wme.0
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 02:34:18 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1477674916-6795-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1477674916-6795-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <35659f5a-cefe-29ce-ac5b-7959f476fb19@redhat.com>
-Date: Wed, 25 Jan 2017 11:34:14 +0100
+	(envelope-from <lersek@redhat.com>) id 1cWKvh-0003DP-N1
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:36:10 -0500
+References: <1485328025-3783-1-git-send-email-kraxel@redhat.com>
+	<20170125083005.GA12762@olga.wb>
+	<1485337815.29826.103.camel@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <5322aaff-c5c6-694b-6206-d6bf729ae6f9@redhat.com>
+Date: Wed, 25 Jan 2017 11:35:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <1477674916-6795-3-git-send-email-imbrenda@linux.vnet.ibm.com>
+In-Reply-To: <1485337815.29826.103.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] gdbstub: Fix vCont behaviour
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] cirrus: fix oob access issue
+ (CVE-2017-TODO)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,296 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: palves@redhat.com, borntraeger@de.ibm.com
+To: Gerd Hoffmann <kraxel@redhat.com>, Wolfgang Bumiller <w.bumiller@proxmox.com>
+Cc: qemu-devel@nongnu.org, Li Qiang <liqiang6-s@360.cn>, qemu-stable@nongnu.org, P J P <ppandit@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-
-
-On 28/10/2016 19:15, Claudio Imbrenda wrote:
-> When GDB issues a "vCont", QEMU was not handling it correctly when
-> multiple VCPUs are active.
-> For vCont, for each thread (VCPU), it can be specified whether to
-> single step, continue or stop that thread. The default is to stop a
-> thread.
-> However, when (for example) "vCont;s:2" is issued, all VCPUs continue
-> to run, although all but VCPU nr 2 are to be stopped.
+On 01/25/17 10:50, Gerd Hoffmann wrote:
+> On Mi, 2017-01-25 at 09:30 +0100, Wolfgang Bumiller wrote:
+>> On Wed, Jan 25, 2017 at 08:07:05AM +0100, Gerd Hoffmann wrote:
+>>> From: Li Qiang <liqiang6-s@360.cn>
+>>>
+>>> When doing bitblt copy in backward mode, we should minus the
+>>> blt width first just like the adding in the forward mode. This
+>>> can avoid the oob access of the front of vga's vram.
+>>>
+>>> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+>>> Message-id: 5887254f.863a240a.2c122.5500@mx.google.com
+>>>
+>>> { kraxel: with backward blits (negative pitch) addr is the topmost
+>>>           address, so check it as-is against vram size ]
+>>>
+>>> Cc: qemu-stable@nongnu.org
+>>> Cc: P J P <ppandit@redhat.com>
+>>> Cc: Laszlo Ersek <lersek@redhat.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
+>>> Fixes: d3532a0db02296e687711b8cdc7791924efccea0 (CVE-2014-8106)
+>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>>> ---
+>>>  hw/display/cirrus_vga.c | 7 +++----
+>>>  1 file changed, 3 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+>>> index 379910d..b8c29a6 100644
+>>> --- a/hw/display/cirrus_vga.c
+>>> +++ b/hw/display/cirrus_vga.c
+>>> @@ -277,10 +277,9 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+>>>      }
+>>>      if (pitch < 0) {
+>>>          int64_t min = addr
+>>> -            + ((int64_t)s->cirrus_blt_height-1) * pitch;
+>>> -        int32_t max = addr
+>>> -            + s->cirrus_blt_width;
+>>> -        if (min < 0 || max > s->vga.vram_size) {
+>>> +            + ((int64_t)s->cirrus_blt_height - 1) * pitch
+>>> +            - s->cirrus_blt_width;
+>>> +        if (min < 0 || addr > s->vga.vram_size) {
+>>
+>> Call me paranoid, but shouldn't this be '>='? Missed this yesterday
+>> apparently, correct me if I'm wrong:
+>> If VRAM goes from 0..7 it has a size of 8, and this would accept
+>> address 8 as it's not > size.
 > 
-> This patch completely rewrites the vCont parsing code.
-> 
-> Please note that this improvement only works in system emulation mode,
-> when in userspace emulation mode the old behaviour is preserved.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-> ---
->  gdbstub.c | 189 ++++++++++++++++++++++++++++++++++++++++++++++----------------
->  1 file changed, 142 insertions(+), 47 deletions(-)
-> 
-> diff --git a/gdbstub.c b/gdbstub.c
-> index b2e1b79..9bb548f 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -386,6 +386,45 @@ static inline void gdb_continue(GDBState *s)
->  #endif
->  }
->  
-> +/*
-> + * Resume execution, per CPU actions. For user-more emulation it's
-> + * equivalent to gdb_continue .
-> + */
-> +static int gdb_continue_partial(GDBState *s, char *newstates)
-> +{
-> +    int res = 0;
-> +#ifdef CONFIG_USER_ONLY
-> +    s->running_state = 1;
-> +#else
-> +    CPUState *cpu;
-> +
-> +    if (!runstate_needs_reset()) {
-> +        if (vm_prepare_start()) {
-> +            return 0;
-> +        }
-> +
-> +        CPU_FOREACH(cpu) {
-> +            switch (newstates[cpu_index(cpu) - 1]) {
-> +            case 0:
-> +            case 1:
-> +                break; /* nothing to do here */
-> +            case 's':
-> +                cpu_single_step(cpu, sstep_flags);
-> +                cpu_resume(cpu);
-> +                break;
-> +            case 'c':
-> +                cpu_resume(cpu);
-> +                break;
-> +            default:
-> +                res = -1;
-> +                break;
-> +            }
-> +        }
-> +    }
-> +#endif
-> +    return res;
-> +}
-> +
->  static void put_buffer(GDBState *s, const uint8_t *buf, int len)
->  {
->  #ifdef CONFIG_USER_ONLY
-> @@ -784,6 +823,102 @@ static int is_query_packet(const char *p, const char *query, char separator)
->          (p[query_len] == '\0' || p[query_len] == separator);
->  }
->  
-> +/**
-> + * gdb_handle_vcont - Parses and handles a vCont packet.
-> + * returns -1 if a command is unsupported, -22 if there is a format error,
-> + *         0 on success.
-> + */
-> +static int gdb_handle_vcont(GDBState *s, const char *p)
-> +{
-> +    int res, idx, signal = 0;
-> +    char cur_action;
-> +    char *newstates;
-> +    unsigned long tmp;
-> +    CPUState *cpu;
-> +
-> +    /* uninitialised CPUs stay 0 */
-> +    newstates = g_new0(char, max_cpus);
-> +
-> +    /* mark valid CPUs with 1 */
-> +    CPU_FOREACH(cpu) {
-> +        newstates[cpu_index(cpu) - 1] = 1;
-> +    }
-> +
-> +    /*
-> +     * res keeps track of what error we are returning, with -1 meaning
-> +     * that the command is unknown or unsupported, and thus returning
-> +     * an empty packet, while -22 returns an E22 packet due to
-> +     * invalid or incorrect parameters passed.
-> +     */
+> I think you are right.  The bkwd ops first execute the op, then
+> decrement, so addr is inclusive and the check is off by one.
 
-Please use ENOTSUP for unknown/unsupported and any other negative errno
-value for invalid/incorrect parameters.  This simplifies the code a bit
-in this function, as we know that qemu_strtoul only returns -EINVAL or
--ERANGE.
+That's right IMO; however, in that case we also have to posit that "min"
+is exclusive. Assume that we have 16 pixels in the VGA memory (4x4), and
+that we are massaging the bottom right quadrant:
 
-> +    res = 0;
-> +    while (*p) {
-> +        if (*p != ';') {
+   0  1  2  3
+   4  5  6  7
+   8  9 10 11
+  12 13 14 15
 
-Use *p++ here.
+  addr   =  15
+  height =   2
+  width  =   2
+  pitch  =  -4
 
-> +            res = -1;
-> +            break;
+Then
 
-If you change all returns with error to a "goto out", you can avoid the
-"if (!res)" at the end of the loop.
+  min = addr + (height - 1) * pitch - width
+      =   15 + (     2 - 1) * (-4)  - 2
+      = 9
 
-> +        }
-> +        p++; /* skip the ; */
-> +
-> +        /* unknown/invalid/unsupported command */
-> +        if (*p != 'C' && *p != 'S' && *p != 'c' && *p != 's') {
-> +            res = -1;
-> +            break;
-> +        }
-> +        cur_action = tolower(*p);
-> +        if (*p == 'C' || *p == 'S') {
-> +            if (qemu_strtoul(p + 1, &p, 16, &tmp)) {
-> +                res = -22;
-> +                break;
-> +            }
-> +            signal = gdb_signal_to_target(tmp);
-> +        } else {
-> +            p++;
-> +        }
+Which is the address right before the top left pixel; that is, it marks
+the first pixel *not* accessed.
 
-Maybe:
+If that value was (-1), then the operation would still be valid.
 
-	cur_action = *p++;
-	if (cur_action == 'C' || cur_action == 'S') {
-	    cur_action = tolower(cur_action);
-	    res = qemu_strtoul(p, &p, 16, &tmp);
-            if (res < 0) {
-                goto out;
-            }
-	} else if (cur_action != 'c' && cur_action != 's') {
-	    res = -ENOTSUP;
-	    goto out;
-	}
+So we should accept (min == -1) -- this is dictated by plain symmetry.
+If "max" -- here, "addr" -- is inclusive, then "min" becomes exclusive.
 
-What's the meaning of "signal" for system emulation?
-
-> +        /* thread specification. special values: (none), -1 = all; 0 = any */
-> +        if ((p[0] == ':' && p[1] == '-' && p[2] == '1') || (p[0] != ':')) {
-> +            for (idx = 0; idx < max_cpus; idx++) {
-> +                if (newstates[idx] == 1) {
-> +                    newstates[idx] = cur_action;
-> +                }
-> +            }
-> +            if (*p == ':') {
-> +                p += 3;
-> +            }
-
-Please place this "if" before the "for", to match what you do in the
-"else if" case.
-
-> +        } else if (*p == ':') {
-> +            p++;
-> +            if (qemu_strtoul(p, &p, 16, &tmp)) {
-> +                res = -22;
-> +                break;
-> +            }
-
-As suggested above, you can just assign the result of qemu_strtoul to res.
-
-> +            idx = tmp;
-> +            /* 0 means any thread, so we pick the first valid CPU */
-> +            if (!idx) {
-> +                CPU_FOREACH(cpu) {
-> +                    idx = cpu_index(cpu);
-> +                    break;
-> +                }
-
-Can you use first_cpu here perhaps?
-
-> +            }
-> +
-> +            /* invalid CPU specified */
-> +            if (!idx || idx > max_cpus || !newstates[idx - 1]) {
-> +                res = -22;
-> +                break;
-> +            }
-> +            /* only use if no previous match occourred */
-> +            if (newstates[idx - 1] == 1) {
-> +                newstates[idx - 1] = cur_action;
-> +            }
-> +        }
-> +    }
-> +    if (!res) {
-> +        s->signal = signal;
-> +        gdb_continue_partial(s, newstates);
-> +    }
-> +
-
-This would be the placement of the "out:" label.
-
-Thanks,
-
-Paolo
-
-> +    g_free(newstates);
-> +
-> +    return res;
-> +}
-> +
->  static int gdb_handle_packet(GDBState *s, const char *line_buf)
->  {
->      CPUState *cpu;
-> @@ -829,60 +964,20 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
->          return RS_IDLE;
->      case 'v':
->          if (strncmp(p, "Cont", 4) == 0) {
-> -            int res_signal, res_thread;
-> -
->              p += 4;
->              if (*p == '?') {
->                  put_packet(s, "vCont;c;C;s;S");
->                  break;
->              }
-> -            res = 0;
-> -            res_signal = 0;
-> -            res_thread = 0;
-> -            while (*p) {
-> -                int action, signal;
-> -
-> -                if (*p++ != ';') {
-> -                    res = 0;
-> -                    break;
-> -                }
-> -                action = *p++;
-> -                signal = 0;
-> -                if (action == 'C' || action == 'S') {
-> -                    signal = gdb_signal_to_target(strtoul(p, (char **)&p, 16));
-> -                    if (signal == -1) {
-> -                        signal = 0;
-> -                    }
-> -                } else if (action != 'c' && action != 's') {
-> -                    res = 0;
-> -                    break;
-> -                }
-> -                thread = 0;
-> -                if (*p == ':') {
-> -                    thread = strtoull(p+1, (char **)&p, 16);
-> -                }
-> -                action = tolower(action);
-> -                if (res == 0 || (res == 'c' && action == 's')) {
-> -                    res = action;
-> -                    res_signal = signal;
-> -                    res_thread = thread;
-> -                }
-> -            }
-> +
-> +            res = gdb_handle_vcont(s, p);
-> +
->              if (res) {
-> -                if (res_thread != -1 && res_thread != 0) {
-> -                    cpu = find_cpu(res_thread);
-> -                    if (cpu == NULL) {
-> -                        put_packet(s, "E22");
-> -                        break;
-> -                    }
-> -                    s->c_cpu = cpu;
-> -                }
-> -                if (res == 's') {
-> -                    cpu_single_step(s->c_cpu, sstep_flags);
-> +                if (res == -22) {
-> +                    put_packet(s, "E22");
-> +                    break;
->                  }
-> -                s->signal = res_signal;
-> -                gdb_continue(s);
-> -                return RS_IDLE;
-> +                goto unknown_command;
->              }
->              break;
->          } else {
-> 
+Thanks
+Laszlo
