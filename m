@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cWVh7-0005ez-T5
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:05:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cWWNz-0004WP-Hr
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:49:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cWVh4-0008Bt-Et
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:05:33 -0500
-Resent-Message-Id: <E1cWVh4-0008Bt-Et@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21424)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cWVh4-0008BE-6L
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:05:30 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170125215637.2992-1-laurent@vivier.eu>
-Message-ID: <148538190082.27.3833691480222180990@eba24e3a0d7f>
+	(envelope-from <peter.maydell@linaro.org>) id 1cWWNy-0002i4-Hf
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:49:51 -0500
+Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:35916)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cWWNy-0002hr-CN
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:49:50 -0500
+Received: by mail-ua0-x22b.google.com with SMTP id 96so170373640uaq.3
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 14:49:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 25 Jan 2017 14:05:02 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] linux-user: some patches for hppa
+In-Reply-To: <20170125215637.2992-4-laurent@vivier.eu>
+References: <20170125215637.2992-1-laurent@vivier.eu>
+	<20170125215637.2992-4-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 25 Jan 2017 22:49:29 +0000
+Message-ID: <CAFEAcA_1RArYmVCCbxeqYzETBFzuJXWss-JSbos=W2uexO5w2Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] linux-user: define correct UTS
+ machine name for hppa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, glaubitz@physik.fu-berlin.de
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8zXSBsaW51eC11c2VyOiBzb21lIHBhdGNo
-ZXMgZm9yIGhwcGEKTWVzc2FnZS1pZDogMjAxNzAxMjUyMTU2MzcuMjk5Mi0xLWxhdXJlbnRAdml2
-aWVyLmV1Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-IyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDEyNTIxNTYzNy4yOTkyLTEtbGF1cmVu
-dEB2aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE3MDEyNTIxNTYzNy4yOTkyLTEtbGF1cmVudEB2aXZp
-ZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjNDI2Yzg0IGxpbnV4LXVzZXI6
-IGRlZmluZSBjb3JyZWN0IFVUUyBtYWNoaW5lIG5hbWUgZm9yIGhwcGEKMTU2NjEzMiBsaW51eC11
-c2VyOiBmaXggImFwdC1nZXQgdXBkYXRlIiBvbiBsaW51eC11c2VyIGhwcGEKOTdhODQ4ZiBsaW51
-eC11c2VyOiBhZGQgaHBwYSBtYWdpYyBudW1iZXJzIGluIHFlbXUtYmluZm10LWNvbmYuc2gKCj09
-PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogbGludXgtdXNlcjogYWRkIGhw
-cGEgbWFnaWMgbnVtYmVycyBpbiBxZW11LWJpbmZtdC1jb25mLnNoLi4uCkVSUk9SOiBsaW5lIG92
-ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo5
-NToKK2hwcGFfbWFnaWM9J1x4N2ZceDQ1XHg0Y1x4NDZceDAxXHgwMlx4MDFceDAwXHgwMFx4MDBc
-eDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceDBmJwoKRVJST1I6IGxpbmUgb3Zl
-ciA5MCBjaGFyYWN0ZXJzCiMzNTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjk2
-OgoraHBwYV9tYXNrPSdceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgwMFx4ZmZceGZmXHhm
-Zlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZmXHhmZicKCnRvdGFsOiAyIGVycm9ycywg
-MCB3YXJuaW5ncywgMjIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8zOiBsaW51eC11c2VyOiBmaXggImFwdC1nZXQg
-dXBkYXRlIiBvbiBsaW51eC11c2VyIGhwcGEuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8zOiBsaW51eC11
-c2VyOiBkZWZpbmUgY29ycmVjdCBVVFMgbWFjaGluZSBuYW1lIGZvciBocHBhLi4uCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 25 January 2017 at 21:56, Laurent Vivier <laurent@vivier.eu> wrote:
+> the correct UTS machine name (as expected by systemd) is "parisc",
+> not "hppa".
+>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  linux-user/uname.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/linux-user/uname.c b/linux-user/uname.c
+> index 313b79d..daad002 100644
+> --- a/linux-user/uname.c
+> +++ b/linux-user/uname.c
+> @@ -63,6 +63,8 @@ const char *cpu_to_uname_machine(void *cpu_env)
+>          return "i586";
+>      }
+>      return "i686";
+> +#elif defined(TARGET_HPPA)
+> +    return "parisc";
+>  #else
+>      /* default is #define-d in each arch/ subdir */
+>      return UNAME_MACHINE;
+
+This function is for when the uname string has to be
+determined at runtime. If this target has a fixed
+string, then you should just set UNAME_MACHINE correctly
+in linux-user/$ARCH/target_syscall.h.
+
+thanks
+-- PMM
