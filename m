@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cWMRK-0006xn-DM
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:12:39 -0500
+	(envelope-from <w.bumiller@proxmox.com>) id 1cWMRR-00070W-NF
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:12:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cWMRG-00038l-EU
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:12:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56724)
+	(envelope-from <w.bumiller@proxmox.com>) id 1cWMRN-0003C9-OK
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:12:45 -0500
+Received: from proxmox.maurer-it.com ([212.186.127.180]:53680)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cWMRG-00038V-8W
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:12:34 -0500
-Date: Wed, 25 Jan 2017 20:12:29 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170125121229.GD9699@lemon.Home>
-References: <20170124184742.1639-1-dgilbert@redhat.com>
-	<20170124184742.1639-3-dgilbert@redhat.com>
-	<20170125114620.GA9699@lemon.Home> <20170125120053.GA2096@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170125120053.GA2096@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 02/15] migration: extend VMStateInfo
+	(Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
+	id 1cWMRN-0003AP-Gv
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 07:12:41 -0500
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Wed, 25 Jan 2017 13:12:33 +0100
+Message-Id: <1485346353-23814-1-git-send-email-w.bumiller@proxmox.com>
+Subject: [Qemu-devel] [PATCH] cirrus: handle negative pitch in
+ cirrus_invalidate_region()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: cornelia.huck@de.ibm.com, qemu-devel@nongnu.org, Jianjun Duan <duanj@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Li Qiang <liqiang6-s@360.cn>, Laszlo Ersek <lersek@redhat.com>
 
-On Wed, 01/25 12:00, Dr. David Alan Gilbert wrote:
-> * Fam Zheng (famz@redhat.com) wrote:
-> > On Tue, 01/24 18:47, Dr. David Alan Gilbert (git) wrote:
-> > > diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-> > > index c313166..da8e4df 100644
-> > > --- a/hw/intc/s390_flic_kvm.c
-> > > +++ b/hw/intc/s390_flic_kvm.c
-> > > @@ -286,7 +286,8 @@ static void kvm_s390_release_adapter_routes(S39=
-0FLICState *fs,
-> > >   * increase until buffer is sufficient or maxium size is
-> > >   * reached
-> > >   */
-> > > -static void kvm_flic_save(QEMUFile *f, void *opaque, size_t size)
-> > > +static int kvm_flic_save(QEMUFile *f, void *opaque, size_t size,
-> > > +                         VMStateField *field, QJSON *vmdesc)
-> > >  {
-> > >      KVMS390FLICState *flic =3D opaque;
-> > >      int len =3D FLIC_SAVE_INITIAL_SIZE;
-> > > @@ -319,6 +320,8 @@ static void kvm_flic_save(QEMUFile *f, void *op=
-aque, size_t size)
-> > >                          count * sizeof(struct kvm_s390_irq));
-> > >      }
-> > >      g_free(buf);
-> > > +
-> > > +    return 0;
-> > >  }
-> >=20
-> > This hunk left one 'return' behind in the function, which should have=
- been
-> > changed to 'return 0' as well, and now the compiler is not happy:
-> >=20
-> > /var/tmp/patchew-tester-tmp-itftfkl9/src/hw/intc/s390_flic_kvm.c: In =
-function =E2=80=98kvm_flic_save=E2=80=99:
-> > /var/tmp/patchew-tester-tmp-itftfkl9/src/hw/intc/s390_flic_kvm.c:306:=
-9: error: =E2=80=98return=E2=80=99 with no value, in function returning n=
-on-void [-Werror]
-> >          return;
-> >          ^~~~~~
-> > /var/tmp/patchew-tester-tmp-itftfkl9/src/hw/intc/s390_flic_kvm.c:289:=
-12: note: declared here
-> >  static int kvm_flic_save(QEMUFile *f, void *opaque, size_t size,
-> >             ^~~~~~~~~~~~~
-> > cc1: all warnings being treated as errors
->=20
-> OK, so it looks like that's a failure path, adding a return -ENOMEM wou=
-ld seem to make
-> sense there.
+cirrus_invalidate_region() calls memory_region_set_dirty()
+on a per-line basis, always ranging from off_begin to
+off_begin+bytesperline. With a negative pitch off_begin
+marks the top most used address and thus we need to do an
+initial shift backwards by bytesperline for negative
+pitches of backward blits, otherwise the first iteration
+covers the line going from the start offset forwards instead
+of backwards.
 
-OK! I was wrong.
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+---
+I bumped the patch context to 4 lines to get it to include the
+memory_region_set_dirty() call which takes an unsigned length (`hwaddr
+size`) because I'm also not too happy about the masking going on there
+since it means off_cur_end may be less than off_cur, but if the range
+checks are finnaly correct I don't think this case could happen
+anymore? (A check shouldn't hurt though, or maybe an assert()?)
 
->=20
-> Do you have a way of build testing that on x86, or can it only be build
-> tested on s390?
-> (My build test included an s390x-softmmu build on x86-64).
+ hw/display/cirrus_vga.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Unfortunately I don't know. This is reported by the newly connected s390x
-patchew tester, which is in staging so not replying publicly yet. Hopeful=
-ly we
-can get s390x native build covered in the future.
-
-Fam
-
->=20
-> Dave
-> > Fam
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index b1a0773..af61981 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -669,8 +669,12 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
+     int y;
+     int off_cur;
+     int off_cur_end;
+ 
++    if (off_pitch < 0) {
++        off_begin -= bytesperline;
++    }
++
+     for (y = 0; y < lines; y++) {
+ 	off_cur = off_begin;
+ 	off_cur_end = (off_cur + bytesperline) & s->cirrus_addr_mask;
+         memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
+-- 
+2.1.4
