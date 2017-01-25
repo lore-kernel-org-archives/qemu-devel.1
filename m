@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1cWIWk-00087c-Dj
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:01:59 -0500
+	(envelope-from <quintela@redhat.com>) id 1cWLYw-0006dX-OT
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:16:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1cWIWg-0001E1-Fk
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:01:58 -0500
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:33453)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1cWIWg-00010O-5C
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 03:01:54 -0500
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout3.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OKB00JU9SYYKR40@mailout3.w1.samsung.com> for
-	qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:01:46 +0000 (GMT)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <e3d95aa1-d112-c9fa-2810-a3d41ff79ebb@samsung.com>
-Date: Wed, 25 Jan 2017 11:01:44 +0300
-MIME-version: 1.0
-In-reply-to: <20170106182823.1960-2-dgilbert@redhat.com>
-Content-type: text/plain; charset=windows-1252; format=flowed
-Content-transfer-encoding: 7bit
-References: <20170106182823.1960-2-dgilbert@redhat.com>
-	<CGME20170125080145eucas1p2a0b06b64d9687cc3d2efcbaf0bd925a1@eucas1p2.samsung.com>
-Subject: Re: [Qemu-devel] [01/15] postcopy: Transmit and compare individual
- page sizes
+	(envelope-from <quintela@redhat.com>) id 1cWLYs-0000RN-Ou
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:16:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37336)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cWLYs-0000R0-Is
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:16:22 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170125110715.GB15529@redhat.com> (Daniel P. Berrange's message
+	of "Wed, 25 Jan 2017 11:07:15 +0000")
+References: <CAC2QTZY0SJczV9_e3TwJbEXwyuTQXDQesAP5W6U0JeYvsV5uQg@mail.gmail.com>
+	<c5202aa1-bf56-5d66-533a-a1e78a3eafa2@redhat.com>
+	<20170125110715.GB15529@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 25 Jan 2017 12:16:16 +0100
+Message-ID: <87lgtz5r0f.fsf@emacs.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] migration: QEMU aborts migration of "none" machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,85 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dave Gilbert <dgilbert@redhat.com>, qemu-devel@nongnu.org
-Cc: quintela@redhat.com, amit.shah@redhat.com, aarcange@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Ashijeet Acharya <ashijeetacharya@gmail.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi David,
-
-I checked you whole patch set with Andrea's kernel
-git://git.kernel.org/pub/scm/linux/kernel/git/andrea/aa.git
-
-It works and really gives sufficient decreasing of the downtime.
-
-I'm newby in qemu and here in the mailing list.
-
-I have some remarks on current patch.
-
-On both client and server side post copy capability should be enabled
-
-migrate_set_capability postcopy-ram on
-
-and serialization/deserialization relies on it.
-
-  So if destination host
-doesn't set post copy capability ram_load will skip reading of
-remote_page_size and in case of multiple RAMBlocks the next read of len
-will be incorrect. Hopefully usually len is 0, but it could be bigger 
-and overrun buffer ;).
-Maybe it's better to pass post copy capability attribute from host to 
-destination to avoid
-such assumption.
-
-
-On 01/06/2017 09:28 PM, Dave Gilbert wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
+> On Wed, Jan 25, 2017 at 11:53:06AM +0100, Thomas Huth wrote:
+>> On 25.01.2017 11:01, Ashijeet Acharya wrote:
+>> > Hi Thomas,
+>> > 
+>> > I was able to reproduce the bug you encountered while trying to migrate
+>> > a "none" machine.
+>> > 
+>> > After digging deep and debugging the problem with gdb, I found that
+>> > bitmap_new() is the function that crashes qemu as it always has
+>> > zero bits being passed to it.
+>> > 
+>> > I had a discussion with Dave on the IRC yesterday and he suggested the
+>> > reason of crash being the absence of RAM ( since machine is "none")
+>> > while attempting the migration.
+>> > 
+>> > I am not sure what the ideal solution will be in this case; Do any of
+>> > the maintainers have any suggestions or even a starting point which I
+>> > can ponder upon?
+>> 
+>> I'm not that familiar with the migration code either, but maybe you
+>> could simply check for last_ram_offset() == 0 at the beginning of
+>> ram_save_setup() and return with an error in that case?
 >
-> When using postcopy with hugepages, we require the source
-> and destination page sizes for any RAMBlock to match.
->
-> Transmit them as part of the RAM information header and
-> fail if there's a difference.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->   migration/ram.c | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
->
-> diff --git a/migration/ram.c b/migration/ram.c
-> index a1c8089..39998f5 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1970,6 +1970,9 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->           qemu_put_byte(f, strlen(block->idstr));
->           qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr));
->           qemu_put_be64(f, block->used_length);
-> +        if (migrate_postcopy_ram() && block->page_size != qemu_host_page_size) {
-> +            qemu_put_be64(f, block->page_size);
-> +        }
->       }
->   
->       rcu_read_unlock();
-> @@ -2536,6 +2539,18 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->                               error_report_err(local_err);
->                           }
->                       }
-> +                    /* For postcopy we need to check hugepage sizes match */
-> +                    if (migrate_postcopy_ram() &&
-> +                        block->page_size != qemu_host_page_size) {
-> +                        uint64_t remote_page_size = qemu_get_be64(f);
-> +                        if (remote_page_size != block->page_size) {
-> +                            error_report("Mismatched RAM page size %s "
-> +                                         "(local) %" PRId64 "!= %" PRId64,
-> +                                         id, block->page_size,
-> +                                         remote_page_size);
-> +                            ret = -EINVAL;
-> +                        }
-> +                    }
->                       ram_control_load_hook(f, RAM_CONTROL_BLOCK_REG,
->                                             block->idstr);
->                   } else {
+> Do we actually need/want migration to succeed when RAM is 0 or vCPU
+> count is 0 ?  If not, then we could just register a migration blocker
+> during machine init
 
+Only use that I can see for that is to test that we have setup things
+correctly, but for that we could also use an stopped machine.  So, I
+don't know if it really makes sense.
 
--- 
-Best regards,
-Alexey Perevalov
+If the only problem is that bitmap_new(0) returns 0, we can try to fix
+that, no?
+
+Later, Juan.
