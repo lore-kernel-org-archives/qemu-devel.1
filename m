@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cWVZ6-00071D-5Z
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:57:17 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cWVh7-0005ez-T5
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cWVZ1-0003jo-Lm
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:57:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cWVZ1-0003jJ-Fg
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:57:11 -0500
-Date: Wed, 25 Jan 2017 23:57:09 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170125213417-mutt-send-email-mst@kernel.org>
-References: <1485297322-10595-1-git-send-email-mst@redhat.com>
-	<CAFEAcA_TW1JK8DOHt-=kisvemGXjtuadJ+eH7L8NJwsQcQz8sw@mail.gmail.com>
-	<3958a41a-9b0e-4616-19dc-173824a87b31@gmail.com>
-	<CAFEAcA_T-bkoHCVS0ZkaReC8HE66R3XQg6ZOMPks=8mWYSx_cQ@mail.gmail.com>
-	<CAFEAcA_ypHAVRUpMviwj6-hDsM_MPDNQUf0eBN0ooTG2YwCrnw@mail.gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1cWVh4-0008Bt-Et
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:05:33 -0500
+Resent-Message-Id: <E1cWVh4-0008Bt-Et@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21424)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cWVh4-0008BE-6L
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:05:30 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170125215637.2992-1-laurent@vivier.eu>
+Message-ID: <148538190082.27.3833691480222180990@eba24e3a0d7f>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_ypHAVRUpMviwj6-hDsM_MPDNQUf0eBN0ooTG2YwCrnw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/16] virtio, vhost, pci: fixes, features
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 25 Jan 2017 14:05:02 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] linux-user: some patches for hppa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, glaubitz@physik.fu-berlin.de
 
-On Wed, Jan 25, 2017 at 07:24:03PM +0000, Peter Maydell wrote:
-> On 25 January 2017 at 18:08, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
-> > On 25 January 2017 at 18:02, Marcel Apfelbaum
-> > <marcel.apfelbaum@gmail.com> wrote:
-> >> Strange, I re-based in the same day I posted and compiled just fine.=
-..
-> >> However, I get the same error using today's master.
-> >>
-> >> I'll fix and re-post the series.
-> >
-> > mst has done a rebase of the pull request which I'll retry later.
->=20
-> Results:
-> /home/petmay01/linaro/qemu-for-merges/hw/display/qxl.c: In function
-> =E2=80=98qxl_rom_size=E2=80=99:
-> /home/petmay01/linaro/qemu-for-merges/hw/display/qxl.c:313:20: error:
-> bit-field =E2=80=98<anonymous>=E2=80=99 width not an integer constant
->      QEMU_BUILD_BUG_ON(required_rom_size > rom_size);
->                     ^
->=20
-> x86-64 linux host; I guess the usage in this file conflicts
-> with your series' rephrasing of the macro for some versions
-> of gcc. This is gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609
-
-I guess what happened previously is that gcc did not actually
-check this size at all. I posted a patch to rewrite using macros.
-Trivial but I still will give maintainer a bit of time to take a look.
-
-
-> If I rewrite the build-assert in qxl.c as
->     QEMU_BUILD_BUG_ON(sizeof(QXLRom) + sizeof(QXLModes) +
-> sizeof(qxl_modes) > 8192);
-> it compiles OK (and the build then runs into the error below).
->=20
->=20
-> All the other build hosts fell over like this:
->=20
-> /home/pm215/qemu/hw/pci-bridge/gen_pcie_root_port.c:54:9: error:
-> implicit declaration of function =E2=80=98VMSTATE_PCIE_DEVICE=E2=80=99
-> [-Werror=3Dimplicit-function-declaration]
->          VMSTATE_PCIE_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot=
-),
->          ^
-> /home/pm215/qemu/hw/pci-bridge/gen_pcie_root_port.c:54:29: error:
-> =E2=80=98parent_obj=E2=80=99 undeclared here (not in a function)
->          VMSTATE_PCIE_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot=
-),
->                              ^
-> /home/pm215/qemu/hw/pci-bridge/gen_pcie_root_port.c:54:63: error:
-> expected expression before =E2=80=98PCIESlot=E2=80=99
->          VMSTATE_PCIE_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot=
-),
->=20
-> thanks
-> -- PMM
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8zXSBsaW51eC11c2VyOiBzb21lIHBhdGNo
+ZXMgZm9yIGhwcGEKTWVzc2FnZS1pZDogMjAxNzAxMjUyMTU2MzcuMjk5Mi0xLWxhdXJlbnRAdml2
+aWVyLmV1Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+IyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
+ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
+ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
+dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
+cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
+ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
+ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDEyNTIxNTYzNy4yOTkyLTEtbGF1cmVu
+dEB2aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE3MDEyNTIxNTYzNy4yOTkyLTEtbGF1cmVudEB2aXZp
+ZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjNDI2Yzg0IGxpbnV4LXVzZXI6
+IGRlZmluZSBjb3JyZWN0IFVUUyBtYWNoaW5lIG5hbWUgZm9yIGhwcGEKMTU2NjEzMiBsaW51eC11
+c2VyOiBmaXggImFwdC1nZXQgdXBkYXRlIiBvbiBsaW51eC11c2VyIGhwcGEKOTdhODQ4ZiBsaW51
+eC11c2VyOiBhZGQgaHBwYSBtYWdpYyBudW1iZXJzIGluIHFlbXUtYmluZm10LWNvbmYuc2gKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogbGludXgtdXNlcjogYWRkIGhw
+cGEgbWFnaWMgbnVtYmVycyBpbiBxZW11LWJpbmZtdC1jb25mLnNoLi4uCkVSUk9SOiBsaW5lIG92
+ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo5
+NToKK2hwcGFfbWFnaWM9J1x4N2ZceDQ1XHg0Y1x4NDZceDAxXHgwMlx4MDFceDAwXHgwMFx4MDBc
+eDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceDBmJwoKRVJST1I6IGxpbmUgb3Zl
+ciA5MCBjaGFyYWN0ZXJzCiMzNTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjk2
+OgoraHBwYV9tYXNrPSdceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgwMFx4ZmZceGZmXHhm
+Zlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZmXHhmZicKCnRvdGFsOiAyIGVycm9ycywg
+MCB3YXJuaW5ncywgMjIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8zOiBsaW51eC11c2VyOiBmaXggImFwdC1nZXQg
+dXBkYXRlIiBvbiBsaW51eC11c2VyIGhwcGEuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8zOiBsaW51eC11
+c2VyOiBkZWZpbmUgY29ycmVjdCBVVFMgbWFjaGluZSBuYW1lIGZvciBocHBhLi4uCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
+Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
+ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
