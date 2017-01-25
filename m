@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cWO7H-0006zh-BM
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:00:12 -0500
+	(envelope-from <lersek@redhat.com>) id 1cWO7h-0007IS-HC
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:00:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cWO7E-00026v-2r
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:00:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cWO7D-00026k-TH
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:00:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cWO7C-0000lX-Qx
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:59:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BB2B22E80C2
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:59:58 +0000 (UTC)
+	(envelope-from <lersek@redhat.com>) id 1cWO7d-0002GE-VV
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:00:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56598)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cWO7d-0002Fy-Pf
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 09:00:25 -0500
+References: <cover.1485308342.git.ben@skyportsystems.com>
+	<b9ead8f0965c42f78e73e17e461ef7f476ae4318.1485308342.git.ben@skyportsystems.com>
+	<be3cd2b4-9a33-5c2c-902a-8a5967518348@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <09603363-b148-ec6c-8cca-74758af722ff@redhat.com>
+Date: Wed, 25 Jan 2017 15:00:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Jan 2017 13:46:21 -0000
-From: "mike@papersolve.com" <mike@papersolve.com>
-Reply-To: Bug 1622547 <1622547@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160912101319.11954.40146.malonedeb@gac.canonical.com>
-Message-Id: <20170125134621.17212.43556.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1622547] Re: qemu-system-sparc fatal error Trap
- 0x29 on Solaris 2.6
+In-Reply-To: <be3cd2b4-9a33-5c2c-902a-8a5967518348@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 4/9] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: ben@skyportsystems.com
+Cc: qemu-devel@nongnu.org
 
-Dropping SMP doesn't make a difference (I dropped it anyway since it doesn'=
-t make a second processor appear in the guest, and as I've learned it's cur=
-rently emulated in one thread anyway). You don't need an image, just the SP=
-ARCstation-20 ROM file which can be had from a variety of sources:
-910bd7306fcec38361fc4c3a2be50fa0  ss20_v2.25_rom
-and with no images listed:
-sudo /usr/src/qemu-2.8.0/build/sparc-softmmu/qemu-system-sparc -bios ./ss20=
-_v2.25_rom -M SS-20 -nographic -m 512 -cpu "TI SuperSparc 60" -net nic -net=
- bridge,br=3Dbr0
-still get the error. I've never done a git bisect before but I've always wa=
-nted to, so I will try. :)
+On 01/25/17 11:04, Laszlo Ersek wrote:
 
--- =
+> (7) The blob constructed in this function, as a GArray, should be the
+> exact same object that is later linked into fw_cfg, via acpi_setup() -->
+> vmgenid_add_fw_cfg().
+> 
+> Currently, the blob is allocated here under the variable "guid", and
+> passed to bios_linker_loader_alloc_ret_addr(). That results in the
+> creation of a new BiosLinkerFileEntry object, with the "blob" field
+> being set to "guid".
+> 
+> However, in vmgenid_add_fw_cfg(), the VmGenIdState.guid.data field is
+> linked into fw_cfg. This is incorrect, those objects are independent,
+> but they should be the same.
+> 
+> Here's how to implement it:
+> 
+> * Add the field
+> 
+>     GArray *vmgenid
+> 
+>   to the "AcpiBuildTables" structure in "include/hw/acpi/aml-build.h",
+>   under the "tcpalog" field.
+> 
+> * Extend the acpi_build_tables_init() and acpi_build_tables_cleanup()
+>   functions in "hw/acpi/aml-build.c", so that the new field is
+>   initialized and released.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1622547
+In acpi_build_tables_cleanup(), the line you need is
 
-Title:
-  qemu-system-sparc fatal error Trap 0x29 on Solaris 2.6
+    g_array_free(tables->vmgenid, mfre);
 
-Status in QEMU:
-  New
+similarly to "tcpalog".
 
-Bug description:
-  When trying to install Solaris 2.6 from original CDROM, qemu fail with
-  the following error :
+> 
+> * In the acpi_build() function, pass "tables->vmgenid" to
+>   vmgenid_build_acpi(). This will require the a new parameter for the
+>   latter function.
+> 
+> * In vmgenid_build_acpi(), construct the blob as described under (5)
+>   and (6).
+> 
+> * In the acpi_setup() function, pass "tables.vmgenid" to
+>   vmgenid_add_fw_cfg(). (Again, new function parameter is necessary.)
+> 
+> * In vmgenid_add_fw_cfg(), link "tables.vmgenid->data" into fw_cfg, not
+>   VmGenIdState.guid.data.
 
-  qemu: fatal: Trap 0x29 while interrupts disabled, Error state
-  pc: f0041280  npc: f0041284
-  %g0-7: 00000000 f0281800 08000000 ffffffff 00000000 f0243b88 00000001 f02=
-44020
-  %o0-7: 40400ce2 40400ce2 00000000 404000e2 f0243b88 00000000 f023ffd8 f00=
-57914 =
-
-  %l0-7: 40000cc2 f009645c f0096460 00000002 00000209 00000004 00000007 f02=
-3ff90 =
-
-  %i0-7: 00000042 404000e3 00000000 404000e3 e0000000 f028192a f0240038 f00=
-96448 =
-
-  %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  psr: 40400cc2 (icc: -Z-- SPE: SP-) wim: 00000002
-  fsr: 00000000 y: 00000000
-
-  The command line was :
-
-  qemu-system-sparc -nographic -bios ./openbios-sparc32 -M SS-20 -hda
-  ./36G.disk -m 512 -cdrom Solaris_2.6_Software_05_98.img -boot d
-  -serial telnet:0.0.0.0:3000,server -smp 2,cores=3D2 -monitor null
-
-  It fails with a similar output when using bios ss20_v2.25_rom.
-
-  =E2=96=B6 qemu-system-sparc --version
-  QEMU emulator version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and =
-the QEMU Project developers
-
-  =E2=96=B6 uname -a
-  Linux xxx 4.7.1-1-ARCH #1 SMP PREEMPT Wed Aug 17 08:13:35 CEST 2016 x86_6=
-4 GNU/Linux
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1622547/+subscriptions
+Thanks
+Laszlo
