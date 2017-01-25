@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWRDx-0002NG-2k
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:19:12 -0500
+	(envelope-from <jcody@redhat.com>) id 1cWRGt-0004bH-GU
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:22:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWRDw-0006OS-19
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:19:09 -0500
-Date: Wed, 25 Jan 2017 17:18:53 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170125171853.GF29006@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170103182801.9638-1-berrange@redhat.com>
-	<e10208d6-ade6-f31d-83b1-12a12cff6e7f@redhat.com>
-	<20170125162932.GE29006@redhat.com>
-	<d13ff880-3ce4-1b38-3c23-720768d79593@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d13ff880-3ce4-1b38-3c23-720768d79593@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 00/15] Convert QCow[2] to QCryptoBlock &
- add LUKS support
+	(envelope-from <jcody@redhat.com>) id 1cWRGn-0007BQ-4X
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:22:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56966)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cWRGm-0007BH-Vi
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 12:22:05 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 58ED1624DB
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 17:22:04 +0000 (UTC)
+From: Jeff Cody <jcody@redhat.com>
+Date: Wed, 25 Jan 2017 12:22:02 -0500
+Message-Id: <9a93d47ddba5f86d36cbdf884d86e2fa6f5542ae.1485364872.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/1] block: check full backing filename when
+ searching protocol filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com
 
-On Wed, Jan 25, 2017 at 05:41:59PM +0100, Max Reitz wrote:
-> On 25.01.2017 17:29, Daniel P. Berrange wrote:
-> > On Wed, Jan 25, 2017 at 04:58:32PM +0100, Max Reitz wrote:
-> >> On 03.01.2017 19:27, Daniel P. Berrange wrote:
-> >>> This series is a continuation of previous work to support LUKS in
-> >>> QEMU. The existing merged code supports LUKS as a standalone
-> >>> driver which can be layered over/under any other QEMU block device
-> >>> driver. This works well when using LUKS over protocol drivers (file,
-> >>> rbd, iscsi, etc, etc), but has some downsides when combined with
-> >>> format drivers like qcow2.
-> >>
-> >> When trying out whether compressed images are actually encrypted (which
-> >> they are not, as I wrote in my last reply to patch 12), I noticed that
-> >> the user interface still has some flaws:
-> > 
-> > The original code explicitly forbids this combination
-> > 
-> >  "qemu-img: Compression and encryption not supported at the same time"
-> > 
-> > but I guess we lost the error check due to changing to use
-> > encryption-format as the option name
-> 
-> Yes, not supporting it is completely fine, but qemu-img should refuse
-> that combination then (or at least warn about it).
+In bdrv_find_backing_image(), if we are searching an image for a backing
+file that contains a protocol, we currently only compare unmodified
+paths.
 
-Yep, I'll make sure the existing error message covers this scenario.
+However, some management software will change the backing filename to be
+a relative filename in a path.  QEMU is able to handle this fine,
+because internally it will use path_combine to put together the full
+protocol URI.
 
-> 
-> >> One is that you actually can't convert to encrypted images any more, or
-> >> if you can, it doesn't seem obvious to me:
-> >>
-> >> $ ./qemu-img convert -O qcow2 --object secret,id=sec0,data=12345 \
-> >>     -o encryption-format=luks,luks-key-secret=sec0 \
-> >>     foo.qcow2 bar.qcow2
-> >> qemu-img: Could not open 'bar.qcow2': Parameter 'key-secret' is required
-> >> for cipher
-> >>
-> >> The issue is that you have to specify the key secret as a runtime
-> >> parameter in addition to the creation option. Not only is that a bit
-> >> cumbersome, but it's also impossible because --image-opts doesn't work
-> >> for the output image.
-> > 
-> > Yeah, this is a problem I've not figured out a solutiuon for yet - it
-> > also affects the previously merged bare luks format code.
-> > 
-> > Somehow qemu-img needs to know which create options are also required
-> > to be passed when opening the newly created image.
-> > 
-> > Perhaps the BlockDriver struct needs a new callback like
-> > 
-> >   bdrv_create_opts_to_runtime_opts(QemuOpts *copts, QemuOpts *ropts);
-> 
-> Yeah, it's tough. For the moment, I'd be fine with qemu-img convert
-> working at all, though, even if that means having to specify the secret
-> twice. But I don't know if fixing the --image-opts issue is any easier
-> -- maybe we can allow image-opts syntax for the targets when -n is
-> given? Then you'd have to call qemu-img create and qemu-img convert
-> separately (or call qemu-img convert twice, once without -n (which
-> successfully creates the image but then fails when trying to open it)
-> and once without...), but at least there'd be a way to make it work.
-> 
-> I have to admit that I personally wouldn't mind a hack in qemu-img
-> convert like "copy every option ending in 'key-secret' to the runtime
-> opts" too much. But I don't know how much that might infuriate some
-> other people.
-> 
-> It's ugly, yes, but it would work perfectly well for now. I don't think
-> it would hurt us in the future. If other parameters appear that we have
-> to copy over, we can still implement the well-engineered solution.
+However, this can lead to an inability to match an image during a QAPI
+command that needs to use bdrv_find_backing_image() to find the image,
+when it is searched by the full URI.
 
-This turns out to be pretty trivial to implement. So although it is
-a bit ugly, it feels like reasonable approach to take in the short
-term.
+When searching for a protocol filename, if the straight comparison
+fails, this patch will also compare against the full backing filename to
+see if that is a match.
 
-Regards,
-Daniel
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
+ block.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/block.c b/block.c
+index 39ddea3..a173afc 100644
+--- a/block.c
++++ b/block.c
+@@ -3145,6 +3145,7 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+     int is_protocol = 0;
+     BlockDriverState *curr_bs = NULL;
+     BlockDriverState *retval = NULL;
++    Error *local_error = NULL;
+ 
+     if (!bs || !bs->drv || !backing_file) {
+         return NULL;
+@@ -3165,6 +3166,17 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+                 retval = curr_bs->backing->bs;
+                 break;
+             }
++            /* Also check against the full backing filename for the image */
++            bdrv_get_full_backing_filename(curr_bs, backing_file_full, PATH_MAX,
++                                           &local_error);
++            if (local_error == NULL) {
++                if (strcmp(backing_file, backing_file_full) == 0) {
++                    retval = curr_bs->backing->bs;
++                    break;
++                }
++            } else {
++                error_free(local_error);
++            }
+         } else {
+             /* If not an absolute filename path, make it relative to the current
+              * image's filename path */
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.9.3
