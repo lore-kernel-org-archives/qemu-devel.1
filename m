@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cWV4W-0005qE-Qt
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:25:45 -0500
+	(envelope-from <SRS0=oBba=ZH=redhat.com=mst@kernel.org>)
+	id 1cWVUz-00058g-DF
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:53:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cWV4S-0002TQ-AO
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:25:40 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33990)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cWV4S-0002Sf-1E
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:25:36 -0500
-Received: by mail-qt0-x244.google.com with SMTP id w20so636338qtb.1
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:25:34 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170125203852.19254-1-laurent@vivier.eu>
-	<20170125203852.19254-2-laurent@vivier.eu>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ad0ded3c-ee6d-f673-9176-fe0f69245bdf@twiddle.net>
-Date: Wed, 25 Jan 2017 13:25:30 -0800
+	(envelope-from <SRS0=oBba=ZH=redhat.com=mst@kernel.org>)
+	id 1cWVUw-0001Zk-Bx
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:53:01 -0500
+Received: from mail.kernel.org ([198.145.29.136]:44220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <SRS0=oBba=ZH=redhat.com=mst@kernel.org>)
+	id 1cWVUw-0001Xp-5I
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:52:58 -0500
+Date: Wed, 25 Jan 2017 23:52:53 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1485381149-19044-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170125203852.19254-2-laurent@vivier.eu>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] linux-user: add hppa magic numbers in
- qemu-binfmt-conf.sh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] qxl: switch to constants within BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 01/25/2017 12:38 PM, Laurent Vivier wrote:
-> As we have now a linux-user HPPA target, we can add it to the list of
-> supported targets in qemu-binfmt-conf.sh
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  scripts/qemu-binfmt-conf.sh | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+We are switching BUILD_BUG_ON to verify that it's parameter is a
+compile-time constant, and it turns out that some gcc versions
+(specifically gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609) are
+not smart enough to figure it out for expressions involving local
+variables. This is harmless but means that the check is ineffective for
+these platforms.  To fix, replace variables with macros.
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/display/qxl.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-
-r~
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index 62d0c80..af4c0ca 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -306,12 +306,11 @@ void qxl_spice_reset_cursor(PCIQXLDevice *qxl)
+ 
+ static ram_addr_t qxl_rom_size(void)
+ {
+-    uint32_t required_rom_size = sizeof(QXLRom) + sizeof(QXLModes) +
+-                                 sizeof(qxl_modes);
+-    uint32_t rom_size = 8192; /* two pages */
++#define QXL_REQUIRED_SZ (sizeof(QXLRom) + sizeof(QXLModes) + sizeof(qxl_modes))
++#define QXL_ROM_SZ 8192
+ 
+-    QEMU_BUILD_BUG_ON(required_rom_size > rom_size);
+-    return rom_size;
++    QEMU_BUILD_BUG_ON(QXL_REQUIRED_SZ > QXL_ROM_SZ);
++    return QXL_ROM_SZ;
+ }
+ 
+ static void init_qxl_rom(PCIQXLDevice *d)
+-- 
+MST
