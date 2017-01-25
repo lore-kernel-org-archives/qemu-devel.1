@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cWNz0-0008T6-JJ
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:51:31 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cWO5A-0005cV-P5
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:57:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cWNyx-00080N-Bu
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:51:30 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36041)
+	(envelope-from <no-reply@patchew.org>) id 1cWO57-0001Tt-Ex
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:57:52 -0500
+Resent-Message-Id: <E1cWO57-0001Tt-Ex@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21313)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cWNyx-00080F-2x
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:51:27 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0PDpJPI002464
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 08:51:26 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 286ua05356-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 08:51:23 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Wed, 25 Jan 2017 13:48:26 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 25 Jan 2017 14:48:01 +0100
-In-Reply-To: <1485352082-16830-1-git-send-email-groug@kaod.org>
-References: <1485352082-16830-1-git-send-email-groug@kaod.org>
-Message-Id: <1485352082-16830-5-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 4/5] 9pfs: local: trivial cosmetic fix in
- pwritev op
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cWO57-0001Sj-5J
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 08:57:49 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1485352137-29367-1-git-send-email-w.bumiller@proxmox.com>
+Message-ID: <148535263256.27.11323953317104920284@eba24e3a0d7f>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 25 Jan 2017 05:57:14 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2] cirrus: handle negative pitch in
+ cirrus_invalidate_region()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,27 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+To: w.bumiller@proxmox.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, lersek@redhat.com, liqiang6-s@360.cn, kraxel@redhat.com
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/9pfs/9p-local.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 845675e7a1bb..7de07e1ba67f 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -436,8 +436,7 @@ static ssize_t local_pwritev(FsContext *ctx, V9fsFidOpenState *fs,
-                              const struct iovec *iov,
-                              int iovcnt, off_t offset)
- {
--    ssize_t ret
--;
-+    ssize_t ret;
- #ifdef CONFIG_PREADV
-     ret = pwritev(fs->fd, iov, iovcnt, offset);
- #else
--- 
-2.7.4
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjJdIGNpcnJ1czogaGFuZGxlIG5lZ2F0aXZlIHBp
+dGNoIGluIGNpcnJ1c19pbnZhbGlkYXRlX3JlZ2lvbigpCk1lc3NhZ2UtaWQ6IDE0ODUzNTIxMzct
+MjkzNjctMS1naXQtc2VuZC1lbWFpbC13LmJ1bWlsbGVyQHByb3htb3guY29tCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxv
+ZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlv
+bnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
+dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
+UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
+ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
+ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
+dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAg
+ICAgcGF0Y2hldy8xNDg1MzUyMDgyLTE2ODMwLTEtZ2l0LXNlbmQtZW1haWwtZ3JvdWdAa2FvZC5v
+cmcgLT4gcGF0Y2hldy8xNDg1MzUyMDgyLTE2ODMwLTEtZ2l0LXNlbmQtZW1haWwtZ3JvdWdAa2Fv
+ZC5vcmcKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg1MzUyMTM3LTI5MzY3LTEtZ2l0
+LXNlbmQtZW1haWwtdy5idW1pbGxlckBwcm94bW94LmNvbSAtPiBwYXRjaGV3LzE0ODUzNTIxMzct
+MjkzNjctMS1naXQtc2VuZC1lbWFpbC13LmJ1bWlsbGVyQHByb3htb3guY29tCiAtIFt0YWcgdXBk
+YXRlXSAgICAgIHBhdGNoZXcvMjAxNzAxMjQxMTAxNTEuOTM3LTEtYmVycmFuZ2VAcmVkaGF0LmNv
+bSAtPiBwYXRjaGV3LzIwMTcwMTI0MTEwMTUxLjkzNy0xLWJlcnJhbmdlQHJlZGhhdC5jb20KIC0g
+W3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE3MDEyNDE4MDQyMC4xMjQzMC0xLXBib256aW5p
+QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDEyNDE4MDQyMC4xMjQzMC0xLXBib256aW5pQHJl
+ZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5M2U1MTI5IGNpcnJ1czog
+aGFuZGxlIG5lZ2F0aXZlIHBpdGNoIGluIGNpcnJ1c19pbnZhbGlkYXRlX3JlZ2lvbigpCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGNpcnJ1czogaGFuZGxlIG5lZ2F0
+aXZlIHBpdGNoIGluIGNpcnJ1c19pbnZhbGlkYXRlX3JlZ2lvbigpLi4uCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojMzE6IEZJTEU6IGh3L2Rpc3BsYXkv
+Y2lycnVzX3ZnYS5jOjY2NToKKyAgICAgICAgb2ZmX2JlZ2luIC09IGJ5dGVzcGVybGluZS0xOwog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IGNvZGUgaW5kZW50IHNo
+b3VsZCBuZXZlciB1c2UgdGFicwojMzc6IEZJTEU6IGh3L2Rpc3BsYXkvY2lycnVzX3ZnYS5jOjY3
+MToKK15JYXNzZXJ0KG9mZl9jdXJfZW5kID49IG9mZl9jdXIpOyQKCnRvdGFsOiAyIGVycm9ycywg
+MCB3YXJuaW5ncywgMTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQGZyZWVsaXN0cy5vcmc=
