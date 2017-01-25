@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cWUZ3-0000gX-Dh
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:53:13 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cWV4W-0005qE-Qt
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cWUYz-0004IE-De
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:53:09 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:50865)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cWUYz-0004H5-36
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 15:53:05 -0500
-References: <1485377117-18105-1-git-send-email-thuth@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <f60c6090-0ca8-8ce9-8015-4e8e34123a5a@vivier.eu>
-Date: Wed, 25 Jan 2017 21:52:54 +0100
+	(envelope-from <rth7680@gmail.com>) id 1cWV4S-0002TQ-AO
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:25:40 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cWV4S-0002Sf-1E
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 16:25:36 -0500
+Received: by mail-qt0-x244.google.com with SMTP id w20so636338qtb.1
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 13:25:34 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170125203852.19254-1-laurent@vivier.eu>
+	<20170125203852.19254-2-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <ad0ded3c-ee6d-f673-9176-fe0f69245bdf@twiddle.net>
+Date: Wed, 25 Jan 2017 13:25:30 -0800
 MIME-Version: 1.0
-In-Reply-To: <1485377117-18105-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix crash when
- running without CPU
+In-Reply-To: <20170125203852.19254-2-laurent@vivier.eu>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] linux-user: add hppa magic numbers in
+ qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-Le 25/01/2017 à 21:45, Thomas Huth a écrit :
-> When running QEMU with "-M none -device loader,file=kernel.elf", it
-> currently crashes with a segmentation fault, because the "none"-machine
-> does not have any CPU by default and the generic loader code tries
-> to dereference s->cpu. Fix it by adding an appropriate check for a
-> NULL pointer.
+On 01/25/2017 12:38 PM, Laurent Vivier wrote:
+> As we have now a linux-user HPPA target, we can add it to the list of
+> supported targets in qemu-binfmt-conf.sh
 > 
-> Reported-by: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  hw/core/generic-loader.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
-> index 58f1f02..4601267 100644
-> --- a/hw/core/generic-loader.c
-> +++ b/hw/core/generic-loader.c
-> @@ -137,20 +137,21 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
->  #endif
->  
->      if (s->file) {
-> +        AddressSpace *as = s->cpu ? s->cpu->as :  NULL;
+>  scripts/qemu-binfmt-conf.sh | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 
-Should we just abort if s->cpu is NULL?
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-Laurent
+
+r~
