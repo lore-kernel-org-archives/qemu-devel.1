@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cWapK-0006gk-Ay
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 22:34:25 -0500
+	(envelope-from <den@virtuozzo.com>) id 1cWce8-00079e-JO
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 00:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cWapJ-0002sN-6S
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 22:34:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37360)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cWapI-0002sE-UE
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 22:34:21 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 194E53A768C
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 03:34:21 +0000 (UTC)
-From: Fam Zheng <famz@redhat.com>
-Date: Thu, 26 Jan 2017 11:34:06 +0800
-Message-Id: <20170126033406.6433-3-famz@redhat.com>
-In-Reply-To: <20170126033406.6433-1-famz@redhat.com>
-References: <20170126033406.6433-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] virtio-scsi: Implement fc_host feature
+	(envelope-from <den@virtuozzo.com>) id 1cWce5-0004ia-Dj
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 00:30:56 -0500
+Received: from mail-he1eur01on0094.outbound.protection.outlook.com
+	([104.47.0.94]:23666
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cWce4-0004hl-JX
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 00:30:53 -0500
+References: <1485362572-7246-1-git-send-email-den@openvz.org>
+	<1e511c84-c9fa-1d4e-8a73-e48c0b29a59a@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <1251c8d7-3862-2cb9-a3c8-aa6d3c8e3924@openvz.org>
+Date: Wed, 25 Jan 2017 22:44:54 +0300
+MIME-Version: 1.0
+In-Reply-To: <1e511c84-c9fa-1d4e-8a73-e48c0b29a59a@redhat.com>
+Content-Type: text/plain; charset="iso-8859-15"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] block: add missed BDRV_O_NOCACHE when
+ block device is opened without file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,175 +30,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-This patch add qdev properties to allow enabling the fc_host feature of
-virtio-scsi, and fill config fields.
+On 01/25/2017 08:59 PM, Max Reitz wrote:
+> [CC-ing John]
+>
+> On 25.01.2017 17:42, Denis V. Lunev wrote:
+>> Technically there is a problem when the guest DVD is created by libvir=
+t
+>> with AIO mode 'native' on Linux. Current QEMU is unable to start the
+>> domain configured as follows:
+>>     <disk type=3D'file' device=3D'cdrom'>
+>>       <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/=
+>
+>>       <target dev=3D'sdb' bus=3D'scsi'/>
+>>       <readonly/>
+>>     </disk>
+>> The problem comes from the combination of 'cache' and 'io' options.
+>>
+>> 'io' option is common option and it is removed from block driver
+>> specific options. 'cache' originally is not. The patch makes 'cache'
+>> option common. This works fine as long as cdrom media insertion
+>> later on.
+>>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  blockdev.c | 18 +++++++++++++++---
+>>  1 file changed, 15 insertions(+), 3 deletions(-)
+> There was a Red Hat BZ for this:
+>
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1342999
+>
+> There is now a corresponding BZ for libvirt:
+>
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1377321
+>
+> The gist is that it was determined to be a problem with libvirt.
+>
+> RHEL has a downstream commit to work around this issue by ignoring the
+> cache mode set for empty CD-ROMs -- but that is only because that was
+> simpler than fixing libvirt.
+>
+> (Note that it's ignoring the cache mode instead of actually evaluating =
+it.)
+>
+This is what I have exactly started from:
+http://ftp.redhat.com/pub/redhat/linux/enterprise/7Server/en/RHEV/SRPMS/q=
+emu-kvm-rhev-2.6.0-27.el7.src.rpm
 
-For migration, the destination QEMU should be started with the same
-wwnn and wwpn, and a inverted primary_active. When migration is done,
-the config change interrupt will allow guest to discover the toggling.
+This package starts VM well for the above mentioned configuration:
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- hw/scsi/virtio-scsi.c           | 72 +++++++++++++++++++++++++++++++++++++++--
- include/hw/virtio/virtio-scsi.h | 10 ++++++
- 2 files changed, 80 insertions(+), 2 deletions(-)
+    <disk type=3D'file' device=3D'cdrom'>
+      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
+      <target dev=3D'sdb' bus=3D'scsi'/>
+      <readonly/>
+    </disk>
 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index ce19eff..c303f46 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -656,6 +656,11 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
-     virtio_stw_p(vdev, &scsiconf->max_channel, VIRTIO_SCSI_MAX_CHANNEL);
-     virtio_stw_p(vdev, &scsiconf->max_target, VIRTIO_SCSI_MAX_TARGET);
-     virtio_stl_p(vdev, &scsiconf->max_lun, VIRTIO_SCSI_MAX_LUN);
-+    stq_be_p(&scsiconf->primary_wwpn, s->conf.primary_wwpn);
-+    stq_be_p(&scsiconf->primary_wwnn, s->conf.primary_wwnn);
-+    stq_be_p(&scsiconf->secondary_wwpn, s->conf.secondary_wwpn);
-+    stq_be_p(&scsiconf->secondary_wwnn, s->conf.secondary_wwnn);
-+    scsiconf->primary_active =  s->conf.primary_active;
- }
- 
- static void virtio_scsi_set_config(VirtIODevice *vdev,
-@@ -870,18 +875,68 @@ void virtio_scsi_common_realize(DeviceState *dev, Error **errp,
-     }
- }
- 
-+static void virtio_scsi_vm_state_change(void *opaque, int running,
-+                                        RunState state)
-+{
-+    VirtIOSCSI *s = opaque;
-+    VirtIODevice *vdev = VIRTIO_DEVICE(s);
-+
-+    if (!running || !s->config_change_pending) {
-+        return;
-+    }
-+    s->config_change_pending = false;
-+    virtio_notify_config(vdev);
-+}
-+
- static void virtio_scsi_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOSCSI *s = VIRTIO_SCSI(dev);
-+    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
-     Error *err = NULL;
- 
-+    if (vs->conf.fc_host) {
-+        if (!strcmp(vs->conf.fc_host, "off")) {
-+            vs->conf.primary_wwpn = 0;
-+            vs->conf.primary_wwnn = 0;
-+            vs->conf.secondary_wwpn = 0;
-+            vs->conf.secondary_wwnn = 0;
-+        } else if (!strcmp(vs->conf.fc_host, "primary") ||
-+                   !strcmp(vs->conf.fc_host, "secondary")) {
-+            virtio_add_feature(&vdev->host_features, VIRTIO_SCSI_F_FC_HOST);
-+            vs->conf.primary_active = !strcmp(vs->conf.fc_host, "primary");
-+            if (!vs->conf.primary_wwpn) {
-+                error_setg(errp, "fc_host enabled but primary_wwpn not set");
-+                return;
-+            }
-+            if (!vs->conf.primary_wwnn) {
-+                error_setg(errp, "fc_host enabled but primary_wwnn not set");
-+                return;
-+            }
-+            if (!vs->conf.secondary_wwpn) {
-+                error_setg(errp, "fc_host enabled but secondary_wwpn not set");
-+                return;
-+            }
-+            if (!vs->conf.secondary_wwnn) {
-+                error_setg(errp, "fc_host enabled but secondary_wwnn not set");
-+                return;
-+            }
-+            s->vm_state_change =
-+                qemu_add_vm_change_state_handler(virtio_scsi_vm_state_change, s);
-+            s->config_change_pending = runstate_check(RUN_STATE_INMIGRATE);
-+        } else {
-+            error_setg(errp, "Invalid fc_host option. "
-+                             "Must be 'off', 'primary' or 'secondary'");
-+            return;
-+        }
-+    }
-+
-     virtio_scsi_common_realize(dev, &err, virtio_scsi_handle_ctrl,
-                                virtio_scsi_handle_event,
-                                virtio_scsi_handle_cmd);
-     if (err != NULL) {
-         error_propagate(errp, err);
--        return;
-+        goto fail;
-     }
- 
-     scsi_bus_new(&s->bus, sizeof(s->bus), dev,
-@@ -893,11 +948,14 @@ static void virtio_scsi_device_realize(DeviceState *dev, Error **errp)
-         scsi_bus_legacy_handle_cmdline(&s->bus, &err);
-         if (err != NULL) {
-             error_propagate(errp, err);
--            return;
-+            goto fail;
+but the problem comes later at 'change' moment. It reports
+
+'Details: internal error: unable to execute QEMU command 'change':
+aio=3Dnative was specified, but it requires cache.direct=3Don, which
+was not specified.)'
+
+
+Thus partial solution implemented by the RedHat is really
+partial and does not work at the second stage. I have started from
+
+diff --git a/blockdev.c b/blockdev.c
+index d280dc4..e2c9053 100644  =20
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -608,6 +608,13 @@ static BlockBackend *blockdev_init(const char
+*file, QDict *bs_opts,
+             goto early_err;
          }
-     }
- 
-     virtio_scsi_dataplane_setup(s, errp);
-+    return;
-+fail:
-+    qemu_del_vm_change_state_handler(s->vm_state_change);
- }
- 
- static void virtio_scsi_instance_init(Object *obj)
-@@ -921,6 +979,11 @@ void virtio_scsi_common_unrealize(DeviceState *dev, Error **errp)
- 
- static void virtio_scsi_device_unrealize(DeviceState *dev, Error **errp)
- {
-+    VirtIOSCSI *s = VIRTIO_SCSI(dev);
+=20
++        if (qdict_haskey(bs_opts, BDRV_OPT_CACHE_DIRECT)) {
++            bdrv_flags |=3D BDRV_O_NOCACHE;
++        }
++        if (qdict_haskey(bs_opts, BDRV_OPT_CACHE_NO_FLUSH)) {
++            bdrv_flags |=3D BDRV_O_NO_FLUSH;
++        }
 +
-+    if (s->vm_state_change) {
-+        qemu_del_vm_change_state_handler(s->vm_state_change);
-+    }
-     virtio_scsi_common_unrealize(dev, errp);
- }
- 
-@@ -934,6 +997,11 @@ static Property virtio_scsi_properties[] = {
-                                            VIRTIO_SCSI_F_HOTPLUG, true),
-     DEFINE_PROP_BIT("param_change", VirtIOSCSI, host_features,
-                                                 VIRTIO_SCSI_F_CHANGE, true),
-+    DEFINE_PROP_UINT64("primary_wwpn", VirtIOSCSI, parent_obj.conf.primary_wwpn, 0),
-+    DEFINE_PROP_UINT64("primary_wwnn", VirtIOSCSI, parent_obj.conf.primary_wwnn, 0),
-+    DEFINE_PROP_UINT64("secondary_wwpn", VirtIOSCSI, parent_obj.conf.secondary_wwpn, 0),
-+    DEFINE_PROP_UINT64("secondary_wwnn", VirtIOSCSI, parent_obj.conf.secondary_wwnn, 0),
-+    DEFINE_PROP_STRING("fc_host", VirtIOSCSI, parent_obj.conf.fc_host),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
-index 7375196..a0eb080 100644
---- a/include/hw/virtio/virtio-scsi.h
-+++ b/include/hw/virtio/virtio-scsi.h
-@@ -53,6 +53,13 @@ struct VirtIOSCSIConf {
-     char *wwpn;
-     uint32_t boot_tpgt;
-     IOThread *iothread;
-+
-+    char *fc_host;
-+    bool primary_active;
-+    uint64_t primary_wwnn;
-+    uint64_t primary_wwpn;
-+    uint64_t secondary_wwnn;
-+    uint64_t secondary_wwpn;
- };
- 
- struct VirtIOSCSI;
-@@ -83,6 +90,9 @@ typedef struct VirtIOSCSI {
-     bool dataplane_stopping;
-     bool dataplane_fenced;
-     uint32_t host_features;
-+
-+    bool config_change_pending;
-+    VMChangeStateEntry *vm_state_change;
- } VirtIOSCSI;
- 
- typedef struct VirtIOSCSIReq {
--- 
-2.9.3
+         blk_rs =3D blk_get_root_state(blk);
+         blk_rs->open_flags    =3D bdrv_flags;
+         blk_rs->read_only     =3D !(bdrv_flags & BDRV_O_RDWR);
+
+The problem for us is that we have such previously valid configurations
+in the field.
+
+>> May be this has already discussed, but still. AIO=3Dnative for CDROM w=
+ithout
+>> media seems important case.
+> First, I personally don't find aio=3Dnative very important for CD-ROM
+> drives. Yes, we shouldn't make IDE CD-ROM slower than necessary, but I
+> don't think aio=3Dnative will make the difference between "Slow like
+> CD-ROMs are in reality" and "As fast as virtio".
+the problem for me is that each clone() call is costly and counts. That
+is why we are trying to avoid it whenever possible. That is why 'native'
+mode is MUCH better. Also it would be very nice not to use cached
+IO, which is very good for memory overcommit situations.
+
+Here I am fighting not with the performance, which does not make
+any real sense, but with a memory footprint.
+
+> Second, all this patch does is revert some changes done by commit
+> 91a097e7478940483e76d52217f05bc05b98d5a5, which was very deliberate.
+>
+> Third, you may then be asking for the recommended way to put an
+> aio=3Dnative medium into a CD-ROM drive. Good thing you ask, because we=
+
+> have a way that we want to recommend but can't because it's still
+> considered experimental:
+>
+> The BDS is added using blockdev-add, with all of the appropriate cachin=
+g
+> and aio options. Then it's inserted into the drive using the
+> x-blockdev-insert-medium command, and the drive is closed using
+> blockdev-close-tray.
+the problem, again, is that with x-blockdev-insert-medium I can not
+deal with block driver options, or may be I am missing something.
+
+> There are a couple of issues with this: First, blockdev-add and
+> x-blockdev-insert-medium are still experimental. The good news are that=
+
+> I think the reason why the latter is experimental has actually
+> disappeared and we can just drop the x- by now. The
+> not-so-good-but-not-so-bad-either news are that we plan to get
+> blockdev-add declared non-experimental for 2.9. Let's see how it goes.
+Does this mean that x-blockdev-del would also lose x- prefix?
+
+> The other issue is that of course it's more cumbersome to use than a
+> simple 'change' via HMP. I argue that if someone communicates with a VM=
+
+> by hand, they either have to deal with this added complexity or they
+> cannot use aio=3Dnative for CD-ROM drives -- which, as I said, I don't
+> think is too bad.
+this is how 'virsh change-media' works at the moment, at least with
+latest downstreams.
+That is why this is not that clear.
+
+> However, there is a reason why you cannot set cache/aio for an empty
+> drive and it's simply that it doesn't make sense.
+>
+> Max
+>
+Thank you very much for the prompt answer.
+
+Den
