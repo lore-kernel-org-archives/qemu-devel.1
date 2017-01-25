@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWQfV-0003MP-EB
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:43:34 -0500
+	(envelope-from <armbru@redhat.com>) id 1cWQhY-00059a-Md
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:45:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWQfS-0003EN-B6
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:43:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37190)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cWQfS-0003E2-2y
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:43:30 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BFFEAC04B93E
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 16:43:29 +0000 (UTC)
-Date: Wed, 25 Jan 2017 16:43:25 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170125164324.GB6581@work-vm>
-References: <20170106182823.1960-1-dgilbert@redhat.com>
-	<20170106182823.1960-5-dgilbert@redhat.com>
-	<87sho778qn.fsf@emacs.mitica>
+	(envelope-from <armbru@redhat.com>) id 1cWQhV-0003s5-FG
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 11:45:40 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1485164923-17736-1-git-send-email-armbru@redhat.com>
+	<1485164923-17736-7-git-send-email-armbru@redhat.com>
+	<2fd376cd-e88a-b6da-d648-b80d35e74c7a@redhat.com>
+	<877f5l1tak.fsf@dusky.pond.sub.org>
+	<3512807d-d04e-50fa-9fcf-d1d5ba8ac350@redhat.com>
+	<87r33saa6p.fsf@dusky.pond.sub.org>
+Date: Wed, 25 Jan 2017 17:45:27 +0100
+In-Reply-To: <87r33saa6p.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Tue, 24 Jan 2017 13:56:14 +0100")
+Message-ID: <87vat33x7c.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sho778qn.fsf@emacs.mitica>
-Subject: Re: [Qemu-devel] [PATCH 04/15] Fold postcopy_ram_discard_range into
- ram_discard_range
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 6/6] hw/i386/i386: Stop auto-creating
+ lsi53c895a SCSI HBAs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kwolf@redhat.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > I'd created this weird pair of:
-> >   ram_discard_range   that lived in migration/ram.c
-> >      Which is built target-dependent so can access the insides of
-> >      RAMBlock
-> >
-> >   postcopy_ram_discard_range
-> >      Which actually does the discard.
-> >
-> > Flatten these down into ram_discard_range, this relies on the
-> > CONFIG_MADVISE check to be sure we have the real DONTNEED madvise
-> > rather than the posix variant that isn't guaranteed to discard pages.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> 
-> > @@ -1877,7 +1879,15 @@ int ram_discard_range(MigrationIncomingState *mis,
-> >                           host_endaddr);
-> >              goto err;
-> >          }
-> > -        ret = postcopy_ram_discard_range(mis, host_startaddr, length);
-> > +        errno = ENOTSUP;
-> > +#if defined(CONFIG_MADVISE)
-> > +        ret = qemu_madvise(host_startaddr, length, QEMU_MADV_DONTNEED);
-> > +#endif
-> 
-> This really looks weird, we shouldn't arrive here if CONFIG_MADVISE is
-> not configured, no?
+David, Alex, got a sPAPR question for you.
 
-You'd hope so ...but.
+Markus Armbruster <armbru@redhat.com> writes:
 
-ram.c is compiled for everyone, so it's not Linux specific for example.
-The definitions of QEMU_MADV_DONTNEED and qemu_madvise is a bit odd;
-if you're unlucky enough to be on a platform that is
- !CONFIG_MADVISE but is CONFIG_POSIX_MADVISE  then 
-you end up using posix_madvise(POSIX_MADV_DONTNEED) - which is different
-semantics than madvise MADV_DONTNEED - because the posix variant treats
-it as advise for the kernel, where the madvise() case treats
-it as an instruction to throw the page away (I'm not sure how
-portable that semantic is).
+> Cc'ing in sPAPR maintainers...
+[...]
+> Let me spell things out a bit more, to make sure we all agree on what
+> exactly we want to deprecate.
+>
+> After this series, -drive if=scsi works for the following machine types:
+>
+> * magnum pica61 LX SPARCClassic SPARCbook SS-10 SS-20 SS-4 SS-5 SS-600MP
+>   Voyager
+>
+>   The machine has an onboard SCSI HBA, which adopts the drives with
+>   bus=0..  Drives with non-zero bus numbers stay orphaned.  This is
+>   exactly how other interface types work.
+>
+>   Except when additional HBAs get cold-plugged somehow, non-zero bus
+>   numbers can work; see below.
+>
+> * realview-eb realview-eb-mpcore versatileab versatilepb
+>
+>   These create N lsi53c895a SCSI HBAs, where N is the largest value of
+>   bus.  If N is too large, machine initialization fails with a "no
+>   slot/function available for lsi53c895a, all in use" error.
+>
+>   This is just like the PC machine types work before this patch.
+>
+> * pseries-*
+>
+>   Likewise, except create spapr-vscsi SCSI HBAs.  Large N make machine
+>   initialization s-l-o-w.  I tried to find out whether and how it fails
+>   when N is too large, but I lost patience.
 
-Dave
+Totally unscientific experiment: run "qemu-system-ppc64 -S -display none
+-monitor stdio -M pseries,accel=qtest -drive if=scsi,media=cdrom,bus=N"
+for various N and check SZ in ps, with "ps -C qemu-system-ppc64 -O sz".
+Results:
 
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+      N      SZ
+      0  339413
+     10  353182
+     20  375342
+     30  405857
+     40  444716
+     50  491988
+     60  547582
+     70  611589
+     80  683916
+     90  764658
+    100  853743
+
+Definitely super-linear.  Is this expected?
+
+No wonder my previous bus=999 experiement thrashed my machine;
+extrapolating from the above I guesstimate SZ in the order of 50 million
+pages.
+
+Of course, asking for 1000 spapr-vscsi devices is silly, but trashing is
+not a nice way to say "don't be silly".  Should we reject bus=N when N
+exceeds a certain limit?  Care to suggest a limit?
+
+[...]
