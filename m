@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cWWUq-0006jQ-VB
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:56:57 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cWWyS-0008O6-AB
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 18:27:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cWWUn-00057w-Sh
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:56:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cWWUn-00057k-Mi
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 17:56:53 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8330561BA2
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 22:56:53 +0000 (UTC)
-References: <1485381149-19044-1-git-send-email-mst@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5d586519-da5a-b5d1-6c17-d71965174dd9@redhat.com>
-Date: Wed, 25 Jan 2017 16:56:45 -0600
+	(envelope-from <alistair23@gmail.com>) id 1cWWyR-0004mk-LO
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 18:27:32 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1cWWyR-0004lf-Gd
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 18:27:31 -0500
+Received: by mail-oi0-x242.google.com with SMTP id j15so16845857oih.0
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 15:27:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1485381149-19044-1-git-send-email-mst@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="b6jJcGiOaQUf2w0svadOsEvUhwDKNDk2d"
-Subject: Re: [Qemu-devel] [PATCH] qxl: switch to constants within
- BUILD_BUG_ON
+Sender: alistair23@gmail.com
+In-Reply-To: <f60c6090-0ca8-8ce9-8015-4e8e34123a5a@vivier.eu>
+References: <1485377117-18105-1-git-send-email-thuth@redhat.com>
+	<f60c6090-0ca8-8ce9-8015-4e8e34123a5a@vivier.eu>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 25 Jan 2017 15:26:58 -0800
+Message-ID: <CAKmqyKMyzquxEGTF4Un_1WvwBNXOoJU1g67_9fFarVy-yeff+Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix crash when
+ running without CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---b6jJcGiOaQUf2w0svadOsEvUhwDKNDk2d
-From: Eric Blake <eblake@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <5d586519-da5a-b5d1-6c17-d71965174dd9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qxl: switch to constants within BUILD_BUG_ON
-References: <1485381149-19044-1-git-send-email-mst@redhat.com>
-In-Reply-To: <1485381149-19044-1-git-send-email-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Jan 25, 2017 at 12:52 PM, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 25/01/2017 =C3=A0 21:45, Thomas Huth a =C3=A9crit :
+>> When running QEMU with "-M none -device loader,file=3Dkernel.elf", it
+>> currently crashes with a segmentation fault, because the "none"-machine
+>> does not have any CPU by default and the generic loader code tries
+>> to dereference s->cpu. Fix it by adding an appropriate check for a
+>> NULL pointer.
+>>
+>> Reported-by: Laurent Vivier <laurent@vivier.eu>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  hw/core/generic-loader.c | 9 +++++----
+>>  1 file changed, 5 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+>> index 58f1f02..4601267 100644
+>> --- a/hw/core/generic-loader.c
+>> +++ b/hw/core/generic-loader.c
+>> @@ -137,20 +137,21 @@ static void generic_loader_realize(DeviceState *de=
+v, Error **errp)
+>>  #endif
+>>
+>>      if (s->file) {
+>> +        AddressSpace *as =3D s->cpu ? s->cpu->as :  NULL;
+>
+> Should we just abort if s->cpu is NULL?
 
-On 01/25/2017 03:52 PM, Michael S. Tsirkin wrote:
-> We are switching BUILD_BUG_ON to verify that it's parameter is a
-> compile-time constant, and it turns out that some gcc versions
-> (specifically gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609) are
-> not smart enough to figure it out for expressions involving local
-> variables. This is harmless but means that the check is ineffective for=
+I agree, what is the use case where you are loading images without a CPU?
 
-> these platforms.  To fix, replace variables with macros.
->=20
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  hw/display/qxl.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+If there is a use case (maybe some KVM thing?) then this patch looks fine t=
+o me.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Thanks,
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Alistair
 
-
---b6jJcGiOaQUf2w0svadOsEvUhwDKNDk2d
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYiS0tAAoJEKeha0olJ0NqEPYH/jMFN71q6EAlaAjZwr/zb59m
-wrcVCRUmc2aVwHtPzc4P0dxESq+yVDUSX6HrKf033Qe4EFMF8rjF5+5epibLNXsG
-CBeOa/EakhWvsK92fdmKECXgBA8wsh143Lg2BeHeDO5X0rlB3WoT62lbD7yigvyo
-DfAmlfkrMPYQnFg8o4CQfDI0Lm3Z4XIHjag0f73zYNoFN3G91cwMwPVTMifHPoat
-3rxPw25ehoGGODouRM+W6s+u9oTnFu1aBAu1WeyHTLBA2odFMvcVcLDK5y+Iw3bI
-vR9LbMCQrLSrguq8Q/QUMJ/Nw20L+GkAq6XlVZGXUPaYcbPMLUqpSpqsGJr3w44=
-=3GKX
------END PGP SIGNATURE-----
-
---b6jJcGiOaQUf2w0svadOsEvUhwDKNDk2d--
+>
+> Laurent
+>
+>
