@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWLQD-0007zb-JM
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:07:26 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cWLQS-0008BJ-Je
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:07:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWLQ9-0005wM-55
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:07:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cWLQ8-0005wC-Uu
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:07:21 -0500
-Date: Wed, 25 Jan 2017 11:07:15 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170125110715.GB15529@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAC2QTZY0SJczV9_e3TwJbEXwyuTQXDQesAP5W6U0JeYvsV5uQg@mail.gmail.com>
-	<c5202aa1-bf56-5d66-533a-a1e78a3eafa2@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cWLQO-00067f-Jr
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:07:40 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36008)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cWLQO-00066a-44
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 06:07:36 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r126so41802165wmr.3
+	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 03:07:36 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170124071654.4572.41407.stgit@PASHA-ISP>
+	<20170124071724.4572.85855.stgit@PASHA-ISP>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5500e05f-2923-3378-aa42-600cf0c4bf9b@redhat.com>
+Date: Wed, 25 Jan 2017 12:07:31 +0100
 MIME-Version: 1.0
+In-Reply-To: <20170124071724.4572.85855.stgit@PASHA-ISP>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c5202aa1-bf56-5d66-533a-a1e78a3eafa2@redhat.com>
-Subject: Re: [Qemu-devel] migration: QEMU aborts migration of "none" machine
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 05/14] apic: save apic_delivered flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +31,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Ashijeet Acharya <ashijeetacharya@gmail.com>, Juan Quintela <quintela@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, kraxel@redhat.com
 
-On Wed, Jan 25, 2017 at 11:53:06AM +0100, Thomas Huth wrote:
-> On 25.01.2017 11:01, Ashijeet Acharya wrote:
-> > Hi Thomas,
-> > 
-> > I was able to reproduce the bug you encountered while trying to migrate
-> > a "none" machine.
-> > 
-> > After digging deep and debugging the problem with gdb, I found that
-> > bitmap_new() is the function that crashes qemu as it always has
-> > zero bits being passed to it.
-> > 
-> > I had a discussion with Dave on the IRC yesterday and he suggested the
-> > reason of crash being the absence of RAM ( since machine is "none")
-> > while attempting the migration.
-> > 
-> > I am not sure what the ideal solution will be in this case; Do any of
-> > the maintainers have any suggestions or even a starting point which I
-> > can ponder upon?
+
+
+On 24/01/2017 08:17, Pavel Dovgalyuk wrote:
+> This patch implements saving/restoring of static apic_delivered variable.
 > 
-> I'm not that familiar with the migration code either, but maybe you
-> could simply check for last_ram_offset() == 0 at the beginning of
-> ram_save_setup() and return with an error in that case?
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> ---
+>  hw/intc/apic_common.c           |   32 ++++++++++++++++++++++++++++++++
+>  include/hw/i386/apic_internal.h |    2 ++
+>  2 files changed, 34 insertions(+)
+> 
+> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+> index d78c885..ac6cc67 100644
+> --- a/hw/intc/apic_common.c
+> +++ b/hw/intc/apic_common.c
+> @@ -384,6 +384,24 @@ static bool apic_common_sipi_needed(void *opaque)
+>      return s->wait_for_sipi != 0;
+>  }
+>  
+> +static bool apic_irq_delivered_needed(void *opaque)
+> +{
+> +    return true;
 
-Do we actually need/want migration to succeed when RAM is 0 or vCPU
-count is 0 ?  If not, then we could just register a migration blocker
-during machine init
+Is it needed for CPUs except the first (or the last?)?
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Paolo
+
+
+> +}
+> +
+> +static void apic_irq_delivered_pre_save(void *opaque)
+> +{
+> +    APICCommonState *s = APIC_COMMON(opaque);
+> +    s->apic_irq_delivered = apic_irq_delivered;
+> +}
+> +
+> +static int apic_irq_delivered_post_load(void *opaque, int version_id)
+> +{
+> +    APICCommonState *s = APIC_COMMON(opaque);
+> +    apic_irq_delivered = s->apic_irq_delivered;
+> +    return 0;
+> +}
+> +
+>  static const VMStateDescription vmstate_apic_common_sipi = {
+>      .name = "apic_sipi",
+>      .version_id = 1,
+> @@ -396,6 +414,19 @@ static const VMStateDescription vmstate_apic_common_sipi = {
+>      }
+>  };
+>  
+> +static const VMStateDescription vmstate_apic_irq_delivered = {
+> +    .name = "apic_irq_delivered",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = apic_irq_delivered_needed,
+> +    .pre_save = apic_irq_delivered_pre_save,
+> +    .post_load = apic_irq_delivered_post_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_INT32(apic_irq_delivered, APICCommonState),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_apic_common = {
+>      .name = "apic",
+>      .version_id = 3,
+> @@ -430,6 +461,7 @@ static const VMStateDescription vmstate_apic_common = {
+>      },
+>      .subsections = (const VMStateDescription*[]) {
+>          &vmstate_apic_common_sipi,
+> +        &vmstate_apic_irq_delivered,
+>          NULL
+>      }
+>  };
+> diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_internal.h
+> index 1209eb4..20ad28c 100644
+> --- a/include/hw/i386/apic_internal.h
+> +++ b/include/hw/i386/apic_internal.h
+> @@ -189,6 +189,8 @@ struct APICCommonState {
+>      DeviceState *vapic;
+>      hwaddr vapic_paddr; /* note: persistence via kvmvapic */
+>      bool legacy_instance_id;
+> +
+> +    int apic_irq_delivered; /* for saving static variable */
+>  };
+>  
+>  typedef struct VAPICState {
+> 
+> 
+> 
