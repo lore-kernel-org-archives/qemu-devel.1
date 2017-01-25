@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cWKUr-0007D2-MM
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:08:10 -0500
+	(envelope-from <lersek@redhat.com>) id 1cWKW0-0007vX-FK
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cWKUo-0000Vw-Gv
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:08:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48802)
+	(envelope-from <lersek@redhat.com>) id 1cWKVz-0000i0-Jx
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:09:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cWKUo-0000VO-BH
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:08:06 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D2BB80F7D
-	for <qemu-devel@nongnu.org>; Wed, 25 Jan 2017 10:08:06 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170106182823.1960-5-dgilbert@redhat.com> (David Alan Gilbert's
-	message of "Fri, 6 Jan 2017 18:28:12 +0000")
-References: <20170106182823.1960-1-dgilbert@redhat.com>
-	<20170106182823.1960-5-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 25 Jan 2017 11:08:00 +0100
-Message-ID: <87sho778qn.fsf@emacs.mitica>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cWKVz-0000hu-EZ
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 05:09:19 -0500
+References: <cover.1485308342.git.ben@skyportsystems.com>
+	<5c6a8bfb4e36acec297d39e2381cb5ed022265f1.1485308342.git.ben@skyportsystems.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <377c645f-d57b-2bd1-6a65-11b62f5e5a1c@redhat.com>
+Date: Wed, 25 Jan 2017 11:09:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 04/15] Fold postcopy_ram_discard_range into
- ram_discard_range
+In-Reply-To: <5c6a8bfb4e36acec297d39e2381cb5ed022265f1.1485308342.git.ben@skyportsystems.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 7/9] PC: Support dynamic sysbus on
+ pc_i440fx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com
+To: ben@skyportsystems.com
+Cc: qemu-devel@nongnu.org
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> I'd created this weird pair of:
->   ram_discard_range   that lived in migration/ram.c
->      Which is built target-dependent so can access the insides of
->      RAMBlock
->
->   postcopy_ram_discard_range
->      Which actually does the discard.
->
-> Flatten these down into ram_discard_range, this relies on the
-> CONFIG_MADVISE check to be sure we have the real DONTNEED madvise
-> rather than the posix variant that isn't guaranteed to discard pages.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 01/25/17 02:43, ben@skyportsystems.com wrote:
+> From: Ben Warren <ben@skyportsystems.com>
+> 
+> This allows pc_i440fx-based machines to add new devices such as VM Generation ID
+> directly to the sysbus.
+> 
+> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> ---
+>  hw/i386/pc_piix.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 9f102aa..c8ad99c 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -435,6 +435,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>      m->hot_add_cpu = pc_hot_add_cpu;
+>      m->default_machine_opts = "firmware=bios-256k.bin";
+>      m->default_display = "std";
+> +    m->has_dynamic_sysbus = true;
+>  }
+>  
+>  static void pc_i440fx_2_9_machine_options(MachineClass *m)
+> 
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Looks reasonable to me, especially that Q35 already sets it.
 
-> @@ -1877,7 +1879,15 @@ int ram_discard_range(MigrationIncomingState *mis,
->                           host_endaddr);
->              goto err;
->          }
-> -        ret = postcopy_ram_discard_range(mis, host_startaddr, length);
-> +        errno = ENOTSUP;
-> +#if defined(CONFIG_MADVISE)
-> +        ret = qemu_madvise(host_startaddr, length, QEMU_MADV_DONTNEED);
-> +#endif
+One nit: please wrap the commit message at 74 chars.
 
-This really looks weird, we shouldn't arrive here if CONFIG_MADVISE is
-not configured, no?
+I'll let others review the rest of the patches. (My interest lies in the
+ACPI & fw_cfg bits.)
 
-Later, Juan.
+Thanks!
+Laszlo
