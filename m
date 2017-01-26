@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cWiBH-0003p4-GI
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:25:32 -0500
+	(envelope-from <famz@redhat.com>) id 1cWiBs-0004DS-Or
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:26:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cWiBE-0002IO-DI
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:25:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34868)
+	(envelope-from <famz@redhat.com>) id 1cWiBp-0002cu-LY
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:26:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54372)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1cWiBE-0002GP-6x
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:25:28 -0500
-Date: Thu, 26 Jan 2017 12:25:24 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170126112524.ww27c3f6x26hxcup@eukaryote>
-References: <1485422212-31546-1-git-send-email-ashijeetacharya@gmail.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cWiBp-0002cU-FJ
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:26:05 -0500
+Date: Thu, 26 Jan 2017 19:26:01 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170126112601.GK6879@lemon>
+References: <20170124143346.22240-1-alex.bennee@linaro.org>
+	<20170124143346.22240-4-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1485422212-31546-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] migrate: Migration aborts abruptly for
- machine "none"
+In-Reply-To: <20170124143346.22240-4-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] .travis.yml: DEBUG MacOSX build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: thuth@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: "open list:-----------------..." <qemu-devel@nongnu.org>
 
-
-On Thu, Jan 26, 2017 at 02:46:52PM +0530, Ashijeet Acharya wrote:
-> Migration of a "none" machine with no RAM crashes abruptly as
-> bitmap_new() fails and thus aborts. Instead, place a check for
-> last_ram_offset() being '0' at the start of ram_save_setup() and
-> error out with a meaningful error message.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+On Tue, 01/24 14:33, Alex Benn=E9e wrote:
+> Currently the MacOSX build is failing. Dump some information to help
+> with figuring out what has gone wrong.
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
 > ---
->  migration/ram.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  .travis.yml | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index 9008a796f0..a9ce215f42 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -92,6 +92,7 @@ matrix:
+>      - env: CONFIG=3D""
+>        os: osx
+>        compiler: clang
+> +      script: make -j3 || cat qemu-options.texi && false
+>      # Plain Trusty System Build
+>      - env: CONFIG=3D"--disable-linux-user"
+>        sudo: required
+> --=20
+> 2.11.0
+>=20
+>=20
 
-You state the problem in the one-line Git commit summary message, it's
-usually preferred to summarize the _fix_ that you're making :-).  If the
-below variant sounds any better, maybe the maintainer can reword it upon
-applying:
+Why qemu-options.texi? This looks really ad-hocery, not sure it's useful =
+for the
+mainline.
 
-  migrate: Gracefully handle crash of a 'none' machine with no RAM
-
-[...]
-
--- 
-/kashyap
+Fam
