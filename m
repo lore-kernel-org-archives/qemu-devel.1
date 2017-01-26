@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWjyl-0006ah-Vp
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:20:45 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWk59-0000yW-Ui
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:27:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWjyj-0005Y7-B0
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:20:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36528)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWjyj-0005Xp-0q
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:20:41 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2BBF2804FE
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 13:20:41 +0000 (UTC)
-References: <20170126014416.11211-1-lersek@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd9e48f9-760d-3f46-bc48-cf7c8e6af51c@redhat.com>
-Date: Thu, 26 Jan 2017 14:20:37 +0100
+	(envelope-from <berrange@redhat.com>) id 1cWk58-0007Zo-VO
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:27:19 -0500
+Date: Thu, 26 Jan 2017 13:27:08 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170126132708.GB29127@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170126110435.2777-1-berrange@redhat.com>
+	<20170126110435.2777-4-berrange@redhat.com>
+	<20170126123530.GB23095@lemon.Home>
 MIME-Version: 1.0
-In-Reply-To: <20170126014416.11211-1-lersek@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 wave 2 0/3] q35: add negotiable
- broadcast SMI
+Content-Disposition: inline
+In-Reply-To: <20170126123530.GB23095@lemon.Home>
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] qemu-img: add support for -n arg to
+ dd command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+On Thu, Jan 26, 2017 at 08:35:30PM +0800, Fam Zheng wrote:
+> On Thu, 01/26 11:04, Daniel P. Berrange wrote:
+> > The -n arg to the convert command allows use of a pre-existing image,
+> > rather than creating a new image. This adds a -n arg to the dd command
+> > to get feature parity.
+> 
+> I remember there was a discussion about changing qemu-img dd's default to a
+> "conv=nocreat" semantic, if so, "-n" might not be that useful. But that part
+> hasn't made it into the tree, and I'm not sure which direction we should take.
+> (Personally I think default to nocreat is a good idea).
 
+Use nocreat by default would be semantically different from real "dd"
+binary which feels undesirable if the goal is to make "qemu-img dd"
+be as consistent with "dd" as possible.
 
-On 26/01/2017 02:44, Laszlo Ersek wrote:
-> Hi Paolo,
-> 
-> I'm sending v7 with no functional changes; I've only picked up Igor's
-> R-b's from v6 so you don't have to, and while rebasing to current
-> master, I resolved a conflict in patch #3 against recent commit
-> abc62c89f319 ("pc.h: move x-mach-use-reliable-get-clock compat entry to
-> PC_COMPAT_2_8", 2017-01-18).
-> 
-> The series is fully reviewed and is mergeable as-is.
+It would be trivial to rewrite this patch to add support for the "conv"
+option, allowing the user to explicitly give 'qemu-img dd conv=nocreat'
+instead of my 'qemu-img dd -n' syntax, without changing default semantics.
 
-Much appreciated, thanks.  I hope to send the pull request already tomorrow.
-
-Paolo
-
-> v6 wave 2 was at
-> <http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg02424.html>.
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Thanks
-> Laszlo
-> 
-> Laszlo Ersek (3):
->   hw/isa/lpc_ich9: add SMI feature negotiation via fw_cfg
->   hw/isa/lpc_ich9: add broadcast SMI feature
->   hw/isa/lpc_ich9: negotiate SMI broadcast on pc-q35-2.9+ machine types
-> 
->  include/hw/i386/ich9.h | 13 ++++++++
->  include/hw/i386/pc.h   |  6 ++++
->  hw/isa/lpc_ich9.c      | 91 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 109 insertions(+), 1 deletion(-)
-> 
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
