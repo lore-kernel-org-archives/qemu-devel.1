@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cWl0o-0003se-Ar
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:26:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cWl2i-0005dX-A8
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:28:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cWl0j-0008A8-Fg
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:26:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cWl0j-00089H-6H
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:26:49 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0QEPDlJ108337
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 09:26:46 -0500
-Received: from e28smtp04.in.ibm.com (e28smtp04.in.ibm.com [125.16.236.4])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 286ua1nh28-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 09:26:45 -0500
-Received: from localhost
-	by e28smtp04.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Thu, 26 Jan 2017 19:56:41 +0530
-Date: Thu, 26 Jan 2017 19:56:35 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1466145399-32209-1-git-send-email-david@gibson.dropbear.id.au>
-	<1466145399-32209-16-git-send-email-david@gibson.dropbear.id.au>
-	<20170126123258.2d34fe95@Igors-MacBook-Pro.local>
+	(envelope-from <pbonzini@redhat.com>) id 1cWl2f-0000eq-85
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:28:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60674)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWl2f-0000ec-24
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:28:49 -0500
+References: <20170126123411.5412.44769.stgit@PASHA-ISP>
+	<20170126123423.5412.2388.stgit@PASHA-ISP>
+	<06b49612-9faf-5933-d8e9-8645a2fcde4d@redhat.com>
+	<000e01d277d9$5d80dae0$188290a0$@ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d449fbf5-c878-7420-f064-eb819b296e1a@redhat.com>
+Date: Thu, 26 Jan 2017 15:28:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170126123258.2d34fe95@Igors-MacBook-Pro.local>
-Message-Id: <20170126142635.GA8653@in.ibm.com>
-Subject: Re: [Qemu-devel] [PULL 15/18] spapr: CPU hot unplug support
+In-Reply-To: <000e01d277d9$5d80dae0$188290a0$@ru>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 2/9] icount: exit cpu loop on expire
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,114 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org, agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, kraxel@redhat.com
 
-On Thu, Jan 26, 2017 at 12:32:58PM +0100, Igor Mammedov wrote:
-> On Fri, 17 Jun 2016 16:36:36 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-> 
-> > From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > 
-> > Remove the CPU core device by removing the underlying CPU thread devices.
-> > Hot removal of CPU for sPAPR guests is achieved by sending the hot unplug
-> > notification to the guest. Release the vCPU object after CPU hot unplug so
-> > that vCPU fd can be parked and reused.
-> > 
-> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> [...]
-> 
-> 
-> Bharata,
-> 
-> Here is some notes I've made while auditing spapr cpu hotplug code.
->   
-> spapr_core_release() should be spapr_core_unrealize()
-> except of machine related
->  spapr->cores[cc->core_id / smt] = NULL;
-> which should go to spapr_core_unplug()
 
-There were some issues in calling cpu_remove_[sync] from unrealize
-path. I know that x86 does that way. let me remember and get back on this.
 
-> 
-> > +static void spapr_core_release(DeviceState *dev, void *opaque)
-> > +{
-> > +    sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-> > +    const char *typename = object_class_get_name(sc->cpu_class);
-> > +    size_t size = object_type_get_instance_size(typename);
-> > +    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> > +    sPAPRCPUCore *core = SPAPR_CPU_CORE(OBJECT(dev));
-> > +    CPUCore *cc = CPU_CORE(dev);
-> > +    int smt = kvmppc_smt_threads();
-> > +    int i;
-> > +
-> > +    for (i = 0; i < cc->nr_threads; i++) {
-> > +        void *obj = sc->threads + i * size;
-> > +        DeviceState *dev = DEVICE(obj);
-> > +        CPUState *cs = CPU(dev);
-> > +        PowerPCCPU *cpu = POWERPC_CPU(cs);
-> > +
-> > +        spapr_cpu_destroy(cpu);
-> > +        cpu_remove_sync(cs);
-> > +        object_unparent(obj);
-> > +    }
-> > +
-> > +    spapr->cores[cc->core_id / smt] = NULL;
-> > +
-> > +    g_free(core->threads);
-> > +    object_unparent(OBJECT(dev));
-> > +}
-> > +
-> 
-> spapr_core_[un]plug() functions belong to machine code and should
-> be in hw/ppc/spapr.c
+On 26/01/2017 14:37, Pavel Dovgalyuk wrote:
+>> Simpler:
+>>
+>> 	use_icount &&
+>> 	((int32_t)cpu->icount_decr.u32 < 0 ||
+>> 	 cpu->icount_decr.u16.low + cpu->icount_extra =3D=3D 0)
+> Right.
+>=20
+>> But I'm not sure that you need to test u32.  After all you're not
+> Checking u32 is needed, because sometimes it is less than zero.
 
-That's how the series started, but eventually we consolidated all
-core related routines in spapr_cpu_core.c
+If cpu->icount_decr.u32 is less than zero, the next translation block
+would immediately exit with TB_EXIT_ICOUNT_EXPIRED, causing
 
-> 
-> > +void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> > +                       Error **errp)
-> > +{
-> > +    sPAPRCPUCore *core = SPAPR_CPU_CORE(OBJECT(dev));
-> > +    PowerPCCPU *cpu = POWERPC_CPU(core->threads);
-> > +    int id = ppc_get_vcpu_dt_id(cpu);
-> > +    sPAPRDRConnector *drc =
-> > +        spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, id);
-> > +    sPAPRDRConnectorClass *drck;
-> > +    Error *local_err = NULL;
-> > +
-> > +    g_assert(drc);
-> > +
-> > +    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-> > +    drck->detach(drc, dev, spapr_core_release, NULL, &local_err);
-> 
-> Could you explain call flow during cpu unplug?
+            cpu->exception_index =3D EXCP_INTERRUPT;
+            *last_tb =3D NULL;
+            cpu_loop_exit(cpu);
 
-In response to unplug request, spapr_core_unplug() gets called which
-does a detach() on the associated DRC object. The detach() registers
-a callback (spapr_core_release)  and signals the guest about the unplug
-request.
+from cpu_loop_exec_tb's "case TB_EXIT_ICOUNT_EXPIRED".
 
-When the guest is ready to let go of the CPU core, DRC subsystem ends up
-calling the callback spapr_core_release. For each of the CPU thread objects
-of the core, spapr_core_release will call cpu_remove_sync() and waits
-for the CPU to be really removed. cpu_remove will result in CPU unrealize
-function being called (ppc_cpu_unrealizefn) for each of the removed
-CPU.
+And the same is true for cpu->icount_decr.u16.low + cpu->icount_extra =3D=
+=3D
+0, so I don't understand why this part of the patch is necessary.
 
-After we are done waiting for all the threads' removal, the core object is
-ready for removal.
-
-> 
-> My expectations were that unplug_request() handler asks for CPU removal
-> and unplug() handler removes CPU.
-> It's obviously messed up somehow.
-
-When we did CPU unplug, we didn't really implement ->unplug_request() for
-sPAPR. It was added later when memory unplug came in.
-
-Regards,
-Bharata.
+Paolo
