@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cWh9u-0002Q3-9l
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:20:06 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWhHm-0002Bk-1U
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:28:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cWh9p-0006Ol-GT
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:20:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43728)
+	(envelope-from <berrange@redhat.com>) id 1cWhHi-0000Hi-36
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:28:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cWh9p-0006Oa-BK
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:19:57 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu, 26 Jan 2017 10:19:53 +0000
-Message-Id: <20170126101954.21236-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 0/1] Block patches
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cWhHh-0000HW-Tb
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:28:06 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu, 26 Jan 2017 10:27:56 +0000
+Message-Id: <20170126102757.23280-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PULL v1] Merge io/ 2017/01/26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,7 +22,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
 The following changes since commit c7f1cf01b8245762ca5864e835d84f6677ae8b1f:
 
@@ -30,21 +30,22 @@ The following changes since commit c7f1cf01b8245762ca5864e835d84f6677ae8b1f:
 
 are available in the git repository at:
 
-  git://github.com/stefanha/qemu.git tags/block-pull-request
+  git://github.com/berrange/qemu tags/pull-qio-2017-01-26-1
 
-for you to fetch changes up to 59c9f437c59a4bf0594ed300d28fb24c645963a5:
+for you to fetch changes up to 80fb34eda099e7cc519a91e9701ab3c0262717b3:
 
-  aio-posix: honor is_external in AioContext polling (2017-01-26 10:02:33 +0000)
-
-----------------------------------------------------------------
+  io: fix possible double free of task error object (2017-01-26 10:26:18 +0000)
 
 ----------------------------------------------------------------
+Merge io/ 2017/01/26
 
-Stefan Hajnoczi (1):
-  aio-posix: honor is_external in AioContext polling
+----------------------------------------------------------------
+Daniel P. Berrange (1):
+  io: fix possible double free of task error object
 
- aio-posix.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ io/task.c            | 1 +
+ tests/test-io-task.c | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
 -- 
 2.9.3
