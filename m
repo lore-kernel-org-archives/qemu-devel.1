@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWh97-0001lg-Rs
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:19:15 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWh99-0001mr-24
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:19:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWh96-0006BN-Lj
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:19:13 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWh97-0006Bw-SB
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:19:15 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 26 Jan 2017 10:18:19 +0000
-Message-Id: <20170126101827.22378-11-berrange@redhat.com>
+Date: Thu, 26 Jan 2017 10:18:21 +0000
+Message-Id: <20170126101827.22378-13-berrange@redhat.com>
 In-Reply-To: <20170126101827.22378-1-berrange@redhat.com>
 References: <20170126101827.22378-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 10/18] qcow2: make qcow2_encrypt_sectors
- encrypt in place
+Subject: [Qemu-devel] [PATCH v3 12/18] qcow2: extend specification to cover
+ LUKS encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +23,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Instead of requiring separate input/output buffers for
-encrypting data, change qcow2_encrypt_sectors() to assume
-use of a single buffer, encrypting in place. The current
-callers all used the same buffer for input/output already.
+Update the qcow2 specification to describe how the LUKS header is
+placed inside a qcow2 file, when using LUKS encryption for the
+qcow2 payload instead of the legacy AES-CBC encryption
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- block/qcow2-cluster.c | 17 ++++++-----------
- block/qcow2.c         |  4 ++--
- block/qcow2.h         |  3 +--
- 3 files changed, 9 insertions(+), 15 deletions(-)
+ docs/specs/qcow2.txt | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 96 insertions(+)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 928c1e2..907e869 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -346,11 +346,9 @@ static int count_contiguous_clusters_by_type(int nb_clusters,
- }
+diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
+index 80cdfd0..ab07e99 100644
+--- a/docs/specs/qcow2.txt
++++ b/docs/specs/qcow2.txt
+@@ -45,6 +45,7 @@ The first cluster of a qcow2 image contains the file header:
+          32 - 35:   crypt_method
+                     0 for no encryption
+                     1 for AES encryption
++                    2 for LUKS encryption
  
- /* The crypt function is compatible with the linux cryptoloop
--   algorithm for < 4 GB images. NOTE: out_buf == in_buf is
--   supported */
-+   algorithm for < 4 GB images. */
- int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
--                          uint8_t *out_buf, const uint8_t *in_buf,
--                          int nb_sectors, bool enc,
-+                          uint8_t *buf, int nb_sectors, bool enc,
-                           Error **errp)
- {
-     union {
-@@ -370,14 +368,12 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
-         }
-         if (enc) {
-             ret = qcrypto_cipher_encrypt(s->cipher,
--                                         in_buf,
--                                         out_buf,
-+                                         buf, buf,
-                                          512,
-                                          errp);
-         } else {
-             ret = qcrypto_cipher_decrypt(s->cipher,
--                                         in_buf,
--                                         out_buf,
-+                                         buf, buf,
-                                          512,
-                                          errp);
-         }
-@@ -385,8 +381,7 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
-             return -1;
-         }
-         sector_num++;
--        in_buf += 512;
--        out_buf += 512;
-+        buf += 512;
-     }
-     return 0;
- }
-@@ -434,7 +429,7 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
-         assert(s->cipher);
-         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
-         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
--        if (qcow2_encrypt_sectors(s, sector, iov.iov_base, iov.iov_base,
-+        if (qcow2_encrypt_sectors(s, sector, iov.iov_base,
-                                   bytes >> BDRV_SECTOR_BITS, true, &err) < 0) {
-             ret = -EIO;
-             error_free(err);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 96fb8a8..3c14c86 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1530,7 +1530,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-                 Error *err = NULL;
-                 if (qcow2_encrypt_sectors(s, offset >> BDRV_SECTOR_BITS,
--                                          cluster_data, cluster_data,
-+                                          cluster_data,
-                                           cur_bytes >> BDRV_SECTOR_BITS,
-                                           false, &err) < 0) {
-                     error_free(err);
-@@ -1626,7 +1626,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-             qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
+          36 - 39:   l1_size
+                     Number of entries in the active L1 table
+@@ -135,6 +136,7 @@ be stored. Each extension has a structure like the following:
+                         0xE2792ACA - Backing file format name
+                         0x6803f857 - Feature name table
+                         0x23852875 - Bitmaps extension
++                        0x0537be77 - Full disk encryption header pointer
+                         other      - Unknown header extension, can be safely
+                                      ignored
  
-             if (qcow2_encrypt_sectors(s, offset >> BDRV_SECTOR_BITS,
--                                      cluster_data, cluster_data,
-+                                      cluster_data,
-                                       cur_bytes >>BDRV_SECTOR_BITS,
-                                       true, &err) < 0) {
-                 error_free(err);
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 1823414..033d8c0 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -530,8 +530,7 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
- int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index);
- int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset);
- int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
--                          uint8_t *out_buf, const uint8_t *in_buf,
--                          int nb_sectors, bool enc, Error **errp);
-+                          uint8_t *buf, int nb_sectors, bool enc, Error **errp);
+@@ -207,6 +209,100 @@ The fields of the bitmaps extension are:
+                    Offset into the image file at which the bitmap directory
+                    starts. Must be aligned to a cluster boundary.
  
- int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-                              unsigned int *bytes, uint64_t *cluster_offset);
++== Full disk encryption header pointer ==
++
++The full disk encryption header must be present if, and only if, the
++'crypt_method' header requires metadata. Currently this is only true
++of the 'LUKS' crypt method. The header extension must be absent for
++other methods.
++
++This header provides the offset at which the crypt method can store
++its additional data, as well as the length of such data.
++
++    Byte  0 -  7:   Offset into the image file at which the encryption
++                    header starts in bytes. Must be aligned to a cluster
++		    boundary.
++    Byte  8 - 15:   Length of the written encryption header in bytes.
++                    Note actual space allocated in the qcow2 file may
++		    be larger than this value, since it will be rounded
++		    to the nearest multiple of the cluster size. Any
++		    unused bytes in the allocated space will be initialized
++		    to 0.
++
++For the LUKS crypt method, the encryption header works as follows.
++
++The first 592 bytes of the header clusters will contain the LUKS
++partition header. This is then followed by the key material data areas.
++The size of the key material data areas is determined by the number of
++stripes in the key slot and key size. Refer to the LUKS format
++specification ('docs/on-disk-format.pdf' in the cryptsetup source
++package) for details of the LUKS partition header format.
++
++In the LUKS partition header, the "payload-offset" field will be
++calculated as normal for the LUKS spec. ie the size of the LUKS
++header, plus key material regions, plus padding. Its value is not
++used, however, since the qcow2 file format itself defines where
++the real payload offset is.
++
++In the LUKS key slots header, the "key-material-offset" is relative
++to the start of the LUKS header clusters in the qcow2 container,
++not the start of the qcow2 file.
++
++Logically the layout looks like
++
++  +-----------------------------+
++  | QCow2 header                |
++  +-----------------------------+
++  | QCow2 header extension X    |
++  | QCow2 header extension FDE  |
++  | QCow2 header extension ...  |
++  | QCow2 header extension Z    |
++  +-----------------------------+
++  | ....other QCow2 tables....  |
++  .                             .
++  .                             .
++  +-----------------------------+
++  | +-------------------------+ |
++  | | LUKS partition header   | |
++  | +-------------------------+ |
++  | | LUKS key material 1     | |
++  | +-------------------------+ |
++  | | LUKS key material 2     | |
++  | +-------------------------+ |
++  | | LUKS key material ...   | |
++  | +-------------------------+ |
++  | | LUKS key material 8     | |
++  | +-------------------------+ |
++  +-----------------------------+
++  | QCow2 cluster payload       |
++  .                             .
++  .                             .
++  .                             .
++  |                             |
++  +-----------------------------+
++
++== Data encryption ==
++
++When an encryption method is requested in the header, the image payload
++data must be encrypted/decrypted on every write/read. The image headers
++and metadata is never encrypted.
++
++The algorithms used for encryption vary depending on the method
++
++ - AES:
++
++   The AES cipher, in CBC mode, with 256 bit keys.
++
++   Initialization vectors generated using plain64 method, with
++   the virtual disk sector as the input tweak.
++
++ - LUKS:
++
++   The algorithms are specified in the LUKS header.
++
++   Initialization vectors generated using the method specified
++   in the LUKS header, with the physical disk sector as the
++   input tweak.
+ 
+ == Host cluster management ==
+ 
 -- 
 2.9.3
