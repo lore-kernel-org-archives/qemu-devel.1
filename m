@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cWoKC-0003Bz-7d
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:59:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1cWoKk-0003kj-To
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:59:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cWoK9-0002UT-53
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:59:08 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36971)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cWoK8-0002UE-S8
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:59:05 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0QHs9dX102989
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 12:59:03 -0500
-Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 287m9yckmk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 12:59:03 -0500
-Received: from localhost
-	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 26 Jan 2017 17:59:00 -0000
-Date: Thu, 26 Jan 2017 18:58:57 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <8ae107ad-0f3f-46ef-e734-2f88b14bad9a@redhat.com>
-References: <mailman.205.1485450031.31314.qemu-devel@nongnu.org>
-	<E8A8BF62-0E39-4401-B330-2E27CFA3A83F@gmail.com>
-	<8ae107ad-0f3f-46ef-e734-2f88b14bad9a@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1cWoKk-0002af-3L
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:59:43 -0500
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+	<1485443388-27253-5-git-send-email-armbru@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a3509663-3b80-3eab-73ac-f31027d68c87@redhat.com>
+Date: Thu, 26 Jan 2017 18:59:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1485443388-27253-5-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20170126185857.6076de87.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] Qemu-devel] Poll on QEMU documentation project
+Subject: Re: [Qemu-devel] [PATCH v2 4/8] hw: Default -drive to if=none
+ instead of scsi when scsi cannot work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,49 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: G 3 <programmingkidx@gmail.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, mreitz@redhat.com
 
-On Thu, 26 Jan 2017 18:30:46 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 26/01/2017 18:28, G 3 wrote:
-> > 
-> > On Jan 26, 2017, at 12:00 PM, qemu-devel-request@nongnu.org wrote:
-> > 
-> >>
-> >> Hi all,
-> >>
-> >> as you may know I've been collecting some ideas about documentation for
-> >> QEMU at http://wiki.qemu-project.org/Features/Documentation.
-> >>
-> >> I've now prepared a poll to understand how familiars developers are with
-> >> various documentation tools.  I've CCed people with most commits to QEMU
-> >> documentation, or with whom I have discussed about this before, but
-> >> everybody's opinion is of course welcome!
-> >>
-> >> The poll is hosted with Google Forms and you can fill it in at
-> >> https://goo.gl/Yfxj1M.  If you hate Google Forms, contact me offlist and
-> >> I'll send you the questions by email (and remind you when I need someone
-> >> to review my patches).
-> >>
-> >> Paolo
-> >>
-> >>
-> >> tl;dr: poll is at https://goo.gl/Yfxj1M
-> > 
-> > 
-> > For this question:
-> > What's your opinion on the maintainability of the following
-> > documentation formats?
-> > 
-> > Is it from 1(least maintainable) to 5 (most maintainable)?
-> > 
-> > The survey looks good. I will take it.
+On 26.01.2017 16:09, Markus Armbruster wrote:
+> Block backends defined with -drive if=scsi are meant to be picked up
+> by machine initialization code: a suitable frontend gets created and
+> wired up automatically.
 > 
-> Yes, all of them are 1=bad 5=good.
+> if=scsi drives not picked up that way can still be used with -device
+> as if they had if=none, but that's unclean and best avoided.  Unused
+> ones produce an "Orphaned drive without device" warning.
+> 
+> A few machine types default to if=scsi, even though they don't
+> actually have a SCSI HBA.  This makes no sense.  Change their default
+> to if=none.  Affected machines:
+> 
+> * aarch64/arm: realview-pbx-a9 vexpress-a9 vexpress-a15 xilinx-zynq-a9
+> 
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> Cc: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: qemu-arm@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/arm/realview.c    | 1 -
+>  hw/arm/vexpress.c    | 1 -
+>  hw/arm/xilinx_zynq.c | 1 -
+>  3 files changed, 3 deletions(-)
+> 
+> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+> index 8eafcca..8c11c7a 100644
+> --- a/hw/arm/realview.c
+> +++ b/hw/arm/realview.c
+> @@ -443,7 +443,6 @@ static void realview_pbx_a9_class_init(ObjectClass *oc, void *data)
+>  
+>      mc->desc = "ARM RealView Platform Baseboard Explore for Cortex-A9";
+>      mc->init = realview_pbx_a9_init;
+> -    mc->block_default_type = IF_SCSI;
+>      mc->max_cpus = 4;
+>  }
+>  
+> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+> index 58760f4..5756470 100644
+> --- a/hw/arm/vexpress.c
+> +++ b/hw/arm/vexpress.c
+> @@ -751,7 +751,6 @@ static void vexpress_class_init(ObjectClass *oc, void *data)
+>  
+>      mc->desc = "ARM Versatile Express";
+>      mc->init = vexpress_common_init;
+> -    mc->block_default_type = IF_SCSI;
+>      mc->max_cpus = 4;
+>  }
+>  
+> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+> index 7dac20d..3985356 100644
+> --- a/hw/arm/xilinx_zynq.c
+> +++ b/hw/arm/xilinx_zynq.c
+> @@ -323,7 +323,6 @@ static void zynq_machine_init(MachineClass *mc)
+>  {
+>      mc->desc = "Xilinx Zynq Platform Baseboard for Cortex-A9";
+>      mc->init = zynq_init;
+> -    mc->block_default_type = IF_SCSI;
+>      mc->max_cpus = 1;
+>      mc->no_sdcard = 1;
+>  }
 
-Ugh, so I had my answers the wrong way round :( Most of the surveys I
-did recently had the order the other way round...
+Right, that looks like old copy-n-paste bugs from other machine types.
 
-I'll send another form.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
