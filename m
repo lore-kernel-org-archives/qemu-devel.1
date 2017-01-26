@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cWjkn-0002cu-4b
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:06:18 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cWjmB-00045e-WB
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:07:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cWjkh-0007zR-O4
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:06:17 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36033)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cWjkh-0007zG-H6
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:06:11 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r126so50311989wmr.3
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 05:06:11 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1cWjm9-0008Ts-4W
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:07:43 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:46022)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cWjm8-0008Ti-Sh
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:07:41 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
 References: <20170126123411.5412.44769.stgit@PASHA-ISP>
 	<20170126123429.5412.94368.stgit@PASHA-ISP>
 	<e00dfc17-9dec-ea53-e86e-cf3089da659a@redhat.com>
 	<000c01d277d4$9d56f6e0$d804e4a0$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <da273b81-f4d4-77b4-cfc0-6e9a0bf99790@redhat.com>
-Date: Thu, 26 Jan 2017 14:06:09 +0100
+	<da273b81-f4d4-77b4-cfc0-6e9a0bf99790@redhat.com>
+In-Reply-To: <da273b81-f4d4-77b4-cfc0-6e9a0bf99790@redhat.com>
+Date: Thu, 26 Jan 2017 16:07:44 +0300
+Message-ID: <000d01d277d5$2f285f00$8d791d00$@ru>
 MIME-Version: 1.0
-In-Reply-To: <000c01d277d4$9d56f6e0$d804e4a0$@ru>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Content-Language: ru
 Subject: Re: [Qemu-devel] [PATCH v8 3/9] apic: save apic_delivered flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,46 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, kraxel@redhat.com
 
-
-
-On 26/01/2017 14:03, Pavel Dovgalyuk wrote:
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 26/01/2017 13:34, Pavel Dovgalyuk wrote:
->>> This patch implements saving/restoring of static apic_delivered variable.
->>>
->>> v8: saving static variable only for one of the APICs
->>>
->>> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->>> ---
->>>  hw/intc/apic_common.c           |   37 +++++++++++++++++++++++++++++++++++++
->>>  include/hw/i386/apic_internal.h |    2 ++
->>>  2 files changed, 39 insertions(+)
->>>
->>> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
->>> index d78c885..edacb16 100644
->>> --- a/hw/intc/apic_common.c
->>> +++ b/hw/intc/apic_common.c
->>> @@ -384,6 +384,29 @@ static bool apic_common_sipi_needed(void *opaque)
->>>      return s->wait_for_sipi != 0;
->>>  }
->>>
->>> +static bool apic_irq_delivered_needed(void *opaque)
->>> +{
->>> +    static APICCommonState *first_apic;
->>> +    APICCommonState *s = APIC_COMMON(opaque);
->>> +    if (!first_apic) {
->>> +        first_apic = s;
->>> +    }
->>> +    return s == first_apic;
->>
->> Should also check " && apic_irq_delivered != 0".
+> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
+> On 26/01/2017 14:03, Pavel Dovgalyuk wrote:
+> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >> On 26/01/2017 13:34, Pavel Dovgalyuk wrote:
+> >>> This patch implements saving/restoring of static apic_delivered variable.
+> >>>
+> >>> v8: saving static variable only for one of the APICs
+> >>>
+> >>> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> >>> ---
+> >>>  hw/intc/apic_common.c           |   37 +++++++++++++++++++++++++++++++++++++
+> >>>  include/hw/i386/apic_internal.h |    2 ++
+> >>>  2 files changed, 39 insertions(+)
+> >>>
+> >>> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+> >>> index d78c885..edacb16 100644
+> >>> --- a/hw/intc/apic_common.c
+> >>> +++ b/hw/intc/apic_common.c
+> >>> @@ -384,6 +384,29 @@ static bool apic_common_sipi_needed(void *opaque)
+> >>>      return s->wait_for_sipi != 0;
+> >>>  }
+> >>>
+> >>> +static bool apic_irq_delivered_needed(void *opaque)
+> >>> +{
+> >>> +    static APICCommonState *first_apic;
+> >>> +    APICCommonState *s = APIC_COMMON(opaque);
+> >>> +    if (!first_apic) {
+> >>> +        first_apic = s;
+> >>> +    }
+> >>> +    return s == first_apic;
+> >>
+> >> Should also check " && apic_irq_delivered != 0".
+> >
+> > Reset of this variable when machine reboots is also forgotten.
 > 
-> Reset of this variable when machine reboots is also forgotten.
+> Ok, I'll queue this patch with the condition changed, can you send one
+> for reset?
 
-Ok, I'll queue this patch with the condition changed, can you send one
-for reset?
+Ok, I'll send it with the next version of the series.
 
-Paolo
+
+Pavel Dovgalyuk
