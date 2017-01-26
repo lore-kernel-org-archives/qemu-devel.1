@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cWges-000541-VV
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:48:00 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cWget-00054E-6v
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:48:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cWgen-0000mB-KL
+	(envelope-from <fred.konrad@greensocs.com>) id 1cWger-0000qN-V8
 	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:47:59 -0500
-Received: from greensocs.com ([193.104.36.180]:33017)
+Received: from greensocs.com ([193.104.36.180]:33108)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cWgen-0000lP-3y
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:47:53 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cWger-0000oc-Hm
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:47:57 -0500
 From: fred.konrad@greensocs.com
-Date: Thu, 26 Jan 2017 10:47:31 +0100
-Message-Id: <1485424060-12217-2-git-send-email-fred.konrad@greensocs.com>
+Date: Thu, 26 Jan 2017 10:47:36 +0100
+Message-Id: <1485424060-12217-7-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
 References: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH V2 01/10] qemu-clk: introduce qemu-clk qom
- object
+Subject: [Qemu-devel] [PATCH V2 06/10] docs: add qemu-clock documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +28,130 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This introduces qemu-clk qom object.
+This adds the qemu-clock documentation.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
----
- Makefile.objs             |  1 +
- include/qemu/qemu-clock.h | 40 +++++++++++++++++++++++++++++++++++++
- qemu-clock.c              | 50 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 91 insertions(+)
- create mode 100644 include/qemu/qemu-clock.h
- create mode 100644 qemu-clock.c
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 01cef86..de0219d 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -78,6 +78,7 @@ common-obj-y += backends/
- common-obj-$(CONFIG_SECCOMP) += qemu-seccomp.o
- 
- common-obj-$(CONFIG_FDT) += device_tree.o
-+common-obj-y += qemu-clock.o
- 
- ######################################################################
- # qapi
-diff --git a/include/qemu/qemu-clock.h b/include/qemu/qemu-clock.h
+V1 -> V2:
+  * Fixed in accordance with the changes in the previous patches.
+---
+ docs/clock.txt | 108 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 108 insertions(+)
+ create mode 100644 docs/clock.txt
+
+diff --git a/docs/clock.txt b/docs/clock.txt
 new file mode 100644
-index 0000000..e7acd68
+index 0000000..aa23910
 --- /dev/null
-+++ b/include/qemu/qemu-clock.h
-@@ -0,0 +1,40 @@
-+/*
-+ * QEMU Clock
-+ *
-+ *  Copyright (C) 2016 : GreenSocs Ltd
-+ *      http://www.greensocs.com/ , email: info@greensocs.com
-+ *
-+ *  Frederic Konrad <fred.konrad@greensocs.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
++++ b/docs/clock.txt
+@@ -0,0 +1,108 @@
 +
-+#ifndef QEMU_CLOCK_H
-+#define QEMU_CLOCK_H
++What is a QEMU_CLOCK
++====================
 +
-+#include "qemu/osdep.h"
-+#include "qom/object.h"
++A QEMU_CLOCK is a QOM Object developed for the purpose of modeling a clock tree
++with QEMU.
 +
-+#define TYPE_CLOCK "qemu-clk"
-+#define QEMU_CLOCK(obj) OBJECT_CHECK(struct qemu_clk, (obj), TYPE_CLOCK)
++It only simulates the clock by keeping a copy of the current frequency and
++doesn't model the signal itself such as pin toggle or duty cycle.
 +
-+typedef struct qemu_clk {
-+    /*< private >*/
-+    Object parent_obj;
-+} *qemu_clk;
++It allows to model the impact of badly configured PLL, clock source selection
++or disabled clock on the models.
 +
-+#endif /* QEMU_CLOCK_H */
++Binding the clock together to create a tree
++===========================================
 +
++In order to create a clock tree with QEMU_CLOCK two or more clock must be bound
++together. Let's say there are two clocks clk_a and clk_b:
++Using qemu_clk_bind(clk_a, clk_b) will bind clk_a and clk_b.
 +
-diff --git a/qemu-clock.c b/qemu-clock.c
-new file mode 100644
-index 0000000..ceea98d
---- /dev/null
-+++ b/qemu-clock.c
-@@ -0,0 +1,50 @@
-+/*
-+ * QEMU Clock
-+ *
-+ *  Copyright (C) 2016 : GreenSocs Ltd
-+ *      http://www.greensocs.com/ , email: info@greensocs.com
-+ *
-+ *  Frederic Konrad <fred.konrad@greensocs.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
++Binding two qemu-clk together creates a unidirectional link which means that
++changing the rate of clk_a will propagate to clk_b and not the opposite.
++The binding process automatically refreshes clk_b rate.
 +
-+#include "qemu/osdep.h"
-+#include "qemu/qemu-clock.h"
-+#include "hw/hw.h"
-+#include "qemu/log.h"
++Clock can be bound and unbound during execution for modeling eg: a clock
++selector.
 +
-+#ifndef DEBUG_QEMU_CLOCK
-+#define DEBUG_QEMU_CLOCK 0
-+#endif
++A clock can drive more than one other clock. eg with this code:
++qemu_clk_bind(clk_a, clk_b);
++qemu_clk_bind(clk_a, clk_c);
 +
-+#define DPRINTF(fmt, args...) do {                                           \
-+    if (DEBUG_QEMU_CLOCK) {                                                  \
-+        qemu_log("%s: " fmt, __func__, ## args);                             \
-+    }                                                                        \
-+} while (0);
++A clock rate change one clk_a will propagate to clk_b and clk_c.
 +
-+static const TypeInfo qemu_clk_info = {
-+    .name          = TYPE_CLOCK,
-+    .parent        = TYPE_OBJECT,
-+    .instance_size = sizeof(struct qemu_clk),
-+};
++Implementing a callback on a rate change
++========================================
 +
-+static void qemu_clk_register_types(void)
++The function prototype is the following:
++typedef uint64_t QEMUClkRateUpdateCallback(void *opaque, uint64_t rate);
++
++It's main goal is to modify the rate before it's passed to the next clocks in
++the tree.
++
++eg: for a 4x PLL the function will be:
++uint64_t qemu_clk_rate_change_cb(void *opaque, uint64_t rate)
 +{
-+    type_register_static(&qemu_clk_info);
++    return 4 * rate;
 +}
 +
-+type_init(qemu_clk_register_types);
++To set the callback for the clock:
++void qemu_clk_set_callback(qemu_clk clk, QEMUClkRateUpdateCallback *cb,
++                           void *opaque);
++can be called.
++
++The rate update process
++=======================
++
++The rate update happen in this way:
++When a model wants to update a clock frequency (eg: based on a register change
++or something similar) it will call qemu_clk_update_rate(..) on the clock:
++  * The callback associated to the clock is called with the new rate.
++  * qemu_clk_update_rate(..) is then called on all bound clocks with the value
++    returned by the callback.
++
++NOTE: When no callback is attached, the clock qemu_clk_update_rate(..) is called
++with the unmodified rate.
++
++Adding a QEMU_CLOCK to a DeviceState
++====================================
++
++Adding a qemu-clk to a DeviceState is required to be able to get the clock
++outside the model through qemu_clk_device_get_clock(..).
++
++It is also required to be able to print the clock and its rate with info qtree.
++For example:
++
++  type System
++  dev: xlnx.zynqmp_crf, id ""
++    gpio-out "sysbus-irq" 1
++    gpio-out "RST_A9" 4
++    qemu-clk "dbg_trace" 0
++    qemu-clk "vpll_to_lpd" 625000000
++    qemu-clk "dp_stc_ref" 0
++    qemu-clk "dpll_to_lpd" 12500000
++    qemu-clk "acpu_clk" 0
++    qemu-clk "pcie_ref" 0
++    qemu-clk "topsw_main" 0
++    qemu-clk "topsw_lsbus" 0
++    qemu-clk "dp_audio_ref" 0
++    qemu-clk "sata_ref" 0
++    qemu-clk "dp_video_ref" 71428568
++    qemu-clk "vpll_clk" 2500000000
++    qemu-clk "apll_to_lpd" 12500000
++    qemu-clk "dpll_clk" 50000000
++    qemu-clk "gpu_ref" 0
++    qemu-clk "aux_refclk" 0
++    qemu-clk "video_clk" 27000000
++    qemu-clk "gdma_ref" 0
++    qemu-clk "gt_crx_ref_clk" 0
++    qemu-clk "dbg_fdp" 0
++    qemu-clk "apll_clk" 50000000
++    qemu-clk "pss_alt_ref_clk" 0
++    qemu-clk "ddr" 0
++    qemu-clk "pss_ref_clk" 50000000
++    qemu-clk "dpdma_ref" 0
++    qemu-clk "dbg_tstmp" 0
++    mmio 00000000fd1a0000/000000000000010c
++
++This way a DeviceState can have multiple clock input or output.
 -- 
 1.8.3.1
