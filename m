@@ -1,35 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cWhpu-00079B-As
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:03:30 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWhrD-000804-E3
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:04:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cWhpr-0003Dy-7x
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:03:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46494
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cWhpr-0003Ds-3S
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:03:23 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0QAwuax100371
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 06:03:22 -0500
-Received: from e06smtp06.uk.ibm.com (e06smtp06.uk.ibm.com [195.75.94.102])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 287ahdayf7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 06:03:22 -0500
-Received: from localhost
-	by e06smtp06.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 26 Jan 2017 11:03:20 -0000
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Thu, 26 Jan 2017 12:03:15 +0100
-In-Reply-To: <20170126110315.21759-1-cornelia.huck@de.ibm.com>
-References: <20170126110315.21759-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170126110315.21759-2-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 1/1] s390x/flic: fix compilation of kvm flic
+	(envelope-from <berrange@redhat.com>) id 1cWhrC-0003cv-5a
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:04:47 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu, 26 Jan 2017 11:04:29 +0000
+Message-Id: <20170126110435.2777-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 0/6] qemu-img: improve convert & dd commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,31 +17,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-2c21ee7 ("migration: extend VMStateInfo") missed a void -> int
-return conversion for kvm_flic_save().
+This series is in response to Max pointing out that you cannot
+use 'convert' for an encrypted target image.
 
-Fixes: 2c21ee7 ("migration: extend VMStateInfo")
-Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/intc/s390_flic_kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The 'convert' and 'dd' commands need to first create the image
+and then open it. The bdrv_create() method takes a set of options
+for creating the image, which let us provide a key-secret for the
+encryption key. When the commands then open the new image, they
+don't provide any options, so the image is unable to be opened
+due to lack of encryption key. It is also not possible to use
+the --image-opts argument to provide structured options in the
+target image name - it must be a plain filename to satisfy the
+bdrv_create() API contract.
 
-diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-index da8e4dfab6..e86a84e49a 100644
---- a/hw/intc/s390_flic_kvm.c
-+++ b/hw/intc/s390_flic_kvm.c
-@@ -303,7 +303,7 @@ static int kvm_flic_save(QEMUFile *f, void *opaque, size_t size,
-          * migration state */
-         error_report("flic: couldn't allocate memory");
-         qemu_put_be64(f, FLIC_FAILED);
--        return;
-+        return 0;
-     }
- 
-     count = __get_all_irqs(flic, &buf, len);
+This series addresses these problems to some extent
+
+ - Adds a new --target-image-opts flag which is used to say
+   that the target filename is using structured options.
+   It is *only* permitted to use this when -n is also set.
+   ie the target image must be pre-created so convert/dd
+   don't need to run bdrv_create().
+
+ - When --target-image-opts is not used, add special case
+   code that identifies options passed to bdrv_create()
+   named "*key-secret" and adds them to the options used
+   to open the new image
+
+In future it is desirable to make --target-image-opts work
+even when -n is *not* given. This requires considerable
+work to create a new bdrv_create() API impl.
+
+The first four patches improve the 'dd' command to address
+feature gaps wrt the 'convert' command. The last two patches
+implement the improvements described above.
+
+Daniel P. Berrange (6):
+  qemu-img: add support for --object with 'dd' command
+  qemu-img: fix --image-opts usage with dd command
+  qemu-img: add support for -n arg to dd command
+  qemu-img: add support for -o arg to dd command
+  qemu-img: introduce --target-image-opts for 'convert' command
+  qemu-img: copy *key-secret opts when opening newly created files
+
+ qemu-img-cmds.hx |   8 +-
+ qemu-img.c       | 286 ++++++++++++++++++++++++++++++++++++++++++-------------
+ qemu-img.texi    |  23 ++++-
+ 3 files changed, 244 insertions(+), 73 deletions(-)
+
 -- 
-2.11.0
+2.9.3
