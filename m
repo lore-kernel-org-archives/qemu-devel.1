@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=192bd8f5c=roger.pau@citrix.com>)
-	id 1cWmEo-0003LL-8U
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:45:31 -0500
+	(envelope-from <thuth@redhat.com>) id 1cWmTt-00088C-Sc
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:01:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=192bd8f5c=roger.pau@citrix.com>)
-	id 1cWmEj-0008Gu-Ds
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:45:26 -0500
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:54079
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=192bd8f5c=roger.pau@citrix.com>)
-	id 1cWmEj-0008Gj-2w
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:45:21 -0500
-Date: Thu, 26 Jan 2017 15:45:09 +0000
-From: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-Message-ID: <20170126154509.rxi5sy4bcob2ioen@dhcp-3-221.uk.xensource.com>
-References: <20170124164253.jiva4zvk6fxewtsk@dhcp-3-221.uk.xensource.com>
-	<alpine.DEB.2.10.1701241315310.10192@sstabellini-ThinkPad-X260>
-	<alpine.DEB.2.10.1701241326560.10192@sstabellini-ThinkPad-X260>
-	<20170125110529.5rgu7xrh3gkoadog@dhcp-3-221.uk.xensource.com>
+	(envelope-from <thuth@redhat.com>) id 1cWmTp-0005sb-8L
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:01:01 -0500
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+	<1485443388-27253-4-git-send-email-armbru@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2b18b666-4ea7-e1a5-5359-7fd34341e9ec@redhat.com>
+Date: Thu, 26 Jan 2017 17:00:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170125110529.5rgu7xrh3gkoadog@dhcp-3-221.uk.xensource.com>
-Subject: Re: [Qemu-devel] [Xen-devel] Commit 3a6c9 breaks QEMU on FreeBSD/Xen
+In-Reply-To: <1485443388-27253-4-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/8] hw: Default -drive to if=none
+ instead of ide when ide cannot work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +24,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Anthony Green <green@moxielogic.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Stefano Stabellini <sstabellini@kernel.org>, Jia Liu <proljc@gmail.com>, qemu-block@nongnu.org, Alexander Graf <agraf@suse.de>, Anthony Perard <anthony.perard@citrix.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org, kwolf@redhat.com, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Laurent Vivier <laurent@vivier.eu>, mreitz@redhat.com, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, xen-devel@lists.xensource.com
 
-On Wed, Jan 25, 2017 at 11:05:29AM +0000, Roger Pau Monné wrote:
-> On Tue, Jan 24, 2017 at 01:30:02PM -0800, Stefano Stabellini wrote:
-> > On Tue, 24 Jan 2017, Stefano Stabellini wrote:
-> > > On Tue, 24 Jan 2017, Roger Pau Monné wrote:
-> > > > Hello,
-> > > > 
-> > > > The following commit:
-> > > > 
-> > > > commit 3a6c9172ac5951e6dac2b3f6cbce3cfccdec5894
-> > > > Author: Juergen Gross <jgross@suse.com>
-> > > > Date:   Tue Nov 22 07:10:58 2016 +0100
-> > > > 
-> > > > xen: create qdev for each backend device
-> > > > 
-> > > > Prevents me from running QEMU on FreeBSD/Xen, the following is printed on the
-> > > > QEMU log:
-> > > > 
-> > > > char device redirected to /dev/pts/2 (label serial0)
-> > > > xen be core: xen be core: can't open gnttab device
-> > > > can't open gnttab device
-> > > > xen be core: xen be core: can't open gnttab device
-> > > > can't open gnttab device
-> > > > 
-> > > > # xl create -c ~/domain.cfg
-> > > > Parsing config from /root/domain.cfg
-> > > > libxl: error: libxl_dm.c:2201:device_model_spawn_outcome: Domain 32:domain 32 device model: spawn failed (rc=-3)
-> > > > libxl: error: libxl_create.c:1506:domcreate_devmodel_started: Domain 32:device model did not start: -3
-> > > > libxl: error: libxl_dm.c:2315:kill_device_model: Device Model already exited
-> > > > libxl: error: libxl.c:1572:libxl__destroy_domid: Domain 32:Non-existant domain
-> > > > libxl: error: libxl.c:1531:domain_destroy_callback: Domain 32:Unable to destroy guest
-> > > > libxl: error: libxl.c:1458:domain_destroy_cb: Domain 32:Destruction of domain failed
-> > > > # cat /var/log/xen/qemu-dm-domain.log
-> > > > char device redirected to /dev/pts/2 (label serial0)
-> > > > xen be core: xen be core: can't open gnttab device
-> > > > can't open gnttab device
-> > > > xen be core: xen be core: can't open gnttab device
-> > > > can't open gnttab device
-> > > > 
-> > > > I'm not really familiar with any of that code, but I think that using
-> > > > qdev_init_nofail is wrong, since on FreeBSD/Xen for example we don't yet
-> > > > support the gnttab device, so initialization of the Xen Qdisk backend can fail
-> > > > (and possibly the same applies to Linux if someone decides to compile a kernel
-> > > > without the gnttab device). Yet QEMU can be used without the Qdisk backend.
-> > > 
-> > > How did you manage to configure QEMU before? The configure script had
-> > > xc_gnttab_open calls in it up to Xen 4.6.
-> > 
-> > I know the answer! Because the configure script only compiles the code,
-> > doesn't try to run it. xc_gnttab_open compiled correctly but returned
-> > error when executed. Is that right?
+On 26.01.2017 16:09, Markus Armbruster wrote:
+> Block backends defined with -drive if=ide are meant to be picked up by
+> machine initialization code: a suitable frontend gets created and
+> wired up automatically.
 > 
-> Yes, I'm quite that's right. FreeBSD is using gnttab_unimp.c, which implements
-> xengnttab_open, so compilation will not fail.
+> if=ide drives not picked up that way can still be used with -device as
+> if they had if=none, but that's unclean and best avoided.  Unused ones
+> produce an "Orphaned drive without device" warning.
 > 
-> > 
-> > 
-> > > I am happy to support a use case where the kernel doesn't have gntdev,
-> > > but it needs to be explicit: we need to detect it in the configure
-> > > script, then avoid the initialization of devices which require it.
-> > 
-> > I would still prefer configure to be able to detect this case. If it
-> > cannot be made to detect it, then we can try to figure out a way to
-> > catch the initialization errors at run time. 
+> -drive parameter "if" is optional, and the default depends on the
+> machine type.  If a machine type doesn't specify a default, the
+> default is "ide".
 > 
-> I think it's better to simply fail to initialize Xen Qdisk at runtime, or else
-> a xen-tools/QEMU compiled on a non-Xen environment won't get gnttab and as a
-> consequence Xen Qdisk support enabled, and I think it's quite common for
-> distros to compile Xen packages on non-Xen environments (where /dev/xen/gnttab
-> is not available).
+> Many machine types implicitly default to if=ide that way, even though
+> they don't actually have an IDE controller.  This makes no sense.
+> 
+> Change the implicit default to if=none.  Affected machines:
+> 
+> * all targets: none
+> * aarch64/arm: akita ast2500 canon cheetah collie connex imx25
+>   integratorcp kzm lm3s6965evb lm3s811evb mainstone musicpal n800 n810
+>   netduino2 nuri palmetto realview romulus sabrelite smdkc210 sx1 sx1
+>   verdex z2
+> * cris: axis-dev88
+> * i386/x86_64: xenpv
+> * lm32: lm32-evr lm32-uclinux milkymist
+> * m68k: an5206 dummy mcf5208evb
+> * microblaze/microblazeel: petalogix-ml605 petalogix-s3adsp1800
+> * mips/mips64/mips64el/mipsel: mipssim
+> * moxie: moxiesim
+> * or32: or32-sim
+> * ppc/ppc64/ppcemb: bamboo ref405ep taihu virtex-ml507
+> * ppc/ppc64: mpc8544ds ppce500
+> * sh4/sh4eb: shix
+> * sparc: leon3_generic
+> * sparc64: niagara
+> * tricore: tricore_testboard
+> * unicore32: puv3
+> * xtensa/xtensaeb: kc705 lx200 lx60 ml605 sim
+> 
+> None of these machines have an IDE controller, let alone code to
+> honor if=ide.
+> 
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-arm@nongnu.org
+> Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: xen-devel@lists.xensource.com
+> Cc: Michael Walle <michael@walle.cc>
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> Cc: Anthony Green <green@moxielogic.com>
+> Cc: Jia Liu <proljc@gmail.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: qemu-ppc@nongnu.org
+> Cc: Magnus Damm <magnus.damm@gmail.com>
+> Cc: Fabien Chouteau <chouteau@adacore.com>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
+> Cc: Max Filippov <jcmvbkbc@gmail.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Acked-By: Artyom Tarasenko <atar4qemu@gmail.com>
+> ---
+>  include/sysemu/blockdev.h | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+> index 16432f3..351a039 100644
+> --- a/include/sysemu/blockdev.h
+> +++ b/include/sysemu/blockdev.h
+> @@ -19,12 +19,11 @@ void blockdev_auto_del(BlockBackend *blk);
+>  typedef enum {
+>      IF_DEFAULT = -1,            /* for use with drive_add() only */
+>      /*
+> -     * IF_IDE must be zero, because we want MachineClass member
+> -     * block_default_type to default-initialize to IF_IDE
+> +     * IF_NONE must be zero, because we want MachineClass member
+> +     * block_default_type to default-initialize to IF_NONE
+>       */
+> -    IF_IDE = 0,
+> -    IF_NONE,
+> -    IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
+> +    IF_NONE = 0,
+> +    IF_IDE, IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
+>      IF_COUNT
+>  } BlockInterfaceType;
+>  
+> 
 
-Ping?
+Makes sense.
 
-I'm not really sure how to solve this because I have zero experience with QEMU
-internals (all this qdev stuff). Can we restore the previous behavior, where
-the failure to initialize a device wouldn't prevent QEMU from starting?
-
-Roger.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
