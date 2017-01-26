@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cWjGa-0003hX-BL
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:35:06 -0500
+	(envelope-from <famz@redhat.com>) id 1cWjHD-0004EI-W1
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:35:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cWjGV-00057S-AR
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:35:04 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:42604)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cWjGU-000574-VN
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:34:59 -0500
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Thu, 26 Jan 2017 15:35:02 +0300
-Message-ID: <20170126123502.5412.80317.stgit@PASHA-ISP>
-In-Reply-To: <20170126123411.5412.44769.stgit@PASHA-ISP>
-References: <20170126123411.5412.44769.stgit@PASHA-ISP>
+	(envelope-from <famz@redhat.com>) id 1cWjHC-0005Rl-KM
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:35:44 -0500
+Date: Thu, 26 Jan 2017 20:35:30 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170126123530.GB23095@lemon.Home>
+References: <20170126110435.2777-1-berrange@redhat.com>
+	<20170126110435.2777-4-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v8 9/9] replay: add record/replay for audio
- passthrough
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170126110435.2777-4-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] qemu-img: add support for -n arg to
+ dd command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,265 +24,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, dovgaluk@ispras.ru, kraxel@redhat.com, pbonzini@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-This patch adds recording and replaying audio data. Is saves synchronization
-information for audio out and inputs from the microphone.
+On Thu, 01/26 11:04, Daniel P. Berrange wrote:
+> The -n arg to the convert command allows use of a pre-existing image,
+> rather than creating a new image. This adds a -n arg to the dd command
+> to get feature parity.
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- audio/audio.c            |   11 +++++-
- audio/audio.h            |    5 +++
- audio/mixeng.c           |   31 ++++++++++++++++++
- docs/replay.txt          |    7 ++++
- include/sysemu/replay.h  |    7 ++++
- replay/Makefile.objs     |    1 +
- replay/replay-audio.c    |   79 ++++++++++++++++++++++++++++++++++++++++++++++
- replay/replay-internal.h |    4 ++
- 8 files changed, 142 insertions(+), 3 deletions(-)
- create mode 100644 replay/replay-audio.c
+I remember there was a discussion about changing qemu-img dd's default to a
+"conv=nocreat" semantic, if so, "-n" might not be that useful. But that part
+hasn't made it into the tree, and I'm not sure which direction we should take.
+(Personally I think default to nocreat is a good idea).
 
-diff --git a/audio/audio.c b/audio/audio.c
-index 1ee95a5..79c0788 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -28,6 +28,7 @@
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
- #include "qemu/cutils.h"
-+#include "sysemu/replay.h"
- 
- #define AUDIO_CAP "audio"
- #include "audio_int.h"
-@@ -1113,7 +1114,7 @@ static void audio_reset_timer (AudioState *s)
- {
-     if (audio_is_timer_needed ()) {
-         if (!timer_pending(s->ts)) {
--            timer_mod (s->ts,
-+            timer_mod(s->ts,
-                 qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
-         }
-     }
-@@ -1389,6 +1390,7 @@ static void audio_run_out (AudioState *s)
- 
-         prev_rpos = hw->rpos;
-         played = hw->pcm_ops->run_out (hw, live);
-+        replay_audio_out(&played);
-         if (audio_bug (AUDIO_FUNC, hw->rpos >= hw->samples)) {
-             dolog ("hw->rpos=%d hw->samples=%d played=%d\n",
-                    hw->rpos, hw->samples, played);
-@@ -1452,9 +1454,12 @@ static void audio_run_in (AudioState *s)
- 
-     while ((hw = audio_pcm_hw_find_any_enabled_in (hw))) {
-         SWVoiceIn *sw;
--        int captured, min;
-+        int captured = 0, min;
- 
--        captured = hw->pcm_ops->run_in (hw);
-+        if (replay_mode != REPLAY_MODE_PLAY) {
-+            captured = hw->pcm_ops->run_in(hw);
-+        }
-+        replay_audio_in(&captured, hw->conv_buf, &hw->wpos, hw->samples);
- 
-         min = audio_pcm_hw_find_min_in (hw);
-         hw->total_samples_captured += captured - min;
-diff --git a/audio/audio.h b/audio/audio.h
-index c3c5198..f4339a1 100644
---- a/audio/audio.h
-+++ b/audio/audio.h
-@@ -166,4 +166,9 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
- bool audio_is_cleaning_up(void);
- void audio_cleanup(void);
- 
-+void audio_sample_to_uint64(void *samples, int pos,
-+                            uint64_t *left, uint64_t *right);
-+void audio_sample_from_uint64(void *samples, int pos,
-+                            uint64_t left, uint64_t right);
-+
- #endif /* QEMU_AUDIO_H */
-diff --git a/audio/mixeng.c b/audio/mixeng.c
-index 66c0328..c23508e 100644
---- a/audio/mixeng.c
-+++ b/audio/mixeng.c
-@@ -267,6 +267,37 @@ f_sample *mixeng_clip[2][2][2][3] = {
-     }
- };
- 
-+
-+void audio_sample_to_uint64(void *samples, int pos,
-+                            uint64_t *left, uint64_t *right)
-+{
-+    struct st_sample *sample = samples;
-+    sample += pos;
-+#ifdef FLOAT_MIXENG
-+    error_report(
-+        "Coreaudio and floating point samples are not supported by replay yet");
-+    abort();
-+#else
-+    *left = sample->l;
-+    *right = sample->r;
-+#endif
-+}
-+
-+void audio_sample_from_uint64(void *samples, int pos,
-+                            uint64_t left, uint64_t right)
-+{
-+    struct st_sample *sample = samples;
-+    sample += pos;
-+#ifdef FLOAT_MIXENG
-+    error_report(
-+        "Coreaudio and floating point samples are not supported by replay yet");
-+    abort();
-+#else
-+    sample->l = left;
-+    sample->r = right;
-+#endif
-+}
-+
- /*
-  * August 21, 1998
-  * Copyright 1998 Fabrice Bellard.
-diff --git a/docs/replay.txt b/docs/replay.txt
-index 03e1931..486c1e0 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -225,3 +225,10 @@ recording the virtual machine this filter puts all packets coming from
- the outer world into the log. In replay mode packets from the log are
- injected into the network device. All interactions with network backend
- in replay mode are disabled.
-+
-+Audio devices
-+-------------
-+
-+Audio data is recorded and replay automatically. The command line for recording
-+and replaying must contain identical specifications of audio hardware, e.g.:
-+ -soundhw ac97
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 740b425..073ec59 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -152,6 +152,13 @@ void replay_unregister_net(ReplayNetState *rns);
- void replay_net_packet_event(ReplayNetState *rns, unsigned flags,
-                              const struct iovec *iov, int iovcnt);
- 
-+/* Audio */
-+
-+/*! Saves/restores number of played samples of audio out operation. */
-+void replay_audio_out(int *played);
-+/*! Saves/restores recorded samples of audio in operation. */
-+void replay_audio_in(int *recorded, void *samples, int *wpos, int size);
-+
- /* VM state operations */
- 
- /*! Called at the start of execution.
-diff --git a/replay/Makefile.objs b/replay/Makefile.objs
-index b2afd40..cee6539 100644
---- a/replay/Makefile.objs
-+++ b/replay/Makefile.objs
-@@ -6,3 +6,4 @@ common-obj-y += replay-input.o
- common-obj-y += replay-char.o
- common-obj-y += replay-snapshot.o
- common-obj-y += replay-net.o
-+common-obj-y += replay-audio.o
-\ No newline at end of file
-diff --git a/replay/replay-audio.c b/replay/replay-audio.c
-new file mode 100644
-index 0000000..3d83743
---- /dev/null
-+++ b/replay/replay-audio.c
-@@ -0,0 +1,79 @@
-+/*
-+ * replay-audio.c
-+ *
-+ * Copyright (c) 2010-2017 Institute for System Programming
-+ *                         of the Russian Academy of Sciences.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "sysemu/replay.h"
-+#include "replay-internal.h"
-+#include "sysemu/sysemu.h"
-+#include "audio/audio.h"
-+
-+void replay_audio_out(int *played)
-+{
-+    if (replay_mode == REPLAY_MODE_RECORD) {
-+        replay_save_instructions();
-+        replay_mutex_lock();
-+        replay_put_event(EVENT_AUDIO_OUT);
-+        replay_put_dword(*played);
-+        replay_mutex_unlock();
-+    } else if (replay_mode == REPLAY_MODE_PLAY) {
-+        replay_account_executed_instructions();
-+        replay_mutex_lock();
-+        if (replay_next_event_is(EVENT_AUDIO_OUT)) {
-+            *played = replay_get_dword();
-+            replay_finish_event();
-+            replay_mutex_unlock();
-+        } else {
-+            replay_mutex_unlock();
-+            error_report("Missing audio out event in the replay log");
-+            abort();
-+        }
-+    }
-+}
-+
-+void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
-+{
-+    int pos;
-+    uint64_t left, right;
-+    if (replay_mode == REPLAY_MODE_RECORD) {
-+        replay_save_instructions();
-+        replay_mutex_lock();
-+        replay_put_event(EVENT_AUDIO_IN);
-+        replay_put_dword(*recorded);
-+        replay_put_dword(*wpos);
-+        for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
-+             ; pos = (pos + 1) % size) {
-+            audio_sample_to_uint64(samples, pos, &left, &right);
-+            replay_put_qword(left);
-+            replay_put_qword(right);
-+        }
-+        replay_mutex_unlock();
-+    } else if (replay_mode == REPLAY_MODE_PLAY) {
-+        replay_account_executed_instructions();
-+        replay_mutex_lock();
-+        if (replay_next_event_is(EVENT_AUDIO_IN)) {
-+            *recorded = replay_get_dword();
-+            *wpos = replay_get_dword();
-+            for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
-+                 ; pos = (pos + 1) % size) {
-+                left = replay_get_qword();
-+                right = replay_get_qword();
-+                audio_sample_from_uint64(samples, pos, left, right);
-+            }
-+            replay_finish_event();
-+            replay_mutex_unlock();
-+        } else {
-+            replay_mutex_unlock();
-+            error_report("Missing audio in event in the replay log");
-+            abort();
-+        }
-+    }
-+}
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index c26d079..ed66ed8 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -29,6 +29,10 @@ enum ReplayEvents {
-     /* for character device read all event */
-     EVENT_CHAR_READ_ALL,
-     EVENT_CHAR_READ_ALL_ERROR,
-+    /* for audio out event */
-+    EVENT_AUDIO_OUT,
-+    /* for audio in event */
-+    EVENT_AUDIO_IN,
-     /* for clock read/writes */
-     /* some of greater codes are reserved for clocks */
-     EVENT_CLOCK,
+Fam
+
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  qemu-img-cmds.hx |  4 +--
+>  qemu-img.c       | 79 ++++++++++++++++++++++++++++++++++++--------------------
+>  qemu-img.texi    |  7 ++++-
+>  3 files changed, 59 insertions(+), 31 deletions(-)
+> 
+> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+> index f054599..6732713 100644
+> --- a/qemu-img-cmds.hx
+> +++ b/qemu-img-cmds.hx
+> @@ -46,9 +46,9 @@ STEXI
+>  ETEXI
+>  
+>  DEF("dd", img_dd,
+> -    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
+> +    "dd [--image-opts] [-n] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
+>  STEXI
+> -@item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
+> +@item dd [--image-opts] [-n] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
+>  ETEXI
+>  
+>  DEF("info", img_info,
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 629f9e9..4d8d041 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -3917,10 +3917,10 @@ static int img_dd(int argc, char **argv)
+>      QemuOptsList *create_opts = NULL;
+>      Error *local_err = NULL;
+>      bool image_opts = false;
+> -    int c, i;
+> +    int c, i, skip_create = 0;
+>      const char *out_fmt = "raw";
+>      const char *fmt = NULL;
+> -    int64_t size = 0;
+> +    int64_t size = 0, out_size;
+>      int64_t block_count = 0, out_pos, in_pos;
+>      struct DdInfo dd = {
+>          .flags = 0,
+> @@ -3954,7 +3954,7 @@ static int img_dd(int argc, char **argv)
+>          { 0, 0, 0, 0 }
+>      };
+>  
+> -    while ((c = getopt_long(argc, argv, "hf:O:", long_options, NULL))) {
+> +    while ((c = getopt_long(argc, argv, "hnf:O:", long_options, NULL))) {
+>          if (c == EOF) {
+>              break;
+>          }
+> @@ -3965,6 +3965,9 @@ static int img_dd(int argc, char **argv)
+>          case 'f':
+>              fmt = optarg;
+>              break;
+> +        case 'n':
+> +            skip_create = 1;
+> +            break;
+>          case '?':
+>              error_report("Try 'qemu-img --help' for more information.");
+>              ret = -1;
+> @@ -4051,22 +4054,25 @@ static int img_dd(int argc, char **argv)
+>          ret = -1;
+>          goto out;
+>      }
+> -    if (!drv->create_opts) {
+> -        error_report("Format driver '%s' does not support image creation",
+> -                     drv->format_name);
+> -        ret = -1;
+> -        goto out;
+> -    }
+> -    if (!proto_drv->create_opts) {
+> -        error_report("Protocol driver '%s' does not support image creation",
+> -                     proto_drv->format_name);
+> -        ret = -1;
+> -        goto out;
+> -    }
+> -    create_opts = qemu_opts_append(create_opts, drv->create_opts);
+> -    create_opts = qemu_opts_append(create_opts, proto_drv->create_opts);
+>  
+> -    opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
+> +    if (!skip_create) {
+> +        if (!drv->create_opts) {
+> +            error_report("Format driver '%s' does not support image creation",
+> +                         drv->format_name);
+> +            ret = -1;
+> +            goto out;
+> +        }
+> +        if (!proto_drv->create_opts) {
+> +            error_report("Protocol driver '%s' does not support image creation",
+> +                         proto_drv->format_name);
+> +            ret = -1;
+> +            goto out;
+> +        }
+> +        create_opts = qemu_opts_append(create_opts, drv->create_opts);
+> +        create_opts = qemu_opts_append(create_opts, proto_drv->create_opts);
+> +
+> +        opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
+> +    }
+>  
+>      size = blk_getlength(blk1);
+>      if (size < 0) {
+> @@ -4083,19 +4089,22 @@ static int img_dd(int argc, char **argv)
+>      /* Overflow means the specified offset is beyond input image's size */
+>      if (dd.flags & C_SKIP && (in.offset > INT64_MAX / in.bsz ||
+>                                size < in.bsz * in.offset)) {
+> -        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, 0, &error_abort);
+> +        out_size = 0;
+>      } else {
+> -        qemu_opt_set_number(opts, BLOCK_OPT_SIZE,
+> -                            size - in.bsz * in.offset, &error_abort);
+> +        out_size = size - in.bsz * in.offset;
+>      }
+>  
+> -    ret = bdrv_create(drv, out.filename, opts, &local_err);
+> -    if (ret < 0) {
+> -        error_reportf_err(local_err,
+> -                          "%s: error while creating output image: ",
+> -                          out.filename);
+> -        ret = -1;
+> -        goto out;
+> +    if (!skip_create) {
+> +        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, out_size, &error_abort);
+> +
+> +        ret = bdrv_create(drv, out.filename, opts, &local_err);
+> +        if (ret < 0) {
+> +            error_reportf_err(local_err,
+> +                              "%s: error while creating output image: ",
+> +                              out.filename);
+> +            ret = -1;
+> +            goto out;
+> +        }
+>      }
+>  
+>      /* TODO, we can't honour --image-opts for the target,
+> @@ -4111,6 +4120,20 @@ static int img_dd(int argc, char **argv)
+>          goto out;
+>      }
+>  
+> +    if (skip_create) {
+> +        int64_t existing_size = blk_getlength(blk2);
+> +        if (existing_size < 0) {
+> +            error_report("unable to get output image length: %s",
+> +                         strerror(-existing_size));
+> +            ret = -1;
+> +            goto out;
+> +        } else if (existing_size < out_size) {
+> +            error_report("output file is smaller than input data length");
+> +            ret = -1;
+> +            goto out;
+> +        }
+> +    }
+> +
+>      if (dd.flags & C_SKIP && (in.offset > INT64_MAX / in.bsz ||
+>                                size < in.offset * in.bsz)) {
+>          /* We give a warning if the skip option is bigger than the input
+> diff --git a/qemu-img.texi b/qemu-img.texi
+> index 174aae3..b952d6a 100644
+> --- a/qemu-img.texi
+> +++ b/qemu-img.texi
+> @@ -326,7 +326,7 @@ skipped. This is useful for formats such as @code{rbd} if the target
+>  volume has already been created with site specific options that cannot
+>  be supplied through qemu-img.
+>  
+> -@item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
+> +@item dd [-n] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
+>  
+>  Dd copies from @var{input} file to @var{output} file converting it from
+>  @var{fmt} format to @var{output_fmt} format.
+> @@ -337,6 +337,11 @@ dd will stop reading input after reading @var{blocks} input blocks.
+>  
+>  The size syntax is similar to dd(1)'s size syntax.
+>  
+> +If the @code{-n} option is specified, the target volume creation will be
+> +skipped. This is useful for formats such as @code{rbd} if the target
+> +volume has already been created with site specific options that cannot
+> +be supplied through qemu-img.
+> +
+>  @item info [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] @var{filename}
+>  
+>  Give information about the disk image @var{filename}. Use it in
+> -- 
+> 2.9.3
+> 
+> 
