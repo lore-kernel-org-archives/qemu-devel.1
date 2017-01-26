@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cWrUB-00050I-Kf
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 16:21:44 -0500
+	(envelope-from <bounces@canonical.com>) id 1cWrhE-0001i3-Cm
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 16:35:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cWrU7-0006S2-1X
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 16:21:39 -0500
-Received: from mail-vk0-x231.google.com ([2607:f8b0:400c:c05::231]:34710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cWrU6-0006Rj-ST
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 16:21:34 -0500
-Received: by mail-vk0-x231.google.com with SMTP id r136so163731457vke.1
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 13:21:34 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cWrhA-0004N6-FV
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 16:35:08 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cWrhA-0004Mg-9t
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 16:35:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cWrh8-0006Gm-A2
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 21:35:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CD20A2E80CB
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 21:35:01 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA__2S3jTKEFy3Ue=Vvw+tuE1Du573PQp-VYOa6jBRpWCw@mail.gmail.com>
-References: <20170124164253.jiva4zvk6fxewtsk@dhcp-3-221.uk.xensource.com>
-	<alpine.DEB.2.10.1701241315310.10192@sstabellini-ThinkPad-X260>
-	<alpine.DEB.2.10.1701241326560.10192@sstabellini-ThinkPad-X260>
-	<20170125110529.5rgu7xrh3gkoadog@dhcp-3-221.uk.xensource.com>
-	<20170126154509.rxi5sy4bcob2ioen@dhcp-3-221.uk.xensource.com>
-	<alpine.DEB.2.10.1701261017370.2884@sstabellini-ThinkPad-X260>
-	<CAFEAcA__2S3jTKEFy3Ue=Vvw+tuE1Du573PQp-VYOa6jBRpWCw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Jan 2017 21:21:13 +0000
-Message-ID: <CAFEAcA_1cEbnBg9KA35y0OTk_Hw+bng2Guof84WuKfRWhx1A6g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Xen-devel] Commit 3a6c9 breaks QEMU on FreeBSD/Xen
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Jan 2017 21:21:35 -0000
+From: Thomas Huth <1256548@bugs.launchpad.net>
+Reply-To: Bug 1256548 <1256548@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131130185027.7029.31329.malonedeb@soybean.canonical.com>
+Message-Id: <20170126212135.8877.31179.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1256548] Re: qemu windows guest issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,23 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 26 January 2017 at 20:47, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 26 January 2017 at 19:36, Stefano Stabellini <sstabellini@kernel.org> wrote:
->> It should be just a matter of replacing qdev_init_nofail with something
->> that can fail. I couldn't find a regular qdev_init that can return
->> error, so maybe we would need to add it.
->
-> That's just
->     object_property_set_bool(OBJECT(whatever), true, "realized", &err);
->
-> ie "please realize the device".
+Which exact version of QEMU did you use? Does this problem still occur
+with the latest version of QEMU?
 
-(PS watch out for ownership refcounting issues depending on what
-you did with parenting the device: you likely want to object_unparent()
-and then object_unref() the thing in the error-exit path. See
-qdev_device_add() for some example code, maybe.)
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1256548
+
+Title:
+  qemu windows guest issues
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Ive noticed the following in the latest qemu build on mingw 64bit for
+  windows
+
+  older guests like windows 9* no longer boot they mostly just bsod its bee=
+n this way for ages same with 32bit builds
+  xp 64bit and other 64bit windows guests no longer work and havent for age=
+s same with 32bit builds =
+
+  xp 32bit guest doesent work under 64bit builds but they work on 32bit bui=
+lds
+
+  are the issues with the coroutine stuff on windows builds being worked
+  on? id gladly test patches
+
+  just a few observations is all :)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1256548/+subscriptions
