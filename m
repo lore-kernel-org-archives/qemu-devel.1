@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cWf49-0006Cx-26
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:05:58 -0500
+	(envelope-from <bounces@canonical.com>) id 1cWf4C-0006GU-Pw
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cWf47-0003mH-70
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:05:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49221)
+	(envelope-from <bounces@canonical.com>) id 1cWf4B-0003nH-LE
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:06:00 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49379)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cWf47-0003mB-0w
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:05:55 -0500
+	id 1cWf4B-0003n9-Fi
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:05:59 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cWf46-0005qv-3H
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 08:05:54 +0000
+	id 1cWf4A-0005vm-4O
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 08:05:58 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 14C682E81C8
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 08:05:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 1C4412E81C8
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 08:05:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Jan 2017 07:53:36 -0000
-From: Thomas Huth <1257352@bugs.launchpad.net>
-Reply-To: Bug 1257352 <1257352@bugs.launchpad.net>
+Date: Thu, 26 Jan 2017 07:49:00 -0000
+From: Thomas Huth <1254828@bugs.launchpad.net>
+Reply-To: Bug 1254828 <1254828@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20131203160523.17652.24548.malonedeb@wampee.canonical.com>
-Message-Id: <20170126075336.26617.33113.malone@wampee.canonical.com>
+References: <20131125184515.27602.72317.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170126074900.8713.26292.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1257352] Re: kvm hangs occasionally when
- switching out of the qemu console
+Subject: [Qemu-devel] [Bug 1254828] Re: qemu-sparc64-static: Segmentation
+ Fault during debootstrap second stage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,60 +39,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Can you still reproduce this issue with the latest version of QEMU, or
-could we close this ticket nowadays?
+This sounds like a distribution specific bug to me, so moving the bug to
+QEMU-Ubuntu.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+** Project changed: qemu =3D> qemu (Ubuntu)
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1257352
+https://bugs.launchpad.net/bugs/1254828
 
 Title:
-  kvm hangs occasionally when switching out of the qemu console
+  qemu-sparc64-static: Segmentation Fault during debootstrap second
+  stage
 
-Status in QEMU:
-  Incomplete
+Status in Linaro QEMU:
+  New
 Status in qemu package in Ubuntu:
-  Confirmed
+  New
+Status in qemu-linaro package in Ubuntu:
+  New
 
 Bug description:
-  To recreate (although this does *NOT* fail most of the time alas):
+  Host: Ubuntu Precise amd64
+  Guest: Debian Sid (ports) sparc64
 
-  1) press "ctrl-alt-2" to switch to the qemu console.
-  2) type say "sendkey ctrl-alt-f1"
-  3) press "ctrl-alt-1".
+  When attempting the second stage of a debootstrap for a sparc64 Debian
+  Sid guest, a segmentation fault occurs.
 
-  Expected outcome: Switch to tty1 in the VM.
+  $ sudo qemu-debootstrap --no-check-gpg --arch=3Dsparc64 sid sparc64 http:=
+//ftp.debian-ports.org/debian
+  I: Running command: debootstrap --arch sparc64 --foreign --no-check-gpg s=
+id sparc64 http://ftp.debian-ports.org/debian
+  [...]
+  I: Running command: chroot sparc64 /debootstrap/debootstrap --second-stage
+  /debootstrap/debootstrap: 22: .: Can't open /usr/share/debootstrap/functi=
+ons
+  Segmentation fault (core dumped)
 
-  Actual outcome: No switch to tty1 in the VM. and qemu console
-  unresponsive to any keyboard input.
-
-  =
-
-  Rather a vague problem description I'm afraid but this has happened to me=
- 3 times recently. No crash and no excessive CPU is observed.
-
-  I'll grab an strace when it happens again and attach...
+  Running a simple "sudo chroot sparc64" exits silently on amd64, and
+  reports a segfault on i386.
 
   ProblemType: Bug
-  DistroRelease: Ubuntu 14.04
-  Package: qemu-system-x86 1.6.0+dfsg-2ubuntu4
-  ProcVersionSignature: Ubuntu 3.12.0-4.12-generic 3.12.1
-  Uname: Linux 3.12.0-4-generic i686
-  NonfreeKernelModules: nvidia
-  ApportVersion: 2.12.7-0ubuntu1
-  Architecture: i386
-  CurrentDesktop: Unity
-  Date: Tue Dec  3 15:41:40 2013
-  InstallationDate: Installed on 2010-10-21 (1139 days ago)
-  InstallationMedia: Ubuntu 10.10 "Maverick Meerkat" - Release i386 (201010=
-07)
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to trusty on 2013-11-01 (31 days ago)
+  DistroRelease: Ubuntu 12.04
+  Package: qemu-user-static 1.0.50-2012.03-0ubuntu2.1
+  ProcVersionSignature: Ubuntu 3.8.0-33.48~precise1-generic 3.8.13.11
+  Uname: Linux 3.8.0-33-generic x86_64
+  NonfreeKernelModules: wl
+  ApportVersion: 2.0.1-0ubuntu17.6
+  Architecture: amd64
+  Date: Mon Nov 25 17:49:34 2013
+  Dependencies:
+   =
+
+  InstallationMedia: Ubuntu 12.04.3 LTS "Precise Pangolin" - Release amd64 =
+(20130820.1)
+  MarkForUpload: True
+  ProcEnviron:
+   LANGUAGE=3Den_GB:en
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   LANG=3Den_GB.UTF-8
+   SHELL=3D/bin/bash
+  SourcePackage: qemu-linaro
+  UpgradeStatus: No upgrade log present (probably fresh install)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1257352/+subscriptions
+https://bugs.launchpad.net/qemu-linaro/+bug/1254828/+subscriptions
