@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWiWp-0003jv-Pn
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:47:52 -0500
+	(envelope-from <groug@kaod.org>) id 1cWidd-0005ch-Rg
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:54:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWiWk-0004Pi-U2
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:47:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48340)
+	(envelope-from <groug@kaod.org>) id 1cWidZ-00078s-VK
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:54:49 -0500
+Received: from mo69.mail-out.ovh.net ([178.32.228.69]:60099)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cWiWk-0004Pa-Lk
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:47:42 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 975A9C049D59
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 11:47:42 +0000 (UTC)
-Date: Thu, 26 Jan 2017 11:47:37 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170126114737.GH2083@work-vm>
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-8-git-send-email-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cWidZ-00075x-ON
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:54:45 -0500
+Received: from player798.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 826C019D4F
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 12:54:36 +0100 (CET)
+Date: Thu, 26 Jan 2017 12:54:33 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170126125433.5979903a@bahia.lan>
+In-Reply-To: <20170126100705.6005-1-pbonzini@redhat.com>
+References: <20170126100705.6005-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485207141-1941-8-git-send-email-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 07/17] migration: Create x-multifd-group
- parameter
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix v9fs_lock error case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,191 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, aneesh.kumar@linux.vnet.ibm.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Indicates how many pages we are going to send in each bach to a multifd
-> thread.
+On Thu, 26 Jan 2017 11:07:05 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-bach->batch
-
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> In this case, we are marshaling an error status instead of the errno value.
+> Reorganize the out and out_nofid labels to look like all the other cases.
+> Coverity reports this because the "err = -ENOENT" and "err = -EINVAL"
+> assignments above are dead, overwritten by the call to pdu_marshal.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  hmp.c                         |  8 ++++++++
->  include/migration/migration.h |  1 +
->  migration/migration.c         | 23 +++++++++++++++++++++++
->  qapi-schema.json              | 11 +++++++++--
->  4 files changed, 41 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hmp.c b/hmp.c
-> index 8c7e302..e579766 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -325,6 +325,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
->          monitor_printf(mon, " %s: %" PRId64,
->              MigrationParameter_lookup[MIGRATION_PARAMETER_X_MULTIFD_THREADS],
->              params->x_multifd_threads);
-> +        monitor_printf(mon, " %s: %" PRId64,
-> +            MigrationParameter_lookup[MIGRATION_PARAMETER_X_MULTIFD_GROUP],
-> +            params->x_multifd_group);
->          monitor_printf(mon, "\n");
->      }
-> 
-> @@ -1401,6 +1404,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->                  p.has_x_multifd_threads = true;
->                  use_int_value = true;
->                  break;
-> +            case MIGRATION_PARAMETER_X_MULTIFD_GROUP:
-> +                p.has_x_multifd_group = true;
-> +                use_int_value = true;
-> +                break;
->              }
-> 
->              if (use_int_value) {
-> @@ -1419,6 +1426,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->                  p.downtime_limit = valueint;
->                  p.x_checkpoint_delay = valueint;
->                  p.x_multifd_threads = valueint;
-> +                p.x_multifd_group = valueint;
->              }
-> 
->              qmp_migrate_set_parameters(&p, &err);
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index b35044c..515569d 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -248,6 +248,7 @@ bool migration_in_postcopy_after_devices(MigrationState *);
->  MigrationState *migrate_get_current(void);
-> 
->  int migrate_multifd_threads(void);
-> +int migrate_multifd_group(void);
-> 
->  void migrate_compress_threads_create(void);
->  void migrate_compress_threads_join(void);
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 2fe03d8..9bde01b 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -68,6 +68,7 @@
->   */
->  #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
->  #define DEFAULT_MIGRATE_MULTIFD_THREADS 2
-> +#define DEFAULT_MIGRATE_MULTIFD_GROUP 16
 
-See below ^^^
+There was a confusion indeed: if the server fails it should report it to the
+client with an RERROR message.
 
-> 
->  static NotifierList migration_state_notifiers =
->      NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
-> @@ -103,6 +104,7 @@ MigrationState *migrate_get_current(void)
->              .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
->              .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
->              .x_multifd_threads = DEFAULT_MIGRATE_MULTIFD_THREADS,
-> +            .x_multifd_group = DEFAULT_MIGRATE_MULTIFD_GROUP,
->          },
->      };
-> 
-> @@ -595,6 +597,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
->      params->x_checkpoint_delay = s->parameters.x_checkpoint_delay;
->      params->has_x_multifd_threads = true;
->      params->x_multifd_threads = s->parameters.x_multifd_threads;
-> +    params->has_x_multifd_group = true;
-> +    params->x_multifd_group = s->parameters.x_multifd_group;
-> 
->      return params;
->  }
-> @@ -865,6 +869,13 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
->                     "is invalid, it should be in the range of 1 to 255");
->          return;
->      }
-> +    if (params->has_x_multifd_group &&
-> +            (params->x_multifd_group < 1 || params->x_multifd_group > 10000)) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-> +                   "multifd_group",
-> +                   "is invalid, it should be in the range of 1 to 10000");
-> +        return;
-> +    }
-> 
->      if (params->has_compress_level) {
->          s->parameters.compress_level = params->compress_level;
-> @@ -906,6 +917,9 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
->      if (params->has_x_multifd_threads) {
->          s->parameters.x_multifd_threads = params->x_multifd_threads;
->      }
-> +    if (params->has_x_multifd_group) {
-> +        s->parameters.x_multifd_group = params->x_multifd_group;
-> +    }
->  }
-> 
-> 
-> @@ -1351,6 +1365,15 @@ int migrate_multifd_threads(void)
->      return s->parameters.x_multifd_threads;
->  }
-> 
-> +int migrate_multifd_group(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    s = migrate_get_current();
-> +
-> +    return s->parameters.x_multifd_group;
-> +}
-> +
->  int migrate_use_xbzrle(void)
->  {
->      MigrationState *s;
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 2273864..54232ee 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -984,6 +984,9 @@
->  # @x-multifd-threads: Number of threads used to migrate data in parallel
->  #                     The default value is 2 (since 2.9)
->  #
-> +# @x-multifd-group: Number of pages sent together to a thread
-> +#                     The default value is 32 (since 2.9)
+Responding an RLOCK message with a P9_LOCK_ERROR status only makes sense
+when actually implementing locking (i.e. calling flock() on the backend),
+which isn't the case in QEMU as stated in the comment above v9fs_lock(). 
+We should hence always report a P9_LOCK_SUCCESS status when responding
+an RLOCK message.
 
-Your default is set above as 16.
-Other than that;
+Just to make it clear, I've modified your patch to open code this and
+pushed it to https://github.com/gkurz/qemu/commits/9p-next .
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+BTW, I've registered to https://scan.coverity.com/projects/qemu as
+Peter suggested on IRC. I'll have a look at the other 9pfs issues.
 
-> +#
->  # Since: 2.4
->  ##
->  { 'enum': 'MigrationParameter',
-> @@ -991,7 +994,7 @@
->             'cpu-throttle-initial', 'cpu-throttle-increment',
->             'tls-creds', 'tls-hostname', 'max-bandwidth',
->             'downtime-limit', 'x-checkpoint-delay',
-> -           'x-multifd-threads'] }
-> +           'x-multifd-threads', 'x-multifd-group'] }
-> 
->  ##
->  # @migrate-set-parameters:
-> @@ -1058,6 +1061,9 @@
->  # @x-multifd-threads: Number of threads used to migrate data in parallel
->  #                     The default value is 1 (since 2.9)
->  #
-> +# @x-multifd-group: Number of pages sent together in a bunch
-> +#                     The default value is 32 (since 2.9)
-> +#
->  # Since: 2.4
->  ##
->  { 'struct': 'MigrationParameters',
-> @@ -1071,7 +1077,8 @@
->              '*max-bandwidth': 'int',
->              '*downtime-limit': 'int',
->              '*x-checkpoint-delay': 'int',
-> -            '*x-multifd-threads': 'int'} }
-> +            '*x-multifd-threads': 'int',
-> +            '*x-multifd-group': 'int'} }
-> 
->  ##
->  # @query-migrate-parameters:
-> -- 
-> 2.9.3
-> 
+Cheers.
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Greg
+
+>  hw/9pfs/9p.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 99e9472..d028eca 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -3045,14 +3045,15 @@ static void coroutine_fn v9fs_lock(void *opaque)
+>          goto out;
+>      }
+>      status = P9_LOCK_SUCCESS;
+> -out:
+> -    put_fid(pdu, fidp);
+> -out_nofid:
+>      err = pdu_marshal(pdu, offset, "b", status);
+> -    if (err > 0) {
+> -        err += offset;
+> +    if (err < 0) {
+> +        goto out;
+>      }
+> +    err += offset;
+>      trace_v9fs_lock_return(pdu->tag, pdu->id, status);
+> +out:
+> +    put_fid(pdu, fidp);
+> +out_nofid:
+>      pdu_complete(pdu, err);
+>      v9fs_string_free(&flock.client_id);
+>  }
