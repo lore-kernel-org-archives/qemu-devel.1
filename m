@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cWfCU-0005oW-QX
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:14:36 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cWfFe-0008Qn-J8
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cWfCQ-0006c1-Qx
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:14:34 -0500
-Resent-Message-Id: <E1cWfCQ-0006c1-Qx@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21375)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cWfCQ-0006bp-Gv
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:14:30 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170126080449.28255-1-laurent@vivier.eu>
-Message-ID: <148541844416.27.6723497308743114062@eba24e3a0d7f>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 26 Jan 2017 00:14:05 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] linux-user: some patches for hppa
+	(envelope-from <kraxel@redhat.com>) id 1cWfFa-0007EA-KV
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:17:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51990)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cWfFa-0007Du-Eg
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:17:46 -0500
+Message-ID: <1485418662.17048.18.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 26 Jan 2017 09:17:42 +0100
+In-Reply-To: <CAAibmn0YQYZKv_DfqmZ9fkW6nC=rJrrEnyadhV1QOLrLzs2f6Q@mail.gmail.com>
+References: <1485365075-32702-1-git-send-email-phil@philjordan.eu>
+	<148536527026.27.12814124354919992023@eba24e3a0d7f>
+	<CAAibmn0YQYZKv_DfqmZ9fkW6nC=rJrrEnyadhV1QOLrLzs2f6Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3] hw/usb/dev-hid: Improve guest
+ compatibility of usb-tablet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rth@twiddle.net, riku.voipio@iki.fi, glaubitz@physik.fu-berlin.de
+To: Phil Dennis-Jordan <phil@philjordan.eu>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, "Gabriel L. Somlo" <somlo@cmu.edu>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC8zXSBsaW51eC11c2VyOiBzb21lIHBhdGNo
-ZXMgZm9yIGhwcGEKTWVzc2FnZS1pZDogMjAxNzAxMjYwODA0NDkuMjgyNTUtMS1sYXVyZW50QHZp
-dmllci5ldQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
-Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
-CiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBs
-b2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8K
-ICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3Jt
-YXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2Ny
-aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAg
-ICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
-CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAxMjYwODA0NDkuMjgyNTUtMS1sYXVy
-ZW50QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMTcwMTI2MDgwNDQ5LjI4MjU1LTEtbGF1cmVudEB2
-aXZpZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjM2M5MDEzIGxpbnV4LXVz
-ZXI6IGRlZmluZSBjb3JyZWN0IFVUUyBtYWNoaW5lIG5hbWUgZm9yIGhwcGEKN2IwYmUyMSBsaW51
-eC11c2VyOiBmaXggImFwdC1nZXQgdXBkYXRlIiBvbiBsaW51eC11c2VyIGhwcGEKYWI1MDE3NyBs
-aW51eC11c2VyOiBhZGQgaHBwYSBtYWdpYyBudW1iZXJzIGluIHFlbXUtYmluZm10LWNvbmYuc2gK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogbGludXgtdXNlcjogYWRk
-IGhwcGEgbWFnaWMgbnVtYmVycyBpbiBxZW11LWJpbmZtdC1jb25mLnNoLi4uCkVSUk9SOiBsaW5l
-IG92ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5z
-aDo5NToKK2hwcGFfbWFnaWM9J1x4N2ZceDQ1XHg0Y1x4NDZceDAxXHgwMlx4MDFceDAwXHgwMFx4
-MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceDBmJwoKRVJST1I6IGxpbmUg
-b3ZlciA5MCBjaGFyYWN0ZXJzCiMzNTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNo
-Ojk2OgoraHBwYV9tYXNrPSdceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgwMFx4ZmZceGZm
-XHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZmXHhmZicKCnRvdGFsOiAyIGVycm9y
-cywgMCB3YXJuaW5ncywgMjIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8zOiBsaW51eC11c2VyOiBmaXggImFwdC1n
-ZXQgdXBkYXRlIiBvbiBsaW51eC11c2VyIGhwcGEuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8zOiBsaW51
-eC11c2VyOiBkZWZpbmUgY29ycmVjdCBVVFMgbWFjaGluZSBuYW1lIGZvciBocHBhLi4uCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
-b3Jn
+On Mi, 2017-01-25 at 18:36 +0100, Phil Dennis-Jordan wrote:
+> On 25 January 2017 at 18:27,  <no-reply@patchew.org> wrote:
+> > Your series seems to have some coding style problems. See output below =
+for
+> > more information:
+> >
+> > Type: series
+> > Subject: [Qemu-devel] [PATCH v3] hw/usb/dev-hid: Improve guest compatib=
+ility of usb-tablet
+> > Message-id: 1485365075-32702-1-git-send-email-phil@philjordan.eu
+> >
+> > =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> > Checking PATCH 1/1: hw/usb/dev-hid: Improve guest compatibility of usb-=
+tablet...
+> > ERROR: code indent should never use tabs
+> > #43: FILE: hw/usb/dev-hid.c:490:
+> > +    0x09, 0x02,^I^I/* Usage (Mouse) */$
+>=20
+> Interestingly, the surrounding array initialisation already uses tabs,
+> so replacing them with spaces on only the line I edited seems wrong as
+> it'll mis-render in editors configured with a different tab width.
+> Please let me know if I need to take action on this issue, and if so
+> what to do. (I can add a whitespace-only patch to fix the surrounding
+> area, for example. Coding guidelines suggest this might not be
+> desirable though.)
+
+I'll happily take the patch as-is.
+
+thanks,
+  Gerd
