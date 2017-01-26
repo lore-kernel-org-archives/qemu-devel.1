@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWikB-0000Hf-BZ
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:01:36 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cWiwN-0003ov-71
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:14:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWik7-00017P-BF
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:01:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56300)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWik7-00017C-5V
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:01:31 -0500
-Date: Thu, 26 Jan 2017 20:01:22 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170126120122.GL5151@pxdev.xzpeter.org>
-References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
-	<1485253571-19058-3-git-send-email-peterx@redhat.com>
-	<20170124092905.41832531@t450s.home>
-	<9ef03816-0bef-f54b-63fe-daf27eab4a40@redhat.com>
-	<20170126071244.GJ5151@pxdev.xzpeter.org>
-	<11032fa7-1e5f-dac6-f0d8-56b41121361b@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cWiwJ-0005eO-3P
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:14:11 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33461)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cWiwI-0005eB-TE
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:14:07 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r144so50050349wme.0
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 04:14:06 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170123021748.13170-1-rth@twiddle.net>
+	<20170123021748.13170-22-rth@twiddle.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d010ae34-9ddd-d5fc-1fa0-82d3d2341c95@redhat.com>
+Date: Thu, 26 Jan 2017 13:14:04 +0100
 MIME-Version: 1.0
+In-Reply-To: <20170123021748.13170-22-rth@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <11032fa7-1e5f-dac6-f0d8-56b41121361b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 02/18] vfio: introduce vfio_get_vaddr()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 21/26] target-hppa: Implement branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +31,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, qemu-devel@nongnu.org, bd.aviv@gmail.com
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Thu, Jan 26, 2017 at 11:55:22AM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 26/01/2017 08:12, Peter Xu wrote:
-> > 
-> >     /*
-> >      * Here, we need to have the lock not only for vfio_get_vaddr(),
-> >      * but also needs to make sure that the vaddr will be valid for
-> >      * further operations.
-> >      *
-> >      * When we map new pages, we need the lock to make sure that vaddr
-> >      * is valid along the way we build up the IO page table (via
-> >      * vfio_dma_map()). Then, as long as the mapping is set up, we can
-> >      * unlock since those pages will be pinned in kernel (which makes
-> >      * sure that the RAM backend of vaddr will always be there, even
-> >      * if the memory object is destroyed and RAM released).
-> >      *
-> >      * For unmapping case, we don't really need the protection since
-> >      * the pages are in all cases locked in kernel, so we'll probably
-> >      * be safe even without the lock. However, it won't hurt we have
-> >      * the lock as well here.
-> >      */
-> 
-> Even simpler, just before the definition of vfio_get_vaddr:
-> 
-> /* Called with rcu_read_lock held.  */
-> 
-> and just before the vfio_dma_map call:
-> 
->     /* vaddr is only valid until rcu_read_unlock().  But after
->      * vfio_dma_map has set up the mapping the pages will be pinned
->      * by the kernel.  This makes sure that the RAM backend of vaddr
->      * will always be there, even if the memory object is destroyed
->      * and its backing memory munmap-ed.
->      */
-> 
-> I'm not sure that you can get rid of the lock for the unmapping case.
-> Better remove that part of the comment.
+I haven't studied the code much, so I'm just reporting what Coverity
+says.  Not sure if the code has a bug or can just be simplified.
 
-Sure. Let me take yours. Thanks!
+On 23/01/2017 03:17, Richard Henderson wrote:
+> +/* Emit a conditional branch to a direct target.  If the branch itself
+> +   is nullified, we should have already used nullify_over.  */
+> +static ExitStatus do_cbranch(DisasContext *ctx, target_long disp, bool is_n,
+> +                             DisasCond *cond)
+> +{
+> +    target_ulong dest = iaoq_dest(ctx, disp);
+> +    TCGLabel *taken = NULL;
+> +    TCGCond c = cond->c;
+> +    int which = 0;
+> +    bool n;
+> +
+> +    assert(ctx->null_cond.c == TCG_COND_NEVER);
+> +
+> +    /* Handle TRUE and NEVER as direct branches.  */
+> +    if (c == TCG_COND_ALWAYS) {
+> +        return do_dbranch(ctx, dest, 0, is_n && disp >= 0);
+> +    }
+> +    if (c == TCG_COND_NEVER) {
+> +        return do_dbranch(ctx, ctx->iaoq_n, 0, is_n && disp < 0);
+> +    }
+> +
+> +    taken = gen_new_label();
+> +    cond_prep(cond);
+> +    tcg_gen_brcond_tl(c, cond->a0, cond->a1, taken);
+> +    cond_free(cond);
+> +
+> +    /* Not taken: Condition not satisfied; nullify on backward branches. */
+> +    n = is_n && disp < 0;
+> +    if (n && use_nullify_skip(ctx)) {
+> +        nullify_set(ctx, 0);
+> +        gen_goto_tb(ctx, which++, ctx->iaoq_n, ctx->iaoq_n + 4);
+> +    } else {
+> +        if (!n && ctx->null_lab) {
+> +            gen_set_label(ctx->null_lab);
+> +            ctx->null_lab = NULL;
+> +        }
+> +        nullify_set(ctx, n);
+> +        gen_goto_tb(ctx, which++, ctx->iaoq_b, ctx->iaoq_n);
+> +    }
 
--- peterx
+Both branches increment "which", so you can replace it with 0 and which
+is always 1 now.
+
+> +    gen_set_label(taken);
+> +
+> +    /* Taken: Condition satisfied; nullify on forward branches.  */
+> +    n = is_n && disp >= 0;
+> +    if (n && use_nullify_skip(ctx)) {
+> +        nullify_set(ctx, 0);
+> +        gen_goto_tb(ctx, which++, dest, dest + 4);
+> +    } else {
+> +        nullify_set(ctx, n);
+> +        gen_goto_tb(ctx, which++, ctx->iaoq_b, dest);
+> +    }
+
+Both branches increment "which", so you can replace it with 1 and which
+is always 2.
+
+> +    /* Not taken: the branch itself was nullified.  */
+> +    if (ctx->null_lab) {
+> +        gen_set_label(ctx->null_lab);
+> +        ctx->null_lab = NULL;
+> +        if (which < 2) {
+> +            nullify_set(ctx, 0);
+> +            gen_goto_tb(ctx, which, ctx->iaoq_b, ctx->iaoq_n);
+> +            return EXIT_GOTO_TB;
+
+So this branch of the "if" is dead.
+
+> +        } else {
+> +            return EXIT_IAQ_N_STALE;
+> +        }
+> +    } else {
+> +        return EXIT_GOTO_TB;
+> +    }
+> +}
