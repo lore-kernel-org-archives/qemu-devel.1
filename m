@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cWjHD-0004EI-W1
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:35:45 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cWjK2-00075F-0W
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:38:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cWjHC-0005Rl-KM
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:35:44 -0500
-Date: Thu, 26 Jan 2017 20:35:30 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170126123530.GB23095@lemon.Home>
-References: <20170126110435.2777-1-berrange@redhat.com>
-	<20170126110435.2777-4-berrange@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cWjJx-0006wu-VI
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:38:38 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34116)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cWjJx-0006wi-Ly
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:38:33 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so50024190wmi.1
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 04:38:33 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
+	<1485207141-1941-12-git-send-email-quintela@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3547173f-cd36-58fa-4d66-12dd16f1e71c@redhat.com>
+Date: Thu, 26 Jan 2017 13:38:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170126110435.2777-4-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] qemu-img: add support for -n arg to
- dd command
+In-Reply-To: <1485207141-1941-12-git-send-email-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 11/17] migration: Create thread
+ infrastructure for multifd send side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,202 +32,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: amit.shah@redhat.com, dgilbert@redhat.com
 
-On Thu, 01/26 11:04, Daniel P. Berrange wrote:
-> The -n arg to the convert command allows use of a pre-existing image,
-> rather than creating a new image. This adds a -n arg to the dd command
-> to get feature parity.
 
-I remember there was a discussion about changing qemu-img dd's default to a
-"conv=nocreat" semantic, if so, "-n" might not be that useful. But that part
-hasn't made it into the tree, and I'm not sure which direction we should take.
-(Personally I think default to nocreat is a good idea).
 
-Fam
-
+On 23/01/2017 22:32, Juan Quintela wrote:
+> We make the locking and the transfer of information specific, even if we
+> are still transmiting things through the main thread.
 > 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  qemu-img-cmds.hx |  4 +--
->  qemu-img.c       | 79 ++++++++++++++++++++++++++++++++++++--------------------
->  qemu-img.texi    |  7 ++++-
->  3 files changed, 59 insertions(+), 31 deletions(-)
+>  migration/ram.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 52 insertions(+), 1 deletion(-)
 > 
-> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-> index f054599..6732713 100644
-> --- a/qemu-img-cmds.hx
-> +++ b/qemu-img-cmds.hx
-> @@ -46,9 +46,9 @@ STEXI
->  ETEXI
->  
->  DEF("dd", img_dd,
-> -    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
-> +    "dd [--image-opts] [-n] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
->  STEXI
-> -@item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
-> +@item dd [--image-opts] [-n] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
->  ETEXI
->  
->  DEF("info", img_info,
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 629f9e9..4d8d041 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -3917,10 +3917,10 @@ static int img_dd(int argc, char **argv)
->      QemuOptsList *create_opts = NULL;
->      Error *local_err = NULL;
->      bool image_opts = false;
-> -    int c, i;
-> +    int c, i, skip_create = 0;
->      const char *out_fmt = "raw";
->      const char *fmt = NULL;
-> -    int64_t size = 0;
-> +    int64_t size = 0, out_size;
->      int64_t block_count = 0, out_pos, in_pos;
->      struct DdInfo dd = {
->          .flags = 0,
-> @@ -3954,7 +3954,7 @@ static int img_dd(int argc, char **argv)
->          { 0, 0, 0, 0 }
->      };
->  
-> -    while ((c = getopt_long(argc, argv, "hf:O:", long_options, NULL))) {
-> +    while ((c = getopt_long(argc, argv, "hnf:O:", long_options, NULL))) {
->          if (c == EOF) {
->              break;
->          }
-> @@ -3965,6 +3965,9 @@ static int img_dd(int argc, char **argv)
->          case 'f':
->              fmt = optarg;
->              break;
-> +        case 'n':
-> +            skip_create = 1;
-> +            break;
->          case '?':
->              error_report("Try 'qemu-img --help' for more information.");
->              ret = -1;
-> @@ -4051,22 +4054,25 @@ static int img_dd(int argc, char **argv)
->          ret = -1;
->          goto out;
+> diff --git a/migration/ram.c b/migration/ram.c
+> index c71929e..9d7bc64 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -392,17 +392,25 @@ void migrate_compress_threads_create(void)
+>  /* Multiple fd's */
+> 
+>  struct MultiFDSendParams {
+> +    /* not changed */
+>      QemuThread thread;
+>      QIOChannel *c;
+>      QemuCond cond;
+>      QemuMutex mutex;
+> +    /* protected by param mutex */
+>      bool quit;
+>      bool started;
+> +    uint8_t *address;
+> +    /* protected by multifd mutex */
+> +    bool done;
+>  };
+>  typedef struct MultiFDSendParams MultiFDSendParams;
+> 
+>  static MultiFDSendParams *multifd_send;
+> 
+> +QemuMutex multifd_send_mutex;
+> +QemuCond multifd_send_cond;
+
+Having n+1 semaphores instead of n+1 cond/mutex pairs could be more
+efficient.  See thread-pool.c for an example.
+
+Paolo
+
+>  static void *multifd_send_thread(void *opaque)
+>  {
+>      MultiFDSendParams *params = opaque;
+> @@ -416,7 +424,17 @@ static void *multifd_send_thread(void *opaque)
+> 
+>      qemu_mutex_lock(&params->mutex);
+>      while (!params->quit){
+> -        qemu_cond_wait(&params->cond, &params->mutex);
+> +        if (params->address) {
+> +            params->address = 0;
+> +            qemu_mutex_unlock(&params->mutex);
+> +            qemu_mutex_lock(&multifd_send_mutex);
+> +            params->done = true;
+> +            qemu_cond_signal(&multifd_send_cond);
+> +            qemu_mutex_unlock(&multifd_send_mutex);
+> +            qemu_mutex_lock(&params->mutex);
+> +        } else {
+> +            qemu_cond_wait(&params->cond, &params->mutex);
+> +        }
 >      }
-> -    if (!drv->create_opts) {
-> -        error_report("Format driver '%s' does not support image creation",
-> -                     drv->format_name);
-> -        ret = -1;
-> -        goto out;
-> -    }
-> -    if (!proto_drv->create_opts) {
-> -        error_report("Protocol driver '%s' does not support image creation",
-> -                     proto_drv->format_name);
-> -        ret = -1;
-> -        goto out;
-> -    }
-> -    create_opts = qemu_opts_append(create_opts, drv->create_opts);
-> -    create_opts = qemu_opts_append(create_opts, proto_drv->create_opts);
->  
-> -    opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
-> +    if (!skip_create) {
-> +        if (!drv->create_opts) {
-> +            error_report("Format driver '%s' does not support image creation",
-> +                         drv->format_name);
-> +            ret = -1;
-> +            goto out;
-> +        }
-> +        if (!proto_drv->create_opts) {
-> +            error_report("Protocol driver '%s' does not support image creation",
-> +                         proto_drv->format_name);
-> +            ret = -1;
-> +            goto out;
-> +        }
-> +        create_opts = qemu_opts_append(create_opts, drv->create_opts);
-> +        create_opts = qemu_opts_append(create_opts, proto_drv->create_opts);
+>      qemu_mutex_unlock(&params->mutex);
+> 
+> @@ -464,12 +482,16 @@ void migrate_multifd_send_threads_create(void)
+>      }
+>      thread_count = migrate_multifd_threads();
+>      multifd_send = g_new0(MultiFDSendParams, thread_count);
+> +    qemu_mutex_init(&multifd_send_mutex);
+> +    qemu_cond_init(&multifd_send_cond);
+>      for (i = 0; i < thread_count; i++) {
+>          char thread_name[15];
+>          qemu_mutex_init(&multifd_send[i].mutex);
+>          qemu_cond_init(&multifd_send[i].cond);
+>          multifd_send[i].quit = false;
+>          multifd_send[i].started = false;
+> +        multifd_send[i].done = true;
+> +        multifd_send[i].address = 0;
+>          multifd_send[i].c = socket_send_channel_create();
+>          if(!multifd_send[i].c) {
+>              error_report("Error creating a send channel");
+> @@ -487,6 +509,34 @@ void migrate_multifd_send_threads_create(void)
+>      }
+>  }
+> 
+> +static int multifd_send_page(uint8_t *address)
+> +{
+> +    int i, thread_count;
+> +    bool found = false;
 > +
-> +        opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
-> +    }
->  
->      size = blk_getlength(blk1);
->      if (size < 0) {
-> @@ -4083,19 +4089,22 @@ static int img_dd(int argc, char **argv)
->      /* Overflow means the specified offset is beyond input image's size */
->      if (dd.flags & C_SKIP && (in.offset > INT64_MAX / in.bsz ||
->                                size < in.bsz * in.offset)) {
-> -        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, 0, &error_abort);
-> +        out_size = 0;
->      } else {
-> -        qemu_opt_set_number(opts, BLOCK_OPT_SIZE,
-> -                            size - in.bsz * in.offset, &error_abort);
-> +        out_size = size - in.bsz * in.offset;
->      }
->  
-> -    ret = bdrv_create(drv, out.filename, opts, &local_err);
-> -    if (ret < 0) {
-> -        error_reportf_err(local_err,
-> -                          "%s: error while creating output image: ",
-> -                          out.filename);
-> -        ret = -1;
-> -        goto out;
-> +    if (!skip_create) {
-> +        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, out_size, &error_abort);
-> +
-> +        ret = bdrv_create(drv, out.filename, opts, &local_err);
-> +        if (ret < 0) {
-> +            error_reportf_err(local_err,
-> +                              "%s: error while creating output image: ",
-> +                              out.filename);
-> +            ret = -1;
-> +            goto out;
+> +    thread_count = migrate_multifd_threads();
+> +    qemu_mutex_lock(&multifd_send_mutex);
+> +    while (!found) {
+> +        for (i = 0; i < thread_count; i++) {
+> +            if (multifd_send[i].done) {
+> +                multifd_send[i].done = false;
+> +                found = true;
+> +                break;
+> +            }
 > +        }
->      }
->  
->      /* TODO, we can't honour --image-opts for the target,
-> @@ -4111,6 +4120,20 @@ static int img_dd(int argc, char **argv)
->          goto out;
->      }
->  
-> +    if (skip_create) {
-> +        int64_t existing_size = blk_getlength(blk2);
-> +        if (existing_size < 0) {
-> +            error_report("unable to get output image length: %s",
-> +                         strerror(-existing_size));
-> +            ret = -1;
-> +            goto out;
-> +        } else if (existing_size < out_size) {
-> +            error_report("output file is smaller than input data length");
-> +            ret = -1;
-> +            goto out;
+> +        if (!found) {
+> +            qemu_cond_wait(&multifd_send_cond, &multifd_send_mutex);
 > +        }
 > +    }
+> +    qemu_mutex_unlock(&multifd_send_mutex);
+> +    qemu_mutex_lock(&multifd_send[i].mutex);
+> +    multifd_send[i].address = address;
+> +    qemu_cond_signal(&multifd_send[i].cond);
+> +    qemu_mutex_unlock(&multifd_send[i].mutex);
 > +
->      if (dd.flags & C_SKIP && (in.offset > INT64_MAX / in.bsz ||
->                                size < in.offset * in.bsz)) {
->          /* We give a warning if the skip option is bigger than the input
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index 174aae3..b952d6a 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -326,7 +326,7 @@ skipped. This is useful for formats such as @code{rbd} if the target
->  volume has already been created with site specific options that cannot
->  be supplied through qemu-img.
->  
-> -@item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
-> +@item dd [-n] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
->  
->  Dd copies from @var{input} file to @var{output} file converting it from
->  @var{fmt} format to @var{output_fmt} format.
-> @@ -337,6 +337,11 @@ dd will stop reading input after reading @var{blocks} input blocks.
->  
->  The size syntax is similar to dd(1)'s size syntax.
->  
-> +If the @code{-n} option is specified, the target volume creation will be
-> +skipped. This is useful for formats such as @code{rbd} if the target
-> +volume has already been created with site specific options that cannot
-> +be supplied through qemu-img.
+> +    return 0;
+> +}
 > +
->  @item info [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] @var{filename}
->  
->  Give information about the disk image @var{filename}. Use it in
-> -- 
-> 2.9.3
-> 
+>  struct MultiFDRecvParams {
+>      QemuThread thread;
+>      QIOChannel *c;
+> @@ -1015,6 +1065,7 @@ static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
+>          *bytes_transferred +=
+>              save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+>          qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
+> +        multifd_send_page(p);
+>          *bytes_transferred += TARGET_PAGE_SIZE;
+>          pages = 1;
+>          acct_info.norm_pages++;
 > 
