@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cWexC-0003e7-3k
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 02:58:46 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cWf3R-0005jn-FW
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:05:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cWex8-0001Ys-6i
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 02:58:46 -0500
-References: <1476117341-32690-1-git-send-email-drjones@redhat.com>
-	<1476117341-32690-3-git-send-email-drjones@redhat.com>
-	<CAFEAcA92X+oCMji_bnWkjRWvqQ+CyqrR0ogy-SKOGW7TRYsZ3g@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <6442c7ab-a539-c1e2-bb54-23d4643bba65@redhat.com>
-Date: Thu, 26 Jan 2017 08:58:31 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA92X+oCMji_bnWkjRWvqQ+CyqrR0ogy-SKOGW7TRYsZ3g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] hw/arm/virt: no ITS on older machine
- types
+	(envelope-from <laurent@vivier.eu>) id 1cWf3M-0003dP-IA
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:05:13 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:50717)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cWf3M-0003bQ-8d
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:05:08 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Thu, 26 Jan 2017 09:04:46 +0100
+Message-Id: <20170126080449.28255-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v3 0/3] linux-user: some patches for hppa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +21,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-Hi Peter,
+This short series enables hppa in qemu-binfmt-conf.sh, and fixes
+a bug in the netlink functions that has been found by Adrian Glaubitz
+while he was testing a debian chroot with qemu-hppa. I think the problem
+doesn't appear on other architectures I have tested as they should use
+NR_socketcall syscall instead of NR_socket syscall.
 
-On 20/01/2017 16:52, Peter Maydell wrote:
-> On 10 October 2016 at 17:35, Andrew Jones <drjones@redhat.com> wrote:
->> We should avoid exposing new hardware (through DT and ACPI) on older
->> machine types. This patch keeps 2.7 and older from changing, despite
->> the introduction of ITS support for 2.8.
->>
->> Signed-off-by: Andrew Jones <drjones@redhat.com>
->> ---
->>
->> As Eduardo pointed out long ago for a different reason, we should
->> probably replace VirtGuestInfo with direct use of VirtMachineClass,
->> like x86 has done to replace PcGuestInfo with direct use of
->> PCMachineClass. I'll work on that, but wanted to get this ITS
->> fixup in sooner than later, so I'm posting this patch now, which
->> requires 'no_its' to be duplicated.
-> 
-> So this patch added a no_its flag which gets set for virt-2.7
-> and earlier, but there's no user-facing way to say "I'd like
-> a virt-2.8 board with no ITS", right? That's a bit unfortunate
-> because the ITS can't be migrated, which means there's no way
-> to ask for a post-2.7 virt board which can be migrated...
+v3:
+    fix UNAME_MACHINE instead of cpu_to_uname_machine()
 
-Sorry for the delay.
+v2:
+    added the hppa UTS machine name fix
+    added R-b and T-b
 
-For 2.9 machine I can add a new property that would allow the user to
-deselect the ITS. Would that make sense?
+Laurent Vivier (3):
+  linux-user: add hppa magic numbers in qemu-binfmt-conf.sh
+  linux-user: fix "apt-get update" on linux-user hppa
+  linux-user: define correct UTS machine name for hppa
 
-Thanks
+ linux-user/hppa/target_syscall.h | 2 +-
+ linux-user/syscall.c             | 1 -
+ scripts/qemu-binfmt-conf.sh      | 9 +++++++--
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-Eric
-
-
-> thanks
-> -- PMM
-> 
+-- 
+2.9.3
