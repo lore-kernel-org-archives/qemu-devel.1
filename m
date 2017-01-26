@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWhrD-000804-E3
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:04:48 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWhrF-00081s-QO
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:04:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWhrC-0003cv-5a
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:04:47 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWhrE-0003fW-Vl
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:04:49 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 26 Jan 2017 11:04:29 +0000
-Message-Id: <20170126110435.2777-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 0/6] qemu-img: improve convert & dd commands
+Date: Thu, 26 Jan 2017 11:04:31 +0000
+Message-Id: <20170126110435.2777-3-berrange@redhat.com>
+In-Reply-To: <20170126110435.2777-1-berrange@redhat.com>
+References: <20170126110435.2777-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 2/6] qemu-img: fix --image-opts usage with
+ dd command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,52 +23,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This series is in response to Max pointing out that you cannot
-use 'convert' for an encrypted target image.
+The --image-opts flag can only be used to affect the parsing
+of the source image. The target image has to be specified in
+the traditional style regardless, since it needs to be passed
+to the brdv_create() API which does not support the new style
+opts.
 
-The 'convert' and 'dd' commands need to first create the image
-and then open it. The bdrv_create() method takes a set of options
-for creating the image, which let us provide a key-secret for the
-encryption key. When the commands then open the new image, they
-don't provide any options, so the image is unable to be opened
-due to lack of encryption key. It is also not possible to use
-the --image-opts argument to provide structured options in the
-target image name - it must be a plain filename to satisfy the
-bdrv_create() API contract.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qemu-img.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-This series addresses these problems to some extent
-
- - Adds a new --target-image-opts flag which is used to say
-   that the target filename is using structured options.
-   It is *only* permitted to use this when -n is also set.
-   ie the target image must be pre-created so convert/dd
-   don't need to run bdrv_create().
-
- - When --target-image-opts is not used, add special case
-   code that identifies options passed to bdrv_create()
-   named "*key-secret" and adds them to the options used
-   to open the new image
-
-In future it is desirable to make --target-image-opts work
-even when -n is *not* given. This requires considerable
-work to create a new bdrv_create() API impl.
-
-The first four patches improve the 'dd' command to address
-feature gaps wrt the 'convert' command. The last two patches
-implement the improvements described above.
-
-Daniel P. Berrange (6):
-  qemu-img: add support for --object with 'dd' command
-  qemu-img: fix --image-opts usage with dd command
-  qemu-img: add support for -n arg to dd command
-  qemu-img: add support for -o arg to dd command
-  qemu-img: introduce --target-image-opts for 'convert' command
-  qemu-img: copy *key-secret opts when opening newly created files
-
- qemu-img-cmds.hx |   8 +-
- qemu-img.c       | 286 ++++++++++++++++++++++++++++++++++++++++++-------------
- qemu-img.texi    |  23 ++++-
- 3 files changed, 244 insertions(+), 73 deletions(-)
-
+diff --git a/qemu-img.c b/qemu-img.c
+index 391a141..629f9e9 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4098,8 +4098,13 @@ static int img_dd(int argc, char **argv)
+         goto out;
+     }
+ 
+-    blk2 = img_open(image_opts, out.filename, out_fmt, BDRV_O_RDWR,
+-                    false, false);
++    /* TODO, we can't honour --image-opts for the target,
++     * since it needs to be given in a format compatible
++     * with the bdrv_create() call above which does not
++     * support image-opts style.
++     */
++    blk2 = img_open_file(out.filename, out_fmt, BDRV_O_RDWR,
++                         false, false);
+ 
+     if (!blk2) {
+         ret = -1;
 -- 
 2.9.3
