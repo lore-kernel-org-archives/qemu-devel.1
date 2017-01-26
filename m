@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cWYYC-0006Um-7C
-	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 20:08:33 -0500
+	(envelope-from <jcody@redhat.com>) id 1cWYYC-0006Vk-Vv
+	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 20:08:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cWYYB-0007BA-5j
+	(envelope-from <jcody@redhat.com>) id 1cWYYB-0007BN-Jm
 	for qemu-devel@nongnu.org; Wed, 25 Jan 2017 20:08:32 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Wed, 25 Jan 2017 20:08:21 -0500
-Message-Id: <bb4a731a35bc4ac81fe3db17479dd686315317c7.1485392617.git.jcody@redhat.com>
+Date: Wed, 25 Jan 2017 20:08:22 -0500
+Message-Id: <1a7a3d6e6d8af36cd5b47ed6ea93b5a9ededf81b.1485392617.git.jcody@redhat.com>
 In-Reply-To: <cover.1485392617.git.jcody@redhat.com>
 References: <cover.1485392617.git.jcody@redhat.com>
 In-Reply-To: <cover.1485392617.git.jcody@redhat.com>
 References: <cover.1485392617.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] qemu-iotests: Don't create fifos /
- pidfiles with protocol paths
+Subject: [Qemu-devel] [PATCH v2 3/3] qemu-iotest: test to lookup
+ protocol-based image with relative backing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +25,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-Trying to create, use, and remove fifos and pidfiles on protocol paths
-(e.g. nfs://localhost/scratch/qemu-nbd.pid) is obviously broken.
-
-Use the local $TEST_DIR path before it is 'protocolized' for these
-files.
+This test uses NFS and block-stream to force a lookup of a backing
+image that has a relative filename, but a full backing image name
+with the protocol path intact.
 
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- tests/qemu-iotests/common.config |  6 ++++--
- tests/qemu-iotests/common.qemu   | 10 +++++-----
- tests/qemu-iotests/common.rc     |  6 +++---
- 3 files changed, 12 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/173     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/173.out | 12 ++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 110 insertions(+)
+ create mode 100755 tests/qemu-iotests/173
+ create mode 100644 tests/qemu-iotests/173.out
 
-diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
-index f6384fb..55527aa 100644
---- a/tests/qemu-iotests/common.config
-+++ b/tests/qemu-iotests/common.config
-@@ -109,7 +109,7 @@ _qemu_wrapper()
- {
-     (
-         if [ -n "${QEMU_NEED_PID}" ]; then
--            echo $BASHPID > "${TEST_DIR}/qemu-${_QEMU_HANDLE}.pid"
-+            echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid"
-         fi
-         exec "$QEMU_PROG" $QEMU_OPTIONS "$@"
-     )
-@@ -151,7 +151,7 @@ _qemu_io_wrapper()
- _qemu_nbd_wrapper()
- {
-     (
--        echo $BASHPID > "${TEST_DIR}/qemu-nbd.pid"
-+        echo $BASHPID > "${QEMU_TEST_DIR}/qemu-nbd.pid"
-         exec "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS "$@"
-     )
- }
-@@ -186,6 +186,8 @@ if [ -z "$TEST_DIR" ]; then
-         TEST_DIR=`pwd`/scratch
- fi
- 
-+QEMU_TEST_DIR="${TEST_DIR}"
+diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
+new file mode 100755
+index 0000000..bdaa092
+--- /dev/null
++++ b/tests/qemu-iotests/173
+@@ -0,0 +1,97 @@
++#!/bin/bash
++#
++# Test QAPI commands looking up protocol based images with relative
++# filename backing strings
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++# creator
++owner=jcody@redhat.com
 +
- if [ ! -e "$TEST_DIR" ]; then
-         mkdir "$TEST_DIR"
- fi
-diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
-index e657361..4278789 100644
---- a/tests/qemu-iotests/common.qemu
-+++ b/tests/qemu-iotests/common.qemu
-@@ -27,8 +27,8 @@
- 
- QEMU_COMM_TIMEOUT=10
- 
--QEMU_FIFO_IN="${TEST_DIR}/qmp-in-$$"
--QEMU_FIFO_OUT="${TEST_DIR}/qmp-out-$$"
-+QEMU_FIFO_IN="${QEMU_TEST_DIR}/qmp-in-$$"
-+QEMU_FIFO_OUT="${QEMU_TEST_DIR}/qmp-out-$$"
- 
- QEMU_HANDLE=0
- 
-@@ -204,9 +204,9 @@ function _cleanup_qemu()
-     for i in "${!QEMU_OUT[@]}"
-     do
-         local QEMU_PID
--        if [ -f "${TEST_DIR}/qemu-${i}.pid" ]; then
--            read QEMU_PID < "${TEST_DIR}/qemu-${i}.pid"
--            rm -f "${TEST_DIR}/qemu-${i}.pid"
-+        if [ -f "${QEMU_TEST_DIR}/qemu-${i}.pid" ]; then
-+            read QEMU_PID < "${QEMU_TEST_DIR}/qemu-${i}.pid"
-+            rm -f "${QEMU_TEST_DIR}/qemu-${i}.pid"
-             if [ -z "${wait}" ] && [ -n "${QEMU_PID}" ]; then
-                 kill -KILL ${QEMU_PID} 2>/dev/null
-             fi
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 3213765..4bb9b77 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -193,11 +193,11 @@ _cleanup_test_img()
-     case "$IMGPROTO" in
- 
-         nbd)
--            if [ -f "${TEST_DIR}/qemu-nbd.pid" ]; then
-+            if [ -f "${QEMU_TEST_DIR}/qemu-nbd.pid" ]; then
-                 local QEMU_NBD_PID
--                read QEMU_NBD_PID < "${TEST_DIR}/qemu-nbd.pid"
-+                read QEMU_NBD_PID < "${QEMU_TEST_DIR}/qemu-nbd.pid"
-                 kill ${QEMU_NBD_PID}
--                rm -f "${TEST_DIR}/qemu-nbd.pid"
-+                rm -f "${QEMU_TEST_DIR}/qemu-nbd.pid"
-             fi
-             rm -f "$TEST_IMG_FILE"
-             ;;
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1    # failure is the default!
++
++_cleanup()
++{
++    _cleanup_qemu
++    rm  -f "${QEMU_TEST_DIR}/image.base" "${QEMU_TEST_DIR}/image.snp1"
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++_supported_fmt qcow2
++_supported_proto nfs
++_supported_os Linux
++
++size=100M
++
++BASE_IMG="${TEST_DIR}/image.base"
++TOP_IMG="${TEST_DIR}/image.snp1"
++
++TEST_IMG="${BASE_IMG}" _make_test_img $size
++
++TEST_IMG="${TOP_IMG}" _make_test_img $size
++
++echo
++echo === Running QEMU, using block-stream to find backing image ===
++echo
++
++qemu_comm_method="qmp"
++_launch_qemu -drive file="${BASE_IMG}",if=virtio,id=disk2
++h=$QEMU_HANDLE
++
++_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" "return"
++
++_send_qemu_cmd $h "{ 'arguments': {
++                        'device': 'disk2',
++                        'format': '${IMGFMT}',
++                        'mode': 'existing',
++                        'snapshot-file': '${TOP_IMG}',
++                        'snapshot-node-name': 'snp1'
++                     },
++                     'execute': 'blockdev-snapshot-sync'
++                   }" "return"
++
++
++_send_qemu_cmd $h "{ 'arguments': {
++                        'backing-file': 'image.base',
++                        'device': 'disk2',
++                        'image-node-name': 'snp1'
++                     },
++                     'execute': 'change-backing-file'
++                   }" "return"
++
++_send_qemu_cmd $h "{ 'arguments': {
++                        'base': '${BASE_IMG}',
++                        'device': 'disk2'
++                      },
++                      'execute': 'block-stream'
++                   }" "BLOCK_JOB_COMPLETED"
++
++_cleanup_qemu
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/173.out b/tests/qemu-iotests/173.out
+new file mode 100644
+index 0000000..f477a00
+--- /dev/null
++++ b/tests/qemu-iotests/173.out
+@@ -0,0 +1,12 @@
++QA output created by 173
++Formatting 'TEST_DIR/image.base', fmt=IMGFMT size=104857600
++Formatting 'TEST_DIR/image.snp1', fmt=IMGFMT size=104857600
++
++=== Running QEMU, using block-stream to find backing image ===
++
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk2", "len": 104857600, "offset": 104857600, "speed": 0, "type": "stream"}}
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 866c1a0..5a93ba9 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -165,3 +165,4 @@
+ 170 rw auto quick
+ 171 rw auto quick
+ 172 auto
++173 rw auto
 -- 
 2.9.3
