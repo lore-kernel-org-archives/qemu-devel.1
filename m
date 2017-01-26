@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWpvP-0006yZ-Tn
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 14:41:44 -0500
+	(envelope-from <thuth@redhat.com>) id 1cWqGE-0006MU-6z
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 15:03:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cWpvL-0001Er-1A
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 14:41:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:64931)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cWpvK-0001Ed-RB
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 14:41:34 -0500
-Date: Thu, 26 Jan 2017 19:41:29 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170126194128.GB2796@work-vm>
-References: <1485422212-31546-1-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1cWqG9-0007gl-IW
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 15:03:10 -0500
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+	<1485443388-27253-2-git-send-email-armbru@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <04ee1f95-988e-02f7-c1a9-f9630daf54da@redhat.com>
+Date: Thu, 26 Jan 2017 21:02:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485422212-31546-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] migrate: Migration aborts abruptly for
- machine "none"
+In-Reply-To: <1485443388-27253-2-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] hw: Default -drive to if=ide
+ explicitly where it works
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: thuth@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
-> Migration of a "none" machine with no RAM crashes abruptly as
-> bitmap_new() fails and thus aborts. Instead, place a check for
-> last_ram_offset() being '0' at the start of ram_save_setup() and
-> error out with a meaningful error message.
+On 26.01.2017 16:09, Markus Armbruster wrote:
+> Block backends defined with -drive if=ide are meant to be picked up by
+> machine initialization code: a suitable frontend gets created and
+> wired up automatically.
 > 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> if=ide drives not picked up that way can still be used with -device as
+> if they had if=none, but that's unclean and best avoided.  Unused ones
+> produce an "Orphaned drive without device" warning.
+> 
+> -drive parameter "if" is optional, and the default depends on the
+> machine type.  If a machine type doesn't specify a default, the
+> default is "ide".
+> 
+> Many machine types default to if=ide, even though they don't actually
+> have an IDE controller.  A future patch will change these defaults to
+> something more sensible.  To prepare for it, this patch makes default
+> "ide" explicit for the machines that actually pick up if=ide drives:
+> 
+> * alpha: clipper
+> * arm/aarch64: spitz borzoi terrier tosa
+> * i386/x86_64: generic-pc-machine (with concrete subtypes pc-q35-*
+>   pc-i440fx-* pc-* isapc xenfv)
+> * mips64el: fulong2e
+
+Slightly off-topic, but: Is fulong2e still maintained? I did not spot an
+entry in MAINTAINERS...?
+
+> * mips/mipsel/mips64el: malta mips
+> * ppc/ppc64: mac99 g3beige prep
+> * sh4/sh4eb: r2d
+> * sparc64: sun4u sun4v
+> 
+> Note that ppc64 machine powernv already sets an "ide" default
+> explicitly.  Its IDE controller isn't implemented, yet.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  migration/ram.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ef8fadf..bf05d69 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1947,6 +1947,11 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->  {
->      RAMBlock *block;
->  
-> +    if (last_ram_offset() == 0) {
-> +        error_report("Failed to migrate: No RAM available!");
-> +        return -1;
-> +    }
-> +
+>  hw/alpha/dp264.c        | 1 +
+>  hw/arm/spitz.c          | 3 +++
+>  hw/arm/tosa.c           | 1 +
+>  hw/i386/pc.c            | 1 +
+>  hw/mips/mips_fulong2e.c | 1 +
+>  hw/mips/mips_malta.c    | 1 +
+>  hw/mips/mips_r4k.c      | 1 +
+>  hw/ppc/mac_newworld.c   | 1 +
+>  hw/ppc/mac_oldworld.c   | 1 +
+>  hw/ppc/prep.c           | 1 +
+>  hw/sh4/r2d.c            | 1 +
+>  hw/sparc64/sun4u.c      | 2 ++
+>  12 files changed, 15 insertions(+)
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Patch looks right to me.
 
-Dave
-
->      /* migration has already setup the bitmap, reuse it. */
->      if (!migration_in_colo_state()) {
->          if (ram_save_init_globals() < 0) {
-> -- 
-> 2.6.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Thomas Huth <thuth@redhat.com>
