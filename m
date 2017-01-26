@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cWlxn-0006SN-Gw
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:27:56 -0500
+	(envelope-from <armbru@redhat.com>) id 1cWlxr-0006Ve-2g
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:27:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cWlxl-00024m-MN
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:27:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1cWlxn-00025M-8K
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:27:55 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 26 Jan 2017 16:27:34 +0100
-Message-Id: <1485444454-30749-4-git-send-email-armbru@redhat.com>
-In-Reply-To: <1485444454-30749-1-git-send-email-armbru@redhat.com>
-References: <1485444454-30749-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] hw/i386: Deprecate -drive if=scsi with PC
- machine types
+Date: Thu, 26 Jan 2017 16:27:31 +0100
+Message-Id: <1485444454-30749-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] hw: Deprecate unwanted use -drive if=scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +20,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, peter.maydell@linaro.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-The PC machines (pc-q35-* pc-i440fx-* pc-* isapc xenfv) automatically
-create lsi53c895a SCSI HBAs and SCSI devices to honor -drive if=scsi.
-For giggles, try -drive if=scsi,bus=25,media=cdrom --- this makes QEMU
-create 25 of them.
+Drives defined with if=scsi get connected to buses created with
+-device, unlike other interface types.  Deprecate this usage.
 
-lsi53c895a is thoroughly obsolete (PCI Ultra2 SCSI, ca. 2000), and
-currently has no maintainer in QEMU.  megasas is a better choice,
-except with old OSes that lack drivers.  virtio-scsi is a much better
-choice when you have a driver, but only (newish) Linux comes with one
-in the box.  There is no good default that works for all guests.
+There is no good default SCSI HBA for PC machines.  Deprecate if=scsi
+there entirely.
 
-Encourage users to pick a non-obsolete SCSI HBA that works for them by
-deprecating -drive if=scsi.
+Before this series, frontends for -drive if=scsi get created by SCSI
+HBAs.  Frontends for other interface types get created by machine
+initialization.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/i386/pc.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+After this series, they get created by machine initialization, except
+for deprecated cases, which get created by new function
+scsi_legacy_handle_cmdline().
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index c345c04..ceb28c7 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1650,9 +1650,15 @@ void pc_pci_device_init(PCIBus *pci_bus)
-     int max_bus;
-     int bus;
- 
-+    /* Note: if=scsi is deprecated with PC machine types */
-     max_bus = drive_get_max_bus(IF_SCSI);
-     for (bus = 0; bus <= max_bus; bus++) {
--        lsi53c895a_create(pci_bus);
-+        pci_create_simple(pci_bus, -1, "lsi53c895a");
-+        /*
-+         * By not creating frontends here, we make
-+         * scsi_legacy_handle_cmdline() create them, and warn that
-+         * this usage is deprecated.
-+         */
-     }
- }
- 
+Based on "[PATCH v2 0/8] More sensible default for -drive interface
+type".
+
+Markus Armbruster (3):
+  hw/scsi: Concentrate -drive if=scsi auto-create in one place
+  hw: Deprecate -drive if=scsi with non-onboard HBAs
+  hw/i386: Deprecate -drive if=scsi with PC machine types
+
+ hw/arm/realview.c      |  2 +-
+ hw/arm/versatilepb.c   |  2 +-
+ hw/i386/pc.c           |  6 ++++++
+ hw/scsi/esp-pci.c      |  3 ---
+ hw/scsi/esp.c          |  6 ------
+ hw/scsi/lsi53c895a.c   | 10 +++++++---
+ hw/scsi/megasas.c      |  4 ----
+ hw/scsi/mptsas.c       |  4 ----
+ hw/scsi/scsi-bus.c     | 54 +++++++++++++++++++++++++++++++++++++++++++-------
+ hw/scsi/spapr_vscsi.c  |  5 ++---
+ hw/scsi/virtio-scsi.c  |  8 --------
+ include/hw/pci/pci.h   |  2 ++
+ include/hw/scsi/scsi.h |  3 ++-
+ vl.c                   | 10 ++++++++++
+ 14 files changed, 78 insertions(+), 41 deletions(-)
+
 -- 
 2.7.4
