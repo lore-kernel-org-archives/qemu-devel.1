@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53757)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmhg-0001Bj-R6
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:15:21 -0500
+	id 1cWmiZ-0001rt-Lj
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmhc-0003s6-7Q
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:15:16 -0500
-Received: from mail.kernel.org ([198.145.29.136]:38290)
+	id 1cWmiX-0004Bx-Th
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:11 -0500
+Received: from mail.kernel.org ([198.145.29.136]:38910)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmhc-0003rm-11
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:15:12 -0500
-Date: Thu, 26 Jan 2017 18:15:07 +0200
+	id 1cWmiX-0004BU-MX
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:09 -0500
+Date: Thu, 26 Jan 2017 18:16:04 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485447262-27014-2-git-send-email-mst@redhat.com>
+Message-ID: <1485447262-27014-17-git-send-email-mst@redhat.com>
 References: <1485447262-27014-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485447262-27014-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 01/18] compiler: drop ; after BUILD_BUG_ON
+Subject: [Qemu-devel] [PULL v2 16/18] vhost: skip ROM sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +30,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>
 
-All users include the trailing ; anyway, let's require that -
-it seems cleaner.
+vhost does not support RO protections on memory at the moment - adding
+ROMs would mean that e.g. a buggy guest might change them in-memory - a
+condition from which guest reset does not recover. Not nice.
 
+We also definitely don't want to try logging writes into ROMs -
+in particular guests set very high addresses for ROM BARs
+so logging these writes would waste a lot of memory.
+
+Maybe ROMs could be supported with the iotlb variant -
+not sure, but there seems to be no good reason for virtio
+to try to do DMA from ROM. So let's just skip ROM memory.
+
+Suggested-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Tested-by: Laurent Vivier <lvivier@redhat.com>
 ---
- include/qemu/compiler.h | 3 ++-
+ hw/virtio/vhost.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 157698b..7512082 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -86,7 +86,8 @@
- #define type_check(t1,t2) ((t1*)0 - (t2*)0)
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index b124d97..febe519 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -612,7 +612,8 @@ static void vhost_set_memory(MemoryListener *listener,
  
- #define QEMU_BUILD_BUG_ON(x) \
--    typedef char glue(qemu_build_bug_on__,__LINE__)[(x)?-1:1] __attribute__((unused));
-+    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
-+        __attribute__((unused))
+ static bool vhost_section(MemoryRegionSection *section)
+ {
+-    return memory_region_is_ram(section->mr);
++    return memory_region_is_ram(section->mr) &&
++        !memory_region_is_rom(section->mr);
+ }
  
- #if defined __GNUC__
- # if !QEMU_GNUC_PREREQ(4, 4)
+ static void vhost_begin(MemoryListener *listener)
 -- 
 MST
