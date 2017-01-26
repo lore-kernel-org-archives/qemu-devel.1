@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cWo9p-0005j8-SI
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:48:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1cWoB4-0006KB-8M
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:49:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cWo9m-0007B2-0B
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:48:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45576)
+	(envelope-from <eblake@redhat.com>) id 1cWoB3-0007ce-GM
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:49:42 -0500
+Received: from relay4-d.mail.gandi.net ([2001:4b98:c:538::196]:33417)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cWo9l-0007Ag-Qj
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:48:21 -0500
-Date: Thu, 26 Jan 2017 23:18:13 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <alpine.LFD.2.20.1609261613540.30408@wniryva>
-Message-ID: <alpine.LFD.2.20.1701262316020.12566@wniryva>
-References: <1474540298-4152-1-git-send-email-ppandit@redhat.com>
-	<44697264-cc82-7c93-5b04-241bfe4035ab@redhat.com>
-	<65a02429-9c7b-5c9d-c3d7-0cda13789539@redhat.com>
-	<37065598-2277-5ea4-f75b-d88dcbf8cff4@redhat.com>
-	<alpine.LFD.2.20.1609261613540.30408@wniryva>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cWoB3-0007bv-AK
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 12:49:41 -0500
+References: <20170126171613.1399-1-stefanha@redhat.com>
+	<20170126171613.1399-2-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <093d4dea-2486-8542-fb38-2d71d3d18ef8@redhat.com>
+Date: Thu, 26 Jan 2017 11:49:36 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2] net: imx: limit buffer descriptor count
+In-Reply-To: <20170126171613.1399-2-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qapi: add missing
+ trace_visit_type_enum() call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Li Qiang <liqiang6-s@360.cn>, Qemu Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 
-  Hello Jason,
+On 01/26/2017 11:16 AM, Stefan Hajnoczi wrote:
+> A trace event exists for enums but it's never called.  This patch fixes
+> this oversight so that enums are traced just like the other QAPI types.
+> 
+> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  qapi/qapi-visit-core.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-+-- On Mon, 26 Sep 2016, P J P wrote --+
-| +-- On Fri, 23 Sep 2016, Jason Wang wrote --+
-| | Actually the patch does not apply cleanly. Please fix and repost.
-| 
-|   The 'net: imx:...' patch is for v2.6 series. I missed to indicate that in 
-| Patch v2. Could you please try it with v2.6?
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-This patch still isn't merged upstream it seems. Could you please check?
+> 
+> diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+> index 63bd97b..e6e93f0 100644
+> --- a/qapi/qapi-visit-core.c
+> +++ b/qapi/qapi-visit-core.c
+> @@ -374,6 +374,7 @@ void visit_type_enum(Visitor *v, const char *name, int *obj,
+>                       const char *const strings[], Error **errp)
+>  {
+>      assert(obj && strings);
+> +    trace_visit_type_enum(v, name, obj);
+>      switch (v->type) {
+>      case VISITOR_INPUT:
+>          input_type_enum(v, name, obj, strings, errp);
+> 
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+-- 
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
