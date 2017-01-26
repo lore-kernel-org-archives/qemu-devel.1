@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cWcxG-0003jy-LF
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 00:50:43 -0500
+	(envelope-from <thuth@redhat.com>) id 1cWdOd-0001PS-Hv
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 01:19:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cWcxD-0001Qb-JS
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 00:50:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cWcxD-0001PB-92
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 00:50:39 -0500
-References: <1485377117-18105-1-git-send-email-thuth@redhat.com>
-	<f60c6090-0ca8-8ce9-8015-4e8e34123a5a@vivier.eu>
-	<CAKmqyKMyzquxEGTF4Un_1WvwBNXOoJU1g67_9fFarVy-yeff+Q@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1cWdOa-00017L-Dv
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 01:18:59 -0500
+References: <Pine.NEB.4.64.1701251446290.11466@sdf.lonestar.org>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8a528a03-d97e-7c16-70f6-229b80563b2d@redhat.com>
-Date: Thu, 26 Jan 2017 06:50:35 +0100
+Message-ID: <ac4f39e3-6ef7-e57d-f393-e0d069be192d@redhat.com>
+Date: Thu, 26 Jan 2017 07:18:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMyzquxEGTF4Un_1WvwBNXOoJU1g67_9fFarVy-yeff+Q@mail.gmail.com>
+In-Reply-To: <Pine.NEB.4.64.1701251446290.11466@sdf.lonestar.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix crash when
- running without CPU
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] target-ppc: Add MMU model
+ check for booke machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +23,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Laurent Vivier <laurent@vivier.eu>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Valentin Plotkin <caliborn@SDF.ORG>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, Scott Wood <scottwood@freescale.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 26.01.2017 00:26, Alistair Francis wrote:
-> On Wed, Jan 25, 2017 at 12:52 PM, Laurent Vivier <laurent@vivier.eu> wr=
-ote:
->> Le 25/01/2017 =C3=A0 21:45, Thomas Huth a =C3=A9crit :
->>> When running QEMU with "-M none -device loader,file=3Dkernel.elf", it
->>> currently crashes with a segmentation fault, because the "none"-machi=
-ne
->>> does not have any CPU by default and the generic loader code tries
->>> to dereference s->cpu. Fix it by adding an appropriate check for a
->>> NULL pointer.
->>>
->>> Reported-by: Laurent Vivier <laurent@vivier.eu>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  hw/core/generic-loader.c | 9 +++++----
->>>  1 file changed, 5 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
->>> index 58f1f02..4601267 100644
->>> --- a/hw/core/generic-loader.c
->>> +++ b/hw/core/generic-loader.c
->>> @@ -137,20 +137,21 @@ static void generic_loader_realize(DeviceState =
-*dev, Error **errp)
->>>  #endif
->>>
->>>      if (s->file) {
->>> +        AddressSpace *as =3D s->cpu ? s->cpu->as :  NULL;
->>
->> Should we just abort if s->cpu is NULL?
+On 25.01.2017 15:50, Valentin Plotkin wrote:
+> Machines bamboo, e500 and virtex-ml507 assume a certain MMU model,
+> otherwise resulting in unpredictable behavior. Add apropriate checks
+> into *_init functions.
 >=20
-> I agree, what is the use case where you are loading images without a CP=
-U?
->=20
-> If there is a use case (maybe some KVM thing?) then this patch looks fi=
-ne to me.
+> Signed-off-by: Valentin <caliborn@sdf.org>
 
-I think there is no real use case yet. But this fix is 1) simpler than
-doing an error_report() + exit() here, and 2) maybe the vision of
-constructing machines on the fly with QEMU will eventually come true one
-day in the distant future, so with that patch here, the code would
-already be prepared for the case when QEMU gets started without CPUs and
-the CPUs are then later added via QOM...
-Well, I don't mind ... if you prefer an error message instead, feel free
-to suggest another patch. I'm fine as long as we do not simply crash
-with a segmentation fault here.
+Missing last name? ------^
+
+Apart from that, the patch looks fine to me now, thanks for the update!
 
  Thomas
+
+
+> ---
+>  hw/ppc/e500.c          | 6 ++++++
+>  hw/ppc/ppc440_bamboo.c | 6 ++++++
+>  hw/ppc/virtex_ml507.c  | 7 +++++++
+>  3 files changed, 19 insertions(+)
+>=20
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index cf8b122..5b1958c 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -827,6 +827,12 @@ void ppce500_init(MachineState *machine,
+> PPCE500Params *params)
+>          env =3D &cpu->env;
+>          cs =3D CPU(cpu);
+>=20
+> +        if (env->mmu_model !=3D POWERPC_MMU_BOOKE206) {
+> +            fprintf(stderr, "MMU model %i not supported by this
+> machine.\n",
+> +                env->mmu_model);
+> +            exit(1);
+> +        }
+> +
+>          if (!firstenv) {
+>              firstenv =3D env;
+>          }
+> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+> index 5c535b1..9d997bf 100644
+> --- a/hw/ppc/ppc440_bamboo.c
+> +++ b/hw/ppc/ppc440_bamboo.c
+> @@ -193,6 +193,12 @@ static void bamboo_init(MachineState *machine)
+>      }
+>      env =3D &cpu->env;
+>=20
+> +    if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
+> +        fprintf(stderr, "MMU model %i not supported by this machine.\n=
+",
+> +            env->mmu_model);
+> +        exit(1);
+> +    }
+> +
+>      qemu_register_reset(main_cpu_reset, cpu);
+>      ppc_booke_timers_init(cpu, 400000000, 0);
+>      ppc_dcr_init(env, NULL, NULL);
+> diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+> index b97d966..fdbcf22 100644
+> --- a/hw/ppc/virtex_ml507.c
+> +++ b/hw/ppc/virtex_ml507.c
+> @@ -221,6 +221,13 @@ static void virtex_init(MachineState *machine)
+>=20
+>      cpu =3D ppc440_init_xilinx(&ram_size, 1, machine->cpu_model, 40000=
+0000);
+>      env =3D &cpu->env;
+> +
+> +    if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
+> +        fprintf(stderr, "MMU model %i not supported by this machine.\n=
+",
+> +            env->mmu_model);
+> +        exit(1);
+> +    }
+> +
+>      qemu_register_reset(main_cpu_reset, cpu);
+>=20
+>      memory_region_allocate_system_memory(phys_ram, NULL, "ram", ram_si=
+ze);
