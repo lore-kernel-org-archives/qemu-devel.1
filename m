@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cWjFn-0003BQ-TR
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:34:16 -0500
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cWjFt-0003E5-4d
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:34:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cWjFi-0004w9-Tj
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:34:15 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:42454)
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cWjFs-0004z6-7N
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:34:21 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:42486)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cWjFi-0004vj-Mo
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:34:10 -0500
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cWjFs-0004yy-1F
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:34:20 -0500
 From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Thu, 26 Jan 2017 15:34:12 +0300
-Message-ID: <20170126123411.5412.44769.stgit@PASHA-ISP>
+Date: Thu, 26 Jan 2017 15:34:23 +0300
+Message-ID: <20170126123423.5412.2388.stgit@PASHA-ISP>
+In-Reply-To: <20170126123411.5412.44769.stgit@PASHA-ISP>
+References: <20170126123411.5412.44769.stgit@PASHA-ISP>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v8 0/9] replay additions
+Subject: [Qemu-devel] [PATCH v8 2/9] icount: exit cpu loop on expire
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +29,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, dovgaluk@ispras.ru, kraxel@redhat.com, pbonzini@redhat.com
 
-This set of patches includes several fixes for replay and vmstate.
+This patch adds check to break cpu loop when icount expires without
+setting the TB_EXIT_ICOUNT_EXPIRED flag. It happens when there is no
+available translated blocks and all instructions were executed.
+In icount replay mode unnecessary tb_find will be called (which may
+cause an exception) and execution will be non-deterministic.
 
-This patches add rrsnapshot option for icount. rrshapshot option creates
-start snapshot at record and loads it at replay. It allows preserving
-the state of disk images used by virtual machine. This vm state can also
-use used to roll back the execution while replaying.
+v8: refactored loop exit code and moved it to separate function
 
-With these patches operations with audio devices can also be recorded
-and replayed. All interactions with passthrough audio (including
-microphone input) are recorded automatically when -soundhw is specified
-at the command line.
-
-This set of patches includes fixes and additions for icount and
-record/replay implementation:
- - VM start/stop in replay mode
- - overlay creation for blkreplay filter
- - rrsnapshot option for record/replay
- - vmstate fix for integratorcp ARM platform
- - vmstate fixes for apic and rtc
- - fixes for icount record/replay mode
- - record/replay for audio devices
-
-v8 changes:
- - Refined replay exception processing (as suggested by Paolo Bonzini)
- - Saving/restoring static variable for APIC only once (as suggested by Paolo Bonzini)
- - Removed already queued patches
- - Minor fixes
-
-v7 changes:
- - Fixed exception replaying when TB cache is full and
-   when tb_find is called when there are no instructions about to execute
- - Added record/replay for audio devices
-
-v6 changes:
- - Added overlay creation for blkreplay driver
- - Fixed vmstate loading for apic and rtc
- - Fixed instruction counting for apic instruction patching
-
-v5 changes:
- - Recording is stopped when initial snapshot cannot be created
- - Minor changes
-
-v4 changes:
- - Overlay option is removed from blkreplay driver (as suggested by Paolo Bonzini)
- - Minor changes
-
-v3 changes:
- - Added rrsnapshot option for specifying the initial snapshot name (as suggested by Paolo Bonzini)
- - Minor changes
-
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
+ cpu-exec.c |   24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
 
-Pavel Dovgalyuk (9):
-      replay: exception replay fix
-      icount: exit cpu loop on expire
-      apic: save apic_delivered flag
-      integratorcp: adding vmstate for save/restore
-      block: implement bdrv_snapshot_goto for blkreplay
-      blkreplay: create temporary overlay for underlaying devices
-      replay: disable default snapshot for record/replay
-      audio: make audio poll timer deterministic
-      replay: add record/replay for audio passthrough
-
-
- audio/audio.c                   |   15 +++++--
- audio/audio.h                   |    5 ++
- audio/mixeng.c                  |   31 ++++++++++++++
- block/blkreplay.c               |   84 +++++++++++++++++++++++++++++++++++++++
- cpu-exec.c                      |   24 +++++++++--
- docs/replay.txt                 |    7 +++
- hw/arm/integratorcp.c           |   62 +++++++++++++++++++++++++++++
- hw/intc/apic_common.c           |   37 +++++++++++++++++
- include/hw/i386/apic_internal.h |    2 +
- include/sysemu/replay.h         |    7 +++
- replay/Makefile.objs            |    1 
- replay/replay-audio.c           |   79 +++++++++++++++++++++++++++++++++++++
- replay/replay-internal.h        |    4 ++
- stubs/replay.c                  |    1 
- translate-all.c                 |    3 +
- vl.c                            |   10 ++++-
- 16 files changed, 361 insertions(+), 11 deletions(-)
- create mode 100644 replay/replay-audio.c
-
--- 
-Pavel Dovgalyuk
+diff --git a/cpu-exec.c b/cpu-exec.c
+index fa08c73..f9b8ec8 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -523,9 +523,25 @@ static inline void cpu_handle_interrupt(CPUState *cpu,
+             *last_tb = NULL;
+         }
+     }
+-    if (unlikely(atomic_read(&cpu->exit_request) || replay_has_interrupt())) {
++}
++
++
++static void cpu_check_loop_exit(CPUState *cpu)
++{
++    if (unlikely(atomic_read(&cpu->exit_request)
++        /* icount has expired, we need to break the execution loop.
++           This check is needed before tb_find to make execution
++           deterministic - tb_find may cause an exception
++           while translating the code from non-mapped page. */
++        || (use_icount && ((cpu->icount_extra == 0
++                        && cpu->icount_decr.u16.low == 0)
++                    || (int32_t)cpu->icount_decr.u32 < 0)))) {
+         atomic_set(&cpu->exit_request, 0);
+-        cpu->exception_index = EXCP_INTERRUPT;
++        /* If there is an exception that wasn't replayed yet,
++           don't change exception_index. */
++        if (cpu->exception_index == -1) {
++            cpu->exception_index = EXCP_INTERRUPT;
++        }
+         cpu_loop_exit(cpu);
+     }
+ }
+@@ -578,9 +594,6 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+                 cpu_exec_nocache(cpu, insns_left, *last_tb, false);
+                 align_clocks(sc, cpu);
+             }
+-            cpu->exception_index = EXCP_INTERRUPT;
+-            *last_tb = NULL;
+-            cpu_loop_exit(cpu);
+         }
+         break;
+ #endif
+@@ -634,6 +647,7 @@ int cpu_exec(CPUState *cpu)
+ 
+             for(;;) {
+                 cpu_handle_interrupt(cpu, &last_tb);
++                cpu_check_loop_exit(cpu);
+                 tb = tb_find(cpu, last_tb, tb_exit);
+                 cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
+                 /* Try to align the host and virtual clocks
