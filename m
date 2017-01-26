@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWih3-0007YG-BK
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:58:22 -0500
+	(envelope-from <peterx@redhat.com>) id 1cWikB-0000Hf-BZ
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:01:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWigz-00005j-FN
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:58:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50824)
+	(envelope-from <peterx@redhat.com>) id 1cWik7-00017P-BF
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:01:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56300)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWigz-00005S-5e
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:58:17 -0500
-References: <20170126100705.6005-1-pbonzini@redhat.com>
-	<20170126125433.5979903a@bahia.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0039c2fd-34cd-10a1-7f42-0baad9e40412@redhat.com>
-Date: Thu, 26 Jan 2017 12:58:14 +0100
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWik7-00017C-5V
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:01:31 -0500
+Date: Thu, 26 Jan 2017 20:01:22 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170126120122.GL5151@pxdev.xzpeter.org>
+References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
+	<1485253571-19058-3-git-send-email-peterx@redhat.com>
+	<20170124092905.41832531@t450s.home>
+	<9ef03816-0bef-f54b-63fe-daf27eab4a40@redhat.com>
+	<20170126071244.GJ5151@pxdev.xzpeter.org>
+	<11032fa7-1e5f-dac6-f0d8-56b41121361b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170126125433.5979903a@bahia.lan>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix v9fs_lock error case
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <11032fa7-1e5f-dac6-f0d8-56b41121361b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 02/18] vfio: introduce vfio_get_vaddr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, aneesh.kumar@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, qemu-devel@nongnu.org, bd.aviv@gmail.com
 
-
-
-On 26/01/2017 12:54, Greg Kurz wrote:
-> On Thu, 26 Jan 2017 11:07:05 +0100
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, Jan 26, 2017 at 11:55:22AM +0100, Paolo Bonzini wrote:
 > 
->> In this case, we are marshaling an error status instead of the errno value.
->> Reorganize the out and out_nofid labels to look like all the other cases.
->> Coverity reports this because the "err = -ENOENT" and "err = -EINVAL"
->> assignments above are dead, overwritten by the call to pdu_marshal.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
 > 
-> There was a confusion indeed: if the server fails it should report it to the
-> client with an RERROR message.
+> On 26/01/2017 08:12, Peter Xu wrote:
+> > 
+> >     /*
+> >      * Here, we need to have the lock not only for vfio_get_vaddr(),
+> >      * but also needs to make sure that the vaddr will be valid for
+> >      * further operations.
+> >      *
+> >      * When we map new pages, we need the lock to make sure that vaddr
+> >      * is valid along the way we build up the IO page table (via
+> >      * vfio_dma_map()). Then, as long as the mapping is set up, we can
+> >      * unlock since those pages will be pinned in kernel (which makes
+> >      * sure that the RAM backend of vaddr will always be there, even
+> >      * if the memory object is destroyed and RAM released).
+> >      *
+> >      * For unmapping case, we don't really need the protection since
+> >      * the pages are in all cases locked in kernel, so we'll probably
+> >      * be safe even without the lock. However, it won't hurt we have
+> >      * the lock as well here.
+> >      */
 > 
-> Responding an RLOCK message with a P9_LOCK_ERROR status only makes sense
-> when actually implementing locking (i.e. calling flock() on the backend),
-> which isn't the case in QEMU as stated in the comment above v9fs_lock(). 
-> We should hence always report a P9_LOCK_SUCCESS status when responding
-> an RLOCK message.
+> Even simpler, just before the definition of vfio_get_vaddr:
+> 
+> /* Called with rcu_read_lock held.  */
+> 
+> and just before the vfio_dma_map call:
+> 
+>     /* vaddr is only valid until rcu_read_unlock().  But after
+>      * vfio_dma_map has set up the mapping the pages will be pinned
+>      * by the kernel.  This makes sure that the RAM backend of vaddr
+>      * will always be there, even if the memory object is destroyed
+>      * and its backing memory munmap-ed.
+>      */
+> 
+> I'm not sure that you can get rid of the lock for the unmapping case.
+> Better remove that part of the comment.
 
-Which my patch does in a very roundabout way: the first assignment to
-status is now dead, and the pdu_marshal("b") always uses P9_LOCK_SUCCESS.
+Sure. Let me take yours. Thanks!
 
-> Just to make it clear, I've modified your patch to open code this and
-> pushed it to https://github.com/gkurz/qemu/commits/9p-next .
-
-Much, better, thanks.
-
-Paolo
-
-> BTW, I've registered to https://scan.coverity.com/projects/qemu as
-> Peter suggested on IRC. I'll have a look at the other 9pfs issues.
-> 
-> Cheers.
-> 
-> --
-> Greg
-> 
->>  hw/9pfs/9p.c | 11 ++++++-----
->>  1 file changed, 6 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
->> index 99e9472..d028eca 100644
->> --- a/hw/9pfs/9p.c
->> +++ b/hw/9pfs/9p.c
->> @@ -3045,14 +3045,15 @@ static void coroutine_fn v9fs_lock(void *opaque)
->>          goto out;
->>      }
->>      status = P9_LOCK_SUCCESS;
->> -out:
->> -    put_fid(pdu, fidp);
->> -out_nofid:
->>      err = pdu_marshal(pdu, offset, "b", status);
->> -    if (err > 0) {
->> -        err += offset;
->> +    if (err < 0) {
->> +        goto out;
->>      }
->> +    err += offset;
->>      trace_v9fs_lock_return(pdu->tag, pdu->id, status);
->> +out:
->> +    put_fid(pdu, fidp);
->> +out_nofid:
->>      pdu_complete(pdu, err);
->>      v9fs_string_free(&flock.client_id);
->>  }
-> 
+-- peterx
