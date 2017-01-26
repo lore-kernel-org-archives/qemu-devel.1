@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cWpCV-000780-MC
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 13:55:17 -0500
+	(envelope-from <mst@redhat.com>) id 1cWpGK-0001AP-Gi
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 13:59:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cWpCS-00038w-TO
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 13:55:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41928)
+	(envelope-from <mst@redhat.com>) id 1cWpGG-0003ty-0C
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 13:59:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57742)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cWpCS-00038j-Kt
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 13:55:12 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 644A87FB8F
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 18:55:12 +0000 (UTC)
-References: <20170126171613.1399-1-stefanha@redhat.com>
-	<20170126171613.1399-3-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3bbf9804-ce99-0ce5-e6f4-7a1b3f96e055@redhat.com>
-Date: Thu, 26 Jan 2017 12:55:10 -0600
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cWpGF-0003tr-QU
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 13:59:07 -0500
+Date: Thu, 26 Jan 2017 20:59:04 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170126205508-mutt-send-email-mst@kernel.org>
+References: <cover.1485308342.git.ben@skyportsystems.com>
+	<dabc5ffbb5b9d29e88087dcbe03b1ba0232c342c.1485308342.git.ben@skyportsystems.com>
+	<827795cf-5399-7092-267e-e912141931f3@redhat.com>
+	<29F9E21E-D768-47D8-8E7F-BBC9DC4F72DD@skyportsystems.com>
+	<20170125202812-mutt-send-email-mst@kernel.org>
+	<2497755c-8616-1f42-ff36-ad75f6778a52@redhat.com>
+	<20170126165015-mutt-send-email-mst@kernel.org>
+	<adbfd67b-bcbc-2da2-78be-810eb35781ec@redhat.com>
+	<20170126201124-mutt-send-email-mst@kernel.org>
+	<6d15ef62-3184-3293-dd83-da67dd48dab0@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170126171613.1399-3-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xTixOxIMto6KAxncqKcRhmfAqrOpSfJe2"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] trace: clean up trace-events files
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d15ef62-3184-3293-dd83-da67dd48dab0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/9] ACPI: Add a function for building
+ named qword entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Ben Warren <ben@skyportsystems.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xTixOxIMto6KAxncqKcRhmfAqrOpSfJe2
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <3bbf9804-ce99-0ce5-e6f4-7a1b3f96e055@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] trace: clean up trace-events files
-References: <20170126171613.1399-1-stefanha@redhat.com>
- <20170126171613.1399-3-stefanha@redhat.com>
-In-Reply-To: <20170126171613.1399-3-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jan 26, 2017 at 07:25:22PM +0100, Laszlo Ersek wrote:
+> On 01/26/17 19:15, Michael S. Tsirkin wrote:
+> > On Thu, Jan 26, 2017 at 06:43:22PM +0100, Laszlo Ersek wrote:
+> >> On 01/26/17 16:20, Michael S. Tsirkin wrote:
+> >>> On Thu, Jan 26, 2017 at 01:48:37AM +0100, Laszlo Ersek wrote:
+> >>
+> >>>> But, again, I'd like to keep COMMAND_ALLOCATE_RETURN_ADDR 8-byte wide.
+> >>>
+> >>>
+> >>> What is COMMAND_ALLOCATE_RETURN_ADDR? I'm only familiar with
+> >>> COMMAND_ALLOCATE.
+> >>
+> >> It's a new command being introduced in this series, at my suggestion. It
+> >> does the exact same thing as COMMAND_ALLOCATE, except once the
+> >> allocation / download is carried out by the firmware, the firmware
+> >> writes back the allocation address to the fw_cfg file that is named in
+> >> an additional field of the COMMAND_ALLOCATE_RETURN_ADDR structure. (This
+> >> is how QEMU learns where the blob in GPA space was placed by the
+> >> firmware.) The format for this address-receiving fw_cfg file is supposed
+> >> to be 8-byte, little endian.
+> > 
+> > I see. I really think it's better as a separate command though.
+> > E.g. COMMAND_WRITE_PTR?
+> 
+> Sure, but please provide specifics, otherwise Ben & myself will have a
+> hard time divining & implementing your intent :)
+> 
+> Thanks,
+> Laszlo
 
-On 01/26/2017 11:16 AM, Stefan Hajnoczi wrote:
-> There are a number of unused trace events that
-> scripts/cleanup-trace-events.pl finds.  The "hw/vfio/pci-quirks.c"
-> filename was typoed and "qapi/qapi-visit-core.c" was missing the qapi/
-> directory prefix.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  block/trace-events      | 2 --
->  hw/block/trace-events   | 1 -
->  hw/display/trace-events | 1 -
->  hw/i386/trace-events    | 1 -
->  hw/input/trace-events   | 2 --
->  hw/intc/trace-events    | 1 -
->  hw/net/trace-events     | 8 --------
->  hw/usb/trace-events     | 1 -
->  hw/vfio/trace-events    | 2 +-
->  migration/trace-events  | 3 ---
->  qapi/trace-events       | 2 +-
->  trace-events            | 1 -
->  12 files changed, 2 insertions(+), 23 deletions(-)
+I would say a variant of ADD_POINTER:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---xTixOxIMto6KAxncqKcRhmfAqrOpSfJe2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYikYOAAoJEKeha0olJ0NqV7YH/iUliA2ZMscuQbQqR/aZxi+B
-pwMWxUj3wAg6f9J3kxSPhGj8ZPkNmMM1KwIv6dj6DeBIw82sBWIhX6X4t+TFBtPy
-oBifg79eu0J/1PNWhhVzJcmTQBgfMsU01sNDY1x7Ncr698vbR4Te06zIC2pwagZ8
-NlCj/CHNm9ULMNE/u69LEr4MEmL83pVMdF8RCuyzbdWlt18u+BJdo11GwA2g6idw
-WFpcmSEMaDh4cgSfv9r4PNlpQvU0zeFArgMnK1x9ii908/iJ462ajiUZZbwRH4qe
-AyLCUxIeBoDe0sMGz/aAVrrzmQhboGSSCTY03puKqHyfWUAlWijCv+1MJyvtgZ0=
-=5WbF
------END PGP SIGNATURE-----
-
---xTixOxIMto6KAxncqKcRhmfAqrOpSfJe2--
+        /*
+	 * COMMAND_WRITE_POINTER - update a writeable file named
+	 * @pointer.dest_file at @pointer.offset, by writing pointer to
+	 * the table originating from @src_file. 1,2,4 or 8 byte
+	 * unsigned write is used depending on @pointer.size.
+         */
+        struct {
+            char dest_file[BIOS_LINKER_LOADER_FILESZ];
+            char src_file[BIOS_LINKER_LOADER_FILESZ];
+            uint32_t offset;
+            uint8_t size;
+        } pointer;
