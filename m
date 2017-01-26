@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53801)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmhr-0001I0-Vv
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:15:32 -0500
+	id 1cWmie-0001w0-Cn
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmhn-0003wn-7c
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:15:27 -0500
-Received: from mail.kernel.org ([198.145.29.136]:38432)
+	id 1cWmib-0004DA-Rf
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:16 -0500
+Received: from mail.kernel.org ([198.145.29.136]:38954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmhn-0003wF-1Q
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:15:23 -0500
-Date: Thu, 26 Jan 2017 18:15:17 +0200
+	id 1cWmib-0004Ct-Km
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:13 -0500
+Date: Thu, 26 Jan 2017 18:16:08 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485447262-27014-5-git-send-email-mst@redhat.com>
+Message-ID: <1485447262-27014-18-git-send-email-mst@redhat.com>
 References: <1485447262-27014-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1485447262-27014-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 04/18] compiler: expression version of
- QEMU_BUILD_BUG_ON
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 17/18] vhost-user: delete chardev on cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +31,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-QEMU_BUILD_BUG_ON uses a typedef in order to be safe
-to use outside functions, but sometimes it's useful
-to have a version that can be used within an expression.
-Following what Linux does, introduce QEMU_BUILD_BUG_ON_ZERO
-that return zero after checking condition at build time.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+Remove the chardev implicitly when cleaning up the netdev. This
+prevents from reusing the chardev since it would be in an incorrect
+state with the slave.
+
+Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1256618
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qemu/compiler.h | 3 +++
+ net/vhost-user.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 1da500e..e0fb18b 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -92,6 +92,9 @@
- #define QEMU_BUILD_BUG_ON(x) typedef QEMU_BUILD_BUG_ON_STRUCT(x) \
-     glue(qemu_build_bug_on__, __LINE__) __attribute__((unused))
- 
-+#define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(QEMU_BUILD_BUG_ON_STRUCT(x)) - \
-+                                   sizeof(QEMU_BUILD_BUG_ON_STRUCT(x)))
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index 7aff77e..179939f 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -151,7 +151,10 @@ static void vhost_user_cleanup(NetClientState *nc)
+         s->vhost_net =3D NULL;
+     }
+     if (nc->queue_index =3D=3D 0) {
++        CharDriverState *chr =3D qemu_chr_fe_get_driver(&s->chr);
 +
- #if defined __GNUC__
- # if !QEMU_GNUC_PREREQ(4, 4)
-    /* gcc versions before 4.4.x don't support gnu_printf, so use printf. */
--- 
+         qemu_chr_fe_deinit(&s->chr);
++        qemu_chr_delete(chr);
+     }
+=20
+     qemu_purge_queued_packets(nc);
+--=20
 MST
