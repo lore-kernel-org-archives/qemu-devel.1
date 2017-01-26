@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmiJ-0001e9-Vt
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:00 -0500
+	(envelope-from <dmitry@daynix.com>) id 1cWmm6-000548-8c
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:19:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmiF-00047a-7e
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:15:55 -0500
-Received: from mail.kernel.org ([198.145.29.136]:38724)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmiF-00047E-0p
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:15:51 -0500
-Date: Thu, 26 Jan 2017 18:15:45 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485447262-27014-12-git-send-email-mst@redhat.com>
-References: <1485447262-27014-1-git-send-email-mst@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <dmitry@daynix.com>) id 1cWmm3-0004sO-42
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:19:50 -0500
+Received: from mail-wj0-x242.google.com ([2a00:1450:400c:c01::242]:33438)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1cWmm2-0004rq-TN
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:19:47 -0500
+Received: by mail-wj0-x242.google.com with SMTP id un2so5074659wjb.0
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 08:19:45 -0800 (PST)
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485447262-27014-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 11/18] hw/i386: check if nvdimm is enabled
- before plugging
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+From: Dmitry Fleytman <dmitry@daynix.com>
+In-Reply-To: <20170126101010.6375-1-pbonzini@redhat.com>
+Date: Thu, 26 Jan 2017 18:19:41 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <46591E43-32ED-4CC0-8AF9-2D7A42402C22@daynix.com>
+References: <20170126101010.6375-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] net: e1000e: fix dead code in
+ e1000e_write_packet_to_guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Haozhong Zhang <haozhong.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com
 
-From: Haozhong Zhang <haozhong.zhang@intel.com>
+Good catch!
 
-The missing of 'nvdimm' in the machine type option '-M' means NVDIMM
-is disabled. QEMU should refuse to plug any NVDIMM device in this case
-and report the misconfiguration.
+Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
 
-The behavior of NVDIMM on unsupported platform (HW/FW) is vendor
-specific. For some vendors, it's undefined and the platform may do
-anything. Thus, I think QEMU is free to choose the implementation.
-Aborting QEMU (i.e. refusing to boot) is the easiest one.
-
-Reported-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-Id: 20170112110928.GF4621@stefanha-x1.localdomain
-Message-Id: 20170111093630.2088-1-stefanha@redhat.com
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Xiao Guangrong <guangrong.xiao@linux.intel.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/i386/pc.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 706e233..e3fcd51 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1708,6 +1708,11 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
-     }
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
-+        if (!pcms->acpi_nvdimm_state.is_enabled) {
-+            error_setg(&local_err,
-+                       "nvdimm is not enabled: missing 'nvdimm' in '-M'");
-+            goto out;
-+        }
-         nvdimm_plug(&pcms->acpi_nvdimm_state);
-     }
- 
--- 
-MST
+> On 26 Jan 2017, at 12:10 PM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>=20
+> Because is_first is declared inside a loop, it is always true.  The =
+store
+> is dead, and so is the "else" branch of "if (is_first)".  is_last is
+> okay though.
+>=20
+> Reported by Coverity.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+> hw/net/e1000e_core.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+> index 2b11499..c99e2fb 100644
+> --- a/hw/net/e1000e_core.c
+> +++ b/hw/net/e1000e_core.c
+> @@ -1507,6 +1507,7 @@ e1000e_write_packet_to_guest(E1000ECore *core, =
+struct NetRxPkt *pkt,
+>     const E1000E_RingInfo *rxi;
+>     size_t ps_hdr_len =3D 0;
+>     bool do_ps =3D e1000e_do_ps(core, pkt, &ps_hdr_len);
+> +    bool is_first =3D true;
+>=20
+>     rxi =3D rxr->i;
+>=20
+> @@ -1514,7 +1515,6 @@ e1000e_write_packet_to_guest(E1000ECore *core, =
+struct NetRxPkt *pkt,
+>         hwaddr ba[MAX_PS_BUFFERS];
+>         e1000e_ba_state bastate =3D { { 0 } };
+>         bool is_last =3D false;
+> -        bool is_first =3D true;
+>=20
+>         desc_size =3D total_size - desc_offset;
+>=20
+> --=20
+> 2.9.3
+>=20
