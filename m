@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cWiIg-00079Y-3T
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:33:11 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cWiWp-0003jv-Pn
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:47:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cWiIc-0004om-WC
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:33:10 -0500
-Date: Thu, 26 Jan 2017 12:32:58 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170126123258.2d34fe95@Igors-MacBook-Pro.local>
-In-Reply-To: <1466145399-32209-16-git-send-email-david@gibson.dropbear.id.au>
-References: <1466145399-32209-1-git-send-email-david@gibson.dropbear.id.au>
-	<1466145399-32209-16-git-send-email-david@gibson.dropbear.id.au>
+	(envelope-from <dgilbert@redhat.com>) id 1cWiWk-0004Pi-U2
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:47:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48340)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cWiWk-0004Pa-Lk
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 06:47:42 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 975A9C049D59
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 11:47:42 +0000 (UTC)
+Date: Thu, 26 Jan 2017 11:47:37 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170126114737.GH2083@work-vm>
+References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
+	<1485207141-1941-8-git-send-email-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 15/18] spapr: CPU hot unplug support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485207141-1941-8-git-send-email-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 07/17] migration: Create x-multifd-group
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,106 +34,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: peter.maydell@linaro.org, agraf@suse.de, aik@ozlabs.ru, bharata@linux.vnet.ibm.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
 
-On Fri, 17 Jun 2016 16:36:36 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+* Juan Quintela (quintela@redhat.com) wrote:
+> Indicates how many pages we are going to send in each bach to a multifd
+> thread.
 
-> From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+bach->batch
+
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hmp.c                         |  8 ++++++++
+>  include/migration/migration.h |  1 +
+>  migration/migration.c         | 23 +++++++++++++++++++++++
+>  qapi-schema.json              | 11 +++++++++--
+>  4 files changed, 41 insertions(+), 2 deletions(-)
 > 
-> Remove the CPU core device by removing the underlying CPU thread devices.
-> Hot removal of CPU for sPAPR guests is achieved by sending the hot unplug
-> notification to the guest. Release the vCPU object after CPU hot unplug so
-> that vCPU fd can be parked and reused.
+> diff --git a/hmp.c b/hmp.c
+> index 8c7e302..e579766 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -325,6 +325,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+>          monitor_printf(mon, " %s: %" PRId64,
+>              MigrationParameter_lookup[MIGRATION_PARAMETER_X_MULTIFD_THREADS],
+>              params->x_multifd_threads);
+> +        monitor_printf(mon, " %s: %" PRId64,
+> +            MigrationParameter_lookup[MIGRATION_PARAMETER_X_MULTIFD_GROUP],
+> +            params->x_multifd_group);
+>          monitor_printf(mon, "\n");
+>      }
 > 
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-[...]
+> @@ -1401,6 +1404,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>                  p.has_x_multifd_threads = true;
+>                  use_int_value = true;
+>                  break;
+> +            case MIGRATION_PARAMETER_X_MULTIFD_GROUP:
+> +                p.has_x_multifd_group = true;
+> +                use_int_value = true;
+> +                break;
+>              }
+> 
+>              if (use_int_value) {
+> @@ -1419,6 +1426,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>                  p.downtime_limit = valueint;
+>                  p.x_checkpoint_delay = valueint;
+>                  p.x_multifd_threads = valueint;
+> +                p.x_multifd_group = valueint;
+>              }
+> 
+>              qmp_migrate_set_parameters(&p, &err);
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index b35044c..515569d 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -248,6 +248,7 @@ bool migration_in_postcopy_after_devices(MigrationState *);
+>  MigrationState *migrate_get_current(void);
+> 
+>  int migrate_multifd_threads(void);
+> +int migrate_multifd_group(void);
+> 
+>  void migrate_compress_threads_create(void);
+>  void migrate_compress_threads_join(void);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 2fe03d8..9bde01b 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -68,6 +68,7 @@
+>   */
+>  #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
+>  #define DEFAULT_MIGRATE_MULTIFD_THREADS 2
+> +#define DEFAULT_MIGRATE_MULTIFD_GROUP 16
 
+See below ^^^
 
-Bharata,
-
-Here is some notes I've made while auditing spapr cpu hotplug code.
-  
-spapr_core_release() should be spapr_core_unrealize()
-except of machine related
- spapr->cores[cc->core_id / smt] = NULL;
-which should go to spapr_core_unplug()
-
-> +static void spapr_core_release(DeviceState *dev, void *opaque)
-> +{
-> +    sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-> +    const char *typename = object_class_get_name(sc->cpu_class);
-> +    size_t size = object_type_get_instance_size(typename);
-> +    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> +    sPAPRCPUCore *core = SPAPR_CPU_CORE(OBJECT(dev));
-> +    CPUCore *cc = CPU_CORE(dev);
-> +    int smt = kvmppc_smt_threads();
-> +    int i;
-> +
-> +    for (i = 0; i < cc->nr_threads; i++) {
-> +        void *obj = sc->threads + i * size;
-> +        DeviceState *dev = DEVICE(obj);
-> +        CPUState *cs = CPU(dev);
-> +        PowerPCCPU *cpu = POWERPC_CPU(cs);
-> +
-> +        spapr_cpu_destroy(cpu);
-> +        cpu_remove_sync(cs);
-> +        object_unparent(obj);
-> +    }
-> +
-> +    spapr->cores[cc->core_id / smt] = NULL;
-> +
-> +    g_free(core->threads);
-> +    object_unparent(OBJECT(dev));
-> +}
-> +
-
-spapr_core_[un]plug() functions belong to machine code and should
-be in hw/ppc/spapr.c
-
-> +void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                       Error **errp)
-> +{
-> +    sPAPRCPUCore *core = SPAPR_CPU_CORE(OBJECT(dev));
-> +    PowerPCCPU *cpu = POWERPC_CPU(core->threads);
-> +    int id = ppc_get_vcpu_dt_id(cpu);
-> +    sPAPRDRConnector *drc =
-> +        spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, id);
-> +    sPAPRDRConnectorClass *drck;
-> +    Error *local_err = NULL;
-> +
-> +    g_assert(drc);
-> +
-> +    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-> +    drck->detach(drc, dev, spapr_core_release, NULL, &local_err);
-
-Could you explain call flow during cpu unplug?
-
-My expectations were that unplug_request() handler asks for CPU removal
-and unplug() handler removes CPU.
-It's obviously messed up somehow.
-
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
+> 
+>  static NotifierList migration_state_notifiers =
+>      NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
+> @@ -103,6 +104,7 @@ MigrationState *migrate_get_current(void)
+>              .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
+>              .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
+>              .x_multifd_threads = DEFAULT_MIGRATE_MULTIFD_THREADS,
+> +            .x_multifd_group = DEFAULT_MIGRATE_MULTIFD_GROUP,
+>          },
+>      };
+> 
+> @@ -595,6 +597,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+>      params->x_checkpoint_delay = s->parameters.x_checkpoint_delay;
+>      params->has_x_multifd_threads = true;
+>      params->x_multifd_threads = s->parameters.x_multifd_threads;
+> +    params->has_x_multifd_group = true;
+> +    params->x_multifd_group = s->parameters.x_multifd_group;
+> 
+>      return params;
+>  }
+> @@ -865,6 +869,13 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
+>                     "is invalid, it should be in the range of 1 to 255");
+>          return;
+>      }
+> +    if (params->has_x_multifd_group &&
+> +            (params->x_multifd_group < 1 || params->x_multifd_group > 10000)) {
+> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+> +                   "multifd_group",
+> +                   "is invalid, it should be in the range of 1 to 10000");
 > +        return;
 > +    }
+> 
+>      if (params->has_compress_level) {
+>          s->parameters.compress_level = params->compress_level;
+> @@ -906,6 +917,9 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
+>      if (params->has_x_multifd_threads) {
+>          s->parameters.x_multifd_threads = params->x_multifd_threads;
+>      }
+> +    if (params->has_x_multifd_group) {
+> +        s->parameters.x_multifd_group = params->x_multifd_group;
+> +    }
+>  }
+> 
+> 
+> @@ -1351,6 +1365,15 @@ int migrate_multifd_threads(void)
+>      return s->parameters.x_multifd_threads;
+>  }
+> 
+> +int migrate_multifd_group(void)
+> +{
+> +    MigrationState *s;
 > +
-> +    spapr_hotplug_req_remove_by_index(drc);
+> +    s = migrate_get_current();
+> +
+> +    return s->parameters.x_multifd_group;
 > +}
 > +
->  void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->                       Error **errp)
+>  int migrate_use_xbzrle(void)
 >  {
-> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-> index 7cb0515..1c9b319 100644
-> --- a/include/hw/ppc/spapr_cpu_core.h
-> +++ b/include/hw/ppc/spapr_cpu_core.h
-> @@ -31,4 +31,6 @@ void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  char *spapr_get_cpu_core_type(const char *model);
->  void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->                       Error **errp);
-> +void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                       Error **errp);
->  #endif
+>      MigrationState *s;
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 2273864..54232ee 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -984,6 +984,9 @@
+>  # @x-multifd-threads: Number of threads used to migrate data in parallel
+>  #                     The default value is 2 (since 2.9)
+>  #
+> +# @x-multifd-group: Number of pages sent together to a thread
+> +#                     The default value is 32 (since 2.9)
+
+Your default is set above as 16.
+Other than that;
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'enum': 'MigrationParameter',
+> @@ -991,7 +994,7 @@
+>             'cpu-throttle-initial', 'cpu-throttle-increment',
+>             'tls-creds', 'tls-hostname', 'max-bandwidth',
+>             'downtime-limit', 'x-checkpoint-delay',
+> -           'x-multifd-threads'] }
+> +           'x-multifd-threads', 'x-multifd-group'] }
+> 
+>  ##
+>  # @migrate-set-parameters:
+> @@ -1058,6 +1061,9 @@
+>  # @x-multifd-threads: Number of threads used to migrate data in parallel
+>  #                     The default value is 1 (since 2.9)
+>  #
+> +# @x-multifd-group: Number of pages sent together in a bunch
+> +#                     The default value is 32 (since 2.9)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'MigrationParameters',
+> @@ -1071,7 +1077,8 @@
+>              '*max-bandwidth': 'int',
+>              '*downtime-limit': 'int',
+>              '*x-checkpoint-delay': 'int',
+> -            '*x-multifd-threads': 'int'} }
+> +            '*x-multifd-threads': 'int',
+> +            '*x-multifd-group': 'int'} }
+> 
+>  ##
+>  # @query-migrate-parameters:
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
