@@ -1,28 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWlI7-0004w1-JC
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:44:48 -0500
+	(envelope-from <armbru@redhat.com>) id 1cWlgT-0006Wm-Ck
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:10:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cWlI2-0006K1-MR
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:44:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWlI2-0006Jq-Fh
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:44:42 -0500
-References: <20170126123411.5412.44769.stgit@PASHA-ISP>
-	<20170126123423.5412.2388.stgit@PASHA-ISP>
-	<06b49612-9faf-5933-d8e9-8645a2fcde4d@redhat.com>
-	<000e01d277d9$5d80dae0$188290a0$@ru>
-	<d449fbf5-c878-7420-f064-eb819b296e1a@redhat.com>
-	<001e01d277e1$0abe0d20$203a2760$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3634a513-bb63-dc21-3248-d8fc1e8f30e9@redhat.com>
-Date: Thu, 26 Jan 2017 15:44:37 +0100
-MIME-Version: 1.0
-In-Reply-To: <001e01d277e1$0abe0d20$203a2760$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 2/9] icount: exit cpu loop on expire
+	(envelope-from <armbru@redhat.com>) id 1cWlgS-0004rD-94
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:09:57 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 26 Jan 2017 16:09:47 +0100
+Message-Id: <1485443388-27253-8-git-send-email-armbru@redhat.com>
+In-Reply-To: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 7/8] blockdev: Make orphaned -drive fatal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +19,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, kraxel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
+Block backends defined with "-drive if=T" with T other than "none" are
+meant to be picked up by machine initialization code: a suitable
+frontend gets created and wired up automatically.
 
+If machine initialization code doesn't comply, the block backend
+remains unused.  This triggers a warning since commit a66c9dc, v2.2.0.
+Drives created by default are excempted; use -nodefaults to get rid of
+them.
 
-On 26/01/2017 15:32, Pavel Dovgalyuk wrote:
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 26/01/2017 14:37, Pavel Dovgalyuk wrote:
->>>> Simpler:
->>>>
->>>> 	use_icount &&
->>>> 	((int32_t)cpu->icount_decr.u32 < 0 ||
->>>> 	 cpu->icount_decr.u16.low + cpu->icount_extra == 0)
->>> Right.
->>>
->>>> But I'm not sure that you need to test u32.  After all you're not
->>> Checking u32 is needed, because sometimes it is less than zero.
->>
->> If cpu->icount_decr.u32 is less than zero, the next translation block
->> would immediately exit with TB_EXIT_ICOUNT_EXPIRED, causing
->>
->>             cpu->exception_index = EXCP_INTERRUPT;
->>             *last_tb = NULL;
->>             cpu_loop_exit(cpu);
->>
->> from cpu_loop_exec_tb's "case TB_EXIT_ICOUNT_EXPIRED".
->>
->> And the same is true for cpu->icount_decr.u16.low + cpu->icount_extra ==
->> 0, so I don't understand why this part of the patch is necessary.
-> 
-> I removed that lines because we have to check icount=0 not only when it is expired,
-> but also when all instructions were executed successfully. 
-> If there are no instructions to execute, calling tb_find (and translation then)
-> may cause an exception at the wrong moment.
+Turn this warning into an error.
 
-Ok, that makes sense for cpu->icount_decr.u16.low + cpu->icount_extra == 0.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ blockdev.c                | 14 +++++++-------
+ include/sysemu/blockdev.h |  2 +-
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-But for decr.u32 < 0, the same reasoning of this comment is also true:
-
-        /* Something asked us to stop executing
-         * chained TBs; just continue round the main
-         * loop. Whatever requested the exit will also
-         * have set something else (eg exit_request or
-         * interrupt_request) which we will handle
-         * next time around the loop.  But we need to
-         * ensure the tcg_exit_req read in generated code
-         * comes before the next read of cpu->exit_request
-         * or cpu->interrupt_request.
-         */
-
-(and by the way, this means that you need an smp_rmb in case
-TB_EXIT_ICOUNT_EXPIRED).
-
-Thanks,
-
-Paolo
+diff --git a/blockdev.c b/blockdev.c
+index a597a66..ec9c114 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -227,28 +227,28 @@ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit)
+     return NULL;
+ }
+ 
+-bool drive_check_orphaned(void)
++void drive_check_orphaned(void)
+ {
+     BlockBackend *blk;
+     DriveInfo *dinfo;
+     Location loc;
+-    bool rs = false;
++    bool orphans = false;
+ 
+     for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
+         dinfo = blk_legacy_dinfo(blk);
+-        /* If dinfo->bdrv->dev is NULL, it has no device attached. */
+-        /* Unless this is a default drive, this may be an oversight. */
+         if (!blk_get_attached_dev(blk) && !dinfo->is_default &&
+             dinfo->type != IF_NONE) {
+             loc_push_none(&loc);
+             qemu_opts_loc_restore(dinfo->opts);
+-            error_report("warning: machine type does not support this drive");
++            error_report("machine type does not support this drive");
+             loc_pop(&loc);
+-            rs = true;
++            orphans = true;
+         }
+     }
+ 
+-    return rs;
++    if (orphans) {
++        exit(1);
++    }
+ }
+ 
+ DriveInfo *drive_get_by_index(BlockInterfaceType type, int index)
+diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+index 351a039..ac22f2a 100644
+--- a/include/sysemu/blockdev.h
++++ b/include/sysemu/blockdev.h
+@@ -48,7 +48,7 @@ BlockBackend *blk_by_legacy_dinfo(DriveInfo *dinfo);
+ void override_max_devs(BlockInterfaceType type, int max_devs);
+ 
+ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit);
+-bool drive_check_orphaned(void);
++void drive_check_orphaned(void);
+ DriveInfo *drive_get_by_index(BlockInterfaceType type, int index);
+ int drive_get_max_bus(BlockInterfaceType type);
+ int drive_get_max_devs(BlockInterfaceType type);
+-- 
+2.7.4
