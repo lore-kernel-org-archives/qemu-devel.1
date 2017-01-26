@@ -1,27 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cWkKl-0003xB-By
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:43:31 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cWkf0-0003H7-3X
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:04:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cWkKk-0003zQ-7D
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:43:27 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:36707)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cWkKj-0003zM-UN
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 08:43:26 -0500
-Received: by mail-ot0-x243.google.com with SMTP id 36so27399319otx.3
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 05:43:25 -0800 (PST)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cWkew-0001eg-3u
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:04:22 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cWkev-0001eY-RF
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 09:04:18 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0QE47xc055824
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 09:04:16 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 287d2adkk1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 09:04:14 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Thu, 26 Jan 2017 14:03:43 -0000
+Date: Thu, 26 Jan 2017 15:03:39 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <850aa48b-a5ea-782b-b245-5549ec5f08ea@redhat.com>
+References: <1485436265-12573-1-git-send-email-thuth@redhat.com>
+	<1485436265-12573-6-git-send-email-thuth@redhat.com>
+	<195c3d94-9a9c-6e48-954c-b2769691929e@redhat.com>
+	<850aa48b-a5ea-782b-b245-5549ec5f08ea@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170123121204.547e6415@nial.brq.redhat.com>
-References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
-	<20170118175335-mutt-send-email-mst@kernel.org>
-	<CAAibmn3GJWWun69KCHp+0qCBo=fjg1_xg+R_o+Qyro48a7Y_zQ@mail.gmail.com>
-	<20170123121204.547e6415@nial.brq.redhat.com>
-From: Phil Dennis-Jordan <phil@philjordan.eu>
-Date: Thu, 26 Jan 2017 14:43:04 +0100
-Message-ID: <CAAibmn1j8819O1UbSOQphe=2-uAt29uYQXhOkCnc_BKiYovD9w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170126150339.50ce5787.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 5/5] checkpatch: reduce MAINTAINERS
+ update message frequency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +44,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 23 January 2017 at 12:12, Igor Mammedov <imammedo@redhat.com> wrote:
->> For reference, my approach to filling out the Xdsdt/Xfacs fields in
->> build_fadt() is essentially the same as for the 32-bit variants from
->> rev1:
->>
->> unsigned xfacs_offset = (char *)&fadt->Xfacs - table_data->data;
->> bios_linker_loader_add_pointer(linker,
->>         ACPI_BUILD_TABLE_FILE, xfacs_offset, sizeof(fadt->Xfacs),
->>         ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
->>
->> Suggestions welcome.
-> You are not supposed to fill in the same values in X_FOO as in FOO.
-> Spec says that only either one of above should be set.
+On Thu, 26 Jan 2017 14:39:35 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-Thanks for clarifying that. I'd been looking at the ACPI 2.0 spec,
-which isn't clear on this point - the 5.0 one unambiguously agrees
-with you.
+> On 26.01.2017 14:28, Paolo Bonzini wrote:
+> > 
+> > 
+> > On 26/01/2017 14:11, Thomas Huth wrote:
+> >> This is a port of the following commit from the Linux kernel:
+> >>
+> >> commit e0d975b1b439c4fef58fbc306c542c94f48bb849
+> >> Author: Joe Perches <joe@perches.com>
+> >> Date:   Wed Dec 10 15:51:49 2014 -0800
+> >>
+> >>     checkpatch: reduce MAINTAINERS update message frequency
+> >>
+> >>     When files are being added/moved/deleted and a patch contains an update to
+> >>     the MAINTAINERS file, assume it's to update the MAINTAINERS file correctly
+> >>     and do not emit the "does MAINTAINERS need updating?" message.
+> >>
+> >>     Reported by many people.
+> >>
+> >>     Signed-off-by: Joe Perches <joe@perches.com>
+> >>     Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+> >>     Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  scripts/checkpatch.pl | 6 ++++++
+> >>  1 file changed, 6 insertions(+)
+> >>
+> >> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> >> index e1be7b3..555a5b6 100755
+> >> --- a/scripts/checkpatch.pl
+> >> +++ b/scripts/checkpatch.pl
+> >> @@ -1300,6 +1300,12 @@ sub process {
+> >>  			}
+> >>  		}
+> >>  
+> >> +# Check if MAINTAINERS is being updated.  If so, there's probably no need to
+> >> +# emit the "does MAINTAINERS need updating?" message on file add/move/delete
+> >> +		if ($line =~ /^\s*MAINTAINERS\s*\|/) {
+> >> +			$reported_maintainer_file = 1;
+> >> +		}
+> >> +
+> >>  # Check for added, moved or deleted files
+> >>  		if (!$reported_maintainer_file && !$in_commit_log &&
+> >>  		    ($line =~ /^(?:new|deleted) file mode\s*\d+\s*$/ ||
+> >>
+> > 
+> > Maybe leave it as a warning given this change?
+> 
+> I think chances are high that it still pops up quite frequently with
+> false positives:
+> 
+> 1) The above regex only triggers for patches that contain a diffstat. If
+> you run the script on patches without diffstat, you always get the
+> warning as soon as you add, delete or move a file, even if you update
+> the MAINTAINERS file in the same patch.
+> 
+> 2) I think it is quite common in patch series to first introduce new
+> files in the first patches, and then update MAINTAINERS only once at the
+> end.
+> 
+> 3) The MAINTAINERS file often covers whole folders with wildcard
+> expressions. So if you add/delete/rename a file within such a folder,
+> you don't need to update MAINTAINERS thanks to the wildcard.
+> 
+> I guess people might be annoyed if checkpatch.pl throws a warning in
+> these cases. So a "NOTE: ..." sounds more sane to me. But if you like,
+> we can also start with a WARNING first and only ease it if people start
+> to complain?
 
-I've tested the FADT change through again. Leaving Xdsdt and Xfacs as
-0 in the Rev3 does indeed allow macOS to boot, as previously reported.
-Rebooting also works, which is the whole point of the patch. I'm still
-no further with getting Windows 10 past the "ACPI BIOS ERROR"
-bluescreen, however, even after some more experimenting with the
-various fields.
-I've tried a Rev5 FADT too, the Win10 bootloader just hangs in this
-cace, I don't even get a bluescreen. macOS is still happy.
-I've dumped the ACPI tables that OVMF ultimately exports with an EFI
-shell utility, and it all looks ok to me there; I also added various
-debug output to OVMF's ACPI code, and again everything looks pretty
-sane there. I guess my problem is I don't know what I'm looking for as
-I haven't found a way for Windows to tell me exactly what it doesn't
-like.
-
-I'm basically stumped on the Windows 10 issue, but I'd still like to
-fix macOS guest rebooting. Would a patch be acceptable that introduces
-a Rev3 FADT option? (or Rev5 - this'll be much less code as the struct
-already exists) If so, what nature should the option take?
-
-For reference, my latest FADT Rev3 prototype patch follows, in case
-anyone can spot some obvious problem. (I've kept this as compact as
-possible as opposed to optimising code quality for upstreaming.) The
-Rev5 FADT is identical except it uses sizeof(*fadt) and of course 5 as
-the revision.
-
----
- hw/i386/acpi-build.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
-
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 1c928ab..19dde8b 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -271,7 +271,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
- }
-
- /* Load chipset information in FADT */
--static void fadt_setup(AcpiFadtDescriptorRev1 *fadt, AcpiPmInfo *pm)
-+static void fadt_setup(AcpiFadtDescriptorRev5_1 *fadt, AcpiPmInfo *pm)
- {
-     fadt->model = 1;
-     fadt->reserved1 = 0;
-@@ -296,6 +296,11 @@ static void fadt_setup(AcpiFadtDescriptorRev1
-*fadt, AcpiPmInfo *pm)
-                               (1 << ACPI_FADT_F_SLP_BUTTON) |
-                               (1 << ACPI_FADT_F_RTC_S4));
-     fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_USE_PLATFORM_CLOCK);
-+    fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
-+    fadt->reset_value = 0xf;
-+    fadt->reset_register.space_id   = 1;
-+    fadt->reset_register.bit_width = 8;
-+    fadt->reset_register.address            = ICH9_RST_CNT_IOPORT;
-     /* APIC destination mode ("Flat Logical") has an upper limit of 8 CPUs
-      * For more than 8 CPUs, "Clustered Logical" mode has to be used
-      */
-@@ -303,6 +308,15 @@ static void fadt_setup(AcpiFadtDescriptorRev1
-*fadt, AcpiPmInfo *pm)
-         fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
-     }
-     fadt->century = RTC_CENTURY;
-+
-+    fadt->xpm1a_event_block.address = cpu_to_le64(pm->io_base);
-+    fadt->xpm1a_event_block.space_id = 1;
-+    fadt->xpm1a_control_block.address = cpu_to_le64(pm->io_base + 0x04);
-+    fadt->xpm1a_control_block.space_id = 1;
-+    fadt->xpm_timer_block.address = cpu_to_le64(pm->io_base + 0x08);
-+    fadt->xpm_timer_block.space_id = 1;
-+    fadt->xgpe0_block.address = cpu_to_le64(pm->gpe0_blk);
-+    fadt->xgpe0_block.space_id = 1;
- }
-
-
-@@ -312,7 +326,7 @@ build_fadt(GArray *table_data, BIOSLinker *linker,
-AcpiPmInfo *pm,
-            unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
-            const char *oem_id, const char *oem_table_id)
- {
--    AcpiFadtDescriptorRev1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
-+    AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, 244);
-     unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
-     unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
-
-@@ -328,7 +342,7 @@ build_fadt(GArray *table_data, BIOSLinker *linker,
-AcpiPmInfo *pm,
-         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-
-     build_header(linker, table_data,
--                 (void *)fadt, "FACP", sizeof(*fadt), 1, oem_id, oem_table_id);
-+                 (void *)fadt, "FACP", 244, 3, oem_id, oem_table_id);
- }
-
- void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
---
+I'd vote for 'NOTE:'. I'm always a bit annoyed if checkpatch triggers
+for a file already covered by 3) (which seems to be the most common
+case for patches I've been involved with).
