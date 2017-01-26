@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53836)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmiR-0001ka-Ff
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:08 -0500
+	id 1cWmij-00020l-Li
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmiM-00049K-LA
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:03 -0500
-Received: from mail.kernel.org ([198.145.29.136]:38818)
+	id 1cWmie-0004E6-VX
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:21 -0500
+Received: from mail.kernel.org ([198.145.29.136]:38980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=6PQq=ZI=redhat.com=mst@kernel.org>)
-	id 1cWmiM-000497-BB
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:15:58 -0500
-Date: Thu, 26 Jan 2017 18:15:52 +0200
+	id 1cWmie-0004Dh-Oi
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 11:16:16 -0500
+Date: Thu, 26 Jan 2017 18:16:11 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485447262-27014-14-git-send-email-mst@redhat.com>
+Message-ID: <1485447262-27014-19-git-send-email-mst@redhat.com>
 References: <1485447262-27014-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485447262-27014-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 13/18] hcd-xhci: check & correct param before
- using it
+Subject: [Qemu-devel] [PULL v2 18/18] hw/pci: disable pci-bridge's shpc by
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +31,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>
 
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
 
-usb_xhci_realize() corrects invalid values of property "intrs"
-automatically, but the uncorrected value is passed to msi_init(),
-which chokes on invalid values.  Delay that until after the
-correction.
+The shpc component is optional while  ACPI hotplug is used
+for hot-plugging PCI devices into a PCI-PCI bridge.
+Disabling the shpc by default will make slot 0 usable at boot time
+and not only for hot-plug, without loosing any functionality.
+Older machines will have shpc enabled for compatibility reasons.
 
-Resources allocated by usb_xhci_init() are leaked when msi_init()
-fails.  Fix by calling it after msi_init().
-
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Marcel Apfelbaum <marcel@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Marcel Apfelbaum <marcel@redhat.com>
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/usb/hcd-xhci.c | 37 ++++++++++++++++++-------------------
- 1 file changed, 18 insertions(+), 19 deletions(-)
+ include/hw/compat.h            | 4 ++++
+ hw/pci-bridge/pci_bridge_dev.c | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index e0b5169..6575d05 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -3627,25 +3627,6 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-     dev->config[PCI_CACHE_LINE_SIZE] = 0x10;
-     dev->config[0x60] = 0x30; /* release number */
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 34e9b4a..752a9d7 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -10,6 +10,10 @@
+         .driver   = "fw_cfg_io",\
+         .property = "x-file-slots",\
+         .value    = stringify(0x10),\
++    },{\
++        .driver   = "pci-bridge",\
++        .property = "shpc",\
++        .value    = "on",\
+     },
  
--    usb_xhci_init(xhci);
--
--    if (xhci->msi != ON_OFF_AUTO_OFF) {
--        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
--        /* Any error other than -ENOTSUP(board's MSI support is broken)
--         * is a programming error */
--        assert(!ret || ret == -ENOTSUP);
--        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
--            /* Can't satisfy user's explicit msi=on request, fail */
--            error_append_hint(&err, "You have to use msi=auto (default) or "
--                    "msi=off with this machine type.\n");
--            error_propagate(errp, err);
--            return;
--        }
--        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
--        /* With msi=auto, we fall back to MSI off silently */
--        error_free(err);
--    }
--
-     if (xhci->numintrs > MAXINTRS) {
-         xhci->numintrs = MAXINTRS;
-     }
-@@ -3667,6 +3648,24 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-         xhci->max_pstreams_mask = 0;
-     }
+ #define HW_COMPAT_2_7 \
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index 5dbd933..647ad80 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -163,7 +163,7 @@ static Property pci_bridge_dev_properties[] = {
+     DEFINE_PROP_ON_OFF_AUTO(PCI_BRIDGE_DEV_PROP_MSI, PCIBridgeDev, msi,
+                             ON_OFF_AUTO_AUTO),
+     DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
+-                    PCI_BRIDGE_DEV_F_SHPC_REQ, true),
++                    PCI_BRIDGE_DEV_F_SHPC_REQ, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-+    if (xhci->msi != ON_OFF_AUTO_OFF) {
-+        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
-+        /* Any error other than -ENOTSUP(board's MSI support is broken)
-+         * is a programming error */
-+        assert(!ret || ret == -ENOTSUP);
-+        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
-+            /* Can't satisfy user's explicit msi=on request, fail */
-+            error_append_hint(&err, "You have to use msi=auto (default) or "
-+                    "msi=off with this machine type.\n");
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
-+        /* With msi=auto, we fall back to MSI off silently */
-+        error_free(err);
-+    }
-+
-+    usb_xhci_init(xhci);
-     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
- 
-     memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
 -- 
 MST
