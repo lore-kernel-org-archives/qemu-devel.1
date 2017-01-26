@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cWgSp-00040m-8M
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:35:32 -0500
+	(envelope-from <prvs=192659432=Paul.Durrant@citrix.com>)
+	id 1cWgUm-0005fn-Of
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:37:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cWgSk-0002gS-B5
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:35:31 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36759)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cWgSk-0002g5-4G
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:35:26 -0500
-Received: by mail-wm0-x244.google.com with SMTP id r126so49045183wmr.3
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 01:35:26 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1484834995-26826-1-git-send-email-peter.maydell@linaro.org>
-	<1484834995-26826-27-git-send-email-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6807802b-e9d3-e4d2-f904-e34211a336e9@redhat.com>
-Date: Thu, 26 Jan 2017 10:35:23 +0100
+	(envelope-from <prvs=192659432=Paul.Durrant@citrix.com>)
+	id 1cWgUk-0003Sp-6S
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:37:32 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:20876)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=192659432=Paul.Durrant@citrix.com>)
+	id 1cWgUk-0003QA-1r
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:37:30 -0500
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Thu, 26 Jan 2017 09:37:24 +0000
+Message-ID: <1485423445-12302-3-git-send-email-paul.durrant@citrix.com>
+In-Reply-To: <1485423445-12302-1-git-send-email-paul.durrant@citrix.com>
+References: <1485423445-12302-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <1484834995-26826-27-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 26/36] hw/intc/arm_gicv3: Add accessors for
- ICH_ system registers
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 2/3] xen-platform: add support for
+ unplugging NVMe disks...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
+...not just IDE and SCSI.
 
+This patch allows the Xen tool-stack to fully support of NVMe as an
+emulated disk type. See [1] for the relevant tool-stack patch discussion.
 
-On 19/01/2017 15:09, Peter Maydell wrote:
-> +        uint64_t lr = cs->ich_lr_el2[i];
-> +
-> +        if ((lr & ICH_LR_EL2_STATE_MASK) == 0 &&
-> +            ((lr & ICH_LR_EL2_HW) == 1 || (lr & ICH_LR_EL2_EOI) == 0)) {
+[1] https://lists.xen.org/archives/html/xen-devel/2017-01/msg01225.html
 
-This should be "!= 0", not == 1 (reported by Coverity).
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 
-Paolo
+v3:
+- Add reference to xen-devel patch discussion in commit message as
+  requested by Stefano.
+---
+ hw/i386/xen/xen_platform.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> +            value |= (1 << i);
-> +        }
+diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+index f50915f..7d41ebb 100644
+--- a/hw/i386/xen/xen_platform.c
++++ b/hw/i386/xen/xen_platform.c
+@@ -120,6 +120,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *o)
+         break;
+ 
+     case PCI_CLASS_STORAGE_SCSI:
++    case PCI_CLASS_STORAGE_EXPRESS:
+         object_unparent(OBJECT(d));
+         break;
+ 
+-- 
+2.1.4
