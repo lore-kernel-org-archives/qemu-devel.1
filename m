@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cWgez-0005Np-IL
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:48:09 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cWgxI-0003B4-T4
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:07:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cWgex-0000wG-1h
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:48:05 -0500
-Received: from greensocs.com ([193.104.36.180]:33180)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cWgew-0000vv-MF
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:48:02 -0500
-From: fred.konrad@greensocs.com
-Date: Thu, 26 Jan 2017 10:47:40 +0100
-Message-Id: <1485424060-12217-11-git-send-email-fred.konrad@greensocs.com>
-In-Reply-To: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
-References: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH V2 10/10] zynqmp: add reference clock
+	(envelope-from <dgilbert@redhat.com>) id 1cWgxH-0001ng-VY
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:07:00 -0500
+Date: Thu, 26 Jan 2017 10:06:44 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170126100643.GD2083@work-vm>
+References: <1485422381-29019-1-git-send-email-eric.auger@redhat.com>
+	<1485422381-29019-5-git-send-email-eric.auger@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485422381-29019-5-git-send-email-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 4/4] hw/intc/arm_gicv3_its: Allow save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,117 +23,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx.com, mark.burton@greensocs.com, fred.konrad@greensocs.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, shannon.zhao@linaro.org, christoffer.dall@linaro.org, drjones@redhat.com, vijay.kilari@gmail.com, Vijaya.Kumar@cavium.com, peterx@redhat.com, quintela@redhat.com
 
-From: KONRAD Frederic <fred.konrad@greensocs.com>
+* Eric Auger (eric.auger@redhat.com) wrote:
+> We change the restoration priority of both the GICv3 and ITS. The
+> GICv3 must be restored before the ITS and the ITS needs to be restored
+> before PCIe devices since it translates their MSI transactions.
+> 
+> We typically observe the virtio-pci-net device sending MSI transactions
+> very early (even before the first vcpu run) which looks weird. It
+> appears that not servicing those transactions cause the virtio-pci-net
+> to stall.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-This adds some fixed reference clock to the zynqmp platform.
-They will feed the zynqmp_crf block.
+<snip>
 
-Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
----
- hw/arm/xlnx-zynqmp.c         | 49 ++++++++++++++++++++++++++++++++++++++++++++
- include/hw/arm/xlnx-zynqmp.h |  6 ++++++
- 2 files changed, 55 insertions(+)
+> diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+> index 3f8017d..7f81d33 100644
+> --- a/hw/intc/arm_gicv3_its_kvm.c
+> +++ b/hw/intc/arm_gicv3_its_kvm.c
+> @@ -95,8 +95,12 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
+>       * Block migration of a KVM GICv3 ITS device: the API for saving and
+>       * restoring the state in the kernel is not yet available
+>       */
+> -    error_setg(&s->migration_blocker, "vITS migration is not implemented");
+> -    migrate_add_blocker(s->migration_blocker);
+> +    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+> +                               GITS_CTLR)) {
+> +        error_setg(&s->migration_blocker, "This operating system kernel does "
+> +                                          "not support vITS migration");
+> +        migrate_add_blocker(s->migration_blocker);
+> +    }
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 27dccdb..1bef77d 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -24,6 +24,7 @@
- #include "exec/address-spaces.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
-+#include "qemu/qemu-clock.h"
- 
- #define GIC_NUM_SPI_INTR 160
- 
-@@ -182,6 +183,22 @@ static void xlnx_zynqmp_init(Object *obj)
-     qdev_set_parent_bus(DEVICE(s->crf), sysbus_get_default());
-     object_property_add_child(obj, "xlnx.zynqmp_crf", OBJECT(s->crf),
-                               &error_abort);
-+
-+    s->pss_ref_clk = object_new(TYPE_FIXED_CLOCK);
-+    object_property_add_child(obj, "pss_ref_clk", s->pss_ref_clk,
-+                              &error_abort);
-+    object_property_set_int(s->pss_ref_clk, 50000000, "rate", &error_abort);
-+    s->video_clk = object_new(TYPE_FIXED_CLOCK);
-+    object_property_add_child(obj, "video_clk", s->video_clk, &error_abort);
-+    object_property_set_int(s->video_clk, 27000000, "rate", &error_abort);
-+    s->pss_alt_ref_clk = object_new(TYPE_FIXED_CLOCK);
-+    object_property_add_child(obj, "pss_alt_ref_clk", s->pss_alt_ref_clk,
-+                              &error_abort);
-+    s->aux_refclk = object_new(TYPE_FIXED_CLOCK);
-+    object_property_add_child(obj, "aux_refclk", s->aux_refclk, &error_abort);
-+    s->gt_crx_ref_clk = object_new(TYPE_FIXED_CLOCK);
-+    object_property_add_child(obj, "gt_crx_ref_clk", s->gt_crx_ref_clk,
-+                              &error_abort);
- }
- 
- static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-@@ -431,6 +448,38 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->dpdma), 0, gic_spi[DPDMA_IRQ]);
- 
-     sysbus_mmio_map(SYS_BUS_DEVICE(s->crf), 0, 0xFD1A0000);
-+
-+    /* Bind the clock */
-+    qemu_clk_bind_clock(qemu_clk_device_get_clock(DEVICE(s->pss_ref_clk),
-+                                                  "clk_out"),
-+                        qemu_clk_device_get_clock(DEVICE(s->crf),
-+                                                  "pss_ref_clk"));
-+
-+    qemu_clk_bind_clock(qemu_clk_device_get_clock(DEVICE(s->video_clk),
-+                                                  "clk_out"),
-+                        qemu_clk_device_get_clock(DEVICE(s->crf), "video_clk"));
-+
-+    qemu_clk_bind_clock(qemu_clk_device_get_clock(DEVICE(s->pss_alt_ref_clk),
-+                                                  "clk_out"),
-+                        qemu_clk_device_get_clock(DEVICE(s->crf),
-+                                                  "pss_alt_ref_clk"));
-+
-+    qemu_clk_bind_clock(qemu_clk_device_get_clock(DEVICE(s->aux_refclk),
-+                                                  "clk_out"),
-+                        qemu_clk_device_get_clock(DEVICE(s->crf),
-+                                                  "aux_refclk"));
-+
-+    qemu_clk_bind_clock(qemu_clk_device_get_clock(DEVICE(s->gt_crx_ref_clk),
-+                                                  "clk_out"),
-+                        qemu_clk_device_get_clock(DEVICE(s->crf),
-+                                                  "gt_crx_ref_clk"));
-+
-+    object_property_set_bool(s->crf, true, "realized", &err);
-+    object_property_set_bool(s->pss_ref_clk, true, "realized", &err);
-+    object_property_set_bool(s->video_clk, true, "realized", &err);
-+    object_property_set_bool(s->pss_alt_ref_clk, true, "realized", &err);
-+    object_property_set_bool(s->aux_refclk, true, "realized", &err);
-+    object_property_set_bool(s->gt_crx_ref_clk, true, "realized", &err);
- }
- 
- static Property xlnx_zynqmp_props[] = {
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 379a17a..d0cc57f 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -28,6 +28,7 @@
- #include "hw/ssi/xilinx_spips.h"
- #include "hw/dma/xlnx_dpdma.h"
- #include "hw/display/xlnx_dp.h"
-+#include "hw/misc/fixed-clock.h"
- 
- #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
- #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
-@@ -86,6 +87,11 @@ typedef struct XlnxZynqMPState {
-     XlnxDPState dp;
-     XlnxDPDMAState dpdma;
- 
-+    Object *pss_ref_clk;
-+    Object *video_clk;
-+    Object *pss_alt_ref_clk;
-+    Object *aux_refclk;
-+    Object *gt_crx_ref_clk;
-     Object *crf;
- 
-     char *boot_cpu;
--- 
-1.8.3.1
+Watch out, a change went in to the parameters/return value of migrate_add_blocker
+earlier in the week - it can now fail.
+
+>      kvm_msi_use_devid = true;
+>      kvm_gsi_direct_mapping = false;
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 1a22887..ebd755c 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -188,6 +188,8 @@ enum VMStateFlags {
+>  
+>  typedef enum {
+>      MIG_PRI_DEFAULT = 0,
+> +    MIG_PRI_GICV3_ITS,
+> +    MIG_PRI_GICV3,
+>      MIG_PRI_MAX,
+
+Can we keep this commented so it's trivially easy to see the order, something like:
+
+ typedef enum {
+     MIG_PRI_DEFAULT = 0,
++    MIG_PRI_GICV3_ITS,    /* Needs to be before PCI devices */
++    MIG_PRI_GICV3,        /* Must be before ITS */
+     MIG_PRI_MAX,
+ } MigrationPriority;
+
+Dave
+
+>  
+> -- 
+> 2.5.5
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
