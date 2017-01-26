@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWeIB-0000qS-GI
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 02:16:24 -0500
+	(envelope-from <armbru@redhat.com>) id 1cWeb5-00052a-2L
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 02:35:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cWeI8-0006yw-Bf
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 02:16:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40826)
+	(envelope-from <armbru@redhat.com>) id 1cWeb1-0002k4-Qh
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 02:35:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33178)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cWeI8-0006ym-2m
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 02:16:20 -0500
-Date: Thu, 26 Jan 2017 15:16:13 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170126071613.GK5151@pxdev.xzpeter.org>
-References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
-	<20170124114910.GD16400@pxdev.xzpeter.org>
-	<20170124164751-mutt-send-email-mst@kernel.org>
-	<20170125044837.GE5151@pxdev.xzpeter.org>
-	<20170125162554-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cWeb1-0002js-HT
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 02:35:51 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1484165352.git.atar4qemu@gmail.com>
+	<cover.1484165352.git.atar4qemu@gmail.com>
+	<662c7a5b81926a9daba26c943b0c11e99068c867.1484165352.git.atar4qemu@gmail.com>
+Date: Thu, 26 Jan 2017 08:35:46 +0100
+In-Reply-To: <662c7a5b81926a9daba26c943b0c11e99068c867.1484165352.git.atar4qemu@gmail.com>
+	(Artyom Tarasenko's message of "Wed, 11 Jan 2017 21:20:01 +0100")
+Message-ID: <87bmuumfxp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170125162554-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v5 00/18] VT-d: vfio enablement and misc
- enhances
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 30/30] target-sparc: fix up niagara
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +29,419 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Jan 25, 2017 at 04:26:59PM +0200, Michael S. Tsirkin wrote:
-> On Wed, Jan 25, 2017 at 12:48:37PM +0800, Peter Xu wrote:
-> > On Tue, Jan 24, 2017 at 04:48:49PM +0200, Michael S. Tsirkin wrote:
-> > > On Tue, Jan 24, 2017 at 07:49:10PM +0800, Peter Xu wrote:
-> > > > On Tue, Jan 24, 2017 at 06:25:53PM +0800, Peter Xu wrote:
-> > > > > This is v5 of vt-d vfio enablement series.
-> > > > > 
-> > > > > Most of the changes in v5 is not functionally, but related to
-> > > > > comments, error_report()s, debugging, squashing patches, etc. (which
-> > > > > are confirmed changes in v4), besides a tiny tweak when unmapping a
-> > > > > whole address space (please see below changelog). There are still
-> > > > > discussions in v4 thread, we can just continue there (or here), and
-> > > > > from this version I'll remove RFC tag.
-> > > > > 
-> > > > > I didn't rebase to master since current master failed to build on my
-> > > > > laptop (with a "vl.c/hax..." error), however this series should be
-> > > > > okay to be applied cleanly upon it.
-> > > > 
-> > > > Sorry I forgot to append the todo list (please help adding in in case
-> > > > I missed anything):
-> > > > 
-> > > > - don't need to notify IOTLB (psi/gsi/global) invalidations to devices
-> > > >   that with ATS enabled
-> > > > - investigate when guest map page while mask contains existing mapped
-> > > >   pages (e.g. map 12k-16k first, then map 0-12k)
-> > > > - coalesce unmap during page walk (currently, we send it once per
-> > > >   page)
-> > > > - when do PSI for unmap, whether we can send one notify directly
-> > > >   instead of walking over the page table?
-> > > > 
-> > > > Above does not contain those that are still during discussion. And,
-> > > > some of the entries still need tests to further prove it's
-> > > > feasibility.
-> > > > 
-> > > > Thanks,
-> > > > 
-> > > > -- peterx
-> > > 
-> > > While valid I don't think above need to block merging.
-> > 
-> > Sorry for the delay of this series.
-> > 
-> > Looks like we still need to wait until we got explicit acks for vfio
-> > patch 2-3 from Alex/Paolo/David since that'll be required by the
-> > following series. (I'll address all Jason's new comments as well in
-> > next post)
-> > 
-> > Do you like to merge the iommu cleanups first? Or you can also wait
-> > for above to be confirmed, and I'll repost for a final version then
-> > (if we don't have further comments).
-> > 
-> > Thanks,
-> > 
-> > -- peterx
-> 
-> I can do that. If you want me to, pls post just the patches
-> that are ready separately.
+niagara_init() does something naughty, which conflicts with Max's
+"[PATCH v6 0/9] block: Drop BDS.filename".  Details inline.
 
-Thanks for the offer!
+Artyom Tarasenko <atar4qemu@gmail.com> writes:
 
-Since I see that currently the only uncertainty of this series would
-be the impact that patch 3 might bring to Power, I'll prefer we wait
-for several more days until David's back (I suppose it's next Monday
-or so), to see whether I can send a complete final version.
+> Remove the Niagara stub implementation from sun4u.c and add a machine,
+> compatible with Legion simulator from the OpenSPARC T1 project.
+>
+> The machine uses the firmware supplied with the OpenSPARC T1 project,
+> http://download.oracle.com/technetwork/systems/opensparc/OpenSPARCT1_Arch.1.5.tar.bz2
+> in the directory S10image/, and is able to boot the supplied Solaris 10 image.
+>
+> Note that for compatibility with the naming conventions for SPARC machines
+> the new machine name is lowercase niagara.
+>
+> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  MAINTAINERS                         |  13 +--
+>  default-configs/sparc64-softmmu.mak |   2 +
+>  hw/sparc64/Makefile.objs            |   1 +
+>  hw/sparc64/niagara.c                | 177 ++++++++++++++++++++++++++++++++++++
+>  hw/sparc64/sun4u.c                  |  31 -------
+>  qemu-doc.texi                       |  14 ++-
+>  6 files changed, 199 insertions(+), 39 deletions(-)
+>  create mode 100644 hw/sparc64/niagara.c
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 54588e5..b5ebfab 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -725,6 +725,13 @@ S: Maintained
+>  F: hw/sparc64/sun4u.c
+>  F: pc-bios/openbios-sparc64
+>  
+> +Sun4v
+> +M: Artyom Tarasenko <atar4qemu@gmail.com>
+> +S: Maintained
+> +F: hw/sparc64/sun4v.c
+> +F: hw/timer/sun4v-rtc.c
+> +F: include/hw/timer/sun4v-rtc.h
+> +
+>  Leon3
+>  M: Fabien Chouteau <chouteau@adacore.com>
+>  S: Maintained
+> @@ -1098,12 +1105,6 @@ F: hw/nvram/chrp_nvram.c
+>  F: include/hw/nvram/chrp_nvram.h
+>  F: tests/prom-env-test.c
+>  
+> -sun4v RTC
+> -M: Artyom Tarasenko <atar4qemu@gmail.com>
+> -S: Maintained
+> -F: hw/timer/sun4v-rtc.c
+> -F: include/hw/timer/sun4v-rtc.h
+> -
+>  Subsystems
+>  ----------
+>  Audio
+> diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
+> index c0cdd64..c581e61 100644
+> --- a/default-configs/sparc64-softmmu.mak
+> +++ b/default-configs/sparc64-softmmu.mak
+> @@ -13,3 +13,5 @@ CONFIG_IDE_CMD646=y
+>  CONFIG_PCI_APB=y
+>  CONFIG_MC146818RTC=y
+>  CONFIG_ISA_TESTDEV=y
+> +CONFIG_EMPTY_SLOT=y
+> +CONFIG_SUN4V_RTC=y
+> diff --git a/hw/sparc64/Makefile.objs b/hw/sparc64/Makefile.objs
+> index a96b1f8..cf9de21 100644
+> --- a/hw/sparc64/Makefile.objs
+> +++ b/hw/sparc64/Makefile.objs
+> @@ -1,2 +1,3 @@
+>  obj-y += sparc64.o
+>  obj-y += sun4u.o
+> +obj-y += niagara.o
+> \ No newline at end of file
+> diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+> new file mode 100644
+> index 0000000..b55d4bb
+> --- /dev/null
+> +++ b/hw/sparc64/niagara.c
+> @@ -0,0 +1,177 @@
+> +/*
+> + * QEMU Sun4v/Niagara System Emulator
+> + *
+> + * Copyright (c) 2016 Artyom Tarasenko
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "cpu.h"
+> +#include "hw/hw.h"
+> +#include "hw/boards.h"
+> +#include "hw/char/serial.h"
+> +#include "hw/empty_slot.h"
+> +#include "hw/loader.h"
+> +#include "hw/sparc/sparc64.h"
+> +#include "hw/timer/sun4v-rtc.h"
+> +#include "exec/address-spaces.h"
+> +#include "sysemu/block-backend.h"
+> +
+> +
+> +typedef struct NiagaraBoardState {
+> +    MemoryRegion hv_ram;
+> +    MemoryRegion partition_ram;
+> +    MemoryRegion nvram;
+> +    MemoryRegion md_rom;
+> +    MemoryRegion hv_rom;
+> +    MemoryRegion vdisk_ram;
+> +    MemoryRegion prom;
+> +} NiagaraBoardState;
+> +
+> +#define NIAGARA_HV_RAM_BASE 0x100000ULL
+> +#define NIAGARA_HV_RAM_SIZE 0x3f00000ULL /* 63 MiB */
+> +
+> +#define NIAGARA_PARTITION_RAM_BASE 0x80000000ULL
+> +
+> +#define NIAGARA_UART_BASE   0x1f10000000ULL
+> +
+> +#define NIAGARA_NVRAM_BASE  0x1f11000000ULL
+> +#define NIAGARA_NVRAM_SIZE  0x2000
+> +
+> +#define NIAGARA_MD_ROM_BASE 0x1f12000000ULL
+> +#define NIAGARA_MD_ROM_SIZE 0x2000
+> +
+> +#define NIAGARA_HV_ROM_BASE 0x1f12080000ULL
+> +#define NIAGARA_HV_ROM_SIZE 0x2000
+> +
+> +#define NIAGARA_IOBBASE     0x9800000000ULL
+> +#define NIAGARA_IOBSIZE     0x0100000000ULL
+> +
+> +#define NIAGARA_VDISK_BASE  0x1f40000000ULL
+> +#define NIAGARA_RTC_BASE    0xfff0c1fff8ULL
+> +#define NIAGARA_UART_BASE   0x1f10000000ULL
+> +
+> +/* Firmware layout
+> + *
+> + * |------------------|
+> + * |   openboot.bin   |
+> + * |------------------| PROM_ADDR + OBP_OFFSET
+> + * |      q.bin       |
+> + * |------------------| PROM_ADDR + Q_OFFSET
+> + * |     reset.bin    |
+> + * |------------------| PROM_ADDR
+> + */
+> +#define NIAGARA_PROM_BASE   0xfff0000000ULL
+> +#define NIAGARA_Q_OFFSET    0x10000ULL
+> +#define NIAGARA_OBP_OFFSET  0x80000ULL
+> +#define PROM_SIZE_MAX       (4 * 1024 * 1024)
+> +
+> +/* Niagara hardware initialisation */
+> +static void niagara_init(MachineState *machine)
+> +{
+> +    NiagaraBoardState *s = g_new(NiagaraBoardState, 1);
+> +    DriveInfo *dinfo = drive_get_next(IF_PFLASH);
 
-Thanks,
+@dinfo is the first -drive if=pflash (or its sugared form -pflash).
 
--- peterx
+> +    MemoryRegion *sysmem = get_system_memory();
+> +
+> +    /* init CPUs */
+> +    sparc64_cpu_devinit(machine->cpu_model, "Sun UltraSparc T1",
+> +                        NIAGARA_PROM_BASE);
+> +    /* set up devices */
+> +    memory_region_allocate_system_memory(&s->hv_ram, NULL, "sun4v-hv.ram",
+> +                                         NIAGARA_HV_RAM_SIZE);
+> +    memory_region_add_subregion(sysmem, NIAGARA_HV_RAM_BASE, &s->hv_ram);
+> +
+> +    memory_region_allocate_system_memory(&s->partition_ram, NULL,
+> +                                         "sun4v-partition.ram",
+> +                                         machine->ram_size);
+> +    memory_region_add_subregion(sysmem, NIAGARA_PARTITION_RAM_BASE,
+> +                                &s->partition_ram);
+> +
+> +    memory_region_allocate_system_memory(&s->nvram, NULL,
+> +                                         "sun4v.nvram", NIAGARA_NVRAM_SIZE);
+> +    memory_region_add_subregion(sysmem, NIAGARA_NVRAM_BASE, &s->nvram);
+> +    memory_region_allocate_system_memory(&s->md_rom, NULL,
+> +                                         "sun4v-md.rom", NIAGARA_MD_ROM_SIZE);
+> +    memory_region_add_subregion(sysmem, NIAGARA_MD_ROM_BASE, &s->md_rom);
+> +    memory_region_allocate_system_memory(&s->hv_rom, NULL,
+> +                                         "sun4v-hv.rom", NIAGARA_HV_ROM_SIZE);
+> +    memory_region_add_subregion(sysmem, NIAGARA_HV_ROM_BASE, &s->hv_rom);
+> +    memory_region_allocate_system_memory(&s->prom, NULL,
+> +                                         "sun4v.prom", PROM_SIZE_MAX);
+> +    memory_region_add_subregion(sysmem, NIAGARA_PROM_BASE, &s->prom);
+> +
+> +    rom_add_file_fixed("nvram1", NIAGARA_NVRAM_BASE, -1);
+> +    rom_add_file_fixed("1up-md.bin", NIAGARA_MD_ROM_BASE, -1);
+> +    rom_add_file_fixed("1up-hv.bin", NIAGARA_HV_ROM_BASE, -1);
+> +
+> +    rom_add_file_fixed("reset.bin", NIAGARA_PROM_BASE, -1);
+> +    rom_add_file_fixed("q.bin", NIAGARA_PROM_BASE + NIAGARA_Q_OFFSET, -1);
+> +    rom_add_file_fixed("openboot.bin", NIAGARA_PROM_BASE + NIAGARA_OBP_OFFSET,
+> +                       -1);
+> +
+> +    /* the virtual ramdisk is kind of initrd, but it resides
+> +       outside of the partition RAM */
+> +    if (dinfo) {
+> +        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+
+This is the block backend created by the first -drive if=pflash.
+
+> +        int size = blk_getlength(blk);
+> +        if (size > 0) {
+> +            memory_region_allocate_system_memory(&s->vdisk_ram, NULL,
+> +                                                 "sun4v_vdisk.ram", size);
+> +            memory_region_add_subregion(get_system_memory(),
+> +                                        NIAGARA_VDISK_BASE, &s->vdisk_ram);
+> +            dinfo->is_default = 1;
+> +            rom_add_file_fixed(blk_bs(blk)->filename, NIAGARA_VDISK_BASE, -1);
+
+The block backend isn't actually used.  It's merely a carrier for a
+filename.  Naughty.  Also conflicts with Max's work to kill ->filename.
+
+What you create for it isn't actually a pflash device.  Naughty.
+
+Despite rom_add_file_fixed(), it's RAM, not ROM:
+
+    (qemu) info mtree
+    address-space: memory
+      0000000000000000-ffffffffffffffff (prio 0, RW): system
+        0000000000100000-0000000003ffffff (prio 0, RW): sun4v-hv.ram
+        0000000080000000-0000000087ffffff (prio 0, RW): sun4v-partition.ram
+        0000001f10000000-0000001f10000007 (prio 0, RW): serial
+        0000001f11000000-0000001f11001fff (prio 0, RW): sun4v.nvram
+        0000001f12000000-0000001f12001fff (prio 0, RW): sun4v-md.rom
+        0000001f12080000-0000001f12081fff (prio 0, RW): sun4v-hv.rom
+        0000001f40000000-0000001f413fffff (prio 0, RW): sun4v_vdisk.ram
+        0000009800000000-00000098ffffffff (prio 0, RW): empty-slot
+        000000fff0000000-000000fff03fffff (prio 0, RW): sun4v.prom
+        000000fff0c1fff8-000000fff0c1ffff (prio 0, RW): sun4v-rtc
+
+    address-space: I/O
+      0000000000000000-000000000000ffff (prio 0, RW): io
+
+    address-space: cpu-memory
+      0000000000000000-ffffffffffffffff (prio 0, RW): system
+        0000000000100000-0000000003ffffff (prio 0, RW): sun4v-hv.ram
+        0000000080000000-0000000087ffffff (prio 0, RW): sun4v-partition.ram
+        0000001f10000000-0000001f10000007 (prio 0, RW): serial
+        0000001f11000000-0000001f11001fff (prio 0, RW): sun4v.nvram
+        0000001f12000000-0000001f12001fff (prio 0, RW): sun4v-md.rom
+        0000001f12080000-0000001f12081fff (prio 0, RW): sun4v-hv.rom
+--->    0000001f40000000-0000001f413fffff (prio 0, RW): sun4v_vdisk.ram
+        0000009800000000-00000098ffffffff (prio 0, RW): empty-slot
+        000000fff0000000-000000fff03fffff (prio 0, RW): sun4v.prom
+
+Note that sun4v-md.rom and sun4v-hv.rom aren't ROM, either.
+
+The monkey-patching of dinfo->is_default is to silence the "Orphaned
+drive without device" warning.  Naughty.
+
+This use of -drive if=pflash is highly unorthodox.  To suggest better
+ways, we need to understand the role of "the virtual ramdisk".  Can you
+explain?  How does it work on a physical system?
+
+> +        } else {
+> +            fprintf(stderr, "qemu: could not load ram disk '%s'\n",
+> +                    blk_bs(blk)->filename);
+> +            exit(1);
+> +        }
+> +    }
+> +    serial_mm_init(sysmem, NIAGARA_UART_BASE, 0, NULL, 115200,
+> +                   serial_hds[0], DEVICE_BIG_ENDIAN);
+> +
+> +    empty_slot_init(NIAGARA_IOBBASE, NIAGARA_IOBSIZE);
+> +    sun4v_rtc_init(NIAGARA_RTC_BASE);
+> +}
+> +
+> +static void niagara_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+> +
+> +    mc->desc = "Sun4v platform, Niagara";
+> +    mc->init = niagara_init;
+> +    mc->max_cpus = 1; /* XXX for now */
+> +    mc->default_boot_order = "c";
+> +}
+> +
+> +static const TypeInfo niagara_type = {
+> +    .name = MACHINE_TYPE_NAME("niagara"),
+> +    .parent = TYPE_MACHINE,
+> +    .class_init = niagara_class_init,
+> +};
+> +
+> +static void niagara_register_types(void)
+> +{
+> +    type_register_static(&niagara_type);
+> +}
+> +
+> +type_init(niagara_register_types)
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 232d4a6..d1a6bca 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -542,7 +542,6 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>  enum {
+>      sun4u_id = 0,
+>      sun4v_id = 64,
+> -    niagara_id,
+>  };
+>  
+>  static const struct hwdef hwdefs[] = {
+> @@ -560,13 +559,6 @@ static const struct hwdef hwdefs[] = {
+>          .prom_addr = 0x1fff0000000ULL,
+>          .console_serial_base = 0,
+>      },
+> -    /* Sun4v generic Niagara machine */
+> -    {
+> -        .default_cpu_model = "Sun UltraSparc T1",
+> -        .machine_id = niagara_id,
+> -        .prom_addr = 0xfff0000000ULL,
+> -        .console_serial_base = 0xfff0c2c000ULL,
+> -    },
+>  };
+>  
+>  /* Sun4u hardware initialisation */
+> @@ -581,12 +573,6 @@ static void sun4v_init(MachineState *machine)
+>      sun4uv_init(get_system_memory(), machine, &hwdefs[1]);
+>  }
+>  
+> -/* Niagara hardware initialisation */
+> -static void niagara_init(MachineState *machine)
+> -{
+> -    sun4uv_init(get_system_memory(), machine, &hwdefs[2]);
+> -}
+> -
+>  static void sun4u_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> @@ -620,22 +606,6 @@ static const TypeInfo sun4v_type = {
+>      .class_init = sun4v_class_init,
+>  };
+>  
+> -static void niagara_class_init(ObjectClass *oc, void *data)
+> -{
+> -    MachineClass *mc = MACHINE_CLASS(oc);
+> -
+> -    mc->desc = "Sun4v platform, Niagara";
+> -    mc->init = niagara_init;
+> -    mc->max_cpus = 1; /* XXX for now */
+> -    mc->default_boot_order = "c";
+> -}
+> -
+> -static const TypeInfo niagara_type = {
+> -    .name = MACHINE_TYPE_NAME("Niagara"),
+> -    .parent = TYPE_MACHINE,
+> -    .class_init = niagara_class_init,
+> -};
+> -
+>  static void sun4u_register_types(void)
+>  {
+>      type_register_static(&ebus_info);
+> @@ -644,7 +614,6 @@ static void sun4u_register_types(void)
+>  
+>      type_register_static(&sun4u_type);
+>      type_register_static(&sun4v_type);
+> -    type_register_static(&niagara_type);
+>  }
+>  
+>  type_init(sun4u_register_types)
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 02cb39d..0b2746f 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2138,7 +2138,17 @@ Use the executable @file{qemu-system-sparc64} to simulate a Sun4u
+>  (UltraSPARC PC-like machine), Sun4v (T1 PC-like machine), or generic
+>  Niagara (T1) machine. The Sun4u emulator is mostly complete, being
+>  able to run Linux, NetBSD and OpenBSD in headless (-nographic) mode. The
+> -Sun4v and Niagara emulators are still a work in progress.
+> +Sun4v emulator is still a work in progress.
+> +
+> +The Niagara T1 emulator makes use of firmware and OS binaries supplied in the S10image/ directory
+> +of the OpenSPARC T1 project @url{http://download.oracle.com/technetwork/systems/opensparc/OpenSPARCT1_Arch.1.5.tar.bz2}
+> +and is able to boot the disk.s10hw2 Solaris image.
+> +@example
+> +qemu-system-sparc64 -M niagara -L /path-to/S10image/ \
+> +                    -nographic -m 256 \
+> +                    -drive if=pflash,readonly=on,file=/S10image/disk.s10hw2
+> +@end example
+> +
+>  
+>  QEMU emulates the following peripherals:
+>  
+> @@ -2173,7 +2183,7 @@ Set OpenBIOS variables in NVRAM, for example:
+>  qemu-system-sparc64 -prom-env 'auto-boot?=false'
+>  @end example
+>  
+> -@item -M [sun4u|sun4v|Niagara]
+> +@item -M [sun4u|sun4v|niagara]
+>  
+>  Set the emulated machine type. The default is sun4u.
