@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cWjTY-0007xe-S4
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:48:30 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cWjUp-0000Nj-Lk
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:49:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cWjTU-0001Tf-SM
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:48:28 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35610)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cWjTU-0001TL-Lo
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:48:24 -0500
-Received: by mail-wm0-x231.google.com with SMTP id r126so70479840wmr.0
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 04:48:24 -0800 (PST)
-References: <20170124143346.22240-1-alex.bennee@linaro.org>
-	<20170124143346.22240-6-alex.bennee@linaro.org>
-	<20170126105346.GH6879@lemon>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170126105346.GH6879@lemon>
-Date: Thu, 26 Jan 2017 12:48:20 +0000
-Message-ID: <87efzq9ecr.fsf@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1cWjUl-0001pU-MZ
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:49:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cWjUl-0001pP-Db
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 07:49:43 -0500
+References: <20170126123411.5412.44769.stgit@PASHA-ISP>
+	<20170126123429.5412.94368.stgit@PASHA-ISP>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e00dfc17-9dec-ea53-e86e-cf3089da659a@redhat.com>
+Date: Thu, 26 Jan 2017 13:49:38 +0100
 MIME-Version: 1.0
+In-Reply-To: <20170126123429.5412.94368.stgit@PASHA-ISP>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] new debian-multiarch-cross.docker:
- a cross-compiling docker guest
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 3/9] apic: save apic_delivered flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,108 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
 
 
-Fam Zheng <famz@redhat.com> writes:
 
-> On Tue, 01/24 14:33, Alex Bennée wrote:
->> This provides a basic Debian install with access to the emdebian cross
->> compilers for armhf, arm64, mipsel and ppc64el. On its own it provides
->> the basic cross build essentials for building any of those
->> architectures. More complex cross-compilations would need to install
->> library dependencies on top of this image.
->>
->> An example use:
->>
->>   docker run --rm -it \
->>     -v /home/alex/lsrc/qemu/qemu.git/:/home/alex/lsrc/qemu/qemu.git/ \
->>     --user=alex:alex \
->>     -w /home/alex/lsrc/qemu/qemu.git/arm-linux-user/tests \
->>     -e CROSS_CC="arm-linux-gnueabihf-gcc" \
->>     debian:cross make -f ../../tests/tcg/arm/Makefile
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>
->> ---
->> v2
->>   - add clang (keep shippable happy)
->>   - rm adduser code (done direct now)
->>   - add aptitude (useful for debugging package clashes)
->> ---
->>  .../dockerfiles/debian-multiarch-cross.docker      | 45 ++++++++++++++++++++++
->>  1 file changed, 45 insertions(+)
->>  create mode 100644 tests/docker/dockerfiles/debian-multiarch-cross.docker
->>
->> diff --git a/tests/docker/dockerfiles/debian-multiarch-cross.docker b/tests/docker/dockerfiles/debian-multiarch-cross.docker
->> new file mode 100644
->> index 0000000000..749fdf07e1
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/debian-multiarch-cross.docker
->> @@ -0,0 +1,45 @@
->> +#
->> +# Docker multiarch cross-compiler target
->> +#
->> +# This docker target is builds on Debian and Emdebian's cross compiler targets
->> +# to build distro with a selection of cross compilers for building test binaries.
->> +#
->> +# This does not include the build dependancies for QEMU as there are
->> +# so many there are unresolvable clashes.
->> +#
->> +FROM debian:stable-slim
->> +
->> +# Setup some basic tools we need
->> +RUN apt update
->> +RUN apt install -yy curl aptitude
->> +
->> +# Setup Emdebian
->> +RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
->> +RUN curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
->> +
->> +# Duplicate deb line as deb-src
->> +RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
->> +
->> +# Add the foriegn architectures we want
->> +RUN dpkg --add-architecture armhf
->> +RUN dpkg --add-architecture arm64
->> +RUN dpkg --add-architecture mipsel
->> +RUN dpkg --add-architecture ppc64el
->> +
->> +#FIXME: Currently these cause clashes due to multi-arch being an ongoig process
->
-> "ongoing"?
->
->> +#RUN dpkg --add-architecture mips
->> +#RUN dpkg --add-architecture powerpc
->> +
->> +# Final update
->> +RUN apt update
->> +
->> +# Install the crossbuild essential packages
->> +# FIXME: crossbuild-essential-powerpc has a clash with '/lib/ld.so.1'
->> +RUN apt install -yy clang crossbuild-essential-arm64 crossbuild-essential-armhf crossbuild-essential-mipsel crossbuild-essential-ppc64el
->> +
->> +# Before you can actually build something you need to install its build dependancies.
->> +# This is best done in a child container as architecture specific -dev packages have a habit of clashing with
->> +# each other because not everything is fully complient with the multiarch specififcation.
->
-> "compliant"?
->
->> +#
->> +# To install the QEMU build dependacnies you need to run:
->> +# RUN apt-get build-dep -yy -a armhf qemu
->> --
->> 2.11.0
->>
->
-> Does this image work with our tests, such as "make
-> docker-test-quick@debian-multiarch-cross"? If not let's put it into a different
-> folder okay?
+On 26/01/2017 13:34, Pavel Dovgalyuk wrote:
+> This patch implements saving/restoring of static apic_delivered variable.
+> 
+> v8: saving static variable only for one of the APICs
+> 
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> ---
+>  hw/intc/apic_common.c           |   37 +++++++++++++++++++++++++++++++++++++
+>  include/hw/i386/apic_internal.h |    2 ++
+>  2 files changed, 39 insertions(+)
+> 
+> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+> index d78c885..edacb16 100644
+> --- a/hw/intc/apic_common.c
+> +++ b/hw/intc/apic_common.c
+> @@ -384,6 +384,29 @@ static bool apic_common_sipi_needed(void *opaque)
+>      return s->wait_for_sipi != 0;
+>  }
+>  
+> +static bool apic_irq_delivered_needed(void *opaque)
+> +{
+> +    static APICCommonState *first_apic;
+> +    APICCommonState *s = APIC_COMMON(opaque);
+> +    if (!first_apic) {
+> +        first_apic = s;
+> +    }
+> +    return s == first_apic;
 
-There is no particular reason why it couldn't be included in the docker
-targets. We can either expand the existing build.sh to include a
-dependency step or add a new build script for use here.
+Should also check " && apic_irq_delivered != 0".
 
---
-Alex Bennée
+Paolo
+
+> +}
+> +
+> +static void apic_irq_delivered_pre_save(void *opaque)
+> +{
+> +    APICCommonState *s = APIC_COMMON(opaque);
+> +    s->apic_irq_delivered = apic_irq_delivered;
+> +}
+> +
+> +static int apic_irq_delivered_post_load(void *opaque, int version_id)
+> +{
+> +    APICCommonState *s = APIC_COMMON(opaque);
+> +    apic_irq_delivered = s->apic_irq_delivered;
+> +    return 0;
+> +}
+> +
+>  static const VMStateDescription vmstate_apic_common_sipi = {
+>      .name = "apic_sipi",
+>      .version_id = 1,
+> @@ -396,6 +419,19 @@ static const VMStateDescription vmstate_apic_common_sipi = {
+>      }
+>  };
+>  
+> +static const VMStateDescription vmstate_apic_irq_delivered = {
+> +    .name = "apic_irq_delivered",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = apic_irq_delivered_needed,
+> +    .pre_save = apic_irq_delivered_pre_save,
+> +    .post_load = apic_irq_delivered_post_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_INT32(apic_irq_delivered, APICCommonState),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_apic_common = {
+>      .name = "apic",
+>      .version_id = 3,
+> @@ -430,6 +466,7 @@ static const VMStateDescription vmstate_apic_common = {
+>      },
+>      .subsections = (const VMStateDescription*[]) {
+>          &vmstate_apic_common_sipi,
+> +        &vmstate_apic_irq_delivered,
+>          NULL
+>      }
+>  };
+> diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_internal.h
+> index 1209eb4..20ad28c 100644
+> --- a/include/hw/i386/apic_internal.h
+> +++ b/include/hw/i386/apic_internal.h
+> @@ -189,6 +189,8 @@ struct APICCommonState {
+>      DeviceState *vapic;
+>      hwaddr vapic_paddr; /* note: persistence via kvmvapic */
+>      bool legacy_instance_id;
+> +
+> +    int apic_irq_delivered; /* for saving static variable */
+>  };
+>  
+>  typedef struct VAPICState {
+> 
