@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWh9I-0001vh-0w
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:19:26 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWh9L-0001yo-P0
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:19:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cWh9G-0006IV-7B
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:19:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1cWh9K-0006K4-4Q
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 05:19:27 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 26 Jan 2017 10:18:23 +0000
-Message-Id: <20170126101827.22378-15-berrange@redhat.com>
+Date: Thu, 26 Jan 2017 10:18:27 +0000
+Message-Id: <20170126101827.22378-19-berrange@redhat.com>
 In-Reply-To: <20170126101827.22378-1-berrange@redhat.com>
 References: <20170126101827.22378-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 14/18] qcow2: add iotests to cover LUKS
- encryption support
+Subject: [Qemu-devel] [PATCH v3 18/18] block: pass option prefix down to
+ crypto layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,349 +23,299 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This extends the 087 iotest to cover LUKS encryption when doing
-blockdev-add.
-
-Two further tests are added to validate read/write of LUKS
-encrypted images with a single file and with a backing file.
+While the crypto layer uses a fixed option name "key-secret",
+the upper block layer may have a prefix on the options. e.g.
+"luks-key-secret", "aes-key-secret", in order to avoid clashes
+between crypto option names & other block option names. To
+ensure the crypto layer can report accurate error messages,
+we must tell it what option name prefix was used.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/qemu-iotests/087     | 32 ++++++++++++++++-
- tests/qemu-iotests/087.out | 14 +++++++-
- tests/qemu-iotests/174     | 76 ++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/174.out | 19 ++++++++++
- tests/qemu-iotests/175     | 86 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/175.out | 26 ++++++++++++++
- tests/qemu-iotests/group   |  2 ++
- 7 files changed, 253 insertions(+), 2 deletions(-)
- create mode 100755 tests/qemu-iotests/174
- create mode 100644 tests/qemu-iotests/174.out
- create mode 100755 tests/qemu-iotests/175
- create mode 100644 tests/qemu-iotests/175.out
+ block/crypto.c         |  4 ++--
+ block/qcow.c           |  7 ++++---
+ block/qcow2.c          | 15 +++++++++------
+ crypto/block-luks.c    |  8 ++++++--
+ crypto/block-qcow.c    |  8 ++++++--
+ crypto/block.c         |  6 ++++--
+ crypto/blockpriv.h     |  2 ++
+ include/crypto/block.h |  6 +++++-
+ 8 files changed, 38 insertions(+), 18 deletions(-)
 
-diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
-index 55a9e06..1c3ca9f 100755
---- a/tests/qemu-iotests/087
-+++ b/tests/qemu-iotests/087
-@@ -121,7 +121,7 @@ run_qemu <<EOF
- EOF
+diff --git a/block/crypto.c b/block/crypto.c
+index 6d6bd90..22bc6ba 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -369,7 +369,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+     if (flags & BDRV_O_NO_IO) {
+         cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+     }
+-    crypto->block = qcrypto_block_open(open_opts,
++    crypto->block = qcrypto_block_open(open_opts, NULL,
+                                        block_crypto_read_func,
+                                        bs,
+                                        cflags,
+@@ -409,7 +409,7 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+         return -1;
+     }
  
- echo
--echo === Encrypted image ===
-+echo === Encrypted image QCow ===
- echo
+-    crypto = qcrypto_block_create(create_opts,
++    crypto = qcrypto_block_create(create_opts, NULL,
+                                   block_crypto_init_func,
+                                   block_crypto_write_func,
+                                   &data,
+diff --git a/block/qcow.c b/block/qcow.c
+index cf05449..8047415 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -197,8 +197,8 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+             if (flags & BDRV_O_NO_IO) {
+                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+             }
+-            s->crypto = qcrypto_block_open(crypto_opts, NULL, NULL,
+-                                           cflags, errp);
++            s->crypto = qcrypto_block_open(crypto_opts, "aes-",
++                                           NULL, NULL, cflags, errp);
+             if (!s->crypto) {
+                 ret = -EINVAL;
+                 goto fail;
+@@ -819,7 +819,8 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+             goto exit;
+         }
  
- _make_test_img --object secret,id=sec0,data=123456 -o encryption=on,aes-key-secret=sec0 $size
-@@ -151,6 +151,36 @@ run_qemu <<EOF
- EOF
+-        crypto = qcrypto_block_create(crypto_opts, NULL, NULL, NULL, errp);
++        crypto = qcrypto_block_create(crypto_opts, "aes-",
++                                      NULL, NULL, NULL, errp);
+         if (!crypto) {
+             ret = -EINVAL;
+             goto exit;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7c8e602..4f2da2f 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -284,7 +284,7 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+              * provide the same key-secret property against the full
+              * backing chain
+              */
+-            s->crypto = qcrypto_block_open(s->crypto_opts,
++            s->crypto = qcrypto_block_open(s->crypto_opts, "luks-",
+                                            qcow2_crypto_hdr_read_func,
+                                            bs, cflags, errp);
+             if (!s->crypto) {
+@@ -1291,8 +1291,8 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+              * provide the same key-secret property against the full
+              * backing chain
+              */
+-            s->crypto = qcrypto_block_open(s->crypto_opts, NULL, NULL,
+-                                           cflags, errp);
++            s->crypto = qcrypto_block_open(s->crypto_opts, "aes-",
++                                           NULL, NULL, cflags, errp);
+             if (!s->crypto) {
+                 ret = -EINVAL;
+                 goto fail;
+@@ -2209,14 +2209,17 @@ static int qcow2_set_up_encryption(BlockDriverState *bs, QemuOpts *opts,
+     QCryptoBlockCreateOptions *cryptoopts = NULL;
+     QCryptoBlock *crypto = NULL;
+     int ret = -EINVAL;
++    const char *optprefix;
  
- echo
-+echo === Encrypted image LUKS ===
-+echo
-+
-+_make_test_img --object secret,id=sec0,data=123456 -o encryption-format=luks,luks-key-secret=sec0 $size
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "object-add",
-+  "arguments": {
-+      "qom-type": "secret",
-+      "id": "sec0",
-+      "props": {
-+          "data": "123456"
-+      }
-+  }
-+}
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+      "driver": "$IMGFMT",
-+      "node-name": "disk",
-+      "file": {
-+          "driver": "file",
-+          "filename": "$TEST_IMG"
-+      },
-+      "luks-key-secret": "sec0"
-+    }
-+  }
-+{ "execute": "quit" }
-+EOF
-+
-+echo
- echo === Missing driver ===
- echo
+     if (g_str_equal(format, "luks")) {
++        optprefix = "luks-";
+         cryptoopts = block_crypto_create_opts_init(
+-            Q_CRYPTO_BLOCK_FORMAT_LUKS, opts, "luks-", errp);
++            Q_CRYPTO_BLOCK_FORMAT_LUKS, opts, optprefix, errp);
+         s->crypt_method_header = QCOW_CRYPT_LUKS;
+     } else if (g_str_equal(format, "aes")) {
++        optprefix = "aes-";
+         cryptoopts = block_crypto_create_opts_init(
+-            Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", errp);
++            Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, optprefix, errp);
+         s->crypt_method_header = QCOW_CRYPT_AES;
+     } else {
+         error_setg(errp, "Unknown encryption format %s", format);
+@@ -2228,7 +2231,7 @@ static int qcow2_set_up_encryption(BlockDriverState *bs, QemuOpts *opts,
+         goto out;
+     }
  
-diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
-index 8a08d06..c609c3c 100644
---- a/tests/qemu-iotests/087.out
-+++ b/tests/qemu-iotests/087.out
-@@ -32,7 +32,7 @@ QMP_VERSION
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
+-    crypto = qcrypto_block_create(cryptoopts,
++    crypto = qcrypto_block_create(cryptoopts, optprefix,
+                                   qcow2_crypto_hdr_init_func,
+                                   qcow2_crypto_hdr_write_func,
+                                   bs, errp);
+diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+index 4530f82..4a4c4a0 100644
+--- a/crypto/block-luks.c
++++ b/crypto/block-luks.c
+@@ -638,6 +638,7 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
+ static int
+ qcrypto_block_luks_open(QCryptoBlock *block,
+                         QCryptoBlockOpenOptions *options,
++                        const char *optprefix,
+                         QCryptoBlockReadFunc readfunc,
+                         void *opaque,
+                         unsigned int flags,
+@@ -661,7 +662,8 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+ 
+     if (!(flags & QCRYPTO_BLOCK_OPEN_NO_IO)) {
+         if (!options->u.luks.key_secret) {
+-            error_setg(errp, "Parameter 'key-secret' is required for cipher");
++            error_setg(errp, "Parameter '%skey-secret' is required for cipher",
++                       optprefix ? optprefix : "");
+             return -1;
+         }
+         password = qcrypto_secret_lookup_as_utf8(
+@@ -885,6 +887,7 @@ qcrypto_block_luks_uuid_gen(uint8_t *uuidstr)
+ static int
+ qcrypto_block_luks_create(QCryptoBlock *block,
+                           QCryptoBlockCreateOptions *options,
++                          const char *optprefix,
+                           QCryptoBlockInitFunc initfunc,
+                           QCryptoBlockWriteFunc writefunc,
+                           void *opaque,
+@@ -937,7 +940,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+      * be silently ignored, for compatibility with dm-crypt */
+ 
+     if (!options->u.luks.key_secret) {
+-        error_setg(errp, "Parameter 'key-secret' is required for cipher");
++        error_setg(errp, "Parameter '%skey-secret' is required for cipher",
++                   optprefix ? optprefix : "");
+         return -1;
+     }
+     password = qcrypto_secret_lookup_as_utf8(luks_opts.key_secret, errp);
+diff --git a/crypto/block-qcow.c b/crypto/block-qcow.c
+index be88c6f..a456fe3 100644
+--- a/crypto/block-qcow.c
++++ b/crypto/block-qcow.c
+@@ -94,6 +94,7 @@ qcrypto_block_qcow_init(QCryptoBlock *block,
+ static int
+ qcrypto_block_qcow_open(QCryptoBlock *block,
+                         QCryptoBlockOpenOptions *options,
++                        const char *optprefix,
+                         QCryptoBlockReadFunc readfunc G_GNUC_UNUSED,
+                         void *opaque G_GNUC_UNUSED,
+                         unsigned int flags,
+@@ -104,7 +105,8 @@ qcrypto_block_qcow_open(QCryptoBlock *block,
+     } else {
+         if (!options->u.qcow.key_secret) {
+             error_setg(errp,
+-                       "Parameter 'key-secret' is required for cipher");
++                       "Parameter '%skey-secret' is required for cipher",
++                       optprefix ? optprefix : "");
+             return -1;
+         }
+         return qcrypto_block_qcow_init(block,
+@@ -116,13 +118,15 @@ qcrypto_block_qcow_open(QCryptoBlock *block,
+ static int
+ qcrypto_block_qcow_create(QCryptoBlock *block,
+                           QCryptoBlockCreateOptions *options,
++                          const char *optprefix,
+                           QCryptoBlockInitFunc initfunc G_GNUC_UNUSED,
+                           QCryptoBlockWriteFunc writefunc G_GNUC_UNUSED,
+                           void *opaque G_GNUC_UNUSED,
+                           Error **errp)
+ {
+     if (!options->u.qcow.key_secret) {
+-        error_setg(errp, "Parameter 'key-secret' is required for cipher");
++        error_setg(errp, "Parameter '%skey-secret' is required for cipher",
++                   optprefix ? optprefix : "");
+         return -1;
+     }
+     /* QCow2 has no special header, since everything is hardwired */
+diff --git a/crypto/block.c b/crypto/block.c
+index 64c8420..b097d45 100644
+--- a/crypto/block.c
++++ b/crypto/block.c
+@@ -48,6 +48,7 @@ bool qcrypto_block_has_format(QCryptoBlockFormat format,
  
  
--=== Encrypted image ===
-+=== Encrypted image QCow ===
+ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
++                                 const char *optprefix,
+                                  QCryptoBlockReadFunc readfunc,
+                                  void *opaque,
+                                  unsigned int flags,
+@@ -67,7 +68,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
  
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on aes-key-secret=sec0
- Testing:
-@@ -44,6 +44,18 @@ QMP_VERSION
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
+     block->driver = qcrypto_block_drivers[options->format];
+ 
+-    if (block->driver->open(block, options,
++    if (block->driver->open(block, options, optprefix,
+                             readfunc, opaque, flags, errp) < 0) {
+         g_free(block);
+         return NULL;
+@@ -78,6 +79,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
  
  
-+=== Encrypted image LUKS ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption-format=luks luks-key-secret=sec0
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
-+
-+
- === Missing driver ===
+ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
++                                   const char *optprefix,
+                                    QCryptoBlockInitFunc initfunc,
+                                    QCryptoBlockWriteFunc writefunc,
+                                    void *opaque,
+@@ -97,7 +99,7 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
  
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on aes-key-secret=sec0
-diff --git a/tests/qemu-iotests/174 b/tests/qemu-iotests/174
-new file mode 100755
-index 0000000..bb12b55
---- /dev/null
-+++ b/tests/qemu-iotests/174
-@@ -0,0 +1,76 @@
-+#!/bin/bash
-+#
-+# Test encrypted read/write using plain bdrv_read/bdrv_write
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=berrange@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto generic
-+_supported_os Linux
-+
-+
-+size=16M
-+
-+SECRET="secret,id=sec0,data=astrochicken"
-+SECRETALT="secret,id=sec0,data=platypus"
-+
-+_make_test_img --object $SECRET -o "encryption-format=luks,luks-key-secret=sec0,luks-iter-time=10" $size
-+
-+IMGSPEC="driver=$IMGFMT,file.filename=$TEST_IMG,luks-key-secret=sec0"
-+
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
-+
-+echo
-+echo "== reading whole image =="
-+$QEMU_IO --object $SECRET -c "read -P 0 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== rewriting whole image =="
-+$QEMU_IO --object $SECRET -c "write -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern =="
-+$QEMU_IO --object $SECRET -c "read -P 0xa 0 $size"  --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify open failure with wrong password =="
-+$QEMU_IO --object $SECRETALT -c "read -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/174.out b/tests/qemu-iotests/174.out
-new file mode 100644
-index 0000000..bf1a23a
---- /dev/null
-+++ b/tests/qemu-iotests/174.out
-@@ -0,0 +1,19 @@
-+QA output created by 174
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 encryption-format=luks luks-key-secret=sec0 luks-iter-time=10
-+
-+== reading whole image ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== rewriting whole image ==
-+wrote 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify open failure with wrong password ==
-+can't open: Invalid password, cannot unlock any keyslot
-+no file open, try 'help open'
-+*** done
-diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-new file mode 100755
-index 0000000..9dd03d5
---- /dev/null
-+++ b/tests/qemu-iotests/175
-@@ -0,0 +1,86 @@
-+#!/bin/bash
-+#
-+# Test encrypted read/write using backing files
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=berrange@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto generic
-+_supported_os Linux
-+
-+
-+size=16M
-+TEST_IMG_BASE=$TEST_IMG.base
-+SECRET0="secret,id=sec0,data=astrochicken"
-+SECRET1="secret,id=sec1,data=furby"
-+
-+TEST_IMG_SAVE=$TEST_IMG
-+TEST_IMG=$TEST_IMG_BASE
-+echo "== create base =="
-+_make_test_img --object $SECRET0 -o "encryption-format=luks,luks-key-secret=sec0,luks-iter-time=10" $size
-+TEST_IMG=$TEST_IMG_SAVE
-+
-+IMGSPECBASE="driver=$IMGFMT,file.filename=$TEST_IMG_BASE,luks-key-secret=sec0"
-+IMGSPEC="driver=$IMGFMT,file.filename=$TEST_IMG,backing.driver=$IMGFMT,backing.file.filename=$TEST_IMG_BASE,backing.luks-key-secret=sec0,luks-key-secret=sec1"
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
-+
-+echo
-+echo "== writing whole image =="
-+$QEMU_IO --object $SECRET0 -c "write -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern =="
-+$QEMU_IO --object $SECRET0 -c "read -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
-+
-+echo "== create overlay =="
-+_make_test_img --object $SECRET1 -o "encryption-format=luks,luks-key-secret=sec1,luks-iter-time=10" -b "$TEST_IMG_BASE" $size
-+
-+echo
-+echo "== writing part of a cluster =="
-+$QEMU_IO --object $SECRET0 --object $SECRET1 -c "write -P 0xe 0 1024" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern =="
-+$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0xe 0 1024" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+echo
-+echo "== verify pattern =="
-+$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0xa 1024 64512" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
-new file mode 100644
-index 0000000..1925eec
---- /dev/null
-+++ b/tests/qemu-iotests/175.out
-@@ -0,0 +1,26 @@
-+QA output created by 175
-+== create base ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encryption-format=luks luks-key-secret=sec0 luks-iter-time=10
-+
-+== writing whole image ==
-+wrote 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+== create overlay ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encryption-format=luks luks-key-secret=sec1 luks-iter-time=10
-+
-+== writing part of a cluster ==
-+wrote 1024/1024 bytes at offset 0
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern ==
-+read 1024/1024 bytes at offset 0
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern ==
-+read 64512/64512 bytes at offset 1024
-+63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index f5d7bc8..dd510d0 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -166,3 +166,5 @@
- 171 rw auto quick
- 172 auto
- 173 rw auto backing
-+174 rw auto quick
-+175 rw auto quick
+     block->driver = qcrypto_block_drivers[options->format];
+ 
+-    if (block->driver->create(block, options, initfunc,
++    if (block->driver->create(block, options, optprefix, initfunc,
+                               writefunc, opaque, errp) < 0) {
+         g_free(block);
+         return NULL;
+diff --git a/crypto/blockpriv.h b/crypto/blockpriv.h
+index 68f0f06..0edb810 100644
+--- a/crypto/blockpriv.h
++++ b/crypto/blockpriv.h
+@@ -41,6 +41,7 @@ struct QCryptoBlock {
+ struct QCryptoBlockDriver {
+     int (*open)(QCryptoBlock *block,
+                 QCryptoBlockOpenOptions *options,
++                const char *optprefix,
+                 QCryptoBlockReadFunc readfunc,
+                 void *opaque,
+                 unsigned int flags,
+@@ -48,6 +49,7 @@ struct QCryptoBlockDriver {
+ 
+     int (*create)(QCryptoBlock *block,
+                   QCryptoBlockCreateOptions *options,
++                  const char *optprefix,
+                   QCryptoBlockInitFunc initfunc,
+                   QCryptoBlockWriteFunc writefunc,
+                   void *opaque,
+diff --git a/include/crypto/block.h b/include/crypto/block.h
+index b6971de..c0c202a 100644
+--- a/include/crypto/block.h
++++ b/include/crypto/block.h
+@@ -71,6 +71,7 @@ typedef enum {
+ /**
+  * qcrypto_block_open:
+  * @options: the encryption options
++ * @optprefix: name prefix for options
+  * @readfunc: callback for reading data from the volume
+  * @opaque: data to pass to @readfunc
+  * @flags: bitmask of QCryptoBlockOpenFlags values
+@@ -102,6 +103,7 @@ typedef enum {
+  * Returns: a block encryption format, or NULL on error
+  */
+ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
++                                 const char *optprefix,
+                                  QCryptoBlockReadFunc readfunc,
+                                  void *opaque,
+                                  unsigned int flags,
+@@ -109,7 +111,8 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
+ 
+ /**
+  * qcrypto_block_create:
+- * @format: the encryption format
++ * @options: the encryption options
++ * @optprefix: name prefix for options
+  * @initfunc: callback for initializing volume header
+  * @writefunc: callback for writing data to the volume header
+  * @opaque: data to pass to @initfunc and @writefunc
+@@ -133,6 +136,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
+  * Returns: a block encryption format, or NULL on error
+  */
+ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
++                                   const char *optprefix,
+                                    QCryptoBlockInitFunc initfunc,
+                                    QCryptoBlockWriteFunc writefunc,
+                                    void *opaque,
 -- 
 2.9.3
