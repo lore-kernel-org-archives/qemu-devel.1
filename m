@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cWfa1-0001PP-9B
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:38:54 -0500
+	(envelope-from <famz@redhat.com>) id 1cWg2l-0000Df-C9
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:08:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cWfZw-0006tW-Dq
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:38:53 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:62046)
+	(envelope-from <famz@redhat.com>) id 1cWg2k-0008FN-Cq
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:08:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46140)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cWfZw-0006tG-3D
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 03:38:48 -0500
-References: <1485377117-18105-1-git-send-email-thuth@redhat.com>
-	<f60c6090-0ca8-8ce9-8015-4e8e34123a5a@vivier.eu>
-	<CAKmqyKMyzquxEGTF4Un_1WvwBNXOoJU1g67_9fFarVy-yeff+Q@mail.gmail.com>
-	<8a528a03-d97e-7c16-70f6-229b80563b2d@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ed3e0263-ebe5-790b-b1a2-2af4d17a5a58@vivier.eu>
-Date: Thu, 26 Jan 2017 09:38:37 +0100
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cWg2k-0008FF-4T
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:08:34 -0500
+Date: Thu, 26 Jan 2017 17:08:29 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170126090829.GG6879@lemon>
+References: <20170124143346.22240-1-alex.bennee@linaro.org>
+	<20170124143346.22240-5-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8a528a03-d97e-7c16-70f6-229b80563b2d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix crash when
- running without CPU
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170124143346.22240-5-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] tests/docker: add basic user
+ mapping support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-Le 26/01/2017 à 06:50, Thomas Huth a écrit :
-> On 26.01.2017 00:26, Alistair Francis wrote:
->> On Wed, Jan 25, 2017 at 12:52 PM, Laurent Vivier <laurent@vivier.eu> wrote:
->>> Le 25/01/2017 à 21:45, Thomas Huth a écrit :
->>>> When running QEMU with "-M none -device loader,file=kernel.elf", it
->>>> currently crashes with a segmentation fault, because the "none"-machine
->>>> does not have any CPU by default and the generic loader code tries
->>>> to dereference s->cpu. Fix it by adding an appropriate check for a
->>>> NULL pointer.
->>>>
->>>> Reported-by: Laurent Vivier <laurent@vivier.eu>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  hw/core/generic-loader.c | 9 +++++----
->>>>  1 file changed, 5 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
->>>> index 58f1f02..4601267 100644
->>>> --- a/hw/core/generic-loader.c
->>>> +++ b/hw/core/generic-loader.c
->>>> @@ -137,20 +137,21 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
->>>>  #endif
->>>>
->>>>      if (s->file) {
->>>> +        AddressSpace *as = s->cpu ? s->cpu->as :  NULL;
->>>
->>> Should we just abort if s->cpu is NULL?
->>
->> I agree, what is the use case where you are loading images without a CPU?
->>
->> If there is a use case (maybe some KVM thing?) then this patch looks fine to me.
-> 
-> I think there is no real use case yet. But this fix is 1) simpler than
-> doing an error_report() + exit() here, and 2) maybe the vision of
-> constructing machines on the fly with QEMU will eventually come true one
-> day in the distant future, so with that patch here, the code would
-> already be prepared for the case when QEMU gets started without CPUs and
-> the CPUs are then later added via QOM...
-> Well, I don't mind ... if you prefer an error message instead, feel free
-> to suggest another patch. I'm fine as long as we do not simply crash
-> with a segmentation fault here.
+On Tue, 01/24 14:33, Alex Benn=E9e wrote:
+> Currently all docker builds are done by exporting a tarball to the
+> docker container and running the build as the containers root user.
+> Other use cases are possible however and it is possible to map a part
+> of users file-system to the container. This is useful for example for
+> doing cross-builds of arbitrary source trees. For this to work
+> smoothly the container needs to have a user created that maps cleanly
+> to the host system.
+>=20
+> This adds a -u option to the docker script so that:
+>=20
+>   DEB_ARCH=3Darmhf DEB_TYPE=3Dstable ./tests/docker/docker.py build \
+>     -u --include-executable=3Darm-linux-user/qemu-arm \
+>     debian:armhf ./tests/docker/dockerfiles/debian-bootstrap.docker
+>=20
+> Will build a container that can then be run like:
+>=20
+>   docker run --rm -it -v /home/alex/lsrc/qemu/risu.git/:/src \
+>     --user=3Dalex:alex -w /src/ debian:armhf \
+>     sh -c "make clean && ./configure -s && make"
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>=20
+> ---
+> v2
+>   - write the useradd directly
+>   - change long option to --add-current-user
+> ---
+>  tests/docker/docker.py | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 37d83199e7..b85739a9e2 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -25,6 +25,7 @@ import signal
+>  from tarfile import TarFile, TarInfo
+>  from StringIO import StringIO
+>  from shutil import copy, rmtree
+> +from pwd import getpwuid
+> =20
+> =20
+>  DEVNULL =3D open(os.devnull, 'wb')
+> @@ -149,13 +150,20 @@ class Docker(object):
+>          labels =3D json.loads(resp)[0]["Config"].get("Labels", {})
+>          return labels.get("com.qemu.dockerfile-checksum", "")
+> =20
+> -    def build_image(self, tag, docker_dir, dockerfile, quiet=3DTrue, a=
+rgv=3DNone):
+> +    def build_image(self, tag, docker_dir, dockerfile,
+> +                    quiet=3DTrue, user=3DFalse, argv=3DNone):
+>          if argv =3D=3D None:
+>              argv =3D []
+> =20
+>          tmp_df =3D tempfile.NamedTemporaryFile(dir=3Ddocker_dir, suffi=
+x=3D".docker")
+>          tmp_df.write(dockerfile)
+> =20
+> +        if user:
+> +            uid =3D os.getuid()
+> +            uname =3D getpwuid(uid).pw_name
+> +            tmp_df.write("\n")
+> +            tmp_df.write("RUN useradd -u %d -U %s" % (uid, uname))
+> +
+>          tmp_df.write("\n")
+>          tmp_df.write("LABEL com.qemu.dockerfile-checksum=3D%s" %
+>                       _text_checksum(dockerfile))
+> @@ -225,6 +233,9 @@ class BuildCommand(SubCommand):
+>                              help=3D"""Specify a binary that will be co=
+pied to the
+>                              container together with all its dependent
+>                              libraries""")
+> +        parser.add_argument("--add-current-user", "-u", dest=3D"user",
+> +                            action=3D"store_true",
+> +                            help=3D"Add the current user to images pas=
+swd")
 
-OK, the use of NULL as "as" seems reasonable (this is what uses
-load_elf()), so:
+s/images/image's/ ?
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+otherwise looks good. If you fix that, you can add
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
+
+>          parser.add_argument("tag",
+>                              help=3D"Image Tag")
+>          parser.add_argument("dockerfile",
+> @@ -261,7 +272,7 @@ class BuildCommand(SubCommand):
+>                                         docker_dir)
+> =20
+>              dkr.build_image(tag, docker_dir, dockerfile,
+> -                            quiet=3Dargs.quiet, argv=3Dargv)
+> +                            quiet=3Dargs.quiet, user=3Dargs.user, argv=
+=3Dargv)
+> =20
+>              rmtree(docker_dir)
+> =20
+> --=20
+> 2.11.0
+>=20
+>=20
