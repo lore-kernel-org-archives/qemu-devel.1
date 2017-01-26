@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cWmAa-0008Oh-2i
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:41:09 -0500
+	(envelope-from <prvs=192bd8f5c=roger.pau@citrix.com>)
+	id 1cWmEo-0003LL-8U
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:45:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cWmAW-0006wl-14
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:41:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53768)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1cWmAV-0006wS-Nr
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:40:59 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0QFesPL108320
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 10:40:58 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 287kguhjdd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 26 Jan 2017 10:40:57 -0500
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Thu, 26 Jan 2017 15:39:36 -0000
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Date: Thu, 26 Jan 2017 16:39:31 +0100
-In-Reply-To: <1485445171-16935-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-References: <1485445171-16935-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-Message-Id: <1485445171-16935-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v6 2/2] gdbstub: Fix vCont behaviour
+	(envelope-from <prvs=192bd8f5c=roger.pau@citrix.com>)
+	id 1cWmEj-0008Gu-Ds
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:45:26 -0500
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:54079
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=192bd8f5c=roger.pau@citrix.com>)
+	id 1cWmEj-0008Gj-2w
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 10:45:21 -0500
+Date: Thu, 26 Jan 2017 15:45:09 +0000
+From: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Message-ID: <20170126154509.rxi5sy4bcob2ioen@dhcp-3-221.uk.xensource.com>
+References: <20170124164253.jiva4zvk6fxewtsk@dhcp-3-221.uk.xensource.com>
+	<alpine.DEB.2.10.1701241315310.10192@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1701241326560.10192@sstabellini-ThinkPad-X260>
+	<20170125110529.5rgu7xrh3gkoadog@dhcp-3-221.uk.xensource.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170125110529.5rgu7xrh3gkoadog@dhcp-3-221.uk.xensource.com>
+Subject: Re: [Qemu-devel] [Xen-devel] Commit 3a6c9 breaks QEMU on FreeBSD/Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,258 +34,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: borntraeger@de.ibm.com, qemu-devel@nongnu.org, palves@redhat.com
+To: Stefano Stabellini <sstabellini@kernel.org>, Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-When GDB issues a "vCont", QEMU was not handling it correctly when
-multiple VCPUs are active.
-For vCont, for each thread (VCPU), it can be specified whether to
-single step, continue or stop that thread. The default is to stop a
-thread.
-However, when (for example) "vCont;s:2" is issued, all VCPUs continue
-to run, although all but VCPU nr 2 are to be stopped.
+On Wed, Jan 25, 2017 at 11:05:29AM +0000, Roger Pau Monné wrote:
+> On Tue, Jan 24, 2017 at 01:30:02PM -0800, Stefano Stabellini wrote:
+> > On Tue, 24 Jan 2017, Stefano Stabellini wrote:
+> > > On Tue, 24 Jan 2017, Roger Pau Monné wrote:
+> > > > Hello,
+> > > > 
+> > > > The following commit:
+> > > > 
+> > > > commit 3a6c9172ac5951e6dac2b3f6cbce3cfccdec5894
+> > > > Author: Juergen Gross <jgross@suse.com>
+> > > > Date:   Tue Nov 22 07:10:58 2016 +0100
+> > > > 
+> > > > xen: create qdev for each backend device
+> > > > 
+> > > > Prevents me from running QEMU on FreeBSD/Xen, the following is printed on the
+> > > > QEMU log:
+> > > > 
+> > > > char device redirected to /dev/pts/2 (label serial0)
+> > > > xen be core: xen be core: can't open gnttab device
+> > > > can't open gnttab device
+> > > > xen be core: xen be core: can't open gnttab device
+> > > > can't open gnttab device
+> > > > 
+> > > > # xl create -c ~/domain.cfg
+> > > > Parsing config from /root/domain.cfg
+> > > > libxl: error: libxl_dm.c:2201:device_model_spawn_outcome: Domain 32:domain 32 device model: spawn failed (rc=-3)
+> > > > libxl: error: libxl_create.c:1506:domcreate_devmodel_started: Domain 32:device model did not start: -3
+> > > > libxl: error: libxl_dm.c:2315:kill_device_model: Device Model already exited
+> > > > libxl: error: libxl.c:1572:libxl__destroy_domid: Domain 32:Non-existant domain
+> > > > libxl: error: libxl.c:1531:domain_destroy_callback: Domain 32:Unable to destroy guest
+> > > > libxl: error: libxl.c:1458:domain_destroy_cb: Domain 32:Destruction of domain failed
+> > > > # cat /var/log/xen/qemu-dm-domain.log
+> > > > char device redirected to /dev/pts/2 (label serial0)
+> > > > xen be core: xen be core: can't open gnttab device
+> > > > can't open gnttab device
+> > > > xen be core: xen be core: can't open gnttab device
+> > > > can't open gnttab device
+> > > > 
+> > > > I'm not really familiar with any of that code, but I think that using
+> > > > qdev_init_nofail is wrong, since on FreeBSD/Xen for example we don't yet
+> > > > support the gnttab device, so initialization of the Xen Qdisk backend can fail
+> > > > (and possibly the same applies to Linux if someone decides to compile a kernel
+> > > > without the gnttab device). Yet QEMU can be used without the Qdisk backend.
+> > > 
+> > > How did you manage to configure QEMU before? The configure script had
+> > > xc_gnttab_open calls in it up to Xen 4.6.
+> > 
+> > I know the answer! Because the configure script only compiles the code,
+> > doesn't try to run it. xc_gnttab_open compiled correctly but returned
+> > error when executed. Is that right?
+> 
+> Yes, I'm quite that's right. FreeBSD is using gnttab_unimp.c, which implements
+> xengnttab_open, so compilation will not fail.
+> 
+> > 
+> > 
+> > > I am happy to support a use case where the kernel doesn't have gntdev,
+> > > but it needs to be explicit: we need to detect it in the configure
+> > > script, then avoid the initialization of devices which require it.
+> > 
+> > I would still prefer configure to be able to detect this case. If it
+> > cannot be made to detect it, then we can try to figure out a way to
+> > catch the initialization errors at run time. 
+> 
+> I think it's better to simply fail to initialize Xen Qdisk at runtime, or else
+> a xen-tools/QEMU compiled on a non-Xen environment won't get gnttab and as a
+> consequence Xen Qdisk support enabled, and I think it's quite common for
+> distros to compile Xen packages on non-Xen environments (where /dev/xen/gnttab
+> is not available).
 
-This patch completely rewrites the vCont parsing code.
+Ping?
 
-Please note that this improvement only works in system emulation mode,
-when in userspace emulation mode the old behaviour is preserved.
+I'm not really sure how to solve this because I have zero experience with QEMU
+internals (all this qdev stuff). Can we restore the previous behavior, where
+the failure to initialize a device wouldn't prevent QEMU from starting?
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
----
- gdbstub.c             | 187 +++++++++++++++++++++++++++++++++++++-------------
- include/sysemu/cpus.h |   1 +
- 2 files changed, 141 insertions(+), 47 deletions(-)
-
-diff --git a/gdbstub.c b/gdbstub.c
-index de9b62b..eead8d2 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -386,6 +386,50 @@ static inline void gdb_continue(GDBState *s)
- #endif
- }
- 
-+/*
-+ * Resume execution, per CPU actions. For user-mode emulation it's
-+ * equivalent to gdb_continue.
-+ */
-+static int gdb_continue_partial(GDBState *s, char *newstates)
-+{
-+    int res = 0, flag = 0;
-+#ifdef CONFIG_USER_ONLY
-+    s->running_state = 1;
-+#else
-+    CPUState *cpu;
-+
-+    if (!runstate_needs_reset()) {
-+        if (vm_prepare_start()) {
-+            return 0;
-+        }
-+
-+        CPU_FOREACH(cpu) {
-+            switch (newstates[cpu_index(cpu) - 1]) {
-+            case 0:
-+            case 1:
-+                break; /* nothing to do here */
-+            case 's':
-+                cpu_single_step(cpu, sstep_flags);
-+                cpu_resume(cpu);
-+                flag = 1;
-+                break;
-+            case 'c':
-+                cpu_resume(cpu);
-+                flag = 1;
-+                break;
-+            default:
-+                res = -1;
-+                break;
-+            }
-+        }
-+    }
-+    if (flag) {
-+        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
-+    }
-+#endif
-+    return res;
-+}
-+
- static void put_buffer(GDBState *s, const uint8_t *buf, int len)
- {
- #ifdef CONFIG_USER_ONLY
-@@ -784,6 +828,95 @@ static int is_query_packet(const char *p, const char *query, char separator)
-         (p[query_len] == '\0' || p[query_len] == separator);
- }
- 
-+/**
-+ * gdb_handle_vcont - Parses and handles a vCont packet.
-+ * returns -ENOTSUP if a command is unsupported, -EINVAL or -ERANGE if there is
-+ *         a format error, 0 on success.
-+ */
-+static int gdb_handle_vcont(GDBState *s, const char *p)
-+{
-+    int res, idx, signal = 0;
-+    char cur_action;
-+    char *newstates;
-+    unsigned long tmp;
-+    CPUState *cpu;
-+
-+    /* uninitialised CPUs stay 0 */
-+    newstates = g_new0(char, max_cpus);
-+
-+    /* mark valid CPUs with 1 */
-+    CPU_FOREACH(cpu) {
-+        newstates[cpu_index(cpu) - 1] = 1;
-+    }
-+
-+    /*
-+     * res keeps track of what error we are returning, with -1 meaning
-+     * that the command is unknown or unsupported, and thus returning
-+     * an empty packet, while -22 returns an E22 packet due to
-+     * invalid or incorrect parameters passed.
-+     */
-+    res = 0;
-+    while (*p) {
-+        if (*p++ != ';') {
-+            res = -ENOTSUP;
-+            goto out;
-+        }
-+
-+        cur_action = *p++;
-+        if (cur_action == 'C' || cur_action == 'S') {
-+            cur_action = tolower(cur_action);
-+            res = qemu_strtoul(p + 1, &p, 16, &tmp);
-+            if (res) {
-+                goto out;
-+            }
-+            signal = gdb_signal_to_target(tmp);
-+        } else if (cur_action != 'c' && cur_action != 's') {
-+            /* unknown/invalid/unsupported command */
-+            res = -ENOTSUP;
-+            goto out;
-+        }
-+        /* thread specification. special values: (none), -1 = all; 0 = any */
-+        if ((p[0] == ':' && p[1] == '-' && p[2] == '1') || (p[0] != ':')) {
-+            if (*p == ':') {
-+                p += 3;
-+            }
-+            for (idx = 0; idx < max_cpus; idx++) {
-+                if (newstates[idx] == 1) {
-+                    newstates[idx] = cur_action;
-+                }
-+            }
-+        } else if (*p == ':') {
-+            p++;
-+            res = qemu_strtoul(p, &p, 16, &tmp);
-+            if (res) {
-+                goto out;
-+            }
-+            idx = tmp;
-+            /* 0 means any thread, so we pick the first valid CPU */
-+            if (!idx) {
-+                idx = cpu_index(first_cpu);
-+            }
-+
-+            /* invalid CPU specified */
-+            if (!idx || idx > max_cpus || !newstates[idx - 1]) {
-+                res = -EINVAL;
-+                goto out;
-+            }
-+            /* only use if no previous match occourred */
-+            if (newstates[idx - 1] == 1) {
-+                newstates[idx - 1] = cur_action;
-+            }
-+        }
-+    }
-+    s->signal = signal;
-+    gdb_continue_partial(s, newstates);
-+
-+out:
-+    g_free(newstates);
-+
-+    return res;
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -829,60 +962,20 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         return RS_IDLE;
-     case 'v':
-         if (strncmp(p, "Cont", 4) == 0) {
--            int res_signal, res_thread;
--
-             p += 4;
-             if (*p == '?') {
-                 put_packet(s, "vCont;c;C;s;S");
-                 break;
-             }
--            res = 0;
--            res_signal = 0;
--            res_thread = 0;
--            while (*p) {
--                int action, signal;
--
--                if (*p++ != ';') {
--                    res = 0;
--                    break;
--                }
--                action = *p++;
--                signal = 0;
--                if (action == 'C' || action == 'S') {
--                    signal = gdb_signal_to_target(strtoul(p, (char **)&p, 16));
--                    if (signal == -1) {
--                        signal = 0;
--                    }
--                } else if (action != 'c' && action != 's') {
--                    res = 0;
--                    break;
--                }
--                thread = 0;
--                if (*p == ':') {
--                    thread = strtoull(p+1, (char **)&p, 16);
--                }
--                action = tolower(action);
--                if (res == 0 || (res == 'c' && action == 's')) {
--                    res = action;
--                    res_signal = signal;
--                    res_thread = thread;
--                }
--            }
-+
-+            res = gdb_handle_vcont(s, p);
-+
-             if (res) {
--                if (res_thread != -1 && res_thread != 0) {
--                    cpu = find_cpu(res_thread);
--                    if (cpu == NULL) {
--                        put_packet(s, "E22");
--                        break;
--                    }
--                    s->c_cpu = cpu;
--                }
--                if (res == 's') {
--                    cpu_single_step(s->c_cpu, sstep_flags);
-+                if ((res == -EINVAL) || (res == -ERANGE)) {
-+                    put_packet(s, "E22");
-+                    break;
-                 }
--                s->signal = res_signal;
--                gdb_continue(s);
--                return RS_IDLE;
-+                goto unknown_command;
-             }
-             break;
-         } else {
-diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index 3728a1e..5fa074b 100644
---- a/include/sysemu/cpus.h
-+++ b/include/sysemu/cpus.h
-@@ -5,6 +5,7 @@
- bool qemu_in_vcpu_thread(void);
- void qemu_init_cpu_loop(void);
- void resume_all_vcpus(void);
-+void resume_some_vcpus(CPUState **cpus);
- void pause_all_vcpus(void);
- void cpu_stop_current(void);
- void cpu_ticks_init(void);
--- 
-1.9.1
+Roger.
