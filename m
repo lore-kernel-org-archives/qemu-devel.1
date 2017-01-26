@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cWgeq-00053G-Ky
+	(envelope-from <fred.konrad@greensocs.com>) id 1cWgeq-00053H-LA
 	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:47:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cWgeo-0000mY-9G
+	(envelope-from <fred.konrad@greensocs.com>) id 1cWgen-0000m4-Jt
 	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:47:56 -0500
-Received: from greensocs.com ([193.104.36.180]:33056)
+Received: from greensocs.com ([193.104.36.180]:33001)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cWgen-0000mH-TR
-	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:47:54 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cWgen-0000lB-3t
+	for qemu-devel@nongnu.org; Thu, 26 Jan 2017 04:47:53 -0500
 From: fred.konrad@greensocs.com
-Date: Thu, 26 Jan 2017 10:47:33 +0100
-Message-Id: <1485424060-12217-4-git-send-email-fred.konrad@greensocs.com>
-In-Reply-To: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
-References: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH V2 03/10] qemu-clk: allow to bind two clocks
- together
+Date: Thu, 26 Jan 2017 10:47:30 +0100
+Message-Id: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
+Subject: [Qemu-devel] [PATCH V2 00/10] Clock framework API.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,177 +26,98 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This introduces the clock binding and the update part.
-When the qemu_clk_rate_update(qemu_clk, int) function is called:
-  * The clock callback is called on the qemu_clk so it can change the rate.
-  * The qemu_clk_rate_update function is called on all the driven clock.
+Hi,
 
-Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+This is the second version of the clock framework API it contains:
+
+  * The first 6 patches which introduce the framework.
+  * The 7th patch which introduces a fixed-clock model.
+  * The rest which gives an example how to model a PLL from the existing
+    zynqmp-crf extracted from the qemu xilinx tree.
+
+No specific behavior is expected yet when the CRF register set is accessed but
+the user can see for example the dp_video_ref and vpll_to_lpd rate changing in
+the monitor with the "info qtree" command when the vpll_ctrl register is
+modified.
+
+bus: main-system-bus
+  type System
+  dev: xlnx.zynqmp_crf, id ""
+    gpio-out "sysbus-irq" 1
+    qemu-clk "dbg_trace" 0
+    qemu-clk "dp_stc_ref" 0
+    qemu-clk "dpll_to_lpd" 12500000
+    qemu-clk "acpu_clk" 0
+    qemu-clk "pcie_ref" 0
+    qemu-clk "topsw_main" 0
+    qemu-clk "topsw_lsbus" 0
+    qemu-clk "dp_audio_ref" 0
+    qemu-clk "sata_ref" 0
+    qemu-clk "dp_video_ref" 1428571
+    qemu-clk "vpll_clk" 50000000
+    qemu-clk "apll_to_lpd" 12500000
+    qemu-clk "dpll_clk" 50000000
+    qemu-clk "gpu_ref" 0
+    qemu-clk "aux_refclk" 0
+    qemu-clk "video_clk" 27000000
+    qemu-clk "gdma_ref" 0
+    qemu-clk "gt_crx_ref_clk" 0
+    qemu-clk "dbg_fdp" 0
+    qemu-clk "apll_clk" 50000000
+    qemu-clk "pss_alt_ref_clk" 0
+    qemu-clk "ddr" 0
+    qemu-clk "dbg_tstmp" 0
+    qemu-clk "pss_ref_clk" 50000000
+    qemu-clk "dpdma_ref" 0
+    qemu-clk "vpll_to_lpd" 12500000
+    mmio 00000000fd1a0000/000000000000010c
+    
+This series is based on the current master
+(a9e404600a9bd1e6a26431fc89e5069092e67f14).
+
+Thanks,
+Fred
 
 V1 -> V2:
-  * Rename qemu_clk_on_rate_update_cb to QEMUClkRateUpdateCallback and
-    move the pointer to the structure instead of having a pointer-to-function
-    type.
----
- include/qemu/qemu-clock.h | 67 +++++++++++++++++++++++++++++++++++++++++++++++
- qemu-clock.c              | 56 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 123 insertions(+)
+  * Rebased on current master.
+  * Some function renamed and documentation fixed.
 
-diff --git a/include/qemu/qemu-clock.h b/include/qemu/qemu-clock.h
-index 3e692d3..6d30299 100644
---- a/include/qemu/qemu-clock.h
-+++ b/include/qemu/qemu-clock.h
-@@ -30,12 +30,25 @@
- #define TYPE_CLOCK "qemu-clk"
- #define QEMU_CLOCK(obj) OBJECT_CHECK(struct qemu_clk, (obj), TYPE_CLOCK)
- 
-+typedef struct ClkList ClkList;
-+typedef uint64_t QEMUClkRateUpdateCallback(void *opaque, uint64_t rate);
-+
- typedef struct qemu_clk {
-     /*< private >*/
-     Object parent_obj;
-     char *name;            /* name of this clock in the device. */
-+    uint64_t in_rate;      /* rate of the clock which drive this pin. */
-+    uint64_t out_rate;     /* rate of this clock pin. */
-+    void *opaque;
-+    QEMUClkRateUpdateCallback *cb;
-+    QLIST_HEAD(, ClkList) bound;
- } *qemu_clk;
- 
-+struct ClkList {
-+    qemu_clk clk;
-+    QLIST_ENTRY(ClkList) node;
-+};
-+
- /**
-  * qemu_clk_device_add_clock:
-  * @dev: the device on which the clock needs to be added.
-@@ -59,4 +72,58 @@ void qemu_clk_device_add_clock(DeviceState *dev, qemu_clk clk,
-  */
- qemu_clk qemu_clk_device_get_clock(DeviceState *dev, const char *name);
- 
-+/**
-+ * qemu_clk_bind_clock:
-+ * @out: the clock output.
-+ * @in: the clock input.
-+ *
-+ * Connect the clock together. This is unidirectional so a
-+ * qemu_clk_update_rate will go from @out to @in.
-+ *
-+ */
-+void qemu_clk_bind_clock(qemu_clk out, qemu_clk in);
-+
-+/**
-+ * qemu_clk_unbind:
-+ * @out: the clock output.
-+ * @in: the clock input.
-+ *
-+ * Disconnect the clocks if they were bound together.
-+ *
-+ */
-+void qemu_clk_unbind(qemu_clk out, qemu_clk in);
-+
-+/**
-+ * qemu_clk_update_rate:
-+ * @clk: the clock to update.
-+ * @rate: the new rate in Hz.
-+ *
-+ * Update the @clk to the new @rate.
-+ *
-+ */
-+void qemu_clk_update_rate(qemu_clk clk, uint64_t rate);
-+
-+/**
-+ * qemu_clk_refresh:
-+ * @clk: the clock to be refreshed.
-+ *
-+ * If a model alters the topology of a clock tree, it must call this function on
-+ * the clock source to refresh the clock tree.
-+ *
-+ */
-+void qemu_clk_refresh(qemu_clk clk);
-+
-+/**
-+ * qemu_clk_set_callback:
-+ * @clk: the clock associated to the callback.
-+ * @cb: the function which is called when a refresh happen on the clock @clk.
-+ * @opaque: the opaque data passed to the callback.
-+ *
-+ * Set the callback @cb which will be called when the clock @clk is updated.
-+ *
-+ */
-+void qemu_clk_set_callback(qemu_clk clk,
-+                           QEMUClkRateUpdateCallback *cb,
-+                           void *opaque);
-+
- #endif /* QEMU_CLOCK_H */
-diff --git a/qemu-clock.c b/qemu-clock.c
-index 803deb3..8c12368 100644
---- a/qemu-clock.c
-+++ b/qemu-clock.c
-@@ -37,6 +37,62 @@
-     }                                                                        \
- } while (0);
- 
-+void qemu_clk_refresh(qemu_clk clk)
-+{
-+    qemu_clk_update_rate(clk, clk->in_rate);
-+}
-+
-+void qemu_clk_update_rate(qemu_clk clk, uint64_t rate)
-+{
-+    ClkList *child;
-+
-+    clk->in_rate = rate;
-+    clk->out_rate = rate;
-+
-+    if (clk->cb) {
-+        clk->out_rate = clk->cb(clk->opaque, rate);
-+    }
-+
-+    DPRINTF("%s output rate updated to %" PRIu64 "\n",
-+            object_get_canonical_path(OBJECT(clk)),
-+            clk->out_rate);
-+
-+    QLIST_FOREACH(child, &clk->bound, node) {
-+        qemu_clk_update_rate(child->clk, clk->out_rate);
-+    }
-+}
-+
-+void qemu_clk_bind_clock(qemu_clk out, qemu_clk in)
-+{
-+    ClkList *child;
-+
-+    child = g_malloc(sizeof(child));
-+    assert(child);
-+    child->clk = in;
-+    QLIST_INSERT_HEAD(&out->bound, child, node);
-+    qemu_clk_update_rate(in, out->out_rate);
-+}
-+
-+void qemu_clk_unbind(qemu_clk out, qemu_clk in)
-+{
-+    ClkList *child, *next;
-+
-+    QLIST_FOREACH_SAFE(child, &out->bound, node, next) {
-+        if (child->clk == in) {
-+            QLIST_REMOVE(child, node);
-+            g_free(child);
-+        }
-+    }
-+}
-+
-+void qemu_clk_set_callback(qemu_clk clk,
-+                           QEMUClkRateUpdateCallback *cb,
-+                           void *opaque)
-+{
-+    clk->cb = cb;
-+    clk->opaque = opaque;
-+}
-+
- void qemu_clk_device_add_clock(DeviceState *dev, qemu_clk clk,
-                                const char *name)
- {
+RFC -> V1:
+  * Rebased on current master.
+  * The docs has been fixed.
+  * qemu_clk_init_device helper has been provided to ease the initialization
+    of the devices.
+
+KONRAD Frederic (10):
+  qemu-clk: introduce qemu-clk qom object
+  qemu-clk: allow to add a clock to a device
+  qemu-clk: allow to bind two clocks together
+  qemu-clk: introduce an init array to help the device construction
+  qdev-monitor: print the device's clock with info qtree
+  docs: add qemu-clock documentation
+  introduce fixed-clock
+  introduce zynqmp_crf
+  zynqmp: add the zynqmp_crf to the platform
+  zynqmp: add reference clock
+
+ Makefile.objs                 |   1 +
+ docs/clock.txt                | 108 +++++
+ hw/arm/xlnx-zynqmp.c          |  56 +++
+ hw/misc/Makefile.objs         |   2 +
+ hw/misc/fixed-clock.c         |  88 ++++
+ hw/misc/xilinx_zynqmp_crf.c   | 968 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynqmp.h  |   8 +
+ include/hw/misc/fixed-clock.h |  30 ++
+ include/qemu/qemu-clock.h     | 161 +++++++
+ qdev-monitor.c                |   2 +
+ qemu-clock.c                  | 174 ++++++++
+ 11 files changed, 1598 insertions(+)
+ create mode 100644 docs/clock.txt
+ create mode 100644 hw/misc/fixed-clock.c
+ create mode 100644 hw/misc/xilinx_zynqmp_crf.c
+ create mode 100644 include/hw/misc/fixed-clock.h
+ create mode 100644 include/qemu/qemu-clock.h
+ create mode 100644 qemu-clock.c
+
 -- 
 1.8.3.1
