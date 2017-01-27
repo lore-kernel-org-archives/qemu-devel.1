@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cX1Ck-0006Ti-MP
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 02:44:19 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cX1DD-0006mJ-6h
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 02:44:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cX1Cg-0000w9-SO
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 02:44:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cX1Cg-0000vg-MO
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 02:44:14 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BD1603A76B2
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 07:44:14 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170125130308.16104-1-marcandre.lureau@redhat.com>
-	<20170125130308.16104-2-marcandre.lureau@redhat.com>
-Date: Fri, 27 Jan 2017 08:44:11 +0100
-In-Reply-To: <20170125130308.16104-2-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 25 Jan 2017 17:03:07 +0400")
-Message-ID: <87k29h7xro.fsf@dusky.pond.sub.org>
+	(envelope-from <eric.auger@redhat.com>) id 1cX1DC-00014P-DW
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 02:44:47 -0500
+References: <1485422381-29019-1-git-send-email-eric.auger@redhat.com>
+	<1485422381-29019-3-git-send-email-eric.auger@redhat.com>
+	<CALicx6uLp5SapC5PiDRB6OdaVWXVNYUCORAQ7EsPJ-KNNF5cTw@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <ba3db103-9b6f-880d-aeea-d3194a1d34f1@redhat.com>
+Date: Fri, 27 Jan 2017 08:44:36 +0100
 MIME-Version: 1.0
+In-Reply-To: <CALicx6uLp5SapC5PiDRB6OdaVWXVNYUCORAQ7EsPJ-KNNF5cTw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] qapi2texi: change texi formatters
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 2/4] hw/intc/arm_gicv3_kvm: Rename
+ KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,45 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Vijay Kilari <vijay.kilari@gmail.com>
+Cc: eric.auger.pro@gmail.com, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, shannon.zhao@linaro.org, Christoffer Dall <christoffer.dall@linaro.org>, drjones@redhat.com, "Kumar, Vijaya" <Vijaya.Kumar@cavium.com>, peterx@redhat.com, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-I don't like "change FOO" subject lines.  What about;
+Hi Vijaya,
 
-    qapi: Simplify qapi2texi.py a bit
+On 27/01/2017 08:02, Vijay Kilari wrote:
+> Hi Eric,
+> 
+> On Thu, Jan 26, 2017 at 2:49 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>> Rename KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS into KVM_DEV_ARM_VGIC_CPU_SYSREGS
+>> as exposed in the kernel user API and pulled by update-linux-headers.sh.
+> 
+> I will fix it in my next qemu patch series.
+> I have updated kernel to use KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS in
+> latest kernel patch
+> version v11. I so you can drop this patch.
 
-This way, it's obvious that the commit isn't supposed to change
-behavior.  Can touch up on commit.
+Sure I saw the change in your v11.
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Thanks
 
-> STRUCT_FMT is generic enough, rename it to TYPE_FMT, use it for unions.
->
-> Rename COMMAND_FMT to MSG_FMT, since it applies to both commands and
-> events.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi2texi.py | 46 +++++++++++++++++++---------------------------
->  1 file changed, 19 insertions(+), 27 deletions(-)
->
-> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-> index 83ded95c2d..e1b79c2ad3 100755
-> --- a/scripts/qapi2texi.py
-> +++ b/scripts/qapi2texi.py
-> @@ -9,7 +9,7 @@ import sys
->=20=20
->  import qapi
->=20=20
-> -COMMAND_FMT =3D """
-> +MSG_FMT =3D """
-
-QMP_MSG_FMT?  Your choice, can rename on commit.
-
->  @deftypefn {type} {{}} {name}
->=20=20
->  {body}
-[...]
-
-With the commit message improved:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Eric
+> 
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> KVM_DEV_ARM_VGIC_CPU_SYSREGS may be fixed at kernel level instead
+>> ---
+>>  hw/intc/arm_gicv3_kvm.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+>> index 267c2d6..d8ecbc3 100644
+>> --- a/hw/intc/arm_gicv3_kvm.c
+>> +++ b/hw/intc/arm_gicv3_kvm.c
+>> @@ -108,7 +108,7 @@ static inline void kvm_gicr_access(GICv3State *s, int offset, int cpu,
+>>  static inline void kvm_gicc_access(GICv3State *s, uint64_t reg, int cpu,
+>>                                     uint64_t *val, bool write)
+>>  {
+>> -    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+>> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_CPU_SYSREGS,
+>>                        KVM_VGIC_ATTR(reg, s->cpu[cpu].gicr_typer),
+>>                        val, write);
+>>  }
+>> --
+>> 2.5.5
+>>
