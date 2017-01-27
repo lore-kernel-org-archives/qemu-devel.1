@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cXAah-0000cI-Vu
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:45:41 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cXAra-0006d5-BT
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 13:03:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cXAae-0008MK-IY
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:45:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39126)
+	(envelope-from <dgilbert@redhat.com>) id 1cXArV-0005d4-CQ
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 13:03:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52210)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cXAad-0008M0-TS
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:45:36 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cXArV-0005cZ-3z
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 13:03:01 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A305DC04BD5F
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 17:45:35 +0000 (UTC)
-Date: Fri, 27 Jan 2017 17:45:30 +0000
+	by mx1.redhat.com (Postfix) with ESMTPS id 24D4C1B1745
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 18:03:01 +0000 (UTC)
+Date: Fri, 27 Jan 2017 18:02:56 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170127174530.GH3323@work-vm>
+Message-ID: <20170127180255.GI3323@work-vm>
 References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-10-git-send-email-quintela@redhat.com>
+	<1485207141-1941-11-git-send-email-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <1485207141-1941-10-git-send-email-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/17] migration: Start of multiple fd work
+In-Reply-To: <1485207141-1941-11-git-send-email-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 10/17] migration: create ram_multifd_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,294 +37,209 @@ To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
 
 * Juan Quintela (quintela@redhat.com) wrote:
-> We create new channels for each new thread created. We only send through
-> them a character to be sure that we are creating the channels in the
-> right order.
->=20
-> Note: Reference count/freeing of channels is not done
->=20
+> The function still don't use multifd, but we have simplified
+> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
+> counter and a new flag for this type of pages.
+> 
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  include/migration/migration.h |  6 +++++
->  migration/ram.c               | 45 +++++++++++++++++++++++++++++++++-
->  migration/socket.c            | 56 +++++++++++++++++++++++++++++++++++++=
-++++--
->  3 files changed, 104 insertions(+), 3 deletions(-)
-
-One thing not direclt in here, you should probably look at the migration ca=
-ncel
-code to get it to call shutdown() on all your extra sockets, it stops things
-blocking in any one of them.
-
->=20
+>  hmp.c                         |  2 ++
+>  include/migration/migration.h |  1 +
+>  migration/migration.c         |  1 +
+>  migration/ram.c               | 51 ++++++++++++++++++++++++++++++++++++++++++-
+>  qapi-schema.json              |  4 +++-
+>  5 files changed, 57 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index e579766..76bc8c7 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -222,6 +222,8 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>              monitor_printf(mon, "postcopy request count: %" PRIu64 "\n",
+>                             info->ram->postcopy_requests);
+>          }
+> +        monitor_printf(mon, "multifd: %" PRIu64 " pages\n",
+> +                       info->ram->multifd);
+>      }
+> 
+>      if (info->has_disk) {
 > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index f119ba0..3989bd6 100644
+> index 3989bd6..b3e4f31 100644
 > --- a/include/migration/migration.h
 > +++ b/include/migration/migration.h
-> @@ -22,6 +22,7 @@
->  #include "qapi-types.h"
->  #include "exec/cpu-common.h"
->  #include "qemu/coroutine_int.h"
-> +#include "io/channel.h"
->=20
->  #define QEMU_VM_FILE_MAGIC           0x5145564d
->  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
-> @@ -218,6 +219,11 @@ void tcp_start_incoming_migration(const char *host_p=
-ort, Error **errp);
->=20
->  void tcp_start_outgoing_migration(MigrationState *s, const char *host_po=
-rt, Error **errp);
->=20
-> +QIOChannel *socket_recv_channel_create(void);
-> +int socket_recv_channel_destroy(QIOChannel *recv);
-> +QIOChannel *socket_send_channel_create(void);
-> +int socket_send_channel_destroy(QIOChannel *send);
-> +
->  void unix_start_incoming_migration(const char *path, Error **errp);
->=20
->  void unix_start_outgoing_migration(MigrationState *s, const char *path, =
-Error **errp);
+> @@ -282,6 +282,7 @@ uint64_t xbzrle_mig_pages_transferred(void);
+>  uint64_t xbzrle_mig_pages_overflow(void);
+>  uint64_t xbzrle_mig_pages_cache_miss(void);
+>  double xbzrle_mig_cache_miss_rate(void);
+> +uint64_t multifd_mig_pages_transferred(void);
+> 
+>  void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+>  void ram_debug_dump_bitmap(unsigned long *todump, bool expected);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ab48f06..1d62b91 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -652,6 +652,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+>      info->ram->mbps = s->mbps;
+>      info->ram->dirty_sync_count = s->dirty_sync_count;
+>      info->ram->postcopy_requests = s->postcopy_requests;
+> +    info->ram->multifd = multifd_mig_pages_transferred();
+> 
+>      if (s->state != MIGRATION_STATUS_COMPLETED) {
+>          info->ram->remaining = ram_bytes_remaining();
 > diff --git a/migration/ram.c b/migration/ram.c
-> index 939f364..5ad7cb3 100644
+> index 5ad7cb3..c71929e 100644
 > --- a/migration/ram.c
 > +++ b/migration/ram.c
-> @@ -386,9 +386,11 @@ void migrate_compress_threads_create(void)
->=20
->  struct MultiFDSendParams {
->      QemuThread thread;
-> +    QIOChannel *c;
->      QemuCond cond;
->      QemuMutex mutex;
->      bool quit;
-> +    bool started;
->  };
->  typedef struct MultiFDSendParams MultiFDSendParams;
->=20
-> @@ -397,6 +399,13 @@ static MultiFDSendParams *multifd_send;
->  static void *multifd_send_thread(void *opaque)
->  {
->      MultiFDSendParams *params =3D opaque;
-> +    char start =3D 's';
-> +
-> +    qio_channel_write(params->c, &start, 1, &error_abort);
+> @@ -61,6 +61,7 @@ static uint64_t bitmap_sync_count;
+>  #define RAM_SAVE_FLAG_XBZRLE   0x40
+>  /* 0x80 is reserved in migration.h start with 0x100 next */
+>  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
+> +#define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
 
-I'd be tempted to send something stronger as a guarantee
-that you're connecting the right thing to the right place;
-maybe something like a QEMU + UUID + fd index?
-I guarantee someone is going to mess up the fd's in the wrong
-order or connect some random other process to one of them.
+I think a similar reminder from the last iteration of this patch;
+I think we're out of bits here - I'm not sure if 0x200 is even
+available.
 
-> +    qemu_mutex_lock(&params->mutex);
-> +    params->started =3D true;
-> +    qemu_cond_signal(&params->cond);
-> +    qemu_mutex_unlock(&params->mutex);
->=20
->      qemu_mutex_lock(&params->mutex);
-
-That unlock/lock pair is odd.
-
->      while (!params->quit){
-> @@ -433,6 +442,7 @@ void migrate_multifd_send_threads_join(void)
->          qemu_thread_join(&multifd_send[i].thread);
->          qemu_mutex_destroy(&multifd_send[i].mutex);
->          qemu_cond_destroy(&multifd_send[i].cond);
-> +        socket_send_channel_destroy(multifd_send[i].c);
->      }
->      g_free(multifd_send);
->      multifd_send =3D NULL;
-> @@ -452,18 +462,31 @@ void migrate_multifd_send_threads_create(void)
->          qemu_mutex_init(&multifd_send[i].mutex);
->          qemu_cond_init(&multifd_send[i].cond);
->          multifd_send[i].quit =3D false;
-> +        multifd_send[i].started =3D false;
-> +        multifd_send[i].c =3D socket_send_channel_create();
-> +        if(!multifd_send[i].c) {
-> +            error_report("Error creating a send channel");
-> +            exit(0);
-
-Hmm no exit!
-
-> +        }
->          snprintf(thread_name, 15, "multifd_send_%d", i);
->          qemu_thread_create(&multifd_send[i].thread, thread_name,
->                             multifd_send_thread, &multifd_send[i],
->                             QEMU_THREAD_JOINABLE);
-> +        qemu_mutex_lock(&multifd_send[i].mutex);
-> +        while (!multifd_send[i].started) {
-> +            qemu_cond_wait(&multifd_send[i].cond, &multifd_send[i].mutex=
-);
-> +        }
-> +        qemu_mutex_unlock(&multifd_send[i].mutex);
->      }
+>  static uint8_t *ZERO_TARGET_PAGE;
+> 
+> @@ -141,6 +142,7 @@ typedef struct AccountingInfo {
+>      uint64_t dup_pages;
+>      uint64_t skipped_pages;
+>      uint64_t norm_pages;
+> +    uint64_t multifd_pages;
+>      uint64_t iterations;
+>      uint64_t xbzrle_bytes;
+>      uint64_t xbzrle_pages;
+> @@ -211,6 +213,11 @@ uint64_t xbzrle_mig_pages_overflow(void)
+>      return acct_info.xbzrle_overflows;
 >  }
->=20
->  struct MultiFDRecvParams {
->      QemuThread thread;
-> +    QIOChannel *c;
->      QemuCond cond;
->      QemuMutex mutex;
->      bool quit;
-> +    bool started;
->  };
->  typedef struct MultiFDRecvParams MultiFDRecvParams;
->=20
-> @@ -472,7 +495,14 @@ static MultiFDRecvParams *multifd_recv;
->  static void *multifd_recv_thread(void *opaque)
->  {
->      MultiFDRecvParams *params =3D opaque;
-> -=20
-> +    char start;
-> +
-> +    qio_channel_read(params->c, &start, 1, &error_abort);
-> +    qemu_mutex_lock(&params->mutex);
-> +    params->started =3D true;
-> +    qemu_cond_signal(&params->cond);
-> +    qemu_mutex_unlock(&params->mutex);
-> +
->      qemu_mutex_lock(&params->mutex);
->      while (!params->quit){
->          qemu_cond_wait(&params->cond, &params->mutex);
-> @@ -508,6 +538,7 @@ void migrate_multifd_recv_threads_join(void)
->          qemu_thread_join(&multifd_recv[i].thread);
->          qemu_mutex_destroy(&multifd_recv[i].mutex);
->          qemu_cond_destroy(&multifd_recv[i].cond);
-> +        socket_send_channel_destroy(multifd_recv[i].c);
->      }
->      g_free(multifd_recv);
->      multifd_recv =3D NULL;
-> @@ -526,9 +557,21 @@ void migrate_multifd_recv_threads_create(void)
->          qemu_mutex_init(&multifd_recv[i].mutex);
->          qemu_cond_init(&multifd_recv[i].cond);
->          multifd_recv[i].quit =3D false;
-> +        multifd_recv[i].started =3D false;
-> +        multifd_recv[i].c =3D socket_recv_channel_create();
-> +
-> +        if(!multifd_recv[i].c) {
-> +            error_report("Error creating a recv channel");
-> +            exit(0);
-> +        }
->          qemu_thread_create(&multifd_recv[i].thread, "multifd_recv",
->                             multifd_recv_thread, &multifd_recv[i],
->                             QEMU_THREAD_JOINABLE);
-> +        qemu_mutex_lock(&multifd_recv[i].mutex);
-> +        while (!multifd_recv[i].started) {
-> +            qemu_cond_wait(&multifd_recv[i].cond, &multifd_recv[i].mutex=
-);
-> +        }
-> +        qemu_mutex_unlock(&multifd_recv[i].mutex);
->      }
->  }
->=20
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 11f80b1..7cd9213 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -24,6 +24,54 @@
->  #include "io/channel-socket.h"
->  #include "trace.h"
->=20
-> +struct SocketArgs {
-> +    QIOChannelSocket *ioc;
-> +    SocketAddress *saddr;
-> +    Error **errp;
-> +} socket_args;
-> +
-> +QIOChannel *socket_recv_channel_create(void)
+> 
+> +uint64_t multifd_mig_pages_transferred(void)
 > +{
-> +    QIOChannelSocket *sioc;
-> +    Error *err =3D NULL;
+> +    return acct_info.multifd_pages;
+> +}
 > +
-> +    sioc =3D qio_channel_socket_accept(QIO_CHANNEL_SOCKET(socket_args.io=
-c),
-> +                                     &err);
-> +    if (!sioc) {
-> +        error_report("could not accept migration connection (%s)",
-> +                     error_get_pretty(err));
-> +        return NULL;
+>  /* This is the last block that we have visited serching for dirty pages
+>   */
+>  static RAMBlock *last_seen_block;
+> @@ -990,6 +997,33 @@ static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
+>      return pages;
+>  }
+> 
+> +static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
+> +                            bool last_stage, uint64_t *bytes_transferred)
+> +{
+> +    int pages;
+> +    uint8_t *p;
+> +    RAMBlock *block = pss->block;
+> +    ram_addr_t offset = pss->offset;
+> +
+> +    p = block->host + offset;
+> +
+> +    if (block == last_sent_block) {
+> +        offset |= RAM_SAVE_FLAG_CONTINUE;
 > +    }
-> +    return QIO_CHANNEL(sioc);
-> +}
-> +
-> +int socket_recv_channel_destroy(QIOChannel *recv)
-> +{
-> +    // Remove channel
-> +    object_unref(OBJECT(send));
-> +    return 0;
-> +}
-> +
-> +QIOChannel *socket_send_channel_create(void)
-> +{
-> +    QIOChannelSocket *sioc =3D qio_channel_socket_new();
-> +
-> +    qio_channel_socket_connect_sync(sioc, socket_args.saddr,
-> +                                    socket_args.errp);
-
-We need to be careful there since that's a sync; it depends what
-calls this, if I'm reading the code above correctly then it gets called
-=66rom the main thread and that would be bad if it blocked; it's ok if it
-was the fd threads or the migration thread though.
-
-> +    qio_channel_set_delay(QIO_CHANNEL(sioc), false);
-> +    return QIO_CHANNEL(sioc);
-> +}
-> +
-> +int socket_send_channel_destroy(QIOChannel *send)
-> +{
-> +    // Remove channel
-> +    object_unref(OBJECT(send));
-> +    if (socket_args.saddr) {
-> +        qapi_free_SocketAddress(socket_args.saddr);
-> +        socket_args.saddr =3D NULL;
+> +    pages = save_zero_page(f, block, offset, p, bytes_transferred);
+> +    if (pages == -1) {
+> +        *bytes_transferred +=
+> +            save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+> +        qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
+> +        *bytes_transferred += TARGET_PAGE_SIZE;
+> +        pages = 1;
+> +        acct_info.norm_pages++;
+> +        acct_info.multifd_pages++;
 > +    }
-> +    return 0;
+> +
+> +    return pages;
 > +}
->=20
->  static SocketAddress *tcp_build_address(const char *host_port, Error **e=
-rrp)
+> +
+>  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+>                                  ram_addr_t offset)
 >  {
-> @@ -96,6 +144,10 @@ static void socket_start_outgoing_migration(Migration=
-State *s,
->      struct SocketConnectData *data =3D g_new0(struct SocketConnectData, =
-1);
->=20
->      data->s =3D s;
-> +
-> +    socket_args.saddr =3D saddr;
-> +    socket_args.errp =3D errp;
-> +
->      if (saddr->type =3D=3D SOCKET_ADDRESS_KIND_INET) {
->          data->hostname =3D g_strdup(saddr->u.inet.data->host);
+> @@ -1427,6 +1461,8 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
+>              res = ram_save_compressed_page(f, pss,
+>                                             last_stage,
+>                                             bytes_transferred);
+> +        } else if (migrate_use_multifd()) {
+> +            res = ram_multifd_page(f, pss, last_stage, bytes_transferred);
+
+I'm curious whether it's best to pick the destination fd at this level or one level
+higher; for example would it be good to keep all the components of a host page or huge
+page together on the same fd? If so then it would be best to pick the fd
+at ram_save_host_page level.
+
+Dave
+
+>          } else {
+>              res = ram_save_page(f, pss, last_stage,
+>                                  bytes_transferred);
+> @@ -2678,6 +2714,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>      if (!migrate_use_compression()) {
+>          invalid_flags |= RAM_SAVE_FLAG_COMPRESS_PAGE;
 >      }
-> @@ -106,7 +158,6 @@ static void socket_start_outgoing_migration(Migration=
-State *s,
->                                       socket_outgoing_migration,
->                                       data,
->                                       socket_connect_data_free);
-> -    qapi_free_SocketAddress(saddr);
->  }
->=20
->  void tcp_start_outgoing_migration(MigrationState *s,
-> @@ -154,7 +205,7 @@ static gboolean socket_accept_incoming_migration(QIOC=
-hannel *ioc,
->=20
->  out:
->      /* Close listening socket as its no longer needed */
-> -    qio_channel_close(ioc, NULL);
-> +//    qio_channel_close(ioc, NULL);
->      return FALSE; /* unregister */
->  }
->=20
-> @@ -163,6 +214,7 @@ static void socket_start_incoming_migration(SocketAdd=
-ress *saddr,
->                                              Error **errp)
->  {
->      QIOChannelSocket *listen_ioc =3D qio_channel_socket_new();
-> +    socket_args.ioc =3D listen_ioc;
->=20
->      qio_channel_set_name(QIO_CHANNEL(listen_ioc),
->                           "migration-socket-listener");
-> --=20
+> +
+> +    if (!migrate_use_multifd()) {
+> +        invalid_flags |= RAM_SAVE_FLAG_MULTIFD_PAGE;
+> +    }
+>      /* This RCU critical section can be very long running.
+>       * When RCU reclaims in the code start to become numerous,
+>       * it will be necessary to reduce the granularity of this
+> @@ -2705,13 +2745,17 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>              if (flags & invalid_flags  & RAM_SAVE_FLAG_COMPRESS_PAGE) {
+>                  error_report("Received an unexpected compressed page");
+>              }
+> +            if (flags & invalid_flags  & RAM_SAVE_FLAG_MULTIFD_PAGE) {
+> +                error_report("Received an unexpected multifd page");
+> +            }
+> 
+>              ret = -EINVAL;
+>              break;
+>          }
+> 
+>          if (flags & (RAM_SAVE_FLAG_COMPRESS | RAM_SAVE_FLAG_PAGE |
+> -                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
+> +                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
+> +                     RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+>              RAMBlock *block = ram_block_from_stream(f, flags);
+> 
+>              host = host_from_ram_block_offset(block, addr);
+> @@ -2786,6 +2830,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>                  break;
+>              }
+>              break;
+> +
+> +        case RAM_SAVE_FLAG_MULTIFD_PAGE:
+> +            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+> +            break;
+> +
+>          case RAM_SAVE_FLAG_EOS:
+>              /* normal exit */
+>              break;
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 54232ee..3e93f7f 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -574,6 +574,7 @@
+>  #
+>  # @postcopy-requests: The number of page requests received from the destination
+>  #        (since 2.7)
+> +# @multifd: number of pages sent with multifd (since 2.9)
+>  #
+>  # Since: 0.14.0
+>  ##
+> @@ -582,7 +583,8 @@
+>             'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+>             'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+>             'mbps' : 'number', 'dirty-sync-count' : 'int',
+> -           'postcopy-requests' : 'int' } }
+> +           'postcopy-requests' : 'int',
+> +           'multifd' : 'int'} }
+
+>  ##
+>  # @XBZRLECacheStats:
+> -- 
 > 2.9.3
->=20
+> 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
