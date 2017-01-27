@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cX0O9-0005GS-MT
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 01:52:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1cX0RN-0006Ko-Hq
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 01:55:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cX0O6-0003Q2-JA
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 01:52:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cX0O6-0003Pj-DA
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 01:51:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1cX0RM-0004RB-La
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 01:55:21 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <mailman.205.1485450031.31314.qemu-devel@nongnu.org>
-	<E8A8BF62-0E39-4401-B330-2E27CFA3A83F@gmail.com>
-	<8ae107ad-0f3f-46ef-e734-2f88b14bad9a@redhat.com>
-	<265EAA01-0C75-45D5-A55D-481DAC288AE5@gmail.com>
-	<d95139a6-0e38-75b5-b8df-b4e12391e032@redhat.com>
-	<CAFEAcA9N41fGAuVScUXOMorKHmvzzOoNKppEP6eniQEivVT_jg@mail.gmail.com>
-Date: Fri, 27 Jan 2017 07:51:55 +0100
-In-Reply-To: <CAFEAcA9N41fGAuVScUXOMorKHmvzzOoNKppEP6eniQEivVT_jg@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 26 Jan 2017 17:57:10 +0000")
-Message-ID: <87wpdh9er8.fsf@dusky.pond.sub.org>
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+	<1485443388-27253-2-git-send-email-armbru@redhat.com>
+	<04ee1f95-988e-02f7-c1a9-f9630daf54da@redhat.com>
+Date: Fri, 27 Jan 2017 07:55:08 +0100
+In-Reply-To: <04ee1f95-988e-02f7-c1a9-f9630daf54da@redhat.com> (Thomas Huth's
+	message of "Thu, 26 Jan 2017 21:02:48 +0100")
+Message-ID: <87sho59elv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] Qemu-devel] Poll on QEMU documentation project
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] hw: Default -drive to if=ide
+ explicitly where it works
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, G 3 <programmingkidx@gmail.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Thomas Huth <thuth@redhat.com> writes:
 
-> On 26 January 2017 at 17:52, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> - HTML is mostly a destination format.  With the listed formats it is
->> possible to produce a variety of outputs (mostly HTML itself and PDF;
->> secondarily text or ePub or others).
+> On 26.01.2017 16:09, Markus Armbruster wrote:
+>> Block backends defined with -drive if=ide are meant to be picked up by
+>> machine initialization code: a suitable frontend gets created and
+>> wired up automatically.
+>> 
+>> if=ide drives not picked up that way can still be used with -device as
+>> if they had if=none, but that's unclean and best avoided.  Unused ones
+>> produce an "Orphaned drive without device" warning.
+>> 
+>> -drive parameter "if" is optional, and the default depends on the
+>> machine type.  If a machine type doesn't specify a default, the
+>> default is "ide".
+>> 
+>> Many machine types default to if=ide, even though they don't actually
+>> have an IDE controller.  A future patch will change these defaults to
+>> something more sensible.  To prepare for it, this patch makes default
+>> "ide" explicit for the machines that actually pick up if=ide drives:
+>> 
+>> * alpha: clipper
+>> * arm/aarch64: spitz borzoi terrier tosa
+>> * i386/x86_64: generic-pc-machine (with concrete subtypes pc-q35-*
+>>   pc-i440fx-* pc-* isapc xenfv)
+>> * mips64el: fulong2e
 >
-> It's an interesting question to ask what destination formats
-> we should be generating, though. At the moment we output
-> HTML, plain text, PDF and info. Personally I think that list
-> is too long and we should probably cut it down to HTML
-> and PDF or perhaps even just HTML.
+> Slightly off-topic, but: Is fulong2e still maintained? I did not spot an
+> entry in MAINTAINERS...?
 
-"What can we cut" is the wrong question.  The right one is "what are our
-requirements".  Here's my try:
+It's covered by the general MIPS stanza:
 
-HTML: required
-nroff with an macros: required
-PDF: wanted (try printing a website)
-plain text: nice to have (for me personally, more than that)
-info: nice to have
+    $ scripts/get_maintainer.pl -f hw/mips/mips_fulong2e.c 
+    Aurelien Jarno <aurelien@aurel32.net> (maintainer:MIPS)
+    Yongbok Kim <yongbok.kim@imgtec.com> (maintainer:MIPS)
+    qemu-devel@nongnu.org (open list:All patches CC here)
 
-If a solution we like can't provide something that's nice to have, we
-can decide to take it anyway.
+>> * mips/mipsel/mips64el: malta mips
+>> * ppc/ppc64: mac99 g3beige prep
+>> * sh4/sh4eb: r2d
+>> * sparc64: sun4u sun4v
+>> 
+>> Note that ppc64 machine powernv already sets an "ide" default
+>> explicitly.  Its IDE controller isn't implemented, yet.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  hw/alpha/dp264.c        | 1 +
+>>  hw/arm/spitz.c          | 3 +++
+>>  hw/arm/tosa.c           | 1 +
+>>  hw/i386/pc.c            | 1 +
+>>  hw/mips/mips_fulong2e.c | 1 +
+>>  hw/mips/mips_malta.c    | 1 +
+>>  hw/mips/mips_r4k.c      | 1 +
+>>  hw/ppc/mac_newworld.c   | 1 +
+>>  hw/ppc/mac_oldworld.c   | 1 +
+>>  hw/ppc/prep.c           | 1 +
+>>  hw/sh4/r2d.c            | 1 +
+>>  hw/sparc64/sun4u.c      | 2 ++
+>>  12 files changed, 15 insertions(+)
+>
+> Patch looks right to me.
+>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-If a solution we like can provide something that's nice to have, we
-should let it provide, unless it turns out to be a drag.
+Thanks!
