@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cX8Vx-00019l-VP
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:32:38 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cX8Vy-0001AF-BB
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:32:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cX8Vx-0005BX-1q
+	(envelope-from <pm215@archaic.org.uk>) id 1cX8Vx-0005Bm-D3
 	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:32:38 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48310)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48311)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cX8Vw-000541-Ri
+	id 1cX8Vx-00055y-6X
 	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:32:37 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cX8Vf-0003L6-3A
+	(envelope-from <pm215@archaic.org.uk>) id 1cX8Vf-0003LH-Hl
 	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 15:32:19 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Jan 2017 15:31:56 +0000
-Message-Id: <1485531137-2362-2-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 27 Jan 2017 15:31:57 +0000
+Message-Id: <1485531137-2362-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1485531137-2362-1-git-send-email-peter.maydell@linaro.org>
 References: <1485531137-2362-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/22] aspeed/smc: handle dummy bytes when doing
- fast reads in command mode
+Subject: [Qemu-devel] [PULL 02/22] armv7m: MRS/MSR: handle unprivileged
+ access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,70 +30,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-When doing fast read, a certain amount of dummy bytes should be sent
-before the read. This number is configurable in the controler CE0
-Control Register and needs to be modeled using fake transfers to the
-flash module.
+The MRS and MSR instruction handling has a number of flaws:
+ * unprivileged accesses should only be able to read
+   CONTROL and the xPSR subfields, and only write APSR
+   (others RAZ/WI)
+ * privileged access should not be able to write xPSR
+   subfields other than APSR
+ * accesses to unimplemented registers should log as
+   guest errors, not abort QEMU
 
-This only supports command mode. User mode requires more work and a
-possible extension of the m25p80 device model.
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
-Message-id: 1484751701-2646-1-git-send-email-clg@kaod.org
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 1484937883-1068-2-git-send-email-peter.maydell@linaro.org
+[PMM: rewrote commit message]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ssi/aspeed_smc.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ target/arm/helper.c | 79 +++++++++++++++++++++++++----------------------------
+ 1 file changed, 37 insertions(+), 42 deletions(-)
 
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index ae1ad2d..087b29e 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -69,7 +69,9 @@
- #define R_CTRL0           (0x10 / 4)
- #define   CTRL_CMD_SHIFT           16
- #define   CTRL_CMD_MASK            0xff
-+#define   CTRL_DUMMY_HIGH_SHIFT    14
- #define   CTRL_AST2400_SPI_4BYTE   (1 << 13)
-+#define   CTRL_DUMMY_LOW_SHIFT     6 /* 2 bits [7:6] */
- #define   CTRL_CE_STOP_ACTIVE      (1 << 2)
- #define   CTRL_CMD_MODE_MASK       0x3
- #define     CTRL_READMODE          0x0
-@@ -485,6 +487,16 @@ static uint32_t aspeed_smc_check_segment_addr(const AspeedSMCFlash *fl,
-     return addr;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 7111c8c..ad23de3 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -8243,23 +8243,32 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
+ 
+ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+ {
+-    ARMCPU *cpu = arm_env_get_cpu(env);
++    uint32_t mask;
++    unsigned el = arm_current_el(env);
++
++    /* First handle registers which unprivileged can read */
++
++    switch (reg) {
++    case 0 ... 7: /* xPSR sub-fields */
++        mask = 0;
++        if ((reg & 1) && el) {
++            mask |= 0x000001ff; /* IPSR (unpriv. reads as zero) */
++        }
++        if (!(reg & 4)) {
++            mask |= 0xf8000000; /* APSR */
++        }
++        /* EPSR reads as zero */
++        return xpsr_read(env) & mask;
++        break;
++    case 20: /* CONTROL */
++        return env->v7m.control;
++    }
++
++    if (el == 0) {
++        return 0; /* unprivileged reads others as zero */
++    }
+ 
+     switch (reg) {
+-    case 0: /* APSR */
+-        return xpsr_read(env) & 0xf8000000;
+-    case 1: /* IAPSR */
+-        return xpsr_read(env) & 0xf80001ff;
+-    case 2: /* EAPSR */
+-        return xpsr_read(env) & 0xff00fc00;
+-    case 3: /* xPSR */
+-        return xpsr_read(env) & 0xff00fdff;
+-    case 5: /* IPSR */
+-        return xpsr_read(env) & 0x000001ff;
+-    case 6: /* EPSR */
+-        return xpsr_read(env) & 0x0700fc00;
+-    case 7: /* IEPSR */
+-        return xpsr_read(env) & 0x0700edff;
+     case 8: /* MSP */
+         return env->v7m.current_sp ? env->v7m.other_sp : env->regs[13];
+     case 9: /* PSP */
+@@ -8271,40 +8280,26 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+         return env->v7m.basepri;
+     case 19: /* FAULTMASK */
+         return (env->daif & PSTATE_F) != 0;
+-    case 20: /* CONTROL */
+-        return env->v7m.control;
+     default:
+-        /* ??? For debugging only.  */
+-        cpu_abort(CPU(cpu), "Unimplemented system register read (%d)\n", reg);
++        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to read unknown special"
++                                       " register %d\n", reg);
+         return 0;
+     }
  }
  
-+static int aspeed_smc_flash_dummies(const AspeedSMCFlash *fl)
-+{
-+    const AspeedSMCState *s = fl->controller;
-+    uint32_t r_ctrl0 = s->regs[s->r_ctrl0 + fl->id];
-+    uint32_t dummy_high = (r_ctrl0 >> CTRL_DUMMY_HIGH_SHIFT) & 0x1;
-+    uint32_t dummy_low = (r_ctrl0 >> CTRL_DUMMY_LOW_SHIFT) & 0x3;
-+
-+    return ((dummy_high << 2) | dummy_low) * 8;
-+}
-+
- static void aspeed_smc_flash_send_addr(AspeedSMCFlash *fl, uint32_t addr)
+ void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
  {
-     const AspeedSMCState *s = fl->controller;
-@@ -521,6 +533,15 @@ static uint64_t aspeed_smc_flash_read(void *opaque, hwaddr addr, unsigned size)
-         aspeed_smc_flash_select(fl);
-         aspeed_smc_flash_send_addr(fl, addr);
+-    ARMCPU *cpu = arm_env_get_cpu(env);
++    if (arm_current_el(env) == 0 && reg > 7) {
++        /* only xPSR sub-fields may be written by unprivileged */
++        return;
++    }
  
-+        /*
-+         * Use fake transfers to model dummy bytes. The value should
-+         * be configured to some non-zero value in fast read mode and
-+         * zero in read mode.
-+         */
-+        for (i = 0; i < aspeed_smc_flash_dummies(fl); i++) {
-+            ssi_transfer(fl->controller->spi, 0xFF);
+     switch (reg) {
+-    case 0: /* APSR */
+-        xpsr_write(env, val, 0xf8000000);
+-        break;
+-    case 1: /* IAPSR */
+-        xpsr_write(env, val, 0xf8000000);
+-        break;
+-    case 2: /* EAPSR */
+-        xpsr_write(env, val, 0xfe00fc00);
+-        break;
+-    case 3: /* xPSR */
+-        xpsr_write(env, val, 0xfe00fc00);
+-        break;
+-    case 5: /* IPSR */
+-        /* IPSR bits are readonly.  */
+-        break;
+-    case 6: /* EPSR */
+-        xpsr_write(env, val, 0x0600fc00);
+-        break;
+-    case 7: /* IEPSR */
+-        xpsr_write(env, val, 0x0600fc00);
++    case 0 ... 7: /* xPSR sub-fields */
++        /* only APSR is actually writable */
++        if (reg & 4) {
++            xpsr_write(env, val, 0xf8000000); /* APSR */
 +        }
-+
-         for (i = 0; i < size; i++) {
-             ret |= ssi_transfer(s->spi, 0x0) << (8 * i);
-         }
+         break;
+     case 8: /* MSP */
+         if (env->v7m.current_sp)
+@@ -8345,8 +8340,8 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
+         switch_v7m_sp(env, (val & 2) != 0);
+         break;
+     default:
+-        /* ??? For debugging only.  */
+-        cpu_abort(CPU(cpu), "Unimplemented system register write (%d)\n", reg);
++        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to write unknown special"
++                                       " register %d\n", reg);
+         return;
+     }
+ }
 -- 
 2.7.4
