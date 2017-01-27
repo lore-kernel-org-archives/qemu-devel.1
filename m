@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX7wI-0004vN-Qf
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:55:51 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cX7yV-0007wM-4F
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:58:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX7wE-0001oN-8B
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:55:46 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38319)
+	(envelope-from <atar4qemu@gmail.com>) id 1cX7yT-0002Zr-N2
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:58:03 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:32793)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cX7wD-0001oD-Uz
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:55:42 -0500
-Received: by mail-wm0-x232.google.com with SMTP id r144so141801152wme.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 06:55:41 -0800 (PST)
-References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
-Date: Fri, 27 Jan 2017 14:55:39 +0000
-Message-ID: <87r33o8sd0.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cX7yT-0002Zb-IK
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:58:01 -0500
+Received: by mail-it0-x242.google.com with SMTP id e137so8534129itc.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 06:58:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 00/18] Emulate guest vector operations with
- host vector operations
+In-Reply-To: <95f20307-f7c0-e88f-67c8-45d3f22af588@redhat.com>
+References: <cover.1484165352.git.atar4qemu@gmail.com>
+	<662c7a5b81926a9daba26c943b0c11e99068c867.1484165352.git.atar4qemu@gmail.com>
+	<87bmuumfxp.fsf@dusky.pond.sub.org>
+	<CACXAS8CFZzU1-PQenvAX2iSnDoWOo62Zb7mNPJSeJJnzNmyXVQ@mail.gmail.com>
+	<8737g4k36w.fsf@dusky.pond.sub.org>
+	<95f20307-f7c0-e88f-67c8-45d3f22af588@redhat.com>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Fri, 27 Jan 2017 15:57:40 +0100
+Message-ID: <CACXAS8AxXY0oz2WpT-Q20QcDCa=GbYBY+2PnBO_LJXc1ELtY=w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 30/30] target-sparc: fix up niagara
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirill Batuzov <batuzovk@ispras.ru>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On Fri, Jan 27, 2017 at 3:27 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 27/01/2017 15:06, Markus Armbruster wrote:
+>>> Is rom_add_file_fixed supposed to mark the memory region read-only? Or
+>>> should it be created read-only before calling rom_add_file_fixed?
+>> I'm not familiar with the memory API, but the fact that you're getting
+>> RW suggests that you need to mark read-only yourself.  Suggest to
+>> examine similar code elsewhere for additional clues.
+>>
+>>>> The monkey-patching of dinfo->is_default is to silence the "Orphaned
+>>>> drive without device" warning.  Naughty.
+>>>>
+>>>> This use of -drive if=pflash is highly unorthodox.  To suggest better
+>>>> ways, we need to understand the role of "the virtual ramdisk".  Can you
+>>>> explain?  How does it work on a physical system?
+>>> AFAIK except for simulators it's only used on FPGA boards. It's what
+>>> the comment says: a kind of initrd, but it resides outside of the
+>>> partition RAM. So, it is a RAM region pre-filled with data in the way
+>>> not visible to the guest.
+>>>
+>>> I would have used an -initrd option instead of -pflash, but it
+>>> required a -kernel option, and there is no sensible way to use the
+>>> -kernel with Solaris.
+>>> If QEMU had something like a nvram-disk - it would have worked here the best.
+>>
+>> Have you considered pressing -bios into service?  -option-rom?  -object
+>> memory-backend-file?  Paolo, any recommendations?
+>
+> Yeah, I think -bios is closest.
 
-Kirill Batuzov <batuzovk@ispras.ru> writes:
+I think it may sound misleading to a user: it's an optional
+(NV)RAM-disk, not a part of a firmware.
+Maybe -object memory-backend-file would do it, but it clears the file
+on reset, doesn't it?
 
-> The goal of these patch series is to set up an infrastructure to emulate
-> guest vector operations using host vector operations. Preliminary
-> experiments show that simply translating loads and stores increases
-> performance of x264 video codec by 10%. The performance of a gcc vectorized
-> for loop increased 2x.
->
-> To be able to emulate guest vector operations using host vector operations,
-> several things need to be done.
+> By the way, where do I get all the .rom
+> files for the Niagara board?  "make check" complains about them.
 
-I see rth has already done a bunch of review so I'll pass on this cycle
-but please feel free to add me to the CC list next iteration.
+The machine uses the firmware supplied with the OpenSPARC T1 project,
+http://download.oracle.com/technetwork/systems/opensparc/OpenSPARCT1_Arch.1.5.tar.bz2
+in the directory S10image/
 
->
-> 1. Corresponding vector types should be added to TCG. These series add
-> TCG_v128 and TCG_v64. I've made TCG_v64 a different type than TCG_i64
-> because it usually needs to be allocated to different registers and
-> supports different operations.
->
-> 2. Load/store operations for these new types need to be implemented.
->
-> 3. For seamless transition from current model to a new one we need to
-> handle cases where memory occupied by global variable can be accessed via
-> pointer to the CPUArchState structure. A very simple conservative alias
-> analysis has been added to do it. This analysis tracks memory loads and
-> stores that overlap with fields of CPUArchState and provides this
-> information to the register allocator. The allocator then spills and
-> reloads affected globals when needed.
->
-> 4. Allow overlapping globals. For scalar registers this is a rare case, and
-> overlapping registers can ba handled as a single one (ah, al, ax, eax,
-> rax). In ARM every Q-register consists of two D-register each consisting of
-> two S-registers. Handling 4 S-registers as one because they are parts of
-> the same Q-register is way too inefficient.
->
-> 5. Add new memory addressing mode to MMU code for large accesses and create
-> needed helpers. Only 128-bit vectors have been handled for now.
->
-> 6. Create TCG opcodes for vector operations. Only addition has beed handled
-> in these series. Each operation has a wrapper that checks if the backend
-> supports the corresponding operation or not. In one case the vector opcode
-> is generated, in the other the operation is emulated with scalar
-> operations. The emulation code is generated inline for performance reasons
-> (there is a huge performance difference between inline generation
-> and calling a helper). As a positive side effect this will eventually allow
->  to merge similar emulation code for vector instructions from different
-> frontends to target-independent implementation.
->
-> 7. Use new operations in the frontend (ARM was used in these series).
->
-> 8. Support new operations in the backend (x86_64 was used in these series).
->
-> For experiments I have used ARM guest on x86_64 host. I wanted some pair of
-> different architectures with vector extensions both. ARM and x86_64 pair
-> fits well.
->
-> Kirill Batuzov (18):
->   tcg: add support for 128bit vector type
->   tcg: add support for 64bit vector type
->   tcg: add ld_v128, ld_v64, st_v128 and st_v64 opcodes
->   tcg: add simple alias analysis
->   tcg: use results of alias analysis in liveness analysis
->   tcg: allow globals to overlap
->   tcg: add vector addition operations
->   target/arm: support access to vector guest registers as globals
->   target/arm: use vector opcode to handle vadd.<size> instruction
->   tcg/i386: add support for vector opcodes
->   tcg/i386: support 64-bit vector operations
->   tcg/i386: support remaining vector addition operations
->   tcg: do not relay on exact values of MO_BSWAP or MO_SIGN in backend
->   tcg: introduce new TCGMemOp - MO_128
->   tcg: introduce qemu_ld_v128 and qemu_st_v128 opcodes
->   softmmu: create helpers for vector loads
->   tcg/i386: add support for qemu_ld_v128/qemu_st_v128 ops
->   target/arm: load two consecutive 64-bits vector regs as a 128-bit
->     vector reg
->
->  cputlb.c                     |   4 +
->  softmmu_template_vector.h    | 266 +++++++++++++++++++++++++++++++++++++++++++
->  target/arm/translate.c       |  89 ++++++++++++++-
->  tcg/aarch64/tcg-target.inc.c |   4 +-
->  tcg/arm/tcg-target.inc.c     |   4 +-
->  tcg/i386/tcg-target.h        |  35 +++++-
->  tcg/i386/tcg-target.inc.c    | 245 ++++++++++++++++++++++++++++++++++++---
->  tcg/mips/tcg-target.inc.c    |   4 +-
->  tcg/optimize.c               | 146 ++++++++++++++++++++++++
->  tcg/ppc/tcg-target.inc.c     |   4 +-
->  tcg/s390/tcg-target.inc.c    |   4 +-
->  tcg/sparc/tcg-target.inc.c   |  12 +-
->  tcg/tcg-op.c                 |  20 +++-
->  tcg/tcg-op.h                 | 262 ++++++++++++++++++++++++++++++++++++++++++
->  tcg/tcg-opc.h                |  34 ++++++
->  tcg/tcg.c                    | 146 ++++++++++++++++++++++++
->  tcg/tcg.h                    | 147 +++++++++++++++++++++++-
->  17 files changed, 1385 insertions(+), 41 deletions(-)
->  create mode 100644 softmmu_template_vector.h
+Also I posted a patch to silence "make check" a couple of days ago.
 
+-- 
+Regards,
+Artyom Tarasenko
 
---
-Alex Bennée
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
