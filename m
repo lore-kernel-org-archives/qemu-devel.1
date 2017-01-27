@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cX1WQ-0006FP-OH
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:04:39 -0500
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cX1WU-0006HJ-TP
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cX1WN-0001P0-JU
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:04:38 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39686)
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cX1WR-0001Tz-Pq
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:04:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35875)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cX1WN-0001OO-Aw
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:04:35 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1cX1WR-0001TR-HK
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:04:39 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0R7xjxv103615
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:04:33 -0500
-Received: from e23smtp04.au.ibm.com (e23smtp04.au.ibm.com [202.81.31.146])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 287vabb40y-1
+	v0R7x2KH057746
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:04:38 -0500
+Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 287va9b1b8-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:04:33 -0500
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:04:38 -0500
 Received: from localhost
-	by e23smtp04.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Fri, 27 Jan 2017 18:04:31 +1000
+	Fri, 27 Jan 2017 18:04:36 +1000
 From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Fri, 27 Jan 2017 13:33:31 +0530
-Message-Id: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v2 0/2] softfloat: Add round-to-odd
- rounding mode
+Date: Fri, 27 Jan 2017 13:33:32 +0530
+In-Reply-To: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
+References: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
+Message-Id: <1485504213-21632-2-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH v2 1/2] softfloat: Handle float64 rounding
+ properly for underflow case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,43 +41,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-Hi,
+When rounding a floating point result to float64 precision, the
+existing code doesn't re-calculate the required round increment
+for the underflow case. Fix this.
 
-Here is the next version of round-to-odd rounding mode implementation.
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+---
+ fpu/softfloat.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-In this version I have addressed the reveiw comments from v1 and added
-a new patch to take care of 64 bit rounding in underflow case. This
-fix was found necessary when comparing the result of PowerPC ISA 3.0
-instruction xscvqpdp between QEMU implementation and a known-good
-implementation.
-
-I have tested these patches and compared the results of
-xsaddqp[o], xsmulqp[o], xsdivqp[o] and xscvqpdp[0] between QEMU
-implementation and a known-good implementation.
-
-I wanted to test with RISU to check if any older floating point
-instructions (prior to PowerPC ISA v3.0) were affected by these
-rounding changes. But even without my patchset, I am seeing RISU
-reporting failures between QEMU implementation and P8 hardware.
-While I am investigating the cause for these failures, I also plan
-to do RISU verification for ISA 3.0 instructions with a known good
-implementation.
-
-Changes in v2:
--------------
-- Do odd or even for the right precision bit in 64bit rounding. (Peter Maydell)
-- Handle the overflow case correctly in 64bit rounding. (Peter Maydell)
-- Add a patch to handle underflow case correctly in 64bit rounding.
- 
-v1: http://patchwork.ozlabs.org/patch/717562/
-
-Bharata B Rao (2):
-  softfloat: Handle float64 rounding properly for underflow case
-  softfloat: Add round-to-odd rounding mode
-
- fpu/softfloat.c         | 34 +++++++++++++++++++++++++++++++++-
- include/fpu/softfloat.h |  2 ++
- 2 files changed, 35 insertions(+), 1 deletion(-)
-
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index c295f31..b04699c 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -651,6 +651,23 @@ static float64 roundAndPackFloat64(flag zSign, int zExp, uint64_t zSig,
+             if (isTiny && roundBits) {
+                 float_raise(float_flag_underflow, status);
+             }
++            switch (roundingMode) {
++            case float_round_nearest_even:
++            case float_round_ties_away:
++                roundIncrement = 0x200;
++                break;
++            case float_round_to_zero:
++                roundIncrement = 0;
++                break;
++            case float_round_up:
++                roundIncrement = zSign ? 0 : 0x3ff;
++                break;
++            case float_round_down:
++                roundIncrement = zSign ? 0x3ff : 0;
++                break;
++            default:
++                abort();
++            }
+         }
+     }
+     if (roundBits) {
 -- 
 2.7.4
