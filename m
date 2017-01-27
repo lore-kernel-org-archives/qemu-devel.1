@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cX2l7-0006Cl-Fb
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:23:55 -0500
+	(envelope-from <berrange@redhat.com>) id 1cX2we-00011x-T2
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:35:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cX2l2-0002c9-Ix
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:23:53 -0500
-References: <20170126204547.9418-1-lvivier@redhat.com>
-	<1566500454.13089168.1485507144455.JavaMail.zimbra@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <a8bdc8da-a5ca-10f9-bd6b-0eada5b2d8de@redhat.com>
-Date: Fri, 27 Jan 2017 10:23:42 +0100
+	(envelope-from <berrange@redhat.com>) id 1cX2wb-0005yu-5F
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:35:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40478)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cX2wa-0005xx-Vv
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:35:45 -0500
+Date: Fri, 27 Jan 2017 09:35:38 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170127093538.GA26553@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <b44e4a5f-cdc0-f5fd-a25e-f2d5e711d57c@gameservers.com>
 MIME-Version: 1.0
-In-Reply-To: <1566500454.13089168.1485507144455.JavaMail.zimbra@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr: clock should count only if vm is
- running
+Content-Disposition: inline
+In-Reply-To: <b44e4a5f-cdc0-f5fd-a25e-f2d5e711d57c@gameservers.com>
+Subject: Re: [Qemu-devel] QEMU websockets support is laggy?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-ppc@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Brian Rak <brak@gameservers.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On 27/01/2017 09:52, Paolo Bonzini wrote:
+On Tue, Jan 24, 2017 at 05:02:25PM -0500, Brian Rak wrote:
+> We've been considering switching over to using qemu's built in websockets
+> support (to avoid the overhead of needing websockify running).  We've been
+> seeing very poor performance after the switch (it takes the console 4-5
+> seconds to update after pressing a key).  So far, I haven't been able to
+> find any indication of why this is happening.  The exact same configuration
+> works perfectly when running with websockify, but laggy when hitting qemu
+> directly.
 > 
->> This is a port to ppc of the i386 commit:
->>     00f4d64 kvmclock: clock should count only if vm is running
->>
->> We remove timebase_/pre_save/post_load/ functions,
->> and use the VM state change handler to save and restore
->> the guest_timebase (on stop and continue).
->>
->> Time base offset has originally been introduced by commit
->>     98a8b52 spapr: Add support for time base offset migration
->>
->> So while VM is paused, the time is stopped. This allows to have
->> the same result with date (based on Time Base Register) and
->> hwclock (based on "get-time-of-day" RTAS call).
->>
->> Moreover in TCG mode, the Time Base is always paused, so this
->> patch also adjust the behavior between TCG and KVM.
->>
->> VM state field "time_of_the_day_ns" is now useless but we keep
->> it to be able to migrate to older version of the machine.
->>
->> As vmstate_ppc_timebase structure (with timebase_pre_save() and
->> timebase_post_load() functions) was only used by vmstate_spapr,
->> we register the VM state change handler only in ppc_spapr_init().
->>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> 
-> I think you should keep the pre_save handler, otherwise after
-> migration the timebase register will be off by as long as the
-> time needed to do the final RAM transfer.  See commit 6053a86
-> ("kvmclock: reduce kvmclock difference on migration", 2016-12-22).
+> I've tried a few things (disabling encryption, bypassing our usual nginx
+> proxy, even connecting via a ssh tunnel), and haven't made any sort of
+> progress here.  Has anyone else seen this?  Any suggestions as to where I
+> should start looking?
 
-I will.
+Can you clarify the exact setup you have ?  As mentioned on IRC, I don't
+see any degradation in performance betweeen builtin websockets vs a
+websockets proxy - if anything the builtin websockets is marginally less
+laggy.  I was connecting over TCP localhost, however, so would not see
+any effects of network latency. My test was QEMU git master, with noVNC
+git master.
 
-Thank you,
-Laurent
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
