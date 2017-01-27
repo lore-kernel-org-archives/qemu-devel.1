@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cXB8h-0008Qm-73
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 13:20:53 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cXBJ9-0003RE-3q
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 13:31:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cXB8b-0002Y8-DO
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 13:20:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45464)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cXB8b-0002Xz-3r
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 13:20:41 -0500
-Date: Fri, 27 Jan 2017 18:20:36 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170127182035.GC5919@work-vm>
-References: <20170124184742.1639-1-dgilbert@redhat.com>
-	<20170124184742.1639-3-dgilbert@redhat.com>
-	<20170125114620.GA9699@lemon.Home> <20170125120053.GA2096@work-vm>
-	<20170125131917.32df62ef.cornelia.huck@de.ibm.com>
-	<20170125132254.GB2096@work-vm>
-	<20170125152014.2ab6f901.cornelia.huck@de.ibm.com>
-	<20170125144420.GE2096@work-vm>
-	<20170126131402.547f1004.cornelia.huck@de.ibm.com>
+	(envelope-from <alistair23@gmail.com>) id 1cXBJ8-0005Hf-6D
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 13:31:35 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170126131402.547f1004.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PULL 02/15] migration: extend VMStateInfo
+Sender: alistair23@gmail.com
+In-Reply-To: <a3509663-3b80-3eab-73ac-f31027d68c87@redhat.com>
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+	<1485443388-27253-5-git-send-email-armbru@redhat.com>
+	<a3509663-3b80-3eab-73ac-f31027d68c87@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 27 Jan 2017 10:31:02 -0800
+Message-ID: <CAKmqyKO5AVnTe0tSQzx_j6wa46spbYD_HVbmqJJxeEQsJRbFWg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 4/8] hw: Default -drive to if=none
+ instead of scsi when scsi cannot work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,124 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Jianjun Duan <duanj@linux.vnet.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>
 
-* Cornelia Huck (cornelia.huck@de.ibm.com) wrote:
-> On Wed, 25 Jan 2017 14:44:20 +0000
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > * Cornelia Huck (cornelia.huck@de.ibm.com) wrote:
-> > > On Wed, 25 Jan 2017 13:22:55 +0000
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > 
-> > > > * Cornelia Huck (cornelia.huck@de.ibm.com) wrote:
-> > > > > On Wed, 25 Jan 2017 12:00:53 +0000
-> > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > > > > > OK, so it looks like that's a failure path, adding a return -ENOMEM would seem to make
-> > > > > > sense there.
-> > > > > 
-> > > > > Just saw this. I don't think we want -ENOMEM, as that would change the
-> > > > > actual state being saved, no?
-> > > > 
-> > > > But isn't that the intention of this function?
-> > > > 
-> > > >     buf = g_try_malloc0(len);
-> > > >     if (!buf) {
-> > > >         /* Storing FLIC_FAILED into the count field here will cause the
-> > > >          * target system to fail when attempting to load irqs from the
-> > > >          * migration state */
-> > > >         error_report("flic: couldn't allocate memory");
-> > > >         qemu_put_be64(f, FLIC_FAILED);
-> > > >         return;
-> > > >     }
-> > > > 
-> > > > What should happen on the destination - should the migration fail?
-> > > > If we want the migration to fail then we should now return an error
-> > > > status rather than 0, and then we see a failed migration on the source
-> > > > as well.
-> > > 
-> > > Yes. There's also another error case below where we should return an
-> > > error instead of putting FLIC_FAILED, then.
-> > > 
-> > > The problem is that this is rather hard to test: So I'd prefer to fix
-> > > the compile for now and introduce error return codes in a separate
-> > > patch.
-> > 
-> > OK, that's fair.
-> 
-> I've coded something up and tried to test it with error injection to
-> trigger the failed case, but I can't really see an improvement :(
-> 
-> Before: source logs error, target fails to load the flic with 'invalid
-> argument'
-> 
-> After: source logs error, target fails to load the flic with 'could not
-> allocate memory'
-> 
-> The migration code does not seem to do anything with the return code of
-> put methods for now, so that's not too surprising. Is anything in the
-> works?
+On Thu, Jan 26, 2017 at 9:59 AM, Thomas Huth <thuth@redhat.com> wrote:
+> On 26.01.2017 16:09, Markus Armbruster wrote:
+>> Block backends defined with -drive if=scsi are meant to be picked up
+>> by machine initialization code: a suitable frontend gets created and
+>> wired up automatically.
+>>
+>> if=scsi drives not picked up that way can still be used with -device
+>> as if they had if=none, but that's unclean and best avoided.  Unused
+>> ones produce an "Orphaned drive without device" warning.
+>>
+>> A few machine types default to if=scsi, even though they don't
+>> actually have a SCSI HBA.  This makes no sense.  Change their default
+>> to if=none.  Affected machines:
+>>
+>> * aarch64/arm: realview-pbx-a9 vexpress-a9 vexpress-a15 xilinx-zynq-a9
+>>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+>> Cc: Alistair Francis <alistair.francis@xilinx.com>
+>> Cc: qemu-arm@nongnu.org
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  hw/arm/realview.c    | 1 -
+>>  hw/arm/vexpress.c    | 1 -
+>>  hw/arm/xilinx_zynq.c | 1 -
+>>  3 files changed, 3 deletions(-)
+>>
+>> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+>> index 8eafcca..8c11c7a 100644
+>> --- a/hw/arm/realview.c
+>> +++ b/hw/arm/realview.c
+>> @@ -443,7 +443,6 @@ static void realview_pbx_a9_class_init(ObjectClass *oc, void *data)
+>>
+>>      mc->desc = "ARM RealView Platform Baseboard Explore for Cortex-A9";
+>>      mc->init = realview_pbx_a9_init;
+>> -    mc->block_default_type = IF_SCSI;
+>>      mc->max_cpus = 4;
+>>  }
+>>
+>> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+>> index 58760f4..5756470 100644
+>> --- a/hw/arm/vexpress.c
+>> +++ b/hw/arm/vexpress.c
+>> @@ -751,7 +751,6 @@ static void vexpress_class_init(ObjectClass *oc, void *data)
+>>
+>>      mc->desc = "ARM Versatile Express";
+>>      mc->init = vexpress_common_init;
+>> -    mc->block_default_type = IF_SCSI;
+>>      mc->max_cpus = 4;
+>>  }
+>>
+>> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+>> index 7dac20d..3985356 100644
+>> --- a/hw/arm/xilinx_zynq.c
+>> +++ b/hw/arm/xilinx_zynq.c
+>> @@ -323,7 +323,6 @@ static void zynq_machine_init(MachineClass *mc)
+>>  {
+>>      mc->desc = "Xilinx Zynq Platform Baseboard for Cortex-A9";
+>>      mc->init = zynq_init;
+>> -    mc->block_default_type = IF_SCSI;
+>>      mc->max_cpus = 1;
+>>      mc->no_sdcard = 1;
+>>  }
+>
+> Right, that looks like old copy-n-paste bugs from other machine types.
+>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-OK, I hadn't remembered that wasn't wired up.
+Yeah, I agree. This looks good to me.
 
-> For now, I'd prefer to keep the old behaviour as 'invalid argument'
-> seems like a more obvious error on the target.
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-Yes, agreed.
+Thanks,
 
-If you feel like, then I'd just change the return -ENOMEM but still
-send the FLIC_FAILED.  That way the destination still fails
-as before, and the destination will fail nicely when we wire up the
-error checks.
+Alistair
 
-Dave
-
-> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-> index e86a84e49a..3c62ef8258 100644
-> --- a/hw/intc/s390_flic_kvm.c
-> +++ b/hw/intc/s390_flic_kvm.c
-> @@ -293,27 +293,21 @@ static int kvm_flic_save(QEMUFile *f, void *opaque, size_t size,
->      int len = FLIC_SAVE_INITIAL_SIZE;
->      void *buf;
->      int count;
-> +    int r = 0;
->  
->      flic_disable_wait_pfault((struct KVMS390FLICState *) opaque);
->  
->      buf = g_try_malloc0(len);
->      if (!buf) {
-> -        /* Storing FLIC_FAILED into the count field here will cause the
-> -         * target system to fail when attempting to load irqs from the
-> -         * migration state */
->          error_report("flic: couldn't allocate memory");
-> -        qemu_put_be64(f, FLIC_FAILED);
-> -        return 0;
-> +        return -ENOMEM;
->      }
->  
->      count = __get_all_irqs(flic, &buf, len);
->      if (count < 0) {
->          error_report("flic: couldn't retrieve irqs from kernel, rc %d",
->                       count);
-> -        /* Storing FLIC_FAILED into the count field here will cause the
-> -         * target system to fail when attempting to load irqs from the
-> -         * migration state */
-> -        qemu_put_be64(f, FLIC_FAILED);
-> +        r = count;
->      } else {
->          qemu_put_be64(f, count);
->          qemu_put_buffer(f, (uint8_t *) buf,
-> @@ -321,7 +315,7 @@ static int kvm_flic_save(QEMUFile *f, void *opaque, size_t size,
->      }
->      g_free(buf);
->  
-> -    return 0;
-> +    return r;
->  }
->  
->  /**
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
