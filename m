@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cX8KR-0003AM-Ho
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:44 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cX8Vp-00011A-AA
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:32:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cX8KO-0001TN-Es
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cX8KO-0001TC-8g
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cX8KN-0002E0-87
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 15:20:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 37DB22E80C2
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 15:20:39 +0000 (UTC)
+	(envelope-from <pm215@archaic.org.uk>) id 1cX8Vo-000559-Af
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:32:29 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48310)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1cX8Vo-000541-3F
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:32:28 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
+	(envelope-from <pm215@archaic.org.uk>) id 1cX8Ve-0003Kv-Js
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 15:32:18 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Jan 2017 15:31:55 +0000
+Message-Id: <1485531137-2362-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Jan 2017 15:02:33 -0000
-From: "mike@papersolve.com" <mike@papersolve.com>
-Reply-To: Bug 1622547 <1622547@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160912101319.11954.40146.malonedeb@gac.canonical.com>
-Message-Id: <20170127150233.12081.17208.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1622547] Re: qemu-system-sparc fatal error Trap
- 0x29 on Solaris 2.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/22] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,61 +30,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Yep, this works great for the SS-20 ROM (tested with SS-5 ROM also).
-Boots all the way to OS (have to use -nographic but that's fine).
-Thanks!
+ARM queue; the bulk of this is M profile bugfixes.
 
--- =
+thanks
+-- PMM
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1622547
+The following changes since commit 8a26d88507b51b7cc5dc40732e51ccc135fec0f6:
 
-Title:
-  qemu-system-sparc fatal error Trap 0x29 on Solaris 2.6
+  Merge remote-tracking branch 'remotes/berrange/tags/pull-qio-2017-01-26-1' into staging (2017-01-27 14:08:57 +0000)
 
-Status in QEMU:
-  New
+are available in the git repository at:
 
-Bug description:
-  When trying to install Solaris 2.6 from original CDROM, qemu fail with
-  the following error :
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170127
 
-  qemu: fatal: Trap 0x29 while interrupts disabled, Error state
-  pc: f0041280  npc: f0041284
-  %g0-7: 00000000 f0281800 08000000 ffffffff 00000000 f0243b88 00000001 f02=
-44020
-  %o0-7: 40400ce2 40400ce2 00000000 404000e2 f0243b88 00000000 f023ffd8 f00=
-57914 =
+for you to fetch changes up to 146871c33eb70ca7090a0a55e69e5a8f9b5eb102:
 
-  %l0-7: 40000cc2 f009645c f0096460 00000002 00000209 00000004 00000007 f02=
-3ff90 =
+  dma: omap: check dma channel data_type (2017-01-27 15:29:08 +0000)
 
-  %i0-7: 00000042 404000e3 00000000 404000e3 e0000000 f028192a f0240038 f00=
-96448 =
+----------------------------------------------------------------
+target-arm queue:
+ * various minor M profile bugfixes
+ * aspeed/smc: handle dummy bytes when doing fast reads in command mode
+ * pflash_cfi01: fix per-device sector length in CFI table
+ * arm: stellaris: make MII accesses complete immediately
+ * hw/char/exynos4210_uart: Drop unused local variable frame_size
+ * arm_gicv3: Fix broken logic in ELRSR calculation
+ * dma: omap: check dma channel data_type
 
-  %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  psr: 40400cc2 (icc: -Z-- SPE: SP-) wim: 00000002
-  fsr: 00000000 y: 00000000
+----------------------------------------------------------------
+Cédric Le Goater (1):
+      aspeed/smc: handle dummy bytes when doing fast reads in command mode
 
-  The command line was :
+Michael Davidsaver (12):
+      armv7m: MRS/MSR: handle unprivileged access
+      armv7m: Replace armv7m.hack with unassigned_access handler
+      armv7m: Explicit error for bad vector table
+      armv7m: Fix reads of CONTROL register bit 1
+      armv7m: Clear FAULTMASK on return from non-NMI exceptions
+      armv7m_nvic: keep a pointer to the CPU
+      armv7m: implement CCR, CFSR, HFSR, DFSR, BFAR, and MMFAR
+      armv7m: honour CCR.STACKALIGN on exception entry
+      armv7m: set CFSR.UNDEFINSTR on undefined instructions
+      armv7m: Honour CCR.USERSETMPEND
+      armv7m: FAULTMASK should be 0 on reset
+      arm: stellaris: make MII accesses complete immediately
 
-  qemu-system-sparc -nographic -bios ./openbios-sparc32 -M SS-20 -hda
-  ./36G.disk -m 512 -cdrom Solaris_2.6_Software_05_98.img -boot d
-  -serial telnet:0.0.0.0:3000,server -smp 2,cores=3D2 -monitor null
+Peter Maydell (8):
+      hw/registerfields.h: Pull FIELD etc macros out of hw/register.h
+      pflash_cfi01: fix per-device sector length in CFI table
+      target/arm: Drop IS_M() macro
+      armv7m: add state for v7M CCR, CFSR, HFSR, DFSR, MMFAR, BFAR
+      armv7m: Report no-coprocessor faults correctly
+      armv7m: R14 should reset to 0xffffffff
+      hw/char/exynos4210_uart: Drop unused local variable frame_size
+      arm_gicv3: Fix broken logic in ELRSR calculation
 
-  It fails with a similar output when using bios ss20_v2.25_rom.
+Prasad J Pandit (1):
+      dma: omap: check dma channel data_type
 
-  =E2=96=B6 qemu-system-sparc --version
-  QEMU emulator version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and =
-the QEMU Project developers
-
-  =E2=96=B6 uname -a
-  Linux xxx 4.7.1-1-ARCH #1 SMP PREEMPT Wed Aug 17 08:13:35 CEST 2016 x86_6=
-4 GNU/Linux
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1622547/+subscriptions
+ include/hw/compat.h         |   4 ++
+ include/hw/register.h       |  47 +------------
+ include/hw/registerfields.h |  60 +++++++++++++++++
+ target/arm/cpu.h            |  62 +++++++++++++++--
+ target/arm/internals.h      |   7 ++
+ hw/arm/armv7m.c             |   8 ---
+ hw/block/pflash_cfi01.c     |  22 ++++--
+ hw/char/exynos4210_uart.c   |   6 +-
+ hw/dma/omap_dma.c           |  10 ++-
+ hw/intc/arm_gicv3_cpuif.c   |   2 +-
+ hw/intc/armv7m_nvic.c       |  58 +++++++++++-----
+ hw/net/stellaris_enet.c     |   5 +-
+ hw/ssi/aspeed_smc.c         |  21 ++++++
+ linux-user/main.c           |   1 +
+ target/arm/cpu.c            |  50 ++++++++++++--
+ target/arm/helper.c         | 160 +++++++++++++++++++++++++++-----------------
+ target/arm/machine.c        |  12 ++--
+ target/arm/translate.c      |  20 ++++--
+ 18 files changed, 386 insertions(+), 169 deletions(-)
+ create mode 100644 include/hw/registerfields.h
