@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1cX7Mj-0002pN-U6
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:19:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1cX7RN-00081Z-71
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:23:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1cX7Mg-00074T-J5
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:19:01 -0500
-Received: from mail-yw0-x241.google.com ([2607:f8b0:4002:c05::241]:33896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1cX7Mg-00072p-DU
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:18:58 -0500
-Received: by mail-yw0-x241.google.com with SMTP id v73so24137796ywg.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 06:18:56 -0800 (PST)
-Date: Fri, 27 Jan 2017 09:18:54 -0500
-From: Kevin O'Connor <kevin@koconnor.net>
-Message-ID: <20170127141854.GA2524@morn.lan>
-References: <dabc5ffbb5b9d29e88087dcbe03b1ba0232c342c.1485308342.git.ben@skyportsystems.com>
-	<827795cf-5399-7092-267e-e912141931f3@redhat.com>
-	<29F9E21E-D768-47D8-8E7F-BBC9DC4F72DD@skyportsystems.com>
-	<20170125202812-mutt-send-email-mst@kernel.org>
-	<2497755c-8616-1f42-ff36-ad75f6778a52@redhat.com>
-	<20170126165015-mutt-send-email-mst@kernel.org>
-	<adbfd67b-bcbc-2da2-78be-810eb35781ec@redhat.com>
-	<20170126201124-mutt-send-email-mst@kernel.org>
-	<6d15ef62-3184-3293-dd83-da67dd48dab0@redhat.com>
-	<20170126205508-mutt-send-email-mst@kernel.org>
+	(envelope-from <eblake@redhat.com>) id 1cX7RK-0000UA-17
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:23:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:4480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cX7RJ-0000U2-OR
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:23:45 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ECA133DBD8
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 14:23:45 +0000 (UTC)
+References: <20170127100029.11356-1-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1fb695b9-1ac2-964f-984c-c32f04ae5e90@redhat.com>
+Date: Fri, 27 Jan 2017 08:23:40 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170126205508-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v4 1/9] ACPI: Add a function for building
- named qword entries
+In-Reply-To: <20170127100029.11356-1-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fVvJBTbnwx1X3TPbKvbJjL9H5HSMNuNUw"
+Subject: Re: [Qemu-devel] [PATCH 0/4] block/gluster: cleanups for
+ GlfsPreopened
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,75 +34,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Ben Warren <ben@skyportsystems.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 
-On Thu, Jan 26, 2017 at 08:59:04PM +0200, Michael S. Tsirkin wrote:
-> On Thu, Jan 26, 2017 at 07:25:22PM +0100, Laszlo Ersek wrote:
-> > On 01/26/17 19:15, Michael S. Tsirkin wrote:
-> > > On Thu, Jan 26, 2017 at 06:43:22PM +0100, Laszlo Ersek wrote:
-> > >> On 01/26/17 16:20, Michael S. Tsirkin wrote:
-> > >>> On Thu, Jan 26, 2017 at 01:48:37AM +0100, Laszlo Ersek wrote:
-> > >>
-> > >>>> But, again, I'd like to keep COMMAND_ALLOCATE_RETURN_ADDR 8-byte wide.
-> > >>>
-> > >>>
-> > >>> What is COMMAND_ALLOCATE_RETURN_ADDR? I'm only familiar with
-> > >>> COMMAND_ALLOCATE.
-> > >>
-> > >> It's a new command being introduced in this series, at my suggestion. It
-> > >> does the exact same thing as COMMAND_ALLOCATE, except once the
-> > >> allocation / download is carried out by the firmware, the firmware
-> > >> writes back the allocation address to the fw_cfg file that is named in
-> > >> an additional field of the COMMAND_ALLOCATE_RETURN_ADDR structure. (This
-> > >> is how QEMU learns where the blob in GPA space was placed by the
-> > >> firmware.) The format for this address-receiving fw_cfg file is supposed
-> > >> to be 8-byte, little endian.
-> > > 
-> > > I see. I really think it's better as a separate command though.
-> > > E.g. COMMAND_WRITE_PTR?
-> > 
-> > Sure, but please provide specifics, otherwise Ben & myself will have a
-> > hard time divining & implementing your intent :)
-> > 
-> > Thanks,
-> > Laszlo
-> 
-> I would say a variant of ADD_POINTER:
-> 
->         /*
-> 	 * COMMAND_WRITE_POINTER - update a writeable file named
-> 	 * @pointer.dest_file at @pointer.offset, by writing pointer to
-> 	 * the table originating from @src_file. 1,2,4 or 8 byte
-> 	 * unsigned write is used depending on @pointer.size.
->          */
->         struct {
->             char dest_file[BIOS_LINKER_LOADER_FILESZ];
->             char src_file[BIOS_LINKER_LOADER_FILESZ];
->             uint32_t offset;
->             uint8_t size;
->         } pointer;
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fVvJBTbnwx1X3TPbKvbJjL9H5HSMNuNUw
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>,
+ Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+Message-ID: <1fb695b9-1ac2-964f-984c-c32f04ae5e90@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/4] block/gluster: cleanups for
+ GlfsPreopened
+References: <20170127100029.11356-1-stefanha@redhat.com>
+In-Reply-To: <20170127100029.11356-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm okay with this approach.
+On 01/27/2017 04:00 AM, Stefan Hajnoczi wrote:
+> Code added in commit 6349c15410361d3fe52c9beee309954d606f8ccd ("block/g=
+luster:
+> memory usage: use one glfs instance per volume") does not follow conven=
+tions
+> and violates QEMU coding style.  Although any single issue in isolation=
+ is not
+> worth patching, there are several of these and I think it's worth resol=
+ving
+> them together in one sweep.
+>=20
+> Stefan Hajnoczi (4):
+>   block/gluster: fix wrong indent in glfs_find_preopened()
+>   block/gluster: drop intermediate ListElement struct
+>   block/gluster: use conventional names for GlfsPreopened functions
+>   block/gluster: add missing QLIST_HEAD_INITIALIZER()
 
-If an offset is going to be added, shouldn't both a source offset and
-destination offset be used?
+For the series,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-        /*
-         * COMMAND_WRITE_POINTER - update a writeable file named
-         * @pointer.dest_file at @pointer.dest_offset, by writing pointer
-         * plus @pointer.src_offset to the blob originating from
-         * @src_file. 1,2,4 or 8 byte unsigned write is used depending
-         * on @pointer.size.
-         */
-        struct {
-            char dest_file[BIOS_LINKER_LOADER_FILESZ];
-            char src_file[BIOS_LINKER_LOADER_FILESZ];
-            uint32_t src_offset, dest_offset;
-            uint8_t size;
-        } pointer;
+>=20
+>  block/gluster.c | 66 +++++++++++++++++++++++++++----------------------=
+--------
+>  1 file changed, 31 insertions(+), 35 deletions(-)
+>=20
 
-I doubt the offsets or size is really all that important though.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
--Kevin
+
+--fVvJBTbnwx1X3TPbKvbJjL9H5HSMNuNUw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYi1fsAAoJEKeha0olJ0NqVPcIAIozpQxrhFnP91BVaeRg9GXL
+VM1+1uhee97ndceZ9/d38ZM9aKPZuJsnlBXR9mvBWEIfpEzz7SR61UhYB5J/LmwE
+qwMTp3rOtHEaLx2sWE7Oglph9AiTWKgfsymb4dgWMtFA1h2aLzAS7qY0mrz1YVY0
+xEHUcyXLlUNaoEpLua/+5D4X6f4VlQPA5ZAovdL8e1qT4AKNGt6F3NyZIaqjq3gc
+H9k4t5w9uOW1ss3ZOZ3QNf9SCaMBYZ9aaXHxu5TZmUqDa20CzBm9NPh07SveuUN9
+snIGd9tpQDM7Q/2KEjIx2ZdWqKt8muAher8A08gm2Rs/cj66VFhp5drk+DkloBY=
+=+1gw
+-----END PGP SIGNATURE-----
+
+--fVvJBTbnwx1X3TPbKvbJjL9H5HSMNuNUw--
