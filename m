@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX3wK-0003Kt-9B
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:34 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cX3wM-0003Mo-Tt
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX3wI-0003VR-6E
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:32 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35385)
+	(envelope-from <alex.bennee@linaro.org>) id 1cX3wL-0003Wj-5c
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:34 -0500
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:38886)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cX3wH-0003VE-Tu
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:30 -0500
-Received: by mail-wm0-x235.google.com with SMTP id r126so110943895wmr.0
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 02:39:29 -0800 (PST)
+	id 1cX3wK-0003WD-TY
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:33 -0500
+Received: by mail-wm0-x22d.google.com with SMTP id r144so130014547wme.1
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 02:39:32 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 27 Jan 2017 10:39:02 +0000
-Message-Id: <20170127103922.19658-6-alex.bennee@linaro.org>
+Date: Fri, 27 Jan 2017 10:39:12 +0000
+Message-Id: <20170127103922.19658-16-alex.bennee@linaro.org>
 In-Reply-To: <20170127103922.19658-1-alex.bennee@linaro.org>
 References: <20170127103922.19658-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 05/25] tcg: add options for enabling MTTCG
+Subject: [Qemu-devel] [PATCH v8 15/25] cputlb: introduce tlb_flush_* async
+ work.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,321 +35,211 @@ Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serg
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-We know there will be cases where MTTCG won't work until additional work
-is done in the front/back ends to support. It will however be useful to
-be able to turn it on.
+Some architectures allow to flush the tlb of other VCPUs. This is not a problem
+when we have only one thread for all VCPUs but it definitely needs to be an
+asynchronous work when we are in true multithreaded work.
 
-As a result MTTCG will default to off unless the combination is
-supported. However the user can turn it on for the sake of testing.
+We take the tb_lock() when doing this to avoid racing with other threads
+which may be invalidating TB's at the same time. The alternative would
+be to use proper atomic primitives to clear the tlb entries en-mass.
+
+This patch doesn't do anything to protect other cputlb function being
+called in MTTCG mode making cross vCPU changes.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
-[AJB: move to -accel tcg,thread=multi|single, defaults]
+[AJB: remove need for g_malloc on defer, make check fixes, tb_lock]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
----
-v1:
-  - merge with add mttcg option.
-  - update commit message
-v2:
-  - machine_init->opts_init
-v3:
-  - moved from -tcg to -accel tcg,thread=single|multi
-  - fix checkpatch warnings
-v4:
-  - make mttcg_enabled extern, qemu_tcg_mttcg_enabled() now just macro
-  - qemu_tcg_configure now propagates Error instead of exiting
-  - better error checking of thread=foo
-  - use CONFIG flags for default_mttcg_enabled()
-  - disable mttcg with icount, error if both forced on
-v7
-  - explicitly disable MTTCG for TCG_OVERSIZED_GUEST
-  - use check_tcg_memory_orders_compatible() instead of CONFIG_MTTCG_HOST
-  - change CONFIG_MTTCG_TARGET to TARGET_SUPPORTS_MTTCG
-v8
-  - fix missing include tcg.h
-  - change mismatched MOs to a warning instead of error
----
- cpus.c                | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++
- include/qom/cpu.h     |  9 +++++++
- include/sysemu/cpus.h |  2 ++
- qemu-options.hx       | 20 ++++++++++++++
- tcg/tcg.h             |  9 +++++++
- vl.c                  | 49 ++++++++++++++++++++++++++++++++++-
- 6 files changed, 160 insertions(+), 1 deletion(-)
 
-diff --git a/cpus.c b/cpus.c
-index 71a82e5004..76b6e04332 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -25,6 +25,7 @@
- /* Needed early for CONFIG_BSD etc. */
- #include "qemu/osdep.h"
- #include "qemu-common.h"
-+#include "qemu/config-file.h"
- #include "cpu.h"
- #include "monitor/monitor.h"
- #include "qapi/qmp/qerror.h"
-@@ -45,6 +46,7 @@
- #include "qemu/main-loop.h"
- #include "qemu/bitmap.h"
- #include "qemu/seqlock.h"
-+#include "tcg.h"
- #include "qapi-event.h"
- #include "hw/nmi.h"
- #include "sysemu/replay.h"
-@@ -150,6 +152,76 @@ typedef struct TimersState {
- } TimersState;
+---
+v8
+  - fix merge failure mentioning global flush
+v6 (base patches)
+  - don't use cmpxchg_bool (we drop it later anyway)
+  - use RUN_ON_CPU macros instead of inlines
+  - bug out of tlb_flush if !tcg_enabled() (MacOSX make check failure)
+v5 (base patches)
+  - take tb_lock() for memset
+  - ensure tb_flush_page properly asyncs work for other vCPUs
+  - use run_on_cpu_data
+v4 (base_patches)
+  - brought forward from arm enabling series
+  - restore pending_tlb_flush flag
+v1
+  - Remove tlb_flush_all just do the check in tlb_flush.
+  - remove the need to g_malloc
+  - tlb_flush calls direct if !cpu->created
+---
+ cputlb.c                | 66 +++++++++++++++++++++++++++++++++++++++++++++++--
+ include/exec/exec-all.h |  1 +
+ include/qom/cpu.h       |  6 +++++
+ 3 files changed, 71 insertions(+), 2 deletions(-)
+
+diff --git a/cputlb.c b/cputlb.c
+index 94fa9977c5..5dfd3c3ba9 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -64,6 +64,10 @@
+         }                                                         \
+     } while (0)
  
- static TimersState timers_state;
-+bool mttcg_enabled;
++/* run_on_cpu_data.target_ptr should always be big enough for a
++ * target_ulong even on 32 bit builds */
++QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
 +
-+/*
-+ * We default to false if we know other options have been enabled
-+ * which are currently incompatible with MTTCG. Otherwise when each
-+ * guest (target) has been updated to support:
-+ *   - atomic instructions
-+ *   - memory ordering primitives (barriers)
-+ * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
-+ *
-+ * Once a guest architecture has been converted to the new primitives
-+ * there are two remaining limitations to check.
-+ *
-+ * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
-+ * - The host must have a stronger memory order than the guest
-+ *
-+ * It may be possible in future to support strong guests on weak hosts
-+ * but that will require tagging all load/stores in a guest with their
-+ * implicit memory order requirements which would likely slow things
-+ * down a lot.
-+ */
-+
-+static bool check_tcg_memory_orders_compatible(void)
-+{
-+#if defined(TCG_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
-+    return (TCG_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
-+#else
-+    return false;
-+#endif
-+}
-+
-+static bool default_mttcg_enabled(void)
-+{
-+    QemuOpts *icount_opts = qemu_find_opts_singleton("icount");
-+    const char *rr = qemu_opt_get(icount_opts, "rr");
-+
-+    if (rr || TCG_OVERSIZED_GUEST) {
-+        return false;
-+    } else {
-+#ifdef TARGET_SUPPORTS_MTTCG
-+        return check_tcg_memory_orders_compatible();
-+#else
-+        return false;
-+#endif
+ /* statistics */
+ int tlb_flush_count;
+ 
+@@ -72,13 +76,22 @@ int tlb_flush_count;
+  * flushing more entries than required is only an efficiency issue,
+  * not a correctness issue.
+  */
+-void tlb_flush(CPUState *cpu)
++static void tlb_flush_nocheck(CPUState *cpu)
+ {
+     CPUArchState *env = cpu->env_ptr;
+ 
++    /* The QOM tests will trigger tlb_flushes without setting up TCG
++     * so we bug out here in that case.
++     */
++    if (!tcg_enabled()) {
++        return;
 +    }
++
+     assert_cpu_is_self(cpu);
+     tlb_debug("(count: %d)\n", tlb_flush_count++);
+ 
++    tb_lock();
++
+     memset(env->tlb_table, -1, sizeof(env->tlb_table));
+     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
+     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
+@@ -86,6 +99,27 @@ void tlb_flush(CPUState *cpu)
+     env->vtlb_index = 0;
+     env->tlb_flush_addr = -1;
+     env->tlb_flush_mask = 0;
++
++    tb_unlock();
++
++    atomic_mb_set(&cpu->pending_tlb_flush, false);
 +}
 +
-+void qemu_tcg_configure(QemuOpts *opts, Error **errp)
++static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
 +{
-+    const char *t = qemu_opt_get(opts, "thread");
-+    if (t) {
-+        if (strcmp(t, "multi") == 0) {
-+            if (TCG_OVERSIZED_GUEST) {
-+                error_setg(errp, "No MTTCG when guest word size > hosts");
-+            } else {
-+                if (!check_tcg_memory_orders_compatible()) {
-+                    error_report("Guest requires stronger MO that host");
-+                    error_printf("Results will likely be unpredictable");
-+                }
-+                mttcg_enabled = true;
-+            }
-+        } else if (strcmp(t, "single") == 0) {
-+            mttcg_enabled = false;
-+        } else {
-+            error_setg(errp, "Invalid 'thread' setting %s", t);
++    tlb_flush_nocheck(cpu);
++}
++
++void tlb_flush(CPUState *cpu)
++{
++    if (cpu->created && !qemu_cpu_is_self(cpu)) {
++        if (atomic_cmpxchg(&cpu->pending_tlb_flush, false, true) == true) {
++            async_run_on_cpu(cpu, tlb_flush_global_async_work,
++                             RUN_ON_CPU_NULL);
 +        }
 +    } else {
-+        mttcg_enabled = default_mttcg_enabled();
++        tlb_flush_nocheck(cpu);
++    }
+ }
+ 
+ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
+@@ -95,6 +129,8 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
+     assert_cpu_is_self(cpu);
+     tlb_debug("start\n");
+ 
++    tb_lock();
++
+     for (;;) {
+         int mmu_idx = va_arg(argp, int);
+ 
+@@ -109,6 +145,8 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
+     }
+ 
+     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
++
++    tb_unlock();
+ }
+ 
+ void tlb_flush_by_mmuidx(CPUState *cpu, ...)
+@@ -131,13 +169,15 @@ static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
+     }
+ }
+ 
+-void tlb_flush_page(CPUState *cpu, target_ulong addr)
++static void tlb_flush_page_async_work(CPUState *cpu, run_on_cpu_data data)
+ {
+     CPUArchState *env = cpu->env_ptr;
++    target_ulong addr = (target_ulong) data.target_ptr;
+     int i;
+     int mmu_idx;
+ 
+     assert_cpu_is_self(cpu);
++
+     tlb_debug("page :" TARGET_FMT_lx "\n", addr);
+ 
+     /* Check if we need to flush due to large pages.  */
+@@ -167,6 +207,18 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
+     tb_flush_jmp_cache(cpu, addr);
+ }
+ 
++void tlb_flush_page(CPUState *cpu, target_ulong addr)
++{
++    tlb_debug("page :" TARGET_FMT_lx "\n", addr);
++
++    if (!qemu_cpu_is_self(cpu)) {
++        async_run_on_cpu(cpu, tlb_flush_page_async_work,
++                         RUN_ON_CPU_TARGET_PTR(addr));
++    } else {
++        tlb_flush_page_async_work(cpu, RUN_ON_CPU_TARGET_PTR(addr));
 +    }
 +}
++
+ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, ...)
+ {
+     CPUArchState *env = cpu->env_ptr;
+@@ -213,6 +265,16 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, ...)
+     tb_flush_jmp_cache(cpu, addr);
+ }
  
- int64_t cpu_get_icount_raw(void)
++void tlb_flush_page_all(target_ulong addr)
++{
++    CPUState *cpu;
++
++    CPU_FOREACH(cpu) {
++        async_run_on_cpu(cpu, tlb_flush_page_async_work,
++                         RUN_ON_CPU_TARGET_PTR(addr));
++    }
++}
++
+ /* update the TLBs so that writes to code in the virtual page 'addr'
+    can be detected */
+ void tlb_protect_code(ram_addr_t ram_addr)
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index bd4622ac5d..e43cb68355 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -158,6 +158,7 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
+ void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr);
+ void probe_write(CPUArchState *env, target_ulong addr, int mmu_idx,
+                  uintptr_t retaddr);
++void tlb_flush_page_all(target_ulong addr);
+ #else
+ static inline void tlb_flush_page(CPUState *cpu, target_ulong addr)
  {
 diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index ca4d0fb1b4..11db2015a4 100644
+index 1a06ae5938..7f1d6a81a0 100644
 --- a/include/qom/cpu.h
 +++ b/include/qom/cpu.h
-@@ -412,6 +412,15 @@ extern struct CPUTailQ cpus;
- extern __thread CPUState *current_cpu;
+@@ -398,6 +398,12 @@ struct CPUState {
  
- /**
-+ * qemu_tcg_mttcg_enabled:
-+ * Check whether we are running MultiThread TCG or not.
-+ *
-+ * Returns: %true if we are in MTTCG mode %false otherwise.
-+ */
-+extern bool mttcg_enabled;
-+#define qemu_tcg_mttcg_enabled() (mttcg_enabled)
+     bool hax_vcpu_dirty;
+     struct hax_vcpu_state *hax_vcpu;
 +
-+/**
-  * cpu_paging_enabled:
-  * @cpu: The CPU whose state is to be inspected.
-  *
-diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index 3728a1ea7e..a73b5d4bce 100644
---- a/include/sysemu/cpus.h
-+++ b/include/sysemu/cpus.h
-@@ -36,4 +36,6 @@ extern int smp_threads;
- 
- void list_cpus(FILE *f, fprintf_function cpu_fprintf, const char *optarg);
- 
-+void qemu_tcg_configure(QemuOpts *opts, Error **errp);
-+
- #endif
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 588e5beab3..47ac537285 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -95,6 +95,26 @@ STEXI
- Select CPU model (@code{-cpu help} for list and additional feature selection)
- ETEXI
- 
-+DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-+    "-accel [accel=]accelerator[,thread=single|multi]\n"
-+    "               select accelerator ('-accel help for list')\n"
-+    "               thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
-+STEXI
-+@item -accel @var{name}[,prop=@var{value}[,...]]
-+@findex -accel
-+This is used to enable an accelerator. Depending on the target architecture,
-+kvm, xen, or tcg can be available. By default, tcg is used. If there is more
-+than one accelerator specified, the next one is used if the previous one fails
-+to initialize.
-+@table @option
-+@item thread=single|multi
-+Controls number of TCG threads. When the TCG is multi-threaded there will be one
-+thread per vCPU therefor taking advantage of additional host cores. The default
-+is to enable multi-threading where both the back-end and front-ends support it and
-+no incompatible TCG features have been enabled (e.g. icount/replay).
-+@end table
-+ETEXI
-+
- DEF("smp", HAS_ARG, QEMU_OPTION_smp,
-     "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
-     "                set the number of CPUs to 'n' [default=1]\n"
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index f946452049..4c7f258220 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -80,6 +80,15 @@ typedef uint64_t tcg_target_ulong;
- #error unsupported
- #endif
- 
-+/* Oversized TCG guests make things like MTTCG hard
-+ * as we can't use atomics for cputlb updates.
-+ */
-+#if TARGET_LONG_BITS > TCG_TARGET_REG_BITS
-+#define TCG_OVERSIZED_GUEST 1
-+#else
-+#define TCG_OVERSIZED_GUEST 0
-+#endif
-+
- #if TCG_TARGET_NB_REGS <= 32
- typedef uint32_t TCGRegSet;
- #elif TCG_TARGET_NB_REGS <= 64
-diff --git a/vl.c b/vl.c
-index 68e8c003d1..eabd7e04f8 100644
---- a/vl.c
-+++ b/vl.c
-@@ -299,6 +299,26 @@ static QemuOptsList qemu_machine_opts = {
-     },
++    /* The pending_tlb_flush flag is set and cleared atomically to
++     * avoid potential races. The aim of the flag is to avoid
++     * unnecessary flushes.
++     */
++    bool pending_tlb_flush;
  };
  
-+static QemuOptsList qemu_accel_opts = {
-+    .name = "accel",
-+    .implied_opt_name = "accel",
-+    .head = QTAILQ_HEAD_INITIALIZER(qemu_accel_opts.head),
-+    .merge_lists = true,
-+    .desc = {
-+        {
-+            .name = "accel",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Select the type of accelerator",
-+        },
-+        {
-+            .name = "thread",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Enable/disable multi-threaded TCG",
-+        },
-+        { /* end of list */ }
-+    },
-+};
-+
- static QemuOptsList qemu_boot_opts = {
-     .name = "boot-opts",
-     .implied_opt_name = "order",
-@@ -2973,7 +2993,8 @@ int main(int argc, char **argv, char **envp)
-     const char *boot_once = NULL;
-     DisplayState *ds;
-     int cyls, heads, secs, translation;
--    QemuOpts *hda_opts = NULL, *opts, *machine_opts, *icount_opts = NULL;
-+    QemuOpts *opts, *machine_opts;
-+    QemuOpts *hda_opts = NULL, *icount_opts = NULL, *accel_opts = NULL;
-     QemuOptsList *olist;
-     int optind;
-     const char *optarg;
-@@ -3028,6 +3049,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_add_opts(&qemu_trace_opts);
-     qemu_add_opts(&qemu_option_rom_opts);
-     qemu_add_opts(&qemu_machine_opts);
-+    qemu_add_opts(&qemu_accel_opts);
-     qemu_add_opts(&qemu_mem_opts);
-     qemu_add_opts(&qemu_smp_opts);
-     qemu_add_opts(&qemu_boot_opts);
-@@ -3723,6 +3745,26 @@ int main(int argc, char **argv, char **envp)
-                 qdev_prop_register_global(&kvm_pit_lost_tick_policy);
-                 break;
-             }
-+            case QEMU_OPTION_accel:
-+                accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
-+                                                     optarg, true);
-+                optarg = qemu_opt_get(accel_opts, "accel");
-+
-+                olist = qemu_find_opts("machine");
-+                if (strcmp("kvm", optarg) == 0) {
-+                    qemu_opts_parse_noisily(olist, "accel=kvm", false);
-+                } else if (strcmp("xen", optarg) == 0) {
-+                    qemu_opts_parse_noisily(olist, "accel=xen", false);
-+                } else if (strcmp("tcg", optarg) == 0) {
-+                    qemu_opts_parse_noisily(olist, "accel=tcg", false);
-+                } else {
-+                    if (!is_help_option(optarg)) {
-+                        error_printf("Unknown accelerator: %s", optarg);
-+                    }
-+                    error_printf("Supported accelerators: kvm, xen, tcg\n");
-+                    exit(1);
-+                }
-+                break;
-             case QEMU_OPTION_usb:
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "usb=on", false);
-@@ -4031,6 +4073,8 @@ int main(int argc, char **argv, char **envp)
- 
-     replay_configure(icount_opts);
- 
-+    qemu_tcg_configure(accel_opts, &error_fatal);
-+
-     machine_class = select_machine();
- 
-     set_memory_options(&ram_slots, &maxram_size, machine_class);
-@@ -4395,6 +4439,9 @@ int main(int argc, char **argv, char **envp)
-         if (!tcg_enabled()) {
-             error_report("-icount is not allowed with hardware virtualization");
-             exit(1);
-+        } else if (qemu_tcg_mttcg_enabled()) {
-+            error_report("-icount does not currently work with MTTCG");
-+            exit(1);
-         }
-         configure_icount(icount_opts, &error_abort);
-         qemu_opts_del(icount_opts);
+ QTAILQ_HEAD(CPUTailQ, CPUState);
 -- 
 2.11.0
