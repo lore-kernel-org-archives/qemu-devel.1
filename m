@@ -1,41 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cXA8n-0005EC-Bg
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:16:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1cXAA5-0005zd-60
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:18:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cXA8i-00069f-BO
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:16:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38106)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1cXA8i-00069Q-2e
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:16:44 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0RH9NJJ145086
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 12:16:42 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2885ns417k-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 12:16:42 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Fri, 27 Jan 2017 17:16:35 -0000
-References: <1476445983-16661-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1476445983-16661-2-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<87poj88nxu.fsf@linaro.org>
-	<ed673cc1-4513-766c-83f6-ff560c9ed1d5@linux.vnet.ibm.com>
-	<87mvec8mbx.fsf@linaro.org>
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Date: Fri, 27 Jan 2017 18:16:29 +0100
+	(envelope-from <armbru@redhat.com>) id 1cXAA0-0006ZL-OU
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:18:09 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1485528688-29914-1-git-send-email-thuth@redhat.com>
+	<CAKmqyKOGTgKfGdjX4AYvh_yz=mSAgSdAWV=58=0s4w7LXjy2qw@mail.gmail.com>
+	<CAFEAcA-fSMkEVh3DOAh0d-JV=SPF6JqfT0SQ4OjwPbss-Jan_Q@mail.gmail.com>
+Date: Fri, 27 Jan 2017 18:18:01 +0100
+In-Reply-To: <CAFEAcA-fSMkEVh3DOAh0d-JV=SPF6JqfT0SQ4OjwPbss-Jan_Q@mail.gmail.com>
+	(Peter Maydell's message of "Fri, 27 Jan 2017 16:52:59 +0000")
+Message-ID: <87wpdga0c6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87mvec8mbx.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <576b7a6e-7cb3-4a02-3e2e-eb24b77ef7c7@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] move vm_start to cpus.c
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] hw/core/or-irq: Mark the device with
+ cannot_instantiate_with_device_add_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,306 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 27/01/17 18:05, Alex Benn=C3=A9e wrote:
->=20
-> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
->=20
->> On 27/01/17 17:31, Alex Benn=C3=A9e wrote:
->>>
->>> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
->>>
->>>> This patch:
->>>>
->>>> * moves vm_start to cpus.c .
->>>> * exports qemu_vmstop_requested, since it's needed by vm_start .
->>>> * extracts vm_prepare_start from vm_start; it does what vm_start did=
-,
->>>>   except restarting the cpus. vm_start now calls vm_prepare_start.
->>>> * moves the call to qemu_clock_enable away from resume_all_vcpus, an=
-d
->>>>   add an explicit call to it before each instance of resume_all_vcpu=
-s
->>>>   in the code.
->>>
->>> Can you be a bit more explicit about this? Shouldn't CPU time still
->>> accrue even if you are only starting some of them?
->>
->> This is what's happening in the newest version of this patch, which I
->> sent around yesterday, although I forgot to update the patch
->> description; I'll send a fixed version ASAP.
->>
->>> I'd prefer making resume_all_vcpus() a private function called from
->>
->> resume_all_vcpus is already being used in other files too, doesn't mak=
-e
->> sense to make it private now.
->=20
-> Yeah I would rename the call-sites across QEMU. Perhaps just one entry
-> point of rename_vcpus() which does the right thing given a list or NULL.
-> But pushing the details of restarting the timer to the call sites just
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-this is not happening any longer in the patch I sent yesterday (v6).
-the only thing happening now in the first patch is moving vm_start and
-splitting it. clocks are not affected, no further code changes are needed.
-
-> sounds like a way of it getting missed next time someone adds a resume
-> somewhere.
->=20
+> On 27 January 2017 at 16:40, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> On Fri, Jan 27, 2017 at 6:51 AM, Thomas Huth <thuth@redhat.com> wrote:
+>>> The "or-irq" device is just used internally. It's strange to
+>>> see this device showing up in the "-device ?" help text. Let's mark it
+>>> with cannot_instantiate_with_device_add_yet to hide it from the users.
 >>
->>> resume_some_vcpus() which can then make the QEMU_CLOCK_VIRTUAL decisi=
-on
->>> in one place - with a comment.
->>>
->>>> * adds resume_some_vcpus, to selectively restart only some CPUs.
->>>>
->>>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
->>>> ---
->>>>  cpus.c                     | 61 +++++++++++++++++++++++++++++++++++=
-++++++++++-
->>>>  hw/i386/kvmvapic.c         |  2 ++
->>>>  include/sysemu/cpus.h      |  1 +
->>>>  include/sysemu/sysemu.h    |  2 ++
->>>>  target-s390x/misc_helper.c |  2 ++
->>>>  vl.c                       | 32 +++---------------------
->>>>  6 files changed, 70 insertions(+), 30 deletions(-)
->>>>
->>>> diff --git a/cpus.c b/cpus.c
->>>> index 31204bb..c102624 100644
->>>> --- a/cpus.c
->>>> +++ b/cpus.c
->>>> @@ -1260,12 +1260,28 @@ void resume_all_vcpus(void)
->>>>  {
->>>>      CPUState *cpu;
->>>>
->>>> -    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>>      CPU_FOREACH(cpu) {
->>>>          cpu_resume(cpu);
->>>>      }
->>>>  }
->>>>
->>>> +/**
->>>> + * resume_some_vcpus - resumes some vCPUs, indicated in a NULL-term=
-inated
->>>> + * array of CPUState *; if the parameter is NULL, all CPUs are resu=
-med.
->>>> + */
->>>> +void resume_some_vcpus(CPUState **cpus)
->>>> +{
->>>> +    int idx;
->>>> +
->>>> +    if (!cpus) {
->>>> +        resume_all_vcpus();
->>>> +        return;
->>>> +    }
->>>> +    for (idx =3D 0; cpus[idx]; idx++) {
->>>> +        cpu_resume(cpus[idx]);
->>>> +    }
->>>> +}
->>>> +
->>>>  void cpu_remove(CPUState *cpu)
->>>>  {
->>>>      cpu->stop =3D true;
->>>> @@ -1396,6 +1412,49 @@ int vm_stop(RunState state)
->>>>      return do_vm_stop(state);
->>>>  }
->>>>
->>>> +/**
->>>> + * Prepare for (re)starting the VM.
->>>> + * Returns -1 if the vCPUs are not to be restarted (e.g. if they ar=
-e already
->>>> + * running or in case of an error condition), 0 otherwise.
->>>> + */
->>>> +int vm_prepare_start(void)
->>>> +{
->>>> +    RunState requested;
->>>> +    int res =3D 0;
->>>> +
->>>> +    qemu_vmstop_requested(&requested);
->>>> +    if (runstate_is_running() && requested =3D=3D RUN_STATE__MAX) {
->>>> +        return -1;
->>>> +    }
->>>> +
->>>> +    /* Ensure that a STOP/RESUME pair of events is emitted if a
->>>> +     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
->>>> +     * example, according to documentation is always followed by
->>>> +     * the STOP event.
->>>> +     */
->>>> +    if (runstate_is_running()) {
->>>> +        qapi_event_send_stop(&error_abort);
->>>> +        res =3D -1;
->>>> +    } else {
->>>> +        replay_enable_events();
->>>> +        cpu_enable_ticks();
->>>> +        runstate_set(RUN_STATE_RUNNING);
->>>> +        vm_state_notify(1, RUN_STATE_RUNNING);
->>>> +    }
->>>> +
->>>> +    /* XXX: is it ok to send this even before actually resuming the=
- CPUs? */
->>>> +    qapi_event_send_resume(&error_abort);
->>>> +    return res;
->>>> +}
->>>> +
->>>> +void vm_start(void)
->>>> +{
->>>> +    if (!vm_prepare_start()) {
->>>> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>> +        resume_all_vcpus();
->>>> +    }
->>>> +}
->>>> +
->>>>  /* does a state transition even if the VM is already stopped,
->>>>     current state is forgotten forever */
->>>>  int vm_stop_force_state(RunState state)
->>>> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
->>>> index 74a549b..3101860 100644
->>>> --- a/hw/i386/kvmvapic.c
->>>> +++ b/hw/i386/kvmvapic.c
->>>> @@ -446,6 +446,7 @@ static void patch_instruction(VAPICROMState *s, =
-X86CPU *cpu, target_ulong ip)
->>>>          abort();
->>>>      }
->>>>
->>>> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>>      resume_all_vcpus();
->>>>
->>>>      if (!kvm_enabled()) {
->>>> @@ -686,6 +687,7 @@ static void vapic_write(void *opaque, hwaddr add=
-r, uint64_t data,
->>>>              pause_all_vcpus();
->>>>              patch_byte(cpu, env->eip - 2, 0x66);
->>>>              patch_byte(cpu, env->eip - 1, 0x90);
->>>> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>>              resume_all_vcpus();
->>>>          }
->>>>
->>>> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
->>>> index 3728a1e..5fa074b 100644
->>>> --- a/include/sysemu/cpus.h
->>>> +++ b/include/sysemu/cpus.h
->>>> @@ -5,6 +5,7 @@
->>>>  bool qemu_in_vcpu_thread(void);
->>>>  void qemu_init_cpu_loop(void);
->>>>  void resume_all_vcpus(void);
->>>> +void resume_some_vcpus(CPUState **cpus);
->>>>  void pause_all_vcpus(void);
->>>>  void cpu_stop_current(void);
->>>>  void cpu_ticks_init(void);
->>>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->>>> index ef2c50b..ac301d6 100644
->>>> --- a/include/sysemu/sysemu.h
->>>> +++ b/include/sysemu/sysemu.h
->>>> @@ -37,6 +37,7 @@ void vm_state_notify(int running, RunState state);
->>>>  #define VMRESET_REPORT   true
->>>>
->>>>  void vm_start(void);
->>>> +int vm_prepare_start(void);
->>>>  int vm_stop(RunState state);
->>>>  int vm_stop_force_state(RunState state);
->>>>
->>>> @@ -60,6 +61,7 @@ void qemu_register_powerdown_notifier(Notifier *no=
-tifier);
->>>>  void qemu_system_debug_request(void);
->>>>  void qemu_system_vmstop_request(RunState reason);
->>>>  void qemu_system_vmstop_request_prepare(void);
->>>> +bool qemu_vmstop_requested(RunState *r);
->>>>  int qemu_shutdown_requested_get(void);
->>>>  int qemu_reset_requested_get(void);
->>>>  void qemu_system_killed(int signal, pid_t pid);
->>>> diff --git a/target-s390x/misc_helper.c b/target-s390x/misc_helper.c
->>>> index 4df2ec6..2b74710 100644
->>>> --- a/target-s390x/misc_helper.c
->>>> +++ b/target-s390x/misc_helper.c
->>>> @@ -133,6 +133,7 @@ static int modified_clear_reset(S390CPU *cpu)
->>>>      s390_crypto_reset();
->>>>      scc->load_normal(CPU(cpu));
->>>>      cpu_synchronize_all_post_reset();
->>>> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>>      resume_all_vcpus();
->>>>      return 0;
->>>>  }
->>>> @@ -152,6 +153,7 @@ static int load_normal_reset(S390CPU *cpu)
->>>>      scc->initial_cpu_reset(CPU(cpu));
->>>>      scc->load_normal(CPU(cpu));
->>>>      cpu_synchronize_all_post_reset();
->>>> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>>      resume_all_vcpus();
->>>>      return 0;
->>>>  }
->>>> diff --git a/vl.c b/vl.c
->>>> index f3abd99..42addbb 100644
->>>> --- a/vl.c
->>>> +++ b/vl.c
->>>> @@ -746,7 +746,7 @@ StatusInfo *qmp_query_status(Error **errp)
->>>>      return info;
->>>>  }
->>>>
->>>> -static bool qemu_vmstop_requested(RunState *r)
->>>> +bool qemu_vmstop_requested(RunState *r)
->>>>  {
->>>>      qemu_mutex_lock(&vmstop_lock);
->>>>      *r =3D vmstop_requested;
->>>> @@ -767,34 +767,6 @@ void qemu_system_vmstop_request(RunState state)
->>>>      qemu_notify_event();
->>>>  }
->>>>
->>>> -void vm_start(void)
->>>> -{
->>>> -    RunState requested;
->>>> -
->>>> -    qemu_vmstop_requested(&requested);
->>>> -    if (runstate_is_running() && requested =3D=3D RUN_STATE__MAX) {
->>>> -        return;
->>>> -    }
->>>> -
->>>> -    /* Ensure that a STOP/RESUME pair of events is emitted if a
->>>> -     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
->>>> -     * example, according to documentation is always followed by
->>>> -     * the STOP event.
->>>> -     */
->>>> -    if (runstate_is_running()) {
->>>> -        qapi_event_send_stop(&error_abort);
->>>> -    } else {
->>>> -        replay_enable_events();
->>>> -        cpu_enable_ticks();
->>>> -        runstate_set(RUN_STATE_RUNNING);
->>>> -        vm_state_notify(1, RUN_STATE_RUNNING);
->>>> -        resume_all_vcpus();
->>>> -    }
->>>> -
->>>> -    qapi_event_send_resume(&error_abort);
->>>> -}
->>>> -
->>>> -
->>>>  /***********************************************************/
->>>>  /* real time host monotonic timer */
->>>>
->>>> @@ -1910,6 +1882,7 @@ static bool main_loop_should_exit(void)
->>>>      if (qemu_reset_requested()) {
->>>>          pause_all_vcpus();
->>>>          qemu_system_reset(VMRESET_REPORT);
->>>> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>>          resume_all_vcpus();
->>>>          if (!runstate_check(RUN_STATE_RUNNING) &&
->>>>                  !runstate_check(RUN_STATE_INMIGRATE)) {
->>>> @@ -1921,6 +1894,7 @@ static bool main_loop_should_exit(void)
->>>>          qemu_system_reset(VMRESET_SILENT);
->>>>          notifier_list_notify(&wakeup_notifiers, &wakeup_reason);
->>>>          wakeup_reason =3D QEMU_WAKEUP_REASON_NONE;
->>>> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>>          resume_all_vcpus();
->>>>          qapi_event_send_wakeup(&error_abort);
->>>>      }
->>>
->>>
->>> --
->>> Alex Benn=C3=A9e
->>>
->=20
->=20
-> --
-> Alex Benn=C3=A9e
->=20
+>> I agree that it is strange to be showing up to users, but is this
+>> really the best way to do this?
+>>
+>> I thought we were trying to get rid of
+>> cannot_instantiate_with_device_add_yet. Would it maybe be better to
+>> have an internal filed that sets this device as internal?
+>
+> Yes, I agree; the reason for cannot_instantiate_with_device_add_yet
+> being such a long and ugly name is so it's easy to grep for
+> things we in theory might want to fix some day. "We'd rather
+> this didn't show up in help" is a different question.
+>
+> (Like a lot of devices, it's pretty useless via -device, though,
+> because we have no way to wire up qemu_irq lines on the command
+> line.)
+
+And that's precisely why it needs cannot_instantiate_with_device_add_yet
+set.  Like any device that needs code to wire it up.
+
+The commit message should state that.  There's no need to argue whether
+we want to hide it from users.
+
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  hw/core/or-irq.c | 3 +++
+>>>  1 file changed, 3 insertions(+)
+>>> 
+>>> diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
+>>> index 1ac090d..2487fa3 100644
+>>> --- a/hw/core/or-irq.c
+>>> +++ b/hw/core/or-irq.c
+>>> @@ -89,6 +89,9 @@ static void or_irq_class_init(ObjectClass *klass, void *data)
+>>>      dc->props = or_irq_properties;
+>>>      dc->realize = or_irq_realize;
+>>>      dc->vmsd = &vmstate_or_irq;
+>>> +
+>>> +    /* It's just used internally, and should not be exposed to users */
+
+Make that
+
+         /* Reason: needs to be wired up, e.g. by stm32f205_soc_realize() */
+
+>>> +    dc->cannot_instantiate_with_device_add_yet = true;
+>>>  }
+>>>  
+>>>  static const TypeInfo or_irq_type_info = {
+
+With that and a rephrased commit message
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
