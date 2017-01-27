@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cX8dX-0002Nf-Sp
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cX8dX-0002Ne-Sl
 	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:40:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cX8dU-0007hZ-PB
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cX8dV-0007iF-W8
 	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:40:27 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38658)
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33214)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cX8dU-0007gx-Jd
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:40:24 -0500
-Received: by mail-wm0-x234.google.com with SMTP id r144so144083144wme.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 07:40:24 -0800 (PST)
+	id 1cX8dV-0007hj-Ps
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:40:25 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r144so59111734wme.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 07:40:25 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 27 Jan 2017 16:40:11 +0100
-Message-Id: <1485531620-121182-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/9] virtio: use MemoryRegionCache for
- descriptors and rings
+Date: Fri, 27 Jan 2017 16:40:12 +0100
+Message-Id: <1485531620-121182-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1485531620-121182-1-git-send-email-pbonzini@redhat.com>
+References: <1485531620-121182-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/9] memory: make memory_listener_unregister
+ idempotent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +31,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com
 
-A few fixes caught by "make check" (yes, brown paper bag).
+Make it easy to unregister a MemoryListener without tracking whether it
+had been registered before.
 
-Paolo
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+	v3: new
 
-v2->v3: patch 1 committed already (replaced by new patch 1)
-	fix error handling in patch 3
-	fix freeing uninitialized VRingMemoryRegionCache (patch 7)
-	new patch 8
+ memory.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Paolo Bonzini (9):
-  memory: make memory_listener_unregister idempotent
-  virtio: add virtio_*_phys_cached
-  virtio: use address_space_map/unmap to access descriptors
-  exec: make address_space_cache_destroy idempotent
-  virtio: use MemoryRegionCache to access descriptors
-  virtio: add MemoryListener to cache ring translations
-  virtio: use VRingMemoryRegionCaches for descriptor ring
-  virtio: check for ring setup in virtio_queue_update_used_idx
-  virtio: use VRingMemoryRegionCaches for avail and used rings
-
- exec.c                            |   1 +
- hw/net/virtio-net.c               |  14 +-
- hw/virtio/virtio.c                | 338 ++++++++++++++++++++++++++++++--------
- include/exec/memory.h             |   2 +
- include/hw/virtio/virtio-access.h |  52 ++++++
- include/hw/virtio/virtio.h        |   1 +
- memory.c                          |   5 +
- 7 files changed, 345 insertions(+), 68 deletions(-)
-
+diff --git a/memory.c b/memory.c
+index 2bfc37f..8fafd4c 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2371,8 +2371,13 @@ void memory_listener_register(MemoryListener *listener, AddressSpace *as)
+ 
+ void memory_listener_unregister(MemoryListener *listener)
+ {
++    if (!listener->address_space) {
++        return;
++    }
++
+     QTAILQ_REMOVE(&memory_listeners, listener, link);
+     QTAILQ_REMOVE(&listener->address_space->listeners, listener, link_as);
++    listener->address_space = NULL;
+ }
+ 
+ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
 -- 
 1.8.3.1
