@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX3wI-0003J4-DG
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:31 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cX3wL-0003M0-GA
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX3wH-0003VA-7H
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:30 -0500
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:37584)
+	(envelope-from <alex.bennee@linaro.org>) id 1cX3wK-0003W9-8C
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:33 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35401)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cX3wG-0003UQ-Uw
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:29 -0500
-Received: by mail-wm0-x22d.google.com with SMTP id c206so130177130wme.0
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 02:39:28 -0800 (PST)
+	id 1cX3wJ-0003Vj-VW
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:32 -0500
+Received: by mail-wm0-x232.google.com with SMTP id r126so110945065wmr.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 02:39:31 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 27 Jan 2017 10:39:01 +0000
-Message-Id: <20170127103922.19658-5-alex.bennee@linaro.org>
+Date: Fri, 27 Jan 2017 10:39:04 +0000
+Message-Id: <20170127103922.19658-8-alex.bennee@linaro.org>
 In-Reply-To: <20170127103922.19658-1-alex.bennee@linaro.org>
 References: <20170127103922.19658-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 04/25] tcg: move TCG_MO/BAR types into own
- file
+Subject: [Qemu-devel] [PATCH v8 07/25] tcg: rename tcg_current_cpu to
+ tcg_current_rr_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +31,178 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
-Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-We'll be using the memory ordering definitions to define values for
-both the host and guest. To avoid fighting with circular header
-dependencies just move these types into their own minimal header.
+..and make the definition local to cpus. In preparation for MTTCG the
+concept of a global tcg_current_cpu will no longer make sense. However
+we still need to keep track of it in the single-threaded case to be able
+to exit quickly when required.
+
+qemu_cpu_kick_no_halt() moves and becomes qemu_cpu_kick_rr_cpu() to
+emphasise its use-case. qemu_cpu_kick now kicks the relevant cpu as
+well as qemu_kick_rr_cpu() which will become a no-op in MTTCG.
+
+For the time being the setting of the global exit_request remains.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/tcg-mo.h | 45 +++++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg.h    | 18 +-----------------
- 2 files changed, 46 insertions(+), 17 deletions(-)
- create mode 100644 tcg/tcg-mo.h
+v4:
+  - keep global exit_request setting for now
+  - fix merge conflicts
+v5:
+  - merge conflicts with kick changes
+---
+ cpu-exec-common.c       |  1 -
+ cpu-exec.c              |  3 ---
+ cpus.c                  | 41 ++++++++++++++++++++++-------------------
+ include/exec/exec-all.h |  1 -
+ 4 files changed, 22 insertions(+), 24 deletions(-)
 
-diff --git a/tcg/tcg-mo.h b/tcg/tcg-mo.h
-new file mode 100644
-index 0000000000..429b022561
---- /dev/null
-+++ b/tcg/tcg-mo.h
-@@ -0,0 +1,45 @@
-+/*
-+ * Tiny Code Generator for QEMU
-+ *
-+ * Copyright (c) 2008 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef TCG_MO_H
-+#define TCG_MO_H
-+
-+typedef enum {
-+    /* Used to indicate the type of accesses on which ordering
-+       is to be ensured.  Modeled after SPARC barriers.  */
-+    TCG_MO_LD_LD  = 0x01,
-+    TCG_MO_ST_LD  = 0x02,
-+    TCG_MO_LD_ST  = 0x04,
-+    TCG_MO_ST_ST  = 0x08,
-+    TCG_MO_ALL    = 0x0F,  /* OR of the above */
-+
-+    /* Used to indicate the kind of ordering which is to be ensured by the
-+       instruction.  These types are derived from x86/aarch64 instructions.
-+       It should be noted that these are different from C11 semantics.  */
-+    TCG_BAR_LDAQ  = 0x10,  /* Following ops will not come forward */
-+    TCG_BAR_STRL  = 0x20,  /* Previous ops will not be delayed */
-+    TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
-+} TCGBar;
-+
-+#endif /* TCG_MO_H */
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 631c6f69b1..f946452049 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -29,6 +29,7 @@
- #include "cpu.h"
- #include "exec/tb-context.h"
- #include "qemu/bitops.h"
-+#include "tcg-mo.h"
- #include "tcg-target.h"
+diff --git a/cpu-exec-common.c b/cpu-exec-common.c
+index 767d9c6f0c..e2bc053372 100644
+--- a/cpu-exec-common.c
++++ b/cpu-exec-common.c
+@@ -24,7 +24,6 @@
+ #include "exec/memory-internal.h"
  
- /* XXX: make safe guess about sizes */
-@@ -498,23 +499,6 @@ static inline intptr_t QEMU_ARTIFICIAL GET_TCGV_PTR(TCGv_ptr t)
- #define TCG_CALL_DUMMY_TCGV     MAKE_TCGV_I32(-1)
- #define TCG_CALL_DUMMY_ARG      ((TCGArg)(-1))
+ bool exit_request;
+-CPUState *tcg_current_cpu;
  
--typedef enum {
--    /* Used to indicate the type of accesses on which ordering
--       is to be ensured.  Modeled after SPARC barriers.  */
--    TCG_MO_LD_LD  = 0x01,
--    TCG_MO_ST_LD  = 0x02,
--    TCG_MO_LD_ST  = 0x04,
--    TCG_MO_ST_ST  = 0x08,
--    TCG_MO_ALL    = 0x0F,  /* OR of the above */
+ /* exit the current TB, but without causing any exception to be raised */
+ void cpu_loop_exit_noexc(CPUState *cpu)
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 1b8685dc21..f9e836c8dd 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -609,7 +609,6 @@ int cpu_exec(CPUState *cpu)
+         return EXCP_HALTED;
+     }
+ 
+-    atomic_mb_set(&tcg_current_cpu, cpu);
+     rcu_read_lock();
+ 
+     if (unlikely(atomic_mb_read(&exit_request))) {
+@@ -668,7 +667,5 @@ int cpu_exec(CPUState *cpu)
+     /* fail safe : never use current_cpu outside cpu_exec() */
+     current_cpu = NULL;
+ 
+-    /* Does not need atomic_mb_set because a spurious wakeup is okay.  */
+-    atomic_set(&tcg_current_cpu, NULL);
+     return ret;
+ }
+diff --git a/cpus.c b/cpus.c
+index a98925105c..6d64199831 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -779,8 +779,7 @@ void configure_icount(QemuOpts *opts, Error **errp)
+  */
+ 
+ static QEMUTimer *tcg_kick_vcpu_timer;
 -
--    /* Used to indicate the kind of ordering which is to be ensured by the
--       instruction.  These types are derived from x86/aarch64 instructions.
--       It should be noted that these are different from C11 semantics.  */
--    TCG_BAR_LDAQ  = 0x10,  /* Following ops will not come forward */
--    TCG_BAR_STRL  = 0x20,  /* Previous ops will not be delayed */
--    TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
--} TCGBar;
+-static void qemu_cpu_kick_no_halt(void);
++static CPUState *tcg_current_rr_cpu;
+ 
+ #define TCG_KICK_PERIOD (NANOSECONDS_PER_SECOND / 10)
+ 
+@@ -789,10 +788,23 @@ static inline int64_t qemu_tcg_next_kick(void)
+     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + TCG_KICK_PERIOD;
+ }
+ 
++/* Kick the currently round-robin scheduled vCPU */
++static void qemu_cpu_kick_rr_cpu(void)
++{
++    CPUState *cpu;
++    atomic_mb_set(&exit_request, 1);
++    do {
++        cpu = atomic_mb_read(&tcg_current_rr_cpu);
++        if (cpu) {
++            cpu_exit(cpu);
++        }
++    } while (cpu != atomic_mb_read(&tcg_current_rr_cpu));
++}
++
+ static void kick_tcg_thread(void *opaque)
+ {
+     timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
+-    qemu_cpu_kick_no_halt();
++    qemu_cpu_kick_rr_cpu();
+ }
+ 
+ static void start_tcg_kick_timer(void)
+@@ -812,7 +824,6 @@ static void stop_tcg_kick_timer(void)
+     }
+ }
+ 
 -
- /* Conditions.  Note that these are laid out for easy manipulation by
-    the functions below:
-      bit 0 is used for inverting;
+ /***********************************************************/
+ void hw_error(const char *fmt, ...)
+ {
+@@ -1323,6 +1334,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+         }
+ 
+         for (; cpu != NULL && !exit_request; cpu = CPU_NEXT(cpu)) {
++            atomic_mb_set(&tcg_current_rr_cpu, cpu);
+ 
+             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
+                               (cpu->singlestep_enabled & SSTEP_NOTIMER) == 0);
+@@ -1342,6 +1354,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+             }
+ 
+         } /* for cpu.. */
++        /* Does not need atomic_mb_set because a spurious wakeup is okay.  */
++        atomic_set(&tcg_current_rr_cpu, NULL);
+ 
+         /* Pairs with smp_wmb in qemu_cpu_kick.  */
+         atomic_mb_set(&exit_request, 0);
+@@ -1420,24 +1434,13 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
+ #endif
+ }
+ 
+-static void qemu_cpu_kick_no_halt(void)
+-{
+-    CPUState *cpu;
+-    /* Ensure whatever caused the exit has reached the CPU threads before
+-     * writing exit_request.
+-     */
+-    atomic_mb_set(&exit_request, 1);
+-    cpu = atomic_mb_read(&tcg_current_cpu);
+-    if (cpu) {
+-        cpu_exit(cpu);
+-    }
+-}
+-
+ void qemu_cpu_kick(CPUState *cpu)
+ {
+     qemu_cond_broadcast(cpu->halt_cond);
+     if (tcg_enabled()) {
+-        qemu_cpu_kick_no_halt();
++        cpu_exit(cpu);
++        /* Also ensure current RR cpu is kicked */
++        qemu_cpu_kick_rr_cpu();
+     } else {
+         if (hax_enabled()) {
+             /*
+@@ -1485,7 +1488,7 @@ void qemu_mutex_lock_iothread(void)
+         atomic_dec(&iothread_requesting_mutex);
+     } else {
+         if (qemu_mutex_trylock(&qemu_global_mutex)) {
+-            qemu_cpu_kick_no_halt();
++            qemu_cpu_kick_rr_cpu();
+             qemu_mutex_lock(&qemu_global_mutex);
+         }
+         atomic_dec(&iothread_requesting_mutex);
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index bbc9478a50..3cbd359dd7 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -404,7 +404,6 @@ bool memory_region_is_unassigned(MemoryRegion *mr);
+ extern int singlestep;
+ 
+ /* cpu-exec.c, accessed with atomic_mb_read/atomic_mb_set */
+-extern CPUState *tcg_current_cpu;
+ extern bool exit_request;
+ 
+ #endif
 -- 
 2.11.0
