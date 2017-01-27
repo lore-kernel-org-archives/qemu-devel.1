@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cX6Er-0000gR-SC
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:06:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cX6MI-0004tS-El
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:14:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cX6Em-0000Bh-TX
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:06:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50012)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cX6Em-0000BT-MO
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:06:44 -0500
-References: <1483601042-6435-1-git-send-email-jitendra.kolhe@hpe.com>
-	<87mvec3bqp.fsf@emacs.mitica>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ad61f8a7-e18a-3a20-92d9-8cf11d4a873e@redhat.com>
-Date: Fri, 27 Jan 2017 14:06:40 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cX6MH-0002Ky-8F
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:14:30 -0500
+Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:32952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cX6MH-0002Kq-3G
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:14:29 -0500
+Received: by mail-vk0-x22f.google.com with SMTP id k127so174570105vke.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 05:14:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87mvec3bqp.fsf@emacs.mitica>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] mem-prealloc: Reduce large guest
- start-up and migration time.
+In-Reply-To: <87bmusadr3.fsf@linaro.org>
+References: <1485285380-10565-1-git-send-email-peter.maydell@linaro.org>
+	<1485285380-10565-4-git-send-email-peter.maydell@linaro.org>
+	<87bmusadr3.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Jan 2017 13:14:08 +0000
+Message-ID: <CAFEAcA9huvBSMMpShBRMkbfhW_4pdyCJs=t2CUA18Gx_BAQj8g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 03/10] armv7m: add state for v7M CCR, CFSR,
+ HFSR, DFSR, MMFAR, BFAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com, Jitendra Kolhe <jitendra.kolhe@hpe.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, armbru@redhat.com, renganathan.meenakshisundaram@hpe.com, mohan_parthasarathy@hpe.com
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Liviu Ionescu <ilg@livius.net>
 
+On 27 January 2017 at 12:28, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> Add the structure fields, VMState fields, reset code and macros for
+>> the v7M system control registers CCR, CFSR, HFSR, DFSR, MMFAR and
+>> BFAR.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  target/arm/cpu.h     | 54 +++++++++++++++++++++++++++++++++++++++++++++=
++++++++
+>>  target/arm/cpu.c     |  7 +++++++
+>>  target/arm/machine.c | 10 ++++++++--
+>>  3 files changed, 69 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index b2cc329..4b062d2 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -21,6 +21,7 @@
+>>  #define ARM_CPU_H
+>>
+>>  #include "kvm-consts.h"
+>> +#include "hw/registerfields.h"
+>>
+>>  #if defined(TARGET_AARCH64)
+>>    /* AArch64 definitions */
+>> @@ -405,6 +406,12 @@ typedef struct CPUARMState {
+>>          uint32_t vecbase;
+>>          uint32_t basepri;
+>>          uint32_t control;
+>> +        uint32_t ccr; /* Configuration and Control */
+>> +        uint32_t cfsr; /* Configurable Fault Status */
+>> +        uint32_t hfsr; /* HardFault Status */
+>> +        uint32_t dfsr; /* Debug Fault Status Register */
+>> +        uint32_t mmfar; /* MemManage Fault Address */
+>> +        uint32_t bfar; /* BusFault Address */
+>
+> Given the CPUARMState needs to be accessed via env do we need to start
+> getting concerned about its size?
 
+We only care that accesses to the front of it are within easy
+reach (specifically, accesses to fields via frequently used
+TCG globals); it doesn't matter if more things are added at
+the end.
 
-On 27/01/2017 13:53, Juan Quintela wrote:
->> +static void *do_touch_pages(void *arg)
->> +{
->> +    PageRange *range = (PageRange *)arg;
->> +    char *start_addr = range->addr;
->> +    uint64_t numpages = range->numpages;
->> +    uint64_t hpagesize = range->hpagesize;
->> +    uint64_t i = 0;
->> +
->> +    for (i = 0; i < numpages; i++) {
->> +        memset(start_addr + (hpagesize * i), 0, 1);
-> 
-> I would use the range->addr and similar here directly, but it is just a
-> question of taste.
-> 
->> -        /* MAP_POPULATE silently ignores failures */
->> -        for (i = 0; i < numpages; i++) {
->> -            memset(area + (hpagesize * i), 0, 1);
->> +        /* touch pages simultaneously for memory >= 64G */
->> +        if (memory < (1ULL << 36)) {
-> 
-> 64GB guest already took quite a bit of time, I think I would put it
-> always as min(num_vcpus, 16).  So, we always execute the multiple theard
-> codepath?
-
-I too would like some kind of heuristic to choose the number of threads.
- Juan's suggested usage of the VCPUs (smp_cpus) is a good one.
-
-Paolo
+thanks
+-- PMM
