@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cX5aV-0007Sd-Up
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 07:25:09 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cX5de-0000tv-MN
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 07:28:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cX5aR-00055i-QX
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 07:25:07 -0500
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Fri, 27 Jan 2017 13:24:58 +0100
-Message-Id: <20170127122458.318-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] spapr: clock should count only if vm is
- running
+	(envelope-from <alex.bennee@linaro.org>) id 1cX5db-00068o-Bv
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 07:28:22 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38629)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cX5db-00068U-2L
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 07:28:19 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id r144so134769645wme.1
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 04:28:18 -0800 (PST)
+References: <1485285380-10565-1-git-send-email-peter.maydell@linaro.org>
+	<1485285380-10565-4-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1485285380-10565-4-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 27 Jan 2017 12:28:16 +0000
+Message-ID: <87bmusadr3.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 03/10] armv7m: add state for v7M CCR, CFSR,
+ HFSR, DFSR, MMFAR, BFAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,202 +31,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-ppc@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Laurent Vivier <lvivier@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Liviu Ionescu <ilg@livius.net>
 
-This is a port to ppc of the i386 commit:
-    00f4d64 kvmclock: clock should count only if vm is running
 
-We remove timebase_post_load function, and use the VM state
-change handler to save and restore the guest_timebase (on stop
-and continue).
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-We keep timebase_pre_save to reduce the clock difference on
-migration like in:
-    6053a86 kvmclock: reduce kvmclock difference on migration
+> Add the structure fields, VMState fields, reset code and macros for
+> the v7M system control registers CCR, CFSR, HFSR, DFSR, MMFAR and
+> BFAR.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.h     | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/cpu.c     |  7 +++++++
+>  target/arm/machine.c | 10 ++++++++--
+>  3 files changed, 69 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index b2cc329..4b062d2 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -21,6 +21,7 @@
+>  #define ARM_CPU_H
+>
+>  #include "kvm-consts.h"
+> +#include "hw/registerfields.h"
+>
+>  #if defined(TARGET_AARCH64)
+>    /* AArch64 definitions */
+> @@ -405,6 +406,12 @@ typedef struct CPUARMState {
+>          uint32_t vecbase;
+>          uint32_t basepri;
+>          uint32_t control;
+> +        uint32_t ccr; /* Configuration and Control */
+> +        uint32_t cfsr; /* Configurable Fault Status */
+> +        uint32_t hfsr; /* HardFault Status */
+> +        uint32_t dfsr; /* Debug Fault Status Register */
+> +        uint32_t mmfar; /* MemManage Fault Address */
+> +        uint32_t bfar; /* BusFault Address */
 
-Time base offset has originally been introduced by commit
-    98a8b52 spapr: Add support for time base offset migration
+Given the CPUARMState needs to be accessed via env do we need to start
+getting concerned about its size?
 
-So while VM is paused, the time is stopped. This allows to have
-the same result with date (based on Time Base Register) and
-hwclock (based on "get-time-of-day" RTAS call).
+>          int exception;
+>      } v7m;
+>
+> @@ -1086,6 +1093,53 @@ enum arm_cpu_mode {
+>  #define ARM_IWMMXT_wCGR2	10
+>  #define ARM_IWMMXT_wCGR3	11
+>
+> +/* V7M CCR bits */
+> +FIELD(V7M_CCR, NONBASETHRDENA, 0, 1)
+> +FIELD(V7M_CCR, USERSETMPEND, 1, 1)
+> +FIELD(V7M_CCR, UNALIGN_TRP, 3, 1)
+> +FIELD(V7M_CCR, DIV_0_TRP, 4, 1)
+> +FIELD(V7M_CCR, BFHFNMIGN, 8, 1)
+> +FIELD(V7M_CCR, STKALIGN, 9, 1)
+> +FIELD(V7M_CCR, DC, 16, 1)
+> +FIELD(V7M_CCR, IC, 17, 1)
+> +
+> +/* V7M CFSR bits for MMFSR */
+> +FIELD(V7M_CFSR, IACCVIOL, 0, 1)
+> +FIELD(V7M_CFSR, DACCVIOL, 1, 1)
+> +FIELD(V7M_CFSR, MUNSTKERR, 3, 1)
+> +FIELD(V7M_CFSR, MSTKERR, 4, 1)
+> +FIELD(V7M_CFSR, MLSPERR, 5, 1)
+> +FIELD(V7M_CFSR, MMARVALID, 7, 1)
+> +
+> +/* V7M CFSR bits for BFSR */
+> +FIELD(V7M_CFSR, IBUSERR, 8 + 0, 1)
+> +FIELD(V7M_CFSR, PRECISERR, 8 + 1, 1)
+> +FIELD(V7M_CFSR, IMPRECISERR, 8 + 2, 1)
+> +FIELD(V7M_CFSR, UNSTKERR, 8 + 3, 1)
+> +FIELD(V7M_CFSR, STKERR, 8 + 4, 1)
+> +FIELD(V7M_CFSR, LSPERR, 8 + 5, 1)
+> +FIELD(V7M_CFSR, BFARVALID, 8 + 7, 1)
+> +
+> +/* V7M CFSR bits for UFSR */
+> +FIELD(V7M_CFSR, UNDEFINSTR, 16 + 0, 1)
+> +FIELD(V7M_CFSR, INVSTATE, 16 + 1, 1)
+> +FIELD(V7M_CFSR, INVPC, 16 + 2, 1)
+> +FIELD(V7M_CFSR, NOCP, 16 + 3, 1)
+> +FIELD(V7M_CFSR, UNALIGNED, 16 + 8, 1)
+> +FIELD(V7M_CFSR, DIVBYZERO, 16 + 9, 1)
+> +
+> +/* V7M HFSR bits */
+> +FIELD(V7M_HFSR, VECTTBL, 1, 1)
+> +FIELD(V7M_HFSR, FORCED, 30, 1)
+> +FIELD(V7M_HFSR, DEBUGEVT, 31, 1)
+> +
+> +/* V7M DFSR bits */
+> +FIELD(V7M_DFSR, HALTED, 0, 1)
+> +FIELD(V7M_DFSR, BKPT, 1, 1)
+> +FIELD(V7M_DFSR, DWTTRAP, 2, 1)
+> +FIELD(V7M_DFSR, VCATCH, 3, 1)
+> +FIELD(V7M_DFSR, EXTERNAL, 4, 1)
+> +
+>  /* If adding a feature bit which corresponds to a Linux ELF
+>   * HWCAP bit, remember to update the feature-bit-to-hwcap
+>   * mapping in linux-user/elfload.c:get_elf_hwcap().
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 6395d5a..c804f59 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -188,6 +188,13 @@ static void arm_cpu_reset(CPUState *s)
+>          uint8_t *rom;
+>
+>          env->daif &= ~PSTATE_I;
+> +
+> +        /* The reset value of this bit is IMPDEF, but ARM recommends
+> +         * that it resets to 1, so QEMU always does that rather than making
+> +         * it dependent on CPU model.
+> +         */
+> +        env->v7m.ccr = R_V7M_CCR_STKALIGN_MASK;
+> +
+>          rom = rom_ptr(0);
+>          if (rom) {
+>              /* Address zero is covered by ROM which hasn't yet been
+> diff --git a/target/arm/machine.c b/target/arm/machine.c
+> index 8ed24bf..49e09a8 100644
+> --- a/target/arm/machine.c
+> +++ b/target/arm/machine.c
+> @@ -96,13 +96,19 @@ static bool m_needed(void *opaque)
+>
+>  static const VMStateDescription vmstate_m = {
+>      .name = "cpu/m",
+> -    .version_id = 2,
+> -    .minimum_version_id = 2,
+> +    .version_id = 3,
+> +    .minimum_version_id = 3,
+>      .needed = m_needed,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_UINT32(env.v7m.vecbase, ARMCPU),
+>          VMSTATE_UINT32(env.v7m.basepri, ARMCPU),
+>          VMSTATE_UINT32(env.v7m.control, ARMCPU),
+> +        VMSTATE_UINT32(env.v7m.ccr, ARMCPU),
+> +        VMSTATE_UINT32(env.v7m.cfsr, ARMCPU),
+> +        VMSTATE_UINT32(env.v7m.hfsr, ARMCPU),
+> +        VMSTATE_UINT32(env.v7m.dfsr, ARMCPU),
+> +        VMSTATE_UINT32(env.v7m.mmfar, ARMCPU),
+> +        VMSTATE_UINT32(env.v7m.bfar, ARMCPU),
+>          VMSTATE_INT32(env.v7m.exception, ARMCPU),
+>          VMSTATE_END_OF_LIST()
+>      }
 
-Moreover in TCG mode, the Time Base is always paused, so this
-patch also adjust the behavior between TCG and KVM.
+Otherwise:
 
-VM state field "time_of_the_day_ns" is now useless but we keep
-it to be able to migrate to older version of the machine.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-As vmstate_ppc_timebase structure (with timebase_pre_save() and
-timebase_post_load() functions) was only used by vmstate_spapr,
-we register the VM state change handler only in ppc_spapr_init().
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
-v2:
-  keep timebase_pre_save()
-  move save and load code to timebase_save() and timebase_load(),
-  to use the timebase_save() in timebase_pre_save() and
-  in cpu_ppc_clock_vm_state_change(), and this eases the
-  patch review.
-  put a "#if defined(CONFIG_KVM)" only around kvm_set_one_reg()
-  don't remove the trace function
-
- hw/ppc/ppc.c         | 66 ++++++++++++++++++++++++++++++++++------------------
- hw/ppc/spapr.c       |  6 +++++
- target/ppc/cpu-qom.h |  3 +++
- 3 files changed, 52 insertions(+), 23 deletions(-)
-
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index 8945869..24d4392 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -847,9 +847,8 @@ static void cpu_ppc_set_tb_clk (void *opaque, uint32_t freq)
-     cpu_ppc_store_purr(cpu, 0x0000000000000000ULL);
- }
- 
--static void timebase_pre_save(void *opaque)
-+static void timebase_save(PPCTimebase *tb)
- {
--    PPCTimebase *tb = opaque;
-     uint64_t ticks = cpu_get_host_ticks();
-     PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
- 
-@@ -858,43 +857,30 @@ static void timebase_pre_save(void *opaque)
-         return;
-     }
- 
-+    /* not used anymore, we keep it for compatibility */
-     tb->time_of_the_day_ns = qemu_clock_get_ns(QEMU_CLOCK_HOST);
-     /*
--     * tb_offset is only expected to be changed by migration so
-+     * tb_offset is only expected to be changed by QEMU so
-      * there is no need to update it from KVM here
-      */
-     tb->guest_timebase = ticks + first_ppc_cpu->env.tb_env->tb_offset;
- }
- 
--static int timebase_post_load(void *opaque, int version_id)
-+static void timebase_load(PPCTimebase *tb)
- {
--    PPCTimebase *tb_remote = opaque;
-     CPUState *cpu;
-     PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
--    int64_t tb_off_adj, tb_off, ns_diff;
--    int64_t migration_duration_ns, migration_duration_tb, guest_tb, host_ns;
-+    int64_t tb_off_adj, tb_off;
-     unsigned long freq;
- 
-     if (!first_ppc_cpu->env.tb_env) {
-         error_report("No timebase object");
--        return -1;
-+        return;
-     }
- 
-     freq = first_ppc_cpu->env.tb_env->tb_freq;
--    /*
--     * Calculate timebase on the destination side of migration.
--     * The destination timebase must be not less than the source timebase.
--     * We try to adjust timebase by downtime if host clocks are not
--     * too much out of sync (1 second for now).
--     */
--    host_ns = qemu_clock_get_ns(QEMU_CLOCK_HOST);
--    ns_diff = MAX(0, host_ns - tb_remote->time_of_the_day_ns);
--    migration_duration_ns = MIN(NANOSECONDS_PER_SECOND, ns_diff);
--    migration_duration_tb = muldiv64(freq, migration_duration_ns,
--                                     NANOSECONDS_PER_SECOND);
--    guest_tb = tb_remote->guest_timebase + MIN(0, migration_duration_tb);
- 
--    tb_off_adj = guest_tb - cpu_get_host_ticks();
-+    tb_off_adj = tb->guest_timebase - cpu_get_host_ticks();
- 
-     tb_off = first_ppc_cpu->env.tb_env->tb_offset;
-     trace_ppc_tb_adjust(tb_off, tb_off_adj, tb_off_adj - tb_off,
-@@ -904,9 +890,44 @@ static int timebase_post_load(void *opaque, int version_id)
-     CPU_FOREACH(cpu) {
-         PowerPCCPU *pcpu = POWERPC_CPU(cpu);
-         pcpu->env.tb_env->tb_offset = tb_off_adj;
-+#if defined(CONFIG_KVM)
-+        kvm_set_one_reg(cpu, KVM_REG_PPC_TB_OFFSET,
-+                        &pcpu->env.tb_env->tb_offset);
-+#endif
-     }
-+}
- 
--    return 0;
-+void cpu_ppc_clock_vm_state_change(void *opaque, int running,
-+                                   RunState state)
-+{
-+    PPCTimebase *tb = opaque;
-+
-+    if (running) {
-+        timebase_load(tb);
-+    } else {
-+        timebase_save(tb);
-+    }
-+}
-+
-+/*
-+ * When migrating, read the clock just before migration,
-+ * so that the guest clock counts during the events
-+ * between:
-+ *
-+ *  * vm_stop()
-+ *  *
-+ *  * pre_save()
-+ *
-+ *  This reduces clock difference on migration from 5s
-+ *  to 0.1s (when max_downtime == 5s), because sending the
-+ *  final pages of memory (which happens between vm_stop()
-+ *  and pre_save()) takes max_downtime.
-+ */
-+static void timebase_pre_save(void *opaque)
-+{
-+    PPCTimebase *tb = opaque;
-+
-+    timebase_save(tb);
- }
- 
- const VMStateDescription vmstate_ppc_timebase = {
-@@ -915,7 +936,6 @@ const VMStateDescription vmstate_ppc_timebase = {
-     .minimum_version_id = 1,
-     .minimum_version_id_old = 1,
-     .pre_save = timebase_pre_save,
--    .post_load = timebase_post_load,
-     .fields      = (VMStateField []) {
-         VMSTATE_UINT64(guest_timebase, PPCTimebase),
-         VMSTATE_INT64(time_of_the_day_ns, PPCTimebase),
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a642e66..ee78096 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2116,6 +2116,12 @@ static void ppc_spapr_init(MachineState *machine)
-     qemu_register_reset(spapr_ccs_reset_hook, spapr);
- 
-     qemu_register_boot_set(spapr_boot_set, spapr);
-+
-+    /* to stop and start vmclock */
-+    if (kvm_enabled()) {
-+        qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
-+                                         &spapr->tb);
-+    }
- }
- 
- static int spapr_kvm_type(const char *vm_type)
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index d46c31a..b7977ba 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -214,6 +214,9 @@ extern const struct VMStateDescription vmstate_ppc_timebase;
-     .flags      = VMS_STRUCT,                                         \
-     .offset     = vmstate_offset_value(_state, _field, PPCTimebase),  \
- }
-+
-+void cpu_ppc_clock_vm_state_change(void *opaque, int running,
-+                                   RunState state);
- #endif
- 
- #endif
--- 
-2.9.3
+--
+Alex Bennée
