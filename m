@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cX53q-0004md-0B
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 06:51:23 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cX55l-0006Yk-Ll
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 06:53:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cX53p-0002nh-33
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 06:51:22 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
-	<1485443388-27253-9-git-send-email-armbru@redhat.com>
-	<9684a908-f425-82d8-046b-19cc17d01f55@redhat.com>
-Date: Fri, 27 Jan 2017 12:51:13 +0100
-In-Reply-To: <9684a908-f425-82d8-046b-19cc17d01f55@redhat.com> (John Snow's
-	message of "Fri, 27 Jan 2017 06:00:32 -0500")
-Message-ID: <87r33o3emm.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cX55k-0003Tq-U4
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 06:53:21 -0500
+Received: from mail-vk0-x22a.google.com ([2607:f8b0:400c:c05::22a]:35483)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cX55k-0003Te-Q9
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 06:53:20 -0500
+Received: by mail-vk0-x22a.google.com with SMTP id x75so173659097vke.2
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:53:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] hw: Drop superfluous special checks
- for orphaned -drive
+In-Reply-To: <20170126024815.22841-1-famz@redhat.com>
+References: <20170126024815.22841-1-famz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Jan 2017 11:52:59 +0000
+Message-ID: <CAFEAcA-NuU+LE9QyFztGKkghh_qXm4deOXz3J1+tzT=rvJh59Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/2] HBitmap patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>, qemu-block@nongnu.org, mreitz@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
-
-> On 01/26/2017 10:09 AM, Markus Armbruster wrote:
->> We've traditionally rejected orphans here and there, but not
->> systematically.  For instance, the sun4m machines have an onboard SCSI
->> HBA (bus=0), and have always rejected bus>0.  Other machines with an
->> onboard SCSI HBA don't.
->> 
->> Commit a66c9dc made all orphans trigger a warning, and the previous
->> commit turned this into an error.  The checks "here and there" are now
->> redundant.  Drop them.
->> 
->> Note that the one in mips_jazz.c was wrong: it rejected bus > MAX_FD,
->> but MAX_FD is the number of floppy drives per bus.
->> 
->> Error messages change from
->> 
->>     $ qemu-system-x86_64 -drive if=ide,bus=2
->>     qemu-system-x86_64: Too many IDE buses defined (3 > 2)
->>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
->>     qemu: too many floppy drives
->>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
->>     qemu: too many SCSI bus
->> 
->> to
->> 
->>     $ qemu-system-x86_64 -drive if=ide,bus=2
->>     qemu-system-x86_64: -drive if=ide,bus=2: machine type does not support this drive
->>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
->>     qemu-system-mips64: -drive if=floppy,bus=2,id=fd1: machine type does not support this drive
->>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
->>     qemu-system-sparc: -drive if=scsi,bus=1: machine type does not support this drive
->> 
+On 26 January 2017 at 02:48, Fam Zheng <famz@redhat.com> wrote:
+> The following changes since commit c7f1cf01b8245762ca5864e835d84f6677ae8b1f:
 >
-> Hm, that's a lot less helpful, isn't it? Can we augment with hints?
+>   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2017-01-25 17:54:14 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/famz/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 7cdc49b9a2ee127b2403f6ce98ce3f96afb41733:
+>
+>   test-hbitmap: Add hbitmap_is_serializable() calls (2017-01-26 10:25:01 +0800)
+>
+> ----------------------------------------------------------------
+>
+> Two patches by Max submitted back in 2.8 timeframe.
+>
+> ----------------------------------------------------------------
+>
+> Max Reitz (2):
+>   hbitmap: Add hbitmap_is_serializable()
+>   test-hbitmap: Add hbitmap_is_serializable() calls
+>
+>  include/qemu/hbitmap.h | 13 +++++++++++++
+>  tests/test-hbitmap.c   | 11 +++++++++++
+>  util/hbitmap.c         | 22 +++++++++++++++++++---
+>  3 files changed, 43 insertions(+), 3 deletions(-)
+>
+> -
 
-The message itself may be less specific, but it now comes with a precise
-location.  Personally, I'd even find
 
-    qemu-system-sparc: -drive if=scsi,bus=1: *mumble* *mumble*
+Applied, thanks.
 
-more helpful than
-
-    qemu: too many SCSI bus
-
-because the former tells me *which* of the options is bad.  We tend to
-have lots and lots of them.
-
-The deleted special case errors cover only a minority of "orphan"
--drive.  If these cases need improvement, then so will the general case.
-If you can come up with a hint that makes the general case message more
-useful, I'm more than happy to squash it into PATCH 6.
+-- PMM
