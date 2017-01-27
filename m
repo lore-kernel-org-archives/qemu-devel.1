@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cXG2Z-0000vX-4y
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 18:34:48 -0500
+	(envelope-from <nirsof@gmail.com>) id 1cXGDg-0004Ol-6R
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 18:46:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cXG2W-0002Xw-1U
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 18:34:47 -0500
-Received: from mail.kernel.org ([198.145.29.136]:51948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cXG2V-0002Xq-Rp
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 18:34:43 -0500
-Date: Fri, 27 Jan 2017 15:34:39 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1485423445-12302-3-git-send-email-paul.durrant@citrix.com>
-Message-ID: <alpine.DEB.2.10.1701271533580.2884@sstabellini-ThinkPad-X260>
-References: <1485423445-12302-1-git-send-email-paul.durrant@citrix.com>
-	<1485423445-12302-3-git-send-email-paul.durrant@citrix.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] xen-platform: add support for
- unplugging NVMe disks...
+	(envelope-from <nirsof@gmail.com>) id 1cXGDd-0005nI-3F
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 18:46:16 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34450)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nirsof@gmail.com>) id 1cXGDc-0005mw-Sn
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 18:46:13 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so61519680wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 15:46:11 -0800 (PST)
+From: Nir Soffer <nirsof@gmail.com>
+Date: Sat, 28 Jan 2017 01:45:54 +0200
+Message-Id: <20170127234554.1196-1-nirsof@gmail.com>
+Subject: [Qemu-devel] [PATCH] qemu-img: Do not truncate before preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +23,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Nir Soffer <nirsof@gmail.com>
 
-On Thu, 26 Jan 2017, Paul Durrant wrote:
-> ...not just IDE and SCSI.
-> 
-> This patch allows the Xen tool-stack to fully support of NVMe as an
-> emulated disk type. See [1] for the relevant tool-stack patch discussion.
-> 
-> [1] https://lists.xen.org/archives/html/xen-devel/2017-01/msg01225.html
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+From: Nir Soffer <nsoffer@redhat.com>
 
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+When using file system that does not support fallocate(),
+posix_fallocate() fallback to emulation mode. In this mode, when
+preallocating blocks before file end, posix_preallocate is calling
+one pread() and one pwrite() per block. But when preallocation blocks
+after file end, it calls only one pwrite per block.
 
-I queued the whole series. FYI I am waiting for another patch to fix a
-regression before sending a pull request.
+Truncating the file only when preallocation=OFF speeds up creating raw
+file in this situation.
 
+Here are example run with without and with this change, tested on Fedora
+25 VM, creating a raw image on NFS version 3 mount over 1G nic:
 
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> v3:
-> - Add reference to xen-devel patch discussion in commit message as
->   requested by Stefano.
-> ---
->  hw/i386/xen/xen_platform.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-> index f50915f..7d41ebb 100644
-> --- a/hw/i386/xen/xen_platform.c
-> +++ b/hw/i386/xen/xen_platform.c
-> @@ -120,6 +120,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *o)
->          break;
->  
->      case PCI_CLASS_STORAGE_SCSI:
-> +    case PCI_CLASS_STORAGE_EXPRESS:
->          object_unparent(OBJECT(d));
->          break;
->  
-> -- 
-> 2.1.4
-> 
+$ time ./qemu-img create -f raw -o preallocation=falloc mnt/test 1g
+Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
+
+real 0m17.083s
+user 0m0.020s
+sys 0m0.404s
+
+$ rm mnt/test
+$ time ./qemu-img create -f raw -o preallocation=falloc mnt/test 1g
+Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
+
+real 0m12.372s
+user 0m0.020s
+sys 0m0.376s
+
+$ strace ./qemu-img-up create -f raw -o preallocation=falloc mnt/test 8192
+...
+pread64(9, "\0", 1, 4095)               = 1
+pwrite64(9, "\0", 1, 4095)              = 1
+pread64(9, "\0", 1, 8191)               = 1
+pwrite64(9, "\0", 1, 8191)              = 1
+
+$ strace ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 8192
+...
+pwrite64(9, "\0", 1, 4095)              = 1
+pwrite64(9, "\0", 1, 8191)              = 1
+
+Signed-off-by: Nir Soffer <nirsof@gmail.com>
+---
+ block/file-posix.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 28b47d9..d7f6129 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1588,12 +1588,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+ #endif
+     }
+ 
+-    if (ftruncate(fd, total_size) != 0) {
+-        result = -errno;
+-        error_setg_errno(errp, -result, "Could not resize file");
+-        goto out_close;
+-    }
+-
+     switch (prealloc) {
+ #ifdef CONFIG_POSIX_FALLOCATE
+     case PREALLOC_MODE_FALLOC:
+@@ -1633,6 +1627,10 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+         break;
+     }
+     case PREALLOC_MODE_OFF:
++        if (ftruncate(fd, total_size) != 0) {
++            result = -errno;
++            error_setg_errno(errp, -result, "Could not resize file");
++        }
+         break;
+     default:
+         result = -EINVAL;
+@@ -1641,7 +1639,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+         break;
+     }
+ 
+-out_close:
+     if (qemu_close(fd) != 0 && result == 0) {
+         result = -errno;
+         error_setg_errno(errp, -result, "Could not close the new file");
+-- 
+2.9.3
