@@ -1,19 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cX1bD-0001ai-BQ
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:09:36 -0500
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cX1g1-0003bk-98
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:14:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cX1bC-00034Z-8a
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:09:35 -0500
-Resent-Message-Id: <E1cX1bC-00034Z-8a@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
-Message-ID: <148550455141.27.8723621652077562403@eba24e3a0d7f>
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cX1fx-0004wO-7G
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:14:33 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1cX1fw-0004w3-Tt
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:14:29 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0R8DkK9059937
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:14:27 -0500
+Received: from e28smtp01.in.ibm.com (e28smtp01.in.ibm.com [125.16.236.1])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 287vatkjp3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:14:27 -0500
+Received: from localhost
+	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Fri, 27 Jan 2017 13:44:23 +0530
+Date: Fri, 27 Jan 2017 13:44:16 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<148550455141.27.8723621652077562403@eba24e3a0d7f>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 27 Jan 2017 00:09:13 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <148550455141.27.8723621652077562403@eba24e3a0d7f>
+Message-Id: <20170127081416.GA17330@in.ibm.com>
 Subject: Re: [Qemu-devel] [RFC PATCH v2 0/2] softfloat: Add round-to-odd
  rounding mode
 List-Id: <qemu-devel.nongnu.org>
@@ -24,52 +43,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bharata@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, nikunj@linux.vnet.ibm.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, nikunj@linux.vnet.ibm.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIFBBVENIIHYyIDAvMl0gc29mdGZsb2F0OiBBZGQgcm91
-bmQtdG8tb2RkIHJvdW5kaW5nIG1vZGUKTWVzc2FnZS1pZDogMTQ4NTUwNDIxMy0yMTYzMi0xLWdp
-dC1zZW5kLWVtYWlsLWJoYXJhdGFAbGludXgudm5ldC5pYm0uY29tCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
-ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
-JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
-JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
-dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
-KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
-L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0
-Y2hldy8xNDg1NTA0MjEzLTIxNjMyLTEtZ2l0LXNlbmQtZW1haWwtYmhhcmF0YUBsaW51eC52bmV0
-LmlibS5jb20gLT4gcGF0Y2hldy8xNDg1NTA0MjEzLTIxNjMyLTEtZ2l0LXNlbmQtZW1haWwtYmhh
-cmF0YUBsaW51eC52bmV0LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwoz
-YWRiYWI5IHNvZnRmbG9hdDogQWRkIHJvdW5kLXRvLW9kZCByb3VuZGluZyBtb2RlCmFmZTdmODMg
-c29mdGZsb2F0OiBIYW5kbGUgZmxvYXQ2NCByb3VuZGluZyBwcm9wZXJseSBmb3IgdW5kZXJmbG93
-IGNhc2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogc29mdGZsb2F0
-OiBIYW5kbGUgZmxvYXQ2NCByb3VuZGluZyBwcm9wZXJseSBmb3IgdW5kZXJmbG93IGNhc2UuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMi8yOiBzb2Z0ZmxvYXQ6IEFkZCByb3VuZC10by1vZGQgcm91bmRpbmcg
-bW9kZS4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICctJyAoY3R4Old4VykK
-IzQxOiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6NjQxOgorICAgICAgICAgICAgcmV0dXJuIHBhY2tG
-bG9hdDY0KCB6U2lnbiwgMHg3RkYsIC0gKCAhb3ZlcmZsb3dfdG9faW5mICkpOwogICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBwcm9o
-aWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzQxOiBGSUxFOiBmcHUvc29m
-dGZsb2F0LmM6NjQxOgorICAgICAgICAgICAgcmV0dXJuIHBhY2tGbG9hdDY0KCB6U2lnbiwgMHg3
-RkYsIC0gKCAhb3ZlcmZsb3dfdG9faW5mICkpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVm
-b3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiM0MTogRklMRTogZnB1L3NvZnRmbG9hdC5j
-OjY0MToKKyAgICAgICAgICAgIHJldHVybiBwYWNrRmxvYXQ2NCggelNpZ24sIDB4N0ZGLCAtICgg
-IW92ZXJmbG93X3RvX2luZiApKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQg
-b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzY5OiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6MTE5OToKKyAg
-ICAgICAgICAgICAgICAgfHwgKCByb3VuZGluZ01vZGUgPT0gZmxvYXRfcm91bmRfdG9fb2RkICkK
-CkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcp
-JwojNjk6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoxMTk5OgorICAgICAgICAgICAgICAgICB8fCAo
-IHJvdW5kaW5nTW9kZSA9PSBmbG9hdF9yb3VuZF90b19vZGQgKQoKdG90YWw6IDUgZXJyb3JzLCAw
-IHdhcm5pbmdzLCA2MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Fri, Jan 27, 2017 at 12:09:13AM -0800, no-reply@patchew.org wrote:
+> Hi,
+> 
+> Your series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Type: series
+> Subject: [Qemu-devel] [RFC PATCH v2 0/2] softfloat: Add round-to-odd rounding mode
+> Message-id: 1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com
+> 
+> Checking PATCH 1/2: softfloat: Handle float64 rounding properly for underflow case...
+> Checking PATCH 2/2: softfloat: Add round-to-odd rounding mode...
+> ERROR: space prohibited after that '-' (ctx:WxW)
+> #41: FILE: fpu/softfloat.c:641:
+> +            return packFloat64( zSign, 0x7FF, - ( !overflow_to_inf ));
+>                                                ^
+> 
+> ERROR: space prohibited after that open parenthesis '('
+> #41: FILE: fpu/softfloat.c:641:
+> +            return packFloat64( zSign, 0x7FF, - ( !overflow_to_inf ));
+> 
+> ERROR: space prohibited before that close parenthesis ')'
+> #41: FILE: fpu/softfloat.c:641:
+> +            return packFloat64( zSign, 0x7FF, - ( !overflow_to_inf ));
+> 
+> ERROR: space prohibited after that open parenthesis '('
+> #69: FILE: fpu/softfloat.c:1199:
+> +                 || ( roundingMode == float_round_to_odd )
+> 
+> ERROR: space prohibited before that close parenthesis ')'
+> #69: FILE: fpu/softfloat.c:1199:
+> +                 || ( roundingMode == float_round_to_odd )
+> 
+> total: 5 errors, 0 warnings, 62 lines checked
+
+fpu/softfloat.c follows a different coding style and hence it made
+sense to stick to the existing style in the file.
+
+Regards,
+Bharata.
