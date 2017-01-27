@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cX8DN-0005bD-BI
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:13:29 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cX8Jv-0002uZ-T1
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cX8DK-0007lC-6I
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:13:25 -0500
-Date: Fri, 27 Jan 2017 16:13:07 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170127151307.meioko5vsz7otxfn@hawk.localdomain>
-References: <98b1ad64-fe10-4ede-3493-f6d4b49ee1d9@sysgo.com>
-	<CAFEAcA8asry6LGTuv+SLVyemNVFk9Q7WhU74Cc2YA_yud8qPMg@mail.gmail.com>
-	<20170112113619.zuc5tuhmhzvawnmz@hawk.localdomain>
-	<CAFEAcA_OBx2ADDOU6Z6_27+EdbWS-1QJde5mB+sKrv0wYrKG1Q@mail.gmail.com>
-	<CAFEAcA8dDcMowqa5NO_NpN7+V-_=VqRSH_9rQGpXKSvYuh4Teg@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cX8Ju-0001OV-SL
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:11 -0500
+Received: from mail-vk0-x22e.google.com ([2607:f8b0:400c:c05::22e]:36467)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cX8Ju-0001OD-NQ
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:10 -0500
+Received: by mail-vk0-x22e.google.com with SMTP id t8so177237373vke.3
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 07:20:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8dDcMowqa5NO_NpN7+V-_=VqRSH_9rQGpXKSvYuh4Teg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] pflash_cfi01: fix per device sector length
- in CFI table
+In-Reply-To: <1485447262-27014-1-git-send-email-mst@redhat.com>
+References: <1485447262-27014-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Jan 2017 15:19:49 +0000
+Message-ID: <CAFEAcA8avJj04_w_GSriA5MsMKGAwLOar1-e1MgVroe+OyUGqA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/18] virtio, vhost, pci: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: David Engraf <david.engraf@sysgo.com>, Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jan 27, 2017 at 02:54:20PM +0000, Peter Maydell wrote:
-> On 27 January 2017 at 14:31, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > On 12 January 2017 at 11:36, Andrew Jones <drjones@redhat.com> wrote:
-> >> On Thu, Jan 12, 2017 at 10:42:41AM +0000, Peter Maydell wrote:
-> >>> Thanks for the patch. I haven't checked against the pflash spec yet,
-> >>> but this looks like it's probably the right thing.
-> >>>
-> >>> The only two machines which use a setup with multiple devices (ie
-> >>> which specify device_width to the pflash_cfi01) are vexpress and virt.
-> >>> For all other machines this patch leaves the behaviour unchanged.
-> >>>
-> >>> Q: do we need to have some kind of nasty hack so that pre-2.9 virt
-> >>> still gets the old broken values in the CFI table, for version and
-> >>> migration compatibility? Ccing Drew for an opinion...
-> >>>
-> >>
-> >> I'm pretty sure we need the nasty hack, but I'm also Ccing David for
-> >> his opinion.
-> >
-> > So given our decision about not needing the back-compat property
-> > for the UEFI table entry, do we still agree that we need one here?
-> 
-> Looking more closely at the patch, changing writeblock underneath
-> a guest's feet is probably not very polite, so let's take the safe
-> path of making it version-dependent.
+On 26 January 2017 at 16:15, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit ae5045ae5b2bbd8ce1335d1b05f9ecacca83a6=
+cf:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-nios-20170124' into=
+ staging (2017-01-25 13:30:23 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 1954d8b17bbccad723c193edba961d49b7ac4a43:
+>
+>   hw/pci: disable pci-bridge's shpc by default (2017-01-26 18:13:33 +0200=
+)
+>
+> ----------------------------------------------------------------
+> virtio, vhost, pci: fixes, features
+>
+> generic pci root port support
+> disable shpc by default
+> safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
+> fixes and cleanups all over the place
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
 
-Right, and I think ACPI generation is getting a bit of special treatment
-due to its status as "part of firmware". Hardware should probably never
-change.
+Failure to build, x86:
 
-> 
-> I've applied David's patch to target-arm.next (with some tweaks to
-> the commit message).
-> 
-> thanks
-> -- PMM
+/home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c: In function
+=E2=80=98spapr_phb_placement=E2=80=99:
+/home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c:2643:20: error:
+bit-field =E2=80=98<anonymous>=E2=80=99 width n
+ot an integer constant
+     QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_IO_WIN_SIZE) >
+SPAPR_PCI_MEM32_WIN_SIZE);
+                    ^
+/home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c:2644:20: error:
+bit-field =E2=80=98<anonymous>=E2=80=99 width not an integer constant
+     QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_MEM32_WIN_SIZE) >
+SPAPR_PCI_MEM64_WIN_SIZE);
+                    ^
 
-Thanks,
-drew
+Failure to build, aarch64 and aarch32:
+
+In file included from /home/petmay01/qemu/target/arm/cpu.h:23:0,
+                 from /home/petmay01/qemu/trace/control-target.c:11:
+/home/petmay01/qemu/target/arm/kvm-consts.h:35:1: error: expected ','
+or ';' before 'typedef'
+ MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK)
+ ^
+/home/petmay01/qemu/target/arm/kvm-consts.h:35:83: error: data
+definition has no type or storage cla
+ss [-Werror]
+ MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK)
+
+            ^
+/home/petmay01/qemu/target/arm/kvm-consts.h:35:83: error: type
+defaults to 'int' in declaration of '
+qemu_build_bug_on__35' [-Werror=3Dimplicit-int]
+
+(repeated for all the other uses of MISMATCH_CHECK in that header)
+
+thanks
+-- PMM
