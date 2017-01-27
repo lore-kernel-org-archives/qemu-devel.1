@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX3wG-0003H8-8R
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:29 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cX3wI-0003J4-DG
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX3wF-0003Tu-0p
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:28 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36038)
+	(envelope-from <alex.bennee@linaro.org>) id 1cX3wH-0003VA-7H
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:30 -0500
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:37584)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cX3wE-0003Td-OZ
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:26 -0500
-Received: by mail-wm0-x234.google.com with SMTP id c85so110609526wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 02:39:26 -0800 (PST)
+	id 1cX3wG-0003UQ-Uw
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:29 -0500
+Received: by mail-wm0-x22d.google.com with SMTP id c206so130177130wme.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 02:39:28 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 27 Jan 2017 10:38:59 +0000
-Message-Id: <20170127103922.19658-3-alex.bennee@linaro.org>
+Date: Fri, 27 Jan 2017 10:39:01 +0000
+Message-Id: <20170127103922.19658-5-alex.bennee@linaro.org>
 In-Reply-To: <20170127103922.19658-1-alex.bennee@linaro.org>
 References: <20170127103922.19658-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 02/25] mttcg: translate-all: Enable locking
- debug in a debug build
+Subject: [Qemu-devel] [PATCH v8 04/25] tcg: move TCG_MO/BAR types into own
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,155 +31,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
-Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Pranith Kumar <bobby.prani@gmail.com>
+We'll be using the memory ordering definitions to define values for
+both the host and guest. To avoid fighting with circular header
+dependencies just move these types into their own minimal header.
 
-Enable tcg lock debug asserts in a debug build by default instead of
-relying on DEBUG_LOCKING. None of the other DEBUG_* macros have
-asserts, so this patch removes DEBUG_LOCKING and enable these asserts
-in a debug build.
-
-CC: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-[AJB: tweak ifdefs so can be early in series]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- translate-all.c | 52 ++++++++++++++++------------------------------------
- 1 file changed, 16 insertions(+), 36 deletions(-)
+ tcg/tcg-mo.h | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.h    | 18 +-----------------
+ 2 files changed, 46 insertions(+), 17 deletions(-)
+ create mode 100644 tcg/tcg-mo.h
 
-diff --git a/translate-all.c b/translate-all.c
-index 20262938bb..055436a676 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -59,7 +59,6 @@
- 
- /* #define DEBUG_TB_INVALIDATE */
- /* #define DEBUG_TB_FLUSH */
--/* #define DEBUG_LOCKING */
- /* make various TB consistency checks */
- /* #define DEBUG_TB_CHECK */
- 
-@@ -74,20 +73,10 @@
-  * access to the memory related structures are protected with the
-  * mmap_lock.
-  */
--#ifdef DEBUG_LOCKING
--#define DEBUG_MEM_LOCKS 1
--#else
--#define DEBUG_MEM_LOCKS 0
--#endif
--
- #ifdef CONFIG_SOFTMMU
- #define assert_memory_lock() do { /* nothing */ } while (0)
- #else
--#define assert_memory_lock() do {               \
--        if (DEBUG_MEM_LOCKS) {                  \
--            g_assert(have_mmap_lock());         \
--        }                                       \
--    } while (0)
-+#define assert_memory_lock() tcg_debug_assert(have_mmap_lock())
- #endif
- 
- #define SMC_BITMAP_USE_THRESHOLD 10
-@@ -169,10 +158,18 @@ static void page_table_config_init(void)
-     assert(v_l2_levels >= 0);
- }
- 
-+#ifdef CONFIG_USER_ONLY
-+#define assert_tb_locked() tcg_debug_assert(have_tb_lock)
-+#define assert_tb_unlocked() tcg_debug_assert(!have_tb_lock)
-+#else
-+#define assert_tb_locked()  do { /* nothing */ } while (0)
-+#define assert_tb_unlocked()  do { /* nothing */ } while (0)
-+#endif
+diff --git a/tcg/tcg-mo.h b/tcg/tcg-mo.h
+new file mode 100644
+index 0000000000..429b022561
+--- /dev/null
++++ b/tcg/tcg-mo.h
+@@ -0,0 +1,45 @@
++/*
++ * Tiny Code Generator for QEMU
++ *
++ * Copyright (c) 2008 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
- void tb_lock(void)
- {
- #ifdef CONFIG_USER_ONLY
--    assert(!have_tb_lock);
-+    assert_tb_unlocked();
-     qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
-     have_tb_lock++;
- #endif
-@@ -181,7 +178,7 @@ void tb_lock(void)
- void tb_unlock(void)
- {
- #ifdef CONFIG_USER_ONLY
--    assert(have_tb_lock);
-+    assert_tb_locked();
-     have_tb_lock--;
-     qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
- #endif
-@@ -197,23 +194,6 @@ void tb_lock_reset(void)
- #endif
- }
++#ifndef TCG_MO_H
++#define TCG_MO_H
++
++typedef enum {
++    /* Used to indicate the type of accesses on which ordering
++       is to be ensured.  Modeled after SPARC barriers.  */
++    TCG_MO_LD_LD  = 0x01,
++    TCG_MO_ST_LD  = 0x02,
++    TCG_MO_LD_ST  = 0x04,
++    TCG_MO_ST_ST  = 0x08,
++    TCG_MO_ALL    = 0x0F,  /* OR of the above */
++
++    /* Used to indicate the kind of ordering which is to be ensured by the
++       instruction.  These types are derived from x86/aarch64 instructions.
++       It should be noted that these are different from C11 semantics.  */
++    TCG_BAR_LDAQ  = 0x10,  /* Following ops will not come forward */
++    TCG_BAR_STRL  = 0x20,  /* Previous ops will not be delayed */
++    TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
++} TCGBar;
++
++#endif /* TCG_MO_H */
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 631c6f69b1..f946452049 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -29,6 +29,7 @@
+ #include "cpu.h"
+ #include "exec/tb-context.h"
+ #include "qemu/bitops.h"
++#include "tcg-mo.h"
+ #include "tcg-target.h"
  
--#ifdef DEBUG_LOCKING
--#define DEBUG_TB_LOCKS 1
--#else
--#define DEBUG_TB_LOCKS 0
--#endif
+ /* XXX: make safe guess about sizes */
+@@ -498,23 +499,6 @@ static inline intptr_t QEMU_ARTIFICIAL GET_TCGV_PTR(TCGv_ptr t)
+ #define TCG_CALL_DUMMY_TCGV     MAKE_TCGV_I32(-1)
+ #define TCG_CALL_DUMMY_ARG      ((TCGArg)(-1))
+ 
+-typedef enum {
+-    /* Used to indicate the type of accesses on which ordering
+-       is to be ensured.  Modeled after SPARC barriers.  */
+-    TCG_MO_LD_LD  = 0x01,
+-    TCG_MO_ST_LD  = 0x02,
+-    TCG_MO_LD_ST  = 0x04,
+-    TCG_MO_ST_ST  = 0x08,
+-    TCG_MO_ALL    = 0x0F,  /* OR of the above */
 -
--#ifdef CONFIG_SOFTMMU
--#define assert_tb_lock() do { /* nothing */ } while (0)
--#else
--#define assert_tb_lock() do {               \
--        if (DEBUG_TB_LOCKS) {               \
--            g_assert(have_tb_lock);         \
--        }                                   \
--    } while (0)
--#endif
+-    /* Used to indicate the kind of ordering which is to be ensured by the
+-       instruction.  These types are derived from x86/aarch64 instructions.
+-       It should be noted that these are different from C11 semantics.  */
+-    TCG_BAR_LDAQ  = 0x10,  /* Following ops will not come forward */
+-    TCG_BAR_STRL  = 0x20,  /* Previous ops will not be delayed */
+-    TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
+-} TCGBar;
 -
--
- static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
- 
- void cpu_gen_init(void)
-@@ -847,7 +827,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- {
-     TranslationBlock *tb;
- 
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     if (tcg_ctx.tb_ctx.nb_tbs >= tcg_ctx.code_gen_max_blocks) {
-         return NULL;
-@@ -862,7 +842,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- /* Called with tb_lock held.  */
- void tb_free(TranslationBlock *tb)
- {
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     /* In practice this is mostly used for single use temporary TB
-        Ignore the hard cases and just back up if this TB happens to
-@@ -1104,7 +1084,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
-     uint32_t h;
-     tb_page_addr_t phys_pc;
- 
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     atomic_set(&tb->invalid, true);
- 
-@@ -1419,7 +1399,7 @@ static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_addr_t end)
- #ifdef CONFIG_SOFTMMU
- void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
- {
--    assert_tb_lock();
-+    assert_tb_locked();
-     tb_invalidate_phys_range_1(start, end);
- }
- #else
-@@ -1462,7 +1442,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
- #endif /* TARGET_HAS_PRECISE_SMC */
- 
-     assert_memory_lock();
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     p = page_find(start >> TARGET_PAGE_BITS);
-     if (!p) {
+ /* Conditions.  Note that these are laid out for easy manipulation by
+    the functions below:
+      bit 0 is used for inverting;
 -- 
 2.11.0
