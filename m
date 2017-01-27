@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cX1WX-0006Jg-Nw
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:04:52 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cX1bD-0001ai-BQ
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:09:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cX1WU-0001WE-HM
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:04:45 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39830)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cX1WU-0001Vm-8h
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:04:42 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0R7xixA103541
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:04:41 -0500
-Received: from e23smtp02.au.ibm.com (e23smtp02.au.ibm.com [202.81.31.144])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 287vabb45c-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:04:41 -0500
-Received: from localhost
-	by e23smtp02.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Fri, 27 Jan 2017 18:04:38 +1000
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Fri, 27 Jan 2017 13:33:33 +0530
+	(envelope-from <no-reply@patchew.org>) id 1cX1bC-00034Z-8a
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 03:09:35 -0500
+Resent-Message-Id: <E1cX1bC-00034Z-8a@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
 In-Reply-To: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
-References: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
-Message-Id: <1485504213-21632-3-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v2 2/2] softfloat: Add round-to-odd
+Message-ID: <148550455141.27.8723621652077562403@eba24e3a0d7f>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 27 Jan 2017 00:09:13 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/2] softfloat: Add round-to-odd
  rounding mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -38,101 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: bharata@linux.vnet.ibm.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, nikunj@linux.vnet.ibm.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 
-Power ISA 3.0 introduces a few quadruple precision floating point
-instructions that support round-to-odd rounding mode. The
-round-to-odd mode is explained as under:
-
-Let Z be the intermediate arithmetic result or the operand of a convert
-operation. If Z can be represented exactly in the target format, the
-result is Z. Otherwise the result is either Z1 or Z2 whichever is odd.
-Here Z1 and Z2 are the next larger and smaller numbers representable
-in the target format respectively.
-
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
----
- fpu/softfloat.c         | 17 ++++++++++++++++-
- include/fpu/softfloat.h |  2 ++
- 2 files changed, 18 insertions(+), 1 deletion(-)
-
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index b04699c..1c322ad 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -623,6 +623,9 @@ static float64 roundAndPackFloat64(flag zSign, int zExp, uint64_t zSig,
-     case float_round_down:
-         roundIncrement = zSign ? 0x3ff : 0;
-         break;
-+    case float_round_to_odd:
-+        roundIncrement = (zSig & 0x400) ? 0 : 0x3ff;
-+        break;
-     default:
-         abort();
-     }
-@@ -632,8 +635,10 @@ static float64 roundAndPackFloat64(flag zSign, int zExp, uint64_t zSig,
-              || (    ( zExp == 0x7FD )
-                   && ( (int64_t) ( zSig + roundIncrement ) < 0 ) )
-            ) {
-+            bool overflow_to_inf = roundingMode != float_round_to_odd &&
-+                                   roundIncrement != 0;
-             float_raise(float_flag_overflow | float_flag_inexact, status);
--            return packFloat64( zSign, 0x7FF, - ( roundIncrement == 0 ));
-+            return packFloat64( zSign, 0x7FF, - ( !overflow_to_inf ));
-         }
-         if ( zExp < 0 ) {
-             if (status->flush_to_zero) {
-@@ -665,6 +670,9 @@ static float64 roundAndPackFloat64(flag zSign, int zExp, uint64_t zSig,
-             case float_round_down:
-                 roundIncrement = zSign ? 0x3ff : 0;
-                 break;
-+            case float_round_to_odd:
-+                roundIncrement = (zSig & 0x400) ? 0 : 0x3ff;
-+                break;
-             default:
-                 abort();
-             }
-@@ -1166,6 +1174,9 @@ static float128 roundAndPackFloat128(flag zSign, int32_t zExp,
-     case float_round_down:
-         increment = zSign && zSig2;
-         break;
-+    case float_round_to_odd:
-+        increment = !(zSig1 & 0x1) && zSig2;
-+        break;
-     default:
-         abort();
-     }
-@@ -1185,6 +1196,7 @@ static float128 roundAndPackFloat128(flag zSign, int32_t zExp,
-             if (    ( roundingMode == float_round_to_zero )
-                  || ( zSign && ( roundingMode == float_round_up ) )
-                  || ( ! zSign && ( roundingMode == float_round_down ) )
-+                 || ( roundingMode == float_round_to_odd )
-                ) {
-                 return
-                     packFloat128(
-@@ -1232,6 +1244,9 @@ static float128 roundAndPackFloat128(flag zSign, int32_t zExp,
-             case float_round_down:
-                 increment = zSign && zSig2;
-                 break;
-+            case float_round_to_odd:
-+                increment = !(zSig1 & 0x1) && zSig2;
-+                break;
-             default:
-                 abort();
-             }
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 842ec6b..8a39028 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -180,6 +180,8 @@ enum {
-     float_round_up           = 2,
-     float_round_to_zero      = 3,
-     float_round_ties_away    = 4,
-+    /* Not an IEEE rounding mode: round to the closest odd mantissa value */
-+    float_round_to_odd       = 5,
- };
- 
- /*----------------------------------------------------------------------------
--- 
-2.7.4
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIFBBVENIIHYyIDAvMl0gc29mdGZsb2F0OiBBZGQgcm91
+bmQtdG8tb2RkIHJvdW5kaW5nIG1vZGUKTWVzc2FnZS1pZDogMTQ4NTUwNDIxMy0yMTYzMi0xLWdp
+dC1zZW5kLWVtYWlsLWJoYXJhdGFAbGludXgudm5ldC5pYm0uY29tCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
+ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
+L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0
+Y2hldy8xNDg1NTA0MjEzLTIxNjMyLTEtZ2l0LXNlbmQtZW1haWwtYmhhcmF0YUBsaW51eC52bmV0
+LmlibS5jb20gLT4gcGF0Y2hldy8xNDg1NTA0MjEzLTIxNjMyLTEtZ2l0LXNlbmQtZW1haWwtYmhh
+cmF0YUBsaW51eC52bmV0LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwoz
+YWRiYWI5IHNvZnRmbG9hdDogQWRkIHJvdW5kLXRvLW9kZCByb3VuZGluZyBtb2RlCmFmZTdmODMg
+c29mdGZsb2F0OiBIYW5kbGUgZmxvYXQ2NCByb3VuZGluZyBwcm9wZXJseSBmb3IgdW5kZXJmbG93
+IGNhc2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogc29mdGZsb2F0
+OiBIYW5kbGUgZmxvYXQ2NCByb3VuZGluZyBwcm9wZXJseSBmb3IgdW5kZXJmbG93IGNhc2UuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMi8yOiBzb2Z0ZmxvYXQ6IEFkZCByb3VuZC10by1vZGQgcm91bmRpbmcg
+bW9kZS4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICctJyAoY3R4Old4VykK
+IzQxOiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6NjQxOgorICAgICAgICAgICAgcmV0dXJuIHBhY2tG
+bG9hdDY0KCB6U2lnbiwgMHg3RkYsIC0gKCAhb3ZlcmZsb3dfdG9faW5mICkpOwogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBwcm9o
+aWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzQxOiBGSUxFOiBmcHUvc29m
+dGZsb2F0LmM6NjQxOgorICAgICAgICAgICAgcmV0dXJuIHBhY2tGbG9hdDY0KCB6U2lnbiwgMHg3
+RkYsIC0gKCAhb3ZlcmZsb3dfdG9faW5mICkpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVm
+b3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiM0MTogRklMRTogZnB1L3NvZnRmbG9hdC5j
+OjY0MToKKyAgICAgICAgICAgIHJldHVybiBwYWNrRmxvYXQ2NCggelNpZ24sIDB4N0ZGLCAtICgg
+IW92ZXJmbG93X3RvX2luZiApKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQg
+b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzY5OiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6MTE5OToKKyAg
+ICAgICAgICAgICAgICAgfHwgKCByb3VuZGluZ01vZGUgPT0gZmxvYXRfcm91bmRfdG9fb2RkICkK
+CkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcp
+JwojNjk6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoxMTk5OgorICAgICAgICAgICAgICAgICB8fCAo
+IHJvdW5kaW5nTW9kZSA9PSBmbG9hdF9yb3VuZF90b19vZGQgKQoKdG90YWw6IDUgZXJyb3JzLCAw
+IHdhcm5pbmdzLCA2MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAZnJlZWxpc3RzLm9yZw==
