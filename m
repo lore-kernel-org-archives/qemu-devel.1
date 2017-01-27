@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX3wJ-0003Ke-Uw
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:34 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cX3wP-0003Pb-Eo
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX3wI-0003Vd-R7
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:32 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37600)
+	(envelope-from <alex.bennee@linaro.org>) id 1cX3wM-0003XZ-3C
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:37 -0500
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37627)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cX3wI-0003VL-La
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:30 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id c206so130178294wme.0
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 02:39:30 -0800 (PST)
+	id 1cX3wL-0003Wh-Ps
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 05:39:33 -0500
+Received: by mail-wm0-x230.google.com with SMTP id c206so130180345wme.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 02:39:33 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 27 Jan 2017 10:39:03 +0000
-Message-Id: <20170127103922.19658-7-alex.bennee@linaro.org>
+Date: Fri, 27 Jan 2017 10:39:06 +0000
+Message-Id: <20170127103922.19658-10-alex.bennee@linaro.org>
 In-Reply-To: <20170127103922.19658-1-alex.bennee@linaro.org>
 References: <20170127103922.19658-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 06/25] tcg: add kick timer for
- single-threaded vCPU emulation
+Subject: [Qemu-devel] [PATCH v8 09/25] tcg: remove global exit_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,128 +32,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
 Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Currently we rely on the side effect of the main loop grabbing the
-iothread_mutex to give any long running basic block chains a kick to
-ensure the next vCPU is scheduled. As this code is being re-factored and
-rationalised we now do it explicitly here.
+There are now only two uses of the global exit_request left.
+
+The first ensures we exit the run_loop when we first start to process
+pending work and in the kick handler. This is just as easily done by
+setting the first_cpu->exit_request flag.
+
+The second use is in the round robin kick routine. The global
+exit_request ensured every vCPU would set its local exit_request and
+cause a full exit of the loop. Now the iothread isn't being held while
+running we can just rely on the kick handler to push us out as intended.
+
+We lightly re-factor the main vCPU thread to ensure cpu->exit_requests
+cause us to exit the main loop and process any IO requests that might
+come along.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
-v2
-  - re-base fixes
-  - get_ticks_per_sec() -> NANOSECONDS_PER_SEC
-v3
-  - add define for TCG_KICK_FREQ
-  - fix checkpatch warning
-v4
-  - wrap next calc in inline qemu_tcg_next_kick() instead of macro
 v5
-  - move all kick code into own section
-  - use global for timer
-  - add helper functions to start/stop timer
-  - stop timer when all cores paused
-v7
-  - checkpatch > 80 char fix
+  - minor merge conflict with kick patch
+v4
+  - moved to after iothread unlocking patch
+  - needed to remove kick exit_request as well.
+  - remove extraneous cpu->exit_request check
+  - remove stray exit_request setting
+  - remove needless atomic operation
 ---
- cpus.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+ cpu-exec-common.c       |  2 --
+ cpu-exec.c              |  9 ++-------
+ cpus.c                  | 18 ++++++++++--------
+ include/exec/exec-all.h |  3 ---
+ 4 files changed, 12 insertions(+), 20 deletions(-)
 
+diff --git a/cpu-exec-common.c b/cpu-exec-common.c
+index e2bc053372..0504a9457b 100644
+--- a/cpu-exec-common.c
++++ b/cpu-exec-common.c
+@@ -23,8 +23,6 @@
+ #include "exec/exec-all.h"
+ #include "exec/memory-internal.h"
+ 
+-bool exit_request;
+-
+ /* exit the current TB, but without causing any exception to be raised */
+ void cpu_loop_exit_noexc(CPUState *cpu)
+ {
+diff --git a/cpu-exec.c b/cpu-exec.c
+index f42a128bdf..cc09c1fc37 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -565,9 +565,8 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+         /* Something asked us to stop executing
+          * chained TBs; just continue round the main
+          * loop. Whatever requested the exit will also
+-         * have set something else (eg exit_request or
+-         * interrupt_request) which we will handle
+-         * next time around the loop.  But we need to
++         * have set something else (eg interrupt_request) which we
++         * will handle next time around the loop.  But we need to
+          * ensure the tcg_exit_req read in generated code
+          * comes before the next read of cpu->exit_request
+          * or cpu->interrupt_request.
+@@ -623,10 +622,6 @@ int cpu_exec(CPUState *cpu)
+ 
+     rcu_read_lock();
+ 
+-    if (unlikely(atomic_mb_read(&exit_request))) {
+-        cpu->exit_request = 1;
+-    }
+-
+     cc->cpu_exec_enter(cpu);
+ 
+     /* Calculate difference between guest clock and host clock.
 diff --git a/cpus.c b/cpus.c
-index 76b6e04332..a98925105c 100644
+index c48bc8d5b3..18daf41dae 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -767,6 +767,53 @@ void configure_icount(QemuOpts *opts, Error **errp)
- }
- 
- /***********************************************************/
-+/* TCG vCPU kick timer
-+ *
-+ * The kick timer is responsible for moving single threaded vCPU
-+ * emulation on to the next vCPU. If more than one vCPU is running a
-+ * timer event with force a cpu->exit so the next vCPU can get
-+ * scheduled.
-+ *
-+ * The timer is removed if all vCPUs are idle and restarted again once
-+ * idleness is complete.
-+ */
-+
-+static QEMUTimer *tcg_kick_vcpu_timer;
-+
-+static void qemu_cpu_kick_no_halt(void);
-+
-+#define TCG_KICK_PERIOD (NANOSECONDS_PER_SECOND / 10)
-+
-+static inline int64_t qemu_tcg_next_kick(void)
-+{
-+    return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + TCG_KICK_PERIOD;
-+}
-+
-+static void kick_tcg_thread(void *opaque)
-+{
-+    timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
-+    qemu_cpu_kick_no_halt();
-+}
-+
-+static void start_tcg_kick_timer(void)
-+{
-+    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
-+        tcg_kick_vcpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                                           kick_tcg_thread, NULL);
-+        timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
-+    }
-+}
-+
-+static void stop_tcg_kick_timer(void)
-+{
-+    if (tcg_kick_vcpu_timer) {
-+        timer_del(tcg_kick_vcpu_timer);
-+        tcg_kick_vcpu_timer = NULL;
-+    }
-+}
-+
-+
-+/***********************************************************/
- void hw_error(const char *fmt, ...)
+@@ -792,7 +792,6 @@ static inline int64_t qemu_tcg_next_kick(void)
+ static void qemu_cpu_kick_rr_cpu(void)
  {
-     va_list ap;
-@@ -1020,9 +1067,12 @@ static void qemu_wait_io_event_common(CPUState *cpu)
- static void qemu_tcg_wait_io_event(CPUState *cpu)
- {
-     while (all_cpu_threads_idle()) {
-+        stop_tcg_kick_timer();
-         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-     }
+     CPUState *cpu;
+-    atomic_mb_set(&exit_request, 1);
+     do {
+         cpu = atomic_mb_read(&tcg_current_rr_cpu);
+         if (cpu) {
+@@ -1315,11 +1314,11 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
  
-+    start_tcg_kick_timer();
-+
-     while (iothread_requesting_mutex) {
-         qemu_cond_wait(&qemu_io_proceeded_cond, &qemu_global_mutex);
-     }
-@@ -1222,6 +1272,15 @@ static void deal_with_unplugged_cpus(void)
-     }
- }
+     start_tcg_kick_timer();
  
-+/* Single-threaded TCG
-+ *
-+ * In the single-threaded case each vCPU is simulated in turn. If
-+ * there is more than a single vCPU we create a simple timer to kick
-+ * the vCPU and ensure we don't get stuck in a tight loop in one vCPU.
-+ * This is done explicitly rather than relying on side-effects
-+ * elsewhere.
-+ */
+-    /* process any pending work */
+-    atomic_mb_set(&exit_request, 1);
+-
+     cpu = first_cpu;
+ 
++    /* process any pending work */
++    cpu->exit_request = 1;
 +
- static void *qemu_tcg_cpu_thread_fn(void *arg)
- {
-     CPUState *cpu = arg;
-@@ -1248,6 +1307,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+     while (1) {
+         /* Account partial waits to QEMU_CLOCK_VIRTUAL.  */
+         qemu_account_warp_timer();
+@@ -1328,7 +1327,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+             cpu = first_cpu;
          }
-     }
  
-+    start_tcg_kick_timer();
+-        for (; cpu != NULL && !exit_request; cpu = CPU_NEXT(cpu)) {
++        while (cpu && !cpu->exit_request) {
+             atomic_mb_set(&tcg_current_rr_cpu, cpu);
+ 
+             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
+@@ -1348,12 +1347,15 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+                 break;
+             }
+ 
+-        } /* for cpu.. */
++            cpu = CPU_NEXT(cpu);
++        } /* while (cpu && !cpu->exit_request).. */
 +
-     /* process any pending work */
-     atomic_mb_set(&exit_request, 1);
+         /* Does not need atomic_mb_set because a spurious wakeup is okay.  */
+         atomic_set(&tcg_current_rr_cpu, NULL);
  
+-        /* Pairs with smp_wmb in qemu_cpu_kick.  */
+-        atomic_mb_set(&exit_request, 0);
++        if (cpu && cpu->exit_request) {
++            atomic_mb_set(&cpu->exit_request, 0);
++        }
+ 
+         handle_icount_deadline();
+ 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 3cbd359dd7..bd4622ac5d 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -403,7 +403,4 @@ bool memory_region_is_unassigned(MemoryRegion *mr);
+ /* vl.c */
+ extern int singlestep;
+ 
+-/* cpu-exec.c, accessed with atomic_mb_read/atomic_mb_set */
+-extern bool exit_request;
+-
+ #endif
 -- 
 2.11.0
