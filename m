@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cX90a-0008JI-JS
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:04:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cX92H-0001aB-FB
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cX90Z-0008Uz-Fp
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:04:16 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
-	<1485443388-27253-9-git-send-email-armbru@redhat.com>
-	<9684a908-f425-82d8-046b-19cc17d01f55@redhat.com>
-	<87r33o3emm.fsf@dusky.pond.sub.org>
-	<2bcf4c7c-5c29-fda5-1ba3-5828600a8995@redhat.com>
-Date: Fri, 27 Jan 2017 17:04:05 +0100
-In-Reply-To: <2bcf4c7c-5c29-fda5-1ba3-5828600a8995@redhat.com> (John Snow's
-	message of "Fri, 27 Jan 2017 09:15:19 -0500")
-Message-ID: <8760l0ebgq.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1cX92D-0000Pq-Fy
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:06:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55820)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cX92D-0000Pk-A0
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:05:57 -0500
+References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
+	<20170118175335-mutt-send-email-mst@kernel.org>
+	<CAAibmn3GJWWun69KCHp+0qCBo=fjg1_xg+R_o+Qyro48a7Y_zQ@mail.gmail.com>
+	<20170123121204.547e6415@nial.brq.redhat.com>
+	<CAAibmn1j8819O1UbSOQphe=2-uAt29uYQXhOkCnc_BKiYovD9w@mail.gmail.com>
+	<20170127145737.3796d088@nial.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d0356bad-17cf-657f-007b-a19e1c88d7a3@redhat.com>
+Date: Fri, 27 Jan 2017 17:05:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] hw: Drop superfluous special checks
- for orphaned -drive
+In-Reply-To: <20170127145737.3796d088@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mreitz@redhat.com, =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>
+To: Igor Mammedov <imammedo@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-John Snow <jsnow@redhat.com> writes:
 
-> On 01/27/2017 06:51 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> On 01/26/2017 10:09 AM, Markus Armbruster wrote:
->>>> We've traditionally rejected orphans here and there, but not
->>>> systematically.  For instance, the sun4m machines have an onboard SCSI
->>>> HBA (bus=0), and have always rejected bus>0.  Other machines with an
->>>> onboard SCSI HBA don't.
->>>>
->>>> Commit a66c9dc made all orphans trigger a warning, and the previous
->>>> commit turned this into an error.  The checks "here and there" are now
->>>> redundant.  Drop them.
->>>>
->>>> Note that the one in mips_jazz.c was wrong: it rejected bus > MAX_FD,
->>>> but MAX_FD is the number of floppy drives per bus.
->>>>
->>>> Error messages change from
->>>>
->>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
->>>>     qemu-system-x86_64: Too many IDE buses defined (3 > 2)
->>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
->>>>     qemu: too many floppy drives
->>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
->>>>     qemu: too many SCSI bus
->>>>
->>>> to
->>>>
->>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
->>>>     qemu-system-x86_64: -drive if=ide,bus=2: machine type does not support this drive
->>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
->>>>     qemu-system-mips64: -drive if=floppy,bus=2,id=fd1: machine type does not support this drive
->>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
->>>>     qemu-system-sparc: -drive if=scsi,bus=1: machine type does not support this drive
->>>>
->>>
->>> Hm, that's a lot less helpful, isn't it? Can we augment with hints?
->> 
->> The message itself may be less specific, but it now comes with a precise
->> location.  Personally, I'd even find
->> 
->>     qemu-system-sparc: -drive if=scsi,bus=1: *mumble* *mumble*
->> 
->> more helpful than
->> 
->>     qemu: too many SCSI bus
->> 
->> because the former tells me *which* of the options is bad.  We tend to
->> have lots and lots of them.
->> 
->> The deleted special case errors cover only a minority of "orphan"
->> -drive.  If these cases need improvement, then so will the general case.
->> If you can come up with a hint that makes the general case message more
->> useful, I'm more than happy to squash it into PATCH 6.
->> 
->
-> The old error had "why" and the new error has "where" but neither has
-> both. I would suggest that from the "why" you can divine the "where,"
-> but the opposite is not as easily true.
 
-Some users will be able to divine more easily than others.  Consider my
-"too many floppy drives" example.  There's just one, and the machine
-actually supports two.  The user has to make the connection to "bus=2"
-somehow.  Now, anybody crazy enough to mess with bus= can probably be
-expected to figure this out, but still, the deleted error messages
-aren't exactly wonderful.
+On 27/01/2017 14:57, Igor Mammedov wrote:
+>> +    fadt->reset_register.space_id   = 1;
+>> +    fadt->reset_register.bit_width = 8;
+>> +    fadt->reset_register.address            = ICH9_RST_CNT_IOPORT;
+> cpu_to_le64
+> 
+> + specify explicitly all fields of GAS structure: reset_register
+> 
+> + is reset_register applicable only to q35 or to both machine types?
+> If it's only q35, you should do above only for it.
+> 
 
-> The new error even suggests information I think is wrong and misleading:
-> We do support SCSI! (Just not this many of them.)
+It applies to i440FX as well.
 
-Well, the error doesn't say "machine doesn't support SCSI", only
-"doesn't support this particular -drive".  Perhaps it could be worded
-more clearly.  Ideas?
-
-> No suggestions for how or where to append the hints. This is not the
-> hill I am preparing to die on.
-
-Plenty of hills around...
+Paolo
