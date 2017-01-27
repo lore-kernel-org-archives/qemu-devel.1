@@ -1,25 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cX6cC-0006HN-Jc
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:30:57 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1cX6lf-0001Gg-Lz
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:40:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cX6cB-0007nR-Fx
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:30:56 -0500
-Received: from mail-ua0-x22f.google.com ([2607:f8b0:400c:c08::22f]:35341)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cX6cB-0007n5-Bi
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:30:55 -0500
-Received: by mail-ua0-x22f.google.com with SMTP id y9so206090087uae.2
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 05:30:55 -0800 (PST)
+	(envelope-from <borntraeger@de.ibm.com>) id 1cX6lb-0002Mn-QB
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:40:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1cX6lb-0002MC-7Z
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:40:39 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0RDd1T1126329
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 08:40:37 -0500
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2884kkp7tm-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 08:40:37 -0500
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 27 Jan 2017 08:40:36 -0500
+References: <1485523252-88288-1-git-send-email-pbonzini@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 27 Jan 2017 14:40:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170126101954.21236-1-stefanha@redhat.com>
-References: <20170126101954.21236-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Jan 2017 13:30:34 +0000
-Message-ID: <CAFEAcA-do0fspBc1-Nig4JWVdc+ut53NtK5de1TrEPoScUfA6g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/1] Block patches
+In-Reply-To: <1485523252-88288-1-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+Message-Id: <ccb7e139-8d71-35f1-94db-b98a328ab746@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390-pci: fix compilation on older GCC
+ versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +41,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: cornelia.huck@de.ibm.com
 
-On 26 January 2017 at 10:19, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit c7f1cf01b8245762ca5864e835d84f6677ae8b1f:
->
->   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2017-01-25 17:54:14 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 59c9f437c59a4bf0594ed300d28fb24c645963a5:
->
->   aio-posix: honor is_external in AioContext polling (2017-01-26 10:02:33 +0000)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Stefan Hajnoczi (1):
->   aio-posix: honor is_external in AioContext polling
->
->  aio-posix.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> --
+On 01/27/2017 02:20 PM, Paolo Bonzini wrote:
+> S390PCIBusDevice is typedef'ed earlier in the file, before the hunks
+> that this patch modifies.  The double typedef causes old versions of
+> GCC to complain.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/s390x/s390-pci-bus.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+> index b0adefa..a25e926 100644
+> --- a/hw/s390x/s390-pci-bus.h
+> +++ b/hw/s390x/s390-pci-bus.h
+> @@ -279,7 +279,7 @@ typedef struct S390PCIIOMMUTable {
+>      S390PCIIOMMU *iommu[PCI_SLOT_MAX];
+>  } S390PCIIOMMUTable;
+> 
+> -typedef struct S390PCIBusDevice {
+> +struct S390PCIBusDevice {
+>      DeviceState qdev;
+>      PCIDevice *pdev;
+>      ZpciState state;
+> @@ -301,7 +301,7 @@ typedef struct S390PCIBusDevice {
+>      IndAddr *indicator;
+>      QEMUTimer *release_timer;
+>      QTAILQ_ENTRY(S390PCIBusDevice) link;
+> -} S390PCIBusDevice;
+> +};
+> 
+>  typedef struct S390PCIBus {
+>      BusState qbus;
+> 
+We cannot move this before S390PCIIOMMUTable due to the cross
+dependency and we need a forward declaration of the typedef, so
+yet this makes sense.
 
-Applied, thanks.
-
--- PMM
+applied to our tree.
