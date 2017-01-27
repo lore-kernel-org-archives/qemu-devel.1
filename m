@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cX31O-0004bf-JN
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:40:43 -0500
+	(envelope-from <berto@igalia.com>) id 1cX334-0006PD-6O
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:42:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cX31L-0007kg-En
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:40:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cX31L-0007kI-7R
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:40:39 -0500
-Date: Fri, 27 Jan 2017 09:40:33 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170127094033.GC26553@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAO_EM_kS-aGQdvPEO+7pkFWHOSiu8XMpZSduS=gPgUsDwJd9ig@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAO_EM_kS-aGQdvPEO+7pkFWHOSiu8XMpZSduS=gPgUsDwJd9ig@mail.gmail.com>
-Subject: Re: [Qemu-devel] [libvirt] char: Logging serial pty output when
- disconnected
+	(envelope-from <berto@igalia.com>) id 1cX331-0008Oi-49
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 04:42:26 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Fri, 27 Jan 2017 11:41:54 +0200
+Message-Id: <20170127094154.19778-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] qemu-doc: Clarify that -vga std is now the
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +18,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Swierk <eswierk@skyportsystems.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Alberto Garcia <berto@igalia.com>
 
-On Thu, Jan 26, 2017 at 05:07:16PM -0800, Ed Swierk wrote:
-> Interactive access to a guest serial console can be enabled by hooking
-> the serial device to a pty backend, e.g. -device
-> isa-serial,chardev=cs0 -chardev pty,id=cs0. With libvirt this can be
-> configured via <console type='pty'><target type='serial'
-> port='0'/></console>.
-> 
-> Output from the same serial device can also be logged to a file by
-> adding logfile=/somefile to the -chardev option (<log file=/somefile/>
-> in libvirt).
-> 
-> Unfortunately output gets logged only when a client like virsh console
-> is connected to the pty; otherwise qemu drops it on the floor. This
-> makes chardev logging much less useful than it could be for debugging
-> guest problems after the fact.
-> 
-> Currently qemu_chr_fe_write() calls qemu_chr_fe_write_log() only for
-> data consumed by the backend chr_write function. With the pty backend,
-> pty_chr_write() returns 0 indicating that the data was not consumed
-> when the pty is disconnected. Simply changing it to return len instead
-> of 0 tricks the caller into logging the data even when the pty is
-> disconnected. I don't know what problems this might cause, but one
-> data point is that tcp_chr_write() already happens to work this way.
-> 
-> Alternatively, qemu_chr_fe_write() could be modified to log everything
-> passed to it, regardless of how much data chr_write claims to have
-> consumed. The trouble is that the serial device retries writing
-> unconsumed data, so when the pty is disconnected you'd see every
-> character duplicated 4 times in the log file.
-> 
-> Any opinions on either approach, or other suggestions? If there are no
-> objections to the first one, I'll prepare a patch.
+The QEMU manual page states that Cirrus Logic is the default video
+card if the user doesn't specify any. However this is not true since
+QEMU 2.2.
 
-If the pty backend intends to just drop data into a blackhole when
-no client is connected, then its chr_write() impl should return
-the length of the data discarded, not zero.
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ qemu-options.hx | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Regards,
-Daniel
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 80df52651a..66ee562821 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1195,12 +1195,12 @@ Select type of VGA card to emulate. Valid values for @var{type} are
+ Cirrus Logic GD5446 Video card. All Windows versions starting from
+ Windows 95 should recognize and use this graphic card. For optimal
+ performances, use 16 bit color depth in the guest and the host OS.
+-(This one is the default)
++(This card was the default before QEMU 2.2)
+ @item std
+ Standard VGA card with Bochs VBE extensions.  If your guest OS
+ supports the VESA 2.0 VBE extensions (e.g. Windows XP) and if you want
+ to use high resolution modes (>= 1280x1024x16) then you should use
+-this option.
++this option. (This card is the default since QEMU 2.2)
+ @item vmware
+ VMWare SVGA-II compatible adapter. Use it if you have sufficiently
+ recent XFree86/XOrg server or Windows guest with a driver for this
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.11.0
