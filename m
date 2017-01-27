@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cX7vH-0003gH-Kl
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:54:46 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cX7wI-0004vN-Qf
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cX7vF-0001DZ-R6
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:54:43 -0500
-Received: from mail-ua0-x22c.google.com ([2607:f8b0:400c:c08::22c]:36052)
+	(envelope-from <alex.bennee@linaro.org>) id 1cX7wE-0001oN-8B
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:55:46 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38319)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cX7vF-0001DD-Li
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:54:41 -0500
-Received: by mail-ua0-x22c.google.com with SMTP id 96so206410880uaq.3
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 06:54:41 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cX7wD-0001oD-Uz
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 09:55:42 -0500
+Received: by mail-wm0-x232.google.com with SMTP id r144so141801152wme.1
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 06:55:41 -0800 (PST)
+References: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1484644078-21312-1-git-send-email-batuzovk@ispras.ru>
+Date: Fri, 27 Jan 2017 14:55:39 +0000
+Message-ID: <87r33o8sd0.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_OBx2ADDOU6Z6_27+EdbWS-1QJde5mB+sKrv0wYrKG1Q@mail.gmail.com>
-References: <98b1ad64-fe10-4ede-3493-f6d4b49ee1d9@sysgo.com>
-	<CAFEAcA8asry6LGTuv+SLVyemNVFk9Q7WhU74Cc2YA_yud8qPMg@mail.gmail.com>
-	<20170112113619.zuc5tuhmhzvawnmz@hawk.localdomain>
-	<CAFEAcA_OBx2ADDOU6Z6_27+EdbWS-1QJde5mB+sKrv0wYrKG1Q@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Jan 2017 14:54:20 +0000
-Message-ID: <CAFEAcA8dDcMowqa5NO_NpN7+V-_=VqRSH_9rQGpXKSvYuh4Teg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] pflash_cfi01: fix per device sector length
- in CFI table
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 00/18] Emulate guest vector operations with
+ host vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +30,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: David Engraf <david.engraf@sysgo.com>, Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Kirill Batuzov <batuzovk@ispras.ru>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 27 January 2017 at 14:31, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 12 January 2017 at 11:36, Andrew Jones <drjones@redhat.com> wrote:
->> On Thu, Jan 12, 2017 at 10:42:41AM +0000, Peter Maydell wrote:
->>> Thanks for the patch. I haven't checked against the pflash spec yet,
->>> but this looks like it's probably the right thing.
->>>
->>> The only two machines which use a setup with multiple devices (ie
->>> which specify device_width to the pflash_cfi01) are vexpress and virt.
->>> For all other machines this patch leaves the behaviour unchanged.
->>>
->>> Q: do we need to have some kind of nasty hack so that pre-2.9 virt
->>> still gets the old broken values in the CFI table, for version and
->>> migration compatibility? Ccing Drew for an opinion...
->>>
->>
->> I'm pretty sure we need the nasty hack, but I'm also Ccing David for
->> his opinion.
+
+Kirill Batuzov <batuzovk@ispras.ru> writes:
+
+> The goal of these patch series is to set up an infrastructure to emulate
+> guest vector operations using host vector operations. Preliminary
+> experiments show that simply translating loads and stores increases
+> performance of x264 video codec by 10%. The performance of a gcc vectorized
+> for loop increased 2x.
 >
-> So given our decision about not needing the back-compat property
-> for the UEFI table entry, do we still agree that we need one here?
+> To be able to emulate guest vector operations using host vector operations,
+> several things need to be done.
 
-Looking more closely at the patch, changing writeblock underneath
-a guest's feet is probably not very polite, so let's take the safe
-path of making it version-dependent.
+I see rth has already done a bunch of review so I'll pass on this cycle
+but please feel free to add me to the CC list next iteration.
 
-I've applied David's patch to target-arm.next (with some tweaks to
-the commit message).
+>
+> 1. Corresponding vector types should be added to TCG. These series add
+> TCG_v128 and TCG_v64. I've made TCG_v64 a different type than TCG_i64
+> because it usually needs to be allocated to different registers and
+> supports different operations.
+>
+> 2. Load/store operations for these new types need to be implemented.
+>
+> 3. For seamless transition from current model to a new one we need to
+> handle cases where memory occupied by global variable can be accessed via
+> pointer to the CPUArchState structure. A very simple conservative alias
+> analysis has been added to do it. This analysis tracks memory loads and
+> stores that overlap with fields of CPUArchState and provides this
+> information to the register allocator. The allocator then spills and
+> reloads affected globals when needed.
+>
+> 4. Allow overlapping globals. For scalar registers this is a rare case, and
+> overlapping registers can ba handled as a single one (ah, al, ax, eax,
+> rax). In ARM every Q-register consists of two D-register each consisting of
+> two S-registers. Handling 4 S-registers as one because they are parts of
+> the same Q-register is way too inefficient.
+>
+> 5. Add new memory addressing mode to MMU code for large accesses and create
+> needed helpers. Only 128-bit vectors have been handled for now.
+>
+> 6. Create TCG opcodes for vector operations. Only addition has beed handled
+> in these series. Each operation has a wrapper that checks if the backend
+> supports the corresponding operation or not. In one case the vector opcode
+> is generated, in the other the operation is emulated with scalar
+> operations. The emulation code is generated inline for performance reasons
+> (there is a huge performance difference between inline generation
+> and calling a helper). As a positive side effect this will eventually allow
+>  to merge similar emulation code for vector instructions from different
+> frontends to target-independent implementation.
+>
+> 7. Use new operations in the frontend (ARM was used in these series).
+>
+> 8. Support new operations in the backend (x86_64 was used in these series).
+>
+> For experiments I have used ARM guest on x86_64 host. I wanted some pair of
+> different architectures with vector extensions both. ARM and x86_64 pair
+> fits well.
+>
+> Kirill Batuzov (18):
+>   tcg: add support for 128bit vector type
+>   tcg: add support for 64bit vector type
+>   tcg: add ld_v128, ld_v64, st_v128 and st_v64 opcodes
+>   tcg: add simple alias analysis
+>   tcg: use results of alias analysis in liveness analysis
+>   tcg: allow globals to overlap
+>   tcg: add vector addition operations
+>   target/arm: support access to vector guest registers as globals
+>   target/arm: use vector opcode to handle vadd.<size> instruction
+>   tcg/i386: add support for vector opcodes
+>   tcg/i386: support 64-bit vector operations
+>   tcg/i386: support remaining vector addition operations
+>   tcg: do not relay on exact values of MO_BSWAP or MO_SIGN in backend
+>   tcg: introduce new TCGMemOp - MO_128
+>   tcg: introduce qemu_ld_v128 and qemu_st_v128 opcodes
+>   softmmu: create helpers for vector loads
+>   tcg/i386: add support for qemu_ld_v128/qemu_st_v128 ops
+>   target/arm: load two consecutive 64-bits vector regs as a 128-bit
+>     vector reg
+>
+>  cputlb.c                     |   4 +
+>  softmmu_template_vector.h    | 266 +++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate.c       |  89 ++++++++++++++-
+>  tcg/aarch64/tcg-target.inc.c |   4 +-
+>  tcg/arm/tcg-target.inc.c     |   4 +-
+>  tcg/i386/tcg-target.h        |  35 +++++-
+>  tcg/i386/tcg-target.inc.c    | 245 ++++++++++++++++++++++++++++++++++++---
+>  tcg/mips/tcg-target.inc.c    |   4 +-
+>  tcg/optimize.c               | 146 ++++++++++++++++++++++++
+>  tcg/ppc/tcg-target.inc.c     |   4 +-
+>  tcg/s390/tcg-target.inc.c    |   4 +-
+>  tcg/sparc/tcg-target.inc.c   |  12 +-
+>  tcg/tcg-op.c                 |  20 +++-
+>  tcg/tcg-op.h                 | 262 ++++++++++++++++++++++++++++++++++++++++++
+>  tcg/tcg-opc.h                |  34 ++++++
+>  tcg/tcg.c                    | 146 ++++++++++++++++++++++++
+>  tcg/tcg.h                    | 147 +++++++++++++++++++++++-
+>  17 files changed, 1385 insertions(+), 41 deletions(-)
+>  create mode 100644 softmmu_template_vector.h
 
-thanks
--- PMM
+
+--
+Alex Bennée
