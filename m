@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cX55l-0006Yk-Ll
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 06:53:22 -0500
+	(envelope-from <ppandit@redhat.com>) id 1cX5Hj-0001Y2-Vf
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 07:05:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cX55k-0003Tq-U4
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 06:53:21 -0500
-Received: from mail-vk0-x22a.google.com ([2607:f8b0:400c:c05::22a]:35483)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cX55k-0003Te-Q9
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 06:53:20 -0500
-Received: by mail-vk0-x22a.google.com with SMTP id x75so173659097vke.2
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 03:53:20 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170126024815.22841-1-famz@redhat.com>
-References: <20170126024815.22841-1-famz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Jan 2017 11:52:59 +0000
-Message-ID: <CAFEAcA-NuU+LE9QyFztGKkghh_qXm4deOXz3J1+tzT=rvJh59Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/2] HBitmap patches
+	(envelope-from <ppandit@redhat.com>) id 1cX5Hf-0007jX-EO
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 07:05:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59726)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cX5Hf-0007jM-6J
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 07:05:39 -0500
+From: P J P <ppandit@redhat.com>
+Date: Fri, 27 Jan 2017 17:35:28 +0530
+Message-Id: <20170127120528.30959-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH] dma: omap: check dma channel data_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +21,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 26 January 2017 at 02:48, Fam Zheng <famz@redhat.com> wrote:
-> The following changes since commit c7f1cf01b8245762ca5864e835d84f6677ae8b1f:
->
->   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2017-01-25 17:54:14 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/famz/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 7cdc49b9a2ee127b2403f6ce98ce3f96afb41733:
->
->   test-hbitmap: Add hbitmap_is_serializable() calls (2017-01-26 10:25:01 +0800)
->
-> ----------------------------------------------------------------
->
-> Two patches by Max submitted back in 2.8 timeframe.
->
-> ----------------------------------------------------------------
->
-> Max Reitz (2):
->   hbitmap: Add hbitmap_is_serializable()
->   test-hbitmap: Add hbitmap_is_serializable() calls
->
->  include/qemu/hbitmap.h | 13 +++++++++++++
->  tests/test-hbitmap.c   | 11 +++++++++++
->  util/hbitmap.c         | 22 +++++++++++++++++++---
->  3 files changed, 43 insertions(+), 3 deletions(-)
->
-> -
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
+When setting dma channel 'data_type', if (value & 3) == 3,
+the set 'data_type' is said to be bad. This also leads to an
+OOB access in 'omap_dma_transfer_generic', while doing
+cpu_physical_memory_r/w operations. Add check to avoid it.
 
-Applied, thanks.
+Reported-by: Jiang Xin <jiangxin1@huawei.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/dma/omap_dma.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
--- PMM
+diff --git a/hw/dma/omap_dma.c b/hw/dma/omap_dma.c
+index f6f86f9..45dfe7a 100644
+--- a/hw/dma/omap_dma.c
++++ b/hw/dma/omap_dma.c
+@@ -878,15 +878,17 @@ static int omap_dma_ch_reg_write(struct omap_dma_s *s,
+         ch->burst[0] = (value & 0x0180) >> 7;
+         ch->pack[0] = (value & 0x0040) >> 6;
+         ch->port[0] = (enum omap_dma_port) ((value & 0x003c) >> 2);
+-        ch->data_type = 1 << (value & 3);
+         if (ch->port[0] >= __omap_dma_port_last)
+             printf("%s: invalid DMA port %i\n", __FUNCTION__,
+                             ch->port[0]);
+         if (ch->port[1] >= __omap_dma_port_last)
+             printf("%s: invalid DMA port %i\n", __FUNCTION__,
+                             ch->port[1]);
+-        if ((value & 3) == 3)
++        ch->data_type = 1 << (value & 3);
++        if ((value & 3) == 3) {
+             printf("%s: bad data_type for DMA channel\n", __FUNCTION__);
++            ch->data_type >>= 1;
++        }
+         break;
+ 
+     case 0x02:	/* SYS_DMA_CCR_CH0 */
+@@ -1988,8 +1990,10 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+             fprintf(stderr, "%s: bad MReqAddressTranslate sideband signal\n",
+                             __FUNCTION__);
+         ch->data_type = 1 << (value & 3);
+-        if ((value & 3) == 3)
++        if ((value & 3) == 3) {
+             printf("%s: bad data_type for DMA channel\n", __FUNCTION__);
++            ch->data_type >>= 1;
++        }
+         break;
+ 
+     case 0x14:	/* DMA4_CEN */
+-- 
+2.9.3
