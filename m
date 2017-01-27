@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=IsLg=ZJ=redhat.com=mst@kernel.org>)
-	id 1cX9My-0004Df-4l
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:27:25 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cX9Qk-0007It-67
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=IsLg=ZJ=redhat.com=mst@kernel.org>)
-	id 1cX9Mw-0007RK-NP
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:27:24 -0500
-Date: Fri, 27 Jan 2017 18:27:13 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485534415-20887-2-git-send-email-mst@redhat.com>
-References: <1485534415-20887-1-git-send-email-mst@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cX9Qf-0000mT-5H
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:31:18 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cX9Qe-0000mI-Qe
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:31:13 -0500
+Received: by mail-wm0-x229.google.com with SMTP id c85so124379524wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 08:31:12 -0800 (PST)
+References: <1476445983-16661-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<1476445983-16661-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1476445983-16661-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+Date: Fri, 27 Jan 2017 16:31:09 +0000
+Message-ID: <87poj88nxu.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485534415-20887-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] arm: add trailing ; after MISMATCH_CHECK
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] move vm_start to cpus.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,166 +30,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-Macro calls without a trailing ; look weird in C, this works as a side
-effect of how QEMU_BUILD_BUG_ON is implemented. Fix this up.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- target/arm/kvm-consts.h | 96 ++++++++++++++++++++++++-------------------------
- 1 file changed, 48 insertions(+), 48 deletions(-)
+Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
 
-diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
-index 06b6c92..ddef815 100644
---- a/target/arm/kvm-consts.h
-+++ b/target/arm/kvm-consts.h
-@@ -33,12 +33,12 @@
- #define CP_REG_ARM             0x4000000000000000ULL
- #define CP_REG_ARCH_MASK       0xff00000000000000ULL
- 
--MISMATCH_CHECK(CP_REG_SIZE_SHIFT, KVM_REG_SIZE_SHIFT)
--MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK)
--MISMATCH_CHECK(CP_REG_SIZE_U32, KVM_REG_SIZE_U32)
--MISMATCH_CHECK(CP_REG_SIZE_U64, KVM_REG_SIZE_U64)
--MISMATCH_CHECK(CP_REG_ARM, KVM_REG_ARM)
--MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK)
-+MISMATCH_CHECK(CP_REG_SIZE_SHIFT, KVM_REG_SIZE_SHIFT);
-+MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK);
-+MISMATCH_CHECK(CP_REG_SIZE_U32, KVM_REG_SIZE_U32);
-+MISMATCH_CHECK(CP_REG_SIZE_U64, KVM_REG_SIZE_U64);
-+MISMATCH_CHECK(CP_REG_ARM, KVM_REG_ARM);
-+MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK);
- 
- #define QEMU_PSCI_0_1_FN_BASE 0x95c1ba5e
- #define QEMU_PSCI_0_1_FN(n) (QEMU_PSCI_0_1_FN_BASE + (n))
-@@ -47,10 +47,10 @@ MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK)
- #define QEMU_PSCI_0_1_FN_CPU_ON QEMU_PSCI_0_1_FN(2)
- #define QEMU_PSCI_0_1_FN_MIGRATE QEMU_PSCI_0_1_FN(3)
- 
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_SUSPEND, KVM_PSCI_FN_CPU_SUSPEND)
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_OFF, KVM_PSCI_FN_CPU_OFF)
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_ON, KVM_PSCI_FN_CPU_ON)
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE)
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_SUSPEND, KVM_PSCI_FN_CPU_SUSPEND);
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_OFF, KVM_PSCI_FN_CPU_OFF);
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_ON, KVM_PSCI_FN_CPU_ON);
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE);
- 
- #define QEMU_PSCI_0_2_FN_BASE 0x84000000
- #define QEMU_PSCI_0_2_FN(n) (QEMU_PSCI_0_2_FN_BASE + (n))
-@@ -77,13 +77,13 @@ MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE)
- #define QEMU_PSCI_0_2_FN64_AFFINITY_INFO QEMU_PSCI_0_2_FN64(4)
- #define QEMU_PSCI_0_2_FN64_MIGRATE QEMU_PSCI_0_2_FN64(5)
- 
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_SUSPEND, PSCI_0_2_FN_CPU_SUSPEND)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_OFF, PSCI_0_2_FN_CPU_OFF)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_ON, PSCI_0_2_FN_CPU_ON)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_MIGRATE, PSCI_0_2_FN_MIGRATE)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_SUSPEND, PSCI_0_2_FN64_CPU_SUSPEND)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_ON, PSCI_0_2_FN64_CPU_ON)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE)
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_SUSPEND, PSCI_0_2_FN_CPU_SUSPEND);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_OFF, PSCI_0_2_FN_CPU_OFF);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_ON, PSCI_0_2_FN_CPU_ON);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_MIGRATE, PSCI_0_2_FN_MIGRATE);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_SUSPEND, PSCI_0_2_FN64_CPU_SUSPEND);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_ON, PSCI_0_2_FN64_CPU_ON);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE);
- 
- /* PSCI v0.2 return values used by TCG emulation of PSCI */
- 
-@@ -93,7 +93,7 @@ MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE)
- /* We implement version 0.2 only */
- #define QEMU_PSCI_0_2_RET_VERSION_0_2                       2
- 
--MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP)
-+MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP);
- MISMATCH_CHECK(QEMU_PSCI_0_2_RET_VERSION_0_2,
-                (PSCI_VERSION_MAJOR(0) | PSCI_VERSION_MINOR(2)))
- 
-@@ -108,15 +108,15 @@ MISMATCH_CHECK(QEMU_PSCI_0_2_RET_VERSION_0_2,
- #define QEMU_PSCI_RET_NOT_PRESENT                 -7
- #define QEMU_PSCI_RET_DISABLED                    -8
- 
--MISMATCH_CHECK(QEMU_PSCI_RET_SUCCESS, PSCI_RET_SUCCESS)
--MISMATCH_CHECK(QEMU_PSCI_RET_NOT_SUPPORTED, PSCI_RET_NOT_SUPPORTED)
--MISMATCH_CHECK(QEMU_PSCI_RET_INVALID_PARAMS, PSCI_RET_INVALID_PARAMS)
--MISMATCH_CHECK(QEMU_PSCI_RET_DENIED, PSCI_RET_DENIED)
--MISMATCH_CHECK(QEMU_PSCI_RET_ALREADY_ON, PSCI_RET_ALREADY_ON)
--MISMATCH_CHECK(QEMU_PSCI_RET_ON_PENDING, PSCI_RET_ON_PENDING)
--MISMATCH_CHECK(QEMU_PSCI_RET_INTERNAL_FAILURE, PSCI_RET_INTERNAL_FAILURE)
--MISMATCH_CHECK(QEMU_PSCI_RET_NOT_PRESENT, PSCI_RET_NOT_PRESENT)
--MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED)
-+MISMATCH_CHECK(QEMU_PSCI_RET_SUCCESS, PSCI_RET_SUCCESS);
-+MISMATCH_CHECK(QEMU_PSCI_RET_NOT_SUPPORTED, PSCI_RET_NOT_SUPPORTED);
-+MISMATCH_CHECK(QEMU_PSCI_RET_INVALID_PARAMS, PSCI_RET_INVALID_PARAMS);
-+MISMATCH_CHECK(QEMU_PSCI_RET_DENIED, PSCI_RET_DENIED);
-+MISMATCH_CHECK(QEMU_PSCI_RET_ALREADY_ON, PSCI_RET_ALREADY_ON);
-+MISMATCH_CHECK(QEMU_PSCI_RET_ON_PENDING, PSCI_RET_ON_PENDING);
-+MISMATCH_CHECK(QEMU_PSCI_RET_INTERNAL_FAILURE, PSCI_RET_INTERNAL_FAILURE);
-+MISMATCH_CHECK(QEMU_PSCI_RET_NOT_PRESENT, PSCI_RET_NOT_PRESENT);
-+MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED);
- 
- /* Note that KVM uses overlapping values for AArch32 and AArch64
-  * target CPU numbers. AArch32 targets:
-@@ -137,14 +137,14 @@ MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED)
- #define QEMU_KVM_ARM_TARGET_NONE UINT_MAX
- 
- #ifdef TARGET_AARCH64
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_AEM_V8, KVM_ARM_TARGET_AEM_V8)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_FOUNDATION_V8, KVM_ARM_TARGET_FOUNDATION_V8)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A57, KVM_ARM_TARGET_CORTEX_A57)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_XGENE_POTENZA, KVM_ARM_TARGET_XGENE_POTENZA)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A53, KVM_ARM_TARGET_CORTEX_A53)
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_AEM_V8, KVM_ARM_TARGET_AEM_V8);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_FOUNDATION_V8, KVM_ARM_TARGET_FOUNDATION_V8);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A57, KVM_ARM_TARGET_CORTEX_A57);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_XGENE_POTENZA, KVM_ARM_TARGET_XGENE_POTENZA);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A53, KVM_ARM_TARGET_CORTEX_A53);
- #else
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A15, KVM_ARM_TARGET_CORTEX_A15)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7)
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A15, KVM_ARM_TARGET_CORTEX_A15);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7);
- #endif
- 
- #define CP_REG_ARM64                   0x6000000000000000ULL
-@@ -166,20 +166,20 @@ MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7)
- #define CP_REG_ARM64_SYSREG_CP (CP_REG_ARM64_SYSREG >> CP_REG_ARM_COPROC_SHIFT)
- 
- #ifdef TARGET_AARCH64
--MISMATCH_CHECK(CP_REG_ARM64, KVM_REG_ARM64)
--MISMATCH_CHECK(CP_REG_ARM_COPROC_MASK, KVM_REG_ARM_COPROC_MASK)
--MISMATCH_CHECK(CP_REG_ARM_COPROC_SHIFT, KVM_REG_ARM_COPROC_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG, KVM_REG_ARM64_SYSREG)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_MASK, KVM_REG_ARM64_SYSREG_OP0_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_SHIFT, KVM_REG_ARM64_SYSREG_OP0_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_MASK, KVM_REG_ARM64_SYSREG_OP1_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_SHIFT, KVM_REG_ARM64_SYSREG_OP1_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_MASK, KVM_REG_ARM64_SYSREG_CRN_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_SHIFT, KVM_REG_ARM64_SYSREG_CRN_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_MASK, KVM_REG_ARM64_SYSREG_CRM_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_SHIFT, KVM_REG_ARM64_SYSREG_CRM_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_MASK, KVM_REG_ARM64_SYSREG_OP2_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_SHIFT, KVM_REG_ARM64_SYSREG_OP2_SHIFT)
-+MISMATCH_CHECK(CP_REG_ARM64, KVM_REG_ARM64);
-+MISMATCH_CHECK(CP_REG_ARM_COPROC_MASK, KVM_REG_ARM_COPROC_MASK);
-+MISMATCH_CHECK(CP_REG_ARM_COPROC_SHIFT, KVM_REG_ARM_COPROC_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG, KVM_REG_ARM64_SYSREG);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_MASK, KVM_REG_ARM64_SYSREG_OP0_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_SHIFT, KVM_REG_ARM64_SYSREG_OP0_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_MASK, KVM_REG_ARM64_SYSREG_OP1_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_SHIFT, KVM_REG_ARM64_SYSREG_OP1_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_MASK, KVM_REG_ARM64_SYSREG_CRN_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_SHIFT, KVM_REG_ARM64_SYSREG_CRN_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_MASK, KVM_REG_ARM64_SYSREG_CRM_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_SHIFT, KVM_REG_ARM64_SYSREG_CRM_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_MASK, KVM_REG_ARM64_SYSREG_OP2_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_SHIFT, KVM_REG_ARM64_SYSREG_OP2_SHIFT);
- #endif
- 
- #undef MISMATCH_CHECK
--- 
-MST
+> This patch:
+>
+> * moves vm_start to cpus.c .
+> * exports qemu_vmstop_requested, since it's needed by vm_start .
+> * extracts vm_prepare_start from vm_start; it does what vm_start did,
+>   except restarting the cpus. vm_start now calls vm_prepare_start.
+> * moves the call to qemu_clock_enable away from resume_all_vcpus, and
+>   add an explicit call to it before each instance of resume_all_vcpus
+>   in the code.
+
+Can you be a bit more explicit about this? Shouldn't CPU time still
+accrue even if you are only starting some of them?
+
+I'd prefer making resume_all_vcpus() a private function called from
+resume_some_vcpus() which can then make the QEMU_CLOCK_VIRTUAL decision
+in one place - with a comment.
+
+> * adds resume_some_vcpus, to selectively restart only some CPUs.
+>
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> ---
+>  cpus.c                     | 61 +++++++++++++++++++++++++++++++++++++++++++++-
+>  hw/i386/kvmvapic.c         |  2 ++
+>  include/sysemu/cpus.h      |  1 +
+>  include/sysemu/sysemu.h    |  2 ++
+>  target-s390x/misc_helper.c |  2 ++
+>  vl.c                       | 32 +++---------------------
+>  6 files changed, 70 insertions(+), 30 deletions(-)
+>
+> diff --git a/cpus.c b/cpus.c
+> index 31204bb..c102624 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1260,12 +1260,28 @@ void resume_all_vcpus(void)
+>  {
+>      CPUState *cpu;
+>
+> -    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+>      CPU_FOREACH(cpu) {
+>          cpu_resume(cpu);
+>      }
+>  }
+>
+> +/**
+> + * resume_some_vcpus - resumes some vCPUs, indicated in a NULL-terminated
+> + * array of CPUState *; if the parameter is NULL, all CPUs are resumed.
+> + */
+> +void resume_some_vcpus(CPUState **cpus)
+> +{
+> +    int idx;
+> +
+> +    if (!cpus) {
+> +        resume_all_vcpus();
+> +        return;
+> +    }
+> +    for (idx = 0; cpus[idx]; idx++) {
+> +        cpu_resume(cpus[idx]);
+> +    }
+> +}
+> +
+>  void cpu_remove(CPUState *cpu)
+>  {
+>      cpu->stop = true;
+> @@ -1396,6 +1412,49 @@ int vm_stop(RunState state)
+>      return do_vm_stop(state);
+>  }
+>
+> +/**
+> + * Prepare for (re)starting the VM.
+> + * Returns -1 if the vCPUs are not to be restarted (e.g. if they are already
+> + * running or in case of an error condition), 0 otherwise.
+> + */
+> +int vm_prepare_start(void)
+> +{
+> +    RunState requested;
+> +    int res = 0;
+> +
+> +    qemu_vmstop_requested(&requested);
+> +    if (runstate_is_running() && requested == RUN_STATE__MAX) {
+> +        return -1;
+> +    }
+> +
+> +    /* Ensure that a STOP/RESUME pair of events is emitted if a
+> +     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
+> +     * example, according to documentation is always followed by
+> +     * the STOP event.
+> +     */
+> +    if (runstate_is_running()) {
+> +        qapi_event_send_stop(&error_abort);
+> +        res = -1;
+> +    } else {
+> +        replay_enable_events();
+> +        cpu_enable_ticks();
+> +        runstate_set(RUN_STATE_RUNNING);
+> +        vm_state_notify(1, RUN_STATE_RUNNING);
+> +    }
+> +
+> +    /* XXX: is it ok to send this even before actually resuming the CPUs? */
+> +    qapi_event_send_resume(&error_abort);
+> +    return res;
+> +}
+> +
+> +void vm_start(void)
+> +{
+> +    if (!vm_prepare_start()) {
+> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+> +        resume_all_vcpus();
+> +    }
+> +}
+> +
+>  /* does a state transition even if the VM is already stopped,
+>     current state is forgotten forever */
+>  int vm_stop_force_state(RunState state)
+> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+> index 74a549b..3101860 100644
+> --- a/hw/i386/kvmvapic.c
+> +++ b/hw/i386/kvmvapic.c
+> @@ -446,6 +446,7 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
+>          abort();
+>      }
+>
+> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+>      resume_all_vcpus();
+>
+>      if (!kvm_enabled()) {
+> @@ -686,6 +687,7 @@ static void vapic_write(void *opaque, hwaddr addr, uint64_t data,
+>              pause_all_vcpus();
+>              patch_byte(cpu, env->eip - 2, 0x66);
+>              patch_byte(cpu, env->eip - 1, 0x90);
+> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+>              resume_all_vcpus();
+>          }
+>
+> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+> index 3728a1e..5fa074b 100644
+> --- a/include/sysemu/cpus.h
+> +++ b/include/sysemu/cpus.h
+> @@ -5,6 +5,7 @@
+>  bool qemu_in_vcpu_thread(void);
+>  void qemu_init_cpu_loop(void);
+>  void resume_all_vcpus(void);
+> +void resume_some_vcpus(CPUState **cpus);
+>  void pause_all_vcpus(void);
+>  void cpu_stop_current(void);
+>  void cpu_ticks_init(void);
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index ef2c50b..ac301d6 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -37,6 +37,7 @@ void vm_state_notify(int running, RunState state);
+>  #define VMRESET_REPORT   true
+>
+>  void vm_start(void);
+> +int vm_prepare_start(void);
+>  int vm_stop(RunState state);
+>  int vm_stop_force_state(RunState state);
+>
+> @@ -60,6 +61,7 @@ void qemu_register_powerdown_notifier(Notifier *notifier);
+>  void qemu_system_debug_request(void);
+>  void qemu_system_vmstop_request(RunState reason);
+>  void qemu_system_vmstop_request_prepare(void);
+> +bool qemu_vmstop_requested(RunState *r);
+>  int qemu_shutdown_requested_get(void);
+>  int qemu_reset_requested_get(void);
+>  void qemu_system_killed(int signal, pid_t pid);
+> diff --git a/target-s390x/misc_helper.c b/target-s390x/misc_helper.c
+> index 4df2ec6..2b74710 100644
+> --- a/target-s390x/misc_helper.c
+> +++ b/target-s390x/misc_helper.c
+> @@ -133,6 +133,7 @@ static int modified_clear_reset(S390CPU *cpu)
+>      s390_crypto_reset();
+>      scc->load_normal(CPU(cpu));
+>      cpu_synchronize_all_post_reset();
+> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+>      resume_all_vcpus();
+>      return 0;
+>  }
+> @@ -152,6 +153,7 @@ static int load_normal_reset(S390CPU *cpu)
+>      scc->initial_cpu_reset(CPU(cpu));
+>      scc->load_normal(CPU(cpu));
+>      cpu_synchronize_all_post_reset();
+> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+>      resume_all_vcpus();
+>      return 0;
+>  }
+> diff --git a/vl.c b/vl.c
+> index f3abd99..42addbb 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -746,7 +746,7 @@ StatusInfo *qmp_query_status(Error **errp)
+>      return info;
+>  }
+>
+> -static bool qemu_vmstop_requested(RunState *r)
+> +bool qemu_vmstop_requested(RunState *r)
+>  {
+>      qemu_mutex_lock(&vmstop_lock);
+>      *r = vmstop_requested;
+> @@ -767,34 +767,6 @@ void qemu_system_vmstop_request(RunState state)
+>      qemu_notify_event();
+>  }
+>
+> -void vm_start(void)
+> -{
+> -    RunState requested;
+> -
+> -    qemu_vmstop_requested(&requested);
+> -    if (runstate_is_running() && requested == RUN_STATE__MAX) {
+> -        return;
+> -    }
+> -
+> -    /* Ensure that a STOP/RESUME pair of events is emitted if a
+> -     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
+> -     * example, according to documentation is always followed by
+> -     * the STOP event.
+> -     */
+> -    if (runstate_is_running()) {
+> -        qapi_event_send_stop(&error_abort);
+> -    } else {
+> -        replay_enable_events();
+> -        cpu_enable_ticks();
+> -        runstate_set(RUN_STATE_RUNNING);
+> -        vm_state_notify(1, RUN_STATE_RUNNING);
+> -        resume_all_vcpus();
+> -    }
+> -
+> -    qapi_event_send_resume(&error_abort);
+> -}
+> -
+> -
+>  /***********************************************************/
+>  /* real time host monotonic timer */
+>
+> @@ -1910,6 +1882,7 @@ static bool main_loop_should_exit(void)
+>      if (qemu_reset_requested()) {
+>          pause_all_vcpus();
+>          qemu_system_reset(VMRESET_REPORT);
+> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+>          resume_all_vcpus();
+>          if (!runstate_check(RUN_STATE_RUNNING) &&
+>                  !runstate_check(RUN_STATE_INMIGRATE)) {
+> @@ -1921,6 +1894,7 @@ static bool main_loop_should_exit(void)
+>          qemu_system_reset(VMRESET_SILENT);
+>          notifier_list_notify(&wakeup_notifiers, &wakeup_reason);
+>          wakeup_reason = QEMU_WAKEUP_REASON_NONE;
+> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+>          resume_all_vcpus();
+>          qapi_event_send_wakeup(&error_abort);
+>      }
+
+
+--
+Alex Bennée
