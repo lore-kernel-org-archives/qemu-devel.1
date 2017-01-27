@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cX6YR-0003Ob-5Z
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:27:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cX6Zf-0004hv-9w
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:28:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cX6YN-0006RB-DJ
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:27:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57700)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cX6YN-0006R3-4m
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:26:59 -0500
-Date: Fri, 27 Jan 2017 13:26:50 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170127132650.GA31231@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1483601042-6435-1-git-send-email-jitendra.kolhe@hpe.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cX6Ze-0006uW-4m
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:28:19 -0500
+Received: from mail-vk0-x231.google.com ([2607:f8b0:400c:c05::231]:34890)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cX6Zd-0006u4-VI
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 08:28:18 -0500
+Received: by mail-vk0-x231.google.com with SMTP id x75so175089530vke.2
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 05:28:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1483601042-6435-1-git-send-email-jitendra.kolhe@hpe.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] mem-prealloc: Reduce large guest
- start-up and migration time.
+In-Reply-To: <20170127103505.18606-17-alex.bennee@linaro.org>
+References: <20170127103505.18606-1-alex.bennee@linaro.org>
+	<20170127103505.18606-17-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Jan 2017 13:27:56 +0000
+Message-ID: <CAFEAcA82McdB15znd7LK-OGkioHreht2Nk6h5t-As0JiYXHoRg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 16/25] cputlb and arm/sparc targets:
+ convert mmuidx flushes from varg to bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jitendra Kolhe <jitendra.kolhe@hpe.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, armbru@redhat.com, renganathan.meenakshisundaram@hpe.com, mohan_parthasarathy@hpe.com, pbonzini@redhat.com
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, "open list:Overall" <qemu-devel@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On Thu, Jan 05, 2017 at 12:54:02PM +0530, Jitendra Kolhe wrote:
-> Using "-mem-prealloc" option for a very large guest leads to huge guest
-> start-up and migration time. This is because with "-mem-prealloc" option
-> qemu tries to map every guest page (create address translations), and
-> make sure the pages are available during runtime. virsh/libvirt by
-> default, seems to use "-mem-prealloc" option in case the guest is
-> configured to use huge pages. The patch tries to map all guest pages
-> simultaneously by spawning multiple threads. Given the problem is more
-> prominent for large guests, the patch limits the changes to the guests
-> of at-least 64GB of memory size. Currently limiting the change to QEMU
-> library functions on POSIX compliant host only, as we are not sure if
-> the problem exists on win32. Below are some stats with "-mem-prealloc"
-> option for guest configured to use huge pages.
-> 
-> ------------------------------------------------------------------------
-> Idle Guest      | Start-up time | Migration time
-> ------------------------------------------------------------------------
-> Guest stats with 2M HugePage usage - single threaded (existing code)
-> ------------------------------------------------------------------------
-> 64 Core - 4TB   | 54m11.796s    | 75m43.843s
-> 64 Core - 1TB   | 8m56.576s     | 14m29.049s
-> 64 Core - 256GB | 2m11.245s     | 3m26.598s
-> ------------------------------------------------------------------------
-> Guest stats with 2M HugePage usage - map guest pages using 8 threads
-> ------------------------------------------------------------------------
-> 64 Core - 4TB   | 5m1.027s      | 34m10.565s
-> 64 Core - 1TB   | 1m10.366s     | 8m28.188s
-> 64 Core - 256GB | 0m19.040s     | 2m10.148s
-> -----------------------------------------------------------------------
-> Guest stats with 2M HugePage usage - map guest pages using 16 threads
-> -----------------------------------------------------------------------
-> 64 Core - 4TB   | 1m58.970s     | 31m43.400s
-> 64 Core - 1TB   | 0m39.885s     | 7m55.289s
-> 64 Core - 256GB | 0m11.960s     | 2m0.135s
-> -----------------------------------------------------------------------
+On 27 January 2017 at 10:34, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+> While the vargs approach was flexible the original MTTCG ended up
+> having munge the bits to a bitmap so the data could be used in
+> deferred work helpers. Instead of hiding that in cputlb we push the
+> change to the API to make it take a bitmap of MMU indexes instead.
+>
+> This change is fairly mechanical but as storing the actual index is
+> useful for cases like the current running context. As a result the
+> constants are renamed to ARMMMUBit_foo and a couple of helper
+> functions added to convert between a single bit and a scalar index.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-For comparison, what is performance like if you replace memset() in
-the current code with a call to mlock().
+So, as discussed on IRC, I don't think this is really the right
+way to go. An MMU index is an index, ie it refers to a particular
+TLB. Almost all the time you don't want to think of it as a bit
+value. The only place that does care about that is places in
+the TLB code which want to say "do some operation on multiple
+TLBs at once", which is basically just the tlb_flush_by_mmuidx()
+function. So that function should have an API that lets you
+specify multiple TLBs (either the one it has now, or maybe one
+where you pass it in a uint32_t with bits set).
 
-IIUC, huge pages are non-swappable once allocated, so it feels like
-we ought to be able to just call mlock() to preallocate them with
-no downside, rather than spawning many threads to memset() them.
+That avoids either all or almost all of this churn.
 
-Of course you'd still need the memset() trick if qemu was given
-non-hugepages in combination with --mem-prealloc, as you don't
-want to lock normal pages into ram permanently.
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1954,27 +1954,40 @@ static inline bool arm_excp_unmasked(CPUState *cs=
+, unsigned int excp_idx,
+>   * of the AT/ATS operations.
+>   * The values used are carefully arranged to make mmu_idx =3D> EL lookup=
+ easy.
+>   */
+> -typedef enum ARMMMUIdx {
+> -    ARMMMUIdx_S12NSE0 =3D 0,
+> -    ARMMMUIdx_S12NSE1 =3D 1,
+> -    ARMMMUIdx_S1E2 =3D 2,
+> -    ARMMMUIdx_S1E3 =3D 3,
+> -    ARMMMUIdx_S1SE0 =3D 4,
+> -    ARMMMUIdx_S1SE1 =3D 5,
+> -    ARMMMUIdx_S2NS =3D 6,
+> +typedef enum ARMMMUBitMap {
+> +    ARMMMUBit_S12NSE0 =3D 1 << 0,
+> +    ARMMMUBit_S12NSE1 =3D 1 << 1,
+> +    ARMMMUBit_S1E2 =3D 1 << 2,
+> +    ARMMMUBit_S1E3 =3D 1 << 3,
+> +    ARMMMUBit_S1SE0 =3D 1 << 4,
+> +    ARMMMUBit_S1SE1 =3D 1 << 5,
+> +    ARMMMUBit_S2NS =3D 1 << 6,
+>      /* Indexes below here don't have TLBs and are used only for AT syste=
+m
+>       * instructions or for the first stage of an S12 page table walk.
+>       */
+> -    ARMMMUIdx_S1NSE0 =3D 7,
+> -    ARMMMUIdx_S1NSE1 =3D 8,
+> -} ARMMMUIdx;
+> +    ARMMMUBit_S1NSE0 =3D 1 << 7,
+> +    ARMMMUBit_S1NSE1 =3D 1 << 8,
+> +} ARMMMUBitMap;
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+In particular I'd be very wary of changing these values, because
+as the comment says things are arranged carefully to make some
+operations easy.
+
+thanks
+-- PMM
