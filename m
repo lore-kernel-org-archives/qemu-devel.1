@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cX8Jv-0002uZ-T1
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:12 -0500
+	(envelope-from <bounces@canonical.com>) id 1cX8KR-0003AM-Ho
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cX8Ju-0001OV-SL
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:11 -0500
-Received: from mail-vk0-x22e.google.com ([2607:f8b0:400c:c05::22e]:36467)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cX8Ju-0001OD-NQ
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:10 -0500
-Received: by mail-vk0-x22e.google.com with SMTP id t8so177237373vke.3
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 07:20:10 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cX8KO-0001TN-Es
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cX8KO-0001TC-8g
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:20:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cX8KN-0002E0-87
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 15:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 37DB22E80C2
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 15:20:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1485447262-27014-1-git-send-email-mst@redhat.com>
-References: <1485447262-27014-1-git-send-email-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Jan 2017 15:19:49 +0000
-Message-ID: <CAFEAcA8avJj04_w_GSriA5MsMKGAwLOar1-e1MgVroe+OyUGqA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/18] virtio, vhost, pci: fixes, features
+Date: Fri, 27 Jan 2017 15:02:33 -0000
+From: "mike@papersolve.com" <mike@papersolve.com>
+Reply-To: Bug 1622547 <1622547@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160912101319.11954.40146.malonedeb@gac.canonical.com>
+Message-Id: <20170127150233.12081.17208.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1622547] Re: qemu-system-sparc fatal error Trap
+ 0x29 on Solaris 2.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 26 January 2017 at 16:15, Michael S. Tsirkin <mst@redhat.com> wrote:
-> The following changes since commit ae5045ae5b2bbd8ce1335d1b05f9ecacca83a6=
-cf:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-nios-20170124' into=
- staging (2017-01-25 13:30:23 +0000)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 1954d8b17bbccad723c193edba961d49b7ac4a43:
->
->   hw/pci: disable pci-bridge's shpc by default (2017-01-26 18:13:33 +0200=
-)
->
-> ----------------------------------------------------------------
-> virtio, vhost, pci: fixes, features
->
-> generic pci root port support
-> disable shpc by default
-> safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
-> fixes and cleanups all over the place
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
+Yep, this works great for the SS-20 ROM (tested with SS-5 ROM also).
+Boots all the way to OS (have to use -nographic but that's fine).
+Thanks!
 
-Failure to build, x86:
+-- =
 
-/home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c: In function
-=E2=80=98spapr_phb_placement=E2=80=99:
-/home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c:2643:20: error:
-bit-field =E2=80=98<anonymous>=E2=80=99 width n
-ot an integer constant
-     QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_IO_WIN_SIZE) >
-SPAPR_PCI_MEM32_WIN_SIZE);
-                    ^
-/home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c:2644:20: error:
-bit-field =E2=80=98<anonymous>=E2=80=99 width not an integer constant
-     QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_MEM32_WIN_SIZE) >
-SPAPR_PCI_MEM64_WIN_SIZE);
-                    ^
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1622547
 
-Failure to build, aarch64 and aarch32:
+Title:
+  qemu-system-sparc fatal error Trap 0x29 on Solaris 2.6
 
-In file included from /home/petmay01/qemu/target/arm/cpu.h:23:0,
-                 from /home/petmay01/qemu/trace/control-target.c:11:
-/home/petmay01/qemu/target/arm/kvm-consts.h:35:1: error: expected ','
-or ';' before 'typedef'
- MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK)
- ^
-/home/petmay01/qemu/target/arm/kvm-consts.h:35:83: error: data
-definition has no type or storage cla
-ss [-Werror]
- MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK)
+Status in QEMU:
+  New
 
-            ^
-/home/petmay01/qemu/target/arm/kvm-consts.h:35:83: error: type
-defaults to 'int' in declaration of '
-qemu_build_bug_on__35' [-Werror=3Dimplicit-int]
+Bug description:
+  When trying to install Solaris 2.6 from original CDROM, qemu fail with
+  the following error :
 
-(repeated for all the other uses of MISMATCH_CHECK in that header)
+  qemu: fatal: Trap 0x29 while interrupts disabled, Error state
+  pc: f0041280  npc: f0041284
+  %g0-7: 00000000 f0281800 08000000 ffffffff 00000000 f0243b88 00000001 f02=
+44020
+  %o0-7: 40400ce2 40400ce2 00000000 404000e2 f0243b88 00000000 f023ffd8 f00=
+57914 =
 
-thanks
--- PMM
+  %l0-7: 40000cc2 f009645c f0096460 00000002 00000209 00000004 00000007 f02=
+3ff90 =
+
+  %i0-7: 00000042 404000e3 00000000 404000e3 e0000000 f028192a f0240038 f00=
+96448 =
+
+  %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  psr: 40400cc2 (icc: -Z-- SPE: SP-) wim: 00000002
+  fsr: 00000000 y: 00000000
+
+  The command line was :
+
+  qemu-system-sparc -nographic -bios ./openbios-sparc32 -M SS-20 -hda
+  ./36G.disk -m 512 -cdrom Solaris_2.6_Software_05_98.img -boot d
+  -serial telnet:0.0.0.0:3000,server -smp 2,cores=3D2 -monitor null
+
+  It fails with a similar output when using bios ss20_v2.25_rom.
+
+  =E2=96=B6 qemu-system-sparc --version
+  QEMU emulator version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and =
+the QEMU Project developers
+
+  =E2=96=B6 uname -a
+  Linux xxx 4.7.1-1-ARCH #1 SMP PREEMPT Wed Aug 17 08:13:35 CEST 2016 x86_6=
+4 GNU/Linux
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1622547/+subscriptions
