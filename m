@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cX8mf-0003Mt-16
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:49:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1cX90a-0008JI-JS
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:04:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cX8ma-0002bA-6T
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:49:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cX8mZ-0002av-U2
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 10:49:48 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA56B7FE9C
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 15:49:47 +0000 (UTC)
-Date: Fri, 27 Jan 2017 15:49:43 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170127154942.GG3323@work-vm>
-References: <20170106182823.1960-1-dgilbert@redhat.com>
-	<20170106182823.1960-8-dgilbert@redhat.com>
-	<87efzr77xy.fsf@emacs.mitica>
+	(envelope-from <armbru@redhat.com>) id 1cX90Z-0008Uz-Fp
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:04:16 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+	<1485443388-27253-9-git-send-email-armbru@redhat.com>
+	<9684a908-f425-82d8-046b-19cc17d01f55@redhat.com>
+	<87r33o3emm.fsf@dusky.pond.sub.org>
+	<2bcf4c7c-5c29-fda5-1ba3-5828600a8995@redhat.com>
+Date: Fri, 27 Jan 2017 17:04:05 +0100
+In-Reply-To: <2bcf4c7c-5c29-fda5-1ba3-5828600a8995@redhat.com> (John Snow's
+	message of "Fri, 27 Jan 2017 09:15:19 -0500")
+Message-ID: <8760l0ebgq.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87efzr77xy.fsf@emacs.mitica>
-Subject: Re: [Qemu-devel] [PATCH 07/15] postcopy: Plumb pagesize down into
- place helpers
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] hw: Drop superfluous special checks
+ for orphaned -drive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,77 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mreitz@redhat.com, =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > Now we deal with normal size pages and huge pages we need
-> > to tell the place handlers the size we're dealing with
-> > and make sure the temporary page is large enough.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> I understand the what you are trying here, but ....
-> 
-> Why do we always map/upmap with the bigger pagesize?  I would assume
-> that this deppends on the block we are dealing with, no?
+John Snow <jsnow@redhat.com> writes:
 
-It's only a temporary, so it seems easier to map it once at the start
-of the migration at the size we need and clean it up at the end, that
-way we don't have to allocate/deallocate on each block.
+> On 01/27/2017 06:51 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>> 
+>>> On 01/26/2017 10:09 AM, Markus Armbruster wrote:
+>>>> We've traditionally rejected orphans here and there, but not
+>>>> systematically.  For instance, the sun4m machines have an onboard SCSI
+>>>> HBA (bus=0), and have always rejected bus>0.  Other machines with an
+>>>> onboard SCSI HBA don't.
+>>>>
+>>>> Commit a66c9dc made all orphans trigger a warning, and the previous
+>>>> commit turned this into an error.  The checks "here and there" are now
+>>>> redundant.  Drop them.
+>>>>
+>>>> Note that the one in mips_jazz.c was wrong: it rejected bus > MAX_FD,
+>>>> but MAX_FD is the number of floppy drives per bus.
+>>>>
+>>>> Error messages change from
+>>>>
+>>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
+>>>>     qemu-system-x86_64: Too many IDE buses defined (3 > 2)
+>>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
+>>>>     qemu: too many floppy drives
+>>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
+>>>>     qemu: too many SCSI bus
+>>>>
+>>>> to
+>>>>
+>>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
+>>>>     qemu-system-x86_64: -drive if=ide,bus=2: machine type does not support this drive
+>>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
+>>>>     qemu-system-mips64: -drive if=floppy,bus=2,id=fd1: machine type does not support this drive
+>>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
+>>>>     qemu-system-sparc: -drive if=scsi,bus=1: machine type does not support this drive
+>>>>
+>>>
+>>> Hm, that's a lot less helpful, isn't it? Can we augment with hints?
+>> 
+>> The message itself may be less specific, but it now comes with a precise
+>> location.  Personally, I'd even find
+>> 
+>>     qemu-system-sparc: -drive if=scsi,bus=1: *mumble* *mumble*
+>> 
+>> more helpful than
+>> 
+>>     qemu: too many SCSI bus
+>> 
+>> because the former tells me *which* of the options is bad.  We tend to
+>> have lots and lots of them.
+>> 
+>> The deleted special case errors cover only a minority of "orphan"
+>> -drive.  If these cases need improvement, then so will the general case.
+>> If you can come up with a hint that makes the general case message more
+>> useful, I'm more than happy to squash it into PATCH 6.
+>> 
+>
+> The old error had "why" and the new error has "where" but neither has
+> both. I would suggest that from the "why" you can divine the "where,"
+> but the opposite is not as easily true.
 
-> > @@ -321,7 +321,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
-> >      migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
-> >  
-> >      if (mis->postcopy_tmp_page) {
-> > -        munmap(mis->postcopy_tmp_page, getpagesize());
-> > +        munmap(mis->postcopy_tmp_page, mis->largest_page_size);
-> >          mis->postcopy_tmp_page = NULL;
-> >      }
-> >      trace_postcopy_ram_incoming_cleanup_exit();
-> 
-> Here
-> 
-> >  void *postcopy_get_tmp_page(MigrationIncomingState *mis)
-> >  {
-> >      if (!mis->postcopy_tmp_page) {
-> > -        mis->postcopy_tmp_page = mmap(NULL, getpagesize(),
-> > +        mis->postcopy_tmp_page = mmap(NULL, mis->largest_page_size,
-> >                               PROT_READ | PROT_WRITE, MAP_PRIVATE |
-> >                               MAP_ANONYMOUS, -1, 0);
-> >          if (mis->postcopy_tmp_page == MAP_FAILED) {
-> 
-> And here ...
-> 
-> >              if (all_zero) {
-> >                  ret = postcopy_place_page_zero(mis,
-> >                                                 host + TARGET_PAGE_SIZE -
-> > -                                               qemu_host_page_size);
-> > +                                               block->page_size,
-> > +                                               block->page_size);
-> >              } else {
-> >                  ret = postcopy_place_page(mis, host + TARGET_PAGE_SIZE -
-> > -                                               qemu_host_page_size,
-> > -                                               place_source);
-> > +                                               block->page_size,
-> > +                                               place_source, block->page_size);
-> >              }
-> >          }
-> >          if (!ret) {
-> 
-> creating a temp for
-> 
-> addr = host + TARGET_PAGE_SIZE - block->page_size;
-> 
-> would make things more readable IMHO.  I was missreading the - by a ,
-> and didn't understand so many parameters O:-)
+Some users will be able to divine more easily than others.  Consider my
+"too many floppy drives" example.  There's just one, and the machine
+actually supports two.  The user has to make the connection to "bus=2"
+somehow.  Now, anybody crazy enough to mess with bus= can probably be
+expected to figure this out, but still, the deleted error messages
+aren't exactly wonderful.
 
-Done.
+> The new error even suggests information I think is wrong and misleading:
+> We do support SCSI! (Just not this many of them.)
 
-Dave
+Well, the error doesn't say "machine doesn't support SCSI", only
+"doesn't support this particular -drive".  Perhaps it could be worded
+more clearly.  Ideas?
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> No suggestions for how or where to append the hints. This is not the
+> hill I am preparing to die on.
+
+Plenty of hills around...
