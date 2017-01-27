@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX9yK-0006Hn-VM
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:06:03 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cX9zW-0007p9-IJ
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:07:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX9yH-0002Wv-OI
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:06:00 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35260)
+	(envelope-from <alex.bennee@linaro.org>) id 1cX9zT-0002ke-CQ
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:07:14 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35979)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cX9yH-0002Wo-EO
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:05:57 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id r126so126152297wmr.0
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 09:05:57 -0800 (PST)
+	id 1cX9zT-0002kO-3J
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:07:11 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id c85so125888461wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 09:07:11 -0800 (PST)
 References: <1476445983-16661-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1476445983-16661-2-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<87poj88nxu.fsf@linaro.org>
-	<ed673cc1-4513-766c-83f6-ff560c9ed1d5@linux.vnet.ibm.com>
+	<1476445983-16661-3-git-send-email-imbrenda@linux.vnet.ibm.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <ed673cc1-4513-766c-83f6-ff560c9ed1d5@linux.vnet.ibm.com>
-Date: Fri, 27 Jan 2017 17:05:54 +0000
-Message-ID: <87mvec8mbx.fsf@linaro.org>
+In-reply-to: <1476445983-16661-3-git-send-email-imbrenda@linux.vnet.ibm.com>
+Date: Fri, 27 Jan 2017 17:07:08 +0000
+Message-ID: <87lgtw8m9v.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] move vm_start to cpus.c
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] gdbstub: Fix vCont behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,279 +36,291 @@ Cc: qemu-devel@nongnu.org
 
 Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
 
-> On 27/01/17 17:31, Alex Bennée wrote:
->>
->> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
->>
->>> This patch:
->>>
->>> * moves vm_start to cpus.c .
->>> * exports qemu_vmstop_requested, since it's needed by vm_start .
->>> * extracts vm_prepare_start from vm_start; it does what vm_start did,
->>>   except restarting the cpus. vm_start now calls vm_prepare_start.
->>> * moves the call to qemu_clock_enable away from resume_all_vcpus, and
->>>   add an explicit call to it before each instance of resume_all_vcpus
->>>   in the code.
->>
->> Can you be a bit more explicit about this? Shouldn't CPU time still
->> accrue even if you are only starting some of them?
+> When GDB issues a "vCont", QEMU was not handling it correctly when
+> multiple VCPUs are active.
+> For vCont, for each thread (VCPU), it can be specified whether to
+> single step, continue or stop that thread. The default is to stop a
+> thread.
+> However, when (for example) "vCont;s:2" is issued, all VCPUs continue
+> to run, although all but VCPU nr 2 are to be stopped.
 >
-> This is what's happening in the newest version of this patch, which I
-> sent around yesterday, although I forgot to update the patch
-> description; I'll send a fixed version ASAP.
+> This patch:
+> * adds some additional helper functions to selectively restart only
+>   some CPUs
+> * completely rewrites the vCont parsing code
 >
->> I'd prefer making resume_all_vcpus() a private function called from
+> Please note that this improvement only works in system emulation mode,
+> when in userspace emulation mode the old behaviour is preserved.
 >
-> resume_all_vcpus is already being used in other files too, doesn't make
-> sense to make it private now.
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> ---
+>  gdbstub.c | 226 +++++++++++++++++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 179 insertions(+), 47 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index ecea8c4..ea42afa 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -386,6 +386,61 @@ static inline void gdb_continue(GDBState *s)
+>  #endif
+>  }
+>
+> +static void gdb_single_step_cpus(CPUState **scpus, int flags)
+> +{
+> +    CPUState *cpu;
+> +    int cx;
+> +
+> +    if (!scpus) {
+> +        CPU_FOREACH(cpu) {
+> +            cpu_single_step(cpu, flags);
+> +        }
+> +    } else {
+> +        for (cx = 0; scpus[cx]; cx++) {
+> +            cpu_single_step(scpus[cx], flags);
+> +        }
+> +    }
+> +}
 
-Yeah I would rename the call-sites across QEMU. Perhaps just one entry
-point of rename_vcpus() which does the right thing given a list or NULL.
-But pushing the details of restarting the timer to the call sites just
-sounds like a way of it getting missed next time someone adds a resume
-somewhere.
+I missed this last time but as gdb_single_step_cpus() is only called for
+system emulation it breaks the linux-user compilation with:
 
+  error: ‘gdb_single_step_cpus’ defined but not used [-Werror=unused-function]
+
+> +
+> +/*
+> + * Resume execution, per CPU actions. For user-more emulation it's
+> + * equivalent to gdb_continue .
+> + */
+> +static int gdb_continue_partial(GDBState *s, char def, CPUState **scpus,
+> +                                                            CPUState **ccpus)
+> +{
+> +    int res = 0;
+> +#ifdef CONFIG_USER_ONLY
+> +    s->running_state = 1;
+> +#else
+> +    if (!runstate_needs_reset()) {
+> +        if (vm_prepare_start()) {
+> +            return 0;
+> +        }
+> +
+> +        if (def == 0) {
+> +            gdb_single_step_cpus(scpus, sstep_flags);
+> +            /* CPUs not in scpus or ccpus stay stopped */
+> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+> +            resume_some_vcpus(scpus);
+> +            resume_some_vcpus(ccpus);
+> +        } else if (def == 'c' || def == 'C') {
+> +            gdb_single_step_cpus(scpus, sstep_flags);
+> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+> +            resume_all_vcpus();
+> +        } else if (def == 's' || def == 'S') {
+> +            gdb_single_step_cpus(NULL, sstep_flags);
+> +            gdb_single_step_cpus(ccpus, 0);
+> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+> +            resume_all_vcpus();
+> +        } else {
+> +            res = -1;
+> +        }
+> +    }
+> +#endif
+> +    return res;
+> +}
+> +
+>  static void put_buffer(GDBState *s, const uint8_t *buf, int len)
+>  {
+>  #ifdef CONFIG_USER_ONLY
+> @@ -784,6 +839,123 @@ static int is_query_packet(const char *p, const char *query, char separator)
+>          (p[query_len] == '\0' || p[query_len] == separator);
+>  }
 >
->> resume_some_vcpus() which can then make the QEMU_CLOCK_VIRTUAL decision
->> in one place - with a comment.
->>
->>> * adds resume_some_vcpus, to selectively restart only some CPUs.
->>>
->>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
->>> ---
->>>  cpus.c                     | 61 +++++++++++++++++++++++++++++++++++++++++++++-
->>>  hw/i386/kvmvapic.c         |  2 ++
->>>  include/sysemu/cpus.h      |  1 +
->>>  include/sysemu/sysemu.h    |  2 ++
->>>  target-s390x/misc_helper.c |  2 ++
->>>  vl.c                       | 32 +++---------------------
->>>  6 files changed, 70 insertions(+), 30 deletions(-)
->>>
->>> diff --git a/cpus.c b/cpus.c
->>> index 31204bb..c102624 100644
->>> --- a/cpus.c
->>> +++ b/cpus.c
->>> @@ -1260,12 +1260,28 @@ void resume_all_vcpus(void)
->>>  {
->>>      CPUState *cpu;
->>>
->>> -    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>      CPU_FOREACH(cpu) {
->>>          cpu_resume(cpu);
->>>      }
->>>  }
->>>
->>> +/**
->>> + * resume_some_vcpus - resumes some vCPUs, indicated in a NULL-terminated
->>> + * array of CPUState *; if the parameter is NULL, all CPUs are resumed.
->>> + */
->>> +void resume_some_vcpus(CPUState **cpus)
->>> +{
->>> +    int idx;
->>> +
->>> +    if (!cpus) {
->>> +        resume_all_vcpus();
->>> +        return;
->>> +    }
->>> +    for (idx = 0; cpus[idx]; idx++) {
->>> +        cpu_resume(cpus[idx]);
->>> +    }
->>> +}
->>> +
->>>  void cpu_remove(CPUState *cpu)
->>>  {
->>>      cpu->stop = true;
->>> @@ -1396,6 +1412,49 @@ int vm_stop(RunState state)
->>>      return do_vm_stop(state);
->>>  }
->>>
->>> +/**
->>> + * Prepare for (re)starting the VM.
->>> + * Returns -1 if the vCPUs are not to be restarted (e.g. if they are already
->>> + * running or in case of an error condition), 0 otherwise.
->>> + */
->>> +int vm_prepare_start(void)
->>> +{
->>> +    RunState requested;
->>> +    int res = 0;
->>> +
->>> +    qemu_vmstop_requested(&requested);
->>> +    if (runstate_is_running() && requested == RUN_STATE__MAX) {
->>> +        return -1;
->>> +    }
->>> +
->>> +    /* Ensure that a STOP/RESUME pair of events is emitted if a
->>> +     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
->>> +     * example, according to documentation is always followed by
->>> +     * the STOP event.
->>> +     */
->>> +    if (runstate_is_running()) {
->>> +        qapi_event_send_stop(&error_abort);
->>> +        res = -1;
->>> +    } else {
->>> +        replay_enable_events();
->>> +        cpu_enable_ticks();
->>> +        runstate_set(RUN_STATE_RUNNING);
->>> +        vm_state_notify(1, RUN_STATE_RUNNING);
->>> +    }
->>> +
->>> +    /* XXX: is it ok to send this even before actually resuming the CPUs? */
->>> +    qapi_event_send_resume(&error_abort);
->>> +    return res;
->>> +}
->>> +
->>> +void vm_start(void)
->>> +{
->>> +    if (!vm_prepare_start()) {
->>> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>> +        resume_all_vcpus();
->>> +    }
->>> +}
->>> +
->>>  /* does a state transition even if the VM is already stopped,
->>>     current state is forgotten forever */
->>>  int vm_stop_force_state(RunState state)
->>> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
->>> index 74a549b..3101860 100644
->>> --- a/hw/i386/kvmvapic.c
->>> +++ b/hw/i386/kvmvapic.c
->>> @@ -446,6 +446,7 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
->>>          abort();
->>>      }
->>>
->>> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>      resume_all_vcpus();
->>>
->>>      if (!kvm_enabled()) {
->>> @@ -686,6 +687,7 @@ static void vapic_write(void *opaque, hwaddr addr, uint64_t data,
->>>              pause_all_vcpus();
->>>              patch_byte(cpu, env->eip - 2, 0x66);
->>>              patch_byte(cpu, env->eip - 1, 0x90);
->>> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>              resume_all_vcpus();
->>>          }
->>>
->>> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
->>> index 3728a1e..5fa074b 100644
->>> --- a/include/sysemu/cpus.h
->>> +++ b/include/sysemu/cpus.h
->>> @@ -5,6 +5,7 @@
->>>  bool qemu_in_vcpu_thread(void);
->>>  void qemu_init_cpu_loop(void);
->>>  void resume_all_vcpus(void);
->>> +void resume_some_vcpus(CPUState **cpus);
->>>  void pause_all_vcpus(void);
->>>  void cpu_stop_current(void);
->>>  void cpu_ticks_init(void);
->>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->>> index ef2c50b..ac301d6 100644
->>> --- a/include/sysemu/sysemu.h
->>> +++ b/include/sysemu/sysemu.h
->>> @@ -37,6 +37,7 @@ void vm_state_notify(int running, RunState state);
->>>  #define VMRESET_REPORT   true
->>>
->>>  void vm_start(void);
->>> +int vm_prepare_start(void);
->>>  int vm_stop(RunState state);
->>>  int vm_stop_force_state(RunState state);
->>>
->>> @@ -60,6 +61,7 @@ void qemu_register_powerdown_notifier(Notifier *notifier);
->>>  void qemu_system_debug_request(void);
->>>  void qemu_system_vmstop_request(RunState reason);
->>>  void qemu_system_vmstop_request_prepare(void);
->>> +bool qemu_vmstop_requested(RunState *r);
->>>  int qemu_shutdown_requested_get(void);
->>>  int qemu_reset_requested_get(void);
->>>  void qemu_system_killed(int signal, pid_t pid);
->>> diff --git a/target-s390x/misc_helper.c b/target-s390x/misc_helper.c
->>> index 4df2ec6..2b74710 100644
->>> --- a/target-s390x/misc_helper.c
->>> +++ b/target-s390x/misc_helper.c
->>> @@ -133,6 +133,7 @@ static int modified_clear_reset(S390CPU *cpu)
->>>      s390_crypto_reset();
->>>      scc->load_normal(CPU(cpu));
->>>      cpu_synchronize_all_post_reset();
->>> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>      resume_all_vcpus();
->>>      return 0;
->>>  }
->>> @@ -152,6 +153,7 @@ static int load_normal_reset(S390CPU *cpu)
->>>      scc->initial_cpu_reset(CPU(cpu));
->>>      scc->load_normal(CPU(cpu));
->>>      cpu_synchronize_all_post_reset();
->>> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>      resume_all_vcpus();
->>>      return 0;
->>>  }
->>> diff --git a/vl.c b/vl.c
->>> index f3abd99..42addbb 100644
->>> --- a/vl.c
->>> +++ b/vl.c
->>> @@ -746,7 +746,7 @@ StatusInfo *qmp_query_status(Error **errp)
->>>      return info;
->>>  }
->>>
->>> -static bool qemu_vmstop_requested(RunState *r)
->>> +bool qemu_vmstop_requested(RunState *r)
->>>  {
->>>      qemu_mutex_lock(&vmstop_lock);
->>>      *r = vmstop_requested;
->>> @@ -767,34 +767,6 @@ void qemu_system_vmstop_request(RunState state)
->>>      qemu_notify_event();
->>>  }
->>>
->>> -void vm_start(void)
->>> -{
->>> -    RunState requested;
->>> -
->>> -    qemu_vmstop_requested(&requested);
->>> -    if (runstate_is_running() && requested == RUN_STATE__MAX) {
->>> -        return;
->>> -    }
->>> -
->>> -    /* Ensure that a STOP/RESUME pair of events is emitted if a
->>> -     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
->>> -     * example, according to documentation is always followed by
->>> -     * the STOP event.
->>> -     */
->>> -    if (runstate_is_running()) {
->>> -        qapi_event_send_stop(&error_abort);
->>> -    } else {
->>> -        replay_enable_events();
->>> -        cpu_enable_ticks();
->>> -        runstate_set(RUN_STATE_RUNNING);
->>> -        vm_state_notify(1, RUN_STATE_RUNNING);
->>> -        resume_all_vcpus();
->>> -    }
->>> -
->>> -    qapi_event_send_resume(&error_abort);
->>> -}
->>> -
->>> -
->>>  /***********************************************************/
->>>  /* real time host monotonic timer */
->>>
->>> @@ -1910,6 +1882,7 @@ static bool main_loop_should_exit(void)
->>>      if (qemu_reset_requested()) {
->>>          pause_all_vcpus();
->>>          qemu_system_reset(VMRESET_REPORT);
->>> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>          resume_all_vcpus();
->>>          if (!runstate_check(RUN_STATE_RUNNING) &&
->>>                  !runstate_check(RUN_STATE_INMIGRATE)) {
->>> @@ -1921,6 +1894,7 @@ static bool main_loop_should_exit(void)
->>>          qemu_system_reset(VMRESET_SILENT);
->>>          notifier_list_notify(&wakeup_notifiers, &wakeup_reason);
->>>          wakeup_reason = QEMU_WAKEUP_REASON_NONE;
->>> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->>>          resume_all_vcpus();
->>>          qapi_event_send_wakeup(&error_abort);
->>>      }
->>
->>
->> --
->> Alex Bennée
->>
+> +/**
+> + * gdb_handle_vcont - Parses and handles a vCont packet.
+> + * returns -1 if a command is unsupported, -22 if there is a format error,
+> + *         0 on success.
+> + */
+> +static int gdb_handle_vcont(GDBState *s, const char *p)
+> +{
+> +    CPUState **s_cpus, **c_cpus;
+> +    CPUState *curcpu;
+> +    int res, idx, signal, scnt, ccnt;
+> +    char cur_action, default_action, broadcast_action;
+> +    unsigned long tmp;
+> +
+> +    /*
+> +     * For us: vCont[;action[:thread-id]]...
+> +     * where action can be one of c s C<sig> S<sig>
+> +     */
+> +    for (idx = scnt = 0; p[idx]; idx++) {
+> +        if (p[idx] == ';') {
+> +            scnt++;
+> +        }
+> +    }
+> +    s_cpus = g_new(CPUState *, scnt + 1);
+> +    c_cpus = g_new(CPUState *, scnt + 1);
+> +    scnt = ccnt = signal = 0;
+> +    default_action = broadcast_action = 0;
+> +
+> +    /*
+> +     * res keeps track of what error we are returning, with -1 meaning
+> +     * that the command is unknown or unsupported, and thus returning
+> +     * an empty packet, while -22 returns an E22 packet due to
+> +     * invalid or incorrect parameters passed.
+> +     */
+> +    res = 0;
+> +    while (*p) {
+> +        if (*p != ';') {
+> +            res = -1;
+> +            break;
+> +        }
+> +        p++; /* skip the ; */
+> +
+> +        /* unknown/invalid/unsupported command */
+> +        if (*p != 'C' && *p != 'S' && *p != 'c' && *p != 's') {
+> +            res = -1;
+> +            break;
+> +        }
+> +        cur_action = *p;
+> +        if (*p == 'C' || *p == 'S') {
+> +            if (qemu_strtoul(p + 1, &p, 16, &tmp)) {
+> +                res = -22;
+> +                break;
+> +            }
+> +            signal = gdb_signal_to_target(tmp);
+> +        } else {
+> +            p++;
+> +        }
+> +        /* thread specified. special values: -1 = all, 0 = any */
+> +        if (*p == ':') {
+> +            /*
+> +             * cannot specify an action for a single thread when an action
+> +             * was already specified for all threads
+> +             */
+> +            if (broadcast_action) {
+> +                res = -22;
+> +                break;
+> +            }
+> +            p++;
+> +            if ((p[0] == '-') && (p[1] == '1')) {
+> +                /*
+> +                 * specifying an action for all threads when some threads
+> +                 * already have actions.
+> +                 */
+> +                if (scnt || ccnt) {
+> +                    res = -22;
+> +                    break;
+> +                }
+> +                broadcast_action = cur_action;
+> +                p += 2;
+> +                continue;
+> +            }
+> +            if (qemu_strtoul(p, &p, 16, &tmp)) {
+> +                res = -22;
+> +                break;
+> +            }
+> +            /* 0 means any thread, so we pick the first */
+> +            idx = tmp ? tmp : 1;
+> +            curcpu = find_cpu(idx);
+> +            if (!curcpu) {
+> +                res = -22;
+> +                break;
+> +            }
+> +            if (cur_action == 's' || cur_action == 'S') {
+> +                s_cpus[scnt++] = curcpu;
+> +            } else {
+> +                c_cpus[ccnt++] = curcpu;
+> +            }
+> +        } else { /* no thread specified */
+> +            if (default_action != 0) {
+> +                res = -22; /* error, can't specify multiple defaults! */
+> +                break;
+> +            }
+> +            default_action = cur_action;
+> +        }
+> +    }
+> +    if (!res) {
+> +        s->signal = signal;
+> +        s_cpus[scnt] = c_cpus[ccnt] = NULL;
+> +        default_action = broadcast_action ? broadcast_action : default_action;
+> +        gdb_continue_partial(s, default_action, s_cpus, c_cpus);
+> +    }
+> +
+> +    g_free(s_cpus);
+> +    g_free(c_cpus);
+> +
+> +    return res;
+> +}
+> +
+>  static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>  {
+>      CPUState *cpu;
+> @@ -829,60 +1001,20 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>          return RS_IDLE;
+>      case 'v':
+>          if (strncmp(p, "Cont", 4) == 0) {
+> -            int res_signal, res_thread;
+> -
+>              p += 4;
+>              if (*p == '?') {
+>                  put_packet(s, "vCont;c;C;s;S");
+>                  break;
+>              }
+> -            res = 0;
+> -            res_signal = 0;
+> -            res_thread = 0;
+> -            while (*p) {
+> -                int action, signal;
+> -
+> -                if (*p++ != ';') {
+> -                    res = 0;
+> -                    break;
+> -                }
+> -                action = *p++;
+> -                signal = 0;
+> -                if (action == 'C' || action == 'S') {
+> -                    signal = gdb_signal_to_target(strtoul(p, (char **)&p, 16));
+> -                    if (signal == -1) {
+> -                        signal = 0;
+> -                    }
+> -                } else if (action != 'c' && action != 's') {
+> -                    res = 0;
+> -                    break;
+> -                }
+> -                thread = 0;
+> -                if (*p == ':') {
+> -                    thread = strtoull(p+1, (char **)&p, 16);
+> -                }
+> -                action = tolower(action);
+> -                if (res == 0 || (res == 'c' && action == 's')) {
+> -                    res = action;
+> -                    res_signal = signal;
+> -                    res_thread = thread;
+> -                }
+> -            }
+> +
+> +            res = gdb_handle_vcont(s, p);
+> +
+>              if (res) {
+> -                if (res_thread != -1 && res_thread != 0) {
+> -                    cpu = find_cpu(res_thread);
+> -                    if (cpu == NULL) {
+> -                        put_packet(s, "E22");
+> -                        break;
+> -                    }
+> -                    s->c_cpu = cpu;
+> -                }
+> -                if (res == 's') {
+> -                    cpu_single_step(s->c_cpu, sstep_flags);
+> +                if (res == -22) {
+> +                    put_packet(s, "E22");
+> +                    break;
+>                  }
+> -                s->signal = res_signal;
+> -                gdb_continue(s);
+> -                return RS_IDLE;
+> +                goto unknown_command;
+>              }
+>              break;
+>          } else {
 
 
 --
