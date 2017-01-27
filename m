@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX9zW-0007p9-IJ
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:07:15 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cX9zv-0008Kw-Mf
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:07:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX9zT-0002ke-CQ
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:07:14 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35979)
+	(envelope-from <alex.bennee@linaro.org>) id 1cX9zs-0002q6-JC
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:07:39 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37542)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cX9zT-0002kO-3J
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:07:11 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id c85so125888461wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 09:07:11 -0800 (PST)
-References: <1476445983-16661-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1476445983-16661-3-git-send-email-imbrenda@linux.vnet.ibm.com>
+	id 1cX9zs-0002pR-D3
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 12:07:36 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id c206so148709849wme.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 09:07:36 -0800 (PST)
+References: <20170127103505.18606-1-alex.bennee@linaro.org>
+	<20170127103505.18606-26-alex.bennee@linaro.org>
+	<CAJhHMCDAf8UqjO6m5RM3Hasdsf4_1FPnqibtRwYkips48tQCvw@mail.gmail.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1476445983-16661-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-Date: Fri, 27 Jan 2017 17:07:08 +0000
-Message-ID: <87lgtw8m9v.fsf@linaro.org>
+In-reply-to: <CAJhHMCDAf8UqjO6m5RM3Hasdsf4_1FPnqibtRwYkips48tQCvw@mail.gmail.com>
+Date: Fri, 27 Jan 2017 17:07:33 +0000
+Message-ID: <87k29g8m96.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] gdbstub: Fix vCont behaviour
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v8 25/25] tcg: enable MTTCG by
+ default for ARM on x86 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,297 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org
+To: Pranith Kumar <bobby.prani+qemu@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
 
-Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
+Pranith Kumar <bobby.prani+qemu@gmail.com> writes:
 
-> When GDB issues a "vCont", QEMU was not handling it correctly when
-> multiple VCPUs are active.
-> For vCont, for each thread (VCPU), it can be specified whether to
-> single step, continue or stop that thread. The default is to stop a
-> thread.
-> However, when (for example) "vCont;s:2" is issued, all VCPUs continue
-> to run, although all but VCPU nr 2 are to be stopped.
+> On Fri, Jan 27, 2017 at 5:35 AM, Alex Bennée <alex.bennee@linaro.org> wrote:
 >
-> This patch:
-> * adds some additional helper functions to selectively restart only
->   some CPUs
-> * completely rewrites the vCont parsing code
+>> diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+>> index 21d96ec35c..536190f647 100644
+>> --- a/tcg/i386/tcg-target.h
+>> +++ b/tcg/i386/tcg-target.h
+>> @@ -165,4 +165,20 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+>>  {
+>>  }
+>>
+>> +/* This defines the natural memory order supported by this
+>> + * architecture before guarantees made by various barrier
+>> + * instructions.
+>> + *
+>> + * The x86 has a pretty strong memory ordering which only really
+>> + * allows for some stores to be re-ordered after loads.
+>> + */
+>> +#include "tcg-mo.h"
+>> +
+>> +static inline int get_tcg_target_mo(void)
+>> +{
+>> +    return TCG_MO_ALL & ~TCG_MO_LD_ST;
+>> +}
+>> +
 >
-> Please note that this improvement only works in system emulation mode,
-> when in userspace emulation mode the old behaviour is preserved.
->
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-> ---
->  gdbstub.c | 226 +++++++++++++++++++++++++++++++++++++++++++++++++-------------
->  1 file changed, 179 insertions(+), 47 deletions(-)
->
-> diff --git a/gdbstub.c b/gdbstub.c
-> index ecea8c4..ea42afa 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -386,6 +386,61 @@ static inline void gdb_continue(GDBState *s)
->  #endif
->  }
->
-> +static void gdb_single_step_cpus(CPUState **scpus, int flags)
-> +{
-> +    CPUState *cpu;
-> +    int cx;
-> +
-> +    if (!scpus) {
-> +        CPU_FOREACH(cpu) {
-> +            cpu_single_step(cpu, flags);
-> +        }
-> +    } else {
-> +        for (cx = 0; scpus[cx]; cx++) {
-> +            cpu_single_step(scpus[cx], flags);
-> +        }
-> +    }
-> +}
+> s/TCG_MO_LD_ST/TCG_MO_ST_LD/?
 
-I missed this last time but as gdb_single_step_cpus() is only called for
-system emulation it breaks the linux-user compilation with:
+Doh - sorry I missed that. Will fix this time ;-)
 
-  error: ‘gdb_single_step_cpus’ defined but not used [-Werror=unused-function]
-
-> +
-> +/*
-> + * Resume execution, per CPU actions. For user-more emulation it's
-> + * equivalent to gdb_continue .
-> + */
-> +static int gdb_continue_partial(GDBState *s, char def, CPUState **scpus,
-> +                                                            CPUState **ccpus)
-> +{
-> +    int res = 0;
-> +#ifdef CONFIG_USER_ONLY
-> +    s->running_state = 1;
-> +#else
-> +    if (!runstate_needs_reset()) {
-> +        if (vm_prepare_start()) {
-> +            return 0;
-> +        }
-> +
-> +        if (def == 0) {
-> +            gdb_single_step_cpus(scpus, sstep_flags);
-> +            /* CPUs not in scpus or ccpus stay stopped */
-> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
-> +            resume_some_vcpus(scpus);
-> +            resume_some_vcpus(ccpus);
-> +        } else if (def == 'c' || def == 'C') {
-> +            gdb_single_step_cpus(scpus, sstep_flags);
-> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
-> +            resume_all_vcpus();
-> +        } else if (def == 's' || def == 'S') {
-> +            gdb_single_step_cpus(NULL, sstep_flags);
-> +            gdb_single_step_cpus(ccpus, 0);
-> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
-> +            resume_all_vcpus();
-> +        } else {
-> +            res = -1;
-> +        }
-> +    }
-> +#endif
-> +    return res;
-> +}
-> +
->  static void put_buffer(GDBState *s, const uint8_t *buf, int len)
->  {
->  #ifdef CONFIG_USER_ONLY
-> @@ -784,6 +839,123 @@ static int is_query_packet(const char *p, const char *query, char separator)
->          (p[query_len] == '\0' || p[query_len] == separator);
->  }
 >
-> +/**
-> + * gdb_handle_vcont - Parses and handles a vCont packet.
-> + * returns -1 if a command is unsupported, -22 if there is a format error,
-> + *         0 on success.
-> + */
-> +static int gdb_handle_vcont(GDBState *s, const char *p)
-> +{
-> +    CPUState **s_cpus, **c_cpus;
-> +    CPUState *curcpu;
-> +    int res, idx, signal, scnt, ccnt;
-> +    char cur_action, default_action, broadcast_action;
-> +    unsigned long tmp;
-> +
-> +    /*
-> +     * For us: vCont[;action[:thread-id]]...
-> +     * where action can be one of c s C<sig> S<sig>
-> +     */
-> +    for (idx = scnt = 0; p[idx]; idx++) {
-> +        if (p[idx] == ';') {
-> +            scnt++;
-> +        }
-> +    }
-> +    s_cpus = g_new(CPUState *, scnt + 1);
-> +    c_cpus = g_new(CPUState *, scnt + 1);
-> +    scnt = ccnt = signal = 0;
-> +    default_action = broadcast_action = 0;
-> +
-> +    /*
-> +     * res keeps track of what error we are returning, with -1 meaning
-> +     * that the command is unknown or unsupported, and thus returning
-> +     * an empty packet, while -22 returns an E22 packet due to
-> +     * invalid or incorrect parameters passed.
-> +     */
-> +    res = 0;
-> +    while (*p) {
-> +        if (*p != ';') {
-> +            res = -1;
-> +            break;
-> +        }
-> +        p++; /* skip the ; */
-> +
-> +        /* unknown/invalid/unsupported command */
-> +        if (*p != 'C' && *p != 'S' && *p != 'c' && *p != 's') {
-> +            res = -1;
-> +            break;
-> +        }
-> +        cur_action = *p;
-> +        if (*p == 'C' || *p == 'S') {
-> +            if (qemu_strtoul(p + 1, &p, 16, &tmp)) {
-> +                res = -22;
-> +                break;
-> +            }
-> +            signal = gdb_signal_to_target(tmp);
-> +        } else {
-> +            p++;
-> +        }
-> +        /* thread specified. special values: -1 = all, 0 = any */
-> +        if (*p == ':') {
-> +            /*
-> +             * cannot specify an action for a single thread when an action
-> +             * was already specified for all threads
-> +             */
-> +            if (broadcast_action) {
-> +                res = -22;
-> +                break;
-> +            }
-> +            p++;
-> +            if ((p[0] == '-') && (p[1] == '1')) {
-> +                /*
-> +                 * specifying an action for all threads when some threads
-> +                 * already have actions.
-> +                 */
-> +                if (scnt || ccnt) {
-> +                    res = -22;
-> +                    break;
-> +                }
-> +                broadcast_action = cur_action;
-> +                p += 2;
-> +                continue;
-> +            }
-> +            if (qemu_strtoul(p, &p, 16, &tmp)) {
-> +                res = -22;
-> +                break;
-> +            }
-> +            /* 0 means any thread, so we pick the first */
-> +            idx = tmp ? tmp : 1;
-> +            curcpu = find_cpu(idx);
-> +            if (!curcpu) {
-> +                res = -22;
-> +                break;
-> +            }
-> +            if (cur_action == 's' || cur_action == 'S') {
-> +                s_cpus[scnt++] = curcpu;
-> +            } else {
-> +                c_cpus[ccnt++] = curcpu;
-> +            }
-> +        } else { /* no thread specified */
-> +            if (default_action != 0) {
-> +                res = -22; /* error, can't specify multiple defaults! */
-> +                break;
-> +            }
-> +            default_action = cur_action;
-> +        }
-> +    }
-> +    if (!res) {
-> +        s->signal = signal;
-> +        s_cpus[scnt] = c_cpus[ccnt] = NULL;
-> +        default_action = broadcast_action ? broadcast_action : default_action;
-> +        gdb_continue_partial(s, default_action, s_cpus, c_cpus);
-> +    }
-> +
-> +    g_free(s_cpus);
-> +    g_free(c_cpus);
-> +
-> +    return res;
-> +}
-> +
->  static int gdb_handle_packet(GDBState *s, const char *line_buf)
->  {
->      CPUState *cpu;
-> @@ -829,60 +1001,20 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
->          return RS_IDLE;
->      case 'v':
->          if (strncmp(p, "Cont", 4) == 0) {
-> -            int res_signal, res_thread;
-> -
->              p += 4;
->              if (*p == '?') {
->                  put_packet(s, "vCont;c;C;s;S");
->                  break;
->              }
-> -            res = 0;
-> -            res_signal = 0;
-> -            res_thread = 0;
-> -            while (*p) {
-> -                int action, signal;
-> -
-> -                if (*p++ != ';') {
-> -                    res = 0;
-> -                    break;
-> -                }
-> -                action = *p++;
-> -                signal = 0;
-> -                if (action == 'C' || action == 'S') {
-> -                    signal = gdb_signal_to_target(strtoul(p, (char **)&p, 16));
-> -                    if (signal == -1) {
-> -                        signal = 0;
-> -                    }
-> -                } else if (action != 'c' && action != 's') {
-> -                    res = 0;
-> -                    break;
-> -                }
-> -                thread = 0;
-> -                if (*p == ':') {
-> -                    thread = strtoull(p+1, (char **)&p, 16);
-> -                }
-> -                action = tolower(action);
-> -                if (res == 0 || (res == 'c' && action == 's')) {
-> -                    res = action;
-> -                    res_signal = signal;
-> -                    res_thread = thread;
-> -                }
-> -            }
-> +
-> +            res = gdb_handle_vcont(s, p);
-> +
->              if (res) {
-> -                if (res_thread != -1 && res_thread != 0) {
-> -                    cpu = find_cpu(res_thread);
-> -                    if (cpu == NULL) {
-> -                        put_packet(s, "E22");
-> -                        break;
-> -                    }
-> -                    s->c_cpu = cpu;
-> -                }
-> -                if (res == 's') {
-> -                    cpu_single_step(s->c_cpu, sstep_flags);
-> +                if (res == -22) {
-> +                    put_packet(s, "E22");
-> +                    break;
->                  }
-> -                s->signal = res_signal;
-> -                gdb_continue(s);
-> -                return RS_IDLE;
-> +                goto unknown_command;
->              }
->              break;
->          } else {
+> Thanks,
 
 
 --
