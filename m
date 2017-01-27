@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX9Qk-0007It-67
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:31:19 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cX9ab-00052n-S2
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:41:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cX9Qf-0000mT-5H
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:31:18 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36207)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cX9Qe-0000mI-Qe
-	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:31:13 -0500
-Received: by mail-wm0-x229.google.com with SMTP id c85so124379524wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Jan 2017 08:31:12 -0800 (PST)
-References: <1476445983-16661-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1476445983-16661-2-git-send-email-imbrenda@linux.vnet.ibm.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1476445983-16661-2-git-send-email-imbrenda@linux.vnet.ibm.com>
-Date: Fri, 27 Jan 2017 16:31:09 +0000
-Message-ID: <87poj88nxu.fsf@linaro.org>
+	(envelope-from <alistair23@gmail.com>) id 1cX9ab-0003kf-5Q
+	for qemu-devel@nongnu.org; Fri, 27 Jan 2017 11:41:29 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] move vm_start to cpus.c
+Sender: alistair23@gmail.com
+In-Reply-To: <1485528688-29914-1-git-send-email-thuth@redhat.com>
+References: <1485528688-29914-1-git-send-email-thuth@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 27 Jan 2017 08:40:56 -0800
+Message-ID: <CAKmqyKOGTgKfGdjX4AYvh_yz=mSAgSdAWV=58=0s4w7LXjy2qw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] hw/core/or-irq: Mark the device with
+ cannot_instantiate_with_device_add_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,262 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
+On Fri, Jan 27, 2017 at 6:51 AM, Thomas Huth <thuth@redhat.com> wrote:
+> The "or-irq" device is just used internally. It's strange to
+> see this device showing up in the "-device ?" help text. Let's mark it
+> with cannot_instantiate_with_device_add_yet to hide it from the users.
 
-Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
+I agree that it is strange to be showing up to users, but is this
+really the best way to do this?
 
-> This patch:
+I thought we were trying to get rid of
+cannot_instantiate_with_device_add_yet. Would it maybe be better to
+have an internal filed that sets this device as internal?
+
+Thanks,
+
+Alistair
+
 >
-> * moves vm_start to cpus.c .
-> * exports qemu_vmstop_requested, since it's needed by vm_start .
-> * extracts vm_prepare_start from vm_start; it does what vm_start did,
->   except restarting the cpus. vm_start now calls vm_prepare_start.
-> * moves the call to qemu_clock_enable away from resume_all_vcpus, and
->   add an explicit call to it before each instance of resume_all_vcpus
->   in the code.
-
-Can you be a bit more explicit about this? Shouldn't CPU time still
-accrue even if you are only starting some of them?
-
-I'd prefer making resume_all_vcpus() a private function called from
-resume_some_vcpus() which can then make the QEMU_CLOCK_VIRTUAL decision
-in one place - with a comment.
-
-> * adds resume_some_vcpus, to selectively restart only some CPUs.
->
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  cpus.c                     | 61 +++++++++++++++++++++++++++++++++++++++++++++-
->  hw/i386/kvmvapic.c         |  2 ++
->  include/sysemu/cpus.h      |  1 +
->  include/sysemu/sysemu.h    |  2 ++
->  target-s390x/misc_helper.c |  2 ++
->  vl.c                       | 32 +++---------------------
->  6 files changed, 70 insertions(+), 30 deletions(-)
+>  hw/core/or-irq.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >
-> diff --git a/cpus.c b/cpus.c
-> index 31204bb..c102624 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1260,12 +1260,28 @@ void resume_all_vcpus(void)
->  {
->      CPUState *cpu;
->
-> -    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->      CPU_FOREACH(cpu) {
->          cpu_resume(cpu);
->      }
+> diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
+> index 1ac090d..2487fa3 100644
+> --- a/hw/core/or-irq.c
+> +++ b/hw/core/or-irq.c
+> @@ -89,6 +89,9 @@ static void or_irq_class_init(ObjectClass *klass, void *data)
+>      dc->props = or_irq_properties;
+>      dc->realize = or_irq_realize;
+>      dc->vmsd = &vmstate_or_irq;
+> +
+> +    /* It's just used internally, and should not be exposed to users */
+> +    dc->cannot_instantiate_with_device_add_yet = true;
 >  }
 >
-> +/**
-> + * resume_some_vcpus - resumes some vCPUs, indicated in a NULL-terminated
-> + * array of CPUState *; if the parameter is NULL, all CPUs are resumed.
-> + */
-> +void resume_some_vcpus(CPUState **cpus)
-> +{
-> +    int idx;
-> +
-> +    if (!cpus) {
-> +        resume_all_vcpus();
-> +        return;
-> +    }
-> +    for (idx = 0; cpus[idx]; idx++) {
-> +        cpu_resume(cpus[idx]);
-> +    }
-> +}
-> +
->  void cpu_remove(CPUState *cpu)
->  {
->      cpu->stop = true;
-> @@ -1396,6 +1412,49 @@ int vm_stop(RunState state)
->      return do_vm_stop(state);
->  }
+>  static const TypeInfo or_irq_type_info = {
+> --
+> 1.8.3.1
 >
-> +/**
-> + * Prepare for (re)starting the VM.
-> + * Returns -1 if the vCPUs are not to be restarted (e.g. if they are already
-> + * running or in case of an error condition), 0 otherwise.
-> + */
-> +int vm_prepare_start(void)
-> +{
-> +    RunState requested;
-> +    int res = 0;
-> +
-> +    qemu_vmstop_requested(&requested);
-> +    if (runstate_is_running() && requested == RUN_STATE__MAX) {
-> +        return -1;
-> +    }
-> +
-> +    /* Ensure that a STOP/RESUME pair of events is emitted if a
-> +     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
-> +     * example, according to documentation is always followed by
-> +     * the STOP event.
-> +     */
-> +    if (runstate_is_running()) {
-> +        qapi_event_send_stop(&error_abort);
-> +        res = -1;
-> +    } else {
-> +        replay_enable_events();
-> +        cpu_enable_ticks();
-> +        runstate_set(RUN_STATE_RUNNING);
-> +        vm_state_notify(1, RUN_STATE_RUNNING);
-> +    }
-> +
-> +    /* XXX: is it ok to send this even before actually resuming the CPUs? */
-> +    qapi_event_send_resume(&error_abort);
-> +    return res;
-> +}
-> +
-> +void vm_start(void)
-> +{
-> +    if (!vm_prepare_start()) {
-> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
-> +        resume_all_vcpus();
-> +    }
-> +}
-> +
->  /* does a state transition even if the VM is already stopped,
->     current state is forgotten forever */
->  int vm_stop_force_state(RunState state)
-> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-> index 74a549b..3101860 100644
-> --- a/hw/i386/kvmvapic.c
-> +++ b/hw/i386/kvmvapic.c
-> @@ -446,6 +446,7 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
->          abort();
->      }
 >
-> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->      resume_all_vcpus();
->
->      if (!kvm_enabled()) {
-> @@ -686,6 +687,7 @@ static void vapic_write(void *opaque, hwaddr addr, uint64_t data,
->              pause_all_vcpus();
->              patch_byte(cpu, env->eip - 2, 0x66);
->              patch_byte(cpu, env->eip - 1, 0x90);
-> +            qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->              resume_all_vcpus();
->          }
->
-> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-> index 3728a1e..5fa074b 100644
-> --- a/include/sysemu/cpus.h
-> +++ b/include/sysemu/cpus.h
-> @@ -5,6 +5,7 @@
->  bool qemu_in_vcpu_thread(void);
->  void qemu_init_cpu_loop(void);
->  void resume_all_vcpus(void);
-> +void resume_some_vcpus(CPUState **cpus);
->  void pause_all_vcpus(void);
->  void cpu_stop_current(void);
->  void cpu_ticks_init(void);
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index ef2c50b..ac301d6 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -37,6 +37,7 @@ void vm_state_notify(int running, RunState state);
->  #define VMRESET_REPORT   true
->
->  void vm_start(void);
-> +int vm_prepare_start(void);
->  int vm_stop(RunState state);
->  int vm_stop_force_state(RunState state);
->
-> @@ -60,6 +61,7 @@ void qemu_register_powerdown_notifier(Notifier *notifier);
->  void qemu_system_debug_request(void);
->  void qemu_system_vmstop_request(RunState reason);
->  void qemu_system_vmstop_request_prepare(void);
-> +bool qemu_vmstop_requested(RunState *r);
->  int qemu_shutdown_requested_get(void);
->  int qemu_reset_requested_get(void);
->  void qemu_system_killed(int signal, pid_t pid);
-> diff --git a/target-s390x/misc_helper.c b/target-s390x/misc_helper.c
-> index 4df2ec6..2b74710 100644
-> --- a/target-s390x/misc_helper.c
-> +++ b/target-s390x/misc_helper.c
-> @@ -133,6 +133,7 @@ static int modified_clear_reset(S390CPU *cpu)
->      s390_crypto_reset();
->      scc->load_normal(CPU(cpu));
->      cpu_synchronize_all_post_reset();
-> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->      resume_all_vcpus();
->      return 0;
->  }
-> @@ -152,6 +153,7 @@ static int load_normal_reset(S390CPU *cpu)
->      scc->initial_cpu_reset(CPU(cpu));
->      scc->load_normal(CPU(cpu));
->      cpu_synchronize_all_post_reset();
-> +    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->      resume_all_vcpus();
->      return 0;
->  }
-> diff --git a/vl.c b/vl.c
-> index f3abd99..42addbb 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -746,7 +746,7 @@ StatusInfo *qmp_query_status(Error **errp)
->      return info;
->  }
->
-> -static bool qemu_vmstop_requested(RunState *r)
-> +bool qemu_vmstop_requested(RunState *r)
->  {
->      qemu_mutex_lock(&vmstop_lock);
->      *r = vmstop_requested;
-> @@ -767,34 +767,6 @@ void qemu_system_vmstop_request(RunState state)
->      qemu_notify_event();
->  }
->
-> -void vm_start(void)
-> -{
-> -    RunState requested;
-> -
-> -    qemu_vmstop_requested(&requested);
-> -    if (runstate_is_running() && requested == RUN_STATE__MAX) {
-> -        return;
-> -    }
-> -
-> -    /* Ensure that a STOP/RESUME pair of events is emitted if a
-> -     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
-> -     * example, according to documentation is always followed by
-> -     * the STOP event.
-> -     */
-> -    if (runstate_is_running()) {
-> -        qapi_event_send_stop(&error_abort);
-> -    } else {
-> -        replay_enable_events();
-> -        cpu_enable_ticks();
-> -        runstate_set(RUN_STATE_RUNNING);
-> -        vm_state_notify(1, RUN_STATE_RUNNING);
-> -        resume_all_vcpus();
-> -    }
-> -
-> -    qapi_event_send_resume(&error_abort);
-> -}
-> -
-> -
->  /***********************************************************/
->  /* real time host monotonic timer */
->
-> @@ -1910,6 +1882,7 @@ static bool main_loop_should_exit(void)
->      if (qemu_reset_requested()) {
->          pause_all_vcpus();
->          qemu_system_reset(VMRESET_REPORT);
-> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->          resume_all_vcpus();
->          if (!runstate_check(RUN_STATE_RUNNING) &&
->                  !runstate_check(RUN_STATE_INMIGRATE)) {
-> @@ -1921,6 +1894,7 @@ static bool main_loop_should_exit(void)
->          qemu_system_reset(VMRESET_SILENT);
->          notifier_list_notify(&wakeup_notifiers, &wakeup_reason);
->          wakeup_reason = QEMU_WAKEUP_REASON_NONE;
-> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->          resume_all_vcpus();
->          qapi_event_send_wakeup(&error_abort);
->      }
-
-
---
-Alex Bennée
