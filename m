@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1cXRj1-0006lg-5t
-	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 07:03:24 -0500
+	(envelope-from <bounces@canonical.com>) id 1cXT0j-0004Yf-4D
+	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 08:25:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1cXRiw-0000Dy-9Z
-	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 07:03:23 -0500
-Received: from mout.gmx.net ([212.227.15.15]:49233)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1cXRiv-0000De-Vx
-	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 07:03:18 -0500
-Date: Sat, 28 Jan 2017 13:03:07 +0100
-From: Helge Deller <deller@gmx.de>
-Message-ID: <20170128120307.GA17532@ls3530.fritz.box>
+	(envelope-from <bounces@canonical.com>) id 1cXT0f-00038U-Oa
+	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 08:25:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37854)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cXT0f-00037a-Gk
+	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 08:25:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cXT0d-00026q-2x
+	for <qemu-devel@nongnu.org>; Sat, 28 Jan 2017 13:25:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0D1A12E80C7
+	for <qemu-devel@nongnu.org>; Sat, 28 Jan 2017 13:25:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] linux-user: Add FICLONE and FICLONERANGE ioctls
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 28 Jan 2017 13:16:07 -0000
+From: dcb <1660035@bugs.launchpad.net>
+Reply-To: Bug 1660035 <1660035@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170128131607.26951.44105.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1660035] [NEW] hw/timer/altera_timer.c:207: bad
+ size in memset ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +37,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
 
-Add missing FICLONE and FICLONERANGE ioctls.
+Public bug reported:
 
-Signed-off-by: Helge Deller <deller@gmx.de>
+hw/timer/altera_timer.c:207:5: warning: =E2=80=98memset=E2=80=99 used with =
+length equal
+to number of elements without multiplication by element size [-Wmemset-
+elt-size]
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 2f6e85b..eb1421d 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -112,6 +112,11 @@
- #ifdef FIBMAP
-      IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
- #endif
-+#ifdef FICLONE
-+     IOCTL(FICLONE, IOC_W, TYPE_INT)
-+     IOCTL(FICLONERANGE, IOC_W, MK_PTR(MK_ARRAY(TYPE_ULONGLONG, 4)))
-+#endif
-+
- #ifdef FIGETBSZ
-      IOCTL(FIGETBSZ, IOC_R, MK_PTR(TYPE_LONG))
- #endif
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 4442c22..72ca5b1 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1086,6 +1086,10 @@ struct target_pollfd {
- 
- #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
- #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
-+
-+#define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
-+#define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
-+
- /* Note that the ioctl numbers claim type "long" but the actual type
-  * used by the kernel is "int".
-  */
+Source code is
+
+     memset(t->regs, 0, ARRAY_SIZE(t->regs));
+
+Maybe better code
+
+     memset(t->regs, 0, R_MAX * sizeof( uint32_t));
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1660035
+
+Title:
+  hw/timer/altera_timer.c:207: bad size in memset ?
+
+Status in QEMU:
+  New
+
+Bug description:
+  hw/timer/altera_timer.c:207:5: warning: =E2=80=98memset=E2=80=99 used wit=
+h length
+  equal to number of elements without multiplication by element size
+  [-Wmemset-elt-size]
+
+  Source code is
+
+       memset(t->regs, 0, ARRAY_SIZE(t->regs));
+
+  Maybe better code
+
+       memset(t->regs, 0, R_MAX * sizeof( uint32_t));
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1660035/+subscriptions
