@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cXOmL-0003PZ-K0
-	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 03:54:38 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cXQKO-0004td-Vg
+	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 05:33:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cXOmK-0001dt-IB
-	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 03:54:37 -0500
-References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
-	<1485443388-27253-9-git-send-email-armbru@redhat.com>
-	<9684a908-f425-82d8-046b-19cc17d01f55@redhat.com>
-	<87r33o3emm.fsf@dusky.pond.sub.org>
-	<2bcf4c7c-5c29-fda5-1ba3-5828600a8995@redhat.com>
-	<8760l0ebgq.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e0f2369d-6ebf-ae73-abf1-7021b257748c@redhat.com>
-Date: Sat, 28 Jan 2017 03:53:08 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cXQKL-0003Xz-Te
+	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 05:33:52 -0500
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:35185)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cXQKL-0003XU-Mb
+	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 05:33:49 -0500
+Received: by mail-wm0-x230.google.com with SMTP id r126so149821294wmr.0
+	for <qemu-devel@nongnu.org>; Sat, 28 Jan 2017 02:33:49 -0800 (PST)
+References: <20170128060834.11421.45757.malonedeb@soybean.canonical.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170128060834.11421.45757.malonedeb@soybean.canonical.com>
+Date: Sat, 28 Jan 2017 10:33:46 +0000
+Message-ID: <87poj7cw39.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8760l0ebgq.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] hw: Drop superfluous special checks
- for orphaned -drive
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Bug 1660010] [NEW] AArch64 system emulation
+ cannot execute virt uefi in 2.7 or 2.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mreitz@redhat.com, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+To: Bug 1660010 <1660010@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
 
+Icenowy Zheng <1660010@bugs.launchpad.net> writes:
 
-On 01/27/2017 11:04 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> On 01/27/2017 06:51 AM, Markus Armbruster wrote:
->>> John Snow <jsnow@redhat.com> writes:
->>>
->>>> On 01/26/2017 10:09 AM, Markus Armbruster wrote:
->>>>> We've traditionally rejected orphans here and there, but not
->>>>> systematically.  For instance, the sun4m machines have an onboard SCSI
->>>>> HBA (bus=0), and have always rejected bus>0.  Other machines with an
->>>>> onboard SCSI HBA don't.
->>>>>
->>>>> Commit a66c9dc made all orphans trigger a warning, and the previous
->>>>> commit turned this into an error.  The checks "here and there" are now
->>>>> redundant.  Drop them.
->>>>>
->>>>> Note that the one in mips_jazz.c was wrong: it rejected bus > MAX_FD,
->>>>> but MAX_FD is the number of floppy drives per bus.
->>>>>
->>>>> Error messages change from
->>>>>
->>>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
->>>>>     qemu-system-x86_64: Too many IDE buses defined (3 > 2)
->>>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
->>>>>     qemu: too many floppy drives
->>>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
->>>>>     qemu: too many SCSI bus
->>>>>
->>>>> to
->>>>>
->>>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
->>>>>     qemu-system-x86_64: -drive if=ide,bus=2: machine type does not support this drive
->>>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
->>>>>     qemu-system-mips64: -drive if=floppy,bus=2,id=fd1: machine type does not support this drive
->>>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
->>>>>     qemu-system-sparc: -drive if=scsi,bus=1: machine type does not support this drive
->>>>>
->>>>
->>>> Hm, that's a lot less helpful, isn't it? Can we augment with hints?
->>>
->>> The message itself may be less specific, but it now comes with a precise
->>> location.  Personally, I'd even find
->>>
->>>     qemu-system-sparc: -drive if=scsi,bus=1: *mumble* *mumble*
->>>
->>> more helpful than
->>>
->>>     qemu: too many SCSI bus
->>>
->>> because the former tells me *which* of the options is bad.  We tend to
->>> have lots and lots of them.
->>>
->>> The deleted special case errors cover only a minority of "orphan"
->>> -drive.  If these cases need improvement, then so will the general case.
->>> If you can come up with a hint that makes the general case message more
->>> useful, I'm more than happy to squash it into PATCH 6.
->>>
->>
->> The old error had "why" and the new error has "where" but neither has
->> both. I would suggest that from the "why" you can divine the "where,"
->> but the opposite is not as easily true.
-> 
-> Some users will be able to divine more easily than others.  Consider my
-> "too many floppy drives" example.  There's just one, and the machine
-> actually supports two.  The user has to make the connection to "bus=2"
-> somehow.  Now, anybody crazy enough to mess with bus= can probably be
-> expected to figure this out, but still, the deleted error messages
-> aren't exactly wonderful.
-> 
->> The new error even suggests information I think is wrong and misleading:
->> We do support SCSI! (Just not this many of them.)
-> 
-> Well, the error doesn't say "machine doesn't support SCSI", only
-> "doesn't support this particular -drive".  Perhaps it could be worded
-> more clearly.  Ideas?
-> 
+> Public bug reported:
+>
+> The UEFI firmware file is retrieved from
+> http://snapshots.linaro.org/components/kernel/linaro-
+> edk2/latest/release/qemu64/QEMU_EFI.fd .
+>
+> The error is:
+> ```
+> TODO /var/lib/abbs/build/tmp.p2dMBBlJ0D/qemu-2.7.0/tci.c:1049: tcg_qemu_tb_exec()
+> /var/lib/abbs/build/tmp.p2dMBBlJ0D/qemu-2.7.0/tci.c:1049: tcg fatal error
+> ```
 
-Ah, I see what you mean now. I interpreted "this drive" to mean SCSI,
-not this SCSI *instance*. If it can be made clearer that QEMU is simply
-unable to instantiate this particular instance, that'd be fine.
+What is your command line and why are you running with the TCI?
 
-Instead of "Machine type does not support this drive,"
+>
+> (both 2.7.0 and 2.8.0 are tested to fail, 2.6.1 works)
+>
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
 
-how about
 
-"Machine type cannot instantiate this drive instance"
-
-Or ... follow your own best judgement. This is really YOUR wheelhouse.
-My example is a little wordy.
-
->> No suggestions for how or where to append the hints. This is not the
->> hill I am preparing to die on.
-> 
-> Plenty of hills around...
-> 
-
-Some of them have flowers.
+--
+Alex Bennée
