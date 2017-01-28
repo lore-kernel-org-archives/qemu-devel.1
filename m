@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cXaYo-0007hm-SH
-	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 16:29:31 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cXab7-00017K-T1
+	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 16:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cXaYj-0005MS-Uw
-	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 16:29:26 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cXab3-0005r1-De
+	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 16:31:49 -0500
 References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-	<20170123121036.4823-8-vsementsov@virtuozzo.com>
+	<20170123121036.4823-9-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bf9c6aae-2aa6-bfe2-8856-67e8b13ad58d@redhat.com>
-Date: Sat, 28 Jan 2017 22:29:06 +0100
+Message-ID: <633cb17f-fb49-46d7-2c94-4659237d1970@redhat.com>
+Date: Sat, 28 Jan 2017 22:31:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170123121036.4823-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20170123121036.4823-9-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="wp9QUEodC9VRoLVqQCbUj68IqSmsoIouo"
-Subject: Re: [Qemu-devel] [PATCH 07/24] qcow2: add bitmaps extension
+	boundary="xcvmeKlwq8LGJSvpNsnekHOs6upf4nK44"
+Subject: Re: [Qemu-devel] [PATCH 08/24] block: introduce auto-loading bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +28,52 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.o
 Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wp9QUEodC9VRoLVqQCbUj68IqSmsoIouo
+--xcvmeKlwq8LGJSvpNsnekHOs6upf4nK44
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
  famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <bf9c6aae-2aa6-bfe2-8856-67e8b13ad58d@redhat.com>
-Subject: Re: [PATCH 07/24] qcow2: add bitmaps extension
+Message-ID: <633cb17f-fb49-46d7-2c94-4659237d1970@redhat.com>
+Subject: Re: [PATCH 08/24] block: introduce auto-loading bitmaps
 References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
- <20170123121036.4823-8-vsementsov@virtuozzo.com>
-In-Reply-To: <20170123121036.4823-8-vsementsov@virtuozzo.com>
+ <20170123121036.4823-9-vsementsov@virtuozzo.com>
+In-Reply-To: <20170123121036.4823-9-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
 On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
-> Add bitmap extension as specified in docs/specs/qcow2.txt.
-> For now, just mirror extension header into Qcow2 state and check
-> constraints.
->=20
-> For now, disable image resize if it has bitmaps. It will be fixed later=
-=2E
+> Auto loading bitmaps are bitmaps stored in the disk image, which should=
+
+> be loaded when the image is opened and become BdrvDirtyBitmaps for the
+> corresponding drive.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
 > ---
->  block/qcow2.c | 119 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++++++-
->  block/qcow2.h |  24 ++++++++++++
->  2 files changed, 141 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 96fb8a8f16..a8835988c7 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
+>  block.c                   | 14 ++++++++++++++
+>  include/block/block.h     |  2 ++
+>  include/block/block_int.h |  3 +++
+>  3 files changed, 19 insertions(+)
 
-[...]
-
-> @@ -185,6 +265,15 @@ static int qcow2_read_extensions(BlockDriverState =
-*bs, uint64_t start_offset,
->          offset +=3D ((ext.len + 7) & ~7);
->      }
-> =20
-> +    if (need_update && !bdrv_is_root_node(bs) &&
-> +        !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
-> +    {
-> +        ret =3D qcow2_update_header(bs);
-
-Good idea, but qcow2_read_extensions() can be called pretty early in
-qcow2_open(). Therefore, some fields in the BDRVQcow2State are not
-necessarily set already.
-
-For instance, it is always called before s->snapshots_offset and
-s->nb_snapshots are set. Thus, this will effectively always discard all
-snapshots.
-
-Max
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---wp9QUEodC9VRoLVqQCbUj68IqSmsoIouo
+--xcvmeKlwq8LGJSvpNsnekHOs6upf4nK44
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliNDSISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AbtMIAIDZ6zUUe1JUl01ArwVgdwNmF5T2LvOf
-WgvWulApB/ZUKOhdZKYENynJGhGf0Qu/ILuKrIyDvq+j1nxSDCGvSiX/tE0I8tH0
-LlWQm2ounWMlJImlpqDSm58RMG+9KLsk8+QHKiZfG/awn3afrkoRcJbueFRW88oM
-4nfT8TYTK8uEasos7cpsI2ffEVvtrrTp7U0uHvxcS+mGAM+O4Ee5HFCiHvJlILJd
-YlF+/M2/E6VzPk0dKjl+m3EizdGnEySc9kde2qY46FnQ1Jy/edKG4UeEG6Xm8l8E
-cx/l5SJqZfbWhoY3WQzi7QtEpOufrtbemwvxeeLIGlT+bNM89YAcf3s=
-=3dov
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliNDbISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AoecH/ihm411++N13QJzxOnAeUfmOcI3PQ1LD
+v+sPG+tOB/RPrwvX/ZJ2M/1/gmoVdBjFPINxJ+4hsYVL51rN9DlZcHSGUkxo3ltu
+YGobjvxlXvwgdt3lKR3EtudUJNCq2AVxDTnv0qVZUqTse+uj7JYyP5Flcn3ZXFUy
+lRvurCkrMWps2uP6Uuot1cYduWo+TOXwW8FpHOnNff55iU/6zq+z7L9fg38gk1Xe
+QF2hrkiHIqOJudIrkyA7Bh4ajbEl2kzuX5Sm9PgUs3Cgmrt8wnn3KSFV7FogBUqs
+mUWYnKnyOHArnG00UYn12PTz8s21IQJBMbm6bDS4a8L1/3wE08XLw90=
+=QJQ2
 -----END PGP SIGNATURE-----
 
---wp9QUEodC9VRoLVqQCbUj68IqSmsoIouo--
+--xcvmeKlwq8LGJSvpNsnekHOs6upf4nK44--
