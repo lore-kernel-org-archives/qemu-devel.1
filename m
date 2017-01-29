@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cXbYg-0004Zd-6f
-	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 17:33:23 -0500
+	(envelope-from <jan.kiszka@web.de>) id 1cXl5U-0002Hq-HE
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 03:43:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cXbYf-0004jY-5u
-	for qemu-devel@nongnu.org; Sat, 28 Jan 2017 17:33:22 -0500
-References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-	<20170123121036.4823-16-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <7c1c947a-aa66-800c-9cc1-af90f70a41f2@redhat.com>
-Date: Sat, 28 Jan 2017 23:33:08 +0100
+	(envelope-from <jan.kiszka@web.de>) id 1cXl5R-0002es-Cv
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 03:43:52 -0500
+Received: from mout.web.de ([212.227.15.14]:57983)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1cXl5R-0002dc-2a
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 03:43:49 -0500
+References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
+	<874m0peu50.fsf@dusky.pond.sub.org>
+	<533e0b17-4d60-a584-5680-559834013c68@web.de>
+	<87inp05m8m.fsf@dusky.pond.sub.org>
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <4504afce-c62e-c54f-33a3-483f16dc4530@web.de>
+Date: Sun, 29 Jan 2017 09:43:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170123121036.4823-16-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oACneCA5mdEm0tkN3qawSSvKDPfvLvcTK"
-Subject: Re: [Qemu-devel] [PATCH 15/24] qcow2: add
- .bdrv_can_store_new_dirty_bitmap
+In-Reply-To: <87inp05m8m.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +29,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>, qemu-devel <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oACneCA5mdEm0tkN3qawSSvKDPfvLvcTK
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <7c1c947a-aa66-800c-9cc1-af90f70a41f2@redhat.com>
-Subject: Re: [PATCH 15/24] qcow2: add .bdrv_can_store_new_dirty_bitmap
-References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
- <20170123121036.4823-16-vsementsov@virtuozzo.com>
-In-Reply-To: <20170123121036.4823-16-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+On 2017-01-27 20:36, Markus Armbruster wrote:
+> Jan Kiszka <jan.kiszka@web.de> writes:
+> 
+>> On 2017-01-23 15:19, Markus Armbruster wrote:
+>>> Jan Kiszka <jan.kiszka@siemens.com> writes:
+>>>
+>>>> Hi,
+>>>>
+>>>> some of you may know that we are using a shared memory device similar to
+>>>> ivshmem in the partitioning hypervisor Jailhouse [1].
+>>>>
+>>>> We started as being compatible to the original ivshmem that QEMU
+>>>> implements, but we quickly deviated in some details, and in the recent
+>>>> months even more. Some of the deviations are related to making the
+>>>> implementation simpler. The new ivshmem takes <500 LoC - Jailhouse is
+>>>
+>>> Compare: hw/misc/ivshmem.c ~1000 SLOC, measured with sloccount.
+>>
+>> That difference comes from remote/migration support and general QEMU
+>> integration - likely not very telling due to the different environments.
+> 
+> Plausible.
+> 
+>>>> aiming at safety critical systems and, therefore, a small code base.
+>>>> Other changes address deficits in the original design, like missing
+>>>> life-cycle management.
+>>>>
+>>>> Now the question is if there is interest in defining a common new
+>>>> revision of this device and maybe also of some protocols used on top,
+>>>> such as virtual network links. Ideally, this would enable us to share
+>>>> Linux drivers. We will definitely go for upstreaming at least a network
+>>>> driver such as [2], a UIO driver and maybe also a serial port/console.
+>>>>
+>>>> I've attached a first draft of the specification of our new ivshmem
+>>>> device. A working implementation can be found in the wip/ivshmem2 branch
+>>>> of Jailhouse [3], the corresponding ivshmem-net driver in [4].
+>>>>
+>>>> Deviations from the original design:
+>>>>
+>>>> - Only two peers per link
+>>>
+>>> Uh, define "link".
+>>
+>> VMs are linked via a common shared memory. Interrupt delivery follows
+>> that route as well.
+>>
+>>>
+>>>>   This simplifies the implementation and also the interfaces (think of
+>>>>   life-cycle management in a multi-peer environment). Moreover, we do
+>>>>   not have an urgent use case for multiple peers, thus also not
+>>>>   reference for a protocol that could be used in such setups. If someone
+>>>>   else happens to share such a protocol, it would be possible to discuss
+>>>>   potential extensions and their implications.
+>>>>
+>>>> - Side-band registers to discover and configure share memory regions
+>>>>
+>>>>   This was one of the first changes: We removed the memory regions from
+>>>>   the PCI BARs and gave them special configuration space registers. By
+>>>>   now, these registers are embedded in a PCI capability. The reasons are
+>>>>   that Jailhouse does not allow to relocate the regions in guest address
+>>>>   space (but other hypervisors may if they like to) and that we now have
+>>>>   up to three of them.
+>>>
+>>> I'm afraid I don't quite understand the change, nor the rationale.  I
+>>> guess I could figure out the former by studying the specification.
+>>
+>> a) It's a Jailhouse thing (we disallow the guest to move the regions
+>>    around in its address space)
+>> b) With 3 regions + MSI-X + MMIO registers, we run out of BARs (or
+>>    would have to downgrade them to 32 bit)
+> 
+> Have you considered putting your three shared memory regions in memory
+> consecutively, so they can be covered by a single BAR?  Similar to how a
+> single BAR covers both MSI-X table and PBA.
 
-On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
-> Realize .bdrv_can_store_new_dirty_bitmap interface.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2-bitmap.c | 40 ++++++++++++++++++++++++++++++++++++++++
->  block/qcow2.c        |  1 +
->  block/qcow2.h        |  4 ++++
->  3 files changed, 45 insertions(+)
+Would still require to pass three times some size information (each
+region can be different or empty/non-existent). Moreover, a) is not
+possible then without ugly modifications to the guest because they
+expect BAR-based regions to be relocatable.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+> 
+>>>> - Changed PCI base class code to 0xff (unspecified class)
+>>>
+>>> Changed from 0x5 (memory controller).
+>>
+>> Right.
+>>
+>>>
+>>>>   This allows us to define our own sub classes and interfaces. That is
+>>>>   now exploited for specifying the shared memory protocol the two
+>>>>   connected peers should use. It also allows the Linux drivers to match
+>>>>   on that.
+>>>>
+>>>> - INTx interrupts support is back
+>>>>
+>>>>   This is needed on target platforms without MSI controllers, i.e.
+>>>>   without the required guest support. Namely some PCI-less ARM SoCs
+>>>>   required the reintroduction. While doing this, we also took care of
+>>>>   keeping the MMIO registers free of privileged controls so that a
+>>>>   guest OS can map them safely into a guest userspace application.
+>>>
+>>> So you need interrupt capability.  Current upstream ivshmem requires a
+>>> server such as the one in contrib/ivshmem-server/.  What about yours?
+>>
+>> IIRC, the need for a server with QEMU/KVM is related to live migration.
+>> Jailhouse is simpler, all guests are managed by the same hypervisor
+>> instance, and there is no migration. That makes interrupt delivery much
+>> simpler as well. However, the device spec should not exclude other
+>> architectures.
+> 
+> The server doesn't really help with live migration.  It's used to dole
+> out file descriptors for shared memory and interrupt signalling, and to
+> notify of peer connect/disconnect.
 
+That should be solvable directly between two peers.
 
---oACneCA5mdEm0tkN3qawSSvKDPfvLvcTK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> 
+>>> The interrupt feature enables me to guess a definition of "link": A and
+>>> B are peers of the same link if they can interrupt each other.
+>>>
+>>> Does your ivshmem2 support interrupt-less operation similar to
+>>> ivshmem-plain?
+>>
+>> Each receiver of interrupts is free to enable that - or leave it off as
+>> it is the default after reset. But currently the spec demands that
+>> either MSI-X or INTx is reported as available to the guests. We could
+>> extend it to permit reporting no interrupts support if there is a good
+>> case for it.
+> 
+> I think the case for interrupt-incapable ivshmem-plain is that
+> interrupt-capable ivshmem-doorbell requires a server, and is therefore a
+> bit more complex to set up, and has additional failure modes.
+> 
+> If that wasn't the case, a single device variant would make more sense.
+> 
+> Besides, contrib/ivshmem-server/ is not fit for production use.
+> 
+>> I will have to look into the details of the client-server structure of
+>> QEMU's ivshmem again to answer the question under with restriction we
+>> can make it both simpler and more robust. As Jailhouse has no live
+>> migration support, requirements on ivshmem related to that may only be
+>> addressed by chance so far.
+> 
+> Here's how live migration works with QEMU's ivshmem: exactly one peer
+> (the "master") migrates with its ivshmem device, all others need to hot
+> unplug ivshmem, migrate, hot plug it back after the master completed its
+> migration.  The master connects to the new server on the destination on
+> startup, then live migration copies over the shared memory.  The other
+> peers connect to the new server when they get their ivshmem hot plugged
+> again.
 
------BEGIN PGP SIGNATURE-----
+OK, hot-plug is a simple answer to this problem. It would be even
+cleaner to support from the guest POV with the new state signalling
+mechanism of ivshmem2.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliNHCQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AOyMIALJTfVRk9f8EfOLxBmzvpUp7blcZY368
-ojm2RrMp9MMboN/3niBxz3wk6V8EghsqA0+yoYJK8Rr27MJmyoerQT/L6CAqcWps
-7R5FK1W8onIpbCz6KnRy6HNO+qWvbVDMoWufkjhoLhxKkH9tXkrop0Wy4+hZXbMt
-oe77u27Qb+RFo36SY3FSDdseiInxojBjuR2RarkuC+2owTURdkP/NWVypuB2GbeD
-nvHUUxQaGeYTPn6PxDx4IH73ZRvdtmCyyzpeq9lJIuU9vt7omJgDvITk057NkbMm
-9/S0Y+RdqX/7SknbeC1ewffqm0sF6W0x9jp1H/ET7sBjPis7wzZCDWs=
-=1/Aa
------END PGP SIGNATURE-----
+> 
+>>>> And then there are some extensions of the original ivshmem:
+>>>>
+>>>> - Multiple shared memory regions, including unidirectional ones
+>>>>
+>>>>   It is now possible to expose up to three different shared memory
+>>>>   regions: The first one is read/writable for both sides. The second
+>>>>   region is read/writable for the local peer and read-only for the
+>>>>   remote peer (useful for output queues). And the third is read-only
+>>>>   locally but read/writable remotely (ie. for input queues).
+>>>>   Unidirectional regions prevent that the receiver of some data can
+>>>>   interfere with the sender while it is still building the message, a
+>>>>   property that is not only useful for safety critical communication,
+>>>>   we are sure.
+>>>>
+>>>> - Life-cycle management via local and remote state
+>>>>
+>>>>   Each device can now signal its own state in form of a value to the
+>>>>   remote side, which triggers an event there.
+>>>
+>>> How are "events" related to interrupts?
+>>
+>> Confusing term chosen here: an interrupt is triggered on the remote side
+>> (if it has interrupts enabled).
+> 
+> Got it.
+> 
+>>>>                                               Moreover, state changes
+>>>>   done by the hypervisor to one peer are signalled to the other side.
+>>>>   And we introduced a write-to-shared-memory mechanism for the
+>>>>   respective remote state so that guests do not have to issue an MMIO
+>>>>   access in order to check the state.
+>>>>
+>>>> So, this is our proposal. Would be great to hear some opinions if you
+>>>> see value in adding support for such an "ivshmem 2.0" device to QEMU as
+>>>> well and expand its ecosystem towards Linux upstream, maybe also DPDK
+>>>> again. If you see problems in the new design /wrt what QEMU provides so
+>>>> far with its ivshmem device, let's discuss how to resolve them. Looking
+>>>> forward to any feedback!
+>>>
+>>> My general opinion on ivshmem is well-known, but I repeat it for the
+>>> record: merging it was a mistake, and using it is probably a mistake.  I
+>>> detailed my concerns in "Why I advise against using ivshmem"[*].
+>>>
+>>> My philosophical concerns remain.  Perhaps you can assuage them.
+>>>
+>>> Only some of my practical concerns have since been addressed.  In part
+>>> by myself, because having a flawed implementation of a bad idea is
+>>> strictly worse than the same with flaws corrected as far as practical.
+>>> But even today, docs/specs/ivshmem-spec.txt is a rather depressing read.
+>>
+>> I agree.
+>>
+>>>
+>>> However, there's one thing that's still worse than a more or less flawed
+>>> implementation of a bad idea: two implementations of a bad idea.  Could
+>>> ivshmem2 be done in a way that permits *replacing* ivshmem?
+>>
+>> If people see the need for having a common ivshmem2, that should of
+>> course be designed to replace the original version of QEMU. I wouldn't
+>> like to design it being backward compatible, but the new version should
+>> provide all useful and required features of the old one.
+> 
+> Nobody likes to provide backward compability, but everybody likes to
+> take advantage of it :)
+> 
+> Seriously, I can't say whether feature parity would suffice, or whether
+> we need full backward compatibility.
 
---oACneCA5mdEm0tkN3qawSSvKDPfvLvcTK--
+Given the deficits of the current design and the lacking driver support
+in Linux, people should be happy if the new interface is default but the
+old one could still be selected for a while. But a first step will
+likely be a separate implementation of the interface.
+
+> 
+>> Of course, I'm careful with investing much time into expanding the
+>> existing, for Jailhouse possibly sufficient design if there no real
+>> interest in continuing the ivshmem support in QEMU - because of
+>> vhost-pci or other reasons. But if that interest exists, it would be
+>> beneficial for us to have QEMU supporting a compatible version and using
+>> the same guest drivers. Then I would start looking into concrete patches
+>> for it as well.
+> 
+> Interest is difficult for me to gauge, not least because alternatives
+> are still being worked on.
+
+I'm considering to suggest this as GSoC project now.
+
+Jan
