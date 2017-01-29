@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1cXl5U-0002Hq-HE
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 03:43:54 -0500
+	(envelope-from <drjones@redhat.com>) id 1cXo2p-0005nl-LG
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 06:53:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1cXl5R-0002es-Cv
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 03:43:52 -0500
-Received: from mout.web.de ([212.227.15.14]:57983)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1cXl5R-0002dc-2a
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 03:43:49 -0500
-References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
-	<874m0peu50.fsf@dusky.pond.sub.org>
-	<533e0b17-4d60-a584-5680-559834013c68@web.de>
-	<87inp05m8m.fsf@dusky.pond.sub.org>
-From: Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <4504afce-c62e-c54f-33a3-483f16dc4530@web.de>
-Date: Sun, 29 Jan 2017 09:43:33 +0100
+	(envelope-from <drjones@redhat.com>) id 1cXo2o-0003Js-1O
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 06:53:19 -0500
+Date: Sun, 29 Jan 2017 12:53:06 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170129115306.iuhvofl3y65x7sjw@hawk.localdomain>
+References: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
+	<1484558821-15512-4-git-send-email-zhaoshenglong@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <87inp05m8m.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1484558821-15512-4-git-send-email-zhaoshenglong@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 3/6] arm: kvm64: Check if kvm supports
+ cross type vCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,250 +24,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Jailhouse <jailhouse-dev@googlegroups.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm@nongnu.org, wei@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, wu.wubin@huawei.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
 
-On 2017-01-27 20:36, Markus Armbruster wrote:
-> Jan Kiszka <jan.kiszka@web.de> writes:
+On Mon, Jan 16, 2017 at 05:26:58PM +0800, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
->> On 2017-01-23 15:19, Markus Armbruster wrote:
->>> Jan Kiszka <jan.kiszka@siemens.com> writes:
->>>
->>>> Hi,
->>>>
->>>> some of you may know that we are using a shared memory device similar to
->>>> ivshmem in the partitioning hypervisor Jailhouse [1].
->>>>
->>>> We started as being compatible to the original ivshmem that QEMU
->>>> implements, but we quickly deviated in some details, and in the recent
->>>> months even more. Some of the deviations are related to making the
->>>> implementation simpler. The new ivshmem takes <500 LoC - Jailhouse is
->>>
->>> Compare: hw/misc/ivshmem.c ~1000 SLOC, measured with sloccount.
->>
->> That difference comes from remote/migration support and general QEMU
->> integration - likely not very telling due to the different environments.
+> If user requests a specific type vCPU which is not same with the
+> physical ones and if kvm supports cross type vCPU, we set the
+> KVM_ARM_VCPU_CROSS bit and set the CPU ID registers.
 > 
-> Plausible.
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  target/arm/kvm64.c | 182 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 182 insertions(+)
 > 
->>>> aiming at safety critical systems and, therefore, a small code base.
->>>> Other changes address deficits in the original design, like missing
->>>> life-cycle management.
->>>>
->>>> Now the question is if there is interest in defining a common new
->>>> revision of this device and maybe also of some protocols used on top,
->>>> such as virtual network links. Ideally, this would enable us to share
->>>> Linux drivers. We will definitely go for upstreaming at least a network
->>>> driver such as [2], a UIO driver and maybe also a serial port/console.
->>>>
->>>> I've attached a first draft of the specification of our new ivshmem
->>>> device. A working implementation can be found in the wip/ivshmem2 branch
->>>> of Jailhouse [3], the corresponding ivshmem-net driver in [4].
->>>>
->>>> Deviations from the original design:
->>>>
->>>> - Only two peers per link
->>>
->>> Uh, define "link".
->>
->> VMs are linked via a common shared memory. Interrupt delivery follows
->> that route as well.
->>
->>>
->>>>   This simplifies the implementation and also the interfaces (think of
->>>>   life-cycle management in a multi-peer environment). Moreover, we do
->>>>   not have an urgent use case for multiple peers, thus also not
->>>>   reference for a protocol that could be used in such setups. If someone
->>>>   else happens to share such a protocol, it would be possible to discuss
->>>>   potential extensions and their implications.
->>>>
->>>> - Side-band registers to discover and configure share memory regions
->>>>
->>>>   This was one of the first changes: We removed the memory regions from
->>>>   the PCI BARs and gave them special configuration space registers. By
->>>>   now, these registers are embedded in a PCI capability. The reasons are
->>>>   that Jailhouse does not allow to relocate the regions in guest address
->>>>   space (but other hypervisors may if they like to) and that we now have
->>>>   up to three of them.
->>>
->>> I'm afraid I don't quite understand the change, nor the rationale.  I
->>> guess I could figure out the former by studying the specification.
->>
->> a) It's a Jailhouse thing (we disallow the guest to move the regions
->>    around in its address space)
->> b) With 3 regions + MSI-X + MMIO registers, we run out of BARs (or
->>    would have to downgrade them to 32 bit)
-> 
-> Have you considered putting your three shared memory regions in memory
-> consecutively, so they can be covered by a single BAR?  Similar to how a
-> single BAR covers both MSI-X table and PBA.
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 6111109..70442ea 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -481,7 +481,151 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUClass *ahcc)
+>      return true;
+>  }
+>  
+> +#define ARM_CPU_ID_MIDR        3, 0, 0, 0, 0
+>  #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
+> +/* ID group 1 registers */
+> +#define ARM_CPU_ID_REVIDR      3, 0, 0, 0, 6
+> +#define ARM_CPU_ID_AIDR        3, 1, 0, 0, 7
+> +
+> +/* ID group 2 registers */
+> +#define ARM_CPU_ID_CCSIDR      3, 1, 0, 0, 0
+> +#define ARM_CPU_ID_CLIDR       3, 1, 0, 0, 1
+> +#define ARM_CPU_ID_CSSELR      3, 2, 0, 0, 0
+> +#define ARM_CPU_ID_CTR         3, 3, 0, 0, 1
+> +
+> +/* ID group 3 registers */
+> +#define ARM_CPU_ID_PFR0        3, 0, 0, 1, 0
+> +#define ARM_CPU_ID_PFR1        3, 0, 0, 1, 1
+> +#define ARM_CPU_ID_DFR0        3, 0, 0, 1, 2
+> +#define ARM_CPU_ID_AFR0        3, 0, 0, 1, 3
+> +#define ARM_CPU_ID_MMFR0       3, 0, 0, 1, 4
+> +#define ARM_CPU_ID_MMFR1       3, 0, 0, 1, 5
+> +#define ARM_CPU_ID_MMFR2       3, 0, 0, 1, 6
+> +#define ARM_CPU_ID_MMFR3       3, 0, 0, 1, 7
+> +#define ARM_CPU_ID_ISAR0       3, 0, 0, 2, 0
+> +#define ARM_CPU_ID_ISAR1       3, 0, 0, 2, 1
+> +#define ARM_CPU_ID_ISAR2       3, 0, 0, 2, 2
+> +#define ARM_CPU_ID_ISAR3       3, 0, 0, 2, 3
+> +#define ARM_CPU_ID_ISAR4       3, 0, 0, 2, 4
+> +#define ARM_CPU_ID_ISAR5       3, 0, 0, 2, 5
+> +#define ARM_CPU_ID_MMFR4       3, 0, 0, 2, 6
+> +#define ARM_CPU_ID_MVFR0       3, 0, 0, 3, 0
+> +#define ARM_CPU_ID_MVFR1       3, 0, 0, 3, 1
+> +#define ARM_CPU_ID_MVFR2       3, 0, 0, 3, 2
+> +#define ARM_CPU_ID_AA64PFR0    3, 0, 0, 4, 0
+> +#define ARM_CPU_ID_AA64PFR1    3, 0, 0, 4, 1
+> +#define ARM_CPU_ID_AA64DFR0    3, 0, 0, 5, 0
+> +#define ARM_CPU_ID_AA64DFR1    3, 0, 0, 5, 1
+> +#define ARM_CPU_ID_AA64AFR0    3, 0, 0, 5, 4
+> +#define ARM_CPU_ID_AA64AFR1    3, 0, 0, 5, 5
+> +#define ARM_CPU_ID_AA64ISAR0   3, 0, 0, 6, 0
+> +#define ARM_CPU_ID_AA64ISAR1   3, 0, 0, 6, 1
+> +#define ARM_CPU_ID_AA64MMFR0   3, 0, 0, 7, 0
+> +#define ARM_CPU_ID_AA64MMFR1   3, 0, 0, 7, 1
+> +#define ARM_CPU_ID_MAX         36
 
-Would still require to pass three times some size information (each
-region can be different or empty/non-existent). Moreover, a) is not
-possible then without ugly modifications to the guest because they
-expect BAR-based regions to be relocatable.
+We don't need ARM_CPU_ID_MAX, I'll show you why below
 
-> 
->>>> - Changed PCI base class code to 0xff (unspecified class)
->>>
->>> Changed from 0x5 (memory controller).
->>
->> Right.
->>
->>>
->>>>   This allows us to define our own sub classes and interfaces. That is
->>>>   now exploited for specifying the shared memory protocol the two
->>>>   connected peers should use. It also allows the Linux drivers to match
->>>>   on that.
->>>>
->>>> - INTx interrupts support is back
->>>>
->>>>   This is needed on target platforms without MSI controllers, i.e.
->>>>   without the required guest support. Namely some PCI-less ARM SoCs
->>>>   required the reintroduction. While doing this, we also took care of
->>>>   keeping the MMIO registers free of privileged controls so that a
->>>>   guest OS can map them safely into a guest userspace application.
->>>
->>> So you need interrupt capability.  Current upstream ivshmem requires a
->>> server such as the one in contrib/ivshmem-server/.  What about yours?
->>
->> IIRC, the need for a server with QEMU/KVM is related to live migration.
->> Jailhouse is simpler, all guests are managed by the same hypervisor
->> instance, and there is no migration. That makes interrupt delivery much
->> simpler as well. However, the device spec should not exclude other
->> architectures.
-> 
-> The server doesn't really help with live migration.  It's used to dole
-> out file descriptors for shared memory and interrupt signalling, and to
-> notify of peer connect/disconnect.
+> +
+> +static int kvm_arm_set_id_registers(CPUState *cs)
+> +{
+> +    int ret = 0;
+> +    uint32_t i;
+> +    ARMCPU *cpu = ARM_CPU(cs);
+> +    struct kvm_one_reg id_regitsers[ARM_CPU_ID_MAX];
+> +
+> +    memset(id_regitsers, 0, ARM_CPU_ID_MAX * sizeof(struct kvm_one_reg));
+> +
+> +    id_regitsers[0].id = ARM64_SYS_REG(ARM_CPU_ID_MIDR);
+> +    id_regitsers[0].addr = (uintptr_t)&cpu->midr;
+> +
+> +    id_regitsers[1].id = ARM64_SYS_REG(ARM_CPU_ID_REVIDR);
+> +    id_regitsers[1].addr = (uintptr_t)&cpu->revidr;
+> +
 
-That should be solvable directly between two peers.
+We can condense this nicely with list initialization
 
-> 
->>> The interrupt feature enables me to guess a definition of "link": A and
->>> B are peers of the same link if they can interrupt each other.
->>>
->>> Does your ivshmem2 support interrupt-less operation similar to
->>> ivshmem-plain?
->>
->> Each receiver of interrupts is free to enable that - or leave it off as
->> it is the default after reset. But currently the spec demands that
->> either MSI-X or INTx is reported as available to the guests. We could
->> extend it to permit reporting no interrupts support if there is a good
->> case for it.
-> 
-> I think the case for interrupt-incapable ivshmem-plain is that
-> interrupt-capable ivshmem-doorbell requires a server, and is therefore a
-> bit more complex to set up, and has additional failure modes.
-> 
-> If that wasn't the case, a single device variant would make more sense.
-> 
-> Besides, contrib/ivshmem-server/ is not fit for production use.
-> 
->> I will have to look into the details of the client-server structure of
->> QEMU's ivshmem again to answer the question under with restriction we
->> can make it both simpler and more robust. As Jailhouse has no live
->> migration support, requirements on ivshmem related to that may only be
->> addressed by chance so far.
-> 
-> Here's how live migration works with QEMU's ivshmem: exactly one peer
-> (the "master") migrates with its ivshmem device, all others need to hot
-> unplug ivshmem, migrate, hot plug it back after the master completed its
-> migration.  The master connects to the new server on the destination on
-> startup, then live migration copies over the shared memory.  The other
-> peers connect to the new server when they get their ivshmem hot plugged
-> again.
+ struct kvm_one_reg id_regitsers[] = {
+   { ARM64_SYS_REG(ARM_CPU_ID_MIDR), (uintptr_t)&cpu->midr },
+   { ARM64_SYS_REG(ARM_CPU_ID_REVIDR), (uintptr_t)&cpu->revidr },
+   ...
+   { 0, 0 }
+ };
 
-OK, hot-plug is a simple answer to this problem. It would be even
-cleaner to support from the guest POV with the new state signalling
-mechanism of ivshmem2.
+...
+> +
+> +    for (i = 0; i < ARM_CPU_ID_MAX; i++) {
+> +        if(id_regitsers[i].id != 0) {
 
-> 
->>>> And then there are some extensions of the original ivshmem:
->>>>
->>>> - Multiple shared memory regions, including unidirectional ones
->>>>
->>>>   It is now possible to expose up to three different shared memory
->>>>   regions: The first one is read/writable for both sides. The second
->>>>   region is read/writable for the local peer and read-only for the
->>>>   remote peer (useful for output queues). And the third is read-only
->>>>   locally but read/writable remotely (ie. for input queues).
->>>>   Unidirectional regions prevent that the receiver of some data can
->>>>   interfere with the sender while it is still building the message, a
->>>>   property that is not only useful for safety critical communication,
->>>>   we are sure.
->>>>
->>>> - Life-cycle management via local and remote state
->>>>
->>>>   Each device can now signal its own state in form of a value to the
->>>>   remote side, which triggers an event there.
->>>
->>> How are "events" related to interrupts?
->>
->> Confusing term chosen here: an interrupt is triggered on the remote side
->> (if it has interrupts enabled).
-> 
-> Got it.
-> 
->>>>                                               Moreover, state changes
->>>>   done by the hypervisor to one peer are signalled to the other side.
->>>>   And we introduced a write-to-shared-memory mechanism for the
->>>>   respective remote state so that guests do not have to issue an MMIO
->>>>   access in order to check the state.
->>>>
->>>> So, this is our proposal. Would be great to hear some opinions if you
->>>> see value in adding support for such an "ivshmem 2.0" device to QEMU as
->>>> well and expand its ecosystem towards Linux upstream, maybe also DPDK
->>>> again. If you see problems in the new design /wrt what QEMU provides so
->>>> far with its ivshmem device, let's discuss how to resolve them. Looking
->>>> forward to any feedback!
->>>
->>> My general opinion on ivshmem is well-known, but I repeat it for the
->>> record: merging it was a mistake, and using it is probably a mistake.  I
->>> detailed my concerns in "Why I advise against using ivshmem"[*].
->>>
->>> My philosophical concerns remain.  Perhaps you can assuage them.
->>>
->>> Only some of my practical concerns have since been addressed.  In part
->>> by myself, because having a flawed implementation of a bad idea is
->>> strictly worse than the same with flaws corrected as far as practical.
->>> But even today, docs/specs/ivshmem-spec.txt is a rather depressing read.
->>
->> I agree.
->>
->>>
->>> However, there's one thing that's still worse than a more or less flawed
->>> implementation of a bad idea: two implementations of a bad idea.  Could
->>> ivshmem2 be done in a way that permits *replacing* ivshmem?
->>
->> If people see the need for having a common ivshmem2, that should of
->> course be designed to replace the original version of QEMU. I wouldn't
->> like to design it being backward compatible, but the new version should
->> provide all useful and required features of the old one.
-> 
-> Nobody likes to provide backward compability, but everybody likes to
-> take advantage of it :)
-> 
-> Seriously, I can't say whether feature parity would suffice, or whether
-> we need full backward compatibility.
+Not sure why this check was here before, as there shouldn't have been
+any zero ids in the list, but now we need the test, just not here.
+The for loop should be written as
 
-Given the deficits of the current design and the lacking driver support
-in Linux, people should be happy if the new interface is default but the
-old one could still be selected for a while. But a first step will
-likely be a separate implementation of the interface.
+ for (i = 0; id_regitsers[i].id; i++) {
 
+> +            ret = kvm_set_one_reg(cs, id_regitsers[i].id,
+> +                                  (void *)id_regitsers[i].addr);
+> +            if (ret) {
+> +                fprintf(stderr, "set ID register 0x%llx failed\n",
+> +                        id_regitsers[i].id);
+> +                return ret;
+> +            }
+> +        } else {
+> +            break;
+> +        }
+> +    }
+> +
+> +    /* TODO: Set CCSIDR */
+> +    return ret;
+> +}
+>  
+>  int kvm_arch_init_vcpu(CPUState *cs)
+>  {
+> @@ -489,6 +633,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      uint64_t mpidr;
+>      ARMCPU *cpu = ARM_CPU(cs);
+>      CPUARMState *env = &cpu->env;
+> +    bool heterogeneous = false, cross = false;
+> +    struct kvm_vcpu_init init;
+>  
+>      if (cpu->kvm_target == QEMU_KVM_ARM_TARGET_NONE ||
+>          !object_dynamic_cast(OBJECT(cpu), TYPE_AARCH64_CPU)) {
+> @@ -518,12 +664,48 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          unset_feature(&env->features, ARM_FEATURE_PMU);
+>      }
+>  
+> +    /*
+> +     * Check if host is a heterogeneous system. It doesn't support -cpu host on
+> +     * heterogeneous system. If user requests a specific type VCPU, it should
+> +     * set the KVM_ARM_VCPU_CROSS bit to tell KVM that userspace want a specific
+> +     * vCPU. If KVM supports cross type vCPU, then set the ID registers.
+> +     */
+> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_HETEROGENEOUS)) {
+> +        heterogeneous = true;
+> +    }
+
+I don't think it should be necessary for qemu to check this. It should
+just fail to create vcpus if it chooses the wrong type. Anyway, there
+should be other ways for qemu to determine it's running on a
+heterogeneous system without extending kvm's api.
+
+> +
+> +    if (strcmp(object_get_typename(OBJECT(cpu)), TYPE_ARM_HOST_CPU) == 0) {
+> +        if (heterogeneous) {
+> +            fprintf(stderr, "heterogeneous system can't support host guest CPU type\n");
+> +            return -EINVAL;
+> +        }
+
+IMO, we should leave this to higher levels. E.g. libvirt can determine if
+a host is heterogeneous and then output errors when a user tries to
+configure a guest to use cpu host. At the QEMU level an ioctl EINVAL on
+vcpu create should be sufficient.
+
+> +    } else if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_CROSS_VCPU)) {
+> +        init.features[0] = 1 << KVM_ARM_VCPU_CROSS;
+
+As I stated in the kvm series, I don't think this feature bit should be
+necessary.
+
+> +        if (kvm_vm_ioctl(cs->kvm_state, KVM_ARM_PREFERRED_TARGET, &init) < 0) {
+> +            return -EINVAL;
+> +        }
+> +
+> +        if (init.target != (cpu->midr & 0xFF00FFF0) || heterogeneous) {
+> +            cpu->kvm_target = QEMU_KVM_ARM_TARGET_GENERIC_V8;
+
+Why force the target to be generic when we're cross? Not being possible
+to do anything else, and that that's what we agreed on in Toronto is a
+fair answer :-) I just don't recall right now what we said.
+
+> +            cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_CROSS;
+> +            cross = true;
+> +       }
+> +    }
+> +
+>      /* Do KVM_ARM_VCPU_INIT ioctl */
+>      ret = kvm_arm_vcpu_init(cs);
+>      if (ret) {
+>          return ret;
+>      }
+>  
+> +    if (cross) {
+> +        ret = kvm_arm_set_id_registers(cs);
+> +        if (ret) {
+> +            fprintf(stderr, "set vcpu ID registers failed\n");
+
+You already have an fprintf(stderr, at the point of failure. We probably
+don't need two, with this one having less information. I'd just return
+ret here quietly.
+
+> +            return ret;
+> +        }
+> +    }
+> +
+>      /*
+>       * When KVM is in use, PSCI is emulated in-kernel and not by qemu.
+>       * Currently KVM has its own idea about MPIDR assignment, so we
+> -- 
+> 2.0.4
 > 
->> Of course, I'm careful with investing much time into expanding the
->> existing, for Jailhouse possibly sufficient design if there no real
->> interest in continuing the ivshmem support in QEMU - because of
->> vhost-pci or other reasons. But if that interest exists, it would be
->> beneficial for us to have QEMU supporting a compatible version and using
->> the same guest drivers. Then I would start looking into concrete patches
->> for it as well.
 > 
-> Interest is difficult for me to gauge, not least because alternatives
-> are still being worked on.
+>
 
-I'm considering to suggest this as GSoC project now.
-
-Jan
+Thanks,
+drew 
