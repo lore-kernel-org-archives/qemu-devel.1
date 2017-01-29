@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwit-000810-Vw
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwiu-000818-5X
 	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwiq-0002CF-A1
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:19 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33183)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwip-0002Br-DQ
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:20 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36323)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cXwiq-0002C0-5U
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:16 -0500
-Received: by mail-qk0-x242.google.com with SMTP id 11so16258674qkl.0
-	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 13:09:16 -0800 (PST)
+	id 1cXwip-0002Bg-9N
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:15 -0500
+Received: by mail-qt0-x243.google.com with SMTP id h53so17150689qth.3
+	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 13:09:15 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 29 Jan 2017 22:09:08 +0100
-Message-Id: <20170129210910.6333-6-pbonzini@redhat.com>
+Date: Sun, 29 Jan 2017 22:09:07 +0100
+Message-Id: <20170129210910.6333-5-pbonzini@redhat.com>
 In-Reply-To: <20170129210910.6333-1-pbonzini@redhat.com>
 References: <20170129210910.6333-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/7] cpu-exec: remove outermost infinite loop
+Subject: [Qemu-devel] [PATCH 4/7] cpu-exec: avoid repeated sigsetjmp on
+ interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +31,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: serge.fdrv@gmail.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru
 
-Reorganize the sigsetjmp so that the restart case falls through
-to cpu_handle_exception and the execution loop.
+The sigsetjmp only needs to be prepared once for the whole execution
+of cpu_exec.  This patch takes care of the "== 0" side, using a
+nested loop so that cpu_handle_interrupt goes straight back to
+cpu_handle_exception without doing another sigsetjmp.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpu-exec.c | 58 +++++++++++++++++++++++++++-------------------------------
- 1 file changed, 27 insertions(+), 31 deletions(-)
+ cpu-exec.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/cpu-exec.c b/cpu-exec.c
-index fcf37ba..1226362 100644
+index e62abed..fcf37ba 100644
 --- a/cpu-exec.c
 +++ b/cpu-exec.c
-@@ -624,41 +624,37 @@ int cpu_exec(CPUState *cpu)
-      */
-     init_delay_params(&sc, cpu);
- 
--    for(;;) {
--        /* prepare setjmp context for exception handling */
--        if (sigsetjmp(cpu->jmp_env, 0) == 0) {
--            /* if an exception is pending, we execute it here */
--            while (!cpu_handle_exception(cpu, &ret)) {
--                TranslationBlock *last_tb = NULL;
--                int tb_exit = 0;
+@@ -627,21 +627,21 @@ int cpu_exec(CPUState *cpu)
+     for(;;) {
+         /* prepare setjmp context for exception handling */
+         if (sigsetjmp(cpu->jmp_env, 0) == 0) {
+-            TranslationBlock *last_tb = NULL;
+-            int tb_exit = 0;
 -
--                while (!cpu_handle_interrupt(cpu, &last_tb)) {
--                    TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
--                    cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
--                    /* Try to align the host and virtual clocks
--                       if the guest is in advance */
--                    align_clocks(&sc, cpu);
--                }
+             /* if an exception is pending, we execute it here */
+-            if (cpu_handle_exception(cpu, &ret)) {
+-                break;
++            while (!cpu_handle_exception(cpu, &ret)) {
++                TranslationBlock *last_tb = NULL;
++                int tb_exit = 0;
++
++                while (!cpu_handle_interrupt(cpu, &last_tb)) {
++                    TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
++                    cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
++                    /* Try to align the host and virtual clocks
++                       if the guest is in advance */
++                    align_clocks(&sc, cpu);
++                }
+             }
++            break;
+ 
+-            while (!cpu_handle_interrupt(cpu, &last_tb)) {
+-                TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
+-                cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
+-                /* Try to align the host and virtual clocks
+-                   if the guest is in advance */
+-                align_clocks(&sc, cpu);
 -            }
--            break;
--
--        } else {
-+    /* prepare setjmp context for exception handling */
-+    if (sigsetjmp(cpu->jmp_env, 0) != 0) {
+         } else {
  #if defined(__clang__) || !QEMU_GNUC_PREREQ(4, 6)
--            /* Some compilers wrongly smash all local variables after
--             * siglongjmp. There were bug reports for gcc 4.5.0 and clang.
--             * Reload essential local variables here for those compilers.
--             * Newer versions of gcc would complain about this code (-Wclobbered). */
--            cpu = current_cpu;
--            cc = CPU_GET_CLASS(cpu);
-+        /* Some compilers wrongly smash all local variables after
-+         * siglongjmp. There were bug reports for gcc 4.5.0 and clang.
-+         * Reload essential local variables here for those compilers.
-+         * Newer versions of gcc would complain about this code (-Wclobbered). */
-+        cpu = current_cpu;
-+        cc = CPU_GET_CLASS(cpu);
- #else /* buggy compiler */
--            /* Assert that the compiler does not smash local variables. */
--            g_assert(cpu == current_cpu);
--            g_assert(cc == CPU_GET_CLASS(cpu));
-+        /* Assert that the compiler does not smash local variables. */
-+        g_assert(cpu == current_cpu);
-+        g_assert(cc == CPU_GET_CLASS(cpu));
- #endif /* buggy compiler */
--            cpu->can_do_io = 1;
--            tb_lock_reset();
-+        cpu->can_do_io = 1;
-+        tb_lock_reset();
-+    }
-+
-+    /* if an exception is pending, we execute it here */
-+    while (!cpu_handle_exception(cpu, &ret)) {
-+        TranslationBlock *last_tb = NULL;
-+        int tb_exit = 0;
-+
-+        while (!cpu_handle_interrupt(cpu, &last_tb)) {
-+            TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
-+            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
-+            /* Try to align the host and virtual clocks
-+               if the guest is in advance */
-+            align_clocks(&sc, cpu);
-         }
--    } /* for(;;) */
-+    }
- 
-     cc->cpu_exec_exit(cpu);
-     rcu_read_unlock();
+             /* Some compilers wrongly smash all local variables after
 -- 
 2.9.3
