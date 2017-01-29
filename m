@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cXsZ1-0005FY-6B
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 11:42:53 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cXskt-0000sL-9Y
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 11:55:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cXsYz-0008M1-Ux
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 11:42:51 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cXskr-0002zx-P9
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 11:55:07 -0500
 References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-	<20170123121036.4823-22-vsementsov@virtuozzo.com>
+	<20170123121036.4823-23-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c7c56077-16de-f297-1d94-d4623cbb3117@redhat.com>
-Date: Sun, 29 Jan 2017 17:42:37 +0100
+Message-ID: <b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
+Date: Sun, 29 Jan 2017 17:54:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170123121036.4823-22-vsementsov@virtuozzo.com>
+In-Reply-To: <20170123121036.4823-23-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="fMrFqpx7ukrsc9c5Ul54wjxBAmoPlTD3Q"
-Subject: Re: [Qemu-devel] [PATCH 21/24] qcow2-bitmap: refcounts
+	boundary="bUisP2G2Qb5D5em6JdBijLQKQ9tK4fuwR"
+Subject: Re: [Qemu-devel] [PATCH 22/24] block/dirty-bitmap: deep release
+ dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,152 +29,156 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.o
 Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fMrFqpx7ukrsc9c5Ul54wjxBAmoPlTD3Q
+--bUisP2G2Qb5D5em6JdBijLQKQ9tK4fuwR
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
  famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <c7c56077-16de-f297-1d94-d4623cbb3117@redhat.com>
-Subject: Re: [PATCH 21/24] qcow2-bitmap: refcounts
+Message-ID: <b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
+Subject: Re: [PATCH 22/24] block/dirty-bitmap: deep release dirty bitmaps
 References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
- <20170123121036.4823-22-vsementsov@virtuozzo.com>
-In-Reply-To: <20170123121036.4823-22-vsementsov@virtuozzo.com>
+ <20170123121036.4823-23-vsementsov@virtuozzo.com>
+In-Reply-To: <20170123121036.4823-23-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
 On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
-> Calculate refcounts for qcow2 bitmaps. It is needed for qcow2's qemu-im=
-g
-> check implementation.
+> Remove persistent bitmap from its storage on bdrv_release_dirty_bitmap.=
+
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2-bitmap.c   | 80 ++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  block/qcow2-refcount.c |  6 ++++
->  block/qcow2.h          |  3 ++
->  3 files changed, 89 insertions(+)
+>  block/dirty-bitmap.c      | 21 ++++++++++++++++++---
+>  include/block/block_int.h |  3 +++
+>  2 files changed, 21 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 8b8f2d11ec..2687a3acd5 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -1232,3 +1232,83 @@ common_errp:
->                 name, bdrv_get_device_or_node_name(bs), reason);
->      return false;
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 775181c9ab..0977df6309 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -297,7 +297,8 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *b=
+s)
+> =20
+>  static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs=
+,
+>                                                    BdrvDirtyBitmap *bit=
+map,
+> -                                                  bool only_named)
+> +                                                  bool only_named,
+> +                                                  bool deep)
+
+I'd rather call it "remove_persistent" or something, which is bad
+grammar, but it's better at getting the point across.
+
+>  {
+>      BdrvDirtyBitmap *bm, *next;
+>      QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
+> @@ -305,6 +306,19 @@ static void bdrv_do_release_matching_dirty_bitmap(=
+BlockDriverState *bs,
+>              assert(!bm->active_iterators);
+>              assert(!bdrv_dirty_bitmap_frozen(bm));
+>              assert(!bm->meta);
+> +
+> +            if (deep && bm->persistent && bs->drv &&
+> +                bs->drv->bdrv_remove_persistent_dirty_bitmap)
+> +            {
+> +                Error *local_err =3D NULL;
+> +                bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, bm->n=
+ame,
+> +                                                             &local_er=
+r);
+> +                if (local_err !=3D NULL) {
+> +                    error_report_err(local_err);
+
+This looks like maybe it's the wrong thing to do... I do agree that
+sometimes it may not be fatal, but sometimes it probably is.
+
+> +                }
+> +            }
+> +
+> +
+>              QLIST_REMOVE(bm, list);
+>              hbitmap_free(bm->bitmap);
+>              g_free(bm->name);
+> @@ -322,16 +336,17 @@ static void bdrv_do_release_matching_dirty_bitmap=
+(BlockDriverState *bs,
+> =20
+>  void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *=
+bitmap)
+>  {
+> -    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false);
+> +    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false, true);
+
+The @deep parameter (or however you decide to call it) should be
+available to this function's caller, too. I don't believe qcow2's
+load_bitmap() wants to delete the persistent bitmap in the error path;
+and block-dirty-bitmap-remove should probably allow the user to decide
+what to do.
+
+Which brings me to the error thing above: If the user (or management
+tool) decides that block-dirty-bitmap-remove should remove the
+persistent bitmap, I believe that the operation should be aborted if the
+persistent bitmap cannot be removed. It should not just go on and
+release the in-memory bitmap but abort altogether. If the user just
+wants to release that in-memory bitmap then, they can still go on an
+call block-dirty-bitmap-remove with deep=3Dfalse.
+
 >  }
-> +
-> +int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResul=
-t *res,
-> +                                  void **refcount_table,
-> +                                  int64_t *refcount_table_size)
-> +{
-> +    int ret;
-> +    BDRVQcow2State *s =3D bs->opaque;
-> +    Qcow2BitmapList *bm_list;
-> +    Qcow2Bitmap *bm;
-> +
-> +    if (s->nb_bitmaps =3D=3D 0) {
-> +        return 0;
-> +    }
-> +
-> +    ret =3D qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount=
-_table_size,
-> +                                   s->bitmap_directory_offset,
-> +                                   s->bitmap_directory_size);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
-> +    bm_list =3D bitmap_list_load(bs, s->bitmap_directory_offset,
-> +                               s->bitmap_directory_size, NULL);
-> +    if (bm_list =3D=3D NULL) {
-> +        res->corruptions++;
-> +        return -EINVAL;
-> +    }
-> +
-> +    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-> +        uint64_t *bitmap_table =3D NULL;
-> +        int i;
-> +
-> +        ret =3D qcow2_inc_refcounts_imrt(bs, res,
-> +                                       refcount_table, refcount_table_=
-size,
-> +                                       bm->table.offset,
-> +                                       bm->table.size * sizeof(uint64_=
-t));
-> +        if (ret < 0) {
-> +            goto out;
-> +        }
-> +
-> +        ret =3D bitmap_table_load(bs, &bm->table, &bitmap_table);
-> +        if (ret < 0) {
-> +            res->corruptions++;
-> +            goto out;
-> +        }
-> +
-> +        for (i =3D 0; i < bm->table.size; ++i) {
-> +            uint64_t entry =3D bitmap_table[i];
-> +            uint64_t offset =3D entry & BME_TABLE_ENTRY_OFFSET_MASK;
-> +
-> +            if (check_table_entry(entry, s->cluster_size) < 0) {
-> +                res->corruptions++;
-> +                continue;
-> +            }
-> +
-> +            if (offset =3D=3D 0) {
-> +                continue;
-> +            }
-> +
-> +            ret =3D qcow2_inc_refcounts_imrt(bs, res,
-> +                                           refcount_table, refcount_ta=
-ble_size,
-> +                                           offset, s->cluster_size);
-> +            if (ret < 0) {
-> +                g_free(bitmap_table);
-> +                goto out;
-> +            }
-> +        }
-> +
-> +        g_free(bitmap_table);
-> +    }
-> +
-> +    if (res->corruptions > 0) {
-> +        ret =3D -EINVAL;
-> +    }
+> =20
+>  /**
+>   * Release all named dirty bitmaps attached to a BDS (for use in bdrv_=
+close()).
+>   * There must not be any frozen bitmaps attached.
+> + * This function do not remove persistent bitmaps from the storage.
 
-res->corruptions may already be greater than zero when this function is
-invoked.
+*does
 
-But in any case, you don't need to return a negative value just because
-some corruption was found. These check functions should only return
-negative values if they were unable to do what they are supposed to do
-(whatever that is), e.g. because of an I/O error or ENOMEM. In these
-cases, however, they usually return to the caller immediately.
+Max
 
-It wouldn't be strictly wrong to return a negative value if some table
-entry is corrupted, but I don't think it's necessary either. So if you
-just drop the above three lines:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+>   */
+>  void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
+>  {
+> -    bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
+> +    bdrv_do_release_matching_dirty_bitmap(bs, NULL, true, false);
+>  }
+> =20
+>  void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index b38b3aa198..3e080d6d68 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -326,6 +326,9 @@ struct BlockDriver {
+>                                                  Error **errp);
+>      bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs, cons=
+t char *name,
+>                                              uint32_t granularity, Erro=
+r **errp);
+> +    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
+> +                                                const char *name,
+> +                                                Error **errp);
+> =20
+>      QLIST_ENTRY(BlockDriver) list;
+>  };
+>=20
 
 
---fMrFqpx7ukrsc9c5Ul54wjxBAmoPlTD3Q
+
+--bUisP2G2Qb5D5em6JdBijLQKQ9tK4fuwR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliOG30SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ATn4H/RFD0T8wHU2YWFJ+aXorIN8lnGHfSEVx
-7iMWXhORX7F71Y4602ENSyLc3OEivu0CaBrfYiT4WD9ARF5KXpK/C6jB99bP0ir/
-n6epFCSupYuAkLB3bYdP1KQ7qrqRUWdmBKOi2qPSy/vvwy53yLtgNUWdeYlk1i4n
-0Oiv+sXxABkyaV6ULWj9BYWCbFaYJf69lhCcVl5civF7HDcAMSTAFsk0MoRsG3bf
-zj/EK81VNKi09IX65k07ohFyFwxat+uAQ47feVHfRycNdAA5Zl1u5JR1RcoAzod3
-1EIg36ATfeYN72nG/dca2JVtzYd4DTF40cu0amrRSePFUry0FmaEOvo=
-=0zji
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliOHlwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AWF8H/ix9IN5mGZ9zQzI11s7Jjgf9sgmgRymj
+y4koom2B7EWPuYs7lljSZ3yQfHbCDCW/uphCVvgz9Va4NqHq7EPqOmPtlDNotfST
+gs+afwg6qhL5jFVbMdOZERZ9dg9z8VlTGgMrcGPYIM5sG1+U5F08w/L0eOUSpBos
+b7FNlTn5oaw6p1x7wQt9LZeo2/w3cH1TWq2jgmXGnCXDh7QUxuAE4ahE4ZxSIuhi
+yhPttKZJ73r2IJtxSUGCbiFCnZKzYKBObVIg0jRZClGvGRvKDzR6M83cMIMLGQhH
+Z7XSZQ/cYvv56iY1DWTAvMnSTKoYuVWbhTLUkUJ5RBs0z9VJ40tzsCI=
+=6JRf
 -----END PGP SIGNATURE-----
 
---fMrFqpx7ukrsc9c5Ul54wjxBAmoPlTD3Q--
+--bUisP2G2Qb5D5em6JdBijLQKQ9tK4fuwR--
