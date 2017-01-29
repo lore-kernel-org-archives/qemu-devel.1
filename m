@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwir-00080Q-G1
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:18 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwir-00080O-Cq
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwio-0002BJ-5w
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwim-0002Ak-Nd
 	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:17 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34161)
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33178)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cXwio-0002BA-1N
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:14 -0500
-Received: by mail-qt0-x242.google.com with SMTP id w20so20059407qtb.1
-	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 13:09:14 -0800 (PST)
+	id 1cXwim-0002AZ-Hu
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:12 -0500
+Received: by mail-qk0-x243.google.com with SMTP id 11so16258453qkl.0
+	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 13:09:12 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 29 Jan 2017 22:09:05 +0100
-Message-Id: <20170129210910.6333-3-pbonzini@redhat.com>
-In-Reply-To: <20170129210910.6333-1-pbonzini@redhat.com>
-References: <20170129210910.6333-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/7] cpu-exec: tighten barrier on
- TCG_EXIT_REQUESTED
+Date: Sun, 29 Jan 2017 22:09:03 +0100
+Message-Id: <20170129210910.6333-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [RFC/RFT PATCH 0/7] cpu-exec: simplify cpu_exec and
+ remove some icount special cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +29,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: serge.fdrv@gmail.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru
 
-This seems to have worked just fine so far on weakly-ordered
-architectures, but I don't see anything that prevents the
-reordering from:
+The series includes three parts:
 
-    store 1 to exit_request
-    store 1 to tcg_exit_req
-                                 load tcg_exit_req
-                                 store 0 to tcg_exit_req
-                                 load exit_request
-                                 store 0 to exit_request
-    store 1 to exit_request
-    store 1 to tcg_exit_req
+1-2: fix two bugs, the first one pretty bad, the second seems
+to be theoretical only.
 
-to this:
+3-5: simplify cpu_exec.  This builds on Sergey's conversion
+of cpu_exec to a simple top-down logic, making the phases
+clearer and saving on the cost of siglongjmp in the meanwhile.
 
-    store 1 to exit_request
-    store 1 to tcg_exit_req
-                                 load tcg_exit_req
-                                 load exit_request
-    store 1 to exit_request
-    store 1 to tcg_exit_req
-                                 store 0 to tcg_exit_req
-                                 store 0 to exit_request
+6-7: these are intended to be a base for Pavel's record/replay
+fixes.  The main thing I noticed while reviewing is that icount
+is redoing (with u16.high) a lot of things that tcg_exit_req is
+doing too.  This is because, at the time icount was introduced,
+tcg_exit_req didn't exist and QEMU instead unwound chained TBs
+through POSIX signals.  But now we have essentially two ways to
+do the same thing with subtly different invariants or downright
+bugs (such as the one fixed by patch 1).  Patch 6 therefore
+unifies tcg_exit_req and the icount interrupt flag.  It saves a
+handful of instructions per TB in icount mode and generally
+makes icount mode "less special", which is a good thing since
+no one seems to understand it well.  Patch 7 then removes another
+EXCP_INTERRUPT/cpu_loop_exit pair; by exiting to main loop simply
+through cpu->exit_request, hopefully it fixes one of the issues that
+Pavel was seeing.
 
-therefore losing a request.  It's possible that other memory barriers
-(e.g. in rcu_read_unlock) are hiding it, but better safe than
-sorry.
+For now I've tested this only on an aarch64 Linux image (with
+and without -icount).  Thanks,
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- cpu-exec.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Paolo
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 2dc10c1..4065e0e 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -552,11 +552,11 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-          * have set something else (eg exit_request or
-          * interrupt_request) which we will handle
-          * next time around the loop.  But we need to
--         * ensure the tcg_exit_req read in generated code
-+         * ensure the zeroing of tcg_exit_req (see cpu_tb_exec)
-          * comes before the next read of cpu->exit_request
-          * or cpu->interrupt_request.
-          */
--        smp_rmb();
-+        smp_mb();
-         *last_tb = NULL;
-         break;
-     case TB_EXIT_ICOUNT_EXPIRED:
+Paolo Bonzini (7):
+  cpu-exec: fix jmp_first out-of-bounds access with icount
+  cpu-exec: tighten barrier on TCG_EXIT_REQUESTED
+  cpu-exec: avoid cpu_loop_exit in cpu_handle_interrupt
+  cpu-exec: avoid repeated sigsetjmp on interrupts
+  cpu-exec: remove outermost infinite loop
+  cpu-exec: unify icount_decr and tcg_exit_req
+  cpu-exec: centralize exiting to the main loop
+
+ cpu-exec.c                | 153 +++++++++++++++++++++-------------------------
+ include/exec/exec-all.h   |   1 +
+ include/exec/gen-icount.h |  53 ++++++++--------
+ include/qom/cpu.h         |  15 +++--
+ qom/cpu.c                 |   2 +-
+ tcg/tcg.h                 |   1 -
+ translate-all.c           |   2 +-
+ translate-common.c        |  13 ++--
+ 8 files changed, 109 insertions(+), 131 deletions(-)
+
 -- 
 2.9.3
