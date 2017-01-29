@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cXpOh-0001H4-VT
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 08:20:00 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cXq2F-0004QQ-SO
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 09:00:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cXpOg-0006ve-Ut
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 08:19:59 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:33935)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cXq2E-0000RI-4z
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 09:00:51 -0500
+Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:33544)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1cXpOg-0006vM-QA
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 08:19:58 -0500
-Received: by mail-ot0-x241.google.com with SMTP id 73so35687630otj.1
-	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 05:19:58 -0800 (PST)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cXq2D-0000RD-Vm
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 09:00:50 -0500
+Received: by mail-yw0-x242.google.com with SMTP id u68so27738551ywg.0
+	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 06:00:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170129140329.3646dee3@bahia.lan>
-References: <1485422212-31546-1-git-send-email-ashijeetacharya@gmail.com>
-	<20170128194157.0c82cc8a@bahia.lan>
-	<CAC2QTZZaaMgiiJbXgnLzBF+02=XnzKsofP7fwK7oF56maXY8Gg@mail.gmail.com>
-	<20170129140329.3646dee3@bahia.lan>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Sun, 29 Jan 2017 18:49:57 +0530
-Message-ID: <CAC2QTZZA53iu0q09D+WA9Sn4q9K2pFXmT0CiU9a4=TPiMM9EzQ@mail.gmail.com>
+References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
+	<874m0peu50.fsf@dusky.pond.sub.org>
+	<533e0b17-4d60-a584-5680-559834013c68@web.de>
+	<87inp05m8m.fsf@dusky.pond.sub.org>
+	<4504afce-c62e-c54f-33a3-483f16dc4530@web.de>
+In-Reply-To: <4504afce-c62e-c54f-33a3-483f16dc4530@web.de>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Sun, 29 Jan 2017 14:00:36 +0000
+Message-ID: <CAJ+F1C+UmEz_On1cGSrYDL0FZXqqeURV93nAvbnLA71WpNoL4w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] migrate: Migration aborts abruptly for
- machine "none"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +33,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Jan Kiszka <jan.kiszka@web.de>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Wei Wang <wei.w.wang@intel.com>
 
-On Sun, Jan 29, 2017 at 6:33 PM, Greg Kurz <groug@kaod.org> wrote:
-> On Sun, 29 Jan 2017 01:06:47 +0530
-> Ashijeet Acharya <ashijeetacharya@gmail.com> wrote:
->
->> On Sun, Jan 29, 2017 at 12:11 AM, Greg Kurz <groug@kaod.org> wrote:
->> > On Thu, 26 Jan 2017 14:46:52 +0530
->> > Ashijeet Acharya <ashijeetacharya@gmail.com> wrote:
->> >
->> >> Migration of a "none" machine with no RAM crashes abruptly as
->> >> bitmap_new() fails and thus aborts. Instead, place a check for
->> >> last_ram_offset() being '0' at the start of ram_save_setup() and
->> >> error out with a meaningful error message.
->> >>
->> >> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
->> >> ---
->> >
->>
->> cc'ing Paolo in : I had an IRC chat with him and he has a very
->> interesting twist in the tale to add here.
->>
->> > Maybe a naive question: why a "none" machine with zero RAM should fail to
->> > migrate ?
->>
->> Assuming you are referring to why its failing ATM; it fails because
->
-> My question was more: why deciding to fail migration instead of fixing the
-> crash ? One would naively think that no RAM is *just* less state to
-> migrate... but maybe the current code assumes that a machine always has
-> RAM.
+Hi
 
-Actually, I think, the current code does assume that the machine
-always has RAM which is why it crashes here. I am not aware if we can
-also boot machines other than 'none'  with zero RAM so I have not
-tested that case.
-Also, Paolo has a similar opinion to yours that we should fix it
-instead of blocking it. He suggests to migrate only the device states
-and skip all the RAM related stuff. Maybe he can explain it better
-when he is available.
+On Sun, Jan 29, 2017 at 12:44 PM Jan Kiszka <jan.kiszka@web.de> wrote:
 
-I have had mixed opinions on this one which is why I am waiting until
-we reach a common ground.
+> >> Of course, I'm careful with investing much time into expanding the
+> >> existing, for Jailhouse possibly sufficient design if there no real
+> >> interest in continuing the ivshmem support in QEMU - because of
+> >> vhost-pci or other reasons. But if that interest exists, it would be
+> >> beneficial for us to have QEMU supporting a compatible version and usi=
+ng
+> >> the same guest drivers. Then I would start looking into concrete patch=
+es
+> >> for it as well.
+> >
+> > Interest is difficult for me to gauge, not least because alternatives
+> > are still being worked on.
+>
+> I'm considering to suggest this as GSoC project now.
+>
 
-Ashijeet
->
->> g_try_malloc0() inside bitmap_try_new() returns a NULL pointer for
->> zero bits and thus the check for NULL inside bitmap_new() becomes true
->> and it aborts. Check bitmap_new() for convenience.
->>
->> Ignore the noise if you already knew this! :-)
->>
->
-> I hadn't checked, thanks for the details.
->
-> Cheers.
->
-> --
-> Greg
->
->> Ashijeet
->
+It's better for a student and for the community if the work get accepted in
+the end.
+
+So, I think that could be an intersting GSoC (implementing your ivshmem 2
+proposal). However, if the qemu community isn't ready to accept a new
+ivshmem, and would rather have vhost-pci based solution, I would suggest a
+different project (hopefully Wei Wang can help define it and mentor): work
+on a vhost-pci using dedicated shared PCI BARs (and kernel support to avoid
+extra copy - if I understand the extra copy situation correctly).
+--=20
+Marc-Andr=C3=A9 Lureau
