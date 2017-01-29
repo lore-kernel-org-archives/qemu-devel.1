@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwOY-00017Q-Qk
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 15:48:20 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cXwVS-0002r7-8T
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 15:55:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwOV-0004HY-PB
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 15:48:18 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35470)
+	(envelope-from <bobby.prani@gmail.com>) id 1cXwVP-0006Q0-7P
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 15:55:26 -0500
+Received: from mail-yb0-x243.google.com ([2607:f8b0:4002:c09::243]:34207)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cXwOV-0004HS-Ip
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 15:48:15 -0500
-Received: by mail-qk0-x242.google.com with SMTP id u25so16148508qki.2
-	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 12:48:15 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170120164322.21851-1-pbonzini@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7b9d9743-c482-1c99-b284-17c42b1383e1@redhat.com>
-Date: Sun, 29 Jan 2017 21:48:13 +0100
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cXwVP-0006Pq-1n
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 15:55:23 -0500
+Received: by mail-yb0-x243.google.com with SMTP id w194so24725417ybe.1
+	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 12:55:22 -0800 (PST)
+References: <20170127103922.19658-1-alex.bennee@linaro.org>
+	<20170127103922.19658-5-alex.bennee@linaro.org>
+From: Pranith Kumar <bobby.prani@gmail.com>
+In-reply-to: <20170127103922.19658-5-alex.bennee@linaro.org>
+Date: Sun, 29 Jan 2017 15:55:20 -0500
+Message-ID: <8760kxr3gn.fsf@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170120164322.21851-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/17] aio_context_acquire/release pushdown, part 2
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v8 04/25] tcg: move TCG_MO/BAR types into
+ own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,168 +31,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, stefanha@redhat.com
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org
 
 
+Alex Bennée writes:
 
-On 20/01/2017 17:43, Paolo Bonzini wrote:
-> This series pushes down aio_context_acquire/release to the point
-> where we can actually reason on using different fine-grained mutexes.
-> 
-> The main infrastructure is introduced in patch 1.  The new API aio_co_wake
-> starts a coroutine with aio_context_acquire/release protection, which
-> requires tracking each coroutine's "home" AioContext.  aio_co_schedule
-> instead takes care of moving a sleeping coroutine to a different
-> AioContext, also ensuring that it runs under aio_context_acquire/release.
-> This is useful to implement bdrv_set_aio_context, as a simpler alternative
-> to bottom halves.  Even though one-shot BHs are already simpler than
-> what we had before, after this patch aio_co_wake and aio_co_schedule
-> save you from having to do aio_context_acquire/release explicitly.
-> 
-> After patch 2 to 4, which are just small preparatory changes, patches
-> 5 to 8 provide an example of how to use the new API.  In particular patch
-> 5 to 7 implement a new organization of coroutines in the NBD client,
-> which allows not blocking on partial reply header reads.
-> 
-> Patch 9 introduces helpers for AioContext locking in QED, which is
-> the most complex AIO-based driver left.  Then the actual meat of the
-> series runs from patch 10 to patch 14, followed by small optimizations
-> in patches 15 and 16.
-> 
-> The patches do some back and forth in adding/removing
-> aio_context_acquire/release calls in block/*.c but ultimately a small
-> number of aio_context_acquire/release pairs are added after the pushdown.
-> These are mostly in drivers that use external libraries (and actually
-> they could already be replaced by QemuMutex) and in device models
-> that support multithreaded operation (aka iothread aka dataplane).
-> 
-> Notably, coroutines need not care about aio_context_acquire/release.
-> The device models ensure that the first creation of the coroutine has
-> the AioContext, while aio_co_wake/aio_co_schedule do the same after
-> they yield.  Therefore, most of the files only need to use those two
-> functions instead of, respectively, qemu_coroutine_enter and
-> aio_bh_schedule_oneshot.
-> 
-> However, this is only an intermediate step which is needed because the
-> block layer and qemu-coroutine locks are thread-unsafe.  So the next
-> part will add separate locking, independent of AioContext, to block.c and
-> mostly block/io.c---this includes making CoMutex thread-safe.  Patch 17
-> therefore already documents the current locking policies block.h to
-> prepare for the next series.
-> 
-> Paolo
-> 
-> v1->v2:
->         new patch (4) removing block-obj-y -> io-obj-y dependency
->         removed QIOChannelRestart from
->                 "io: add methods to set I/O handlers on AioContext"
->         improved qio_channel_set_aio_context docs, renamed to
->                 qio_channel_attach_aio_context
->         fixed pasto in "io: make qio_channel_yield aware of AioContexts"
->         document restrictions in bdrv_aio_cancel due to qemu_aio_ref
->         converted NBD server to qio_channel_yield too
->         allow NULL s->read_reply_co
->         
-> *** BLURB HERE ***
-> 
-> Paolo Bonzini (17):
->   aio: introduce aio_co_schedule and aio_co_wake
->   block-backend: allow blk_prw from coroutine context
->   test-thread-pool: use generic AioContext infrastructure
->   block: move AioContext and QEMUTimer to libqemuutil
->   io: add methods to set I/O handlers on AioContext
->   io: make qio_channel_yield aware of AioContexts
->   nbd: convert to use qio_channel_yield
->   coroutine-lock: reschedule coroutine on the AioContext it was running
->     on
->   qed: introduce qed_aio_start_io and qed_aio_next_io_cb
->   aio: push aio_context_acquire/release down to dispatching
->   block: explicitly acquire aiocontext in timers that need it
->   block: explicitly acquire aiocontext in callbacks that need it
->   block: explicitly acquire aiocontext in bottom halves that need it
->   block: explicitly acquire aiocontext in aio callbacks that need it
->   aio-posix: partially inline aio_dispatch into aio_poll
->   async: remove unnecessary inc/dec pairs
->   block: document fields protected by AioContext lock
-> 
->  Makefile.objs                       |   5 +-
->  block/blkdebug.c                    |   9 +-
->  block/blkreplay.c                   |   2 +-
->  block/block-backend.c               |  13 ++-
->  block/curl.c                        |  44 ++++++--
->  block/gluster.c                     |   9 +-
->  block/io.c                          |  38 ++-----
->  block/iscsi.c                       |  15 ++-
->  block/linux-aio.c                   |  10 +-
->  block/mirror.c                      |  12 +-
->  block/nbd-client.c                  | 108 ++++++++----------
->  block/nbd-client.h                  |   2 +-
->  block/nfs.c                         |   9 +-
->  block/qed-cluster.c                 |   2 +
->  block/qed-table.c                   |  12 +-
->  block/qed.c                         |  58 +++++++---
->  block/qed.h                         |   3 +
->  block/sheepdog.c                    |  29 ++---
->  block/ssh.c                         |  29 ++---
->  block/throttle-groups.c             |   2 +
->  block/win32-aio.c                   |   9 +-
->  dma-helpers.c                       |   2 +
->  hw/block/virtio-blk.c               |  19 +++-
->  hw/scsi/scsi-bus.c                  |   2 +
->  hw/scsi/scsi-disk.c                 |  15 +++
->  hw/scsi/scsi-generic.c              |  20 +++-
->  hw/scsi/virtio-scsi.c               |   6 +
->  include/block/aio.h                 |  38 ++++++-
->  include/block/block_int.h           |  64 ++++++-----
->  include/io/channel.h                |  72 +++++++++++-
->  include/qemu/coroutine_int.h        |  10 +-
->  include/sysemu/block-backend.h      |  14 ++-
->  io/channel-command.c                |  13 +++
->  io/channel-file.c                   |  11 ++
->  io/channel-socket.c                 |  16 ++-
->  io/channel-tls.c                    |  12 ++
->  io/channel-watch.c                  |   6 +
->  io/channel.c                        |  97 ++++++++++++----
->  nbd/client.c                        |   2 +-
->  nbd/common.c                        |   9 +-
->  nbd/server.c                        |  94 +++++-----------
->  stubs/Makefile.objs                 |   2 +
->  stubs/linux-aio.c                   |  32 ++++++
->  stubs/main-loop.c                   |   8 ++
->  stubs/set-fd-handler.c              |  11 --
->  tests/Makefile.include              |  18 +--
->  tests/iothread.c                    |  91 +++++++++++++++
->  tests/iothread.h                    |  25 +++++
->  tests/test-aio-multithread.c        | 213 ++++++++++++++++++++++++++++++++++++
->  tests/test-thread-pool.c            |  12 +-
->  tests/test-vmstate.c                |  11 --
->  trace-events                        |   4 +
->  util/Makefile.objs                  |   5 +-
->  aio-posix.c => util/aio-posix.c     |  60 +++-------
->  aio-win32.c => util/aio-win32.c     |  30 ++---
->  util/aiocb.c                        |  55 ++++++++++
->  async.c => util/async.c             |  84 ++++++++++++--
->  util/qemu-coroutine-lock.c          |   5 +-
->  util/qemu-coroutine-sleep.c         |   2 +-
->  util/qemu-coroutine.c               |   8 ++
->  qemu-timer.c => util/qemu-timer.c   |   0
->  thread-pool.c => util/thread-pool.c |   6 +-
->  util/trace-events                   |   1 -
->  63 files changed, 1155 insertions(+), 465 deletions(-)
->  create mode 100644 stubs/linux-aio.c
->  create mode 100644 stubs/main-loop.c
->  create mode 100644 tests/iothread.c
->  create mode 100644 tests/iothread.h
->  create mode 100644 tests/test-aio-multithread.c
->  rename aio-posix.c => util/aio-posix.c (94%)
->  rename aio-win32.c => util/aio-win32.c (95%)
->  create mode 100644 util/aiocb.c
->  rename async.c => util/async.c (82%)
->  rename qemu-timer.c => util/qemu-timer.c (100%)
->  rename thread-pool.c => util/thread-pool.c (98%)
-> 
+> We'll be using the memory ordering definitions to define values for
+> both the host and guest. To avoid fighting with circular header
+> dependencies just move these types into their own minimal header.
+>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  tcg/tcg-mo.h | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>  tcg/tcg.h    | 18 +-----------------
+>  2 files changed, 46 insertions(+), 17 deletions(-)
+>  create mode 100644 tcg/tcg-mo.h
+>
+> diff --git a/tcg/tcg-mo.h b/tcg/tcg-mo.h
+> new file mode 100644
+> index 0000000000..429b022561
+> --- /dev/null
+> +++ b/tcg/tcg-mo.h
+> @@ -0,0 +1,45 @@
+> +/*
+> + * Tiny Code Generator for QEMU
+> + *
+> + * Copyright (c) 2008 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef TCG_MO_H
+> +#define TCG_MO_H
+> +
+> +typedef enum {
+> +    /* Used to indicate the type of accesses on which ordering
+> +       is to be ensured.  Modeled after SPARC barriers.  */
+> +    TCG_MO_LD_LD  = 0x01,
+> +    TCG_MO_ST_LD  = 0x02,
+> +    TCG_MO_LD_ST  = 0x04,
+> +    TCG_MO_ST_ST  = 0x08,
+> +    TCG_MO_ALL    = 0x0F,  /* OR of the above */
+> +
+> +    /* Used to indicate the kind of ordering which is to be ensured by the
+> +       instruction.  These types are derived from x86/aarch64 instructions.
+> +       It should be noted that these are different from C11 semantics.  */
+> +    TCG_BAR_LDAQ  = 0x10,  /* Following ops will not come forward */
+> +    TCG_BAR_STRL  = 0x20,  /* Previous ops will not be delayed */
+> +    TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
+> +} TCGBar;
+> +
+> +#endif /* TCG_MO_H */
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 631c6f69b1..f946452049 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -29,6 +29,7 @@
+>  #include "cpu.h"
+>  #include "exec/tb-context.h"
+>  #include "qemu/bitops.h"
+> +#include "tcg-mo.h"
+>  #include "tcg-target.h"
+>  
+>  /* XXX: make safe guess about sizes */
+> @@ -498,23 +499,6 @@ static inline intptr_t QEMU_ARTIFICIAL GET_TCGV_PTR(TCGv_ptr t)
+>  #define TCG_CALL_DUMMY_TCGV     MAKE_TCGV_I32(-1)
+>  #define TCG_CALL_DUMMY_ARG      ((TCGArg)(-1))
+>  
+> -typedef enum {
+> -    /* Used to indicate the type of accesses on which ordering
+> -       is to be ensured.  Modeled after SPARC barriers.  */
+> -    TCG_MO_LD_LD  = 0x01,
+> -    TCG_MO_ST_LD  = 0x02,
+> -    TCG_MO_LD_ST  = 0x04,
+> -    TCG_MO_ST_ST  = 0x08,
+> -    TCG_MO_ALL    = 0x0F,  /* OR of the above */
 
-Ping?
+Can you please add the following comment:
 
-Paolo
+This is of the form TCG_MO_A_B where A is before B in program order.
+
+Thanks,
+-- 
+Pranith
