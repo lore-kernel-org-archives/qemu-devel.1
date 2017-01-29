@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwiw-00082X-D5
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:27 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cXwrl-00089S-IE
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:18:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cXwir-0002D6-Nn
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:22 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33523)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cXwir-0002Cp-KM
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:09:17 -0500
-Received: by mail-qt0-x244.google.com with SMTP id n13so53482243qtc.0
-	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 13:09:17 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 29 Jan 2017 22:09:10 +0100
-Message-Id: <20170129210910.6333-8-pbonzini@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1cXwri-0006Bp-2G
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:18:29 -0500
+Resent-Message-Id: <E1cXwri-0006Bp-2G@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cXwrh-0006B4-Qd
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 16:18:26 -0500
+Reply-To: <qemu-devel@nongnu.org>
 In-Reply-To: <20170129210910.6333-1-pbonzini@redhat.com>
-References: <20170129210910.6333-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 7/7] cpu-exec: centralize exiting to the main
- loop
+Message-ID: <148572468985.27.2571788839275134608@eba24e3a0d7f>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 29 Jan 2017 13:18:11 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC/RFT PATCH 0/7] cpu-exec: simplify cpu_exec
+ and remove some icount special cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: serge.fdrv@gmail.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, serge.fdrv@gmail.com, pavel.dovgaluk@ispras.ru, peter.maydell@linaro.org
 
-The cpu->exit_request check in cpu_loop_exec_tb is unnecessary,
-because cpu->tcg_exit_req is always set after cpu->exit_request.
-So let the TB exit and we will pick up the exit request later
-in cpu_handle_interrupt.
-
-Likewise, use cpu->exit_request to set EXCP_INTERRUPT when the
-instruction counter expires.  Because cpu_loop_exec_tb is
-followed immediately by align_clocks, this lets us remove the
-SyncClocks *sc argument to cpu_loop_exec_tb.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- cpu-exec.c | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
-
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 903a834..3838eb8 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -517,6 +517,8 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-             *last_tb = NULL;
-         }
-     }
-+
-+    /* Finally, check if we need to exit to the main loop.  */
-     if (unlikely(atomic_read(&cpu->exit_request) || replay_has_interrupt())) {
-         atomic_set(&cpu->exit_request, 0);
-         cpu->exception_index = EXCP_INTERRUPT;
-@@ -527,16 +529,11 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
- }
- 
- static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
--                                    TranslationBlock **last_tb, int *tb_exit,
--                                    SyncClocks *sc)
-+                                    TranslationBlock **last_tb, int *tb_exit)
- {
-     uintptr_t ret;
-     int32_t insns_left;
- 
--    if (unlikely(atomic_read(&cpu->exit_request))) {
--        return;
--    }
--
-     trace_exec_tb(tb, tb->pc);
-     ret = cpu_tb_exec(cpu, tb);
-     tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
-@@ -578,10 +575,8 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-          */
-         if (insns_left > 0) {
-             cpu_exec_nocache(cpu, insns_left, tb, false);
--            align_clocks(sc, cpu);
-         }
--        cpu->exception_index = EXCP_INTERRUPT;
--        cpu_loop_exit(cpu);
-+        atomic_set(&cpu->exit_request, 1);
-     }
- }
- 
-@@ -641,7 +636,7 @@ int cpu_exec(CPUState *cpu)
- 
-         while (!cpu_handle_interrupt(cpu, &last_tb)) {
-             TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
--            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
-+            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit);
-             /* Try to align the host and virtual clocks
-                if the guest is in advance */
-             align_clocks(&sc, cpu);
--- 
-2.9.3
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDL1JGVCBQQVRDSCAwLzddIGNwdS1leGVjOiBzaW1wbGlm
+eSBjcHVfZXhlYyBhbmQgcmVtb3ZlIHNvbWUgaWNvdW50IHNwZWNpYWwgY2FzZXMKTWVzc2FnZS1p
+ZDogMjAxNzAxMjkyMTA5MTAuNjMzMy0xLXBib256aW5pQHJlZGhhdC5jb20KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
+IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9u
+cwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
+ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
+QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
+ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
+LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
+ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
+dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAg
+ICBwYXRjaGV3LzIwMTYxMjIwMTkxNTIzLjU3NzktMS1lYmxha2VAcmVkaGF0LmNvbSAtPiBwYXRj
+aGV3LzIwMTYxMjIwMTkxNTIzLjU3NzktMS1lYmxha2VAcmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0
+ZV0gICAgICBwYXRjaGV3LzIwMTcwMTI3MTAzOTIyLjE5NjU4LTEtYWxleC5iZW5uZWVAbGluYXJv
+Lm9yZyAtPiBwYXRjaGV3LzIwMTcwMTI3MTAzOTIyLjE5NjU4LTEtYWxleC5iZW5uZWVAbGluYXJv
+Lm9yZwogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMTI5MjEwOTEwLjYzMzMtMS1w
+Ym9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzAxMjkyMTA5MTAuNjMzMy0xLXBib256
+aW5pQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowZjVlM2RmIGNw
+dS1leGVjOiBjZW50cmFsaXplIGV4aXRpbmcgdG8gdGhlIG1haW4gbG9vcApjNThkODRlIGNwdS1l
+eGVjOiB1bmlmeSBpY291bnRfZGVjciBhbmQgdGNnX2V4aXRfcmVxCmExYmJkZmMgY3B1LWV4ZWM6
+IHJlbW92ZSBvdXRlcm1vc3QgaW5maW5pdGUgbG9vcAphOTg0ZDAzIGNwdS1leGVjOiBhdm9pZCBy
+ZXBlYXRlZCBzaWdzZXRqbXAgb24gaW50ZXJydXB0cwowZGM5OGU2IGNwdS1leGVjOiBhdm9pZCBj
+cHVfbG9vcF9leGl0IGluIGNwdV9oYW5kbGVfaW50ZXJydXB0CjIxOGRlMDQgY3B1LWV4ZWM6IHRp
+Z2h0ZW4gYmFycmllciBvbiBUQ0dfRVhJVF9SRVFVRVNURUQKYmY2M2U1YSBjcHUtZXhlYzogZml4
+IGptcF9maXJzdCBvdXQtb2YtYm91bmRzIGFjY2VzcyB3aXRoIGljb3VudAoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiBjcHUtZXhlYzogZml4IGptcF9maXJzdCBvdXQt
+b2YtYm91bmRzIGFjY2VzcyB3aXRoIGljb3VudC4uLgpDaGVja2luZyBQQVRDSCAyLzc6IGNwdS1l
+eGVjOiB0aWdodGVuIGJhcnJpZXIgb24gVENHX0VYSVRfUkVRVUVTVEVELi4uCkVSUk9SOiBtZW1v
+cnkgYmFycmllciB3aXRob3V0IGNvbW1lbnQKIzUxOiBGSUxFOiBjcHUtZXhlYy5jOjU1OToKKyAg
+ICAgICAgc21wX21iKCk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEzIGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
+VENIIDMvNzogY3B1LWV4ZWM6IGF2b2lkIGNwdV9sb29wX2V4aXQgaW4gY3B1X2hhbmRsZV9pbnRl
+cnJ1cHQuLi4KQ2hlY2tpbmcgUEFUQ0ggNC83OiBjcHUtZXhlYzogYXZvaWQgcmVwZWF0ZWQgc2ln
+c2V0am1wIG9uIGludGVycnVwdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS83OiBjcHUtZXhlYzogcmVt
+b3ZlIG91dGVybW9zdCBpbmZpbml0ZSBsb29wLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiM1MTogRklMRTogY3B1LWV4ZWMuYzo2MzM6CisgICAgICAgICAqIE5ld2VyIHZlcnNp
+b25zIG9mIGdjYyB3b3VsZCBjb21wbGFpbiBhYm91dCB0aGlzIGNvZGUgKC1XY2xvYmJlcmVkKS4g
+Ki8KCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjggbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA2Lzc6IGNwdS1l
+eGVjOiB1bmlmeSBpY291bnRfZGVjciBhbmQgdGNnX2V4aXRfcmVxLi4uCkNoZWNraW5nIFBBVENI
+IDcvNzogY3B1LWV4ZWM6IGNlbnRyYWxpemUgZXhpdGluZyB0byB0aGUgbWFpbiBsb29wLi4uCj09
+PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
+RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
+dHMub3Jn
