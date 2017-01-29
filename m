@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cXskt-0000sL-9Y
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 11:55:11 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cXwEM-0005Oc-ED
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 15:37:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cXskr-0002zx-P9
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 11:55:07 -0500
-References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-	<20170123121036.4823-23-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
-Date: Sun, 29 Jan 2017 17:54:52 +0100
+	(envelope-from <bobby.prani@gmail.com>) id 1cXwEI-0001fc-Gm
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 15:37:46 -0500
+Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:33362)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cXwEI-0001dy-AQ
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 15:37:42 -0500
+Received: by mail-yw0-x242.google.com with SMTP id u68so28195609ywg.0
+	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 12:37:40 -0800 (PST)
+References: <20170127103922.19658-1-alex.bennee@linaro.org>
+	<20170127103922.19658-6-alex.bennee@linaro.org>
+From: Pranith Kumar <bobby.prani@gmail.com>
+In-reply-to: <20170127103922.19658-6-alex.bennee@linaro.org>
+Date: Sun, 29 Jan 2017 15:37:38 -0500
+Message-ID: <877f5dr4a5.fsf@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170123121036.4823-23-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bUisP2G2Qb5D5em6JdBijLQKQ9tK4fuwR"
-Subject: Re: [Qemu-devel] [PATCH 22/24] block/dirty-bitmap: deep release
- dirty bitmaps
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v8 05/25] tcg: add options for enabling
+ MTTCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,160 +31,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bUisP2G2Qb5D5em6JdBijLQKQ9tK4fuwR
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
-Subject: Re: [PATCH 22/24] block/dirty-bitmap: deep release dirty bitmaps
-References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
- <20170123121036.4823-23-vsementsov@virtuozzo.com>
-In-Reply-To: <20170123121036.4823-23-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
 
-On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
-> Remove persistent bitmap from its storage on bdrv_release_dirty_bitmap.=
+Alex Bennée writes:
 
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> From: KONRAD Frederic <fred.konrad@greensocs.com>
+>
+> We know there will be cases where MTTCG won't work until additional work
+> is done in the front/back ends to support. It will however be useful to
+> be able to turn it on.
+>
+> As a result MTTCG will default to off unless the combination is
+> supported. However the user can turn it on for the sake of testing.
+>
+> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+> [AJB: move to -accel tcg,thread=multi|single, defaults]
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
 > ---
->  block/dirty-bitmap.c      | 21 ++++++++++++++++++---
->  include/block/block_int.h |  3 +++
->  2 files changed, 21 insertions(+), 3 deletions(-)
->=20
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 775181c9ab..0977df6309 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -297,7 +297,8 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *b=
-s)
-> =20
->  static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs=
-,
->                                                    BdrvDirtyBitmap *bit=
-map,
-> -                                                  bool only_named)
-> +                                                  bool only_named,
-> +                                                  bool deep)
-
-I'd rather call it "remove_persistent" or something, which is bad
-grammar, but it's better at getting the point across.
-
->  {
->      BdrvDirtyBitmap *bm, *next;
->      QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
-> @@ -305,6 +306,19 @@ static void bdrv_do_release_matching_dirty_bitmap(=
-BlockDriverState *bs,
->              assert(!bm->active_iterators);
->              assert(!bdrv_dirty_bitmap_frozen(bm));
->              assert(!bm->meta);
+> v1:
+>   - merge with add mttcg option.
+>   - update commit message
+> v2:
+>   - machine_init->opts_init
+> v3:
+>   - moved from -tcg to -accel tcg,thread=single|multi
+>   - fix checkpatch warnings
+> v4:
+>   - make mttcg_enabled extern, qemu_tcg_mttcg_enabled() now just macro
+>   - qemu_tcg_configure now propagates Error instead of exiting
+>   - better error checking of thread=foo
+>   - use CONFIG flags for default_mttcg_enabled()
+>   - disable mttcg with icount, error if both forced on
+> v7
+>   - explicitly disable MTTCG for TCG_OVERSIZED_GUEST
+>   - use check_tcg_memory_orders_compatible() instead of CONFIG_MTTCG_HOST
+>   - change CONFIG_MTTCG_TARGET to TARGET_SUPPORTS_MTTCG
+> v8
+>   - fix missing include tcg.h
+>   - change mismatched MOs to a warning instead of error
+> ---
+>  cpus.c                | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/qom/cpu.h     |  9 +++++++
+>  include/sysemu/cpus.h |  2 ++
+>  qemu-options.hx       | 20 ++++++++++++++
+>  tcg/tcg.h             |  9 +++++++
+>  vl.c                  | 49 ++++++++++++++++++++++++++++++++++-
+>  6 files changed, 160 insertions(+), 1 deletion(-)
+>
+> diff --git a/cpus.c b/cpus.c
+> index 71a82e5004..76b6e04332 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -25,6 +25,7 @@
+>  /* Needed early for CONFIG_BSD etc. */
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> +#include "qemu/config-file.h"
+>  #include "cpu.h"
+>  #include "monitor/monitor.h"
+>  #include "qapi/qmp/qerror.h"
+> @@ -45,6 +46,7 @@
+>  #include "qemu/main-loop.h"
+>  #include "qemu/bitmap.h"
+>  #include "qemu/seqlock.h"
+> +#include "tcg.h"
+>  #include "qapi-event.h"
+>  #include "hw/nmi.h"
+>  #include "sysemu/replay.h"
+> @@ -150,6 +152,76 @@ typedef struct TimersState {
+>  } TimersState;
+>  
+>  static TimersState timers_state;
+> +bool mttcg_enabled;
 > +
-> +            if (deep && bm->persistent && bs->drv &&
-> +                bs->drv->bdrv_remove_persistent_dirty_bitmap)
-> +            {
-> +                Error *local_err =3D NULL;
-> +                bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, bm->n=
-ame,
-> +                                                             &local_er=
-r);
-> +                if (local_err !=3D NULL) {
-> +                    error_report_err(local_err);
-
-This looks like maybe it's the wrong thing to do... I do agree that
-sometimes it may not be fatal, but sometimes it probably is.
-
-> +                }
-> +            }
+> +/*
+> + * We default to false if we know other options have been enabled
+> + * which are currently incompatible with MTTCG. Otherwise when each
+> + * guest (target) has been updated to support:
+> + *   - atomic instructions
+> + *   - memory ordering primitives (barriers)
+> + * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
+> + *
+> + * Once a guest architecture has been converted to the new primitives
+> + * there are two remaining limitations to check.
+> + *
+> + * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
+> + * - The host must have a stronger memory order than the guest
+> + *
+> + * It may be possible in future to support strong guests on weak hosts
+> + * but that will require tagging all load/stores in a guest with their
+> + * implicit memory order requirements which would likely slow things
+> + * down a lot.
+> + */
 > +
-> +
->              QLIST_REMOVE(bm, list);
->              hbitmap_free(bm->bitmap);
->              g_free(bm->name);
-> @@ -322,16 +336,17 @@ static void bdrv_do_release_matching_dirty_bitmap=
-(BlockDriverState *bs,
-> =20
->  void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *=
-bitmap)
->  {
-> -    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false);
-> +    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false, true);
+> +static bool check_tcg_memory_orders_compatible(void)
+> +{
+> +#if defined(TCG_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
+> +    return (TCG_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
+> +#else
+> +    return false;
+> +#endif
+> +}
 
-The @deep parameter (or however you decide to call it) should be
-available to this function's caller, too. I don't believe qcow2's
-load_bitmap() wants to delete the persistent bitmap in the error path;
-and block-dirty-bitmap-remove should probably allow the user to decide
-what to do.
+This still doesn't look right. It is saying that a host like ARM will be able
+to run guests that have a stronger memory model, no?
 
-Which brings me to the error thing above: If the user (or management
-tool) decides that block-dirty-bitmap-remove should remove the
-persistent bitmap, I believe that the operation should be aborted if the
-persistent bitmap cannot be removed. It should not just go on and
-release the in-memory bitmap but abort altogether. If the user just
-wants to release that in-memory bitmap then, they can still go on an
-call block-dirty-bitmap-remove with deep=3Dfalse.
-
->  }
-> =20
->  /**
->   * Release all named dirty bitmaps attached to a BDS (for use in bdrv_=
-close()).
->   * There must not be any frozen bitmaps attached.
-> + * This function do not remove persistent bitmaps from the storage.
-
-*does
-
-Max
-
->   */
->  void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
->  {
-> -    bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
-> +    bdrv_do_release_matching_dirty_bitmap(bs, NULL, true, false);
->  }
-> =20
->  void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index b38b3aa198..3e080d6d68 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -326,6 +326,9 @@ struct BlockDriver {
->                                                  Error **errp);
->      bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs, cons=
-t char *name,
->                                              uint32_t granularity, Erro=
-r **errp);
-> +    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
-> +                                                const char *name,
-> +                                                Error **errp);
-> =20
->      QLIST_ENTRY(BlockDriver) list;
->  };
->=20
-
-
-
---bUisP2G2Qb5D5em6JdBijLQKQ9tK4fuwR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliOHlwSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AWF8H/ix9IN5mGZ9zQzI11s7Jjgf9sgmgRymj
-y4koom2B7EWPuYs7lljSZ3yQfHbCDCW/uphCVvgz9Va4NqHq7EPqOmPtlDNotfST
-gs+afwg6qhL5jFVbMdOZERZ9dg9z8VlTGgMrcGPYIM5sG1+U5F08w/L0eOUSpBos
-b7FNlTn5oaw6p1x7wQt9LZeo2/w3cH1TWq2jgmXGnCXDh7QUxuAE4ahE4ZxSIuhi
-yhPttKZJ73r2IJtxSUGCbiFCnZKzYKBObVIg0jRZClGvGRvKDzR6M83cMIMLGQhH
-Z7XSZQ/cYvv56iY1DWTAvMnSTKoYuVWbhTLUkUJ5RBs0z9VJ40tzsCI=
-=6JRf
------END PGP SIGNATURE-----
-
---bUisP2G2Qb5D5em6JdBijLQKQ9tK4fuwR--
+-- 
+Pranith
