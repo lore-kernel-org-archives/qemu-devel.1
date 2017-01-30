@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cY7BT-00012u-PA
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 03:19:33 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cY7Jz-0003VB-U0
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 03:28:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cY7BO-0005Zv-RA
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 03:19:31 -0500
-Received: from g2t2354.austin.hpe.com ([15.233.44.27]:47210)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jitendra.kolhe@hpe.com>)
-	id 1cY7BO-0005Re-Jz
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 03:19:26 -0500
-References: <1483601042-6435-1-git-send-email-jitendra.kolhe@hpe.com>
-	<87mvec3bqp.fsf@emacs.mitica>
-From: Jitendra Kolhe <jitendra.kolhe@hpe.com>
-Message-ID: <e8bf1275-31b7-2ea7-d5d6-137804e8a0e1@hpe.com>
-Date: Mon, 30 Jan 2017 13:49:12 +0530
+	(envelope-from <jsnow@redhat.com>) id 1cY7Jy-0006YF-CN
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 03:28:19 -0500
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+	<1485443388-27253-9-git-send-email-armbru@redhat.com>
+	<9684a908-f425-82d8-046b-19cc17d01f55@redhat.com>
+	<87r33o3emm.fsf@dusky.pond.sub.org>
+	<2bcf4c7c-5c29-fda5-1ba3-5828600a8995@redhat.com>
+	<8760l0ebgq.fsf@dusky.pond.sub.org>
+	<e0f2369d-6ebf-ae73-abf1-7021b257748c@redhat.com>
+	<87a8a9vuhu.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <36c5c518-0f6e-d9e3-b835-9696078e870e@redhat.com>
+Date: Mon, 30 Jan 2017 03:28:08 -0500
 MIME-Version: 1.0
-In-Reply-To: <87mvec3bqp.fsf@emacs.mitica>
+In-Reply-To: <87a8a9vuhu.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] mem-prealloc: Reduce large guest
- start-up and migration time.
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] hw: Drop superfluous special checks
+ for orphaned -drive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +30,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, armbru@redhat.com, renganathan.meenakshisundaram@hpe.com, mohan_parthasarathy@hpe.com, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mreitz@redhat.com, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-On 1/27/2017 6:23 PM, Juan Quintela wrote:
-> Jitendra Kolhe <jitendra.kolhe@hpe.com> wrote:
->> Using "-mem-prealloc" option for a very large guest leads to huge guest
->> start-up and migration time. This is because with "-mem-prealloc" option
->> qemu tries to map every guest page (create address translations), and
->> make sure the pages are available during runtime. virsh/libvirt by
->> default, seems to use "-mem-prealloc" option in case the guest is
->> configured to use huge pages. The patch tries to map all guest pages
->> simultaneously by spawning multiple threads. Given the problem is more
->> prominent for large guests, the patch limits the changes to the guests
->> of at-least 64GB of memory size. Currently limiting the change to QEMU
->> library functions on POSIX compliant host only, as we are not sure if
->> the problem exists on win32. Below are some stats with "-mem-prealloc"
->> option for guest configured to use huge pages.
+
+
+On 01/30/2017 03:10 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> On 01/27/2017 11:04 AM, Markus Armbruster wrote:
+>>> John Snow <jsnow@redhat.com> writes:
+>>>
+>>>> On 01/27/2017 06:51 AM, Markus Armbruster wrote:
+>>>>> John Snow <jsnow@redhat.com> writes:
+>>>>>
+>>>>>> On 01/26/2017 10:09 AM, Markus Armbruster wrote:
+>>>>>>> We've traditionally rejected orphans here and there, but not
+>>>>>>> systematically.  For instance, the sun4m machines have an onboard SCSI
+>>>>>>> HBA (bus=0), and have always rejected bus>0.  Other machines with an
+>>>>>>> onboard SCSI HBA don't.
+>>>>>>>
+>>>>>>> Commit a66c9dc made all orphans trigger a warning, and the previous
+>>>>>>> commit turned this into an error.  The checks "here and there" are now
+>>>>>>> redundant.  Drop them.
+>>>>>>>
+>>>>>>> Note that the one in mips_jazz.c was wrong: it rejected bus > MAX_FD,
+>>>>>>> but MAX_FD is the number of floppy drives per bus.
+>>>>>>>
+>>>>>>> Error messages change from
+>>>>>>>
+>>>>>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
+>>>>>>>     qemu-system-x86_64: Too many IDE buses defined (3 > 2)
+>>>>>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
+>>>>>>>     qemu: too many floppy drives
+>>>>>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
+>>>>>>>     qemu: too many SCSI bus
+>>>>>>>
+>>>>>>> to
+>>>>>>>
+>>>>>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
+>>>>>>>     qemu-system-x86_64: -drive if=ide,bus=2: machine type does not support this drive
+>>>>>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
+>>>>>>>     qemu-system-mips64: -drive if=floppy,bus=2,id=fd1: machine type does not support this drive
+>>>>>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
+>>>>>>>     qemu-system-sparc: -drive if=scsi,bus=1: machine type does not support this drive
+>>>>>>>
+>>>>>>
+>>>>>> Hm, that's a lot less helpful, isn't it? Can we augment with hints?
+>>>>>
+>>>>> The message itself may be less specific, but it now comes with a precise
+>>>>> location.  Personally, I'd even find
+>>>>>
+>>>>>     qemu-system-sparc: -drive if=scsi,bus=1: *mumble* *mumble*
+>>>>>
+>>>>> more helpful than
+>>>>>
+>>>>>     qemu: too many SCSI bus
+>>>>>
+>>>>> because the former tells me *which* of the options is bad.  We tend to
+>>>>> have lots and lots of them.
+>>>>>
+>>>>> The deleted special case errors cover only a minority of "orphan"
+>>>>> -drive.  If these cases need improvement, then so will the general case.
+>>>>> If you can come up with a hint that makes the general case message more
+>>>>> useful, I'm more than happy to squash it into PATCH 6.
+>>>>>
+>>>>
+>>>> The old error had "why" and the new error has "where" but neither has
+>>>> both. I would suggest that from the "why" you can divine the "where,"
+>>>> but the opposite is not as easily true.
+>>>
+>>> Some users will be able to divine more easily than others.  Consider my
+>>> "too many floppy drives" example.  There's just one, and the machine
+>>> actually supports two.  The user has to make the connection to "bus=2"
+>>> somehow.  Now, anybody crazy enough to mess with bus= can probably be
+>>> expected to figure this out, but still, the deleted error messages
+>>> aren't exactly wonderful.
+>>>
+>>>> The new error even suggests information I think is wrong and misleading:
+>>>> We do support SCSI! (Just not this many of them.)
+>>>
+>>> Well, the error doesn't say "machine doesn't support SCSI", only
+>>> "doesn't support this particular -drive".  Perhaps it could be worded
+>>> more clearly.  Ideas?
+>>>
 >>
->> ------------------------------------------------------------------------
->> Idle Guest      | Start-up time | Migration time
->> ------------------------------------------------------------------------
->> Guest stats with 2M HugePage usage - single threaded (existing code)
->> ------------------------------------------------------------------------
->> 64 Core - 4TB   | 54m11.796s    | 75m43.843s
->                     ^^^^^^^^^^
+>> Ah, I see what you mean now. I interpreted "this drive" to mean SCSI,
+>> not this SCSI *instance*.
 > 
->> 64 Core - 1TB   | 8m56.576s     | 14m29.049s
->> 64 Core - 256GB | 2m11.245s     | 3m26.598s
->> ------------------------------------------------------------------------
->> Guest stats with 2M HugePage usage - map guest pages using 8 threads
->> ------------------------------------------------------------------------
->> 64 Core - 4TB   | 5m1.027s      | 34m10.565s
->> 64 Core - 1TB   | 1m10.366s     | 8m28.188s
->> 64 Core - 256GB | 0m19.040s     | 2m10.148s
->> -----------------------------------------------------------------------
->> Guest stats with 2M HugePage usage - map guest pages using 16 threads
->> -----------------------------------------------------------------------
->> 64 Core - 4TB   | 1m58.970s     | 31m43.400s
->                     ^^^^^^^^^
+> Uh, I would've written "does not support if=scsi" then.  But I see where
+> you come from.
 > 
-> Impressive, not everyday one get an speedup of 20 O:-)
+>>                           If it can be made clearer that QEMU is simply
+>> unable to instantiate this particular instance, that'd be fine.
+>>
+>> Instead of "Machine type does not support this drive,"
+>>
+>> how about
+>>
+>> "Machine type cannot instantiate this drive instance"
 > 
+> Hmm.
 > 
->> +static void *do_touch_pages(void *arg)
->> +{
->> +    PageRange *range = (PageRange *)arg;
->> +    char *start_addr = range->addr;
->> +    uint64_t numpages = range->numpages;
->> +    uint64_t hpagesize = range->hpagesize;
->> +    uint64_t i = 0;
->> +
->> +    for (i = 0; i < numpages; i++) {
->> +        memset(start_addr + (hpagesize * i), 0, 1);
+>> Or ... follow your own best judgement. This is really YOUR wheelhouse.
+>> My example is a little wordy.
 > 
-> I would use the range->addr and similar here directly, but it is just a
-> question of taste.
+> All I can come up with is even wordier: "Machine type doesn't support
+> this combination of if, bus, unit", or "if=scsi,bus=%d,unit=%d not
+> supported with this machine type".  Could also be confusing when the
+> user specified index instead of bus, unit.
+> 
+> Good error messages are hard...
 > 
 
-Thanks for your response, 
-will update my next patch.
+Yes, so just follow your own instincts. Just offering a non-blocking
+comment.
 
->> -        /* MAP_POPULATE silently ignores failures */
->> -        for (i = 0; i < numpages; i++) {
->> -            memset(area + (hpagesize * i), 0, 1);
->> +        /* touch pages simultaneously for memory >= 64G */
->> +        if (memory < (1ULL << 36)) {
-> 
-> 64GB guest already took quite a bit of time, I think I would put it
-> always as min(num_vcpus, 16).  So, we always execute the multiple theard
-> codepath?
-> 
-
-It sounds good idea to have a heuristic on vcpu count. I will add in my 
-next version. But shouldn't we also restrict based on guest RAM size too, 
-to avoid overhead spawning multiple threads for thin guests?
-
-Thanks,
-- Jitendra
-
-> But very nice, thanks.
-> 
-> Later, Juan.
-> 
+--js
