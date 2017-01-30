@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cYDjW-0004ZB-0O
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:19:06 -0500
+	(envelope-from <sw@weilnetz.de>) id 1cYDnQ-0006Ht-GG
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:23:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cYDjS-0007pe-Q8
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:19:05 -0500
-Received: from mail-wj0-x243.google.com ([2a00:1450:400c:c01::243]:33403)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cYDjS-0007pB-Iu
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:19:02 -0500
-Received: by mail-wj0-x243.google.com with SMTP id un2so8201356wjb.0
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:19:02 -0800 (PST)
-Date: Mon, 30 Jan 2017 15:18:59 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170130151859.GL2118@stefanha-x1.localdomain>
-References: <20170120164322.21851-1-pbonzini@redhat.com>
-	<20170120164322.21851-2-pbonzini@redhat.com>
+	(envelope-from <sw@weilnetz.de>) id 1cYDnL-0000et-Fo
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:23:08 -0500
+References: <20170130145025.26475-1-david@redhat.com>
+	<89891b01-8d50-98ac-c26c-2a769b22b400@weilnetz.de>
+	<CAFEAcA86o3ohxZj0qqHKSxqxmo1mCtwKPa_j78xdO2izynEopA@mail.gmail.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <2d18251c-395e-641e-30d1-e44d7be9c012@weilnetz.de>
+Date: Mon, 30 Jan 2017 16:23:03 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8cpS+6Cx+xtICsjy"
-Content-Disposition: inline
-In-Reply-To: <20170120164322.21851-2-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/17] aio: introduce aio_co_schedule and
- aio_co_wake
+In-Reply-To: <CAFEAcA86o3ohxZj0qqHKSxqxmo1mCtwKPa_j78xdO2izynEopA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: use "qemu" cpu model in user
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>, pkg-qemu-devel@lists.alioth.debian.org, qemu-stable <qemu-stable@nongnu.org>
 
+Am 30.01.2017 um 16:11 schrieb Peter Maydell:
+> On 30 January 2017 at 15:09, Stefan Weil <sw@weilnetz.de> wrote:
+>> Am 30.01.2017 um 15:50 schrieb David Hildenbrand:
+>>> "any" does not exist, therefore resulting in a misleading error message.
+>>>
+>>> Reported-by: Stefan Weil <sw@weilnetz.de>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  linux-user/main.c | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/linux-user/main.c b/linux-user/main.c
+>>> index 3004958..e588f58 100644
+>>> --- a/linux-user/main.c
+>>> +++ b/linux-user/main.c
+>>> @@ -4322,6 +4322,8 @@ int main(int argc, char **argv, char **envp)
+>>>  # endif
+>>>  #elif defined TARGET_SH4
+>>>          cpu_model = TYPE_SH7785_CPU;
+>>> +#elif defined TARGET_S390X
+>>> +        cpu_model = "qemu";
+>>>  #else
+>>>          cpu_model = "any";
+>>>  #endif
+>>
+>> Thanks.
+>>
+>> Reviewed-by: Stefan Weil <sw@weilnetz.de>
+>>
+>> This fix is also needed for Debian's QEMU user emulation.
+> Does it merit a cc: qemu-stable ?
+>
+> thanks
+> -- PMM
 
---8cpS+6Cx+xtICsjy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jan 20, 2017 at 05:43:06PM +0100, Paolo Bonzini wrote:
-> diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
-> index 14d4f1d..1efa356 100644
-> --- a/include/qemu/coroutine_int.h
-> +++ b/include/qemu/coroutine_int.h
-> @@ -40,12 +40,20 @@ struct Coroutine {
->      CoroutineEntry *entry;
->      void *entry_arg;
->      Coroutine *caller;
-> +
-> +    /* Only used when the coroutine has terminated.  */
->      QSLIST_ENTRY(Coroutine) pool_next;
->      size_t locks_held;
-
-locks_held is used when the coroutine is running.  Please add a newline
-to separate it from pool_next.
-
-> =20
-> -    /* Coroutines that should be woken up when we yield or terminate */
-> +    /* Coroutines that should be woken up when we yield or terminate.
-> +     * Only used when the coroutine is running.
-> +     */
->      QSIMPLEQ_HEAD(, Coroutine) co_queue_wakeup;
-> +
-> +    /* Only used when the coroutine is sleeping.  */
-
-"running", "yielded", and "terminated" are terms with specific meanings.
-Is "sleeping" a subset of "yielded" where the coroutine is waiting for a
-mutex or its AioContext to schedule it?
-
-> +static void test_multi_co_schedule_entry(void *opaque)
-
-Missing coroutine_fn.
-
-> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-> index d2f529b..cb87997 100644
-> --- a/tests/test-vmstate.c
-> +++ b/tests/test-vmstate.c
-> @@ -33,17 +33,6 @@
->  static char temp_file[] =3D "/tmp/vmst.test.XXXXXX";
->  static int temp_fd;
-> =20
-> -/* Fake yield_until_fd_readable() implementation so we don't have to pul=
-l the
-> - * coroutine code as dependency.
-> - */
-> -void yield_until_fd_readable(int fd)
-> -{
-> -    fd_set fds;
-> -    FD_ZERO(&fds);
-> -    FD_SET(fd, &fds);
-> -    select(fd + 1, &fds, NULL, NULL, NULL);
-> -}
-> -
-> =20
->  /* Duplicate temp_fd and seek to the beginning of the file */
->  static QEMUFile *open_test_file(bool write)
-
-This should be a separate patch.
-
---8cpS+6Cx+xtICsjy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYj1ljAAoJEJykq7OBq3PIZPwIAIjH3iMPaVVVg1oZHhL+x5dK
-bt50UnQNmdDlvjT8Ok1mKSqvMTyTsPBYCgAZmlz+WYcClxLBNmjQN0ncVzI+5g2C
-/V4zlo9hfiFMcB/G6UCE9Eke6jHqB5UQvomAjxvZMGvaO0osgotRuncbtZ12FO6f
-YdlFnV2ul1ykQf4y3lG0fXgXnw5EVAee+lma8zSQkFsuAiG4xXH48f+BkRXkzddJ
-k3oiQiU+ss9oYfzSLXOq10zMATIBpofW4FIC48dPKTM2leeQ5Tb3hFAh191z7opT
-EFJCiSyhsyYN68YjJVhKkLS1IKjjSbYXH0W1cavJDYcpnN/7iD1asClJTiPQXuo=
-=FX1f
------END PGP SIGNATURE-----
-
---8cpS+6Cx+xtICsjy--
+Yes, of course. Thanks for the reminder - I added that list now as cc.
