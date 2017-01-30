@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=196d01cee=Paul.Durrant@citrix.com>)
-	id 1cY7g6-0001Tp-Tg
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 03:51:11 -0500
+	(envelope-from <quintela@redhat.com>) id 1cY83j-0007aC-5b
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 04:15:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=196d01cee=Paul.Durrant@citrix.com>)
-	id 1cY7g3-00078n-Ra
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 03:51:10 -0500
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:59562
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=196d01cee=Paul.Durrant@citrix.com>)
-	id 1cY7g3-00072O-Ib
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 03:51:07 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Mon, 30 Jan 2017 08:51:01 +0000
-Message-ID: <39438b53d7ab43e7b57a91b39938bd6c@AMSPEX02CL03.citrite.net>
-References: <1485423445-12302-1-git-send-email-paul.durrant@citrix.com>
-	<1485423445-12302-3-git-send-email-paul.durrant@citrix.com>
-	<alpine.DEB.2.10.1701271533580.2884@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1701271533580.2884@sstabellini-ThinkPad-X260>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <quintela@redhat.com>) id 1cY83i-0005VB-B9
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 04:15:35 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1485422381-29019-4-git-send-email-eric.auger@redhat.com> (Eric
+	Auger's message of "Thu, 26 Jan 2017 10:19:40 +0100")
+References: <1485422381-29019-1-git-send-email-eric.auger@redhat.com>
+	<1485422381-29019-4-git-send-email-eric.auger@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 30 Jan 2017 10:15:13 +0100
+Message-ID: <87vasw29jy.fsf@emacs.mitica>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] xen-platform: add support for
- unplugging NVMe disks...
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC 3/4] hw/intc/arm_gicv3_its: Implement state
+ save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Anthony
-	Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, shannon.zhao@linaro.org, christoffer.dall@linaro.org, drjones@redhat.com, vijay.kilari@gmail.com, Vijaya.Kumar@cavium.com, peterx@redhat.com, dgilbert@redhat.com
 
-> -----Original Message-----
-> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> Sent: 27 January 2017 23:35
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; Stefano
-> Stabellini <sstabellini@kernel.org>; Anthony Perard
-> <anthony.perard@citrix.com>; Michael S. Tsirkin <mst@redhat.com>; Paolo
-> Bonzini <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>;
-> Eduardo Habkost <ehabkost@redhat.com>
-> Subject: Re: [PATCH v3 2/3] xen-platform: add support for unplugging NVMe
-> disks...
->=20
-> On Thu, 26 Jan 2017, Paul Durrant wrote:
-> > ...not just IDE and SCSI.
-> >
-> > This patch allows the Xen tool-stack to fully support of NVMe as an
-> > emulated disk type. See [1] for the relevant tool-stack patch discussio=
-n.
-> >
-> > [1] https://lists.xen.org/archives/html/xen-devel/2017-01/msg01225.html
-> >
-> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
->=20
-> Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
->=20
-> I queued the whole series. FYI I am waiting for another patch to fix a
-> regression before sending a pull request.
->=20
+Eric Auger <eric.auger@redhat.com> wrote:
+> We need to handle both registers and ITS tables. While
+> register handling is standard, ITS table handling is more
+> challenging since the kernel API is devised so that the
+> tables are flushed into guest RAM and not in vmstate buffers.
+>
+> Flushing the ITS tables on device pre_save() is too late
+> since the guest RAM had already been saved at this point.
+>
+> Table flushing needs to happen when we are sure the vcpus
+> are stopped and before the last dirty page saving. The
+> right point is RUN_STATE_FINISH_MIGRATE but sometimes the
+> VM gets stopped before migration launch so let's simply
+> flush the tables each time the VM gets stopped.
+>
+> For regular ITS registers we just can use vmstate pre_save
+> and post_load callbacks.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Cool. Thanks Stefano.
+Hi
 
-  Paul
 
->=20
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> >
-> > v3:
-> > - Add reference to xen-devel patch discussion in commit message as
-> >   requested by Stefano.
-> > ---
-> >  hw/i386/xen/xen_platform.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-> > index f50915f..7d41ebb 100644
-> > --- a/hw/i386/xen/xen_platform.c
-> > +++ b/hw/i386/xen/xen_platform.c
-> > @@ -120,6 +120,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d,
-> void *o)
-> >          break;
-> >
-> >      case PCI_CLASS_STORAGE_SCSI:
-> > +    case PCI_CLASS_STORAGE_EXPRESS:
-> >          object_unparent(OBJECT(d));
-> >          break;
-> >
-> > --
-> > 2.1.4
-> >
+> + * vm_change_state_handler - VM change state callback aiming at flushing
+> + * ITS tables into guest RAM
+> + *
+> + * The tables get flushed to guest RAM whenever the VM gets stopped.
+> + */
+> +static void vm_change_state_handler(void *opaque, int running,
+> +                                    RunState state)
+> +{
+> +    GICv3ITSState *s = (GICv3ITSState *)opaque;
+
+Cast is unneeded.
+
+> +
+> +    if (running) {
+> +        return;
+> +    }
+> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_TABLES,
+> +                      0, NULL, false);
+
+As you are adding it to do everytime that we stop the guest, how
+expensive/slow is that?
+
+Thanks, Juan.
