@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cYDt6-0001mK-3a
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:29:00 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cYDx3-0003Y5-7h
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:33:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cYDt1-0002Wz-2I
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:29:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56227
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cYDt0-0002Sq-TR
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:28:54 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0UFSQgI045416
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 10:28:39 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28a7f4a4sk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 10:28:39 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 30 Jan 2017 15:28:37 -0000
-References: <20161020132556.67321-1-pasic@linux.vnet.ibm.com>
-	<20161020132556.67321-3-pasic@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 30 Jan 2017 16:28:35 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cYDwy-00049H-8f
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:33:05 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35832)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cYDwy-00048M-0h
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:33:00 -0500
+Received: by mail-wm0-x243.google.com with SMTP id u63so9499055wmu.2
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:32:59 -0800 (PST)
+Date: Mon, 30 Jan 2017 15:32:56 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170130153256.GN2118@stefanha-x1.localdomain>
+References: <20170120164322.21851-1-pbonzini@redhat.com>
+	<20170120164322.21851-6-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161020132556.67321-3-pasic@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <b1f6f338-601f-8525-1f1b-cffdbe203453@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] migration: drop unused
- VMStateField.start
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jnYfR+Q8IWTs8BNa"
+Content-Disposition: inline
+In-Reply-To: <20170120164322.21851-6-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/17] io: add methods to set I/O handlers
+ on AioContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,44 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amit Shah <amit.shah@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Guenther Hutzl <hutzl@linux.vnet.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha@redhat.com
 
 
+--jnYfR+Q8IWTs8BNa
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 10/20/2016 03:25 PM, Halil Pasic wrote:
-> diff --git a/migration/vmstate.c b/migration/vmstate.c
-> index fc29acf..8767e40 100644
-> --- a/migration/vmstate.c
-> +++ b/migration/vmstate.c
-> @@ -66,10 +66,10 @@ static void *vmstate_base_addr(void *opaque, VMStateField *field, bool alloc)
->                  }
->              }
->              if (size) {
-> -                *((void **)base_addr + field->start) = g_malloc(size);
-> +                *(void **)base_addr = g_malloc(size);
->              }
->          }
-> -        base_addr = *(void **)base_addr + field->start;
-> +        base_addr = *(void **)base_addr;
->      }
-> 
->      return base_addr;
-Hi!
+On Fri, Jan 20, 2017 at 05:43:10PM +0100, Paolo Bonzini wrote:
+> This is in preparation for making qio_channel_yield work on
+> AioContexts other than the main one.
+>=20
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>         v1->v2: removed QIOChannelRestart [Daniel]
+>=20
+>  include/io/channel.h | 25 +++++++++++++++++++++++++
+>  io/channel-command.c | 13 +++++++++++++
+>  io/channel-file.c    | 11 +++++++++++
+>  io/channel-socket.c  | 16 +++++++++++-----
+>  io/channel-tls.c     | 12 ++++++++++++
+>  io/channel-watch.c   |  6 ++++++
+>  io/channel.c         | 11 +++++++++++
+>  7 files changed, 89 insertions(+), 5 deletions(-)
 
-It is been a while, and IMHO this is still broken, and the
-VMSTATE_VBUFFER* macros are still only used with the start argument
-being zero.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-What changed is that with commit 94869d5c ("migration: migrate QTAILQ")
-from Jan 19 we have code actually using VMStateDecription.start -- but
-for something different (IMHO), as allocation is done by get_qtailq and
-not by vmstate_base_addr (as in case of VMSTATE_VBUFFER_ALLOC_UINT32).
-Thus I would need to update the commit message and keep the start field
-at least.
+--jnYfR+Q8IWTs8BNa
+Content-Type: application/pgp-signature; name="signature.asc"
 
-But before I do so, I would like to ask the maintainers if there is
-interest in a change like this?
+-----BEGIN PGP SIGNATURE-----
 
-Regards,
-Halil
+iQEcBAEBAgAGBQJYj1yoAAoJEJykq7OBq3PIvaEIAJO2PBOgAft6pCZRpj+aVfMr
+KJTQnqF8wsFbNKZUlx1ehf0rqNqAv0B6FLugDEMJk6c5ECYNZLcG04sU0Wt250vq
+zEAnD4dBx0fQhHUfezQH2HF08FccsTzXQhNTa3Y78qQgd2NvV4nzCH8mzn0ibC4e
+S/uLaXv/1t+Or/wPUm+KMpgKyyQyJ//eKs98onw2vToKbb++5HDAJ0mQUfNI9p0M
+/zBWDV6A2usyRgyOKpJfxUVI+QSv9eevsXUmQxJGlvvnTiwHw4+bcskNkkNz6N0Z
+6XsK4nVMBi4uCkilfODOPwfv1zhDmjvnlP7oqU4nOVrxjWwRUTw41/gB1LYrUpc=
+=M0ux
+-----END PGP SIGNATURE-----
+
+--jnYfR+Q8IWTs8BNa--
