@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cYCen-0007Eu-O3
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:10:13 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cYChS-0001K7-DX
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:12:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cYCej-00072F-Rk
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:10:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41208)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cYCej-00071Z-Lo
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:10:05 -0500
-References: <20170130131517.8092-1-sw@weilnetz.de>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <c8f2b3c6-34b9-cfe1-0363-8afa5ab1ec0f@redhat.com>
-Date: Mon, 30 Jan 2017 15:10:01 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cYChO-00086p-FY
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:12:54 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:32835)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cYChO-000859-95
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:12:50 -0500
+Received: by mail-wm0-x243.google.com with SMTP id v77so16416366wmv.0
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 06:12:50 -0800 (PST)
+Date: Mon, 30 Jan 2017 14:12:46 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170130141246.GE2118@stefanha-x1.localdomain>
+References: <1485436265-12573-1-git-send-email-thuth@redhat.com>
+	<1485436265-12573-2-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170130131517.8092-1-sw@weilnetz.de>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/s390x: Fix broken user mode
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="VUDLurXRWRKrGuMn"
+Content-Disposition: inline
+In-Reply-To: <1485436265-12573-2-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/5] checkpatch: add a check for utf-8
+ in commit logs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, David Hildenbrand <dahi@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Am 30.01.2017 um 14:15 schrieb Stefan Weil:
-> Returning NULL from get_max_cpu_model results in a SIGSEGV runtime error.
-> 
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+
+--VUDLurXRWRKrGuMn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jan 26, 2017 at 02:11:01PM +0100, Thomas Huth wrote:
+> This patch is a port of the following commit from the Linux kernel:
+>=20
+> commit 15662b3e8644905032c2e26808401a487d4e90c1
+> Author: Joe Perches <joe@perches.com>
+> Date:   Mon Oct 31 17:13:12 2011 -0700
+>=20
+>     checkpatch: add a --strict check for utf-8 in commit logs
+>=20
+>     Some find using utf-8 in commit logs inappropriate.
+>=20
+>     Some patch commit logs contain unintended utf-8 characters when doing
+>     things like copy/pasting compilation output.
+>=20
+>     Look for the start of any commit log by skipping initial lines that l=
+ook
+>     like email headers and "From: " lines.
+>=20
+>     Stop looking for utf-8 at the first signature line.
+>=20
+>     Signed-off-by: Joe Perches <joe@perches.com>
+>     Suggested-by: Andrew Morton <akpm@linux-foundation.org>
+>     Cc: Andy Whitcroft <apw@shadowen.org>
+>     Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+>     Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-> 
-> v2: Re-sent as v1 was damaged by my mailer.
-> 
-> This is also broken in Debian.
-> 
-> In addition, there is no default CPU ("any"), so binfmt and related
-> actions currently don't work. I hacked my local installation by
-> duplicating the "qemu" cpu definition for "any", but maybe there is
-> a better solution.
+>  scripts/checkpatch.pl | 30 ++++++++++++++++++++++++++----
+>  1 file changed, 26 insertions(+), 4 deletions(-)
 
-we have the "qemu" model for that (or simply drop the -cpu parameter
-completely). Eduardo currently proposed "max" as an alternative for x86.
-There is also no "any" model on x86.
+This patch prevents including names with non-ASCII characters in the
+commit description.  Some people care about the proper spelling of their
+names.
 
-> 
-> Regards
-> Stefan
-> 
->  target/s390x/cpu_models.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index 2a894ee..6e34763 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -660,7 +660,6 @@ static void check_compatibility(const S390CPUModel *max_model,
->  
->  static S390CPUModel *get_max_cpu_model(Error **errp)
->  {
-> -#ifndef CONFIG_USER_ONLY
->      static S390CPUModel max_model;
->      static bool cached;
->  
-> @@ -680,7 +679,6 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
->          cached = true;
->          return &max_model;
->      }
-> -#endif
->      return NULL;
->  }
->  
-> 
+Allowing UTF-8 in Signed-off-by and other headers isn't enough.
 
-Okay, the main problem is that get_max_cpu_model() doesn't return an
-error in this case, therefor s390_realize_cpu_model() doesn't fail
-correctly.
+--VUDLurXRWRKrGuMn
+Content-Type: application/pgp-signature; name="signature.asc"
 
-But it seems like cpu models also make sense for user mode (as you
-recognized, we tried to not touch it but failed). However, for now, just
-as for ordinary tcg, only "qemu"/z900 is supported, until proper support
-for tcg is implemented.
+-----BEGIN PGP SIGNATURE-----
 
-Then, also the CONFIG_USER_ONLY in apply_cpu_model() has to go.
+iQEcBAEBAgAGBQJYj0neAAoJEJykq7OBq3PI3g4IAKrRps+9pIbgrpInodSMBxOb
+CPb4rBSnkjYqRJZVXyxeuc2o5+fK6iwTqG+fWDm55+XWoqMsRGg+SnkumYVrQmdc
+GCRVAdWwcJ7faK6NUUCnsf4AkVBtYYsQunzDhL5ldLAGVEsgQvyb2itLmyWsfYWj
+nsvD/s461Xjv8o6mVfe7aSI7n16RR2qXeVGVSeGV0F8vSrl7fFEKlV0O0Cg7MaPK
+Omt8i6V2ir219mESEGNrXtLZGLWT3dFEDBDj6z2Uy87ufHRAHKWeHVs7SPwUJVps
+1LYih9RFHiYcK2gUWN1RcnnwsUcANy+4aJ6jSm45Ywyj1/qyHQpx2MgXxMuLEGE=
+=uGfW
+-----END PGP SIGNATURE-----
 
-So this makes sense to me and should fix the current problem.
-
--- 
-
-David
+--VUDLurXRWRKrGuMn--
