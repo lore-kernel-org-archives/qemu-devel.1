@@ -1,37 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cYAqM-0008Hp-Rv
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:13:59 -0500
+	(envelope-from <groug@kaod.org>) id 1cYAqX-0008Rh-LZ
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:14:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cYAqJ-0000xi-N2
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:13:58 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38258
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1cYAqT-0000zm-Mw
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:14:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46849)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cYAqJ-0000xS-Gx
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:13:55 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0UCDpv1027959
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:13:55 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28a1ah1nse-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cYAqT-0000zR-EO
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:14:05 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0UCDU2r018600
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:14:04 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28a2r8xmkw-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:13:54 -0500
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:14:04 -0500
 Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 30 Jan 2017 05:13:45 -0700
+	Mon, 30 Jan 2017 05:14:03 -0700
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 30 Jan 2017 13:13:40 +0100
+Date: Mon, 30 Jan 2017 13:13:48 +0100
 In-Reply-To: <148577817618.10533.9740628265078537215.stgit@bahia.lan>
 References: <148577817618.10533.9740628265078537215.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <148577842061.10533.9523839559863367492.stgit@bahia.lan>
-Subject: [Qemu-devel] [PATCH RFC 32/36] 9pfs: local: lstat: don't follow
+Message-Id: <148577842861.10533.18318187494566021344.stgit@bahia.lan>
+Subject: [Qemu-devel] [PATCH RFC 33/36] 9pfs: local: lgetxattr: don't follow
  symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -44,77 +43,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: ppandit@redhat.com, jannh@google.com, Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-This fixes CVE-2016-9602 for the "passthrough" and "mapped" security models.
+This fixes CVE-2016-9602 for all security models.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/9pfs/9p-local.c |   36 ++++++++++++++++++++++++------------
- 1 file changed, 24 insertions(+), 12 deletions(-)
+ hw/9pfs/9p-posix-acl.c  |   16 ++--------------
+ hw/9pfs/9p-xattr-user.c |    8 +-------
+ hw/9pfs/9p-xattr.c      |    8 +-------
+ 3 files changed, 4 insertions(+), 28 deletions(-)
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 60edfb25f8a5..b46a81792ecf 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -168,12 +168,17 @@ static void local_mapped_file_attr(FsContext *ctx, const char *path,
- 
- static int local_lstat(FsContext *fs_ctx, V9fsPath *fs_path, struct stat *stbuf)
+diff --git a/hw/9pfs/9p-posix-acl.c b/hw/9pfs/9p-posix-acl.c
+index ec003181cd33..9435e27a368c 100644
+--- a/hw/9pfs/9p-posix-acl.c
++++ b/hw/9pfs/9p-posix-acl.c
+@@ -25,13 +25,7 @@
+ static ssize_t mp_pacl_getxattr(FsContext *ctx, const char *path,
+                                 const char *name, void *value, size_t size)
  {
--    int err;
 -    char *buffer;
--    char *path = fs_path->data;
-+    int err = -1;
-+    char *dirpath = local_dirname(fs_path->data);
-+    char *name = local_basename(fs_path->data);
-+    int dirfd;
- 
--    buffer = rpath(fs_ctx, path);
--    err =  lstat(buffer, stbuf);
-+    dirfd = local_opendir_nofollow(fs_ctx, dirpath);
-+    if (dirfd == -1) {
-+        goto out;
-+    }
-+
-+    err = fstatat(dirfd, name, stbuf, AT_SYMLINK_NOFOLLOW);
-     if (err) {
-         goto err_out;
-     }
-@@ -183,25 +188,32 @@ static int local_lstat(FsContext *fs_ctx, V9fsPath *fs_path, struct stat *stbuf)
-         gid_t tmp_gid;
-         mode_t tmp_mode;
-         dev_t tmp_dev;
--        if (getxattr(buffer, "user.virtfs.uid", &tmp_uid, sizeof(uid_t)) > 0) {
-+
-+        if (fgetxattrat(dirfd, name, "user.virtfs.uid", &tmp_uid,
-+                        sizeof(uid_t)) > 0) {
-             stbuf->st_uid = le32_to_cpu(tmp_uid);
-         }
--        if (getxattr(buffer, "user.virtfs.gid", &tmp_gid, sizeof(gid_t)) > 0) {
-+        if (fgetxattrat(dirfd, name, "user.virtfs.gid", &tmp_gid,
-+                        sizeof(gid_t)) > 0) {
-             stbuf->st_gid = le32_to_cpu(tmp_gid);
-         }
--        if (getxattr(buffer, "user.virtfs.mode",
--                    &tmp_mode, sizeof(mode_t)) > 0) {
-+        if (fgetxattrat(dirfd, name, "user.virtfs.mode", &tmp_mode,
-+                        sizeof(mode_t)) > 0) {
-             stbuf->st_mode = le32_to_cpu(tmp_mode);
-         }
--        if (getxattr(buffer, "user.virtfs.rdev", &tmp_dev, sizeof(dev_t)) > 0) {
-+        if (fgetxattrat(dirfd, name, "user.virtfs.rdev", &tmp_dev,
-+                        sizeof(dev_t)) > 0) {
-             stbuf->st_rdev = le64_to_cpu(tmp_dev);
-         }
-     } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        local_mapped_file_attr(fs_ctx, path, stbuf);
-+        local_mapped_file_attr(fs_ctx, fs_path->data, stbuf);
-     }
- 
- err_out:
+-    ssize_t ret;
+-
+-    buffer = rpath(ctx, path);
+-    ret = lgetxattr(buffer, MAP_ACL_ACCESS, value, size);
 -    g_free(buffer);
-+    close_preserve_errno(dirfd);
-+out:
-+    g_free(name);
-+    g_free(dirpath);
-     return err;
+-    return ret;
++    return local_getxattr_nofollow(ctx, path, MAP_ACL_ACCESS, value, size);
  }
  
+ static ssize_t mp_pacl_listxattr(FsContext *ctx, const char *path,
+@@ -89,13 +83,7 @@ static int mp_pacl_removexattr(FsContext *ctx,
+ static ssize_t mp_dacl_getxattr(FsContext *ctx, const char *path,
+                                 const char *name, void *value, size_t size)
+ {
+-    char *buffer;
+-    ssize_t ret;
+-
+-    buffer = rpath(ctx, path);
+-    ret = lgetxattr(buffer, MAP_ACL_DEFAULT, value, size);
+-    g_free(buffer);
+-    return ret;
++    return local_getxattr_nofollow(ctx, path, MAP_ACL_DEFAULT, value, size);
+ }
+ 
+ static ssize_t mp_dacl_listxattr(FsContext *ctx, const char *path,
+diff --git a/hw/9pfs/9p-xattr-user.c b/hw/9pfs/9p-xattr-user.c
+index f87530c8b526..4071fbc4c086 100644
+--- a/hw/9pfs/9p-xattr-user.c
++++ b/hw/9pfs/9p-xattr-user.c
+@@ -20,9 +20,6 @@
+ static ssize_t mp_user_getxattr(FsContext *ctx, const char *path,
+                                 const char *name, void *value, size_t size)
+ {
+-    char *buffer;
+-    ssize_t ret;
+-
+     if (strncmp(name, "user.virtfs.", 12) == 0) {
+         /*
+          * Don't allow fetch of user.virtfs namesapce
+@@ -31,10 +28,7 @@ static ssize_t mp_user_getxattr(FsContext *ctx, const char *path,
+         errno = ENOATTR;
+         return -1;
+     }
+-    buffer = rpath(ctx, path);
+-    ret = lgetxattr(buffer, name, value, size);
+-    g_free(buffer);
+-    return ret;
++    return local_getxattr_nofollow(ctx, path, name, value, size);
+ }
+ 
+ static ssize_t mp_user_listxattr(FsContext *ctx, const char *path,
+diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
+index ea0695f37242..29f4f940a23f 100644
+--- a/hw/9pfs/9p-xattr.c
++++ b/hw/9pfs/9p-xattr.c
+@@ -302,13 +302,7 @@ int v9fs_remove_xattr(FsContext *ctx,
+ ssize_t pt_getxattr(FsContext *ctx, const char *path, const char *name,
+                     void *value, size_t size)
+ {
+-    char *buffer;
+-    ssize_t ret;
+-
+-    buffer = rpath(ctx, path);
+-    ret = lgetxattr(buffer, name, value, size);
+-    g_free(buffer);
+-    return ret;
++    return local_getxattr_nofollow(ctx, path, name, value, size);
+ }
+ 
+ int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
