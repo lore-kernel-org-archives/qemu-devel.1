@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cY9Np-0000yB-1o
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:40:26 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cY9T3-0003Ac-Ek
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:45:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cY9Nl-00016l-42
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:40:25 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36945)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cY9Nk-00014g-Se
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:40:21 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id v77so41377885wmv.0
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 02:40:20 -0800 (PST)
-References: <1465026847-6744-1-git-send-email-rth@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1465026847-6744-1-git-send-email-rth@twiddle.net>
-Date: Mon, 30 Jan 2017 10:40:17 +0000
-Message-ID: <878tps7rvy.fsf@linaro.org>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cY9T1-0001v5-D1
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:45:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cY9T1-0001tJ-71
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:45:47 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DFB78C056790
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 10:45:46 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 30 Jan 2017 14:45:40 +0400
+Message-Id: <20170130104540.14660-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] tcg/i386 guest_base improvements
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] spice: wakeup QXL worker to pick up mouse
+ changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+Without it, server-mode mouse is "slow" to update position: QXL will
+wait until new display commands come. This is very visible with
+virtio-gpu.
 
-Richard Henderson <rth@twiddle.net> writes:
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ ui/spice-display.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> The first change does two things: (1) improve bsd-user so that it
-> doesn't continually reload guest_base into a temp register and
-> (2) extract the bulk of the guest_base logic to a routine that
-> is run once at startup.
->
-> The second change adds segmentation support to 32-bit linux.  There,
-> if we're using a guest base, we can save 3 bytes per memory op by
-> using a segment override.  In addition, if we're using a reserved_va,
-> we can set up the segment such that guest memory references are
-> constrained by the segment.
->
-> Comments?
-
-I'm not sure how to best review this given its fairly low level
-x86 stuff. Do you have any numbers to show how this improves things?
-
->
->
-> r~
->
->
-> Richard Henderson (2):
->   tcg/i386: Reserve register for guest_base if a segment isn't available
->   tcg/i386: Use segment for 32-bit guest base on linux
->
->  tcg/i386/tcg-target.inc.c | 181 +++++++++++++++++++++++++---------------------
->  1 file changed, 100 insertions(+), 81 deletions(-)
-
-
---
-Alex Bennée
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index 5e6f78a219..64e472eeb0 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -769,6 +769,7 @@ static void display_mouse_set(DisplayChangeListener *=
+dcl,
+     g_free(ssd->ptr_move);
+     ssd->ptr_move =3D qemu_spice_create_cursor_update(ssd, NULL, on);
+     qemu_mutex_unlock(&ssd->lock);
++    qemu_spice_wakeup(ssd);
+ }
+=20
+ static void display_mouse_define(DisplayChangeListener *dcl,
+@@ -787,6 +788,7 @@ static void display_mouse_define(DisplayChangeListene=
+r *dcl,
+     g_free(ssd->ptr_define);
+     ssd->ptr_define =3D qemu_spice_create_cursor_update(ssd, c, 0);
+     qemu_mutex_unlock(&ssd->lock);
++    qemu_spice_wakeup(ssd);
+ }
+=20
+ static const DisplayChangeListenerOps display_listener_ops =3D {
+--=20
+2.11.0.295.gd7dffce1c.dirty
