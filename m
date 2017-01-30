@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cYChS-0001K7-DX
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:12:58 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cYChz-0001ib-1S
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:13:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cYChO-00086p-FY
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:12:54 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:32835)
+	(envelope-from <stefanha@gmail.com>) id 1cYChv-0008No-42
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:13:27 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36324)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cYChO-000859-95
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:12:50 -0500
-Received: by mail-wm0-x243.google.com with SMTP id v77so16416366wmv.0
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 06:12:50 -0800 (PST)
-Date: Mon, 30 Jan 2017 14:12:46 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cYChu-0008NQ-U5
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:13:23 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r18so6097457wmd.3
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 06:13:22 -0800 (PST)
+Date: Mon, 30 Jan 2017 14:13:20 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170130141246.GE2118@stefanha-x1.localdomain>
+Message-ID: <20170130141320.GF2118@stefanha-x1.localdomain>
 References: <1485436265-12573-1-git-send-email-thuth@redhat.com>
-	<1485436265-12573-2-git-send-email-thuth@redhat.com>
+	<1485436265-12573-3-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="VUDLurXRWRKrGuMn"
+	protocol="application/pgp-signature"; boundary="5Mfx4RzfBqgnTE/w"
 Content-Disposition: inline
-In-Reply-To: <1485436265-12573-2-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/5] checkpatch: add a check for utf-8
- in commit logs
+In-Reply-To: <1485436265-12573-3-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 2/5] checkpatch: check utf-8 content
+ from a commit log when it's missing from charset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +35,55 @@ To: Thomas Huth <thuth@redhat.com>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 
---VUDLurXRWRKrGuMn
+--5Mfx4RzfBqgnTE/w
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 26, 2017 at 02:11:01PM +0100, Thomas Huth wrote:
-> This patch is a port of the following commit from the Linux kernel:
+On Thu, Jan 26, 2017 at 02:11:02PM +0100, Thomas Huth wrote:
+> This is a port of the following commit from the Linux kernel:
 >=20
-> commit 15662b3e8644905032c2e26808401a487d4e90c1
-> Author: Joe Perches <joe@perches.com>
-> Date:   Mon Oct 31 17:13:12 2011 -0700
+> commit fa64205df9dfd7b7662cc64a7e82115c00e428e5
+> Author: Pasi Savanainen <pasi.savanainen@nixu.com>
+> Date:   Thu Oct 4 17:13:29 2012 -0700
 >=20
->     checkpatch: add a --strict check for utf-8 in commit logs
+>     checkpatch: check utf-8 content from a commit log when it's missing f=
+rom charset
 >=20
->     Some find using utf-8 in commit logs inappropriate.
+>     Check that a commit log doesn't contain UTF-8 when a mail header
+>     explicitly defines a different charset, like
 >=20
->     Some patch commit logs contain unintended utf-8 characters when doing
->     things like copy/pasting compilation output.
+>     'Content-Type: text/plain; charset=3D"us-ascii"'
 >=20
->     Look for the start of any commit log by skipping initial lines that l=
-ook
->     like email headers and "From: " lines.
->=20
->     Stop looking for utf-8 at the first signature line.
->=20
->     Signed-off-by: Joe Perches <joe@perches.com>
->     Suggested-by: Andrew Morton <akpm@linux-foundation.org>
->     Cc: Andy Whitcroft <apw@shadowen.org>
+>     Signed-off-by: Pasi Savanainen <pasi.savanainen@nixu.com>
+>     Cc: Joe Perches <joe@perches.com>
+>     Cc: Andy Whitcroft <apw@canonical.com>
 >     Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 >     Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
 >=20
+> Note: I slightly updated the regex for the "Content-Type" line check
+> since most of the time, the character set does not seem to be given
+> in quotes.
+>=20
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  scripts/checkpatch.pl | 30 ++++++++++++++++++++++++++----
->  1 file changed, 26 insertions(+), 4 deletions(-)
+>  scripts/checkpatch.pl | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
 
-This patch prevents including names with non-ASCII characters in the
-commit description.  Some people care about the proper spelling of their
-names.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Allowing UTF-8 in Signed-off-by and other headers isn't enough.
-
---VUDLurXRWRKrGuMn
+--5Mfx4RzfBqgnTE/w
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYj0neAAoJEJykq7OBq3PI3g4IAKrRps+9pIbgrpInodSMBxOb
-CPb4rBSnkjYqRJZVXyxeuc2o5+fK6iwTqG+fWDm55+XWoqMsRGg+SnkumYVrQmdc
-GCRVAdWwcJ7faK6NUUCnsf4AkVBtYYsQunzDhL5ldLAGVEsgQvyb2itLmyWsfYWj
-nsvD/s461Xjv8o6mVfe7aSI7n16RR2qXeVGVSeGV0F8vSrl7fFEKlV0O0Cg7MaPK
-Omt8i6V2ir219mESEGNrXtLZGLWT3dFEDBDj6z2Uy87ufHRAHKWeHVs7SPwUJVps
-1LYih9RFHiYcK2gUWN1RcnnwsUcANy+4aJ6jSm45Ywyj1/qyHQpx2MgXxMuLEGE=
-=uGfW
+iQEcBAEBAgAGBQJYj0oAAAoJEJykq7OBq3PImngIAKy35UYKQOMiGF/9IzTARaSs
+wKBFBqEP9GsJdZSWkHNvaIgb9jb3AgPFuqdVMUBCMiyPpQktPAID6XPHWmdx+zBu
+hEIhqAqBAX0Su65Hxj4gd9nXov321sJPwMwke/eb/WvyO8bpDC/Uvnu9AIXkoi5+
+aE6zXs9KBuSDLAX+DLah71YKu8s7lW3D0ko/FzP6yFBTPCEUT1vIYSMPy+LiU09i
+QfV3qGuRayOi9Ig+pRLucToJayy67LhtPbEqONwOdzRVGGaDCN0lDZ06kwmSqY7T
+z/Y+QhVGA8cFlfEtUYkUq955goRFYbkr7ptIiYFu+UaPF1rbF6kqccNxB7ve1Gg=
+=0WFd
 -----END PGP SIGNATURE-----
 
---VUDLurXRWRKrGuMn--
+--5Mfx4RzfBqgnTE/w--
