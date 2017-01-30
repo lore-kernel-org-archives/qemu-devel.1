@@ -1,27 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cXyXX-0003gl-OE
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 18:05:45 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cY20b-0005Cm-2f
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 21:47:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cXyXS-0005dH-OU
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 18:05:43 -0500
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:33376)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cXyXS-0005d9-II
-	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 18:05:38 -0500
-Received: by mail-yw0-x242.google.com with SMTP id u68so28361975ywg.0
-	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 15:05:38 -0800 (PST)
-References: <20170127103922.19658-1-alex.bennee@linaro.org>
-From: Pranith Kumar <bobby.prani@gmail.com>
-In-reply-to: <20170127103922.19658-1-alex.bennee@linaro.org>
-Date: Sun, 29 Jan 2017 18:05:36 -0500
-Message-ID: <87zii9piv3.fsf@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 00/25] Remaining MTTCG Base patches and
- ARM enablement
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cY20Y-0003l2-0r
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 21:47:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36723
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1cY20X-0003kn-S9
+	for qemu-devel@nongnu.org; Sun, 29 Jan 2017 21:47:53 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v0U2iCwf139584
+	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 21:47:52 -0500
+Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 289he1gxda-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 21:47:51 -0500
+Received: from localhost
+	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Mon, 30 Jan 2017 00:47:49 -0200
+Received: from d24relay04.br.ibm.com (d24relay04.br.ibm.com [9.18.232.146])
+	by d24dlp01.br.ibm.com (Postfix) with ESMTP id 838BF352005F
+	for <qemu-devel@nongnu.org>; Sun, 29 Jan 2017 21:47:14 -0500 (EST)
+Received: from d24av05.br.ibm.com (d24av05.br.ibm.com [9.18.232.44])
+	by d24relay04.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v0U2llbg27459604
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 00:47:47 -0200
+Received: from d24av05.br.ibm.com (localhost [127.0.0.1])
+	by d24av05.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v0U2lkbE001252
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 00:47:47 -0200
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Date: Mon, 30 Jan 2017 00:47:35 -0200
+Message-Id: <1485744457-10324-1-git-send-email-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH Risu 0/2] PPC64 improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +47,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
+This patchset contains a fix necessary to run Risu under linux-user, that is due to the fact that linux-user doesn't fully implement ucontext struct. It also contains an small improvement to validate FPSRC flag for floating-point operations.
 
-Alex Bennée writes:
+Jose Ricardo Ziviani (2):
+  risu_ppc64: Fix Risu to run under qemu linux user
+  risu_ppc64: Compare FPSCR flags
 
-> Hi,
->
-> All of the changes in this revision are addressing comments from v7
-> posted last week. A new pre-cursor patch was added:
->
->   cputlb and arm/sparc targets: convert mmuidx flushes from varg to
->     bitmap
->
-> To change the cputlb API to use a bitmap instead of vargs. This has
-> generated quite a bit of churn in the ARM target but it is pretty
-> mechanical.
->
-> I also folded the BQL irq protection patches from v7 into:
->
->   tcg: drop global lock during TCG code execution
->
-> This is required to keep the series bisectable although the BQL safety
-> is only really relevant to guests using MTTCG. I didn't think it was
-> worth making the asserts conditional on parallel_cpus although it does
-> mean this patch gets a little bigger.
->
-> The other big change was to:
->
->   cputlb: introduce tlb_flush_*_all_cpus[_synced]
->
-> Where I replaced the wait flag with an expanded set of API calls. The
-> *_synced variants which are marked as QEMU_NORETURN to make their
-> behaviour clear.
->
-> The series applies to origin/master as of today and you can find my
-> tree at:
->
->   https://github.com/stsquad/qemu/tree/mttcg/base-patches-v8
->
-> There is the usual collection of r-b tags and minor merge/re-base
-> fixes all documented in the --- sections of the commit messages.
->
-> In terms of merging strategy I would appreciate some thoughts. While I
-> think the series is ready to go I appreciate it is quite a chunk to
-> merge in one go. That said an early merge gives us plenty of time to
-> shake out any lingering issues before feature freeze.
->
-> I guess the key decider is that we are happy the design provides for
-> solutions for any other things we come across?
->
-> Cheers,
->
-> Alex
->
-> Alex Bennée (19):
->   docs: new design document multi-thread-tcg.txt
->   tcg: move TCG_MO/BAR types into own file
->   tcg: add kick timer for single-threaded vCPU emulation
->   tcg: rename tcg_current_cpu to tcg_current_rr_cpu
->   tcg: remove global exit_request
->   tcg: enable tb_lock() for SoftMMU
->   tcg: enable thread-per-vCPU
->   cputlb: add assert_cpu_is_self checks
->   cputlb: tweak qemu_ram_addr_from_host_nofail reporting
->   cputlb and arm/sparc targets: convert mmuidx flushes from varg to
->     bitmap
->   cputlb: add tlb_flush_by_mmuidx async routines
->   cputlb: atomically update tlb fields used by tlb_reset_dirty
->   cputlb: introduce tlb_flush_*_all_cpus[_synced]
->   target-arm/powerctl: defer cpu reset work to CPU context
->   target-arm: don't generate WFE/YIELD calls for MTTCG
->   target-arm/cpu.h: make ARM_CP defined consistent
->   target-arm: introduce ARM_CP_EXIT_PC
->   target-arm: ensure all cross vCPUs TLB flushes complete
->   tcg: enable MTTCG by default for ARM on x86 hosts
->
-> Jan Kiszka (1):
->   tcg: drop global lock during TCG code execution
->
-> KONRAD Frederic (2):
->   tcg: add options for enabling MTTCG
->   cputlb: introduce tlb_flush_* async work.
->
-> Pranith Kumar (3):
->   mttcg: translate-all: Enable locking debug in a debug build
->   mttcg: Add missing tb_lock/unlock() in cpu_exec_step()
->   tcg: handle EXCP_ATOMIC exception for system emulation
->
->  configure                  |   6 +
->  cpu-exec-common.c          |   3 -
->  cpu-exec.c                 |  41 ++--
->  cpus.c                     | 343 ++++++++++++++++++++++++++-------
->  cputlb.c                   | 465 +++++++++++++++++++++++++++++++++++++--------
->  docs/multi-thread-tcg.txt  | 350 ++++++++++++++++++++++++++++++++++
->  exec.c                     |  12 +-
->  hw/core/irq.c              |   1 +
->  hw/i386/kvmvapic.c         |   4 +-
->  hw/intc/arm_gicv3_cpuif.c  |   3 +
->  hw/ppc/ppc.c               |  16 +-
->  hw/ppc/spapr.c             |   3 +
->  include/exec/cputlb.h      |   2 -
->  include/exec/exec-all.h    | 130 +++++++++++--
->  include/qom/cpu.h          |  16 ++
->  include/sysemu/cpus.h      |   2 +
->  memory.c                   |   2 +
->  qemu-options.hx            |  20 ++
->  qom/cpu.c                  |  10 +
->  target/arm/arm-powerctl.c  | 146 ++++++++------
->  target/arm/cpu.h           |  73 ++++---
->  target/arm/helper.c        | 385 ++++++++++++++++++-------------------
->  target/arm/op_helper.c     |  50 ++++-
->  target/arm/translate-a64.c |  26 ++-
->  target/arm/translate.c     |  46 +++--
->  target/arm/translate.h     |   4 +-
->  target/i386/smm_helper.c   |   7 +
->  target/s390x/misc_helper.c |   5 +-
->  target/sparc/ldst_helper.c |   8 +-
->  tcg/i386/tcg-target.h      |  16 ++
->  tcg/tcg-mo.h               |  45 +++++
->  tcg/tcg.h                  |  27 +--
->  translate-all.c            |  66 ++-----
->  translate-common.c         |  21 +-
->  vl.c                       |  49 ++++-
->  35 files changed, 1818 insertions(+), 585 deletions(-)
->  create mode 100644 docs/multi-thread-tcg.txt
->  create mode 100644 tcg/tcg-mo.h
-
-Tested-by: Pranith Kumar <bobby.prani@gmail.com>
-Reviewed-by: Pranith Kumar <bobby.prani@gmail.com>
+ risu_ppc64le.c         |  2 +-
+ risu_reginfo_ppc64le.c | 16 +++++++++++-----
+ test_ppc64le.s         | 20 +++++++++-----------
+ 3 files changed, 21 insertions(+), 17 deletions(-)
 
 -- 
-Pranith
+2.7.4
