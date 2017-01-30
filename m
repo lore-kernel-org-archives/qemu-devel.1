@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cYGVr-0002ox-AO
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:12 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cYGVw-0002tx-Pl
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cYGVn-00026J-AE
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:11 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:56497)
+	(envelope-from <laurent@vivier.eu>) id 1cYGVs-00028f-OV
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:16 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:61326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cYGVm-00025u-Vh
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:07 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cYGVs-00027Q-CT
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:12 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Jan 2017 19:16:20 +0100
-Message-Id: <20170130181634.13934-3-laurent@vivier.eu>
+Date: Mon, 30 Jan 2017 19:16:22 +0100
+Message-Id: <20170130181634.13934-5-laurent@vivier.eu>
 In-Reply-To: <20170130181634.13934-1-laurent@vivier.eu>
 References: <20170130181634.13934-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v2 02/16] softloat: disable
- floatx80_invalid_encoding() for m68k
+Subject: [Qemu-devel] [PATCH v2 04/16] target-m68k: define ext_opsize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +26,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-According to the comment, this definition of invalid encoding is given
-by intel developer's manual, and doesn't work with the behavior
-of 680x0 FPU.
-
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- fpu/softfloat.c         | 20 ++++++++++++++++++++
- include/fpu/softfloat.h | 15 ---------------
- 2 files changed, 20 insertions(+), 15 deletions(-)
+ target/m68k/translate.c | 43 ++++++++++++++++++++++++-------------------
+ 1 file changed, 24 insertions(+), 19 deletions(-)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index c295f31..3aa05c1 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -4799,6 +4799,26 @@ int float64_unordered_quiet(float64 a, float64 b, float_status *status)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 9f60fbc..d9ba735 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -669,6 +669,21 @@ static inline int insn_opsize(int insn)
+     }
  }
  
- /*----------------------------------------------------------------------------
-+| Return whether the given value is an invalid floatx80 encoding.
-+| Invalid floatx80 encodings arise when the integer bit is not set, but
-+| the exponent is not zero. The only times the integer bit is permitted to
-+| be zero is in subnormal numbers and the value zero.
-+| This includes what the Intel software developer's manual calls pseudo-NaNs,
-+| pseudo-infinities and un-normal numbers. It does not include
-+| pseudo-denormals, which must still be correctly handled as inputs even
-+| if they are never generated as outputs.
-+*----------------------------------------------------------------------------*/
-+static inline bool floatx80_invalid_encoding(floatx80 a)
++static inline int ext_opsize(int ext, int pos)
 +{
-+#if defined(TARGET_M68K)
-+    return 0;
-+#else
-+    return (a.low & (1ULL << 63)) == 0 && (a.high & 0x7FFF) != 0;
-+#endif
++    switch ((ext >> pos) & 7) {
++    case 0: return OS_LONG;
++    case 1: return OS_SINGLE;
++    case 2: return OS_EXTENDED;
++    case 3: return OS_PACKED;
++    case 4: return OS_WORD;
++    case 5: return OS_DOUBLE;
++    case 6: return OS_BYTE;
++    default:
++        g_assert_not_reached();
++    }
 +}
 +
+ /* Assign value to a register.  If the width is less than the register width
+    only the low part of the register is set.  */
+ static void gen_partset_reg(int opsize, TCGv reg, TCGv val)
+@@ -4101,20 +4116,19 @@ DISAS_INSN(fpu)
+         tmp32 = tcg_temp_new_i32();
+         /* fmove */
+         /* ??? TODO: Proper behavior on overflow.  */
+-        switch ((ext >> 10) & 7) {
+-        case 0:
+-            opsize = OS_LONG;
 +
-+/*----------------------------------------------------------------------------
- | Returns the result of converting the extended double-precision floating-
- | point value `a' to the 32-bit two's complement integer format.  The
- | conversion is performed according to the IEC/IEEE Standard for Binary
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 14f8383..1bde349 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -658,21 +658,6 @@ static inline int floatx80_is_any_nan(floatx80 a)
-     return ((a.high & 0x7fff) == 0x7fff) && (a.low<<1);
- }
- 
--/*----------------------------------------------------------------------------
--| Return whether the given value is an invalid floatx80 encoding.
--| Invalid floatx80 encodings arise when the integer bit is not set, but
--| the exponent is not zero. The only times the integer bit is permitted to
--| be zero is in subnormal numbers and the value zero.
--| This includes what the Intel software developer's manual calls pseudo-NaNs,
--| pseudo-infinities and un-normal numbers. It does not include
--| pseudo-denormals, which must still be correctly handled as inputs even
--| if they are never generated as outputs.
--*----------------------------------------------------------------------------*/
--static inline bool floatx80_invalid_encoding(floatx80 a)
--{
--    return (a.low & (1ULL << 63)) == 0 && (a.high & 0x7FFF) != 0;
--}
--
- #define floatx80_zero make_floatx80(0x0000, 0x0000000000000000LL)
- #define floatx80_one make_floatx80(0x3fff, 0x8000000000000000LL)
- #define floatx80_ln2 make_floatx80(0x3ffe, 0xb17217f7d1cf79acLL)
++        opsize = ext_opsize(ext, 10);
++        switch (opsize) {
++        case OS_LONG:
+             gen_helper_f64_to_i32(tmp32, cpu_env, src);
+             break;
+-        case 1:
+-            opsize = OS_SINGLE;
++        case OS_SINGLE:
+             gen_helper_f64_to_f32(tmp32, cpu_env, src);
+             break;
+-        case 4:
+-            opsize = OS_WORD;
++        case OS_WORD:
+             gen_helper_f64_to_i32(tmp32, cpu_env, src);
+             break;
+-        case 5: /* OS_DOUBLE */
++        case OS_DOUBLE:
+             tcg_gen_mov_i32(tmp32, AREG(insn, 0));
+             switch ((insn >> 3) & 7) {
+             case 2:
+@@ -4143,8 +4157,7 @@ DISAS_INSN(fpu)
+             }
+             tcg_temp_free_i32(tmp32);
+             return;
+-        case 6:
+-            opsize = OS_BYTE;
++        case OS_BYTE:
+             gen_helper_f64_to_i32(tmp32, cpu_env, src);
+             break;
+         default:
+@@ -4217,15 +4230,7 @@ DISAS_INSN(fpu)
+     }
+     if (ext & (1 << 14)) {
+         /* Source effective address.  */
+-        switch ((ext >> 10) & 7) {
+-        case 0: opsize = OS_LONG; break;
+-        case 1: opsize = OS_SINGLE; break;
+-        case 4: opsize = OS_WORD; break;
+-        case 5: opsize = OS_DOUBLE; break;
+-        case 6: opsize = OS_BYTE; break;
+-        default:
+-            goto undef;
+-        }
++        opsize = ext_opsize(ext, 10);
+         if (opsize == OS_DOUBLE) {
+             tmp32 = tcg_temp_new_i32();
+             tcg_gen_mov_i32(tmp32, AREG(insn, 0));
 -- 
 2.9.3
