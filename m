@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cYGWa-0003PH-C8
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:18:01 -0500
+	(envelope-from <mlureau@redhat.com>) id 1cYGX2-0003ll-59
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:18:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cYGWV-0002Ou-Hz
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:56 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:51287)
+	(envelope-from <mlureau@redhat.com>) id 1cYGWy-0002aw-3e
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:18:24 -0500
+Received: from mx4-phx2.redhat.com ([209.132.183.25]:53846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cYGWU-0002Lq-Dc
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:51 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Jan 2017 19:16:29 +0100
-Message-Id: <20170130181634.13934-12-laurent@vivier.eu>
-In-Reply-To: <20170130181634.13934-1-laurent@vivier.eu>
-References: <20170130181634.13934-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v2 11/16] target-m68k: add fmovecr
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cYGWx-0002aW-RK
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:18:20 -0500
+Date: Mon, 30 Jan 2017 13:18:16 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
+Message-ID: <1327323310.207981.1485800296146.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170130134332.GB2118@stefanha-x1.localdomain>
+References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
+	<20170123105502.GH29186@stefanha-x1.localdomain>
+	<10505721.4200193.1485170849535.JavaMail.zimbra@redhat.com>
+	<20170124114302.GB17221@stefanha-x1.localdomain>
+	<1305616133.813189.1485283397962.JavaMail.zimbra@redhat.com>
+	<20170130134332.GB2118@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 00/25] qmp: add async command type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,108 +31,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, armbru@redhat.com, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>
 
-fmovecr moves a floating point constant from the
-FPU ROM to a floating point register.
+Hi
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- target/m68k/fpu_helper.c | 31 +++++++++++++++++++++++++++++++
- target/m68k/helper.h     |  1 +
- target/m68k/translate.c  | 12 +++++++++++-
- 3 files changed, 43 insertions(+), 1 deletion(-)
+----- Original Message -----
+> On Tue, Jan 24, 2017 at 01:43:17PM -0500, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >=20
+> > ----- Original Message -----
+> > > On Mon, Jan 23, 2017 at 06:27:29AM -0500, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > > ----- Original Message -----
+> > > > > On Wed, Jan 18, 2017 at 08:03:07PM +0400, Marc-Andr=C3=A9 Lureau =
+wrote:
+> > > > > > Hi,
+> > > > >=20
+> > > > > CCing Jeff Cody and John Snow, who have been working on generaliz=
+ing
+> > > > > Block Job APIs to generic background jobs.  There is some overlap
+> > > > > between async commands and background jobs.
+> > > >=20
+> > > > If you say so :) Did I miss a proposal or a discussion for async qm=
+p
+> > > > commands?
+> > >=20
+> > > There is no recent mailing list thread, so it's probably best to disc=
+uss
+> > > here:
+> > >=20
+> > > The goal of jobs is to support long-running operations that can be
+> > > managed via QMP.  Jobs can have a more elaborate lifecycle than just
+> > > start -> finish/cancel (e.g. they can be paused/resumed and may have
+> > > multiple phases of execution that the client controls).  There are QM=
+P
+> > > APIs to query their state (Are they running?  How much "progress" has
+> > > been made?).
+> >=20
+> > Indeed, I mention that in my cover. Such use cases require something mo=
+re
+> > complete than simple async qmp commands. I don't see why it would be
+> > incompatible with the usage of async qmp commands.
+> >=20
+> > > A client reconnecting to QEMU can query running jobs.  This way a cli=
+ent
+> > > can resume with a running QEMU process.  For commands like saving a
+> > > screenshot is mostly does not matter, but for commands that modify st=
+ate
+> > > it's critical that clients are aware of running commands after reconn=
+ect
+> > > to prevent corruption/interference.  This behavior is what I asked ab=
+out
+> > > in my previous mail.
+> >=20
+> > That's what I mention in the cover, some commands are global (and
+> > broadcasted events are appropriate) and some are local to the client
+> > context. Some could be discarded when the client disconnects etc. It's =
+a
+> > case by case.
+> >=20
+> > > Jobs are currently only used by the block layer and called "block job=
+s",
+> > > but the idea is to generalize this.  They use synchronous QMP + event=
+s.
+> >=20
+> > That pattern will have the flaws I mentioned (empty return, broadcast
+> > events, id conflict, qapi semantic & documentation etc). Something new =
+can
+> > be invented, but it will likely make the protocol more complicated
+> > compared to the solution I proposed (which is optional btw, and gracefu=
+lly
+> > fallbacks to sync processing for clients that do not support the async =
+qmp
+> > capability). However, I believe the job interface could be built on top=
+ of
+> > what I propose.
+> >=20
+> > > Jobs are more heavy-weight than async QMP commands, but pause/resume,
+> > > rate-limiting, progress reporting, robust reconnect, etc are importan=
+t
+> > > features.  Users want to be aware of long-running operations and have
+> > > the ability to control them.
+> >=20
+> > You can't generalize such job interface to all async commands. Some may=
+ not
+> > implement the ability to report progress, to cancel, to pause etc, etc.=
+ In
+> > the end, it will be complicated and unneeded in many cases (what's the =
+use
+> > case to pause or to get the progress of a screendump?). What I propose =
+is
+> > simpler and compatible with job/task interfaces appropriate for various
+> > domains.
+> >=20
+> > > I suspect that if we transition synchronous QMP commands to async we'=
+ll
+> > > soon have requirements for progress reporting, pause/resume, etc.  So=
+ is
+> > > there a set of commands that should be async and others that should b=
+e
+> > > jobs or should everything just be a job?
+> >=20
+> > Hard to say without a concrete proposal of what "job" is. Likely,
+> > everything is not going to be a "job".
+> >=20
+> > But hopefully qmp-async and jobs can co-exist and benefit from each oth=
+er.
+>=20
+> My concern with this series is that background operations must be
+> observable and there must be a way to cancel them.  Otherwise management
+> tools cannot do their job and it's hard to troubleshoot a misbehaving
+> system because you can't answer the question "what's going on?".  Once
+> you add that then a large chunk of block jobs is duplicated.
 
-diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index aadfc82..d8145e0 100644
---- a/target/m68k/fpu_helper.c
-+++ b/target/m68k/fpu_helper.c
-@@ -24,6 +24,31 @@
- #include "exec/helper-proto.h"
- #include "exec/exec-all.h"
- 
-+static const floatx80 fpu_rom[128] = {
-+    [0x00] = floatx80_pi,                                   /* Pi */
-+    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
-+    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
-+    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
-+    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
-+    [0x0f] = floatx80_zero,                                 /* Zero     */
-+    [0x30] = floatx80_ln2,                                  /* ln(2)    */
-+    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
-+    [0x32] = floatx80_one,                                  /* 10^0     */
-+    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
-+    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
-+    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
-+    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
-+    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
-+    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
-+    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
-+    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
-+    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
-+    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
-+    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
-+    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
-+    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
-+};
-+
- static floatx80 FP0_to_floatx80(CPUM68KState *env)
- {
-     return (floatx80){ .low = env->fp0l, .high = env->fp0h };
-@@ -427,3 +452,9 @@ void HELPER(fmovem)(CPUM68KState *env, uint32_t opsize,
- {
-     fprintf(stderr, "MISSING HELPER fmovem\n");
- }
-+
-+void HELPER(const_FP0)(CPUM68KState *env, uint32_t offset)
-+{
-+    env->fp0l = fpu_rom[offset].low;
-+    env->fp0h = fpu_rom[offset].high;
-+}
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 58bc273..4927324 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -32,6 +32,7 @@ DEF_HELPER_2(set_fpcr, void, env, i32)
- DEF_HELPER_1(tst_FP0, void, env)
- DEF_HELPER_1(update_fpstatus, void, env)
- DEF_HELPER_4(fmovem, void, env, i32, i32, i32)
-+DEF_HELPER_2(const_FP0, void, env, i32)
- 
- DEF_HELPER_3(mac_move, void, env, i32, i32)
- DEF_HELPER_3(macmulf, i64, env, i32, i32)
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 3fc744d..26160a3 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -4555,16 +4555,26 @@ static void gen_op_fmovem(CPUM68KState *env, DisasContext *s,
- DISAS_INSN(fpu)
- {
-     uint16_t ext;
-+    uint8_t rom_offset;
-     int opmode;
-     int opsize;
- 
-     ext = read_im16(env, s);
-     opmode = ext & 0x7f;
-     switch ((ext >> 13) & 7) {
--    case 0: case 2:
-+    case 0:
-         break;
-     case 1:
-         goto undef;
-+    case 2:
-+        if (insn == 0xf200 && (ext & 0xfc00) == 0x5c00) {
-+            /* fmovecr */
-+            rom_offset = ext & 0x7f;
-+            gen_helper_const_FP0(cpu_env, tcg_const_i32(rom_offset));
-+            gen_op_store_fpr_FP0(REG(ext, 7));
-+            return;
-+        }
-+        break;
-     case 3: /* fmove out */
-         gen_op_load_fpr_FP0(REG(ext, 7));
-         opsize = ext_opsize(ext, 10);
--- 
-2.9.3
+Tracking ongoing operations can also be done at management layer. If needed=
+, we could add qmp-commands to list on-going commands (their ids etc), and =
+add commands to cancel them. But then again, not all operations will be can=
+cellable, and I am not sure having requirements to list or cancel or modify=
+ all on-going operation is needed (I would say no, just like today you can'=
+t do anything while a command is running)
+
+>=20
+> So then you look at block jobs and realize that no QMP wire protocol
+> changes are necessary.  Despite the limitations you've listed, block
+> jobs have been working successfully for years and don't require QMP
+> clients to change.
+
+Right, but we have existing bugs with functions that need to be async, at l=
+east at the qemu level. My proposal fixes this and optionally also allows c=
+ommands to be async at the qmp level to solve the limitations and issues I =
+listed.
+
+>=20
+> I agree that not all background operations need to support the same set
+> of management primitives to rate-limit, report progress, cancel,
+> pause/resume, etc.
+>=20
+> It would be nice for this series to evolve to a generic QMP jobs series
+> so that all background operations are visible to the client and a useful
+> subset of management primitives can be implemented on a per-command
+> basis.  Both live migration and existing block jobs could use this code
+> so that we don't have multiple copies of the same infrastructure.
+
+Indeed, but I would need to know what proposal or requirements the block la=
+yer have here, and I would appreciate if they took time to review mine.=20
