@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cYEwR-0007rB-PP
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:36:32 -0500
+	(envelope-from <quintela@redhat.com>) id 1cYEyQ-000134-M6
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:38:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cYEwO-00030C-Kc
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:36:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40032)
+	(envelope-from <quintela@redhat.com>) id 1cYEyN-0003wf-HR
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:38:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cYEwO-0002zh-Bw
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:36:28 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8B9D8C04B316
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 16:36:27 +0000 (UTC)
-Date: Mon, 30 Jan 2017 16:36:23 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170130163622.GF2450@work-vm>
-References: <20170106182823.1960-1-dgilbert@redhat.com>
-	<20170106182823.1960-7-dgilbert@redhat.com>
-	<87inp378bb.fsf@emacs.mitica>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cYEyN-0003wR-Bl
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:38:31 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <CAFEAcA_tGGVL2aP5Gu5ZyX3KKVTA_gFa4wtSxAhJrjAKQZiOLw@mail.gmail.com>
+	(Peter Maydell's message of "Mon, 30 Jan 2017 15:09:52 +0000")
+References: <1485787271-8754-1-git-send-email-ashijeetacharya@gmail.com>
+	<CAFEAcA_tGGVL2aP5Gu5ZyX3KKVTA_gFa4wtSxAhJrjAKQZiOLw@mail.gmail.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 30 Jan 2017 17:38:28 +0100
+Message-ID: <87a8a8ec57.fsf@emacs.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87inp378bb.fsf@emacs.mitica>
-Subject: Re: [Qemu-devel] [PATCH 06/15] postcopy: Record largest page size
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] migrate: Introduce a 'dc->vmsd' check to
+ avoid segfault for --only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,101 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Ashijeet Acharya <ashijeetacharya@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Amit Shah <amit.shah@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > Record the largest page size in use; we'll need it soon for allocating
-> > temporary buffers.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> Not that I object, but .... could we store this in ram_list, and update it
-> it at RAMBlock creation time?  Why searh for the value later when we can
-> store it from the beggining.  Instead of putting it on migration_state,
-> put it on the ram_list itself?
-> 
+Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 30 January 2017 at 14:41, Ashijeet Acharya <ashijeetacharya@gmail.com> wrote:
+>> Commit a3a3d8c7 introduced a segfault bug while checking for
+>> 'dc->vmsd->unmigratable' which caused QEMU to crash when trying to add
+>> devices which do no set their 'dc->vmsd' yet while initialization.
+>> Place a 'dc->vmsd' check prior to it so that we do not segfault for
+>> such devices.
+>>
+>> NOTE: This doesn't compromise the functioning of --only-migratable
+>> option as all the unmigratable devices do set their 'dc->vmsd'.
+>>
+>> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+>> ---
+>>  qdev-monitor.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/qdev-monitor.c b/qdev-monitor.c
+>> index 81d01df..a1106fd 100644
+>> --- a/qdev-monitor.c
+>> +++ b/qdev-monitor.c
+>> @@ -578,7 +578,7 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>>          return NULL;
+>>      }
+>>
+>> -    if (only_migratable) {
+>> +    if (only_migratable && dc->vmsd) {
+>>          if (dc->vmsd->unmigratable) {
+>>              error_setg(errp, "Device %s is not migratable, but "
+>>                         "--only-migratable was specified", driver);
+>
+> This seems like a good fix for the crash as a short term fix,
+> but longer term I think it would be better to make setting
+> dc->vmsd mandatory. I think devices which don't set it fall into
+> one of these categories:
+>  * deliberately has no VMState struct as it has no state that
+>    needs migrating -- we should have some kind of flag for
+>    such devices to positively assert that they don't need to
+>    deal with migration
+>  * accidentally failed to provide a VMState struct -- this is
+>    a bug and the device should be fixed to at minimum mark
+>    itself as unmigratable (and ideally fixed to implement
+>    migration!)
+>  * didn't provide a VMState struct because they handle
+>    migration manually using vmstate_register() -- we should
+>    update these to use VMState, or failing that use the
+>    flag to say "deliberately not providing VMState"
+>
+> Then we can make QEMU assert if dc->vmsd is NULL, and
+> catch future occurrences of "oops I didn't think about
+> migration" bugs in new device models. We also have an
+> easy way to grep the codebase for devices that need to
+> have migration implemented.
 
-We could, but the code does get quite a bit more complicated for little gain,
-given that we currently read it exactly once.
-The update at creation time would be easier, but then you have to also
-update at deletion time and that has to run along the list just like this.
-(or cache based on the ram_list.version)
++1
 
-Dave
-
-> Later, Juan.
-> 
-> 
-> > ---
-> >  exec.c                        | 13 +++++++++++++
-> >  include/exec/cpu-common.h     |  1 +
-> >  include/migration/migration.h |  1 +
-> >  migration/migration.c         |  1 +
-> >  4 files changed, 16 insertions(+)
-> >
-> > diff --git a/exec.c b/exec.c
-> > index 8d4bb0e..69331d0 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -1485,6 +1485,19 @@ size_t qemu_ram_pagesize(RAMBlock *rb)
-> >      return rb->page_size;
-> >  }
-> >  
-> > +/* Returns the largest size of page in use */
-> > +size_t qemu_ram_pagesize_largest(void)
-> > +{
-> > +    RAMBlock *block;
-> > +    size_t largest = 0;
-> > +
-> > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> > +        largest = MAX(largest, qemu_ram_pagesize(block));
-> > +    }
-> > +
-> > +    return largest;
-> > +}
-> > +
-> >  static int memory_try_enable_merging(void *addr, size_t len)
-> >  {
-> >      if (!machine_mem_merge(current_machine)) {
-> > diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> > index bd15853..0e67727 100644
-> > --- a/include/exec/cpu-common.h
-> > +++ b/include/exec/cpu-common.h
-> > @@ -64,6 +64,7 @@ void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
-> >  void qemu_ram_unset_idstr(RAMBlock *block);
-> >  const char *qemu_ram_get_idstr(RAMBlock *rb);
-> >  size_t qemu_ram_pagesize(RAMBlock *block);
-> > +size_t qemu_ram_pagesize_largest(void);
-> >  
-> >  void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
-> >                              int len, int is_write);
-> > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> > index 0188bcf..7b311dd 100644
-> > --- a/include/migration/migration.h
-> > +++ b/include/migration/migration.h
-> > @@ -89,6 +89,7 @@ struct MigrationIncomingState {
-> >       */
-> >      QemuEvent main_thread_load_event;
-> >  
-> > +    size_t         largest_page_size;
-> >      bool           have_fault_thread;
-> >      QemuThread     fault_thread;
-> >      QemuSemaphore  fault_thread_sem;
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index f498ab8..d8dafde 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -387,6 +387,7 @@ static void process_incoming_migration_co(void *opaque)
-> >      int ret;
-> >  
-> >      mis = migration_incoming_state_new(f);
-> > +    mis->largest_page_size = qemu_ram_pagesize_largest();
-> >      postcopy_state_set(POSTCOPY_INCOMING_NONE);
-> >      migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
-> >                        MIGRATION_STATUS_ACTIVE);
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Juan Quintela <quintela@redhat.com>
