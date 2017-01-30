@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYHUa-0003GR-7f
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 14:19:57 -0500
+	(envelope-from <quintela@redhat.com>) id 1cYHWo-0004pA-HD
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 14:22:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYHUZ-0005Sf-7u
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 14:19:56 -0500
-Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:34599)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cYHUZ-0005SH-3Y
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 14:19:55 -0500
-Received: by mail-ua0-x22e.google.com with SMTP id 35so257369450uak.1
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 11:19:55 -0800 (PST)
+	(envelope-from <quintela@redhat.com>) id 1cYHWg-0007a2-T9
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 14:22:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cYHWg-0007Zp-NG
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 14:22:06 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E207380476
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 19:22:06 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170130163622.GF2450@work-vm> (David Alan Gilbert's message of
+	"Mon, 30 Jan 2017 16:36:23 +0000")
+References: <20170106182823.1960-1-dgilbert@redhat.com>
+	<20170106182823.1960-7-dgilbert@redhat.com>
+	<87inp378bb.fsf@emacs.mitica> <20170130163622.GF2450@work-vm>
+Reply-To: quintela@redhat.com
+Date: Mon, 30 Jan 2017 20:22:03 +0100
+Message-ID: <87wpdccq04.fsf@emacs.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170130181634.13934-2-laurent@vivier.eu>
-References: <20170130181634.13934-1-laurent@vivier.eu>
-	<20170130181634.13934-2-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jan 2017 19:19:34 +0000
-Message-ID: <CAFEAcA_V-whern5JBdwHJXz3=q-qKpxNXQU3asFEoGOHB1DZNg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 01/16] softfloat: define 680x0 specific
- values
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 06/15] postcopy: Record largest page size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +35,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com
 
-On 30 January 2017 at 18:16, Laurent Vivier <laurent@vivier.eu> wrote:
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> +#elif defined(TARGET_M68K)
-> +static int pickNaN(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
-> +                   flag aIsLargerSignificand)
-> +{
-> +    /* If either operand, but not both operands, of an operation is a
-> +     * nonsignaling NAN, then that NAN is returned as the result. If both
-> +     * operands are nonsignaling NANs, then the destination operand
-> +     * nonsignaling NAN is returned as the result.
-> +     */
-> +
-> +    if (aIsSNaN) {
-> +        return 0;
-> +    } else if (bIsSNaN) {
-> +        return 1;
-> +    } else if (bIsQNaN) {
-> +        return 1;
-> +    } else {
-> +        return 0;
-> +    }
-> +}
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+>> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> >
+>> > Record the largest page size in use; we'll need it soon for allocating
+>> > temporary buffers.
+>> >
+>> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> 
+>> Not that I object, but .... could we store this in ram_list, and update it
+>> it at RAMBlock creation time?  Why searh for the value later when we can
+>> store it from the beggining.  Instead of putting it on migration_state,
+>> put it on the ram_list itself?
+>> 
+>
+> We could, but the code does get quite a bit more complicated for little gain,
+> given that we currently read it exactly once.
+> The update at creation time would be easier, but then you have to also
+> update at deletion time and that has to run along the list just like this.
+> (or cache based on the ram_list.version)
 
-This function doesn't seem to quite do what the comment says (in
-particular the comment doesn't say anything about handling
-of signaling NaNs but the code makes decisions based on
-which inputs are signaling).
+As I am so lazy, I would only update it at creation time, and never at
+deletion time.  But I can see that some people could object.  Anyways it
+don't matter a lot, it is used only once, and on the other hand, we
+don't care a lot if we have a bit bigger than needed buffer.  Just a
+case of taste I guess.
 
-PS: NaN is conventionally capitalized with a lowercase 'a'.
-
-thanks
--- PMM
+Later, Juan.
