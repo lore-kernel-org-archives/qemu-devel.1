@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cYA61-0005xs-MR
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 06:26:06 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cYA6F-00065r-49
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 06:26:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cYA5w-0002dC-NF
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 06:26:05 -0500
-Date: Mon, 30 Jan 2017 11:25:50 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170130112550.GA2118@stefanha-x1.localdomain>
-References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
-	<CAJ+F1C+WV7OhxpYb3RgmtRjXU7_kfygr2jh2cawYwZq8MMrJGQ@mail.gmail.com>
-	<79bc9757-3ba0-87c3-3502-a25a30e304a3@siemens.com>
-	<20170117095910.GC4265@stefanha-x1.localdomain>
-	<7586642a42833441c2bbe5ac3403e44b@suse.de>
+	(envelope-from <alex.bennee@linaro.org>) id 1cYA6A-0002gP-5x
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 06:26:19 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37177)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cYA69-0002gI-Um
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 06:26:14 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id v77so43051807wmv.0
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 03:26:13 -0800 (PST)
+References: <1485744457-10324-1-git-send-email-joserz@linux.vnet.ibm.com>
+	<1485744457-10324-2-git-send-email-joserz@linux.vnet.ibm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1485744457-10324-2-git-send-email-joserz@linux.vnet.ibm.com>
+Date: Mon, 30 Jan 2017 11:26:10 +0000
+Message-ID: <877f5c7prh.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5mCyUwZo2JvN/JJP"
-Content-Disposition: inline
-In-Reply-To: <7586642a42833441c2bbe5ac3403e44b@suse.de>
-Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH Risu 1/2] risu_ppc64: Fix Risu to run under
+ qemu linux user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +31,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: msuchanek <msuchanek@suse.de>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Jailhouse <jailhouse-dev@googlegroups.com>, Wei Wang <wei.w.wang@intel.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Qemu-devel <qemu-devel-bounces+msuchanek=suse.de@nongnu.org>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
---5mCyUwZo2JvN/JJP
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com> writes:
 
-On Sun, Jan 29, 2017 at 12:56:23PM +0100, msuchanek wrote:
-> On 2017-01-17 10:59, Stefan Hajnoczi wrote:
-> > On Mon, Jan 16, 2017 at 02:10:17PM +0100, Jan Kiszka wrote:
-> > > On 2017-01-16 13:41, Marc-Andr=E9 Lureau wrote:
-> > > > On Mon, Jan 16, 2017 at 12:37 PM Jan Kiszka <jan.kiszka@siemens.com
-> > > > <mailto:jan.kiszka@siemens.com>> wrote:
-> > > >     So, this is our proposal. Would be great to hear some opinions =
-if you
-> > > >     see value in adding support for such an "ivshmem 2.0" device to=
- QEMU as
-> > > >     well and expand its ecosystem towards Linux upstream, maybe als=
-o DPDK
-> > > >     again. If you see problems in the new design /wrt what QEMU pro=
-vides so
-> > > >     far with its ivshmem device, let's discuss how to resolve them.=
- Looking
-> > > >     forward to any feedback!
-> > > >
-> > > >
-> > > > My feeling is that ivshmem is not being actively developped in qemu=
-, but
-> > > > rather virtio-based solutions (vhost-pci for vm2vm).
-> > >=20
-> > > As pointed out, for us it's most important to keep the design simple -
-> > > even at the price of "reinventing" some drivers for upstream (at
-> > > least,
-> > > we do not need two sets of drivers because our interface is fully
-> > > symmetric). I don't see yet how vhost-pci could achieve the same, but
-> > > I'm open to learn more!
-> >=20
-> > The concept of symmetry is nice but only applies for communications
-> > channels like networking and serial.
-> >=20
-> > It doesn't apply for I/O that is fundamentally asymmetric like disk I/O.
-> >=20
-> > I just wanted to point this out because lack symmetry has also bothered
-> > me about virtio but it's actually impossible to achieve it for all
-> > device types.
-> >=20
->=20
-> What's asymetric about storage? IIRC both SCSI and Firewire which can be
-> used for storage are symmetric. All asymmetry only comes from usage
-> convention or less capable buses like IDE/SATA.
+> Qemu linux-user doesn't fill uc_mcontext completely like full emul.
+> does.
 
-I'll also add Intel NVMe and virtio-blk to the list of interfaces that
-are not symmetric.
+Are you going to submit a fix for QEMU for this? Is there a reason it
+doesn't do it correctly?
 
-Even for SCSI, separate roles for initiator and target are central to
-the SCSI Architecture Model.  The consequence is that hardware
-interfaces and software stacks are not symmetric.  For example, the
-Linux SCSI target only supports a small set of FC HBAs with explicit
-target mode support rather than all SCSI HBAs.
+> For instance, uc->uc_mcontext.regs->nip is an invalid so this
+> commit replaces it by uc->uc_mcontext.gp_regs[PT_NIP]
+>
+> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> ---
+>  risu_ppc64le.c         |  2 +-
+>  risu_reginfo_ppc64le.c | 11 ++++++-----
+>  test_ppc64le.s         | 20 +++++++++-----------
+>  3 files changed, 16 insertions(+), 17 deletions(-)
+>
+> diff --git a/risu_ppc64le.c b/risu_ppc64le.c
+> index 9c1fafd..773d14c 100644
+> --- a/risu_ppc64le.c
+> +++ b/risu_ppc64le.c
+> @@ -27,7 +27,7 @@ uint8_t apprentice_memblock[MEMBLOCKLEN];
+>  void advance_pc(void *vuc)
+>  {
+>      ucontext_t *uc = (ucontext_t*)vuc;
+> -    uc->uc_mcontext.regs->nip += 4;
+> +    uc->uc_mcontext.gp_regs[PT_NIP] += 4;
+>  }
+>
+>  void set_x0(void *vuc, uint64_t x0)
+> diff --git a/risu_reginfo_ppc64le.c b/risu_reginfo_ppc64le.c
+> index 7a54eab..4dc509c 100644
+> --- a/risu_reginfo_ppc64le.c
+> +++ b/risu_reginfo_ppc64le.c
+> @@ -28,8 +28,9 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+>      int i;
+>      memset(ri, 0, sizeof(*ri));
+>
+> -    ri->faulting_insn = *((uint32_t *)uc->uc_mcontext.regs->nip);
+> -    ri->nip = uc->uc_mcontext.regs->nip - image_start_address;
+> +    ri->faulting_insn = *((uint32_t *)uc->uc_mcontext.gp_regs[PT_NIP]);
+> +    ri->prev_insn = *((uint32_t *)(uc->uc_mcontext.gp_regs[PT_NIP] - 4));
+> +    ri->nip = uc->uc_mcontext.gp_regs[PT_NIP] - image_start_address;
+>
+>      for (i = 0; i < NGREG; i++) {
+>          ri->gregs[i] = uc->uc_mcontext.gp_regs[i];
+> @@ -105,9 +106,9 @@ void reginfo_dump(struct reginfo *ri, int is_master)
+>  {
+>      int i;
+>      if (is_master) {
+> -        fprintf(stderr, "  faulting insn \e[1;101;37m0x%x\e[0m\n", ri->faulting_insn);
+> -        fprintf(stderr, "  prev insn     \e[1;101;37m0x%x\e[0m\n", ri->prev_insn);
+> -        fprintf(stderr, "  prev addr     \e[1;101;37m0x%" PRIx64 "\e[0m\n\n", ri->prev_addr);
+> +        fprintf(stderr, "  faulting insn 0x%x\n", ri->faulting_insn);
+> +        fprintf(stderr, "  prev insn     0x%x\n", ri->prev_insn);
+> +        fprintf(stderr, "  prev addr    0x%" PRIx64 "\n\n", ri->nip);
+>      }
+>
+>      for (i = 0; i < 16; i++) {
+> diff --git a/test_ppc64le.s b/test_ppc64le.s
+> index 4321751..4af770c 100644
+> --- a/test_ppc64le.s
+> +++ b/test_ppc64le.s
+> @@ -12,20 +12,18 @@
+>   *****************************************************************************/
+>
+>  /* Initialise the gp regs */
+> -li 0,0
+> -li 1,1
+> -li 2,2
+> -li 3,3
+> -li 4,4
+> -li 5,5
+> -li 6,6
+> -li 7,7
+> -li 8,8
+> -li 9,9
+> +li 0, 0
+> +li 2, 2
+> +li 3, 3
+> +li 4, 4
+> +li 5, 5
+> +li 6, 6
+> +li 7, 7
+> +li 8, 8
+> +li 9, 9
+>  li 10, 10
+>  li 11, 11
+>  li 12, 12
+> -li 13, 13
+>  li 14, 14
+>  li 15, 15
+>  li 16, 16
 
-Intuitively this makes sense - if the I/O has clear "client" and
-"server" roles then why should both sides implement both roles?  It adds
-cost and complexity for no benefit.
 
-The same goes for other device types like graphics cards.  They are
-inherently asymmetric.  Only one side has the actual hardware to perform
-the I/O so it doesn't make sense to be symmetric.
-
-You can pretend they are symmetric by restricting the hardware interface
-and driver to just message passing.  Then another layer of software
-handles the asymmetric behavior.  But then you may as well use iSCSI,
-VNC, etc and not have a hardware interface for disk and graphics.
-
-Stefan
-
---5mCyUwZo2JvN/JJP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYjyK+AAoJEJykq7OBq3PI+fAH/R/7F76OG8qq3WlJeFRSrdI2
-xrn25BZMEfWgr0u8lnKuugHmegqlXVGGTD6Us15iuIOJT9NcVO9r0N5Mwg0iE/uu
-EnPwf9BZ9stQ76drnJB2v1Xnd/HfaaJl5YT6k8x0+Zk2E7V1CAR5rdPaq/O8gClk
-91MosneJakeGOpQhUxnFHXQI+k9Z95fdbsAAHJ42bg88Fp5maOFzuLIfiJLMSXG1
-4anlrEGuWibFGqVKABS/vqQNzHCap2JNnTvahzOA+VLlCssRUYe9ImVgOTsv/Agn
-hdvOeSCa9x4Q42co+pJPWQARvTuAs2BLig7Lnpui6FaCoHKSvkd4mx5fc+D/nTY=
-=jmgb
------END PGP SIGNATURE-----
-
---5mCyUwZo2JvN/JJP--
+--
+Alex Bennée
