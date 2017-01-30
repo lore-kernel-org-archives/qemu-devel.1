@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cY9T3-0003Ac-Ek
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:45:50 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cY9T5-0003B8-TW
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:45:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cY9T1-0001v5-D1
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:45:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cY9T1-0001tJ-71
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:45:47 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DFB78C056790
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 10:45:46 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 30 Jan 2017 14:45:40 +0400
-Message-Id: <20170130104540.14660-1-marcandre.lureau@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1cY9T4-00020h-Mb
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:45:51 -0500
+References: <1485422381-29019-1-git-send-email-eric.auger@redhat.com>
+	<1485422381-29019-4-git-send-email-eric.auger@redhat.com>
+	<87vasw29jy.fsf@emacs.mitica>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <21a261aa-15ac-d24f-8318-ec1a659fc293@redhat.com>
+Date: Mon, 30 Jan 2017 11:45:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] spice: wakeup QXL worker to pick up mouse
- changes
+In-Reply-To: <87vasw29jy.fsf@emacs.mitica>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 3/4] hw/intc/arm_gicv3_its: Implement state
+ save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: quintela@redhat.com
+Cc: peter.maydell@linaro.org, drjones@redhat.com, vijay.kilari@gmail.com, qemu-devel@nongnu.org, peterx@redhat.com, Vijaya.Kumar@cavium.com, qemu-arm@nongnu.org, shannon.zhao@linaro.org, dgilbert@redhat.com, christoffer.dall@linaro.org, eric.auger.pro@gmail.com
 
-Without it, server-mode mouse is "slow" to update position: QXL will
-wait until new display commands come. This is very visible with
-virtio-gpu.
+Hi Juan,
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- ui/spice-display.c | 2 ++
- 1 file changed, 2 insertions(+)
+On 30/01/2017 10:15, Juan Quintela wrote:
+> Eric Auger <eric.auger@redhat.com> wrote:
+>> We need to handle both registers and ITS tables. While
+>> register handling is standard, ITS table handling is more
+>> challenging since the kernel API is devised so that the
+>> tables are flushed into guest RAM and not in vmstate buffers.
+>>
+>> Flushing the ITS tables on device pre_save() is too late
+>> since the guest RAM had already been saved at this point.
+>>
+>> Table flushing needs to happen when we are sure the vcpus
+>> are stopped and before the last dirty page saving. The
+>> right point is RUN_STATE_FINISH_MIGRATE but sometimes the
+>> VM gets stopped before migration launch so let's simply
+>> flush the tables each time the VM gets stopped.
+>>
+>> For regular ITS registers we just can use vmstate pre_save
+>> and post_load callbacks.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> Hi
+> 
+> 
+>> + * vm_change_state_handler - VM change state callback aiming at flushing
+>> + * ITS tables into guest RAM
+>> + *
+>> + * The tables get flushed to guest RAM whenever the VM gets stopped.
+>> + */
+>> +static void vm_change_state_handler(void *opaque, int running,
+>> +                                    RunState state)
+>> +{
+>> +    GICv3ITSState *s = (GICv3ITSState *)opaque;
+> 
+> Cast is unneeded.
+> 
+>> +
+>> +    if (running) {
+>> +        return;
+>> +    }
+>> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_TABLES,
+>> +                      0, NULL, false);
+> 
+> As you are adding it to do everytime that we stop the guest, how
+> expensive/slow is that?
 
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index 5e6f78a219..64e472eeb0 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -769,6 +769,7 @@ static void display_mouse_set(DisplayChangeListener *=
-dcl,
-     g_free(ssd->ptr_move);
-     ssd->ptr_move =3D qemu_spice_create_cursor_update(ssd, NULL, on);
-     qemu_mutex_unlock(&ssd->lock);
-+    qemu_spice_wakeup(ssd);
- }
-=20
- static void display_mouse_define(DisplayChangeListener *dcl,
-@@ -787,6 +788,7 @@ static void display_mouse_define(DisplayChangeListene=
-r *dcl,
-     g_free(ssd->ptr_define);
-     ssd->ptr_define =3D qemu_spice_create_cursor_update(ssd, c, 0);
-     qemu_mutex_unlock(&ssd->lock);
-+    qemu_spice_wakeup(ssd);
- }
-=20
- static const DisplayChangeListenerOps display_listener_ops =3D {
---=20
-2.11.0.295.gd7dffce1c.dirty
+This is highly dependent on the number of devices using MSIs and number
+of allocated MSIs on guest. The number of bytes to transfer basically is:
+
+(#nb_vcpus + #nb_devices_using_MSI_on_guest  +  2 *
+nb_allocated_guest_MSIs bytes ) * 8 bytes
+
+So I would say < 10 kB in real life case. In my virtio-pci test case it
+is just 440 Bytes.
+
+For live migration I could hook a callback at RUN_STATE_FINISH_MIGRATE.
+However this does not work with virsh save/restore use case since the
+notifier is not called (the VM being already paused), hence that choice.
+
+Thanks
+
+Eric
+
+> 
+> Thanks, Juan.
+> 
