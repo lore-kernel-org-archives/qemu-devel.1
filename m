@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYF7w-0000Rj-EI
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:48:27 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cYFBg-0002nN-9B
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:52:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYF7r-0006xf-SQ
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:48:24 -0500
-References: <20170126110435.2777-1-berrange@redhat.com>
-	<20170126110435.2777-2-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7bf56bb5-8840-616e-b271-3cc15f2c38a6@redhat.com>
-Date: Mon, 30 Jan 2017 10:48:13 -0600
+	(envelope-from <rth7680@gmail.com>) id 1cYFBf-0008VW-Jz
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:52:16 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170127103922.19658-1-alex.bennee@linaro.org>
+	<20170127103922.19658-9-alex.bennee@linaro.org>
+	<871svlr1od.fsf@gmail.com> <87d1f47tvv.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <27a34e99-c862-a1c3-1357-9c937914ae10@twiddle.net>
+Date: Mon, 30 Jan 2017 08:52:01 -0800
 MIME-Version: 1.0
-In-Reply-To: <20170126110435.2777-2-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ogBoURnw5uph65lsjc2EScHC9DkGw0NKV"
-Subject: Re: [Qemu-devel] [PATCH v1 1/6] qemu-img: add support for --object
- with 'dd' command
+In-Reply-To: <87d1f47tvv.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v8 08/25] tcg: drop global lock during TCG
+ code execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Pranith Kumar <bobby.prani@gmail.com>
+Cc: mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:ARM cores" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ogBoURnw5uph65lsjc2EScHC9DkGw0NKV
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <7bf56bb5-8840-616e-b271-3cc15f2c38a6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/6] qemu-img: add support for --object
- with 'dd' command
-References: <20170126110435.2777-1-berrange@redhat.com>
- <20170126110435.2777-2-berrange@redhat.com>
-In-Reply-To: <20170126110435.2777-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 01/30/2017 01:57 AM, Alex Bennée wrote:
+>>> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+>>> index a9ee7fddf9..2624d8d909 100644
+>>> --- a/hw/intc/arm_gicv3_cpuif.c
+>>> +++ b/hw/intc/arm_gicv3_cpuif.c
+>>> @@ -14,6 +14,7 @@
+>>>
+>>>  #include "qemu/osdep.h"
+>>>  #include "qemu/bitops.h"
+>>> +#include "qemu/main-loop.h"
+>>>  #include "trace.h"
+>>>  #include "gicv3_internal.h"
+>>>  #include "cpu.h"
+>>> @@ -733,6 +734,8 @@ void gicv3_cpuif_update(GICv3CPUState *cs)
+>>>      ARMCPU *cpu = ARM_CPU(cs->cpu);
+>>>      CPUARMState *env = &cpu->env;
+>>>
+>>> +    g_assert(qemu_mutex_iothread_locked());
+>>> +
+>> tcg_debug_assert()?
+> Depends if KVM can use this for emulation as well (which I think it can).
+> 
 
-On 01/26/2017 05:04 AM, Daniel P. Berrange wrote:
-> The qemu-img dd command added --image-opts support, but missed
-> the corresponding --object support. This prevented passing
-> secrets (eg auth passwords) needed by certain disk images.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-img.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+It probably could, but it shouldn't.  Let's not leak tcg_* into hw/.
 
 
---ogBoURnw5uph65lsjc2EScHC9DkGw0NKV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYj25NAAoJEKeha0olJ0NqxqoH/35MXznlxWgpafmScdSsRx4I
-jywB09+QOYGZdOz1r8/8l5HeK/2UvGxku4slahU689iY9LWr+dKaNBbSjjwNRSkn
-pAKQ6rMnl08jshtq/WoSIbo/EhB1gXsHzsRuG/EXuTZ82vbavu3VajGGPXmuk/xL
-cGSSAyf9hSD+bFkv2UC2jXIVG+4eSa73ycN3+zdKvBvmTL3fY8HmF0vctR+TFLaX
-m7j+Vwf5NWtUu1Z993UFlk78s7CewhADLeNn+R4RIv70KYfDY0vRShQxeD6ujfjz
-u86AGbyDLdSYrkwxlxs/8WlhBaZCHT78oxFC3G0DANfucR5aevawXwjXIIjhgjU=
-=uOoD
------END PGP SIGNATURE-----
-
---ogBoURnw5uph65lsjc2EScHC9DkGw0NKV--
+r~
