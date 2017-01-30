@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cY96L-0003Gw-3v
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:22:22 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cY97S-0003n1-Ow
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:23:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cY96G-00058d-5W
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:22:21 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:23322 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cY96F-000523-Qr
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:22:16 -0500
-From: "Denis V. Lunev" <den@openvz.org>
-Date: Mon, 30 Jan 2017 13:22:10 +0300
-Message-Id: <1485771730-19849-1-git-send-email-den@openvz.org>
-Subject: [Qemu-devel] [PATCH 1/1] mirror: restore offset after zeroing out
- the image
+	(envelope-from <peter.maydell@linaro.org>) id 1cY97S-0007Bp-4Y
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:23:30 -0500
+Received: from mail-vk0-x229.google.com ([2607:f8b0:400c:c05::229]:34085)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cY97S-0007B8-01
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:23:30 -0500
+Received: by mail-vk0-x229.google.com with SMTP id r136so212690783vke.1
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 02:23:29 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1485531137-2362-1-git-send-email-peter.maydell@linaro.org>
+References: <1485531137-2362-1-git-send-email-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Jan 2017 10:23:08 +0000
+Message-ID: <CAFEAcA_+nPVpFbki1XpT4JCaF1c06bs_yXcrZAcUdNZ5LyMbgA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/22] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,57 +28,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Denis V. Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-If explicit zeroing out before mirroring is required for the target image,
-it moves the block job offset counter to EOF, then offset and len counters
-count the image size twice.
+On 27 January 2017 at 15:31, Peter Maydell <peter.maydell@linaro.org> wrote:
+> ARM queue; the bulk of this is M profile bugfixes.
+>
+> thanks
+> -- PMM
 
-There is no harm but confusing stats (e.g. for 1G image the completion
-counter starts from 1G and increases to 2G)
+Applied, thanks.
 
-The patch fixed that problem by resetting the offset counter.
-
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Jeff Cody <jcody@redhat.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
----
- block/mirror.c             | 3 +++
- tests/qemu-iotests/094.out | 4 ++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/block/mirror.c b/block/mirror.c
-index 301ba92..94915e8 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -587,6 +587,9 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-         }
- 
-         mirror_wait_for_all_io(s);
-+
-+        /* offset has moved to EOF, restore it */
-+        s->common.offset = 0;
-     }
- 
-     /* First part, loop on the sectors and initialize the dirty bitmap.  */
-diff --git a/tests/qemu-iotests/094.out b/tests/qemu-iotests/094.out
-index b66dc07..522a20c 100644
---- a/tests/qemu-iotests/094.out
-+++ b/tests/qemu-iotests/094.out
-@@ -3,9 +3,9 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- Formatting 'TEST_DIR/source.IMGFMT', fmt=IMGFMT size=67108864
- {"return": {}}
- {"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 67108864, "offset": 67108864, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 0, "offset": 0, "speed": 0, "type": "mirror"}}
- {"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 67108864, "offset": 67108864, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 0, "offset": 0, "speed": 0, "type": "mirror"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
- *** done
--- 
-2.7.4
+-- PMM
