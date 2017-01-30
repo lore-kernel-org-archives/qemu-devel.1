@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cY5ki-00029q-OT
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 01:47:51 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cY6Hj-00009T-KB
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 02:21:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cY5kf-0005J2-LL
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 01:47:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53010)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cY6Hi-0006wD-U2
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 02:21:55 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:3488 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cY5kf-0005HC-Es
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 01:47:45 -0500
-From: P J P <ppandit@redhat.com>
-Date: Mon, 30 Jan 2017 12:17:36 +0530
-Message-Id: <20170130064736.9236-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH] sd: sdhci: check data length during
- dma_memory_read
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cY6Hi-0006uT-IO
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 02:21:54 -0500
+References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
+	<20170123121036.4823-8-vsementsov@virtuozzo.com>
+	<bf9c6aae-2aa6-bfe2-8856-67e8b13ad58d@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <6d98fdb6-6043-8805-6df7-a2a03a7925da@virtuozzo.com>
+Date: Mon, 30 Jan 2017 10:21:37 +0300
+MIME-Version: 1.0
+In-Reply-To: <bf9c6aae-2aa6-bfe2-8856-67e8b13ad58d@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 07/24] qcow2: add bitmaps extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+29.01.2017 00:29, Max Reitz wrote:
+> On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
+>> Add bitmap extension as specified in docs/specs/qcow2.txt.
+>> For now, just mirror extension header into Qcow2 state and check
+>> constraints.
+>>
+>> For now, disable image resize if it has bitmaps. It will be fixed later.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/qcow2.c | 119 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>   block/qcow2.h |  24 ++++++++++++
+>>   2 files changed, 141 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index 96fb8a8f16..a8835988c7 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+> [...]
+>
+>> @@ -185,6 +265,15 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+>>           offset += ((ext.len + 7) & ~7);
+>>       }
+>>   
+>> +    if (need_update && !bdrv_is_root_node(bs) &&
+>> +        !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
+>> +    {
+>> +        ret = qcow2_update_header(bs);
+> Good idea, but qcow2_read_extensions() can be called pretty early in
+> qcow2_open(). Therefore, some fields in the BDRVQcow2State are not
+> necessarily set already.
+>
+> For instance, it is always called before s->snapshots_offset and
+> s->nb_snapshots are set. Thus, this will effectively always discard all
+> snapshots.
+>
+> Max
+>
 
-While doing multi block SDMA transfer in routine
-'sdhci_sdma_transfer_multi_blocks', the 's->fifo_buffer' starting
-index 'begin' and data length 's->data_count' could end up to be same.
-This could lead to an OOB access issue. Correct transfer data length
-to avoid it.
+So, I need to move need_update to qcow2_read_extensions parameters as 
+'bool *' and handle it later, in the end of qcow2_open. Ok?
 
-Reported-by: Jiang Xin <jiangxin1@huawei.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/sd/sdhci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 01fbf22..5bd5ab6 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -536,7 +536,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
-                 boundary_count -= block_size - begin;
-             }
-             dma_memory_read(&address_space_memory, s->sdmasysad,
--                            &s->fifo_buffer[begin], s->data_count);
-+                            &s->fifo_buffer[begin], s->data_count - begin);
-             s->sdmasysad += s->data_count - begin;
-             if (s->data_count == block_size) {
-                 for (n = 0; n < block_size; n++) {
+
 -- 
-2.9.3
+Best regards,
+Vladimir
