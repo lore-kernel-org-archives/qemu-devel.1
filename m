@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cYGWV-0003La-L8
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:53 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cYGWY-0003NX-BS
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cYGWR-0002Lz-KR
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:51 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:56105)
+	(envelope-from <laurent@vivier.eu>) id 1cYGWU-0002Nv-87
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:54 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:54641)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cYGWR-0002Kp-6T
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:47 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cYGWT-0002NR-S0
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:17:50 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Jan 2017 19:16:32 +0100
-Message-Id: <20170130181634.13934-15-laurent@vivier.eu>
+Date: Mon, 30 Jan 2017 19:16:33 +0100
+Message-Id: <20170130181634.13934-16-laurent@vivier.eu>
 In-Reply-To: <20170130181634.13934-1-laurent@vivier.eu>
 References: <20170130181634.13934-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v2 14/16] target-m68k: add explicit single and
- double precision operations
+Subject: [Qemu-devel] [PATCH v2 15/16] target-m68k: add more FPU instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,416 +26,378 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-Add fssqrt, fdsqrt, fsabs, fdabs, fsneg, fdneg, fsadd, fdadd,
-fssub, fdsub, fsmul, fdmul, fsdiv, fddiv, fsmove and fdmove.
+Add fsinh, flognp1, ftanh, fatan, fasin, fatanh,
+fsin, ftan, fetox, ftwotox, ftentox, flogn, flog10, facos,
+fcos.
 
-The precision is managed using set_floatx80_rounding_precision(),
-except for fsmove, fdmove, fsneg, fdneg, fsabs and fdabs:
-the value is converted manually to the given precision and
-converted back to floatx80.
+As softfloat library does not provide these functions,
+we us the libm of the host.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/fpu_helper.c | 178 ++++++++++++++++++++++++++++++++++++++++++++++-
- target/m68k/helper.h     |  16 ++++-
- target/m68k/translate.c  |  76 +++++++++++++++++---
- 3 files changed, 259 insertions(+), 11 deletions(-)
+ target/m68k/fpu_helper.c | 237 +++++++++++++++++++++++++++++++++++++++++++++++
+ target/m68k/helper.h     |  16 ++++
+ target/m68k/translate.c  |  48 ++++++++++
+ 3 files changed, 301 insertions(+)
 
 diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 8a3eed3..c69efe1 100644
+index c69efe1..95d5cc4 100644
 --- a/target/m68k/fpu_helper.c
 +++ b/target/m68k/fpu_helper.c
-@@ -294,6 +294,16 @@ void HELPER(itrunc_FP0)(CPUM68KState *env)
-     floatx80_to_FP0(env, res);
- }
+@@ -23,6 +23,7 @@
+ #include "cpu.h"
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
++#include <math.h>
  
-+#define PREC_BEGIN(prec)                                        \
-+    do {                                                        \
-+        int old;                                                \
-+        old = get_floatx80_rounding_precision(&env->fp_status); \
-+        set_floatx80_rounding_precision(prec, &env->fp_status)  \
-+
-+#define PREC_END()                                              \
-+        set_floatx80_rounding_precision(old, &env->fp_status);  \
-+    } while (0)
-+
- void HELPER(sqrt_FP0)(CPUM68KState *env)
- {
-     floatx80 res;
-@@ -303,6 +313,28 @@ void HELPER(sqrt_FP0)(CPUM68KState *env)
-     floatx80_to_FP0(env, res);
- }
- 
-+void HELPER(ssqrt_FP0)(CPUM68KState *env)
-+{
-+    floatx80 res;
-+
-+    PREC_BEGIN(32);
-+    res = floatx80_sqrt(FP0_to_floatx80(env), &env->fp_status);
-+    PREC_END();
-+
-+    floatx80_to_FP0(env, res);
-+}
-+
-+void HELPER(dsqrt_FP0)(CPUM68KState *env)
-+{
-+    floatx80 res;
-+
-+    PREC_BEGIN(64);
-+    res = floatx80_sqrt(FP0_to_floatx80(env), &env->fp_status);
-+    PREC_END();
-+
-+    floatx80_to_FP0(env, res);
-+}
-+
- void HELPER(abs_FP0)(CPUM68KState *env)
- {
-     floatx80 res;
-@@ -312,11 +344,59 @@ void HELPER(abs_FP0)(CPUM68KState *env)
-     floatx80_to_FP0(env, res);
- }
- 
--void HELPER(chs_FP0)(CPUM68KState *env)
-+void HELPER(sabs_FP0)(CPUM68KState *env)
- {
-     floatx80 res;
-+    float32 f32;
-+
-+    res = floatx80_abs(FP0_to_floatx80(env));
-+    f32 = floatx80_to_float32(res, &env->fp_status);
-+    res = float32_to_floatx80(f32, &env->fp_status);
-+
-+    floatx80_to_FP0(env, res);
-+}
-+
-+void HELPER(dabs_FP0)(CPUM68KState *env)
-+{
-+    floatx80 res;
-+    float64 f64;
-+
-+    res = floatx80_abs(FP0_to_floatx80(env));
-+    f64 = floatx80_to_float64(res, &env->fp_status);
-+    res = float64_to_floatx80(f64, &env->fp_status);
-+
-+    floatx80_to_FP0(env, res);
-+}
-+
-+void HELPER(neg_FP0)(CPUM68KState *env)
-+{
-+    floatx80 res;
-+
-+    res = floatx80_chs(FP0_to_floatx80(env));
-+
-+    floatx80_to_FP0(env, res);
-+}
-+
-+void HELPER(sneg_FP0)(CPUM68KState *env)
-+{
-+    floatx80 res;
-+    float32 f32;
-+
-+    res = floatx80_chs(FP0_to_floatx80(env));
-+    f32 = floatx80_to_float32(res, &env->fp_status);
-+    res = float32_to_floatx80(f32, &env->fp_status);
-+
-+    floatx80_to_FP0(env, res);
-+}
-+
-+void HELPER(dneg_FP0)(CPUM68KState *env)
-+{
-+    floatx80 res;
-+    float64 f64;
- 
-     res = floatx80_chs(FP0_to_floatx80(env));
-+    f64 = floatx80_to_float64(res, &env->fp_status);
-+    res = float64_to_floatx80(f64, &env->fp_status);
+ static const floatx80 fpu_rom[128] = {
+     [0x00] = floatx80_pi,                                   /* Pi */
+@@ -712,3 +713,239 @@ void HELPER(mod_FP0_FP1)(CPUM68KState *env)
  
      floatx80_to_FP0(env, res);
  }
-@@ -331,6 +411,30 @@ void HELPER(add_FP0_FP1)(CPUM68KState *env)
-     floatx80_to_FP0(env, res);
- }
- 
-+void HELPER(sadd_FP0_FP1)(CPUM68KState *env)
++
++static long double floatx80_to_ldouble(floatx80 val)
++{
++    if (floatx80_is_infinity(val)) {
++            if (floatx80_is_neg(val)) {
++                    return -__builtin_infl();
++            }
++            return __builtin_infl();
++    }
++    if (floatx80_is_any_nan(val)) {
++            char low[20];
++            sprintf(low, "0x%016"PRIx64, val.low);
++
++            return nanl(low);
++    }
++
++    return *(long double *)&val;
++}
++
++static floatx80 ldouble_to_floatx80(long double val)
 +{
 +    floatx80 res;
 +
-+    PREC_BEGIN(32);
-+    res = floatx80_add(FP0_to_floatx80(env), FP1_to_floatx80(env),
-+                      &env->fp_status);
-+    PREC_END();
++    if (isinf(val)) {
++            res.high = floatx80_default_nan(NULL).high;
++            res.low = 0;
++    }
++    if (isinf(val) < 0) {
++            res.high |= 0x8000;
++    }
++    if (isnan(val)) {
++            res.high = floatx80_default_nan(NULL).high;
++            res.low = *(uint64_t *)((char *)&val + 4);
++    }
++    return *(floatx80 *)&val;
++}
++
++void HELPER(sinh_FP0)(CPUM68KState *env)
++{
++    floatx80 res;
++    long double val;
++
++    val = sinhl(floatx80_to_ldouble(FP0_to_floatx80(env)));
++    res = ldouble_to_floatx80(val);
 +
 +    floatx80_to_FP0(env, res);
 +}
 +
-+void HELPER(dadd_FP0_FP1)(CPUM68KState *env)
++void HELPER(lognp1_FP0)(CPUM68KState *env)
++{
++    floatx80 val;
++    long double res;
++
++    val = FP0_to_floatx80(env);
++    res = logl(floatx80_to_ldouble(val) + 1.0);
++
++    floatx80_to_FP0(env, ldouble_to_floatx80(res));
++}
++
++void HELPER(ln_FP0)(CPUM68KState *env)
++{
++    floatx80 val;
++    long double res;
++
++    val = FP0_to_floatx80(env);
++    res = logl(floatx80_to_ldouble(val));
++
++    floatx80_to_FP0(env, ldouble_to_floatx80(res));
++}
++
++void HELPER(log10_FP0)(CPUM68KState *env)
++{
++    floatx80 val;
++    long double res;
++
++    val = FP0_to_floatx80(env);
++    res = log10l(floatx80_to_ldouble(val));
++
++    floatx80_to_FP0(env, ldouble_to_floatx80(res));
++}
++
++void HELPER(atan_FP0)(CPUM68KState *env)
 +{
 +    floatx80 res;
++    long double val;
 +
-+    PREC_BEGIN(64);
-+    res = floatx80_add(FP0_to_floatx80(env), FP1_to_floatx80(env),
-+                      &env->fp_status);
-+    PREC_END();
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
 +
++    val = atanl(val);
++    res = ldouble_to_floatx80(val);
 +    floatx80_to_FP0(env, res);
 +}
 +
- void HELPER(sub_FP0_FP1)(CPUM68KState *env)
- {
-     floatx80 res;
-@@ -341,6 +445,30 @@ void HELPER(sub_FP0_FP1)(CPUM68KState *env)
-     floatx80_to_FP0(env, res);
- }
- 
-+void HELPER(ssub_FP0_FP1)(CPUM68KState *env)
++void HELPER(asin_FP0)(CPUM68KState *env)
 +{
 +    floatx80 res;
++    long double val;
 +
-+    PREC_BEGIN(32);
-+    res = floatx80_sub(FP1_to_floatx80(env), FP0_to_floatx80(env),
-+                       &env->fp_status);
-+    PREC_END();
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
++    if (val < -1.0 || val > 1.0) {
++        floatx80_to_FP0(env, floatx80_default_nan(NULL));
++        return;
++    }
 +
++    val = asinl(val);
++    res = ldouble_to_floatx80(val);
 +    floatx80_to_FP0(env, res);
 +}
 +
-+void HELPER(dsub_FP0_FP1)(CPUM68KState *env)
++void HELPER(atanh_FP0)(CPUM68KState *env)
 +{
 +    floatx80 res;
++    long double val;
 +
-+    PREC_BEGIN(64);
-+    res = floatx80_sub(FP1_to_floatx80(env), FP0_to_floatx80(env),
-+                       &env->fp_status);
-+    PREC_END();
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
++    if (val < -1.0 || val > 1.0) {
++        floatx80_to_FP0(env, floatx80_default_nan(NULL));
++        return;
++    }
 +
++    val = atanhl(val);
++    res = ldouble_to_floatx80(val);
 +    floatx80_to_FP0(env, res);
 +}
 +
- void HELPER(mul_FP0_FP1)(CPUM68KState *env)
- {
-     floatx80 res;
-@@ -351,6 +479,30 @@ void HELPER(mul_FP0_FP1)(CPUM68KState *env)
-     floatx80_to_FP0(env, res);
- }
- 
-+void HELPER(smul_FP0_FP1)(CPUM68KState *env)
++void HELPER(sin_FP0)(CPUM68KState *env)
 +{
 +    floatx80 res;
++    long double val;
 +
-+    PREC_BEGIN(32);
-+    res = floatx80_mul(FP0_to_floatx80(env), FP1_to_floatx80(env),
-+                       &env->fp_status);
-+    PREC_END();
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
 +
++    val = sinl(val);
++    res = ldouble_to_floatx80(val);
 +    floatx80_to_FP0(env, res);
 +}
 +
-+void HELPER(dmul_FP0_FP1)(CPUM68KState *env)
++void HELPER(tanh_FP0)(CPUM68KState *env)
 +{
 +    floatx80 res;
++    long double val;
 +
-+    PREC_BEGIN(64);
-+    res = floatx80_mul(FP0_to_floatx80(env), FP1_to_floatx80(env),
-+                       &env->fp_status);
-+    PREC_END();
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
 +
++    val = tanhl(val);
++    res = ldouble_to_floatx80(val);
 +    floatx80_to_FP0(env, res);
 +}
 +
- void HELPER(sglmul_FP0_FP1)(CPUM68KState *env)
- {
-     float64 a, b, res;
-@@ -372,6 +524,30 @@ void HELPER(div_FP0_FP1)(CPUM68KState *env)
-     floatx80_to_FP0(env, res);
- }
- 
-+void HELPER(sdiv_FP0_FP1)(CPUM68KState *env)
++void HELPER(tan_FP0)(CPUM68KState *env)
 +{
 +    floatx80 res;
++    long double val;
 +
-+    PREC_BEGIN(32);
-+    res = floatx80_div(FP1_to_floatx80(env), FP0_to_floatx80(env),
-+                       &env->fp_status);
-+    PREC_END();
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
 +
++    val = tanl(val);
++    res = ldouble_to_floatx80(val);
 +    floatx80_to_FP0(env, res);
 +}
 +
-+void HELPER(ddiv_FP0_FP1)(CPUM68KState *env)
++void HELPER(exp_FP0)(CPUM68KState *env)
++{
++    floatx80 f;
++    long double res;
++
++    f = FP0_to_floatx80(env);
++
++    res = expl(floatx80_to_ldouble(f));
++
++    floatx80_to_FP0(env, ldouble_to_floatx80(res));
++}
++
++void HELPER(exp2_FP0)(CPUM68KState *env)
++{
++    floatx80 f;
++    long double res;
++
++    f = FP0_to_floatx80(env);
++
++    res = exp2l(floatx80_to_ldouble(f));
++
++    floatx80_to_FP0(env, ldouble_to_floatx80(res));
++}
++
++void HELPER(exp10_FP0)(CPUM68KState *env)
 +{
 +    floatx80 res;
++    long double val;
 +
-+    PREC_BEGIN(64);
-+    res = floatx80_div(FP1_to_floatx80(env), FP0_to_floatx80(env),
-+                       &env->fp_status);
-+    PREC_END();
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
 +
++    val = exp10l(val);
++    res = ldouble_to_floatx80(val);
 +    floatx80_to_FP0(env, res);
 +}
 +
- void HELPER(sgldiv_FP0_FP1)(CPUM68KState *env)
- {
-     float64 a, b, res;
++void HELPER(cosh_FP0)(CPUM68KState *env)
++{
++    floatx80 res;
++    long double val;
++
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
++
++    val = coshl(val);
++    res = ldouble_to_floatx80(val);
++    floatx80_to_FP0(env, res);
++}
++
++void HELPER(acos_FP0)(CPUM68KState *env)
++{
++    floatx80 res;
++    long double val;
++
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
++    if (val < -1.0 || val > 1.0) {
++        floatx80_to_FP0(env, floatx80_default_nan(NULL));
++        return;
++    }
++
++    val = acosl(val);
++    res = ldouble_to_floatx80(val);
++    floatx80_to_FP0(env, res);
++}
++
++void HELPER(cos_FP0)(CPUM68KState *env)
++{
++    floatx80 res;
++    long double val;
++
++    val = floatx80_to_ldouble(FP0_to_floatx80(env));
++
++    val = cosl(val);
++    res = ldouble_to_floatx80(val);
++    floatx80_to_FP0(env, res);
++}
 diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index c30e5f7..07aa04f 100644
+index 07aa04f..600a9a6 100644
 --- a/target/m68k/helper.h
 +++ b/target/m68k/helper.h
-@@ -21,13 +21,27 @@ DEF_HELPER_1(reds32_FP0, void, env)
- DEF_HELPER_1(iround_FP0, void, env)
- DEF_HELPER_1(itrunc_FP0, void, env)
- DEF_HELPER_1(sqrt_FP0, void, env)
-+DEF_HELPER_1(ssqrt_FP0, void, env)
-+DEF_HELPER_1(dsqrt_FP0, void, env)
- DEF_HELPER_1(abs_FP0, void, env)
--DEF_HELPER_1(chs_FP0, void, env)
-+DEF_HELPER_1(sabs_FP0, void, env)
-+DEF_HELPER_1(dabs_FP0, void, env)
-+DEF_HELPER_1(neg_FP0, void, env)
-+DEF_HELPER_1(sneg_FP0, void, env)
-+DEF_HELPER_1(dneg_FP0, void, env)
- DEF_HELPER_1(add_FP0_FP1, void, env)
-+DEF_HELPER_1(sadd_FP0_FP1, void, env)
-+DEF_HELPER_1(dadd_FP0_FP1, void, env)
- DEF_HELPER_1(sub_FP0_FP1, void, env)
-+DEF_HELPER_1(ssub_FP0_FP1, void, env)
-+DEF_HELPER_1(dsub_FP0_FP1, void, env)
- DEF_HELPER_1(mul_FP0_FP1, void, env)
-+DEF_HELPER_1(smul_FP0_FP1, void, env)
-+DEF_HELPER_1(dmul_FP0_FP1, void, env)
- DEF_HELPER_1(sglmul_FP0_FP1, void, env)
- DEF_HELPER_1(div_FP0_FP1, void, env)
-+DEF_HELPER_1(sdiv_FP0_FP1, void, env)
-+DEF_HELPER_1(ddiv_FP0_FP1, void, env)
- DEF_HELPER_1(sgldiv_FP0_FP1, void, env)
- DEF_HELPER_1(cmp_FP0_FP1, void, env)
- DEF_HELPER_2(set_fpcr, void, env, i32)
+@@ -53,6 +53,22 @@ DEF_HELPER_1(getexp_FP0, void, env)
+ DEF_HELPER_1(getman_FP0, void, env)
+ DEF_HELPER_1(scale_FP0_FP1, void, env)
+ DEF_HELPER_1(mod_FP0_FP1, void, env)
++DEF_HELPER_1(sinh_FP0, void, env)
++DEF_HELPER_1(lognp1_FP0, void, env)
++DEF_HELPER_1(atan_FP0, void, env)
++DEF_HELPER_1(asin_FP0, void, env)
++DEF_HELPER_1(atanh_FP0, void, env)
++DEF_HELPER_1(sin_FP0, void, env)
++DEF_HELPER_1(tanh_FP0, void, env)
++DEF_HELPER_1(tan_FP0, void, env)
++DEF_HELPER_1(exp_FP0, void, env)
++DEF_HELPER_1(exp2_FP0, void, env)
++DEF_HELPER_1(exp10_FP0, void, env)
++DEF_HELPER_1(ln_FP0, void, env)
++DEF_HELPER_1(log10_FP0, void, env)
++DEF_HELPER_1(cosh_FP0, void, env)
++DEF_HELPER_1(acos_FP0, void, env)
++DEF_HELPER_1(cos_FP0, void, env)
+ 
+ DEF_HELPER_3(mac_move, void, env, i32, i32)
+ DEF_HELPER_3(macmulf, i64, env, i32, i32)
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index cfdc858..f238d30 100644
+index f238d30..4af6a98 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -4612,7 +4612,15 @@ DISAS_INSN(fpu)
-         gen_op_load_fpr_FP0(REG(ext, 10));
-     }
-     switch (opmode) {
--    case 0: case 0x40: case 0x44: /* fmove */
-+    case 0: /* fmove */
-+        break;
-+    case 0x40: /* fsmove */
-+        gen_helper_redf32_FP0(cpu_env);
-+        gen_helper_extf32_FP0(cpu_env);
-+        break;
-+    case 0x44: /* fdmove */
-+        gen_helper_redf64_FP0(cpu_env);
-+        gen_helper_extf64_FP0(cpu_env);
-         break;
+@@ -4625,6 +4625,9 @@ DISAS_INSN(fpu)
      case 1: /* fint */
          gen_helper_iround_FP0(cpu_env);
-@@ -4620,14 +4628,32 @@ DISAS_INSN(fpu)
+         break;
++    case 2: /* fsinh */
++        gen_helper_sinh_FP0(cpu_env);
++        break;
      case 3: /* fintrz */
          gen_helper_itrunc_FP0(cpu_env);
          break;
--    case 4: case 0x41: case 0x45: /* fsqrt */
-+    case 4: /* fsqrt */
-         gen_helper_sqrt_FP0(cpu_env);
+@@ -4637,6 +4640,42 @@ DISAS_INSN(fpu)
+     case 0x45: /* fdsqrt */
+         gen_helper_dsqrt_FP0(cpu_env);
          break;
--    case 0x18: case 0x58: case 0x5c: /* fabs */
-+    case 0x41: /* fssqrt */
-+        gen_helper_ssqrt_FP0(cpu_env);
++    case 0x06: /* flognp1 */
++        gen_helper_lognp1_FP0(cpu_env);
 +        break;
-+    case 0x45: /* fdsqrt */
-+        gen_helper_dsqrt_FP0(cpu_env);
++    case 0x09: /* ftanh */
++        gen_helper_tanh_FP0(cpu_env);
 +        break;
-+    case 0x18: /* fabs */
++    case 0x0a: /* fatan */
++        gen_helper_atan_FP0(cpu_env);
++        break;
++    case 0x0c: /* fasin */
++        gen_helper_asin_FP0(cpu_env);
++        break;
++    case 0x0d: /* fatanh */
++        gen_helper_atanh_FP0(cpu_env);
++        break;
++    case 0x0e: /* fsin */
++        gen_helper_sin_FP0(cpu_env);
++        break;
++    case 0x0f: /* ftan */
++        gen_helper_tan_FP0(cpu_env);
++        break;
++    case 0x10: /* fetox */
++        gen_helper_exp_FP0(cpu_env);
++        break;
++    case 0x11: /* ftwotox */
++        gen_helper_exp2_FP0(cpu_env);
++        break;
++    case 0x12: /* ftentox */
++        gen_helper_exp10_FP0(cpu_env);
++        break;
++    case 0x14: /* flogn */
++        gen_helper_ln_FP0(cpu_env);
++        break;
++    case 0x15: /* flog10 */
++        gen_helper_log10_FP0(cpu_env);
++        break;
+     case 0x18: /* fabs */
          gen_helper_abs_FP0(cpu_env);
          break;
--    case 0x1a: case 0x5a: case 0x5e: /* fneg */
--        gen_helper_chs_FP0(cpu_env);
-+    case 0x58: /* fsabs */
-+        gen_helper_sabs_FP0(cpu_env);
-+        break;
-+    case 0x5c: /* fdabs */
-+        gen_helper_dabs_FP0(cpu_env);
-+        break;
-+    case 0x1a: /* fneg */
-+        gen_helper_neg_FP0(cpu_env);
-+        break;
-+    case 0x5a: /* fsneg */
-+        gen_helper_sneg_FP0(cpu_env);
-+        break;
-+    case 0x5e: /* fdneg */
-+        gen_helper_dneg_FP0(cpu_env);
+@@ -4646,6 +4685,9 @@ DISAS_INSN(fpu)
+     case 0x5c: /* fdabs */
+         gen_helper_dabs_FP0(cpu_env);
          break;
++    case 0x19: /* fcosh */
++        gen_helper_cosh_FP0(cpu_env);
++        break;
+     case 0x1a: /* fneg */
+         gen_helper_neg_FP0(cpu_env);
+         break;
+@@ -4655,6 +4697,12 @@ DISAS_INSN(fpu)
+     case 0x5e: /* fdneg */
+         gen_helper_dneg_FP0(cpu_env);
+         break;
++    case 0x1c: /* facos */
++        gen_helper_acos_FP0(cpu_env);
++        break;
++    case 0x1d: /* fcos */
++        gen_helper_cos_FP0(cpu_env);
++        break;
      case 0x1e: /* fgetexp */
          gen_helper_getexp_FP0(cpu_env);
-@@ -4635,22 +4661,46 @@ DISAS_INSN(fpu)
-     case 0x1f: /* fgetman */
-         gen_helper_getman_FP0(cpu_env);
          break;
--    case 0x20: case 0x60: case 0x64: /* fdiv */
-+    case 0x20: /* fdiv */
-         gen_op_load_fpr_FP1(REG(ext, 7));
-         gen_helper_div_FP0_FP1(cpu_env);
-         break;
-+    case 0x60: /* fsdiv */
-+        gen_op_load_fpr_FP1(REG(ext, 7));
-+        gen_helper_sdiv_FP0_FP1(cpu_env);
-+        break;
-+    case 0x64: /* fddiv */
-+        gen_op_load_fpr_FP1(REG(ext, 7));
-+        gen_helper_ddiv_FP0_FP1(cpu_env);
-+        break;
-     case 0x21: /* fmod */
-         gen_op_load_fpr_FP1(REG(ext, 7));
-         gen_helper_mod_FP0_FP1(cpu_env);
-         break;
--    case 0x22: case 0x62: case 0x66: /* fadd */
-+    case 0x22: /* fadd */
-         gen_op_load_fpr_FP1(REG(ext, 7));
-         gen_helper_add_FP0_FP1(cpu_env);
-         break;
--    case 0x23: case 0x63: case 0x67: /* fmul */
-+    case 0x62: /* fsadd */
-+        gen_op_load_fpr_FP1(REG(ext, 7));
-+        gen_helper_sadd_FP0_FP1(cpu_env);
-+        break;
-+    case 0x66: /* fdadd */
-+        gen_op_load_fpr_FP1(REG(ext, 7));
-+        gen_helper_dadd_FP0_FP1(cpu_env);
-+        break;
-+    case 0x23: /* fmul */
-         gen_op_load_fpr_FP1(REG(ext, 7));
-         gen_helper_mul_FP0_FP1(cpu_env);
-         break;
-+    case 0x63: /* fsmul */
-+        gen_op_load_fpr_FP1(REG(ext, 7));
-+        gen_helper_smul_FP0_FP1(cpu_env);
-+        break;
-+    case 0x67: /* fdmul */
-+        gen_op_load_fpr_FP1(REG(ext, 7));
-+        gen_helper_dmul_FP0_FP1(cpu_env);
-+        break;
-     case 0x24: /* fsgldiv */
-         gen_op_load_fpr_FP1(REG(ext, 7));
-         gen_helper_sgldiv_FP0_FP1(cpu_env);
-@@ -4663,10 +4713,18 @@ DISAS_INSN(fpu)
-         gen_op_load_fpr_FP1(REG(ext, 7));
-         gen_helper_sglmul_FP0_FP1(cpu_env);
-         break;
--    case 0x28: case 0x68: case 0x6c: /* fsub */
-+    case 0x28: /* fsub */
-         gen_op_load_fpr_FP1(REG(ext, 7));
-         gen_helper_sub_FP0_FP1(cpu_env);
-         break;
-+    case 0x68: /* fssub */
-+        gen_op_load_fpr_FP1(REG(ext, 7));
-+        gen_helper_ssub_FP0_FP1(cpu_env);
-+        break;
-+    case 0x6c: /* fdsub */
-+        gen_op_load_fpr_FP1(REG(ext, 7));
-+        gen_helper_dsub_FP0_FP1(cpu_env);
-+        break;
-     case 0x38: /* fcmp */
-         gen_op_load_fpr_FP1(REG(ext, 7));
-         gen_helper_cmp_FP0_FP1(cpu_env);
 -- 
 2.9.3
