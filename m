@@ -1,37 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cYAqo-0000GM-Hn
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:14:29 -0500
+	(envelope-from <groug@kaod.org>) id 1cYAr6-0000Wc-Tj
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:14:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cYAql-00014Z-E4
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:14:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38774
+	(envelope-from <groug@kaod.org>) id 1cYAr3-00016X-Pz
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:14:44 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37381
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cYAql-00014T-9N
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:14:23 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cYAr3-00016L-Je
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:14:41 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0UCEDZQ022492
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:14:23 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28a3d3d8wp-1
+	v0UCEYB3171830
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:14:41 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 289954wvjr-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:14:22 -0500
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:14:36 -0500
 Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 30 Jan 2017 05:14:19 -0700
+	Mon, 30 Jan 2017 05:14:02 -0700
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 30 Jan 2017 13:14:12 +0100
+Date: Mon, 30 Jan 2017 13:13:56 +0100
 In-Reply-To: <148577817618.10533.9740628265078537215.stgit@bahia.lan>
 References: <148577817618.10533.9740628265078537215.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <148577845274.10533.5364955445893182409.stgit@bahia.lan>
-Subject: [Qemu-devel] [PATCH RFC 36/36] 9pfs: local: lremovexattr: don't
+Message-Id: <148577843680.10533.18024708307122210366.stgit@bahia.lan>
+Subject: [Qemu-devel] [PATCH RFC 34/36] 9pfs: local: llistxattr: don't
  follow symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -48,108 +48,66 @@ This fixes CVE-2016-9602 for all security models.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/9pfs/9p-posix-acl.c  |   14 ++++----------
- hw/9pfs/9p-xattr-user.c |   12 +++---------
- hw/9pfs/9p-xattr.c      |    8 +-------
- 3 files changed, 8 insertions(+), 26 deletions(-)
+ hw/9pfs/9p-xattr.c |   30 ++++++++++++++++++++++++------
+ 1 file changed, 24 insertions(+), 6 deletions(-)
 
-diff --git a/hw/9pfs/9p-posix-acl.c b/hw/9pfs/9p-posix-acl.c
-index 0154e2a7605f..73aee0e9d1fa 100644
---- a/hw/9pfs/9p-posix-acl.c
-+++ b/hw/9pfs/9p-posix-acl.c
-@@ -54,14 +54,12 @@ static int mp_pacl_setxattr(FsContext *ctx, const char *path, const char *name,
-                                    flags);
- }
- 
--static int mp_pacl_removexattr(FsContext *ctx,
--                               const char *path, const char *name)
-+static int mp_pacl_removexattr(FsContext *ctx, const char *path,
-+                               const char *name)
- {
-     int ret;
--    char *buffer;
- 
--    buffer = rpath(ctx, path);
--    ret  = lremovexattr(buffer, MAP_ACL_ACCESS);
-+    ret = local_removexattr_nofollow(ctx, MAP_ACL_ACCESS, name);
-     if (ret == -1 && errno == ENODATA) {
-         /*
-          * We don't get ENODATA error when trying to remove a
-@@ -71,7 +69,6 @@ static int mp_pacl_removexattr(FsContext *ctx,
-         errno = 0;
-         ret = 0;
-     }
--    g_free(buffer);
-     return ret;
- }
- 
-@@ -111,10 +108,8 @@ static int mp_dacl_removexattr(FsContext *ctx,
-                                const char *path, const char *name)
- {
-     int ret;
--    char *buffer;
- 
--    buffer = rpath(ctx, path);
--    ret  = lremovexattr(buffer, MAP_ACL_DEFAULT);
-+    ret = local_removexattr_nofollow(ctx, MAP_ACL_DEFAULT, name);
-     if (ret == -1 && errno == ENODATA) {
-         /*
-          * We don't get ENODATA error when trying to remove a
-@@ -124,7 +119,6 @@ static int mp_dacl_removexattr(FsContext *ctx,
-         errno = 0;
-         ret = 0;
-     }
--    g_free(buffer);
-     return ret;
- }
- 
-diff --git a/hw/9pfs/9p-xattr-user.c b/hw/9pfs/9p-xattr-user.c
-index 1840a5db66f3..ec606a4146a7 100644
---- a/hw/9pfs/9p-xattr-user.c
-+++ b/hw/9pfs/9p-xattr-user.c
-@@ -78,12 +78,9 @@ static int mp_user_setxattr(FsContext *ctx, const char *path, const char *name,
-     return local_setxattr_nofollow(ctx, path, name, value, size, flags);
- }
- 
--static int mp_user_removexattr(FsContext *ctx,
--                               const char *path, const char *name)
-+static int mp_user_removexattr(FsContext *ctx, const char *path,
-+                               const char *name)
- {
--    char *buffer;
--    int ret;
--
-     if (strncmp(name, "user.virtfs.", 12) == 0) {
-         /*
-          * Don't allow fetch of user.virtfs namesapce
-@@ -92,10 +89,7 @@ static int mp_user_removexattr(FsContext *ctx,
-         errno = EACCES;
-         return -1;
-     }
--    buffer = rpath(ctx, path);
--    ret = lremovexattr(buffer, name);
--    g_free(buffer);
--    return ret;
-+    return local_removexattr_nofollow(ctx, path, name);
- }
- 
- XattrOperations mapped_user_xattr = {
 diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
-index 053ab6eff692..bbfef248e767 100644
+index 29f4f940a23f..08df02e0bab2 100644
 --- a/hw/9pfs/9p-xattr.c
 +++ b/hw/9pfs/9p-xattr.c
-@@ -331,13 +331,7 @@ int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
- 
- int pt_removexattr(FsContext *ctx, const char *path, const char *name)
- {
--    char *buffer;
--    int ret;
--
--    buffer = rpath(ctx, path);
--    ret = lremovexattr(path, name);
--    g_free(buffer);
--    return ret;
-+    return local_removexattr_nofollow(ctx, path, name);
+@@ -214,6 +214,11 @@ ssize_t pt_listxattr(FsContext *ctx, const char *path,
+     return name_size;
  }
  
- ssize_t notsup_getxattr(FsContext *ctx, const char *path, const char *name,
++static ssize_t flistxattrat(int dirfd, const char *path, char *list,
++                            size_t size)
++{
++    return do_xattrat_op(XATTRAT_OP_LIST, dirfd, path, NULL, list, size, 0);
++}
+ 
+ /*
+  * Get the list and pass to each layer to find out whether
+@@ -223,24 +228,37 @@ ssize_t v9fs_list_xattr(FsContext *ctx, const char *path,
+                         void *value, size_t vsize)
+ {
+     ssize_t size = 0;
+-    char *buffer;
+     void *ovalue = value;
+     XattrOperations *xops;
+     char *orig_value, *orig_value_start;
+     ssize_t xattr_len, parsed_len = 0, attr_len;
++    char *dirpath, *name;
++    int dirfd;
+ 
+     /* Get the actual len */
+-    buffer = rpath(ctx, path);
+-    xattr_len = llistxattr(buffer, value, 0);
++    dirpath = local_dirname(path);
++    dirfd = local_opendir_nofollow(ctx, dirpath);
++    g_free(dirpath);
++    if (dirfd == -1) {
++        return -1;
++    }
++
++    name = local_basename(path);
++    xattr_len = flistxattrat(dirfd, name, value, 0);
+     if (xattr_len <= 0) {
+-        g_free(buffer);
++        g_free(name);
++        close_preserve_errno(dirfd);
+         return xattr_len;
+     }
+ 
+     /* Now fetch the xattr and find the actual size */
+     orig_value = g_malloc(xattr_len);
+-    xattr_len = llistxattr(buffer, orig_value, xattr_len);
+-    g_free(buffer);
++    xattr_len = flistxattrat(dirfd, name, orig_value, xattr_len);
++    g_free(name);
++    close_preserve_errno(dirfd);
++    if (xattr_len < 0) {
++        return -1;
++    }
+ 
+     /* store the orig pointer */
+     orig_value_start = orig_value;
