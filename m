@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brak@gameservers.com>) id 1cYEdE-00010I-Ft
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:16:41 -0500
+	(envelope-from <berto@igalia.com>) id 1cYEua-0006vO-Il
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brak@gameservers.com>) id 1cYEd9-0003pu-Ja
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:16:40 -0500
-Received: from mail2015.choopa.net ([208.167.225.251]:19930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brak@gameservers.com>)
-	id 1cYEd9-0003ou-Dt
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:16:35 -0500
-References: <b44e4a5f-cdc0-f5fd-a25e-f2d5e711d57c@gameservers.com>
-	<20170127093538.GA26553@redhat.com> <20170127180820.GA6273@redhat.com>
-	<20170130105147.GF27325@redhat.com>
-From: Brian Rak <brak@gameservers.com>
-Message-ID: <8bf50f09-5b31-f95d-52bf-5a384f99127e@gameservers.com>
-Date: Mon, 30 Jan 2017 11:16:28 -0500
+	(envelope-from <berto@igalia.com>) id 1cYEuW-0002Kw-MB
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:34:36 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170130161441.30493-1-berto@igalia.com>
+References: <20170130161441.30493-1-berto@igalia.com>
+Date: Mon, 30 Jan 2017 17:34:29 +0100
+Message-ID: <w51vaswzeui.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20170130105147.GF27325@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU websockets support is laggy?
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Optimize the refcount-block overlap
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +22,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
+On Mon 30 Jan 2017 05:14:41 PM CET, Alberto Garcia wrote:
 
+> This patch keeps the index of the last used (i.e. non-zero) entry in
+> the refcount table and updates it every time the table changes. The
+> refcount-block overlap check then uses that index instead of reading
+> the whole table.
 
-On 1/30/2017 5:51 AM, Daniel P. Berrange wrote:
-> On Fri, Jan 27, 2017 at 06:08:20PM +0000, Daniel P. Berrange wrote:
->> On Fri, Jan 27, 2017 at 09:35:38AM +0000, Daniel P. Berrange wrote:
->>> On Tue, Jan 24, 2017 at 05:02:25PM -0500, Brian Rak wrote:
->>>> We've been considering switching over to using qemu's built in websockets
->>>> support (to avoid the overhead of needing websockify running).  We've been
->>>> seeing very poor performance after the switch (it takes the console 4-5
->>>> seconds to update after pressing a key).  So far, I haven't been able to
->>>> find any indication of why this is happening.  The exact same configuration
->>>> works perfectly when running with websockify, but laggy when hitting qemu
->>>> directly.
->>>>
->>>> I've tried a few things (disabling encryption, bypassing our usual nginx
->>>> proxy, even connecting via a ssh tunnel), and haven't made any sort of
->>>> progress here.  Has anyone else seen this?  Any suggestions as to where I
->>>> should start looking?
->>> Can you clarify the exact setup you have ?  As mentioned on IRC, I don't
->>> see any degradation in performance betweeen builtin websockets vs a
->>> websockets proxy - if anything the builtin websockets is marginally less
->>> laggy.  I was connecting over TCP localhost, however, so would not see
->>> any effects of network latency. My test was QEMU git master, with noVNC
->>> git master.
->> It turns out that to see the problem you have a wait a while - the
->> connection is initially fine, but gets worse over time. Using a TCP
->> connection seems to make it get worse more quickly.
->>
->> After a painful debugging session I've discovered the problem is that
->> QEMU is reading data off the socket, decoding a websockets packet and
->> then processing it. The problem is if the read off the socket gets
->> multiple websockets packets at once, it only decodes the first packet.
->> The remaining packets aren't decoded until more data arrives on the
->> socket. This gets progressively worse & worse. I'll send a patch for
->> this next week...
-> I've just sent a patch & would appreciate your testing to confirm that
-> it fixes the problem for you too.
->
-> Regards,
-> Daniel
-Confirmed, with the patch the built in websockets support performs just 
-as well as vnc + websockify.  Thanks for the help!
+Note that while I decided to go for this approach the patch can be made
+much simpler by simply stopping at the first empty entry in the refcount
+table:
+
+    if ((chk & QCOW2_OL_REFCOUNT_BLOCK) && s->refcount_table) {
+        for (i = 0; i < s->refcount_table_size; i++) {
+            if (!(s->refcount_table[i] & REFT_OFFSET_MASK)) {
+                break;
+            }
+            if (overlaps_with(s->refcount_table[i] & REFT_OFFSET_MASK,
+                s->cluster_size)) {
+                return QCOW2_OL_REFCOUNT_BLOCK;
+            }
+        }
+    }
+
+I don't think QEMU produces files where refcount_table[i] == 0 but
+refcount_table[i + 1] != 0. Do they even make sense? In any case, my
+patch would cover those cases too, but this simplified version wouldn't.
+
+Berto
