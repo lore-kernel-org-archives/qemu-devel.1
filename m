@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cY9YT-0005kD-Dt
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:51:26 -0500
+	(envelope-from <berrange@redhat.com>) id 1cY9Yu-0006UN-QL
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:51:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cY9YQ-0002Xw-AI
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:51:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58092)
+	(envelope-from <berrange@redhat.com>) id 1cY9Yt-0003LZ-FI
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:51:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58184)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cY9YQ-0002VB-4a
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:51:22 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cY9Yt-0003K1-9a
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:51:51 -0500
+Date: Mon, 30 Jan 2017 10:51:47 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 30 Jan 2017 10:51:16 +0000
-Message-Id: <20170130105116.29337-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] io: fix decoding when multiple websockets
- frames arrive at once
+Message-ID: <20170130105147.GF27325@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <b44e4a5f-cdc0-f5fd-a25e-f2d5e711d57c@gameservers.com>
+	<20170127093538.GA26553@redhat.com>
+	<20170127180820.GA6273@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170127180820.GA6273@redhat.com>
+Subject: Re: [Qemu-devel] QEMU websockets support is laggy?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,76 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Brian Rak <brak@gameservers.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Brian Rak <brak@gameservers.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-The qio_channel_websock_read_wire() method will read upto 4096
-bytes off the socket and then decode the websockets header and
-payload. The code was only decoding a single websockets frame,
-even if the buffered data contained multiple frames. This meant
-that decoding of subsequent frames was delayed until further
-input arrived on the socket. This backlog of delayed frames
-gets worse & worse over time.
+On Fri, Jan 27, 2017 at 06:08:20PM +0000, Daniel P. Berrange wrote:
+> On Fri, Jan 27, 2017 at 09:35:38AM +0000, Daniel P. Berrange wrote:
+> > On Tue, Jan 24, 2017 at 05:02:25PM -0500, Brian Rak wrote:
+> > > We've been considering switching over to using qemu's built in websockets
+> > > support (to avoid the overhead of needing websockify running).  We've been
+> > > seeing very poor performance after the switch (it takes the console 4-5
+> > > seconds to update after pressing a key).  So far, I haven't been able to
+> > > find any indication of why this is happening.  The exact same configuration
+> > > works perfectly when running with websockify, but laggy when hitting qemu
+> > > directly.
+> > > 
+> > > I've tried a few things (disabling encryption, bypassing our usual nginx
+> > > proxy, even connecting via a ssh tunnel), and haven't made any sort of
+> > > progress here.  Has anyone else seen this?  Any suggestions as to where I
+> > > should start looking?
+> > 
+> > Can you clarify the exact setup you have ?  As mentioned on IRC, I don't
+> > see any degradation in performance betweeen builtin websockets vs a
+> > websockets proxy - if anything the builtin websockets is marginally less
+> > laggy.  I was connecting over TCP localhost, however, so would not see
+> > any effects of network latency. My test was QEMU git master, with noVNC
+> > git master.
+> 
+> It turns out that to see the problem you have a wait a while - the
+> connection is initially fine, but gets worse over time. Using a TCP
+> connection seems to make it get worse more quickly.
+> 
+> After a painful debugging session I've discovered the problem is that
+> QEMU is reading data off the socket, decoding a websockets packet and
+> then processing it. The problem is if the read off the socket gets
+> multiple websockets packets at once, it only decodes the first packet.
+> The remaining packets aren't decoded until more data arrives on the
+> socket. This gets progressively worse & worse. I'll send a patch for
+> this next week...
 
-Symptom was that when connecting to the VNC server via the
-built-in websockets server, mouse/keyboard interaction would
-start out fine, but slowly get more & more delayed until it
-was unusable.
+I've just sent a patch & would appreciate your testing to confirm that
+it fixes the problem for you too.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- io/channel-websock.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
-
-diff --git a/io/channel-websock.c b/io/channel-websock.c
-index e47279a..a06a4a8 100644
---- a/io/channel-websock.c
-+++ b/io/channel-websock.c
-@@ -570,21 +570,24 @@ static ssize_t qio_channel_websock_read_wire(QIOChannelWebsock *ioc,
-         ioc->encinput.offset += ret;
-     }
- 
--    if (ioc->payload_remain == 0) {
--        ret = qio_channel_websock_decode_header(ioc, errp);
-+    while (ioc->encinput.offset != 0) {
-+        if (ioc->payload_remain == 0) {
-+            ret = qio_channel_websock_decode_header(ioc, errp);
-+            if (ret < 0) {
-+                return ret;
-+            }
-+            if (ret == 0) {
-+                ioc->io_eof = TRUE;
-+                break;
-+            }
-+        }
-+
-+        ret = qio_channel_websock_decode_payload(ioc, errp);
-         if (ret < 0) {
-             return ret;
-         }
--        if (ret == 0) {
--            return 0;
--        }
-     }
--
--    ret = qio_channel_websock_decode_payload(ioc, errp);
--    if (ret < 0) {
--        return ret;
--    }
--    return ret;
-+    return 1;
- }
- 
- 
-@@ -642,9 +645,6 @@ static gboolean qio_channel_websock_flush(QIOChannel *ioc,
-         if (ret < 0) {
-             goto cleanup;
-         }
--        if (ret == 0) {
--            wioc->io_eof = TRUE;
--        }
-     }
- 
-  cleanup:
+Regards,
+Daniel
 -- 
-2.9.3
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
