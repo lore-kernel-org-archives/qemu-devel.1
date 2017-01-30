@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cYChz-0001ib-1S
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:13:27 -0500
+	(envelope-from <prvs=1964c29ca=roger.pau@citrix.com>)
+	id 1cYChv-0001fe-Hl
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:13:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cYChv-0008No-42
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:13:27 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36324)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cYChu-0008NQ-U5
+	(envelope-from <prvs=1964c29ca=roger.pau@citrix.com>)
+	id 1cYChr-0008L9-9v
 	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:13:23 -0500
-Received: by mail-wm0-x242.google.com with SMTP id r18so6097457wmd.3
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 06:13:22 -0800 (PST)
-Date: Mon, 30 Jan 2017 14:13:20 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170130141320.GF2118@stefanha-x1.localdomain>
-References: <1485436265-12573-1-git-send-email-thuth@redhat.com>
-	<1485436265-12573-3-git-send-email-thuth@redhat.com>
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:7525
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=1964c29ca=roger.pau@citrix.com>)
+	id 1cYChr-0008Iu-0s
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 09:13:19 -0500
+Date: Mon, 30 Jan 2017 14:13:05 +0000
+From: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Message-ID: <20170130141304.doxmygo677hhhjuj@dhcp-3-221.uk.xensource.com>
+References: <20170124164253.jiva4zvk6fxewtsk@dhcp-3-221.uk.xensource.com>
+	<0b9ad017-4b7f-956c-4b33-8d8cbc16fd66@suse.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5Mfx4RzfBqgnTE/w"
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
-In-Reply-To: <1485436265-12573-3-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/5] checkpatch: check utf-8 content
- from a commit log when it's missing from charset
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0b9ad017-4b7f-956c-4b33-8d8cbc16fd66@suse.com>
+Subject: Re: [Qemu-devel] Commit 3a6c9 breaks QEMU on FreeBSD/Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Juergen Gross <jgross@suse.com>
+Cc: xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
 
+On Fri, Jan 27, 2017 at 12:13:58PM +0100, Juergen Gross wrote:
+> On 24/01/17 17:42, Roger Pau Monné wrote:
+> > Hello,
+> > 
+> > The following commit:
+> > 
+> > commit 3a6c9172ac5951e6dac2b3f6cbce3cfccdec5894
+> > Author: Juergen Gross <jgross@suse.com>
+> > Date:   Tue Nov 22 07:10:58 2016 +0100
+> > 
+> > xen: create qdev for each backend device
+> > 
+> > Prevents me from running QEMU on FreeBSD/Xen, the following is printed on the
+> > QEMU log:
+> > 
+> > char device redirected to /dev/pts/2 (label serial0)
+> > xen be core: xen be core: can't open gnttab device
+> > can't open gnttab device
+> > xen be core: xen be core: can't open gnttab device
+> > can't open gnttab device
+> > 
+> > # xl create -c ~/domain.cfg
+> > Parsing config from /root/domain.cfg
+> > libxl: error: libxl_dm.c:2201:device_model_spawn_outcome: Domain 32:domain 32 device model: spawn failed (rc=-3)
+> > libxl: error: libxl_create.c:1506:domcreate_devmodel_started: Domain 32:device model did not start: -3
+> > libxl: error: libxl_dm.c:2315:kill_device_model: Device Model already exited
+> > libxl: error: libxl.c:1572:libxl__destroy_domid: Domain 32:Non-existant domain
+> > libxl: error: libxl.c:1531:domain_destroy_callback: Domain 32:Unable to destroy guest
+> > libxl: error: libxl.c:1458:domain_destroy_cb: Domain 32:Destruction of domain failed
+> > # cat /var/log/xen/qemu-dm-domain.log
+> > char device redirected to /dev/pts/2 (label serial0)
+> > xen be core: xen be core: can't open gnttab device
+> > can't open gnttab device
+> > xen be core: xen be core: can't open gnttab device
+> > can't open gnttab device
+> > 
+> > I'm not really familiar with any of that code, but I think that using
+> > qdev_init_nofail is wrong, since on FreeBSD/Xen for example we don't yet
+> > support the gnttab device, so initialization of the Xen Qdisk backend can fail
+> > (and possibly the same applies to Linux if someone decides to compile a kernel
+> > without the gnttab device). Yet QEMU can be used without the Qdisk backend.
+> 
+> I don't think this is due to qdev_init_nofail(). As the gnttab related
+> messages are printed _after_ calling qdev_init_nofail() I don't see how
+> it could be related.
+> 
+> I think the error exits of xen_be_get_xendev() are just wrong in using
+> g_free(xendev) instead of qdev_unplug(&xendev->qdev, NULL).
+> 
+> I'll do a test with that modification. Could you test it in parallel?
 
---5Mfx4RzfBqgnTE/w
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, that does indeed fix the issue. If you send the patch please add my
+"Tested-by".
 
-On Thu, Jan 26, 2017 at 02:11:02PM +0100, Thomas Huth wrote:
-> This is a port of the following commit from the Linux kernel:
->=20
-> commit fa64205df9dfd7b7662cc64a7e82115c00e428e5
-> Author: Pasi Savanainen <pasi.savanainen@nixu.com>
-> Date:   Thu Oct 4 17:13:29 2012 -0700
->=20
->     checkpatch: check utf-8 content from a commit log when it's missing f=
-rom charset
->=20
->     Check that a commit log doesn't contain UTF-8 when a mail header
->     explicitly defines a different charset, like
->=20
->     'Content-Type: text/plain; charset=3D"us-ascii"'
->=20
->     Signed-off-by: Pasi Savanainen <pasi.savanainen@nixu.com>
->     Cc: Joe Perches <joe@perches.com>
->     Cc: Andy Whitcroft <apw@canonical.com>
->     Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
->     Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
->=20
-> Note: I slightly updated the regex for the "Content-Type" line check
-> since most of the time, the character set does not seem to be given
-> in quotes.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  scripts/checkpatch.pl | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---5Mfx4RzfBqgnTE/w
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYj0oAAAoJEJykq7OBq3PImngIAKy35UYKQOMiGF/9IzTARaSs
-wKBFBqEP9GsJdZSWkHNvaIgb9jb3AgPFuqdVMUBCMiyPpQktPAID6XPHWmdx+zBu
-hEIhqAqBAX0Su65Hxj4gd9nXov321sJPwMwke/eb/WvyO8bpDC/Uvnu9AIXkoi5+
-aE6zXs9KBuSDLAX+DLah71YKu8s7lW3D0ko/FzP6yFBTPCEUT1vIYSMPy+LiU09i
-QfV3qGuRayOi9Ig+pRLucToJayy67LhtPbEqONwOdzRVGGaDCN0lDZ06kwmSqY7T
-z/Y+QhVGA8cFlfEtUYkUq955goRFYbkr7ptIiYFu+UaPF1rbF6kqccNxB7ve1Gg=
-=0WFd
------END PGP SIGNATURE-----
-
---5Mfx4RzfBqgnTE/w--
+Roger.
