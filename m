@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYIEj-00008c-R4
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:07:40 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cYIMm-0004fy-JD
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:15:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYIEg-0002dB-La
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:07:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57542)
+	(envelope-from <pbonzini@redhat.com>) id 1cYIMi-0005KL-U0
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:15:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59744)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cYIEg-0002cm-FY
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:07:34 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 90FC18EB54
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 20:07:34 +0000 (UTC)
-References: <20170130133954.31353-1-marcandre.lureau@redhat.com>
-	<20170130133954.31353-29-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <521aad2e-e1a7-12f7-40c4-49824b5a9d92@redhat.com>
-Date: Mon, 30 Jan 2017 14:07:32 -0600
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cYIMi-0005K1-Ne
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:15:52 -0500
+References: <20170120164322.21851-1-pbonzini@redhat.com>
+	<20170120164322.21851-2-pbonzini@redhat.com>
+	<20170130151859.GL2118@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <75db602a-4cbe-f75b-9001-2949a99da341@redhat.com>
+Date: Mon, 30 Jan 2017 15:15:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170130133954.31353-29-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="quevfRF4E1NqvjvfgXFxgCFStUsXQOF2B"
-Subject: Re: [Qemu-devel] [PATCH v2 28/41] char: move QIOChannel-related
- stuff to char-io.h
+In-Reply-To: <20170130151859.GL2118@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/17] aio: introduce aio_co_schedule and
+ aio_co_wake
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,61 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---quevfRF4E1NqvjvfgXFxgCFStUsXQOF2B
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
-Message-ID: <521aad2e-e1a7-12f7-40c4-49824b5a9d92@redhat.com>
-Subject: Re: [PATCH v2 28/41] char: move QIOChannel-related stuff to char-io.h
-References: <20170130133954.31353-1-marcandre.lureau@redhat.com>
- <20170130133954.31353-29-marcandre.lureau@redhat.com>
-In-Reply-To: <20170130133954.31353-29-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 01/30/2017 07:39 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  chardev/char-io.h     |  46 ++++++++++++
->  chardev/char-io.c     | 192 ++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  chardev/char.c        | 174 +-----------------------------------------=
----
->  chardev/Makefile.objs |   1 +
->  4 files changed, 240 insertions(+), 173 deletions(-)
->  create mode 100644 chardev/char-io.h
->  create mode 100644 chardev/char-io.c
+
+On 30/01/2017 10:18, Stefan Hajnoczi wrote:
+> On Fri, Jan 20, 2017 at 05:43:06PM +0100, Paolo Bonzini wrote:
+>> diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int=
+.h
+>> index 14d4f1d..1efa356 100644
+>> --- a/include/qemu/coroutine_int.h
+>> +++ b/include/qemu/coroutine_int.h
+>> @@ -40,12 +40,20 @@ struct Coroutine {
+>>      CoroutineEntry *entry;
+>>      void *entry_arg;
+>>      Coroutine *caller;
+>> +
+>> +    /* Only used when the coroutine has terminated.  */
+>>      QSLIST_ENTRY(Coroutine) pool_next;
+>>      size_t locks_held;
 >=20
+> locks_held is used when the coroutine is running.  Please add a newline
+> to separate it from pool_next.
+>=20
+>> =20
+>> -    /* Coroutines that should be woken up when we yield or terminate =
+*/
+>> +    /* Coroutines that should be woken up when we yield or terminate.
+>> +     * Only used when the coroutine is running.
+>> +     */
+>>      QSIMPLEQ_HEAD(, Coroutine) co_queue_wakeup;
+>> +
+>> +    /* Only used when the coroutine is sleeping.  */
+>=20
+> "running", "yielded", and "terminated" are terms with specific meanings=
+.
+> Is "sleeping" a subset of "yielded" where the coroutine is waiting for =
+a
+> mutex or its AioContext to schedule it?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+No, I'll just change it to "has yielded".
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+>> +static void test_multi_co_schedule_entry(void *opaque)
+>=20
+> Missing coroutine_fn.
+>=20
+>> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+>> index d2f529b..cb87997 100644
+>> --- a/tests/test-vmstate.c
+>> +++ b/tests/test-vmstate.c
+>> @@ -33,17 +33,6 @@
+>>  static char temp_file[] =3D "/tmp/vmst.test.XXXXXX";
+>>  static int temp_fd;
+>> =20
+>> -/* Fake yield_until_fd_readable() implementation so we don't have to =
+pull the
+>> - * coroutine code as dependency.
+>> - */
+>> -void yield_until_fd_readable(int fd)
+>> -{
+>> -    fd_set fds;
+>> -    FD_ZERO(&fds);
+>> -    FD_SET(fd, &fds);
+>> -    select(fd + 1, &fds, NULL, NULL, NULL);
+>> -}
+>> -
+>> =20
+>>  /* Duplicate temp_fd and seek to the beginning of the file */
+>>  static QEMUFile *open_test_file(bool write)
+>=20
+> This should be a separate patch.
 
+Yes, it probably doesn't have to be in this series either.
 
---quevfRF4E1NqvjvfgXFxgCFStUsXQOF2B
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYj50EAAoJEKeha0olJ0NqYF0H/38gAXV0KzaZwgcxXF2QihbR
-WLxCcvE3u+3b3MABDGLfMrwmDP8CWPAeJP10pBBrKhZ2NmjyppO7r0v+Dc0G1fke
-GI4c4ZeWvNiKktRgBxzusAR4EuX9D94E2YOX5ICd0ZYeYTUHco0xInRIt5iRfR2J
-AF70260nfWRuxFEaY7V4p2wYcnPA+3JxDBytkFFFHC/K0hdp7b+M7ZqeB7sYlQx6
-uH/a7I5K5svjK5ex0l5QHWe+ZpM0fn/bf+1YR45YGmB1ol9ioY9nU1CNSdMD/+tj
-/xQQJdnxLJzVkLN0uvz9VzT5iB+E1XC2pH8an3HzzDrVA4rdTOZIwHGqof62cQA=
-=R+6B
------END PGP SIGNATURE-----
-
---quevfRF4E1NqvjvfgXFxgCFStUsXQOF2B--
+Paolo
