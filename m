@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cYFBg-0002nN-9B
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:52:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1cYFBq-0002vZ-MZ
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:52:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cYFBf-0008VW-Jz
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:52:16 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170127103922.19658-1-alex.bennee@linaro.org>
-	<20170127103922.19658-9-alex.bennee@linaro.org>
-	<871svlr1od.fsf@gmail.com> <87d1f47tvv.fsf@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <27a34e99-c862-a1c3-1357-9c937914ae10@twiddle.net>
-Date: Mon, 30 Jan 2017 08:52:01 -0800
+	(envelope-from <eblake@redhat.com>) id 1cYFBp-00006z-PG
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 11:52:26 -0500
+References: <20161220191523.5779-1-eblake@redhat.com>
+	<20161220191523.5779-3-eblake@redhat.com>
+	<c251adb7-7269-95f1-66aa-6d2457e5d8f6@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <08d6f722-22b5-5604-46f7-0d1f812756f5@redhat.com>
+Date: Mon, 30 Jan 2017 10:52:18 -0600
 MIME-Version: 1.0
-In-Reply-To: <87d1f47tvv.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 08/25] tcg: drop global lock during TCG
- code execution
+In-Reply-To: <c251adb7-7269-95f1-66aa-6d2457e5d8f6@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="68XhqHMDD6ecTmj8mlgMjG5hxLdxjQX1b"
+Subject: Re: [Qemu-devel] [PATCH v4 2/7] qcow2: Discard/zero clusters by
+ byte count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +26,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Pranith Kumar <bobby.prani@gmail.com>
-Cc: mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:ARM cores" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>
 
-On 01/30/2017 01:57 AM, Alex Bennée wrote:
->>> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
->>> index a9ee7fddf9..2624d8d909 100644
->>> --- a/hw/intc/arm_gicv3_cpuif.c
->>> +++ b/hw/intc/arm_gicv3_cpuif.c
->>> @@ -14,6 +14,7 @@
->>>
->>>  #include "qemu/osdep.h"
->>>  #include "qemu/bitops.h"
->>> +#include "qemu/main-loop.h"
->>>  #include "trace.h"
->>>  #include "gicv3_internal.h"
->>>  #include "cpu.h"
->>> @@ -733,6 +734,8 @@ void gicv3_cpuif_update(GICv3CPUState *cs)
->>>      ARMCPU *cpu = ARM_CPU(cs->cpu);
->>>      CPUARMState *env = &cpu->env;
->>>
->>> +    g_assert(qemu_mutex_iothread_locked());
->>> +
->> tcg_debug_assert()?
-> Depends if KVM can use this for emulation as well (which I think it can).
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--68XhqHMDD6ecTmj8mlgMjG5hxLdxjQX1b
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>
+Message-ID: <08d6f722-22b5-5604-46f7-0d1f812756f5@redhat.com>
+Subject: Re: [PATCH v4 2/7] qcow2: Discard/zero clusters by byte count
+References: <20161220191523.5779-1-eblake@redhat.com>
+ <20161220191523.5779-3-eblake@redhat.com>
+ <c251adb7-7269-95f1-66aa-6d2457e5d8f6@redhat.com>
+In-Reply-To: <c251adb7-7269-95f1-66aa-6d2457e5d8f6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It probably could, but it shouldn't.  Let's not leak tcg_* into hw/.
+On 01/28/2017 02:21 PM, Max Reitz wrote:
+> On 20.12.2016 20:15, Eric Blake wrote:
+>> Passing a byte offset, but sector count, when we ultimately
+>> want to operate on cluster granularity, is madness.  Clean up
+>> the interfaces to take both offset and count as bytes, while
+>> still keeping the assertion added previously that the caller
+>> must align the values to a cluster.  Then rename things to
+>> make sure backports don't get confused by changed units:
+>> instead of qcow2_discard_clusters() and qcow2_zero_clusters(),
+>> we now have qcow2_cluster_discard and qcow2_cluster_zeroize().
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+
+>> +int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+>> +                          uint64_t count, int flags);
+>=20
+> I know byte count parameters are often called "count", but I find it a
+> bit problematic if the function name contains a word that can be a unit=
+=2E
+> In these cases, it's not entirely clear whether "count" refers to bytes=
+
+> or clusters. Maybe "length" or "size" would be better?
+
+Now that you mention it, 'cluster' and 'count' is indeed confusing.  I'm
+leaning towards 'size'.  Do I need to respin, or is that something that
+the maintainer is comfortable tweaking?
+
+>=20
+> Purely subjective and thus optional, of course.
+>=20
+> Another thing: I'm not quite positive whether qcow2_cluster_zeroize()
+> can actually handle a byte count greater than INT_MAX. If you could pas=
+s
+> such a number to it, the multiplication "ret * s->cluster_size" might
+> overflow. It's only caller qcow2_co_pwrite_zeroes() will never exceed
+> that limit, but maybe this should be made clear somewhere -- either by
+> making the parameter an int instead of a uint64_t or by asserting it in=
+
+> the function.
+
+I'd lean towards an assertion, especially since it would be nice to
+someday unify all the internal block interfaces to get to a 64-bit
+interface wherever possible (limiting ourselves to 32-bit is necessary
+for some drivers, like NBD, but that limitation should be enforced via
+proper BlockLimits, rather than by inherent limits in our API).  An
+assertion with 64-bit types is better than yet one more place to audit
+for missing assertions if we use a 32-bit type now and then widen to
+64-bit later.
 
 
-r~
+>> -int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
+>> -    int nb_sectors, enum qcow2_discard_type type, bool full_discard)
+>> +int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
+>> +                          uint64_t count, enum qcow2_discard_type typ=
+e,
+>> +                          bool full_discard)
+>>  {
+>>      BDRVQcow2State *s =3D bs->opaque;
+>> -    uint64_t end_offset;
+>> +    uint64_t end_offset =3D offset + count;
+>>      uint64_t nb_clusters;
+>>      int ret;
+>>
+>> -    end_offset =3D offset + (nb_sectors << BDRV_SECTOR_BITS);
+>> -
+>>      /* Caller must pass aligned values */
+>>      assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+>>      assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size));
+>=20
+> Directly below this we have "offset - end_offset" which could be
+> shortened to "count" (or "length" or "size" or...).
+
+Okay, there's now enough comments that it's worth me respinning a v5.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--68XhqHMDD6ecTmj8mlgMjG5hxLdxjQX1b
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYj29CAAoJEKeha0olJ0NqYDAIAJ3DxZRTg1+2pl2y9jlYiDzC
+N31EBil/Qh8GaPmutFzzMRH0mxDBw+m6iUyHEN9IofL82Wg69+39zCOy4xZ1Q8cW
+6R5LQ2yEWVEOBFX5JYmvp1bsu3sriJ6bLTIERqDiGzhTHhMs1aQ/Bz0Enr/5ZSU8
+owm8dMd4Tiy95af4fXezH88DE+HGLmPYBwP26fVDofR/gc9U4fWaYmiBmNXc/jw0
+rzohLy2DxdvTscK1vJDie2hcQK46EY00j6WqtMvgDs/l33G3ltfNdlLaTHxDGpCL
+FeGgXxu3oGRcj9b5R0Wt1Jl/0OSsih0Aq0P+p5yBg+uqmzmyDBCAAgPBT17Da/4=
+=iblf
+-----END PGP SIGNATURE-----
+
+--68XhqHMDD6ecTmj8mlgMjG5hxLdxjQX1b--
