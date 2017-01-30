@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whitebox@nefkom.net>) id 1cYGwH-0001jW-5B
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:44:29 -0500
+	(envelope-from <keith.busch@intel.com>) id 1cYGyM-0003DU-Q9
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:46:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whitebox@nefkom.net>) id 1cYGwE-0002CV-KH
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:44:29 -0500
-Received: from mail-out.m-online.net ([212.18.0.9]:37264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <whitebox@nefkom.net>) id 1cYGwE-0002BN-Dh
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:44:26 -0500
-From: Andreas Schwab <schwab@linux-m68k.org>
-References: <20170130181634.13934-1-laurent@vivier.eu>
-Date: Mon, 30 Jan 2017 19:44:12 +0100
-In-Reply-To: <20170130181634.13934-1-laurent@vivier.eu> (Laurent Vivier's
-	message of "Mon, 30 Jan 2017 19:16:18 +0100")
-Message-ID: <8737g09ymb.fsf@linux-m68k.org>
+	(envelope-from <keith.busch@intel.com>) id 1cYGyK-0002ae-8l
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 13:46:38 -0500
+Date: Mon, 30 Jan 2017 13:55:22 -0500
+From: Keith Busch <keith.busch@intel.com>
+Message-ID: <20170130185522.GA17997@localhost.localdomain>
+References: <1485800032-24404-1-git-send-email-hch@lst.de>
+	<1485800032-24404-2-git-send-email-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] target-m68k: implement 680x0 FPU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485800032-24404-2-git-send-email-hch@lst.de>
+Subject: Re: [Qemu-devel] [PATCH 1/2] nvme: implement the DSM command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +23,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: Christoph Hellwig <hch@lst.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Jan 30 2017, Laurent Vivier <laurent@vivier.eu> wrote:
+On Mon, Jan 30, 2017 at 07:13:51PM +0100, Christoph Hellwig wrote:
+> Support deallocating of LBAs using the DSM command by wiring it up to
+> the qemu discard implementation.  The other DSM operations which are
+> purely advisory are ignored for now.
+> 
+> Based on an implementation by Keith Busch in the qemu-nvme.git repository,
+> but rewritten to use the qemu AIO infrastructure properly to not block
+> the main thread on discard requests, and cleaned up a little bit.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-> The floatx80 datatype used here is not exactly the same as the
-> one used by 680x0 for its extended precision data type, because
-> normally the signaling bit of 680x0 NAN is the MSB of the mantissa
-> minus one and in floatx80 it is the MSB.
+Thanks for doing this. I've one comment below, but I don't think it should
+block this unless you see a good way to fix it.
 
-An Intel Extended also has a different exponent bias than a Motorola
-Extended in the denormal range.  In other words, for the latter the bias
-doesn't change between normal and denormal numbers.
+Reviewed-by: Keith Busch <keith.busch@intel.com>
 
-Andreas.
+> +    for (i = 0; i < nr; i++) {
+> +        uint64_t slba = le64_to_cpu(range[i].slba);
+> +        uint32_t nlb = le32_to_cpu(range[i].nlb);
+> +
+> +        if (slba + nlb > le64_to_cpu(ns->id_ns.nsze)) {
+> +            return NVME_LBA_RANGE | NVME_DNR;
+> +        }
+> +
+> +        req->aio_inflight++;
+> +        req->aiocb = blk_aio_pdiscard(n->conf.blk, slba << data_shift,
+> +                                      nlb << data_shift, nvme_discard_cb, req);
 
--- 
-Andreas Schwab, schwab@linux-m68k.org
-GPG Key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
-"And now for something completely different."
+Overwriting the request's aiocb here for a multiple ranges is potentially
+a problem if we have to cancel the request later. That scenario is
+extremely unlikely, though, so I don't think it's worth addressing.
