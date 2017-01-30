@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cY9F5-0006WL-Na
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:31:24 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cY9Np-0000yB-1o
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:40:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cY9F1-0002cf-0B
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:31:23 -0500
-Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:35942)
+	(envelope-from <alex.bennee@linaro.org>) id 1cY9Nl-00016l-42
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:40:25 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36945)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cY9F0-0002bV-PX
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:31:18 -0500
-Received: by mail-vk0-x233.google.com with SMTP id t8so212696920vke.3
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 02:31:18 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cY9Nk-00014g-Se
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 05:40:21 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id v77so41377885wmv.0
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 02:40:20 -0800 (PST)
+References: <1465026847-6744-1-git-send-email-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1465026847-6744-1-git-send-email-rth@twiddle.net>
+Date: Mon, 30 Jan 2017 10:40:17 +0000
+Message-ID: <878tps7rvy.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170130064736.9236-1-ppandit@redhat.com>
-References: <20170130064736.9236-1-ppandit@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jan 2017 10:30:57 +0000
-Message-ID: <CAFEAcA9H8NTnHaQEUUbuC0VC4oSfPywWR3aTDzymRc+A84yfrw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] sd: sdhci: check data length during
- dma_memory_read
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] tcg/i386 guest_base improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-stable <qemu-stable@nongnu.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-On 30 January 2017 at 06:47, P J P <ppandit@redhat.com> wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> While doing multi block SDMA transfer in routine
-> 'sdhci_sdma_transfer_multi_blocks', the 's->fifo_buffer' starting
-> index 'begin' and data length 's->data_count' could end up to be same.
-> This could lead to an OOB access issue. Correct transfer data length
-> to avoid it.
->
-> Reported-by: Jiang Xin <jiangxin1@huawei.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/sd/sdhci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index 01fbf22..5bd5ab6 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -536,7 +536,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
->                  boundary_count -= block_size - begin;
->              }
->              dma_memory_read(&address_space_memory, s->sdmasysad,
-> -                            &s->fifo_buffer[begin], s->data_count);
-> +                            &s->fifo_buffer[begin], s->data_count - begin);
->              s->sdmasysad += s->data_count - begin;
->              if (s->data_count == block_size) {
->                  for (n = 0; n < block_size; n++) {
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-stable@nongnu.org
+Richard Henderson <rth@twiddle.net> writes:
 
-thanks
--- PMM
+> The first change does two things: (1) improve bsd-user so that it
+> doesn't continually reload guest_base into a temp register and
+> (2) extract the bulk of the guest_base logic to a routine that
+> is run once at startup.
+>
+> The second change adds segmentation support to 32-bit linux.  There,
+> if we're using a guest base, we can save 3 bytes per memory op by
+> using a segment override.  In addition, if we're using a reserved_va,
+> we can set up the segment such that guest memory references are
+> constrained by the segment.
+>
+> Comments?
+
+I'm not sure how to best review this given its fairly low level
+x86 stuff. Do you have any numbers to show how this improves things?
+
+>
+>
+> r~
+>
+>
+> Richard Henderson (2):
+>   tcg/i386: Reserve register for guest_base if a segment isn't available
+>   tcg/i386: Use segment for 32-bit guest base on linux
+>
+>  tcg/i386/tcg-target.inc.c | 181 +++++++++++++++++++++++++---------------------
+>  1 file changed, 100 insertions(+), 81 deletions(-)
+
+
+--
+Alex Bennée
