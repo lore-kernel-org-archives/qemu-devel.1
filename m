@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cYIMm-0004fy-JD
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:15:58 -0500
+	(envelope-from <den@virtuozzo.com>) id 1cYIWc-0000yP-04
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:26:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cYIMi-0005KL-U0
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:15:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cYIMi-0005K1-Ne
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:15:52 -0500
-References: <20170120164322.21851-1-pbonzini@redhat.com>
-	<20170120164322.21851-2-pbonzini@redhat.com>
-	<20170130151859.GL2118@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <75db602a-4cbe-f75b-9001-2949a99da341@redhat.com>
-Date: Mon, 30 Jan 2017 15:15:51 -0500
+	(envelope-from <den@virtuozzo.com>) id 1cYIWX-0007aM-0J
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:26:06 -0500
+Received: from mail-db5eur01on0091.outbound.protection.outlook.com
+	([104.47.2.91]:27379
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cYIWW-0007a5-BA
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 15:26:00 -0500
+References: <1485782396-22341-1-git-send-email-den@openvz.org>
+	<20170130154749.GJ27325@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <054865b8-9d37-e51c-8f52-30aed490a2e9@openvz.org>
+Date: Mon, 30 Jan 2017 18:52:17 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170130151859.GL2118@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 01/17] aio: introduce aio_co_schedule and
- aio_co_wake
+In-Reply-To: <20170130154749.GJ27325@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] io: ignore case in WebSocket HTTP
+ header #PSBM-57554
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
+
+On 01/30/2017 06:47 PM, Daniel P. Berrange wrote:
+> What is #PSBM-57554 referring to ?  Is that some custom bug tracker
+> you have ? I'm going to drop that unless its something we need to
+> keep
+it must be dropped. Sorry, this is my mistake.
+
+Den
 
 
-
-On 30/01/2017 10:18, Stefan Hajnoczi wrote:
-> On Fri, Jan 20, 2017 at 05:43:06PM +0100, Paolo Bonzini wrote:
->> diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int=
-.h
->> index 14d4f1d..1efa356 100644
->> --- a/include/qemu/coroutine_int.h
->> +++ b/include/qemu/coroutine_int.h
->> @@ -40,12 +40,20 @@ struct Coroutine {
->>      CoroutineEntry *entry;
->>      void *entry_arg;
->>      Coroutine *caller;
->> +
->> +    /* Only used when the coroutine has terminated.  */
->>      QSLIST_ENTRY(Coroutine) pool_next;
->>      size_t locks_held;
->=20
-> locks_held is used when the coroutine is running.  Please add a newline
-> to separate it from pool_next.
->=20
->> =20
->> -    /* Coroutines that should be woken up when we yield or terminate =
-*/
->> +    /* Coroutines that should be woken up when we yield or terminate.
->> +     * Only used when the coroutine is running.
->> +     */
->>      QSIMPLEQ_HEAD(, Coroutine) co_queue_wakeup;
->> +
->> +    /* Only used when the coroutine is sleeping.  */
->=20
-> "running", "yielded", and "terminated" are terms with specific meanings=
-.
-> Is "sleeping" a subset of "yielded" where the coroutine is waiting for =
-a
-> mutex or its AioContext to schedule it?
-
-No, I'll just change it to "has yielded".
-
->> +static void test_multi_co_schedule_entry(void *opaque)
->=20
-> Missing coroutine_fn.
->=20
->> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
->> index d2f529b..cb87997 100644
->> --- a/tests/test-vmstate.c
->> +++ b/tests/test-vmstate.c
->> @@ -33,17 +33,6 @@
->>  static char temp_file[] =3D "/tmp/vmst.test.XXXXXX";
->>  static int temp_fd;
->> =20
->> -/* Fake yield_until_fd_readable() implementation so we don't have to =
-pull the
->> - * coroutine code as dependency.
->> - */
->> -void yield_until_fd_readable(int fd)
->> -{
->> -    fd_set fds;
->> -    FD_ZERO(&fds);
->> -    FD_SET(fd, &fds);
->> -    select(fd + 1, &fds, NULL, NULL, NULL);
->> -}
->> -
->> =20
->>  /* Duplicate temp_fd and seek to the beginning of the file */
->>  static QEMUFile *open_test_file(bool write)
->=20
-> This should be a separate patch.
-
-Yes, it probably doesn't have to be in this series either.
-
-Paolo
+> On Mon, Jan 30, 2017 at 04:19:56PM +0300, Denis V. Lunev wrote:
+>> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>>
+>> According to RFC7230 Section 3.2, header field name is case-insensitive.
+>>
+>> The haystack string length is limited by 4096 bytes by
+>> qio_channel_websock_handshake_read().
+>>
+>> Further, handshake_process() dups and NULL-terminates the string
+>> so it is safe to call non length-limited functions like strcasestr().
+>>
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+>>  io/channel-websock.c | 25 ++++++++++++++-----------
+>>  1 file changed, 14 insertions(+), 11 deletions(-)
+> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+>
+> will add this to my io queue
+>
+> Regards,
+> Daniel
