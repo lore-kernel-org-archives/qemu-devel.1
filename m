@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cYDnQ-0006Ht-GG
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:23:12 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cYDoe-0006w8-MP
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:24:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cYDnL-0000et-Fo
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:23:08 -0500
-References: <20170130145025.26475-1-david@redhat.com>
-	<89891b01-8d50-98ac-c26c-2a769b22b400@weilnetz.de>
-	<CAFEAcA86o3ohxZj0qqHKSxqxmo1mCtwKPa_j78xdO2izynEopA@mail.gmail.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <2d18251c-395e-641e-30d1-e44d7be9c012@weilnetz.de>
-Date: Mon, 30 Jan 2017 16:23:03 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cYDoZ-000192-Mf
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:24:24 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36155)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cYDoZ-00018b-F9
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 10:24:19 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r18so6443354wmd.3
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 07:24:19 -0800 (PST)
+Date: Mon, 30 Jan 2017 15:24:15 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170130152415.GM2118@stefanha-x1.localdomain>
+References: <20170120164322.21851-1-pbonzini@redhat.com>
+	<20170120164322.21851-5-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA86o3ohxZj0qqHKSxqxmo1mCtwKPa_j78xdO2izynEopA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: use "qemu" cpu model in user
- mode
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="rpGc+ACYPE+RMC+Z"
+Content-Disposition: inline
+In-Reply-To: <20170120164322.21851-5-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/17] block: move AioContext and QEMUTimer
+ to libqemuutil
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>, pkg-qemu-devel@lists.alioth.debian.org, qemu-stable <qemu-stable@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha@redhat.com
 
-Am 30.01.2017 um 16:11 schrieb Peter Maydell:
-> On 30 January 2017 at 15:09, Stefan Weil <sw@weilnetz.de> wrote:
->> Am 30.01.2017 um 15:50 schrieb David Hildenbrand:
->>> "any" does not exist, therefore resulting in a misleading error message.
->>>
->>> Reported-by: Stefan Weil <sw@weilnetz.de>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  linux-user/main.c | 2 ++
->>>  1 file changed, 2 insertions(+)
->>>
->>> diff --git a/linux-user/main.c b/linux-user/main.c
->>> index 3004958..e588f58 100644
->>> --- a/linux-user/main.c
->>> +++ b/linux-user/main.c
->>> @@ -4322,6 +4322,8 @@ int main(int argc, char **argv, char **envp)
->>>  # endif
->>>  #elif defined TARGET_SH4
->>>          cpu_model = TYPE_SH7785_CPU;
->>> +#elif defined TARGET_S390X
->>> +        cpu_model = "qemu";
->>>  #else
->>>          cpu_model = "any";
->>>  #endif
->>
->> Thanks.
->>
->> Reviewed-by: Stefan Weil <sw@weilnetz.de>
->>
->> This fix is also needed for Debian's QEMU user emulation.
-> Does it merit a cc: qemu-stable ?
->
-> thanks
-> -- PMM
 
-Yes, of course. Thanks for the reminder - I added that list now as cc.
+--rpGc+ACYPE+RMC+Z
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 20, 2017 at 05:43:09PM +0100, Paolo Bonzini wrote:
+> AioContext is fairly self contained, the only dependency is QEMUTimer but
+> that in turn doesn't need anything else.  So move them out of block-obj-y
+> to avoid introducing a dependency from io/ to block-obj-y.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>         v1->v2: new patch [Daniel]
+>=20
+>  Makefile.objs                       |  5 +---
+>  block/io.c                          | 29 -------------------
+>  stubs/Makefile.objs                 |  2 ++
+>  stubs/linux-aio.c                   | 32 +++++++++++++++++++++
+>  stubs/main-loop.c                   |  8 ++++++
+>  stubs/set-fd-handler.c              | 11 --------
+>  tests/Makefile.include              | 13 ++++-----
+>  util/Makefile.objs                  |  5 +++-
+>  aio-posix.c =3D> util/aio-posix.c     |  0
+>  aio-win32.c =3D> util/aio-win32.c     |  0
+>  util/aiocb.c                        | 55 +++++++++++++++++++++++++++++++=
+++++++
+>  async.c =3D> util/async.c             |  3 +-
+>  qemu-timer.c =3D> util/qemu-timer.c   |  0
+>  thread-pool.c =3D> util/thread-pool.c |  0
+>  14 files changed, 110 insertions(+), 53 deletions(-)
+>  create mode 100644 stubs/linux-aio.c
+>  create mode 100644 stubs/main-loop.c
+>  rename aio-posix.c =3D> util/aio-posix.c (100%)
+>  rename aio-win32.c =3D> util/aio-win32.c (100%)
+>  create mode 100644 util/aiocb.c
+>  rename async.c =3D> util/async.c (99%)
+>  rename qemu-timer.c =3D> util/qemu-timer.c (100%)
+>  rename thread-pool.c =3D> util/thread-pool.c (100%)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--rpGc+ACYPE+RMC+Z
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYj1qfAAoJEJykq7OBq3PIfOIH/jLUEBnjvYdpw6XcWzdYNdgH
+hkQl7QWLakhQre+c2lVjkYeybbUZzz6HZU0P40vwqT8l6GHuCPucz2ygQWkyjeud
+3tSy3LbLl/VbMD5WwS9h+inhcNc1Gpk1BYet0vU2Amp3DFWmtcAnn2LvB+oQ5LqR
+cg0DyJbWTXQtCCywKakHhGG37jJ/BCUvxiglvNR2RPDZmtV8DQDjvdvhu9L0hpst
+fly4UW7vJUm68j17XrxsQU40PTfF+yuMIP0Z6OjF5/VjVD+ZCPpSSuNASqaI/7UN
+DUf7qP/GYjmj/T4k6fl7bGHtj1sBkvP5VJn1yPB2ydU0uYoGK8B0GvbRvAHXUqo=
+=54oi
+-----END PGP SIGNATURE-----
+
+--rpGc+ACYPE+RMC+Z--
