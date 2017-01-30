@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYBVA-000362-O0
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:56:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cYBWf-0004wU-1i
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:57:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYBV9-0002eL-TE
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:56:08 -0500
-Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:35836)
+	(envelope-from <peter.maydell@linaro.org>) id 1cYBWe-0002sN-C6
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:57:41 -0500
+Received: from mail-ua0-x22f.google.com ([2607:f8b0:400c:c08::22f]:34516)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cYBV9-0002eA-On
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:56:07 -0500
-Received: by mail-ua0-x22a.google.com with SMTP id y9so250422713uae.2
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 04:56:07 -0800 (PST)
+	id 1cYBWe-0002sH-8L
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 07:57:40 -0500
+Received: by mail-ua0-x22f.google.com with SMTP id 35so249094333uak.1
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 04:57:40 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1483979087-32663-11-git-send-email-clg@kaod.org>
-References: <1483979087-32663-1-git-send-email-clg@kaod.org>
-	<1483979087-32663-11-git-send-email-clg@kaod.org>
+In-Reply-To: <8d16a464-18c0-feb6-d1dd-1a9e3d8c84aa@redhat.com>
+References: <20170127193504.32290-1-pbonzini@redhat.com>
+	<8d16a464-18c0-feb6-d1dd-1a9e3d8c84aa@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jan 2017 12:55:46 +0000
-Message-ID: <CAFEAcA-6vi3UbSa5naSqbk-JG+UysiwM6TyvqE29VUbswD7MFA@mail.gmail.com>
+Date: Mon, 30 Jan 2017 12:57:19 +0000
+Message-ID: <CAFEAcA9a-eybevVZ2ad3tTD7FfJvUp_eShSx65h8XUtKAUyUEA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/11] aspeed: use first FMC flash as a
- boot ROM
+Subject: Re: [Qemu-devel] [PULL v2 00/41] Misc patches for 2017-01-27
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Marcin Krzeminski <marcin.krzeminski@nokia.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 9 January 2017 at 16:24, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> Create a ROM region, using the default size of the mapping window for
-> the CE0 FMC flash module, and fill it with the flash content.
+On 30 January 2017 at 12:33, Laszlo Ersek <lersek@redhat.com> wrote:
+> Peter,
 >
-> This is a little hacky but until we can boot from a MMIO region, it
-> seems difficult to do anything else.
+> On 01/27/17 20:35, Paolo Bonzini wrote:
+>> The following changes since commit 29ba0cdc1fd1300f910d150c03a0f74236083bf7:
+>>
+>>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-01-27' into staging (2017-01-27 15:20:08 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   git://github.com/bonzini/qemu.git tags/for-upstream
+>>
+>> for you to fetch changes up to 6da67de6803e93cbb7e93ac3497865832f8c00ea:
+>>
+>>   memory: don't sign-extend 32-bit writes (2017-01-27 18:08:00 +0100)
+>>
 >
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Reviewed-by: Joel Stanley <joel@jms.id.au>
-> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-> ---
->  hw/arm/aspeed.c | 41 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 41 insertions(+)
->
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index 40c13838fb2d..a92c2f1c362b 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -20,6 +20,8 @@
->  #include "qemu/log.h"
->  #include "sysemu/block-backend.h"
->  #include "sysemu/blockdev.h"
-> +#include "hw/loader.h"
-> +#include "qemu/error-report.h"
->
->  static struct arm_boot_info aspeed_board_binfo =3D {
->      .board_id =3D -1, /* device-tree-only board */
-> @@ -104,6 +106,28 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
->      },
->  };
->
-> +#define FIRMWARE_ADDR 0x0
-> +
-> +static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_siz=
-e,
-> +                           Error **errp)
-> +{
-> +    BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
-> +    uint8_t *storage;
-> +
-> +    if (rom_size > blk_getlength(blk)) {
-> +        rom_size =3D blk_getlength(blk);
-> +    }
-> +
-> +    storage =3D g_new0(uint8_t, rom_size);
+> Can you please pull this v2?
 
-Hi -- coverity points out that you're not checking for the
-case where blk_getlength() returns negative. (This can happen
-for the case where the BlockBackend represents an insertable
-device like a floppy or cdrom with no medium present.)
-
-Since for aspeed this dinfo always represents a flash device,
-we know this shouldn't happen, so you can just make it a fatal
-error if blk_getlength() doesn't return what you're expecting.
-
-> +    if (blk_pread(blk, 0, storage, rom_size) < 0) {
-> +        error_setg(errp, "failed to read the initial flash content");
-> +        return;
-> +    }
-> +
-> +    rom_add_blob_fixed("aspeed.boot_rom", storage, rom_size, addr);
-> +    g_free(storage);
-> +}
+I am currently processing it, yes. Paolo only sent it to the list
+late on Friday evening, and I don't generally work weekends,
+so it's not like this has been lying around for a long time...
 
 thanks
 -- PMM
