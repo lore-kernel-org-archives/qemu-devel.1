@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYC83-0001W7-S6
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 08:36:24 -0500
+	(envelope-from <clg@kaod.org>) id 1cYCAZ-0002r7-Tn
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 08:38:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYC82-0005N6-VL
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 08:36:19 -0500
-Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:33552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cYC82-0005Mk-PX
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 08:36:18 -0500
-Received: by mail-ua0-x231.google.com with SMTP id i68so249336126uad.0
-	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 05:36:18 -0800 (PST)
+	(envelope-from <clg@kaod.org>) id 1cYCAV-0006AF-SP
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 08:38:55 -0500
+Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:52020)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cYCAV-00069j-Lh
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 08:38:51 -0500
+Received: from player774.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 35CCD9426B
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 14:38:48 +0100 (CET)
+References: <1483979087-32663-1-git-send-email-clg@kaod.org>
+	<1483979087-32663-11-git-send-email-clg@kaod.org>
+	<CAFEAcA-6vi3UbSa5naSqbk-JG+UysiwM6TyvqE29VUbswD7MFA@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3a9e6ba8-5b0c-48de-e0c5-7e2f701bbcba@kaod.org>
+Date: Mon, 30 Jan 2017 14:38:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <2aac246f-995e-d0bf-7d60-eb3b71a01b32@redhat.com>
-References: <20170127193504.32290-1-pbonzini@redhat.com>
-	<8d16a464-18c0-feb6-d1dd-1a9e3d8c84aa@redhat.com>
-	<CAFEAcA9a-eybevVZ2ad3tTD7FfJvUp_eShSx65h8XUtKAUyUEA@mail.gmail.com>
-	<2aac246f-995e-d0bf-7d60-eb3b71a01b32@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jan 2017 13:35:57 +0000
-Message-ID: <CAFEAcA9OfG2OFz149-o_gW1Ages4xwU8_3Js8cPOwt3F4NFufw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 00/41] Misc patches for 2017-01-27
+In-Reply-To: <CAFEAcA-6vi3UbSa5naSqbk-JG+UysiwM6TyvqE29VUbswD7MFA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/11] aspeed: use first FMC flash as a
+ boot ROM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Marcin Krzeminski <marcin.krzeminski@nokia.com>
 
-On 30 January 2017 at 13:29, Laszlo Ersek <lersek@redhat.com> wrote:
-> Yeah I was conflicted whether I should ping you or not... The very first
-> version of the patches goes back to October 2015; I may have gotten
-> over-enthusiastic about the feature being finally merged, and possibly
-> made the wrong call. Sorry.
+>> +#define FIRMWARE_ADDR 0x0
+>> +
+>> +static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_size,
+>> +                           Error **errp)
+>> +{
+>> +    BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+>> +    uint8_t *storage;
+>> +
+>> +    if (rom_size > blk_getlength(blk)) {
+>> +        rom_size = blk_getlength(blk);
+>> +    }
+>> +
+>> +    storage = g_new0(uint8_t, rom_size);
+> 
+> Hi -- coverity points out that you're not checking for the
+> case where blk_getlength() returns negative. (This can happen
+> for the case where the BlockBackend represents an insertable
+> device like a floppy or cdrom with no medium present.)
+> 
+> Since for aspeed this dinfo always represents a flash device,
+> we know this shouldn't happen, so you can just make it a fatal
+> error if blk_getlength() doesn't return what you're expecting.
 
-> It's difficult to ask politely in email... I tend to start with
-> apologizing and various disclaimers, saying "please" and "thank you"
-> profusely, but I've also been told that I should be more "assertive"...
-> Sigh.
->
-> Thank you anyway, and sorry about the poke. It was meant in good faith.
+OK. I will send a fix to improve this routine. 
 
-No problem; I should probably have been a bit clearer that I
-wasn't strongly objecting to being nudged here, merely noting
-that it wasn't really necessary just yet. Sorry for being
-unnecessarily grumpy.
+Thanks,
 
-thanks
--- PMM
+C.
