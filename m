@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58153)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGV-0001Ff-I8
+	id 1cYYGV-0001Fe-Hf
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGR-00008f-Ju
+	id 1cYYGS-00008v-T5
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:31 -0500
-Received: from mail.kernel.org ([198.145.29.136]:39032)
+Received: from mail.kernel.org ([198.145.29.136]:39050)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGR-00008X-AA
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:27 -0500
-Date: Tue, 31 Jan 2017 15:14:22 +0200
+	id 1cYYGS-00008j-M9
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:28 -0500
+Date: Tue, 31 Jan 2017 15:14:24 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485868446-10587-1-git-send-email-mst@redhat.com>
+Message-ID: <1485868446-10587-2-git-send-email-mst@redhat.com>
+References: <1485868446-10587-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 00/21] virtio, vhost, pci: fixes, features
+In-Reply-To: <1485868446-10587-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL v3 01/21] compiler: drop ; after BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +30,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-The following changes since commit ae5045ae5b2bbd8ce1335d1b05f9ecacca83a6=
-cf:
-
-  Merge remote-tracking branch 'remotes/rth/tags/pull-nios-20170124' into=
- staging (2017-01-25 13:30:23 +0000)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to b16127353f6b5ccdbe1e61e48848a83a6d30e640:
-
-  arm: add trailing ; after MISMATCH_CHECK (2017-01-31 15:11:35 +0200)
-
-----------------------------------------------------------------
-virtio, vhost, pci: fixes, features
-
-generic pci root port support
-disable shpc by default
-safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
-fixes and cleanups all over the place
+All users include the trailing ; anyway, let's require that -
+it seems cleaner.
 
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ include/qemu/compiler.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-----------------------------------------------------------------
-Cao jin (3):
-      msix: Follow CODING_STYLE
-      hcd-xhci: check & correct param before using it
-      pci: Convert msix_init() to Error and fix callers
-
-Haozhong Zhang (1):
-      hw/i386: check if nvdimm is enabled before plugging
-
-Jason Wang (1):
-      intel_iommu: fix and simplify size calculation in process_device_io=
-tlb_desc()
-
-Marc-Andr=C3=A9 Lureau (1):
-      vhost-user: delete chardev on cleanup
-
-Marcel Apfelbaum (4):
-      hw/pcie: Introduce a base class for PCI Express Root Ports
-      hw/ioh3420: derive from PCI Express Root Port base class
-      hw/pcie: Introduce Generic PCI Express Root Port
-      hw/pci: disable pci-bridge's shpc by default
-
-Michael S. Tsirkin (10):
-      compiler: drop ; after BUILD_BUG_ON
-      qxl: switch to constants within BUILD_BUG_ON
-      ppc: switch to constants within BUILD_BUG_ON
-      compiler: rework BUG_ON using a struct
-      compiler: expression version of QEMU_BUILD_BUG_ON
-      ARRAY_SIZE: check that argument is an array
-      pci: mark ROMs read-only
-      vhost: skip ROM sections
-      arm: better stub version for MISMATCH_CHECK
-      arm: add trailing ; after MISMATCH_CHECK
-
-Paolo Bonzini (1):
-      virtio: make virtio_should_notify static
-
- default-configs/arm-softmmu.mak    |   1 +
- default-configs/i386-softmmu.mak   |   1 +
- default-configs/x86_64-softmmu.mak |   1 +
- include/hw/compat.h                |   4 +
- include/hw/pci/msix.h              |   5 +-
- include/hw/pci/pci.h               |   1 +
- include/hw/pci/pcie_port.h         |  19 +++++
- include/hw/virtio/virtio.h         |   1 -
- include/qemu/compiler.h            |  11 ++-
- include/qemu/osdep.h               |   9 +-
- target/arm/kvm-consts.h            | 102 +++++++++++-----------
- hw/block/nvme.c                    |   2 +-
- hw/display/qxl.c                   |   9 +-
- hw/i386/intel_iommu.c              |  10 ++-
- hw/i386/pc.c                       |   5 ++
- hw/misc/ivshmem.c                  |   8 +-
- hw/net/e1000e.c                    |   2 +-
- hw/net/rocker/rocker.c             |   4 +-
- hw/net/vmxnet3.c                   |   2 +-
- hw/pci-bridge/gen_pcie_root_port.c |  87 +++++++++++++++++++
- hw/pci-bridge/ioh3420.c            | 121 ++++----------------------
- hw/pci-bridge/pci_bridge_dev.c     |   2 +-
- hw/pci-bridge/pcie_root_port.c     | 171 +++++++++++++++++++++++++++++++=
-++++++
- hw/pci/msix.c                      |  44 ++++++++--
- hw/pci/pci.c                       |   2 +-
- hw/ppc/spapr.c                     |  14 +--
- hw/scsi/megasas.c                  |   4 +-
- hw/usb/hcd-xhci.c                  |  41 +++++----
- hw/vfio/pci.c                      |   8 +-
- hw/virtio/vhost.c                  |   3 +-
- hw/virtio/virtio-pci.c             |   4 +-
- hw/virtio/virtio.c                 |   2 +-
- net/vhost-user.c                   |   3 +
- hw/pci-bridge/Makefile.objs        |   1 +
- 34 files changed, 485 insertions(+), 219 deletions(-)
- create mode 100644 hw/pci-bridge/gen_pcie_root_port.c
- create mode 100644 hw/pci-bridge/pcie_root_port.c
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 157698b..7512082 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -86,7 +86,8 @@
+ #define type_check(t1,t2) ((t1*)0 - (t2*)0)
+ 
+ #define QEMU_BUILD_BUG_ON(x) \
+-    typedef char glue(qemu_build_bug_on__,__LINE__)[(x)?-1:1] __attribute__((unused));
++    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
++        __attribute__((unused))
+ 
+ #if defined __GNUC__
+ # if !QEMU_GNUC_PREREQ(4, 4)
+-- 
+MST
