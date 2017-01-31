@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cYWeA-0004wm-Uu
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:30:52 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cYWlG-0008OT-TD
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:38:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cYWe9-0001m7-Ll
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:30:50 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cYWlG-0003Ti-5L
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:38:10 -0500
+References: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
+	<20170122142959.GA12419@lemon.Home>
+	<ff2fd02a-09ea-a28f-eb6e-e1858efff552@redhat.com>
+	<20170124120957.GC13714@lemon.Home>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
+Date: Tue, 31 Jan 2017 06:37:59 -0500
 MIME-Version: 1.0
-In-Reply-To: <b3cd5e07-6120-0540-cd77-5a0562270bb2@redhat.com>
-References: <20170128035929.10168-1-nirsof@gmail.com>
-	<b3cd5e07-6120-0540-cd77-5a0562270bb2@redhat.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Tue, 31 Jan 2017 13:30:42 +0200
-Message-ID: <CAMr-obs0X=3JjcMhsUsnzddfsUqZHcKdPu-tBBxDLW32pQ-bEA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] qemu-io: Return non-zero exit code
- on failure
+In-Reply-To: <20170124120957.GC13714@lemon.Home>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/3] scsi-generic and
+ BLKSECTGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,90 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>
+To: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mreitz@redhat.com, kwolf@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Mon, Jan 30, 2017 at 6:44 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 01/27/2017 09:59 PM, Nir Soffer wrote:
->> From: Nir Soffer <nsoffer@redhat.com>
->>
->> The result of openfile was not checked, leading to failure deep in the
->> actual command with confusing error message, and exiting with exit code 0.
->>
->
-> When posting a series, please ensure that your messages are all marked
-> In-Reply-To a 0/3 cover letter (it may help if you do 'git config
-> format.coverletter auto').
->
->> Here is a simple example - trying to read with the wrong format:
->>
->>     $ touch file
->>     $ qemu-io -f qcow2 -c 'read -P 1 0 1024' file; echo $?
->>     can't open device file: Image is not in qcow2 format
->>     no file open, try 'help open'
->>     0
->>
->> With this patch, we fail earlier with exit code 1:
->>
->>     $ ./qemu-io -f qcow2 -c 'read -P 1 0 1024' file; echo $?
->>     can't open device file: Image is not in qcow2 format
->>     1
->>
->> Signed-off-by: Nir Soffer <nirsof@gmail.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> Reviewed-by: Fam Zheng <famz@redhat.com>
->> ---
->>
->> Changes since v2:
->> - Adding missing signed-off-by
->> - Fix tests expecting the wrong output
->
-> I don't see any tests changed...
->
->>
->>  qemu-io.c | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> ...in this diffstat.  If something really changed in this particular
-> patch since v2, then you should drop the Reviewed-by lines in order to
-> make sure I re-review it.  Or, if the changes you mention here are to
-> other patches in the series, then the 0/3 cover letter would have been a
-> better place to put that information.
 
-This diffstat is a poor man cover letter,  I'll resend a proper one.
 
->
+On 01/24/2017 07:09 AM, Fam Zheng wrote:
+> On Tue, 01/24 12:23, Paolo Bonzini wrote:
 >>
->> diff --git a/qemu-io.c b/qemu-io.c
->> index 23a229f..427cbae 100644
->> --- a/qemu-io.c
->> +++ b/qemu-io.c
->> @@ -595,13 +595,17 @@ int main(int argc, char **argv)
->>                  exit(1);
->>              }
->>              opts = qemu_opts_to_qdict(qopts, NULL);
->> -            openfile(NULL, flags, writethrough, opts);
->> +            if (openfile(NULL, flags, writethrough, opts)) {
->> +                exit(1);
->> +            }
->>          } else {
->>              if (format) {
->>                  opts = qdict_new();
->>                  qdict_put(opts, "driver", qstring_from_str(format));
->>              }
->> -            openfile(argv[optind], flags, writethrough, opts);
->> +            if (openfile(argv[optind], flags, writethrough, opts)) {
->> +                exit(1);
->> +            }
->>          }
->>      }
->>      command_loop();
 >>
->
-> At any rate, I'm happy with this current patch, even if its presentation
-> in a series is less than ideal, so you can keep my R-b.
->
-> --
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
->
+>> On 22/01/2017 15:29, Fam Zheng wrote:
+>>> On Fri, 01/20 17:25, Eric Farman wrote:
+>>>> Changes:
+>>>>  v2->v3:
+>>>>   - Move byte/sector conversions to patch 2 [Fam Zheng]
+>>>>   - Rename "max_sectors" when holding a byte value [Fam Zheng]
+>>>>  v1->v2:
+>>>>   - Patch 3, make hdev_get_max_transfer_length return bytes [Fam Zheng]
+>>>
+>>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>>
+>> Looks good, who's merging this? :)
+> 
+> All I know is not me :) Adding Kevin and Max who maintain block/file-posix.c.
+> 
+> Fam
+> 
+
+Kevin's traveling for DevConf.cz, so how about Max? :)
