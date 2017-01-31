@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYc1k-0000JX-0j
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:15:33 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cYcGY-0006dH-Hm
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:30:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYc1g-0002Nl-04
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:15:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60156)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cYc1f-0002Ng-Q9
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:15:27 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C69C2C05AA42
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 17:15:27 +0000 (UTC)
-Date: Tue, 31 Jan 2017 17:15:24 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131171524.GB25011@stefanha-x1.localdomain>
-References: <20170126171613.1399-1-stefanha@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1cYcGX-0006ZH-J5
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:30:50 -0500
+Date: Tue, 31 Jan 2017 10:30:44 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170131103044.66316989@t450s.home>
+In-Reply-To: <1485880595-16376-1-git-send-email-thuth@redhat.com>
+References: <1485880595-16376-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cvVnyQ+4j833TQvp"
-Content-Disposition: inline
-In-Reply-To: <20170126171613.1399-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] trace: clean up trace-events files
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/vfio: Add CONFIG switches for
+ calxeda-xgmac and amd-xgbe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org
 
+On Tue, 31 Jan 2017 17:36:35 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
---cvVnyQ+4j833TQvp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Both devices seem to be specific to the ARM platform. It's confusing
+> for the users if they show up on other target architectures, too
+> (e.g. when the user runs QEMU with "-device ?" to get a list of
+> supported devices). Thus let's introduce proper configuration switches
+> so that the devices are only compiled and included when they are
+> really required.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  default-configs/arm-softmmu.mak | 2 ++
+>  hw/vfio/Makefile.objs           | 4 ++--
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 6de3e16..a78be51 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -94,6 +94,8 @@ CONFIG_VERSATILE_PCI=y
+>  CONFIG_VERSATILE_I2C=y
+>  
+>  CONFIG_PCI_GENERIC=y
+> +CONFIG_VFIO_XGMAC=y
+> +CONFIG_VFIO_AMD_XGBE=y
+>  
+>  CONFIG_SDHCI=y
+>  CONFIG_INTEGRATOR_DEBUG=y
+> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+> index c25e32b..05e7fbb 100644
+> --- a/hw/vfio/Makefile.objs
+> +++ b/hw/vfio/Makefile.objs
+> @@ -2,7 +2,7 @@ ifeq ($(CONFIG_LINUX), y)
+>  obj-$(CONFIG_SOFTMMU) += common.o
+>  obj-$(CONFIG_PCI) += pci.o pci-quirks.o
+>  obj-$(CONFIG_SOFTMMU) += platform.o
+> -obj-$(CONFIG_SOFTMMU) += calxeda-xgmac.o
+> -obj-$(CONFIG_SOFTMMU) += amd-xgbe.o
+> +obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+> +obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+>  obj-$(CONFIG_SOFTMMU) += spapr.o
+>  endif
 
-On Thu, Jan 26, 2017 at 05:16:11PM +0000, Stefan Hajnoczi wrote:
-> I noticed that some trace-events files are out of date.  This series fixe=
-s them.
->=20
-> Stefan Hajnoczi (2):
->   qapi: add missing trace_visit_type_enum() call
->   trace: clean up trace-events files
->=20
->  qapi/qapi-visit-core.c  | 1 +
->  block/trace-events      | 2 --
->  hw/block/trace-events   | 1 -
->  hw/display/trace-events | 1 -
->  hw/i386/trace-events    | 1 -
->  hw/input/trace-events   | 2 --
->  hw/intc/trace-events    | 1 -
->  hw/net/trace-events     | 8 --------
->  hw/usb/trace-events     | 1 -
->  hw/vfio/trace-events    | 2 +-
->  migration/trace-events  | 3 ---
->  qapi/trace-events       | 2 +-
->  trace-events            | 1 -
->  13 files changed, 3 insertions(+), 23 deletions(-)
->=20
-> --=20
-> 2.9.3
->=20
+I can't say that I fully agree that this is a good idea.  How many
+users are actually confused by this, versus the benefit of ensuring
+that it builds across all architectures?  Do we want to make platform
+also specific to ARM and spapr specific to ppc64?  Thanks,
 
-Thanks, applied to my tracing tree:
-https://github.com/stefanha/qemu/commits/tracing
-
-Stefan
-
---cvVnyQ+4j833TQvp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYkMYsAAoJEJykq7OBq3PIzy4H/irxHWQkXJKjwy2FOGRMHNHx
-1qyzQD6cAIjExeju90MaBdtcTYdqkLnhx3UIUg7QRUlhdGRihrBOBP3PU9pBq5Yg
-jMDmrXhdyjsz1I1jcnINshgp10dprm8eWoqwDZAXz0FiYfQurw9jr90BHz/l1v9W
-oAD6dvbNCILfDrzm5S67bppFAyu9KhXBAy6PF4nmnT5zLyi/epPBGE3rCtioW9Z9
-tX44SZMUL0BiQyHLerqva1l3cbyG5C9xAH0fpPqmwEdCVVgKcx1LhoikdJNBomAf
-mi+pGV+YjOHqNP4io2FK3IULVe3ZcFr8Bq8bDRuwfXkfNMeOWQZTLMJxKghq92Q=
-=vPUN
------END PGP SIGNATURE-----
-
---cvVnyQ+4j833TQvp--
+Alex
