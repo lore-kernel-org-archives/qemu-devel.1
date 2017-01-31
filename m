@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYZy1-0005Yg-6J
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:03:33 -0500
+	(envelope-from <mfabian@redhat.com>) id 1cYYDL-0007ZO-SP
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:11:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYZxy-0006KV-5G
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:03:33 -0500
-Date: Tue, 31 Jan 2017 15:03:19 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131150319.GS18804@stefanha-x1.localdomain>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-14-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <mfabian@redhat.com>) id 1cYYDH-0007aV-U3
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:11:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53732)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mfabian@redhat.com>) id 1cYYDH-0007aC-Lx
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:11:11 -0500
+From: Mike FABIAN <mfabian@redhat.com>
+References: <20170131100945.8189-1-kwolf@redhat.com>
+	<w51mve7o4n1.fsf@maestria.local.igalia.com>
+Date: Tue, 31 Jan 2017 14:11:07 +0100
+In-Reply-To: <w51mve7o4n1.fsf@maestria.local.igalia.com> (Alberto Garcia's
+	message of "Tue, 31 Jan 2017 12:22:42 +0100")
+Message-ID: <s9dlgtr8jdg.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zu8lIfFVzXMVnfzp"
-Content-Disposition: inline
-In-Reply-To: <1482503344-6424-14-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 13/21] coroutine: add
- qemu_coroutine_add_next
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] gtk: Hardcode LC_CTYPE as C.utf-8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, kraxel@redhat.com
 
+Alberto Garcia <berto@igalia.com> =E3=81=95=E3=82=93=E3=81=AF=E3=81=8B=E3=
+=81=8D=E3=81=BE=E3=81=97=E3=81=9F:
 
---zu8lIfFVzXMVnfzp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Tue 31 Jan 2017 11:09:45 AM CET, Kevin Wolf <kwolf@redhat.com> wrote=
+:
+>
+>> Recently, however, glibc introduced a new locale "C.utf-8" that just
+>> uses UTF-8 as its charset, but otherwise leaves the semantics alone.
+>> Just setting the right character set is enough for our use case, so we
+>> can just hardcode this one without having to be afraid of nasty side
+>> effects.
+>
+>>     setlocale(LC_MESSAGES, "");
+>> +   setlocale(LC_CTYPE, "C.utf-8");
+>>     bindtextdomain("qemu", CONFIG_QEMU_LOCALEDIR);
+>
+> A couple of quick questions:
+>
+> - Is it C.utf-8 or C.UTF-8 ? 'locale -a' shows only the latter in my
+>   system.
 
-On Fri, Dec 23, 2016 at 05:28:56PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Simple add coroutine to self->co_queue_wakeup.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/qemu/coroutine.h | 2 ++
->  util/qemu-coroutine.c    | 7 +++++++
->  2 files changed, 9 insertions(+)
->=20
-> diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-> index e6a60d5..6e87c87 100644
-> --- a/include/qemu/coroutine.h
-> +++ b/include/qemu/coroutine.h
-> @@ -226,4 +226,6 @@ void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QE=
-MUClockType type,
->   */
->  void coroutine_fn yield_until_fd_readable(int fd);
-> =20
-> +void qemu_coroutine_add_next(Coroutine *next);
+Both work:
 
-Missing coroutine_fn.
+mfabian@taka:~
+$ LC_ALL=3DC.utf-8 strace -eopen ls 2>&1 |  grep LC_CTYPE
+open("/usr/lib/locale/C.utf-8/LC_CTYPE", O_RDONLY|O_CLOEXEC) =3D -1 ENOEN=
+T (No such file or directory)
+open("/usr/lib/locale/C.utf8/LC_CTYPE", O_RDONLY|O_CLOEXEC) =3D 3
+mfabian@taka:~
+$ LC_ALL=3DC.UTF-8 strace -eopen ls 2>&1 |  grep LC_CTYPE
+open("/usr/lib/locale/C.UTF-8/LC_CTYPE", O_RDONLY|O_CLOEXEC) =3D -1 ENOEN=
+T (No such file or directory)
+open("/usr/lib/locale/C.utf8/LC_CTYPE", O_RDONLY|O_CLOEXEC) =3D 3
+mfabian@taka:~
+$ LC_ALL=3DC.UTF8 strace -eopen ls 2>&1 |  grep LC_CTYPE
+open("/usr/lib/locale/C.UTF8/LC_CTYPE", O_RDONLY|O_CLOEXEC) =3D -1 ENOENT=
+ (No such file or directory)
+open("/usr/lib/locale/C.utf8/LC_CTYPE", O_RDONLY|O_CLOEXEC) =3D 3
+mfabian@taka:~
+$ LC_ALL=3DC.utf8 strace -eopen ls 2>&1 |  grep LC_CTYPE
+open("/usr/lib/locale/C.utf8/LC_CTYPE", O_RDONLY|O_CLOEXEC) =3D 3
+mfabian@taka:~
+$=20
 
-Please add a doc comment and a testcase in tests/test-coroutine.c.
+I like C.UTF-8 because =E2=80=9CUTF-8=E2=80=9D is the official spelling
+of that encoding:
 
---zu8lIfFVzXMVnfzp
-Content-Type: application/pgp-signature; name="signature.asc"
+https://en.wikipedia.org/wiki/UTF-8#Official_name_and_variants
 
------BEGIN PGP SIGNATURE-----
+Using =E2=80=9CC.utf8=E2=80=9D uses one stat less though because it is th=
+e last
+fallback, as you can see in the strace.
 
-iQEcBAEBAgAGBQJYkKc3AAoJEJykq7OBq3PIYcUIAKkUBQra9tz/Iyl5VQogIO/T
-pKOICVd2X49S2u/Y/J/VxfJmapEN1x+cDPEkge1xz5oyuRHA2iaXR1ZWyiHxJri3
-XC+qrS0PWqsNdxRpzqDSIoW6V+Dv9/+GrQmZfYLXrKE8Dv0evxQEaPpQgG88Qv3L
-dEq6yV+I6gIoOUzm/6oVCizEyzSD5JU22ce1pXS9T5yuYE4cbbxobLwowg/ErHBm
-EbknCPxkulT5FyzNG9K1SZ1TUsWWKqWOUF1dRWMJQvBc9S6pKEWE6qSgJtcdqPKn
-duetjhqkITy6IHy1oz7IJH/XqDdsJLfo+M+eIhkj6Ckjpj7sucDiTpGmd22OjF4=
-=33YJ
------END PGP SIGNATURE-----
+> - When was this added? This bug seems to be still open:
+>   https://sourceware.org/bugzilla/show_bug.cgi?id=3D17318
 
---zu8lIfFVzXMVnfzp--
+Fedora has it since Fedora 24 (spring 2016), Debian for a while longer.
+
+I=E2=80=99ll ping again to get it included upstream.
+
+It needs 1.5MB at runtime only because of
+
+https://sourceware.org/bugzilla/show_bug.cgi?id=3D18978
+
+as soon as that sorting bug is fixed, the C.UTF-8 locale will need
+less than 200k.
+
+> Berto
+
+--=20
+Mike FABIAN <mfabian@redhat.com>
+=E7=9D=A1=E7=9C=A0=E4=B8=8D=E8=B6=B3=E3=81=AF=E3=81=84=E3=81=84=E4=BB=95=E4=
+=BA=8B=E3=81=AE=E6=95=B5=E3=81=A0=E3=80=82
