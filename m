@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbCk-0000h9-Ce
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:54 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbCr-0000kc-Nd
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbCj-00018U-BB
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57874)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbCq-00019Z-Ln
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:28097)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cYbCj-00017s-1o
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:49 -0500
+	id 1cYbCq-00019M-Fj
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:56 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 31 Jan 2017 20:21:01 +0400
-Message-Id: <20170131162122.29408-21-marcandre.lureau@redhat.com>
+Date: Tue, 31 Jan 2017 20:21:03 +0400
+Message-Id: <20170131162122.29408-23-marcandre.lureau@redhat.com>
 In-Reply-To: <20170131162122.29408-1-marcandre.lureau@redhat.com>
 References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/41] char: move to chardev/
+Subject: [Qemu-devel] [PULL 22/41] char: make null_chr_write() the default
+ method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +31,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The following commits will split char.c in several files. Let's put them
-in a subdirectory.
+All chardev must implement chr_write(), but parallel and null chardev
+both use null_chr_write(). Move it to the base class, so we don't need
+to export the function when splitting the chardev in respective files.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qemu-char.c =3D> chardev/char.c | 0
- MAINTAINERS                   | 2 +-
- Makefile.objs                 | 2 +-
- chardev/Makefile.objs         | 1 +
- tests/Makefile.include        | 8 +++++---
- 5 files changed, 8 insertions(+), 5 deletions(-)
- rename qemu-char.c =3D> chardev/char.c (100%)
- create mode 100644 chardev/Makefile.objs
+ chardev/char.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/qemu-char.c b/chardev/char.c
-similarity index 100%
-rename from qemu-char.c
-rename to chardev/char.c
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5efd8cc671..497ca54627 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1196,7 +1196,7 @@ Character device backends
- M: Paolo Bonzini <pbonzini@redhat.com>
- M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
- S: Maintained
--F: qemu-char.c
-+F: chardev/
- F: backends/msmouse.c
- F: backends/testdev.c
+diff --git a/chardev/char.c b/chardev/char.c
+index 15f4a853bc..ee6ceb3471 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -522,6 +522,18 @@ static void char_init(Object *obj)
+     qemu_mutex_init(&chr->chr_write_lock);
+ }
 =20
-diff --git a/Makefile.objs b/Makefile.objs
-index 01cef866e4..cad4c54740 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -51,7 +51,7 @@ common-obj-$(CONFIG_POSIX) +=3D os-posix.o
- common-obj-$(CONFIG_LINUX) +=3D fsdev/
++static int null_chr_write(Chardev *chr, const uint8_t *buf, int len)
++{
++    return len;
++}
++
++static void char_class_init(ObjectClass *oc, void *data)
++{
++    ChardevClass *cc =3D CHARDEV_CLASS(oc);
++
++    cc->chr_write =3D null_chr_write;
++}
++
+ static void char_finalize(Object *obj)
+ {
+     Chardev *chr =3D CHARDEV(obj);
+@@ -545,13 +557,9 @@ static const TypeInfo char_type_info =3D {
+     .instance_finalize =3D char_finalize,
+     .abstract =3D true,
+     .class_size =3D sizeof(ChardevClass),
++    .class_init =3D char_class_init,
+ };
 =20
- common-obj-y +=3D migration/
--common-obj-y +=3D qemu-char.o #aio.o
-+common-obj-y +=3D chardev/ #aio.o
- common-obj-y +=3D page_cache.o
+-static int null_chr_write(Chardev *chr, const uint8_t *buf, int len)
+-{
+-    return len;
+-}
+-
+ static void null_chr_open(Chardev *chr,
+                           ChardevBackend *backend,
+                           bool *be_opened,
+@@ -565,7 +573,6 @@ static void char_null_class_init(ObjectClass *oc, voi=
+d *data)
+     ChardevClass *cc =3D CHARDEV_CLASS(oc);
 =20
- common-obj-$(CONFIG_SPICE) +=3D spice-qemu-char.o
-diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-new file mode 100644
-index 0000000000..3fc5539518
---- /dev/null
-+++ b/chardev/Makefile.objs
-@@ -0,0 +1 @@
-+common-obj-y +=3D char.o
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 33b4f88746..2145b9877d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -9,7 +9,7 @@ SYSEMU_TARGET_LIST :=3D $(subst -softmmu.mak,,$(notdir \
- check-unit-y =3D tests/check-qdict$(EXESUF)
- gcov-files-check-qdict-y =3D qobject/qdict.c
- check-unit-y +=3D tests/test-char$(EXESUF)
--gcov-files-check-qdict-y =3D qemu-char.c
-+gcov-files-check-qdict-y =3D chardev/char.c
- check-unit-y +=3D tests/check-qfloat$(EXESUF)
- gcov-files-check-qfloat-y =3D qobject/qfloat.c
- check-unit-y +=3D tests/check-qint$(EXESUF)
-@@ -510,7 +510,8 @@ tests/check-qjson$(EXESUF): tests/check-qjson.o $(tes=
-t-util-obj-y)
- tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-q=
-om-obj-y)
- tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-qom=
--obj-y)
+     cc->open =3D null_chr_open;
+-    cc->chr_write =3D null_chr_write;
+ }
 =20
--tests/test-char$(EXESUF): tests/test-char.o qemu-char.o qemu-timer.o $(t=
-est-util-obj-y) $(qtest-obj-y) $(test-block-obj-y)
-+tests/test-char$(EXESUF): tests/test-char.o chardev/char.o qemu-timer.o =
-\
-+	$(test-util-obj-y) $(qtest-obj-y) $(test-block-obj-y)
- tests/test-coroutine$(EXESUF): tests/test-coroutine.o $(test-block-obj-y=
-)
- tests/test-aio$(EXESUF): tests/test-aio.o $(test-block-obj-y)
- tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
-@@ -703,7 +704,8 @@ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-=
-test.o $(libqos-usb-obj-y)
- tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb=
--obj-y)
- tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
- tests/postcopy-test$(EXESUF): tests/postcopy-test.o
--tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o qemu-char.o qemu=
--timer.o $(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-=
-pc-obj-y)
-+tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o chardev/char.o q=
-emu-timer.o \
-+	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-=
-y)
- tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket=
-_scm_helper.o
- tests/test-qemu-opts$(EXESUF): tests/test-qemu-opts.o $(test-util-obj-y)
- tests/test-write-threshold$(EXESUF): tests/test-write-threshold.o $(test=
--block-obj-y)
+ static const TypeInfo char_null_type_info =3D {
+@@ -4712,10 +4719,8 @@ static void char_parallel_class_init(ObjectClass *=
+oc, void *data)
+     cc->parse =3D qemu_chr_parse_parallel;
+     cc->open =3D qmp_chardev_open_parallel;
+ #if defined(__linux__)
+-    cc->chr_write =3D null_chr_write;
+     cc->chr_ioctl =3D pp_ioctl;
+ #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__D=
+ragonFly__)
+-    cc->chr_write =3D null_chr_write;
+     cc->chr_ioctl =3D pp_ioctl;
+ #endif
+ }
 --=20
 2.11.0.295.gd7dffce1c.dirty
