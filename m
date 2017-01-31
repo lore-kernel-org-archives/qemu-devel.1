@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cYXHe-0000Hc-Co
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:11:42 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cYXMO-0003JK-Uc
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:16:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cYXHZ-00027B-Pf
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:11:38 -0500
-Resent-Message-Id: <E1cYXHZ-00027B-Pf@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21328)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cYXHZ-000270-Fz
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:11:33 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170131115913.6828.12266.stgit@PASHA-ISP>
-Message-ID: <148586468644.33.894043856547178057@eba24e3a0d7f>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cYXMN-0003CZ-Tz
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:16:32 -0500
+Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:33227)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cYXMN-0003CT-M9
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:16:31 -0500
+Received: by mail-yb0-x241.google.com with SMTP id 123so29508408ybe.0
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 04:16:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 31 Jan 2017 04:11:27 -0800 (PST)
+References: <20170131115913.6828.12266.stgit@PASHA-ISP>
+In-Reply-To: <20170131115913.6828.12266.stgit@PASHA-ISP>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 31 Jan 2017 12:16:20 +0000
+Message-ID: <CAJ+F1CKUVDvnyhOT6XR1=bQL8ia9GCUBx=0xotGCBmojtR6XSg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] audio: make audio poll timer deterministic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,36 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pavel.dovgaluk@ispras.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com
+To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, kraxel@redhat.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGF1ZGlvOiBtYWtlIGF1ZGlvIHBvbGwgdGltZXIg
-ZGV0ZXJtaW5pc3RpYwpNZXNzYWdlLWlkOiAyMDE3MDEzMTExNTkxMy42ODI4LjEyMjY2LnN0Z2l0
-QFBBU0hBLUlTUAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
-bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
-dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
-ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
-b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
-CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
-ZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAxMzExMTU5MTMuNjgyOC4xMjI2
-Ni5zdGdpdEBQQVNIQS1JU1AgLT4gcGF0Y2hldy8yMDE3MDEzMTExNTkxMy42ODI4LjEyMjY2LnN0
-Z2l0QFBBU0hBLUlTUApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjljN2FjNTMgYXVk
-aW86IG1ha2UgYXVkaW8gcG9sbCB0aW1lciBkZXRlcm1pbmlzdGljCgo9PT0gT1VUUFVUIEJFR0lO
-ID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGF1ZGlvOiBtYWtlIGF1ZGlvIHBvbGwgdGltZXIgZGV0
-ZXJtaW5pc3RpYy4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5h
-bWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMyMzogRklMRTogYXVkaW8vYXVkaW8uYzoxMTE2
-OgorICAgICAgICAgICAgdGltZXJfbW9kIChzLT50cywKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMTIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QGZyZWVsaXN0cy5vcmc=
+Hi
+
+On Tue, Jan 31, 2017 at 4:03 PM Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+wrote:
+
+> This patch changes resetting strategy of the audio polling timer.
+> It does not change expiration time if the timer is already set.
+>
+>
+You describe the change, but could you explain the reasons you propose it?
+
+
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> ---
+>  audio/audio.c |    6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/audio/audio.c b/audio/audio.c
+> index c845a44..1ee95a5 100644
+> --- a/audio/audio.c
+> +++ b/audio/audio.c
+> @@ -1112,8 +1112,10 @@ static int audio_is_timer_needed (void)
+>  static void audio_reset_timer (AudioState *s)
+>  {
+>      if (audio_is_timer_needed ()) {
+> -        timer_mod (s->ts,
+> -            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
+> +        if (!timer_pending(s->ts)) {
+> +            timer_mod (s->ts,
+> +                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+> conf.period.ticks);
+> +        }
+>      }
+>      else {
+>          timer_del (s->ts);
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
