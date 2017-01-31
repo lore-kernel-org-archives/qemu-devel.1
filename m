@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYeue-0004km-VF
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:20:29 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cYf7x-0001yh-32
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:34:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYeud-0004bU-EJ
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:20:24 -0500
-Date: Tue, 31 Jan 2017 22:20:09 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485893872-26524-23-git-send-email-mst@redhat.com>
-References: <1485893872-26524-1-git-send-email-mst@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485893872-26524-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v5 22/22] arm: add trailing ;
- after MISMATCH_CHECK
+	(envelope-from <kraxel@redhat.com>) id 1cYf7t-0007pA-5N
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:34:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60734)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cYf7s-0007p2-S7
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:34:05 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EBDE2155E4
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 20:34:03 +0000 (UTC)
+Message-ID: <1485894840.1076.45.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 31 Jan 2017 21:34:00 +0100
+In-Reply-To: <1485788877-3823-1-git-send-email-abologna@redhat.com>
+References: <1485788877-3823-1-git-send-email-abologna@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] q35: Provide improved sample configurations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,170 +32,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: qemu-devel@nongnu.org, drjones@redhat.com
 
-Macro calls without a trailing ; look weird in C, this works as a side
-effect of how QEMU_BUILD_BUG_ON is implemented. Fix this up.
+  Hi,
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/kvm-consts.h | 98 ++++++++++++++++++++++++-------------------------
- 1 file changed, 49 insertions(+), 49 deletions(-)
+> Both configuration file are full commented, neatly
+> organized, and use paravirtualized devices instead of
+> emulated devices whenever possible for a better user
+> experience. Moreover, they follow the PCI Express
+> Guidelines (docs/pcie.txt) for their topology.
+> ---
+> I plan to provide similar sample configurations for
+> aarch64/virt guests once the generic PCIe Root Ports
+> have been merged.
+>=20
+>  docs/q35-chipset.cfg   | 152 -------------------------------------------=
+-----
 
-diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
-index 06b6c92..aad2825 100644
---- a/target/arm/kvm-consts.h
-+++ b/target/arm/kvm-consts.h
-@@ -33,12 +33,12 @@
- #define CP_REG_ARM             0x4000000000000000ULL
- #define CP_REG_ARCH_MASK       0xff00000000000000ULL
- 
--MISMATCH_CHECK(CP_REG_SIZE_SHIFT, KVM_REG_SIZE_SHIFT)
--MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK)
--MISMATCH_CHECK(CP_REG_SIZE_U32, KVM_REG_SIZE_U32)
--MISMATCH_CHECK(CP_REG_SIZE_U64, KVM_REG_SIZE_U64)
--MISMATCH_CHECK(CP_REG_ARM, KVM_REG_ARM)
--MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK)
-+MISMATCH_CHECK(CP_REG_SIZE_SHIFT, KVM_REG_SIZE_SHIFT);
-+MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK);
-+MISMATCH_CHECK(CP_REG_SIZE_U32, KVM_REG_SIZE_U32);
-+MISMATCH_CHECK(CP_REG_SIZE_U64, KVM_REG_SIZE_U64);
-+MISMATCH_CHECK(CP_REG_ARM, KVM_REG_ARM);
-+MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK);
- 
- #define QEMU_PSCI_0_1_FN_BASE 0x95c1ba5e
- #define QEMU_PSCI_0_1_FN(n) (QEMU_PSCI_0_1_FN_BASE + (n))
-@@ -47,10 +47,10 @@ MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK)
- #define QEMU_PSCI_0_1_FN_CPU_ON QEMU_PSCI_0_1_FN(2)
- #define QEMU_PSCI_0_1_FN_MIGRATE QEMU_PSCI_0_1_FN(3)
- 
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_SUSPEND, KVM_PSCI_FN_CPU_SUSPEND)
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_OFF, KVM_PSCI_FN_CPU_OFF)
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_ON, KVM_PSCI_FN_CPU_ON)
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE)
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_SUSPEND, KVM_PSCI_FN_CPU_SUSPEND);
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_OFF, KVM_PSCI_FN_CPU_OFF);
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_ON, KVM_PSCI_FN_CPU_ON);
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE);
- 
- #define QEMU_PSCI_0_2_FN_BASE 0x84000000
- #define QEMU_PSCI_0_2_FN(n) (QEMU_PSCI_0_2_FN_BASE + (n))
-@@ -77,13 +77,13 @@ MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE)
- #define QEMU_PSCI_0_2_FN64_AFFINITY_INFO QEMU_PSCI_0_2_FN64(4)
- #define QEMU_PSCI_0_2_FN64_MIGRATE QEMU_PSCI_0_2_FN64(5)
- 
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_SUSPEND, PSCI_0_2_FN_CPU_SUSPEND)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_OFF, PSCI_0_2_FN_CPU_OFF)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_ON, PSCI_0_2_FN_CPU_ON)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_MIGRATE, PSCI_0_2_FN_MIGRATE)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_SUSPEND, PSCI_0_2_FN64_CPU_SUSPEND)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_ON, PSCI_0_2_FN64_CPU_ON)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE)
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_SUSPEND, PSCI_0_2_FN_CPU_SUSPEND);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_OFF, PSCI_0_2_FN_CPU_OFF);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_ON, PSCI_0_2_FN_CPU_ON);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_MIGRATE, PSCI_0_2_FN_MIGRATE);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_SUSPEND, PSCI_0_2_FN64_CPU_SUSPEND);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_ON, PSCI_0_2_FN64_CPU_ON);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE);
- 
- /* PSCI v0.2 return values used by TCG emulation of PSCI */
- 
-@@ -93,9 +93,9 @@ MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE)
- /* We implement version 0.2 only */
- #define QEMU_PSCI_0_2_RET_VERSION_0_2                       2
- 
--MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP)
-+MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP);
- MISMATCH_CHECK(QEMU_PSCI_0_2_RET_VERSION_0_2,
--               (PSCI_VERSION_MAJOR(0) | PSCI_VERSION_MINOR(2)))
-+               (PSCI_VERSION_MAJOR(0) | PSCI_VERSION_MINOR(2)));
- 
- /* PSCI return values (inclusive of all PSCI versions) */
- #define QEMU_PSCI_RET_SUCCESS                     0
-@@ -108,15 +108,15 @@ MISMATCH_CHECK(QEMU_PSCI_0_2_RET_VERSION_0_2,
- #define QEMU_PSCI_RET_NOT_PRESENT                 -7
- #define QEMU_PSCI_RET_DISABLED                    -8
- 
--MISMATCH_CHECK(QEMU_PSCI_RET_SUCCESS, PSCI_RET_SUCCESS)
--MISMATCH_CHECK(QEMU_PSCI_RET_NOT_SUPPORTED, PSCI_RET_NOT_SUPPORTED)
--MISMATCH_CHECK(QEMU_PSCI_RET_INVALID_PARAMS, PSCI_RET_INVALID_PARAMS)
--MISMATCH_CHECK(QEMU_PSCI_RET_DENIED, PSCI_RET_DENIED)
--MISMATCH_CHECK(QEMU_PSCI_RET_ALREADY_ON, PSCI_RET_ALREADY_ON)
--MISMATCH_CHECK(QEMU_PSCI_RET_ON_PENDING, PSCI_RET_ON_PENDING)
--MISMATCH_CHECK(QEMU_PSCI_RET_INTERNAL_FAILURE, PSCI_RET_INTERNAL_FAILURE)
--MISMATCH_CHECK(QEMU_PSCI_RET_NOT_PRESENT, PSCI_RET_NOT_PRESENT)
--MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED)
-+MISMATCH_CHECK(QEMU_PSCI_RET_SUCCESS, PSCI_RET_SUCCESS);
-+MISMATCH_CHECK(QEMU_PSCI_RET_NOT_SUPPORTED, PSCI_RET_NOT_SUPPORTED);
-+MISMATCH_CHECK(QEMU_PSCI_RET_INVALID_PARAMS, PSCI_RET_INVALID_PARAMS);
-+MISMATCH_CHECK(QEMU_PSCI_RET_DENIED, PSCI_RET_DENIED);
-+MISMATCH_CHECK(QEMU_PSCI_RET_ALREADY_ON, PSCI_RET_ALREADY_ON);
-+MISMATCH_CHECK(QEMU_PSCI_RET_ON_PENDING, PSCI_RET_ON_PENDING);
-+MISMATCH_CHECK(QEMU_PSCI_RET_INTERNAL_FAILURE, PSCI_RET_INTERNAL_FAILURE);
-+MISMATCH_CHECK(QEMU_PSCI_RET_NOT_PRESENT, PSCI_RET_NOT_PRESENT);
-+MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED);
- 
- /* Note that KVM uses overlapping values for AArch32 and AArch64
-  * target CPU numbers. AArch32 targets:
-@@ -137,14 +137,14 @@ MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED)
- #define QEMU_KVM_ARM_TARGET_NONE UINT_MAX
- 
- #ifdef TARGET_AARCH64
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_AEM_V8, KVM_ARM_TARGET_AEM_V8)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_FOUNDATION_V8, KVM_ARM_TARGET_FOUNDATION_V8)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A57, KVM_ARM_TARGET_CORTEX_A57)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_XGENE_POTENZA, KVM_ARM_TARGET_XGENE_POTENZA)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A53, KVM_ARM_TARGET_CORTEX_A53)
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_AEM_V8, KVM_ARM_TARGET_AEM_V8);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_FOUNDATION_V8, KVM_ARM_TARGET_FOUNDATION_V8);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A57, KVM_ARM_TARGET_CORTEX_A57);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_XGENE_POTENZA, KVM_ARM_TARGET_XGENE_POTENZA);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A53, KVM_ARM_TARGET_CORTEX_A53);
- #else
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A15, KVM_ARM_TARGET_CORTEX_A15)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7)
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A15, KVM_ARM_TARGET_CORTEX_A15);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7);
- #endif
- 
- #define CP_REG_ARM64                   0x6000000000000000ULL
-@@ -166,20 +166,20 @@ MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7)
- #define CP_REG_ARM64_SYSREG_CP (CP_REG_ARM64_SYSREG >> CP_REG_ARM_COPROC_SHIFT)
- 
- #ifdef TARGET_AARCH64
--MISMATCH_CHECK(CP_REG_ARM64, KVM_REG_ARM64)
--MISMATCH_CHECK(CP_REG_ARM_COPROC_MASK, KVM_REG_ARM_COPROC_MASK)
--MISMATCH_CHECK(CP_REG_ARM_COPROC_SHIFT, KVM_REG_ARM_COPROC_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG, KVM_REG_ARM64_SYSREG)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_MASK, KVM_REG_ARM64_SYSREG_OP0_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_SHIFT, KVM_REG_ARM64_SYSREG_OP0_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_MASK, KVM_REG_ARM64_SYSREG_OP1_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_SHIFT, KVM_REG_ARM64_SYSREG_OP1_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_MASK, KVM_REG_ARM64_SYSREG_CRN_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_SHIFT, KVM_REG_ARM64_SYSREG_CRN_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_MASK, KVM_REG_ARM64_SYSREG_CRM_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_SHIFT, KVM_REG_ARM64_SYSREG_CRM_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_MASK, KVM_REG_ARM64_SYSREG_OP2_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_SHIFT, KVM_REG_ARM64_SYSREG_OP2_SHIFT)
-+MISMATCH_CHECK(CP_REG_ARM64, KVM_REG_ARM64);
-+MISMATCH_CHECK(CP_REG_ARM_COPROC_MASK, KVM_REG_ARM_COPROC_MASK);
-+MISMATCH_CHECK(CP_REG_ARM_COPROC_SHIFT, KVM_REG_ARM_COPROC_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG, KVM_REG_ARM64_SYSREG);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_MASK, KVM_REG_ARM64_SYSREG_OP0_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_SHIFT, KVM_REG_ARM64_SYSREG_OP0_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_MASK, KVM_REG_ARM64_SYSREG_OP1_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_SHIFT, KVM_REG_ARM64_SYSREG_OP1_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_MASK, KVM_REG_ARM64_SYSREG_CRN_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_SHIFT, KVM_REG_ARM64_SYSREG_CRN_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_MASK, KVM_REG_ARM64_SYSREG_CRM_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_SHIFT, KVM_REG_ARM64_SYSREG_CRM_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_MASK, KVM_REG_ARM64_SYSREG_OP2_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_SHIFT, KVM_REG_ARM64_SYSREG_OP2_SHIFT);
- #endif
- 
- #undef MISMATCH_CHECK
--- 
-MST
+Please leave q35-chipset.cfg there.
+
+The purpose of q35-chipset.cfg is to document how you can build a
+virtual machine which comes as close as possible to physical hardware
+with q35 northbridge and ich9 southbridge.  So it is pretty much
+fixed ;)  Maybe it makes sense to add a comment at the top clarifying
+this.  The (currently commented out) pcie switch configuration can be
+dropped or moved to another file.  And maybe we can add the ethernet
+device meanwhile (has the e1000e emulation a ich9 device?).
+
+Adding another sample config focusing on pcie and good performance is
+perfectly fine of course.
+
+>  docs/q35-graphical.cfg | 154 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  docs/q35-serial.cfg    | 110 +++++++++++++++++++++++++++++++++++
+
+Note that you can specify -readconfig multiple times, so you can split
+out common stuff and ask people to run "qemu -readconfig
+q35-paravirt-base.cfg -readconfig q35-paravirt-$style.cfg"
+
+> +# PCIe controllers
+> +# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +#
+> +# We create four PCIe Root Ports: the first three are used
+> +# by devices defined below, while the last one is left
+> +# unused so that one more device can be hotplugged.
+> +
+> +[device "pci.1"]
+> +  driver =3D "ioh3420"
+> +  bus =3D "pcie.0"
+> +  addr =3D "0x2"
+> +  port =3D "0x10"
+> +  chassis =3D "1"
+
+I'd suggest to create 8 pcie root ports, as multifunction device in a
+single slot, following pcie.txt suggestions.
+
+And I'd pick slot 1c for that, simply because the pcie root ports are in
+that slot on physical hardware, but that is just cosmetic and a matter
+of taste.
+
+> +[device "usb"]
+> +  driver =3D "nec-usb-xhci"
+> +  bus =3D "pci.3"
+> +  addr =3D "0x0"
+
+Good, needs promotion ;)
+
+> +[device "keyboard"]
+> +  driver =3D "usb-kbd"
+> +  bus =3D "usb.0"
+> +  port =3D "1"
+
+We have a ps/2 keyboard anyway, so this is pointless (on x86, arm is a
+different story of course).
+
+> +[device "tablet"]
+> +  driver =3D "usb-tablet"
+> +  bus =3D "usb.0"
+> +  port =3D "2"
+
+There is also virtio-tablet, but for a generic config usb is probably
+the better choice as virtio-tablet is supported by modern linux only (on
+x86, on arm we have only modern linux anyway so picking virtio-tablet
+should be fine).
+
+> +# Video card
+> +# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +#
+> +# We plug the QXL video card directly into the PCIe Root
+> +# Bus as it is a legacy PCI device; this way, we can reduce
+> +# the number of PCIe controllers in the guest.
+> +
+> +[device "video"]
+> +  driver =3D "qxl-vga"
+> +  bus =3D "pcie.0"
+> +  addr =3D "0x1"
+
+Note that you can put multiple devices into a single root port, using
+multifunction.  I have a guest here which looks like this:
+
+root@localhost ~# lspci -vt
+-[0000:00]-+-00.0  Intel Corporation 82G33/G31/P35/P31 Express DRAM
+Controller
+           +-02.0  Device 1234:1111
+           +-1b.0  Intel Corporation 82801I (ICH9 Family) HD Audio
+Controller
+           +-1c.0-[01]----00.0  Red Hat, Inc Virtio SCSI
+           +-1c.1-[02]----00.0  Red Hat, Inc Virtio network device
+           +-1c.2-[03]--
+           +-1c.3-[04]--
+           +-1c.4-[05]--+-00.0  Red Hat, Inc Virtio console
+           |            +-00.1  Red Hat, Inc Virtio memory balloon
+           |            \-00.2  Red Hat, Inc Virtio input
+           +-1c.5-[06]----00.0  NEC Corporation uPD720200 USB 3.0 Host
+Controller
+           +-1c.6-[07]--
+           +-1c.7-[08]--
+           +-1e.0-[09-0a]----00.0-[0a]--
+           +-1f.0  Intel Corporation 82801IB (ICH9) LPC Interface
+Controller
+           +-1f.2  Intel Corporation 82801IR/IO/IH (ICH9R/DO/DH) 6 port
+SATA Controller [AHCI mode]
+           \-1f.3  Intel Corporation 82801I (ICH9 Family) SMBus
+Controller
+
+cheers,
+  Gerd
