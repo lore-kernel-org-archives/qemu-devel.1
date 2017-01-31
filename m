@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cYhpU-00048n-As
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:27:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYhpa-0004G0-O0
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:27:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cYhpT-0001eP-Iw
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:27:16 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-References: <1485879287-12548-1-git-send-email-peter.maydell@linaro.org>
-	<87wpdbw2ki.fsf@dusky.pond.sub.org>
-Message-ID: <157b55c5-2927-5f4e-0c43-820abd75a6d2@redhat.com>
-Date: Tue, 31 Jan 2017 18:27:10 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYhpZ-0001fe-QM
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:27:22 -0500
+References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
+	<20170123121036.4823-25-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d7e217d7-2080-ebaa-3d66-f97a64770a31@redhat.com>
+Date: Wed, 1 Feb 2017 00:27:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <87wpdbw2ki.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Drop QEMU_GNUC_PREREQ() checks for gcc
- older than 4.1
+In-Reply-To: <20170123121036.4823-25-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="gwo4p7WX0vAXSBsfi92ViiQdhGbgxp1uN"
+Subject: Re: [Qemu-devel] [PATCH 24/24] qcow2-bitmap: cache bitmap list in
+ BDRVQcow2State
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, patches@linaro.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gwo4p7WX0vAXSBsfi92ViiQdhGbgxp1uN
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <d7e217d7-2080-ebaa-3d66-f97a64770a31@redhat.com>
+Subject: Re: [PATCH 24/24] qcow2-bitmap: cache bitmap list in BDRVQcow2State
+References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
+ <20170123121036.4823-25-vsementsov@virtuozzo.com>
+In-Reply-To: <20170123121036.4823-25-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
+> Do not reload bitmap list every time it is needed.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-bitmap.c | 125 ++++++++++++++++++++++++++++++++++---------=
+--------
+>  block/qcow2.c        |   2 +
+>  block/qcow2.h        |   4 ++
+>  3 files changed, 89 insertions(+), 42 deletions(-)
+
+Hm, difficult. On a glance, this patch seems alright, and it probably
+makes sense. Maybe it would make the code actually a bit easier to
+understand if it was squashed into the other patches. But OTOH it would
+mean that I would have to start review from scratch for those patches...
+
+So in my opinion this patch makes sense and you should keep it updated,
+but I think we should keep it separate from the rest of the series. Get
+the first 23 patches in first and then we can merge this on top later on.=
 
 
+Would that be OK?
 
-On 31/01/2017 12:40, Markus Armbruster wrote:
->>  
->>  #define QEMU_NORETURN __attribute__ ((__noreturn__))
->>  
->> -#if QEMU_GNUC_PREREQ(3, 4)
->>  #define QEMU_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
->> -#else
->> -#define QEMU_WARN_UNUSED_RESULT
->> -#endif
-> Should we inline this macro?
-> 
->>  
->> -#if QEMU_GNUC_PREREQ(4, 0)
->>  #define QEMU_SENTINEL __attribute__((sentinel))
->> -#else
->> -#define QEMU_SENTINEL
->> -#endif
-> Likewise.
+Max
 
-Why, since we don't do that for QEMU_NORETURN, QEMU_PACKED, etc.?
 
-Paolo
+--gwo4p7WX0vAXSBsfi92ViiQdhGbgxp1uN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRHU8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AnzAIALX5gGahM/ptv42b79v4qBaO2AM8eNGm
+5AOfEgSyQhdUva8FVv4u2Zc7ZD8iJe3hW3turNe+qCyw4uaRQ8BkGwDw/W1WCtSa
+2JbqhIgEpqX0gvFyTilxpIEUSA/ghB2pTkzfL51zgdSkZTZlrzycdT9ut5Tf6EFG
+ha2+8Ne0Kbj00dW4VFJ1W76B235G0CV6TiE1dKmB6YvFjJJ9J7RGLvLvdNNaUOEO
+CY92q5SmKGQ7cL9e9OLNqw+PUFqEDToV+5SykYsHdzOYC2gKr5cIKmInZwZvteLV
+ksmFS524kTiI7s3xioM9K/4198zS8jrxqGJv2MqVqKz14nHlKaFpFGQ=
+=LX/p
+-----END PGP SIGNATURE-----
+
+--gwo4p7WX0vAXSBsfi92ViiQdhGbgxp1uN--
