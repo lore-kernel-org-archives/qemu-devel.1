@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cYXh1-0006Nm-GW
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:37:52 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cYXnn-0000MK-PX
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cYXh0-0007xj-KC
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:37:51 -0500
-References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
-	<1485443388-27253-8-git-send-email-armbru@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <894b7bb8-768b-de12-cb48-7c9d52333bbe@redhat.com>
-Date: Tue, 31 Jan 2017 07:37:42 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cYXnm-0001Ur-Qq
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:51 -0500
+Date: Tue, 31 Jan 2017 11:20:49 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170131112049.GF18804@stefanha-x1.localdomain>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-6-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1485443388-27253-8-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 7/8] blockdev: Make
- orphaned -drive fatal
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="hK8Uo4Yp55NZU70L"
+Content-Disposition: inline
+In-Reply-To: <1482503344-6424-6-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 05/21] hbitmap: improve dirty iter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
 
 
+--hK8Uo4Yp55NZU70L
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 01/26/2017 10:09 AM, Markus Armbruster wrote:
-> Block backends defined with "-drive if=T" with T other than "none" are
-> meant to be picked up by machine initialization code: a suitable
-> frontend gets created and wired up automatically.
-> 
-> If machine initialization code doesn't comply, the block backend
-> remains unused.  This triggers a warning since commit a66c9dc, v2.2.0.
-> Drives created by default are excempted; use -nodefaults to get rid of
-> them.
-> 
-> Turn this warning into an error.
-> 
-
-"Exempted," oddly enough.
-</eblake>
-
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On Fri, Dec 23, 2016 at 05:28:48PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Make dirty iter resistant to resetting bits in corresponding HBitmap.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  blockdev.c                | 14 +++++++-------
->  include/sysemu/blockdev.h |  2 +-
->  2 files changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/blockdev.c b/blockdev.c
-> index a597a66..ec9c114 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -227,28 +227,28 @@ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit)
->      return NULL;
->  }
->  
-> -bool drive_check_orphaned(void)
-> +void drive_check_orphaned(void)
->  {
->      BlockBackend *blk;
->      DriveInfo *dinfo;
->      Location loc;
-> -    bool rs = false;
-> +    bool orphans = false;
->  
->      for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
->          dinfo = blk_legacy_dinfo(blk);
-> -        /* If dinfo->bdrv->dev is NULL, it has no device attached. */
-> -        /* Unless this is a default drive, this may be an oversight. */
->          if (!blk_get_attached_dev(blk) && !dinfo->is_default &&
->              dinfo->type != IF_NONE) {
->              loc_push_none(&loc);
->              qemu_opts_loc_restore(dinfo->opts);
-> -            error_report("warning: machine type does not support this drive");
-> +            error_report("machine type does not support this drive");
->              loc_pop(&loc);
-> -            rs = true;
-> +            orphans = true;
->          }
->      }
->  
-> -    return rs;
-> +    if (orphans) {
-> +        exit(1);
-> +    }
+>  include/qemu/hbitmap.h | 24 ++----------------------
+>  util/hbitmap.c         | 23 ++++++++++++++++++++++-
+>  2 files changed, 24 insertions(+), 23 deletions(-)
 
-Hardcore. Why not just return a status code and allow vl.c to exit? It
-only has the one caller. (Unless you added more and I didn't read
-because I'm lazy.)
+Please add a test case to tests/test-hbitmap.c.
 
-You could even add an Error **arg if you wanted to; but vl.c has exits
-all over the dang place, so maybe that's not really interesting.
+--hK8Uo4Yp55NZU70L
+Content-Type: application/pgp-signature; name="signature.asc"
 
---js
+-----BEGIN PGP SIGNATURE-----
 
->  }
->  
->  DriveInfo *drive_get_by_index(BlockInterfaceType type, int index)
-> diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
-> index 351a039..ac22f2a 100644
-> --- a/include/sysemu/blockdev.h
-> +++ b/include/sysemu/blockdev.h
-> @@ -48,7 +48,7 @@ BlockBackend *blk_by_legacy_dinfo(DriveInfo *dinfo);
->  void override_max_devs(BlockInterfaceType type, int max_devs);
->  
->  DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit);
-> -bool drive_check_orphaned(void);
-> +void drive_check_orphaned(void);
->  DriveInfo *drive_get_by_index(BlockInterfaceType type, int index);
->  int drive_get_max_bus(BlockInterfaceType type);
->  int drive_get_max_devs(BlockInterfaceType type);
-> 
+iQEcBAEBAgAGBQJYkHMRAAoJEJykq7OBq3PIX+gIALmh+qW1Gwin68PmiD2fgWZe
+NJJ0GPW5mVf8xpXq08gvKLsdNpovIgJsOogdVeXkZcY+q3m8vkat6Gnsy8QxNf0R
+L9xa4FxqAk9D+tLLoFEPRMNM5TsqcveaDqyXKNe6u4C+uKF19ItInUxYz4yoD9OJ
+f7CYh6XqhrdYlL/+d+FmdL3NG5L4P8KTlKsAbzZkLwy+ApmqBDhnTyV4a8+SNHIQ
+hPrd3Sh3PmRdgFdMvNkgwmlpZ5isNw3FJObNHkin+a4m4GfaFgwvr8CtB7R8nF3O
+kOubVJpDS0S3ED1p1Da8l0/ea21AkRbFTRJjqu0IiFSCE1ie7lS0qq9qoky2OsY=
+=xlfe
+-----END PGP SIGNATURE-----
+
+--hK8Uo4Yp55NZU70L--
