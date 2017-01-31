@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cYU5N-0004Bk-MD
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 03:46:46 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cYUNI-0000pe-8p
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:05:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cYU5K-0000hN-KD
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 03:46:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cYU5K-0000hH-Bt
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 03:46:42 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1D3BC7E9F3
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 08:46:42 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 31 Jan 2017 09:46:38 +0100
-Message-Id: <1485852398-2327-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH] audio/sdlaudio: Allow audio playback with
- SDL2
+	(envelope-from <dovgaluk@ispras.ru>) id 1cYUND-0005Vd-A5
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:05:16 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:39698)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cYUNC-0005UF-VM
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:05:11 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170129210910.6333-1-pbonzini@redhat.com>
+In-Reply-To: <20170129210910.6333-1-pbonzini@redhat.com>
+Date: Tue, 31 Jan 2017 12:05:08 +0300
+Message-ID: <000601d27ba1$1f009a50$5d01cef0$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC/RFT PATCH 0/7] cpu-exec: simplify cpu_exec
+ and remove some icount special cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,197 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: serge.fdrv@gmail.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru
 
-When compiling with SDL2, the semaphore trick used in sdlaudio.c
-does not work - QEMU locks up completely in this case. To avoid
-the hang and get at least some audio playback up and running (it's
-a little bit crackling, but better than nothing), we can use the
-SDL locking functions SDL_LockAudio() and SDL_UnlockAudio() to sync
-with the sound playback thread instead.
+Hi, Paolo!
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- audio/sdlaudio.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+Thanks for refactoring.
+I tested these patches with icount record/replay on i386 machine.
+It works, but the following changes should be applied.
+I also removed call to replay_has_interrupt, because now it is not needed here.
+It seems, that this call is an artifact of an older record/replay revision.
 
-diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
-index db69fe1..e8d91d2 100644
---- a/audio/sdlaudio.c
-+++ b/audio/sdlaudio.c
-@@ -38,10 +38,14 @@
- #define AUDIO_CAP "sdl"
- #include "audio_int.h"
- 
-+#define USE_SEMAPHORE (SDL_MAJOR_VERSION < 2)
-+
- typedef struct SDLVoiceOut {
-     HWVoiceOut hw;
-     int live;
-+#if USE_SEMAPHORE
-     int rpos;
-+#endif
-     int decr;
- } SDLVoiceOut;
- 
-@@ -53,8 +57,10 @@ static struct {
- 
- static struct SDLAudioState {
-     int exit;
-+#if USE_SEMAPHORE
-     SDL_mutex *mutex;
-     SDL_sem *sem;
-+#endif
-     int initialized;
-     bool driver_created;
- } glob_sdl;
-@@ -73,31 +79,45 @@ static void GCC_FMT_ATTR (1, 2) sdl_logerr (const char *fmt, ...)
- 
- static int sdl_lock (SDLAudioState *s, const char *forfn)
- {
-+#if USE_SEMAPHORE
-     if (SDL_LockMutex (s->mutex)) {
-         sdl_logerr ("SDL_LockMutex for %s failed\n", forfn);
-         return -1;
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 3838eb8..5cef8bc 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -519,7 +519,8 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
      }
-+#else
-+    SDL_LockAudio();
-+#endif
-+
-     return 0;
- }
- 
- static int sdl_unlock (SDLAudioState *s, const char *forfn)
- {
-+#if USE_SEMAPHORE
-     if (SDL_UnlockMutex (s->mutex)) {
-         sdl_logerr ("SDL_UnlockMutex for %s failed\n", forfn);
-         return -1;
-     }
-+#else
-+    SDL_UnlockAudio();
-+#endif
-+
-     return 0;
- }
- 
- static int sdl_post (SDLAudioState *s, const char *forfn)
- {
-+#if USE_SEMAPHORE
-     if (SDL_SemPost (s->sem)) {
-         sdl_logerr ("SDL_SemPost for %s failed\n", forfn);
-         return -1;
-     }
-+#endif
-+
-     return 0;
- }
- 
-+#if USE_SEMAPHORE
- static int sdl_wait (SDLAudioState *s, const char *forfn)
- {
-     if (SDL_SemWait (s->sem)) {
-@@ -106,6 +126,7 @@ static int sdl_wait (SDLAudioState *s, const char *forfn)
-     }
-     return 0;
- }
-+#endif
- 
- static int sdl_unlock_and_post (SDLAudioState *s, const char *forfn)
- {
-@@ -246,6 +267,7 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
-         int to_mix, decr;
- 
-         /* dolog ("in callback samples=%d\n", samples); */
-+#if USE_SEMAPHORE
-         sdl_wait (s, "sdl_callback");
-         if (s->exit) {
-             return;
-@@ -264,6 +286,11 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
-         if (!sdl->live) {
-             goto again;
-         }
-+#else
-+        if (s->exit || !sdl->live) {
-+            break;
-+        }
-+#endif
- 
-         /* dolog ("in callback live=%d\n", live); */
-         to_mix = audio_MIN (samples, sdl->live);
-@@ -274,7 +301,11 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
- 
-             /* dolog ("in callback to_mix %d, chunk %d\n", to_mix, chunk); */
-             hw->clip (buf, src, chunk);
-+#if USE_SEMAPHORE
-             sdl->rpos = (sdl->rpos + chunk) % hw->samples;
-+#else
-+            hw->rpos = (hw->rpos + chunk) % hw->samples;
-+#endif
-             to_mix -= chunk;
-             buf += chunk << hw->info.shift;
-         }
-@@ -282,12 +313,21 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
-         sdl->live -= decr;
-         sdl->decr += decr;
- 
-+#if USE_SEMAPHORE
-     again:
-         if (sdl_unlock (s, "sdl_callback")) {
-             return;
-         }
-+#endif
-     }
-     /* dolog ("done len=%d\n", len); */
-+
-+#if (SDL_MAJOR_VERSION >= 2)
-+    /* SDL2 does not clear the remaining buffer for us, so do it on our own */
-+    if (samples) {
-+        memset(buf, 0, samples << hw->info.shift);
-+    }
-+#endif
- }
- 
- static int sdl_write_out (SWVoiceOut *sw, void *buf, int len)
-@@ -315,8 +355,12 @@ static int sdl_run_out (HWVoiceOut *hw, int live)
-     decr = audio_MIN (sdl->decr, live);
-     sdl->decr -= decr;
- 
-+#if USE_SEMAPHORE
-     sdl->live = live - decr;
-     hw->rpos = sdl->rpos;
-+#else
-+    sdl->live = live;
-+#endif
- 
-     if (sdl->live > 0) {
-         sdl_unlock_and_post (s, "sdl_run_out");
-@@ -405,6 +449,7 @@ static void *sdl_audio_init (void)
-         return NULL;
-     }
- 
-+#if USE_SEMAPHORE
-     s->mutex = SDL_CreateMutex ();
-     if (!s->mutex) {
-         sdl_logerr ("Failed to create SDL mutex\n");
-@@ -419,6 +464,7 @@ static void *sdl_audio_init (void)
-         SDL_QuitSubSystem (SDL_INIT_AUDIO);
-         return NULL;
-     }
-+#endif
- 
-     s->driver_created = true;
-     return s;
-@@ -428,8 +474,10 @@ static void sdl_audio_fini (void *opaque)
- {
-     SDLAudioState *s = opaque;
-     sdl_close (s);
-+#if USE_SEMAPHORE
-     SDL_DestroySemaphore (s->sem);
-     SDL_DestroyMutex (s->mutex);
-+#endif
-     SDL_QuitSubSystem (SDL_INIT_AUDIO);
-     s->driver_created = false;
- }
--- 
-1.8.3.1
+
+     /* Finally, check if we need to exit to the main loop.  */
+-    if (unlikely(atomic_read(&cpu->exit_request) || replay_has_interrupt())) {
++    if (unlikely(atomic_read(&cpu->exit_request)
++        || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
+         atomic_set(&cpu->exit_request, 0);
+         cpu->exception_index = EXCP_INTERRUPT;
+         return true;
+
+Pavel Dovgalyuk
+
+> -----Original Message-----
+> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
+> Sent: Monday, January 30, 2017 12:09 AM
+> To: qemu-devel@nongnu.org
+> Cc: serge.fdrv@gmail.com; peter.maydell@linaro.org; pavel.dovgaluk@ispras.ru
+> Subject: [RFC/RFT PATCH 0/7] cpu-exec: simplify cpu_exec and remove some icount special cases
+> 
+> The series includes three parts:
+> 
+> 1-2: fix two bugs, the first one pretty bad, the second seems
+> to be theoretical only.
+> 
+> 3-5: simplify cpu_exec.  This builds on Sergey's conversion
+> of cpu_exec to a simple top-down logic, making the phases
+> clearer and saving on the cost of siglongjmp in the meanwhile.
+> 
+> 6-7: these are intended to be a base for Pavel's record/replay
+> fixes.  The main thing I noticed while reviewing is that icount
+> is redoing (with u16.high) a lot of things that tcg_exit_req is
+> doing too.  This is because, at the time icount was introduced,
+> tcg_exit_req didn't exist and QEMU instead unwound chained TBs
+> through POSIX signals.  But now we have essentially two ways to
+> do the same thing with subtly different invariants or downright
+> bugs (such as the one fixed by patch 1).  Patch 6 therefore
+> unifies tcg_exit_req and the icount interrupt flag.  It saves a
+> handful of instructions per TB in icount mode and generally
+> makes icount mode "less special", which is a good thing since
+> no one seems to understand it well.  Patch 7 then removes another
+> EXCP_INTERRUPT/cpu_loop_exit pair; by exiting to main loop simply
+> through cpu->exit_request, hopefully it fixes one of the issues that
+> Pavel was seeing.
+> 
+> For now I've tested this only on an aarch64 Linux image (with
+> and without -icount).  Thanks,
+> 
+> Paolo
+> 
+> Paolo Bonzini (7):
+>   cpu-exec: fix jmp_first out-of-bounds access with icount
+>   cpu-exec: tighten barrier on TCG_EXIT_REQUESTED
+>   cpu-exec: avoid cpu_loop_exit in cpu_handle_interrupt
+>   cpu-exec: avoid repeated sigsetjmp on interrupts
+>   cpu-exec: remove outermost infinite loop
+>   cpu-exec: unify icount_decr and tcg_exit_req
+>   cpu-exec: centralize exiting to the main loop
+> 
+>  cpu-exec.c                | 153 +++++++++++++++++++++-------------------------
+>  include/exec/exec-all.h   |   1 +
+>  include/exec/gen-icount.h |  53 ++++++++--------
+>  include/qom/cpu.h         |  15 +++--
+>  qom/cpu.c                 |   2 +-
+>  tcg/tcg.h                 |   1 -
+>  translate-all.c           |   2 +-
+>  translate-common.c        |  13 ++--
+>  8 files changed, 109 insertions(+), 131 deletions(-)
+> 
+> --
+> 2.9.3
