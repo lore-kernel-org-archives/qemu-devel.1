@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39342)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYan6-0001j3-PK
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:21 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39445)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1cYanG-0001ri-NN
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYan5-0002s1-VC
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:20 -0500
-Date: Tue, 31 Jan 2017 15:56:10 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131155610.GV18804@stefanha-x1.localdomain>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-17-git-send-email-vsementsov@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="oAjj1ZwgLg4oRN9q"
-Content-Disposition: inline
-In-Reply-To: <1482503344-6424-17-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 16/21] hbitmap: add hbitmap_count_between()
- function
+	(envelope-from <pl@kamp.de>) id 1cYanC-0002tn-2j
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:30 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:53319 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cYanB-0002sx-PS
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:25 -0500
+From: Peter Lieven <pl@kamp.de>
+Date: Tue, 31 Jan 2017 16:56:11 +0100
+Message-Id: <1485878172-15463-2-git-send-email-pl@kamp.de>
+In-Reply-To: <1485878172-15463-1-git-send-email-pl@kamp.de>
+References: <1485878172-15463-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH V2 1/2] block/nfs: fix NULL pointer dereference
+ in URI parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, ashijeetacharya@gmail.com, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
 
+parse_uint_full wants to put the parsed value into the
+variable passed via its second argument which is NULL.
 
---oAjj1ZwgLg4oRN9q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixes: 94d6a7a76e9df9919629428f6c598e2b97d9426c
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Lieven <pl@kamp.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/nfs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On Fri, Dec 23, 2016 at 05:28:59PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Add this function only for HBitmap's with greanularity =3D 0.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> ---
->  include/qemu/hbitmap.h | 2 ++
->  util/hbitmap.c         | 9 +++++++++
->  2 files changed, 11 insertions(+)
->=20
-> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-> index 2873a46..1967e13 100644
-> --- a/include/qemu/hbitmap.h
-> +++ b/include/qemu/hbitmap.h
-> @@ -314,4 +314,6 @@ static inline size_t hbitmap_iter_next_word(HBitmapIt=
-er *hbi, unsigned long *p_c
->  }
-> =20
-> =20
-> +uint64_t hbitmap_count_between(HBitmap *hb, uint64_t start, uint64_t end=
-);
-
-Missing doc comments.
-
-> +
->  #endif
-> diff --git a/util/hbitmap.c b/util/hbitmap.c
-> index 48d8b2d..d06bfa3 100644
-> --- a/util/hbitmap.c
-> +++ b/util/hbitmap.c
-> @@ -232,6 +232,15 @@ static uint64_t hb_count_between(HBitmap *hb, uint64=
-_t start, uint64_t last)
->      return count;
->  }
-> =20
-> +/* hbitmap_count_between() is only for HBitmap's with granularity =3D 0 =
-*/
-> +uint64_t hbitmap_count_between(HBitmap *hb, uint64_t start, uint64_t end)
-> +{
-> +    assert(hb->granularity =3D=3D 0);
-> +    assert(start < end);
-> +
-> +    return hb_count_between(hb, start, end - 1);
-> +}
-
-Please rename hb_count_between() and make it externally visible instead
-of adding a similarly-named wrapper.
-
---oAjj1ZwgLg4oRN9q
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYkLOaAAoJEJykq7OBq3PIAh8H+gJnLk8ULeoYKnGoNsRbrqh6
-hEXtsqy1RHgD+dbIFXQOvu54RlMOHlYk703hknVKt+1tMM4NMSxotHC8XbfrzAsp
-UzKIZFsi2pkvfSBIced5Ti5V238gguQCEBihaoCMK9UxoPdGguhlJugJbg+aZ1j7
-+RYFAf05trqrWgZdNC5231Fsd6V7FmwZyLa+CUvTTiWmkq81fFlFGmvPO5NI7Fu9
-GJ9qtgnACRXOk0jJkcvuuzcc8l4j6ZsN4TZZrb2J7SBxmSrEFg8ZTC5+RVyZ5p2v
-prZOnCUyfN0hGcrko7yEJwPnMvE6bRcXaHyIqu+yCUUaHE8iSXzraBgiQUJAofU=
-=oE2t
------END PGP SIGNATURE-----
-
---oAjj1ZwgLg4oRN9q--
+diff --git a/block/nfs.c b/block/nfs.c
+index a564340..baaecff 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -108,12 +108,13 @@ static int nfs_parse_uri(const char *filename, QDict *options, Error **errp)
+     qdict_put(options, "path", qstring_from_str(uri->path));
+ 
+     for (i = 0; i < qp->n; i++) {
++        unsigned long long val;
+         if (!qp->p[i].value) {
+             error_setg(errp, "Value for NFS parameter expected: %s",
+                        qp->p[i].name);
+             goto out;
+         }
+-        if (parse_uint_full(qp->p[i].value, NULL, 0)) {
++        if (parse_uint_full(qp->p[i].value, &val, 0)) {
+             error_setg(errp, "Illegal value for NFS parameter: %s",
+                        qp->p[i].name);
+             goto out;
+-- 
+1.9.1
