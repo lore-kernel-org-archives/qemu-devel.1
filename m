@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cYahe-00054f-Os
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:50:49 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cYan6-0001j3-PK
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cYahd-0001Uo-3B
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:50:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48724)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cYahc-0001U0-Rm
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:50:41 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D0B059D51F
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 15:50:40 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 31 Jan 2017 16:50:28 +0100
-Message-Id: <1485877831-28786-9-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1485877831-28786-1-git-send-email-kraxel@redhat.com>
-References: <1485877831-28786-1-git-send-email-kraxel@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1cYan5-0002s1-VC
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:20 -0500
+Date: Tue, 31 Jan 2017 15:56:10 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170131155610.GV18804@stefanha-x1.localdomain>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-17-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 08/11] spice: wakeup QXL worker to pick up
- mouse changes
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="oAjj1ZwgLg4oRN9q"
+Content-Disposition: inline
+In-Reply-To: <1482503344-6424-17-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 16/21] hbitmap: add hbitmap_count_between()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Without it, server-mode mouse is "slow" to update position: QXL will
-wait until new display commands come. This is very visible with
-virtio-gpu.
+--oAjj1ZwgLg4oRN9q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20170130104540.14660-1-marcandre.lureau@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/spice-display.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Fri, Dec 23, 2016 at 05:28:59PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Add this function only for HBitmap's with greanularity =3D 0.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> ---
+>  include/qemu/hbitmap.h | 2 ++
+>  util/hbitmap.c         | 9 +++++++++
+>  2 files changed, 11 insertions(+)
+>=20
+> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+> index 2873a46..1967e13 100644
+> --- a/include/qemu/hbitmap.h
+> +++ b/include/qemu/hbitmap.h
+> @@ -314,4 +314,6 @@ static inline size_t hbitmap_iter_next_word(HBitmapIt=
+er *hbi, unsigned long *p_c
+>  }
+> =20
+> =20
+> +uint64_t hbitmap_count_between(HBitmap *hb, uint64_t start, uint64_t end=
+);
 
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index 5e6f78a..64e472e 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -769,6 +769,7 @@ static void display_mouse_set(DisplayChangeListener *=
-dcl,
-     g_free(ssd->ptr_move);
-     ssd->ptr_move =3D qemu_spice_create_cursor_update(ssd, NULL, on);
-     qemu_mutex_unlock(&ssd->lock);
-+    qemu_spice_wakeup(ssd);
- }
-=20
- static void display_mouse_define(DisplayChangeListener *dcl,
-@@ -787,6 +788,7 @@ static void display_mouse_define(DisplayChangeListene=
-r *dcl,
-     g_free(ssd->ptr_define);
-     ssd->ptr_define =3D qemu_spice_create_cursor_update(ssd, c, 0);
-     qemu_mutex_unlock(&ssd->lock);
-+    qemu_spice_wakeup(ssd);
- }
-=20
- static const DisplayChangeListenerOps display_listener_ops =3D {
---=20
-1.8.3.1
+Missing doc comments.
+
+> +
+>  #endif
+> diff --git a/util/hbitmap.c b/util/hbitmap.c
+> index 48d8b2d..d06bfa3 100644
+> --- a/util/hbitmap.c
+> +++ b/util/hbitmap.c
+> @@ -232,6 +232,15 @@ static uint64_t hb_count_between(HBitmap *hb, uint64=
+_t start, uint64_t last)
+>      return count;
+>  }
+> =20
+> +/* hbitmap_count_between() is only for HBitmap's with granularity =3D 0 =
+*/
+> +uint64_t hbitmap_count_between(HBitmap *hb, uint64_t start, uint64_t end)
+> +{
+> +    assert(hb->granularity =3D=3D 0);
+> +    assert(start < end);
+> +
+> +    return hb_count_between(hb, start, end - 1);
+> +}
+
+Please rename hb_count_between() and make it externally visible instead
+of adding a similarly-named wrapper.
+
+--oAjj1ZwgLg4oRN9q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYkLOaAAoJEJykq7OBq3PIAh8H+gJnLk8ULeoYKnGoNsRbrqh6
+hEXtsqy1RHgD+dbIFXQOvu54RlMOHlYk703hknVKt+1tMM4NMSxotHC8XbfrzAsp
+UzKIZFsi2pkvfSBIced5Ti5V238gguQCEBihaoCMK9UxoPdGguhlJugJbg+aZ1j7
++RYFAf05trqrWgZdNC5231Fsd6V7FmwZyLa+CUvTTiWmkq81fFlFGmvPO5NI7Fu9
+GJ9qtgnACRXOk0jJkcvuuzcc8l4j6ZsN4TZZrb2J7SBxmSrEFg8ZTC5+RVyZ5p2v
+prZOnCUyfN0hGcrko7yEJwPnMvE6bRcXaHyIqu+yCUUaHE8iSXzraBgiQUJAofU=
+=oE2t
+-----END PGP SIGNATURE-----
+
+--oAjj1ZwgLg4oRN9q--
