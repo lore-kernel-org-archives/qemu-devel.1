@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58533)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYH1-0001lJ-LX
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:08 -0500
+	id 1cYYHU-0002Fa-1a
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYH0-0000Gm-6e
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:03 -0500
-Received: from mail.kernel.org ([198.145.29.136]:39680)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGz-0000GT-TD
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:02 -0500
-Date: Tue, 31 Jan 2017 15:14:57 +0200
+	id 1cYYHP-0000OO-J3
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:32 -0500
+Date: Tue, 31 Jan 2017 15:15:16 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485868446-10587-15-git-send-email-mst@redhat.com>
+Message-ID: <1485868446-10587-22-git-send-email-mst@redhat.com>
 References: <1485868446-10587-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485868446-10587-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 14/21] hcd-xhci: check & correct param before
- using it
+Subject: [Qemu-devel] [PULL v3 21/21] arm: add trailing ;
+ after MISMATCH_CHECK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +26,169 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Macro calls without a trailing ; look weird in C, this works as a side
+effect of how QEMU_BUILD_BUG_ON is implemented. Fix this up.
 
-usb_xhci_realize() corrects invalid values of property "intrs"
-automatically, but the uncorrected value is passed to msi_init(),
-which chokes on invalid values.  Delay that until after the
-correction.
-
-Resources allocated by usb_xhci_init() are leaked when msi_init()
-fails.  Fix by calling it after msi_init().
-
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Marcel Apfelbaum <marcel@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Marcel Apfelbaum <marcel@redhat.com>
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/usb/hcd-xhci.c | 37 ++++++++++++++++++-------------------
- 1 file changed, 18 insertions(+), 19 deletions(-)
+ target/arm/kvm-consts.h | 98 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 49 insertions(+), 49 deletions(-)
 
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index e0b5169..6575d05 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -3627,25 +3627,6 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-     dev->config[PCI_CACHE_LINE_SIZE] = 0x10;
-     dev->config[0x60] = 0x30; /* release number */
+diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
+index 06b6c92..aad2825 100644
+--- a/target/arm/kvm-consts.h
++++ b/target/arm/kvm-consts.h
+@@ -33,12 +33,12 @@
+ #define CP_REG_ARM             0x4000000000000000ULL
+ #define CP_REG_ARCH_MASK       0xff00000000000000ULL
  
--    usb_xhci_init(xhci);
--
--    if (xhci->msi != ON_OFF_AUTO_OFF) {
--        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
--        /* Any error other than -ENOTSUP(board's MSI support is broken)
--         * is a programming error */
--        assert(!ret || ret == -ENOTSUP);
--        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
--            /* Can't satisfy user's explicit msi=on request, fail */
--            error_append_hint(&err, "You have to use msi=auto (default) or "
--                    "msi=off with this machine type.\n");
--            error_propagate(errp, err);
--            return;
--        }
--        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
--        /* With msi=auto, we fall back to MSI off silently */
--        error_free(err);
--    }
--
-     if (xhci->numintrs > MAXINTRS) {
-         xhci->numintrs = MAXINTRS;
-     }
-@@ -3667,6 +3648,24 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-         xhci->max_pstreams_mask = 0;
-     }
+-MISMATCH_CHECK(CP_REG_SIZE_SHIFT, KVM_REG_SIZE_SHIFT)
+-MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK)
+-MISMATCH_CHECK(CP_REG_SIZE_U32, KVM_REG_SIZE_U32)
+-MISMATCH_CHECK(CP_REG_SIZE_U64, KVM_REG_SIZE_U64)
+-MISMATCH_CHECK(CP_REG_ARM, KVM_REG_ARM)
+-MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK)
++MISMATCH_CHECK(CP_REG_SIZE_SHIFT, KVM_REG_SIZE_SHIFT);
++MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK);
++MISMATCH_CHECK(CP_REG_SIZE_U32, KVM_REG_SIZE_U32);
++MISMATCH_CHECK(CP_REG_SIZE_U64, KVM_REG_SIZE_U64);
++MISMATCH_CHECK(CP_REG_ARM, KVM_REG_ARM);
++MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK);
  
-+    if (xhci->msi != ON_OFF_AUTO_OFF) {
-+        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
-+        /* Any error other than -ENOTSUP(board's MSI support is broken)
-+         * is a programming error */
-+        assert(!ret || ret == -ENOTSUP);
-+        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
-+            /* Can't satisfy user's explicit msi=on request, fail */
-+            error_append_hint(&err, "You have to use msi=auto (default) or "
-+                    "msi=off with this machine type.\n");
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
-+        /* With msi=auto, we fall back to MSI off silently */
-+        error_free(err);
-+    }
-+
-+    usb_xhci_init(xhci);
-     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
+ #define QEMU_PSCI_0_1_FN_BASE 0x95c1ba5e
+ #define QEMU_PSCI_0_1_FN(n) (QEMU_PSCI_0_1_FN_BASE + (n))
+@@ -47,10 +47,10 @@ MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK)
+ #define QEMU_PSCI_0_1_FN_CPU_ON QEMU_PSCI_0_1_FN(2)
+ #define QEMU_PSCI_0_1_FN_MIGRATE QEMU_PSCI_0_1_FN(3)
  
-     memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
+-MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_SUSPEND, KVM_PSCI_FN_CPU_SUSPEND)
+-MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_OFF, KVM_PSCI_FN_CPU_OFF)
+-MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_ON, KVM_PSCI_FN_CPU_ON)
+-MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE)
++MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_SUSPEND, KVM_PSCI_FN_CPU_SUSPEND);
++MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_OFF, KVM_PSCI_FN_CPU_OFF);
++MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_ON, KVM_PSCI_FN_CPU_ON);
++MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE);
+ 
+ #define QEMU_PSCI_0_2_FN_BASE 0x84000000
+ #define QEMU_PSCI_0_2_FN(n) (QEMU_PSCI_0_2_FN_BASE + (n))
+@@ -77,13 +77,13 @@ MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE)
+ #define QEMU_PSCI_0_2_FN64_AFFINITY_INFO QEMU_PSCI_0_2_FN64(4)
+ #define QEMU_PSCI_0_2_FN64_MIGRATE QEMU_PSCI_0_2_FN64(5)
+ 
+-MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_SUSPEND, PSCI_0_2_FN_CPU_SUSPEND)
+-MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_OFF, PSCI_0_2_FN_CPU_OFF)
+-MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_ON, PSCI_0_2_FN_CPU_ON)
+-MISMATCH_CHECK(QEMU_PSCI_0_2_FN_MIGRATE, PSCI_0_2_FN_MIGRATE)
+-MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_SUSPEND, PSCI_0_2_FN64_CPU_SUSPEND)
+-MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_ON, PSCI_0_2_FN64_CPU_ON)
+-MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE)
++MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_SUSPEND, PSCI_0_2_FN_CPU_SUSPEND);
++MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_OFF, PSCI_0_2_FN_CPU_OFF);
++MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_ON, PSCI_0_2_FN_CPU_ON);
++MISMATCH_CHECK(QEMU_PSCI_0_2_FN_MIGRATE, PSCI_0_2_FN_MIGRATE);
++MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_SUSPEND, PSCI_0_2_FN64_CPU_SUSPEND);
++MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_ON, PSCI_0_2_FN64_CPU_ON);
++MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE);
+ 
+ /* PSCI v0.2 return values used by TCG emulation of PSCI */
+ 
+@@ -93,9 +93,9 @@ MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE)
+ /* We implement version 0.2 only */
+ #define QEMU_PSCI_0_2_RET_VERSION_0_2                       2
+ 
+-MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP)
++MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP);
+ MISMATCH_CHECK(QEMU_PSCI_0_2_RET_VERSION_0_2,
+-               (PSCI_VERSION_MAJOR(0) | PSCI_VERSION_MINOR(2)))
++               (PSCI_VERSION_MAJOR(0) | PSCI_VERSION_MINOR(2)));
+ 
+ /* PSCI return values (inclusive of all PSCI versions) */
+ #define QEMU_PSCI_RET_SUCCESS                     0
+@@ -108,15 +108,15 @@ MISMATCH_CHECK(QEMU_PSCI_0_2_RET_VERSION_0_2,
+ #define QEMU_PSCI_RET_NOT_PRESENT                 -7
+ #define QEMU_PSCI_RET_DISABLED                    -8
+ 
+-MISMATCH_CHECK(QEMU_PSCI_RET_SUCCESS, PSCI_RET_SUCCESS)
+-MISMATCH_CHECK(QEMU_PSCI_RET_NOT_SUPPORTED, PSCI_RET_NOT_SUPPORTED)
+-MISMATCH_CHECK(QEMU_PSCI_RET_INVALID_PARAMS, PSCI_RET_INVALID_PARAMS)
+-MISMATCH_CHECK(QEMU_PSCI_RET_DENIED, PSCI_RET_DENIED)
+-MISMATCH_CHECK(QEMU_PSCI_RET_ALREADY_ON, PSCI_RET_ALREADY_ON)
+-MISMATCH_CHECK(QEMU_PSCI_RET_ON_PENDING, PSCI_RET_ON_PENDING)
+-MISMATCH_CHECK(QEMU_PSCI_RET_INTERNAL_FAILURE, PSCI_RET_INTERNAL_FAILURE)
+-MISMATCH_CHECK(QEMU_PSCI_RET_NOT_PRESENT, PSCI_RET_NOT_PRESENT)
+-MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED)
++MISMATCH_CHECK(QEMU_PSCI_RET_SUCCESS, PSCI_RET_SUCCESS);
++MISMATCH_CHECK(QEMU_PSCI_RET_NOT_SUPPORTED, PSCI_RET_NOT_SUPPORTED);
++MISMATCH_CHECK(QEMU_PSCI_RET_INVALID_PARAMS, PSCI_RET_INVALID_PARAMS);
++MISMATCH_CHECK(QEMU_PSCI_RET_DENIED, PSCI_RET_DENIED);
++MISMATCH_CHECK(QEMU_PSCI_RET_ALREADY_ON, PSCI_RET_ALREADY_ON);
++MISMATCH_CHECK(QEMU_PSCI_RET_ON_PENDING, PSCI_RET_ON_PENDING);
++MISMATCH_CHECK(QEMU_PSCI_RET_INTERNAL_FAILURE, PSCI_RET_INTERNAL_FAILURE);
++MISMATCH_CHECK(QEMU_PSCI_RET_NOT_PRESENT, PSCI_RET_NOT_PRESENT);
++MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED);
+ 
+ /* Note that KVM uses overlapping values for AArch32 and AArch64
+  * target CPU numbers. AArch32 targets:
+@@ -137,14 +137,14 @@ MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED)
+ #define QEMU_KVM_ARM_TARGET_NONE UINT_MAX
+ 
+ #ifdef TARGET_AARCH64
+-MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_AEM_V8, KVM_ARM_TARGET_AEM_V8)
+-MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_FOUNDATION_V8, KVM_ARM_TARGET_FOUNDATION_V8)
+-MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A57, KVM_ARM_TARGET_CORTEX_A57)
+-MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_XGENE_POTENZA, KVM_ARM_TARGET_XGENE_POTENZA)
+-MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A53, KVM_ARM_TARGET_CORTEX_A53)
++MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_AEM_V8, KVM_ARM_TARGET_AEM_V8);
++MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_FOUNDATION_V8, KVM_ARM_TARGET_FOUNDATION_V8);
++MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A57, KVM_ARM_TARGET_CORTEX_A57);
++MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_XGENE_POTENZA, KVM_ARM_TARGET_XGENE_POTENZA);
++MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A53, KVM_ARM_TARGET_CORTEX_A53);
+ #else
+-MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A15, KVM_ARM_TARGET_CORTEX_A15)
+-MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7)
++MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A15, KVM_ARM_TARGET_CORTEX_A15);
++MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7);
+ #endif
+ 
+ #define CP_REG_ARM64                   0x6000000000000000ULL
+@@ -166,20 +166,20 @@ MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7)
+ #define CP_REG_ARM64_SYSREG_CP (CP_REG_ARM64_SYSREG >> CP_REG_ARM_COPROC_SHIFT)
+ 
+ #ifdef TARGET_AARCH64
+-MISMATCH_CHECK(CP_REG_ARM64, KVM_REG_ARM64)
+-MISMATCH_CHECK(CP_REG_ARM_COPROC_MASK, KVM_REG_ARM_COPROC_MASK)
+-MISMATCH_CHECK(CP_REG_ARM_COPROC_SHIFT, KVM_REG_ARM_COPROC_SHIFT)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG, KVM_REG_ARM64_SYSREG)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_MASK, KVM_REG_ARM64_SYSREG_OP0_MASK)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_SHIFT, KVM_REG_ARM64_SYSREG_OP0_SHIFT)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_MASK, KVM_REG_ARM64_SYSREG_OP1_MASK)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_SHIFT, KVM_REG_ARM64_SYSREG_OP1_SHIFT)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_MASK, KVM_REG_ARM64_SYSREG_CRN_MASK)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_SHIFT, KVM_REG_ARM64_SYSREG_CRN_SHIFT)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_MASK, KVM_REG_ARM64_SYSREG_CRM_MASK)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_SHIFT, KVM_REG_ARM64_SYSREG_CRM_SHIFT)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_MASK, KVM_REG_ARM64_SYSREG_OP2_MASK)
+-MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_SHIFT, KVM_REG_ARM64_SYSREG_OP2_SHIFT)
++MISMATCH_CHECK(CP_REG_ARM64, KVM_REG_ARM64);
++MISMATCH_CHECK(CP_REG_ARM_COPROC_MASK, KVM_REG_ARM_COPROC_MASK);
++MISMATCH_CHECK(CP_REG_ARM_COPROC_SHIFT, KVM_REG_ARM_COPROC_SHIFT);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG, KVM_REG_ARM64_SYSREG);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_MASK, KVM_REG_ARM64_SYSREG_OP0_MASK);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_SHIFT, KVM_REG_ARM64_SYSREG_OP0_SHIFT);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_MASK, KVM_REG_ARM64_SYSREG_OP1_MASK);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_SHIFT, KVM_REG_ARM64_SYSREG_OP1_SHIFT);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_MASK, KVM_REG_ARM64_SYSREG_CRN_MASK);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_SHIFT, KVM_REG_ARM64_SYSREG_CRN_SHIFT);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_MASK, KVM_REG_ARM64_SYSREG_CRM_MASK);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_SHIFT, KVM_REG_ARM64_SYSREG_CRM_SHIFT);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_MASK, KVM_REG_ARM64_SYSREG_OP2_MASK);
++MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_SHIFT, KVM_REG_ARM64_SYSREG_OP2_SHIFT);
+ #endif
+ 
+ #undef MISMATCH_CHECK
 -- 
 MST
