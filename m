@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbDq-0001i7-2K
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:24:02 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbDu-0001n3-M1
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:24:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbDo-0001Og-C4
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:23:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39618)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbDs-0001PX-Cn
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:24:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47322)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cYbDo-0001OQ-2W
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:23:56 -0500
+	id 1cYbDs-0001PF-3R
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:24:00 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 31 Jan 2017 20:21:18 +0400
-Message-Id: <20170131162122.29408-38-marcandre.lureau@redhat.com>
+Date: Tue, 31 Jan 2017 20:21:19 +0400
+Message-Id: <20170131162122.29408-39-marcandre.lureau@redhat.com>
 In-Reply-To: <20170131162122.29408-1-marcandre.lureau@redhat.com>
 References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 37/41] char: move pipe chardev in its own file
+Subject: [Qemu-devel] [PULL 38/41] char: move pty chardev in its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,19 +33,19 @@ Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lu
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Acked-by: Eric Blake <eblake@redhat.com>
 ---
- chardev/char-pipe.c   | 191 ++++++++++++++++++++++++++++++++++++++++++++=
+ chardev/char-pty.c    | 300 ++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- chardev/char.c        | 166 -------------------------------------------
+ chardev/char.c        | 258 -------------------------------------------
  chardev/Makefile.objs |   1 +
- 3 files changed, 192 insertions(+), 166 deletions(-)
- create mode 100644 chardev/char-pipe.c
+ 3 files changed, 301 insertions(+), 258 deletions(-)
+ create mode 100644 chardev/char-pty.c
 
-diff --git a/chardev/char-pipe.c b/chardev/char-pipe.c
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
 new file mode 100644
-index 0000000000..54240c863d
+index 0000000000..27eb85f505
 --- /dev/null
-+++ b/chardev/char-pipe.c
-@@ -0,0 +1,191 @@
++++ b/chardev/char-pty.c
+@@ -0,0 +1,300 @@
 +/*
 + * QEMU System Emulator
 + *
@@ -82,391 +82,576 @@ S IN
 + */
 +#include "qemu/osdep.h"
 +#include "qapi/error.h"
++#include "qemu-common.h"
 +#include "sysemu/char.h"
++#include "io/channel-file.h"
++#include "qemu/sockets.h"
++#include "qemu/error-report.h"
 +
-+#ifdef _WIN32
-+#include "char-win.h"
-+#else
-+#include "char-fd.h"
-+#endif
++#include "char-io.h"
 +
-+#ifdef _WIN32
-+#define MAXCONNECT 1
-+#define NTIMEOUT 5000
++#if defined(__linux__) || defined(__sun__) || defined(__FreeBSD__)      =
+\
++    || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFl=
+y__) \
++    || defined(__GLIBC__)
 +
-+static int win_chr_pipe_init(Chardev *chr, const char *filename,
-+                             Error **errp)
++typedef struct {
++    Chardev parent;
++    QIOChannel *ioc;
++    int read_bytes;
++
++    /* Protected by the Chardev chr_write_lock.  */
++    int connected;
++    guint timer_tag;
++    guint open_tag;
++} PtyChardev;
++
++#define PTY_CHARDEV(obj) OBJECT_CHECK(PtyChardev, (obj), TYPE_CHARDEV_PT=
+Y)
++
++static void pty_chr_update_read_handler_locked(Chardev *chr);
++static void pty_chr_state(Chardev *chr, int connected);
++
++static gboolean pty_chr_timer(gpointer opaque)
 +{
-+    WinChardev *s =3D WIN_CHARDEV(chr);
-+    OVERLAPPED ov;
-+    int ret;
-+    DWORD size;
-+    char *openname;
++    struct Chardev *chr =3D CHARDEV(opaque);
++    PtyChardev *s =3D PTY_CHARDEV(opaque);
 +
-+    s->fpipe =3D TRUE;
-+
-+    s->hsend =3D CreateEvent(NULL, TRUE, FALSE, NULL);
-+    if (!s->hsend) {
-+        error_setg(errp, "Failed CreateEvent");
-+        goto fail;
++    qemu_mutex_lock(&chr->chr_write_lock);
++    s->timer_tag =3D 0;
++    s->open_tag =3D 0;
++    if (!s->connected) {
++        /* Next poll ... */
++        pty_chr_update_read_handler_locked(chr);
 +    }
-+    s->hrecv =3D CreateEvent(NULL, TRUE, FALSE, NULL);
-+    if (!s->hrecv) {
-+        error_setg(errp, "Failed CreateEvent");
-+        goto fail;
-+    }
-+
-+    openname =3D g_strdup_printf("\\\\.\\pipe\\%s", filename);
-+    s->hcom =3D CreateNamedPipe(openname,
-+                              PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
-+                              PIPE_TYPE_BYTE | PIPE_READMODE_BYTE |
-+                              PIPE_WAIT,
-+                              MAXCONNECT, NSENDBUF, NRECVBUF, NTIMEOUT, =
-NULL);
-+    g_free(openname);
-+    if (s->hcom =3D=3D INVALID_HANDLE_VALUE) {
-+        error_setg(errp, "Failed CreateNamedPipe (%lu)", GetLastError())=
-;
-+        s->hcom =3D NULL;
-+        goto fail;
-+    }
-+
-+    ZeroMemory(&ov, sizeof(ov));
-+    ov.hEvent =3D CreateEvent(NULL, TRUE, FALSE, NULL);
-+    ret =3D ConnectNamedPipe(s->hcom, &ov);
-+    if (ret) {
-+        error_setg(errp, "Failed ConnectNamedPipe");
-+        goto fail;
-+    }
-+
-+    ret =3D GetOverlappedResult(s->hcom, &ov, &size, TRUE);
-+    if (!ret) {
-+        error_setg(errp, "Failed GetOverlappedResult");
-+        if (ov.hEvent) {
-+            CloseHandle(ov.hEvent);
-+            ov.hEvent =3D NULL;
-+        }
-+        goto fail;
-+    }
-+
-+    if (ov.hEvent) {
-+        CloseHandle(ov.hEvent);
-+        ov.hEvent =3D NULL;
-+    }
-+    qemu_add_polling_cb(win_chr_pipe_poll, chr);
-+    return 0;
-+
-+ fail:
-+    return -1;
++    qemu_mutex_unlock(&chr->chr_write_lock);
++    return FALSE;
 +}
 +
-+static void qemu_chr_open_pipe(Chardev *chr,
-+                               ChardevBackend *backend,
-+                               bool *be_opened,
-+                               Error **errp)
++/* Called with chr_write_lock held.  */
++static void pty_chr_rearm_timer(Chardev *chr, int ms)
 +{
-+    ChardevHostdev *opts =3D backend->u.pipe.data;
-+    const char *filename =3D opts->device;
++    PtyChardev *s =3D PTY_CHARDEV(chr);
++    char *name;
 +
-+    if (win_chr_pipe_init(chr, filename, errp) < 0) {
++    if (s->timer_tag) {
++        g_source_remove(s->timer_tag);
++        s->timer_tag =3D 0;
++    }
++
++    if (ms =3D=3D 1000) {
++        name =3D g_strdup_printf("pty-timer-secs-%s", chr->label);
++        s->timer_tag =3D g_timeout_add_seconds(1, pty_chr_timer, chr);
++    } else {
++        name =3D g_strdup_printf("pty-timer-ms-%s", chr->label);
++        s->timer_tag =3D g_timeout_add(ms, pty_chr_timer, chr);
++    }
++    g_source_set_name_by_id(s->timer_tag, name);
++    g_free(name);
++}
++
++/* Called with chr_write_lock held.  */
++static void pty_chr_update_read_handler_locked(Chardev *chr)
++{
++    PtyChardev *s =3D PTY_CHARDEV(chr);
++    GPollFD pfd;
++    int rc;
++    QIOChannelFile *fioc =3D QIO_CHANNEL_FILE(s->ioc);
++
++    pfd.fd =3D fioc->fd;
++    pfd.events =3D G_IO_OUT;
++    pfd.revents =3D 0;
++    do {
++        rc =3D g_poll(&pfd, 1, 0);
++    } while (rc =3D=3D -1 && errno =3D=3D EINTR);
++    assert(rc >=3D 0);
++
++    if (pfd.revents & G_IO_HUP) {
++        pty_chr_state(chr, 0);
++    } else {
++        pty_chr_state(chr, 1);
++    }
++}
++
++static void pty_chr_update_read_handler(Chardev *chr,
++                                        GMainContext *context)
++{
++    qemu_mutex_lock(&chr->chr_write_lock);
++    pty_chr_update_read_handler_locked(chr);
++    qemu_mutex_unlock(&chr->chr_write_lock);
++}
++
++/* Called with chr_write_lock held.  */
++static int char_pty_chr_write(Chardev *chr, const uint8_t *buf, int len)
++{
++    PtyChardev *s =3D PTY_CHARDEV(chr);
++
++    if (!s->connected) {
++        /* guest sends data, check for (re-)connect */
++        pty_chr_update_read_handler_locked(chr);
++        if (!s->connected) {
++            return 0;
++        }
++    }
++    return io_channel_send(s->ioc, buf, len);
++}
++
++static GSource *pty_chr_add_watch(Chardev *chr, GIOCondition cond)
++{
++    PtyChardev *s =3D PTY_CHARDEV(chr);
++    if (!s->connected) {
++        return NULL;
++    }
++    return qio_channel_create_watch(s->ioc, cond);
++}
++
++static int pty_chr_read_poll(void *opaque)
++{
++    Chardev *chr =3D CHARDEV(opaque);
++    PtyChardev *s =3D PTY_CHARDEV(opaque);
++
++    s->read_bytes =3D qemu_chr_be_can_write(chr);
++    return s->read_bytes;
++}
++
++static gboolean pty_chr_read(QIOChannel *chan, GIOCondition cond, void *=
+opaque)
++{
++    Chardev *chr =3D CHARDEV(opaque);
++    PtyChardev *s =3D PTY_CHARDEV(opaque);
++    gsize len;
++    uint8_t buf[CHR_READ_BUF_LEN];
++    ssize_t ret;
++
++    len =3D sizeof(buf);
++    if (len > s->read_bytes) {
++        len =3D s->read_bytes;
++    }
++    if (len =3D=3D 0) {
++        return TRUE;
++    }
++    ret =3D qio_channel_read(s->ioc, (char *)buf, len, NULL);
++    if (ret <=3D 0) {
++        pty_chr_state(chr, 0);
++        return FALSE;
++    } else {
++        pty_chr_state(chr, 1);
++        qemu_chr_be_write(chr, buf, ret);
++    }
++    return TRUE;
++}
++
++static gboolean qemu_chr_be_generic_open_func(gpointer opaque)
++{
++    Chardev *chr =3D CHARDEV(opaque);
++    PtyChardev *s =3D PTY_CHARDEV(opaque);
++
++    s->open_tag =3D 0;
++    qemu_chr_be_generic_open(chr);
++    return FALSE;
++}
++
++/* Called with chr_write_lock held.  */
++static void pty_chr_state(Chardev *chr, int connected)
++{
++    PtyChardev *s =3D PTY_CHARDEV(chr);
++
++    if (!connected) {
++        if (s->open_tag) {
++            g_source_remove(s->open_tag);
++            s->open_tag =3D 0;
++        }
++        remove_fd_in_watch(chr);
++        s->connected =3D 0;
++        /* (re-)connect poll interval for idle guests: once per second.
++         * We check more frequently in case the guests sends data to
++         * the virtual device linked to our pty. */
++        pty_chr_rearm_timer(chr, 1000);
++    } else {
++        if (s->timer_tag) {
++            g_source_remove(s->timer_tag);
++            s->timer_tag =3D 0;
++        }
++        if (!s->connected) {
++            g_assert(s->open_tag =3D=3D 0);
++            s->connected =3D 1;
++            s->open_tag =3D g_idle_add(qemu_chr_be_generic_open_func, ch=
+r);
++        }
++        if (!chr->fd_in_tag) {
++            chr->fd_in_tag =3D io_add_watch_poll(chr, s->ioc,
++                                               pty_chr_read_poll,
++                                               pty_chr_read,
++                                               chr, NULL);
++        }
++    }
++}
++
++static void char_pty_finalize(Object *obj)
++{
++    Chardev *chr =3D CHARDEV(obj);
++    PtyChardev *s =3D PTY_CHARDEV(obj);
++
++    qemu_mutex_lock(&chr->chr_write_lock);
++    pty_chr_state(chr, 0);
++    object_unref(OBJECT(s->ioc));
++    if (s->timer_tag) {
++        g_source_remove(s->timer_tag);
++        s->timer_tag =3D 0;
++    }
++    qemu_mutex_unlock(&chr->chr_write_lock);
++    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
++}
++
++static void char_pty_open(Chardev *chr,
++                          ChardevBackend *backend,
++                          bool *be_opened,
++                          Error **errp)
++{
++    PtyChardev *s;
++    int master_fd, slave_fd;
++    char pty_name[PATH_MAX];
++    char *name;
++
++    master_fd =3D qemu_openpty_raw(&slave_fd, pty_name);
++    if (master_fd < 0) {
++        error_setg_errno(errp, errno, "Failed to create PTY");
 +        return;
 +    }
++
++    close(slave_fd);
++    qemu_set_nonblock(master_fd);
++
++    chr->filename =3D g_strdup_printf("pty:%s", pty_name);
++    error_report("char device redirected to %s (label %s)",
++                 pty_name, chr->label);
++
++    s =3D PTY_CHARDEV(chr);
++    s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
++    name =3D g_strdup_printf("chardev-pty-%s", chr->label);
++    qio_channel_set_name(QIO_CHANNEL(s->ioc), name);
++    g_free(name);
++    s->timer_tag =3D 0;
++    *be_opened =3D false;
 +}
 +
-+#else
-+
-+static void qemu_chr_open_pipe(Chardev *chr,
-+                               ChardevBackend *backend,
-+                               bool *be_opened,
-+                               Error **errp)
-+{
-+    ChardevHostdev *opts =3D backend->u.pipe.data;
-+    int fd_in, fd_out;
-+    char *filename_in;
-+    char *filename_out;
-+    const char *filename =3D opts->device;
-+
-+    filename_in =3D g_strdup_printf("%s.in", filename);
-+    filename_out =3D g_strdup_printf("%s.out", filename);
-+    TFR(fd_in =3D qemu_open(filename_in, O_RDWR | O_BINARY));
-+    TFR(fd_out =3D qemu_open(filename_out, O_RDWR | O_BINARY));
-+    g_free(filename_in);
-+    g_free(filename_out);
-+    if (fd_in < 0 || fd_out < 0) {
-+        if (fd_in >=3D 0) {
-+            close(fd_in);
-+        }
-+        if (fd_out >=3D 0) {
-+            close(fd_out);
-+        }
-+        TFR(fd_in =3D fd_out =3D qemu_open(filename, O_RDWR | O_BINARY))=
-;
-+        if (fd_in < 0) {
-+            error_setg_file_open(errp, errno, filename);
-+            return;
-+        }
-+    }
-+    qemu_chr_open_fd(chr, fd_in, fd_out);
-+}
-+
-+#endif /* !_WIN32 */
-+
-+static void qemu_chr_parse_pipe(QemuOpts *opts, ChardevBackend *backend,
-+                                Error **errp)
-+{
-+    const char *device =3D qemu_opt_get(opts, "path");
-+    ChardevHostdev *dev;
-+
-+    if (device =3D=3D NULL) {
-+        error_setg(errp, "chardev: pipe: no device path given");
-+        return;
-+    }
-+    backend->type =3D CHARDEV_BACKEND_KIND_PIPE;
-+    dev =3D backend->u.pipe.data =3D g_new0(ChardevHostdev, 1);
-+    qemu_chr_parse_common(opts, qapi_ChardevHostdev_base(dev));
-+    dev->device =3D g_strdup(device);
-+}
-+
-+static void char_pipe_class_init(ObjectClass *oc, void *data)
++static void char_pty_class_init(ObjectClass *oc, void *data)
 +{
 +    ChardevClass *cc =3D CHARDEV_CLASS(oc);
 +
-+    cc->parse =3D qemu_chr_parse_pipe;
-+    cc->open =3D qemu_chr_open_pipe;
++    cc->open =3D char_pty_open;
++    cc->chr_write =3D char_pty_chr_write;
++    cc->chr_update_read_handler =3D pty_chr_update_read_handler;
++    cc->chr_add_watch =3D pty_chr_add_watch;
 +}
 +
-+static const TypeInfo char_pipe_type_info =3D {
-+    .name =3D TYPE_CHARDEV_PIPE,
-+#ifdef _WIN32
-+    .parent =3D TYPE_CHARDEV_WIN,
-+#else
-+    .parent =3D TYPE_CHARDEV_FD,
-+#endif
-+    .class_init =3D char_pipe_class_init,
++static const TypeInfo char_pty_type_info =3D {
++    .name =3D TYPE_CHARDEV_PTY,
++    .parent =3D TYPE_CHARDEV,
++    .instance_size =3D sizeof(PtyChardev),
++    .instance_finalize =3D char_pty_finalize,
++    .class_init =3D char_pty_class_init,
 +};
 +
 +static void register_types(void)
 +{
-+    type_register_static(&char_pipe_type_info);
++    type_register_static(&char_pty_type_info);
 +}
 +
 +type_init(register_types);
++
++#endif
 diff --git a/chardev/char.c b/chardev/char.c
-index 8ae8b5a4c3..b542c25cec 100644
+index b542c25cec..6d4cb7c71e 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
-@@ -655,36 +655,6 @@ void qemu_chr_fe_take_focus(CharBackend *b)
- }
-=20
- #ifndef _WIN32
--static void qemu_chr_open_pipe(Chardev *chr,
--                               ChardevBackend *backend,
--                               bool *be_opened,
--                               Error **errp)
--{
--    ChardevHostdev *opts =3D backend->u.pipe.data;
--    int fd_in, fd_out;
--    char *filename_in;
--    char *filename_out;
--    const char *filename =3D opts->device;
--
--    filename_in =3D g_strdup_printf("%s.in", filename);
--    filename_out =3D g_strdup_printf("%s.out", filename);
--    TFR(fd_in =3D qemu_open(filename_in, O_RDWR | O_BINARY));
--    TFR(fd_out =3D qemu_open(filename_out, O_RDWR | O_BINARY));
--    g_free(filename_in);
--    g_free(filename_out);
--    if (fd_in < 0 || fd_out < 0) {
--	if (fd_in >=3D 0)
--	    close(fd_in);
--	if (fd_out >=3D 0)
--	    close(fd_out);
--        TFR(fd_in =3D fd_out =3D qemu_open(filename, O_RDWR | O_BINARY))=
-;
--        if (fd_in < 0) {
--            error_setg_file_open(errp, errno, filename);
--            return;
--        }
--    }
--    qemu_chr_open_fd(chr, fd_in, fd_out);
--}
-=20
- #if defined(__linux__) || defined(__sun__) || defined(__FreeBSD__) \
-     || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFl=
-y__) \
-@@ -1325,107 +1295,6 @@ static void qemu_chr_open_pp_fd(Chardev *chr,
+@@ -661,261 +661,6 @@ void qemu_chr_fe_take_focus(CharBackend *b)
+     || defined(__GLIBC__)
 =20
  #define HAVE_CHARDEV_SERIAL 1
-=20
--#define MAXCONNECT 1
--#define NTIMEOUT 5000
+-#define HAVE_CHARDEV_PTY 1
 -
--static int win_chr_pipe_init(Chardev *chr, const char *filename,
--                             Error **errp)
+-typedef struct {
+-    Chardev parent;
+-    QIOChannel *ioc;
+-    int read_bytes;
+-
+-    /* Protected by the Chardev chr_write_lock.  */
+-    int connected;
+-    guint timer_tag;
+-    guint open_tag;
+-} PtyChardev;
+-
+-#define PTY_CHARDEV(obj) OBJECT_CHECK(PtyChardev, (obj), TYPE_CHARDEV_PT=
+Y)
+-
+-static void pty_chr_update_read_handler_locked(Chardev *chr);
+-static void pty_chr_state(Chardev *chr, int connected);
+-
+-static gboolean pty_chr_timer(gpointer opaque)
 -{
--    WinChardev *s =3D WIN_CHARDEV(chr);
--    OVERLAPPED ov;
--    int ret;
--    DWORD size;
--    char *openname;
+-    struct Chardev *chr =3D CHARDEV(opaque);
+-    PtyChardev *s =3D PTY_CHARDEV(opaque);
 -
--    s->fpipe =3D TRUE;
--
--    s->hsend =3D CreateEvent(NULL, TRUE, FALSE, NULL);
--    if (!s->hsend) {
--        error_setg(errp, "Failed CreateEvent");
--        goto fail;
+-    qemu_mutex_lock(&chr->chr_write_lock);
+-    s->timer_tag =3D 0;
+-    s->open_tag =3D 0;
+-    if (!s->connected) {
+-        /* Next poll ... */
+-        pty_chr_update_read_handler_locked(chr);
 -    }
--    s->hrecv =3D CreateEvent(NULL, TRUE, FALSE, NULL);
--    if (!s->hrecv) {
--        error_setg(errp, "Failed CreateEvent");
--        goto fail;
--    }
+-    qemu_mutex_unlock(&chr->chr_write_lock);
+-    return FALSE;
+-}
 -
--    openname =3D g_strdup_printf("\\\\.\\pipe\\%s", filename);
--    s->hcom =3D CreateNamedPipe(openname, PIPE_ACCESS_DUPLEX | FILE_FLAG=
-_OVERLAPPED,
--                              PIPE_TYPE_BYTE | PIPE_READMODE_BYTE |
--                              PIPE_WAIT,
--                              MAXCONNECT, NSENDBUF, NRECVBUF, NTIMEOUT, =
-NULL);
--    g_free(openname);
--    if (s->hcom =3D=3D INVALID_HANDLE_VALUE) {
--        error_setg(errp, "Failed CreateNamedPipe (%lu)", GetLastError())=
-;
--        s->hcom =3D NULL;
--        goto fail;
+-/* Called with chr_write_lock held.  */
+-static void pty_chr_rearm_timer(Chardev *chr, int ms)
+-{
+-    PtyChardev *s =3D PTY_CHARDEV(chr);
+-    char *name;
+-
+-    if (s->timer_tag) {
+-        g_source_remove(s->timer_tag);
+-        s->timer_tag =3D 0;
 -    }
 -
--    ZeroMemory(&ov, sizeof(ov));
--    ov.hEvent =3D CreateEvent(NULL, TRUE, FALSE, NULL);
--    ret =3D ConnectNamedPipe(s->hcom, &ov);
--    if (ret) {
--        error_setg(errp, "Failed ConnectNamedPipe");
--        goto fail;
+-    if (ms =3D=3D 1000) {
+-        name =3D g_strdup_printf("pty-timer-secs-%s", chr->label);
+-        s->timer_tag =3D g_timeout_add_seconds(1, pty_chr_timer, chr);
+-    } else {
+-        name =3D g_strdup_printf("pty-timer-ms-%s", chr->label);
+-        s->timer_tag =3D g_timeout_add(ms, pty_chr_timer, chr);
 -    }
+-    g_source_set_name_by_id(s->timer_tag, name);
+-    g_free(name);
+-}
 -
--    ret =3D GetOverlappedResult(s->hcom, &ov, &size, TRUE);
--    if (!ret) {
--        error_setg(errp, "Failed GetOverlappedResult");
--        if (ov.hEvent) {
--            CloseHandle(ov.hEvent);
--            ov.hEvent =3D NULL;
+-/* Called with chr_write_lock held.  */
+-static void pty_chr_update_read_handler_locked(Chardev *chr)
+-{
+-    PtyChardev *s =3D PTY_CHARDEV(chr);
+-    GPollFD pfd;
+-    int rc;
+-    QIOChannelFile *fioc =3D QIO_CHANNEL_FILE(s->ioc);
+-
+-    pfd.fd =3D fioc->fd;
+-    pfd.events =3D G_IO_OUT;
+-    pfd.revents =3D 0;
+-    do {
+-        rc =3D g_poll(&pfd, 1, 0);
+-    } while (rc =3D=3D -1 && errno =3D=3D EINTR);
+-    assert(rc >=3D 0);
+-
+-    if (pfd.revents & G_IO_HUP) {
+-        pty_chr_state(chr, 0);
+-    } else {
+-        pty_chr_state(chr, 1);
+-    }
+-}
+-
+-static void pty_chr_update_read_handler(Chardev *chr,
+-                                        GMainContext *context)
+-{
+-    qemu_mutex_lock(&chr->chr_write_lock);
+-    pty_chr_update_read_handler_locked(chr);
+-    qemu_mutex_unlock(&chr->chr_write_lock);
+-}
+-
+-/* Called with chr_write_lock held.  */
+-static int char_pty_chr_write(Chardev *chr, const uint8_t *buf, int len)
+-{
+-    PtyChardev *s =3D PTY_CHARDEV(chr);
+-
+-    if (!s->connected) {
+-        /* guest sends data, check for (re-)connect */
+-        pty_chr_update_read_handler_locked(chr);
+-        if (!s->connected) {
+-            return 0;
 -        }
--        goto fail;
 -    }
--
--    if (ov.hEvent) {
--        CloseHandle(ov.hEvent);
--        ov.hEvent =3D NULL;
--    }
--    qemu_add_polling_cb(win_chr_pipe_poll, chr);
--    return 0;
--
-- fail:
--    return -1;
+-    return io_channel_send(s->ioc, buf, len);
 -}
 -
--
--static void qemu_chr_open_pipe(Chardev *chr,
--                               ChardevBackend *backend,
--                               bool *be_opened,
--                               Error **errp)
+-static GSource *pty_chr_add_watch(Chardev *chr, GIOCondition cond)
 -{
--    ChardevHostdev *opts =3D backend->u.pipe.data;
--    const char *filename =3D opts->device;
+-    PtyChardev *s =3D PTY_CHARDEV(chr);
+-    if (!s->connected) {
+-        return NULL;
+-    }
+-    return qio_channel_create_watch(s->ioc, cond);
+-}
 -
--    if (win_chr_pipe_init(chr, filename, errp) < 0) {
+-static int pty_chr_read_poll(void *opaque)
+-{
+-    Chardev *chr =3D CHARDEV(opaque);
+-    PtyChardev *s =3D PTY_CHARDEV(opaque);
+-
+-    s->read_bytes =3D qemu_chr_be_can_write(chr);
+-    return s->read_bytes;
+-}
+-
+-static gboolean pty_chr_read(QIOChannel *chan, GIOCondition cond, void *=
+opaque)
+-{
+-    Chardev *chr =3D CHARDEV(opaque);
+-    PtyChardev *s =3D PTY_CHARDEV(opaque);
+-    gsize len;
+-    uint8_t buf[CHR_READ_BUF_LEN];
+-    ssize_t ret;
+-
+-    len =3D sizeof(buf);
+-    if (len > s->read_bytes)
+-        len =3D s->read_bytes;
+-    if (len =3D=3D 0) {
+-        return TRUE;
+-    }
+-    ret =3D qio_channel_read(s->ioc, (char *)buf, len, NULL);
+-    if (ret <=3D 0) {
+-        pty_chr_state(chr, 0);
+-        return FALSE;
+-    } else {
+-        pty_chr_state(chr, 1);
+-        qemu_chr_be_write(chr, buf, ret);
+-    }
+-    return TRUE;
+-}
+-
+-static gboolean qemu_chr_be_generic_open_func(gpointer opaque)
+-{
+-    Chardev *chr =3D CHARDEV(opaque);
+-    PtyChardev *s =3D PTY_CHARDEV(opaque);
+-
+-    s->open_tag =3D 0;
+-    qemu_chr_be_generic_open(chr);
+-    return FALSE;
+-}
+-
+-/* Called with chr_write_lock held.  */
+-static void pty_chr_state(Chardev *chr, int connected)
+-{
+-    PtyChardev *s =3D PTY_CHARDEV(chr);
+-
+-    if (!connected) {
+-        if (s->open_tag) {
+-            g_source_remove(s->open_tag);
+-            s->open_tag =3D 0;
+-        }
+-        remove_fd_in_watch(chr);
+-        s->connected =3D 0;
+-        /* (re-)connect poll interval for idle guests: once per second.
+-         * We check more frequently in case the guests sends data to
+-         * the virtual device linked to our pty. */
+-        pty_chr_rearm_timer(chr, 1000);
+-    } else {
+-        if (s->timer_tag) {
+-            g_source_remove(s->timer_tag);
+-            s->timer_tag =3D 0;
+-        }
+-        if (!s->connected) {
+-            g_assert(s->open_tag =3D=3D 0);
+-            s->connected =3D 1;
+-            s->open_tag =3D g_idle_add(qemu_chr_be_generic_open_func, ch=
+r);
+-        }
+-        if (!chr->fd_in_tag) {
+-            chr->fd_in_tag =3D io_add_watch_poll(chr, s->ioc,
+-                                               pty_chr_read_poll,
+-                                               pty_chr_read,
+-                                               chr, NULL);
+-        }
+-    }
+-}
+-
+-static void char_pty_finalize(Object *obj)
+-{
+-    Chardev *chr =3D CHARDEV(obj);
+-    PtyChardev *s =3D PTY_CHARDEV(obj);
+-
+-    qemu_mutex_lock(&chr->chr_write_lock);
+-    pty_chr_state(chr, 0);
+-    object_unref(OBJECT(s->ioc));
+-    if (s->timer_tag) {
+-        g_source_remove(s->timer_tag);
+-        s->timer_tag =3D 0;
+-    }
+-    qemu_mutex_unlock(&chr->chr_write_lock);
+-    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+-}
+-
+-static void char_pty_open(Chardev *chr,
+-                          ChardevBackend *backend,
+-                          bool *be_opened,
+-                          Error **errp)
+-{
+-    PtyChardev *s;
+-    int master_fd, slave_fd;
+-    char pty_name[PATH_MAX];
+-    char *name;
+-
+-    master_fd =3D qemu_openpty_raw(&slave_fd, pty_name);
+-    if (master_fd < 0) {
+-        error_setg_errno(errp, errno, "Failed to create PTY");
 -        return;
 -    }
+-
+-    close(slave_fd);
+-    qemu_set_nonblock(master_fd);
+-
+-    chr->filename =3D g_strdup_printf("pty:%s", pty_name);
+-    error_report("char device redirected to %s (label %s)",
+-                 pty_name, chr->label);
+-
+-    s =3D PTY_CHARDEV(chr);
+-    s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
+-    name =3D g_strdup_printf("chardev-pty-%s", chr->label);
+-    qio_channel_set_name(QIO_CHANNEL(s->ioc), name);
+-    g_free(name);
+-    s->timer_tag =3D 0;
+-    *be_opened =3D false;
 -}
 -
--static void qemu_chr_open_win_con(Chardev *chr,
--                                  ChardevBackend *backend,
--                                  bool *be_opened,
--                                  Error **errp)
--{
--    qemu_chr_open_win_file(chr, GetStdHandle(STD_OUTPUT_HANDLE));
--}
--
--static void char_console_class_init(ObjectClass *oc, void *data)
+-static void char_pty_class_init(ObjectClass *oc, void *data)
 -{
 -    ChardevClass *cc =3D CHARDEV_CLASS(oc);
 -
--    cc->open =3D qemu_chr_open_win_con;
+-    cc->open =3D char_pty_open;
+-    cc->chr_write =3D char_pty_chr_write;
+-    cc->chr_update_read_handler =3D pty_chr_update_read_handler;
+-    cc->chr_add_watch =3D pty_chr_add_watch;
 -}
 -
--static const TypeInfo char_console_type_info =3D {
--    .name =3D TYPE_CHARDEV_CONSOLE,
--    .parent =3D TYPE_CHARDEV_WIN,
--    .class_init =3D char_console_class_init,
+-static const TypeInfo char_pty_type_info =3D {
+-    .name =3D TYPE_CHARDEV_PTY,
+-    .parent =3D TYPE_CHARDEV,
+-    .instance_size =3D sizeof(PtyChardev),
+-    .instance_finalize =3D char_pty_finalize,
+-    .class_init =3D char_pty_class_init,
 -};
--
- #endif /* !_WIN32 */
 =20
- int qemu_chr_wait_connected(Chardev *chr, Error **errp)
-@@ -1638,40 +1507,6 @@ static void qemu_chr_parse_parallel(QemuOpts *opts=
-, ChardevBackend *backend,
- }
+ static void tty_serial_init(int fd, int speed,
+                             int parity, int data_bits, int stop_bits)
+@@ -2175,9 +1920,6 @@ static void register_types(void)
+ #ifdef HAVE_CHARDEV_PARPORT
+     type_register_static(&char_parallel_type_info);
  #endif
-=20
--static void qemu_chr_parse_pipe(QemuOpts *opts, ChardevBackend *backend,
--                                Error **errp)
--{
--    const char *device =3D qemu_opt_get(opts, "path");
--    ChardevHostdev *dev;
--
--    backend->type =3D CHARDEV_BACKEND_KIND_PIPE;
--    if (device =3D=3D NULL) {
--        error_setg(errp, "chardev: pipe: no device path given");
--        return;
--    }
--    dev =3D backend->u.pipe.data =3D g_new0(ChardevHostdev, 1);
--    qemu_chr_parse_common(opts, qapi_ChardevHostdev_base(dev));
--    dev->device =3D g_strdup(device);
--}
--
--static void char_pipe_class_init(ObjectClass *oc, void *data)
--{
--    ChardevClass *cc =3D CHARDEV_CLASS(oc);
--
--    cc->parse =3D qemu_chr_parse_pipe;
--    cc->open =3D qemu_chr_open_pipe;
--}
--
--static const TypeInfo char_pipe_type_info =3D {
--    .name =3D TYPE_CHARDEV_PIPE,
--#ifdef _WIN32
--    .parent =3D TYPE_CHARDEV_WIN,
--#else
--    .parent =3D TYPE_CHARDEV_FD,
+-#ifdef HAVE_CHARDEV_PTY
+-    type_register_static(&char_pty_type_info);
 -#endif
--    .class_init =3D char_pipe_class_init,
--};
--
- static const ChardevClass *char_get_class(const char *driver, Error **er=
-rp)
- {
-     ObjectClass *oc;
-@@ -2343,7 +2178,6 @@ static void register_types(void)
- #ifdef HAVE_CHARDEV_PTY
-     type_register_static(&char_pty_type_info);
- #endif
--    type_register_static(&char_pipe_type_info);
 =20
      /* this must be done after machine init, since we register FEs with =
 muxes
       * as part of realize functions like serial_isa_realizefn when -nogr=
 aphic
 diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index 265a6dad5d..778b312377 100644
+index 778b312377..b2c14fe795 100644
 --- a/chardev/Makefile.objs
 +++ b/chardev/Makefile.objs
-@@ -5,6 +5,7 @@ chardev-obj-y +=3D char-file.o
- chardev-obj-y +=3D char-io.o
+@@ -6,6 +6,7 @@ chardev-obj-y +=3D char-io.o
  chardev-obj-y +=3D char-mux.o
  chardev-obj-y +=3D char-null.o
-+chardev-obj-y +=3D char-pipe.o
+ chardev-obj-y +=3D char-pipe.o
++chardev-obj-$(CONFIG_POSIX) +=3D char-pty.o
  chardev-obj-y +=3D char-ringbuf.o
  chardev-obj-y +=3D char-socket.o
  chardev-obj-y +=3D char-stdio.o
