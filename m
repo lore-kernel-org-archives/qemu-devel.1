@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbCC-0008TE-Oo
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:17 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbCD-0008U1-9b
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbC8-0000ri-Px
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34158)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbCC-0000sB-Ki
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cYbC8-0000rb-K1
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:12 -0500
+	id 1cYbCC-0000s3-EH
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:16 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 31 Jan 2017 20:20:52 +0400
-Message-Id: <20170131162122.29408-12-marcandre.lureau@redhat.com>
+Date: Tue, 31 Jan 2017 20:20:53 +0400
+Message-Id: <20170131162122.29408-13-marcandre.lureau@redhat.com>
 In-Reply-To: <20170131162122.29408-1-marcandre.lureau@redhat.com>
 References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/41] char-stdio: convert to finalize
+Subject: [Qemu-devel] [PULL 12/41] char-win-stdio: convert to finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +37,39 @@ Reviewed-by: Eric Blake <eblake@redhat.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/qemu-char.c b/qemu-char.c
-index 1981058f45..390e6a99de 100644
+index 390e6a99de..d92642735e 100644
 --- a/qemu-char.c
 +++ b/qemu-char.c
-@@ -1422,10 +1422,10 @@ static void qemu_chr_set_echo_stdio(Chardev *chr,=
- bool echo)
-     tcsetattr (0, TCSANOW, &tty);
+@@ -2594,9 +2594,9 @@ static void qemu_chr_set_echo_win_stdio(Chardev *ch=
+r, bool echo)
+     }
  }
 =20
--static void qemu_chr_free_stdio(struct Chardev *chr)
-+static void char_stdio_finalize(Object *obj)
+-static void win_stdio_free(Chardev *chr)
++static void char_win_stdio_finalize(Object *obj)
  {
-     term_exit();
--    fd_chr_free(chr);
-+    fd_chr_free(CHARDEV(chr));
- }
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(obj);
 =20
- static void qemu_chr_open_stdio(Chardev *chr,
-@@ -3859,7 +3859,6 @@ static void char_stdio_class_init(ObjectClass *oc, =
+     if (stdio->hInputReadyEvent !=3D INVALID_HANDLE_VALUE) {
+         CloseHandle(stdio->hInputReadyEvent);
+@@ -2613,6 +2613,7 @@ static const TypeInfo char_win_stdio_type_info =3D =
+{
+     .name =3D TYPE_CHARDEV_WIN_STDIO,
+     .parent =3D TYPE_CHARDEV,
+     .instance_size =3D sizeof(WinStdioChardev),
++    .instance_finalize =3D char_win_stdio_finalize,
+     .abstract =3D true,
+ };
+=20
+@@ -3856,7 +3857,6 @@ static void char_stdio_class_init(ObjectClass *oc, =
 void *data)
-     cc->chr_free =3D win_stdio_free;
+ #ifdef _WIN32
+     cc->chr_write =3D win_stdio_write;
+     cc->chr_set_echo =3D qemu_chr_set_echo_win_stdio;
+-    cc->chr_free =3D win_stdio_free;
  #else
      cc->chr_set_echo =3D qemu_chr_set_echo_stdio;
--    cc->chr_free =3D qemu_chr_free_stdio;
  #endif
- }
-=20
-@@ -3869,6 +3868,7 @@ static const TypeInfo char_stdio_type_info =3D {
-     .parent =3D TYPE_CHARDEV_WIN_STDIO,
- #else
-     .parent =3D TYPE_CHARDEV_FD,
-+    .instance_finalize =3D char_stdio_finalize,
- #endif
-     .class_init =3D char_stdio_class_init,
- };
 --=20
 2.11.0.295.gd7dffce1c.dirty
