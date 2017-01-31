@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cYi5s-0005vI-2C
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:44:13 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYi9I-0008Hv-Eb
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:47:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cYi5q-0006qF-Q5
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:44:12 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cYi5q-0006py-KG
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:44:10 -0500
-Received: by mail-pf0-x241.google.com with SMTP id 19so30235894pfo.3
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 15:44:10 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170127103922.19658-1-alex.bennee@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <56f0e8fe-294f-6076-ac1d-20064c0fcc8e@twiddle.net>
-Date: Tue, 31 Jan 2017 15:44:07 -0800
+	(envelope-from <mreitz@redhat.com>) id 1cYi9H-00082p-LN
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:47:44 -0500
+References: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
+	<20170122142959.GA12419@lemon.Home>
+	<ff2fd02a-09ea-a28f-eb6e-e1858efff552@redhat.com>
+	<20170124120957.GC13714@lemon.Home>
+	<e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b57d8de7-394d-5446-8d5b-ea4e0ec85cc3@redhat.com>
+Date: Wed, 1 Feb 2017 00:47:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170127103922.19658-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 00/25] Remaining MTTCG Base patches and
- ARM enablement
+In-Reply-To: <e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oPHLkdTcXkpdkIVUqPGwnQFhwg43MxDtl"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/3] scsi-generic and
+ BLKSECTGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
-Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org
+To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kwolf@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 01/27/2017 02:38 AM, Alex Bennée wrote:
-> Hi,
->
-> All of the changes in this revision are addressing comments from v7
-> posted last week. A new pre-cursor patch was added:
->
->   cputlb and arm/sparc targets: convert mmuidx flushes from varg to
->     bitmap
->
-> To change the cputlb API to use a bitmap instead of vargs. This has
-> generated quite a bit of churn in the ARM target but it is pretty
-> mechanical.
->
-> I also folded the BQL irq protection patches from v7 into:
->
->   tcg: drop global lock during TCG code execution
->
-> This is required to keep the series bisectable although the BQL safety
-> is only really relevant to guests using MTTCG. I didn't think it was
-> worth making the asserts conditional on parallel_cpus although it does
-> mean this patch gets a little bigger.
->
-> The other big change was to:
->
->   cputlb: introduce tlb_flush_*_all_cpus[_synced]
->
-> Where I replaced the wait flag with an expanded set of API calls. The
-> *_synced variants which are marked as QEMU_NORETURN to make their
-> behaviour clear.
->
-> The series applies to origin/master as of today and you can find my
-> tree at:
->
->   https://github.com/stsquad/qemu/tree/mttcg/base-patches-v8
->
-> There is the usual collection of r-b tags and minor merge/re-base
-> fixes all documented in the --- sections of the commit messages.
->
-> In terms of merging strategy I would appreciate some thoughts. While I
-> think the series is ready to go I appreciate it is quite a chunk to
-> merge in one go. That said an early merge gives us plenty of time to
-> shake out any lingering issues before feature freeze.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oPHLkdTcXkpdkIVUqPGwnQFhwg43MxDtl
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kwolf@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <b57d8de7-394d-5446-8d5b-ea4e0ec85cc3@redhat.com>
+Subject: Re: [Qemu-block] [Qemu-devel] [PATCH v3 0/3] scsi-generic and
+ BLKSECTGET
+References: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
+ <20170122142959.GA12419@lemon.Home>
+ <ff2fd02a-09ea-a28f-eb6e-e1858efff552@redhat.com>
+ <20170124120957.GC13714@lemon.Home>
+ <e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
+In-Reply-To: <e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-As far as I'm concerned, I'm done with my review and this can go in.
+On 31.01.2017 12:37, John Snow wrote:
+>=20
+>=20
+> On 01/24/2017 07:09 AM, Fam Zheng wrote:
+>> On Tue, 01/24 12:23, Paolo Bonzini wrote:
+>>>
+>>>
+>>> On 22/01/2017 15:29, Fam Zheng wrote:
+>>>> On Fri, 01/20 17:25, Eric Farman wrote:
+>>>>> Changes:
+>>>>>  v2->v3:
+>>>>>   - Move byte/sector conversions to patch 2 [Fam Zheng]
+>>>>>   - Rename "max_sectors" when holding a byte value [Fam Zheng]
+>>>>>  v1->v2:
+>>>>>   - Patch 3, make hdev_get_max_transfer_length return bytes [Fam Zh=
+eng]
+>>>>
+>>>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>>>
+>>> Looks good, who's merging this? :)
+>>
+>> All I know is not me :) Adding Kevin and Max who maintain block/file-p=
+osix.c.
+>>
+>> Fam
+>>
+>=20
+> Kevin's traveling for DevConf.cz, so how about Max? :)
 
-Those remaining nits in target/arm are extremely minor and ought to be between 
-you and PMM as ARM maintainer -- whatever he's happy with should go.
+Did Kevin tell you to write that? If so, tell him he's got to merge all
+of my patches once he's back. :-P
 
-Once this is in I'll send a patch to enable mttcg for Alpha, which has also 
-tested well.
+Ooooh, I see, he's trying to get me to merge so many patches I'll have
+to send my own pull request. Cleverrr. Verrry clever. ;-)
+
+Max
 
 
-r~
+--oPHLkdTcXkpdkIVUqPGwnQFhwg43MxDtl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRIhUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AescIALesBYRtkVZSVpmMhi14r4LfrivUwkyV
+qw1b8heHCOYHSn9VmPj+aE/WJPWs9cZ4ZC4cW+w0ZQ40AsALtlhz370X3z7Y1LEK
+G5DIwGBuw/lMIjX7YqSGFCf23pjQtTbrhlW4bdsxhIBf2m0rSAp39MJfOuL/HIIl
+sBLYlo3r927sIsK3HjVyNfNx8xt7B9Q/uN6A2wkXHhHNTf8F6hQOpr9CRfWzSxAp
+FkmV0l15mFsD29kgtJbnpnn0ollXQV6abADF5CwKm23b6bb0K0WX91St1sPcBYLe
+zcCZNl+yuiYN3Dux5MR22DDc39de0qQbzent2QZivML/y0Ee7hp7C6M=
+=jXne
+-----END PGP SIGNATURE-----
+
+--oPHLkdTcXkpdkIVUqPGwnQFhwg43MxDtl--
