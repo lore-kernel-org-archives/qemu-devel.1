@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYXny-0000Vp-Lr
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:45:03 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cYXyr-00016c-Ts
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:56:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYXnx-0001Ys-QF
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:45:02 -0500
-Date: Tue, 31 Jan 2017 11:29:26 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131112926.GG18804@stefanha-x1.localdomain>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-6-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1cYXyn-0003hu-TC
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:56:17 -0500
+References: <1484305370-6220-1-git-send-email-lprosek@redhat.com>
+	<0343b5cd-f2b9-b439-7652-44ab5f05f0c4@redhat.com>
+	<CABdb734ESPhd=354YHCs2AV_jiCj=NwiR-AU0TcWuv0XMDcCaQ@mail.gmail.com>
+	<9d544d44-f41f-e691-ee73-54f9383a13e3@redhat.com>
+	<CABdb735JeFpoXqE1A-V1ih7F3Tbg3KFgs69_ijeyeYf_bo+jBw@mail.gmail.com>
+	<74186249-fee1-9917-2bf4-50aa240eb114@redhat.com>
+	<CABdb736fzG4u6-tS_LeGAmsWMuao1pP2Z83qYazQQkeFrSxwoA@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d837afc4-86ec-4343-2293-00658ea8c93e@redhat.com>
+Date: Tue, 31 Jan 2017 07:56:04 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="hTiIB9CRvBOLTyqY"
-Content-Disposition: inline
-In-Reply-To: <1482503344-6424-6-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 05/21] hbitmap: improve dirty iter
+In-Reply-To: <CABdb736fzG4u6-tS_LeGAmsWMuao1pP2Z83qYazQQkeFrSxwoA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ahci: advertise HOST_CAP_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
 
---hTiIB9CRvBOLTyqY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 23, 2016 at 05:28:48PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Make dirty iter resistant to resetting bits in corresponding HBitmap.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/qemu/hbitmap.h | 24 ++----------------------
->  util/hbitmap.c         | 23 ++++++++++++++++++++++-
->  2 files changed, 24 insertions(+), 23 deletions(-)
->=20
-> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-> index eb46475..2873a46 100644
-> --- a/include/qemu/hbitmap.h
-> +++ b/include/qemu/hbitmap.h
-> @@ -243,10 +243,7 @@ void hbitmap_free(HBitmap *hb);
->   * the lowest-numbered bit that is set in @hb, starting at @first.
->   *
->   * Concurrent setting of bits is acceptable, and will at worst cause the
-> - * iteration to miss some of those bits.  Resetting bits before the curr=
-ent
-> - * position of the iterator is also okay.  However, concurrent resetting=
- of
-> - * bits can lead to unexpected behavior if the iterator has not yet reac=
-hed
-> - * those bits.
-> + * iteration to miss some of those bits.  Resetting bits is also okay.
->   */
->  void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t fir=
-st);
+On 01/16/2017 02:49 AM, Ladi Prosek wrote:
+> On Fri, Jan 13, 2017 at 8:15 PM, John Snow <jsnow@redhat.com> wrote:
+>>
+>>
+>> On 01/13/2017 02:01 PM, Ladi Prosek wrote:
+>>> On Fri, Jan 13, 2017 at 7:31 PM, John Snow <jsnow@redhat.com> wrote:
+>>>>
+>>>>
+>>>> On 01/13/2017 01:12 PM, Ladi Prosek wrote:
+>>>>> On Fri, Jan 13, 2017 at 6:23 PM, John Snow <jsnow@redhat.com> wrote:
+>>>>>> On 01/13/2017 06:02 AM, Ladi Prosek wrote:
+>>>>>>> The AHCI emulation code supports 64-bit addressing and should advertise this
+>>>>>>> fact in the Host Capabilities register. Both Linux and Windows drivers test
+>>>>>>> this bit to decide if the upper 32 bits of various registers may be written
+>>>>>>> to, and at least some versions of Windows have a bug where DMA is attempted
+>>>>>>> with an address above 4GB but, in the absence of HOST_CAP_64, the upper 32
+>>>>>>> bits are left unititialized which leads to a memory corruption.
+>>>>>>>
+>>>>>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+>>>>>>> ---
+>>>>>>>  hw/ide/ahci.c | 2 +-
+>>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>>>>>>> index 3c19bda..6a17acf 100644
+>>>>>>> --- a/hw/ide/ahci.c
+>>>>>>> +++ b/hw/ide/ahci.c
+>>>>>>> @@ -488,7 +488,7 @@ static void ahci_reg_init(AHCIState *s)
+>>>>>>>      s->control_regs.cap = (s->ports - 1) |
+>>>>>>>                            (AHCI_NUM_COMMAND_SLOTS << 8) |
+>>>>>>>                            (AHCI_SUPPORTED_SPEED_GEN1 << AHCI_SUPPORTED_SPEED) |
+>>>>>>> -                          HOST_CAP_NCQ | HOST_CAP_AHCI;
+>>>>>>> +                          HOST_CAP_NCQ | HOST_CAP_AHCI | HOST_CAP_64;
+>>>>>>>
+>>>>>>>      s->control_regs.impl = (1 << s->ports) - 1;
+>>>>>>>
+>>>>>>>
+>>>>>>
+>>>>>> Was this tested? What was the use case that prompted this patch, and do
+>>>>>> you have a public bugzilla to point to?
+>>>>>
+>>>>> Sorry, I thought you were aware. Here's the BZ with details:
+>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1411105
+>>>>>
+>>>>
+>>>> It's for the public record :)
+>>>>
+>>>> I'm going to amend your commit message, OK?
+>>>>
+>>>> https://github.com/jnsnow/qemu/commit/f037be92fc0c4580b846134e0355a69d0eccd0d9
+>>>
+>>> Minor nit: the OS we know for sure is affected is Windows Server 2008,
+>>> without the "R2". Thanks!
+>>>
+>>
+>> I misunderstood. It looked like the initial report was for "SP2," though
+>> I see you saying that the R2 version actually worked okay, but by
+>> coincidence.
+>>
+>> I didn't think there *was* an "SP2," for Windows Server, so I
+>> interpreted that to mean R2.
+>>
+>> So this only manifests with vanilla 2008?
+> 
+> We know it manifests on 2008 SP2, which is very different from 2008
+> R2. 2008 is the server variant of Vista, 2008 R2 is the server variant
+> of Win7 (yay for marketing names!)
+> 
+> I believe that 2008 SP2 32-bit is the only OS where it's been confirmed so far.
+> 
 
-Do you need to modify hbitmap_iter_next_word() as well?  Otherwise it
-uses the hbi->cur[] cached information and does not handle clearing bits
-ahead of the iterator.
+Thanks for clearing that up for me, I re-edited the commit message
+upstream. If it looks OK, I'll likely merge this when I get back home
+after FOSDEM.
 
-Stefan
-
---hTiIB9CRvBOLTyqY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYkHUWAAoJEJykq7OBq3PIU/IH/jz0Dac1oJ2e+fKSsksBE4ET
-QKA6EB7ASZX06lcvl2gc1BWZ/mw6nc/WKnGcVuVwDo1GmLPxihue1UoIc98DuHRX
-aTh7fyy/n97LG6eRz/Day6Z4+4nPXcGGSdLVMaV95a6awGCbREeI5Exyca1uXii5
-ZH1BKjqVgG3C61TAig/IVWvh+fqzwk0HvDmLLTBAGzAXmdc7SPWZQMs08R2QM2Bm
-jlQWKqKXxeNmBgh+tUEaEsjeKsmw3p2JMtrdCHkWyl9EcS4DYyKRStezAmiBWwWi
-KieEzuoGTgdUxkJtWAmihXbGUHnBuQ4fXIeSPqOmBeVEyBaUMU+sFfvYcyjUIjI=
-=kAsE
------END PGP SIGNATURE-----
-
---hTiIB9CRvBOLTyqY--
+--js
