@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cYdWK-00055m-IN
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:51:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1cYdXT-0006Dd-JI
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:52:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cYdWJ-0003ZR-LN
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:51:12 -0500
-References: <1485880595-16376-1-git-send-email-thuth@redhat.com>
-	<20170131103044.66316989@t450s.home>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <5f0bafdc-6bb8-d936-e38c-5be92c46efc6@redhat.com>
-Date: Tue, 31 Jan 2017 19:51:02 +0100
+	(envelope-from <eblake@redhat.com>) id 1cYdXO-0003rO-ES
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:52:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54158)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cYdXO-0003r4-50
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:52:18 -0500
+References: <1485888144-16531-1-git-send-email-mst@redhat.com>
+	<1485888144-16531-7-git-send-email-mst@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c7b111d6-3c5c-e89c-f928-e195469b2328@redhat.com>
+Date: Tue, 31 Jan 2017 12:52:11 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170131103044.66316989@t450s.home>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/vfio: Add CONFIG switches for
- calxeda-xgmac and amd-xgbe
+In-Reply-To: <1485888144-16531-7-git-send-email-mst@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="aRtDsNkkQe4cPVtxVvUV4rbwUsiPgx6o1"
+Subject: Re: [Qemu-devel] [PULL v4 06/23] QEMU_BUILD_BUG_ON: use __COUNTER__
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 31.01.2017 18:30, Alex Williamson wrote:
-> On Tue, 31 Jan 2017 17:36:35 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--aRtDsNkkQe4cPVtxVvUV4rbwUsiPgx6o1
+From: Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <c7b111d6-3c5c-e89c-f928-e195469b2328@redhat.com>
+Subject: Re: [PULL v4 06/23] QEMU_BUILD_BUG_ON: use __COUNTER__
+References: <1485888144-16531-1-git-send-email-mst@redhat.com>
+ <1485888144-16531-7-git-send-email-mst@redhat.com>
+In-Reply-To: <1485888144-16531-7-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/31/2017 12:43 PM, Michael S. Tsirkin wrote:
+> Some headers use QEMU_BUILD_BUG_ON. This causes a problem
+> if the C file including that header happens to have
+> QEMU_BUILD_BUG_ON at the same line number.
 >=20
->> Both devices seem to be specific to the ARM platform. It's confusing
->> for the users if they show up on other target architectures, too
->> (e.g. when the user runs QEMU with "-device ?" to get a list of
->> supported devices). Thus let's introduce proper configuration switches
->> so that the devices are only compiled and included when they are
->> really required.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  default-configs/arm-softmmu.mak | 2 ++
->>  hw/vfio/Makefile.objs           | 4 ++--
->>  2 files changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
-tmmu.mak
->> index 6de3e16..a78be51 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -94,6 +94,8 @@ CONFIG_VERSATILE_PCI=3Dy
->>  CONFIG_VERSATILE_I2C=3Dy
->> =20
->>  CONFIG_PCI_GENERIC=3Dy
->> +CONFIG_VFIO_XGMAC=3Dy
->> +CONFIG_VFIO_AMD_XGBE=3Dy
->> =20
->>  CONFIG_SDHCI=3Dy
->>  CONFIG_INTEGRATOR_DEBUG=3Dy
->> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
->> index c25e32b..05e7fbb 100644
->> --- a/hw/vfio/Makefile.objs
->> +++ b/hw/vfio/Makefile.objs
->> @@ -2,7 +2,7 @@ ifeq ($(CONFIG_LINUX), y)
->>  obj-$(CONFIG_SOFTMMU) +=3D common.o
->>  obj-$(CONFIG_PCI) +=3D pci.o pci-quirks.o
->>  obj-$(CONFIG_SOFTMMU) +=3D platform.o
->> -obj-$(CONFIG_SOFTMMU) +=3D calxeda-xgmac.o
->> -obj-$(CONFIG_SOFTMMU) +=3D amd-xgbe.o
->> +obj-$(CONFIG_VFIO_XGMAC) +=3D calxeda-xgmac.o
->> +obj-$(CONFIG_VFIO_AMD_XGBE) +=3D amd-xgbe.o
->>  obj-$(CONFIG_SOFTMMU) +=3D spapr.o
->>  endif
+> Fix using a widely available extension: __COUNTER__.
+> If unavailable, provide a stub.
+
+Uhh, this isn't the right commit message.  What happened?
+
 >=20
-> I can't say that I fully agree that this is a good idea.  How many
-> users are actually confused by this, versus the benefit of ensuring
-> that it builds across all architectures?
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  include/qemu/compiler.h | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> index 057639a..e0ce9ff 100644
+> --- a/include/qemu/compiler.h
+> +++ b/include/qemu/compiler.h
+> @@ -97,6 +97,9 @@
+>  #define QEMU_BUILD_BUG_ON(x)
+>  #endif
+> =20
+> +#define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(QEMU_BUILD_BUG_ON_STRUCT(x))=
+ - \
+> +                                   sizeof(QEMU_BUILD_BUG_ON_STRUCT(x))=
+)
+> +
+>  #if defined __GNUC__
+>  # if !QEMU_GNUC_PREREQ(4, 4)
+>     /* gcc versions before 4.4.x don't support gnu_printf, so use print=
+f. */
+>=20
 
-Why do you want this to be build on all architectures? The devices are
-only available on ARM as far as I know, so I can't see any real use for
-this. And it slows down compilation time, too, if we compile it
-everywhere (well, a little bit at least ;-)).
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-> Do we want to make platform also specific to ARM
 
-I did not notice that one yet, since it does not show up in the "-device
-?" help text (it's apparently an abstract device), so it also does not
-really bother me.
-But if I remove the device from the build, I get a funny error when I
-try to view the device help text:
+--aRtDsNkkQe4cPVtxVvUV4rbwUsiPgx6o1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-$ qemu-system-tricore -device ?
-**
-ERROR:/home/thuth/devel/qemu/qom/object.c:168:type_get_parent: assertion
-failed: (type->parent_type !=3D NULL)
-Aborted (core dumped)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-So I guess we should rather keep that one for now.
+iQEcBAEBCAAGBQJYkNzbAAoJEKeha0olJ0NqcM8H/ivFVK4Dvc/ThlslLPo701vU
+EZwUSmlO0kM1fslxO7grgBb1coj7/F3+UBGb5mB3Km56U6t/WBPiZNsplkr2wga8
+Y1/Uj44Fm66+QNXl613989JOBNbXR+/chW8pZ1L7gRfqEYnR6QyJKyOMJCuVN7CS
+kblkPhP6edfvUSAk9xhr7toQ9n+dFEF3U+S+6Bko6hOZF7VbYGeMWXqrxdfS+wp1
+oCNmNIv9K3Xna66FsrafWKYIdotsj2erMEH+WuI9X3XYI8j7XWl00cw24UIHmfx5
+POI0UcalkaIKJw35kCbVuUO9SDcvBFXv4TTJhZRhXjBpd3j0T4MX1f3Wbs8eGDM=
+=O7Fi
+-----END PGP SIGNATURE-----
 
-> and spapr specific to ppc64?
-
-I already tried that (with the already existing CONFIG_PSERIES), but the
-code in common.c depends on the code in spapr.c, so it can't be removed
-without reworking the code quite a bit. But spapr.c also does not really
-bug me, since it does not register a type that shows up in the "-device
-?" help text, so I think it is not worth the effort here.
-
- Thomas
+--aRtDsNkkQe4cPVtxVvUV4rbwUsiPgx6o1--
