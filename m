@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYPhT-00087X-Rz
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 23:05:48 -0500
+	(envelope-from <eswierk@skyportsystems.com>) id 1cYQX5-0003v0-LR
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 23:59:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYPhQ-0005wt-Ox
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 23:05:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51503)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cYPhQ-0005wf-JQ
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 23:05:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cYPhP-0002T6-GL
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 04:05:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 77F1E2E80C1
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 04:05:43 +0000 (UTC)
+	(envelope-from <eswierk@skyportsystems.com>) id 1cYQX4-0007PP-ND
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 23:59:07 -0500
+Received: from mail-ua0-x22c.google.com ([2607:f8b0:400c:c08::22c]:35180)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1cYQX4-0007PK-Hh
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 23:59:06 -0500
+Received: by mail-ua0-x22c.google.com with SMTP id y9so266947386uae.2
+	for <qemu-devel@nongnu.org>; Mon, 30 Jan 2017 20:59:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 31 Jan 2017 03:58:30 -0000
-From: Ziyue Yang <1656710@bugs.launchpad.net>
-Reply-To: Bug 1656710 <1656710@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170115231359.21186.42325.malonedeb@gac.canonical.com>
-Message-Id: <20170131035830.9153.40157.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1656710] Re: Please support Ctrl-Alt-= to zoom in
+In-Reply-To: <20170127094033.GC26553@redhat.com>
+References: <CAO_EM_kS-aGQdvPEO+7pkFWHOSiu8XMpZSduS=gPgUsDwJd9ig@mail.gmail.com>
+	<20170127094033.GC26553@redhat.com>
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Mon, 30 Jan 2017 20:58:25 -0800
+Message-ID: <CAO_EM_no14RDCd42hJy1xbo=mYsdo8k7oAESVx2KpF277U45VQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [libvirt] char: Logging serial pty output when
+ disconnected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Eric Blake <eblake@redhat.com>
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+On Fri, Jan 27, 2017 at 1:40 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Thu, Jan 26, 2017 at 05:07:16PM -0800, Ed Swierk wrote:
+>> Currently qemu_chr_fe_write() calls qemu_chr_fe_write_log() only for
+>> data consumed by the backend chr_write function. With the pty backend,
+>> pty_chr_write() returns 0 indicating that the data was not consumed
+>> when the pty is disconnected. Simply changing it to return len instead
+>> of 0 tricks the caller into logging the data even when the pty is
+>> disconnected. I don't know what problems this might cause, but one
+>> data point is that tcp_chr_write() already happens to work this way.
+>>
+>> Alternatively, qemu_chr_fe_write() could be modified to log everything
+>> passed to it, regardless of how much data chr_write claims to have
+>> consumed. The trouble is that the serial device retries writing
+>> unconsumed data, so when the pty is disconnected you'd see every
+>> character duplicated 4 times in the log file.
+>>
+>> Any opinions on either approach, or other suggestions? If there are no
+>> objections to the first one, I'll prepare a patch.
+>
+> If the pty backend intends to just drop data into a blackhole when
+> no client is connected, then its chr_write() impl should return
+> the length of the data discarded, not zero.
 
--- =
+That's exactly the question: when no client is connected, should the
+pty backend just drop the data into a black hole, returning the length
+of the data discarded? Or should it return 0, letting the frontend
+device decide what to do with it?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1656710
+I can't discern a consistent pattern across all the char backends. The
+closest analog is the tcp backend, which does discard the data and
+return len. In contrast, several backends call
+io_channel_send{,_full}(), which returns -1 if the write would block
+or fails for any other reason.
 
-Title:
-  Please support Ctrl-Alt-=3D to zoom in
+It's not clear there's much the frontend can do to recover from an
+error, but there's no consistent pattern across serial devices either.
+Most just ignore the return value. But the 16550A serial device
+retries 4 times after an error. Changing the pty backend to discard
+the data on the first attempt would bypass this retry mechanism. Is
+that a problem?
 
-Status in QEMU:
-  In Progress
-
-Bug description:
-  With the GTK3 interface, qemu-system supports pressing Ctrl-Alt-plus
-  to zoom in and Ctrl-Alt-minus to zoom out.  However, unlike many
-  programs that support similar zoom hotkeys, qemu-system actually
-  requires using '+', making the hotkey Ctrl-Alt-Shift-=3D .  Most programs
-  with similar zoom hotkeys allow Ctrl-Alt-=3D as a synonym.
-
-  Please consider accepting Ctrl-Alt-=3D as an additional zoom-in hotkey.
-
-  (Observed in QEMU 2.8)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1656710/+subscriptions
+--Ed
