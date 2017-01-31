@@ -1,35 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYgSr-0001OK-6p
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:59:50 -0500
+	(envelope-from <eswierk@skyportsystems.com>) id 1cYgXK-00048v-GE
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 17:04:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYgSo-0003rc-4u
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:59:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49948)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cYgSn-0003rT-Ud
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:59:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cYgSm-00082e-Em
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 21:59:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6E3EE2E80BF
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 21:59:44 +0000 (UTC)
+	(envelope-from <eswierk@skyportsystems.com>) id 1cYgXJ-00052F-I5
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 17:04:26 -0500
+Received: from mail-vk0-x236.google.com ([2607:f8b0:400c:c05::236]:33571)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1cYgXJ-000529-DO
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 17:04:25 -0500
+Received: by mail-vk0-x236.google.com with SMTP id k127so246758679vke.0
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 14:04:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 31 Jan 2017 21:49:29 -0000
-From: Blue <vali.dragnuta@inode.ro>
-Reply-To: Bug 1250360 <1250360@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131112091735.10165.76015.malonedeb@soybean.canonical.com>
-	<20170131204938.8844.76368.malone@gac.canonical.com>
-Message-Id: <CAAbO6n3Z7oQb4b2Jkz=qB4pip3KShEa5OK7gD_tx5DaAcciEkA@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1250360] Re: qcow2 image logical corruption
- after host crash
+In-Reply-To: <d659ecc7-34a4-aad5-69c1-36ba4aff3d15@redhat.com>
+References: <CAO_EM_kS-aGQdvPEO+7pkFWHOSiu8XMpZSduS=gPgUsDwJd9ig@mail.gmail.com>
+	<20170127094033.GC26553@redhat.com>
+	<CAO_EM_no14RDCd42hJy1xbo=mYsdo8k7oAESVx2KpF277U45VQ@mail.gmail.com>
+	<20170131093927.GA20303@redhat.com>
+	<d659ecc7-34a4-aad5-69c1-36ba4aff3d15@redhat.com>
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Tue, 31 Jan 2017 14:03:44 -0800
+Message-ID: <CAO_EM_ndhE1ibyHRyE3D_jSjs0PbX1wmetYTP6rvY_AM4Un8-Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [libvirt] char: Logging serial pty output when
+ disconnected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,100 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, marcandre.lureau@redhat.com, Eric Blake <eblake@redhat.com>
 
-Since then, I switched all my vm images to (sparse) raw  and never
-experienced corruption problems again.
-I could not say if this can still be reproduced today, even then it was
-probably a corner case.
-I would suggest the closing of the issue as we cannot gather newer and more
-relevant data.
-
-
-On Tue, Jan 31, 2017 at 10:49 PM, Thomas Huth <1250360@bugs.launchpad.net>
-wrote:
-
-> Did this issue happen ever again with a recent version of QEMU? ... if
-> not, should we close this bug nowadays?
+On Tue, Jan 31, 2017 at 7:34 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> ** Changed in: qemu
->        Status: New =3D> Incomplete
 >
-> --
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1250360
+> On 31/01/2017 04:39, Daniel P. Berrange wrote:
+>> I don't think so - retrying in this way is pointless IMHO - it is just
+>> going to get the same result on every retry on 99% of occassions.
 >
-> Title:
->   qcow2 image logical corruption after host crash
+> Just to provide the full context, the retry happens even if you get
+> EAGAIN, and in that case it does makes sense.
 >
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1250360/+subscriptions
->
+> But if the pty is disconnected I agree it should discard the data.
 
--- =
+Thanks for the feedback. Please refer to this proposed patch:
+http://patchwork.ozlabs.org/patch/721974/ .
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1250360
-
-Title:
-  qcow2 image logical corruption after host crash
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Description of problem:
-  In case of power failure disk images that were active and created in qcow=
-2 format can become logically corrupt so that they actually appear as unuse=
-d (full of zeroes).
-  Data seems to be there, but at this moment i cannot find any reliable met=
-hod to recover it. Should it be a raw image, a recovery path would be avail=
-able, but a qcow2 image only presents zeroes once it gets corrupted. My und=
-erstanding is that the blockmap of the image gets reset and the image is th=
-en assumed to be unused.
-  My detailed setup :
-
-  Kernel 2.6.32-358.18.1.el6.x86_64
-  qemu-kvm-0.12.1.2-2.355.0.1.el6.centos.7.x86_64
-  Used via libvirt libvirt-0.10.2-18.el6_4.14.x86_64
-  The image was used from a NFS share (the nfs server did NOT crash and rem=
-ained permanently active).
-
-  qemu-img check finds no corruption;
-  qemu-img convert will fully convert the image to raw at a raw image full =
-of zeroes. However, there is data in the file, and the storage backend was =
-not restarted, inactivated during the incident.
-  I encountered this issue on two different machines, in both cases i was n=
-ot able to recover the data.
-  Image was qcow2, thin provisioned, created like this :
-   qemu-img create -f qcow2 -o cluster_size=3D2M imagename.img
-
-  While addressing the root cause in order to not have this issue repeat
-  would be the ideal scenario, a temporary workaround to run on the
-  affected qcow2 image to "patch" it and recover the data (eventually
-  after a full fsck/recovery inside the guest) would also be good.
-  Otherwise we are basically losing data on a large scale when using
-  qcow2.
-
-
-  Version-Release number of selected component (if applicable):
-  Kernel 2.6.32-358.18.1.el6.x86_64
-  qemu-kvm-0.12.1.2-2.355.0.1.el6.centos.7.x86_64
-  Used via libvirt libvirt-0.10.2-18.el6_4.14.x86_64
-
-  How reproducible:
-  I am not able (and don't have at the moment enough resources to try to ma=
-nually reproduce it), but the probability of the issue seems quite high as =
-this is the second case of such corruption in weeks.
-  Additional info:
-  I can privately provide an image displaying the corruption.
-
-  The reported problem has actually two aspects : first is the cause that e=
-ventually produces this issue.
-  The second is the fact that once the logical corruption has occured, qemu=
--img check finds nothing wrong with the image - this is obviously wrong.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1250360/+subscriptions
+--Ed
