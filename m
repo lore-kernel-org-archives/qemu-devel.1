@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYX7U-0002NW-1q
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:01:11 -0500
+	(envelope-from <quintela@redhat.com>) id 1cYX8s-00047I-0n
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYX7R-0008Tt-2s
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:01:08 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55717)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cYX7Q-0008Tn-To
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:01:05 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cYX7O-0007d1-8h
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 12:01:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3FDE22E80CA
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 12:01:02 +0000 (UTC)
+	(envelope-from <quintela@redhat.com>) id 1cYX8o-0000CV-RD
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:02:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46426)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cYX8o-0000C8-LH
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:02:30 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <87mveg8sbw.fsf@emacs.mitica> (Juan Quintela's message of "Tue,
+	24 Jan 2017 15:07:15 +0100")
+References: <87mveg8sbw.fsf@emacs.mitica>
+Reply-To: quintela@redhat.com
+Date: Tue, 31 Jan 2017 13:02:26 +0100
+Message-ID: <8737fztp2l.fsf@emacs.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 31 Jan 2017 11:45:43 -0000
-From: Uqbar <1660599@bugs.launchpad.net>
-Reply-To: Bug 1660599 <1660599@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170131114543.27337.90403.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1660599] [NEW] v2.8.0 won't compile if g++
- compiler doesn't understand "-fstack-protector-strong"
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] KVM call for 2017-01-31
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: KVM devel mailing list <kvm@vger.kernel.org>
+Cc: QEMU Developer <qemu-devel@nongnu.org>
 
-Public bug reported:
+Juan Quintela <quintela@redhat.com> wrote:
+> Hi
+>
+> Please, send any topic that you are interested in covering.
+>
+> At the end of Monday I will send an email with the agenda or the
+> cancellation of the call, so hurry up.
+>
+> After discussions on the QEMU Summit, we are going to have always open a
+> KVM call where you can add topics.
 
-For example, Ubuntu Trusty (LTS 14.04) uses g++ v4.8.5.
-Compilation fails with a syntax error saying that the ""-fstack-protector-s=
-trong" option in g++ is unrecognized.
-Instead, under Ubuntu Xenial (LTS 16.04), the g++ compiler is v5.4.0 and th=
-e compilation goes on smoothly.
+Hi
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+No agenda -> no call.
 
--- =
+Happy hacking.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1660599
-
-Title:
-  v2.8.0 won't compile if g++ compiler doesn't understand "-fstack-
-  protector-strong"
-
-Status in QEMU:
-  New
-
-Bug description:
-  For example, Ubuntu Trusty (LTS 14.04) uses g++ v4.8.5.
-  Compilation fails with a syntax error saying that the ""-fstack-protector=
--strong" option in g++ is unrecognized.
-  Instead, under Ubuntu Xenial (LTS 16.04), the g++ compiler is v5.4.0 and =
-the compilation goes on smoothly.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1660599/+subscriptions
+>
+>  Call details:
+>
+> By popular demand, a google calendar public entry with it
+>
+>   https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+>
+> (Let me know if you have any problems with the calendar entry.  I just
+> gave up about getting right at the same time CEST, CET, EDT and DST).
+>
+> If you need phone number details,  contact me privately
+>
+> Thanks, Juan.
