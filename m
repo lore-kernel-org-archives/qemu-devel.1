@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYXnn-0000MJ-PS
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:52 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cYXnp-0000O0-QJ
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYXnm-0001Uw-UM
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:51 -0500
-Date: Tue, 31 Jan 2017 10:20:35 +0000
+	(envelope-from <stefanha@redhat.com>) id 1cYXnp-0001Vc-0L
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:53 -0500
+Date: Tue, 31 Jan 2017 10:25:00 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131102035.GA18804@stefanha-x1.localdomain>
+Message-ID: <20170131102500.GB18804@stefanha-x1.localdomain>
 References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="CE+1k2dSO48ffgeK"
+	protocol="application/pgp-signature"; boundary="XF85m9dhOBO43t/C"
 Content-Disposition: inline
-In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 00/21] new backup architecture
+In-Reply-To: <1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 01/21] backup: move from done_bitmap to
+ copy_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +29,42 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
 
 
---CE+1k2dSO48ffgeK
+--XF85m9dhOBO43t/C
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 23, 2016 at 05:28:43PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+On Fri, Dec 23, 2016 at 05:28:44PM +0300, Vladimir Sementsov-Ogievskiy wrot=
 e:
-> This is a new architecture for backup. It solves some current problems:
-> 1. intersecting requests: for now at request start we wait for all inters=
-ecting requests, which means that
->     a. we may wait even for unrelated to our request clusters
->     b. not full async: if we are going to copy clusters 1,2,3,4, when 2 a=
-nd 4 are in flight, why should we wait for 2 and 4 to be fully copied? Why =
-not to start 1 and 3 in parallel with 2 and 4?
+> Use HBitmap copy_bitmap instead of done_bitmap. This is needed to unify
+> backup loop for full/incremental modes in future patches.
 >=20
-> 2. notifier request is internally synchronous: if notifier starts copying=
- clusters 1,2,3,4, they will be copied one by one in synchronous loop.
+> We reset bit of the copy_bitmap immediately after checking it in
+> backup_do_cow(). It is safe, because all other intersecting requests
+> will wait for our request finish anyway.
 >=20
-> 3. notifier wait full copying of corresponding clusters (when actually it=
- may wait only for _read_ operations to be finished)
+> The other difference is that in case of error we will have zeroed bit in
+> copy_bitmap, when in done_bitmap we have not set bit.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
 
-Please include benchmark results since this is a performance
-optimization.  I think this new level of complexity is worth it because
-it should be possible to achieve significantly higher throughput, but
-data is still necessary.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-The cover letter mentions spawning 24 coroutines.  Did you compare the
-memory footprint against the old backup architecture?  Sometimes users
-complain when they notice QEMU using significantly more memory than in
-previous versions.  If there's a good justification or a way to minimize
-the impact then it's fine, but please check.
-
-Stefan
-
---CE+1k2dSO48ffgeK
+--XF85m9dhOBO43t/C
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYkGTzAAoJEJykq7OBq3PI+KEH/151YV4VYeUWRpSbA2V4iYPC
-p9nRnKqvxaoUNfZFAQSgSn1D7RGv5IiRO3Sc40iZKABEI3dKZ9Tz0xu+VO5xr6uF
-+SwjMiAkdC0jqz4grkOVk/ylGoAjRyGomqr45LQojbeuQfTX9PxC0EWW1eQfAgKH
-CFvdJHpYJpZyiPAVK/k8ZkA22v+wex8AIYaV7/tMcXosxjggxJFnKLgMikb6Vj72
-X8PvevM0/dc7Cv3GDbycoXBVxqMwMUNyfs9wGuqhF7DShb4yKX4ahRkHaFXVBeEZ
-3cpLnWJQbYpfG/lWjBKoz576O7JVgIIpXEPY3W6UAOQdWoppJoUOdGYgRvt35+s=
-=TxNC
+iQEcBAEBAgAGBQJYkGX8AAoJEJykq7OBq3PI6FUH/Ruu+C4gxrjqOLBCj7HHfOpZ
+HCtLQh0+FTiM9DMt2XorjFIimsKDYYFUmfP5+O3edesb+PZRDhjSX4Zp6avtH1p4
+V6PxMt24WoFfXmCLHaCn+VLPQURjriBjhCJa2pFCQrpoy0nWyTPSYCUCV2r8EnQc
+NkJYrsx6N43y8saNgRy2f+Zcyoql6WTNxtAtmoyu3TpiwnAskkZuBqzYtHp9br/V
+Knf0bZ4NumHnfQPcdPXT7wDzLKUAgMA7HS2B4AVlOp6bFokFqDNYSFJ5RwibDTv2
+9qf4hAak2dpAqtiJyX0l00ho4ddiOhQT/L5UmOEI+4ROdODNtXt2jFFBF3kYTZ4=
+=qERi
 -----END PGP SIGNATURE-----
 
---CE+1k2dSO48ffgeK--
+--XF85m9dhOBO43t/C--
