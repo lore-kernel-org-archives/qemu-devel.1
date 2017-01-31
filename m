@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYUm1-0007AR-3f
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:30:50 -0500
+	(envelope-from <berrange@redhat.com>) id 1cYUuX-0002hi-Vd
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:39:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYUlw-00040r-6d
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:30:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39625)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cYUlw-00040Z-0n
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:30:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cYUlt-0008K4-Hg
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 09:30:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6BD4D2E80AE
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 09:30:41 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1cYUuU-0006JM-7A
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:39:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35004)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cYUuT-0006Hj-VB
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:39:34 -0500
+Date: Tue, 31 Jan 2017 09:39:27 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170131093927.GA20303@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAO_EM_kS-aGQdvPEO+7pkFWHOSiu8XMpZSduS=gPgUsDwJd9ig@mail.gmail.com>
+	<20170127094033.GC26553@redhat.com>
+	<CAO_EM_no14RDCd42hJy1xbo=mYsdo8k7oAESVx2KpF277U45VQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 31 Jan 2017 09:14:08 -0000
-From: Thomas Huth <1031920@bugs.launchpad.net>
-Reply-To: Bug 1031920 <1031920@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120801202321.9879.66283.malonedeb@wampee.canonical.com>
-Message-Id: <20170131091408.16745.48502.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1031920] Re: Linux user gdbserver does not
- respond to remote `Ctrl-C' interrupts
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAO_EM_no14RDCd42hJy1xbo=mYsdo8k7oAESVx2KpF277U45VQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [libvirt] char: Logging serial pty output when
+ disconnected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ed Swierk <eswierk@skyportsystems.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Eric Blake <eblake@redhat.com>
 
-Has the fix mentioned in comment #1 been included in the QEMU
-repository?
+On Mon, Jan 30, 2017 at 08:58:25PM -0800, Ed Swierk wrote:
+> On Fri, Jan 27, 2017 at 1:40 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > On Thu, Jan 26, 2017 at 05:07:16PM -0800, Ed Swierk wrote:
+> >> Currently qemu_chr_fe_write() calls qemu_chr_fe_write_log() only for
+> >> data consumed by the backend chr_write function. With the pty backend,
+> >> pty_chr_write() returns 0 indicating that the data was not consumed
+> >> when the pty is disconnected. Simply changing it to return len instead
+> >> of 0 tricks the caller into logging the data even when the pty is
+> >> disconnected. I don't know what problems this might cause, but one
+> >> data point is that tcp_chr_write() already happens to work this way.
+> >>
+> >> Alternatively, qemu_chr_fe_write() could be modified to log everything
+> >> passed to it, regardless of how much data chr_write claims to have
+> >> consumed. The trouble is that the serial device retries writing
+> >> unconsumed data, so when the pty is disconnected you'd see every
+> >> character duplicated 4 times in the log file.
+> >>
+> >> Any opinions on either approach, or other suggestions? If there are no
+> >> objections to the first one, I'll prepare a patch.
+> >
+> > If the pty backend intends to just drop data into a blackhole when
+> > no client is connected, then its chr_write() impl should return
+> > the length of the data discarded, not zero.
+> 
+> That's exactly the question: when no client is connected, should the
+> pty backend just drop the data into a black hole, returning the length
+> of the data discarded? Or should it return 0, letting the frontend
+> device decide what to do with it?
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+It should return len of data discarded.
 
--- =
+> 
+> I can't discern a consistent pattern across all the char backends. The
+> closest analog is the tcp backend, which does discard the data and
+> return len. In contrast, several backends call
+> io_channel_send{,_full}(), which returns -1 if the write would block
+> or fails for any other reason.
+> 
+> It's not clear there's much the frontend can do to recover from an
+> error, but there's no consistent pattern across serial devices either.
+> Most just ignore the return value. But the 16550A serial device
+> retries 4 times after an error. Changing the pty backend to discard
+> the data on the first attempt would bypass this retry mechanism. Is
+> that a problem?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1031920
+I don't think so - retrying in this way is pointless IMHO - it is just
+going to get the same result on every retry on 99% of occassions.
 
-Title:
-  Linux user gdbserver does not respond to remote  `Ctrl-C' interrupts
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  The bug was reproduced in a recent mainline build for ARM Linux by
-  starting emulation with a gdbserver:
-
-  $ qemu-arm -g 1234 a.out
-
-  and then connecting from gdb:
-
-  (gdb) target remote :1234
-  Remote debugging using :1234
-  [New Remote target]
-  [Switching to Remote target]
-  0x00008ba8 in _start ()
-  (gdb) b main
-  Breakpoint 1 at 0x8cb0: file hello.c, line 5.
-  (gdb) cont
-  Continuing.
-
-  Breakpoint 1, main (argc=3D1, argv=3D0xf6fff24c) at hello.c:5
-  5	  int n =3D 0;
-  (gdb) l
-  1	#include <stdio.h>
-  2
-  3	int main (int argc, char **argv)
-  4	{
-  5	  int n =3D 0;
-  6
-  7	  for (;;) {
-  8	     printf ("Hello, World!\n");
-  9	     sleep (5);
-  10	  }
-  (gdb) cont
-  Continuing.
-  ^C^CInterrupted while waiting for the program.
-  Give up (and stop debugging it)? (y or n) y
-
-  Notice that the `Ctrl-C' interrupts are ignored.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1031920/+subscriptions
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
