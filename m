@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cYX5s-0000y9-LK
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:59:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1cYX7U-0002NW-1q
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:01:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cYX5r-000892-61
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:59:28 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:58234)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cYX5q-00088n-QI
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:59:27 -0500
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Tue, 31 Jan 2017 14:59:26 +0300
-Message-ID: <20170131115926.7132.9645.stgit@PASHA-ISP>
+	(envelope-from <bounces@canonical.com>) id 1cYX7R-0008Tt-2s
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:01:08 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55717)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cYX7Q-0008Tn-To
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:01:05 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cYX7O-0007d1-8h
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 12:01:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3FDE22E80CA
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 12:01:02 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] replay: add record/replay for audio passthrough
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 31 Jan 2017 11:45:43 -0000
+From: Uqbar <1660599@bugs.launchpad.net>
+Reply-To: Bug 1660599 <1660599@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170131114543.27337.90403.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1660599] [NEW] v2.8.0 won't compile if g++
+ compiler doesn't understand "-fstack-protector-strong"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,264 +37,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, dovgaluk@ispras.ru, kraxel@redhat.com
 
-This patch adds recording and replaying audio data. Is saves synchronization
-information for audio out and inputs from the microphone.
+Public bug reported:
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- audio/audio.c            |   11 +++++-
- audio/audio.h            |    5 +++
- audio/mixeng.c           |   31 ++++++++++++++++++
- docs/replay.txt          |    7 ++++
- include/sysemu/replay.h  |    7 ++++
- replay/Makefile.objs     |    1 +
- replay/replay-audio.c    |   79 ++++++++++++++++++++++++++++++++++++++++++++++
- replay/replay-internal.h |    4 ++
- 8 files changed, 142 insertions(+), 3 deletions(-)
- create mode 100644 replay/replay-audio.c
+For example, Ubuntu Trusty (LTS 14.04) uses g++ v4.8.5.
+Compilation fails with a syntax error saying that the ""-fstack-protector-s=
+trong" option in g++ is unrecognized.
+Instead, under Ubuntu Xenial (LTS 16.04), the g++ compiler is v5.4.0 and th=
+e compilation goes on smoothly.
 
-diff --git a/audio/audio.c b/audio/audio.c
-index 1ee95a5..79c0788 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -28,6 +28,7 @@
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
- #include "qemu/cutils.h"
-+#include "sysemu/replay.h"
- 
- #define AUDIO_CAP "audio"
- #include "audio_int.h"
-@@ -1113,7 +1114,7 @@ static void audio_reset_timer (AudioState *s)
- {
-     if (audio_is_timer_needed ()) {
-         if (!timer_pending(s->ts)) {
--            timer_mod (s->ts,
-+            timer_mod(s->ts,
-                 qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
-         }
-     }
-@@ -1389,6 +1390,7 @@ static void audio_run_out (AudioState *s)
- 
-         prev_rpos = hw->rpos;
-         played = hw->pcm_ops->run_out (hw, live);
-+        replay_audio_out(&played);
-         if (audio_bug (AUDIO_FUNC, hw->rpos >= hw->samples)) {
-             dolog ("hw->rpos=%d hw->samples=%d played=%d\n",
-                    hw->rpos, hw->samples, played);
-@@ -1452,9 +1454,12 @@ static void audio_run_in (AudioState *s)
- 
-     while ((hw = audio_pcm_hw_find_any_enabled_in (hw))) {
-         SWVoiceIn *sw;
--        int captured, min;
-+        int captured = 0, min;
- 
--        captured = hw->pcm_ops->run_in (hw);
-+        if (replay_mode != REPLAY_MODE_PLAY) {
-+            captured = hw->pcm_ops->run_in(hw);
-+        }
-+        replay_audio_in(&captured, hw->conv_buf, &hw->wpos, hw->samples);
- 
-         min = audio_pcm_hw_find_min_in (hw);
-         hw->total_samples_captured += captured - min;
-diff --git a/audio/audio.h b/audio/audio.h
-index c3c5198..f4339a1 100644
---- a/audio/audio.h
-+++ b/audio/audio.h
-@@ -166,4 +166,9 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
- bool audio_is_cleaning_up(void);
- void audio_cleanup(void);
- 
-+void audio_sample_to_uint64(void *samples, int pos,
-+                            uint64_t *left, uint64_t *right);
-+void audio_sample_from_uint64(void *samples, int pos,
-+                            uint64_t left, uint64_t right);
-+
- #endif /* QEMU_AUDIO_H */
-diff --git a/audio/mixeng.c b/audio/mixeng.c
-index 66c0328..c23508e 100644
---- a/audio/mixeng.c
-+++ b/audio/mixeng.c
-@@ -267,6 +267,37 @@ f_sample *mixeng_clip[2][2][2][3] = {
-     }
- };
- 
-+
-+void audio_sample_to_uint64(void *samples, int pos,
-+                            uint64_t *left, uint64_t *right)
-+{
-+    struct st_sample *sample = samples;
-+    sample += pos;
-+#ifdef FLOAT_MIXENG
-+    error_report(
-+        "Coreaudio and floating point samples are not supported by replay yet");
-+    abort();
-+#else
-+    *left = sample->l;
-+    *right = sample->r;
-+#endif
-+}
-+
-+void audio_sample_from_uint64(void *samples, int pos,
-+                            uint64_t left, uint64_t right)
-+{
-+    struct st_sample *sample = samples;
-+    sample += pos;
-+#ifdef FLOAT_MIXENG
-+    error_report(
-+        "Coreaudio and floating point samples are not supported by replay yet");
-+    abort();
-+#else
-+    sample->l = left;
-+    sample->r = right;
-+#endif
-+}
-+
- /*
-  * August 21, 1998
-  * Copyright 1998 Fabrice Bellard.
-diff --git a/docs/replay.txt b/docs/replay.txt
-index 03e1931..486c1e0 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -225,3 +225,10 @@ recording the virtual machine this filter puts all packets coming from
- the outer world into the log. In replay mode packets from the log are
- injected into the network device. All interactions with network backend
- in replay mode are disabled.
-+
-+Audio devices
-+-------------
-+
-+Audio data is recorded and replay automatically. The command line for recording
-+and replaying must contain identical specifications of audio hardware, e.g.:
-+ -soundhw ac97
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 7aad20b..f1c0712 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -152,6 +152,13 @@ void replay_unregister_net(ReplayNetState *rns);
- void replay_net_packet_event(ReplayNetState *rns, unsigned flags,
-                              const struct iovec *iov, int iovcnt);
- 
-+/* Audio */
-+
-+/*! Saves/restores number of played samples of audio out operation. */
-+void replay_audio_out(int *played);
-+/*! Saves/restores recorded samples of audio in operation. */
-+void replay_audio_in(int *recorded, void *samples, int *wpos, int size);
-+
- /* VM state operations */
- 
- /*! Called at the start of execution.
-diff --git a/replay/Makefile.objs b/replay/Makefile.objs
-index b2afd40..cee6539 100644
---- a/replay/Makefile.objs
-+++ b/replay/Makefile.objs
-@@ -6,3 +6,4 @@ common-obj-y += replay-input.o
- common-obj-y += replay-char.o
- common-obj-y += replay-snapshot.o
- common-obj-y += replay-net.o
-+common-obj-y += replay-audio.o
-\ No newline at end of file
-diff --git a/replay/replay-audio.c b/replay/replay-audio.c
-new file mode 100644
-index 0000000..3d83743
---- /dev/null
-+++ b/replay/replay-audio.c
-@@ -0,0 +1,79 @@
-+/*
-+ * replay-audio.c
-+ *
-+ * Copyright (c) 2010-2017 Institute for System Programming
-+ *                         of the Russian Academy of Sciences.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "sysemu/replay.h"
-+#include "replay-internal.h"
-+#include "sysemu/sysemu.h"
-+#include "audio/audio.h"
-+
-+void replay_audio_out(int *played)
-+{
-+    if (replay_mode == REPLAY_MODE_RECORD) {
-+        replay_save_instructions();
-+        replay_mutex_lock();
-+        replay_put_event(EVENT_AUDIO_OUT);
-+        replay_put_dword(*played);
-+        replay_mutex_unlock();
-+    } else if (replay_mode == REPLAY_MODE_PLAY) {
-+        replay_account_executed_instructions();
-+        replay_mutex_lock();
-+        if (replay_next_event_is(EVENT_AUDIO_OUT)) {
-+            *played = replay_get_dword();
-+            replay_finish_event();
-+            replay_mutex_unlock();
-+        } else {
-+            replay_mutex_unlock();
-+            error_report("Missing audio out event in the replay log");
-+            abort();
-+        }
-+    }
-+}
-+
-+void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
-+{
-+    int pos;
-+    uint64_t left, right;
-+    if (replay_mode == REPLAY_MODE_RECORD) {
-+        replay_save_instructions();
-+        replay_mutex_lock();
-+        replay_put_event(EVENT_AUDIO_IN);
-+        replay_put_dword(*recorded);
-+        replay_put_dword(*wpos);
-+        for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
-+             ; pos = (pos + 1) % size) {
-+            audio_sample_to_uint64(samples, pos, &left, &right);
-+            replay_put_qword(left);
-+            replay_put_qword(right);
-+        }
-+        replay_mutex_unlock();
-+    } else if (replay_mode == REPLAY_MODE_PLAY) {
-+        replay_account_executed_instructions();
-+        replay_mutex_lock();
-+        if (replay_next_event_is(EVENT_AUDIO_IN)) {
-+            *recorded = replay_get_dword();
-+            *wpos = replay_get_dword();
-+            for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
-+                 ; pos = (pos + 1) % size) {
-+                left = replay_get_qword();
-+                right = replay_get_qword();
-+                audio_sample_from_uint64(samples, pos, left, right);
-+            }
-+            replay_finish_event();
-+            replay_mutex_unlock();
-+        } else {
-+            replay_mutex_unlock();
-+            error_report("Missing audio in event in the replay log");
-+            abort();
-+        }
-+    }
-+}
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index c26d079..ed66ed8 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -29,6 +29,10 @@ enum ReplayEvents {
-     /* for character device read all event */
-     EVENT_CHAR_READ_ALL,
-     EVENT_CHAR_READ_ALL_ERROR,
-+    /* for audio out event */
-+    EVENT_AUDIO_OUT,
-+    /* for audio in event */
-+    EVENT_AUDIO_IN,
-     /* for clock read/writes */
-     /* some of greater codes are reserved for clocks */
-     EVENT_CLOCK,
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1660599
+
+Title:
+  v2.8.0 won't compile if g++ compiler doesn't understand "-fstack-
+  protector-strong"
+
+Status in QEMU:
+  New
+
+Bug description:
+  For example, Ubuntu Trusty (LTS 14.04) uses g++ v4.8.5.
+  Compilation fails with a syntax error saying that the ""-fstack-protector=
+-strong" option in g++ is unrecognized.
+  Instead, under Ubuntu Xenial (LTS 16.04), the g++ compiler is v5.4.0 and =
+the compilation goes on smoothly.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1660599/+subscriptions
