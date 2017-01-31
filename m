@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54058)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYetM-0003l8-7h
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:19:05 -0500
+	id 1cYetK-0003kz-Mi
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:19:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYetL-0004GG-FZ
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:19:04 -0500
-Received: from mail.kernel.org ([198.145.29.136]:52354)
+	id 1cYetI-0004Fk-CM
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:19:02 -0500
+Received: from mail.kernel.org ([198.145.29.136]:52328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYetL-0004G1-9k
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:19:03 -0500
-Date: Tue, 31 Jan 2017 22:18:58 +0200
+	id 1cYetI-0004Fc-6g
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:19:00 -0500
+Date: Tue, 31 Jan 2017 22:18:55 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485893872-26524-3-git-send-email-mst@redhat.com>
+Message-ID: <1485893872-26524-2-git-send-email-mst@redhat.com>
 References: <1485893872-26524-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485893872-26524-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v5 02/22] qxl: switch to constants within
- BUILD_BUG_ON
+Subject: [Qemu-devel] [PULL v5 01/22] compiler: drop ; after BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +30,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-We are switching BUILD_BUG_ON to verify that it's parameter is a
-compile-time constant, and it turns out that some gcc versions
-(specifically gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609) are
-not smart enough to figure it out for expressions involving local
-variables. This is harmless but means that the check is ineffective for
-these platforms.  To fix, replace variables with macros.
+All users include the trailing ; anyway, let's require that -
+it seems cleaner.
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/display/qxl.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ include/qemu/compiler.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index 62d0c80..af4c0ca 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -306,12 +306,11 @@ void qxl_spice_reset_cursor(PCIQXLDevice *qxl)
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 157698b..7512082 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -86,7 +86,8 @@
+ #define type_check(t1,t2) ((t1*)0 - (t2*)0)
  
- static ram_addr_t qxl_rom_size(void)
- {
--    uint32_t required_rom_size = sizeof(QXLRom) + sizeof(QXLModes) +
--                                 sizeof(qxl_modes);
--    uint32_t rom_size = 8192; /* two pages */
-+#define QXL_REQUIRED_SZ (sizeof(QXLRom) + sizeof(QXLModes) + sizeof(qxl_modes))
-+#define QXL_ROM_SZ 8192
+ #define QEMU_BUILD_BUG_ON(x) \
+-    typedef char glue(qemu_build_bug_on__,__LINE__)[(x)?-1:1] __attribute__((unused));
++    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
++        __attribute__((unused))
  
--    QEMU_BUILD_BUG_ON(required_rom_size > rom_size);
--    return rom_size;
-+    QEMU_BUILD_BUG_ON(QXL_REQUIRED_SZ > QXL_ROM_SZ);
-+    return QXL_ROM_SZ;
- }
- 
- static void init_qxl_rom(PCIQXLDevice *d)
+ #if defined __GNUC__
+ # if !QEMU_GNUC_PREREQ(4, 4)
 -- 
 MST
