@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYZUo-0007tb-Nl
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:33:26 -0500
+	(envelope-from <armbru@redhat.com>) id 1cYZZ3-0002MD-41
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:37:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYZUn-0004Rd-UQ
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:33:22 -0500
-Date: Tue, 31 Jan 2017 14:33:12 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131143312.GM18804@stefanha-x1.localdomain>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-9-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <armbru@redhat.com>) id 1cYZZ2-0006UD-6K
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:37:45 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+	<1485443388-27253-8-git-send-email-armbru@redhat.com>
+	<894b7bb8-768b-de12-cb48-7c9d52333bbe@redhat.com>
+Date: Tue, 31 Jan 2017 15:37:34 +0100
+In-Reply-To: <894b7bb8-768b-de12-cb48-7c9d52333bbe@redhat.com> (John Snow's
+	message of "Tue, 31 Jan 2017 07:37:42 -0500")
+Message-ID: <87efzjcn2p.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zHDeOHGDnzKksZSU"
-Content-Disposition: inline
-In-Reply-To: <1482503344-6424-9-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 08/21] backup: skip unallocated clusters
- for full mode
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 7/8] blockdev: Make
+ orphaned -drive fatal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
+John Snow <jsnow@redhat.com> writes:
 
---zHDeOHGDnzKksZSU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 01/26/2017 10:09 AM, Markus Armbruster wrote:
+>> Block backends defined with "-drive if=T" with T other than "none" are
+>> meant to be picked up by machine initialization code: a suitable
+>> frontend gets created and wired up automatically.
+>> 
+>> If machine initialization code doesn't comply, the block backend
+>> remains unused.  This triggers a warning since commit a66c9dc, v2.2.0.
+>> Drives created by default are excempted; use -nodefaults to get rid of
+>> them.
+>> 
+>> Turn this warning into an error.
+>> 
+>
+> "Exempted," oddly enough.
+> </eblake>
 
-On Fri, Dec 23, 2016 at 05:28:51PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> In case of full backup we can skip unallocated clusters if the target
-> disk is already zero-initialized.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/backup.c         | 8 ++++++--
->  tests/qemu-iotests/055 | 2 ++
->  2 files changed, 8 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block/backup.c b/block/backup.c
-> index 2afd1b6..4ef8daf 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -562,9 +562,13 @@ static void coroutine_fn backup_run(void *opaque)
->          if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
->              backup_incremental_init_copy_bitmap(job);
->          } else {
-> +            /* top or full mode */
-> +            bool is_top =3D job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP;
-> +            BlockDriverState *base =3D
-> +                    is_top ? backing_bs(blk_bs(job->common.blk)) : NULL;
->              hbitmap_set(job->copy_bitmap, 0, end);
-> -            if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {
-> -                backup_skip_loop(job, backing_bs(blk_bs(job->common.blk)=
-));
-> +            if (is_top || bdrv_has_zero_init(blk_bs(job->target))) {
-> +                backup_skip_loop(job, base);
->              }
+Thanks!
 
-An alternative that I find easier to read:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  blockdev.c                | 14 +++++++-------
+>>  include/sysemu/blockdev.h |  2 +-
+>>  2 files changed, 8 insertions(+), 8 deletions(-)
+>> 
+>> diff --git a/blockdev.c b/blockdev.c
+>> index a597a66..ec9c114 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -227,28 +227,28 @@ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit)
+>>      return NULL;
+>>  }
+>>  
+>> -bool drive_check_orphaned(void)
+>> +void drive_check_orphaned(void)
+>>  {
+>>      BlockBackend *blk;
+>>      DriveInfo *dinfo;
+>>      Location loc;
+>> -    bool rs = false;
+>> +    bool orphans = false;
+>>  
+>>      for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
+>>          dinfo = blk_legacy_dinfo(blk);
+>> -        /* If dinfo->bdrv->dev is NULL, it has no device attached. */
+>> -        /* Unless this is a default drive, this may be an oversight. */
+>>          if (!blk_get_attached_dev(blk) && !dinfo->is_default &&
+>>              dinfo->type != IF_NONE) {
+>>              loc_push_none(&loc);
+>>              qemu_opts_loc_restore(dinfo->opts);
+>> -            error_report("warning: machine type does not support this drive");
+>> +            error_report("machine type does not support this drive");
+>>              loc_pop(&loc);
+>> -            rs = true;
+>> +            orphans = true;
+>>          }
+>>      }
+>>  
+>> -    return rs;
+>> +    if (orphans) {
+>> +        exit(1);
+>> +    }
+>
+> Hardcore. Why not just return a status code and allow vl.c to exit? It
+> only has the one caller. (Unless you added more and I didn't read
+> because I'm lazy.)
+>
+> You could even add an Error **arg if you wanted to; but vl.c has exits
+> all over the dang place, so maybe that's not really interesting.
 
-hbitmap_set(job->copy_bitmap, 0, end);
-if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {
-    backup_skip_loop(job, backing_bs(blk_bs(job->common.blk)));
-} else if (bdrv_has_zero_init(blk_bs(job->target))) {
-    backup_skip_loop(job, NULL);
-}
+My excuse it that checking for orphans makes sense only during initial
+startup, and there, exit(1) on error is what we do.  Doing it right away
+is simplest.
 
---zHDeOHGDnzKksZSU
-Content-Type: application/pgp-signature; name="signature.asc"
+I'm fine with leaving the exit() to the caller.  I would prefer to leave
+the printing to the caller as well then.
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYkKAoAAoJEJykq7OBq3PIhx0H/ia9w+mANNDIOCp52zUNIlO5
-SD+vo3iCtIR/hJ4JORkoIfnKLyk/3yzJVA7x83yzln0oybpt7BRTYvO/zKYUT82+
-v2KfdZ/6sCwYR6a13SjVT/iGSQ03H9pfrAcc1xvV3lLcbBomZkqllhCEl/gEieiE
-NN6PC7Chads83caNrdRZWPRVzcGaZNW2RTRSgvuPiIG0Q+oIMlGMENEJIxBmxXb6
-RkZSE6wOIsn90QOOpbb2DaFL/pRbDTkExdIrB7udMQnzu4jV9gDbFKSEg8NlLx5Y
-htqeDbeFsTifHt0mXSY8M+Lt+4TJ10PCjZmzyHKGV5zhmZvRefmtSYl7dRQ88ww=
-=2eX6
------END PGP SIGNATURE-----
-
---zHDeOHGDnzKksZSU--
+Anyone else got a preference?
