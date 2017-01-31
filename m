@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cYZ0a-0005cd-4b
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:02:09 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cYZ3K-0007rd-5j
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:05:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cYZ0X-0002t5-2W
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:02:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cYZ0W-0002sz-T7
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:02:05 -0500
-Date: Tue, 31 Jan 2017 16:01:59 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170131155906-mutt-send-email-mst@kernel.org>
-References: <1485868446-10587-1-git-send-email-mst@redhat.com>
-	<CAFEAcA-UMXm1PSr46uUY1-RScww_QgZgKt5mZwTd_VH6Btj30g@mail.gmail.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cYZ3J-0003lF-4C
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:04:58 -0500
+References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479837270-79005-4-git-send-email-vsementsov@virtuozzo.com>
+	<87mvegajzv.fsf@emacs.mitica>
+	<7890fa87-faa1-fd99-e8c8-76b51f039ad6@virtuozzo.com>
+	<20170124195334.GF2220@work-vm>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <86b7650e-de88-e058-84cc-ce22b91eabff@virtuozzo.com>
+Date: Tue, 31 Jan 2017 17:04:40 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-UMXm1PSr46uUY1-RScww_QgZgKt5mZwTd_VH6Btj30g@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v3 00/21] virtio, vhost, pci: fixes, features
+In-Reply-To: <20170124195334.GF2220@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 03/17] migration: split common postcopy out
+ of ram postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +27,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: quintela@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On Tue, Jan 31, 2017 at 01:24:30PM +0000, Peter Maydell wrote:
-> On 31 January 2017 at 13:14, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > The following changes since commit ae5045ae5b2bbd8ce1335d1b05f9ecacca=
-83a6cf:
-> >
-> >   Merge remote-tracking branch 'remotes/rth/tags/pull-nios-20170124' =
-into staging (2017-01-25 13:30:23 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstrea=
-m
-> >
-> > for you to fetch changes up to b16127353f6b5ccdbe1e61e48848a83a6d30e6=
-40:
-> >
-> >   arm: add trailing ; after MISMATCH_CHECK (2017-01-31 15:11:35 +0200=
-)
-> >
-> > ----------------------------------------------------------------
-> > virtio, vhost, pci: fixes, features
-> >
-> > generic pci root port support
-> > disable shpc by default
-> > safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
-> > fixes and cleanups all over the place
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >
-> > ----------------------------------------------------------------
->=20
-> Fails to build:
->=20
-> /home/petmay01/linaro/qemu-for-merges/net/vhost-user.c: In function
-> =E2=80=98vhost_user_cleanup=E2=80=99:
-> /home/petmay01/linaro/qemu-for-merges/net/vhost-user.c:154:9: error:
-> unknown type name =E2=80=98CharDriverSt
-> ate=E2=80=99
->          CharDriverState *chr =3D qemu_chr_fe_get_driver(&s->chr);
->          ^
-> /home/petmay01/linaro/qemu-for-merges/net/vhost-user.c:154:32: error:
-> initialization from incompatible pointer type
-> [-Werror=3Dincompatible-pointer-types]
->          CharDriverState *chr =3D qemu_chr_fe_get_driver(&s->chr);
->                                 ^
-> /home/petmay01/linaro/qemu-for-merges/net/vhost-user.c:157:25: error:
-> passing argument 1 of =E2=80=98qemu_chr_delete=E2=80=99 from incompatib=
-le pointer type
-> [-Werror=3Dincompatible-pointer-types]
->          qemu_chr_delete(chr);
->                          ^
-> In file included from
-> /home/petmay01/linaro/qemu-for-merges/net/vhost-user.c:15:0:
-> /home/petmay01/linaro/qemu-for-merges/include/sysemu/char.h:185:6:
-> note: expected =E2=80=98Chardev * {aka struct Chardev *}=E2=80=99 but a=
-rgument is of
-> type =E2=80=98int *=E2=80=99
->  void qemu_chr_delete(Chardev *chr);
->       ^
->=20
-> Looks like something in your tree is semantically conflicting
-> with the char device QOMification that landed via Paolo's
-> tree yesterday. Can you rebase/fix/drop patches as appropriate,
-> please?
->=20
-> thanks
-> -- PMM
+24.01.2017 22:53, Dr. David Alan Gilbert wrote:
+> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+>> 24.01.2017 12:24, Juan Quintela wrote:
+>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+>>>> Split common postcopy staff from ram postcopy staff.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> ---
+>>>>    include/migration/migration.h |  1 +
+>>>>    migration/migration.c         | 39 +++++++++++++++++++++++++++------------
+>>>>    migration/postcopy-ram.c      |  4 +++-
+>>>>    migration/savevm.c            | 31 ++++++++++++++++++++++---------
+>>>>    4 files changed, 53 insertions(+), 22 deletions(-)
+>>>>
+>>> Hi
+>>>
+>>> {
+>>>>        MigrationState *s;
+>>>> @@ -1587,9 +1592,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+>>>>         * need to tell the destination to throw any pages it's already received
+>>>>         * that are dirty
+>>>>         */
+>>>> -    if (ram_postcopy_send_discard_bitmap(ms)) {
+>>>> -        error_report("postcopy send discard bitmap failed");
+>>>> -        goto fail;
+>>>> +    if (migrate_postcopy_ram()) {
+>>>> +        if (ram_postcopy_send_discard_bitmap(ms)) {
+>>>> +            error_report("postcopy send discard bitmap failed");
+>>>> +            goto fail;
+>>>> +        }
+>>> I will have preffered that for the ram commands, to embed the
+>>> migrate_postocpy_ram() check inside them, but that is taste, and
+>>> everyone has its own O:-)
+>>>
+>>>> diff --git a/migration/savevm.c b/migration/savevm.c
+>>>> index e436cb2..c8a71c8 100644
+>>>> --- a/migration/savevm.c
+>>>> +++ b/migration/savevm.c
+>>>> @@ -73,7 +73,7 @@ static struct mig_cmd_args {
+>>>>        [MIG_CMD_INVALID]          = { .len = -1, .name = "INVALID" },
+>>>>        [MIG_CMD_OPEN_RETURN_PATH] = { .len =  0, .name = "OPEN_RETURN_PATH" },
+>>>>        [MIG_CMD_PING]             = { .len = sizeof(uint32_t), .name = "PING" },
+>>>> -    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = 16, .name = "POSTCOPY_ADVISE" },
+>>>> +    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = -1, .name = "POSTCOPY_ADVISE" },
+>>>>        [MIG_CMD_POSTCOPY_LISTEN]  = { .len =  0, .name = "POSTCOPY_LISTEN" },
+>>>>        [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
+>>>>        [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
+>>>> @@ -827,12 +827,17 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
+>>>>    /* Send prior to any postcopy transfer */
+>>>>    void qemu_savevm_send_postcopy_advise(QEMUFile *f)
+>>>>    {
+>>>> -    uint64_t tmp[2];
+>>>> -    tmp[0] = cpu_to_be64(getpagesize());
+>>>> -    tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
+>>>> +    if (migrate_postcopy_ram()) {
+>>>> +        uint64_t tmp[2];
+>>>> +        tmp[0] = cpu_to_be64(getpagesize());
+>>>> +        tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
+>>>> -    trace_qemu_savevm_send_postcopy_advise();
+>>>> -    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
+>>>> +        trace_qemu_savevm_send_postcopy_advise();
+>>>> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE,
+>>>> +                                 16, (uint8_t *)tmp);
+>>>> +    } else {
+>>>> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 0, NULL);
+>>>> +    }
+>>>>    }
+>>>>    /* Sent prior to starting the destination running in postcopy, discard pages
+>>> I haven't yet figured out why you are reusing this command with a
+>>> different number of parameters.
+>>> For this to pass, I need that Dave comment on this.
+>>>
+>>> So,
+>>>
+>>> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>>>
+>>> conditioned that Dave agrees with this.
+>> These parameters are unrelated if ram postcopy is disabled. So, I should be
+>> better to have a possibility of skipping them, then to send unneeded numbers
+>> and write separate code to read them from the stream (rewriting
+>> loadvm_postcopy_handle_advise to just read these two numbers and do nothing
+>> about ram postcopy for this case).
+> I think I'd prefer either a new command or keeping these fields (probably all 0 ?)
+> my worry is what happens in the case if we add a 3rd postcopy subfeature;
+> In your case we have three possibilities:
+>
+>      a) Postcopy RAM only - 16 bytes
+>      b) Postcopy persistent-dirty-bitmap only - 0 bytes
+>      c) Both - 16 bytes
+>
+> Lets say we added postcopy-foo in the future and it wanted to add
+> another 16 bytes, what would it send if it was foo+persistent-dirty-bitmap and no RAM?
+> We'd end up with 16 bytes sent but you'd have to be very careful
+> never to get that confused with case (a) above.
+>
+> (I don't feel too strongly about it though)
 
-Right it's a trivial conflict. I'll rebase and resend
-with minimal testing.
+Hmm.. Actually I use migrate_postcopy_ram() to distinct these thing in 
+loadvm_postcopy_handle_advise.. And it seem like it is a mistake. Are 
+migration capabilities available on target?.. On the other hand 
+postcopy-test doesn't fail...
 
---=20
-MST
+>
+> Dave
+>
+>> -- 
+>> Best regards,
+>> Vladimir
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+
+-- 
+Best regards,
+Vladimir
