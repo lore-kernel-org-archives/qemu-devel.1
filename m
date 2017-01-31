@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYYWh-0001Ad-P9
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:31:18 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cYYhB-000393-0H
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:42:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYYWg-0003eS-NY
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:31:15 -0500
-Date: Tue, 31 Jan 2017 13:31:06 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131133106.GH18804@stefanha-x1.localdomain>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-7-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <kraxel@redhat.com>) id 1cYYh6-0005yc-Ao
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:42:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cYYh6-0005yL-4f
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:42:00 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 11C0F6AAD8
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 13:42:00 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 31 Jan 2017 14:41:36 +0100
+Message-Id: <1485870106-25016-1-git-send-email-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="jRdC2OsRnuV8iIl8"
-Content-Disposition: inline
-In-Reply-To: <1482503344-6424-7-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 06/21] backup: rewrite top mode cluster
- skipping
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/10] ui patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+
+  Hi,
+
+Here comes the ui patch queue.  Nothing outstanding here.  Bugfixes and
+small improvements all user interfaces.
+
+please pull,
+  Gerd
+
+The following changes since commit a0def594286d9110a6035e02eef558cf3cf5d8=
+47:
+
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2017-01-30 10:23:20 +0000)
+
+are available in the git repository at:
 
 
---jRdC2OsRnuV8iIl8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  git://git.kraxel.org/qemu tags/pull-ui-20170131-1
 
-On Fri, Dec 23, 2016 at 05:28:49PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> @@ -374,6 +379,101 @@ static bool coroutine_fn yield_and_check(BackupBloc=
-kJob *job)
->      return false;
->  }
-> =20
-> +static void backup_skip_clusters(BackupBlockJob *job,
-> +                                 int64_t start, int64_t end)
+for you to fetch changes up to 9f533e705dd140ea725747e8fd9bbab7f1e84a8b:
 
-Missing coroutine_fn to document that this function must be called from
-coroutine context.
+  gtk: Hardcode LC_CTYPE as C.utf-8 (2017-01-31 14:02:28 +0100)
 
-> +{
-> +    CowRequest cow_request;
-> +
-> +    wait_for_overlapping_requests(job, start, end);
-> +    cow_request_begin(&cow_request, job, start, end);
-> +
-> +    if (end * job->cluster_size > job->common.len) {
-> +        int64_t n;
-> +        end--;
-> +        n =3D job->common.len - end * job->cluster_size;
-> +        assert(n > 0);
-> +
-> +        if (hbitmap_get(job->copy_bitmap, end)) {
-> +            hbitmap_reset(job->copy_bitmap, end, 1);
-> +            job->common.offset +=3D n;
-> +        }
-> +    }
-> +
-> +    for ( ; start < end; start++) {
-> +        if (!hbitmap_get(job->copy_bitmap, start)) {
-> +            continue;
-> +        }
-> +
-> +        hbitmap_reset(job->copy_bitmap, start, 1);
-> +        job->common.offset +=3D job->cluster_size;
-> +    }
-> +
-> +    cow_request_end(&cow_request);
-> +}
-> +
-> +static int backup_skip_unallocated_clusters(BackupBlockJob *job,
-> +                                            BlockDriverState *base,
-> +                                            int64_t start, int *n)
+----------------------------------------------------------------
+ui: bugfixes and small improvements all over the place.
 
-Missing coroutine_fn.
+----------------------------------------------------------------
+Fabian Lesniak (3):
+      qapi: add support for mice with extra/side buttons
+      ps2: add support for mice with extra/side buttons
+      ui: add support for mice with extra/side buttons
 
-> +{
-> +    int ret;
-> +    int64_t sectors_per_cluster =3D cluster_size_sectors(job);
-> +    BlockDriverState *bs =3D blk_bs(job->common.blk);
-> +    int64_t sector_end =3D job->common.len >> BDRV_SECTOR_BITS;
-> +    int64_t sector =3D start * sectors_per_cluster;
-> +    int max_sectors =3D MIN(max_query_sectors(job), sector_end - sector);
-> +    int n_sectors =3D 0;
-> +
-> +    ret =3D bdrv_is_allocated_above(bs, base, sector, max_sectors, &n_se=
-ctors);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
-> +    if (sector + n_sectors =3D=3D sector_end || ret =3D=3D 1) {
-> +        *n =3D DIV_ROUND_UP(n_sectors, sectors_per_cluster);
-> +    } else if (n_sectors < sectors_per_cluster) {
-> +        *n =3D 1;
-> +        ret =3D 1;
-> +    } else {
-> +        *n =3D n_sectors / sectors_per_cluster;
-> +    }
-> +
-> +    if (ret =3D=3D 0) {
-> +        backup_skip_clusters(job, start, start + *n);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void backup_skip_loop(BackupBlockJob *job, BlockDriverState *base)
+Gerd Hoffmann (1):
+      vnc: fix overflow in vnc_update_stats
 
-Missing coroutine_fn.
+Kevin Wolf (1):
+      gtk: Hardcode LC_CTYPE as C.utf-8
 
---jRdC2OsRnuV8iIl8
-Content-Type: application/pgp-signature; name="signature.asc"
+Marc-Andr=C3=A9 Lureau (1):
+      spice: wakeup QXL worker to pick up mouse changes
 
------BEGIN PGP SIGNATURE-----
+OGAWA Hirofumi (1):
+      ui/gtk: Fix mouse wheel on 3.4.0 or later
 
-iQEcBAEBAgAGBQJYkJGaAAoJEJykq7OBq3PIOXQH/iX5UrYU91yL8+m87OxH3xcJ
-b7ZmkyXEJbB1eEdd/mEMBHkGLftqqWChsL5OQIumeK22ZhF8TkmhVB4lz6kARp5f
-XN1H3YC1RElhCgcYPIqv8dCQBQZU3BNMqGyQfRysl2iw5jjxAO5hhqz+vJP/B+bD
-YuF6VrSA0ScOSbyYRC0FAZcyuKlRL2L6vHnRYDboX/36TWuwNDFLZMX6etgoW9ng
-EDpytQ6CA6z3sacTLpW2+sl065VCCQx/Ml+ciQqCIN3K+bNCEdyV+3QWJ06ZuREK
-l1pgXX6tv9oAP0WE4GSEk5IGIIKwbXXGdr51UmWS/N9HT2QOEG21X4Aa2uEGusw=
-=K9Jr
------END PGP SIGNATURE-----
+Pierre Ossman (1):
+      vnc: track LED state separately
 
---jRdC2OsRnuV8iIl8--
+Rami Rosen (1):
+      ui: fix format specfier in vnc to avoid break in build.
+
+Ziyue Yang (1):
+      ui/gtk.c: add ctrl-alt-=3D support for zoom in acceleration
+
+ hw/input/ps2.c         |  8 +++---
+ include/hw/input/ps2.h |  6 +++++
+ qapi-schema.json       |  7 +++++-
+ ui/gtk.c               | 32 +++++++++++++++++++++++-
+ ui/input-linux.c       |  6 +++++
+ ui/spice-display.c     |  2 ++
+ ui/vnc.c               | 67 ++++++++++++++++----------------------------=
+------
+ ui/vnc.h               |  3 ++-
+ 8 files changed, 79 insertions(+), 52 deletions(-)
