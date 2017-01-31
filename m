@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anibal.limon@linux.intel.com>) id 1cYgGG-0003Yu-Hn
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:46:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1cYgSr-0001OK-6p
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:59:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anibal.limon@linux.intel.com>) id 1cYgGD-0000OR-Dv
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:46:48 -0500
-References: <587D4171.6@linux.intel.com> <587D4329.5020702@linux.intel.com>
-	<20170130235210.GA4681@tungsten.ozlabs.ibm.com>
-From: =?UTF-8?B?QW7DrWJhbCBMaW3Ds24=?= <anibal.limon@linux.intel.com>
-Message-ID: <58910677.9080501@linux.intel.com>
-Date: Tue, 31 Jan 2017 15:49:43 -0600
+	(envelope-from <bounces@canonical.com>) id 1cYgSo-0003rc-4u
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:59:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cYgSn-0003rT-Ud
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:59:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cYgSm-00082e-Em
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 21:59:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6E3EE2E80BF
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 21:59:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170130235210.GA4681@tungsten.ozlabs.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="VehTKUqeA76rsmI1G8kiKJ85bK7S198mq"
-Subject: Re: [Qemu-devel] qemu-pcc 2.8.0 linux-user segfaults
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 31 Jan 2017 21:49:29 -0000
+From: Blue <vali.dragnuta@inode.ro>
+Reply-To: Bug 1250360 <1250360@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131112091735.10165.76015.malonedeb@soybean.canonical.com>
+	<20170131204938.8844.76368.malone@gac.canonical.com>
+Message-Id: <CAAbO6n3Z7oQb4b2Jkz=qB4pip3KShEa5OK7gD_tx5DaAcciEkA@mail.gmail.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1250360] Re: qcow2 image logical corruption
+ after host crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,138 +38,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VehTKUqeA76rsmI1G8kiKJ85bK7S198mq
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-
-
-On 01/30/2017 05:52 PM, Sam Bobroff wrote:
-> On Mon, Jan 16, 2017 at 04:03:21PM -0600, An=EDbal Lim=F3n wrote:
->>
->>
->> On 01/16/2017 03:56 PM, An=EDbal Lim=F3n wrote:
->>> Hi folks,
->>>
->>> I'm trying to upgrade qemu to 2.8.0 in Openembedded-core and segfault=
-s
->>> in qemu-ppc when is executing:
->=20
-> Hi An=EDbal,
->=20
-> I've recently encountered a similar problem and I've posted a fix. If
-> you'd like to try it, it's here:
->=20
-> https://lists.gnu.org/archive/html/qemu-ppc/2017-01/msg00413.html
-
-The patch works, thanks for made it.
-
-Cheers,
-	alimon
-
->=20
-> Cheers,
-> Sam.
->=20
->>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
-=2E8.0-r0/build/ppc-linux-user/qemu-ppc
->>> -s 16M -r 3.2.0 -cpu 7400 -L
->>> /home/alimon/repos/poky/build-ppc/tmp/sysroots/qemuppc -E
->>> LD_LIBRARY_PATH=3D/home/alimon/repos/poky/build-ppc/tmp/work/ppc7400-=
-poky-linux/gobject-introspection/1.50.0-r0/build/.libs:.libs:/home/alimon=
-/repos/poky/build-ppc/tmp/sysroots/qemuppc//usr/lib:/home/alimon/repos/po=
-ky/build-ppc/tmp/sysroots/qemuppc//lib
->>> /home/alimon/repos/poky/build-ppc/tmp/work/ppc7400-poky-linux/gobject=
--introspection/1.50.0-r0/build/tmp-introspectu_ewt_1z/Gio-2.0
->>> --introspect-dump=3D/home/alimon/repos/poky/build-ppc/tmp/work/ppc740=
-0-poky-linux/gobject-introspection/1.50.0-r0/build/tmp-introspectu_ewt_1z=
-/functions.txt,/home/alimon/repos/poky/build-ppc/tmp/work/ppc7400-poky-li=
-nux/gobject-introspection/1.50.0-r0/build/tmp-introspectu_ewt_1z/dump.xml=
-
->>> [Thread debugging using libthread_db enabled]
->>>
->>>
->>> And the debug info,
->>>
->>> (gdb) info threads
->>>   Id   Target Id         Frame
->>>   1    Thread 0x7ffff7fd0780 (LWP 25457) "qemu-ppc"
->>> pthread_cond_wait@@GLIBC_2.3.2 () at
->>> ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:185
->>>   2    Thread 0x7ffff647e700 (LWP 25461) "qemu-ppc" syscall () at
->>> ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
->>> * 3    Thread 0x7ffff7f4d700 (LWP 25462) "qemu-ppc" 0x000000000086fba=
-4
->>> in static_code_gen_buffer ()
->>>
->>> (gdb) bt
->>> #0  0x000000000086fba4 in static_code_gen_buffer ()
->>> #1  0x000000000040e922 in cpu_tb_exec (itb=3D<optimized out>,
->>> itb=3D<optimized out>, cpu=3D0x29864d0) at
->>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
-=2E8.0-r0/qemu-2.8.0/cpu-exec.c:164
->>> #2  cpu_loop_exec_tb (sc=3D<optimized out>, tb_exit=3D<synthetic poin=
-ter>,
->>> last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D0x29864d0)=
- at
->>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
-=2E8.0-r0/qemu-2.8.0/cpu-exec.c:544
->>> #3  cpu_exec (cpu=3Dcpu@entry=3D0x29864d0) at
->>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
-=2E8.0-r0/qemu-2.8.0/cpu-exec.c:638
->>> #4  0x0000000000445fba in cpu_loop (env=3Denv@entry=3D0x298e750) at
->>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
-=2E8.0-r0/qemu-2.8.0/linux-user/main.c:1359
->>> #5  0x0000000000448a95 in clone_func (arg=3D0x7fffffffa910) at
->>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
-=2E8.0-r0/qemu-2.8.0/linux-user/syscall.c:6090
->>> #6  0x00007ffff6a750a4 in start_thread (arg=3D0x7ffff7f4d700) at
->>> pthread_create.c:309
->>> #7  0x00007ffff67aa62d in clone () at
->>> ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
->>
->> Here is the core dump,
->>
->> https://drive.google.com/file/d/0B9uDfO-FJ1kgY3ZhendISTZzOUU/view?usp=3D=
-sharing
->>
->>>
->>> Any help will be appreciated.
->>>
->>> Best regards,
->>> 	alimon
->>>
->>
->=20
->=20
->=20
+Since then, I switched all my vm images to (sparse) raw  and never
+experienced corruption problems again.
+I could not say if this can still be reproduced today, even then it was
+probably a corner case.
+I would suggest the closing of the issue as we cannot gather newer and more
+relevant data.
 
 
---VehTKUqeA76rsmI1G8kiKJ85bK7S198mq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+On Tue, Jan 31, 2017 at 10:49 PM, Thomas Huth <1250360@bugs.launchpad.net>
+wrote:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+> Did this issue happen ever again with a recent version of QEMU? ... if
+> not, should we close this bug nowadays?
+>
+> ** Changed in: qemu
+>        Status: New =3D> Incomplete
+>
+> --
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1250360
+>
+> Title:
+>   qcow2 image logical corruption after host crash
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1250360/+subscriptions
+>
 
-iQIcBAEBAgAGBQJYkQZ8AAoJEGJqcE9h3glgWpMQAIG1oiYFkDWXDRYRZLRwa3CD
-hRVlnpAnurHqsZOFa6gfflcovOTXhW780SeWKkKeuMW3L2qYK28QwDof0Cb5a3KS
-1zr7rkNZ1O+n58JweCshhnL53iIaUnkCwCY5J1yji+GlJE77ZHohYP0/JK3jzwFh
-YvDjJugqqLMZAhqWLB6o0UNeAwA2V7X+xYsaOGermpJJJQrW4Kw06fiq/IwkUc22
-LPppDfjLGfQKYnisBWWxlR22UaMX27WqxHtEPwjtOAEu63KDkejvA/tHYM/Ja+eo
-PW1syoijn3Rs3oYIQSd4atuEQMM4YugrRJJF2yp1k4qs1KOOyhnJcOPocJ/XhtiZ
-K2EwHY3Kt1Lw4nU/sEMptJfHMeqLTPqi2CvkJF4soe4VU1/97aDsCboDij6+noHv
-5/rq8q/eeOWy/2aJfdRigcJo+UgRzlF8B2NMvwk7MM40MSShkfeo6mCa7c/VxrZU
-h70ZWCMK1uaPrfOuJMxKTbmYtRlvOjLdCuTJPOmhN5nT4xJ5c1ktLzudqjsFUA+x
-+OLqkhmvRrUOStY9ewLjb+ULx97myEwfJwRvjI10/p1U+JCagihr14wbBb57yfCY
-5Yr2GO/03ERDWsM1PhkNiVp7uzwPKq/YJWqbPOYeu1Fo5B4vzNmlHj8t5qrd+fbr
-pyiLv04gLsaV2t362/Vi
-=dVMH
------END PGP SIGNATURE-----
+-- =
 
---VehTKUqeA76rsmI1G8kiKJ85bK7S198mq--
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1250360
+
+Title:
+  qcow2 image logical corruption after host crash
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Description of problem:
+  In case of power failure disk images that were active and created in qcow=
+2 format can become logically corrupt so that they actually appear as unuse=
+d (full of zeroes).
+  Data seems to be there, but at this moment i cannot find any reliable met=
+hod to recover it. Should it be a raw image, a recovery path would be avail=
+able, but a qcow2 image only presents zeroes once it gets corrupted. My und=
+erstanding is that the blockmap of the image gets reset and the image is th=
+en assumed to be unused.
+  My detailed setup :
+
+  Kernel 2.6.32-358.18.1.el6.x86_64
+  qemu-kvm-0.12.1.2-2.355.0.1.el6.centos.7.x86_64
+  Used via libvirt libvirt-0.10.2-18.el6_4.14.x86_64
+  The image was used from a NFS share (the nfs server did NOT crash and rem=
+ained permanently active).
+
+  qemu-img check finds no corruption;
+  qemu-img convert will fully convert the image to raw at a raw image full =
+of zeroes. However, there is data in the file, and the storage backend was =
+not restarted, inactivated during the incident.
+  I encountered this issue on two different machines, in both cases i was n=
+ot able to recover the data.
+  Image was qcow2, thin provisioned, created like this :
+   qemu-img create -f qcow2 -o cluster_size=3D2M imagename.img
+
+  While addressing the root cause in order to not have this issue repeat
+  would be the ideal scenario, a temporary workaround to run on the
+  affected qcow2 image to "patch" it and recover the data (eventually
+  after a full fsck/recovery inside the guest) would also be good.
+  Otherwise we are basically losing data on a large scale when using
+  qcow2.
+
+
+  Version-Release number of selected component (if applicable):
+  Kernel 2.6.32-358.18.1.el6.x86_64
+  qemu-kvm-0.12.1.2-2.355.0.1.el6.centos.7.x86_64
+  Used via libvirt libvirt-0.10.2-18.el6_4.14.x86_64
+
+  How reproducible:
+  I am not able (and don't have at the moment enough resources to try to ma=
+nually reproduce it), but the probability of the issue seems quite high as =
+this is the second case of such corruption in weeks.
+  Additional info:
+  I can privately provide an image displaying the corruption.
+
+  The reported problem has actually two aspects : first is the cause that e=
+ventually produces this issue.
+  The second is the fact that once the logical corruption has occured, qemu=
+-img check finds nothing wrong with the image - this is obviously wrong.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1250360/+subscriptions
