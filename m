@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39461)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1cYanG-0001ri-NN
+	id 1cYanH-0001rw-04
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1cYanC-0002tn-2j
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:30 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:53319 helo=mx01.kamp.de)
+	(envelope-from <pl@kamp.de>) id 1cYanC-0002ty-4I
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:31 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:56666 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cYanB-0002sx-PS
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:25 -0500
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cYanB-0002sw-Ox
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:56:26 -0500
 From: Peter Lieven <pl@kamp.de>
-Date: Tue, 31 Jan 2017 16:56:11 +0100
-Message-Id: <1485878172-15463-2-git-send-email-pl@kamp.de>
-In-Reply-To: <1485878172-15463-1-git-send-email-pl@kamp.de>
-References: <1485878172-15463-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH V2 1/2] block/nfs: fix NULL pointer dereference
- in URI parsing
+Date: Tue, 31 Jan 2017 16:56:10 +0100
+Message-Id: <1485878172-15463-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH V2 0/2] fix segfault and naming of runtime opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +22,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, ashijeetacharya@gmail.com, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, ashijeetacharya@gmail.com, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, Peter Lieven <pl@kamp.de>
 
-parse_uint_full wants to put the parsed value into the
-variable passed via its second argument which is NULL.
+commit 94d6a7a accidently left the naming of runtime opts and QAPI
+scheme inconsistent. Furthermore a NULL pointer dereference resulted
+in a segfault when parsing URI parameters.
 
-Fixes: 94d6a7a76e9df9919629428f6c598e2b97d9426c
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Lieven <pl@kamp.de>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- block/nfs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+v1->v2: Patch 1: fixed type in commit msg [Eric]
+        Patch 2: noted backwards incompatiblity with 2.8 [Eric]
 
-diff --git a/block/nfs.c b/block/nfs.c
-index a564340..baaecff 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -108,12 +108,13 @@ static int nfs_parse_uri(const char *filename, QDict *options, Error **errp)
-     qdict_put(options, "path", qstring_from_str(uri->path));
- 
-     for (i = 0; i < qp->n; i++) {
-+        unsigned long long val;
-         if (!qp->p[i].value) {
-             error_setg(errp, "Value for NFS parameter expected: %s",
-                        qp->p[i].name);
-             goto out;
-         }
--        if (parse_uint_full(qp->p[i].value, NULL, 0)) {
-+        if (parse_uint_full(qp->p[i].value, &val, 0)) {
-             error_setg(errp, "Illegal value for NFS parameter: %s",
-                        qp->p[i].name);
-             goto out;
+Peter Lieven (2):
+  block/nfs: fix NULL pointer dereference in URI parsing
+  block/nfs: fix naming of runtime opts
+
+ block/nfs.c | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
+
 -- 
 1.9.1
