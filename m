@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cYYOF-0001St-Jr
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:22:32 -0500
+	(envelope-from <berto@igalia.com>) id 1cYYP1-00029I-LF
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:23:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cYYOB-0001Sz-Mg
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:22:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36366)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cYYOB-0001Sv-HA
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:22:27 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B55598046D
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 13:22:27 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170106182823.1960-14-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Fri, 6 Jan 2017 18:28:21 +0000")
-References: <20170106182823.1960-1-dgilbert@redhat.com>
-	<20170106182823.1960-14-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 31 Jan 2017 14:22:23 +0100
-Message-ID: <87h94fs6sw.fsf@emacs.mitica>
+	(envelope-from <berto@igalia.com>) id 1cYYOx-0001o2-O7
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:23:19 -0500
+Received: from smtp3.mundo-r.com ([212.51.32.191]:30234 helo=smtp4.mundo-r.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berto@igalia.com>) id 1cYYOx-0001ne-AE
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:23:15 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <s9dlgtr8jdg.fsf@redhat.com>
+References: <20170131100945.8189-1-kwolf@redhat.com>
+	<w51mve7o4n1.fsf@maestria.local.igalia.com>
+	<s9dlgtr8jdg.fsf@redhat.com>
+Date: Tue, 31 Jan 2017 14:23:13 +0100
+Message-ID: <w51h94fnz26.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 13/15] postcopy: Update userfaultfd.h header
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] gtk: Hardcode LC_CTYPE as C.utf-8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,16 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com
+To: Mike FABIAN <mfabian@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, kraxel@redhat.com
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> We use a new userfaultfd define, so update the header.
-> (Not needed if someone just runs the update script once it's
-> gone into the main kernel).
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Tue 31 Jan 2017 02:11:07 PM CET, Mike FABIAN <mfabian@redhat.com> wrote:
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+>> - Is it C.utf-8 or C.UTF-8 ? 'locale -a' shows only the latter in my
+>>   system.
+>
+> Both work:
+
+Hmmm... apparently not in my system:
+
+$ LC_CTYPE=3DC.utf-8 locale
+locale: Cannot set LC_CTYPE to default locale: No such file or directory
+locale: Cannot set LC_ALL to default locale: No such file or directory
+LANG=3Den_US.utf8
+LANGUAGE=3D
+LC_CTYPE=3DC.utf-8
+[...]
+
+$ LC_CTYPE=3DC.UTF-8 locale
+LANG=3Den_US.utf8
+LANGUAGE=3D
+LC_CTYPE=3DC.UTF-8
+
+I have glibc 2.24-8 (Debian).
+
+>> - When was this added? This bug seems to be still open:
+>>   https://sourceware.org/bugzilla/show_bug.cgi?id=3D17318
+>
+> Fedora has it since Fedora 24 (spring 2016), Debian for a while
+> longer.
+>
+> I=E2=80=99ll ping again to get it included upstream.
+
+Ah ok, so it's a distro-specific change at the moment.
+
+Thanks,
+
+Berto
