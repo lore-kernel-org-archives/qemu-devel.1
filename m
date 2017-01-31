@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbCr-0000ka-Nc
+	(envelope-from <peter.maydell@linaro.org>) id 1cYbCw-0000pz-37
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:23:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbCn-000190-13
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33890)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cYbCm-00018u-Oq
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:22:52 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 31 Jan 2017 20:21:02 +0400
-Message-Id: <20170131162122.29408-22-marcandre.lureau@redhat.com>
-In-Reply-To: <20170131162122.29408-1-marcandre.lureau@redhat.com>
-References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cYbCv-0001Ab-BN
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:23:02 -0500
+Received: from mail-vk0-x236.google.com ([2607:f8b0:400c:c05::236]:35631)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cYbCv-0001AM-7j
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:23:01 -0500
+Received: by mail-vk0-x236.google.com with SMTP id x75so240397747vke.2
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 08:23:01 -0800 (PST)
 MIME-Version: 1.0
+In-Reply-To: <1485877831-28786-1-git-send-email-kraxel@redhat.com>
+References: <1485877831-28786-1-git-send-email-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 31 Jan 2017 16:22:40 +0000
+Message-ID: <CAFEAcA9MbE1QwcXaxOEot4J0+Fua8mXOG-KoxQOdcD4vWmwcsg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/41] char: create chardev-obj-y
+Subject: Re: [Qemu-devel] [PULL v2 00/11] ui patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,141 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This will help to split char.c in several units without having to
-reference them all everywhere. This is useful in particular for tests.
+On 31 January 2017 at 15:50, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+> Here comes the ui patch queue.  Nothing outstanding here.  Bugfixes and
+> small improvements all user interfaces.
+>
+> v2 updates:
+>   * change "C.utf-8" locale to "C.UTF-8".
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- Makefile               | 4 +++-
- Makefile.objs          | 5 +++--
- Makefile.target        | 3 +++
- chardev/Makefile.objs  | 2 +-
- tests/Makefile.include | 9 +++++----
- 5 files changed, 15 insertions(+), 8 deletions(-)
+> Kevin Wolf (1):
+>       gtk: Hardcode LC_CTYPE as C.utf-8
 
-diff --git a/Makefile b/Makefile
-index 1e5cb1934d..aef76221f5 100644
---- a/Makefile
-+++ b/Makefile
-@@ -147,6 +147,7 @@ endif
-=20
- dummy :=3D $(call unnest-vars,, \
-                 stub-obj-y \
-+                chardev-obj-y \
-                 util-obj-y \
-                 qga-obj-y \
-                 ivshmem-client-obj-y \
-@@ -223,7 +224,8 @@ subdir-dtc:dtc/libfdt dtc/tests
- dtc/%:
- 	mkdir -p $@
-=20
--$(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(qom-obj-y=
-) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
-+$(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(chardev-o=
-bj-y) \
-+	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
-=20
- ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
- # Only keep -O and -g cflags
-diff --git a/Makefile.objs b/Makefile.objs
-index cad4c54740..91a4794f28 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -51,8 +51,7 @@ common-obj-$(CONFIG_POSIX) +=3D os-posix.o
- common-obj-$(CONFIG_LINUX) +=3D fsdev/
-=20
- common-obj-y +=3D migration/
--common-obj-y +=3D chardev/ #aio.o
--common-obj-y +=3D page_cache.o
-+common-obj-y +=3D page_cache.o #aio.o
-=20
- common-obj-$(CONFIG_SPICE) +=3D spice-qemu-char.o
-=20
-@@ -79,6 +78,8 @@ common-obj-$(CONFIG_SECCOMP) +=3D qemu-seccomp.o
-=20
- common-obj-$(CONFIG_FDT) +=3D device_tree.o
-=20
-+chardev-obj-y =3D chardev/
-+
- ######################################################################
- # qapi
-=20
-diff --git a/Makefile.target b/Makefile.target
-index fa2b151caa..5a487b5187 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -172,12 +172,14 @@ all-obj-y :=3D $(obj-y)
- target-obj-y :=3D
- block-obj-y :=3D
- common-obj-y :=3D
-+chardev-obj-y :=3D
- include $(SRC_PATH)/Makefile.objs
- dummy :=3D $(call unnest-vars,,target-obj-y)
- target-obj-y-save :=3D $(target-obj-y)
- dummy :=3D $(call unnest-vars,.., \
-                block-obj-y \
-                block-obj-m \
-+               chardev-obj-y \
-                crypto-obj-y \
-                crypto-aes-obj-y \
-                qom-obj-y \
-@@ -186,6 +188,7 @@ dummy :=3D $(call unnest-vars,.., \
-                common-obj-m)
- target-obj-y :=3D $(target-obj-y-save)
- all-obj-y +=3D $(common-obj-y)
-+all-obj-y +=3D $(chardev-obj-y)
- all-obj-y +=3D $(target-obj-y)
- all-obj-y +=3D $(qom-obj-y)
- all-obj-$(CONFIG_SOFTMMU) +=3D $(block-obj-y)
-diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index 3fc5539518..8bf131b461 100644
---- a/chardev/Makefile.objs
-+++ b/chardev/Makefile.objs
-@@ -1 +1 @@
--common-obj-y +=3D char.o
-+chardev-obj-y +=3D char.o
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 2145b9877d..ad35a6494b 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -510,8 +510,8 @@ tests/check-qjson$(EXESUF): tests/check-qjson.o $(tes=
-t-util-obj-y)
- tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-q=
-om-obj-y)
- tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-qom=
--obj-y)
-=20
--tests/test-char$(EXESUF): tests/test-char.o chardev/char.o qemu-timer.o =
-\
--	$(test-util-obj-y) $(qtest-obj-y) $(test-block-obj-y)
-+tests/test-char$(EXESUF): tests/test-char.o qemu-timer.o \
-+	$(test-util-obj-y) $(qtest-obj-y) $(test-block-obj-y) $(chardev-obj-y)
- tests/test-coroutine$(EXESUF): tests/test-coroutine.o $(test-block-obj-y=
-)
- tests/test-aio$(EXESUF): tests/test-aio.o $(test-block-obj-y)
- tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
-@@ -704,8 +704,9 @@ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-=
-test.o $(libqos-usb-obj-y)
- tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb=
--obj-y)
- tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
- tests/postcopy-test$(EXESUF): tests/postcopy-test.o
--tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o chardev/char.o q=
-emu-timer.o \
--	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-=
-y)
-+tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o qemu-timer.o \
-+	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-=
-y) \
-+	$(chardev-obj-y)
- tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket=
-_scm_helper.o
- tests/test-qemu-opts$(EXESUF): tests/test-qemu-opts.o $(test-util-obj-y)
- tests/test-write-threshold$(EXESUF): tests/test-write-threshold.o $(test=
--block-obj-y)
---=20
-2.11.0.295.gd7dffce1c.dirty
+...commit message no longer matches change.
+
+thanks
+-- PMM
