@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cYX4G-00081T-4w
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:57:48 -0500
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cYX5h-0000oP-1R
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:59:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cYX4F-0007mK-DY
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:57:48 -0500
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cYX5e-00086P-2c
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:59:17 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:58206)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cYX5d-00086D-SF
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 06:59:14 -0500
 From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Tue, 31 Jan 2017 14:57:45 +0300
-Message-ID: <20170131115745.5244.36762.stgit@PASHA-ISP>
-In-Reply-To: <20170131115728.5244.21690.stgit@PASHA-ISP>
-References: <20170131115728.5244.21690.stgit@PASHA-ISP>
+Date: Tue, 31 Jan 2017 14:59:13 +0300
+Message-ID: <20170131115913.6828.12266.stgit@PASHA-ISP>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 3/3] replay: disable default snapshot for
- record/replay
+Subject: [Qemu-devel] [PATCH] audio: make audio poll timer deterministic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +25,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, dovgaluk@ispras.ru, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: pbonzini@redhat.com, dovgaluk@ispras.ru, kraxel@redhat.com
 
-This patch disables setting '-snapshot' option on by default
-in record/replay mode. This is needed for creating vmstates in record
-and replay modes.
+This patch changes resetting strategy of the audio polling timer.
+It does not change expiration time if the timer is already set.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- vl.c |    8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ audio/audio.c |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index c6fc5c9..671fc04 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3129,7 +3129,13 @@ int main(int argc, char **argv, char **envp)
-                 drive_add(IF_PFLASH, -1, optarg, PFLASH_OPTS);
-                 break;
-             case QEMU_OPTION_snapshot:
--                snapshot = 1;
-+                {
-+                    Error *blocker = NULL;
-+                    snapshot = 1;
-+                    error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
-+                               "-snapshot");
-+                    replay_add_blocker(blocker);
-+                }
-                 break;
-             case QEMU_OPTION_hdachs:
-                 {
+diff --git a/audio/audio.c b/audio/audio.c
+index c845a44..1ee95a5 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -1112,8 +1112,10 @@ static int audio_is_timer_needed (void)
+ static void audio_reset_timer (AudioState *s)
+ {
+     if (audio_is_timer_needed ()) {
+-        timer_mod (s->ts,
+-            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
++        if (!timer_pending(s->ts)) {
++            timer_mod (s->ts,
++                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
++        }
+     }
+     else {
+         timer_del (s->ts);
