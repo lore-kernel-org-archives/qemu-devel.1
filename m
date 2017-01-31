@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cYaYR-0005aG-8R
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:41:12 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cYaav-0007ig-2a
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:43:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cYaYO-00079q-4c
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:41:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58148)
+	(envelope-from <pbonzini@redhat.com>) id 1cYaar-0007uB-Vl
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:43:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cYaYN-00079R-Qu
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:41:08 -0500
-Date: Tue, 31 Jan 2017 16:41:02 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170131164102.583323d7@nial.brq.redhat.com>
-In-Reply-To: <20170131165802-mutt-send-email-mst@kernel.org>
-References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
-	<20170118175335-mutt-send-email-mst@kernel.org>
-	<20170118181918.783cb7bd@nial.brq.redhat.com>
-	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
-	<20170131165802-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cYaar-0007tT-CL
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:43:41 -0500
+References: <1485857239-14296-1-git-send-email-den@openvz.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5f9269e3-0cff-0916-cecf-f21a68337c0f@redhat.com>
+Date: Tue, 31 Jan 2017 10:43:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
+In-Reply-To: <1485857239-14296-1-git-send-email-den@openvz.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] kvm: log available guest crash
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +27,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Phil Dennis-Jordan <phil@philjordan.eu>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, lersek@redhat.com
-
-On Tue, 31 Jan 2017 16:58:22 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-
-> On Tue, Jan 31, 2017 at 03:31:46PM +0100, Phil Dennis-Jordan wrote:
-> > On 18 January 2017 at 18:19, Igor Mammedov <imammedo@redhat.com> wrote:  
-> > > On Wed, 18 Jan 2017 18:30:59 +0200
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > >  
-> > >> On Wed, Jan 18, 2017 at 12:45:54PM +0100, Phil Dennis-Jordan wrote:  
-> > > [...]
-> > >  
-> > >> > I suspect more might be involved in enabling ACPI 2.0, and it should probably be an option so as to avoid regressions. I don't know what the best approach would be for this, so comments welcome. Should adding the reset register to the FADT also be configurable?  
-> > >>
-> > >> I would say an option to make FADT use rev 3 format would be a good
-> > >> idea.
-> > >>
-> > >> I'd make it the default if XP survives.  
-> > > if XP and legacy linux survive,
-> > > I'd skip adding option as probably there won't be any users,
-> > > in unlikely case such user surfaces we always can add option later
-> > > but we can't do it other way around (i.e. take it away).  
-> > 
-> > I have now finally solved the mystery of why my FADT patch has been
-> > going so disastrously wrong - I've now got working code, but I'd
-> > appreciate some guidance on the best way to structure a patch to
-> > minimise further back-and forth.  
-> 
-> + lersek
-> 
-> > The culprit turned out to be OVMF,
-> > specifically 2 bugs/shortcomings:
-> > 
-> > 1. It completely gives up on parsing Qemu's ACPI tables if more than
-> > one "add pointer" linker command points to the same table. In this
-> > case, if you add a command for both the DSDT and X_DSDT fields of the
-> > FADT, it aborts completely and uses fallback tables. (The following
-> > InstallAcpiTable call fails if called twice with the same table type.)
-> > https://github.com/tianocore/edk2/blob/master/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c#L518
-> > 
-> > 2. After applying all the linker commands, it goes and rewrites part
-> > of the FADT anyway. Specifically, it rewrites the DSDT and X_DSDT
-> > fields - and it always sets one of them to 0. Which one depends on
-> > whether the DSDT is above the 4G barrier:
-> > https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableProtocol.c#L650
-> > 
-> > Both of these are easily fixed, and I will submit a corresponding patch to EDK2.
-> > 
-> > With that fixed, the rest of the FADT provided by Qemu is accepted by
-> > OVMF and the operating systems. On the Qemu side, it does mean we'll
-> > need to still retain the ACPI 1.0 tables for backwards compatibility.
-> > 
-> > Q1: How should the option be structured and named? Should the FADT
-> > revision be selectable via a sub-option on -machine? Or as a
-> > standalone option? Something else?
-WinXP is main reason why we are using 1.0 revisions,
-but if bumping revision doesn't affect it or later versions
-and linux kernel (ancient/contemporary) boots fine,
-I wouldn't bother with yet another option.
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
 
-> > Q2: To avoid any more confusion, I'd appreciate
-> > confirmation/clarification on the X_ and non-X FADT fields in the case
-> > where 32-bit pointers suffice.
-> > 
-> > Q2a: DSDT/X_DSDT: Both variants appear to be de-facto required.
-spec doesn't say that X_DSDT is optional and Windows requires it if field is present.
 
-> > 
-> > Q2b: FIRMWARE_CTRL/X_FIRMWARE_CTRL: leave X_FIRMWARE_CTRL zero.
-> > 
-> > Q2c: X_PM1a_EVT_BLK, X_PM1a_CNT_BLK, X_PM_TMR_BLK: These all state
-> > "This is a required field" for both variants.
-> > 
-> > Q2d: GPE0_BLK/X_GPE0_BLK: Both variants state "if this register block
-> > is not supported, this field contains zero." - I understand this to
-> > mean that when the register block IS supported and 32-bit, both
-> > variants must be filled.
-> > 
-> > In other words, only X_FIRMWARE_CTRL stays zero in Qemu's x86 case.
-> > 
-> > 
-> > I'll come up with a revised patch in the next few days.
-> > 
-> > Thanks for your help and patience so far, everyone!  
+On 31/01/2017 05:07, Denis V. Lunev wrote:
+> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>=20
+> Windows reports BSOD parameters through Hyper-V crash MSRs. This
+> information is very useful for initial crash analysis and thus
+> it would be nice to see it in the QEMU log file. There is suitable
+> log mask for the purpose.
+>=20
+> Linux guest does not provide this information, but still it would
+> be nice to log that we have crashed.
+
+We tell libvirt that the guest crashed through a QMP event, so I think
+this should be passed as arguments of the QMP event.  You could add:
+
+- a QAPI type GuestPanicInformation
+
+{'union': 'GuestPanicInformation',
+ 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
+
+{'struct': 'GuestPanicInformationHyperV',
+ 'data': { 'arg1': 'uint64',
+           'arg2': 'uint64',
+           'arg3': 'uint64',
+           'arg4': 'uint64' } }
+
+- a QOM property on the CPU object, crash-information, whose getter
+returns an error unless cpu->crash_occurred =3D true
+
+- an optional GuestPanicInformation argument to the GUEST_PANICKED
+event, which is passed if the QOM property returns a non-error value
+
+Thanks,
+
+Paolo
+
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Marcelo Tosatti <mtosatti@redhat.com>
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  hw/misc/pvpanic.c    |  1 +
+>  include/sysemu/kvm.h |  2 ++
+>  kvm-all.c            |  1 +
+>  stubs/Makefile.objs  |  1 +
+>  stubs/kvm-crash.c    |  8 ++++++++
+>  target/i386/kvm.c    | 51 ++++++++++++++++++++++++++++++++++++++++++++=
++++++++
+>  6 files changed, 64 insertions(+)
+>  create mode 100644 stubs/kvm-crash.c
+>=20
+> diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
+> index 0ac1e6a..221aa4e 100644
+> --- a/hw/misc/pvpanic.c
+> +++ b/hw/misc/pvpanic.c
+> @@ -42,6 +42,7 @@ static void handle_event(int event)
+>      }
+> =20
+>      if (event & PVPANIC_PANICKED) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Guest panicked\n");
+>          qemu_system_guest_panicked();
+>          return;
+>      }
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index 3045ee7..70cab9d 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -527,4 +527,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void=
+ *source);
+>   */
+>  int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
+>  int kvm_get_max_memslots(void);
+> +
+> +void kvm_arch_log_crash(CPUState *cpu);
+>  #endif
+> diff --git a/kvm-all.c b/kvm-all.c
+> index 330219e..5f83389 100644
+> --- a/kvm-all.c
+> +++ b/kvm-all.c
+> @@ -2000,6 +2000,7 @@ int kvm_cpu_exec(CPUState *cpu)
+>                  ret =3D EXCP_INTERRUPT;
+>                  break;
+>              case KVM_SYSTEM_EVENT_CRASH:
+> +                kvm_arch_log_crash(cpu);
+>                  qemu_mutex_lock_iothread();
+>                  qemu_system_guest_panicked();
+>                  qemu_mutex_unlock_iothread();
+> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> index a187295..3b1632a 100644
+> --- a/stubs/Makefile.objs
+> +++ b/stubs/Makefile.objs
+> @@ -35,3 +35,4 @@ stub-obj-y +=3D qmp_pc_dimm_device_list.o
+>  stub-obj-y +=3D target-monitor-defs.o
+>  stub-obj-y +=3D target-get-monitor-def.o
+>  stub-obj-y +=3D pc_madt_cpu_entry.o
+> +stub-obj-y +=3D kvm-crash.o
+> diff --git a/stubs/kvm-crash.c b/stubs/kvm-crash.c
+> new file mode 100644
+> index 0000000..36ab7f0
+> --- /dev/null
+> +++ b/stubs/kvm-crash.c
+> @@ -0,0 +1,8 @@
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "sysemu/kvm.h"
+> +
+> +void kvm_arch_log_crash(CPUState *cs)
+> +{
+> +    return;
+> +}
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 3b52821..899a83c 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2020,6 +2020,36 @@ static int kvm_get_sregs(X86CPU *cpu)
+>      return 0;
+>  }
+> =20
+> +static int kvm_read_msr_hv_crash(X86CPU *cpu, uint64_t *buf)
+> +{
+> +    int i, ret;
+> +    struct {
+> +        struct kvm_msrs info;
+> +        struct kvm_msr_entry entries[HV_X64_MSR_CRASH_PARAMS];
+> +    } msr_data;
+> +
+> +    if (!has_msr_hv_crash) {
+> +        return -ENOSYS;
+> +    }
+> +
+> +    for (i =3D 0; i < HV_X64_MSR_CRASH_PARAMS; i++) {
+> +        msr_data.entries[i].index =3D HV_X64_MSR_CRASH_P0 + i;
+> +    }
+> +    msr_data.info.nmsrs =3D HV_X64_MSR_CRASH_PARAMS;
+> +
+> +    ret =3D kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+> +    for (i =3D 0; i < ret; i++) {
+> +        const struct kvm_msr_entry *msr =3D msr_data.entries + i;
+> +        buf[msr->index - HV_X64_MSR_CRASH_P0] =3D msr->data;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  static int kvm_get_msrs(X86CPU *cpu)
+>  {
+>      CPUX86State *env =3D &cpu->env;
+> @@ -2767,6 +2797,27 @@ int kvm_arch_get_registers(CPUState *cs)
+>      return ret;
+>  }
+> =20
+> +void kvm_arch_log_crash(CPUState *cs)
+> +{
+> +    uint64_t msrs[HV_X64_MSR_CRASH_PARAMS];
+> +    int ret;
+> +    X86CPU *cpu =3D X86_CPU(cs);
+> +
+> +    qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed\n");
+> +    if (!has_msr_hv_crash) {
+> +        return;
+> +    }
+> +
+> +    ret =3D kvm_read_msr_hv_crash(cpu, msrs);
+> +    if (ret < 0) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Failed to get HV crash paramet=
+ers\n");
+> +        return;
+> +    }
+> +    qemu_log_mask(LOG_GUEST_ERROR, "HV crash parameters: (%#"PRIx64
+> +                  " %#"PRIx64" %#"PRIx64" %#"PRIx64" %#"PRIx64")\n",
+> +                  msrs[0], msrs[1], msrs[2], msrs[3], msrs[4]);
+> +}
+> +
+>  void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+>  {
+>      X86CPU *x86_cpu =3D X86_CPU(cpu);
+>=20
