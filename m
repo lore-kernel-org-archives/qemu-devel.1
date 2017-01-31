@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58216)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGZ-0001Iu-3w
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:36 -0500
+	id 1cYYGb-0001Kt-04
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGY-00009z-0y
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:35 -0500
-Date: Tue, 31 Jan 2017 15:14:29 +0200
+	id 1cYYGa-0000Ag-6h
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:37 -0500
+Received: from mail.kernel.org ([198.145.29.136]:39188)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
+	id 1cYYGa-0000AI-0K
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:36 -0500
+Date: Tue, 31 Jan 2017 15:14:31 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485868446-10587-4-git-send-email-mst@redhat.com>
+Message-ID: <1485868446-10587-5-git-send-email-mst@redhat.com>
 References: <1485868446-10587-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485868446-10587-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 03/21] ppc: switch to constants within
- BUILD_BUG_ON
+Subject: [Qemu-devel] [PULL v3 04/21] compiler: rework BUG_ON using a struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +30,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-We are switching BUILD_BUG_ON to verify that it's parameter is a
-compile-time constant, and it turns out that some gcc versions
-(specifically gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609) are
-not smart enough to figure it out for expressions involving local
-variables. This is harmless but means that the check is ineffective for
-these platforms.  To fix, replace the variable with macros.
+There are theoretical concerns that some compilers might not trigger
+build failures on attempts to define an array of size (x ? -1 : 1) where
+x is a variable and make it a variable sized array instead. Let rewrite
+using a struct with a negative bit field size instead as there are no
+dynamic bit field sizes.  This is similar to what Linux does.
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/ppc/spapr.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ include/qemu/compiler.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a642e66..b81f2ac 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2630,8 +2630,8 @@ static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t index,
-      * 1TiB 64-bit MMIO windows for each PHB.
-      */
-     const uint64_t base_buid = 0x800000020000000ULL;
--    const int max_phbs =
--        (SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / SPAPR_PCI_MEM64_WIN_SIZE - 1;
-+#define SPAPR_MAX_PHBS ((SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / \
-+                        SPAPR_PCI_MEM64_WIN_SIZE - 1)
-     int i;
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 7512082..1da500e 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -85,9 +85,12 @@
+ #define typeof_field(type, field) typeof(((type *)0)->field)
+ #define type_check(t1,t2) ((t1*)0 - (t2*)0)
  
-     /* Sanity check natural alignments */
-@@ -2640,12 +2640,14 @@ static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t index,
-     QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM64_WIN_SIZE % SPAPR_PCI_MEM32_WIN_SIZE) != 0);
-     QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM32_WIN_SIZE % SPAPR_PCI_IO_WIN_SIZE) != 0);
-     /* Sanity check bounds */
--    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_IO_WIN_SIZE) > SPAPR_PCI_MEM32_WIN_SIZE);
--    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_MEM32_WIN_SIZE) > SPAPR_PCI_MEM64_WIN_SIZE);
-+    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_IO_WIN_SIZE) >
-+                      SPAPR_PCI_MEM32_WIN_SIZE);
-+    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_MEM32_WIN_SIZE) >
-+                      SPAPR_PCI_MEM64_WIN_SIZE);
+-#define QEMU_BUILD_BUG_ON(x) \
+-    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
+-        __attribute__((unused))
++#define QEMU_BUILD_BUG_ON_STRUCT(x) \
++    struct { \
++        int:(x) ? -1 : 1; \
++    }
++#define QEMU_BUILD_BUG_ON(x) typedef QEMU_BUILD_BUG_ON_STRUCT(x) \
++    glue(qemu_build_bug_on__, __LINE__) __attribute__((unused))
  
--    if (index >= max_phbs) {
-+    if (index >= SPAPR_MAX_PHBS) {
-         error_setg(errp, "\"index\" for PAPR PHB is too large (max %u)",
--                   max_phbs - 1);
-+                   SPAPR_MAX_PHBS - 1);
-         return;
-     }
- 
+ #if defined __GNUC__
+ # if !QEMU_GNUC_PREREQ(4, 4)
 -- 
 MST
