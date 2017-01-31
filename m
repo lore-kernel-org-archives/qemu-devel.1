@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cYbNo-0003ba-OZ
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:34:17 -0500
+	(envelope-from <thuth@redhat.com>) id 1cYbQC-0005hR-RG
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:36:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cYbNl-000416-KR
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:34:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cYbNl-00040u-Dy
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:34:13 -0500
-Message-ID: <1485880450.1076.7.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 31 Jan 2017 17:34:10 +0100
-In-Reply-To: <CAFEAcA9MbE1QwcXaxOEot4J0+Fua8mXOG-KoxQOdcD4vWmwcsg@mail.gmail.com>
-References: <1485877831-28786-1-git-send-email-kraxel@redhat.com>
-	<CAFEAcA9MbE1QwcXaxOEot4J0+Fua8mXOG-KoxQOdcD4vWmwcsg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL v2 00/11] ui patch queue
+	(envelope-from <thuth@redhat.com>) id 1cYbQC-0004Tw-1l
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:36:44 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 31 Jan 2017 17:36:35 +0100
+Message-Id: <1485880595-16376-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/vfio: Add CONFIG switches for calxeda-xgmac
+ and amd-xgbe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +18,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org
 
-On Di, 2017-01-31 at 16:22 +0000, Peter Maydell wrote:
-> On 31 January 2017 at 15:50, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >   Hi,
-> >
-> > Here comes the ui patch queue.  Nothing outstanding here.  Bugfixes and
-> > small improvements all user interfaces.
-> >
-> > v2 updates:
-> >   * change "C.utf-8" locale to "C.UTF-8".
->=20
-> > Kevin Wolf (1):
-> >       gtk: Hardcode LC_CTYPE as C.utf-8
->=20
-> ...commit message no longer matches change.
+Both devices seem to be specific to the ARM platform. It's confusing
+for the users if they show up on other target architectures, too
+(e.g. when the user runs QEMU with "-device ?" to get a list of
+supported devices). Thus let's introduce proper configuration switches
+so that the devices are only compiled and included when they are
+really required.
 
-Subject is unchanged indeed.  The update is noted in the body of the
-commit message though.  Is that good enough or do you want a v3 pull
-with the subject updated too?
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ default-configs/arm-softmmu.mak | 2 ++
+ hw/vfio/Makefile.objs           | 4 ++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-cheers,
-  Gerd
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 6de3e16..a78be51 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -94,6 +94,8 @@ CONFIG_VERSATILE_PCI=y
+ CONFIG_VERSATILE_I2C=y
+ 
+ CONFIG_PCI_GENERIC=y
++CONFIG_VFIO_XGMAC=y
++CONFIG_VFIO_AMD_XGBE=y
+ 
+ CONFIG_SDHCI=y
+ CONFIG_INTEGRATOR_DEBUG=y
+diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+index c25e32b..05e7fbb 100644
+--- a/hw/vfio/Makefile.objs
++++ b/hw/vfio/Makefile.objs
+@@ -2,7 +2,7 @@ ifeq ($(CONFIG_LINUX), y)
+ obj-$(CONFIG_SOFTMMU) += common.o
+ obj-$(CONFIG_PCI) += pci.o pci-quirks.o
+ obj-$(CONFIG_SOFTMMU) += platform.o
+-obj-$(CONFIG_SOFTMMU) += calxeda-xgmac.o
+-obj-$(CONFIG_SOFTMMU) += amd-xgbe.o
++obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
++obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+ obj-$(CONFIG_SOFTMMU) += spapr.o
+ endif
+-- 
+1.8.3.1
