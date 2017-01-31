@@ -1,19 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cYb0i-0006Qi-DK
+	(envelope-from <berto@igalia.com>) id 1cYb0i-0006Qk-E8
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:10:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cYb0f-0006lE-50
+	(envelope-from <berto@igalia.com>) id 1cYb0e-0006l3-Fu
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:10:24 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 31 Jan 2017 18:09:55 +0200
-Message-Id: <c988ccf62ad4000775d3b322744ea0f5900daaa7.1485878688.git.berto@igalia.com>
-In-Reply-To: <cover.1485878688.git.berto@igalia.com>
-References: <cover.1485878688.git.berto@igalia.com>
-In-Reply-To: <cover.1485878688.git.berto@igalia.com>
-References: <cover.1485878688.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 2/2] iov: assert that qiov->size doesn't exceed
- INT_MAX
+Date: Tue, 31 Jan 2017 18:09:53 +0200
+Message-Id: <cover.1485878688.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 0/2] qemu-io: check the size of the I/O requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +20,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-The type of qiov->size is size_t but the QEMU I/O code uses int all
-over the place to measure request sizes. Overflows are likely going
-to be detected by any of the many assert(qiov->size == nbytes), where
-nbytes is an int, but let's add proper checks in the QEMUIOVector
-initialization, which is where it belongs.
+Hi,
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- util/iov.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+qemu-io allows arbitrary values (up to SIZE_MAX) for the size of its
+I/O requests, but QEMU cannot handle anything larger than INT_MAX.
 
-diff --git a/util/iov.c b/util/iov.c
-index 74e6ca8ed7..6b5cc9203c 100644
---- a/util/iov.c
-+++ b/util/iov.c
-@@ -283,13 +283,18 @@ void qemu_iovec_init_external(QEMUIOVector *qiov, struct iovec *iov, int niov)
-     qiov->niov = niov;
-     qiov->nalloc = -1;
-     qiov->size = 0;
--    for (i = 0; i < niov; i++)
-+    for (i = 0; i < niov; i++) {
-+        assert(iov[i].iov_len <= INT_MAX);
-+        assert(qiov->size <= INT_MAX - iov[i].iov_len);
-         qiov->size += iov[i].iov_len;
-+    }
- }
- 
- void qemu_iovec_add(QEMUIOVector *qiov, void *base, size_t len)
- {
-     assert(qiov->nalloc != -1);
-+    assert(len <= INT_MAX);
-+    assert(qiov->size <= INT_MAX - len);
- 
-     if (qiov->niov == qiov->nalloc) {
-         qiov->nalloc = 2 * qiov->nalloc + 1;
+   $ qemu-io -c 'aio_write 0 2G' hd.qcow2
+   block/block-backend.c:1035: blk_aio_write_entry:
+   Assertion `!rwco->qiov || rwco->qiov->size == acb->bytes' failed.
+
+   $ qemu-io -c 'aio_read 0 1G 1G' hd.qcow2
+   block/block-backend.c:1024:
+   blk_aio_read_entry: Assertion `rwco->qiov->size == acb->bytes' failed.
+
+This series checks that those values are within range and also adds
+assertions to qemu_iovec_add() and qemu_iovec_init_external() to
+detect these cases earlier.
+
+Regards,
+
+Berto
+
+Alberto Garcia (2):
+  qemu-io: don't allow I/O operations larger than INT_MAX
+  iov: assert that qiov->size doesn't exceed INT_MAX
+
+ qemu-io-cmds.c | 21 ++++++++++++---------
+ util/iov.c     |  7 ++++++-
+ 2 files changed, 18 insertions(+), 10 deletions(-)
+
 -- 
 2.11.0
