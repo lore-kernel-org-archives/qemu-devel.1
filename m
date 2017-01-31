@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cYbQC-0005hR-RG
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:36:45 -0500
+	(envelope-from <berto@igalia.com>) id 1cYbQW-0006A8-FQ
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cYbQC-0004Tw-1l
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:36:44 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 31 Jan 2017 17:36:35 +0100
-Message-Id: <1485880595-16376-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/vfio: Add CONFIG switches for calxeda-xgmac
- and amd-xgbe
+	(envelope-from <berto@igalia.com>) id 1cYbQV-0004Wk-0N
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:37:04 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <f9e9efcc-2a59-db47-a048-763eed52d92f@redhat.com>
+References: <cover.1485878688.git.berto@igalia.com>
+	<79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+	<f9e9efcc-2a59-db47-a048-763eed52d92f@redhat.com>
+Date: Tue, 31 Jan 2017 17:36:22 +0100
+Message-ID: <w51efzjnq49.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-io: don't allow I/O operations
+ larger than INT_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,48 +24,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-Cc: Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Both devices seem to be specific to the ARM platform. It's confusing
-for the users if they show up on other target architectures, too
-(e.g. when the user runs QEMU with "-device ?" to get a list of
-supported devices). Thus let's introduce proper configuration switches
-so that the devices are only compiled and included when they are
-really required.
+On Tue 31 Jan 2017 05:31:32 PM CET, Eric Blake wrote:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/arm-softmmu.mak | 2 ++
- hw/vfio/Makefile.objs           | 4 ++--
- 2 files changed, 4 insertions(+), 2 deletions(-)
+> Ideally, it would be nice to fix the block layer to allow larger
+> requests (since we already have code to auto-fragment down to device
+> limits, we should be able to rely on that code instead of having to
+> duplicate artificial constraints everywhere else in the tree).  But
+> that's a bigger task, and this is a good patch in the interim.
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 6de3e16..a78be51 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -94,6 +94,8 @@ CONFIG_VERSATILE_PCI=y
- CONFIG_VERSATILE_I2C=y
- 
- CONFIG_PCI_GENERIC=y
-+CONFIG_VFIO_XGMAC=y
-+CONFIG_VFIO_AMD_XGBE=y
- 
- CONFIG_SDHCI=y
- CONFIG_INTEGRATOR_DEBUG=y
-diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-index c25e32b..05e7fbb 100644
---- a/hw/vfio/Makefile.objs
-+++ b/hw/vfio/Makefile.objs
-@@ -2,7 +2,7 @@ ifeq ($(CONFIG_LINUX), y)
- obj-$(CONFIG_SOFTMMU) += common.o
- obj-$(CONFIG_PCI) += pci.o pci-quirks.o
- obj-$(CONFIG_SOFTMMU) += platform.o
--obj-$(CONFIG_SOFTMMU) += calxeda-xgmac.o
--obj-$(CONFIG_SOFTMMU) += amd-xgbe.o
-+obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
-+obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
- obj-$(CONFIG_SOFTMMU) += spapr.o
- endif
--- 
-1.8.3.1
+Related question: what's the largest request than a guest can
+theoretically submit?
+
+Berto
