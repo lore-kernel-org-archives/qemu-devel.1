@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58520)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYH1-0001lI-LL
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:09 -0500
+	id 1cYYHO-0002Bt-Vy
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGx-0000GJ-IH
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:03 -0500
-Received: from mail.kernel.org ([198.145.29.136]:39570)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGx-0000GD-B7
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:59 -0500
-Date: Tue, 31 Jan 2017 15:14:54 +0200
+	id 1cYYHO-0000O9-6H
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:27 -0500
+Date: Tue, 31 Jan 2017 15:15:13 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485868446-10587-14-git-send-email-mst@redhat.com>
+Message-ID: <1485868446-10587-21-git-send-email-mst@redhat.com>
 References: <1485868446-10587-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485868446-10587-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 13/21] msix: Follow CODING_STYLE
+Subject: [Qemu-devel] [PULL v3 20/21] arm: better stub version for
+ MISMATCH_CHECK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +26,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
+stub version of MISMATCH_CHECK is empty so it's easy to misuse for
+people not building kvm on arm.  Use QEMU_BUILD_BUG_ON similar to the
+non-stub version to make it easier to catch bugs.
 
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Marcel Apfelbaum <marcel@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Marcel Apfelbaum <marcel@redhat.com>
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/pci/msix.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ target/arm/kvm-consts.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index ee1714d..c938a9b 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -447,8 +447,10 @@ void msix_notify(PCIDevice *dev, unsigned vector)
- {
-     MSIMessage msg;
+diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
+index a2c9518..06b6c92 100644
+--- a/target/arm/kvm-consts.h
++++ b/target/arm/kvm-consts.h
+@@ -21,7 +21,9 @@
+ #define MISMATCH_CHECK(X, Y) QEMU_BUILD_BUG_ON(X != Y)
  
--    if (vector >= dev->msix_entries_nr || !dev->msix_entry_used[vector])
-+    if (vector >= dev->msix_entries_nr || !dev->msix_entry_used[vector]) {
-         return;
-+    }
+ #else
+-#define MISMATCH_CHECK(X, Y)
 +
-     if (msix_is_masked(dev, vector)) {
-         msix_set_pending(dev, vector);
-         return;
-@@ -483,8 +485,10 @@ void msix_reset(PCIDevice *dev)
- /* Mark vector as used. */
- int msix_vector_use(PCIDevice *dev, unsigned vector)
- {
--    if (vector >= dev->msix_entries_nr)
-+    if (vector >= dev->msix_entries_nr) {
-         return -EINVAL;
-+    }
++#define MISMATCH_CHECK(X, Y) QEMU_BUILD_BUG_ON(0)
 +
-     dev->msix_entry_used[vector]++;
-     return 0;
- }
+ #endif
+ 
+ #define CP_REG_SIZE_SHIFT 52
 -- 
 MST
