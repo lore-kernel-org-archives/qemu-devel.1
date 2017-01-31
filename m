@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cYUNI-0000pe-8p
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:05:17 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cYUQO-0002PE-ES
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:08:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cYUND-0005Vd-A5
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:05:16 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:39698)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cYUNC-0005UF-VM
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:05:11 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170129210910.6333-1-pbonzini@redhat.com>
-In-Reply-To: <20170129210910.6333-1-pbonzini@redhat.com>
-Date: Tue, 31 Jan 2017 12:05:08 +0300
-Message-ID: <000601d27ba1$1f009a50$5d01cef0$@ru>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cYUQN-0006Q5-I9
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:08:28 -0500
+Received: from mail-yb0-x242.google.com ([2607:f8b0:4002:c09::242]:35733)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cYUQN-0006Pw-Cm
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:08:27 -0500
+Received: by mail-yb0-x242.google.com with SMTP id j82so23202682ybg.2
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 01:08:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC/RFT PATCH 0/7] cpu-exec: simplify cpu_exec
- and remove some icount special cases
+References: <20170130133954.31353-1-marcandre.lureau@redhat.com>
+	<20170130133954.31353-20-marcandre.lureau@redhat.com>
+	<68c0ebae-7559-80eb-23fc-f8acc218a6d3@redhat.com>
+In-Reply-To: <68c0ebae-7559-80eb-23fc-f8acc218a6d3@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 31 Jan 2017 09:08:15 +0000
+Message-ID: <CAJ+F1CL1reqXTC+qvhcjKbNt2YSFd=R37A7ZidiVJdFXv7nhdQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 19/41] char: remove class kind field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: serge.fdrv@gmail.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Hi, Paolo!
+Hi
 
-Thanks for refactoring.
-I tested these patches with icount record/replay on i386 machine.
-It works, but the following changes should be applied.
-I also removed call to replay_has_interrupt, because now it is not needed here.
-It seems, that this call is an artifact of an older record/replay revision.
+On Tue, Jan 31, 2017 at 12:08 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 3838eb8..5cef8bc 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -519,7 +519,8 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-     }
+>
+>
+> On 30/01/2017 08:39, Marc-Andr=C3=A9 Lureau wrote:
+> > The class kind is necessary to lookup the chardev name in
+> > qmp_chardev_add() after calling qemu_chr_new_from_opts() and to set
+> > the appropriate ChardevBackend (mainly to free the right
+> > fields).
+> >
+> > qemu_chr_new_from_opts() can be changed to use a non-qmp function
+> > using the chardev class typename. Introduce qemu_chardev_add() to be
+> > called from qemu_chr_new_from_opts() and remove the class chardev kind
+> > field. Set the backend->type in the parse callback (when non-common
+> > fields are added).
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  include/sysemu/char.h |  1 -
+> >  backends/baum.c       |  1 -
+> >  backends/msmouse.c    |  1 -
+> >  backends/testdev.c    |  1 -
+> >  qemu-char.c           | 99
+> +++++++++++++++++++++++++--------------------------
+> >  spice-qemu-char.c     |  4 +--
+> >  ui/console.c          |  2 +-
+> >  ui/gtk.c              |  1 -
+> >  8 files changed, 51 insertions(+), 59 deletions(-)
+>
+> I am not sure about this patch.  Why not remove backend->type
+> altogether, and instead look at ChardevClass with object_dynamic_cast?
+>
+>
+For the reason I gave in the patch summary: qapi_free_ChardevBackend()
+dispatch based on ChardevBackendKind enum, not on Chardev object type.
 
-     /* Finally, check if we need to exit to the main loop.  */
--    if (unlikely(atomic_read(&cpu->exit_request) || replay_has_interrupt())) {
-+    if (unlikely(atomic_read(&cpu->exit_request)
-+        || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
-         atomic_set(&cpu->exit_request, 0);
-         cpu->exception_index = EXCP_INTERRUPT;
-         return true;
-
-Pavel Dovgalyuk
-
-> -----Original Message-----
-> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
-> Sent: Monday, January 30, 2017 12:09 AM
-> To: qemu-devel@nongnu.org
-> Cc: serge.fdrv@gmail.com; peter.maydell@linaro.org; pavel.dovgaluk@ispras.ru
-> Subject: [RFC/RFT PATCH 0/7] cpu-exec: simplify cpu_exec and remove some icount special cases
-> 
-> The series includes three parts:
-> 
-> 1-2: fix two bugs, the first one pretty bad, the second seems
-> to be theoretical only.
-> 
-> 3-5: simplify cpu_exec.  This builds on Sergey's conversion
-> of cpu_exec to a simple top-down logic, making the phases
-> clearer and saving on the cost of siglongjmp in the meanwhile.
-> 
-> 6-7: these are intended to be a base for Pavel's record/replay
-> fixes.  The main thing I noticed while reviewing is that icount
-> is redoing (with u16.high) a lot of things that tcg_exit_req is
-> doing too.  This is because, at the time icount was introduced,
-> tcg_exit_req didn't exist and QEMU instead unwound chained TBs
-> through POSIX signals.  But now we have essentially two ways to
-> do the same thing with subtly different invariants or downright
-> bugs (such as the one fixed by patch 1).  Patch 6 therefore
-> unifies tcg_exit_req and the icount interrupt flag.  It saves a
-> handful of instructions per TB in icount mode and generally
-> makes icount mode "less special", which is a good thing since
-> no one seems to understand it well.  Patch 7 then removes another
-> EXCP_INTERRUPT/cpu_loop_exit pair; by exiting to main loop simply
-> through cpu->exit_request, hopefully it fixes one of the issues that
-> Pavel was seeing.
-> 
-> For now I've tested this only on an aarch64 Linux image (with
-> and without -icount).  Thanks,
-> 
-> Paolo
-> 
-> Paolo Bonzini (7):
->   cpu-exec: fix jmp_first out-of-bounds access with icount
->   cpu-exec: tighten barrier on TCG_EXIT_REQUESTED
->   cpu-exec: avoid cpu_loop_exit in cpu_handle_interrupt
->   cpu-exec: avoid repeated sigsetjmp on interrupts
->   cpu-exec: remove outermost infinite loop
->   cpu-exec: unify icount_decr and tcg_exit_req
->   cpu-exec: centralize exiting to the main loop
-> 
->  cpu-exec.c                | 153 +++++++++++++++++++++-------------------------
->  include/exec/exec-all.h   |   1 +
->  include/exec/gen-icount.h |  53 ++++++++--------
->  include/qom/cpu.h         |  15 +++--
->  qom/cpu.c                 |   2 +-
->  tcg/tcg.h                 |   1 -
->  translate-all.c           |   2 +-
->  translate-common.c        |  13 ++--
->  8 files changed, 109 insertions(+), 131 deletions(-)
-> 
-> --
-> 2.9.3
+--=20
+Marc-Andr=C3=A9 Lureau
