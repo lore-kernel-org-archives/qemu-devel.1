@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYbJy-0000bV-HG
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:30:19 -0500
+	(envelope-from <eblake@redhat.com>) id 1cYbLP-0001lI-Pr
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:31:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYbJx-0003BU-OQ
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:30:18 -0500
-Date: Tue, 31 Jan 2017 16:30:10 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131163010.GW18804@stefanha-x1.localdomain>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-18-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1cYbLK-0003Lv-R2
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:31:47 -0500
+References: <cover.1485878688.git.berto@igalia.com>
+	<79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f9e9efcc-2a59-db47-a048-763eed52d92f@redhat.com>
+Date: Tue, 31 Jan 2017 10:31:32 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Y974o0GblB/Ae/yP"
-Content-Disposition: inline
-In-Reply-To: <1482503344-6424-18-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 17/21] backup: make all reads not
- serializing
+In-Reply-To: <79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="sIAtw1ORQxIQ3Tm1AOQWSx66epnc1PGka"
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-io: don't allow I/O operations
+ larger than INT_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-
---Y974o0GblB/Ae/yP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sIAtw1ORQxIQ3Tm1AOQWSx66epnc1PGka
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <f9e9efcc-2a59-db47-a048-763eed52d92f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-io: don't allow I/O operations
+ larger than INT_MAX
+References: <cover.1485878688.git.berto@igalia.com>
+ <79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+In-Reply-To: <79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 23, 2016 at 05:29:00PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> To simplify things make all reads not serializing, not only from
-> notifiers. This is needed because after the following patch, there would
-> not be strong division between reads from notifiers or not - they all
-> would be called from one place.
+On 01/31/2017 10:09 AM, Alberto Garcia wrote:
+> Passing a request size larger than INT_MAX to any of the I/O commands
+> results in an error. While 'read' and 'write' handle the error
+> correctly, 'aio_read' and 'aio_write' hit an assertion:
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> blk_aio_read_entry: Assertion `rwco->qiov->size =3D=3D acb->bytes' fail=
+ed.
+>=20
+> The reason is that the QEMU I/O code cannot handle request sizes
+> larger than INT_MAX, so this patch makes qemu-io check that all values
+> are within range.
+
+Ideally, it would be nice to fix the block layer to allow larger
+requests (since we already have code to auto-fragment down to device
+limits, we should be able to rely on that code instead of having to
+duplicate artificial constraints everywhere else in the tree).  But
+that's a bigger task, and this is a good patch in the interim.
+
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  block/backup.c | 20 ++++++++------------
->  1 file changed, 8 insertions(+), 12 deletions(-)
+>  qemu-io-cmds.c | 21 ++++++++++++---------
+>  1 file changed, 12 insertions(+), 9 deletions(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
---Y974o0GblB/Ae/yP
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--sIAtw1ORQxIQ3Tm1AOQWSx66epnc1PGka
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJYkLuSAAoJEJykq7OBq3PI+QIIAIX5eqIgIp9jDFeGn22AYuPB
-2ifiwyrNRNL0nbsOdfWb/JEuXICswRSFI0St9quzMW9D9F34kwBNSSAF6H2tYcge
-Eu6YAbacjJrWfmFmndRCVCSUqyxcoKJuiSdjrIXSkniLox0+wvZq76+NqEYxRlwP
-J3u/9zW1aRqyCr9D5GLeTEInSUXSYCnMamPA0uAP7zF610JKdUGrLip/IFhXsR4K
-Th7za9b4wIzCy+4jECgIVhvkGkkj7x2znzi0c96lORi2TbF0hNeioHwPs6R1JYd/
-/8E82mGXtsyHw80VvinSehzyKKIEabYIwcPMkuG3BQIYbD63oNWybxboAeeNG28=
-=iOna
+iQEcBAEBCAAGBQJYkLvkAAoJEKeha0olJ0NqL/0H/3LWF1GxBPCNZo4icf3/BHdD
++nIl3itzCTUyUCO+bQ5wiSNTMm6E8VJGGClU/ng1ugOUR1AO+eArz4zg9tq4/wSN
+DI08EPeWDILUQ/+ZMRIItPqaJcAuCWS+Agk+IM5BSUxPL4sdEcyXv2jv22hQbOFU
+hd3YCf90TYyPUXwwW8nvS+46KcHiq8AjhslS9kZh9jO33k+k07VA88DIV+xHyM6Q
+JBi8AR1mkKydwmtWPR3B1lLa2J/yqoTRJ6e0DvWfyzRgVtmkfGDf+SoUywLzyMwK
+x9asyS5E7N1tYEKD9R1SHlkDwsOFhWuZOWMZOTrweyvKSby2ucLKMCl5FmQNoLQ=
+=Z6h3
 -----END PGP SIGNATURE-----
 
---Y974o0GblB/Ae/yP--
+--sIAtw1ORQxIQ3Tm1AOQWSx66epnc1PGka--
