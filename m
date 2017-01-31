@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cYdaW-0002PU-UG
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:55:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1cYdbb-0003Vx-PR
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:56:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cYdaV-0004qw-LJ
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:55:33 -0500
-Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:34482)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cYdaV-0004qn-8p
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:55:31 -0500
-Received: by mail-yb0-x241.google.com with SMTP id w194so30920777ybe.1
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 10:55:30 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1cYdbY-00053R-JE
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:56:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55812)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cYdbY-00053M-AK
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:56:36 -0500
+References: <1485888144-16531-1-git-send-email-mst@redhat.com>
+	<1485888144-16531-8-git-send-email-mst@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ecd713f1-0b3b-179f-3c2d-3082f44d57a9@redhat.com>
+Date: Tue, 31 Jan 2017 12:56:31 -0600
 MIME-Version: 1.0
-References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
-	<CAFEAcA9jzxGZXXoFWxrDztb4or=0LaqpeNa3YH9rpZePa2mFdA@mail.gmail.com>
-In-Reply-To: <CAFEAcA9jzxGZXXoFWxrDztb4or=0LaqpeNa3YH9rpZePa2mFdA@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 31 Jan 2017 18:55:19 +0000
-Message-ID: <CAJ+F1CJzchr6f9nfCsHyOUFmz-08e4R-8BLi4QWc3q0h0+9Quw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/41] Chr split patches
+In-Reply-To: <1485888144-16531-8-git-send-email-mst@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6Lvoa888MfHlvCj6xVJhgwrCCXSuW29ei"
+Subject: Re: [Qemu-devel] [PULL v4 07/23] compiler: expression version of
+ QEMU_BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi!
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6Lvoa888MfHlvCj6xVJhgwrCCXSuW29ei
+From: Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ecd713f1-0b3b-179f-3c2d-3082f44d57a9@redhat.com>
+Subject: Re: [PULL v4 07/23] compiler: expression version of QEMU_BUILD_BUG_ON
+References: <1485888144-16531-1-git-send-email-mst@redhat.com>
+ <1485888144-16531-8-git-send-email-mst@redhat.com>
+In-Reply-To: <1485888144-16531-8-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 31, 2017 at 10:42 PM Peter Maydell <peter.maydell@linaro.org>
-wrote:
+On 01/31/2017 12:43 PM, Michael S. Tsirkin wrote:
+> QEMU_BUILD_BUG_ON uses a typedef in order to be safe
+> to use outside functions, but sometimes it's useful
+> to have a version that can be used within an expression.
+> Following what Linux does, introduce QEMU_BUILD_BUG_ON_ZERO
+> that return zero after checking condition at build time.
+>=20
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/qemu/compiler.h | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> index e0ce9ff..462ade2 100644
+> --- a/include/qemu/compiler.h
+> +++ b/include/qemu/compiler.h
+> @@ -100,6 +100,9 @@
+>  #define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(QEMU_BUILD_BUG_ON_STRUCT(x))=
+ - \
+>                                     sizeof(QEMU_BUILD_BUG_ON_STRUCT(x))=
+)
+> =20
+> +#define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(QEMU_BUILD_BUG_ON_STRUCT(x))=
+ - \
+> +                                   sizeof(QEMU_BUILD_BUG_ON_STRUCT(x))=
+)
+> +
 
-> On 31 January 2017 at 16:20, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> > The following changes since commit
-> a0def594286d9110a6035e02eef558cf3cf5d847:
-> >
-> >   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into
-> staging (2017-01-30 10:23:20 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   https://github.com/elmarco/qemu.git tags/chr-split-pull-request
-> >
-> > for you to fetch changes up to 3766519be2843e0947425cafd1e7e205dd63f0fd=
-:
-> >
-> >   char: headers clean-up (2017-01-31 13:03:48 +0400)
-> >
-> > ----------------------------------------------------------------
-> >
->
-> 'make check' fails on a linux-user-targets-only build:
->
-> tests/test-char.o: In function `char_stdio_test_subprocess':
-> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:47: undefined
-> reference to `qemu_chr_new'
-> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:50: undefined
-> reference to `qemu_chr_fe_init'
-> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:51: undefined
-> reference to `qemu_chr_fe_set_open'
-> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:52: undefined
-> reference to `qemu_chr_fe_write'
-> [etc etc etc]
->
->
-Oh good catch. We want to have chardev-obj-y defined globally, but only
-linked with -softmmu target.
+Umm, we don't want this defined twice. I think you have a rebase
+mistake, where 6/23 is bogus (it repeats the commit message of 4/23 and
+the contents of 7/23).
 
-A possible fix to squash with chardev-obj-j patch is:
 
-Eric, do you want me to resend the patch for review or is that enough for
-you to ack?
-
-diff --git a/Makefile.objs b/Makefile.objs
-index 91a4794f28..b09a9588fc 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -4,6 +4,8 @@ stub-obj-y =3D stubs/ crypto/
- util-obj-y =3D util/ qobject/ qapi/
- util-obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
-
-+chardev-obj-y =3D chardev/
-+
- #######################################################################
- # block-obj-y is code used by both qemu system emulation and qemu-img
-
-@@ -78,8 +80,6 @@ common-obj-$(CONFIG_SECCOMP) +=3D qemu-seccomp.o
-
- common-obj-$(CONFIG_FDT) +=3D device_tree.o
-
--chardev-obj-y =3D chardev/
--
- ######################################################################
- # qapi
-
-diff --git a/Makefile.target b/Makefile.target
-index 5a487b5187..054db85e9e 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -188,10 +188,9 @@ dummy :=3D $(call unnest-vars,.., \
-                common-obj-m)
- target-obj-y :=3D $(target-obj-y-save)
- all-obj-y +=3D $(common-obj-y)
--all-obj-y +=3D $(chardev-obj-y)
- all-obj-y +=3D $(target-obj-y)
- all-obj-y +=3D $(qom-obj-y)
--all-obj-$(CONFIG_SOFTMMU) +=3D $(block-obj-y)
-+all-obj-$(CONFIG_SOFTMMU) +=3D $(block-obj-y) $(chardev-obj-y)
- all-obj-$(CONFIG_USER_ONLY) +=3D $(crypto-aes-obj-y)
- all-obj-$(CONFIG_SOFTMMU) +=3D $(crypto-obj-y)
- all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
 --=20
-Marc-Andr=C3=A9 Lureau
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--6Lvoa888MfHlvCj6xVJhgwrCCXSuW29ei
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYkN3fAAoJEKeha0olJ0NqkPoH/2RqZTJMJi2K+sw3Du8FDTbR
+SAecPcapJGFMM7+B6vr7P/NwkBKlTJsVqT98+ZSzl+oB4E40CSYWs1armtXABV3m
+aWRTMj8X0fkTMof17hqPGEDKVoQhPRa6bTDhLAGJN5bxD6N8dQU1InsTx6nMyS9W
+NQqJp9MkoHVjqoAUgpxwgcTbE3XRzMlFJXXQUrZFSFbx4DB6BUav5EGiCkvu2Wqh
+SZ8h81Zh6NSeKSBNzx58tHgIenAv/60fgfoqG1a9mSQ9+595i24QySy0iF7A8Usw
+oP+Dc9/0wynQjn/EtmNi4jJXLTnWphBZu3//t611NJCJdB+prEhp2oB0G/teeG8=
+=0Snf
+-----END PGP SIGNATURE-----
+
+--6Lvoa888MfHlvCj6xVJhgwrCCXSuW29ei--
