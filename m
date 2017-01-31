@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cYYQU-0003On-IX
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:24:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cYYQX-0003SR-IX
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:24:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cYYQR-0002MU-Df
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:24:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cYYQR-0002ML-7O
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:24:47 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6F4023D945
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 13:24:47 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170106182823.1960-15-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Fri, 6 Jan 2017 18:28:22 +0000")
-References: <20170106182823.1960-1-dgilbert@redhat.com>
-	<20170106182823.1960-15-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 31 Jan 2017 14:24:42 +0100
-Message-ID: <87d1f3s6p1.fsf@emacs.mitica>
+	(envelope-from <peter.maydell@linaro.org>) id 1cYYQW-0002My-F1
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:24:53 -0500
+Received: from mail-ua0-x233.google.com ([2607:f8b0:400c:c08::233]:34700)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cYYQW-0002Mu-A1
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:24:52 -0500
+Received: by mail-ua0-x233.google.com with SMTP id 35so272481992uak.1
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 05:24:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 14/15] postcopy: Check for
- userfault+hugepage feature
+In-Reply-To: <1485868446-10587-1-git-send-email-mst@redhat.com>
+References: <1485868446-10587-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 31 Jan 2017 13:24:30 +0000
+Message-ID: <CAFEAcA-UMXm1PSr46uUY1-RScww_QgZgKt5mZwTd_VH6Btj30g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v3 00/21] virtio, vhost, pci: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,32 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 31 January 2017 at 13:14, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit ae5045ae5b2bbd8ce1335d1b05f9ecacca83a6=
+cf:
 >
-> We need extra Linux kernel support (~4.9) to support userfaults
-> on hugetlbfs; check for them.
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-nios-20170124' into=
+ staging (2017-01-25 13:30:23 +0000)
 >
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-
-
->  migration/postcopy-ram.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+> are available in the git repository at:
 >
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 6b30b43..d12dd7f 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -81,6 +81,17 @@ static bool ufd_version_check(int ufd)
->          return false;
->      }
->  
-> +    if (getpagesize() != ram_pagesize_summary()) {
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to b16127353f6b5ccdbe1e61e48848a83a6d30e640:
+>
+>   arm: add trailing ; after MISMATCH_CHECK (2017-01-31 15:11:35 +0200)
+>
+> ----------------------------------------------------------------
+> virtio, vhost, pci: fixes, features
+>
+> generic pci root port support
+> disable shpc by default
+> safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
+> fixes and cleanups all over the place
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
 
-I am pretty sure that I don't like ram_pagesize_summary() name.  I have
-already forgot what I mean O:-)
+Fails to build:
+
+/home/petmay01/linaro/qemu-for-merges/net/vhost-user.c: In function
+=E2=80=98vhost_user_cleanup=E2=80=99:
+/home/petmay01/linaro/qemu-for-merges/net/vhost-user.c:154:9: error:
+unknown type name =E2=80=98CharDriverSt
+ate=E2=80=99
+         CharDriverState *chr =3D qemu_chr_fe_get_driver(&s->chr);
+         ^
+/home/petmay01/linaro/qemu-for-merges/net/vhost-user.c:154:32: error:
+initialization from incompatible pointer type
+[-Werror=3Dincompatible-pointer-types]
+         CharDriverState *chr =3D qemu_chr_fe_get_driver(&s->chr);
+                                ^
+/home/petmay01/linaro/qemu-for-merges/net/vhost-user.c:157:25: error:
+passing argument 1 of =E2=80=98qemu_chr_delete=E2=80=99 from incompatible p=
+ointer type
+[-Werror=3Dincompatible-pointer-types]
+         qemu_chr_delete(chr);
+                         ^
+In file included from
+/home/petmay01/linaro/qemu-for-merges/net/vhost-user.c:15:0:
+/home/petmay01/linaro/qemu-for-merges/include/sysemu/char.h:185:6:
+note: expected =E2=80=98Chardev * {aka struct Chardev *}=E2=80=99 but argum=
+ent is of
+type =E2=80=98int *=E2=80=99
+ void qemu_chr_delete(Chardev *chr);
+      ^
+
+Looks like something in your tree is semantically conflicting
+with the char device QOMification that landed via Paolo's
+tree yesterday. Can you rebase/fix/drop patches as appropriate,
+please?
+
+thanks
+-- PMM
