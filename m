@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cYhf7-0007bp-2S
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:16:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYhjW-00025g-Bn
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:21:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cYhf6-0007ls-7N
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:16:33 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYhjV-0000Zi-8Y
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:21:06 -0500
 References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-	<20170123121036.4823-23-vsementsov@virtuozzo.com>
-	<b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
-	<aaf5add3-f612-b504-5589-442ec432366f@virtuozzo.com>
-	<66c726b0-3ee4-36fa-9842-b2729733172b@redhat.com>
+	<20170123121036.4823-24-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f9b4dbf0-beda-8e5e-7b0f-57ee9e381be4@redhat.com>
-Date: Wed, 1 Feb 2017 00:16:20 +0100
+Message-ID: <6ff8e50e-c6d8-d3b6-f900-3700bbe30dee@redhat.com>
+Date: Wed, 1 Feb 2017 00:20:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <66c726b0-3ee4-36fa-9842-b2729733172b@redhat.com>
+In-Reply-To: <20170123121036.4823-24-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="qKqJGdrW7CG7DAFVrX9AD7RkXBuvR2OLM"
-Subject: Re: [Qemu-devel] [PATCH 22/24] block/dirty-bitmap: deep release
- dirty bitmaps
+	boundary="CTXUUGcu2QW35MDgP6ANlKEc7vMwV7eFb"
+Subject: Re: [Qemu-devel] [PATCH 23/24] qcow2: add
+ .bdrv_remove_persistent_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +29,147 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.o
 Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qKqJGdrW7CG7DAFVrX9AD7RkXBuvR2OLM
+--CTXUUGcu2QW35MDgP6ANlKEc7vMwV7eFb
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
  famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <f9b4dbf0-beda-8e5e-7b0f-57ee9e381be4@redhat.com>
-Subject: Re: [PATCH 22/24] block/dirty-bitmap: deep release dirty bitmaps
+Message-ID: <6ff8e50e-c6d8-d3b6-f900-3700bbe30dee@redhat.com>
+Subject: Re: [PATCH 23/24] qcow2: add .bdrv_remove_persistent_dirty_bitmap
 References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
- <20170123121036.4823-23-vsementsov@virtuozzo.com>
- <b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
- <aaf5add3-f612-b504-5589-442ec432366f@virtuozzo.com>
- <66c726b0-3ee4-36fa-9842-b2729733172b@redhat.com>
-In-Reply-To: <66c726b0-3ee4-36fa-9842-b2729733172b@redhat.com>
+ <20170123121036.4823-24-vsementsov@virtuozzo.com>
+In-Reply-To: <20170123121036.4823-24-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 01.02.2017 00:00, Max Reitz wrote:
-> On 31.01.2017 17:03, Vladimir Sementsov-Ogievskiy wrote:
-
-[...]
-
->> I've started to rewrite it in that way and it seems like deep almost
->> always will be false. What about just move call to
->> bs->drv->bdrv_remove_persistent_dirty_bitmap() directly to
->> qmp_block_dirty_bitmap_remove and add parameter
->> 'remove_persistent' (or 'remove_from_storage', to make it maximum
->> descriptive) only to this qmp command?
+On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
+> Realize .bdrv_remove_persistent_dirty_bitmap interface.
 >=20
-> Or you could add an explicit bdrv_remove_persistent_dirty_bitmap() whic=
-h
-> just wraps the bs->drv function.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-bitmap.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  block/qcow2.c        |  1 +
+>  block/qcow2.h        |  3 +++
+>  3 files changed, 44 insertions(+)
 >=20
->> Or even without that parameter, as leaving inconsistent version of
->> bitmap in the storage doesn't seem useful.
->=20
-> Hm, right, the bitmap will be automatically removed from the image once=
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index 2687a3acd5..be026fc80e 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -1064,6 +1064,46 @@ static Qcow2Bitmap *find_bitmap_by_name(Qcow2Bit=
+mapList *bm_list,
+>      return NULL;
+>  }
+> =20
+> +void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+> +                                          const char *name,
+> +                                          Error **errp)
+> +{
+> +    int ret;
+> +    BDRVQcow2State *s =3D bs->opaque;
+> +    Qcow2Bitmap *bm;
+> +    Qcow2BitmapList *bm_list;
+> +
+> +    if (s->nb_bitmaps =3D=3D 0) {
+> +        /* No bitmaps - nothing to do */
 
-> it's closed, right?
+Shouldn't it be an error? I.e. "bitmap not found"?
 
-[No, it won't.]
+> +        return;
+> +    }
+> +
+> +    bm_list =3D bitmap_list_load(bs, s->bitmap_directory_offset,
+> +                               s->bitmap_directory_size, errp);
+> +    if (bm_list =3D=3D NULL) {
+> +        return;
+> +    }
+> +
+> +    bm =3D find_bitmap_by_name(bm_list, name);
+> +    if (bm =3D=3D NULL) {
+> +        goto fail;
 
-But you're right, if a persistent bitmap is completely removed by the
-user, it should probably be always removed from the image file, too.
+What about setting errp? Or do you not consider this an error?
 
-The only use I could think of for dropping a bitmap from memory but
-wanting to keep it in the file is for keeping it at a certain state. It
-would make more sense to allow the user to disable a bitmap to achieve
-this, though.
+I think it should be an error.
 
-We don't have a block-dirty-bitmap-disable command yet, though, but I
-guess it shouldn't be too hard to add...?
+> +    }
+> +
+> +    QSIMPLEQ_REMOVE(bm_list, bm, Qcow2Bitmap, entry);
 
-(Anyway, it's something that's out of scope for this series, I think.)
+bm->name is leaked here.
 
 Max
 
+> +
+> +    ret =3D update_ext_header_and_dir(bs, bm_list);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret, "Failed to update bitmap extensio=
+n");
+> +        goto fail;
+> +    }
+> +
+> +    free_bitmap_clusters(bs, &bm->table);
+> +
+> +fail:
+> +    bitmap_free(bm);
+> +    bitmap_list_free(bm_list);
+> +}
+> +
+>  void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error =
+**errp)
+>  {
+>      BdrvDirtyBitmap *bitmap;
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 76a6a2ba28..f6bac38e51 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -3544,6 +3544,7 @@ BlockDriver bdrv_qcow2 =3D {
+>      .bdrv_load_autoloading_dirty_bitmaps =3D qcow2_load_autoloading_di=
+rty_bitmaps,
+>      .bdrv_store_persistent_dirty_bitmaps =3D qcow2_store_persistent_di=
+rty_bitmaps,
+>      .bdrv_can_store_new_dirty_bitmap =3D qcow2_can_store_new_dirty_bit=
+map,
+> +    .bdrv_remove_persistent_dirty_bitmap =3D qcow2_remove_persistent_d=
+irty_bitmap,
+>  };
+> =20
+>  static void bdrv_qcow2_init(void)
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index eaad34a527..a009827f60 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -627,5 +627,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverSt=
+ate *bs,
+>  int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResul=
+t *res,
+>                                    void **refcount_table,
+>                                    int64_t *refcount_table_size);
+> +void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+> +                                          const char *name,
+> +                                          Error **errp);
+> =20
+>  #endif
+>=20
 
---qKqJGdrW7CG7DAFVrX9AD7RkXBuvR2OLM
+
+
+--CTXUUGcu2QW35MDgP6ANlKEc7vMwV7eFb
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRGsQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AmtoH/RTws3owHmCauaqSnqW3lURvcbtEvgpt
-IIfcIwpr6knwm+ZNqmLMiHZFGAelLsio8a4zefpE9GHwCKqi1CcVhT/RNZDgPKLg
-YEqPxFLzOgWhmmeoZQHYLTYCWyYofO1H1mUZDPyfXR5/za689R3hmNe07rk/Dx+z
-+QWbjwUU9AM/yl5+1wERMuI5/Y7Vz70Hvc4uMjyLzptuLyn7hq1zJ0V7wU8PhakN
-9FhC/VfcnHeM+cJIX4j7G79jdpddc1akE6LDwenfxtD9x5uYTIv+JFVlxTXYtP8P
-xCVJS10y7u8CwdU6CCFgTM67wVV8QZjUfpcXJkR/ZMcOr28Lh2NqH94=
-=N9FS
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRG9YSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AdxYH/0TLHFsUgZBYAtfJyM4BtPix2IGMF8lF
+QBu8QZC7IWy+sjaH0ECG2iMxKLh+BaCcj6R+yvzV0fdeXMRNY8pdsW7svLysvmWF
+yhoddffhTAlVuqxhRX2DOvdSCaG8Akr8HSfZa6VQeqmMIVp+Jr9a/rNznr/3EL/v
+2oL8Ncifd+X3gn8VkGeHFAod8Xd+q3mWdLOUGbbBGs0DBuPedAnlUphqoMi2E2xI
+CjTElxKw+Rq18tD8PCyoEAGrncLD9CU98041sA8oOCot+EghV9R65eX2cGQUvHM3
+OaRi4PiIklmFsMNmN99My1mbQTpAEdPN1rOH7rDTyDALkC28XQAA21c=
+=0xaQ
 -----END PGP SIGNATURE-----
 
---qKqJGdrW7CG7DAFVrX9AD7RkXBuvR2OLM--
+--CTXUUGcu2QW35MDgP6ANlKEc7vMwV7eFb--
