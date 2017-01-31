@@ -1,51 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cYgc8-0007MY-UY
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 17:09:25 -0500
+	(envelope-from <eswierk@skyportsystems.com>) id 1cYgmI-0002LT-Mh
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 17:19:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cYgc5-0006oF-Pa
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 17:09:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51412)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1cYgc5-0006o8-Fu
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 17:09:21 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v0VM9Kf4036025
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 17:09:20 -0500
-Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28aycmgd4k-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 17:09:20 -0500
-Received: from localhost
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 31 Jan 2017 20:09:17 -0200
-Received: from d24relay01.br.ibm.com (d24relay01.br.ibm.com [9.8.31.16])
-	by d24dlp02.br.ibm.com (Postfix) with ESMTP id 0730E1DC006D
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 17:09:15 -0500 (EST)
-Received: from d24av01.br.ibm.com (d24av01.br.ibm.com [9.8.31.91])
-	by d24relay01.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v0VM9DF04214956
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 20:09:13 -0200
-Received: from d24av01.br.ibm.com (localhost [127.0.0.1])
-	by d24av01.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v0VM9Dvd007777
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 20:09:13 -0200
-Date: Tue, 31 Jan 2017 20:09:08 -0200
-From: joserz@linux.vnet.ibm.com
-References: <1485744457-10324-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<1485744457-10324-2-git-send-email-joserz@linux.vnet.ibm.com>
-	<CAFEAcA_juuc1jxnLqE6BFOcROM7uR_UEkY+d1Zrh2b17CiaVjQ@mail.gmail.com>
+	(envelope-from <eswierk@skyportsystems.com>) id 1cYgmI-0001RE-12
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 17:19:54 -0500
+Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:34581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1cYgmH-0001RA-RX
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 17:19:53 -0500
+Received: by mail-ua0-x22e.google.com with SMTP id 35so283693311uak.1
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 14:19:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_juuc1jxnLqE6BFOcROM7uR_UEkY+d1Zrh2b17CiaVjQ@mail.gmail.com>
-Message-Id: <20170131220908.GA19075@pacoca>
-Subject: Re: [Qemu-devel] [PATCH Risu 1/2] risu_ppc64: Fix Risu to run under
- qemu linux user
+In-Reply-To: <421566746.771522.1485871592528.JavaMail.zimbra@redhat.com>
+References: <1485870329-79428-1-git-send-email-eswierk@skyportsystems.com>
+	<421566746.771522.1485871592528.JavaMail.zimbra@redhat.com>
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Tue, 31 Jan 2017 14:19:12 -0800
+Message-ID: <CAO_EM_=PLhSB4JxQitC1zev+RQuSdJqpYyo8rOdVDSvyuoCgkw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] char: drop data written to a disconnected
+ pty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -54,37 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <mlureau@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, marcandre lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Benjamin Warren <ben@skyportsystems.com>
 
-On Mon, Jan 30, 2017 at 11:49:34AM +0000, Peter Maydell wrote:
-> On 30 January 2017 at 02:47, Jose Ricardo Ziviani
-> <joserz@linux.vnet.ibm.com> wrote:
-> > Qemu linux-user doesn't fill uc_mcontext completely like full emul. does.
-> > For instance, uc->uc_mcontext.regs->nip is an invalid so this
-> > commit replaces it by uc->uc_mcontext.gp_regs[PT_NIP]
-> 
-> It's not clear to me from this commit message whether this is
-> a bug in QEMU's userspace emulation which this is trying to work
-> around (in which case we should just fix it in QEMU), or a
-> bug in risu where we were incorrectly relying on something the
-> kernel doesn't actually guarantee. Which is it?
-> 
-> Also, looking at the kernel source and headers as far
-> as I can see uc_context.regs is a pointer set up such that
-> uc->uc_mcontext.regs->nip is pointing at the same bit of
-> memory where uc->uc_mcontext.gp_regs[PT_NIP] is,
-> and the QEMU code does similar, so I don't see how you can
-> get two different values from the two things.
-> 
-> (It is certainly the case that risu is quite good at exercising
-> odd corner cases of the signal handling code in QEMU which most
-> normal programs don't care about...)
+On Tue, Jan 31, 2017 at 6:06 AM, Marc-Andr=C3=A9 Lureau <mlureau@redhat.com=
+> wrote:
+> I think this can be confusing if some backends silently drop the data (un=
+der disconnected state), while other don't. Perhaps we should have instead =
+a new common chardev property "hup-drop" ? (suggestions for better name wel=
+come)
 
-Peter
+Either way, when a pty is disconnected data will get dropped, whether
+by the pty backend (as proposed) or by the serial port device or other
+frontend (as currently).
 
-I just sent a patch "linux-user: fill target sigcontext struct accordingly" to fix it in QEMU. Please, forget this patchset, I'll reorganize it and send it later.
+The only difference from a user's perspective is whether the dropped
+data gets written to the log file, which is the main motivation for
+this change. The backward compatibility concern would be an existing
+application that relies on data not being logged when the pty is
+disconnected.
 
-Thank you
-
-Ziviani
+--Ed
