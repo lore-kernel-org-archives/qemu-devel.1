@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cYhPq-0000yv-W3
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:00:48 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cYhYj-0004Za-Tx
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:09:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cYhPp-0003aI-Vc
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:00:47 -0500
-References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-	<20170123121036.4823-23-vsementsov@virtuozzo.com>
-	<b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
-	<aaf5add3-f612-b504-5589-442ec432366f@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <66c726b0-3ee4-36fa-9842-b2729733172b@redhat.com>
-Date: Wed, 1 Feb 2017 00:00:33 +0100
+	(envelope-from <rth7680@gmail.com>) id 1cYhYi-0006bN-KF
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:09:57 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170127103922.19658-1-alex.bennee@linaro.org>
+	<20170127103922.19658-17-alex.bennee@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <70fe24bb-c8f1-43c4-010f-a682bdd507ef@twiddle.net>
+Date: Tue, 31 Jan 2017 15:09:49 -0800
 MIME-Version: 1.0
-In-Reply-To: <aaf5add3-f612-b504-5589-442ec432366f@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JSOOJR4JJOgiAvBClfxv25VwnjaLfs0Nv"
-Subject: Re: [Qemu-devel] [PATCH 22/24] block/dirty-bitmap: deep release
- dirty bitmaps
+In-Reply-To: <20170127103922.19658-17-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v8 16/25] cputlb and arm/sparc targets:
+ convert mmuidx flushes from varg to bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,142 +25,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JSOOJR4JJOgiAvBClfxv25VwnjaLfs0Nv
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <66c726b0-3ee4-36fa-9842-b2729733172b@redhat.com>
-Subject: Re: [PATCH 22/24] block/dirty-bitmap: deep release dirty bitmaps
-References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
- <20170123121036.4823-23-vsementsov@virtuozzo.com>
- <b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
- <aaf5add3-f612-b504-5589-442ec432366f@virtuozzo.com>
-In-Reply-To: <aaf5add3-f612-b504-5589-442ec432366f@virtuozzo.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
-
-On 31.01.2017 17:03, Vladimir Sementsov-Ogievskiy wrote:
-> 29.01.2017 19:54, Max Reitz wrote:
->> On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
->>> Remove persistent bitmap from its storage on bdrv_release_dirty_bitma=
-p.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+On 01/27/2017 02:39 AM, Alex Bennée wrote:
+> +    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
 >
->>> ---
->>>   block/dirty-bitmap.c      | 21 ++++++++++++++++++---
->>>   include/block/block_int.h |  3 +++
->>>   2 files changed, 21 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->>> index 775181c9ab..0977df6309 100644
->>> --- a/block/dirty-bitmap.c
->>> +++ b/block/dirty-bitmap.c
->>> @@ -297,7 +297,8 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState
->>> *bs)
->>>     static void
->>> bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
->>>                                                     BdrvDirtyBitmap
->>> *bitmap,
->>> -                                                  bool only_named)
->>> +                                                  bool only_named,
->>> +                                                  bool deep)
->> I'd rather call it "remove_persistent" or something, which is bad
->> grammar, but it's better at getting the point across.
->>
->>>   {
->>>       BdrvDirtyBitmap *bm, *next;
->>>       QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
->>> @@ -305,6 +306,19 @@ static void
->>> bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
->>>               assert(!bm->active_iterators);
->>>               assert(!bdrv_dirty_bitmap_frozen(bm));
->>>               assert(!bm->meta);
->>> +
->>> +            if (deep && bm->persistent && bs->drv &&
->>> +                bs->drv->bdrv_remove_persistent_dirty_bitmap)
->>> +            {
->>> +                Error *local_err =3D NULL;
->>> +                bs->drv->bdrv_remove_persistent_dirty_bitmap(bs,
->>> bm->name,
->>> +                                                           =20
->>> &local_err);
->>> +                if (local_err !=3D NULL) {
->>> +                    error_report_err(local_err);
->> This looks like maybe it's the wrong thing to do... I do agree that
->> sometimes it may not be fatal, but sometimes it probably is.
->>
->>> +                }
->>> +            }
->>> +
->>> +
->>>               QLIST_REMOVE(bm, list);
->>>               hbitmap_free(bm->bitmap);
->>>               g_free(bm->name);
->>> @@ -322,16 +336,17 @@ static void
->>> bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
->>>     void bdrv_release_dirty_bitmap(BlockDriverState *bs,
->>> BdrvDirtyBitmap *bitmap)
->>>   {
->>> -    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false);
->>> +    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false, true);
->> The @deep parameter (or however you decide to call it) should be
->> available to this function's caller, too. I don't believe qcow2's
->> load_bitmap() wants to delete the persistent bitmap in the error path;=
+> -        tlb_debug("%d\n", mmu_idx);
+> +        if (test_bit(mmu_idx, &mmu_idx_bitmask)) {
+> +            tlb_debug("%d\n", mmu_idx);
+>
+> -        memset(env->tlb_table[mmu_idx], -1, sizeof(env->tlb_table[0]));
+> -        memset(env->tlb_v_table[mmu_idx], -1, sizeof(env->tlb_v_table[0]));
+> +            memset(env->tlb_table[mmu_idx], -1, sizeof(env->tlb_table[0]));
+> +            memset(env->tlb_v_table[mmu_idx], -1, sizeof(env->tlb_v_table[0]));
+> +        }
 
->> and block-dirty-bitmap-remove should probably allow the user to decide=
+Perhaps it doesn't matter since NB_MMU_MODES is so small but
 
->> what to do.
->>
->> Which brings me to the error thing above: If the user (or management
->> tool) decides that block-dirty-bitmap-remove should remove the
->> persistent bitmap, I believe that the operation should be aborted if t=
-he
->> persistent bitmap cannot be removed. It should not just go on and
->> release the in-memory bitmap but abort altogether. If the user just
->> wants to release that in-memory bitmap then, they can still go on an
->> call block-dirty-bitmap-remove with deep=3Dfalse.
->=20
-> I've started to rewrite it in that way and it seems like deep almost
-> always will be false. What about just move call to
-> bs->drv->bdrv_remove_persistent_dirty_bitmap() directly to
-> qmp_block_dirty_bitmap_remove and add parameter
-> 'remove_persistent' (or 'remove_from_storage', to make it maximum
-> descriptive) only to this qmp command?
+   for (; idxmap != 0; idxmap &= idxmap - 1) {
+     int mmu_idx = ctz32(idxmap);
+     ...
+   }
 
-Or you could add an explicit bdrv_remove_persistent_dirty_bitmap() which
-just wraps the bs->drv function.
+iterates only for the bits that are set.
 
-> Or even without that parameter, as leaving inconsistent version of
-> bitmap in the storage doesn't seem useful.
+> -typedef enum ARMMMUIdx {
+> -    ARMMMUIdx_S12NSE0 = 0,
+> -    ARMMMUIdx_S12NSE1 = 1,
+> -    ARMMMUIdx_S1E2 = 2,
+> -    ARMMMUIdx_S1E3 = 3,
+> -    ARMMMUIdx_S1SE0 = 4,
+> -    ARMMMUIdx_S1SE1 = 5,
+> -    ARMMMUIdx_S2NS = 6,
+> +typedef enum ARMMMUBitMap {
+> +    ARMMMUBit_S12NSE0 = 1 << 0,
+> +    ARMMMUBit_S12NSE1 = 1 << 1,
+> +    ARMMMUBit_S1E2 = 1 << 2,
+> +    ARMMMUBit_S1E3 = 1 << 3,
+> +    ARMMMUBit_S1SE0 = 1 << 4,
+> +    ARMMMUBit_S1SE1 = 1 << 5,
+> +    ARMMMUBit_S2NS = 1 << 6,
+>      /* Indexes below here don't have TLBs and are used only for AT system
+>       * instructions or for the first stage of an S12 page table walk.
+>       */
+> -    ARMMMUIdx_S1NSE0 = 7,
+> -    ARMMMUIdx_S1NSE1 = 8,
+> -} ARMMMUIdx;
+> +    ARMMMUBit_S1NSE0 = 1 << 7,
+> +    ARMMMUBit_S1NSE1 = 1 << 8,
+> +} ARMMMUBitMap;
+>
+> -#define MMU_USER_IDX 0
+> +typedef int ARMMMUIdx;
+> +
+> +static inline ARMMMUIdx arm_mmu_bit_to_idx(ARMMMUBitMap bit)
+> +{
+> +    g_assert(ctpop16(bit) == 1);
+> +    return ctz32(bit);
+> +}
+> +
+> +static inline ARMMMUBitMap arm_mmu_idx_to_bit(ARMMMUIdx idx)
+> +{
+> +    return 1 << idx;
+> +}
 
-Hm, right, the bitmap will be automatically removed from the image once
-it's closed, right?
+I don't understand this redefinition though, causing...
 
-Max
+> @@ -2109,13 +2109,13 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>          /* stage 1 current state PL1: ATS1CPR, ATS1CPW */
+>          switch (el) {
+>          case 3:
+> -            mmu_idx = ARMMMUIdx_S1E3;
+> +            mmu_bit = ARMMMUBit_S1E3;
+>              break;
+>          case 2:
+> -            mmu_idx = ARMMMUIdx_S1NSE1;
+> +            mmu_bit = ARMMMUBit_S1NSE1;
+>              break;
+>          case 1:
+> -            mmu_idx = secure ? ARMMMUIdx_S1SE1 : ARMMMUIdx_S1NSE1;
+> +            mmu_bit = secure ? ARMMMUBit_S1SE1 : ARMMMUBit_S1NSE1;
+>              break;
+>          default:
+>              g_assert_not_reached();
+> @@ -2125,13 +2125,13 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>          /* stage 1 current state PL0: ATS1CUR, ATS1CUW */
+>          switch (el) {
+>          case 3:
+> -            mmu_idx = ARMMMUIdx_S1SE0;
+> +            mmu_bit = ARMMMUBit_S1SE0;
+>              break;
+>          case 2:
+> -            mmu_idx = ARMMMUIdx_S1NSE0;
+> +            mmu_bit = ARMMMUBit_S1NSE0;
+>              break;
+>          case 1:
+> -            mmu_idx = secure ? ARMMMUIdx_S1SE0 : ARMMMUIdx_S1NSE0;
+> +            mmu_bit = secure ? ARMMMUBit_S1SE0 : ARMMMUBit_S1NSE0;
+>              break;
+>          default:
+>              g_assert_not_reached();
+> @@ -2139,17 +2139,17 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>          break;
+>      case 4:
+>          /* stage 1+2 NonSecure PL1: ATS12NSOPR, ATS12NSOPW */
+> -        mmu_idx = ARMMMUIdx_S12NSE1;
+> +        mmu_bit = ARMMMUBit_S12NSE1;
+>          break;
+>      case 6:
+>          /* stage 1+2 NonSecure PL0: ATS12NSOUR, ATS12NSOUW */
+> -        mmu_idx = ARMMMUIdx_S12NSE0;
+> +        mmu_bit = ARMMMUBit_S12NSE0;
+>          break;
+>      default:
+>          g_assert_not_reached();
+>      }
+>
+> -    par64 = do_ats_write(env, value, access_type, mmu_idx);
+> +    par64 = do_ats_write(env, value, access_type, arm_mmu_bit_to_idx(mmu_bit));
+
+... this sort of churn, only to convert *back* to an index.
+
+> @@ -2185,26 +2186,26 @@ static void ats_write64(CPUARMState *env, const ARMCPRegInfo *ri,
+>      case 0:
+>          switch (ri->opc1) {
+>          case 0: /* AT S1E1R, AT S1E1W */
+> -            mmu_idx = secure ? ARMMMUIdx_S1SE1 : ARMMMUIdx_S1NSE1;
+> +            mmu_idx = secure ? ARMMMUBit_S1SE1 : ARMMMUBit_S1NSE1;
+>              break;
+>          case 4: /* AT S1E2R, AT S1E2W */
+> -            mmu_idx = ARMMMUIdx_S1E2;
+> +            mmu_idx = ARMMMUBit_S1E2;
+>              break;
+>          case 6: /* AT S1E3R, AT S1E3W */
+> -            mmu_idx = ARMMMUIdx_S1E3;
+> +            mmu_idx = ARMMMUBit_S1E3;
+>              break;
+>          default:
+>              g_assert_not_reached();
+>          }
+>          break;
+>      case 2: /* AT S1E0R, AT S1E0W */
+> -        mmu_idx = secure ? ARMMMUIdx_S1SE0 : ARMMMUIdx_S1NSE0;
+> +        mmu_idx = secure ? ARMMMUBit_S1SE0 : ARMMMUBit_S1NSE0;
+>          break;
+>      case 4: /* AT S12E1R, AT S12E1W */
+> -        mmu_idx = secure ? ARMMMUIdx_S1SE1 : ARMMMUIdx_S12NSE1;
+> +        mmu_idx = secure ? ARMMMUBit_S1SE1 : ARMMMUBit_S12NSE1;
+>          break;
+>      case 6: /* AT S12E0R, AT S12E0W */
+> -        mmu_idx = secure ? ARMMMUIdx_S1SE0 : ARMMMUIdx_S12NSE0;
+> +        mmu_idx = secure ? ARMMMUBit_S1SE0 : ARMMMUBit_S12NSE0;
+>          break;
+>      default:
+>          g_assert_not_reached();
+> @@ -2499,8 +2500,8 @@ static void vttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+
+... and then there's this one where you don't rename the variable, and as far 
+as I can tell don't adjust the argument for do_ats_write.
+
+Which is probably a mistake?
+
+Just define both Idx and Bit symbols and be done with it.
 
 
---JSOOJR4JJOgiAvBClfxv25VwnjaLfs0Nv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRFxESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AaugIAKzy7HIIZHJfOKTPW/bRkyFbVtCJEgDG
-DQHaDP8IreBs37XgaLrQhuvIDsXWwKDiW0SkPWqzJkKHH0MgA+KF1UwzH/qef3LQ
-68Bg3fAW0j6+5Go3wJPPPdqrLj1veoSd7aTNqEK99nAG4syliTue0Ksbwv63Fol8
-jMmYgFs9gZxgGJBhRGVXOE2Z+cdVZYnhzU/N9rqpJlLl+p4d0ZJQBn02MpP5mEle
-V97zyBNmZwgN90vCQm5F38gOuP4Pgea595xsAys4ymu0EU4PbcnvfnDRNEDPF6sN
-8/cqFyaY8AuT7zhpMex0ihP+FVq1gTZvoOr5dX0DD8HzhpxYEhnJmKc=
-=d2xQ
------END PGP SIGNATURE-----
-
---JSOOJR4JJOgiAvBClfxv25VwnjaLfs0Nv--
+r~
