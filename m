@@ -1,15 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cYb5A-00023F-Sf
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:15:02 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cYb5x-00033U-9S
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:15:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cYb59-0007j0-Jt
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:15:00 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Jan 2017 16:14:47 +0000
-Message-Id: <1485879287-12548-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] Drop QEMU_GNUC_PREREQ() checks for gcc older
- than 4.1
+	(envelope-from <vijay.kilari@gmail.com>) id 1cYb5w-0007t6-5o
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:15:49 -0500
+MIME-Version: 1.0
+In-Reply-To: <1485878749-5641-1-git-send-email-vijay.kilari@gmail.com>
+References: <1485878749-5641-1-git-send-email-vijay.kilari@gmail.com>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Date: Tue, 31 Jan 2017 21:45:44 +0530
+Message-ID: <CALicx6uhAKV-3K=3vHb_GgySJ_bZOAPp315DTmbQGHWo+ndbxg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] GICv3 live migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,261 +21,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Auger Eric <eric.auger@redhat.com>
+Cc: Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-We already require gcc 4.1 or newer (for the atomic
-support), so the fallback codepaths for older gcc
-versions than that are now dead code and we can
-just delete them.
-
-NB: clang reports itself as gcc 4.2 (regardless of
-clang version), so clang won't be using the fallbacks
-either.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-For compatibility with clang we should probably try to avoid
-using QEMU_GNUC_PREREQ() and instead have something in
-compiler.h that abstracts away whether the test for "does
-the compiler support feature foo" is via a GCC version
-check or a clang __has_feature or whatever.
+Please ignore this patch series. Missed out one patch of this series.
+Will resend the full patch series
 
 
- include/qemu/compiler.h   |   8 ---
- include/qemu/host-utils.h | 121 ----------------------------------------------
- tcg/arm/tcg-target.h      |   7 ---
- 3 files changed, 136 deletions(-)
-
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 157698b..fc12e49 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -24,17 +24,9 @@
- 
- #define QEMU_NORETURN __attribute__ ((__noreturn__))
- 
--#if QEMU_GNUC_PREREQ(3, 4)
- #define QEMU_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
--#else
--#define QEMU_WARN_UNUSED_RESULT
--#endif
- 
--#if QEMU_GNUC_PREREQ(4, 0)
- #define QEMU_SENTINEL __attribute__((sentinel))
--#else
--#define QEMU_SENTINEL
--#endif
- 
- #if QEMU_GNUC_PREREQ(4, 3)
- #define QEMU_ARTIFICIAL __attribute__((always_inline, artificial))
-diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
-index 96288d0..e0d5b0e 100644
---- a/include/qemu/host-utils.h
-+++ b/include/qemu/host-utils.h
-@@ -115,37 +115,7 @@ static inline uint64_t muldiv64(uint64_t a, uint32_t b, uint32_t c)
-  */
- static inline int clz32(uint32_t val)
- {
--#if QEMU_GNUC_PREREQ(3, 4)
-     return val ? __builtin_clz(val) : 32;
--#else
--    /* Binary search for the leading one bit.  */
--    int cnt = 0;
--
--    if (!(val & 0xFFFF0000U)) {
--        cnt += 16;
--        val <<= 16;
--    }
--    if (!(val & 0xFF000000U)) {
--        cnt += 8;
--        val <<= 8;
--    }
--    if (!(val & 0xF0000000U)) {
--        cnt += 4;
--        val <<= 4;
--    }
--    if (!(val & 0xC0000000U)) {
--        cnt += 2;
--        val <<= 2;
--    }
--    if (!(val & 0x80000000U)) {
--        cnt++;
--        val <<= 1;
--    }
--    if (!(val & 0x80000000U)) {
--        cnt++;
--    }
--    return cnt;
--#endif
- }
- 
- /**
-@@ -168,19 +138,7 @@ static inline int clo32(uint32_t val)
-  */
- static inline int clz64(uint64_t val)
- {
--#if QEMU_GNUC_PREREQ(3, 4)
-     return val ? __builtin_clzll(val) : 64;
--#else
--    int cnt = 0;
--
--    if (!(val >> 32)) {
--        cnt += 32;
--    } else {
--        val >>= 32;
--    }
--
--    return cnt + clz32(val);
--#endif
- }
- 
- /**
-@@ -203,39 +161,7 @@ static inline int clo64(uint64_t val)
-  */
- static inline int ctz32(uint32_t val)
- {
--#if QEMU_GNUC_PREREQ(3, 4)
-     return val ? __builtin_ctz(val) : 32;
--#else
--    /* Binary search for the trailing one bit.  */
--    int cnt;
--
--    cnt = 0;
--    if (!(val & 0x0000FFFFUL)) {
--        cnt += 16;
--        val >>= 16;
--    }
--    if (!(val & 0x000000FFUL)) {
--        cnt += 8;
--        val >>= 8;
--    }
--    if (!(val & 0x0000000FUL)) {
--        cnt += 4;
--        val >>= 4;
--    }
--    if (!(val & 0x00000003UL)) {
--        cnt += 2;
--        val >>= 2;
--    }
--    if (!(val & 0x00000001UL)) {
--        cnt++;
--        val >>= 1;
--    }
--    if (!(val & 0x00000001UL)) {
--        cnt++;
--    }
--
--    return cnt;
--#endif
- }
- 
- /**
-@@ -258,19 +184,7 @@ static inline int cto32(uint32_t val)
-  */
- static inline int ctz64(uint64_t val)
- {
--#if QEMU_GNUC_PREREQ(3, 4)
-     return val ? __builtin_ctzll(val) : 64;
--#else
--    int cnt;
--
--    cnt = 0;
--    if (!((uint32_t)val)) {
--        cnt += 32;
--        val >>= 32;
--    }
--
--    return cnt + ctz32(val);
--#endif
- }
- 
- /**
-@@ -322,15 +236,7 @@ static inline int clrsb64(uint64_t val)
-  */
- static inline int ctpop8(uint8_t val)
- {
--#if QEMU_GNUC_PREREQ(3, 4)
-     return __builtin_popcount(val);
--#else
--    val = (val & 0x55) + ((val >> 1) & 0x55);
--    val = (val & 0x33) + ((val >> 2) & 0x33);
--    val = (val + (val >> 4)) & 0x0f;
--
--    return val;
--#endif
- }
- 
- /**
-@@ -339,16 +245,7 @@ static inline int ctpop8(uint8_t val)
-  */
- static inline int ctpop16(uint16_t val)
- {
--#if QEMU_GNUC_PREREQ(3, 4)
-     return __builtin_popcount(val);
--#else
--    val = (val & 0x5555) + ((val >> 1) & 0x5555);
--    val = (val & 0x3333) + ((val >> 2) & 0x3333);
--    val = (val + (val >> 4)) & 0x0f0f;
--    val = (val + (val >> 8)) & 0x00ff;
--
--    return val;
--#endif
- }
- 
- /**
-@@ -357,16 +254,7 @@ static inline int ctpop16(uint16_t val)
-  */
- static inline int ctpop32(uint32_t val)
- {
--#if QEMU_GNUC_PREREQ(3, 4)
-     return __builtin_popcount(val);
--#else
--    val = (val & 0x55555555) + ((val >> 1) & 0x55555555);
--    val = (val & 0x33333333) + ((val >> 2) & 0x33333333);
--    val = (val + (val >> 4)) & 0x0f0f0f0f;
--    val = (val * 0x01010101) >> 24;
--
--    return val;
--#endif
- }
- 
- /**
-@@ -375,16 +263,7 @@ static inline int ctpop32(uint32_t val)
-  */
- static inline int ctpop64(uint64_t val)
- {
--#if QEMU_GNUC_PREREQ(3, 4)
-     return __builtin_popcountll(val);
--#else
--    val = (val & 0x5555555555555555ULL) + ((val >> 1) & 0x5555555555555555ULL);
--    val = (val & 0x3333333333333333ULL) + ((val >> 2) & 0x3333333333333333ULL);
--    val = (val + (val >> 4)) & 0x0f0f0f0f0f0f0f0fULL;
--    val = (val * 0x0101010101010101ULL) >> 56;
--
--    return val;
--#endif
- }
- 
- /**
-diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
-index 09a19c6..75ea247 100644
---- a/tcg/arm/tcg-target.h
-+++ b/tcg/arm/tcg-target.h
-@@ -130,14 +130,7 @@ enum {
- 
- static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
- {
--#if QEMU_GNUC_PREREQ(4, 1)
-     __builtin___clear_cache((char *) start, (char *) stop);
--#else
--    register uintptr_t _beg __asm("a1") = start;
--    register uintptr_t _end __asm("a2") = stop;
--    register uintptr_t _flg __asm("a3") = 0;
--    __asm __volatile__ ("swi 0x9f0002" : : "r" (_beg), "r" (_end), "r" (_flg));
--#endif
- }
- 
- #endif
--- 
-2.7.4
+On Tue, Jan 31, 2017 at 9:35 PM,  <vijay.kilari@gmail.com> wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>
+> This series introduces support for GICv3 live migration with
+> new VGIC implementation in 4.7-rc3 kernel.
+> In this series, patch 1 of the previous implementation
+> are ported.
+> https://lists.nongnu.org/archive/html/qemu-devel/2015-10/msg05284.html
+>
+> Patch 2, is based on below implementation.
+> http://patchwork.ozlabs.org/patch/626746/
+>
+> Latest kernel patches
+> https://www.spinics.net/lists/arm-kernel/msg558046.html
+>
+> This API definition is as per version of VGICv3 specification
+> in linux kernel Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>
+> Tested Live migration of Idle VM running with 4 VCPUs and 8GB RAM.
+>
+> v6 => v7:
+>  - Added patch to add icc_ctrl_el1 to vmstruct before live migration
+>    patch
+>  - Added patch to add gicv3state variable to CPUARMState struct to
+>    store GICv3CPUState pointer.
+>  - Added patch to register ARMCPRegInfo[] struct and reset on CPU reset.
+>
+> v5 => v6:
+>  - Added separate patch for Reseting ICC* register
+>  - Added seperate patch for save and restore of ICC_CTLR_EL1
+>  - Dropped translate_fn mechanism and coded open functions
+>    for edge_trigger and priority save and restore.
+>  - Save and Restore APnR registers based on ICC_CTLR_EL1.PRIBITS
+>
+> v4 => v5:
+>  - Initialized ICC registers before reset.
+>
+> v3 => v4:
+>  - Reintroduced offset GICR_SGI_OFFSET
+>  - Implement save and restore of ICC_SRE_EL1
+>  - Updated kvm.h header file in sync with KVM v4 patches
+>
+> v2 => v3:
+>  - Dropped offset GICR_SGI_OFFSET
+>  - Implement save/restore of irq line level using
+>    KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
+>  - Fixed bug with save/restore of edge_trigger
+>
+> Vijaya Kumar K (4):
+>   hw/intc/arm_gicv3_kvm: Add ICC_SRE_EL1 register to vmstate
+>   hw/intc/arm_gicv3_kvm: Implement get/put functions
+>   target-arm: Add GICv3CPUState in CPUARMState struct
+>   hw/intc/arm_gicv3_kvm: Reset GICv3 cpu interface registers
+>
+>  hw/intc/arm_gicv3_common.c         |   1 +
+>  hw/intc/arm_gicv3_kvm.c            | 640 ++++++++++++++++++++++++++++++++++++-
+>  hw/intc/gicv3_internal.h           |   1 +
+>  include/hw/intc/arm_gicv3_common.h |   1 +
+>  target-arm/cpu.h                   |   2 +
+>  5 files changed, 634 insertions(+), 11 deletions(-)
+>
+> --
+> 1.9.1
+>
