@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cYg9Z-0001Nm-Hn
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:39:54 -0500
+	(envelope-from <anibal.limon@linux.intel.com>) id 1cYgGG-0003Yu-Hn
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:46:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cYg9W-0007Gs-FE
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:39:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49328)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cYg9W-0007GY-64
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:39:50 -0500
-Date: Tue, 31 Jan 2017 23:39:44 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170131233906-mutt-send-email-mst@kernel.org>
-References: <20170126165015-mutt-send-email-mst@kernel.org>
-	<adbfd67b-bcbc-2da2-78be-810eb35781ec@redhat.com>
-	<20170126201124-mutt-send-email-mst@kernel.org>
-	<6d15ef62-3184-3293-dd83-da67dd48dab0@redhat.com>
-	<20170126205508-mutt-send-email-mst@kernel.org>
-	<20170127141854.GA2524@morn.lan>
-	<58bbf216-a2f1-481f-21b0-4ada4f73a5e5@redhat.com>
-	<20170127154313.GB7213@morn.lan>
-	<20170130222539-mutt-send-email-mst@kernel.org>
-	<20170131105102.456c9477@nial.brq.redhat.com>
+	(envelope-from <anibal.limon@linux.intel.com>) id 1cYgGD-0000OR-Dv
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 16:46:48 -0500
+References: <587D4171.6@linux.intel.com> <587D4329.5020702@linux.intel.com>
+	<20170130235210.GA4681@tungsten.ozlabs.ibm.com>
+From: =?UTF-8?B?QW7DrWJhbCBMaW3Ds24=?= <anibal.limon@linux.intel.com>
+Message-ID: <58910677.9080501@linux.intel.com>
+Date: Tue, 31 Jan 2017 15:49:43 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170131105102.456c9477@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/9] ACPI: Add a function for building
- named qword entries
+In-Reply-To: <20170130235210.GA4681@tungsten.ozlabs.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="VehTKUqeA76rsmI1G8kiKJ85bK7S198mq"
+Subject: Re: [Qemu-devel] qemu-pcc 2.8.0 linux-user segfaults
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,69 +24,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Kevin O'Connor <kevin@koconnor.net>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Ben Warren <ben@skyportsystems.com>
+To: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, Jan 31, 2017 at 10:51:02AM +0100, Igor Mammedov wrote:
-> On Mon, 30 Jan 2017 22:28:41 +0200
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Fri, Jan 27, 2017 at 10:43:13AM -0500, Kevin O'Connor wrote:
-> > > On Fri, Jan 27, 2017 at 03:46:33PM +0100, Laszlo Ersek wrote:  
-> > > > On 01/27/17 15:18, Kevin O'Connor wrote:  
-> > > > > If an offset is going to be added, shouldn't both a source offset and
-> > > > > destination offset be used?
-> > > > > 
-> > > > >         /*
-> > > > >          * COMMAND_WRITE_POINTER - update a writeable file named
-> > > > >          * @pointer.dest_file at @pointer.dest_offset, by writing pointer
-> > > > >          * plus @pointer.src_offset to the blob originating from
-> > > > >          * @src_file. 1,2,4 or 8 byte unsigned write is used depending
-> > > > >          * on @pointer.size.
-> > > > >          */
-> > > > >         struct {
-> > > > >             char dest_file[BIOS_LINKER_LOADER_FILESZ];
-> > > > >             char src_file[BIOS_LINKER_LOADER_FILESZ];
-> > > > >             uint32_t src_offset, dest_offset;
-> > > > >             uint8_t size;
-> > > > >         } pointer;
-> > > > > 
-> > > > > I doubt the offsets or size is really all that important though.  
-> > > > 
-> > > > The offset into the fw_cfg file that receives the allocation address is
-> > > > important, that allows the same file to receive several different
-> > > > addresses (for different downloaded blobs), at different offsets.
-> > > > 
-> > > > OTOH, asking the firmware to add a constant to the address value before
-> > > > writing it to the fw_cfg file is not necessary, in my opinion. The blob
-> > > > that the firmware allocated and downloaded originates from QEMU to begin
-> > > > with, so QEMU knows its internal structure.  
-> > > 
-> > > I guess I'm missing why QEMU would want to use the same writable file
-> > > for multiple pointers as well as why it would want support for
-> > > pointers smaller than 8 bytes in size.  If it's because it may be
-> > > easier to support an internal QEMU blob of a particular format, then
-> > > adding a src_offset would facilitate that.
-> > > 
-> > > However, if it was done so that WRITE_POINTER mimicks ADD_POINTER then
-> > > that's fine too.  I'm okay with either format.
-> > > 
-> > > -Kevin  
-> > 
-> > Both reasons :) offset is because it's easier for QEMU not to have to add
-> > more files (e.g. it simplifies cross-version migration if we don't).
-> On one hand offset simplifies since one file could be re-used for
-> several pointers, on the other hand it doesn't make difference wrt
-> migration since offset becomes ABI and has to be maintained in
-> cross-version migration scenario (size of file shouldn't be issue
-> as they are re-sizable now). So we just end-up with offset vs new file
-> versioning.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VehTKUqeA76rsmI1G8kiKJ85bK7S198mq
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Not really - offset is migrated automatically since it's in RAM.
-No need to version it.
 
-> However considering that number of files is limited,
-> offset scales up better.
-> 
-> > size is to mimick ADD_POINTER.
-> > 
+
+On 01/30/2017 05:52 PM, Sam Bobroff wrote:
+> On Mon, Jan 16, 2017 at 04:03:21PM -0600, An=EDbal Lim=F3n wrote:
+>>
+>>
+>> On 01/16/2017 03:56 PM, An=EDbal Lim=F3n wrote:
+>>> Hi folks,
+>>>
+>>> I'm trying to upgrade qemu to 2.8.0 in Openembedded-core and segfault=
+s
+>>> in qemu-ppc when is executing:
+>=20
+> Hi An=EDbal,
+>=20
+> I've recently encountered a similar problem and I've posted a fix. If
+> you'd like to try it, it's here:
+>=20
+> https://lists.gnu.org/archive/html/qemu-ppc/2017-01/msg00413.html
+
+The patch works, thanks for made it.
+
+Cheers,
+	alimon
+
+>=20
+> Cheers,
+> Sam.
+>=20
+>>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
+=2E8.0-r0/build/ppc-linux-user/qemu-ppc
+>>> -s 16M -r 3.2.0 -cpu 7400 -L
+>>> /home/alimon/repos/poky/build-ppc/tmp/sysroots/qemuppc -E
+>>> LD_LIBRARY_PATH=3D/home/alimon/repos/poky/build-ppc/tmp/work/ppc7400-=
+poky-linux/gobject-introspection/1.50.0-r0/build/.libs:.libs:/home/alimon=
+/repos/poky/build-ppc/tmp/sysroots/qemuppc//usr/lib:/home/alimon/repos/po=
+ky/build-ppc/tmp/sysroots/qemuppc//lib
+>>> /home/alimon/repos/poky/build-ppc/tmp/work/ppc7400-poky-linux/gobject=
+-introspection/1.50.0-r0/build/tmp-introspectu_ewt_1z/Gio-2.0
+>>> --introspect-dump=3D/home/alimon/repos/poky/build-ppc/tmp/work/ppc740=
+0-poky-linux/gobject-introspection/1.50.0-r0/build/tmp-introspectu_ewt_1z=
+/functions.txt,/home/alimon/repos/poky/build-ppc/tmp/work/ppc7400-poky-li=
+nux/gobject-introspection/1.50.0-r0/build/tmp-introspectu_ewt_1z/dump.xml=
+
+>>> [Thread debugging using libthread_db enabled]
+>>>
+>>>
+>>> And the debug info,
+>>>
+>>> (gdb) info threads
+>>>   Id   Target Id         Frame
+>>>   1    Thread 0x7ffff7fd0780 (LWP 25457) "qemu-ppc"
+>>> pthread_cond_wait@@GLIBC_2.3.2 () at
+>>> ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:185
+>>>   2    Thread 0x7ffff647e700 (LWP 25461) "qemu-ppc" syscall () at
+>>> ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+>>> * 3    Thread 0x7ffff7f4d700 (LWP 25462) "qemu-ppc" 0x000000000086fba=
+4
+>>> in static_code_gen_buffer ()
+>>>
+>>> (gdb) bt
+>>> #0  0x000000000086fba4 in static_code_gen_buffer ()
+>>> #1  0x000000000040e922 in cpu_tb_exec (itb=3D<optimized out>,
+>>> itb=3D<optimized out>, cpu=3D0x29864d0) at
+>>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
+=2E8.0-r0/qemu-2.8.0/cpu-exec.c:164
+>>> #2  cpu_loop_exec_tb (sc=3D<optimized out>, tb_exit=3D<synthetic poin=
+ter>,
+>>> last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D0x29864d0)=
+ at
+>>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
+=2E8.0-r0/qemu-2.8.0/cpu-exec.c:544
+>>> #3  cpu_exec (cpu=3Dcpu@entry=3D0x29864d0) at
+>>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
+=2E8.0-r0/qemu-2.8.0/cpu-exec.c:638
+>>> #4  0x0000000000445fba in cpu_loop (env=3Denv@entry=3D0x298e750) at
+>>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
+=2E8.0-r0/qemu-2.8.0/linux-user/main.c:1359
+>>> #5  0x0000000000448a95 in clone_func (arg=3D0x7fffffffa910) at
+>>> /home/alimon/repos/poky/build-ppc/tmp/work/x86_64-linux/qemu-native/2=
+=2E8.0-r0/qemu-2.8.0/linux-user/syscall.c:6090
+>>> #6  0x00007ffff6a750a4 in start_thread (arg=3D0x7ffff7f4d700) at
+>>> pthread_create.c:309
+>>> #7  0x00007ffff67aa62d in clone () at
+>>> ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+>>
+>> Here is the core dump,
+>>
+>> https://drive.google.com/file/d/0B9uDfO-FJ1kgY3ZhendISTZzOUU/view?usp=3D=
+sharing
+>>
+>>>
+>>> Any help will be appreciated.
+>>>
+>>> Best regards,
+>>> 	alimon
+>>>
+>>
+>=20
+>=20
+>=20
+
+
+--VehTKUqeA76rsmI1G8kiKJ85bK7S198mq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBAgAGBQJYkQZ8AAoJEGJqcE9h3glgWpMQAIG1oiYFkDWXDRYRZLRwa3CD
+hRVlnpAnurHqsZOFa6gfflcovOTXhW780SeWKkKeuMW3L2qYK28QwDof0Cb5a3KS
+1zr7rkNZ1O+n58JweCshhnL53iIaUnkCwCY5J1yji+GlJE77ZHohYP0/JK3jzwFh
+YvDjJugqqLMZAhqWLB6o0UNeAwA2V7X+xYsaOGermpJJJQrW4Kw06fiq/IwkUc22
+LPppDfjLGfQKYnisBWWxlR22UaMX27WqxHtEPwjtOAEu63KDkejvA/tHYM/Ja+eo
+PW1syoijn3Rs3oYIQSd4atuEQMM4YugrRJJF2yp1k4qs1KOOyhnJcOPocJ/XhtiZ
+K2EwHY3Kt1Lw4nU/sEMptJfHMeqLTPqi2CvkJF4soe4VU1/97aDsCboDij6+noHv
+5/rq8q/eeOWy/2aJfdRigcJo+UgRzlF8B2NMvwk7MM40MSShkfeo6mCa7c/VxrZU
+h70ZWCMK1uaPrfOuJMxKTbmYtRlvOjLdCuTJPOmhN5nT4xJ5c1ktLzudqjsFUA+x
++OLqkhmvRrUOStY9ewLjb+ULx97myEwfJwRvjI10/p1U+JCagihr14wbBb57yfCY
+5Yr2GO/03ERDWsM1PhkNiVp7uzwPKq/YJWqbPOYeu1Fo5B4vzNmlHj8t5qrd+fbr
+pyiLv04gLsaV2t362/Vi
+=dVMH
+-----END PGP SIGNATURE-----
+
+--VehTKUqeA76rsmI1G8kiKJ85bK7S198mq--
