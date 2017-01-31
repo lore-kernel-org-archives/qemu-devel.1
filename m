@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYZea-0007XS-LO
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:43:32 -0500
+	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
+	id 1cYZf6-00081I-S0
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:44:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYZeU-0008B0-V7
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:43:28 -0500
-References: <20170131135703.5638-1-nirsof@gmail.com>
-	<20170131135703.5638-2-nirsof@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b361c639-f7bb-b707-6010-6c0127aab10a@redhat.com>
-Date: Tue, 31 Jan 2017 08:43:08 -0600
+	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
+	id 1cYZf2-0008Ol-UZ
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:44:00 -0500
+Received: from mail.kernel.org ([198.145.29.136]:55598)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
+	id 1cYZf2-0008Of-OU
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:43:56 -0500
+Date: Tue, 31 Jan 2017 16:43:52 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1485873796-15095-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170131135703.5638-2-nirsof@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="UiVnQlEpMp1qQK7jMq0OlJbNSwUSvPXGi"
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] qemu-io: Return non-zero exit code
- on failure
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] QEMU_BUILD_BUG_ON: use __COUNTER__
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Nir Soffer <nsoffer@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UiVnQlEpMp1qQK7jMq0OlJbNSwUSvPXGi
-From: Eric Blake <eblake@redhat.com>
-To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Nir Soffer <nsoffer@redhat.com>, qemu-block@nongnu.org
-Message-ID: <b361c639-f7bb-b707-6010-6c0127aab10a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] qemu-io: Return non-zero exit code on
- failure
-References: <20170131135703.5638-1-nirsof@gmail.com>
- <20170131135703.5638-2-nirsof@gmail.com>
-In-Reply-To: <20170131135703.5638-2-nirsof@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Some headers use QEMU_BUILD_BUG_ON. This causes a problem
+if the C file including that header happens to have
+QEMU_BUILD_BUG_ON at the same line number.
 
-On 01/31/2017 07:57 AM, Nir Soffer wrote:
-> From: Nir Soffer <nsoffer@redhat.com>
->=20
-> The result of openfile was not checked, leading to failure deep in the
-> actual command with confusing error message, and exiting with exit code=
- 0.
->=20
-> Here is a simple example - trying to read with the wrong format:
->=20
->     $ touch file
->     $ qemu-io -f qcow2 -c 'read -P 1 0 1024' file; echo $?
->     can't open device file: Image is not in qcow2 format
->     no file open, try 'help open'
->     0
->=20
-> With this patch, we fail earlier with exit code 1:
->=20
->     $ ./qemu-io -f qcow2 -c 'read -P 1 0 1024' file; echo $?
->     can't open device file: Image is not in qcow2 format
->     1
->=20
-> Failing earlier, we don't log this error now:
->=20
->     no file open, try 'help open'
->=20
-> But some tests expected it; the line was removed from the test output.
->=20
-> Signed-off-by: Nir Soffer <nirsof@gmail.com>
-> ---
+Fix using a widely available extension: __COUNTER__.
+If unavailable, provide a stub.
 
-Yay - v4 is a lot nicer! Thanks for putting up with our advice on making
-your submission better.
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ include/qemu/compiler.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---UiVnQlEpMp1qQK7jMq0OlJbNSwUSvPXGi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYkKJ8AAoJEKeha0olJ0NqRUUH/ib8IFz6lTOKYdmFf3rvbjRU
-tOTCrSNHZjRFfJ0lSLcCH49clFsh1FIPFLzxLJbVHYuqOjNh//e9uE5zXwf4N45s
-nrtUgHI41FLyXTJs6+Q4M363hqyElbBbuuUQ8XHnN+VOt7BcGE9aUBIvofqYaIR1
-GlZ1GR/k2JnZ3hPWFPoDdw7lfB4opoRVtlubH9qV2i7LOncx4p+5uIAbqR47e2XT
-rzKXEVK8ZekuJfsdNkt8vHp7eUiRVWHhZWL7t31QsTYyvUA/3xMhD5Mu+yS/UJTQ
-3M100e74vsVXBewpBClSkF4ac8m7hiUJ2lfOooAii7GRlCQ/2Sq55EqRgBd2pxI=
-=6yYM
------END PGP SIGNATURE-----
-
---UiVnQlEpMp1qQK7jMq0OlJbNSwUSvPXGi--
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index e0fb18b..bad25a9 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -89,8 +89,12 @@
+     struct { \
+         int:(x) ? -1 : 1; \
+     }
++#ifdef __COUNTER__
+ #define QEMU_BUILD_BUG_ON(x) typedef QEMU_BUILD_BUG_ON_STRUCT(x) \
+-    glue(qemu_build_bug_on__, __LINE__) __attribute__((unused))
++    glue(qemu_build_bug_on__, __COUNTER__) __attribute__((unused))
++#else
++#define QEMU_BUILD_BUG_ON(x)
++#endif
+ 
+ #define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(QEMU_BUILD_BUG_ON_STRUCT(x)) - \
+                                    sizeof(QEMU_BUILD_BUG_ON_STRUCT(x)))
+-- 
+MST
