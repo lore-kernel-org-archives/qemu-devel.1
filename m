@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cYUuX-0002hi-Vd
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:39:39 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cYV5l-00062M-6Q
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:51:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cYUuU-0006JM-7A
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:39:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35004)
+	(envelope-from <imammedo@redhat.com>) id 1cYV5g-0000vu-6D
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:51:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60376)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cYUuT-0006Hj-VB
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:39:34 -0500
-Date: Tue, 31 Jan 2017 09:39:27 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170131093927.GA20303@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAO_EM_kS-aGQdvPEO+7pkFWHOSiu8XMpZSduS=gPgUsDwJd9ig@mail.gmail.com>
-	<20170127094033.GC26553@redhat.com>
-	<CAO_EM_no14RDCd42hJy1xbo=mYsdo8k7oAESVx2KpF277U45VQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cYV5f-0000vj-Ts
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 04:51:08 -0500
+Date: Tue, 31 Jan 2017 10:51:02 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170131105102.456c9477@nial.brq.redhat.com>
+In-Reply-To: <20170130222539-mutt-send-email-mst@kernel.org>
+References: <20170125202812-mutt-send-email-mst@kernel.org>
+	<2497755c-8616-1f42-ff36-ad75f6778a52@redhat.com>
+	<20170126165015-mutt-send-email-mst@kernel.org>
+	<adbfd67b-bcbc-2da2-78be-810eb35781ec@redhat.com>
+	<20170126201124-mutt-send-email-mst@kernel.org>
+	<6d15ef62-3184-3293-dd83-da67dd48dab0@redhat.com>
+	<20170126205508-mutt-send-email-mst@kernel.org>
+	<20170127141854.GA2524@morn.lan>
+	<58bbf216-a2f1-481f-21b0-4ada4f73a5e5@redhat.com>
+	<20170127154313.GB7213@morn.lan>
+	<20170130222539-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAO_EM_no14RDCd42hJy1xbo=mYsdo8k7oAESVx2KpF277U45VQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [libvirt] char: Logging serial pty output when
- disconnected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/9] ACPI: Add a function for building
+ named qword entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Swierk <eswierk@skyportsystems.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin O'Connor <kevin@koconnor.net>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Ben Warren <ben@skyportsystems.com>
 
-On Mon, Jan 30, 2017 at 08:58:25PM -0800, Ed Swierk wrote:
-> On Fri, Jan 27, 2017 at 1:40 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > On Thu, Jan 26, 2017 at 05:07:16PM -0800, Ed Swierk wrote:
-> >> Currently qemu_chr_fe_write() calls qemu_chr_fe_write_log() only for
-> >> data consumed by the backend chr_write function. With the pty backend,
-> >> pty_chr_write() returns 0 indicating that the data was not consumed
-> >> when the pty is disconnected. Simply changing it to return len instead
-> >> of 0 tricks the caller into logging the data even when the pty is
-> >> disconnected. I don't know what problems this might cause, but one
-> >> data point is that tcp_chr_write() already happens to work this way.
-> >>
-> >> Alternatively, qemu_chr_fe_write() could be modified to log everything
-> >> passed to it, regardless of how much data chr_write claims to have
-> >> consumed. The trouble is that the serial device retries writing
-> >> unconsumed data, so when the pty is disconnected you'd see every
-> >> character duplicated 4 times in the log file.
-> >>
-> >> Any opinions on either approach, or other suggestions? If there are no
-> >> objections to the first one, I'll prepare a patch.
-> >
-> > If the pty backend intends to just drop data into a blackhole when
-> > no client is connected, then its chr_write() impl should return
-> > the length of the data discarded, not zero.
+On Mon, 30 Jan 2017 22:28:41 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> On Fri, Jan 27, 2017 at 10:43:13AM -0500, Kevin O'Connor wrote:
+> > On Fri, Jan 27, 2017 at 03:46:33PM +0100, Laszlo Ersek wrote:  
+> > > On 01/27/17 15:18, Kevin O'Connor wrote:  
+> > > > If an offset is going to be added, shouldn't both a source offset and
+> > > > destination offset be used?
+> > > > 
+> > > >         /*
+> > > >          * COMMAND_WRITE_POINTER - update a writeable file named
+> > > >          * @pointer.dest_file at @pointer.dest_offset, by writing pointer
+> > > >          * plus @pointer.src_offset to the blob originating from
+> > > >          * @src_file. 1,2,4 or 8 byte unsigned write is used depending
+> > > >          * on @pointer.size.
+> > > >          */
+> > > >         struct {
+> > > >             char dest_file[BIOS_LINKER_LOADER_FILESZ];
+> > > >             char src_file[BIOS_LINKER_LOADER_FILESZ];
+> > > >             uint32_t src_offset, dest_offset;
+> > > >             uint8_t size;
+> > > >         } pointer;
+> > > > 
+> > > > I doubt the offsets or size is really all that important though.  
+> > > 
+> > > The offset into the fw_cfg file that receives the allocation address is
+> > > important, that allows the same file to receive several different
+> > > addresses (for different downloaded blobs), at different offsets.
+> > > 
+> > > OTOH, asking the firmware to add a constant to the address value before
+> > > writing it to the fw_cfg file is not necessary, in my opinion. The blob
+> > > that the firmware allocated and downloaded originates from QEMU to begin
+> > > with, so QEMU knows its internal structure.  
+> > 
+> > I guess I'm missing why QEMU would want to use the same writable file
+> > for multiple pointers as well as why it would want support for
+> > pointers smaller than 8 bytes in size.  If it's because it may be
+> > easier to support an internal QEMU blob of a particular format, then
+> > adding a src_offset would facilitate that.
+> > 
+> > However, if it was done so that WRITE_POINTER mimicks ADD_POINTER then
+> > that's fine too.  I'm okay with either format.
+> > 
+> > -Kevin  
 > 
-> That's exactly the question: when no client is connected, should the
-> pty backend just drop the data into a black hole, returning the length
-> of the data discarded? Or should it return 0, letting the frontend
-> device decide what to do with it?
+> Both reasons :) offset is because it's easier for QEMU not to have to add
+> more files (e.g. it simplifies cross-version migration if we don't).
+On one hand offset simplifies since one file could be re-used for
+several pointers, on the other hand it doesn't make difference wrt
+migration since offset becomes ABI and has to be maintained in
+cross-version migration scenario (size of file shouldn't be issue
+as they are re-sizable now). So we just end-up with offset vs new file
+versioning. However considering that number of files is limited,
+offset scales up better.
 
-It should return len of data discarded.
-
+> size is to mimick ADD_POINTER.
 > 
-> I can't discern a consistent pattern across all the char backends. The
-> closest analog is the tcp backend, which does discard the data and
-> return len. In contrast, several backends call
-> io_channel_send{,_full}(), which returns -1 if the write would block
-> or fails for any other reason.
-> 
-> It's not clear there's much the frontend can do to recover from an
-> error, but there's no consistent pattern across serial devices either.
-> Most just ignore the return value. But the 16550A serial device
-> retries 4 times after an error. Changing the pty backend to discard
-> the data on the first attempt would bypass this retry mechanism. Is
-> that a problem?
-
-I don't think so - retrying in this way is pointless IMHO - it is just
-going to get the same result on every retry on 99% of occassions.
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
