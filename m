@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58389)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGw-0001gR-FE
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:59 -0500
+	id 1cYYH1-0001lJ-LX
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGv-0000G3-KP
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:58 -0500
-Received: from mail.kernel.org ([198.145.29.136]:39480)
+	id 1cYYH0-0000Gm-6e
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:03 -0500
+Received: from mail.kernel.org ([198.145.29.136]:39680)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYYGv-0000Fv-DI
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:14:57 -0500
-Date: Tue, 31 Jan 2017 15:14:51 +0200
+	id 1cYYGz-0000GT-TD
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:15:02 -0500
+Date: Tue, 31 Jan 2017 15:14:57 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485868446-10587-13-git-send-email-mst@redhat.com>
+Message-ID: <1485868446-10587-15-git-send-email-mst@redhat.com>
 References: <1485868446-10587-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485868446-10587-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 12/21] hw/i386: check if nvdimm is enabled
- before plugging
+Subject: [Qemu-devel] [PULL v3 14/21] hcd-xhci: check & correct param before
+ using it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +31,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Haozhong Zhang <haozhong.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-From: Haozhong Zhang <haozhong.zhang@intel.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
 
-The missing of 'nvdimm' in the machine type option '-M' means NVDIMM
-is disabled. QEMU should refuse to plug any NVDIMM device in this case
-and report the misconfiguration.
+usb_xhci_realize() corrects invalid values of property "intrs"
+automatically, but the uncorrected value is passed to msi_init(),
+which chokes on invalid values.  Delay that until after the
+correction.
 
-The behavior of NVDIMM on unsupported platform (HW/FW) is vendor
-specific. For some vendors, it's undefined and the platform may do
-anything. Thus, I think QEMU is free to choose the implementation.
-Aborting QEMU (i.e. refusing to boot) is the easiest one.
+Resources allocated by usb_xhci_init() are leaked when msi_init()
+fails.  Fix by calling it after msi_init().
 
-Reported-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-Id: 20170112110928.GF4621@stefanha-x1.localdomain
-Message-Id: 20170111093630.2088-1-stefanha@redhat.com
+CC: Gerd Hoffmann <kraxel@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Marcel Apfelbaum <marcel@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Marcel Apfelbaum <marcel@redhat.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Xiao Guangrong <guangrong.xiao@linux.intel.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/i386/pc.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/usb/hcd-xhci.c | 37 ++++++++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 706e233..e3fcd51 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1708,6 +1708,11 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index e0b5169..6575d05 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3627,25 +3627,6 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+     dev->config[PCI_CACHE_LINE_SIZE] = 0x10;
+     dev->config[0x60] = 0x30; /* release number */
+ 
+-    usb_xhci_init(xhci);
+-
+-    if (xhci->msi != ON_OFF_AUTO_OFF) {
+-        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
+-        /* Any error other than -ENOTSUP(board's MSI support is broken)
+-         * is a programming error */
+-        assert(!ret || ret == -ENOTSUP);
+-        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
+-            /* Can't satisfy user's explicit msi=on request, fail */
+-            error_append_hint(&err, "You have to use msi=auto (default) or "
+-                    "msi=off with this machine type.\n");
+-            error_propagate(errp, err);
+-            return;
+-        }
+-        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
+-        /* With msi=auto, we fall back to MSI off silently */
+-        error_free(err);
+-    }
+-
+     if (xhci->numintrs > MAXINTRS) {
+         xhci->numintrs = MAXINTRS;
+     }
+@@ -3667,6 +3648,24 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+         xhci->max_pstreams_mask = 0;
      }
  
-     if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
-+        if (!pcms->acpi_nvdimm_state.is_enabled) {
-+            error_setg(&local_err,
-+                       "nvdimm is not enabled: missing 'nvdimm' in '-M'");
-+            goto out;
++    if (xhci->msi != ON_OFF_AUTO_OFF) {
++        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
++        /* Any error other than -ENOTSUP(board's MSI support is broken)
++         * is a programming error */
++        assert(!ret || ret == -ENOTSUP);
++        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
++            /* Can't satisfy user's explicit msi=on request, fail */
++            error_append_hint(&err, "You have to use msi=auto (default) or "
++                    "msi=off with this machine type.\n");
++            error_propagate(errp, err);
++            return;
 +        }
-         nvdimm_plug(&pcms->acpi_nvdimm_state);
-     }
++        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
++        /* With msi=auto, we fall back to MSI off silently */
++        error_free(err);
++    }
++
++    usb_xhci_init(xhci);
+     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
  
+     memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
 -- 
 MST
