@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cYauc-0000tf-6U
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:04:07 -0500
+	(envelope-from <phil@philjordan.eu>) id 1cYavf-0001kw-T9
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:05:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cYauX-0004yl-9d
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:04:06 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:24820 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cYauW-0004yb-Og
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:04:01 -0500
-References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-	<20170123121036.4823-23-vsementsov@virtuozzo.com>
-	<b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <aaf5add3-f612-b504-5589-442ec432366f@virtuozzo.com>
-Date: Tue, 31 Jan 2017 19:03:44 +0300
+	(envelope-from <phil@philjordan.eu>) id 1cYavd-0005GV-V3
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:05:11 -0500
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:35211)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cYavd-0005G5-Nq
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:05:09 -0500
+Received: by mail-oi0-x236.google.com with SMTP id j15so216951872oih.2
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 08:05:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <b24dd2ce-2472-d170-2d09-dbe2bf85edd8@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 22/24] block/dirty-bitmap: deep release
- dirty bitmaps
+References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
+	<20170118175335-mutt-send-email-mst@kernel.org>
+	<20170118181918.783cb7bd@nial.brq.redhat.com>
+	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
+	<20170131165802-mutt-send-email-mst@kernel.org>
+	<20170131164102.583323d7@nial.brq.redhat.com>
+In-Reply-To: <20170131164102.583323d7@nial.brq.redhat.com>
+From: Phil Dennis-Jordan <phil@philjordan.eu>
+Date: Tue, 31 Jan 2017 16:04:58 +0000
+Message-ID: <CAAibmn1T=3A5wdenc=8H7G2OAMZVPjTHiM8XCO27BCAfpPYvpQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,126 +32,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, lersek@redhat.com, qemu-devel@nongnu.org
 
-29.01.2017 19:54, Max Reitz wrote:
-> On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
->> Remove persistent bitmap from its storage on bdrv_release_dirty_bitmap.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/dirty-bitmap.c      | 21 ++++++++++++++++++---
->>   include/block/block_int.h |  3 +++
->>   2 files changed, 21 insertions(+), 3 deletions(-)
->>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 775181c9ab..0977df6309 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -297,7 +297,8 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
->>   
->>   static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
->>                                                     BdrvDirtyBitmap *bitmap,
->> -                                                  bool only_named)
->> +                                                  bool only_named,
->> +                                                  bool deep)
-> I'd rather call it "remove_persistent" or something, which is bad
-> grammar, but it's better at getting the point across.
->
->>   {
->>       BdrvDirtyBitmap *bm, *next;
->>       QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
->> @@ -305,6 +306,19 @@ static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
->>               assert(!bm->active_iterators);
->>               assert(!bdrv_dirty_bitmap_frozen(bm));
->>               assert(!bm->meta);
->> +
->> +            if (deep && bm->persistent && bs->drv &&
->> +                bs->drv->bdrv_remove_persistent_dirty_bitmap)
->> +            {
->> +                Error *local_err = NULL;
->> +                bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, bm->name,
->> +                                                             &local_err);
->> +                if (local_err != NULL) {
->> +                    error_report_err(local_err);
-> This looks like maybe it's the wrong thing to do... I do agree that
-> sometimes it may not be fatal, but sometimes it probably is.
->
->> +                }
->> +            }
->> +
->> +
->>               QLIST_REMOVE(bm, list);
->>               hbitmap_free(bm->bitmap);
->>               g_free(bm->name);
->> @@ -322,16 +336,17 @@ static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
->>   
->>   void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
->>   {
->> -    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false);
->> +    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false, true);
-> The @deep parameter (or however you decide to call it) should be
-> available to this function's caller, too. I don't believe qcow2's
-> load_bitmap() wants to delete the persistent bitmap in the error path;
-> and block-dirty-bitmap-remove should probably allow the user to decide
-> what to do.
->
-> Which brings me to the error thing above: If the user (or management
-> tool) decides that block-dirty-bitmap-remove should remove the
-> persistent bitmap, I believe that the operation should be aborted if the
-> persistent bitmap cannot be removed. It should not just go on and
-> release the in-memory bitmap but abort altogether. If the user just
-> wants to release that in-memory bitmap then, they can still go on an
-> call block-dirty-bitmap-remove with deep=false.
+On Tue, 31 Jan 2017 at 16:41, Igor Mammedov <imammedo@redhat.com> wrote:
 
-I've started to rewrite it in that way and it seems like deep almost 
-always will be false. What about just move call to
-bs->drv->bdrv_remove_persistent_dirty_bitmap() directly to 
-qmp_block_dirty_bitmap_remove and add parameter
-'remove_persistent' (or 'remove_from_storage', to make it maximum 
-descriptive) only to this qmp command?
-
-Or even without that parameter, as leaving inconsistent version of 
-bitmap in the storage doesn't seem useful.
-
+> On Tue, 31 Jan 2017 16:58:22 +0200
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 >
->>   }
->>   
->>   /**
->>    * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
->>    * There must not be any frozen bitmaps attached.
->> + * This function do not remove persistent bitmaps from the storage.
-> *does
->
-> Max
->
->>    */
->>   void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
->>   {
->> -    bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
->> +    bdrv_do_release_matching_dirty_bitmap(bs, NULL, true, false);
->>   }
->>   
->>   void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
->> diff --git a/include/block/block_int.h b/include/block/block_int.h
->> index b38b3aa198..3e080d6d68 100644
->> --- a/include/block/block_int.h
->> +++ b/include/block/block_int.h
->> @@ -326,6 +326,9 @@ struct BlockDriver {
->>                                                   Error **errp);
->>       bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs, const char *name,
->>                                               uint32_t granularity, Error **errp);
->> +    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
->> +                                                const char *name,
->> +                                                Error **errp);
->>   
->>       QLIST_ENTRY(BlockDriver) list;
->>   };
->>
+> > On Tue, Jan 31, 2017 at 03:31:46PM +0100, Phil Dennis-Jordan wrote:
+> > > On 18 January 2017 at 18:19, Igor Mammedov <imammedo@redhat.com>
+> wrote:
+> > > > On Wed, 18 Jan 2017 18:30:59 +0200
+> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > >
+> > > >> On Wed, Jan 18, 2017 at 12:45:54PM +0100, Phil Dennis-Jordan wrote:
+> > > > [...]
+> > > >
+> > > >> > I suspect more might be involved in enabling ACPI 2.0, and it
+> should probably be an option so as to avoid regressions. I don't know what
+> the best approach would be for this, so comments welcome. Should adding the
+> reset register to the FADT also be configurable?
+> > > >>
+> > > >> I would say an option to make FADT use rev 3 format would be a good
+> > > >> idea.
+> > > >>
+> > > >> I'd make it the default if XP survives.
+> > > > if XP and legacy linux survive,
+> > > > I'd skip adding option as probably there won't be any users,
+> > > > in unlikely case such user surfaces we always can add option later
+> > > > but we can't do it other way around (i.e. take it away).
+> > >
+> > > I have now finally solved the mystery of why my FADT patch has been
+> > > going so disastrously wrong - I've now got working code, but I'd
+> > > appreciate some guidance on the best way to structure a patch to
+> > > minimise further back-and forth.
+> >
+> > + lersek
+> >
+> > > The culprit turned out to be OVMF,
+> > > specifically 2 bugs/shortcomings:
+> > >
+> > > 1. It completely gives up on parsing Qemu's ACPI tables if more than
+> > > one "add pointer" linker command points to the same table. In this
+> > > case, if you add a command for both the DSDT and X_DSDT fields of the
+> > > FADT, it aborts completely and uses fallback tables. (The following
+> > > InstallAcpiTable call fails if called twice with the same table type.)
+> > >
+> https://github.com/tianocore/edk2/blob/master/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c#L518
+> > >
+> > > 2. After applying all the linker commands, it goes and rewrites part
+> > > of the FADT anyway. Specifically, it rewrites the DSDT and X_DSDT
+> > > fields - and it always sets one of them to 0. Which one depends on
+> > > whether the DSDT is above the 4G barrier:
+> > >
+> https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableProtocol.c#L650
+> > >
+> > > Both of these are easily fixed, and I will submit a corresponding
+> patch to EDK2.
+> > >
+> > > With that fixed, the rest of the FADT provided by Qemu is accepted by
+> > > OVMF and the operating systems. On the Qemu side, it does mean we'll
+> > > need to still retain the ACPI 1.0 tables for backwards compatibility.
+> > >
+> > > Q1: How should the option be structured and named? Should the FADT
+> > > revision be selectable via a sub-option on -machine? Or as a
+> > > standalone option? Something else?
+> WinXP is main reason why we are using 1.0 revisions,
+> but if bumping revision doesn't affect it or later versions
+> and linux kernel (ancient/contemporary) boots fine,
+> I wouldn't bother with yet another option.
 >
 
+XP is fine. My concern is that setups with OVMF+Windows (10 confirmed, but
+probably 7/8 too) will suddenly bluescreen on boot because unpatched OVMF
+delivers a non-compliant FADT.
 
--- 
-Best regards,
-Vladimir
+
+> > > Q2: To avoid any more confusion, I'd appreciate
+> > > confirmation/clarification on the X_ and non-X FADT fields in the case
+> > > where 32-bit pointers suffice.
+> > >
+> > > Q2a: DSDT/X_DSDT: Both variants appear to be de-facto required.
+> spec doesn't say that X_DSDT is optional and Windows requires it if field
+> is present.
+>
+> > >
+> > > Q2b: FIRMWARE_CTRL/X_FIRMWARE_CTRL: leave X_FIRMWARE_CTRL zero.
+> > >
+> > > Q2c: X_PM1a_EVT_BLK, X_PM1a_CNT_BLK, X_PM_TMR_BLK: These all state
+> > > "This is a required field" for both variants.
+> > >
+> > > Q2d: GPE0_BLK/X_GPE0_BLK: Both variants state "if this register block
+> > > is not supported, this field contains zero." - I understand this to
+> > > mean that when the register block IS supported and 32-bit, both
+> > > variants must be filled.
+> > >
+> > > In other words, only X_FIRMWARE_CTRL stays zero in Qemu's x86 case.
+> > >
+> > >
+> > > I'll come up with a revised patch in the next few days.
+> > >
+> > > Thanks for your help and patience so far, everyone!
+>
+>
