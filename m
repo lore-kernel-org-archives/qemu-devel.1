@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbE6-0001xr-J5
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:24:16 -0500
+	(envelope-from <lersek@redhat.com>) id 1cYbIo-0007xw-5F
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:29:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbE0-0001RI-UG
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:24:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42740)
+	(envelope-from <lersek@redhat.com>) id 1cYbIk-0002oc-Ss
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:29:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37730)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cYbE0-0001R1-Ks
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:24:08 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 31 Jan 2017 20:21:21 +0400
-Message-Id: <20170131162122.29408-41-marcandre.lureau@redhat.com>
-In-Reply-To: <20170131162122.29408-1-marcandre.lureau@redhat.com>
-References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cYbIk-0002oD-Is
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:29:02 -0500
+References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
+	<20170118175335-mutt-send-email-mst@kernel.org>
+	<20170118181918.783cb7bd@nial.brq.redhat.com>
+	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
+	<20170131165802-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <fe787fcc-0c92-5842-1a67-b50466b6f38f@redhat.com>
+Date: Tue, 31 Jan 2017 17:28:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 40/41] char: move parallel chardev in its own
- file
+In-Reply-To: <20170131165802-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,767 +30,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Eric Blake <eblake@redhat.com>
----
- chardev/char-parallel.h |  32 +++++
- chardev/char-parallel.c | 316 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
- chardev/char.c          | 287 +-----------------------------------------=
--
- chardev/Makefile.objs   |   1 +
- 4 files changed, 350 insertions(+), 286 deletions(-)
- create mode 100644 chardev/char-parallel.h
- create mode 100644 chardev/char-parallel.c
+On 01/31/17 15:58, Michael S. Tsirkin wrote:
+> On Tue, Jan 31, 2017 at 03:31:46PM +0100, Phil Dennis-Jordan wrote:
+>> On 18 January 2017 at 18:19, Igor Mammedov <imammedo@redhat.com> wrote:
+>>> On Wed, 18 Jan 2017 18:30:59 +0200
+>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>>
+>>>> On Wed, Jan 18, 2017 at 12:45:54PM +0100, Phil Dennis-Jordan wrote:
+>>> [...]
+>>>
+>>>>> I suspect more might be involved in enabling ACPI 2.0, and it should probably be an option so as to avoid regressions. I don't know what the best approach would be for this, so comments welcome. Should adding the reset register to the FADT also be configurable?
+>>>>
+>>>> I would say an option to make FADT use rev 3 format would be a good
+>>>> idea.
+>>>>
+>>>> I'd make it the default if XP survives.
+>>> if XP and legacy linux survive,
+>>> I'd skip adding option as probably there won't be any users,
+>>> in unlikely case such user surfaces we always can add option later
+>>> but we can't do it other way around (i.e. take it away).
+>>
+>> I have now finally solved the mystery of why my FADT patch has been
+>> going so disastrously wrong - I've now got working code, but I'd
+>> appreciate some guidance on the best way to structure a patch to
+>> minimise further back-and forth.
+> 
+> + lersek
+> 
+>> The culprit turned out to be OVMF,
+>> specifically 2 bugs/shortcomings:
+>>
+>> 1. It completely gives up on parsing Qemu's ACPI tables if more than
+>> one "add pointer" linker command points to the same table. In this
+>> case, if you add a command for both the DSDT and X_DSDT fields of the
+>> FADT, it aborts completely and uses fallback tables. (The following
+>> InstallAcpiTable call fails if called twice with the same table type.)
+>> https://github.com/tianocore/edk2/blob/master/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c#L518
 
-diff --git a/chardev/char-parallel.h b/chardev/char-parallel.h
-new file mode 100644
-index 0000000000..26742f9d5c
---- /dev/null
-+++ b/chardev/char-parallel.h
-@@ -0,0 +1,32 @@
-+/*
-+ * QEMU System Emulator
-+ *
-+ * Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+#ifndef CHAR_PARALLEL_H
-+#define CHAR_PARALLEL_H
-+
-+#if defined(__linux__) || defined(__FreeBSD__) || \
-+    defined(__FreeBSD_kernel__) || defined(__DragonFly__)
-+#define HAVE_CHARDEV_PARPORT 1
-+#endif
-+
-+#endif /* CHAR_PARALLEL_H */
-diff --git a/chardev/char-parallel.c b/chardev/char-parallel.c
-new file mode 100644
-index 0000000000..3fa22ce29d
---- /dev/null
-+++ b/chardev/char-parallel.c
-@@ -0,0 +1,316 @@
-+/*
-+ * QEMU System Emulator
-+ *
-+ * Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "sysemu/char.h"
-+#include "qapi/error.h"
-+#include <sys/ioctl.h>
-+
-+#ifdef CONFIG_BSD
-+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+#include <dev/ppbus/ppi.h>
-+#include <dev/ppbus/ppbconf.h>
-+#elif defined(__DragonFly__)
-+#include <dev/misc/ppi/ppi.h>
-+#include <bus/ppbus/ppbconf.h>
-+#endif
-+#else
-+#ifdef __linux__
-+#include <linux/ppdev.h>
-+#include <linux/parport.h>
-+#endif
-+#endif
-+
-+#include "char-fd.h"
-+#include "char-parallel.h"
-+
-+#if defined(__linux__)
-+
-+typedef struct {
-+    Chardev parent;
-+    int fd;
-+    int mode;
-+} ParallelChardev;
-+
-+#define PARALLEL_CHARDEV(obj) \
-+    OBJECT_CHECK(ParallelChardev, (obj), TYPE_CHARDEV_PARALLEL)
-+
-+static int pp_hw_mode(ParallelChardev *s, uint16_t mode)
-+{
-+    if (s->mode !=3D mode) {
-+        int m =3D mode;
-+        if (ioctl(s->fd, PPSETMODE, &m) < 0) {
-+            return 0;
-+        }
-+        s->mode =3D mode;
-+    }
-+    return 1;
-+}
-+
-+static int pp_ioctl(Chardev *chr, int cmd, void *arg)
-+{
-+    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
-+    int fd =3D drv->fd;
-+    uint8_t b;
-+
-+    switch (cmd) {
-+    case CHR_IOCTL_PP_READ_DATA:
-+        if (ioctl(fd, PPRDATA, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        *(uint8_t *)arg =3D b;
-+        break;
-+    case CHR_IOCTL_PP_WRITE_DATA:
-+        b =3D *(uint8_t *)arg;
-+        if (ioctl(fd, PPWDATA, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        break;
-+    case CHR_IOCTL_PP_READ_CONTROL:
-+        if (ioctl(fd, PPRCONTROL, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        /* Linux gives only the lowest bits, and no way to know data
-+           direction! For better compatibility set the fixed upper
-+           bits. */
-+        *(uint8_t *)arg =3D b | 0xc0;
-+        break;
-+    case CHR_IOCTL_PP_WRITE_CONTROL:
-+        b =3D *(uint8_t *)arg;
-+        if (ioctl(fd, PPWCONTROL, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        break;
-+    case CHR_IOCTL_PP_READ_STATUS:
-+        if (ioctl(fd, PPRSTATUS, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        *(uint8_t *)arg =3D b;
-+        break;
-+    case CHR_IOCTL_PP_DATA_DIR:
-+        if (ioctl(fd, PPDATADIR, (int *)arg) < 0) {
-+            return -ENOTSUP;
-+        }
-+        break;
-+    case CHR_IOCTL_PP_EPP_READ_ADDR:
-+        if (pp_hw_mode(drv, IEEE1284_MODE_EPP | IEEE1284_ADDR)) {
-+            struct ParallelIOArg *parg =3D arg;
-+            int n =3D read(fd, parg->buffer, parg->count);
-+            if (n !=3D parg->count) {
-+                return -EIO;
-+            }
-+        }
-+        break;
-+    case CHR_IOCTL_PP_EPP_READ:
-+        if (pp_hw_mode(drv, IEEE1284_MODE_EPP)) {
-+            struct ParallelIOArg *parg =3D arg;
-+            int n =3D read(fd, parg->buffer, parg->count);
-+            if (n !=3D parg->count) {
-+                return -EIO;
-+            }
-+        }
-+        break;
-+    case CHR_IOCTL_PP_EPP_WRITE_ADDR:
-+        if (pp_hw_mode(drv, IEEE1284_MODE_EPP | IEEE1284_ADDR)) {
-+            struct ParallelIOArg *parg =3D arg;
-+            int n =3D write(fd, parg->buffer, parg->count);
-+            if (n !=3D parg->count) {
-+                return -EIO;
-+            }
-+        }
-+        break;
-+    case CHR_IOCTL_PP_EPP_WRITE:
-+        if (pp_hw_mode(drv, IEEE1284_MODE_EPP)) {
-+            struct ParallelIOArg *parg =3D arg;
-+            int n =3D write(fd, parg->buffer, parg->count);
-+            if (n !=3D parg->count) {
-+                return -EIO;
-+            }
-+        }
-+        break;
-+    default:
-+        return -ENOTSUP;
-+    }
-+    return 0;
-+}
-+
-+static void qemu_chr_open_pp_fd(Chardev *chr,
-+                                int fd,
-+                                bool *be_opened,
-+                                Error **errp)
-+{
-+    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
-+
-+    if (ioctl(fd, PPCLAIM) < 0) {
-+        error_setg_errno(errp, errno, "not a parallel port");
-+        close(fd);
-+        return;
-+    }
-+
-+    drv->fd =3D fd;
-+    drv->mode =3D IEEE1284_MODE_COMPAT;
-+}
-+#endif /* __linux__ */
-+
-+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__Dra=
-gonFly__)
-+
-+typedef struct {
-+    Chardev parent;
-+    int fd;
-+} ParallelChardev;
-+
-+#define PARALLEL_CHARDEV(obj)                                   \
-+    OBJECT_CHECK(ParallelChardev, (obj), TYPE_CHARDEV_PARALLEL)
-+
-+static int pp_ioctl(Chardev *chr, int cmd, void *arg)
-+{
-+    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
-+    uint8_t b;
-+
-+    switch (cmd) {
-+    case CHR_IOCTL_PP_READ_DATA:
-+        if (ioctl(drv->fd, PPIGDATA, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        *(uint8_t *)arg =3D b;
-+        break;
-+    case CHR_IOCTL_PP_WRITE_DATA:
-+        b =3D *(uint8_t *)arg;
-+        if (ioctl(drv->fd, PPISDATA, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        break;
-+    case CHR_IOCTL_PP_READ_CONTROL:
-+        if (ioctl(drv->fd, PPIGCTRL, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        *(uint8_t *)arg =3D b;
-+        break;
-+    case CHR_IOCTL_PP_WRITE_CONTROL:
-+        b =3D *(uint8_t *)arg;
-+        if (ioctl(drv->fd, PPISCTRL, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        break;
-+    case CHR_IOCTL_PP_READ_STATUS:
-+        if (ioctl(drv->fd, PPIGSTATUS, &b) < 0) {
-+            return -ENOTSUP;
-+        }
-+        *(uint8_t *)arg =3D b;
-+        break;
-+    default:
-+        return -ENOTSUP;
-+    }
-+    return 0;
-+}
-+
-+static void qemu_chr_open_pp_fd(Chardev *chr,
-+                                int fd,
-+                                bool *be_opened,
-+                                Error **errp)
-+{
-+    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
-+    drv->fd =3D fd;
-+    *be_opened =3D false;
-+}
-+#endif
-+
-+#ifdef HAVE_CHARDEV_PARPORT
-+static void qmp_chardev_open_parallel(Chardev *chr,
-+                                      ChardevBackend *backend,
-+                                      bool *be_opened,
-+                                      Error **errp)
-+{
-+    ChardevHostdev *parallel =3D backend->u.parallel.data;
-+    int fd;
-+
-+    fd =3D qmp_chardev_open_file_source(parallel->device, O_RDWR, errp);
-+    if (fd < 0) {
-+        return;
-+    }
-+    qemu_chr_open_pp_fd(chr, fd, be_opened, errp);
-+}
-+
-+static void qemu_chr_parse_parallel(QemuOpts *opts, ChardevBackend *back=
-end,
-+                                    Error **errp)
-+{
-+    const char *device =3D qemu_opt_get(opts, "path");
-+    ChardevHostdev *parallel;
-+
-+    if (device =3D=3D NULL) {
-+        error_setg(errp, "chardev: parallel: no device path given");
-+        return;
-+    }
-+    backend->type =3D CHARDEV_BACKEND_KIND_PARALLEL;
-+    parallel =3D backend->u.parallel.data =3D g_new0(ChardevHostdev, 1);
-+    qemu_chr_parse_common(opts, qapi_ChardevHostdev_base(parallel));
-+    parallel->device =3D g_strdup(device);
-+}
-+
-+static void char_parallel_class_init(ObjectClass *oc, void *data)
-+{
-+    ChardevClass *cc =3D CHARDEV_CLASS(oc);
-+
-+    cc->parse =3D qemu_chr_parse_parallel;
-+    cc->open =3D qmp_chardev_open_parallel;
-+#if defined(__linux__)
-+    cc->chr_ioctl =3D pp_ioctl;
-+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || \
-+    defined(__DragonFly__)
-+    cc->chr_ioctl =3D pp_ioctl;
-+#endif
-+}
-+
-+static void char_parallel_finalize(Object *obj)
-+{
-+#if defined(__linux__)
-+    Chardev *chr =3D CHARDEV(obj);
-+    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
-+    int fd =3D drv->fd;
-+
-+    pp_hw_mode(drv, IEEE1284_MODE_COMPAT);
-+    ioctl(fd, PPRELEASE);
-+    close(fd);
-+    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || \
-+    defined(__DragonFly__)
-+    /* FIXME: close fd? */
-+#endif
-+}
-+
-+static const TypeInfo char_parallel_type_info =3D {
-+    .name =3D TYPE_CHARDEV_PARALLEL,
-+    .parent =3D TYPE_CHARDEV,
-+    .instance_size =3D sizeof(ParallelChardev),
-+    .instance_finalize =3D char_parallel_finalize,
-+    .class_init =3D char_parallel_class_init,
-+};
-+
-+static void register_types(void)
-+{
-+    type_register_static(&char_parallel_type_info);
-+}
-+
-+type_init(register_types);
-+
-+#endif
-diff --git a/chardev/char.c b/chardev/char.c
-index faba68db21..a9daf9956c 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -53,19 +53,6 @@
- #include <arpa/inet.h>
- #include <netdb.h>
- #include <sys/select.h>
--#ifdef CONFIG_BSD
--#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
--#include <dev/ppbus/ppi.h>
--#include <dev/ppbus/ppbconf.h>
--#elif defined(__DragonFly__)
--#include <dev/misc/ppi/ppi.h>
--#include <bus/ppbus/ppbconf.h>
--#endif
--#else
--#ifdef __linux__
--#include <linux/ppdev.h>
--#include <linux/parport.h>
--#endif
- #ifdef __sun__
- #include <sys/ethernet.h>
- #include <sys/sockio.h>
-@@ -78,17 +65,16 @@
- #include <netinet/tcp.h>
- #endif
- #endif
--#endif
-=20
- #include "qemu/sockets.h"
- #include "ui/qemu-spice.h"
-=20
- #include "char-mux.h"
--#include "char-fd.h"
- #include "char-io.h"
- #ifdef _WIN32
- #include "char-win.h"
- #endif
-+#include "char-parallel.h"
- #include "char-serial.h"
-=20
- /***********************************************************/
-@@ -653,198 +639,6 @@ void qemu_chr_fe_take_focus(CharBackend *b)
-     }
- }
-=20
--#ifndef _WIN32
--
--#if defined(__linux__)
--
--#define HAVE_CHARDEV_PARPORT 1
--
--typedef struct {
--    Chardev parent;
--    int fd;
--    int mode;
--} ParallelChardev;
--
--#define PARALLEL_CHARDEV(obj) \
--    OBJECT_CHECK(ParallelChardev, (obj), TYPE_CHARDEV_PARALLEL)
--
--static int pp_hw_mode(ParallelChardev *s, uint16_t mode)
--{
--    if (s->mode !=3D mode) {
--	int m =3D mode;
--        if (ioctl(s->fd, PPSETMODE, &m) < 0)
--            return 0;
--	s->mode =3D mode;
--    }
--    return 1;
--}
--
--static int pp_ioctl(Chardev *chr, int cmd, void *arg)
--{
--    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
--    int fd =3D drv->fd;
--    uint8_t b;
--
--    switch(cmd) {
--    case CHR_IOCTL_PP_READ_DATA:
--        if (ioctl(fd, PPRDATA, &b) < 0)
--            return -ENOTSUP;
--        *(uint8_t *)arg =3D b;
--        break;
--    case CHR_IOCTL_PP_WRITE_DATA:
--        b =3D *(uint8_t *)arg;
--        if (ioctl(fd, PPWDATA, &b) < 0)
--            return -ENOTSUP;
--        break;
--    case CHR_IOCTL_PP_READ_CONTROL:
--        if (ioctl(fd, PPRCONTROL, &b) < 0)
--            return -ENOTSUP;
--	/* Linux gives only the lowest bits, and no way to know data
--	   direction! For better compatibility set the fixed upper
--	   bits. */
--        *(uint8_t *)arg =3D b | 0xc0;
--        break;
--    case CHR_IOCTL_PP_WRITE_CONTROL:
--        b =3D *(uint8_t *)arg;
--        if (ioctl(fd, PPWCONTROL, &b) < 0)
--            return -ENOTSUP;
--        break;
--    case CHR_IOCTL_PP_READ_STATUS:
--        if (ioctl(fd, PPRSTATUS, &b) < 0)
--            return -ENOTSUP;
--        *(uint8_t *)arg =3D b;
--        break;
--    case CHR_IOCTL_PP_DATA_DIR:
--        if (ioctl(fd, PPDATADIR, (int *)arg) < 0)
--            return -ENOTSUP;
--        break;
--    case CHR_IOCTL_PP_EPP_READ_ADDR:
--	if (pp_hw_mode(drv, IEEE1284_MODE_EPP|IEEE1284_ADDR)) {
--	    struct ParallelIOArg *parg =3D arg;
--	    int n =3D read(fd, parg->buffer, parg->count);
--	    if (n !=3D parg->count) {
--		return -EIO;
--	    }
--	}
--        break;
--    case CHR_IOCTL_PP_EPP_READ:
--	if (pp_hw_mode(drv, IEEE1284_MODE_EPP)) {
--	    struct ParallelIOArg *parg =3D arg;
--	    int n =3D read(fd, parg->buffer, parg->count);
--	    if (n !=3D parg->count) {
--		return -EIO;
--	    }
--	}
--        break;
--    case CHR_IOCTL_PP_EPP_WRITE_ADDR:
--	if (pp_hw_mode(drv, IEEE1284_MODE_EPP|IEEE1284_ADDR)) {
--	    struct ParallelIOArg *parg =3D arg;
--	    int n =3D write(fd, parg->buffer, parg->count);
--	    if (n !=3D parg->count) {
--		return -EIO;
--	    }
--	}
--        break;
--    case CHR_IOCTL_PP_EPP_WRITE:
--	if (pp_hw_mode(drv, IEEE1284_MODE_EPP)) {
--	    struct ParallelIOArg *parg =3D arg;
--	    int n =3D write(fd, parg->buffer, parg->count);
--	    if (n !=3D parg->count) {
--		return -EIO;
--	    }
--	}
--        break;
--    default:
--        return -ENOTSUP;
--    }
--    return 0;
--}
--
--static void qemu_chr_open_pp_fd(Chardev *chr,
--                                int fd,
--                                bool *be_opened,
--                                Error **errp)
--{
--    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
--
--    if (ioctl(fd, PPCLAIM) < 0) {
--        error_setg_errno(errp, errno, "not a parallel port");
--        close(fd);
--        return;
--    }
--
--    drv->fd =3D fd;
--    drv->mode =3D IEEE1284_MODE_COMPAT;
--}
--#endif /* __linux__ */
--
--#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__Dra=
-gonFly__)
--
--#define HAVE_CHARDEV_PARPORT 1
--
--typedef struct {
--    Chardev parent;
--    int fd;
--} ParallelChardev;
--
--#define PARALLEL_CHARDEV(obj)                                   \
--    OBJECT_CHECK(ParallelChardev, (obj), TYPE_CHARDEV_PARALLEL)
--
--static int pp_ioctl(Chardev *chr, int cmd, void *arg)
--{
--    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
--    uint8_t b;
--
--    switch (cmd) {
--    case CHR_IOCTL_PP_READ_DATA:
--        if (ioctl(drv->fd, PPIGDATA, &b) < 0) {
--            return -ENOTSUP;
--        }
--        *(uint8_t *)arg =3D b;
--        break;
--    case CHR_IOCTL_PP_WRITE_DATA:
--        b =3D *(uint8_t *)arg;
--        if (ioctl(drv->fd, PPISDATA, &b) < 0) {
--            return -ENOTSUP;
--        }
--        break;
--    case CHR_IOCTL_PP_READ_CONTROL:
--        if (ioctl(drv->fd, PPIGCTRL, &b) < 0) {
--            return -ENOTSUP;
--        }
--        *(uint8_t *)arg =3D b;
--        break;
--    case CHR_IOCTL_PP_WRITE_CONTROL:
--        b =3D *(uint8_t *)arg;
--        if (ioctl(drv->fd, PPISCTRL, &b) < 0) {
--            return -ENOTSUP;
--        }
--        break;
--    case CHR_IOCTL_PP_READ_STATUS:
--        if (ioctl(drv->fd, PPIGSTATUS, &b) < 0) {
--            return -ENOTSUP;
--        }
--        *(uint8_t *)arg =3D b;
--        break;
--    default:
--        return -ENOTSUP;
--    }
--    return 0;
--}
--
--static void qemu_chr_open_pp_fd(Chardev *chr,
--                                int fd,
--                                bool *be_opened,
--                                Error **errp)
--{
--    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
--    drv->fd =3D fd;
--    *be_opened =3D false;
--}
--#endif
--
--#endif /* !_WIN32 */
--
- int qemu_chr_wait_connected(Chardev *chr, Error **errp)
- {
-     ChardevClass *cc =3D CHARDEV_GET_CLASS(chr);
-@@ -1019,24 +813,6 @@ void qemu_chr_parse_common(QemuOpts *opts, ChardevC=
-ommon *backend)
-     backend->logappend =3D qemu_opt_get_bool(opts, "logappend", false);
- }
-=20
--#ifdef HAVE_CHARDEV_PARPORT
--static void qemu_chr_parse_parallel(QemuOpts *opts, ChardevBackend *back=
-end,
--                                    Error **errp)
--{
--    const char *device =3D qemu_opt_get(opts, "path");
--    ChardevHostdev *parallel;
--
--    backend->type =3D CHARDEV_BACKEND_KIND_PARALLEL;
--    if (device =3D=3D NULL) {
--        error_setg(errp, "chardev: parallel: no device path given");
--        return;
--    }
--    parallel =3D backend->u.parallel.data =3D g_new0(ChardevHostdev, 1);
--    qemu_chr_parse_common(opts, qapi_ChardevHostdev_base(parallel));
--    parallel->device =3D g_strdup(device);
--}
--#endif
--
- static const ChardevClass *char_get_class(const char *driver, Error **er=
-rp)
- {
-     ObjectClass *oc;
-@@ -1484,64 +1260,6 @@ QemuOptsList qemu_chardev_opts =3D {
-     },
- };
-=20
--#ifndef _WIN32
--
--#ifdef HAVE_CHARDEV_PARPORT
--static void qmp_chardev_open_parallel(Chardev *chr,
--                                      ChardevBackend *backend,
--                                      bool *be_opened,
--                                      Error **errp)
--{
--    ChardevHostdev *parallel =3D backend->u.parallel.data;
--    int fd;
--
--    fd =3D qmp_chardev_open_file_source(parallel->device, O_RDWR, errp);
--    if (fd < 0) {
--        return;
--    }
--    qemu_chr_open_pp_fd(chr, fd, be_opened, errp);
--}
--
--static void char_parallel_class_init(ObjectClass *oc, void *data)
--{
--    ChardevClass *cc =3D CHARDEV_CLASS(oc);
--
--    cc->parse =3D qemu_chr_parse_parallel;
--    cc->open =3D qmp_chardev_open_parallel;
--#if defined(__linux__)
--    cc->chr_ioctl =3D pp_ioctl;
--#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__D=
-ragonFly__)
--    cc->chr_ioctl =3D pp_ioctl;
--#endif
--}
--
--static void char_parallel_finalize(Object *obj)
--{
--#if defined(__linux__)
--    Chardev *chr =3D CHARDEV(obj);
--    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
--    int fd =3D drv->fd;
--
--    pp_hw_mode(drv, IEEE1284_MODE_COMPAT);
--    ioctl(fd, PPRELEASE);
--    close(fd);
--    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
--#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__D=
-ragonFly__)
--    /* FIXME: close fd? */
--#endif
--}
--
--static const TypeInfo char_parallel_type_info =3D {
--    .name =3D TYPE_CHARDEV_PARALLEL,
--    .parent =3D TYPE_CHARDEV,
--    .instance_size =3D sizeof(ParallelChardev),
--    .instance_finalize =3D char_parallel_finalize,
--    .class_init =3D char_parallel_class_init,
--};
--#endif
--
--#endif /* WIN32 */
--
- bool qemu_chr_has_feature(Chardev *chr,
-                           ChardevFeature feature)
- {
-@@ -1643,9 +1361,6 @@ void qemu_chr_cleanup(void)
- static void register_types(void)
- {
-     type_register_static(&char_type_info);
--#ifdef HAVE_CHARDEV_PARPORT
--    type_register_static(&char_parallel_type_info);
--#endif
-=20
-     /* this must be done after machine init, since we register FEs with =
-muxes
-      * as part of realize functions like serial_isa_realizefn when -nogr=
-aphic
-diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index 45fc8af0c4..1feda0f0ed 100644
---- a/chardev/Makefile.objs
-+++ b/chardev/Makefile.objs
-@@ -5,6 +5,7 @@ chardev-obj-y +=3D char-file.o
- chardev-obj-y +=3D char-io.o
- chardev-obj-y +=3D char-mux.o
- chardev-obj-y +=3D char-null.o
-+chardev-obj-$(CONFIG_POSIX) +=3D char-parallel.o
- chardev-obj-y +=3D char-pipe.o
- chardev-obj-$(CONFIG_POSIX) +=3D char-pty.o
- chardev-obj-y +=3D char-ringbuf.o
---=20
-2.11.0.295.gd7dffce1c.dirty
+Unlike SeaBIOS, OVMF can only use EFI_ACPI_TABLE_PROTOCOL to install
+ACPI tables.
+
+EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() installs a *copy* of the
+table that is passed in. In addition, EFI_ACPI_TABLE_PROTOCOL (whose
+implementation is in generic edk2 code, not in OVMF platform code) has
+built-in "smarts" for handling and linking together the various specific
+tables defined by the ACPI spec.
+
+The way we were able to make EFI_ACPI_TABLE_PROTOCOL cooperate with
+QEMU's linker/loader is a two-phase process.
+
+In the first phase, the fw_cfg blobs are allocated, downloaded, linked
+together, and checksummed, in AcpiNVS type memory, as instructed by the
+linker/loader script.
+
+In the second phase, all ADD_POINTER commands are processed again, and
+the targets of those pointers are investigated for ACPI SDT headers.
+Every such pointer target that looks like an ACPI SDT header is passed
+to EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable(); except root tables like
+RSDT etc. This member function handles the actual copying, installation,
+and cross-table linking (to the extent specified in the ACPI spec).
+
+Additionally, for each allocated  / downloaded fw_cfg blob, the second
+phase tracks if there is at least one pointer into the blob that does
+*not* point to an ACPI SDT header. If that's the case, then it implies
+the presence of some non-ACPI-table-buffer within the blob (that is
+referenced by some other field elsewhere). In turn such fw_cfg blobs are
+not freed at the end of the whole process. (If an fw_cfg blob turns out
+to host *only* ACPI tables -- which were then all copied for
+installation, see above -- then the blob is released in the end.)
+
+Finally, EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() may return
+EFI_ACCESS_DENIED (quoting the UEFI spec):
+
+"The table signature matches a table already present in the system and
+platform policy does not allow duplicate tables of this type."
+
+(And see edk2 commit 5966402ed51c, "MdeModulePkg/IntelFrameworkModulePkg
+ACPI: Follow the new UEFI 2.4a spec to return EFI_ACCESS_DENIED for
+duplicated FADT, FACS or DSDT installation.", 2014-05-06.)
+
+
+... BTW, we discussed the question of multiply-pointed-to tables before,
+in connection with XSDT support. Under "XSDT support", I mean an XSDT
+built by QEMU explicitly (because EFI_ACPI_TABLE_PROTOCOL handles both
+XSDT and RSDT internally, automatically). Clearly, if some ACPI table is
+referenced from QEMU's RSDT and XSDT both, that immediately triggers the
+same problem.
+
+Looking at my older notes, I find two references:
+
+Message-Id: <20150827205706-mutt-send-email-mst@redhat.com>
+URL: http://lists.nongnu.org/archive/html/qemu-devel/2015-08/msg03528.html
+
+Message-Id: <20151228141917-mutt-send-email-mst@redhat.com>
+URL: http://lists.nongnu.org/archive/html/qemu-devel/2015-12/msg04636.html
+
+Looking further at my notes, I find the following idea:
+
+    in the second pass only, maintain a global rbtree that contains
+    VOID* objects, pointing to actual physcal addresses in the relocated
+    blobs that have already been passed to InstallAcpiTable. This will
+    ensure that no address is passed to InstallAcpiTable twice
+
+IOW, it's simple memoization for ADD_POINTER targets (in absolute
+guest-phys addr space) so that duplicate
+EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() can be avoided.
+
+If this feature is important, I can file an upstream OVMF bug for it,
+and work on it. (I already have another open BZ for the linker/loader
+anyway, <https://bugzilla.tianocore.org/show_bug.cgi?id=359>.)
+
+Please confirm if this is necessary.
+
+
+>>
+>> 2. After applying all the linker commands, it goes and rewrites part
+>> of the FADT anyway. Specifically, it rewrites the DSDT and X_DSDT
+>> fields - and it always sets one of them to 0. Which one depends on
+>> whether the DSDT is above the 4G barrier:
+>> https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableProtocol.c#L650
+
+Yes. This is precisely what I meant above with:
+
+    EFI_ACPI_TABLE_PROTOCOL (whose implementation is in generic edk2
+    code, not in OVMF platform code) has built-in "smarts" for handling
+    and linking together the various specific tables defined by the
+    ACPI spec.
+
+>>
+>> Both of these are easily fixed, and I will submit a corresponding patch to EDK2.
+
+What easy fixes do you have in mind?
+
+For problem (1), simply ignoring EFI_ACCESS_DENIED from
+EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() is not right. Unless we can
+ensure in a future-proof way that an error code gets returned for *only
+one* error scenario and nothing else, suppressing the error code is
+risky. I'd much rather prevent a function call (with memoization) that
+we know in advance will fail.
+
+For symptom (2), I'm unsure if we can call that a problem at all. You'd
+have to prove that "MdeModulePkg/Universal/Acpi/AcpiTableDxe" violates
+the ACPI spec (or that it's within the spec, but works sub-optimally),
+when it ensures exclusivity between FADT.DSDT and FADT.X_DSDT.
+
+The ACPI 6.1 spec says,
+
+- DSDT: [...] If the X_DSDT field contains a non-zero value then this
+  field must be zero.
+- X_DSDT: [...] If the DSDT field contains a non-zero value then this
+  field must be zero.
+
+Therefore the EFI_ACPI_TABLE_PROTOCOL implementation in edk2 seems
+conformant & correct to me.
+
+Related edk2 commits:
+
+- the one that added the code you reference above:
+
+f9bbb8d9c3f0 ("MdeModulePkg: AcpiTableDxe: make 4 GB table allocation
+limit optional", 2016-02-17)
+
+- the earlier, similar one, that enforces exclusivity between
+FADT.FIRMWARE_CTRL and FADT.X_FIRMWARE_CTRL:
+
+f798e8bff773 ("MdeModulePkg: Acpi: enforce exclusion between
+FirmwareCtrl and XFirmwareCtrl", 2015-01-26)
+
+>>
+>> With that fixed, the rest of the FADT provided by Qemu is accepted by
+>> OVMF and the operating systems. On the Qemu side, it does mean we'll
+>> need to still retain the ACPI 1.0 tables for backwards compatibility.
+>>
+>> Q1: How should the option be structured and named? Should the FADT
+>> revision be selectable via a sub-option on -machine? Or as a
+>> standalone option? Something else?
+
+No input from me on this one.
+
+>> Q2: To avoid any more confusion, I'd appreciate
+>> confirmation/clarification on the X_ and non-X FADT fields in the case
+>> where 32-bit pointers suffice.
+>>
+>> Q2a: DSDT/X_DSDT: Both variants appear to be de-facto required.
+
+I disagree. The 6.1 release of the ACPI spec requires exclusivity.
+
+The changelog at the top of the spec lists:
+
+Revision    Change Description                         Affected Sections
+----------  -----------------------------------------  -----------------
+6.0 Errata  1393 In FADT: if X_DSDT field is           Table 5-34
+            non-zero, DSDT field should be ignored or
+            deprecated
+
+The number "1393" is most likely the Mantis ticket number:
+
+https://mantis.uefi.org/mantis/view.php?id=1393
+
+(Unfortunately, I don't have the necessary credentials to verify if this
+Mantis ticket actually corresponds to this change. I could do that for
+Platform Init or UEFI spec items -- without quoting any specifics --,
+but apparently my ASWG membership level isn't high enough for this one.)
+
+>> Q2b: FIRMWARE_CTRL/X_FIRMWARE_CTRL: leave X_FIRMWARE_CTRL zero.
+
+Sounds good.
+
+>>
+>> Q2c: X_PM1a_EVT_BLK, X_PM1a_CNT_BLK, X_PM_TMR_BLK: These all state
+>> "This is a required field" for both variants.
+
+Hmmm, I don't think so (again, from ACPI 6.1):
+
+- PM1a_EVT_BLK: [...] This is a required field. If the X_PM1a_CNT_BLK
+  field contains a non-zero value then this field must be zero.
+- X_PM1a_EVT_BLK: [...] This is a required field. If the PM1a_EVT_BLK
+  field contains a non-zero value then this field must be zero.
+
+(Not checking the rest.)
+
+>>
+>> Q2d: GPE0_BLK/X_GPE0_BLK: Both variants state "if this register block
+>> is not supported, this field contains zero." - I understand this to
+>> mean that when the register block IS supported and 32-bit, both
+>> variants must be filled.
+>>
+>> In other words, only X_FIRMWARE_CTRL stays zero in Qemu's x86 case.
+>>
+>>
+>> I'll come up with a revised patch in the next few days.
+>>
+>> Thanks for your help and patience so far, everyone!
+
+In summary, here's my opinion:
+
+- I think that setting both FADT.DSDT and FADT.X_DSDT to nonzero values
+simultaneously would break the ACPI 6.1 spec (update originating from
+Mantis #1393, most likely)
+
+- "MdeModulePkg/Universal/Acpi/AcpiTableDxe", implementing
+EFI_ACPI_TABLE_PROTOCOL in edk2, appears to conform to this requirement
+specifically
+
+- if remedying symptom (1) were only necessary for setting both DSDT and
+X_DSDT -- which, I claim, should not be done --, then I'd like to
+postpone the above memoization indefinitely. It's too complex to be
+added speculatively.
+
+Thank you,
+Laszlo
