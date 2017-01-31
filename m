@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYaxg-0003w8-RB
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:07:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1cYaxn-00045P-BE
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:07:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYaxd-0005gW-LY
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:07:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51498)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cYaxd-0005g7-FB
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:07:13 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1485873796-15095-1-git-send-email-mst@redhat.com>
-	<87zii75jze.fsf@dusky.pond.sub.org>
-	<20170131172752-mutt-send-email-mst@kernel.org>
-Date: Tue, 31 Jan 2017 17:07:10 +0100
-In-Reply-To: <20170131172752-mutt-send-email-mst@kernel.org> (Michael
-	S. Tsirkin's message of "Tue, 31 Jan 2017 17:29:15 +0200")
-Message-ID: <87o9yn2oy9.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1cYaxh-0005hd-A9
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:07:23 -0500
+References: <1485878172-15463-1-git-send-email-pl@kamp.de>
+	<1485878172-15463-3-git-send-email-pl@kamp.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e77b239c-6c6e-821e-07c2-2009d3cc7163@redhat.com>
+Date: Tue, 31 Jan 2017 10:07:04 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] QEMU_BUILD_BUG_ON: use __COUNTER__
+In-Reply-To: <1485878172-15463-3-git-send-email-pl@kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5flVMmkOWUQdmmgLXaA2Pu47ONPgP6i1g"
+Subject: Re: [Qemu-devel] [PATCH V2 2/2] block/nfs: fix naming of runtime
+ opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, ashijeetacharya@gmail.com, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-stable@nongnu.org
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5flVMmkOWUQdmmgLXaA2Pu47ONPgP6i1g
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, ashijeetacharya@gmail.com,
+ jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com,
+ qemu-stable@nongnu.org
+Message-ID: <e77b239c-6c6e-821e-07c2-2009d3cc7163@redhat.com>
+Subject: Re: [PATCH V2 2/2] block/nfs: fix naming of runtime opts
+References: <1485878172-15463-1-git-send-email-pl@kamp.de>
+ <1485878172-15463-3-git-send-email-pl@kamp.de>
+In-Reply-To: <1485878172-15463-3-git-send-email-pl@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, Jan 31, 2017 at 04:26:13PM +0100, Markus Armbruster wrote:
->> "Michael S. Tsirkin" <mst@redhat.com> writes:
->> 
->> > Some headers use QEMU_BUILD_BUG_ON. This causes a problem
->> > if the C file including that header happens to have
->> > QEMU_BUILD_BUG_ON at the same line number.
->> >
->> > Fix using a widely available extension: __COUNTER__.
->> > If unavailable, provide a stub.
->> >
->> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> > ---
->> >  include/qemu/compiler.h | 6 +++++-
->> >  1 file changed, 5 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
->> > index e0fb18b..bad25a9 100644
->> > --- a/include/qemu/compiler.h
->> > +++ b/include/qemu/compiler.h
->> > @@ -89,8 +89,12 @@
->> >      struct { \
->> >          int:(x) ? -1 : 1; \
->> >      }
->> > +#ifdef __COUNTER__
->> >  #define QEMU_BUILD_BUG_ON(x) typedef QEMU_BUILD_BUG_ON_STRUCT(x) \
->> > -    glue(qemu_build_bug_on__, __LINE__) __attribute__((unused))
->> > +    glue(qemu_build_bug_on__, __COUNTER__) __attribute__((unused))
->> > +#else
->> > +#define QEMU_BUILD_BUG_ON(x)
->> > +#endif
->> 
->> __COUNTER__ was added to GNU cpp in 2007.  Good.  What about clang?
->> "clang -dM -E -x c /dev/null" comes up empty on my machine (3.8.0).
->> 
->> Can we use an extern declaration instead?  You can have any number of
->> these, as long as they match.  Have a look at the appended sketch.  It
->> compiles without -DBUGGY, and errors out with -DBUGGY, as it should.
->
-> I tried that first thing.
-> This generates lots of warnings if you have multiple users
-> within a function: gcc is unhappy about the redundant extern
-> declarations.
+On 01/31/2017 09:56 AM, Peter Lieven wrote:
+> commit 94d6a7a accidently left the naming of runtime opts and QAPI
+> scheme inconsistent. As one consequence passing of parameters in the
+> URI is broken. Sync the naming of the runtime opts to the QAPI
+> scheme.
+>=20
+> Please note that this is technically backwards incompatible with the 2.=
+8
+> release, but the 2.8 release is the only version that had the wrong nam=
+ing.
+> Furthermore release 2.8 suffered from a NULL pointer deference during
 
-#define QEMU_BUILD_BUG_ON(x) \
-    _Pragma("GCC diagnostic push") \
-    _Pragma("GCC diagnostic ignored \"-Wredundant-decls\"") \
-    extern char qemu_build_bug_on_[QEMU_BUILD_BUG_ON_ZERO((x))] __attribute__((unused)); \
-    _Pragma("GCC diagnostic pop")
+s/deference/dereference/
 
-Drawback: natural use like
+> URI parsing.
+>=20
+> Fixes: 94d6a7a76e9df9919629428f6c598e2b97d9426c
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-    QEMU_BUILD_BUG_ON(x);
+Maintainer can touch that up, my review stands.
 
-expands into a declaration followed by an extra semicolon.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--5flVMmkOWUQdmmgLXaA2Pu47ONPgP6i1g
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYkLYoAAoJEKeha0olJ0NqQ8wH/0Dy46Yh4yW3LWWqw1JIRal2
+znI2VXmk08WqgN983619Hhe3xQ71r2bo/DvCNuEPB4Z2vbYqX6sj0yWIN5aL14yF
+rWw8ZUaEoGjRHRDO0DHgsirvO3RhI8WvWQiUF+Fmvp0SOKIkAYX43FqxenFd2crS
+PHfedtSH3DAK9PYQl0ItRuT9BKhDDcPthvkAva44lZQxU/etWLQQGI0IlklJMArm
+DP/Q5O8VJHAW3oZPBroM2xNdaF41dAk+2Hf7pAo+kcNvwM7SI1McGAjv3gMJUC1f
+OHOUNiQ40L7yV24H0RSx3hQE0QGC+zOSw4p9Wxdgh1Wz3/gjiUmhbt/kXbRVFEE=
+=Khwg
+-----END PGP SIGNATURE-----
+
+--5flVMmkOWUQdmmgLXaA2Pu47ONPgP6i1g--
