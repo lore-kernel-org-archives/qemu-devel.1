@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYaew-0003Qi-QK
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:47:55 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cYahd-00053c-J8
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:50:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYaew-0000dp-6e
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:47:54 -0500
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:36274)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cYaew-0000d6-1l
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:47:54 -0500
-Received: by mail-ua0-x22d.google.com with SMTP id 96so275483821uaq.3
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 07:47:53 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <87zii75jze.fsf@dusky.pond.sub.org>
-References: <1485873796-15095-1-git-send-email-mst@redhat.com>
-	<87zii75jze.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Jan 2017 15:47:32 +0000
-Message-ID: <CAFEAcA9hu_zhfE6F1Sj-ZYrp40ki2yTigtonkk_PZDE7qjhO4g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] QEMU_BUILD_BUG_ON: use __COUNTER__
+	(envelope-from <kraxel@redhat.com>) id 1cYaha-0001TO-Ra
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:50:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cYaha-0001Si-Jy
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:50:38 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 31 Jan 2017 16:50:22 +0100
+Message-Id: <1485877831-28786-3-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1485877831-28786-1-git-send-email-kraxel@redhat.com>
+References: <1485877831-28786-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL v2 02/11] ps2: add support for mice with
+ extra/side buttons
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,16 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Fabian Lesniak <fabian@lesniak-it.de>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 31 January 2017 at 15:26, Markus Armbruster <armbru@redhat.com> wrote:
-> __COUNTER__ was added to GNU cpp in 2007.  Good.  What about clang?
-> "clang -dM -E -x c /dev/null" comes up empty on my machine (3.8.0).
+From: Fabian Lesniak <fabian@lesniak-it.de>
 
-Since __COUNTER__ is magic it doesn't appear in the -dM output.
-You can test for it working with
-echo 'counter is __COUNTER__ __COUNTER__' | clang -E -x c -
+This enables the ps2 controller to process mouse events for buttons 4 and 5.
+Additionally, distinct definitions for the ps2 mouse button state are
+introduced. The legacy definitions from console.h are not used anymore.
 
-thanks
--- PMM
+Signed-off-by: Fabian Lesniak <fabian@lesniak-it.de>
+Message-id: 20161206190007.7539-3-fabian@lesniak-it.de
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/input/ps2.c         | 8 +++++---
+ include/hw/input/ps2.h | 6 ++++++
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index 8485a4e..1d3a440 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -881,9 +881,11 @@ static void ps2_mouse_event(DeviceState *dev, QemuConsole *src,
+                             InputEvent *evt)
+ {
+     static const int bmap[INPUT_BUTTON__MAX] = {
+-        [INPUT_BUTTON_LEFT]   = MOUSE_EVENT_LBUTTON,
+-        [INPUT_BUTTON_MIDDLE] = MOUSE_EVENT_MBUTTON,
+-        [INPUT_BUTTON_RIGHT]  = MOUSE_EVENT_RBUTTON,
++        [INPUT_BUTTON_LEFT]   = PS2_MOUSE_BUTTON_LEFT,
++        [INPUT_BUTTON_MIDDLE] = PS2_MOUSE_BUTTON_MIDDLE,
++        [INPUT_BUTTON_RIGHT]  = PS2_MOUSE_BUTTON_RIGHT,
++        [INPUT_BUTTON_SIDE]   = PS2_MOUSE_BUTTON_SIDE,
++        [INPUT_BUTTON_EXTRA]  = PS2_MOUSE_BUTTON_EXTRA,
+     };
+     PS2MouseState *s = (PS2MouseState *)dev;
+     InputMoveEvent *move;
+diff --git a/include/hw/input/ps2.h b/include/hw/input/ps2.h
+index b9ceee4..0fec91c 100644
+--- a/include/hw/input/ps2.h
++++ b/include/hw/input/ps2.h
+@@ -25,6 +25,12 @@
+ #ifndef HW_PS2_H
+ #define HW_PS2_H
+ 
++#define PS2_MOUSE_BUTTON_LEFT   0x01
++#define PS2_MOUSE_BUTTON_MIDDLE 0x02
++#define PS2_MOUSE_BUTTON_RIGHT  0x04
++#define PS2_MOUSE_BUTTON_SIDE   0x08
++#define PS2_MOUSE_BUTTON_EXTRA  0x10
++
+ /* ps2.c */
+ void *ps2_kbd_init(void (*update_irq)(void *, int), void *update_arg);
+ void *ps2_mouse_init(void (*update_irq)(void *, int), void *update_arg);
+-- 
+1.8.3.1
