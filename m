@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYXnr-0000P2-II
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:58 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cYXnw-0000T4-E5
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:45:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYXnq-0001XA-Qe
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:55 -0500
-Date: Tue, 31 Jan 2017 10:36:43 +0000
+	(envelope-from <stefanha@redhat.com>) id 1cYXnv-0001YB-P5
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:45:00 -0500
+Date: Tue, 31 Jan 2017 11:01:14 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131103643.GC18804@stefanha-x1.localdomain>
+Message-ID: <20170131110114.GE18804@stefanha-x1.localdomain>
 References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-3-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-5-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Pk6IbRAofICFmK5e"
+	protocol="application/pgp-signature"; boundary="ey/N+yb7u/X9mFhi"
 Content-Disposition: inline
-In-Reply-To: <1482503344-6424-3-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 02/21] backup: init copy_bitmap from
- sync_bitmap for incremental
+In-Reply-To: <1482503344-6424-5-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 04/21] backup: use copy_bitmap in
+ incremental backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +29,37 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
 
 
---Pk6IbRAofICFmK5e
+--ey/N+yb7u/X9mFhi
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 23, 2016 at 05:28:45PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> +/* init copy_bitmap from sync_bitmap */
-> +static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
-> +{
-> +    int64_t sector;
-> +    BdrvDirtyBitmapIter *dbi;
-> +    uint32_t sect_gran =
-> +        bdrv_dirty_bitmap_granularity(job->sync_bitmap) >> BDRV_SECTOR_BITS;
-> +    int64_t sz = bdrv_dirty_bitmap_size(job->sync_bitmap);
-> +    int64_t sectors_per_cluster = cluster_size_sectors(job);
-> +    uint32_t cl_gran = MAX(1, sect_gran / sectors_per_cluster);
-> +
-> +    dbi = bdrv_dirty_iter_new(job->sync_bitmap, 0);
-> +    while ((sector = bdrv_dirty_iter_next(dbi)) != -1) {
-> +        int64_t cluster = sector / sectors_per_cluster;
-> +        int64_t next_sector = (cluster + cl_gran) * sectors_per_cluster;
-> +
-> +        hbitmap_set(job->copy_bitmap, cluster, cl_gran);
-> +
-> +        if (next_sector >= sz) {
-> +            break;
-> +        }
-> +
-> +        bdrv_set_dirty_iter(dbi, (cluster + cl_gran) * sectors_per_cluster);
+On Fri, Dec 23, 2016 at 05:28:47PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> We can use copy_bitmap instead of sync_bitmap. copy_bitmap is
+> initialized from sync_bitmap and it is more informative: we will not try
+> to process data, that is already in progress (by write notifier).
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 58 +++++++++++++++++++---------------------------------=
+------
+>  1 file changed, 19 insertions(+), 39 deletions(-)
 
-Simpler and clearer:
-bdrv_set_dirty_iter(dbi, next_sector);
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---Pk6IbRAofICFmK5e
+--ey/N+yb7u/X9mFhi
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYkGi7AAoJEJykq7OBq3PIlBMH/3H3YdtdWzQniNxMCelQQ34W
-7n8xFzRBr6aujbUrCDz2J9IN7P61geiOG+Bz1QP6SJXM8/xsMi7j4xsMZRTJ/GKe
-t1Dl4eqBTlu0Vqnz3p+o+8Xe9dX/ah8oDoHg1wJkmErSitTPPF1jAHxaohVwNDlA
-09xILZT8AvIi7DS7rJ+cqRUMGaE8Ls6EOY235+Dg7Cp1MXRTjcRogFCF8d2eGnOR
-XneTP1BzArSPuylwlQS96Ww9i577irXkN97nic3Cqn3+91YFtTdLRn2amogEGPkF
-92x0uwSKPBldLRW18rStocp2ueJbgjrAKesKt0dWGyPT+ATmiDBECoMbAMfkde4=
-=P2So
+iQEcBAEBAgAGBQJYkG56AAoJEJykq7OBq3PI2bcH/0/hcaEUiiKIaHg01r7+INP3
+Akkg8xYwUIpR1RboTJRPDVzsO6UclrVq6371CBOnz3nJjRWZDhVEq/7GupTi0Ol3
+ILr+Vq5fsDh44ToPs+onz53Oxk/ivIkJFOXq3MQIGRBwb/FNt9P2NBMA9oiUy6FO
+eGmhQt4QqASXwp2LGPHPyD0eY7zvUcKpb0AfuigjUBZnqaQwsQXFnQ588xqwe5U/
+MZFhqLCMwFtU9QKjCTXU3EIkPZSRJkLwG6pwpluCnK0ltlGbVNPYdwBhXhK2gdv+
+m0zr1T3Om/xkHnwKTSsrhe89DxWV4nIiM+RFEXZmfm2lQbgibkr4+EoOdiHLkgM=
+=r1lO
 -----END PGP SIGNATURE-----
 
---Pk6IbRAofICFmK5e--
+--ey/N+yb7u/X9mFhi--
