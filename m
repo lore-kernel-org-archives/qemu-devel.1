@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cYbDU-0001Nq-87
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:23:40 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbDU-0001OP-U2
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cYbDR-0001JY-NA
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cYbDP-0001Ir-Oa
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:23:36 -0500
-From: vijay.kilari@gmail.com
-Date: Tue, 31 Jan 2017 21:53:00 +0530
-Message-Id: <1485879782-6075-4-git-send-email-vijay.kilari@gmail.com>
-In-Reply-To: <1485879782-6075-1-git-send-email-vijay.kilari@gmail.com>
-References: <1485879782-6075-1-git-send-email-vijay.kilari@gmail.com>
-Subject: [Qemu-devel] [PATCH v7 RESEND 3/5] hw/intc/arm_gicv3_kvm: Implement
- get/put functions
+Received: from mx1.redhat.com ([209.132.183.28]:58302)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cYbDP-0001IW-EV
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:23:31 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 31 Jan 2017 20:21:12 +0400
+Message-Id: <20170131162122.29408-32-marcandre.lureau@redhat.com>
+In-Reply-To: <20170131162122.29408-1-marcandre.lureau@redhat.com>
+References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 31/41] char: move win-stdio into its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,668 +27,644 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, eric.auger@redhat.com
-Cc: p.fedin@samsung.com, marc.zyngier@arm.com, qemu-devel@nongnu.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-
-This actually implements pre_save and post_load methods for in-kernel
-vGICv3.
-
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM:
- * use decimal, not 0bnnn
- * fixed typo in names of ICC_APR0R_EL1 and ICC_AP1R_EL1
- * completely rearranged the get and put functions to read and write
-   the state in a natural order, rather than mixing distributor and
-   redistributor state together]
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-[Vijay:
- * Update macro KVM_VGIC_ATTR
- * Use 32 bit access for gicd and gicr
- * GICD_IROUTER, GICD_TYPER, GICR_PROPBASER and GICR_PENDBASER reg
-   access  are changed from 64-bit to 32-bit access
- * Add ICC_SRE_EL1 save and restore
- * Dropped translate_fn mechanism and coded functions to handle
-   save and restore of edge_trigger and priority
- * Number of APnR register saved/restored based on number of
-   priority bits supported]
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Eric Blake <eblake@redhat.com>
 ---
----
- hw/intc/arm_gicv3_kvm.c  | 563 ++++++++++++++++++++++++++++++++++++++++++++++-
- hw/intc/gicv3_internal.h |   1 +
- 2 files changed, 553 insertions(+), 11 deletions(-)
+ chardev/char-win-stdio.h |  29 ++++++
+ chardev/char-win-stdio.c | 266 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+ chardev/char.c           | 231 +---------------------------------------
+ chardev/Makefile.objs    |   1 +
+ 4 files changed, 298 insertions(+), 229 deletions(-)
+ create mode 100644 chardev/char-win-stdio.h
+ create mode 100644 chardev/char-win-stdio.c
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 199a439..77af32d 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -23,8 +23,10 @@
- #include "qapi/error.h"
- #include "hw/intc/arm_gicv3_common.h"
- #include "hw/sysbus.h"
-+#include "qemu/error-report.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
-+#include "gicv3_internal.h"
- #include "vgic_common.h"
- #include "migration/migration.h"
- 
-@@ -44,6 +46,32 @@
- #define KVM_ARM_GICV3_GET_CLASS(obj) \
-      OBJECT_GET_CLASS(KVMARMGICv3Class, (obj), TYPE_KVM_ARM_GICV3)
- 
-+#define   KVM_DEV_ARM_VGIC_SYSREG(op0, op1, crn, crm, op2)         \
-+                             (ARM64_SYS_REG_SHIFT_MASK(op0, OP0) | \
-+                              ARM64_SYS_REG_SHIFT_MASK(op1, OP1) | \
-+                              ARM64_SYS_REG_SHIFT_MASK(crn, CRN) | \
-+                              ARM64_SYS_REG_SHIFT_MASK(crm, CRM) | \
-+                              ARM64_SYS_REG_SHIFT_MASK(op2, OP2))
-+
-+#define ICC_PMR_EL1     \
-+    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 4, 6, 0)
-+#define ICC_BPR0_EL1    \
-+    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 8, 3)
-+#define ICC_AP0R_EL1(n) \
-+    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 8, 4 | n)
-+#define ICC_AP1R_EL1(n) \
-+    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 9, n)
-+#define ICC_BPR1_EL1    \
-+    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 12, 3)
-+#define ICC_CTLR_EL1    \
-+    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 12, 4)
-+#define ICC_SRE_EL1 \
-+    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 12, 5)
-+#define ICC_IGRPEN0_EL1 \
-+    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 12, 6)
-+#define ICC_IGRPEN1_EL1 \
-+    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 12, 7)
-+
- typedef struct KVMARMGICv3Class {
-     ARMGICv3CommonClass parent_class;
-     DeviceRealize parent_realize;
-@@ -57,16 +85,523 @@ static void kvm_arm_gicv3_set_irq(void *opaque, int irq, int level)
-     kvm_arm_gic_set_irq(s->num_irq, irq, level);
- }
- 
-+#define KVM_VGIC_ATTR(reg, typer) \
-+    ((typer & KVM_DEV_ARM_VGIC_V3_MPIDR_MASK) | (reg))
-+
-+static inline void kvm_gicd_access(GICv3State *s, int offset,
-+                                   uint32_t *val, bool write)
-+{
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_DIST_REGS,
-+                      KVM_VGIC_ATTR(offset, 0),
-+                      val, write);
-+}
-+
-+static inline void kvm_gicr_access(GICv3State *s, int offset, int cpu,
-+                                   uint32_t *val, bool write)
-+{
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_REDIST_REGS,
-+                      KVM_VGIC_ATTR(offset, s->cpu[cpu].gicr_typer),
-+                      val, write);
-+}
-+
-+static inline void kvm_gicc_access(GICv3State *s, uint64_t reg, int cpu,
-+                                   uint64_t *val, bool write)
-+{
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
-+                      KVM_VGIC_ATTR(reg, s->cpu[cpu].gicr_typer),
-+                      val, write);
-+}
-+
-+static inline void kvm_gic_line_level_access(GICv3State *s, int irq, int cpu,
-+                                             uint32_t *val, bool write)
-+{
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO,
-+                      KVM_VGIC_ATTR(irq, s->cpu[cpu].gicr_typer) |
-+                      (VGIC_LEVEL_INFO_LINE_LEVEL <<
-+                       KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT),
-+                      val, write);
-+}
-+
-+/* Loop through each distributor IRQ related register; since bits
-+ * corresponding to SPIs and PPIs are RAZ/WI when affinity routing
-+ * is enabled, we skip those.
+diff --git a/chardev/char-win-stdio.h b/chardev/char-win-stdio.h
+new file mode 100644
+index 0000000000..d7314f734d
+--- /dev/null
++++ b/chardev/char-win-stdio.h
+@@ -0,0 +1,29 @@
++/*
++ * QEMU System Emulator
++ *
++ * Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
 + */
-+#define for_each_dist_irq_reg(_irq, _max, _field_width) \
-+    for (_irq = GIC_INTERNAL; _irq < _max; _irq += (32 / _field_width))
++#ifndef CHAR_WIN_STDIO_H
++#define CHAR_WIN_STDIO_H
 +
-+static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
++#define TYPE_CHARDEV_WIN_STDIO "chardev-win-stdio"
++
++#endif /* CHAR_WIN_STDIO_H */
+diff --git a/chardev/char-win-stdio.c b/chardev/char-win-stdio.c
+new file mode 100644
+index 0000000000..eb44afc17a
+--- /dev/null
++++ b/chardev/char-win-stdio.c
+@@ -0,0 +1,266 @@
++/*
++ * QEMU System Emulator
++ *
++ * Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "char-win.h"
++#include "char-win-stdio.h"
++
++typedef struct {
++    Chardev parent;
++    HANDLE  hStdIn;
++    HANDLE  hInputReadyEvent;
++    HANDLE  hInputDoneEvent;
++    HANDLE  hInputThread;
++    uint8_t win_stdio_buf;
++} WinStdioChardev;
++
++#define WIN_STDIO_CHARDEV(obj)                                          =
+\
++    OBJECT_CHECK(WinStdioChardev, (obj), TYPE_CHARDEV_WIN_STDIO)
++
++static void win_stdio_wait_func(void *opaque)
 +{
-+    uint32_t reg, *field;
-+    int irq;
-+
-+    field = (uint32_t *)bmp;
-+    for_each_dist_irq_reg(irq, s->num_irq, 8) {
-+        kvm_gicd_access(s, offset, &reg, false);
-+        *field = reg;
-+        offset += 4;
-+        field++;
-+    }
-+}
-+
-+static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
-+{
-+    uint32_t reg, *field;
-+    int irq;
-+
-+    field = (uint32_t *)bmp;
-+    for_each_dist_irq_reg(irq, s->num_irq, 8) {
-+        reg = *field;
-+        kvm_gicd_access(s, offset, &reg, true);
-+        offset += 4;
-+        field++;
-+    }
-+}
-+
-+static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
-+                                      uint32_t *bmp)
-+{
-+    uint32_t reg;
-+    int irq;
-+
-+    for_each_dist_irq_reg(irq, s->num_irq, 2) {
-+        kvm_gicd_access(s, offset, &reg, false);
-+        reg = half_unshuffle32(reg >> 1);
-+        if (irq % 32 != 0) {
-+            reg = (reg << 16);
-+        }
-+        *gic_bmp_ptr32(bmp, irq) |=  reg;
-+        offset += 4;
-+    }
-+}
-+
-+static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
-+                                      uint32_t *bmp)
-+{
-+    uint32_t reg;
-+    int irq;
-+
-+    for_each_dist_irq_reg(irq, s->num_irq, 2) {
-+        reg = *gic_bmp_ptr32(bmp, irq);
-+        if (irq % 32 != 0) {
-+            reg = (reg & 0xffff0000) >> 16;
-+        } else {
-+            reg = reg & 0xffff;
-+        }
-+        reg = half_shuffle32(reg) << 1;
-+        kvm_gicd_access(s, offset, &reg, true);
-+        offset += 4;
-+    }
-+}
-+
-+static void kvm_gic_get_line_level_bmp(GICv3State *s, uint32_t *bmp)
-+{
-+    uint32_t reg;
-+    int irq;
-+
-+    for_each_dist_irq_reg(irq, s->num_irq, 1) {
-+        kvm_gic_line_level_access(s, irq, 0, &reg, false);
-+        *gic_bmp_ptr32(bmp, irq) = reg;
-+    }
-+}
-+
-+static void kvm_gic_put_line_level_bmp(GICv3State *s, uint32_t *bmp)
-+{
-+    uint32_t reg;
-+    int irq;
-+
-+    for_each_dist_irq_reg(irq, s->num_irq, 1) {
-+        reg = *gic_bmp_ptr32(bmp, irq);
-+        kvm_gic_line_level_access(s, irq, 0, &reg, true);
-+    }
-+}
-+
-+/* Read a bitmap register group from the kernel VGIC. */
-+static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
-+{
-+    uint32_t reg;
-+    int irq;
-+
-+    for_each_dist_irq_reg(irq, s->num_irq, 1) {
-+        kvm_gicd_access(s, offset, &reg, false);
-+        *gic_bmp_ptr32(bmp, irq) = reg;
-+        offset += 4;
-+    }
-+}
-+
-+static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
-+                            uint32_t clroffset, uint32_t *bmp)
-+{
-+    uint32_t reg;
-+    int irq;
-+
-+    for_each_dist_irq_reg(irq, s->num_irq, 1) {
-+        /* If this bitmap is a set/clear register pair, first write to the
-+         * clear-reg to clear all bits before using the set-reg to write
-+         * the 1 bits.
-+         */
-+        if (clroffset != 0) {
-+            reg = 0;
-+            kvm_gicd_access(s, clroffset, &reg, true);
-+        }
-+        reg = *gic_bmp_ptr32(bmp, irq);
-+        kvm_gicd_access(s, offset, &reg, true);
-+        offset += 4;
-+    }
-+}
-+
-+static void kvm_arm_gicv3_check(GICv3State *s)
-+{
-+    uint32_t reg;
-+    uint32_t num_irq;
-+
-+    /* Sanity checking s->num_irq */
-+    kvm_gicd_access(s, GICD_TYPER, &reg, false);
-+    num_irq = ((reg & 0x1f) + 1) * 32;
-+
-+    if (num_irq < s->num_irq) {
-+        error_report("Model requests %u IRQs, but kernel supports max %u",
-+                     s->num_irq, num_irq);
-+        abort();
-+    }
-+}
-+
- static void kvm_arm_gicv3_put(GICv3State *s)
- {
--    /* TODO */
--    DPRINTF("Cannot put kernel gic state, no kernel interface\n");
-+    uint32_t regl, regh, reg;
-+    uint64_t reg64, redist_typer;
-+    int ncpu, i;
-+
-+    kvm_arm_gicv3_check(s);
-+
-+    kvm_gicr_access(s, GICR_TYPER, 0, &regl, false);
-+    kvm_gicr_access(s, GICR_TYPER + 4, 0, &regh, false);
-+    redist_typer = ((uint64_t)regh << 32) | regl;
-+
-+    reg = s->gicd_ctlr;
-+    kvm_gicd_access(s, GICD_CTLR, &reg, true);
-+
-+    if (redist_typer & GICR_TYPER_PLPIS) {
-+        /* Set base addresses before LPIs are enabled by GICR_CTLR write */
-+        for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
-+            GICv3CPUState *c = &s->cpu[ncpu];
-+
-+            reg64 = c->gicr_propbaser;
-+            regl = (uint32_t)reg64;
-+            kvm_gicr_access(s, GICR_PROPBASER, ncpu, &regl, true);
-+            regh = (uint32_t)(reg64 >> 32);
-+            kvm_gicr_access(s, GICR_PROPBASER + 4, ncpu, &regh, true);
-+
-+            reg64 = c->gicr_pendbaser;
-+            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
-+                /* Setting PTZ is advised if LPIs are disabled, to reduce
-+                 * GIC initialization time.
-+                 */
-+                reg64 |= GICR_PENDBASER_PTZ;
-+            }
-+            regl = (uint32_t)reg64;
-+            kvm_gicr_access(s, GICR_PENDBASER, ncpu, &regl, true);
-+            regh = (uint32_t)(reg64 >> 32);
-+            kvm_gicr_access(s, GICR_PENDBASER + 4, ncpu, &regh, true);
-+        }
-+    }
-+
-+    /* Redistributor state (one per CPU) */
-+
-+    for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
-+        GICv3CPUState *c = &s->cpu[ncpu];
-+
-+        reg = c->gicr_ctlr;
-+        kvm_gicr_access(s, GICR_CTLR, ncpu, &reg, true);
-+
-+        reg = c->gicr_statusr[GICV3_NS];
-+        kvm_gicr_access(s, GICR_STATUSR, ncpu, &reg, true);
-+
-+        reg = c->gicr_waker;
-+        kvm_gicr_access(s, GICR_WAKER, ncpu, &reg, true);
-+
-+        reg = c->gicr_igroupr0;
-+        kvm_gicr_access(s, GICR_IGROUPR0, ncpu, &reg, true);
-+
-+        reg = ~0;
-+        kvm_gicr_access(s, GICR_ICENABLER0, ncpu, &reg, true);
-+        reg = c->gicr_ienabler0;
-+        kvm_gicr_access(s, GICR_ISENABLER0, ncpu, &reg, true);
-+
-+        /* Restore config before pending so we treat level/edge correctly */
-+        reg = half_shuffle32(c->edge_trigger >> 16) << 1;
-+        kvm_gicr_access(s, GICR_ICFGR1, ncpu, &reg, true);
-+
-+        reg = c->level;
-+        kvm_gic_line_level_access(s, 0, ncpu, &reg, true);
-+
-+        reg = ~0;
-+        kvm_gicr_access(s, GICR_ICPENDR0, ncpu, &reg, true);
-+        reg = c->gicr_ipendr0;
-+        kvm_gicr_access(s, GICR_ISPENDR0, ncpu, &reg, true);
-+
-+        reg = ~0;
-+        kvm_gicr_access(s, GICR_ICACTIVER0, ncpu, &reg, true);
-+        reg = c->gicr_iactiver0;
-+        kvm_gicr_access(s, GICR_ISACTIVER0, ncpu, &reg, true);
-+
-+        for (i = 0; i < GIC_INTERNAL; i += 4) {
-+            reg = c->gicr_ipriorityr[i] |
-+                (c->gicr_ipriorityr[i + 1] << 8) |
-+                (c->gicr_ipriorityr[i + 2] << 16) |
-+                (c->gicr_ipriorityr[i + 3] << 24);
-+            kvm_gicr_access(s, GICR_IPRIORITYR + i, ncpu, &reg, true);
-+        }
-+    }
-+
-+    /* Distributor state (shared between all CPUs */
-+    reg = s->gicd_statusr[GICV3_NS];
-+    kvm_gicd_access(s, GICD_STATUSR, &reg, true);
-+
-+    /* s->enable bitmap -> GICD_ISENABLERn */
-+    kvm_dist_putbmp(s, GICD_ISENABLER, GICD_ICENABLER, s->enabled);
-+
-+    /* s->group bitmap -> GICD_IGROUPRn */
-+    kvm_dist_putbmp(s, GICD_IGROUPR, 0, s->group);
-+
-+    /* Restore targets before pending to ensure the pending state is set on
-+     * the appropriate CPU interfaces in the kernel
-+     */
-+
-+    /* s->gicd_irouter[irq] -> GICD_IROUTERn
-+     * We can't use kvm_dist_put() here because the registers are 64-bit
-+     */
-+    for (i = GIC_INTERNAL; i < s->num_irq; i++) {
-+        uint32_t offset;
-+
-+        offset = GICD_IROUTER + (sizeof(uint32_t) * i);
-+        reg = (uint32_t)s->gicd_irouter[i];
-+        kvm_gicd_access(s, offset, &reg, true);
-+
-+        offset = GICD_IROUTER + (sizeof(uint32_t) * i) + 4;
-+        reg = (uint32_t)(s->gicd_irouter[i] >> 32);
-+        kvm_gicd_access(s, offset, &reg, true);
-+    }
-+
-+    /* s->trigger bitmap -> GICD_ICFGRn
-+     * (restore configuration registers before pending IRQs so we treat
-+     * level/edge correctly)
-+     */
-+    kvm_dist_put_edge_trigger(s, GICD_ICFGR, s->edge_trigger);
-+
-+    /* s->level bitmap ->  line_level */
-+    kvm_gic_put_line_level_bmp(s, s->level);
-+
-+    /* s->pending bitmap -> GICD_ISPENDRn */
-+    kvm_dist_putbmp(s, GICD_ISPENDR, GICD_ICPENDR, s->pending);
-+
-+    /* s->active bitmap -> GICD_ISACTIVERn */
-+    kvm_dist_putbmp(s, GICD_ISACTIVER, GICD_ICACTIVER, s->active);
-+
-+    /* s->gicd_ipriority[] -> GICD_IPRIORITYRn */
-+    kvm_dist_put_priority(s, GICD_IPRIORITYR, s->gicd_ipriority);
-+
-+    /* CPU Interface state (one per CPU) */
-+
-+    for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
-+        GICv3CPUState *c = &s->cpu[ncpu];
-+        int num_pri_bits;
-+
-+        kvm_gicc_access(s, ICC_SRE_EL1, ncpu, &c->icc_sre_el1, true);
-+        kvm_gicc_access(s, ICC_CTLR_EL1, ncpu,
-+                        &c->icc_ctlr_el1[GICV3_NS], true);
-+        kvm_gicc_access(s, ICC_IGRPEN0_EL1, ncpu,
-+                        &c->icc_igrpen[GICV3_G0], true);
-+        kvm_gicc_access(s, ICC_IGRPEN1_EL1, ncpu,
-+                        &c->icc_igrpen[GICV3_G1NS], true);
-+        kvm_gicc_access(s, ICC_PMR_EL1, ncpu, &c->icc_pmr_el1, true);
-+        kvm_gicc_access(s, ICC_BPR0_EL1, ncpu, &c->icc_bpr[GICV3_G0], true);
-+        kvm_gicc_access(s, ICC_BPR1_EL1, ncpu, &c->icc_bpr[GICV3_G1NS], true);
-+
-+        num_pri_bits = ((c->icc_ctlr_el1[GICV3_NS] &
-+                        ICC_CTLR_EL1_PRIBITS_MASK) >>
-+                        ICC_CTLR_EL1_PRIBITS_SHIFT) + 1;
-+
-+        switch (num_pri_bits) {
-+        case 7:
-+            reg64 = c->icc_apr[GICV3_G0][3];
-+            kvm_gicc_access(s, ICC_AP0R_EL1(3), ncpu, &reg64, true);
-+            reg64 = c->icc_apr[GICV3_G0][2];
-+            kvm_gicc_access(s, ICC_AP0R_EL1(2), ncpu, &reg64, true);
-+        case 6:
-+            reg64 = c->icc_apr[GICV3_G0][1];
-+            kvm_gicc_access(s, ICC_AP0R_EL1(1), ncpu, &reg64, true);
-+        default:
-+            reg64 = c->icc_apr[GICV3_G0][0];
-+            kvm_gicc_access(s, ICC_AP0R_EL1(0), ncpu, &reg64, true);
-+        }
-+
-+        switch (num_pri_bits) {
-+        case 7:
-+            reg64 = c->icc_apr[GICV3_G1NS][3];
-+            kvm_gicc_access(s, ICC_AP1R_EL1(3), ncpu, &reg64, true);
-+            reg64 = c->icc_apr[GICV3_G1NS][2];
-+            kvm_gicc_access(s, ICC_AP1R_EL1(2), ncpu, &reg64, true);
-+        case 6:
-+            reg64 = c->icc_apr[GICV3_G1NS][1];
-+            kvm_gicc_access(s, ICC_AP1R_EL1(1), ncpu, &reg64, true);
-+        default:
-+            reg64 = c->icc_apr[GICV3_G1NS][0];
-+            kvm_gicc_access(s, ICC_AP1R_EL1(0), ncpu, &reg64, true);
-+        }
-+    }
- }
- 
- static void kvm_arm_gicv3_get(GICv3State *s)
- {
--    /* TODO */
--    DPRINTF("Cannot get kernel gic state, no kernel interface\n");
-+    uint32_t regl, regh, reg;
-+    uint64_t reg64, redist_typer;
-+    int ncpu, i;
-+
-+    kvm_arm_gicv3_check(s);
-+
-+    kvm_gicr_access(s, GICR_TYPER, 0, &regl, false);
-+    kvm_gicr_access(s, GICR_TYPER + 4, 0, &regh, false);
-+    redist_typer = ((uint64_t)regh << 32) | regl;
-+
-+    kvm_gicd_access(s, GICD_CTLR, &reg, false);
-+    s->gicd_ctlr = reg;
-+
-+    /* Redistributor state (one per CPU) */
-+
-+    for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
-+        GICv3CPUState *c = &s->cpu[ncpu];
-+
-+        kvm_gicr_access(s, GICR_CTLR, ncpu, &reg, false);
-+        c->gicr_ctlr = reg;
-+
-+        kvm_gicr_access(s, GICR_STATUSR, ncpu, &reg, false);
-+        c->gicr_statusr[GICV3_NS] = reg;
-+
-+        kvm_gicr_access(s, GICR_WAKER, ncpu, &reg, false);
-+        c->gicr_waker = reg;
-+
-+        kvm_gicr_access(s, GICR_IGROUPR0, ncpu, &reg, false);
-+        c->gicr_igroupr0 = reg;
-+        kvm_gicr_access(s, GICR_ISENABLER0, ncpu, &reg, false);
-+        c->gicr_ienabler0 = reg;
-+        kvm_gicr_access(s, GICR_ICFGR1, ncpu, &reg, false);
-+        c->edge_trigger = half_unshuffle32(reg >> 1) << 16;
-+        kvm_gic_line_level_access(s, 0, ncpu, &reg, false);
-+        c->level = reg;
-+        kvm_gicr_access(s, GICR_ISPENDR0, ncpu, &reg, false);
-+        c->gicr_ipendr0 = reg;
-+        kvm_gicr_access(s, GICR_ISACTIVER0, ncpu, &reg, false);
-+        c->gicr_iactiver0 = reg;
-+
-+        for (i = 0; i < GIC_INTERNAL; i += 4) {
-+            kvm_gicr_access(s, GICR_IPRIORITYR + i, ncpu, &reg, false);
-+            c->gicr_ipriorityr[i] = extract32(reg, 0, 8);
-+            c->gicr_ipriorityr[i + 1] = extract32(reg, 8, 8);
-+            c->gicr_ipriorityr[i + 2] = extract32(reg, 16, 8);
-+            c->gicr_ipriorityr[i + 3] = extract32(reg, 24, 8);
-+        }
-+    }
-+
-+    if (redist_typer & GICR_TYPER_PLPIS) {
-+        for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
-+            GICv3CPUState *c = &s->cpu[ncpu];
-+
-+            kvm_gicr_access(s, GICR_PROPBASER, ncpu, &regl, false);
-+            kvm_gicr_access(s, GICR_PROPBASER + 4, ncpu, &regh, false);
-+            c->gicr_propbaser = ((uint64_t)regh << 32) | regl;
-+
-+            kvm_gicr_access(s, GICR_PENDBASER, ncpu, &regl, false);
-+            kvm_gicr_access(s, GICR_PENDBASER + 4, ncpu, &regh, false);
-+            c->gicr_pendbaser = ((uint64_t)regh << 32) | regl;
-+        }
-+    }
-+
-+    /* Distributor state (shared between all CPUs */
-+
-+    kvm_gicd_access(s, GICD_STATUSR, &reg, false);
-+    s->gicd_statusr[GICV3_NS] = reg;
-+
-+    /* GICD_IGROUPRn -> s->group bitmap */
-+    kvm_dist_getbmp(s, GICD_IGROUPR, s->group);
-+
-+    /* GICD_ISENABLERn -> s->enabled bitmap */
-+    kvm_dist_getbmp(s, GICD_ISENABLER, s->enabled);
-+
-+    /* Line level of irq */
-+    kvm_gic_get_line_level_bmp(s, s->level);
-+    /* GICD_ISPENDRn -> s->pending bitmap */
-+    kvm_dist_getbmp(s, GICD_ISPENDR, s->pending);
-+
-+    /* GICD_ISACTIVERn -> s->active bitmap */
-+    kvm_dist_getbmp(s, GICD_ISACTIVER, s->active);
-+
-+    /* GICD_ICFGRn -> s->trigger bitmap */
-+    kvm_dist_get_edge_trigger(s, GICD_ICFGR, s->edge_trigger);
-+
-+    /* GICD_IPRIORITYRn -> s->gicd_ipriority[] */
-+    kvm_dist_get_priority(s, GICD_IPRIORITYR, s->gicd_ipriority);
-+
-+    /* GICD_IROUTERn -> s->gicd_irouter[irq] */
-+    for (i = GIC_INTERNAL; i < s->num_irq; i++) {
-+        uint32_t offset;
-+
-+        offset = GICD_IROUTER + (sizeof(uint32_t) * i);
-+        kvm_gicd_access(s, offset, &regl, false);
-+        offset = GICD_IROUTER + (sizeof(uint32_t) * i) + 4;
-+        kvm_gicd_access(s, offset, &regh, false);
-+        s->gicd_irouter[i] = ((uint64_t)regh << 32) | regl;
-+    }
-+
-+    /*****************************************************************
-+     * CPU Interface(s) State
-+     */
-+
-+    for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
-+        GICv3CPUState *c = &s->cpu[ncpu];
-+        int num_pri_bits;
-+
-+        kvm_gicc_access(s, ICC_SRE_EL1, ncpu, &c->icc_sre_el1, false);
-+        kvm_gicc_access(s, ICC_CTLR_EL1, ncpu,
-+                        &c->icc_ctlr_el1[GICV3_NS], false);
-+        kvm_gicc_access(s, ICC_IGRPEN0_EL1, ncpu,
-+                        &c->icc_igrpen[GICV3_G0], false);
-+        kvm_gicc_access(s, ICC_IGRPEN1_EL1, ncpu,
-+                        &c->icc_igrpen[GICV3_G1NS], false);
-+        kvm_gicc_access(s, ICC_PMR_EL1, ncpu, &c->icc_pmr_el1, false);
-+        kvm_gicc_access(s, ICC_BPR0_EL1, ncpu, &c->icc_bpr[GICV3_G0], false);
-+        kvm_gicc_access(s, ICC_BPR1_EL1, ncpu, &c->icc_bpr[GICV3_G1NS], false);
-+        num_pri_bits = ((c->icc_ctlr_el1[GICV3_NS] &
-+                        ICC_CTLR_EL1_PRIBITS_MASK) >>
-+                        ICC_CTLR_EL1_PRIBITS_SHIFT) + 1;
-+
-+        switch (num_pri_bits) {
-+        case 7:
-+            kvm_gicc_access(s, ICC_AP0R_EL1(3), ncpu, &reg64, false);
-+            c->icc_apr[GICV3_G0][3] = reg64;
-+            kvm_gicc_access(s, ICC_AP0R_EL1(2), ncpu, &reg64, false);
-+            c->icc_apr[GICV3_G0][2] = reg64;
-+        case 6:
-+            kvm_gicc_access(s, ICC_AP0R_EL1(1), ncpu, &reg64, false);
-+            c->icc_apr[GICV3_G0][1] = reg64;
-+        default:
-+            kvm_gicc_access(s, ICC_AP0R_EL1(0), ncpu, &reg64, false);
-+            c->icc_apr[GICV3_G0][0] = reg64;
-+        }
-+
-+        switch (num_pri_bits) {
-+        case 7:
-+            kvm_gicc_access(s, ICC_AP1R_EL1(3), ncpu, &reg64, false);
-+            c->icc_apr[GICV3_G1NS][3] = reg64;
-+            kvm_gicc_access(s, ICC_AP1R_EL1(2), ncpu, &reg64, false);
-+            c->icc_apr[GICV3_G1NS][2] = reg64;
-+        case 6:
-+            kvm_gicc_access(s, ICC_AP1R_EL1(1), ncpu, &reg64, false);
-+            c->icc_apr[GICV3_G1NS][1] = reg64;
-+        default:
-+            kvm_gicc_access(s, ICC_AP1R_EL1(0), ncpu, &reg64, false);
-+            c->icc_apr[GICV3_G1NS][0] = reg64;
-+        }
-+    }
- }
- 
- static void kvm_arm_gicv3_reset(DeviceState *dev)
-@@ -77,6 +612,12 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
-     DPRINTF("Reset\n");
- 
-     kgc->parent_reset(dev);
-+
-+    if (s->migration_blocker) {
-+        DPRINTF("Cannot put kernel gic state, no kernel interface\n");
++    Chardev *chr =3D CHARDEV(opaque);
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(opaque);
++    INPUT_RECORD       buf[4];
++    int                ret;
++    DWORD              dwSize;
++    int                i;
++
++    ret =3D ReadConsoleInput(stdio->hStdIn, buf, ARRAY_SIZE(buf), &dwSiz=
+e);
++
++    if (!ret) {
++        /* Avoid error storm */
++        qemu_del_wait_object(stdio->hStdIn, NULL, NULL);
 +        return;
 +    }
 +
-     kvm_arm_gicv3_put(s);
- }
- 
-@@ -122,13 +663,6 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-     kvm_arm_register_device(&s->iomem_redist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
-                             KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd);
- 
--    /* Block migration of a KVM GICv3 device: the API for saving and restoring
--     * the state in the kernel is not yet finalised in the kernel or
--     * implemented in QEMU.
--     */
--    error_setg(&s->migration_blocker, "vGICv3 migration is not implemented");
--    migrate_add_blocker(s->migration_blocker);
--
-     if (kvm_has_gsi_routing()) {
-         /* set up irq routing */
-         kvm_init_irq_routing(kvm_state);
-@@ -140,6 +674,13 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
- 
-         kvm_irqchip_commit_routes(kvm_state);
-     }
++    for (i =3D 0; i < dwSize; i++) {
++        KEY_EVENT_RECORD *kev =3D &buf[i].Event.KeyEvent;
 +
-+    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_DIST_REGS,
-+                               GICD_CTLR)) {
-+        error_setg(&s->migration_blocker, "This operating system kernel does "
-+                                          "not support vGICv3 migration");
-+        migrate_add_blocker(s->migration_blocker);
++        if (buf[i].EventType =3D=3D KEY_EVENT && kev->bKeyDown) {
++            int j;
++            if (kev->uChar.AsciiChar !=3D 0) {
++                for (j =3D 0; j < kev->wRepeatCount; j++) {
++                    if (qemu_chr_be_can_write(chr)) {
++                        uint8_t c =3D kev->uChar.AsciiChar;
++                        qemu_chr_be_write(chr, &c, 1);
++                    }
++                }
++            }
++        }
 +    }
++}
++
++static DWORD WINAPI win_stdio_thread(LPVOID param)
++{
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(param);
++    int                ret;
++    DWORD              dwSize;
++
++    while (1) {
++
++        /* Wait for one byte */
++        ret =3D ReadFile(stdio->hStdIn, &stdio->win_stdio_buf, 1, &dwSiz=
+e, NULL);
++
++        /* Exit in case of error, continue if nothing read */
++        if (!ret) {
++            break;
++        }
++        if (!dwSize) {
++            continue;
++        }
++
++        /* Some terminal emulator returns \r\n for Enter, just pass \n *=
+/
++        if (stdio->win_stdio_buf =3D=3D '\r') {
++            continue;
++        }
++
++        /* Signal the main thread and wait until the byte was eaten */
++        if (!SetEvent(stdio->hInputReadyEvent)) {
++            break;
++        }
++        if (WaitForSingleObject(stdio->hInputDoneEvent, INFINITE)
++            !=3D WAIT_OBJECT_0) {
++            break;
++        }
++    }
++
++    qemu_del_wait_object(stdio->hInputReadyEvent, NULL, NULL);
++    return 0;
++}
++
++static void win_stdio_thread_wait_func(void *opaque)
++{
++    Chardev *chr =3D CHARDEV(opaque);
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(opaque);
++
++    if (qemu_chr_be_can_write(chr)) {
++        qemu_chr_be_write(chr, &stdio->win_stdio_buf, 1);
++    }
++
++    SetEvent(stdio->hInputDoneEvent);
++}
++
++static void qemu_chr_set_echo_win_stdio(Chardev *chr, bool echo)
++{
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
++    DWORD              dwMode =3D 0;
++
++    GetConsoleMode(stdio->hStdIn, &dwMode);
++
++    if (echo) {
++        SetConsoleMode(stdio->hStdIn, dwMode | ENABLE_ECHO_INPUT);
++    } else {
++        SetConsoleMode(stdio->hStdIn, dwMode & ~ENABLE_ECHO_INPUT);
++    }
++}
++
++static void qemu_chr_open_stdio(Chardev *chr,
++                                ChardevBackend *backend,
++                                bool *be_opened,
++                                Error **errp)
++{
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
++    DWORD              dwMode;
++    int                is_console =3D 0;
++
++    stdio->hStdIn =3D GetStdHandle(STD_INPUT_HANDLE);
++    if (stdio->hStdIn =3D=3D INVALID_HANDLE_VALUE) {
++        error_setg(errp, "cannot open stdio: invalid handle");
++        return;
++    }
++
++    is_console =3D GetConsoleMode(stdio->hStdIn, &dwMode) !=3D 0;
++
++    if (is_console) {
++        if (qemu_add_wait_object(stdio->hStdIn,
++                                 win_stdio_wait_func, chr)) {
++            error_setg(errp, "qemu_add_wait_object: failed");
++            goto err1;
++        }
++    } else {
++        DWORD   dwId;
++
++        stdio->hInputReadyEvent =3D CreateEvent(NULL, FALSE, FALSE, NULL=
+);
++        stdio->hInputDoneEvent  =3D CreateEvent(NULL, FALSE, FALSE, NULL=
+);
++        if (stdio->hInputReadyEvent =3D=3D INVALID_HANDLE_VALUE
++            || stdio->hInputDoneEvent =3D=3D INVALID_HANDLE_VALUE) {
++            error_setg(errp, "cannot create event");
++            goto err2;
++        }
++        if (qemu_add_wait_object(stdio->hInputReadyEvent,
++                                 win_stdio_thread_wait_func, chr)) {
++            error_setg(errp, "qemu_add_wait_object: failed");
++            goto err2;
++        }
++        stdio->hInputThread     =3D CreateThread(NULL, 0, win_stdio_thre=
+ad,
++                                               chr, 0, &dwId);
++
++        if (stdio->hInputThread =3D=3D INVALID_HANDLE_VALUE) {
++            error_setg(errp, "cannot create stdio thread");
++            goto err3;
++        }
++    }
++
++    dwMode |=3D ENABLE_LINE_INPUT;
++
++    if (is_console) {
++        /* set the terminal in raw mode */
++        /* ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS */
++        dwMode |=3D ENABLE_PROCESSED_INPUT;
++    }
++
++    SetConsoleMode(stdio->hStdIn, dwMode);
++
++    qemu_chr_set_echo_win_stdio(chr, false);
++
++    return;
++
++err3:
++    qemu_del_wait_object(stdio->hInputReadyEvent, NULL, NULL);
++err2:
++    CloseHandle(stdio->hInputReadyEvent);
++    CloseHandle(stdio->hInputDoneEvent);
++err1:
++    qemu_del_wait_object(stdio->hStdIn, NULL, NULL);
++}
++
++static void char_win_stdio_finalize(Object *obj)
++{
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(obj);
++
++    if (stdio->hInputReadyEvent !=3D INVALID_HANDLE_VALUE) {
++        CloseHandle(stdio->hInputReadyEvent);
++    }
++    if (stdio->hInputDoneEvent !=3D INVALID_HANDLE_VALUE) {
++        CloseHandle(stdio->hInputDoneEvent);
++    }
++    if (stdio->hInputThread !=3D INVALID_HANDLE_VALUE) {
++        TerminateThread(stdio->hInputThread, 0);
++    }
++}
++
++static int win_stdio_write(Chardev *chr, const uint8_t *buf, int len)
++{
++    HANDLE  hStdOut =3D GetStdHandle(STD_OUTPUT_HANDLE);
++    DWORD   dwSize;
++    int     len1;
++
++    len1 =3D len;
++
++    while (len1 > 0) {
++        if (!WriteFile(hStdOut, buf, len1, &dwSize, NULL)) {
++            break;
++        }
++        buf  +=3D dwSize;
++        len1 -=3D dwSize;
++    }
++
++    return len - len1;
++}
++
++static void char_win_stdio_class_init(ObjectClass *oc, void *data)
++{
++    ChardevClass *cc =3D CHARDEV_CLASS(oc);
++
++    cc->open =3D qemu_chr_open_stdio;
++    cc->chr_write =3D win_stdio_write;
++    cc->chr_set_echo =3D qemu_chr_set_echo_win_stdio;
++}
++
++static const TypeInfo char_win_stdio_type_info =3D {
++    .name =3D TYPE_CHARDEV_WIN_STDIO,
++    .parent =3D TYPE_CHARDEV,
++    .instance_size =3D sizeof(WinStdioChardev),
++    .instance_finalize =3D char_win_stdio_finalize,
++    .class_init =3D char_win_stdio_class_init,
++    .abstract =3D true,
++};
++
++static void register_types(void)
++{
++    type_register_static(&char_win_stdio_type_info);
++}
++
++type_init(register_types);
+diff --git a/chardev/char.c b/chardev/char.c
+index b80fcae028..8393bb0294 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -90,6 +90,7 @@
+ #include "char-io.h"
+ #ifdef _WIN32
+ #include "char-win.h"
++#include "char-win-stdio.h"
+ #endif
+=20
+ #define TCP_MAX_FDS 16
+@@ -1474,19 +1475,6 @@ static void qemu_chr_open_pp_fd(Chardev *chr,
+=20
+ #define HAVE_CHARDEV_SERIAL 1
+=20
+-typedef struct {
+-    Chardev parent;
+-    HANDLE  hStdIn;
+-    HANDLE  hInputReadyEvent;
+-    HANDLE  hInputDoneEvent;
+-    HANDLE  hInputThread;
+-    uint8_t win_stdio_buf;
+-} WinStdioChardev;
+-
+-#define TYPE_CHARDEV_WIN_STDIO "chardev-win-stdio"
+-#define WIN_STDIO_CHARDEV(obj)                                  \
+-    OBJECT_CHECK(WinStdioChardev, (obj), TYPE_CHARDEV_WIN_STDIO)
+-
+ #define MAXCONNECT 1
+ #define NTIMEOUT 5000
+=20
+@@ -1588,215 +1576,6 @@ static const TypeInfo char_console_type_info =3D =
+{
+     .class_init =3D char_console_class_init,
+ };
+=20
+-static int win_stdio_write(Chardev *chr, const uint8_t *buf, int len)
+-{
+-    HANDLE  hStdOut =3D GetStdHandle(STD_OUTPUT_HANDLE);
+-    DWORD   dwSize;
+-    int     len1;
+-
+-    len1 =3D len;
+-
+-    while (len1 > 0) {
+-        if (!WriteFile(hStdOut, buf, len1, &dwSize, NULL)) {
+-            break;
+-        }
+-        buf  +=3D dwSize;
+-        len1 -=3D dwSize;
+-    }
+-
+-    return len - len1;
+-}
+-
+-static void win_stdio_wait_func(void *opaque)
+-{
+-    Chardev *chr =3D CHARDEV(opaque);
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(opaque);
+-    INPUT_RECORD       buf[4];
+-    int                ret;
+-    DWORD              dwSize;
+-    int                i;
+-
+-    ret =3D ReadConsoleInput(stdio->hStdIn, buf, ARRAY_SIZE(buf), &dwSiz=
+e);
+-
+-    if (!ret) {
+-        /* Avoid error storm */
+-        qemu_del_wait_object(stdio->hStdIn, NULL, NULL);
+-        return;
+-    }
+-
+-    for (i =3D 0; i < dwSize; i++) {
+-        KEY_EVENT_RECORD *kev =3D &buf[i].Event.KeyEvent;
+-
+-        if (buf[i].EventType =3D=3D KEY_EVENT && kev->bKeyDown) {
+-            int j;
+-            if (kev->uChar.AsciiChar !=3D 0) {
+-                for (j =3D 0; j < kev->wRepeatCount; j++) {
+-                    if (qemu_chr_be_can_write(chr)) {
+-                        uint8_t c =3D kev->uChar.AsciiChar;
+-                        qemu_chr_be_write(chr, &c, 1);
+-                    }
+-                }
+-            }
+-        }
+-    }
+-}
+-
+-static DWORD WINAPI win_stdio_thread(LPVOID param)
+-{
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(param);
+-    int                ret;
+-    DWORD              dwSize;
+-
+-    while (1) {
+-
+-        /* Wait for one byte */
+-        ret =3D ReadFile(stdio->hStdIn, &stdio->win_stdio_buf, 1, &dwSiz=
+e, NULL);
+-
+-        /* Exit in case of error, continue if nothing read */
+-        if (!ret) {
+-            break;
+-        }
+-        if (!dwSize) {
+-            continue;
+-        }
+-
+-        /* Some terminal emulator returns \r\n for Enter, just pass \n *=
+/
+-        if (stdio->win_stdio_buf =3D=3D '\r') {
+-            continue;
+-        }
+-
+-        /* Signal the main thread and wait until the byte was eaten */
+-        if (!SetEvent(stdio->hInputReadyEvent)) {
+-            break;
+-        }
+-        if (WaitForSingleObject(stdio->hInputDoneEvent, INFINITE)
+-            !=3D WAIT_OBJECT_0) {
+-            break;
+-        }
+-    }
+-
+-    qemu_del_wait_object(stdio->hInputReadyEvent, NULL, NULL);
+-    return 0;
+-}
+-
+-static void win_stdio_thread_wait_func(void *opaque)
+-{
+-    Chardev *chr =3D CHARDEV(opaque);
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(opaque);
+-
+-    if (qemu_chr_be_can_write(chr)) {
+-        qemu_chr_be_write(chr, &stdio->win_stdio_buf, 1);
+-    }
+-
+-    SetEvent(stdio->hInputDoneEvent);
+-}
+-
+-static void qemu_chr_set_echo_win_stdio(Chardev *chr, bool echo)
+-{
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
+-    DWORD              dwMode =3D 0;
+-
+-    GetConsoleMode(stdio->hStdIn, &dwMode);
+-
+-    if (echo) {
+-        SetConsoleMode(stdio->hStdIn, dwMode | ENABLE_ECHO_INPUT);
+-    } else {
+-        SetConsoleMode(stdio->hStdIn, dwMode & ~ENABLE_ECHO_INPUT);
+-    }
+-}
+-
+-static void char_win_stdio_finalize(Object *obj)
+-{
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(obj);
+-
+-    if (stdio->hInputReadyEvent !=3D INVALID_HANDLE_VALUE) {
+-        CloseHandle(stdio->hInputReadyEvent);
+-    }
+-    if (stdio->hInputDoneEvent !=3D INVALID_HANDLE_VALUE) {
+-        CloseHandle(stdio->hInputDoneEvent);
+-    }
+-    if (stdio->hInputThread !=3D INVALID_HANDLE_VALUE) {
+-        TerminateThread(stdio->hInputThread, 0);
+-    }
+-}
+-
+-static const TypeInfo char_win_stdio_type_info =3D {
+-    .name =3D TYPE_CHARDEV_WIN_STDIO,
+-    .parent =3D TYPE_CHARDEV,
+-    .instance_size =3D sizeof(WinStdioChardev),
+-    .instance_finalize =3D char_win_stdio_finalize,
+-    .abstract =3D true,
+-};
+-
+-static void qemu_chr_open_stdio(Chardev *chr,
+-                                ChardevBackend *backend,
+-                                bool *be_opened,
+-                                Error **errp)
+-{
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
+-    DWORD              dwMode;
+-    int                is_console =3D 0;
+-
+-    stdio->hStdIn =3D GetStdHandle(STD_INPUT_HANDLE);
+-    if (stdio->hStdIn =3D=3D INVALID_HANDLE_VALUE) {
+-        error_setg(errp, "cannot open stdio: invalid handle");
+-        return;
+-    }
+-
+-    is_console =3D GetConsoleMode(stdio->hStdIn, &dwMode) !=3D 0;
+-
+-    if (is_console) {
+-        if (qemu_add_wait_object(stdio->hStdIn,
+-                                 win_stdio_wait_func, chr)) {
+-            error_setg(errp, "qemu_add_wait_object: failed");
+-            goto err1;
+-        }
+-    } else {
+-        DWORD   dwId;
+-           =20
+-        stdio->hInputReadyEvent =3D CreateEvent(NULL, FALSE, FALSE, NULL=
+);
+-        stdio->hInputDoneEvent  =3D CreateEvent(NULL, FALSE, FALSE, NULL=
+);
+-        if (stdio->hInputReadyEvent =3D=3D INVALID_HANDLE_VALUE
+-            || stdio->hInputDoneEvent =3D=3D INVALID_HANDLE_VALUE) {
+-            error_setg(errp, "cannot create event");
+-            goto err2;
+-        }
+-        if (qemu_add_wait_object(stdio->hInputReadyEvent,
+-                                 win_stdio_thread_wait_func, chr)) {
+-            error_setg(errp, "qemu_add_wait_object: failed");
+-            goto err2;
+-        }
+-        stdio->hInputThread     =3D CreateThread(NULL, 0, win_stdio_thre=
+ad,
+-                                               chr, 0, &dwId);
+-
+-        if (stdio->hInputThread =3D=3D INVALID_HANDLE_VALUE) {
+-            error_setg(errp, "cannot create stdio thread");
+-            goto err3;
+-        }
+-    }
+-
+-    dwMode |=3D ENABLE_LINE_INPUT;
+-
+-    if (is_console) {
+-        /* set the terminal in raw mode */
+-        /* ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS */
+-        dwMode |=3D ENABLE_PROCESSED_INPUT;
+-    }
+-
+-    SetConsoleMode(stdio->hStdIn, dwMode);
+-
+-    qemu_chr_set_echo_win_stdio(chr, false);
+-
+-    return;
+-
+-err3:
+-    qemu_del_wait_object(stdio->hInputReadyEvent, NULL, NULL);
+-err2:
+-    CloseHandle(stdio->hInputReadyEvent);
+-    CloseHandle(stdio->hInputDoneEvent);
+-err1:
+-    qemu_del_wait_object(stdio->hStdIn, NULL, NULL);
+-}
+ #endif /* !_WIN32 */
+=20
+ /***********************************************************/
+@@ -2785,11 +2564,8 @@ static void char_stdio_class_init(ObjectClass *oc,=
+ void *data)
+     ChardevClass *cc =3D CHARDEV_CLASS(oc);
+=20
+     cc->parse =3D qemu_chr_parse_stdio;
++#ifndef _WIN32
+     cc->open =3D qemu_chr_open_stdio;
+-#ifdef _WIN32
+-    cc->chr_write =3D win_stdio_write;
+-    cc->chr_set_echo =3D qemu_chr_set_echo_win_stdio;
+-#else
+     cc->chr_set_echo =3D qemu_chr_set_echo_stdio;
+ #endif
  }
- 
- static void kvm_arm_gicv3_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/intc/gicv3_internal.h b/hw/intc/gicv3_internal.h
-index 8f3567e..179556f 100644
---- a/hw/intc/gicv3_internal.h
-+++ b/hw/intc/gicv3_internal.h
-@@ -138,6 +138,7 @@
- #define ICC_CTLR_EL1_EOIMODE        (1U << 1)
- #define ICC_CTLR_EL1_PMHE           (1U << 6)
- #define ICC_CTLR_EL1_PRIBITS_SHIFT 8
-+#define ICC_CTLR_EL1_PRIBITS_MASK   (7U << ICC_CTLR_EL1_PRIBITS_SHIFT)
- #define ICC_CTLR_EL1_IDBITS_SHIFT 11
- #define ICC_CTLR_EL1_SEIS           (1U << 14)
- #define ICC_CTLR_EL1_A3V            (1U << 15)
--- 
-1.9.1
+@@ -3955,9 +3731,6 @@ void qemu_chr_cleanup(void)
+ static void register_types(void)
+ {
+     type_register_static(&char_type_info);
+-#ifdef _WIN32
+-    type_register_static(&char_win_stdio_type_info);
+-#endif
+     type_register_static(&char_socket_type_info);
+     type_register_static(&char_udp_type_info);
+     type_register_static(&char_file_type_info);
+diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+index bdf5a112a7..3c4a328de8 100644
+--- a/chardev/Makefile.objs
++++ b/chardev/Makefile.objs
+@@ -5,3 +5,4 @@ chardev-obj-y +=3D char-mux.o
+ chardev-obj-y +=3D char-null.o
+ chardev-obj-y +=3D char-ringbuf.o
+ chardev-obj-$(CONFIG_WIN32) +=3D char-win.o
++chardev-obj-$(CONFIG_WIN32) +=3D char-win-stdio.o
+--=20
+2.11.0.295.gd7dffce1c.dirty
