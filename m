@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cYYhB-00039M-Aw
+	(envelope-from <kraxel@redhat.com>) id 1cYYhB-00039J-Ab
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:42:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cYYh6-0005ym-FF
+	(envelope-from <kraxel@redhat.com>) id 1cYYh7-0005zl-GI
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:42:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40656)
+Received: from mx1.redhat.com ([209.132.183.28]:36324)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cYYh6-0005yR-9I
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:42:00 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cYYh7-0005z9-BL
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 08:42:01 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 31 Jan 2017 14:41:37 +0100
-Message-Id: <1485870106-25016-2-git-send-email-kraxel@redhat.com>
+Date: Tue, 31 Jan 2017 14:41:43 +0100
+Message-Id: <1485870106-25016-8-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1485870106-25016-1-git-send-email-kraxel@redhat.com>
 References: <1485870106-25016-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 01/10] qapi: add support for mice with
- extra/side buttons
+Subject: [Qemu-devel] [PULL 07/10] ui/gtk.c: add ctrl-alt-= support for zoom
+ in acceleration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +25,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fabian Lesniak <fabian@lesniak-it.de>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Ziyue Yang <yzylivezh@hotmail.com>, Ziyue Yang <skiver.cloud.yzy@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Fabian Lesniak <fabian@lesniak-it.de>
+From: Ziyue Yang <yzylivezh@hotmail.com>
 
-Adds "side" and "extra" values to enum InputButton. The naming was borrowed
-from evdev since it is more descriptive than "button4" and "button5".
+Solving wishlist item at
+https://bugs.launchpad.net/qemu/+bug/1656710
+by accepting Ctrl-Alt-= as an additional zoom-in acceleration.
 
-Signed-off-by: Fabian Lesniak <fabian@lesniak-it.de>
-Message-id: 20161206190007.7539-2-fabian@lesniak-it.de
+Using gtk_accel_group_connect to support multiple accelerations
+triggering a single menu item since that gtk_accel_map_add_entry
+seems to support only one acceleration. A wrapper function
+gd_accel_zoom_in is added to support gtk_accel_group_connect's
+callback activities.
+
+Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
+Message-id: 1485826335-15686-1-git-send-email-skiver.cloud.yzy@gmail.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- qapi-schema.json | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ ui/gtk.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 82fabc6..cbdffdd 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -5390,10 +5390,15 @@
- #
- # Button of a pointer input device (mouse, tablet).
- #
-+# @side: front side button of a 5-button mouse (since 2.9)
-+#
-+# @extra: rear side button of a 5-button mouse (since 2.9)
-+#
- # Since: 2.0
- ##
- { 'enum'  : 'InputButton',
--  'data'  : [ 'left', 'middle', 'right', 'wheel-up', 'wheel-down' ] }
-+  'data'  : [ 'left', 'middle', 'right', 'wheel-up', 'wheel-down', 'side',
-+  'extra' ] }
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 2f81863..b734c0b 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -105,6 +105,7 @@
+ #define GDK_KEY_g GDK_g
+ #define GDK_KEY_q GDK_q
+ #define GDK_KEY_plus GDK_plus
++#define GDK_KEY_equal GDK_equal
+ #define GDK_KEY_minus GDK_minus
+ #define GDK_KEY_Pause GDK_Pause
+ #define GDK_KEY_Delete GDK_Delete
+@@ -1342,6 +1343,12 @@ static void gd_menu_zoom_in(GtkMenuItem *item, void *opaque)
+     gd_update_windowsize(vc);
+ }
  
- ##
- # @InputAxis:
++static void gd_accel_zoom_in(void *opaque)
++{
++    GtkDisplayState *s = opaque;
++    gtk_menu_item_activate(GTK_MENU_ITEM(s->zoom_in_item));
++}
++
+ static void gd_menu_zoom_out(GtkMenuItem *item, void *opaque)
+ {
+     GtkDisplayState *s = opaque;
+@@ -2109,6 +2116,8 @@ static GtkWidget *gd_create_menu_view(GtkDisplayState *s)
+                                  "<QEMU>/View/Zoom In");
+     gtk_accel_map_add_entry("<QEMU>/View/Zoom In", GDK_KEY_plus,
+                             HOTKEY_MODIFIERS);
++    gtk_accel_group_connect(s->accel_group, GDK_KEY_equal, HOTKEY_MODIFIERS, 0,
++            g_cclosure_new_swap(G_CALLBACK(gd_accel_zoom_in), s, NULL));
+     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), s->zoom_in_item);
+ 
+     s->zoom_out_item = gtk_menu_item_new_with_mnemonic(_("Zoom _Out"));
 -- 
 1.8.3.1
