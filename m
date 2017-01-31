@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYXnp-0000O0-QJ
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:54 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cYXnr-0000P2-II
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYXnp-0001Vc-0L
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:53 -0500
-Date: Tue, 31 Jan 2017 10:25:00 +0000
+	(envelope-from <stefanha@redhat.com>) id 1cYXnq-0001XA-Qe
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 07:44:55 -0500
+Date: Tue, 31 Jan 2017 10:36:43 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170131102500.GB18804@stefanha-x1.localdomain>
+Message-ID: <20170131103643.GC18804@stefanha-x1.localdomain>
 References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-	<1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-3-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="XF85m9dhOBO43t/C"
+	protocol="application/pgp-signature"; boundary="Pk6IbRAofICFmK5e"
 Content-Disposition: inline
-In-Reply-To: <1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 01/21] backup: move from done_bitmap to
- copy_bitmap
+In-Reply-To: <1482503344-6424-3-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 02/21] backup: init copy_bitmap from
+ sync_bitmap for incremental
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +29,50 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
 
 
---XF85m9dhOBO43t/C
+--Pk6IbRAofICFmK5e
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 23, 2016 at 05:28:44PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Use HBitmap copy_bitmap instead of done_bitmap. This is needed to unify
-> backup loop for full/incremental modes in future patches.
->=20
-> We reset bit of the copy_bitmap immediately after checking it in
-> backup_do_cow(). It is safe, because all other intersecting requests
-> will wait for our request finish anyway.
->=20
-> The other difference is that in case of error we will have zeroed bit in
-> copy_bitmap, when in done_bitmap we have not set bit.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/backup.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
+On Fri, Dec 23, 2016 at 05:28:45PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> +/* init copy_bitmap from sync_bitmap */
+> +static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+> +{
+> +    int64_t sector;
+> +    BdrvDirtyBitmapIter *dbi;
+> +    uint32_t sect_gran =
+> +        bdrv_dirty_bitmap_granularity(job->sync_bitmap) >> BDRV_SECTOR_BITS;
+> +    int64_t sz = bdrv_dirty_bitmap_size(job->sync_bitmap);
+> +    int64_t sectors_per_cluster = cluster_size_sectors(job);
+> +    uint32_t cl_gran = MAX(1, sect_gran / sectors_per_cluster);
+> +
+> +    dbi = bdrv_dirty_iter_new(job->sync_bitmap, 0);
+> +    while ((sector = bdrv_dirty_iter_next(dbi)) != -1) {
+> +        int64_t cluster = sector / sectors_per_cluster;
+> +        int64_t next_sector = (cluster + cl_gran) * sectors_per_cluster;
+> +
+> +        hbitmap_set(job->copy_bitmap, cluster, cl_gran);
+> +
+> +        if (next_sector >= sz) {
+> +            break;
+> +        }
+> +
+> +        bdrv_set_dirty_iter(dbi, (cluster + cl_gran) * sectors_per_cluster);
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Simpler and clearer:
+bdrv_set_dirty_iter(dbi, next_sector);
 
---XF85m9dhOBO43t/C
+--Pk6IbRAofICFmK5e
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYkGX8AAoJEJykq7OBq3PI6FUH/Ruu+C4gxrjqOLBCj7HHfOpZ
-HCtLQh0+FTiM9DMt2XorjFIimsKDYYFUmfP5+O3edesb+PZRDhjSX4Zp6avtH1p4
-V6PxMt24WoFfXmCLHaCn+VLPQURjriBjhCJa2pFCQrpoy0nWyTPSYCUCV2r8EnQc
-NkJYrsx6N43y8saNgRy2f+Zcyoql6WTNxtAtmoyu3TpiwnAskkZuBqzYtHp9br/V
-Knf0bZ4NumHnfQPcdPXT7wDzLKUAgMA7HS2B4AVlOp6bFokFqDNYSFJ5RwibDTv2
-9qf4hAak2dpAqtiJyX0l00ho4ddiOhQT/L5UmOEI+4ROdODNtXt2jFFBF3kYTZ4=
-=qERi
+iQEcBAEBAgAGBQJYkGi7AAoJEJykq7OBq3PIlBMH/3H3YdtdWzQniNxMCelQQ34W
+7n8xFzRBr6aujbUrCDz2J9IN7P61geiOG+Bz1QP6SJXM8/xsMi7j4xsMZRTJ/GKe
+t1Dl4eqBTlu0Vqnz3p+o+8Xe9dX/ah8oDoHg1wJkmErSitTPPF1jAHxaohVwNDlA
+09xILZT8AvIi7DS7rJ+cqRUMGaE8Ls6EOY235+Dg7Cp1MXRTjcRogFCF8d2eGnOR
+XneTP1BzArSPuylwlQS96Ww9i577irXkN97nic3Cqn3+91YFtTdLRn2amogEGPkF
+92x0uwSKPBldLRW18rStocp2ueJbgjrAKesKt0dWGyPT+ATmiDBECoMbAMfkde4=
+=P2So
 -----END PGP SIGNATURE-----
 
---XF85m9dhOBO43t/C--
+--Pk6IbRAofICFmK5e--
