@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYaS9-00087B-Tn
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:34:42 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cYaSO-0008IC-Bl
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:35:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYaS5-0005VL-6W
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:34:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53314)
+	(envelope-from <pbonzini@redhat.com>) id 1cYaSN-0005b0-Bq
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:34:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54786)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cYaS5-0005VF-1N
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:34:37 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1485873796-15095-1-git-send-email-mst@redhat.com>
-	<b1e5af37-6547-e688-0365-2bb1bfe45954@redhat.com>
-	<CAFEAcA-UPQrgq8h1LbqsUWP-MKwkOBLsAk0R0u0YuSfyA=nQAg@mail.gmail.com>
-Date: Tue, 31 Jan 2017 16:34:34 +0100
-In-Reply-To: <CAFEAcA-UPQrgq8h1LbqsUWP-MKwkOBLsAk0R0u0YuSfyA=nQAg@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 31 Jan 2017 15:12:32 +0000")
-Message-ID: <87wpdb4511.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cYaSN-0005aj-4c
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:34:55 -0500
+References: <CAO_EM_kS-aGQdvPEO+7pkFWHOSiu8XMpZSduS=gPgUsDwJd9ig@mail.gmail.com>
+	<20170127094033.GC26553@redhat.com>
+	<CAO_EM_no14RDCd42hJy1xbo=mYsdo8k7oAESVx2KpF277U45VQ@mail.gmail.com>
+	<20170131093927.GA20303@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d659ecc7-34a4-aad5-69c1-36ba4aff3d15@redhat.com>
+Date: Tue, 31 Jan 2017 10:34:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] QEMU_BUILD_BUG_ON: use __COUNTER__
+In-Reply-To: <20170131093927.GA20303@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [libvirt] char: Logging serial pty output when
+ disconnected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Ed Swierk <eswierk@skyportsystems.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, marcandre.lureau@redhat.com, Eric Blake <eblake@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 31 January 2017 at 15:03, Eric Blake <eblake@redhat.com> wrote:
->> On 01/31/2017 08:43 AM, Michael S. Tsirkin wrote:
->>> Some headers use QEMU_BUILD_BUG_ON. This causes a problem
->>> if the C file including that header happens to have
->>> QEMU_BUILD_BUG_ON at the same line number.
+
+On 31/01/2017 04:39, Daniel P. Berrange wrote:
+> On Mon, Jan 30, 2017 at 08:58:25PM -0800, Ed Swierk wrote:
+>> On Fri, Jan 27, 2017 at 1:40 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+>>> On Thu, Jan 26, 2017 at 05:07:16PM -0800, Ed Swierk wrote:
+>>>> Currently qemu_chr_fe_write() calls qemu_chr_fe_write_log() only for
+>>>> data consumed by the backend chr_write function. With the pty backend,
+>>>> pty_chr_write() returns 0 indicating that the data was not consumed
+>>>> when the pty is disconnected. Simply changing it to return len instead
+>>>> of 0 tricks the caller into logging the data even when the pty is
+>>>> disconnected. I don't know what problems this might cause, but one
+>>>> data point is that tcp_chr_write() already happens to work this way.
+>>>>
+>>>> Alternatively, qemu_chr_fe_write() could be modified to log everything
+>>>> passed to it, regardless of how much data chr_write claims to have
+>>>> consumed. The trouble is that the serial device retries writing
+>>>> unconsumed data, so when the pty is disconnected you'd see every
+>>>> character duplicated 4 times in the log file.
+>>>>
+>>>> Any opinions on either approach, or other suggestions? If there are no
+>>>> objections to the first one, I'll prepare a patch.
 >>>
->>> Fix using a widely available extension: __COUNTER__.
+>>> If the pty backend intends to just drop data into a blackhole when
+>>> no client is connected, then its chr_write() impl should return
+>>> the length of the data discarded, not zero.
 >>
->> gcc 4.3 and later; clang documents it but doesn't say when it was added.
+>> That's exactly the question: when no client is connected, should the
+>> pty backend just drop the data into a black hole, returning the length
+>> of the data discarded? Or should it return 0, letting the frontend
+>> device decide what to do with it?
+> 
+> It should return len of data discarded.
+> 
 >>
->>> If unavailable, provide a stub.
+>> I can't discern a consistent pattern across all the char backends. The
+>> closest analog is the tcp backend, which does discard the data and
+>> return len. In contrast, several backends call
+>> io_channel_send{,_full}(), which returns -1 if the write would block
+>> or fails for any other reason.
 >>
->> What fails in our build farm if we don't provide the stub? Can we just
->> require that our compiler is new enough to have __COUNTER__, or will
->> that break some of our existing targets?
->
-> I think the problem is not so much our build farm (which is
-> I think all recent enough to postdate introduction of
-> __COUNTER__) but the probability of there being users
-> out there who are still using older compilers to build
-> QEMU releases. We don't need to enforce compile time
-> asserts on those old compilers but given that it's
-> trivial to avoid actually breaking the build for them,
-> why not provide the do-nothing fallback?
+>> It's not clear there's much the frontend can do to recover from an
+>> error, but there's no consistent pattern across serial devices either.
+>> Most just ignore the return value. But the 16550A serial device
+>> retries 4 times after an error. Changing the pty backend to discard
+>> the data on the first attempt would bypass this retry mechanism. Is
+>> that a problem?
+> 
+> I don't think so - retrying in this way is pointless IMHO - it is just
+> going to get the same result on every retry on 99% of occassions.
 
-I don't think we actually need __COUNTER__.
+Just to provide the full context, the retry happens even if you get
+EAGAIN, and in that case it does makes sense.
 
-If we want it, providing a fallback is nice.  However, the "expand to
-nothing" fallback is syntactically unsound.  A sound fallback expands to
-the exact same syntactic construct as the real thing does, in this case
-a declaration.  When it doesn't, we risk parse errors.
+But if the pty is disconnected I agree it should discard the data.
 
-Of course, we may decide to accept that risk.
+Paolo
