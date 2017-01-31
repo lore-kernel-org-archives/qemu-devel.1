@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cYchj-0000GO-4G
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:58:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cYcjL-0001pj-Ju
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:00:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cYchf-0008Nt-4r
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:58:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cYche-0008Me-Vx
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:58:51 -0500
-Date: Tue, 31 Jan 2017 19:58:42 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170131195700-mutt-send-email-mst@kernel.org>
-References: <1485873796-15095-1-git-send-email-mst@redhat.com>
-	<b1e5af37-6547-e688-0365-2bb1bfe45954@redhat.com>
-	<CAFEAcA-UPQrgq8h1LbqsUWP-MKwkOBLsAk0R0u0YuSfyA=nQAg@mail.gmail.com>
-	<87wpdb4511.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cYcjK-0000aH-Nz
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:00:35 -0500
+Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:35347)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cYcjK-0000a9-EY
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:00:34 -0500
+Received: by mail-vk0-x233.google.com with SMTP id x75so242515018vke.2
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 10:00:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wpdb4511.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] QEMU_BUILD_BUG_ON: use __COUNTER__
+In-Reply-To: <87wpdbw2ki.fsf@dusky.pond.sub.org>
+References: <1485879287-12548-1-git-send-email-peter.maydell@linaro.org>
+	<87wpdbw2ki.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 31 Jan 2017 18:00:13 +0000
+Message-ID: <CAFEAcA-Ggv2VGszZg0Ld3-1wm=hVe8w=4ZcQ7TDRHf5Puq88ug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] Drop QEMU_GNUC_PREREQ() checks for gcc
+ older than 4.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +31,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On Tue, Jan 31, 2017 at 04:34:34PM +0100, Markus Armbruster wrote:
+On 31 January 2017 at 17:40, Markus Armbruster <armbru@redhat.com> wrote:
 > Peter Maydell <peter.maydell@linaro.org> writes:
-> 
-> > On 31 January 2017 at 15:03, Eric Blake <eblake@redhat.com> wrote:
-> >> On 01/31/2017 08:43 AM, Michael S. Tsirkin wrote:
-> >>> Some headers use QEMU_BUILD_BUG_ON. This causes a problem
-> >>> if the C file including that header happens to have
-> >>> QEMU_BUILD_BUG_ON at the same line number.
-> >>>
-> >>> Fix using a widely available extension: __COUNTER__.
-> >>
-> >> gcc 4.3 and later; clang documents it but doesn't say when it was added.
-> >>
-> >>> If unavailable, provide a stub.
-> >>
-> >> What fails in our build farm if we don't provide the stub? Can we just
-> >> require that our compiler is new enough to have __COUNTER__, or will
-> >> that break some of our existing targets?
-> >
-> > I think the problem is not so much our build farm (which is
-> > I think all recent enough to postdate introduction of
-> > __COUNTER__) but the probability of there being users
-> > out there who are still using older compilers to build
-> > QEMU releases. We don't need to enforce compile time
-> > asserts on those old compilers but given that it's
-> > trivial to avoid actually breaking the build for them,
-> > why not provide the do-nothing fallback?
-> 
-> I don't think we actually need __COUNTER__.
+>
+>> We already require gcc 4.1 or newer (for the atomic
+>> support), so the fallback codepaths for older gcc
+>> versions than that are now dead code and we can
+>> just delete them.
+>>
+>> NB: clang reports itself as gcc 4.2 (regardless of
+>> clang version), so clang won't be using the fallbacks
+>> either.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> For compatibility with clang we should probably try to avoid
+>> using QEMU_GNUC_PREREQ() and instead have something in
+>> compiler.h that abstracts away whether the test for "does
+>> the compiler support feature foo" is via a GCC version
+>> check or a clang __has_feature or whatever.
+>
+> Yes, testing for feature is better than testing a version.
+>
+> This patch reduces use of QEMU_GNUC_PREREQ roughly by half.  Good.
+>
+>>
+>>
+>>  include/qemu/compiler.h   |   8 ---
+>>  include/qemu/host-utils.h | 121 ----------------------------------------------
+>>  tcg/arm/tcg-target.h      |   7 ---
+>>  3 files changed, 136 deletions(-)
+>>
+>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+>> index 157698b..fc12e49 100644
+>> --- a/include/qemu/compiler.h
+>> +++ b/include/qemu/compiler.h
+>> @@ -24,17 +24,9 @@
+>>
+>>  #define QEMU_NORETURN __attribute__ ((__noreturn__))
+>>
+>> -#if QEMU_GNUC_PREREQ(3, 4)
+>>  #define QEMU_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+>> -#else
+>> -#define QEMU_WARN_UNUSED_RESULT
+>> -#endif
+>
+> Should we inline this macro?
 
-How would you fix the conflict above?
+We have attributes which we wrap in QEMU_ macros already
+even though they always expand to the same thing:
+QEMU_NORETURN and QEMU_ALIGNED. I'm happy to leave these
+to follow that pattern. (If you wanted to send a patch
+series that uninlined all of those then I wouldn't hugely
+object to it, but I think it touches enough files that it's
+a separate thing from removing the #if guards that this
+patch does.)
 
-> If we want it, providing a fallback is nice.  However, the "expand to
-> nothing" fallback is syntactically unsound.  A sound fallback expands
-> to the exact same syntactic construct as the real thing does, in this
-> case a declaration.  When it doesn't, we risk parse errors.
-> Of course, we may decide to accept that risk.
-
-That's the best I could do.
+thanks
+-- PMM
