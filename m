@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYb8N-0005De-ES
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:18:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cYbAf-00077N-M9
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:20:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYb8M-0008Jq-M0
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:18:19 -0500
-Received: from mail-vk0-x22c.google.com ([2607:f8b0:400c:c05::22c]:33142)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cYb8M-0008Jf-Fb
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:18:18 -0500
-Received: by mail-vk0-x22c.google.com with SMTP id k127so239926360vke.0
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 08:18:18 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1cYbAb-0000aV-L7
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:20:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55400)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cYbAb-0000aG-Ds
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 11:20:37 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 69CF7C05681A
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 16:20:37 +0000 (UTC)
+Date: Tue, 31 Jan 2017 16:20:32 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170131162032.GA30735@work-vm>
+References: <20170106182823.1960-1-dgilbert@redhat.com>
+	<20170106182823.1960-15-dgilbert@redhat.com>
+	<87d1f3s6p1.fsf@emacs.mitica>
 MIME-Version: 1.0
-In-Reply-To: <278c72d2-669a-9591-9391-2be3ead266a8@redhat.com>
-References: <1485873796-15095-1-git-send-email-mst@redhat.com>
-	<b1e5af37-6547-e688-0365-2bb1bfe45954@redhat.com>
-	<CAFEAcA-UPQrgq8h1LbqsUWP-MKwkOBLsAk0R0u0YuSfyA=nQAg@mail.gmail.com>
-	<c6c5267a-58df-061b-8dd3-73d691d37578@redhat.com>
-	<CAFEAcA_rPxu8tmHn88t4odtCA1ZCK4iPsRB8+jLqk13k2u90yg@mail.gmail.com>
-	<278c72d2-669a-9591-9391-2be3ead266a8@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Jan 2017 16:17:57 +0000
-Message-ID: <CAFEAcA9dWvXjXSLW8i0eA=d1t0H99YwnHyBipAk5V4=-Hj94nA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] QEMU_BUILD_BUG_ON: use __COUNTER__
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87d1f3s6p1.fsf@emacs.mitica>
+Subject: Re: [Qemu-devel] [PATCH 14/15] postcopy: Check for
+ userfault+hugepage feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,15 +35,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com
 
-On 31 January 2017 at 15:28, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> We already require 4.1 for atomics.
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > We need extra Linux kernel support (~4.9) to support userfaults
+> > on hugetlbfs; check for them.
+> >
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> 
+> 
+> >  migration/postcopy-ram.c | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> >
+> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > index 6b30b43..d12dd7f 100644
+> > --- a/migration/postcopy-ram.c
+> > +++ b/migration/postcopy-ram.c
+> > @@ -81,6 +81,17 @@ static bool ufd_version_check(int ufd)
+> >          return false;
+> >      }
+> >  
+> > +    if (getpagesize() != ram_pagesize_summary()) {
+> 
+> I am pretty sure that I don't like ram_pagesize_summary() name.  I have
+> already forgot what I mean O:-)
 
-Oh good. I've just sent a patch which gets rid of all the
-checks for "gcc must be at least X" where X is 4.1 or
-earlier.
+Suggested replacements welcome!
 
-thanks
--- PMM
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
