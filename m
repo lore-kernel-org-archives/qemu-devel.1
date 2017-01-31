@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYdhC-0000wB-Lk
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 14:02:27 -0500
+	(envelope-from <lersek@redhat.com>) id 1cYdn7-0006s5-J4
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 14:08:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYdh9-0006hX-Dk
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 14:02:26 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1485879287-12548-1-git-send-email-peter.maydell@linaro.org>
-	<87wpdbw2ki.fsf@dusky.pond.sub.org>
-	<CAFEAcA-Ggv2VGszZg0Ld3-1wm=hVe8w=4ZcQ7TDRHf5Puq88ug@mail.gmail.com>
-	<20170131181124.GF20303@redhat.com>
-	<CAFEAcA_utwK=JxC7aa9chZa2DjuGkBfGAYrEfXVo86pZ5u5-zg@mail.gmail.com>
-Date: Tue, 31 Jan 2017 20:02:19 +0100
-In-Reply-To: <CAFEAcA_utwK=JxC7aa9chZa2DjuGkBfGAYrEfXVo86pZ5u5-zg@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 31 Jan 2017 18:32:38 +0000")
-Message-ID: <87bmunnjd0.fsf@dusky.pond.sub.org>
+	(envelope-from <lersek@redhat.com>) id 1cYdn4-0000Qg-6X
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 14:08:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33034)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cYdn3-0000QX-W5
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 14:08:30 -0500
+References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
+	<20170118175335-mutt-send-email-mst@kernel.org>
+	<20170118181918.783cb7bd@nial.brq.redhat.com>
+	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
+	<20170131165802-mutt-send-email-mst@kernel.org>
+	<fe787fcc-0c92-5842-1a67-b50466b6f38f@redhat.com>
+	<20170131201333-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <b2c2b185-8443-2d0e-dbd4-f6759184d69c@redhat.com>
+Date: Tue, 31 Jan 2017 20:08:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] Drop QEMU_GNUC_PREREQ() checks for gcc
- older than 4.1
+In-Reply-To: <20170131201333-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Phil Dennis-Jordan <phil@philjordan.eu>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 01/31/17 19:17, Michael S. Tsirkin wrote:
+> On Tue, Jan 31, 2017 at 05:28:57PM +0100, Laszlo Ersek wrote:
+>> The ACPI 6.1 spec says,
+>>
+>> - DSDT: [...] If the X_DSDT field contains a non-zero value then this
+>>   field must be zero.
+>> - X_DSDT: [...] If the DSDT field contains a non-zero value then this
+>>   field must be zero.
+> 
+> But that's only 6.1. 6.0 and earlier did not say this.
+> The errata they wanted to address was:
+> 1393 In FADT: if X_DSDT field is non-zero, DSDT
+> field should be ignored or deprecated
+> 
+> I would class this as a spec bug.
+> 
 
-> On 31 January 2017 at 18:11, Daniel P. Berrange <berrange@redhat.com> wrote:
->> On Tue, Jan 31, 2017 at 06:00:13PM +0000, Peter Maydell wrote:
->>> We have attributes which we wrap in QEMU_ macros already
->>> even though they always expand to the same thing:
->>> QEMU_NORETURN and QEMU_ALIGNED. I'm happy to leave these
->>> to follow that pattern. (If you wanted to send a patch
->>> series that uninlined all of those then I wouldn't hugely
->>> object to it, but I think it touches enough files that it's
->>> a separate thing from removing the #if guards that this
->>> patch does.)
->>
->> The other option is just to replace QEMU_WARN_UNUSED_RESULT with
->>
->>   #define QEMU_WARN_UNUSED_RESULT  G_GNUC_WARN_UNUSED_RESULT
->>
->> and convert code to use G_GNUC_WARN_UNUSED_RESULT directly until we
->> can kill the QEMU specific define. There's no benefit to QEMU having
->> its own defines that duplicate stuff already covered by our min
->> required glib - G_GNUC_WARN_UNUSED_RESULT was added in 2.10 for
->> example.
->
-> I wouldn't object to that either, but again it ought to be
-> a different patch or patch series to this one...
+Process-wise, that's not a bad idea; it could be the only way (or the
+best way) to argue for a corresponding change in edk2's
+EFI_ACPI_TABLE_PROTOCOL implementation
+(MdeModulePkg/Universal/Acpi/AcpiTableDxe).
 
-I wouldn't exactly object, just say that to me, wrapping an attribute in
-a GLib-provided macro even though we're not aware of a compiler that
-profits from it feels a bit like "look ma, I've read all of the GLib
-manual!"
+Do you want to raise this on the ASWG list? I vaguely recall that you
+subscribed; if not, I think you should be able to, as a Red Hatter
+<http://members.uefi.org/kmembership_info/person_signup/>.
+
+(I'd like to avoid being the middle man.)
+
+Hm... It seems that the "Adopter Membership" is free, which could be
+appropriate for individual observers:
+
+http://uefi.org/join
+http://members.uefi.org/home/
+
+(Should Phil consider it.)
+
+Thanks
+Laszlo
