@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cYcGY-0006dH-Hm
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:30:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1cYcPl-0007Oo-F3
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:40:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cYcGX-0006ZH-J5
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:30:50 -0500
-Date: Tue, 31 Jan 2017 10:30:44 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170131103044.66316989@t450s.home>
-In-Reply-To: <1485880595-16376-1-git-send-email-thuth@redhat.com>
-References: <1485880595-16376-1-git-send-email-thuth@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1cYcPg-0001cr-IK
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 12:40:21 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1485879287-12548-1-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 31 Jan 2017 18:40:13 +0100
+In-Reply-To: <1485879287-12548-1-git-send-email-peter.maydell@linaro.org>
+	(Peter Maydell's message of "Tue, 31 Jan 2017 16:14:47 +0000")
+Message-ID: <87wpdbw2ki.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/vfio: Add CONFIG switches for
- calxeda-xgmac and amd-xgbe
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] Drop QEMU_GNUC_PREREQ() checks for gcc
+ older than 4.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, patches@linaro.org
 
-On Tue, 31 Jan 2017 17:36:35 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> Both devices seem to be specific to the ARM platform. It's confusing
-> for the users if they show up on other target architectures, too
-> (e.g. when the user runs QEMU with "-device ?" to get a list of
-> supported devices). Thus let's introduce proper configuration switches
-> so that the devices are only compiled and included when they are
-> really required.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> We already require gcc 4.1 or newer (for the atomic
+> support), so the fallback codepaths for older gcc
+> versions than that are now dead code and we can
+> just delete them.
+>
+> NB: clang reports itself as gcc 4.2 (regardless of
+> clang version), so clang won't be using the fallbacks
+> either.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  default-configs/arm-softmmu.mak | 2 ++
->  hw/vfio/Makefile.objs           | 4 ++--
->  2 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 6de3e16..a78be51 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -94,6 +94,8 @@ CONFIG_VERSATILE_PCI=y
->  CONFIG_VERSATILE_I2C=y
->  
->  CONFIG_PCI_GENERIC=y
-> +CONFIG_VFIO_XGMAC=y
-> +CONFIG_VFIO_AMD_XGBE=y
->  
->  CONFIG_SDHCI=y
->  CONFIG_INTEGRATOR_DEBUG=y
-> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-> index c25e32b..05e7fbb 100644
-> --- a/hw/vfio/Makefile.objs
-> +++ b/hw/vfio/Makefile.objs
-> @@ -2,7 +2,7 @@ ifeq ($(CONFIG_LINUX), y)
->  obj-$(CONFIG_SOFTMMU) += common.o
->  obj-$(CONFIG_PCI) += pci.o pci-quirks.o
->  obj-$(CONFIG_SOFTMMU) += platform.o
-> -obj-$(CONFIG_SOFTMMU) += calxeda-xgmac.o
-> -obj-$(CONFIG_SOFTMMU) += amd-xgbe.o
-> +obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
-> +obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
->  obj-$(CONFIG_SOFTMMU) += spapr.o
->  endif
+> For compatibility with clang we should probably try to avoid
+> using QEMU_GNUC_PREREQ() and instead have something in
+> compiler.h that abstracts away whether the test for "does
+> the compiler support feature foo" is via a GCC version
+> check or a clang __has_feature or whatever.
 
-I can't say that I fully agree that this is a good idea.  How many
-users are actually confused by this, versus the benefit of ensuring
-that it builds across all architectures?  Do we want to make platform
-also specific to ARM and spapr specific to ppc64?  Thanks,
+Yes, testing for feature is better than testing a version.
 
-Alex
+This patch reduces use of QEMU_GNUC_PREREQ roughly by half.  Good.
+
+>
+>
+>  include/qemu/compiler.h   |   8 ---
+>  include/qemu/host-utils.h | 121 ----------------------------------------------
+>  tcg/arm/tcg-target.h      |   7 ---
+>  3 files changed, 136 deletions(-)
+>
+> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> index 157698b..fc12e49 100644
+> --- a/include/qemu/compiler.h
+> +++ b/include/qemu/compiler.h
+> @@ -24,17 +24,9 @@
+>  
+>  #define QEMU_NORETURN __attribute__ ((__noreturn__))
+>  
+> -#if QEMU_GNUC_PREREQ(3, 4)
+>  #define QEMU_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+> -#else
+> -#define QEMU_WARN_UNUSED_RESULT
+> -#endif
+
+Should we inline this macro?
+
+>  
+> -#if QEMU_GNUC_PREREQ(4, 0)
+>  #define QEMU_SENTINEL __attribute__((sentinel))
+> -#else
+> -#define QEMU_SENTINEL
+> -#endif
+
+Likewise.
+
+>  
+>  #if QEMU_GNUC_PREREQ(4, 3)
+>  #define QEMU_ARTIFICIAL __attribute__((always_inline, artificial))
+[Nothing to say on the rest...]
+
+Regardless of my question:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
