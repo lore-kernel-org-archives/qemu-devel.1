@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33548)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cYaSO-0008IC-Bl
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:35:00 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34024)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1cYaUH-0001gp-3v
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:36:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cYaSN-0005b0-Bq
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:34:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54786)
+	(envelope-from <pl@kamp.de>) id 1cYaUC-0005xv-PI
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:36:53 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:54890 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cYaSN-0005aj-4c
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:34:55 -0500
-References: <CAO_EM_kS-aGQdvPEO+7pkFWHOSiu8XMpZSduS=gPgUsDwJd9ig@mail.gmail.com>
-	<20170127094033.GC26553@redhat.com>
-	<CAO_EM_no14RDCd42hJy1xbo=mYsdo8k7oAESVx2KpF277U45VQ@mail.gmail.com>
-	<20170131093927.GA20303@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d659ecc7-34a4-aad5-69c1-36ba4aff3d15@redhat.com>
-Date: Tue, 31 Jan 2017 10:34:53 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170131093927.GA20303@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [libvirt] char: Logging serial pty output when
- disconnected
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cYaUC-0005wq-Fj
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 10:36:48 -0500
+From: Peter Lieven <pl@kamp.de>
+Date: Tue, 31 Jan 2017 16:36:34 +0100
+Message-Id: <1485876994-14555-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH] qga: ignore EBUSY when freezing a filesystem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +21,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Ed Swierk <eswierk@skyportsystems.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, marcandre.lureau@redhat.com, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, ct@flyingcircus.io, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
 
+the current implementation fails if we try to freeze an
+already frozen filesystem. This can happen if a filesystem
+is mounted more than once (e.g. with a bind mount).
 
+Suggested-by: Christian Theune <ct@flyingcircus.io>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+ qga/commands-posix.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-On 31/01/2017 04:39, Daniel P. Berrange wrote:
-> On Mon, Jan 30, 2017 at 08:58:25PM -0800, Ed Swierk wrote:
->> On Fri, Jan 27, 2017 at 1:40 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
->>> On Thu, Jan 26, 2017 at 05:07:16PM -0800, Ed Swierk wrote:
->>>> Currently qemu_chr_fe_write() calls qemu_chr_fe_write_log() only for
->>>> data consumed by the backend chr_write function. With the pty backend,
->>>> pty_chr_write() returns 0 indicating that the data was not consumed
->>>> when the pty is disconnected. Simply changing it to return len instead
->>>> of 0 tricks the caller into logging the data even when the pty is
->>>> disconnected. I don't know what problems this might cause, but one
->>>> data point is that tcp_chr_write() already happens to work this way.
->>>>
->>>> Alternatively, qemu_chr_fe_write() could be modified to log everything
->>>> passed to it, regardless of how much data chr_write claims to have
->>>> consumed. The trouble is that the serial device retries writing
->>>> unconsumed data, so when the pty is disconnected you'd see every
->>>> character duplicated 4 times in the log file.
->>>>
->>>> Any opinions on either approach, or other suggestions? If there are no
->>>> objections to the first one, I'll prepare a patch.
->>>
->>> If the pty backend intends to just drop data into a blackhole when
->>> no client is connected, then its chr_write() impl should return
->>> the length of the data discarded, not zero.
->>
->> That's exactly the question: when no client is connected, should the
->> pty backend just drop the data into a black hole, returning the length
->> of the data discarded? Or should it return 0, letting the frontend
->> device decide what to do with it?
-> 
-> It should return len of data discarded.
-> 
->>
->> I can't discern a consistent pattern across all the char backends. The
->> closest analog is the tcp backend, which does discard the data and
->> return len. In contrast, several backends call
->> io_channel_send{,_full}(), which returns -1 if the write would block
->> or fails for any other reason.
->>
->> It's not clear there's much the frontend can do to recover from an
->> error, but there's no consistent pattern across serial devices either.
->> Most just ignore the return value. But the 16550A serial device
->> retries 4 times after an error. Changing the pty backend to discard
->> the data on the first attempt would bypass this retry mechanism. Is
->> that a problem?
-> 
-> I don't think so - retrying in this way is pointless IMHO - it is just
-> going to get the same result on every retry on 99% of occassions.
-
-Just to provide the full context, the retry happens even if you get
-EAGAIN, and in that case it does makes sense.
-
-But if the pty is disconnected I agree it should discard the data.
-
-Paolo
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index ea37c09..73d93eb 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1243,6 +1243,9 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
+          * filesystems may not implement fsfreeze for less obvious reasons.
+          * these will report EOPNOTSUPP. we simply ignore these when tallying
+          * the number of frozen filesystems.
++         * if a filesystem is mounted more than once (aka bind mount) a
++         * consecutive attempt to freeze an already frozen filesystem will
++         * return EBUSY.
+          *
+          * any other error means a failure to freeze a filesystem we
+          * expect to be freezable, so return an error in those cases
+@@ -1250,7 +1253,7 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
+          */
+         ret = ioctl(fd, FIFREEZE);
+         if (ret == -1) {
+-            if (errno != EOPNOTSUPP) {
++            if (errno != EOPNOTSUPP && errno != EBUSY) {
+                 error_setg_errno(errp, errno, "failed to freeze %s",
+                                  mount->dirname);
+                 close(fd);
+-- 
+1.9.1
