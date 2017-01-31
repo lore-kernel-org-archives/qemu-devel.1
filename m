@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60433)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYdP5-0007GN-PY
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:43:44 -0500
+	id 1cYdP8-0007Ix-Nb
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:43:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYdP4-0000Zw-Mt
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:43:43 -0500
-Received: from mail.kernel.org ([198.145.29.136]:38258)
+	id 1cYdP7-0000aj-Pe
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:43:46 -0500
+Received: from mail.kernel.org ([198.145.29.136]:38306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYdP4-0000Zg-Fy
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:43:42 -0500
-Date: Tue, 31 Jan 2017 20:43:38 +0200
+	id 1cYdP7-0000aP-Fr
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:43:45 -0500
+Date: Tue, 31 Jan 2017 20:43:40 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485888144-16531-16-git-send-email-mst@redhat.com>
+Message-ID: <1485888144-16531-17-git-send-email-mst@redhat.com>
 References: <1485888144-16531-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485888144-16531-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v4 15/23] msix: Follow CODING_STYLE
+Subject: [Qemu-devel] [PULL v4 16/23] hcd-xhci: check & correct param before
+ using it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,10 +31,19 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
 
+usb_xhci_realize() corrects invalid values of property "intrs"
+automatically, but the uncorrected value is passed to msi_init(),
+which chokes on invalid values.  Delay that until after the
+correction.
+
+Resources allocated by usb_xhci_init() are leaked when msi_init()
+fails.  Fix by calling it after msi_init().
+
+CC: Gerd Hoffmann <kraxel@redhat.com>
 CC: Markus Armbruster <armbru@redhat.com>
 CC: Marcel Apfelbaum <marcel@redhat.com>
 CC: Michael S. Tsirkin <mst@redhat.com>
@@ -44,36 +54,63 @@ Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci/msix.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ hw/usb/hcd-xhci.c | 37 ++++++++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
 
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index ee1714d..c938a9b 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -447,8 +447,10 @@ void msix_notify(PCIDevice *dev, unsigned vector)
- {
-     MSIMessage msg;
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index e0b5169..6575d05 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3627,25 +3627,6 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+     dev->config[PCI_CACHE_LINE_SIZE] = 0x10;
+     dev->config[0x60] = 0x30; /* release number */
  
--    if (vector >= dev->msix_entries_nr || !dev->msix_entry_used[vector])
-+    if (vector >= dev->msix_entries_nr || !dev->msix_entry_used[vector]) {
-         return;
+-    usb_xhci_init(xhci);
+-
+-    if (xhci->msi != ON_OFF_AUTO_OFF) {
+-        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
+-        /* Any error other than -ENOTSUP(board's MSI support is broken)
+-         * is a programming error */
+-        assert(!ret || ret == -ENOTSUP);
+-        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
+-            /* Can't satisfy user's explicit msi=on request, fail */
+-            error_append_hint(&err, "You have to use msi=auto (default) or "
+-                    "msi=off with this machine type.\n");
+-            error_propagate(errp, err);
+-            return;
+-        }
+-        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
+-        /* With msi=auto, we fall back to MSI off silently */
+-        error_free(err);
+-    }
+-
+     if (xhci->numintrs > MAXINTRS) {
+         xhci->numintrs = MAXINTRS;
+     }
+@@ -3667,6 +3648,24 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+         xhci->max_pstreams_mask = 0;
+     }
+ 
++    if (xhci->msi != ON_OFF_AUTO_OFF) {
++        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
++        /* Any error other than -ENOTSUP(board's MSI support is broken)
++         * is a programming error */
++        assert(!ret || ret == -ENOTSUP);
++        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
++            /* Can't satisfy user's explicit msi=on request, fail */
++            error_append_hint(&err, "You have to use msi=auto (default) or "
++                    "msi=off with this machine type.\n");
++            error_propagate(errp, err);
++            return;
++        }
++        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
++        /* With msi=auto, we fall back to MSI off silently */
++        error_free(err);
 +    }
 +
-     if (msix_is_masked(dev, vector)) {
-         msix_set_pending(dev, vector);
-         return;
-@@ -483,8 +485,10 @@ void msix_reset(PCIDevice *dev)
- /* Mark vector as used. */
- int msix_vector_use(PCIDevice *dev, unsigned vector)
- {
--    if (vector >= dev->msix_entries_nr)
-+    if (vector >= dev->msix_entries_nr) {
-         return -EINVAL;
-+    }
-+
-     dev->msix_entry_used[vector]++;
-     return 0;
- }
++    usb_xhci_init(xhci);
+     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
+ 
+     memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
 -- 
 MST
