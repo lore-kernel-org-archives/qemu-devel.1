@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYZZ3-0002MD-41
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:37:46 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cYZZU-0002hd-CJ
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYZZ2-0006UD-6K
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:37:45 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
-	<1485443388-27253-8-git-send-email-armbru@redhat.com>
-	<894b7bb8-768b-de12-cb48-7c9d52333bbe@redhat.com>
-Date: Tue, 31 Jan 2017 15:37:34 +0100
-In-Reply-To: <894b7bb8-768b-de12-cb48-7c9d52333bbe@redhat.com> (John Snow's
-	message of "Tue, 31 Jan 2017 07:37:42 -0500")
-Message-ID: <87efzjcn2p.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanha@redhat.com>) id 1cYZZT-0006b9-IU
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 09:38:12 -0500
+Date: Tue, 31 Jan 2017 14:38:01 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170131143801.GN18804@stefanha-x1.localdomain>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	<1482503344-6424-9-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 7/8] blockdev: Make
- orphaned -drive fatal
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Ll0BBk1HBk/f94B0"
+Content-Disposition: inline
+In-Reply-To: <1482503344-6424-9-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 08/21] backup: skip unallocated clusters
+ for full mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, jcody@redhat.com
 
-John Snow <jsnow@redhat.com> writes:
 
-> On 01/26/2017 10:09 AM, Markus Armbruster wrote:
->> Block backends defined with "-drive if=T" with T other than "none" are
->> meant to be picked up by machine initialization code: a suitable
->> frontend gets created and wired up automatically.
->> 
->> If machine initialization code doesn't comply, the block backend
->> remains unused.  This triggers a warning since commit a66c9dc, v2.2.0.
->> Drives created by default are excempted; use -nodefaults to get rid of
->> them.
->> 
->> Turn this warning into an error.
->> 
->
-> "Exempted," oddly enough.
-> </eblake>
+--Ll0BBk1HBk/f94B0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks!
+On Fri, Dec 23, 2016 at 05:28:51PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> +            if (is_top || bdrv_has_zero_init(blk_bs(job->target))) {
 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  blockdev.c                | 14 +++++++-------
->>  include/sysemu/blockdev.h |  2 +-
->>  2 files changed, 8 insertions(+), 8 deletions(-)
->> 
->> diff --git a/blockdev.c b/blockdev.c
->> index a597a66..ec9c114 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -227,28 +227,28 @@ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit)
->>      return NULL;
->>  }
->>  
->> -bool drive_check_orphaned(void)
->> +void drive_check_orphaned(void)
->>  {
->>      BlockBackend *blk;
->>      DriveInfo *dinfo;
->>      Location loc;
->> -    bool rs = false;
->> +    bool orphans = false;
->>  
->>      for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
->>          dinfo = blk_legacy_dinfo(blk);
->> -        /* If dinfo->bdrv->dev is NULL, it has no device attached. */
->> -        /* Unless this is a default drive, this may be an oversight. */
->>          if (!blk_get_attached_dev(blk) && !dinfo->is_default &&
->>              dinfo->type != IF_NONE) {
->>              loc_push_none(&loc);
->>              qemu_opts_loc_restore(dinfo->opts);
->> -            error_report("warning: machine type does not support this drive");
->> +            error_report("machine type does not support this drive");
->>              loc_pop(&loc);
->> -            rs = true;
->> +            orphans = true;
->>          }
->>      }
->>  
->> -    return rs;
->> +    if (orphans) {
->> +        exit(1);
->> +    }
->
-> Hardcore. Why not just return a status code and allow vl.c to exit? It
-> only has the one caller. (Unless you added more and I didn't read
-> because I'm lazy.)
->
-> You could even add an Error **arg if you wanted to; but vl.c has exits
-> all over the dang place, so maybe that's not really interesting.
+  /*
+   * Returns 1 if newly created images are guaranteed to contain
+   * only zeros, 0 otherwise.
+   */
+  int (*bdrv_has_zero_init)(BlockDriverState *bs);
 
-My excuse it that checking for orphans makes sense only during initial
-startup, and there, exit(1) on error is what we do.  Doing it right away
-is simplest.
+This function does not cover arbitrary images opened with bdrv_open(),
+only those created with bdrv_img_create() immediately before opening.
 
-I'm fine with leaving the exit() to the caller.  I would prefer to leave
-the printing to the caller as well then.
+This means that the check is only valid with backup->mode !=
+NEW_IMAGE_MODE_EXISTING.
 
-Anyone else got a preference?
+--Ll0BBk1HBk/f94B0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYkKFJAAoJEJykq7OBq3PIz3AH/3ZZ1lvFQCj2zhwSxy2JVL2q
+bZSMg70TO5/RwT7PA1YZeCHgaocC3ted8pwt4SQFw4UixM6OYRlo+9GCG9OgR01N
+b4Gf2MdLeu3+88kk2C2sX7Vc12iuGPCpH1Zk7uw0/DfMq9O5xcrcBs0QWzYRyWQK
+c8hRXKue6gTFOSRrSqTtG9jrwesKHsBoUicrzUe5DcME7payfjsYQicWbtgBnkVw
+CuHq8Msy6bi7EXdHpxugT+9OloLgU3Vd3tfMoFOjMewsT4zPVHFxOxY8jDhNnG2u
+ASIrOontF3WQEZp5VjBF4TAtqddwm3TJ7FBgh3hQBKwOGx3DIOZ2bMY6YIPPP1c=
+=p7yV
+-----END PGP SIGNATURE-----
+
+--Ll0BBk1HBk/f94B0--
