@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60001)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYdOJ-0006Yp-4v
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:42:56 -0500
+	id 1cYdOM-0006bJ-1y
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYdOI-00006v-AN
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:42:55 -0500
-Received: from mail.kernel.org ([198.145.29.136]:37610)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYdOI-00006C-4z
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:42:54 -0500
-Date: Tue, 31 Jan 2017 20:42:49 +0200
+	id 1cYdOL-00009z-4m
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:42:58 -0500
+Date: Tue, 31 Jan 2017 20:42:52 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485888144-16531-3-git-send-email-mst@redhat.com>
+Message-ID: <1485888144-16531-4-git-send-email-mst@redhat.com>
 References: <1485888144-16531-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485888144-16531-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v4 02/23] qxl: switch to constants within
+Subject: [Qemu-devel] [PULL v4 03/23] ppc: switch to constants within
  BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,42 +26,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
 We are switching BUILD_BUG_ON to verify that it's parameter is a
 compile-time constant, and it turns out that some gcc versions
 (specifically gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609) are
 not smart enough to figure it out for expressions involving local
 variables. This is harmless but means that the check is ineffective for
-these platforms.  To fix, replace variables with macros.
+these platforms.  To fix, replace the variable with macros.
 
 Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/display/qxl.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ hw/ppc/spapr.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index 62d0c80..af4c0ca 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -306,12 +306,11 @@ void qxl_spice_reset_cursor(PCIQXLDevice *qxl)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index a642e66..b81f2ac 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2630,8 +2630,8 @@ static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t index,
+      * 1TiB 64-bit MMIO windows for each PHB.
+      */
+     const uint64_t base_buid = 0x800000020000000ULL;
+-    const int max_phbs =
+-        (SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / SPAPR_PCI_MEM64_WIN_SIZE - 1;
++#define SPAPR_MAX_PHBS ((SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / \
++                        SPAPR_PCI_MEM64_WIN_SIZE - 1)
+     int i;
  
- static ram_addr_t qxl_rom_size(void)
- {
--    uint32_t required_rom_size = sizeof(QXLRom) + sizeof(QXLModes) +
--                                 sizeof(qxl_modes);
--    uint32_t rom_size = 8192; /* two pages */
-+#define QXL_REQUIRED_SZ (sizeof(QXLRom) + sizeof(QXLModes) + sizeof(qxl_modes))
-+#define QXL_ROM_SZ 8192
+     /* Sanity check natural alignments */
+@@ -2640,12 +2640,14 @@ static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t index,
+     QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM64_WIN_SIZE % SPAPR_PCI_MEM32_WIN_SIZE) != 0);
+     QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM32_WIN_SIZE % SPAPR_PCI_IO_WIN_SIZE) != 0);
+     /* Sanity check bounds */
+-    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_IO_WIN_SIZE) > SPAPR_PCI_MEM32_WIN_SIZE);
+-    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_MEM32_WIN_SIZE) > SPAPR_PCI_MEM64_WIN_SIZE);
++    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_IO_WIN_SIZE) >
++                      SPAPR_PCI_MEM32_WIN_SIZE);
++    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_MEM32_WIN_SIZE) >
++                      SPAPR_PCI_MEM64_WIN_SIZE);
  
--    QEMU_BUILD_BUG_ON(required_rom_size > rom_size);
--    return rom_size;
-+    QEMU_BUILD_BUG_ON(QXL_REQUIRED_SZ > QXL_ROM_SZ);
-+    return QXL_ROM_SZ;
- }
+-    if (index >= max_phbs) {
++    if (index >= SPAPR_MAX_PHBS) {
+         error_setg(errp, "\"index\" for PAPR PHB is too large (max %u)",
+-                   max_phbs - 1);
++                   SPAPR_MAX_PHBS - 1);
+         return;
+     }
  
- static void init_qxl_rom(PCIQXLDevice *d)
 -- 
 MST
