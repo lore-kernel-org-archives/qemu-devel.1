@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cYVJi-0001p7-On
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 05:05:39 -0500
+	(envelope-from <den@openvz.org>) id 1cYVLg-000463-Sr
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 05:07:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cYVJe-0005L2-KD
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 05:05:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36562)
+	(envelope-from <den@openvz.org>) id 1cYVLc-0005ig-O1
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 05:07:40 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:44933 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cYVJe-0005Kq-6v
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 05:05:34 -0500
-Date: Tue, 31 Jan 2017 10:05:29 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170131100528.GC2395@work-vm>
-References: <1485327241-15104-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1485327241-15104-3-git-send-email-zhang.zhanghailiang@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485327241-15104-3-git-send-email-zhang.zhanghailiang@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] savevm: Add new helpers to process the
- different stages of loadvm/savevm
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cYVLc-0005eA-BV
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 05:07:36 -0500
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Tue, 31 Jan 2017 13:07:19 +0300
+Message-Id: <1485857239-14296-1-git-send-email-den@openvz.org>
+Subject: [Qemu-devel] [PATCH 1/1] kvm: log available guest crash parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +21,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, quintela@redhat.com, xuquan8@huawei.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-* zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
-> There are several stages during loadvm/savevm process. In different stage,
-> migration incoming processes different types of sections.
-> We want to control these stages more accuracy, it will benefit COLO
-> performance, we don't have to save type of QEMU_VM_SECTION_START
-> sections everytime while do checkpoint, besides, we want to separate
-> the process of saving/loading memory and devices state.
-> 
-> So we add three new helper functions: qemu_loadvm_state_begin(),
-> qemu_load_device_state() and qemu_savevm_live_state() to achieve
-> different process during migration.
-> 
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-I don't think this one can go in without the patch that follows which
-uses these functions; we don't normally add functions
-without the patch that uses them.
+Windows reports BSOD parameters through Hyper-V crash MSRs. This
+information is very useful for initial crash analysis and thus
+it would be nice to see it in the QEMU log file. There is suitable
+log mask for the purpose.
 
-Dave
+Linux guest does not provide this information, but still it would
+be nice to log that we have crashed.
 
-> ---
->  include/sysemu/sysemu.h |  4 ++++
->  migration/savevm.c      | 41 +++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 45 insertions(+)
-> 
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index ff8ffb5..d9214bf 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -126,7 +126,11 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
->                                             uint64_t *start_list,
->                                             uint64_t *length_list);
->  
-> +void qemu_savevm_live_state(QEMUFile *f);
-> +
->  int qemu_loadvm_state(QEMUFile *f);
-> +int qemu_loadvm_state_begin(QEMUFile *f);
-> +int qemu_load_device_state(QEMUFile *f);
->  
->  extern int autostart;
->  
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 92b3d6c..04dee4f 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1264,6 +1264,13 @@ done:
->      return ret;
->  }
->  
-> +void qemu_savevm_live_state(QEMUFile *f)
-> +{
-> +    /* save QEMU_VM_SECTION_END section */
-> +    qemu_savevm_state_complete_precopy(f, true);
-> +    qemu_put_byte(f, QEMU_VM_EOF);
-> +}
-> +
->  static int qemu_save_device_state(QEMUFile *f)
->  {
->      SaveStateEntry *se;
-> @@ -2064,6 +2071,40 @@ int qemu_loadvm_state(QEMUFile *f)
->      return ret;
->  }
->  
-> +int qemu_loadvm_state_begin(QEMUFile *f)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    Error *local_err = NULL;
-> +    int ret;
-> +
-> +    if (qemu_savevm_state_blocked(&local_err)) {
-> +        error_report_err(local_err);
-> +        return -EINVAL;
-> +    }
-> +    /* Load QEMU_VM_SECTION_START section */
-> +    ret = qemu_loadvm_state_main(f, mis);
-> +    if (ret < 0) {
-> +        error_report("Failed to loadvm begin work: %d", ret);
-> +    }
-> +    return ret;
-> +}
-> +
-> +int qemu_load_device_state(QEMUFile *f)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    int ret;
-> +
-> +    /* Load QEMU_VM_SECTION_FULL section */
-> +    ret = qemu_loadvm_state_main(f, mis);
-> +    if (ret < 0) {
-> +        error_report("Failed to load device state: %d", ret);
-> +        return ret;
-> +    }
-> +
-> +    cpu_synchronize_all_post_init();
-> +    return 0;
-> +}
-> +
->  void hmp_savevm(Monitor *mon, const QDict *qdict)
->  {
->      BlockDriverState *bs, *bs1;
-> -- 
-> 1.8.3.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Marcelo Tosatti <mtosatti@redhat.com>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+---
+ hw/misc/pvpanic.c    |  1 +
+ include/sysemu/kvm.h |  2 ++
+ kvm-all.c            |  1 +
+ stubs/Makefile.objs  |  1 +
+ stubs/kvm-crash.c    |  8 ++++++++
+ target/i386/kvm.c    | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 64 insertions(+)
+ create mode 100644 stubs/kvm-crash.c
+
+diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
+index 0ac1e6a..221aa4e 100644
+--- a/hw/misc/pvpanic.c
++++ b/hw/misc/pvpanic.c
+@@ -42,6 +42,7 @@ static void handle_event(int event)
+     }
+ 
+     if (event & PVPANIC_PANICKED) {
++        qemu_log_mask(LOG_GUEST_ERROR, "Guest panicked\n");
+         qemu_system_guest_panicked();
+         return;
+     }
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 3045ee7..70cab9d 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -527,4 +527,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *source);
+  */
+ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
+ int kvm_get_max_memslots(void);
++
++void kvm_arch_log_crash(CPUState *cpu);
+ #endif
+diff --git a/kvm-all.c b/kvm-all.c
+index 330219e..5f83389 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -2000,6 +2000,7 @@ int kvm_cpu_exec(CPUState *cpu)
+                 ret = EXCP_INTERRUPT;
+                 break;
+             case KVM_SYSTEM_EVENT_CRASH:
++                kvm_arch_log_crash(cpu);
+                 qemu_mutex_lock_iothread();
+                 qemu_system_guest_panicked();
+                 qemu_mutex_unlock_iothread();
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index a187295..3b1632a 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -35,3 +35,4 @@ stub-obj-y += qmp_pc_dimm_device_list.o
+ stub-obj-y += target-monitor-defs.o
+ stub-obj-y += target-get-monitor-def.o
+ stub-obj-y += pc_madt_cpu_entry.o
++stub-obj-y += kvm-crash.o
+diff --git a/stubs/kvm-crash.c b/stubs/kvm-crash.c
+new file mode 100644
+index 0000000..36ab7f0
+--- /dev/null
++++ b/stubs/kvm-crash.c
+@@ -0,0 +1,8 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "sysemu/kvm.h"
++
++void kvm_arch_log_crash(CPUState *cs)
++{
++    return;
++}
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 3b52821..899a83c 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -2020,6 +2020,36 @@ static int kvm_get_sregs(X86CPU *cpu)
+     return 0;
+ }
+ 
++static int kvm_read_msr_hv_crash(X86CPU *cpu, uint64_t *buf)
++{
++    int i, ret;
++    struct {
++        struct kvm_msrs info;
++        struct kvm_msr_entry entries[HV_X64_MSR_CRASH_PARAMS];
++    } msr_data;
++
++    if (!has_msr_hv_crash) {
++        return -ENOSYS;
++    }
++
++    for (i = 0; i < HV_X64_MSR_CRASH_PARAMS; i++) {
++        msr_data.entries[i].index = HV_X64_MSR_CRASH_P0 + i;
++    }
++    msr_data.info.nmsrs = HV_X64_MSR_CRASH_PARAMS;
++
++    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
++    if (ret < 0) {
++        return ret;
++    }
++
++    for (i = 0; i < ret; i++) {
++        const struct kvm_msr_entry *msr = msr_data.entries + i;
++        buf[msr->index - HV_X64_MSR_CRASH_P0] = msr->data;
++    }
++
++    return 0;
++}
++
+ static int kvm_get_msrs(X86CPU *cpu)
+ {
+     CPUX86State *env = &cpu->env;
+@@ -2767,6 +2797,27 @@ int kvm_arch_get_registers(CPUState *cs)
+     return ret;
+ }
+ 
++void kvm_arch_log_crash(CPUState *cs)
++{
++    uint64_t msrs[HV_X64_MSR_CRASH_PARAMS];
++    int ret;
++    X86CPU *cpu = X86_CPU(cs);
++
++    qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed\n");
++    if (!has_msr_hv_crash) {
++        return;
++    }
++
++    ret = kvm_read_msr_hv_crash(cpu, msrs);
++    if (ret < 0) {
++        qemu_log_mask(LOG_GUEST_ERROR, "Failed to get HV crash parameters\n");
++        return;
++    }
++    qemu_log_mask(LOG_GUEST_ERROR, "HV crash parameters: (%#"PRIx64
++                  " %#"PRIx64" %#"PRIx64" %#"PRIx64" %#"PRIx64")\n",
++                  msrs[0], msrs[1], msrs[2], msrs[3], msrs[4]);
++}
++
+ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+ {
+     X86CPU *x86_cpu = X86_CPU(cpu);
+-- 
+2.7.4
