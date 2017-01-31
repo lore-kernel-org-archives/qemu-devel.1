@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54436)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYeuN-0004So-Dx
+	id 1cYeuN-0004Sr-Dx
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:20:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYeuM-0004Tc-7N
+	id 1cYeuI-0004Sc-EW
 	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:20:07 -0500
-Received: from mail.kernel.org ([198.145.29.136]:52918)
+Received: from mail.kernel.org ([198.145.29.136]:52858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYeuM-0004TK-2B
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:20:06 -0500
-Date: Tue, 31 Jan 2017 22:20:00 +0200
+	id 1cYeuI-0004SP-9F
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 15:20:02 -0500
+Date: Tue, 31 Jan 2017 22:19:58 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485893872-26524-20-git-send-email-mst@redhat.com>
+Message-ID: <1485893872-26524-19-git-send-email-mst@redhat.com>
 References: <1485893872-26524-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1485893872-26524-1-git-send-email-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v5 19/22] vhost-user: delete chardev on cleanup
+Subject: [Qemu-devel] [PULL v5 18/22] vhost: skip ROM sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +30,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+vhost does not support RO protections on memory at the moment - adding
+ROMs would mean that e.g. a buggy guest might change them in-memory - a
+condition from which guest reset does not recover. Not nice.
 
-Remove the chardev implicitly when cleaning up the netdev. This
-prevents from reusing the chardev since it would be in an incorrect
-state with the slave.
+We also definitely don't want to try logging writes into ROMs -
+in particular guests set very high addresses for ROM BARs
+so logging these writes would waste a lot of memory.
 
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1256618
+Maybe ROMs could be supported with the iotlb variant -
+not sure, but there seems to be no good reason for virtio
+to try to do DMA from ROM. So let's just skip ROM memory.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Suggested-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Tested-by: Laurent Vivier <lvivier@redhat.com>
 ---
- net/vhost-user.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/virtio/vhost.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index b0f0ab6..77b8110 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -151,7 +151,10 @@ static void vhost_user_cleanup(NetClientState *nc)
-         s->vhost_net =3D NULL;
-     }
-     if (nc->queue_index =3D=3D 0) {
-+        Chardev *chr =3D qemu_chr_fe_get_driver(&s->chr);
-+
-         qemu_chr_fe_deinit(&s->chr);
-+        qemu_chr_delete(chr);
-     }
-=20
-     qemu_purge_queued_packets(nc);
---=20
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index b124d97..febe519 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -612,7 +612,8 @@ static void vhost_set_memory(MemoryListener *listener,
+ 
+ static bool vhost_section(MemoryRegionSection *section)
+ {
+-    return memory_region_is_ram(section->mr);
++    return memory_region_is_ram(section->mr) &&
++        !memory_region_is_rom(section->mr);
+ }
+ 
+ static void vhost_begin(MemoryListener *listener)
+-- 
 MST
