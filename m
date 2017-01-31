@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYdPa-0007jH-EH
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:44:16 -0500
+	(envelope-from <thuth@redhat.com>) id 1cYdWK-00055m-IN
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:51:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
-	id 1cYdPZ-0000kx-7a
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:44:14 -0500
-Date: Tue, 31 Jan 2017 20:44:05 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1485888144-16531-24-git-send-email-mst@redhat.com>
-References: <1485888144-16531-1-git-send-email-mst@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1cYdWJ-0003ZR-LN
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:51:12 -0500
+References: <1485880595-16376-1-git-send-email-thuth@redhat.com>
+	<20170131103044.66316989@t450s.home>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5f0bafdc-6bb8-d936-e38c-5be92c46efc6@redhat.com>
+Date: Tue, 31 Jan 2017 19:51:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485888144-16531-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v4 23/23] arm: add trailing ;
- after MISMATCH_CHECK
+In-Reply-To: <20170131103044.66316989@t450s.home>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/vfio: Add CONFIG switches for
+ calxeda-xgmac and amd-xgbe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,170 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org
 
-Macro calls without a trailing ; look weird in C, this works as a side
-effect of how QEMU_BUILD_BUG_ON is implemented. Fix this up.
+On 31.01.2017 18:30, Alex Williamson wrote:
+> On Tue, 31 Jan 2017 17:36:35 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
+>=20
+>> Both devices seem to be specific to the ARM platform. It's confusing
+>> for the users if they show up on other target architectures, too
+>> (e.g. when the user runs QEMU with "-device ?" to get a list of
+>> supported devices). Thus let's introduce proper configuration switches
+>> so that the devices are only compiled and included when they are
+>> really required.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  default-configs/arm-softmmu.mak | 2 ++
+>>  hw/vfio/Makefile.objs           | 4 ++--
+>>  2 files changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
+tmmu.mak
+>> index 6de3e16..a78be51 100644
+>> --- a/default-configs/arm-softmmu.mak
+>> +++ b/default-configs/arm-softmmu.mak
+>> @@ -94,6 +94,8 @@ CONFIG_VERSATILE_PCI=3Dy
+>>  CONFIG_VERSATILE_I2C=3Dy
+>> =20
+>>  CONFIG_PCI_GENERIC=3Dy
+>> +CONFIG_VFIO_XGMAC=3Dy
+>> +CONFIG_VFIO_AMD_XGBE=3Dy
+>> =20
+>>  CONFIG_SDHCI=3Dy
+>>  CONFIG_INTEGRATOR_DEBUG=3Dy
+>> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+>> index c25e32b..05e7fbb 100644
+>> --- a/hw/vfio/Makefile.objs
+>> +++ b/hw/vfio/Makefile.objs
+>> @@ -2,7 +2,7 @@ ifeq ($(CONFIG_LINUX), y)
+>>  obj-$(CONFIG_SOFTMMU) +=3D common.o
+>>  obj-$(CONFIG_PCI) +=3D pci.o pci-quirks.o
+>>  obj-$(CONFIG_SOFTMMU) +=3D platform.o
+>> -obj-$(CONFIG_SOFTMMU) +=3D calxeda-xgmac.o
+>> -obj-$(CONFIG_SOFTMMU) +=3D amd-xgbe.o
+>> +obj-$(CONFIG_VFIO_XGMAC) +=3D calxeda-xgmac.o
+>> +obj-$(CONFIG_VFIO_AMD_XGBE) +=3D amd-xgbe.o
+>>  obj-$(CONFIG_SOFTMMU) +=3D spapr.o
+>>  endif
+>=20
+> I can't say that I fully agree that this is a good idea.  How many
+> users are actually confused by this, versus the benefit of ensuring
+> that it builds across all architectures?
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/kvm-consts.h | 98 ++++++++++++++++++++++++-------------------------
- 1 file changed, 49 insertions(+), 49 deletions(-)
+Why do you want this to be build on all architectures? The devices are
+only available on ARM as far as I know, so I can't see any real use for
+this. And it slows down compilation time, too, if we compile it
+everywhere (well, a little bit at least ;-)).
 
-diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
-index 06b6c92..aad2825 100644
---- a/target/arm/kvm-consts.h
-+++ b/target/arm/kvm-consts.h
-@@ -33,12 +33,12 @@
- #define CP_REG_ARM             0x4000000000000000ULL
- #define CP_REG_ARCH_MASK       0xff00000000000000ULL
- 
--MISMATCH_CHECK(CP_REG_SIZE_SHIFT, KVM_REG_SIZE_SHIFT)
--MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK)
--MISMATCH_CHECK(CP_REG_SIZE_U32, KVM_REG_SIZE_U32)
--MISMATCH_CHECK(CP_REG_SIZE_U64, KVM_REG_SIZE_U64)
--MISMATCH_CHECK(CP_REG_ARM, KVM_REG_ARM)
--MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK)
-+MISMATCH_CHECK(CP_REG_SIZE_SHIFT, KVM_REG_SIZE_SHIFT);
-+MISMATCH_CHECK(CP_REG_SIZE_MASK, KVM_REG_SIZE_MASK);
-+MISMATCH_CHECK(CP_REG_SIZE_U32, KVM_REG_SIZE_U32);
-+MISMATCH_CHECK(CP_REG_SIZE_U64, KVM_REG_SIZE_U64);
-+MISMATCH_CHECK(CP_REG_ARM, KVM_REG_ARM);
-+MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK);
- 
- #define QEMU_PSCI_0_1_FN_BASE 0x95c1ba5e
- #define QEMU_PSCI_0_1_FN(n) (QEMU_PSCI_0_1_FN_BASE + (n))
-@@ -47,10 +47,10 @@ MISMATCH_CHECK(CP_REG_ARCH_MASK, KVM_REG_ARCH_MASK)
- #define QEMU_PSCI_0_1_FN_CPU_ON QEMU_PSCI_0_1_FN(2)
- #define QEMU_PSCI_0_1_FN_MIGRATE QEMU_PSCI_0_1_FN(3)
- 
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_SUSPEND, KVM_PSCI_FN_CPU_SUSPEND)
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_OFF, KVM_PSCI_FN_CPU_OFF)
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_ON, KVM_PSCI_FN_CPU_ON)
--MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE)
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_SUSPEND, KVM_PSCI_FN_CPU_SUSPEND);
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_OFF, KVM_PSCI_FN_CPU_OFF);
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_CPU_ON, KVM_PSCI_FN_CPU_ON);
-+MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE);
- 
- #define QEMU_PSCI_0_2_FN_BASE 0x84000000
- #define QEMU_PSCI_0_2_FN(n) (QEMU_PSCI_0_2_FN_BASE + (n))
-@@ -77,13 +77,13 @@ MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE)
- #define QEMU_PSCI_0_2_FN64_AFFINITY_INFO QEMU_PSCI_0_2_FN64(4)
- #define QEMU_PSCI_0_2_FN64_MIGRATE QEMU_PSCI_0_2_FN64(5)
- 
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_SUSPEND, PSCI_0_2_FN_CPU_SUSPEND)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_OFF, PSCI_0_2_FN_CPU_OFF)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_ON, PSCI_0_2_FN_CPU_ON)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN_MIGRATE, PSCI_0_2_FN_MIGRATE)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_SUSPEND, PSCI_0_2_FN64_CPU_SUSPEND)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_ON, PSCI_0_2_FN64_CPU_ON)
--MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE)
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_SUSPEND, PSCI_0_2_FN_CPU_SUSPEND);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_OFF, PSCI_0_2_FN_CPU_OFF);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_ON, PSCI_0_2_FN_CPU_ON);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN_MIGRATE, PSCI_0_2_FN_MIGRATE);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_SUSPEND, PSCI_0_2_FN64_CPU_SUSPEND);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_ON, PSCI_0_2_FN64_CPU_ON);
-+MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE);
- 
- /* PSCI v0.2 return values used by TCG emulation of PSCI */
- 
-@@ -93,9 +93,9 @@ MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE)
- /* We implement version 0.2 only */
- #define QEMU_PSCI_0_2_RET_VERSION_0_2                       2
- 
--MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP)
-+MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP);
- MISMATCH_CHECK(QEMU_PSCI_0_2_RET_VERSION_0_2,
--               (PSCI_VERSION_MAJOR(0) | PSCI_VERSION_MINOR(2)))
-+               (PSCI_VERSION_MAJOR(0) | PSCI_VERSION_MINOR(2)));
- 
- /* PSCI return values (inclusive of all PSCI versions) */
- #define QEMU_PSCI_RET_SUCCESS                     0
-@@ -108,15 +108,15 @@ MISMATCH_CHECK(QEMU_PSCI_0_2_RET_VERSION_0_2,
- #define QEMU_PSCI_RET_NOT_PRESENT                 -7
- #define QEMU_PSCI_RET_DISABLED                    -8
- 
--MISMATCH_CHECK(QEMU_PSCI_RET_SUCCESS, PSCI_RET_SUCCESS)
--MISMATCH_CHECK(QEMU_PSCI_RET_NOT_SUPPORTED, PSCI_RET_NOT_SUPPORTED)
--MISMATCH_CHECK(QEMU_PSCI_RET_INVALID_PARAMS, PSCI_RET_INVALID_PARAMS)
--MISMATCH_CHECK(QEMU_PSCI_RET_DENIED, PSCI_RET_DENIED)
--MISMATCH_CHECK(QEMU_PSCI_RET_ALREADY_ON, PSCI_RET_ALREADY_ON)
--MISMATCH_CHECK(QEMU_PSCI_RET_ON_PENDING, PSCI_RET_ON_PENDING)
--MISMATCH_CHECK(QEMU_PSCI_RET_INTERNAL_FAILURE, PSCI_RET_INTERNAL_FAILURE)
--MISMATCH_CHECK(QEMU_PSCI_RET_NOT_PRESENT, PSCI_RET_NOT_PRESENT)
--MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED)
-+MISMATCH_CHECK(QEMU_PSCI_RET_SUCCESS, PSCI_RET_SUCCESS);
-+MISMATCH_CHECK(QEMU_PSCI_RET_NOT_SUPPORTED, PSCI_RET_NOT_SUPPORTED);
-+MISMATCH_CHECK(QEMU_PSCI_RET_INVALID_PARAMS, PSCI_RET_INVALID_PARAMS);
-+MISMATCH_CHECK(QEMU_PSCI_RET_DENIED, PSCI_RET_DENIED);
-+MISMATCH_CHECK(QEMU_PSCI_RET_ALREADY_ON, PSCI_RET_ALREADY_ON);
-+MISMATCH_CHECK(QEMU_PSCI_RET_ON_PENDING, PSCI_RET_ON_PENDING);
-+MISMATCH_CHECK(QEMU_PSCI_RET_INTERNAL_FAILURE, PSCI_RET_INTERNAL_FAILURE);
-+MISMATCH_CHECK(QEMU_PSCI_RET_NOT_PRESENT, PSCI_RET_NOT_PRESENT);
-+MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED);
- 
- /* Note that KVM uses overlapping values for AArch32 and AArch64
-  * target CPU numbers. AArch32 targets:
-@@ -137,14 +137,14 @@ MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED)
- #define QEMU_KVM_ARM_TARGET_NONE UINT_MAX
- 
- #ifdef TARGET_AARCH64
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_AEM_V8, KVM_ARM_TARGET_AEM_V8)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_FOUNDATION_V8, KVM_ARM_TARGET_FOUNDATION_V8)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A57, KVM_ARM_TARGET_CORTEX_A57)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_XGENE_POTENZA, KVM_ARM_TARGET_XGENE_POTENZA)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A53, KVM_ARM_TARGET_CORTEX_A53)
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_AEM_V8, KVM_ARM_TARGET_AEM_V8);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_FOUNDATION_V8, KVM_ARM_TARGET_FOUNDATION_V8);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A57, KVM_ARM_TARGET_CORTEX_A57);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_XGENE_POTENZA, KVM_ARM_TARGET_XGENE_POTENZA);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A53, KVM_ARM_TARGET_CORTEX_A53);
- #else
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A15, KVM_ARM_TARGET_CORTEX_A15)
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7)
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A15, KVM_ARM_TARGET_CORTEX_A15);
-+MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7);
- #endif
- 
- #define CP_REG_ARM64                   0x6000000000000000ULL
-@@ -166,20 +166,20 @@ MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7)
- #define CP_REG_ARM64_SYSREG_CP (CP_REG_ARM64_SYSREG >> CP_REG_ARM_COPROC_SHIFT)
- 
- #ifdef TARGET_AARCH64
--MISMATCH_CHECK(CP_REG_ARM64, KVM_REG_ARM64)
--MISMATCH_CHECK(CP_REG_ARM_COPROC_MASK, KVM_REG_ARM_COPROC_MASK)
--MISMATCH_CHECK(CP_REG_ARM_COPROC_SHIFT, KVM_REG_ARM_COPROC_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG, KVM_REG_ARM64_SYSREG)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_MASK, KVM_REG_ARM64_SYSREG_OP0_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_SHIFT, KVM_REG_ARM64_SYSREG_OP0_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_MASK, KVM_REG_ARM64_SYSREG_OP1_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_SHIFT, KVM_REG_ARM64_SYSREG_OP1_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_MASK, KVM_REG_ARM64_SYSREG_CRN_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_SHIFT, KVM_REG_ARM64_SYSREG_CRN_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_MASK, KVM_REG_ARM64_SYSREG_CRM_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_SHIFT, KVM_REG_ARM64_SYSREG_CRM_SHIFT)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_MASK, KVM_REG_ARM64_SYSREG_OP2_MASK)
--MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_SHIFT, KVM_REG_ARM64_SYSREG_OP2_SHIFT)
-+MISMATCH_CHECK(CP_REG_ARM64, KVM_REG_ARM64);
-+MISMATCH_CHECK(CP_REG_ARM_COPROC_MASK, KVM_REG_ARM_COPROC_MASK);
-+MISMATCH_CHECK(CP_REG_ARM_COPROC_SHIFT, KVM_REG_ARM_COPROC_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG, KVM_REG_ARM64_SYSREG);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_MASK, KVM_REG_ARM64_SYSREG_OP0_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP0_SHIFT, KVM_REG_ARM64_SYSREG_OP0_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_MASK, KVM_REG_ARM64_SYSREG_OP1_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP1_SHIFT, KVM_REG_ARM64_SYSREG_OP1_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_MASK, KVM_REG_ARM64_SYSREG_CRN_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRN_SHIFT, KVM_REG_ARM64_SYSREG_CRN_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_MASK, KVM_REG_ARM64_SYSREG_CRM_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_SHIFT, KVM_REG_ARM64_SYSREG_CRM_SHIFT);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_MASK, KVM_REG_ARM64_SYSREG_OP2_MASK);
-+MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_SHIFT, KVM_REG_ARM64_SYSREG_OP2_SHIFT);
- #endif
- 
- #undef MISMATCH_CHECK
--- 
-MST
+> Do we want to make platform also specific to ARM
+
+I did not notice that one yet, since it does not show up in the "-device
+?" help text (it's apparently an abstract device), so it also does not
+really bother me.
+But if I remove the device from the build, I get a funny error when I
+try to view the device help text:
+
+$ qemu-system-tricore -device ?
+**
+ERROR:/home/thuth/devel/qemu/qom/object.c:168:type_get_parent: assertion
+failed: (type->parent_type !=3D NULL)
+Aborted (core dumped)
+
+So I guess we should rather keep that one for now.
+
+> and spapr specific to ppc64?
+
+I already tried that (with the already existing CONFIG_PSERIES), but the
+code in common.c depends on the code in spapr.c, so it can't be removed
+without reworking the code quite a bit. But spapr.c also does not really
+bug me, since it does not register a type that shows up in the "-device
+?" help text, so I think it is not worth the effort here.
+
+ Thomas
