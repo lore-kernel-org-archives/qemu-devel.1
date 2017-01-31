@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYdMr-0005Mk-Ij
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:41:26 -0500
+	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
+	id 1cYdOH-0006Y4-UJ
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:42:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYdMq-0007s6-M0
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:41:25 -0500
-Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:36469)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cYdMq-0007rp-Gw
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:41:24 -0500
-Received: by mail-ua0-x22b.google.com with SMTP id 96so279356376uaq.3
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 10:41:24 -0800 (PST)
+	(envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
+	id 1cYdOF-0008Vs-FM
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:42:54 -0500
+Received: from mail.kernel.org ([198.145.29.136]:37584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <SRS0=CMim=ZN=redhat.com=mst@kernel.org>)
+	id 1cYdOF-0008VI-9m
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:42:51 -0500
+Date: Tue, 31 Jan 2017 20:42:47 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1485888144-16531-2-git-send-email-mst@redhat.com>
+References: <1485888144-16531-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170131162122.29408-1-marcandre.lureau@redhat.com>
-References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Jan 2017 18:41:03 +0000
-Message-ID: <CAFEAcA9jzxGZXXoFWxrDztb4or=0LaqpeNa3YH9rpZePa2mFdA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/41] Chr split patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485888144-16531-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL v4 01/23] compiler: drop ; after BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 31 January 2017 at 16:20, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
-> The following changes since commit a0def594286d9110a6035e02eef558cf3cf5d8=
-47:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
-taging (2017-01-30 10:23:20 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/elmarco/qemu.git tags/chr-split-pull-request
->
-> for you to fetch changes up to 3766519be2843e0947425cafd1e7e205dd63f0fd:
->
->   char: headers clean-up (2017-01-31 13:03:48 +0400)
->
-> ----------------------------------------------------------------
->
+All users include the trailing ; anyway, let's require that -
+it seems cleaner.
 
-'make check' fails on a linux-user-targets-only build:
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ include/qemu/compiler.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-tests/test-char.o: In function `char_stdio_test_subprocess':
-/home/petmay01/linaro/qemu-for-merges/tests/test-char.c:47: undefined
-reference to `qemu_chr_new'
-/home/petmay01/linaro/qemu-for-merges/tests/test-char.c:50: undefined
-reference to `qemu_chr_fe_init'
-/home/petmay01/linaro/qemu-for-merges/tests/test-char.c:51: undefined
-reference to `qemu_chr_fe_set_open'
-/home/petmay01/linaro/qemu-for-merges/tests/test-char.c:52: undefined
-reference to `qemu_chr_fe_write'
-[etc etc etc]
-
-thanks
--- PMM
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 157698b..7512082 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -86,7 +86,8 @@
+ #define type_check(t1,t2) ((t1*)0 - (t2*)0)
+ 
+ #define QEMU_BUILD_BUG_ON(x) \
+-    typedef char glue(qemu_build_bug_on__,__LINE__)[(x)?-1:1] __attribute__((unused));
++    typedef char glue(qemu_build_bug_on__, __LINE__)[(x) ? -1 : 1] \
++        __attribute__((unused))
+ 
+ #if defined __GNUC__
+ # if !QEMU_GNUC_PREREQ(4, 4)
+-- 
+MST
