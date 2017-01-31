@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYdXT-0006Dd-JI
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:52:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1cYdYm-0000r4-MN
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYdXO-0003rO-ES
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:52:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54158)
+	(envelope-from <eblake@redhat.com>) id 1cYdYi-0004Ti-N0
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:53:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cYdXO-0003r4-50
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:52:18 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cYdYi-0004Ta-Dn
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 13:53:40 -0500
 References: <1485888144-16531-1-git-send-email-mst@redhat.com>
-	<1485888144-16531-7-git-send-email-mst@redhat.com>
+	<1485888144-16531-6-git-send-email-mst@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c7b111d6-3c5c-e89c-f928-e195469b2328@redhat.com>
-Date: Tue, 31 Jan 2017 12:52:11 -0600
+Message-ID: <ca375be4-6694-2de2-dac2-38e0f587d576@redhat.com>
+Date: Tue, 31 Jan 2017 12:53:34 -0600
 MIME-Version: 1.0
-In-Reply-To: <1485888144-16531-7-git-send-email-mst@redhat.com>
+In-Reply-To: <1485888144-16531-6-git-send-email-mst@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="aRtDsNkkQe4cPVtxVvUV4rbwUsiPgx6o1"
-Subject: Re: [Qemu-devel] [PULL v4 06/23] QEMU_BUILD_BUG_ON: use __COUNTER__
+	boundary="JS2mIScO2nhh4xrmwRDF5ABp66sFiK343"
+Subject: Re: [Qemu-devel] [PULL v4 05/23] compiler: rework BUG_ON using a
+ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +30,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aRtDsNkkQe4cPVtxVvUV4rbwUsiPgx6o1
+--JS2mIScO2nhh4xrmwRDF5ABp66sFiK343
 From: Eric Blake <eblake@redhat.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <c7b111d6-3c5c-e89c-f928-e195469b2328@redhat.com>
-Subject: Re: [PULL v4 06/23] QEMU_BUILD_BUG_ON: use __COUNTER__
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ca375be4-6694-2de2-dac2-38e0f587d576@redhat.com>
+Subject: Re: [PULL v4 05/23] compiler: rework BUG_ON using a struct
 References: <1485888144-16531-1-git-send-email-mst@redhat.com>
- <1485888144-16531-7-git-send-email-mst@redhat.com>
-In-Reply-To: <1485888144-16531-7-git-send-email-mst@redhat.com>
+ <1485888144-16531-6-git-send-email-mst@redhat.com>
+In-Reply-To: <1485888144-16531-6-git-send-email-mst@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 01/31/2017 12:43 PM, Michael S. Tsirkin wrote:
-> Some headers use QEMU_BUILD_BUG_ON. This causes a problem
-> if the C file including that header happens to have
-> QEMU_BUILD_BUG_ON at the same line number.
->=20
-> Fix using a widely available extension: __COUNTER__.
-> If unavailable, provide a stub.
+On 01/31/2017 12:42 PM, Michael S. Tsirkin wrote:
+> There are theoretical concerns that some compilers might not trigger
+> build failures on attempts to define an array of size (x ? -1 : 1) wher=
+e
+> x is a variable and make it a variable sized array instead. Let rewrite=
 
-Uhh, this isn't the right commit message.  What happened?
+
+s/Let/Let's/
+
+> using a struct with a negative bit field size instead as there are no
+> dynamic bit field sizes.  This is similar to what Linux does.
+
+On one of the earlier review spins, I suggested making it explicit that
+we are now requiring that the condition be a compile-time constant (you
+got that wording in 2/23, but not here) - food for thought if you have
+to respin this.
 
 >=20
 > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  include/qemu/compiler.h | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-> index 057639a..e0ce9ff 100644
-> --- a/include/qemu/compiler.h
-> +++ b/include/qemu/compiler.h
-> @@ -97,6 +97,9 @@
->  #define QEMU_BUILD_BUG_ON(x)
->  #endif
-> =20
-> +#define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(QEMU_BUILD_BUG_ON_STRUCT(x))=
- - \
-> +                                   sizeof(QEMU_BUILD_BUG_ON_STRUCT(x))=
-)
-> +
->  #if defined __GNUC__
->  # if !QEMU_GNUC_PREREQ(4, 4)
->     /* gcc versions before 4.4.x don't support gnu_printf, so use print=
-f. */
->=20
+>  include/qemu/compiler.h | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---aRtDsNkkQe4cPVtxVvUV4rbwUsiPgx6o1
+--JS2mIScO2nhh4xrmwRDF5ABp66sFiK343
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -95,13 +86,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYkNzbAAoJEKeha0olJ0NqcM8H/ivFVK4Dvc/ThlslLPo701vU
-EZwUSmlO0kM1fslxO7grgBb1coj7/F3+UBGb5mB3Km56U6t/WBPiZNsplkr2wga8
-Y1/Uj44Fm66+QNXl613989JOBNbXR+/chW8pZ1L7gRfqEYnR6QyJKyOMJCuVN7CS
-kblkPhP6edfvUSAk9xhr7toQ9n+dFEF3U+S+6Bko6hOZF7VbYGeMWXqrxdfS+wp1
-oCNmNIv9K3Xna66FsrafWKYIdotsj2erMEH+WuI9X3XYI8j7XWl00cw24UIHmfx5
-POI0UcalkaIKJw35kCbVuUO9SDcvBFXv4TTJhZRhXjBpd3j0T4MX1f3Wbs8eGDM=
-=O7Fi
+iQEcBAEBCAAGBQJYkN0uAAoJEKeha0olJ0NqUzoH/0ClWSCKbow86sRZL2AxN9EH
+LFDPSBSdlzsUR1P1skOWCy67BAgn4cAu0teub8X8vs8r560AcPMpmc1bpRjEDVhS
+7w1zevkEFjz8BotzsRPNNNZx1T7TbXjVod631L0de0zvK9hfa+SfGZ+dF09fqRbU
+ZF9FBsj4x6XJbNXLbPXc9cPe41kcH4AiwJFVTzK0mh0frJ+COesFOdraXAUw0PXW
+2rZcjQ3RWcQl1d074Jx+0H+Wqp69O1MFVR7GISA8V3C/c3jS0Vz+NF9ZCyZx/yVE
+zADKjgous1Eb7ogk6kO911b3rRSQreBZJl9Q7uLodXYXT4JPeNisYl8pRgPeHF8=
+=317x
 -----END PGP SIGNATURE-----
 
---aRtDsNkkQe4cPVtxVvUV4rbwUsiPgx6o1--
+--JS2mIScO2nhh4xrmwRDF5ABp66sFiK343--
