@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cYOXL-0003Ih-47
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 21:51:16 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cYPTq-0000nR-Jh
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 22:51:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cYOXI-0002Y6-2U
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 21:51:15 -0500
-Received: from mga04.intel.com ([192.55.52.120]:54041)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cYOXH-0002Xp-OU
-	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 21:51:12 -0500
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Tue, 31 Jan 2017 02:51:04 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F73917B30A@shsmsx102.ccr.corp.intel.com>
-References: <8a51513f-59d7-a361-a4ef-99679aa460fb@siemens.com>
-	<874m0peu50.fsf@dusky.pond.sub.org>
-	<533e0b17-4d60-a584-5680-559834013c68@web.de>
-	<87inp05m8m.fsf@dusky.pond.sub.org>
-	<4504afce-c62e-c54f-33a3-483f16dc4530@web.de>
-	<CAJ+F1C+UmEz_On1cGSrYDL0FZXqqeURV93nAvbnLA71WpNoL4w@mail.gmail.com>
-	<bf19ec6d-7382-5563-2871-65a1111df691@web.de>
-In-Reply-To: <bf19ec6d-7382-5563-2871-65a1111df691@web.de>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <dgibson@ozlabs.org>) id 1cYPTp-0001Wo-EW
+	for qemu-devel@nongnu.org; Mon, 30 Jan 2017 22:51:42 -0500
+Date: Tue, 31 Jan 2017 13:55:24 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170131025524.GI14879@umbus.fritz.box>
+References: <1485534415-20887-1-git-send-email-mst@redhat.com>
+	<1485534415-20887-3-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Towards an ivshmem 2.0?
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ev7mvGV+3JQuI2Eo"
+Content-Disposition: inline
+In-Reply-To: <1485534415-20887-3-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] ppc: switch to constants within
+ BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@web.de>, =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: Jailhouse <jailhouse-dev@googlegroups.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-T24gU3VuZGF5LCBKYW51YXJ5IDI5LCAyMDE3IDEwOjE0IFBNLCBKYW4gS2lzemthIHdyb3RlOg0K
-PiBPbiAyMDE3LTAxLTI5IDE1OjAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3JvdGU6DQo+ID4gSGkN
-Cj4gPg0KPiA+IE9uIFN1biwgSmFuIDI5LCAyMDE3IGF0IDEyOjQ0IFBNIEphbiBLaXN6a2EgPGph
-bi5raXN6a2FAd2ViLmRlDQo+ID4gPG1haWx0bzpqYW4ua2lzemthQHdlYi5kZT4+IHdyb3RlOg0K
-PiA+DQo+ID4gICAgID4+IE9mIGNvdXJzZSwgSSdtIGNhcmVmdWwgd2l0aCBpbnZlc3RpbmcgbXVj
-aCB0aW1lIGludG8gZXhwYW5kaW5nIHRoZQ0KPiA+ICAgICA+PiBleGlzdGluZywgZm9yIEphaWxo
-b3VzZSBwb3NzaWJseSBzdWZmaWNpZW50IGRlc2lnbiBpZiB0aGVyZSBubyByZWFsDQo+ID4gICAg
-ID4+IGludGVyZXN0IGluIGNvbnRpbnVpbmcgdGhlIGl2c2htZW0gc3VwcG9ydCBpbiBRRU1VIC0g
-YmVjYXVzZSBvZg0KPiA+ICAgICA+PiB2aG9zdC1wY2kgb3Igb3RoZXIgcmVhc29ucy4gQnV0IGlm
-IHRoYXQgaW50ZXJlc3QgZXhpc3RzLCBpdCB3b3VsZCBiZQ0KPiA+ICAgICA+PiBiZW5lZmljaWFs
-IGZvciB1cyB0byBoYXZlIFFFTVUgc3VwcG9ydGluZyBhIGNvbXBhdGlibGUgdmVyc2lvbg0KPiA+
-ICAgICBhbmQgdXNpbmcNCj4gPiAgICAgPj4gdGhlIHNhbWUgZ3Vlc3QgZHJpdmVycy4gVGhlbiBJ
-IHdvdWxkIHN0YXJ0IGxvb2tpbmcgaW50byBjb25jcmV0ZQ0KPiA+ICAgICBwYXRjaGVzDQo+ID4g
-ICAgID4+IGZvciBpdCBhcyB3ZWxsLg0KPiA+ICAgICA+DQo+ID4gICAgID4gSW50ZXJlc3QgaXMg
-ZGlmZmljdWx0IGZvciBtZSB0byBnYXVnZSwgbm90IGxlYXN0IGJlY2F1c2UgYWx0ZXJuYXRpdmVz
-DQo+ID4gICAgID4gYXJlIHN0aWxsIGJlaW5nIHdvcmtlZCBvbi4NCj4gPg0KPiA+ICAgICBJJ20g
-Y29uc2lkZXJpbmcgdG8gc3VnZ2VzdCB0aGlzIGFzIEdTb0MgcHJvamVjdCBub3cuDQo+ID4NCj4g
-Pg0KPiA+IEl0J3MgYmV0dGVyIGZvciBhIHN0dWRlbnQgYW5kIGZvciB0aGUgY29tbXVuaXR5IGlm
-IHRoZSB3b3JrIGdldA0KPiA+IGFjY2VwdGVkIGluIHRoZSBlbmQuDQo+ID4NCj4gPiBTbywgSSB0
-aGluayB0aGF0IGNvdWxkIGJlIGFuIGludGVyc3RpbmcgR1NvQyAoaW1wbGVtZW50aW5nIHlvdXIN
-Cj4gPiBpdnNobWVtDQo+ID4gMiBwcm9wb3NhbCkuIEhvd2V2ZXIsIGlmIHRoZSBxZW11IGNvbW11
-bml0eSBpc24ndCByZWFkeSB0byBhY2NlcHQgYQ0KPiA+IG5ldyBpdnNobWVtLCBhbmQgd291bGQg
-cmF0aGVyIGhhdmUgdmhvc3QtcGNpIGJhc2VkIHNvbHV0aW9uLCBJIHdvdWxkDQo+ID4gc3VnZ2Vz
-dCBhIGRpZmZlcmVudCBwcm9qZWN0IChob3BlZnVsbHkgV2VpIFdhbmcgY2FuIGhlbHAgZGVmaW5l
-IGl0IGFuZCBtZW50b3IpOg0KPiA+IHdvcmsgb24gYSB2aG9zdC1wY2kgdXNpbmcgZGVkaWNhdGVk
-IHNoYXJlZCBQQ0kgQkFScyAoYW5kIGtlcm5lbA0KPiA+IHN1cHBvcnQgdG8gYXZvaWQgZXh0cmEg
-Y29weSAtIGlmIEkgdW5kZXJzdGFuZCB0aGUgZXh0cmEgY29weSBzaXR1YXRpb24gY29ycmVjdGx5
-KS4NCg0KVGhhbmtzIGZvciB0aGUgc3VnZ2VzdGlvbi4gSeKAmW0gZ2xhZCB0byBoZWxwIGl0LiAN
-Cg0KRm9yIHRoYXQgc29ydCBvZiB1c2FnZSAoc3RhdGljIGNvbmZpZ3VyYXRpb24gZXh0ZW5zaW9u
-IFsxXSksIEnigJltIHRoaW5raW5nIHRoYXQgaXTigJlzIHBvc3NpYmxlIHRvIGJ1aWxkIHN5bW1l
-dHJpYyB2aG9zdC1wY2ktbmV0IGNvbW11bmljYXRpb24sIGFzIGFwcG9zZSB0byDigJx2aG9zdC1w
-Y2ktbmV0PC0+IHZpcnRpby1uZXTigJ0uDQoNCj4gSXQncyBzdGlsbCBvcGVuIGlmIHZob3N0LXBj
-aSBjYW4gcmVwbGFjZSBpdnNobWVtIChub3QgdG8gc3BlYWsgb2YgYmVpbmcgZGVzaXJhYmxlDQo+
-IGZvciBKYWlsaG91c2UgLSBJJ20gc3RpbGwgc3R1ZHlpbmcpLiBJbiB0aGF0IGxpZ2h0LCBoYXZp
-bmcgYm90aCBpbXBsZW1lbnRhdGlvbnMNCj4gYXZhaWxhYmxlIHRvIGRvIHJlYWwgY29tcGFyaXNv
-bnMgaXMgdmFsdWFibGUgSU1ITy4NCj4gDQo+IFRoYXQgc2FpZCwgd2Ugd2lsbCBwbGF5IHdpdGgg
-b3BlbiBjYXJkcywgZXhwbGFpbiB0aGUgc3R1ZGVudCB0aGUgc2l0dWF0aW9uIGFuZCBsZXQNCj4g
-aGVyL2hpbSBkZWNpZGUga25vd2luZ2x5Lg0KIA0KSSB0aGluayB0aGUgc3RhdGljIGNvbmZpZ3Vy
-YXRpb24gb2Ygdmhvc3QtcGNpIHdvdWxkIGJlIHF1aXRlIHNpbWlsYXIgdG8geW91ciBpdnNobWVt
-IGJhc2VkIHByb3Bvc2FsLSBjb3VsZCBiZSB0aG91Z2h0IG9mIGFzIG1vdmluZyB5b3VyIHByb3Bv
-c2FsIHRvIHRoZSB2aXJ0aW8gZGV2aWNlIHN0cnVjdHVyZS4gRG8geW91IHNlZSBhbnkgbW9yZSBi
-aWcgZGlmZmVyZW5jZT8gT3IgaXMgdGhlcmUgYW55IGZ1bmRhbWVudGFsIHJlYXNvbiB0aGF0IGl0
-IGlzIG5vdCBnb29kIHRvIGRvIHRoYXQgYmFzZWQgb24gdmlydGlvPyBUaGFua3MuDQoNCkJlc3Qs
-DQpXZWkNCg0KWzFdIHN0YXRpYyBjb25maWd1cmF0aW9uIGV4dGVuc2lvbjogc2V0IHRoZSB2aG9z
-dC1wY2kgZGV2aWNlIHZpYSB0aGUgUUVNVSBjb21tYW5kIGxpbmUgKHJhdGhlciB0aGFuIGhvdHBs
-dWdnaW5nIHZpYSB2aG9zdC11c2VyIHByb3RvY29sKSAsIGFuZCAgc2hhcmUgYSBwaWVjZSBvZiBt
-ZW1vcnkgYmV0d2VlbiB0d28gVk1zIChyYXRoZXIgdGhhbiB0aGUgd2hvbGUgVk0ncyBtZW1vcnkp
-DQoNCg==
+
+--ev7mvGV+3JQuI2Eo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 27, 2017 at 06:27:16PM +0200, Michael S. Tsirkin wrote:
+> We are switching BUILD_BUG_ON to verify that it's parameter is a
+> compile-time constant, and it turns out that some gcc versions
+> (specifically gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609) are
+> not smart enough to figure it out for expressions involving local
+> variables. This is harmless but means that the check is ineffective for
+> these platforms.  To fix, replace the variable with macros.
+>=20
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+Applied to ppc-for-2.9, thanks.
+
+> ---
+>  hw/ppc/spapr.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index a642e66..b81f2ac 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2630,8 +2630,8 @@ static void spapr_phb_placement(sPAPRMachineState *=
+spapr, uint32_t index,
+>       * 1TiB 64-bit MMIO windows for each PHB.
+>       */
+>      const uint64_t base_buid =3D 0x800000020000000ULL;
+> -    const int max_phbs =3D
+> -        (SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / SPAPR_PCI_MEM64_WIN_SIZE - =
+1;
+> +#define SPAPR_MAX_PHBS ((SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / \
+> +                        SPAPR_PCI_MEM64_WIN_SIZE - 1)
+>      int i;
+> =20
+>      /* Sanity check natural alignments */
+> @@ -2640,12 +2640,14 @@ static void spapr_phb_placement(sPAPRMachineState=
+ *spapr, uint32_t index,
+>      QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM64_WIN_SIZE % SPAPR_PCI_MEM32_WIN_SI=
+ZE) !=3D 0);
+>      QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM32_WIN_SIZE % SPAPR_PCI_IO_WIN_SIZE)=
+ !=3D 0);
+>      /* Sanity check bounds */
+> -    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_IO_WIN_SIZE) > SPAPR_PCI_MEM=
+32_WIN_SIZE);
+> -    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_MEM32_WIN_SIZE) > SPAPR_PCI_=
+MEM64_WIN_SIZE);
+> +    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_IO_WIN_SIZE) >
+> +                      SPAPR_PCI_MEM32_WIN_SIZE);
+> +    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_MEM32_WIN_SIZE) >
+> +                      SPAPR_PCI_MEM64_WIN_SIZE);
+> =20
+> -    if (index >=3D max_phbs) {
+> +    if (index >=3D SPAPR_MAX_PHBS) {
+>          error_setg(errp, "\"index\" for PAPR PHB is too large (max %u)",
+> -                   max_phbs - 1);
+> +                   SPAPR_MAX_PHBS - 1);
+>          return;
+>      }
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ev7mvGV+3JQuI2Eo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYj/ybAAoJEGw4ysog2bOSficP/3+f7TdH9iw7CGx5su8KQGoj
+TnrcpqqW/NWF9jstWrYAodp2C/7OLEIVxyZYBXk+NCtLCCeM+H6T5ZD/u57/1oQW
+oEGjK5D0G2h4G5MD+THjZqTDiVfFOm91RWTsVzphe0oOLBbOUaqzrb6rO9gipOGa
+VS/xzY/DA1Jvg+tIRBGejg95w5YcPV6t4hS4tUebiZbWJ5ouJqNP/1vFAtFfsu+F
+TH84n8zE+0PGEJDPeES1Vhh6JuCM1rKOnWxFPn0sLydVXJxwg8dNsAeh1qDritxT
+RzNWnFiS3qvAT29Der8wB667+G3Ctl4CAQ6/0TUT+fc3WnIh9oBIWft8PeHoV3xd
+eFitTjTzrsbg8/nM3/4o2y3TPN+TX+RqFLsdrct+1mApLuwCJxjv+hvjH993r003
+3WT2Eb74RaVsmzYfXMjeMF7bdA7M8dZTMY6SuZTltTSHiGzPiSzqbHtVhNidRwqT
+pqjxkvaMs9Q7QUIRJ4C9PC2/u+lIq5gRA3ONFUCNlqhqZHWajyXHcqz2kDFXJkZ7
+2aNerh+M41LiOSIvdP1Iqm3bG+XDdh8VR0OXOH5IqoulLXZ5Ii/ho9Am0F8eM3cu
+jhR4ankpxQeYS3Ns8O3nUeVJg1Iw3huyvypQ/Ctb5eByaVcZNUWsLDAZqd8CNHDn
+q4/AThioX/X83b/G8xNG
+=ifgb
+-----END PGP SIGNATURE-----
+
+--ev7mvGV+3JQuI2Eo--
