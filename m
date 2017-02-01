@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYy7X-0004nI-9u
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:51:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1cYyRe-0006An-6D
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:11:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cYy7W-0000Vs-6j
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:50:59 -0500
-References: <1485942829-10756-1-git-send-email-pl@kamp.de>
-	<1485942829-10756-3-git-send-email-pl@kamp.de>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <018a5f72-8052-dede-b2af-3010b4182563@redhat.com>
-Date: Wed, 1 Feb 2017 10:50:48 -0600
-MIME-Version: 1.0
-In-Reply-To: <1485942829-10756-3-git-send-email-pl@kamp.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6u0fqwqqGNMjqU9wp6bcpgSFF4lIXfhco"
-Subject: Re: [Qemu-devel] [PATCH V3 2/2] block/nfs: fix naming of runtime
- opts
+	(envelope-from <armbru@redhat.com>) id 1cYyRN-0005bu-09
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:11:46 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Wed,  1 Feb 2017 18:08:53 +0100
+Message-Id: <1485968933-9162-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH] block: Crude initial implementation of
+ -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +18,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, ashijeetacharya@gmail.com, jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6u0fqwqqGNMjqU9wp6bcpgSFF4lIXfhco
-From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, ashijeetacharya@gmail.com,
- jcody@redhat.com, mreitz@redhat.com, armbru@redhat.com,
- qemu-stable@nongnu.org
-Message-ID: <018a5f72-8052-dede-b2af-3010b4182563@redhat.com>
-Subject: Re: [PATCH V3 2/2] block/nfs: fix naming of runtime opts
-References: <1485942829-10756-1-git-send-email-pl@kamp.de>
- <1485942829-10756-3-git-send-email-pl@kamp.de>
-In-Reply-To: <1485942829-10756-3-git-send-email-pl@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The new command line option -blockdev works like QMP command
+blockdev-add.  The option argument is JSON.  Example usage:
 
-On 02/01/2017 03:53 AM, Peter Lieven wrote:
-> commit 94d6a7a accidently left the naming of runtime opts and QAPI
+    -blockdev '{"node-name": "foo", "driver": "raw", "file": {"driver": "file", "filename": "foo.img"} }'
 
-Whoops - I caught one typo in v2, but missed another:
-s/accidently/accidentally/
+The JSON argument doesn't exactly blend into the existing option
+syntax.  Alternative syntax is TBD.
 
-> scheme inconsistent. As one consequence passing of parameters in the
-> URI is broken. Sync the naming of the runtime opts to the QAPI
-> scheme.
->=20
-> Please note that this is technically backwards incompatible with the 2.=
-8
-> release, but the 2.8 release is the only version that had the wrong nam=
-ing.
-> Furthermore release 2.8 suffered from a NULL pointer dereference during=
+Note that calling qmp_blockdev_add() (say via qmp_marshal_block_add())
+right away would crash.  We need to stash the configuration for later
+instead.  This is crudely done, and bypasses QemuOpts, even though
+storing configuration is what QemuOpts is for.  Need to revamp option
+infrastructure to support QAPI types like BlockdevOptions.
 
-> URI parsing.
->=20
-> Fixes: 94d6a7a76e9df9919629428f6c598e2b97d9426c
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> ---
->  block/nfs.c | 46 +++++++++++++++++++++++-----------------------
->  1 file changed, 23 insertions(+), 23 deletions(-)
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+We need -blockdev to complete the blockdev-add job.  I'm working on it
+for 2.9.  This patch is a quick hack to give people something to play
+while I work on the real thing.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+We need to agree on option argument syntax.  I'm going to post a
+summary of our previous discussion.
 
-(Maintainer can probably fix the typo)
+ qemu-options.hx |  3 +++
+ vl.c            | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---6u0fqwqqGNMjqU9wp6bcpgSFF4lIXfhco
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYkhHoAAoJEKeha0olJ0NqVAAIAJeRd6j6zOLcRjwmoFevV4kL
-82/jPPbS/bTyWJ+Mu4Wkap7i2Wz/WwSTYXPPX/gr639OLaYJ0o8a+j9H41ZE6kfN
-NLdMNQafgKbAfZHqecTaTx4LPuIeCWH5uYtCi3DgosNYzgo/QsPSe4l5P9r8QIUD
-rweTUnFa5KBQMwa74qRQ2lGuHvHoPx3kflJKxgp/waz7PPUFtzmoV1hOz/Cvanj6
-zhHAjcyGkjrbihHMD1h7hRUC510n++A8C+n40uj3HXUFfBKe90QVoeCHk8sBcl1q
-5dkNbs/ysQq3LYLMqfTLJBqzH4Oc/tkeQey7mF6mC0QReyDJ27i2w7btU+FcOgM=
-=h6zJ
------END PGP SIGNATURE-----
-
---6u0fqwqqGNMjqU9wp6bcpgSFF4lIXfhco--
+diff --git a/qemu-options.hx b/qemu-options.hx
+index ad2f8fc..a66bd65 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -512,6 +512,9 @@ Use @var{file} as CD-ROM image (you cannot use @option{-hdc} and
+ using @file{/dev/cdrom} as filename (@pxref{host_drives}).
+ ETEXI
+ 
++DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
++    "-blockdev FIXME document\n", QEMU_OPTION_blockdev)
++
+ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
+     "       [,cyls=c,heads=h,secs=s[,trans=t]][,snapshot=on|off]\n"
+diff --git a/vl.c b/vl.c
+index 0b72b12..51345c8 100644
+--- a/vl.c
++++ b/vl.c
+@@ -94,6 +94,9 @@ int main(int argc, char **argv)
+ #include "migration/colo.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/hax.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi-visit.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+@@ -2965,6 +2968,12 @@ int main(int argc, char **argv, char **envp)
+     Error *main_loop_err = NULL;
+     Error *err = NULL;
+     bool list_data_dirs = false;
++    typedef struct BlockdevOptions_queue {
++        BlockdevOptions *bdo;
++        Location loc;
++        QSIMPLEQ_ENTRY(BlockdevOptions_queue) entry;
++    } BlockdevOptions_queue;
++    QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
+ 
+     module_call_init(MODULE_INIT_TRACE);
+ 
+@@ -3106,6 +3115,28 @@ int main(int argc, char **argv, char **envp)
+                 drive_add(IF_DEFAULT, popt->index - QEMU_OPTION_hda, optarg,
+                           HD_OPTS);
+                 break;
++            case QEMU_OPTION_blockdev:
++                {
++                    QObject *args = qobject_from_json(optarg);
++                    Visitor *v;
++                    BlockdevOptions_queue *bdo;
++
++                    // TODO get error out of parser
++                    if (!args) {
++                        error_report("invalid JSON");
++                        exit(1);
++                    }
++
++                    bdo = g_new(BlockdevOptions_queue, 1);
++                    v = qobject_input_visitor_new(args, true);
++                    visit_type_BlockdevOptions(v, NULL, &bdo->bdo,
++                                               &error_fatal);
++                    visit_free(v);
++                    qobject_decref(args);
++                    loc_save(&bdo->loc);
++                    QSIMPLEQ_INSERT_TAIL(&bdo_queue, bdo, entry);
++                    break;
++                }
+             case QEMU_OPTION_drive:
+                 if (drive_def(optarg) == NULL) {
+                     exit(1);
+@@ -4418,6 +4449,16 @@ int main(int argc, char **argv, char **envp)
+         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
+                           NULL, NULL);
+     }
++    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
++        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
++
++        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
++        loc_push_restore(&bdo->loc);
++        qmp_blockdev_add(bdo->bdo, &error_fatal);
++        loc_pop(&bdo->loc);
++        qapi_free_BlockdevOptions(bdo->bdo);
++        g_free(bdo);
++    }
+     if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
+                           &machine_class->block_default_type, NULL)) {
+         exit(1);
+-- 
+2.7.4
