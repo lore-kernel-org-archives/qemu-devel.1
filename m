@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cYwWs-0001xJ-GN
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:09:03 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cYwda-000090-VY
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cYwWn-0000j2-RC
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:09:02 -0500
-Received: from smtp3.mundo-r.com ([212.51.32.191]:34297 helo=smtp4.mundo-r.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cYwWn-0000ia-Bi
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:08:57 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1485249848-13854-2-git-send-email-pradeep.jagadeesh@huawei.com>
-References: <1485249848-13854-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1485249848-13854-2-git-send-email-pradeep.jagadeesh@huawei.com>
-Date: Wed, 01 Feb 2017 16:08:36 +0100
-Message-ID: <w51a8a6rlsb.fsf@maestria.local.igalia.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cYwdY-00020I-LX
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:15:58 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38518)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cYwdY-0001zr-FJ
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:15:56 -0500
+Received: by mail-wm0-x232.google.com with SMTP id r141so42920732wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 07:15:56 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed,  1 Feb 2017 15:05:53 +0000
+Message-Id: <20170201150553.9381-26-alex.bennee@linaro.org>
+In-Reply-To: <20170201150553.9381-1-alex.bennee@linaro.org>
+References: <20170201150553.9381-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2 v14] fsdev: add IO throttle support to
- fsdev devices
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v9 25/25] tcg: enable MTTCG by default for ARM
+ on x86 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +30,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
+To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
-Hello, and sorry for being late reviewing these patches :)
+This enables the multi-threaded system emulation by default for ARMv7
+and ARMv8 guests using the x86_64 TCG backend. This is because on the
+guest side:
 
-On Tue 24 Jan 2017 10:24:07 AM CET, Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
+  - The ARM translate.c/translate-64.c have been converted to
+    - use MTTCG safe atomic primitives
+    - emit the appropriate barrier ops
+  - The ARM machine has been updated to
+    - hold the BQL when modifying shared cross-vCPU state
+    - defer cpu_reset to async safe work
 
-> This patchset adds the io throttle support for the 9p-local driver.
-> For now this functionality can be used only through qemu cli options.
-> QMP interface and support to other 9p drivers need further extensions.
-> To make it simple for other 9p drivers, the throttle code has been put
-> in separate files.
+All the host backends support the barrier and atomic primitives but
+need to provide same-or-better support for normal load/store
+operations.
 
-Compared to the previous patch that I reviewed, you removed the
-fsdev_throttle_cleanup() call from v9fs_device_unrealize_common(). Why
-did you do that?
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+v7
+  - drop configure check for backend
+  - declare backend memory order for x86
+  - declare guest memory order for ARM
+  - add configure snippet to set TARGET_SUPPORTS_MTTCG
+v8
+  - TCG_DEFAULT_MO -> TCG_GUEST_DEFAULT_MO
+  - ~TCG_MO_LD_ST -> ~TCG_MO_ST_LD
+---
+ configure             |  6 ++++++
+ cpus.c                |  4 ++--
+ target/arm/cpu.h      |  3 +++
+ tcg/i386/tcg-target.h | 11 +++++++++++
+ 4 files changed, 22 insertions(+), 2 deletions(-)
 
-I miss the list of changes in the cover letter.
-
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -3520,6 +3520,10 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
->          error_setg(errp, "share path %s is not a directory", fse->path);
->          goto out;
->      }
-> +
-> +    s->ctx.fst = &fse->fst;
-> +    fsdev_throttle_init(s->ctx.fst);
-> +
->      v9fs_path_free(&path);
->  
->      rc = 0;
-> @@ -3528,6 +3532,7 @@ out:
->          if (s->ops && s->ops->cleanup && s->ctx.private) {
->              s->ops->cleanup(&s->ctx);
->          }
-> +        fsdev_throttle_cleanup(s->ctx.fst);
->          g_free(s->tag);
->          g_free(s->ctx.fs_root);
->          v9fs_path_free(&path);
-
-You also added the fsdev_throttle_cleanup() here, but look at the code:
-
-       fsdev_throttle_init(s->ctx.fst);
-
-       v9fs_path_free(&path);
-
-       rc = 0;
-   out:
-       if (rc) {
-           /* ... */
-           fsdev_throttle_cleanup(s->ctx.fst);
-           /* ... */
-       }
-
-If rc != 0 you don't need to do the clean up, because there was never an
-initialization.
-
-Berto
+diff --git a/configure b/configure
+index 86fd833feb..9f2a665f5b 100755
+--- a/configure
++++ b/configure
+@@ -5879,6 +5879,7 @@ mkdir -p $target_dir
+ echo "# Automatically generated by configure - do not modify" > $config_target_mak
+ 
+ bflt="no"
++mttcg="no"
+ interp_prefix1=$(echo "$interp_prefix" | sed "s/%M/$target_name/g")
+ gdb_xml_files=""
+ 
+@@ -5897,11 +5898,13 @@ case "$target_name" in
+   arm|armeb)
+     TARGET_ARCH=arm
+     bflt="yes"
++    mttcg="yes"
+     gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
+   aarch64)
+     TARGET_BASE_ARCH=arm
+     bflt="yes"
++    mttcg="yes"
+     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
+   cris)
+@@ -6066,6 +6069,9 @@ if test "$target_bigendian" = "yes" ; then
+ fi
+ if test "$target_softmmu" = "yes" ; then
+   echo "CONFIG_SOFTMMU=y" >> $config_target_mak
++  if test "$mttcg" = "yes" ; then
++    echo "TARGET_SUPPORTS_MTTCG=y" >> $config_target_mak
++  fi
+ fi
+ if test "$target_user_only" = "yes" ; then
+   echo "CONFIG_USER_ONLY=y" >> $config_target_mak
+diff --git a/cpus.c b/cpus.c
+index e3d9f3fe21..e1b82bcd49 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -176,8 +176,8 @@ bool mttcg_enabled;
+ 
+ static bool check_tcg_memory_orders_compatible(void)
+ {
+-#if defined(TCG_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
+-    return (TCG_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
++#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
++    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
+ #else
+     return false;
+ #endif
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index a3c4d07817..0ef31db3e0 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -30,6 +30,9 @@
+ #  define TARGET_LONG_BITS 32
+ #endif
+ 
++/* ARM processors have a weak memory model */
++#define TCG_GUEST_DEFAULT_MO      (0)
++
+ #define CPUArchState struct CPUARMState
+ 
+ #include "qemu-common.h"
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 21d96ec35c..4275787db9 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -165,4 +165,15 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
+ }
+ 
++/* This defines the natural memory order supported by this
++ * architecture before guarantees made by various barrier
++ * instructions.
++ *
++ * The x86 has a pretty strong memory ordering which only really
++ * allows for some stores to be re-ordered after loads.
++ */
++#include "tcg-mo.h"
++
++#define TCG_TARGET_DEFAULT_MO (TCG_MO_ALL & ~TCG_MO_ST_LD)
++
+ #endif
+-- 
+2.11.0
