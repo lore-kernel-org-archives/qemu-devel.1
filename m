@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cYuP6-0005X7-Ew
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:52:53 -0500
+	(envelope-from <quintela@redhat.com>) id 1cYuSk-0008VF-6x
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:56:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cYuP3-0006Qe-CE
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:52:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52512)
+	(envelope-from <quintela@redhat.com>) id 1cYuSh-0007kT-4V
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:56:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cYuP3-0006QU-6E
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:52:49 -0500
-References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
-	<20170118175335-mutt-send-email-mst@kernel.org>
-	<20170118181918.783cb7bd@nial.brq.redhat.com>
-	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
-	<20170131165802-mutt-send-email-mst@kernel.org>
-	<fe787fcc-0c92-5842-1a67-b50466b6f38f@redhat.com>
-	<20170131201333-mutt-send-email-mst@kernel.org>
-	<20170201123739.387de47b@nial.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6e912456-9d9c-7084-c4b4-91596216d3dd@redhat.com>
-Date: Wed, 1 Feb 2017 13:52:45 +0100
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cYuSg-0007kJ-VL
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:56:35 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5E90A61BA0
+	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 12:56:34 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170109201340.16593-2-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Mon, 9 Jan 2017 20:13:38 +0000")
+References: <20170109201340.16593-1-dgilbert@redhat.com>
+	<20170109201340.16593-2-dgilbert@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 01 Feb 2017 13:56:28 +0100
+Message-ID: <87wpdaqdc3.fsf@emacs.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170201123739.387de47b@nial.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/3] vmstate_register_with_alias_id: Take
+ an Error **
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +35,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Phil Dennis-Jordan <phil@philjordan.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, amit.shah@redhat.com
 
-On 02/01/17 12:37, Igor Mammedov wrote:
-> On Tue, 31 Jan 2017 20:17:02 +0200
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
->> On Tue, Jan 31, 2017 at 05:28:57PM +0100, Laszlo Ersek wrote:
->>> The ACPI 6.1 spec says,
->>>
->>> - DSDT: [...] If the X_DSDT field contains a non-zero value then this
->>>   field must be zero.
->>> - X_DSDT: [...] If the DSDT field contains a non-zero value then this
->>>   field must be zero.  
->>
->> But that's only 6.1. 6.0 and earlier did not say this.
->> The errata they wanted to address was:
->> 1393 In FADT: if X_DSDT field is non-zero, DSDT
->> field should be ignored or deprecated
->>
->> I would class this as a spec bug.
->>
-> 
-> The same applies to X_PM1a_EVT_BLK and co,
-> for example 5.1 spec "This is a required
-> field."
-> 
-> And looks like Windows implemented it as mandatory
-> to boot perhaps to be compatible with 5.1 and earlier
-> specs.
-> 
-> It appears fw would be forced to fill fields depending
-> on table revision.
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> I'll be adding an error to it in a subsequent patch.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Sounds like a valid point.
-
-I compared the FADT defintion between ACPI 5.1 and ACPI 6.1. Indeed, the
-former says:
-
-- FADT Major Version: 5; Major Version of this FADT structure, [...]
-- DSDT: Physical memory address (0-4 GB) of the DSDT.
-- X_DSDT: 64bit physical address of the DSDT.
-
-the latter says:
-
-- FADT Major Version: 6; Major Version of this FADT structure, [...]
-
-- DSDT: Physical memory address of the DSDT. If the X_DSDT field
-  contains a non-zero value then this field must be zero.
-
-- X_DSDT: Extended physical address of the DSDT. If the DSDT field
-  contains a non-zero value then this field must be zero.
-
-I will ask on edk2-devel whether the
-"MdeModulePkg/Universal/Acpi/AcpiTableDxe" maintainers can think of a
-way to accommodate this.
-
-Thanks
-Laszlo
+Reviewed-by: Juan Quintela <quintela@redhat.com>
