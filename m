@@ -1,41 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cZ4ec-00056E-PJ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:49:35 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cZ4g7-00064N-UG
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:51:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cZ4eZ-0004M8-Lx
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:49:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33800
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1cZ4eZ-0004Lt-GF
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:49:31 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v11NmXsx128265
-	for <qemu-devel@nongnu.org>; Wed, 1 Feb 2017 18:49:30 -0500
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28bmw9shpg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 18:49:30 -0500
-Received: from localhost
-	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Thu, 2 Feb 2017 09:49:26 +1000
-Date: Thu, 2 Feb 2017 10:48:23 +1100
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-References: <587D4171.6@linux.intel.com> <587D4329.5020702@linux.intel.com>
-	<20170130235210.GA4681@tungsten.ozlabs.ibm.com>
-	<CAFEAcA-FPmqw0pt7kT=eHR_osfFbZNhrDdGAb87VxUWD_XXSNw@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cZ4g4-0005Fj-SN
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:51:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cZ4g4-0005FF-Mx
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:51:04 -0500
+References: <mailman.205.1485450031.31314.qemu-devel@nongnu.org>
+	<E8A8BF62-0E39-4401-B330-2E27CFA3A83F@gmail.com>
+	<8ae107ad-0f3f-46ef-e734-2f88b14bad9a@redhat.com>
+	<265EAA01-0C75-45D5-A55D-481DAC288AE5@gmail.com>
+	<58763C1D-20EB-4C1F-86EC-C9903F87BDB3@gmail.com>
+	<97ae663a-f2d1-c45d-bb8d-8be352d8f84c@redhat.com>
+	<87B90AC4-A4F9-4A6B-83F9-4E351BC71F80@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1d27660e-84a3-d200-aa50-5bce1ab56046@redhat.com>
+Date: Wed, 1 Feb 2017 15:50:58 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-FPmqw0pt7kT=eHR_osfFbZNhrDdGAb87VxUWD_XXSNw@mail.gmail.com>
-Message-Id: <20170201234823.GA4326@tungsten.ozlabs.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu-pcc 2.8.0 linux-user segfaults
+In-Reply-To: <87B90AC4-A4F9-4A6B-83F9-4E351BC71F80@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Qemu-devel] Poll on QEMU documentation project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,57 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?iso-8859-1?Q?An=EDbal_Lim=F3n?= <anibal.limon@linux.intel.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: G 3 <programmingkidx@gmail.com>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On Wed, Feb 01, 2017 at 03:25:05PM +0000, Peter Maydell wrote:
-> On 30 January 2017 at 23:52, Sam Bobroff <sam.bobroff@au1.ibm.com> wrot=
-e:
-> >> On 01/16/2017 03:56 PM, An=EDbal Lim=F3n wrote:
-> >> > I'm trying to upgrade qemu to 2.8.0 in Openembedded-core and segfa=
-ults
-> >> > in qemu-ppc when is executing:
->=20
-> > I've recently encountered a similar problem and I've posted a fix. If
-> > you'd like to try it, it's here:
-> >
-> > https://lists.gnu.org/archive/html/qemu-ppc/2017-01/msg00413.html
->=20
-> Hmm, I missed that patch (it doesn't seem to have made it
-> to the qemu-devel list), but it isn't correct, I'm afraid.
 
-Oh, sorry I think I forgot to cross post it!
 
-Thanks for taking a look at it :-)
+On 01/02/2017 15:36, G 3 wrote:
+> On Feb 1, 2017, at 6:17 PM, Paolo Bonzini wrote:
+>> The requirements for the format are:
+>>
+>> * support for HTML and man as output formats, optionally PDF and text
+>> * support for QEMU's usual submission workflow
+>> * producing documentation with a consistent look
+>> * tool support and extensibility
+>> * being easy to use and not too obscure
+>>
+>> in this order.  Based on this, the only formats we could plausibly use
+>> are Texinfo (if only because that's what we use now), Markdown,
+>> restructuredText, Docbook and Asciidoc.  The poll mentioned all of these
+>> except Asciidoc, plus LaTeX as a "control group".
+> 
+> Ok. I understand.
+> 
+> For the above requirements of "tool support and extensibility", what do
+> you mean by this? Do you mean command-line tool support? What do you
+> mean by extensibility?
 
-> In the patch for handling TARGET_USER_ESIGRETURN you must
-> not change the nip register, because we will have just
-> set it from the signal context that the guest provided
-> to the sigreturn syscall. (The patch as it stands will
-> cause us to reexecute an instruction after return from
-> a signal handler, which isn't going to go very well).
+Basically, easily integrating QEMU-specific code in the build.  This
+way, we don't need 20 different steps in the Makefile; instead a single
+tool invocation will do everything from parsing the input, to extracting
+documentation comments from C source, to finally generating the output.
 
-Ah, thank you. I think I understand what you mean: do_syscall() and the
-TARGET_QEMU_ESIGRETURN case must both see the same value for env->nip().
+Of course you need to find the right balance between redoing the same
+work over and over (a solution purely based on Make can do that best)
+and ease of use.
 
-I tried a test program that went through that case (which I obviously
-should have done before) and you're definitely right, because userspace
-gets stuck looping on the system call. Removing the NIP adjustment from
-the case seems to fix it. Is that what you mean? (I'll post a v2 with
-that change if so.)
-
-It seems that the similar adjustment for the TARGET_ERESTARTSYS should
-stay, as removing it causes signal restart to fail (userspace sees
--EINTR even when they've specified a signal handler with SA_RESTART).
-
-> David, can you drop that patch from your ppc queue, please?
->
-> (I think the change is good otherwise but I couldn't
-> seem to find the bit in the ppc linux kernel that
-> corresponds to moving the NIP value around.)
-
-> thanks
-> -- PMM
-
-Thanks again for the help!
-Sam.
+Paolo
