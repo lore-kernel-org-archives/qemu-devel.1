@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYtsD-00062X-1G
+	(envelope-from <batuzovk@ispras.ru>) id 1cYtsE-00064M-Fk
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005ci-2l
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:52 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:46096 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005e9-E2
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:54 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:46124 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts7-0005cF-IQ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:48 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005dE-Ts
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:49 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Wed,  1 Feb 2017 15:18:10 +0300
-Message-Id: <1485951502-28774-9-git-send-email-batuzovk@ispras.ru>
+Date: Wed,  1 Feb 2017 15:18:19 +0300
+Message-Id: <1485951502-28774-18-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
 References: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2 08/20] tcg: add vector addition operations
+Subject: [Qemu-devel] [PATCH v2 17/20] softmmu: create helpers for vector
+ loads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,402 +29,314 @@ Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Pe
 
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
+ cputlb.c                  |   4 +
+ softmmu_template_vector.h | 266 ++++++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.h                 |   5 +
+ 3 files changed, 275 insertions(+)
+ create mode 100644 softmmu_template_vector.h
 
-Support for representing a v128 addition as two v64 additions have been added.
-As a result GEN_VECT_WRAPPER_HALVES macro was added. It is larger and more
-complicated than original GEN_VECT_WRAPPER (which is still used for v64 additions
-because they do not have half operations (v32 additions)).
-
-GEN_VECT_WRAPPER_HALVES seems to grow fast (in size and complexity) for each
-supported representation. Calling tcg_gen_add_<smaller_size> may not be desirable
-because last resort fallback code is better be generated for the whole vector as
-it will require less additional operations.
-
-Some additional performance optimization can be done by creating hand written
-tcg_gen_internal_<operation> for some cases (for example, add_i8x16). This function
-will still operate on memory locations but will use 64 bit scalar additions with some
-bit masking as Richard suggested in v1 discussion. This series is focused on
-infrastructure (not on optimization of particular instructions), so I have not
-included this optimization yet.
-
----
- tcg/tcg-op.c  |  64 ++++++++++++++++++++++
- tcg/tcg-op.h  | 167 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg-opc.h |  12 +++++
- tcg/tcg.c     |  12 +++++
- tcg/tcg.h     |  43 +++++++++++++++
- 5 files changed, 298 insertions(+)
-
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 95a39b7..8a19eee 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -3038,3 +3038,67 @@ static void tcg_gen_mov2_i64(TCGv_i64 r, TCGv_i64 a, TCGv_i64 b)
- GEN_ATOMIC_HELPER(xchg, mov2, 0)
+diff --git a/cputlb.c b/cputlb.c
+index 6c39927..41c9a01 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -660,6 +660,10 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+ #define DATA_SIZE 8
+ #include "softmmu_template.h"
  
- #undef GEN_ATOMIC_HELPER
++#define SHIFT 4
++#include "softmmu_template_vector.h"
++#undef MMUSUFFIX
 +
-+/* Find a memory location for 128-bit TCG variable. */
-+void tcg_v128_to_ptr(TCGv_v128 tmp, TCGv_ptr base, int slot,
-+                     TCGv_ptr *real_base, intptr_t *real_offset, int is_read)
+ /* First set of helpers allows passing in of OI and RETADDR.  This makes
+    them callable from other helpers.  */
+ 
+diff --git a/softmmu_template_vector.h b/softmmu_template_vector.h
+new file mode 100644
+index 0000000..b286d65
+--- /dev/null
++++ b/softmmu_template_vector.h
+@@ -0,0 +1,266 @@
++/*
++ *  Software MMU support
++ *
++ * Generate helpers used by TCG for qemu_ld/st vector ops and code
++ * load functions.
++ *
++ * Included from target op helpers and exec.c.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++#include "qemu/timer.h"
++#include "exec/address-spaces.h"
++#include "exec/memory.h"
++
++#define DATA_SIZE (1 << SHIFT)
++
++#if DATA_SIZE == 16
++#define SUFFIX v128
++#else
++#error unsupported data size
++#endif
++
++
++#ifdef SOFTMMU_CODE_ACCESS
++#define READ_ACCESS_TYPE MMU_INST_FETCH
++#define ADDR_READ addr_code
++#else
++#define READ_ACCESS_TYPE MMU_DATA_LOAD
++#define ADDR_READ addr_read
++#endif
++
++#define helper_te_ld_name  glue(glue(helper_te_ld, SUFFIX), MMUSUFFIX)
++#define helper_te_st_name  glue(glue(helper_te_st, SUFFIX), MMUSUFFIX)
++
++#ifndef SOFTMMU_CODE_ACCESS
++static inline void glue(io_read, SUFFIX)(CPUArchState *env,
++                                         CPUIOTLBEntry *iotlbentry,
++                                         target_ulong addr,
++                                         uintptr_t retaddr,
++                                         uint8_t *res)
 +{
-+    int idx = GET_TCGV_V128(tmp);
-+    assert(idx >= 0 && idx < tcg_ctx.nb_temps);
-+    if (idx < tcg_ctx.nb_globals) {
-+        /* Globals use their locations within CPUArchState. */
-+        int env = GET_TCGV_PTR(tcg_ctx.tcg_env);
-+        TCGTemp *ts_env = &tcg_ctx.temps[env];
-+        TCGTemp *ts_arg = &tcg_ctx.temps[idx];
++    CPUState *cpu = ENV_GET_CPU(env);
++    hwaddr physaddr = iotlbentry->addr;
++    MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
++    int i;
 +
-+        /* Sanity checks: global's memory locations must be addressed
-+           relative to ENV. */
-+        assert(ts_env->val_type == TEMP_VAL_REG &&
-+               ts_env == ts_arg->mem_base &&
-+               ts_arg->mem_allocated);
++    assert(0); /* Needs testing */
 +
-+        *real_base = tcg_ctx.tcg_env;
-+        *real_offset = ts_arg->mem_offset;
-+    } else {
-+        /* Temporaries use swap space in TCGContext. Since we already have
-+           a 128-bit temporary we'll assume that the target supports 128-bit
-+           loads and stores. */
-+        *real_base = base;
-+        *real_offset = slot * 16;
-+        if (is_read) {
-+            tcg_gen_st_v128(tmp, base, slot * 16);
++    physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
++    cpu->mem_io_pc = retaddr;
++    if (mr != &io_mem_rom && mr != &io_mem_notdirty && !cpu->can_do_io) {
++        cpu_io_recompile(cpu, retaddr);
++    }
++
++    cpu->mem_io_vaddr = addr;
++    for (i = 0; i < (1 << SHIFT); i += 8) {
++        memory_region_dispatch_read(mr, physaddr + i, (uint64_t *)(res + i),
++                                    8, iotlbentry->attrs);
++    }
++}
++#endif
++
++void helper_te_ld_name(CPUArchState *env, target_ulong addr,
++                       TCGMemOpIdx oi, uintptr_t retaddr, uint8_t *res)
++{
++    unsigned mmu_idx = get_mmuidx(oi);
++    int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    target_ulong tlb_addr = env->tlb_table[mmu_idx][index].ADDR_READ;
++    uintptr_t haddr;
++    int i;
++
++    /* Adjust the given return address.  */
++    retaddr -= GETPC_ADJ;
++
++    /* If the TLB entry is for a different page, reload and try again.  */
++    if ((addr & TARGET_PAGE_MASK)
++         != (tlb_addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
++        if ((addr & (DATA_SIZE - 1)) != 0
++            && (get_memop(oi) & MO_AMASK) == MO_ALIGN) {
++            cpu_unaligned_access(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
++                                 mmu_idx, retaddr);
 +        }
-+    }
-+}
-+
-+/* Find a memory location for 64-bit vector TCG variable. */
-+void tcg_v64_to_ptr(TCGv_v64 tmp, TCGv_ptr base, int slot,
-+                    TCGv_ptr *real_base, intptr_t *real_offset, int is_read)
-+{
-+    int idx = GET_TCGV_V64(tmp);
-+    assert(idx >= 0 && idx < tcg_ctx.nb_temps);
-+    if (idx < tcg_ctx.nb_globals) {
-+        /* Globals use their locations within CPUArchState. */
-+        int env = GET_TCGV_PTR(tcg_ctx.tcg_env);
-+        TCGTemp *ts_env = &tcg_ctx.temps[env];
-+        TCGTemp *ts_arg = &tcg_ctx.temps[idx];
-+
-+        /* Sanity checks: global's memory locations must be addressed
-+           relative to ENV. */
-+        assert(ts_env->val_type == TEMP_VAL_REG &&
-+               ts_env == ts_arg->mem_base &&
-+               ts_arg->mem_allocated);
-+
-+        *real_base = tcg_ctx.tcg_env;
-+        *real_offset = ts_arg->mem_offset;
-+    } else {
-+        /* Temporaries use swap space in TCGContext. Since we already have
-+           a 128-bit temporary we'll assume that the target supports 128-bit
-+           loads and stores. */
-+        *real_base = base;
-+        *real_offset = slot * 16;
-+        if (is_read) {
-+            tcg_gen_st_v64(tmp, base, slot * 16);
++        if (!VICTIM_TLB_HIT(ADDR_READ, addr)) {
++            tlb_fill(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
++                     mmu_idx, retaddr);
 +        }
++        tlb_addr = env->tlb_table[mmu_idx][index].ADDR_READ;
++    }
++
++    /* Handle an IO access.  */
++    if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
++        CPUIOTLBEntry *iotlbentry;
++        if ((addr & (DATA_SIZE - 1)) != 0) {
++            goto do_unaligned_access;
++        }
++        iotlbentry = &env->iotlb[mmu_idx][index];
++
++        /* ??? Note that the io helpers always read data in the target
++           byte ordering.  We should push the LE/BE request down into io.  */
++        glue(io_read, SUFFIX)(env, iotlbentry, addr, retaddr, res);
++        return ;
++    }
++
++    /* Handle slow unaligned access (it spans two pages or IO).  */
++    if (DATA_SIZE > 1
++        && unlikely((addr & ~TARGET_PAGE_MASK) + DATA_SIZE - 1
++                    >= TARGET_PAGE_SIZE)) {
++        target_ulong addr1, addr2;
++        uint8_t res1[DATA_SIZE * 2];
++        unsigned shift;
++    do_unaligned_access:
++        if ((get_memop(oi) & MO_AMASK) == MO_ALIGN) {
++            cpu_unaligned_access(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
++                                 mmu_idx, retaddr);
++        }
++        addr1 = addr & ~(DATA_SIZE - 1);
++        addr2 = addr1 + DATA_SIZE;
++        /* Note the adjustment at the beginning of the function.
++           Undo that for the recursion.  */
++        helper_te_ld_name(env, addr1, oi, retaddr + GETPC_ADJ, res1);
++        helper_te_ld_name(env, addr2, oi, retaddr + GETPC_ADJ,
++                          res1 + DATA_SIZE);
++        shift = addr & (DATA_SIZE - 1);
++
++        for (i = 0; i < DATA_SIZE; i++) {
++            res[i] = res1[i + shift];
++        }
++        return;
++    }
++
++    /* Handle aligned access or unaligned access in the same page.  */
++    if ((addr & (DATA_SIZE - 1)) != 0
++        && (get_memop(oi) & MO_AMASK) == MO_ALIGN) {
++        cpu_unaligned_access(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
++                             mmu_idx, retaddr);
++    }
++
++    haddr = addr + env->tlb_table[mmu_idx][index].addend;
++    for (i = 0; i < DATA_SIZE; i++) {
++        res[i] = ((uint8_t *)haddr)[i];
 +    }
 +}
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 250493b..3727be7 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -1195,6 +1195,10 @@ void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-     tcg_gen_add_i32(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), TCGV_PTR_TO_NAT(B))
- # define tcg_gen_addi_ptr(R, A, B) \
-     tcg_gen_addi_i32(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), (B))
-+# define tcg_gen_mov_ptr(R, B) \
-+    tcg_gen_mov_i32(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(B))
-+# define tcg_gen_movi_ptr(R, B) \
-+    tcg_gen_movi_i32(TCGV_PTR_TO_NAT(R), (B))
- # define tcg_gen_ext_i32_ptr(R, A) \
-     tcg_gen_mov_i32(TCGV_PTR_TO_NAT(R), (A))
- #else
-@@ -1206,6 +1210,169 @@ void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-     tcg_gen_add_i64(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), TCGV_PTR_TO_NAT(B))
- # define tcg_gen_addi_ptr(R, A, B) \
-     tcg_gen_addi_i64(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), (B))
-+# define tcg_gen_mov_ptr(R, B) \
-+    tcg_gen_mov_i64(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(B))
-+# define tcg_gen_movi_ptr(R, B) \
-+    tcg_gen_movi_i64(TCGV_PTR_TO_NAT(R), (B))
- # define tcg_gen_ext_i32_ptr(R, A) \
-     tcg_gen_ext_i32_i64(TCGV_PTR_TO_NAT(R), (A))
- #endif /* UINTPTR_MAX == UINT32_MAX */
 +
-+/***************************************/
-+/* 64-bit and 128-bit vector arithmetic.          */
++#ifndef SOFTMMU_CODE_ACCESS
 +
-+/* Find a memory location for 128-bit TCG variable. */
-+void tcg_v128_to_ptr(TCGv_v128 tmp, TCGv_ptr base, int slot,
-+                     TCGv_ptr *real_base, intptr_t *real_offset, int is_read);
-+/* Find a memory location for 64-bit vector TCG variable. */
-+void tcg_v64_to_ptr(TCGv_v64 tmp, TCGv_ptr base, int slot,
-+                    TCGv_ptr *real_base, intptr_t *real_offset, int is_read);
-+
-+#define VTYPE(width) glue(TCG_TYPE_V, width)
-+#define TEMP_TYPE(arg, temp_type) \
-+            tcg_ctx.temps[glue(GET_TCGV_, temp_type)(arg)].type
-+
-+#define GEN_VECT_WRAPPER_HALVES(op, width, half_op, half_width, func)        \
-+    static inline void glue(tcg_gen_, op)(glue(TCGv_v, width) res,           \
-+                                            glue(TCGv_v, width) arg1,        \
-+                                            glue(TCGv_v, width) arg2)        \
-+    {                                                                        \
-+        if (glue(TCG_TARGET_HAS_, op)) {                                     \
-+            glue(tcg_gen_op3_v, width)(glue(INDEX_op_, op), res, arg1,       \
-+                                       arg2);                                \
-+        } else if (TEMP_TYPE(res, glue(V, width)) == VTYPE(half_width) &&    \
-+                   glue(TCG_TARGET_HAS_, half_op)) {                         \
-+            glue(TCGv_v, half_width) res_lo, res_hi, arg1_lo, arg1_hi,       \
-+                                     arg2_lo, arg2_hi;                       \
-+            res_lo = glue(tcg_temp_low_half_v, width)(res);                  \
-+            res_hi = glue(tcg_temp_high_half_v, width)(res);                 \
-+            arg1_lo = glue(tcg_temp_low_half_v, width)(arg1);                \
-+            arg1_hi = glue(tcg_temp_high_half_v, width)(arg1);               \
-+            arg2_lo = glue(tcg_temp_low_half_v, width)(arg2);                \
-+            arg2_hi = glue(tcg_temp_high_half_v, width)(arg2);               \
-+            glue(tcg_gen_op3_v, half_width)(glue(INDEX_op_, half_op),        \
-+                                            res_lo, arg1_lo, arg2_lo);       \
-+            glue(tcg_gen_op3_v, half_width)(glue(INDEX_op_, half_op),        \
-+                                            res_hi, arg1_hi, arg2_hi);       \
-+        } else {                                                             \
-+            TCGv_ptr base =                                                  \
-+                        MAKE_TCGV_PTR(tcg_ctx.frame_temp - tcg_ctx.temps);   \
-+            TCGv_ptr t1 = tcg_temp_new_ptr();                                \
-+            TCGv_ptr t2 = tcg_temp_new_ptr();                                \
-+            TCGv_ptr t3 = tcg_temp_new_ptr();                                \
-+            TCGv_ptr arg1p, arg2p, resp;                                     \
-+            intptr_t arg1of, arg2of, resof;                                  \
-+                                                                             \
-+            glue(glue(tcg_v, width), _to_ptr)(arg1, base, 1,                 \
-+                                            &arg1p, &arg1of, 1);             \
-+            glue(glue(tcg_v, width), _to_ptr)(arg2, base, 2,                 \
-+                                            &arg2p, &arg2of, 1);             \
-+            glue(glue(tcg_v, width), _to_ptr)(res, base, 0, &resp, &resof,   \
-+                                              0);                            \
-+                                                                             \
-+            tcg_gen_addi_ptr(t1, resp, resof);                               \
-+            tcg_gen_addi_ptr(t2, arg1p, arg1of);                             \
-+            tcg_gen_addi_ptr(t3, arg2p, arg2of);                             \
-+            func(t1, t2, t3);                                                \
-+                                                                             \
-+            if ((intptr_t)res >= tcg_ctx.nb_globals) {                       \
-+                glue(tcg_gen_ld_v, width)(res, base, 0);                     \
-+            }                                                                \
-+                                                                             \
-+            tcg_temp_free_ptr(t1);                                           \
-+            tcg_temp_free_ptr(t2);                                           \
-+            tcg_temp_free_ptr(t3);                                           \
-+        }                                                                    \
-+    }
-+
-+#define GEN_VECT_WRAPPER(op, width, func)                                    \
-+    static inline void glue(tcg_gen_, op)(glue(TCGv_v, width) res,           \
-+                                            glue(TCGv_v, width) arg1,        \
-+                                            glue(TCGv_v, width) arg2)        \
-+    {                                                                        \
-+        if (glue(TCG_TARGET_HAS_, op)) {                                     \
-+            glue(tcg_gen_op3_v, width)(glue(INDEX_op_, op), res, arg1,       \
-+                                       arg2);                                \
-+        } else {                                                             \
-+            TCGv_ptr base =                                                  \
-+                        MAKE_TCGV_PTR(tcg_ctx.frame_temp - tcg_ctx.temps);   \
-+            TCGv_ptr t1 = tcg_temp_new_ptr();                                \
-+            TCGv_ptr t2 = tcg_temp_new_ptr();                                \
-+            TCGv_ptr t3 = tcg_temp_new_ptr();                                \
-+            TCGv_ptr arg1p, arg2p, resp;                                     \
-+            intptr_t arg1of, arg2of, resof;                                  \
-+                                                                             \
-+            glue(glue(tcg_v, width), _to_ptr)(arg1, base, 1,                 \
-+                                            &arg1p, &arg1of, 1);             \
-+            glue(glue(tcg_v, width), _to_ptr)(arg2, base, 2,                 \
-+                                            &arg2p, &arg2of, 1);             \
-+            glue(glue(tcg_v, width), _to_ptr)(res, base, 0, &resp, &resof,   \
-+                                              0);                            \
-+                                                                             \
-+            tcg_gen_addi_ptr(t1, resp, resof);                               \
-+            tcg_gen_addi_ptr(t2, arg1p, arg1of);                             \
-+            tcg_gen_addi_ptr(t3, arg2p, arg2of);                             \
-+            func(t1, t2, t3);                                                \
-+                                                                             \
-+            if ((intptr_t)res >= tcg_ctx.nb_globals) {                       \
-+                glue(tcg_gen_ld_v, width)(res, base, 0);                     \
-+            }                                                                \
-+                                                                             \
-+            tcg_temp_free_ptr(t1);                                           \
-+            tcg_temp_free_ptr(t2);                                           \
-+            tcg_temp_free_ptr(t3);                                           \
-+        }                                                                    \
-+    }
-+#define TCG_INTERNAL_OP(name, N, size, ld, st, op, type)                     \
-+    static inline void glue(tcg_internal_, name)(TCGv_ptr resp,              \
-+                                                 TCGv_ptr arg1p,             \
-+                                                 TCGv_ptr arg2p)             \
-+    {                                                                        \
-+        int i;                                                               \
-+        glue(TCGv_, type) tmp1, tmp2;                                        \
-+                                                                             \
-+        tmp1 = glue(tcg_temp_new_, type)();                                  \
-+        tmp2 = glue(tcg_temp_new_, type)();                                  \
-+                                                                             \
-+        for (i = 0; i < N; i++) {                                            \
-+            glue(tcg_gen_, ld)(tmp1, arg1p, i * size);                       \
-+            glue(tcg_gen_, ld)(tmp2, arg2p, i * size);                       \
-+            glue(tcg_gen_, op)(tmp1, tmp1, tmp2);                            \
-+            glue(tcg_gen_, st)(tmp1, resp, i * size);                        \
-+        }                                                                    \
-+                                                                             \
-+        glue(tcg_temp_free_, type)(tmp1);                                    \
-+        glue(tcg_temp_free_, type)(tmp2);                                    \
-+    }
-+
-+#define TCG_INTERNAL_OP_8(name, N, op) \
-+    TCG_INTERNAL_OP(name, N, 1, ld8u_i32, st8_i32, op, i32)
-+#define TCG_INTERNAL_OP_16(name, N, op) \
-+    TCG_INTERNAL_OP(name, N, 2, ld16u_i32, st16_i32, op, i32)
-+#define TCG_INTERNAL_OP_32(name, N, op) \
-+    TCG_INTERNAL_OP(name, N, 4, ld_i32, st_i32, op, i32)
-+#define TCG_INTERNAL_OP_64(name, N, op) \
-+    TCG_INTERNAL_OP(name, N, 8, ld_i64, st_i64, op, i64)
-+
-+TCG_INTERNAL_OP_8(add_i8x16, 16, add_i32)
-+TCG_INTERNAL_OP_16(add_i16x8, 8, add_i32)
-+TCG_INTERNAL_OP_32(add_i32x4, 4, add_i32)
-+TCG_INTERNAL_OP_64(add_i64x2, 2, add_i64)
-+
-+TCG_INTERNAL_OP_8(add_i8x8, 8, add_i32)
-+TCG_INTERNAL_OP_16(add_i16x4, 4, add_i32)
-+TCG_INTERNAL_OP_32(add_i32x2, 2, add_i32)
-+TCG_INTERNAL_OP_64(add_i64x1, 1, add_i64)
-+
-+GEN_VECT_WRAPPER_HALVES(add_i8x16, 128, add_i8x8, 64, tcg_internal_add_i8x16)
-+GEN_VECT_WRAPPER_HALVES(add_i16x8, 128, add_i16x4, 64, tcg_internal_add_i16x8)
-+GEN_VECT_WRAPPER_HALVES(add_i32x4, 128, add_i32x2, 64, tcg_internal_add_i32x4)
-+GEN_VECT_WRAPPER_HALVES(add_i64x2, 128, add_i64x1, 64, tcg_internal_add_i64x2)
-+
-+GEN_VECT_WRAPPER(add_i8x8, 64, tcg_internal_add_i8x8)
-+GEN_VECT_WRAPPER(add_i16x4, 64, tcg_internal_add_i16x4)
-+GEN_VECT_WRAPPER(add_i32x2, 64, tcg_internal_add_i32x2)
-+GEN_VECT_WRAPPER(add_i64x1, 64, tcg_internal_add_i64x1)
-+
-+#undef VTYPE
-+#undef BASE_TYPE
-diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
-index 2365c97..4c8f195 100644
---- a/tcg/tcg-opc.h
-+++ b/tcg/tcg-opc.h
-@@ -206,6 +206,18 @@ DEF(ld_v128, 1, 1, 1, IMPL128)
- DEF(st_v64, 0, 2, 1, IMPLV64)
- DEF(ld_v64, 1, 1, 1, IMPLV64)
- 
-+/* 128-bit vector arith */
-+DEF(add_i8x16, 1, 2, 0, IMPL128 | IMPL(TCG_TARGET_HAS_add_i8x16))
-+DEF(add_i16x8, 1, 2, 0, IMPL128 | IMPL(TCG_TARGET_HAS_add_i16x8))
-+DEF(add_i32x4, 1, 2, 0, IMPL128 | IMPL(TCG_TARGET_HAS_add_i32x4))
-+DEF(add_i64x2, 1, 2, 0, IMPL128 | IMPL(TCG_TARGET_HAS_add_i64x2))
-+
-+/* 64-bit vector arith */
-+DEF(add_i8x8, 1, 2, 0, IMPLV64 | IMPL(TCG_TARGET_HAS_add_i8x8))
-+DEF(add_i16x4, 1, 2, 0, IMPLV64 | IMPL(TCG_TARGET_HAS_add_i16x4))
-+DEF(add_i32x2, 1, 2, 0, IMPLV64 | IMPL(TCG_TARGET_HAS_add_i32x2))
-+DEF(add_i64x1, 1, 2, 0, IMPLV64 | IMPL(TCG_TARGET_HAS_add_i64x1))
-+
- /* QEMU specific */
- DEF(insn_start, 0, 0, TLADDR_ARGS * TARGET_INSN_START_WORDS,
-     TCG_OPF_NOT_PRESENT)
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index a8df040..a23f739 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -712,6 +712,18 @@ TCGv_v128 tcg_temp_new_internal_v128(int temp_local)
-     return MAKE_TCGV_V128(idx);
- }
- 
-+int tcg_temp_half_internal(int arg, TCGType type, int is_high)
++static inline void glue(io_write, SUFFIX)(CPUArchState *env,
++                                          CPUIOTLBEntry *iotlbentry,
++                                          uint8_t *val,
++                                          target_ulong addr,
++                                          uintptr_t retaddr)
 +{
-+    const TCGTemp *ts = &tcg_ctx.temps[arg];
-+    tcg_debug_assert(ts->type != ts->base_type);
-+    tcg_debug_assert(tcg_type_size(type) > tcg_type_size(ts->type));
-+    tcg_debug_assert(tcg_type_size(type) <= tcg_type_size(ts->base_type));
-+    if (is_high) {
-+        arg += tcg_type_size(type) / tcg_type_size(ts->type) / 2;
++    CPUState *cpu = ENV_GET_CPU(env);
++    hwaddr physaddr = iotlbentry->addr;
++    MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
++    int i;
++
++    assert(0); /* Needs testing */
++
++    physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
++    if (mr != &io_mem_rom && mr != &io_mem_notdirty && !cpu->can_do_io) {
++        cpu_io_recompile(cpu, retaddr);
 +    }
-+    return arg;
++
++    cpu->mem_io_vaddr = addr;
++    cpu->mem_io_pc = retaddr;
++    for (i = 0; i < (1 << SHIFT); i += 8) {
++        memory_region_dispatch_write(mr, physaddr + i, *(uint64_t *)(val + i),
++                                     8, iotlbentry->attrs);
++    }
 +}
 +
- static void tcg_temp_free_internal(int idx)
- {
-     TCGContext *s = &tcg_ctx;
++void helper_te_st_name(CPUArchState *env, target_ulong addr, uint8_t *val,
++                       TCGMemOpIdx oi, uintptr_t retaddr)
++{
++    unsigned mmu_idx = get_mmuidx(oi);
++    int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    target_ulong tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
++    uintptr_t haddr;
++    int i;
++
++    /* Adjust the given return address.  */
++    retaddr -= GETPC_ADJ;
++
++    /* If the TLB entry is for a different page, reload and try again.  */
++    if ((addr & TARGET_PAGE_MASK)
++        != (tlb_addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
++        if ((addr & (DATA_SIZE - 1)) != 0
++            && (get_memop(oi) & MO_AMASK) == MO_ALIGN) {
++            cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
++                                 mmu_idx, retaddr);
++        }
++        if (!VICTIM_TLB_HIT(addr_write, addr)) {
++            tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
++        }
++        tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
++    }
++
++    /* Handle an IO access.  */
++    if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
++        CPUIOTLBEntry *iotlbentry;
++        if ((addr & (DATA_SIZE - 1)) != 0) {
++            goto do_unaligned_access;
++        }
++        iotlbentry = &env->iotlb[mmu_idx][index];
++
++        /* ??? Note that the io helpers always read data in the target
++           byte ordering.  We should push the LE/BE request down into io.  */
++        glue(io_write, SUFFIX)(env, iotlbentry, val, addr, retaddr);
++        return;
++    }
++
++    /* Handle slow unaligned access (it spans two pages or IO).  */
++    if (DATA_SIZE > 1
++        && unlikely((addr & ~TARGET_PAGE_MASK) + DATA_SIZE - 1
++                     >= TARGET_PAGE_SIZE)) {
++        int i;
++    do_unaligned_access:
++        if ((get_memop(oi) & MO_AMASK) == MO_ALIGN) {
++            cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
++                                 mmu_idx, retaddr);
++        }
++        /* XXX: not efficient, but simple */
++        /* Note: relies on the fact that tlb_fill() does not remove the
++         * previous page from the TLB cache.  */
++        for (i = DATA_SIZE - 1; i >= 0; i--) {
++            /* Note the adjustment at the beginning of the function.
++               Undo that for the recursion.  */
++            glue(helper_ret_stb, MMUSUFFIX)(env, addr + i, val[i],
++                                            oi, retaddr + GETPC_ADJ);
++        }
++        return;
++    }
++
++    /* Handle aligned access or unaligned access in the same page.  */
++    if ((addr & (DATA_SIZE - 1)) != 0
++        && (get_memop(oi) & MO_AMASK) == MO_ALIGN) {
++        cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
++                             mmu_idx, retaddr);
++    }
++
++    haddr = addr + env->tlb_table[mmu_idx][index].addend;
++    for (i = 0; i < DATA_SIZE; i++) {
++        ((uint8_t *)haddr)[i] = val[i];
++    }
++}
++
++#endif /* !defined(SOFTMMU_CODE_ACCESS) */
++
++#undef READ_ACCESS_TYPE
++#undef SHIFT
++#undef SUFFIX
++#undef DATA_SIZE
++#undef ADDR_READ
++#undef helper_te_ld_name
++#undef helper_te_st_name
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 01299cc..fd43f15 100644
+index 63a83f9..8dee5c2 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
-@@ -156,6 +156,34 @@ typedef uint64_t TCGRegSet;
- #define TCG_TARGET_HAS_rem_i64          0
- #endif
+@@ -1330,6 +1330,11 @@ uint32_t helper_be_ldl_cmmu(CPUArchState *env, target_ulong addr,
+ uint64_t helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr,
+                             TCGMemOpIdx oi, uintptr_t retaddr);
  
-+/* 64-bit vector */
-+#ifndef TCG_TARGET_HAS_add_i8x8
-+#define TCG_TARGET_HAS_add_i8x8         0
-+#endif
-+#ifndef TCG_TARGET_HAS_add_i16x4
-+#define TCG_TARGET_HAS_add_i16x4        0
-+#endif
-+#ifndef TCG_TARGET_HAS_add_i32x2
-+#define TCG_TARGET_HAS_add_i32x2        0
-+#endif
-+#ifndef TCG_TARGET_HAS_add_i64x1
-+#define TCG_TARGET_HAS_add_i64x1        0
-+#endif
++void helper_te_ldv128_mmu(CPUArchState *env, target_ulong addr,
++                          TCGMemOpIdx oi, uintptr_t retaddr, uint8_t *res);
++void helper_te_stv128_mmu(CPUArchState *env, target_ulong addr, uint8_t *val,
++                          TCGMemOpIdx oi, uintptr_t retaddr);
 +
-+/* 128-bit vector */
-+#ifndef TCG_TARGET_HAS_add_i8x16
-+#define TCG_TARGET_HAS_add_i8x16        0
-+#endif
-+#ifndef TCG_TARGET_HAS_add_i16x8
-+#define TCG_TARGET_HAS_add_i16x8        0
-+#endif
-+#ifndef TCG_TARGET_HAS_add_i32x4
-+#define TCG_TARGET_HAS_add_i32x4        0
-+#endif
-+#ifndef TCG_TARGET_HAS_add_i64x2
-+#define TCG_TARGET_HAS_add_i64x2        0
-+#endif
-+
- /* For 32-bit targets, some sort of unsigned widening multiply is required.  */
- #if TCG_TARGET_REG_BITS == 32 \
-     && !(defined(TCG_TARGET_HAS_mulu2_i32) \
-@@ -761,6 +789,7 @@ struct TCGContext {
-     void *code_gen_buffer;
-     size_t code_gen_buffer_size;
-     void *code_gen_ptr;
-+    uint8_t v128_swap[16 * 3];
- 
-     /* Threshold to flush the translated code buffer.  */
-     void *code_gen_highwater;
-@@ -938,6 +967,20 @@ static inline TCGv_v128 tcg_temp_local_new_v128(void)
-     return tcg_temp_new_internal_v128(1);
- }
- 
-+int tcg_temp_half_internal(int arg, TCGType type, int is_high);
-+
-+static inline TCGv_v64 tcg_temp_low_half_v128(TCGv_v128 arg)
-+{
-+    int idx = tcg_temp_half_internal(GET_TCGV_V128(arg), TCG_TYPE_V128, 0);
-+    return MAKE_TCGV_V64(idx);
-+}
-+
-+static inline TCGv_v64 tcg_temp_high_half_v128(TCGv_v128 arg)
-+{
-+    int idx = tcg_temp_half_internal(GET_TCGV_V128(arg), TCG_TYPE_V128, 1);
-+    return MAKE_TCGV_V64(idx);
-+}
-+
- #if defined(CONFIG_DEBUG_TCG)
- /* If you call tcg_clear_temp_count() at the start of a section of
-  * code which is not supposed to leak any TCG temporaries, then
+ /* Temporary aliases until backends are converted.  */
+ #ifdef TARGET_WORDS_BIGENDIAN
+ # define helper_ret_ldsw_mmu  helper_be_ldsw_mmu
 -- 
 2.1.4
