@@ -1,29 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cYpac-0001rK-Qa
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 02:44:27 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1cYptw-0007B5-IR
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:04:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cYpaZ-0000l0-L0
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 02:44:26 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:38843)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cYpaZ-0000kn-F1
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 02:44:23 -0500
-Received: by mail-wm0-x230.google.com with SMTP id r141so25230609wmg.1
-	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 23:44:23 -0800 (PST)
-References: <20170127103922.19658-1-alex.bennee@linaro.org>
-	<20170127103922.19658-26-alex.bennee@linaro.org>
-	<f15d91cd-e5b9-3dda-7afa-5b2a91b9e9d0@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <f15d91cd-e5b9-3dda-7afa-5b2a91b9e9d0@twiddle.net>
-Date: Wed, 01 Feb 2017 07:44:23 +0000
-Message-ID: <87h94e4ap4.fsf@linaro.org>
+	(envelope-from <borntraeger@de.ibm.com>) id 1cYptt-0004uH-FK
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:04:24 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32773)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1cYptt-0004u4-6v
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:04:21 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v117suWg080589
+	for <qemu-devel@nongnu.org>; Wed, 1 Feb 2017 03:04:19 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28ba36ua61-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 03:04:18 -0500
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 1 Feb 2017 03:04:17 -0500
+References: <20170130145025.26475-1-david@redhat.com>
+	<89891b01-8d50-98ac-c26c-2a769b22b400@weilnetz.de>
+	<CAFEAcA86o3ohxZj0qqHKSxqxmo1mCtwKPa_j78xdO2izynEopA@mail.gmail.com>
+	<2d18251c-395e-641e-30d1-e44d7be9c012@weilnetz.de>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 1 Feb 2017 09:04:10 +0100
 MIME-Version: 1.0
+In-Reply-To: <2d18251c-395e-641e-30d1-e44d7be9c012@weilnetz.de>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 25/25] tcg: enable MTTCG by default for
- ARM on x86 hosts
+Content-Transfer-Encoding: 7bit
+Message-Id: <c0e1d939-774c-485b-b9b5-1e3631309358@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: use "qemu" cpu model in user
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +44,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, "open list:ARM" <qemu-arm@nongnu.org>
+To: Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>
+Cc: David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cornelia.huck@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>, pkg-qemu-devel@lists.alioth.debian.org, qemu-stable <qemu-stable@nongnu.org>
 
+On 01/30/2017 04:23 PM, Stefan Weil wrote:
+> Am 30.01.2017 um 16:11 schrieb Peter Maydell:
+>> On 30 January 2017 at 15:09, Stefan Weil <sw@weilnetz.de> wrote:
+>>> Am 30.01.2017 um 15:50 schrieb David Hildenbrand:
+>>>> "any" does not exist, therefore resulting in a misleading error message.
+>>>>
+>>>> Reported-by: Stefan Weil <sw@weilnetz.de>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>  linux-user/main.c | 2 ++
+>>>>  1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/linux-user/main.c b/linux-user/main.c
+>>>> index 3004958..e588f58 100644
+>>>> --- a/linux-user/main.c
+>>>> +++ b/linux-user/main.c
+>>>> @@ -4322,6 +4322,8 @@ int main(int argc, char **argv, char **envp)
+>>>>  # endif
+>>>>  #elif defined TARGET_SH4
+>>>>          cpu_model = TYPE_SH7785_CPU;
+>>>> +#elif defined TARGET_S390X
+>>>> +        cpu_model = "qemu";
+>>>>  #else
+>>>>          cpu_model = "any";
+>>>>  #endif
+>>>
+>>> Thanks.
+>>>
+>>> Reviewed-by: Stefan Weil <sw@weilnetz.de>
+>>>
+>>> This fix is also needed for Debian's QEMU user emulation.
+>> Does it merit a cc: qemu-stable ?
+>>
+>> thanks
+>> -- PMM
+> 
+> Yes, of course. Thanks for the reminder - I added that list now as cc.
 
-Richard Henderson <rth@twiddle.net> writes:
-
-> On 01/27/2017 02:39 AM, Alex Bennée wrote:
->> +/* This defines the natural memory order supported by this
->> + * architecture before guarantees made by various barrier
->> + * instructions.
->> + *
->> + * The x86 has a pretty strong memory ordering which only really
->> + * allows for some stores to be re-ordered after loads.
->> + */
->> +#include "tcg-mo.h"
->> +
->> +static inline int get_tcg_target_mo(void)
->> +{
->> +    return TCG_MO_ALL & ~TCG_MO_LD_ST;
->> +}
->> +
->> +#define TCG_TARGET_DEFAULT_MO get_tcg_target_mo()
->> +
->
-> Why the inline function?  The expression in the define would seem sufficient.
-> Otherwise,
-
-Good point. It was just to get around the definition at pre-processor and
-compile time.
-
->
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
->
->
-> r~
-
-
---
-Alex Bennée
+Added to the kvm/s390 tree (since this tree introduced the regression)
