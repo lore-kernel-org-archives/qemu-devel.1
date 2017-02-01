@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cZ3Cr-0005wF-F0
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 17:16:50 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cZ3Pc-0002ct-1O
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 17:30:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cZ3Cq-0000UU-Fz
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 17:16:49 -0500
-References: <cover.1485878688.git.berto@igalia.com>
-	<79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+	(envelope-from <mreitz@redhat.com>) id 1cZ3Pb-0007v2-As
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 17:30:00 -0500
+References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479837270-79005-9-git-send-email-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <5c316901-5632-ff05-7700-6427cd33bf74@redhat.com>
-Date: Wed, 1 Feb 2017 23:16:38 +0100
+Message-ID: <057d247b-febb-6938-4594-67e36a22aa61@redhat.com>
+Date: Wed, 1 Feb 2017 23:29:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+In-Reply-To: <1479837270-79005-9-git-send-email-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="7taDwnn2fvC5elqenV1dLC2mMEdn4F3LQ"
-Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-io: don't allow I/O operations
- larger than INT_MAX
+	boundary="a4ishfdvIRaa6cD0QGGORDkgVWtMUdFKK"
+Subject: Re: [Qemu-devel] [PATCH 08/17] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_release_successor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7taDwnn2fvC5elqenV1dLC2mMEdn4F3LQ
+--a4ishfdvIRaa6cD0QGGORDkgVWtMUdFKK
 From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <5c316901-5632-ff05-7700-6427cd33bf74@redhat.com>
-Subject: Re: [PATCH 1/2] qemu-io: don't allow I/O operations larger than
- INT_MAX
-References: <cover.1485878688.git.berto@igalia.com>
- <79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
-In-Reply-To: <79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com,
+ famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com,
+ quintela@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org,
+ dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+Message-ID: <057d247b-febb-6938-4594-67e36a22aa61@redhat.com>
+Subject: Re: [PATCH 08/17] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_release_successor
+References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
+ <1479837270-79005-9-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1479837270-79005-9-git-send-email-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 31.01.2017 17:09, Alberto Garcia wrote:
-> Passing a request size larger than INT_MAX to any of the I/O commands
-> results in an error. While 'read' and 'write' handle the error
-> correctly, 'aio_read' and 'aio_write' hit an assertion:
+On 22.11.2016 18:54, Vladimir Sementsov-Ogievskiy wrote:
+> To just release successor and unfreeze bitmap without any additional
+> work.
 >=20
-> blk_aio_read_entry: Assertion `rwco->qiov->size =3D=3D acb->bytes' fail=
-ed.
->=20
-> The reason is that the QEMU I/O code cannot handle request sizes
-> larger than INT_MAX, so this patch makes qemu-io check that all values
-> are within range.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
 > ---
->  qemu-io-cmds.c | 21 ++++++++++++---------
->  1 file changed, 12 insertions(+), 9 deletions(-)
+>  block/dirty-bitmap.c         | 10 ++++++++++
+>  include/block/dirty-bitmap.h |  2 ++
+>  2 files changed, 12 insertions(+)
 
-Thanks, applied to my block tree, with
-%s/INT_MAX/BDRV_REQUEST_MAX_BYTES/g:
-
-https://github.com/XanClic/qemu/commits/block
-
-(Maybe you should take a quick glance on whether all of the changes are
-really OK for you, the commit currently resides under
-https://github.com/XanClic/qemu/commit/beaf099368f91eb44ebd49e863c57bc0ff=
-80659f
-)
-
-Max
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---7taDwnn2fvC5elqenV1dLC2mMEdn4F3LQ
+--a4ishfdvIRaa6cD0QGGORDkgVWtMUdFKK
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliSXkYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A6doH/1JJfSGqThctFeQUO9wCxdDrigFJVRp4
-hoFDygMbJfcsR8e9b22+gmmfh5FZ4TPLcwF/cVfguR+/2JEnNzM6w4BNvYWQoAY+
-VDijDRPT3A7yXZ2dQj158Mr3OBJ0df9nZF/83h3qGqjsCelgwNNGnTa2ZQkkm9I3
-EhJELREPCG0VsQg+WbAL4gQx/WELpqzHMsazhrnacMZ9UdTxgok/ht0LgYVCMyOm
-LUk/OkaerARxzrRvuxuUKFdPRboeaqE+PvjNtdEFlGRAFNH9a6/QlsQUrWLogFPU
-DYY4sha0yYIOQ3uteSm0CV1tMERKn3LvgBZDaN/nar2sBs+JJtfftzA=
-=WnkB
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliSYVoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AcqUH/0D/qIy4SxgXx6v7zkxw6il0Rslp8ZPk
+rOlGexyHkiHKsH/TYTa0Fl71e5HkPXXuSqJB0Vq7nSkR2ZMJY6D3WkwrLWePK3NN
+ZmQb5o9jG3tvOYFHKw9s9Ly2S+G+JStbg54OsDN63dPaFMddaU2lybi8cIuIvVEW
+ZFpaY8yapC2OUkU4ncHftDjlnGD1SoxaiBzrwhxjDub3YUCV9dd7OECBrePVxXRz
+0kUd5cJ9nkurq9Af4X3Ap0BPs+bGXRT5e4IDMG37UFohVogHcnPvxlbLG6dQGBIa
+L6LR7QZhHhYIIyNOB9WnMVspwyvQdrj9pymgNk8X57m/8SHNzldi/10=
+=VrP9
 -----END PGP SIGNATURE-----
 
---7taDwnn2fvC5elqenV1dLC2mMEdn4F3LQ--
+--a4ishfdvIRaa6cD0QGGORDkgVWtMUdFKK--
