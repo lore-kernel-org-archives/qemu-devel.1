@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cYzqV-0007M5-0i
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 13:41:32 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1cZ0iz-0001nT-F6
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 14:37:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cYzqR-0004NC-SK
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 13:41:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46520)
+	(envelope-from <sstabellini@kernel.org>) id 1cZ0iw-0003J5-Bs
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 14:37:49 -0500
+Received: from mail.kernel.org ([198.145.29.136]:55280)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cYzqR-0004N8-JX
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 13:41:27 -0500
-Date: Wed, 1 Feb 2017 18:41:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170201184120.GB15789@work-vm>
-References: <20161020132556.67321-1-pasic@linux.vnet.ibm.com>
-	<20161020132556.67321-3-pasic@linux.vnet.ibm.com>
-	<b1f6f338-601f-8525-1f1b-cffdbe203453@linux.vnet.ibm.com>
-	<20170131200016.GP2395@work-vm>
-	<6b789ed6-7043-8f6f-5dd7-a6a213f9f1cc@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cZ0iw-0003FI-1M
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 14:37:46 -0500
+Date: Wed, 1 Feb 2017 11:37:40 -0800 (PST)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20170201065202.7746-1-jgross@suse.com>
+Message-ID: <alpine.DEB.2.10.1702011134020.17946@sstabellini-ThinkPad-X260>
+References: <20170201065202.7746-1-jgross@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6b789ed6-7043-8f6f-5dd7-a6a213f9f1cc@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] migration: drop unused
- VMStateField.start
+Content-ID: <alpine.DEB.2.10.1702011134140.17946@sstabellini-ThinkPad-X260>
+Content-Type: TEXT/PLAIN; CHARSET=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] xen: use qdev_unplug() instead of
+ g_free() in xen_pv_find_xendev()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,179 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Guenther Hutzl <hutzl@linux.vnet.ibm.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, kraxel@redhat.com, sstabellini@kernel.org, jgross@suse.com
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> 
-> 
-> On 01/31/2017 09:00 PM, Dr. David Alan Gilbert wrote:
-> > * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> >>
-> >>
-> >> On 10/20/2016 03:25 PM, Halil Pasic wrote:
-> >>> diff --git a/migration/vmstate.c b/migration/vmstate.c
-> >>> index fc29acf..8767e40 100644
-> >>> --- a/migration/vmstate.c
-> >>> +++ b/migration/vmstate.c
-> >>> @@ -66,10 +66,10 @@ static void *vmstate_base_addr(void *opaque, VMStateField *field, bool alloc)
-> >>>                  }
-> >>>              }
-> >>>              if (size) {
-> >>> -                *((void **)base_addr + field->start) = g_malloc(size);
-> >>> +                *(void **)base_addr = g_malloc(size);
-> >>>              }
-> >>>          }
-> >>> -        base_addr = *(void **)base_addr + field->start;
-> >>> +        base_addr = *(void **)base_addr;
-> >>>      }
-> >>>
-> >>>      return base_addr;
-> >> Hi!
-> >>
-> >> It is been a while, and IMHO this is still broken, and the
-> >> VMSTATE_VBUFFER* macros are still only used with the start argument
-> >> being zero.
-> >>
-> >> What changed is that with commit 94869d5c ("migration: migrate QTAILQ")
-> >> from Jan 19 we have code actually using VMStateDecription.start -- but
-> >> for something different (IMHO), as allocation is done by get_qtailq and
-> >> not by vmstate_base_addr (as in case of VMSTATE_VBUFFER_ALLOC_UINT32).
-> >> Thus I would need to update the commit message and keep the start field
-> >> at least.
-> >>
-> >> But before I do so, I would like to ask the maintainers if there is
-> >> interest in a change like this?
-> > 
-> > I think it's certainly worth fixing VMSTATE_BUFFER_ALLOC*; if it can't
-> > use the start field properly then it should have the start parameter
-> > removed.
-> 
-> Thanks for the reply! Let us try to figure out what to do together...
-> > 
-> > I'll admit I can't remember the details of why field->start as an offset
-> > didn't work; are the other macros that take a start value correct?
-> 
-> I'm going to explain my view on field->start, but first let us have a look
-> which macros are using it: 
-> 
-> $ pcregrep -Mi '#define VMSTATE_[^{]*{[^}]*\.start[^}]*}' include/migration/vmstate.h
+Hi Peter,
 
-nice :-)
+do you think this is acceptable?
 
-> #define VMSTATE_VBUFFER_MULTIPLY(_field, _state, _version, _test, _start, _field_size, _multiply) { \
->     .name         = (stringify(_field)),                             \
->     .version_id   = (_version),                                      \
->     .field_exists = (_test),                                         \
->     .size_offset  = vmstate_offset_value(_state, _field_size, uint32_t),\
->     .size         = (_multiply),                                      \
->     .info         = &vmstate_info_buffer,                            \
->     .flags        = VMS_VBUFFER|VMS_POINTER|VMS_MULTIPLY,            \
->     .offset       = offsetof(_state, _field),                        \
->     .start        = (_start),                                        \
-> }
-> #define VMSTATE_VBUFFER(_field, _state, _version, _test, _start, _field_size) { \
->     .name         = (stringify(_field)),                             \
->     .version_id   = (_version),                                      \
->     .field_exists = (_test),                                         \
->     .size_offset  = vmstate_offset_value(_state, _field_size, int32_t),\
->     .info         = &vmstate_info_buffer,                            \
->     .flags        = VMS_VBUFFER|VMS_POINTER,                         \
->     .offset       = offsetof(_state, _field),                        \
->     .start        = (_start),                                        \
-> }
-> #define VMSTATE_VBUFFER_UINT32(_field, _state, _version, _test, _start, _field_size) { \
->     .name         = (stringify(_field)),                             \
->     .version_id   = (_version),                                      \
->     .field_exists = (_test),                                         \
->     .size_offset  = vmstate_offset_value(_state, _field_size, uint32_t),\
->     .info         = &vmstate_info_buffer,                            \
->     .flags        = VMS_VBUFFER|VMS_POINTER,                         \
->     .offset       = offsetof(_state, _field),                        \
->     .start        = (_start),                                        \
-> }
-> #define VMSTATE_VBUFFER_ALLOC_UINT32(_field, _state, _version, _test, _start, _field_size) { \
->     .name         = (stringify(_field)),                             \
->     .version_id   = (_version),                                      \
->     .field_exists = (_test),                                         \
->     .size_offset  = vmstate_offset_value(_state, _field_size, uint32_t),\
->     .info         = &vmstate_info_buffer,                            \
->     .flags        = VMS_VBUFFER|VMS_POINTER|VMS_ALLOC,               \
->     .offset       = offsetof(_state, _field),                        \
->     .start        = (_start),                                        \
-> }
-> #define VMSTATE_QTAILQ_V(_field, _state, _version, _vmsd, _type, _next)  \
-> {                                                                        \
->     .name         = (stringify(_field)),                                 \
->     .version_id   = (_version),                                          \
->     .vmsd         = &(_vmsd),                                            \
->     .size         = sizeof(_type),                                       \
->     .info         = &vmstate_info_qtailq,                                \
->     .offset       = offsetof(_state, _field),                            \
->     .start        = offsetof(_type, _next),                              \
-> }
-> 
-> We both agree that VMSTATE_VBUFFER_ALLOC_UINT32 is wrong with start != 0,
-> and that VMSTATE_QTAILQ_V needs the data member. But I think
-> VMSTATE_QTAILQ_V is not using the start handling from vmstate_base_addr,
-> (because it has no VMS_POINTER flag set).
+Thanks,
 
-Yes, I think I agree.
+Stefano
 
-> I think the not allocating versions of VMSTATE_VBUFFER are also fine as
-> is, but if someone had the bright idea to make an allocating version,
-> it's very straightforward to create something broken.
-
-Yes.
-
-> So my original train of thought was, because nobody uses VMSTATE_VBUFFER
-> with start != 0 let us get rid of the extra complexity, and eventually
-> reintroduce it when it's needed. This feature is around for quite some
-> time now, but nobody uses it, and I do not think it is very likely we
-> will need it in the future.
-> 
-> 
-> > If we can't remove the start variable then it's probably not removing
-> > the start parameter everywhere.
-> 
-> Yes we can. We just can't remove the start data member form VMStateField
-> because the QTAILQ stuff is now using it.
-> > 
-> > That alloc case looks the most unusual in that vmstate_base_addr()
-> > function; I *think* the non-alloc case makes sense
-> > (i.e. follow a pointer and then use an offset from that pointer?)
-> > even if no one currently uses it.
-> 
-> I also think it makes sense, but as written above, it is never used.
-> 
-> I see 3 options regarding how to proceed:
-> 
-> 1) Remove the start parameter from the VMSTATE_VBUFFER* macros, and
-> the start handling from vmstate_base_addr (basically the same I
-> did here, with the difference that VMStateField.start remains).
-> 2) Proclaim that .start && (.flags & VMSTATE_ALLOC) == false is an
-> invariant of QEMU, and assert when we would allocate. Remove the parameter
-> form VMSTATRE_VBUFFER_ALLOC.
-> 3) Make .start work properly for dynamically allocated buffers.
-> 
-> I prefer option 1). What is your preference?
-
-Yes OK; that probably makes sense; I slightly preferred (2) but I think
-you convinced me :-)
-
-Dave
-
-> Halil
-> 
-> > 
-> > Dave
-> > 
-> >> Regards,
-> >> Halil
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+On Wed, 1 Feb 2017, Juergen Gross wrote:
+> The error exits of xen_pv_find_xendev() free the new xen-device via
+> g_free() which is wrong.
+>=20
+> As the xen-device has been initialized as qdev it must be removed
+> via qdev_unplug().
+>=20
+> This bug has been introduced with commit 3a6c9172ac5951e6dac2b3f6
+> ("xen: create qdev for each backend device").
+>=20
+> Reported-by: Roger Pau Monn=C3=A9 <roger.pau@citrix.com>
+> Tested-by: Roger Pau Monn=C3=A9 <roger.pau@citrix.com>
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> ---
+> V2: set free method to avoid memory leak (Peter Maydell)
+>     use DEVICE(xendev) instead of &xendev->qdev (Peter Maydell)
+> ---
+>  hw/xen/xen_backend.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+> index d119004..6c21c37 100644
+> --- a/hw/xen/xen_backend.c
+> +++ b/hw/xen/xen_backend.c
+> @@ -124,10 +124,11 @@ static struct XenDevice *xen_be_get_xendev(const =
+char *type, int dom, int dev,
+>      /* init new xendev */
+>      xendev =3D g_malloc0(ops->size);
+>      object_initialize(&xendev->qdev, ops->size, TYPE_XENBACKEND);
+> -    qdev_set_parent_bus(&xendev->qdev, xen_sysbus);
+> -    qdev_set_id(&xendev->qdev, g_strdup_printf("xen-%s-%d", type, dev)=
+);
+> -    qdev_init_nofail(&xendev->qdev);
+> -    object_unref(OBJECT(&xendev->qdev));
+> +    OBJECT(xendev)->free =3D g_free;
+> +    qdev_set_parent_bus(DEVICE(xendev), xen_sysbus);
+> +    qdev_set_id(DEVICE(xendev), g_strdup_printf("xen-%s-%d", type, dev=
+));
+> +    qdev_init_nofail(DEVICE(xendev));
+> +    object_unref(OBJECT(xendev));
+> =20
+>      xendev->type  =3D type;
+>      xendev->dom   =3D dom;
+> @@ -145,7 +146,7 @@ static struct XenDevice *xen_be_get_xendev(const ch=
+ar *type, int dom, int dev,
+>      xendev->evtchndev =3D xenevtchn_open(NULL, 0);
+>      if (xendev->evtchndev =3D=3D NULL) {
+>          xen_pv_printf(NULL, 0, "can't open evtchn device\n");
+> -        g_free(xendev);
+> +        qdev_unplug(DEVICE(xendev), NULL);
+>          return NULL;
+>      }
+>      fcntl(xenevtchn_fd(xendev->evtchndev), F_SETFD, FD_CLOEXEC);
+> @@ -155,7 +156,7 @@ static struct XenDevice *xen_be_get_xendev(const ch=
+ar *type, int dom, int dev,
+>          if (xendev->gnttabdev =3D=3D NULL) {
+>              xen_pv_printf(NULL, 0, "can't open gnttab device\n");
+>              xenevtchn_close(xendev->evtchndev);
+> -            g_free(xendev);
+> +            qdev_unplug(DEVICE(xendev), NULL);
+>              return NULL;
+>          }
+>      } else {
+> --=20
+> 2.10.2
+>=20
