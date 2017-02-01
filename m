@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cYue1-0002AO-0g
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:08:18 -0500
+	(envelope-from <den@openvz.org>) id 1cYul7-0000dQ-Lb
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:15:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cYudw-0002TD-Ih
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:08:16 -0500
-Resent-Message-Id: <E1cYudw-0002TD-Ih@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21336)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cYudw-0002ST-Al
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:08:12 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-Message-ID: <148595447536.33.7250913320886070032@eba24e3a0d7f>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 1 Feb 2017 05:07:56 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/20] Emulate guest vector operations
- with host vector operations
+	(envelope-from <den@openvz.org>) id 1cYul3-0004ea-IQ
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:15:37 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:44246 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cYul3-0004eK-6i
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:15:33 -0500
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Wed,  1 Feb 2017 16:15:28 +0300
+Message-Id: <1485954928-22287-1-git-send-email-den@openvz.org>
+Subject: [Qemu-devel] [PATCH 1/1] qemu_char: socket backend: disconnect on
+ EPIPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,123 +22,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: batuzovk@ispras.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, crosthwaite.peter@gmail.com, pbonzini@redhat.com, alex.bennee@linaro.org, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMjBdIEVtdWxhdGUgZ3Vlc3QgdmVjdG9y
-IG9wZXJhdGlvbnMgd2l0aCBob3N0IHZlY3RvciBvcGVyYXRpb25zCk1lc3NhZ2UtaWQ6IDE0ODU5
-NTE1MDItMjg3NzQtMS1naXQtc2VuZC1lbWFpbC1iYXR1em92a0Bpc3ByYXMucnUKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
-bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0
-aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAg
-ICAgICBwYXRjaGV3LzE0ODU5NTE1MDItMjg3NzQtMS1naXQtc2VuZC1lbWFpbC1iYXR1em92a0Bp
-c3ByYXMucnUgLT4gcGF0Y2hldy8xNDg1OTUxNTAyLTI4Nzc0LTEtZ2l0LXNlbmQtZW1haWwtYmF0
-dXpvdmtAaXNwcmFzLnJ1ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDI5NDJiNyB0
-Y2cvUkVBRE1FOiB1cGRhdGUgUkVBRE1FIHRvIGluY2x1ZGUgaW5mb3JtYXRpb24gYWJvdXQgdmVj
-dG9yIG9wY29kZXMKNDRmZWJmYSB0YXJnZXQvYXJtOiBsb2FkIHR3byBjb25zZWN1dGl2ZSA2NC1i
-aXRzIHZlY3RvciByZWdzIGFzIGEgMTI4LWJpdCB2ZWN0b3IgcmVnCjhiMmY4YTMgdGNnL2kzODY6
-IGFkZCBzdXBwb3J0IGZvciBxZW11X2xkX3YxMjgvcWVtdV9zdF92MTI4IG9wcwphZTJhMzFjIHNv
-ZnRtbXU6IGNyZWF0ZSBoZWxwZXJzIGZvciB2ZWN0b3IgbG9hZHMKMjZmMTBkNCB0Y2c6IGludHJv
-ZHVjZSBxZW11X2xkX3YxMjggYW5kIHFlbXVfc3RfdjEyOCBvcGNvZGVzCmE1YThmODIgdGNnOiBp
-bnRyb2R1Y2UgbmV3IFRDR01lbU9wIC0gTU9fMTI4CmUwZDAwNjcgdGNnOiBkbyBub3QgcmVseSBv
-biBleGFjdCB2YWx1ZXMgb2YgTU9fQlNXQVAgb3IgTU9fU0lHTiBpbiBiYWNrZW5kCjgyMzNjODYg
-dGNnL2kzODY6IHN1cHBvcnQgcmVtYWluaW5nIHZlY3RvciBhZGRpdGlvbiBvcGVyYXRpb25zCjli
-ZDM0YjUgdGNnL2kzODY6IHN1cHBvcnQgNjQtYml0IHZlY3RvciBvcGVyYXRpb25zCjc3M2RjODYg
-dGNnL2kzODY6IGFkZCBzdXBwb3J0IGZvciB2ZWN0b3Igb3Bjb2Rlcwo0ODk2ZDhiIHRhcmdldC9h
-cm06IHVzZSB2ZWN0b3Igb3Bjb2RlIHRvIGhhbmRsZSB2YWRkLjxzaXplPiBpbnN0cnVjdGlvbgo4
-MTE3ZDA0IHRhcmdldC9hcm06IHN1cHBvcnQgYWNjZXNzIHRvIHZlY3RvciBndWVzdCByZWdpc3Rl
-cnMgYXMgZ2xvYmFscwo2ZWI4MTkwIHRjZzogYWRkIHZlY3RvciBhZGRpdGlvbiBvcGVyYXRpb25z
-CjAwMzczNGEgdGNnOiBhbGxvdyBnbG9iYWxzIHRvIG92ZXJsYXAKMGI0ZjMxZSB0Y2c6IHVzZSBy
-ZXN1bHRzIG9mIGFsaWFzIGFuYWx5c2lzIGluIGxpdmVuZXNzIGFuYWx5c2lzCjVkYzc2MTIgdGNn
-OiBhZGQgc2ltcGxlIGFsaWFzIGFuYWx5c2lzCjhiMTYzMGYgdGNnOiBhZGQgbGRfdjEyOCwgbGRf
-djY0LCBzdF92MTI4IGFuZCBzdF92NjQgb3Bjb2RlcwplYzZiMjg0IHRjZzogc3VwcG9ydCByZXBy
-ZXNlbnRpbmcgdmVjdG9yIHR5cGUgd2l0aCBzbWFsbGVyIHZlY3RvciBvciBzY2FsYXIgdHlwZXMK
-MmU5YzVhZSB0Y2c6IGFkZCBzdXBwb3J0IGZvciA2NGJpdCB2ZWN0b3IgdHlwZQo2MWY5MzhhIHRj
-ZzogYWRkIHN1cHBvcnQgZm9yIDEyOGJpdCB2ZWN0b3IgdHlwZQoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yMDogdGNnOiBhZGQgc3VwcG9ydCBmb3IgMTI4Yml0IHZlY3Rv
-ciB0eXBlLi4uCkNoZWNraW5nIFBBVENIIDIvMjA6IHRjZzogYWRkIHN1cHBvcnQgZm9yIDY0Yml0
-IHZlY3RvciB0eXBlLi4uCkNoZWNraW5nIFBBVENIIDMvMjA6IHRjZzogc3VwcG9ydCByZXByZXNl
-bnRpbmcgdmVjdG9yIHR5cGUgd2l0aCBzbWFsbGVyIHZlY3RvciBvciBzY2FsYXIgdHlwZXMuLi4K
-Q2hlY2tpbmcgUEFUQ0ggNC8yMDogdGNnOiBhZGQgbGRfdjEyOCwgbGRfdjY0LCBzdF92MTI4IGFu
-ZCBzdF92NjQgb3Bjb2Rlcy4uLgpDaGVja2luZyBQQVRDSCA1LzIwOiB0Y2c6IGFkZCBzaW1wbGUg
-YWxpYXMgYW5hbHlzaXMuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicg
-KGN0eDpWeEUpCiM4MTogRklMRTogdGNnL29wdGltaXplLmM6MTQ3MjoKKyAgICAgICAgQ0FTRV9P
-UF8zMl82NChtb3ZpKToKICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFj
-ZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojODU6IEZJTEU6IHRjZy9vcHRp
-bWl6ZS5jOjE0NzY6CisgICAgICAgIENBU0VfT1BfMzJfNjQobW92KToKICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0
-eDpWeEUpCiM5MDogRklMRTogdGNnL29wdGltaXplLmM6MTQ4MToKKyAgICAgICAgQ0FTRV9PUF8z
-Ml82NChhZGQpOgogICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJl
-cXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzkxOiBGSUxFOiB0Y2cvb3B0aW1pemUu
-YzoxNDgyOgorICAgICAgICBDQVNFX09QXzMyXzY0KHN1Yik6CiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhF
-KQojMTAxOiBGSUxFOiB0Y2cvb3B0aW1pemUuYzoxNDkyOgorICAgICAgICBDQVNFX09QXzMyXzY0
-KGxkOHMpOgogICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1
-aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeEUpCiMxMDI6IEZJTEU6IHRjZy9vcHRpbWl6ZS5j
-OjE0OTM6CisgICAgICAgIENBU0VfT1BfMzJfNjQobGQ4dSk6CiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4
-RSkKIzEwNjogRklMRTogdGNnL29wdGltaXplLmM6MTQ5NzoKKyAgICAgICAgQ0FTRV9PUF8zMl82
-NChsZDE2cyk6CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBy
-ZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeEUpCiMxMDc6IEZJTEU6IHRjZy9vcHRpbWl6
-ZS5jOjE0OTg6CisgICAgICAgIENBU0VfT1BfMzJfNjQobGQxNnUpOgogICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChj
-dHg6VnhFKQojMTI1OiBGSUxFOiB0Y2cvb3B0aW1pemUuYzoxNTE2OgorICAgICAgICBDQVNFX09Q
-XzMyXzY0KHN0OCk6CiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojMTI5OiBGSUxFOiB0Y2cvb3B0aW1p
-emUuYzoxNTIwOgorICAgICAgICBDQVNFX09QXzMyXzY0KHN0MTYpOgogICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXgoKdG90YWw6IDEwIGVycm9ycywgMCB3YXJuaW5ncywgMTk2IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
-VENIIDYvMjA6IHRjZzogdXNlIHJlc3VsdHMgb2YgYWxpYXMgYW5hbHlzaXMgaW4gbGl2ZW5lc3Mg
-YW5hbHlzaXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8yMDogdGNnOiBhbGxvdyBnbG9iYWxzIHRvIG92
-ZXJsYXAuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yMDogdGNnOiBhZGQgdmVjdG9yIGFkZGl0aW9uIG9w
-ZXJhdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yMDogdGFyZ2V0L2FybTogc3VwcG9ydCBhY2Nl
-c3MgdG8gdmVjdG9yIGd1ZXN0IHJlZ2lzdGVycyBhcyBnbG9iYWxzLi4uCkVSUk9SOiB0aGF0IG9w
-ZW4gYnJhY2UgeyBzaG91bGQgYmUgb24gdGhlIHByZXZpb3VzIGxpbmUKIzM4OiBGSUxFOiB0YXJn
-ZXQvYXJtL3RyYW5zbGF0ZS5jOjgyOgorc3RhdGljIGNvbnN0IGNoYXIgKnJlZ25hbWVzX3FbXSA9
-CisgICAgeyAicTAiLCAicTEiLCAicTIiLCAicTMiLCAicTQiLCAicTUiLCAicTYiLCAicTciLAoK
-RVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBiZSBvbiB0aGUgcHJldmlvdXMgbGluZQoj
-NDI6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLmM6ODY6CitzdGF0aWMgY29uc3QgY2hhciAq
-cmVnbmFtZXNfZFtdID0KKyAgICB7ICJkMCIsICJkMSIsICJkMiIsICJkMyIsICJkNCIsICJkNSIs
-ICJkNiIsICJkNyIsCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDUyIGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDEwLzIwOiB0YXJnZXQvYXJtOiB1c2UgdmVjdG9yIG9wY29kZSB0byBoYW5kbGUgdmFkZC48c2l6
-ZT4gaW5zdHJ1Y3Rpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjA6IHRjZy9pMzg2OiBhZGQgc3Vw
-cG9ydCBmb3IgdmVjdG9yIG9wY29kZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjA6IHRjZy9pMzg2
-OiBzdXBwb3J0IDY0LWJpdCB2ZWN0b3Igb3BlcmF0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAxMy8y
-MDogdGNnL2kzODY6IHN1cHBvcnQgcmVtYWluaW5nIHZlY3RvciBhZGRpdGlvbiBvcGVyYXRpb25z
-Li4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojMTAy
-OiBGSUxFOiB0Y2cvaTM4Ni90Y2ctdGFyZ2V0LmluYy5jOjI0MDQ6CisgICAgT1BfVjEyOF9BTEwo
-YWRkKToKICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
-bmQgdGhhdCAnOicgKGN0eDpWeEUpCiMxMDM6IEZJTEU6IHRjZy9pMzg2L3RjZy10YXJnZXQuaW5j
-LmM6MjQwNToKKyAgICBPUF9WNjRfQUxMKGFkZCk6CiAgICAgICAgICAgICAgICAgICAgXgoKdG90
-YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTQvMjA6IHRjZzogZG8g
-bm90IHJlbHkgb24gZXhhY3QgdmFsdWVzIG9mIE1PX0JTV0FQIG9yIE1PX1NJR04gaW4gYmFja2Vu
-ZC4uLgpDaGVja2luZyBQQVRDSCAxNS8yMDogdGNnOiBpbnRyb2R1Y2UgbmV3IFRDR01lbU9wIC0g
-TU9fMTI4Li4uCkNoZWNraW5nIFBBVENIIDE2LzIwOiB0Y2c6IGludHJvZHVjZSBxZW11X2xkX3Yx
-MjggYW5kIHFlbXVfc3RfdjEyOCBvcGNvZGVzLi4uCkNoZWNraW5nIFBBVENIIDE3LzIwOiBzb2Z0
-bW11OiBjcmVhdGUgaGVscGVycyBmb3IgdmVjdG9yIGxvYWRzLi4uCkNoZWNraW5nIFBBVENIIDE4
-LzIwOiB0Y2cvaTM4NjogYWRkIHN1cHBvcnQgZm9yIHFlbXVfbGRfdjEyOC9xZW11X3N0X3YxMjgg
-b3BzLi4uCkNoZWNraW5nIFBBVENIIDE5LzIwOiB0YXJnZXQvYXJtOiBsb2FkIHR3byBjb25zZWN1
-dGl2ZSA2NC1iaXRzIHZlY3RvciByZWdzIGFzIGEgMTI4LWJpdCB2ZWN0b3IgcmVnLi4uCkNoZWNr
-aW5nIFBBVENIIDIwLzIwOiB0Y2cvUkVBRE1FOiB1cGRhdGUgUkVBRE1FIHRvIGluY2x1ZGUgaW5m
-b3JtYXRpb24gYWJvdXQgdmVjdG9yIG9wY29kZXMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+
+Socket backend read handler should normally perform a disconnect, however
+the read handler may not get a chance to run if the frontend is not ready
+(qemu_chr_be_can_write == 0).
+
+This means that in virtio-serial frontend case if
+ - the host has disconnected (giving EPIPE on socket write)
+ - and the guest has disconnected (-> frontend not ready -> backend
+   will not read)
+ - and there is still data (frontend->backend) to flush (has to be a really
+   tricky timing but nevertheless, we have observed the case in production)
+
+This results in virtio-serial trying to flush this data continiously forming
+a busy loop.
+
+Solution: react on EPIPE in the socket write handler. We must not disconnect
+right away though, there still may be data to read (see 4bf1cb0).
+
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Daniel P. Berrange <berrange@redhat.com>
+---
+ qemu-char.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/qemu-char.c b/qemu-char.c
+index 6b4a299..f1f7a07 100644
+--- a/qemu-char.c
++++ b/qemu-char.c
+@@ -1202,7 +1202,7 @@ static int io_channel_send_full(QIOChannel *ioc,
+             errno = EAGAIN;
+             return -1;
+         } else if (ret < 0) {
+-            errno = EINVAL;
++            errno = errno == EPIPE ? EPIPE : EINVAL;
+             return -1;
+         }
+ 
+@@ -2854,6 +2854,9 @@ static gboolean tcp_chr_accept(QIOChannel *chan,
+                                GIOCondition cond,
+                                void *opaque);
+ 
++static int tcp_chr_read_poll(void *opaque);
++static void tcp_chr_disconnect(Chardev *chr);
++
+ /* Called with chr_write_lock held.  */
+ static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
+ {
+@@ -2871,6 +2874,13 @@ static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
+             s->write_msgfds_num = 0;
+         }
+ 
++        if (ret < 0 && errno == EPIPE) {
++            if (tcp_chr_read_poll(chr) <= 0) {
++                tcp_chr_disconnect(chr);
++                return len;
++            } /* else let the read handler finish it properly */
++        }
++
+         return ret;
+     } else {
+         /* XXX: indicate an error ? */
+-- 
+2.7.4
