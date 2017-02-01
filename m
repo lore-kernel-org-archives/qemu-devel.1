@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cYkGz-0000fZ-QW
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 21:03:50 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cYkPU-0003iL-M8
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 21:12:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cYkGy-0004ca-W3
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 21:03:49 -0500
-References: <20170131112308.54189-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e735b235-4502-f779-16db-ea3b2b86ae27@redhat.com>
-Date: Wed, 1 Feb 2017 03:03:38 +0100
+	(envelope-from <dgibson@ozlabs.org>) id 1cYkPQ-00085J-Pa
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 21:12:36 -0500
+Date: Wed, 1 Feb 2017 12:04:16 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170201010416.GH30639@umbus.fritz.box>
+References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
+	<148429054793.208.9311021714190421447@790289a7ca88>
 MIME-Version: 1.0
-In-Reply-To: <20170131112308.54189-1-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="V6Vb9tiMuUjle1CnxDwbRffItSm0E0jE1"
-Subject: Re: [Qemu-devel] [PATCH] block: bdrv_invalidate_cache: invalidate
- children first
+	protocol="application/pgp-signature"; boundary="Uu2n37VG4rOBDVuR"
+Content-Disposition: inline
+In-Reply-To: <148429054793.208.9311021714190421447@790289a7ca88>
+Subject: Re: [Qemu-devel] [RFC PATCH 00/17] target/ppc: Implement POWER9
+ pseries tcg legacy kernel support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: sjitindarsingh@gmail.com, famz@redhat.com, qemu-ppc@nongnu.org, agraf@suse.de
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---V6Vb9tiMuUjle1CnxDwbRffItSm0E0jE1
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <e735b235-4502-f779-16db-ea3b2b86ae27@redhat.com>
-Subject: Re: [PATCH] block: bdrv_invalidate_cache: invalidate children first
-References: <20170131112308.54189-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20170131112308.54189-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=iso-8859-15
+
+--Uu2n37VG4rOBDVuR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 31.01.2017 12:23, Vladimir Sementsov-Ogievskiy wrote:
-> Current implementation invalidates firstly parent bds and then its
-> children. This leads to the following bug:
+On Thu, Jan 12, 2017 at 10:55:49PM -0800, no-reply@patchew.org wrote:
+> Hi,
 >=20
-> after incoming migration, in bdrv_invalidate_cache_all:
-> 1. invalidate parent bds - reopen it with BDRV_O_INACTIVE cleared
-> 2. child is not yet invalidated
-> 3. parent check that its BDRV_O_INACTIVE is cleared
-> 4. parent writes to child
-> 5. assert in bdrv_co_pwritev, as BDRV_O_INACTIVE is set for child
+> Your series seems to have some coding style problems. See output below for
+> more information:
 >=20
-> This patch fixes it by just changing invalidate sequence: invalidate
-> children first.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->=20
-> v2: I've missed that bdrv_invalidate_cache is already recursive, so we
-> can change sequence here. Also v1 doesn't cover the case when
-> bdrv_invalidate_cache is called not from bdrv_invalidate_cache_all.
->=20
->  block.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
+> Message-id: 1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com
+> Subject: [Qemu-devel] [RFC PATCH 00/17] target/ppc: Implement POWER9 pser=
+ies tcg legacy kernel support
+> Type: series
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+The style bot does generate a fair few false positives, but AFAICT all
+the things below should be addressed.
 
-I'll wait a bit until I apply this patch (please remind me next week if
-I forget it...), though, because migration-related things are not
-exactly my forte, so maybe someone else has something to say.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Max
-
-
---V6Vb9tiMuUjle1CnxDwbRffItSm0E0jE1
+--Uu2n37VG4rOBDVuR
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRQfoSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AAF8H/3hEHPxey0S9g/eCzXRqtg+k779rXE4H
-Rrtn+yTgb7GWFP4kvWtoluYub51CKCfhRUz2JRjolTb3gUXWcAFX+Ysfjvc39Z7d
-NO+/kwqcN7I8DCZqVrWNL5moGqGfsLdhMEM2MAM+jLA/KLAjPME8qrneZjq9TfCk
-OGEHNrPqyY2Oyl12AUtee0HRg3TUWZ/nd5A2LYaKPYQuat5PbcFxvM+ogkzb4w/I
-svK9DnrqOlaLuWdFj9KK1g6uYRvs8Ki5siZg7/FwRlFBSWumZlxickwwb3VFMnUn
-FL6Ow4wS/6Z5ZBXH3DcCSA3QvC38yppJ9j5Gj42glP3g0qGGJiDM4yI=
-=tKfj
+iQIcBAEBCAAGBQJYkTQPAAoJEGw4ysog2bOSrYsP/1TywYXllFr+yXchAdXbWHtq
+p0oyFAqYHPYCvwrEwtEI+GscPB1LyDaB/tnafv1oggQ93QgvU677FFu4cBH+DUYn
+hmsQxm02j4ET5wa1e8sPCrT+p/09YOb8CSrO1WQGoiTxvflphXLOUfkJRhLq2MGe
+n/Qoipl5SgRlCY6Gh7bccRiv2vfDyiYxuQxyNsdrOa3RXIwtNbjRA3T71/b9JXp7
+5fMYTGNdf376/uHYhaNqjKg9nVajMZjFu4x/0sGRxP+seyy26buunXFExNY5GU/G
+4snzTWMbD1Co5nm13WwnBvFxYsSP15tkMGvBSTWZQWBdyhRViZewJQX8EeZ0PUKX
+DEV6feNM4+efEKsI90VYZjrnvsN37Aj5kyeIVqmST2/pUftt7pbV5YspYkHIor9F
+2DFi/bl83e3IoDoc9JXp93zbbV4OseWoaEeJ/TgzwcVMIsHKizrYM5TYppIS2mxO
+TWJtT3+nA+OoeSiCeeibksDJ6uD2TV4LNAbTgVcNCb/KL4PylmvIx2JUeFlnqfKA
+oaWNpEoOTQbmTCK2nq2zuUe9oehcJKH5aTSh+w13ILnjmNEkdyEgQhPQEK0DGM3V
+RJkkfaMBOXA97RRV9fsILPg6WquU+f/Dx67c1Fri4iiq6cBBIax6rtf3KT6/IAvd
+UYJQyBsFYmMoRZ1/qPnH
+=O89T
 -----END PGP SIGNATURE-----
 
---V6Vb9tiMuUjle1CnxDwbRffItSm0E0jE1--
+--Uu2n37VG4rOBDVuR--
