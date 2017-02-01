@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cYtNH-0002H3-GK
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:47:00 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYtYk-0006kD-Tf
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:58:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cYtNE-0005Lt-AV
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:46:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59372)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cYtNE-0005Lo-20
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:46:52 -0500
-Date: Wed, 1 Feb 2017 12:46:47 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170201124647.69d95d1f@nial.brq.redhat.com>
-In-Reply-To: <20170131233906-mutt-send-email-mst@kernel.org>
-References: <20170126165015-mutt-send-email-mst@kernel.org>
-	<adbfd67b-bcbc-2da2-78be-810eb35781ec@redhat.com>
-	<20170126201124-mutt-send-email-mst@kernel.org>
-	<6d15ef62-3184-3293-dd83-da67dd48dab0@redhat.com>
-	<20170126205508-mutt-send-email-mst@kernel.org>
-	<20170127141854.GA2524@morn.lan>
-	<58bbf216-a2f1-481f-21b0-4ada4f73a5e5@redhat.com>
-	<20170127154313.GB7213@morn.lan>
-	<20170130222539-mutt-send-email-mst@kernel.org>
-	<20170131105102.456c9477@nial.brq.redhat.com>
-	<20170131233906-mutt-send-email-mst@kernel.org>
+	(envelope-from <mreitz@redhat.com>) id 1cYtYk-0000Da-6V
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:58:46 -0500
+References: <20170130161441.30493-1-berto@igalia.com>
+	<574dd15d-ace7-cbaf-574a-944c2c436b95@redhat.com>
+	<w51inoury83.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <0e44af0e-6319-62f0-1e17-87f91ee1b66e@redhat.com>
+Date: Wed, 1 Feb 2017 12:58:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/9] ACPI: Add a function for building
- named qword entries
+In-Reply-To: <w51inoury83.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MMO5I8rPP8hlJi1CpCH4LPCMjWXnXloUn"
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Optimize the refcount-block overlap
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,79 +26,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Kevin O'Connor <kevin@koconnor.net>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Ben Warren <ben@skyportsystems.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Tue, 31 Jan 2017 23:39:44 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MMO5I8rPP8hlJi1CpCH4LPCMjWXnXloUn
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <0e44af0e-6319-62f0-1e17-87f91ee1b66e@redhat.com>
+Subject: Re: [PATCH] qcow2: Optimize the refcount-block overlap check
+References: <20170130161441.30493-1-berto@igalia.com>
+ <574dd15d-ace7-cbaf-574a-944c2c436b95@redhat.com>
+ <w51inoury83.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51inoury83.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, Jan 31, 2017 at 10:51:02AM +0100, Igor Mammedov wrote:
-> > On Mon, 30 Jan 2017 22:28:41 +0200
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Fri, Jan 27, 2017 at 10:43:13AM -0500, Kevin O'Connor wrote:  
-> > > > On Fri, Jan 27, 2017 at 03:46:33PM +0100, Laszlo Ersek wrote:    
-> > > > > On 01/27/17 15:18, Kevin O'Connor wrote:    
-> > > > > > If an offset is going to be added, shouldn't both a source offset and
-> > > > > > destination offset be used?
-> > > > > > 
-> > > > > >         /*
-> > > > > >          * COMMAND_WRITE_POINTER - update a writeable file named
-> > > > > >          * @pointer.dest_file at @pointer.dest_offset, by writing pointer
-> > > > > >          * plus @pointer.src_offset to the blob originating from
-> > > > > >          * @src_file. 1,2,4 or 8 byte unsigned write is used depending
-> > > > > >          * on @pointer.size.
-> > > > > >          */
-> > > > > >         struct {
-> > > > > >             char dest_file[BIOS_LINKER_LOADER_FILESZ];
-> > > > > >             char src_file[BIOS_LINKER_LOADER_FILESZ];
-> > > > > >             uint32_t src_offset, dest_offset;
-> > > > > >             uint8_t size;
-> > > > > >         } pointer;
-> > > > > > 
-> > > > > > I doubt the offsets or size is really all that important though.    
-> > > > > 
-> > > > > The offset into the fw_cfg file that receives the allocation address is
-> > > > > important, that allows the same file to receive several different
-> > > > > addresses (for different downloaded blobs), at different offsets.
-> > > > > 
-> > > > > OTOH, asking the firmware to add a constant to the address value before
-> > > > > writing it to the fw_cfg file is not necessary, in my opinion. The blob
-> > > > > that the firmware allocated and downloaded originates from QEMU to begin
-> > > > > with, so QEMU knows its internal structure.    
-> > > > 
-> > > > I guess I'm missing why QEMU would want to use the same writable file
-> > > > for multiple pointers as well as why it would want support for
-> > > > pointers smaller than 8 bytes in size.  If it's because it may be
-> > > > easier to support an internal QEMU blob of a particular format, then
-> > > > adding a src_offset would facilitate that.
-> > > > 
-> > > > However, if it was done so that WRITE_POINTER mimicks ADD_POINTER then
-> > > > that's fine too.  I'm okay with either format.
-> > > > 
-> > > > -Kevin    
-> > > 
-> > > Both reasons :) offset is because it's easier for QEMU not to have to add
-> > > more files (e.g. it simplifies cross-version migration if we don't).  
-> > On one hand offset simplifies since one file could be re-used for
-> > several pointers, on the other hand it doesn't make difference wrt
-> > migration since offset becomes ABI and has to be maintained in
-> > cross-version migration scenario (size of file shouldn't be issue
-> > as they are re-sizable now). So we just end-up with offset vs new file
-> > versioning.  
-> 
-> Not really - offset is migrated automatically since it's in RAM.
-> No need to version it.
-I've meant offset inside of writebale blob dest_offset,
-it has to stay the same within a machine type across builds,
-so that if migration happens during linking time, the old
-already shadowed and migrated liker file would match offsets in
-writable fwcfg file on new qemu.
-In other words format of writable fw_cfg file becomes ABI.
+On 01.02.2017 11:39, Alberto Garcia wrote:
+> On Wed 01 Feb 2017 02:46:20 AM CET, Max Reitz <mreitz@redhat.com> wrote=
+:
+>=20
+>>> The problem with the refcount table is that since it always occupies
+>>> complete clusters its size is usually very big.
+>>
+>> Actually the main problem is that BDRVQcow2State.refcount_table_size
+>> is updated very generously as opposed to BDRVQcow2State.l1_size. The
+>> latter is usually exactly as large as it needs to be (because the L1
+>> table size usually doesn't change), whereas the refcount_table_size is=
 
-> 
-> > However considering that number of files is limited,
-> > offset scales up better.
-> >   
-> > > size is to mimick ADD_POINTER.
-> > >   
+>> just bumped up every time the image gets bigger until it reaches or
+>> exceeds the value it needs to be.
+>=20
+> That's actually a good point.
+>=20
+> One reason why this happens is that the size of the L1 table is static
+> and the qcow2 header stores the actual number of entries, whereas for
+> the refcount table it stores the number of clusters.
+
+The other reason is what I said: The image size changes, so the refcount
+table size needs to be bumped up from time to time. The L1 table size is
+pretty much static, so it makes sense to keep it exactly as large as it
+needs to be to represent all of the virtual disk.
+
+> Maybe we can have refcount_table_size store the actual size of the
+> table. The number of clusters can be calculated from that after all, an=
+d
+> we would get rid of max_refcount_table_index.
+
+refcount_table_size as in the one in BDRVQcow2State? That is the number
+of entries already. I don't think making it "exact" is worth it, because
+see above (you need to bump it up any time an allocation is made, and
+you don't want to reallocate the refcount table all the time).
+
+Also, you lose all of the accuracy once the image is closed and reopened
+because the field in the qcow2 header only stores number of clusters.
+Changing that would not be backwards compatible. You could add a new
+field which stores the number of entries, but I don't see the point, as
+it is very easy to just recalculate it once the image is opened (which
+doesn't take *that* much time if you do it just once).
+
+> The change might be a bit more difficult, though, I'll take a look.
+
+Well, I won't hold you back, but I don't think it's worth it.
+
+Max
+
+>>> @@ -439,6 +450,7 @@ static int alloc_refcount_block(BlockDriverState =
+*bs,
+>>>          }
+>>> =20
+>>>          s->refcount_table[refcount_table_index] =3D new_block;
+>>> +        s->max_refcount_table_index =3D refcount_table_index;
+>>
+>> Should be MAX(s->max_refcount_table_index, refcount_table_index) or
+>> this won't support refcount tables with holes in them.
+>=20
+> Good catch.
+>=20
+> Berto
+>=20
+
+
+
+--MMO5I8rPP8hlJi1CpCH4LPCMjWXnXloUn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRzWwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AR8kH/AnaYuhwMN5lWNT/r968cSEQAPU9yHM1
+AB6RnwX0sr8e/qGeFmIPPnR82qs1nZeqVEhmdkE+cOoobz5h6glfyoJ063QpSyhb
+2sGycHjIOi6F6sYb8psbkOhtD9JNI7OXZEOz/3dzP761Q+B4zm8jZPkyjuagHth0
+GCKS2+khXaVf+sdtIWoKLAo61iCZih0+ktGcZGGszaGP1m9CFrR9UvepGvbXflXG
+5fbSI7E/1zp+TTQStzCz+FroxJnosTFI3JZ/nctdm5WQzVSaowa7pooUTl7yS9hO
+Ju/uQJB6b+q6TQj9ZXWUoXOX6QL047PNA3H/SfWXht4QJzhBRlhmTOs=
+=MOtb
+-----END PGP SIGNATURE-----
+
+--MMO5I8rPP8hlJi1CpCH4LPCMjWXnXloUn--
