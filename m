@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cYwTw-00071p-R0
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:06:01 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cYwTw-00071w-VU
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:06:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cYwTr-0008B8-0E
+	(envelope-from <alex.bennee@linaro.org>) id 1cYwTq-0008B1-PO
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:06:00 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:34994)
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:36397)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cYwTq-0008Ar-Mj
+	id 1cYwTq-0008Am-Fs
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:05:54 -0500
-Received: by mail-wm0-x235.google.com with SMTP id b65so43288727wmf.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 07:05:54 -0800 (PST)
+Received: by mail-wm0-x230.google.com with SMTP id c85so43193936wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 07:05:53 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed,  1 Feb 2017 15:05:30 +0000
-Message-Id: <20170201150553.9381-3-alex.bennee@linaro.org>
-In-Reply-To: <20170201150553.9381-1-alex.bennee@linaro.org>
-References: <20170201150553.9381-1-alex.bennee@linaro.org>
+Date: Wed,  1 Feb 2017 15:05:28 +0000
+Message-Id: <20170201150553.9381-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 02/25] mttcg: translate-all: Enable locking
- debug in a debug build
+Subject: [Qemu-devel] [PATCH v9 00/25] MTTCG Base enabling patches with ARM
+ enablement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,155 +29,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
-Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Pranith Kumar <bobby.prani@gmail.com>
+Hi,
 
-Enable tcg lock debug asserts in a debug build by default instead of
-relying on DEBUG_LOCKING. None of the other DEBUG_* macros have
-asserts, so this patch removes DEBUG_LOCKING and enable these asserts
-in a debug build.
+This is a quick update to the series I posted at the end of last week.
+It mostly adds a bunch of review tags. There are two changes of note:
 
-CC: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-[AJB: tweak ifdefs so can be early in series]
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
----
- translate-all.c | 52 ++++++++++++++++------------------------------------
- 1 file changed, 16 insertions(+), 36 deletions(-)
+  cputlb and arm/sparc targets: convert mmuidx flushes...
 
-diff --git a/translate-all.c b/translate-all.c
-index 6d2fcabca7..708d5cc3d7 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -59,7 +59,6 @@
- 
- /* #define DEBUG_TB_INVALIDATE */
- /* #define DEBUG_TB_FLUSH */
--/* #define DEBUG_LOCKING */
- /* make various TB consistency checks */
- /* #define DEBUG_TB_CHECK */
- 
-@@ -74,20 +73,10 @@
-  * access to the memory related structures are protected with the
-  * mmap_lock.
-  */
--#ifdef DEBUG_LOCKING
--#define DEBUG_MEM_LOCKS 1
--#else
--#define DEBUG_MEM_LOCKS 0
--#endif
--
- #ifdef CONFIG_SOFTMMU
- #define assert_memory_lock() do { /* nothing */ } while (0)
- #else
--#define assert_memory_lock() do {               \
--        if (DEBUG_MEM_LOCKS) {                  \
--            g_assert(have_mmap_lock());         \
--        }                                       \
--    } while (0)
-+#define assert_memory_lock() tcg_debug_assert(have_mmap_lock())
- #endif
- 
- #define SMC_BITMAP_USE_THRESHOLD 10
-@@ -169,10 +158,18 @@ static void page_table_config_init(void)
-     assert(v_l2_levels >= 0);
- }
- 
-+#ifdef CONFIG_USER_ONLY
-+#define assert_tb_locked() tcg_debug_assert(have_tb_lock)
-+#define assert_tb_unlocked() tcg_debug_assert(!have_tb_lock)
-+#else
-+#define assert_tb_locked()  do { /* nothing */ } while (0)
-+#define assert_tb_unlocked()  do { /* nothing */ } while (0)
-+#endif
-+
- void tb_lock(void)
- {
- #ifdef CONFIG_USER_ONLY
--    assert(!have_tb_lock);
-+    assert_tb_unlocked();
-     qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
-     have_tb_lock++;
- #endif
-@@ -181,7 +178,7 @@ void tb_lock(void)
- void tb_unlock(void)
- {
- #ifdef CONFIG_USER_ONLY
--    assert(have_tb_lock);
-+    assert_tb_locked();
-     have_tb_lock--;
-     qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
- #endif
-@@ -197,23 +194,6 @@ void tb_lock_reset(void)
- #endif
- }
- 
--#ifdef DEBUG_LOCKING
--#define DEBUG_TB_LOCKS 1
--#else
--#define DEBUG_TB_LOCKS 0
--#endif
--
--#ifdef CONFIG_SOFTMMU
--#define assert_tb_lock() do { /* nothing */ } while (0)
--#else
--#define assert_tb_lock() do {               \
--        if (DEBUG_TB_LOCKS) {               \
--            g_assert(have_tb_lock);         \
--        }                                   \
--    } while (0)
--#endif
--
--
- static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
- 
- void cpu_gen_init(void)
-@@ -847,7 +827,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- {
-     TranslationBlock *tb;
- 
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     if (tcg_ctx.tb_ctx.nb_tbs >= tcg_ctx.code_gen_max_blocks) {
-         return NULL;
-@@ -862,7 +842,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- /* Called with tb_lock held.  */
- void tb_free(TranslationBlock *tb)
- {
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     /* In practice this is mostly used for single use temporary TB
-        Ignore the hard cases and just back up if this TB happens to
-@@ -1104,7 +1084,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
-     uint32_t h;
-     tb_page_addr_t phys_pc;
- 
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     atomic_set(&tb->invalid, true);
- 
-@@ -1421,7 +1401,7 @@ static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_addr_t end)
- #ifdef CONFIG_SOFTMMU
- void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
- {
--    assert_tb_lock();
-+    assert_tb_locked();
-     tb_invalidate_phys_range_1(start, end);
- }
- #else
-@@ -1464,7 +1444,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
- #endif /* TARGET_HAS_PRECISE_SMC */
- 
-     assert_memory_lock();
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     p = page_find(start >> TARGET_PAGE_BITS);
-     if (!p) {
+  This has been updated to reduce the churn of the previous iteration
+  by doing all the MMUIdx shifting in-situ for the tlb_flush calls.
+
+And:
+
+  tcg: enable MTTCG by default for ARM on x86 hosts
+
+  Mostly cosmetic tweaks but I have clarified the semantics of the
+  TCG_MO_foo declarations with a tweak to the TCG_TARGET_DEFAULT_MO on
+  x86 to be (TCG_MO_ALL & ~TCG_MO_ST_LD).
+
+>From v8 rth said:
+
+  "As far as I'm concerned, I'm done with my review and this can go in."
+
+So this is really your last chance to raise any concerns or questions
+before the merge (although of course bug fixes can go in later ;-).
+
+Peter,
+
+The patches that touch ARM and that could do with maintainer sign-off are:
+
+  tcg: enable MTTCG by default for ARM on x86 hosts
+  target-arm: ensure all cross vCPUs TLB flushes complete
+  target-arm: introduce ARM_CP_EXIT_PC
+  target-arm/cpu.h: make ARM_CP defined consistent
+  target-arm: don't generate WFE/YIELD calls for MTTCG
+  target-arm/powerctl: defer cpu reset work to CPU context
+  cputlb and arm/sparc targets: convert mmuidx flushes from varg to bitmap
+  tcg: drop global lock during TCG code execution
+
+Cheers,
+
+Alex Bennée (19):
+  docs: new design document multi-thread-tcg.txt
+  tcg: move TCG_MO/BAR types into own file
+  tcg: add kick timer for single-threaded vCPU emulation
+  tcg: rename tcg_current_cpu to tcg_current_rr_cpu
+  tcg: remove global exit_request
+  tcg: enable tb_lock() for SoftMMU
+  tcg: enable thread-per-vCPU
+  cputlb: add assert_cpu_is_self checks
+  cputlb: tweak qemu_ram_addr_from_host_nofail reporting
+  cputlb and arm/sparc targets: convert mmuidx flushes from varg to
+    bitmap
+  cputlb: add tlb_flush_by_mmuidx async routines
+  cputlb: atomically update tlb fields used by tlb_reset_dirty
+  cputlb: introduce tlb_flush_*_all_cpus[_synced]
+  target-arm/powerctl: defer cpu reset work to CPU context
+  target-arm: don't generate WFE/YIELD calls for MTTCG
+  target-arm/cpu.h: make ARM_CP defined consistent
+  target-arm: introduce ARM_CP_EXIT_PC
+  target-arm: ensure all cross vCPUs TLB flushes complete
+  tcg: enable MTTCG by default for ARM on x86 hosts
+
+Jan Kiszka (1):
+  tcg: drop global lock during TCG code execution
+
+KONRAD Frederic (2):
+  tcg: add options for enabling MTTCG
+  cputlb: introduce tlb_flush_* async work.
+
+Pranith Kumar (3):
+  mttcg: translate-all: Enable locking debug in a debug build
+  mttcg: Add missing tb_lock/unlock() in cpu_exec_step()
+  tcg: handle EXCP_ATOMIC exception for system emulation
+
+ configure                  |   6 +
+ cpu-exec-common.c          |   3 -
+ cpu-exec.c                 |  41 ++--
+ cpus.c                     | 343 ++++++++++++++++++++++++++-------
+ cputlb.c                   | 465 +++++++++++++++++++++++++++++++++++++--------
+ docs/multi-thread-tcg.txt  | 350 ++++++++++++++++++++++++++++++++++
+ exec.c                     |  12 +-
+ hw/core/irq.c              |   1 +
+ hw/i386/kvmvapic.c         |   4 +-
+ hw/intc/arm_gicv3_cpuif.c  |   3 +
+ hw/ppc/ppc.c               |  16 +-
+ hw/ppc/spapr.c             |   3 +
+ include/exec/cputlb.h      |   2 -
+ include/exec/exec-all.h    | 130 +++++++++++--
+ include/qom/cpu.h          |  16 ++
+ include/sysemu/cpus.h      |   2 +
+ memory.c                   |   2 +
+ qemu-options.hx            |  20 ++
+ qom/cpu.c                  |  10 +
+ target/arm/arm-powerctl.c  | 146 ++++++++------
+ target/arm/cpu.h           |  32 ++--
+ target/arm/helper.c        | 275 ++++++++++++++-------------
+ target/arm/op_helper.c     |  50 ++++-
+ target/arm/translate-a64.c |  12 +-
+ target/arm/translate.c     |  24 ++-
+ target/i386/smm_helper.c   |   7 +
+ target/s390x/misc_helper.c |   5 +-
+ target/sparc/ldst_helper.c |   8 +-
+ tcg/i386/tcg-target.h      |  11 ++
+ tcg/tcg-mo.h               |  48 +++++
+ tcg/tcg.h                  |  27 +--
+ translate-all.c            |  66 ++-----
+ translate-common.c         |  21 +-
+ vl.c                       |  49 ++++-
+ 34 files changed, 1731 insertions(+), 479 deletions(-)
+ create mode 100644 docs/multi-thread-tcg.txt
+ create mode 100644 tcg/tcg-mo.h
+
 -- 
 2.11.0
