@@ -1,22 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cYqIN-0005Xw-Fk
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:29:40 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cYqNv-0007Zm-8g
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:35:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cYqIL-0006rn-SS
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:29:39 -0500
-References: <1485880595-16376-1-git-send-email-thuth@redhat.com>
-	<20170131103044.66316989@t450s.home>
-	<5f0bafdc-6bb8-d936-e38c-5be92c46efc6@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <d2491c49-f124-7939-64bc-dc5547c2b53b@redhat.com>
-Date: Wed, 1 Feb 2017 09:29:25 +0100
-MIME-Version: 1.0
-In-Reply-To: <5f0bafdc-6bb8-d936-e38c-5be92c46efc6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/vfio: Add CONFIG switches for
- calxeda-xgmac and amd-xgbe
+	(envelope-from <kraxel@redhat.com>) id 1cYqNr-0001Mo-BO
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:35:23 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed,  1 Feb 2017 09:35:01 +0100
+Message-Id: <1485938101-26602-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] cirrus: fix oob access issue (CVE-2017-2615)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +17,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Li Qiang <liqiang6-s@360.cn>, qemu-stable@nongnu.org, P J P <ppandit@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Wolfgang Bumiller <w.bumiller@proxmox.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Hi Thomas,
+From: Li Qiang <liqiang6-s@360.cn>
 
-On 31/01/2017 19:51, Thomas Huth wrote:
-> On 31.01.2017 18:30, Alex Williamson wrote:
->> On Tue, 31 Jan 2017 17:36:35 +0100
->> Thomas Huth <thuth@redhat.com> wrote:
->>
->>> Both devices seem to be specific to the ARM platform. It's confusing
->>> for the users if they show up on other target architectures, too
->>> (e.g. when the user runs QEMU with "-device ?" to get a list of
->>> supported devices). Thus let's introduce proper configuration switches
->>> so that the devices are only compiled and included when they are
->>> really required.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  default-configs/arm-softmmu.mak | 2 ++
->>>  hw/vfio/Makefile.objs           | 4 ++--
->>>  2 files changed, 4 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->>> index 6de3e16..a78be51 100644
->>> --- a/default-configs/arm-softmmu.mak
->>> +++ b/default-configs/arm-softmmu.mak
->>> @@ -94,6 +94,8 @@ CONFIG_VERSATILE_PCI=y
->>>  CONFIG_VERSATILE_I2C=y
->>>  
->>>  CONFIG_PCI_GENERIC=y
->>> +CONFIG_VFIO_XGMAC=y
->>> +CONFIG_VFIO_AMD_XGBE=y
->>>  
->>>  CONFIG_SDHCI=y
->>>  CONFIG_INTEGRATOR_DEBUG=y
->>> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
->>> index c25e32b..05e7fbb 100644
->>> --- a/hw/vfio/Makefile.objs
->>> +++ b/hw/vfio/Makefile.objs
->>> @@ -2,7 +2,7 @@ ifeq ($(CONFIG_LINUX), y)
->>>  obj-$(CONFIG_SOFTMMU) += common.o
->>>  obj-$(CONFIG_PCI) += pci.o pci-quirks.o
->>>  obj-$(CONFIG_SOFTMMU) += platform.o
->>> -obj-$(CONFIG_SOFTMMU) += calxeda-xgmac.o
->>> -obj-$(CONFIG_SOFTMMU) += amd-xgbe.o
->>> +obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
->>> +obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
->>>  obj-$(CONFIG_SOFTMMU) += spapr.o
->>>  endif
->>
->> I can't say that I fully agree that this is a good idea.  How many
->> users are actually confused by this, versus the benefit of ensuring
->> that it builds across all architectures?
-> 
-> Why do you want this to be build on all architectures? The devices are
-> only available on ARM as far as I know, so I can't see any real use for
-> this. And it slows down compilation time, too, if we compile it
-> everywhere (well, a little bit at least ;-)).
-> 
->> Do we want to make platform also specific to ARM
-> 
-> I did not notice that one yet, since it does not show up in the "-device
-> ?" help text (it's apparently an abstract device), so it also does not
-> really bother me.
-> But if I remove the device from the build, I get a funny error when I
-> try to view the device help text:
-> 
-> $ qemu-system-tricore -device ?
-> **
-> ERROR:/home/thuth/devel/qemu/qom/object.c:168:type_get_parent: assertion
-> failed: (type->parent_type != NULL)
-> Aborted (core dumped)
-> 
-> So I guess we should rather keep that one for now.
+When doing bitblt copy in backward mode, we should minus the
+blt width first just like the adding in the forward mode. This
+can avoid the oob access of the front of vga's vram.
 
-FYI I will send patches to make VFIO platform device non abstract.
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+Message-id: 5887254f.863a240a.2c122.5500@mx.google.com
 
-Thanks
+{ kraxel: with backward blits (negative pitch) addr is the topmost
+          address, so check it as-is against vram size ]
 
-Eric
-> 
->> and spapr specific to ppc64?
-> 
-> I already tried that (with the already existing CONFIG_PSERIES), but the
-> code in common.c depends on the code in spapr.c, so it can't be removed
-> without reworking the code quite a bit. But spapr.c also does not really
-> bug me, since it does not register a type that shows up in the "-device
-> ?" help text, so I think it is not worth the effort here.
-> 
->  Thomas
-> 
+Cc: qemu-stable@nongnu.org
+Cc: P J P <ppandit@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Fixes: d3532a0db02296e687711b8cdc7791924efccea0 (CVE-2014-8106)
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/cirrus_vga.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index 95873ae..3961712 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -277,10 +277,9 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+     }
+     if (pitch < 0) {
+         int64_t min = addr
+-            + ((int64_t)s->cirrus_blt_height-1) * pitch;
+-        int32_t max = addr
+-            + s->cirrus_blt_width;
+-        if (min < 0 || max > s->vga.vram_size) {
++            + ((int64_t)s->cirrus_blt_height - 1) * pitch
++            - s->cirrus_blt_width;
++        if (min < -1 || addr >= s->vga.vram_size) {
+             return true;
+         }
+     } else {
+-- 
+1.8.3.1
