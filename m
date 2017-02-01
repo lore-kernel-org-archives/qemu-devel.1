@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cYx4B-0000fm-9h
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:43:28 -0500
+	(envelope-from <lersek@redhat.com>) id 1cYxNu-0006L8-FX
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:03:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cYx46-0001x4-F0
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:43:27 -0500
-Received: from mail-ua0-f177.google.com ([209.85.217.177]:35417)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cYx46-0001vx-AB
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:43:22 -0500
-Received: by mail-ua0-f177.google.com with SMTP id y9so300442866uae.2
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 07:43:22 -0800 (PST)
+	(envelope-from <lersek@redhat.com>) id 1cYxNr-0006yr-BY
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:03:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cYxNr-0006yk-3m
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:03:47 -0500
+References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
+	<20170118175335-mutt-send-email-mst@kernel.org>
+	<20170118181918.783cb7bd@nial.brq.redhat.com>
+	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
+	<20170131165802-mutt-send-email-mst@kernel.org>
+	<fe787fcc-0c92-5842-1a67-b50466b6f38f@redhat.com>
+	<20170131201333-mutt-send-email-mst@kernel.org>
+	<20170201123739.387de47b@nial.brq.redhat.com>
+	<6e912456-9d9c-7084-c4b4-91596216d3dd@redhat.com>
+	<e158344b-b3e7-253b-f919-e48f6490c7b0@redhat.com>
+	<20170201161636.28f1e2dc@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <7c950267-9cd6-2e85-8b5e-218c0c7f7bdb@redhat.com>
+Date: Wed, 1 Feb 2017 17:03:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <15e45a8d-852e-97da-65c5-3f69258dd59b@redhat.com>
-References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
-	<20170201102013.GC3232@redhat.com>
-	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
-	<20170201110320.GD3232@redhat.com>
-	<CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
-	<15e45a8d-852e-97da-65c5-3f69258dd59b@redhat.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Wed, 1 Feb 2017 16:43:20 +0100
-Message-ID: <CABdb734L84bLriTvuE3FY7HHcSZ+sZ+C=CGpWnxonH-4kDivfg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
+In-Reply-To: <20170201161636.28f1e2dc@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Feb 1, 2017 at 3:43 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 02/01/2017 07:41 AM, Ladi Prosek wrote:
->
+On 02/01/17 16:16, Igor Mammedov wrote:
+> On Wed, 1 Feb 2017 14:03:52 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+>> On 02/01/17 13:52, Laszlo Ersek wrote:
+>>> On 02/01/17 12:37, Igor Mammedov wrote:  
+>>>> On Tue, 31 Jan 2017 20:17:02 +0200
+>>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>>>  
+>>>>> On Tue, Jan 31, 2017 at 05:28:57PM +0100, Laszlo Ersek wrote:  
+>>>>>> The ACPI 6.1 spec says,
+>>>>>>
+>>>>>> - DSDT: [...] If the X_DSDT field contains a non-zero value then this
+>>>>>>   field must be zero.
+>>>>>> - X_DSDT: [...] If the DSDT field contains a non-zero value then this
+>>>>>>   field must be zero.    
+>>>>>
+>>>>> But that's only 6.1. 6.0 and earlier did not say this.
+>>>>> The errata they wanted to address was:
+>>>>> 1393 In FADT: if X_DSDT field is non-zero, DSDT
+>>>>> field should be ignored or deprecated
+>>>>>
+>>>>> I would class this as a spec bug.
+>>>>>  
+>>>>
+>>>> The same applies to X_PM1a_EVT_BLK and co,
+>>>> for example 5.1 spec "This is a required
+>>>> field."
+>>>>
+>>>> And looks like Windows implemented it as mandatory
+>>>> to boot perhaps to be compatible with 5.1 and earlier
+>>>> specs.
+>>>>
+>>>> It appears fw would be forced to fill fields depending
+>>>> on table revision.  
+>>>
+>>> Sounds like a valid point.
+>>>
+>>> I compared the FADT defintion between ACPI 5.1 and ACPI 6.1. Indeed, the
+>>> former says:
+>>>
+>>> - FADT Major Version: 5; Major Version of this FADT structure, [...]
+>>> - DSDT: Physical memory address (0-4 GB) of the DSDT.
+>>> - X_DSDT: 64bit physical address of the DSDT.
+>>>
+>>> the latter says:
+>>>
+>>> - FADT Major Version: 6; Major Version of this FADT structure, [...]
+>>>
+>>> - DSDT: Physical memory address of the DSDT. If the X_DSDT field
+>>>   contains a non-zero value then this field must be zero.
+>>>
+>>> - X_DSDT: Extended physical address of the DSDT. If the DSDT field
+>>>   contains a non-zero value then this field must be zero.
+>>>
+>>> I will ask on edk2-devel whether the
+>>> "MdeModulePkg/Universal/Acpi/AcpiTableDxe" maintainers can think of a
+>>> way to accommodate this.  
 >>
->> Ok, so there are two different aspects that should probably be
->> separated. The actual semantics of IOCTL calls is equivalent to the
->> semantics of files in general. For files it's stream in, stream out
->> (and seeking and such). For IOCTL it's a buffer in, buffer out (and a
->> return code). The content is file specific, IOCTL code specific,
->> whatever. Definitely not guest agent's business to interpret it. Here
->> I think my analogy holds.
->
-> I don't.  ioctl() is a leaky abstraction - it exists as the blanket
-> catch-all do-anything-else-that-doesn't-have-a-dedicated-API.  It is, by
-> its very nature, non-portable and VERY hard to abstract - because there
-> is no one abstraction for every possible ioctl code.  I strongly agree
-> with Dan here that you are going to get nowhere by adding a qga-ioctl
-> command, because there is no SANE way that you can specify it in QAPI.
-> Rather, add specific commands for the specific actions you want to
-> expose, and if the implementation of those specific commands uses a
-> particular ioctl() under the hood, fine.  But don't directly expose
-> ioctl() over the wire.
-
-If I wasn't outnumbered and didn't have a feeling that I already lost
-:) I would ask you to show me a couple of real-world IOCTLs that don't
-fit the abstraction proposed in this patch. And trade it off against
-enabling all the rest that would fit. And I would maybe also say that
-done is better than perfect but that might mean crossing the line and
-getting muself into trouble :p
-
-But yeah, whoever thought that having ... in a syscall signature is a
-good idea should be shamed forever.
-
->>> It would be possible to design a ioctl API that is more usable if you
->>> didn't try to do generic passthrough of arbitrary ioctl commands. Instead
->>> provide a QAPI schema that uses a union to provide strongly typed arguments
->>> for the ioctl commands you care about using. Or completely separate QAPI
->>> commands instead of multiplexing everything into an ioctl command.
+>> Sigh, this looks nasty.
 >>
->> I can add a QAPI command for my specific use case if it's acceptable,
->
-> Certainly more palatable, and more likely to gain my acceptance.
+>> Considering specifically the DSDT <-> X_DSDT question, Mantis ticket
+>> #1393 (which requires the mutual exclusion) went into 5.1B. In version
+>> 5.1A, the mutual exclusion is not required.
+>>
+>> Unfortuantely, the FADT Major.Minor version, as reported through the
+>> bytes at offsets 8 and 131 decimal in the table, is "5.1" for *both*
+>> 5.1A and 5.1B. In other words, looking at just Major.Minor, it cannot be
+>> determined with full precision whether the DSDT and X_DSDT fields should
+>> be exclusive or not. :/
+> The same applies to 6.0 vs 6.0A 
 
-I'll look into it. Thanks!
+Thanks for the info; I've updated the patch!
 
->> that's not a problem. Although at that point I would probably just go
->> back to my plan b and use regular file I/O and guest-file-read. I just
->> wanted to be as generic as possible to benefit other use cases as well
->> and I ended up with what's basically my stab at RPC ioctl.
->
-> The problem is that RPC ioctl is not sanely possible.
->
-> --
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
->
+Laszlo
