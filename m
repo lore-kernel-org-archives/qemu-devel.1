@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYqOD-0007lG-BT
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:35:42 -0500
+	(envelope-from <armbru@redhat.com>) id 1cYqmM-0008Ej-QG
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:00:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYqO9-0001UH-DZ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:35:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52545)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cYqO9-0001Tu-5Q
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:35:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cYqO6-0003Xs-PZ
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 08:35:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BC6162E80C2
-	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 08:35:34 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1cYqmL-0002X7-Dn
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:00:38 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
+	<1485443388-27253-8-git-send-email-armbru@redhat.com>
+	<894b7bb8-768b-de12-cb48-7c9d52333bbe@redhat.com>
+	<87efzjcn2p.fsf@dusky.pond.sub.org>
+	<13043bdb-4fd7-6e1a-308a-605b46272788@redhat.com>
+Date: Wed, 01 Feb 2017 10:00:23 +0100
+In-Reply-To: <13043bdb-4fd7-6e1a-308a-605b46272788@redhat.com> (John Snow's
+	message of "Tue, 31 Jan 2017 10:37:15 -0500")
+Message-ID: <87zii6guag.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Feb 2017 08:23:15 -0000
-From: Thomas Huth <1250360@bugs.launchpad.net>
-Reply-To: Bug 1250360 <1250360@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131112091735.10165.76015.malonedeb@soybean.canonical.com>
-Message-Id: <20170201082315.9076.51144.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1250360] Re: qcow2 image logical corruption after
- host crash
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 7/8] blockdev: Make
+ orphaned -drive fatal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +27,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-Ok, so let's close this now. Thanks for your reply!
+John Snow <jsnow@redhat.com> writes:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Won't Fix
+> On 01/31/2017 09:37 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>> 
+>>> On 01/26/2017 10:09 AM, Markus Armbruster wrote:
+>>>> Block backends defined with "-drive if=T" with T other than "none" are
+>>>> meant to be picked up by machine initialization code: a suitable
+>>>> frontend gets created and wired up automatically.
+>>>>
+>>>> If machine initialization code doesn't comply, the block backend
+>>>> remains unused.  This triggers a warning since commit a66c9dc, v2.2.0.
+>>>> Drives created by default are excempted; use -nodefaults to get rid of
+>>>> them.
+>>>>
+>>>> Turn this warning into an error.
+>>>>
+>>>
+>>> "Exempted," oddly enough.
+>>> </eblake>
+>> 
+>> Thanks!
+>> 
+>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>> ---
+>>>>  blockdev.c                | 14 +++++++-------
+>>>>  include/sysemu/blockdev.h |  2 +-
+>>>>  2 files changed, 8 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/blockdev.c b/blockdev.c
+>>>> index a597a66..ec9c114 100644
+>>>> --- a/blockdev.c
+>>>> +++ b/blockdev.c
+>>>> @@ -227,28 +227,28 @@ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit)
+>>>>      return NULL;
+>>>>  }
+>>>>  
+>>>> -bool drive_check_orphaned(void)
+>>>> +void drive_check_orphaned(void)
+>>>>  {
+>>>>      BlockBackend *blk;
+>>>>      DriveInfo *dinfo;
+>>>>      Location loc;
+>>>> -    bool rs = false;
+>>>> +    bool orphans = false;
+>>>>  
+>>>>      for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
+>>>>          dinfo = blk_legacy_dinfo(blk);
+>>>> -        /* If dinfo->bdrv->dev is NULL, it has no device attached. */
+>>>> -        /* Unless this is a default drive, this may be an oversight. */
+>>>>          if (!blk_get_attached_dev(blk) && !dinfo->is_default &&
+>>>>              dinfo->type != IF_NONE) {
+>>>>              loc_push_none(&loc);
+>>>>              qemu_opts_loc_restore(dinfo->opts);
+>>>> -            error_report("warning: machine type does not support this drive");
+>>>> +            error_report("machine type does not support this drive");
+>>>>              loc_pop(&loc);
+>>>> -            rs = true;
+>>>> +            orphans = true;
+>>>>          }
+>>>>      }
+>>>>  
+>>>> -    return rs;
+>>>> +    if (orphans) {
+>>>> +        exit(1);
+>>>> +    }
+>>>
+>>> Hardcore. Why not just return a status code and allow vl.c to exit? It
+>>> only has the one caller. (Unless you added more and I didn't read
+>>> because I'm lazy.)
+>>>
+>>> You could even add an Error **arg if you wanted to; but vl.c has exits
+>>> all over the dang place, so maybe that's not really interesting.
+>> 
+>> My excuse it that checking for orphans makes sense only during initial
+>> startup, and there, exit(1) on error is what we do.  Doing it right away
+>> is simplest.
+>> 
+>> I'm fine with leaving the exit() to the caller.  I would prefer to leave
+>> the printing to the caller as well then.
 
--- =
+Returning an Error makes reporting all offending -drive too bothersome
+to be worthwhile.  We'd report just the first one then.  Pity.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1250360
+>> Anyone else got a preference?
+>> 
+>
+> I guess my preference here was just simply to keep the exit() out of
+> blockdev.c to discourage code-by-example naughtiness in the future.
 
-Title:
-  qcow2 image logical corruption after host crash
+Understand.  Of course, the error handling rules are a good deal more
+complex than "don't exit()".
 
-Status in QEMU:
-  Won't Fix
+During initial startup, including command line processing, we exit() on
+error.  This is generally wrong elsewhere.  exit() right away saves us
+the error-prone busy-work of propagating errors and cleaning up along
+the way.  Half-hearted error handling like "I don't dare to exit(), so I
+propagate, but I can't be bothered to clean up, because I know we'll
+exit()" is the worst, in my opinion.
 
-Bug description:
-  Description of problem:
-  In case of power failure disk images that were active and created in qcow=
-2 format can become logically corrupt so that they actually appear as unuse=
-d (full of zeroes).
-  Data seems to be there, but at this moment i cannot find any reliable met=
-hod to recover it. Should it be a raw image, a recovery path would be avail=
-able, but a qcow2 image only presents zeroes once it gets corrupted. My und=
-erstanding is that the blockmap of the image gets reset and the image is th=
-en assumed to be unused.
-  My detailed setup :
+For reporting errors during startup, error_report() is appropriate.
+fprintf() is bad, because it leads to inferior error messages (no
+location, no timestamp).
 
-  Kernel 2.6.32-358.18.1.el6.x86_64
-  qemu-kvm-0.12.1.2-2.355.0.1.el6.centos.7.x86_64
-  Used via libvirt libvirt-0.10.2-18.el6_4.14.x86_64
-  The image was used from a NFS share (the nfs server did NOT crash and rem=
-ained permanently active).
+In HMP commands, error_report() is appopriate.  monitor_printf() works,
+but is bad style, because it makes errors less obvious in the code.
 
-  qemu-img check finds no corruption;
-  qemu-img convert will fully convert the image to raw at a raw image full =
-of zeroes. However, there is data in the file, and the storage backend was =
-not restarted, inactivated during the incident.
-  I encountered this issue on two different machines, in both cases i was n=
-ot able to recover the data.
-  Image was qcow2, thin provisioned, created like this :
-   qemu-img create -f qcow2 -o cluster_size=3D2M imagename.img
+In code that's used for both by HMP and startup, error_report() is fine,
+but you can't exit().
 
-  While addressing the root cause in order to not have this issue repeat
-  would be the ideal scenario, a temporary workaround to run on the
-  affected qcow2 image to "patch" it and recover the data (eventually
-  after a full fsck/recovery inside the guest) would also be good.
-  Otherwise we are basically losing data on a large scale when using
-  qcow2.
+When error_report() is appropriate, calling it right away saves us the
+propagating.  Occasionally permits better error messages, because it's
+less of a straitjacket.
 
+In QMP commands, you need to error_setg().  error_report(),
+monitor_printf, fprintf() and so forth are all wrong.
 
-  Version-Release number of selected component (if applicable):
-  Kernel 2.6.32-358.18.1.el6.x86_64
-  qemu-kvm-0.12.1.2-2.355.0.1.el6.centos.7.x86_64
-  Used via libvirt libvirt-0.10.2-18.el6_4.14.x86_64
+In code that doesn't (want to) know in what context (startup, HMP, QMP,
+other) it is used, you generally need to error_setg().  However, there
+are situations where that is plainly impossible, e.g. in a callback for
+a guest device register access.  error_report() may be the best you can
+do there.  abort() or its fancy cousin hw_error() is still used in many
+places.
 
-  How reproducible:
-  I am not able (and don't have at the moment enough resources to try to ma=
-nually reproduce it), but the probability of the issue seems quite high as =
-this is the second case of such corruption in weeks.
-  Additional info:
-  I can privately provide an image displaying the corruption.
+My point is: when the context is clear, what to do is fairly obvious.
+Sadly, we tend to mix code meant for different contexts willy-nilly,
+which can make the context needlessly hard to see.
 
-  The reported problem has actually two aspects : first is the cause that e=
-ventually produces this issue.
-  The second is the fact that once the logical corruption has occured, qemu=
--img check finds nothing wrong with the image - this is obviously wrong.
+One way to deal with that is to minimize relying on context.  Minimizing
+assumptions is good.  Complicating / boiler-plating the code is bad.
+Tradeoff.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1250360/+subscriptions
+When a function could conceivably be useful in different contexts,
+keeping it unaware of the context can be worth the boilerplate, even
+when it's currently used only in one context.
+
+But when it's clearly useful in just one context, I tend to balk.
+
+drive_check_orphaned() makes sense only during startup.  Not relying on
+that isn't so bad, because there's nothing to clean up.  Would be easier
+to decide if it was bad ;)
+
+> As many as I can keep or cram into vl.c, the better, I think?
+
+Only 142 out of 1000+ exit() are in vl.c.  You got work to do!
+
+> Well, that's my story.
+>
+> --js
