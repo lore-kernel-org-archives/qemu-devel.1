@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cYr9D-0003CD-QC
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:24:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1cYrKV-0008Jd-1Y
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:35:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cYr99-0000X4-RZ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:24:15 -0500
-References: <1485938101-26602-1-git-send-email-kraxel@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a5677375-ddfd-8bcb-14a8-6e06fcc4afd3@redhat.com>
-Date: Wed, 1 Feb 2017 10:24:07 +0100
+	(envelope-from <bounces@canonical.com>) id 1cYrKR-0003W9-5N
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:35:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49427)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cYrKQ-0003Uw-Vt
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:35:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cYrKP-0005V3-6m
+	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 09:35:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 26EF42E80CB
+	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 09:35:49 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1485938101-26602-1-git-send-email-kraxel@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] cirrus: fix oob access issue
- (CVE-2017-2615)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 01 Feb 2017 09:22:43 -0000
+From: Thomas Huth <1221797@bugs.launchpad.net>
+Reply-To: Bug 1221797 <1221797@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130906152853.18609.27662.malonedeb@wampee.canonical.com>
+Message-Id: <20170201092243.8713.40831.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1221797] Re: virt-install gets stuck during
+ downloading install.img
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +37,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Li Qiang <liqiang6-s@360.cn>, qemu-stable@nongnu.org, P J P <ppandit@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Wolfgang Bumiller <w.bumiller@proxmox.com>
+To: qemu-devel@nongnu.org
 
-On 02/01/17 09:35, Gerd Hoffmann wrote:
-> From: Li Qiang <liqiang6-s@360.cn>
-> 
-> When doing bitblt copy in backward mode, we should minus the
-> blt width first just like the adding in the forward mode. This
-> can avoid the oob access of the front of vga's vram.
-> 
-> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-> Message-id: 5887254f.863a240a.2c122.5500@mx.google.com
-> 
-> { kraxel: with backward blits (negative pitch) addr is the topmost
->           address, so check it as-is against vram size ]
-> 
-> Cc: qemu-stable@nongnu.org
-> Cc: P J P <ppandit@redhat.com>
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
-> Fixes: d3532a0db02296e687711b8cdc7791924efccea0 (CVE-2014-8106)
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/display/cirrus_vga.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-> index 95873ae..3961712 100644
-> --- a/hw/display/cirrus_vga.c
-> +++ b/hw/display/cirrus_vga.c
-> @@ -277,10 +277,9 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
->      }
->      if (pitch < 0) {
->          int64_t min = addr
-> -            + ((int64_t)s->cirrus_blt_height-1) * pitch;
-> -        int32_t max = addr
-> -            + s->cirrus_blt_width;
-> -        if (min < 0 || max > s->vga.vram_size) {
-> +            + ((int64_t)s->cirrus_blt_height - 1) * pitch
-> +            - s->cirrus_blt_width;
-> +        if (min < -1 || addr >= s->vga.vram_size) {
->              return true;
->          }
->      } else {
-> 
+This is not a QEMU bug ... for virt-install related problems, please see
+https://virt-manager.org/bugs/ instead.
 
-Famous last words:
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+-- =
 
-Thanks
-Laszlo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1221797
+
+Title:
+  virt-install gets stuck during downloading install.img
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  I have tried to install CentOS 6.4 using the latest version of all kvm
+  related tools. My problem is that I get stuck at arround 20% during
+  the download of the file install.img. Everything before that works
+  just fine.
+
+  My Server is based on CentOS 6.4
+
+  I am using the following commands to install to server:
+  virt-install \
+  =C2=A0-n test \
+  =C2=A0-r 1024 \
+  =C2=A0--disk path=3D/var/kvm/images/test.img,size=3D25 \
+  =C2=A0--vcpus=3D1 \
+  =C2=A0--os-type linux \
+  =C2=A0--os-variant=3Drhel6 \
+  =C2=A0--network bridge=3Dbr2 \
+  =C2=A0--nographics \
+  =C2=A0--location=3D'http://mirror.netcologne.de/centos/6.4/os/x86_64' \
+  =C2=A0--extra-args=3D'console=3Dtty0 console=3DttyS0,115200n8 serial' \
+
+  I have checked that my server is ready for virtualization.
+
+  If you need any further information I am happy to provide them
+
+  Patrick Gramsl
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1221797/+subscriptions
