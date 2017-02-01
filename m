@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cYjBO-0003xv-5m
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 19:53:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYjO7-0003fY-TS
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 20:07:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cYjBM-0007WD-OH
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 19:53:58 -0500
-Date: Wed, 1 Feb 2017 11:50:50 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170201005050.GF30639@umbus.fritz.box>
-References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
-	<1484288903-18807-7-git-send-email-sjitindarsingh@gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1cYjO6-0001tI-V1
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 20:07:07 -0500
+References: <1485878172-15463-1-git-send-email-pl@kamp.de>
+	<1485878172-15463-3-git-send-email-pl@kamp.de>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <863201d4-1207-1917-0d13-3083c4cede6f@redhat.com>
+Date: Wed, 1 Feb 2017 02:06:54 +0100
 MIME-Version: 1.0
+In-Reply-To: <1485878172-15463-3-git-send-email-pl@kamp.de>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SnV5plBeK2Ge1I9g"
-Content-Disposition: inline
-In-Reply-To: <1484288903-18807-7-git-send-email-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 06/17] target/ppc/POWER9: Direct all
- instr and data storage interrupts to the hypv
+	protocol="application/pgp-signature";
+	boundary="vf1n3UIXDXCISbWaoVDIWV10nO95DJ6QC"
+Subject: Re: [Qemu-devel] [PATCH V2 2/2] block/nfs: fix naming of runtime
+ opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, ashijeetacharya@gmail.com, jcody@redhat.com, armbru@redhat.com, qemu-stable@nongnu.org
 
-
---SnV5plBeK2Ge1I9g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vf1n3UIXDXCISbWaoVDIWV10nO95DJ6QC
+From: Max Reitz <mreitz@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com,
+ ashijeetacharya@gmail.com, jcody@redhat.com, armbru@redhat.com,
+ qemu-stable@nongnu.org
+Message-ID: <863201d4-1207-1917-0d13-3083c4cede6f@redhat.com>
+Subject: Re: [PATCH V2 2/2] block/nfs: fix naming of runtime opts
+References: <1485878172-15463-1-git-send-email-pl@kamp.de>
+ <1485878172-15463-3-git-send-email-pl@kamp.de>
+In-Reply-To: <1485878172-15463-3-git-send-email-pl@kamp.de>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 13, 2017 at 05:28:12PM +1100, Suraj Jitindar Singh wrote:
-> The vpm0 bit was removed from the LPCR in POWER9, this bit controlled
-> whether ISI and DSI interrupts were directed to the hypervisor or the
-> partition. These interrupts now go to the hypervisor irrespective, thus
-> it is no longer necessary to check the vmp0 bit in the LPCR.
+On 31.01.2017 16:56, Peter Lieven wrote:
+> commit 94d6a7a accidently left the naming of runtime opts and QAPI
+> scheme inconsistent. As one consequence passing of parameters in the
+> URI is broken. Sync the naming of the runtime opts to the QAPI
+> scheme.
 >=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Please note that this is technically backwards incompatible with the 2.=
+8
+> release, but the 2.8 release is the only version that had the wrong nam=
+ing.
+> Furthermore release 2.8 suffered from a NULL pointer deference during
+> URI parsing.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+I always love things like this. "This technically breaks X, but
+obviously nobody used X, because X always crashed." Reminds me of how we
+success^W accidentally removed qcow2 encryption.
 
-> ---
->  target/ppc/mmu-hash64.c | 20 ++++++++++++++++++--
->  1 file changed, 18 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 3a2acb8..fe7da18 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -640,7 +640,15 @@ static void ppc_hash64_set_isi(CPUState *cs, CPUPPCS=
-tate *env,
->      if (msr_ir) {
->          vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
->      } else {
-> -        vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-> +        switch (env->mmu_model) {
-> +        case POWERPC_MMU_3_00:
-> +            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
-perv */
-> +            vpm =3D true;
-> +            break;
-> +        default:
-> +            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-> +            break;
-> +        }
->      }
->      if (vpm && !msr_hv) {
->          cs->exception_index =3D POWERPC_EXCP_HISI;
-> @@ -658,7 +666,15 @@ static void ppc_hash64_set_dsi(CPUState *cs, CPUPPCS=
-tate *env, uint64_t dar,
->      if (msr_dr) {
->          vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
->      } else {
-> -        vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-> +        switch (env->mmu_model) {
-> +        case POWERPC_MMU_3_00:
-> +            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
-perv */
-> +            vpm =3D true;
-> +            break;
-> +        default:
-> +            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-> +            break;
-> +        }
->      }
->      if (vpm && !msr_hv) {
->          cs->exception_index =3D POWERPC_EXCP_HDSI;
+Technically however this also changes the runtime parameter names, I
+think. Giving them probably did work in 2.8, so it is not compatible
+there. I don't mind very much, though, and you're the maintainer, so
+it's fine with me.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Anyway, I think this patch should also update nfs_refresh_filename().
 
---SnV5plBeK2Ge1I9g
+Max
+
+
+--vf1n3UIXDXCISbWaoVDIWV10nO95DJ6QC
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYkTDqAAoJEGw4ysog2bOSqMcP/0e1cY7bdnVHwTofhM5Kn7P8
-bZ49E5qc/U31Dj8FkOmToE4invzNIWRJDJq4QMG24cpZRyAJvqQzj1cZEg41bmX7
-gTLBO7B5AYdGps+oBDyI5D5VN+MNpekETM4Z32e6lrjGReQ60m1vp61TqBnMrVMA
-eCQhgMqunZgQSUAksHiRgBfNVUTuwlRLvqDROxqZKTiQGj7p7aPSXMkgeaxUa1YL
-Xw3BaXa3Anf67/1ZyardqtHzBZELpcE/eY+ITKU2jNbRtuNODQOkvoYj74rPinHD
-f7tn2Jukg5xyMgdvfU1+xVJomMxhwQtCWWekLlUcXf2Y2dszfE173ZozxXAf0R6J
-boHQM+kf07WxPS9Zp7URh2JKPfCuG539PkqeLc4lBsAYknZETwOdNcDjEMZ7OUpR
-zZFL3iKWEa2JktcyRm+gq/0CM22HCxHIUb+p7ti+/ICW1oR96YoJWJPH7Mgc7Q59
-7Svh6W221GhQjcYXaETeb0dLyBFGhw5d3A/ZgI7CMzAfVnMveoKEagBOGN46nbvj
-iq1n4qx8ZW271P863ysuRwJj4B9cZzRwGQgM5YbKoeLl+vcM+ZPtTdzlcGsPTAA3
-W5XDcYv183iWfioRKjLXds56lucEHF6/xRgomxWPJ1byZlJ/yyGIswPfncvtbIVL
-SRHJbVOS/+e3aaz5fAel
-=XD8L
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRNK4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AV9IH+gNI49pUrWmlBBt2I3d4BhZX2md+tMvk
+qbHl7RrbjKW91Se0C1av53Rcos0YEuloL4al/vHdPwM5HGUCmqxBMSH2Ht3E1WGl
+VZIPgfMtLbdLK2zIl+rB06oGSv/zsPjoUcmdsVaLo2wtP9jyp27UKLopj/BamePl
+BVba1v+2FpJ7jZc5af6dM+4amww4YPNZyvBjiSH38R6ybqkQH7oWW496mN/nNfwj
+WrpLPl52F/DhbI8MDWDm3mIRJ3pJzHLtRzu6063nAmsQrI4Z7CfhQ+upS1VwHMAk
+NhVGqX6V0F90HzJz2YsXYXgVEjWjB3Nhsv5yLs3TsqCVX4N45zuLn9A=
+=2A+8
 -----END PGP SIGNATURE-----
 
---SnV5plBeK2Ge1I9g--
+--vf1n3UIXDXCISbWaoVDIWV10nO95DJ6QC--
