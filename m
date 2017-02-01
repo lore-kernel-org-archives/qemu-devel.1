@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cYjk6-0005GK-30
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 20:29:51 -0500
+	(envelope-from <mst@redhat.com>) id 1cYjs4-0007dx-JR
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 20:38:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cYjk2-0006XA-Vj
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 20:29:50 -0500
-Received: from [59.151.112.132] (port=29386 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cYjk2-0006Uo-KG
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 20:29:46 -0500
-References: <1484746795-19523-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<87y3xw8urn.fsf@linaro.org>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <f83bc24b-645d-d050-61c2-bc5d08cee246@cn.fujitsu.com>
-Date: Wed, 1 Feb 2017 09:29:26 +0800
+	(envelope-from <mst@redhat.com>) id 1cYjs1-0000cr-E9
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 20:38:04 -0500
+Date: Wed, 1 Feb 2017 03:37:54 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170201033722-mutt-send-email-mst@kernel.org>
+References: <1485868446-10587-1-git-send-email-mst@redhat.com>
+	<1485868446-10587-4-git-send-email-mst@redhat.com>
+	<20170131221628.GN14879@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <87y3xw8urn.fsf@linaro.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] vl: Ensure the
- cpu_synchronize_all_post_init() in the appropriate location
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170131221628.GN14879@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PULL v3 03/21] ppc: switch to constants within
+ BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, sergey.fedorov@linaro.org, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-Hi, Alex
+On Wed, Feb 01, 2017 at 09:16:28AM +1100, David Gibson wrote:
+> On Tue, Jan 31, 2017 at 03:14:29PM +0200, Michael S. Tsirkin wrote:
+> > We are switching BUILD_BUG_ON to verify that it's parameter is a
+> > compile-time constant, and it turns out that some gcc versions
+> > (specifically gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609) are
+> > not smart enough to figure it out for expressions involving local
+> > variables. This is harmless but means that the check is ineffective for
+> > these platforms.  To fix, replace the variable with macros.
+> > 
+> > Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> Ugh.. I pulled this into my tree already (I've been having trouble
+> with my test setup, which is why I haven't sent my own pullreq yet).
+> However, it needs a s/%u/%llu/ to compile correctly on some platforms.
 
-Sorry for late reply.
+I need it to avoid breaking build. I fixed it up - want to drop it
+from you tree? Or leave it there - git will resolve the trivial conflict.
 
-At 01/27/2017 10:03 PM, Alex Bennée wrote:
->
-> Dou Liyang <douly.fnst@cn.fujitsu.com> writes:
->
->> At the Qemu initialization, we call the cpu_synchronize_all_post_init()
->> to synchronize All CPU states to KVM in the ./vl.c::main().
->>
->> Currently, it is called before we initialize the CPUs, which created by
->> "-device" command, So, these CPUs may be ignored to synchronize.
->>
->> The patch moves the numa_post_machine_init func in the appropriate
->> location to make sure that all the CPUs has already been created
->> when it is called.
->
-> This doesn't match what the patch does (the function is
-> cpu_synchronise_all_post_init) but I see another patch is already merged
-> that moved the NUMA one.
->
-
-Oops, Yes, I make the mistake.
-
-> I'm afraid you'll need to re-base anyway because it no longer applies
-> cleanly.
->
-
-Yes, I will re-base it.
-
-Thanks,
-
-	Liyang
-
-
->
->>
->> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
->> ---
->>
->> Change log v1-> v2:
->> 1. Split it from
->> https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03354.html
->> 2. Rewrite the log.
->>
->>  vl.c | 5 +++--
->>  1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/vl.c b/vl.c
->> index c643d3f..38269be 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -4547,8 +4547,6 @@ int main(int argc, char **argv, char **envp)
->>
->>      audio_init();
->>
->> -    cpu_synchronize_all_post_init();
->> -
->>      numa_post_machine_init();
->>
->>      if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
->> @@ -4571,6 +4569,9 @@ int main(int argc, char **argv, char **envp)
->>                            device_init_func, NULL, NULL)) {
->>          exit(1);
->>      }
->> +
->> +    cpu_synchronize_all_post_init();
->> +
->>      rom_reset_order_override();
->>
->>      /* Did we create any drives that we failed to create a device for? */
->
->
-> --
-> Alex Bennée
->
->
->
+> > ---
+> >  hw/ppc/spapr.c | 14 ++++++++------
+> >  1 file changed, 8 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index a642e66..b81f2ac 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2630,8 +2630,8 @@ static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t index,
+> >       * 1TiB 64-bit MMIO windows for each PHB.
+> >       */
+> >      const uint64_t base_buid = 0x800000020000000ULL;
+> > -    const int max_phbs =
+> > -        (SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / SPAPR_PCI_MEM64_WIN_SIZE - 1;
+> > +#define SPAPR_MAX_PHBS ((SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / \
+> > +                        SPAPR_PCI_MEM64_WIN_SIZE - 1)
+> >      int i;
+> >  
+> >      /* Sanity check natural alignments */
+> > @@ -2640,12 +2640,14 @@ static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t index,
+> >      QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM64_WIN_SIZE % SPAPR_PCI_MEM32_WIN_SIZE) != 0);
+> >      QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM32_WIN_SIZE % SPAPR_PCI_IO_WIN_SIZE) != 0);
+> >      /* Sanity check bounds */
+> > -    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_IO_WIN_SIZE) > SPAPR_PCI_MEM32_WIN_SIZE);
+> > -    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_MEM32_WIN_SIZE) > SPAPR_PCI_MEM64_WIN_SIZE);
+> > +    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_IO_WIN_SIZE) >
+> > +                      SPAPR_PCI_MEM32_WIN_SIZE);
+> > +    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_MEM32_WIN_SIZE) >
+> > +                      SPAPR_PCI_MEM64_WIN_SIZE);
+> >  
+> > -    if (index >= max_phbs) {
+> > +    if (index >= SPAPR_MAX_PHBS) {
+> >          error_setg(errp, "\"index\" for PAPR PHB is too large (max %u)",
+> > -                   max_phbs - 1);
+> > +                   SPAPR_MAX_PHBS - 1);
+> >          return;
+> >      }
+> >  
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
