@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cYwdh-0000G4-DT
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:16:09 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cYweK-0000oo-CZ
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:16:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cYwdb-00021V-8I
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:16:05 -0500
-Received: from mail-wj0-x236.google.com ([2a00:1450:400c:c01::236]:36274)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cYwdb-00020y-0j
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:15:59 -0500
-Received: by mail-wj0-x236.google.com with SMTP id n2so21387590wjq.3
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 07:15:58 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed,  1 Feb 2017 15:05:48 +0000
-Message-Id: <20170201150553.9381-21-alex.bennee@linaro.org>
-In-Reply-To: <20170201150553.9381-1-alex.bennee@linaro.org>
-References: <20170201150553.9381-1-alex.bennee@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1cYweH-00027N-6b
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:16:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cYweG-00027G-UG
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:16:41 -0500
+Date: Wed, 1 Feb 2017 16:16:36 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170201161636.28f1e2dc@nial.brq.redhat.com>
+In-Reply-To: <e158344b-b3e7-253b-f919-e48f6490c7b0@redhat.com>
+References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
+	<20170118175335-mutt-send-email-mst@kernel.org>
+	<20170118181918.783cb7bd@nial.brq.redhat.com>
+	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
+	<20170131165802-mutt-send-email-mst@kernel.org>
+	<fe787fcc-0c92-5842-1a67-b50466b6f38f@redhat.com>
+	<20170131201333-mutt-send-email-mst@kernel.org>
+	<20170201123739.387de47b@nial.brq.redhat.com>
+	<6e912456-9d9c-7084-c4b4-91596216d3dd@redhat.com>
+	<e158344b-b3e7-253b-f919-e48f6490c7b0@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 20/25] target-arm/powerctl: defer cpu reset
- work to CPU context
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,196 +35,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
-Cc: mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 
-When switching a new vCPU on we want to complete a bunch of the setup
-work before we start scheduling the vCPU thread. To do this cleanly we
-defer vCPU setup to async work which will run the vCPUs execution
-context as the thread is woken up. The scheduling of the work will kick
-the vCPU awake.
+On Wed, 1 Feb 2017 14:03:52 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-This avoids potential races in MTTCG system emulation.
+> On 02/01/17 13:52, Laszlo Ersek wrote:
+> > On 02/01/17 12:37, Igor Mammedov wrote:  
+> >> On Tue, 31 Jan 2017 20:17:02 +0200
+> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >>  
+> >>> On Tue, Jan 31, 2017 at 05:28:57PM +0100, Laszlo Ersek wrote:  
+> >>>> The ACPI 6.1 spec says,
+> >>>>
+> >>>> - DSDT: [...] If the X_DSDT field contains a non-zero value then this
+> >>>>   field must be zero.
+> >>>> - X_DSDT: [...] If the DSDT field contains a non-zero value then this
+> >>>>   field must be zero.    
+> >>>
+> >>> But that's only 6.1. 6.0 and earlier did not say this.
+> >>> The errata they wanted to address was:
+> >>> 1393 In FADT: if X_DSDT field is non-zero, DSDT
+> >>> field should be ignored or deprecated
+> >>>
+> >>> I would class this as a spec bug.
+> >>>  
+> >>
+> >> The same applies to X_PM1a_EVT_BLK and co,
+> >> for example 5.1 spec "This is a required
+> >> field."
+> >>
+> >> And looks like Windows implemented it as mandatory
+> >> to boot perhaps to be compatible with 5.1 and earlier
+> >> specs.
+> >>
+> >> It appears fw would be forced to fill fields depending
+> >> on table revision.  
+> > 
+> > Sounds like a valid point.
+> > 
+> > I compared the FADT defintion between ACPI 5.1 and ACPI 6.1. Indeed, the
+> > former says:
+> > 
+> > - FADT Major Version: 5; Major Version of this FADT structure, [...]
+> > - DSDT: Physical memory address (0-4 GB) of the DSDT.
+> > - X_DSDT: 64bit physical address of the DSDT.
+> > 
+> > the latter says:
+> > 
+> > - FADT Major Version: 6; Major Version of this FADT structure, [...]
+> > 
+> > - DSDT: Physical memory address of the DSDT. If the X_DSDT field
+> >   contains a non-zero value then this field must be zero.
+> > 
+> > - X_DSDT: Extended physical address of the DSDT. If the DSDT field
+> >   contains a non-zero value then this field must be zero.
+> > 
+> > I will ask on edk2-devel whether the
+> > "MdeModulePkg/Universal/Acpi/AcpiTableDxe" maintainers can think of a
+> > way to accommodate this.  
+> 
+> Sigh, this looks nasty.
+> 
+> Considering specifically the DSDT <-> X_DSDT question, Mantis ticket
+> #1393 (which requires the mutual exclusion) went into 5.1B. In version
+> 5.1A, the mutual exclusion is not required.
+> 
+> Unfortuantely, the FADT Major.Minor version, as reported through the
+> bytes at offsets 8 and 131 decimal in the table, is "5.1" for *both*
+> 5.1A and 5.1B. In other words, looking at just Major.Minor, it cannot be
+> determined with full precision whether the DSDT and X_DSDT fields should
+> be exclusive or not. :/
+The same applies to 6.0 vs 6.0A 
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-
----
-v7
-  - add const to static mode_for_el[] array
-  - fix checkpatch long lines
----
- target/arm/arm-powerctl.c | 146 ++++++++++++++++++++++++++++------------------
- 1 file changed, 88 insertions(+), 58 deletions(-)
-
-diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-index fbb7a15daa..082788e3a4 100644
---- a/target/arm/arm-powerctl.c
-+++ b/target/arm/arm-powerctl.c
-@@ -48,11 +48,87 @@ CPUState *arm_get_cpu_by_id(uint64_t id)
-     return NULL;
- }
- 
-+struct cpu_on_info {
-+    uint64_t entry;
-+    uint64_t context_id;
-+    uint32_t target_el;
-+    bool target_aa64;
-+};
-+
-+
-+static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
-+                                      run_on_cpu_data data)
-+{
-+    ARMCPU *target_cpu = ARM_CPU(target_cpu_state);
-+    struct cpu_on_info *info = (struct cpu_on_info *) data.host_ptr;
-+
-+    /* Initialize the cpu we are turning on */
-+    cpu_reset(target_cpu_state);
-+    target_cpu->powered_off = false;
-+    target_cpu_state->halted = 0;
-+
-+    if (info->target_aa64) {
-+        if ((info->target_el < 3) && arm_feature(&target_cpu->env,
-+                                                 ARM_FEATURE_EL3)) {
-+            /*
-+             * As target mode is AArch64, we need to set lower
-+             * exception level (the requested level 2) to AArch64
-+             */
-+            target_cpu->env.cp15.scr_el3 |= SCR_RW;
-+        }
-+
-+        if ((info->target_el < 2) && arm_feature(&target_cpu->env,
-+                                                 ARM_FEATURE_EL2)) {
-+            /*
-+             * As target mode is AArch64, we need to set lower
-+             * exception level (the requested level 1) to AArch64
-+             */
-+            target_cpu->env.cp15.hcr_el2 |= HCR_RW;
-+        }
-+
-+        target_cpu->env.pstate = aarch64_pstate_mode(info->target_el, true);
-+    } else {
-+        /* We are requested to boot in AArch32 mode */
-+        static const uint32_t mode_for_el[] = { 0,
-+                                                ARM_CPU_MODE_SVC,
-+                                                ARM_CPU_MODE_HYP,
-+                                                ARM_CPU_MODE_SVC };
-+
-+        cpsr_write(&target_cpu->env, mode_for_el[info->target_el], CPSR_M,
-+                   CPSRWriteRaw);
-+    }
-+
-+    if (info->target_el == 3) {
-+        /* Processor is in secure mode */
-+        target_cpu->env.cp15.scr_el3 &= ~SCR_NS;
-+    } else {
-+        /* Processor is not in secure mode */
-+        target_cpu->env.cp15.scr_el3 |= SCR_NS;
-+    }
-+
-+    /* We check if the started CPU is now at the correct level */
-+    assert(info->target_el == arm_current_el(&target_cpu->env));
-+
-+    if (info->target_aa64) {
-+        target_cpu->env.xregs[0] = info->context_id;
-+        target_cpu->env.thumb = false;
-+    } else {
-+        target_cpu->env.regs[0] = info->context_id;
-+        target_cpu->env.thumb = info->entry & 1;
-+        info->entry &= 0xfffffffe;
-+    }
-+
-+    /* Start the new CPU at the requested address */
-+    cpu_set_pc(target_cpu_state, info->entry);
-+    g_free(info);
-+}
-+
- int arm_set_cpu_on(uint64_t cpuid, uint64_t entry, uint64_t context_id,
-                    uint32_t target_el, bool target_aa64)
- {
-     CPUState *target_cpu_state;
-     ARMCPU *target_cpu;
-+    struct cpu_on_info *info;
- 
-     DPRINTF("cpu %" PRId64 " (EL %d, %s) @ 0x%" PRIx64 " with R0 = 0x%" PRIx64
-             "\n", cpuid, target_el, target_aa64 ? "aarch64" : "aarch32", entry,
-@@ -109,64 +185,18 @@ int arm_set_cpu_on(uint64_t cpuid, uint64_t entry, uint64_t context_id,
-         return QEMU_ARM_POWERCTL_INVALID_PARAM;
-     }
- 
--    /* Initialize the cpu we are turning on */
--    cpu_reset(target_cpu_state);
--    target_cpu->powered_off = false;
--    target_cpu_state->halted = 0;
--
--    if (target_aa64) {
--        if ((target_el < 3) && arm_feature(&target_cpu->env, ARM_FEATURE_EL3)) {
--            /*
--             * As target mode is AArch64, we need to set lower
--             * exception level (the requested level 2) to AArch64
--             */
--            target_cpu->env.cp15.scr_el3 |= SCR_RW;
--        }
--
--        if ((target_el < 2) && arm_feature(&target_cpu->env, ARM_FEATURE_EL2)) {
--            /*
--             * As target mode is AArch64, we need to set lower
--             * exception level (the requested level 1) to AArch64
--             */
--            target_cpu->env.cp15.hcr_el2 |= HCR_RW;
--        }
--
--        target_cpu->env.pstate = aarch64_pstate_mode(target_el, true);
--    } else {
--        /* We are requested to boot in AArch32 mode */
--        static uint32_t mode_for_el[] = { 0,
--                                          ARM_CPU_MODE_SVC,
--                                          ARM_CPU_MODE_HYP,
--                                          ARM_CPU_MODE_SVC };
--
--        cpsr_write(&target_cpu->env, mode_for_el[target_el], CPSR_M,
--                   CPSRWriteRaw);
--    }
--
--    if (target_el == 3) {
--        /* Processor is in secure mode */
--        target_cpu->env.cp15.scr_el3 &= ~SCR_NS;
--    } else {
--        /* Processor is not in secure mode */
--        target_cpu->env.cp15.scr_el3 |= SCR_NS;
--    }
--
--    /* We check if the started CPU is now at the correct level */
--    assert(target_el == arm_current_el(&target_cpu->env));
--
--    if (target_aa64) {
--        target_cpu->env.xregs[0] = context_id;
--        target_cpu->env.thumb = false;
--    } else {
--        target_cpu->env.regs[0] = context_id;
--        target_cpu->env.thumb = entry & 1;
--        entry &= 0xfffffffe;
--    }
--
--    /* Start the new CPU at the requested address */
--    cpu_set_pc(target_cpu_state, entry);
--
--    qemu_cpu_kick(target_cpu_state);
-+    /* To avoid racing with a CPU we are just kicking off we do the
-+     * final bit of preparation for the work in the target CPUs
-+     * context.
-+     */
-+    info = g_new(struct cpu_on_info, 1);
-+    info->entry = entry;
-+    info->context_id = context_id;
-+    info->target_el = target_el;
-+    info->target_aa64 = target_aa64;
-+
-+    async_run_on_cpu(target_cpu_state, arm_set_cpu_on_async_work,
-+                     RUN_ON_CPU_HOST_PTR(info));
- 
-     /* We are good to go */
-     return QEMU_ARM_POWERCTL_RET_SUCCESS;
--- 
-2.11.0
+> 
+> Laszlo
+> 
+> 
