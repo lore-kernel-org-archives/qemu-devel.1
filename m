@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYtsC-00061x-HX
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:54 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cYtsC-00062J-TB
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005da-Ve
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005dv-2N
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:52 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:46120 helo=smtp.ispras.ru)
+Received: from bran.ispras.ru ([83.149.199.196]:46096 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005cy-Kr
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005cF-N6
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:48 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Wed,  1 Feb 2017 15:18:15 +0300
-Message-Id: <1485951502-28774-14-git-send-email-batuzovk@ispras.ru>
+Date: Wed,  1 Feb 2017 15:18:20 +0300
+Message-Id: <1485951502-28774-19-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
 References: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2 13/20] tcg/i386: support remaining vector
- addition operations
+Subject: [Qemu-devel] [PATCH v2 18/20] tcg/i386: add support for
+ qemu_ld_v128/qemu_st_v128 ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,147 +29,156 @@ Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Pe
 
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- tcg/i386/tcg-target.h     | 10 +++++++++
- tcg/i386/tcg-target.inc.c | 54 +++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 62 insertions(+), 2 deletions(-)
+ tcg/i386/tcg-target.inc.c | 68 ++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 61 insertions(+), 7 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 755ebaa..bd6cfe1 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -172,7 +172,17 @@ extern bool have_popcnt;
- #endif
- 
- #ifdef TCG_TARGET_HAS_REG128
-+#define TCG_TARGET_HAS_add_i8x16        1
-+#define TCG_TARGET_HAS_add_i16x8        1
- #define TCG_TARGET_HAS_add_i32x4        1
-+#define TCG_TARGET_HAS_add_i64x2        1
-+#endif
-+
-+#ifdef TCG_TARGET_HAS_REGV64
-+#define TCG_TARGET_HAS_add_i8x8         1
-+#define TCG_TARGET_HAS_add_i16x4        1
-+#define TCG_TARGET_HAS_add_i32x2        1
-+#define TCG_TARGET_HAS_add_i64x1        1
- #endif
- 
- #define TCG_TARGET_deposit_i32_valid(ofs, len) \
 diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 208bb81..d8f0d81 100644
+index 1e6edc0..4647e97 100644
 --- a/tcg/i386/tcg-target.inc.c
 +++ b/tcg/i386/tcg-target.inc.c
-@@ -168,6 +168,11 @@ static bool have_lzcnt;
- #else
- # define have_lzcnt 0
- #endif
-+#if defined(CONFIG_CPUID_H) && defined(bit_AVX) && defined(bit_OSXSAVE)
-+static bool have_avx;
-+#else
-+# define have_avx 0
-+#endif
+@@ -1342,6 +1342,7 @@ static void * const qemu_ld_helpers[] = {
+     [MO_BEUW] = helper_be_lduw_mmu,
+     [MO_BEUL] = helper_be_ldul_mmu,
+     [MO_BEQ]  = helper_be_ldq_mmu,
++    [MO_128]  = helper_te_ldv128_mmu,
+ };
  
- static tcg_insn_unit *tb_ret_addr;
+ /* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
+@@ -1355,6 +1356,7 @@ static void * const qemu_st_helpers[] = {
+     [MO_BEUW] = helper_be_stw_mmu,
+     [MO_BEUL] = helper_be_stl_mmu,
+     [MO_BEQ]  = helper_be_stq_mmu,
++    [MO_128]  = helper_te_stv128_mmu,
+ };
  
-@@ -393,7 +398,10 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_MOVQ_M2R    (0x7e | P_SSE_F30F)
- #define OPC_MOVQ_R2M    (0xd6 | P_SSE_660F)
- #define OPC_MOVQ_R2R    (0x7e | P_SSE_F30F)
-+#define OPC_PADDB       (0xfc | P_SSE_660F)
-+#define OPC_PADDW       (0xfd | P_SSE_660F)
- #define OPC_PADDD       (0xfe | P_SSE_660F)
-+#define OPC_PADDQ       (0xd4 | P_SSE_660F)
+ /* Perform the TLB load and compare.
+@@ -1521,12 +1523,30 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+         ofs += 4;
  
- /* Group 1 opcode extensions for 0x80-0x83.
-    These are also used as modifiers for OPC_ARITH.  */
-@@ -1963,6 +1971,19 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     TCGArg a0, a1, a2;
-     int c, const_a2, vexop, rexw = 0;
- 
-+    static const int vect_binop[] = {
-+        [INDEX_op_add_i8x16] = OPC_PADDB,
-+        [INDEX_op_add_i16x8] = OPC_PADDW,
-+        [INDEX_op_add_i32x4] = OPC_PADDD,
-+        [INDEX_op_add_i64x2] = OPC_PADDQ,
+         tcg_out_sti(s, TCG_TYPE_PTR, (uintptr_t)l->raddr, TCG_REG_ESP, ofs);
 +
-+        [INDEX_op_add_i8x8]  = OPC_PADDB,
-+        [INDEX_op_add_i16x4] = OPC_PADDW,
-+        [INDEX_op_add_i32x2] = OPC_PADDD,
-+        [INDEX_op_add_i64x1] = OPC_PADDQ,
-+    };
-+
-+
- #if TCG_TARGET_REG_BITS == 64
- # define OP_32_64(x) \
-         case glue(glue(INDEX_op_, x), _i64): \
-@@ -1972,6 +1993,17 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
- # define OP_32_64(x) \
-         case glue(glue(INDEX_op_, x), _i32)
- #endif
-+#define OP_V128_ALL(x) \
-+        case glue(glue(INDEX_op_, x), _i8x16): \
-+        case glue(glue(INDEX_op_, x), _i16x8): \
-+        case glue(glue(INDEX_op_, x), _i32x4): \
-+        case glue(glue(INDEX_op_, x), _i64x2)
-+
-+#define OP_V64_ALL(x) \
-+        case glue(glue(INDEX_op_, x), _i8x8):  \
-+        case glue(glue(INDEX_op_, x), _i16x4): \
-+        case glue(glue(INDEX_op_, x), _i32x2): \
-+        case glue(glue(INDEX_op_, x), _i64x1)
- 
-     /* Hoist the loads of the most common arguments.  */
-     a0 = args[0];
-@@ -2369,8 +2401,13 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         tcg_out_mb(s, a0);
-         break;
- 
--    case INDEX_op_add_i32x4:
--        tcg_out_modrm(s, OPC_PADDD, args[0], args[2]);
-+    OP_V128_ALL(add):
-+    OP_V64_ALL(add):
-+        if (have_avx) {
-+            tcg_out_vex_modrm(s, vect_binop[opc], args[0], args[1], args[2]);
-+        } else {
-+            tcg_out_modrm(s, vect_binop[opc], args[0], args[2]);
++        if ((opc & MO_SSIZE) == MO_128) {
++            ofs += 4;
++            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
++            tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
++            tcg_out_st(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP, ofs);
 +        }
-         break;
- 
-     case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
-@@ -2383,6 +2420,8 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+     } else {
+         tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[0], TCG_AREG0);
+         /* The second argument is already loaded with addrlo.  */
+         tcg_out_movi(s, TCG_TYPE_I32, tcg_target_call_iarg_regs[2], oi);
+         tcg_out_movi(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[3],
+                      (uintptr_t)l->raddr);
++        if ((opc & MO_SSIZE) == MO_128) {
++            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
++            tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
++            if (ARRAY_SIZE(tcg_target_call_iarg_regs) > 4) {
++                tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[4],
++                            TCG_REG_EAX);
++            } else {
++                tcg_out_st(s, TCG_TYPE_PTR, TCG_REG_EAX,
++                            TCG_REG_ESP, TCG_TARGET_CALL_STACK_OFFSET);
++            }
++        }
      }
  
- #undef OP_32_64
-+#undef OP_V128_ALL
-+#undef OP_V64_ALL
- }
- 
- static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-@@ -2613,7 +2652,14 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-             return &s2;
+     tcg_out_call(s, qemu_ld_helpers[opc & (MO_BSWAP | MO_SIZE)]);
+@@ -1562,6 +1582,11 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+             tcg_out_mov(s, TCG_TYPE_I32, l->datahi_reg, TCG_REG_EDX);
+         }
+         break;
++    case MO_128:
++        tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
++        tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
++        tcg_out_ld(s, TCG_TYPE_V128, l->datalo_reg, TCG_REG_EAX, 0);
++        break;
+     default:
+         tcg_abort();
+     }
+@@ -1601,12 +1626,20 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+             ofs += 4;
          }
  
-+    case INDEX_op_add_i8x16:
-+    case INDEX_op_add_i16x8:
-     case INDEX_op_add_i32x4:
-+    case INDEX_op_add_i64x2:
-+    case INDEX_op_add_i8x8:
-+    case INDEX_op_add_i16x4:
-+    case INDEX_op_add_i32x2:
-+    case INDEX_op_add_i64x1:
-         return &V_0_V;
- 
-     default:
-@@ -2728,6 +2774,10 @@ static void tcg_target_init(TCGContext *s)
- #ifdef bit_POPCNT
-         have_popcnt = (c & bit_POPCNT) != 0;
- #endif
-+#if defined(bit_AVX) && defined(bit_OSXSAVE)
-+        have_avx = (c & (bit_AVX | bit_OSXSAVE)) == (bit_AVX | bit_OSXSAVE);
-+#endif
+-        tcg_out_st(s, TCG_TYPE_I32, l->datalo_reg, TCG_REG_ESP, ofs);
+-        ofs += 4;
+-
+-        if (s_bits == MO_64) {
+-            tcg_out_st(s, TCG_TYPE_I32, l->datahi_reg, TCG_REG_ESP, ofs);
++        if (s_bits == MO_128) {
++            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
++            tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
++            tcg_out_st(s, TCG_TYPE_V128, l->datalo_reg, TCG_REG_EAX, 0);
++            tcg_out_st(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP, ofs);
+             ofs += 4;
++        } else {
++            tcg_out_st(s, TCG_TYPE_I32, l->datalo_reg, TCG_REG_ESP, ofs);
++            ofs += 4;
 +
-     }
++            if (s_bits == MO_64) {
++                tcg_out_st(s, TCG_TYPE_I32, l->datahi_reg, TCG_REG_ESP, ofs);
++                ofs += 4;
++            }
+         }
  
-     if (max >= 7) {
+         tcg_out_sti(s, TCG_TYPE_I32, oi, TCG_REG_ESP, ofs);
+@@ -1618,8 +1651,16 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+     } else {
+         tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[0], TCG_AREG0);
+         /* The second argument is already loaded with addrlo.  */
+-        tcg_out_mov(s, (s_bits == MO_64 ? TCG_TYPE_I64 : TCG_TYPE_I32),
+-                    tcg_target_call_iarg_regs[2], l->datalo_reg);
++        if (s_bits == MO_128) {
++            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_RAX, TCG_REG_ESP);
++            tcg_out_addi(s, TCG_REG_RAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
++            tcg_out_st(s, TCG_TYPE_V128, l->datalo_reg, TCG_REG_RAX, 0);
++            tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[2],
++                        TCG_REG_RAX);
++        } else {
++            tcg_out_mov(s, (s_bits == MO_64 ? TCG_TYPE_I64 : TCG_TYPE_I32),
++                        tcg_target_call_iarg_regs[2], l->datalo_reg);
++        }
+         tcg_out_movi(s, TCG_TYPE_I32, tcg_target_call_iarg_regs[3], oi);
+ 
+         if (ARRAY_SIZE(tcg_target_call_iarg_regs) > 4) {
+@@ -1751,6 +1792,10 @@ static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
+             }
+         }
+         break;
++    case MO_128:
++        tcg_out_modrm_sib_offset(s, OPC_MOVDQU_M2R + seg, datalo,
++                                 base, index, 0, ofs);
++        break;
+     default:
+         tcg_abort();
+     }
+@@ -1894,6 +1939,9 @@ static void tcg_out_qemu_st_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
+             tcg_out_modrm_offset(s, movop + seg, datahi, base, ofs+4);
+         }
+         break;
++    case MO_128:
++        tcg_out_modrm_offset(s, OPC_MOVDQU_R2M + seg, datalo, base, ofs);
++        break;
+     default:
+         tcg_abort();
+     }
+@@ -2264,12 +2312,18 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+     case INDEX_op_qemu_ld_i64:
+         tcg_out_qemu_ld(s, args, 1);
+         break;
++    case INDEX_op_qemu_ld_v128:
++        tcg_out_qemu_ld(s, args, 0);
++        break;
+     case INDEX_op_qemu_st_i32:
+         tcg_out_qemu_st(s, args, 0);
+         break;
+     case INDEX_op_qemu_st_i64:
+         tcg_out_qemu_st(s, args, 1);
+         break;
++    case INDEX_op_qemu_st_v128:
++        tcg_out_qemu_st(s, args, 0);
++        break;
+ 
+     OP_32_64(mulu2):
+         tcg_out_modrm(s, OPC_GRP3_Ev + rexw, EXT3_MUL, args[3]);
 -- 
 2.1.4
