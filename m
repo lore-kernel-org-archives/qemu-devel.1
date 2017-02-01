@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYtsB-000618-Pv
+	(envelope-from <batuzovk@ispras.ru>) id 1cYtsC-00061P-2j
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005d6-H7
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:51 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:46096 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005e3-8D
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:52 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:46128 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005cF-9T
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:48 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005dK-18
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:49 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Wed,  1 Feb 2017 15:18:14 +0300
-Message-Id: <1485951502-28774-13-git-send-email-batuzovk@ispras.ru>
+Date: Wed,  1 Feb 2017 15:18:21 +0300
+Message-Id: <1485951502-28774-20-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
 References: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2 12/20] tcg/i386: support 64-bit vector
- operations
+Subject: [Qemu-devel] [PATCH v2 19/20] target/arm: load two consecutive
+ 64-bits vector regs as a 128-bit vector reg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +27,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kirill Batuzov <batuzovk@ispras.ru>
 
+ARM instruction set does not have loads to 128-bit vector register (q-regs).
+Instead it can read several consecutive 64-bit vector register (d-regs)
+which is used by GCC to load 128-bit registers from memory.
+
+For vector operations to work we need to detect such loads and transform them
+into 128-bit loads to 128-bit temporaries.
+
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- tcg/i386/tcg-target.h     |  1 +
- tcg/i386/tcg-target.inc.c | 22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ target/arm/translate.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index b0704e8..755ebaa 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -31,6 +31,7 @@
- #ifdef __x86_64__
- # if defined(TARGET_WORDS_BIGENDIAN) == defined(HOST_WORDS_BIGENDIAN)
- #  define TCG_TARGET_HAS_REG128 1
-+#  define TCG_TARGET_HAS_REGV64 1
- # endif
- # ifdef TCG_TARGET_HAS_REG128
- #  define TCG_TARGET_REG_BITS  64
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 3e718f3..208bb81 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -390,6 +390,9 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_MOVDQU_M2R  (0x6f | P_SSE_F30F)  /* store 128-bit value */
- #define OPC_MOVDQU_R2M  (0x7f | P_SSE_F30F)  /* load 128-bit value */
- #define OPC_MOVDQA_R2R  (0x6f | P_SSE_660F)  /* reg-to-reg 128-bit mov */
-+#define OPC_MOVQ_M2R    (0x7e | P_SSE_F30F)
-+#define OPC_MOVQ_R2M    (0xd6 | P_SSE_660F)
-+#define OPC_MOVQ_R2R    (0x7e | P_SSE_F30F)
- #define OPC_PADDD       (0xfe | P_SSE_660F)
- 
- /* Group 1 opcode extensions for 0x80-0x83.
-@@ -700,6 +703,15 @@ static inline void tcg_out_mov(TCGContext *s, TCGType type,
-                 tcg_out_modrm(s, OPC_MOVDQA_R2R, ret, arg);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 90e14df..76f9927 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4710,6 +4710,19 @@ static int disas_neon_ls_insn(DisasContext *s, uint32_t insn)
+                 tcg_gen_addi_i32(addr, addr, 1 << size);
              }
-             break;
-+        case TCG_TYPE_V64:
-+            ret -= TCG_REG_XMM0;
-+            arg -= TCG_REG_XMM0;
-+            if (have_avx) {
-+                tcg_out_vex_modrm(s, OPC_MOVQ_R2R, ret, 15, arg);
-+            } else {
-+                tcg_out_modrm(s, OPC_MOVQ_R2R, ret, arg);
-+            }
-+            break;
-         case TCG_TYPE_I32:
-         case TCG_TYPE_I64:
-             opc = OPC_MOVL_GvEv + (type == TCG_TYPE_I64 ? P_REXW : 0);
-@@ -788,6 +800,10 @@ static inline void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
-         ret -= TCG_REG_XMM0;
-         tcg_out_modrm_offset(s, OPC_MOVDQU_M2R, ret, arg1, arg2);
-         break;
-+    case TCG_TYPE_V64:
-+        ret -= TCG_REG_XMM0;
-+        tcg_out_modrm_offset(s, OPC_MOVQ_M2R, ret, arg1, arg2);
-+        break;
-     case TCG_TYPE_I32:
-     case TCG_TYPE_I64:
-         opc = OPC_MOVL_GvEv + (type == TCG_TYPE_I64 ? P_REXW : 0);
-@@ -807,6 +823,10 @@ static inline void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
-         arg -= TCG_REG_XMM0;
-         tcg_out_modrm_offset(s, OPC_MOVDQU_R2M, arg, arg1, arg2);
-         break;
-+    case TCG_TYPE_V64:
-+        arg -= TCG_REG_XMM0;
-+        tcg_out_modrm_offset(s, OPC_MOVQ_R2M, arg, arg1, arg2);
-+        break;
-     case TCG_TYPE_I32:
-     case TCG_TYPE_I64:
-         opc = OPC_MOVL_EvGv + (type == TCG_TYPE_I64 ? P_REXW : 0);
-@@ -2407,6 +2427,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
- 
-     case INDEX_op_ld_v128:
-     case INDEX_op_st_v128:
-+    case INDEX_op_ld_v64:
-+    case INDEX_op_st_v64:
-         return &V_r;
- 
-     case INDEX_op_st8_i32:
+             if (size == 3) {
++#ifdef TCG_TARGET_HAS_REG128
++                if (rd % 2 == 0 && nregs == 2) {
++                    /* 128-bit load */
++                    if (load) {
++                        tcg_gen_qemu_ld_v128(cpu_Q[rd / 2], addr,
++                                             get_mem_index(s), MO_LE | MO_128);
++                    } else {
++                        tcg_gen_qemu_st_v128(cpu_Q[rd / 2], addr,
++                                             get_mem_index(s), MO_LE | MO_128);
++                    }
++                    break;
++                }
++#endif
+                 tmp64 = tcg_temp_new_i64();
+                 if (load) {
+                     gen_aa32_ld64(s, tmp64, addr, get_mem_index(s));
 -- 
 2.1.4
