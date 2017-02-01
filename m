@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYtsC-00061P-2j
+	(envelope-from <batuzovk@ispras.ru>) id 1cYtsC-00061c-9B
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005e3-8D
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005dQ-TN
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:52 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:46128 helo=smtp.ispras.ru)
+Received: from bran.ispras.ru ([83.149.199.196]:46085 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005dK-18
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:49 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005cD-IV
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:48 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Wed,  1 Feb 2017 15:18:21 +0300
-Message-Id: <1485951502-28774-20-git-send-email-batuzovk@ispras.ru>
+Date: Wed,  1 Feb 2017 15:18:18 +0300
+Message-Id: <1485951502-28774-17-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
 References: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2 19/20] target/arm: load two consecutive
- 64-bits vector regs as a 128-bit vector reg
+Subject: [Qemu-devel] [PATCH v2 16/20] tcg: introduce qemu_ld_v128 and
+ qemu_st_v128 opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +27,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kirill Batuzov <batuzovk@ispras.ru>
 
-ARM instruction set does not have loads to 128-bit vector register (q-regs).
-Instead it can read several consecutive 64-bit vector register (d-regs)
-which is used by GCC to load 128-bit registers from memory.
-
-For vector operations to work we need to detect such loads and transform them
-into 128-bit loads to 128-bit temporaries.
-
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- target/arm/translate.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ tcg/i386/tcg-target.inc.c |  5 +++++
+ tcg/tcg-op.c              | 24 ++++++++++++++++++++++++
+ tcg/tcg-op.h              | 15 +++++++++++++++
+ tcg/tcg-opc.h             |  4 ++++
+ 4 files changed, 48 insertions(+)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 90e14df..76f9927 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4710,6 +4710,19 @@ static int disas_neon_ls_insn(DisasContext *s, uint32_t insn)
-                 tcg_gen_addi_i32(addr, addr, 1 << size);
-             }
-             if (size == 3) {
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 263c15e..1e6edc0 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -2448,6 +2448,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+         = { .args_ct_str = { "L", "L", "L", "L" } };
+     static const TCGTargetOpDef V_r = { .args_ct_str  = { "V", "r" } };
+     static const TCGTargetOpDef V_0_V = { .args_ct_str  = { "V", "0", "V" } };
++    static const TCGTargetOpDef V_L = { .args_ct_str  = { "V", "L" } };
+ 
+     switch (op) {
+     case INDEX_op_ld8u_i32:
+@@ -2662,6 +2663,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_add_i64x1:
+         return &V_0_V;
+ 
++    case INDEX_op_qemu_ld_v128:
++    case INDEX_op_qemu_st_v128:
++        return &V_L;
++
+     default:
+         break;
+     }
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 0dfe611..db74017 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -3102,3 +3102,27 @@ void tcg_v64_to_ptr(TCGv_v64 tmp, TCGv_ptr base, int slot,
+         }
+     }
+ }
++
++void tcg_gen_qemu_ld_v128(TCGv_v128 val, TCGv addr, TCGArg idx,
++                          TCGMemOp memop)
++{
 +#ifdef TCG_TARGET_HAS_REG128
-+                if (rd % 2 == 0 && nregs == 2) {
-+                    /* 128-bit load */
-+                    if (load) {
-+                        tcg_gen_qemu_ld_v128(cpu_Q[rd / 2], addr,
-+                                             get_mem_index(s), MO_LE | MO_128);
-+                    } else {
-+                        tcg_gen_qemu_st_v128(cpu_Q[rd / 2], addr,
-+                                             get_mem_index(s), MO_LE | MO_128);
-+                    }
-+                    break;
-+                }
++    tcg_debug_assert((memop & MO_BSWAP) == MO_TE);
++    TCGMemOpIdx oi = make_memop_idx(memop, idx);
++    tcg_gen_op3si_v128(INDEX_op_qemu_ld_v128, val, addr, oi);
++#else
++    g_assert_not_reached();
 +#endif
-                 tmp64 = tcg_temp_new_i64();
-                 if (load) {
-                     gen_aa32_ld64(s, tmp64, addr, get_mem_index(s));
++}
++
++void tcg_gen_qemu_st_v128(TCGv_v128 val, TCGv addr, TCGArg idx,
++                          TCGMemOp memop)
++{
++#ifdef TCG_TARGET_HAS_REG128
++    tcg_debug_assert((memop & MO_BSWAP) == MO_TE);
++    TCGMemOpIdx oi = make_memop_idx(memop, idx);
++    tcg_gen_op3si_v128(INDEX_op_qemu_st_v128, val, addr, oi);
++#else
++    g_assert_not_reached();
++#endif
++}
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index 3727be7..dc1d032 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -266,6 +266,19 @@ static inline void tcg_gen_op3_v128(TCGOpcode opc, TCGv_v128 a1,
+                 GET_TCGV_V128(a3));
+ }
+ 
++static inline void tcg_gen_op3si_v128(TCGOpcode opc, TCGv_v128 a1,
++                                      TCGv a2, TCGArg a3)
++{
++#if TARGET_LONG_BITS == 64 && TCG_TARGET_REG_BITS == 32
++    tcg_gen_op4(&tcg_ctx, opc, GET_TCGV_V128(a1), GET_TCGV_I32(TCGV_LOW(a2)),
++                GET_TCGV_I32(TCGV_HIGH(a2)), a3);
++#elif TARGET_LONG_BITS == 32
++    tcg_gen_op3(&tcg_ctx, opc, GET_TCGV_V128(a1), GET_TCGV_I32(a2), a3);
++#else
++    tcg_gen_op3(&tcg_ctx, opc, GET_TCGV_V128(a1), GET_TCGV_I64(a2), a3);
++#endif
++}
++
+ static inline void tcg_gen_op1_v64(TCGOpcode opc, TCGv_v64 a1)
+ {
+     tcg_gen_op1(&tcg_ctx, opc, GET_TCGV_V64(a1));
+@@ -909,6 +922,8 @@ void tcg_gen_qemu_ld_i32(TCGv_i32, TCGv, TCGArg, TCGMemOp);
+ void tcg_gen_qemu_st_i32(TCGv_i32, TCGv, TCGArg, TCGMemOp);
+ void tcg_gen_qemu_ld_i64(TCGv_i64, TCGv, TCGArg, TCGMemOp);
+ void tcg_gen_qemu_st_i64(TCGv_i64, TCGv, TCGArg, TCGMemOp);
++void tcg_gen_qemu_ld_v128(TCGv_v128, TCGv, TCGArg, TCGMemOp);
++void tcg_gen_qemu_st_v128(TCGv_v128, TCGv, TCGArg, TCGMemOp);
+ 
+ static inline void tcg_gen_qemu_ld8u(TCGv ret, TCGv addr, int mem_index)
+ {
+diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
+index 4c8f195..6c2e697 100644
+--- a/tcg/tcg-opc.h
++++ b/tcg/tcg-opc.h
+@@ -232,6 +232,10 @@ DEF(qemu_ld_i64, DATA64_ARGS, TLADDR_ARGS, 1,
+     TCG_OPF_CALL_CLOBBER | TCG_OPF_SIDE_EFFECTS | TCG_OPF_64BIT)
+ DEF(qemu_st_i64, 0, TLADDR_ARGS + DATA64_ARGS, 1,
+     TCG_OPF_CALL_CLOBBER | TCG_OPF_SIDE_EFFECTS | TCG_OPF_64BIT)
++DEF(qemu_ld_v128, 1, 1, 1,
++    TCG_OPF_CALL_CLOBBER | TCG_OPF_SIDE_EFFECTS | IMPL128)
++DEF(qemu_st_v128, 0, 2, 1,
++    TCG_OPF_CALL_CLOBBER | TCG_OPF_SIDE_EFFECTS | IMPL128)
+ 
+ #undef TLADDR_ARGS
+ #undef DATA64_ARGS
 -- 
 2.1.4
