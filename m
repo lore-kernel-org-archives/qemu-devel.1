@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cYsb9-0000Uq-9q
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:57:12 -0500
+	(envelope-from <thuth@redhat.com>) id 1cYsh4-0002VO-GQ
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:03:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cYsb6-00013f-8T
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:57:11 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37657)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cYsb6-00013Z-0o
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:57:08 -0500
-Received: by mail-wm0-x234.google.com with SMTP id v77so32291922wmv.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 02:57:07 -0800 (PST)
-References: <20170127103922.19658-1-alex.bennee@linaro.org>
-	<20170127103922.19658-4-alex.bennee@linaro.org>
-	<cfcdb82a-fb1b-f48b-0ba4-963ee465e8b7@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <cfcdb82a-fb1b-f48b-0ba4-963ee465e8b7@twiddle.net>
-Date: Wed, 01 Feb 2017 10:57:06 +0000
-Message-ID: <87fujy41rx.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 03/25] mttcg: Add missing
- tb_lock/unlock() in cpu_exec_step()
+	(envelope-from <thuth@redhat.com>) id 1cYsgz-0002ew-Jq
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:03:18 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed,  1 Feb 2017 12:03:10 +0100
+Message-Id: <1485946990-11090-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/ppc/pnv: Use error_report instead of
+ hw_error if a ROM file can't be found
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +18,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org
 
+hw_error() is for CPU related errors only (it dumps the CPU registers
+and  calls abort()!), so using error_report() is the better choice
+of reporting an error in case we simply did not find a file.
 
-Richard Henderson <rth@twiddle.net> writes:
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/ppc/pnv.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> On 01/27/2017 02:39 AM, Alex Bennée wrote:
->> From: Pranith Kumar <bobby.prani@gmail.com>
->>
->> The recent patch enabling lock assertions uncovered the missing lock
->> acquisition in cpu_exec_step(). This patch adds them.
->>
->> CC: Richard Henderson <rth@twiddle.net>
->> CC: Alex Bennée <alex.bennee@linaro.org>
->> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
->> ---
->>  cpu-exec.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
->
-> (Didn't I give a r-b for v7 on this?)
-
-You did but my tooling dropped the ball recalling this :-/
-
-(I keep tags in an org-mode file which re-writes (foo) to {foo}
-in the subject which was confusing the script looking for un-applied tags).
-
-Anyway done now thanks :-)
-
---
-Alex Bennée
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 83597fe..4fab5c0 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -381,7 +381,7 @@ static void ppc_powernv_init(MachineState *machine)
+ 
+     fw_size = load_image_targphys(fw_filename, FW_LOAD_ADDR, FW_MAX_SIZE);
+     if (fw_size < 0) {
+-        hw_error("qemu: could not load OPAL '%s'\n", fw_filename);
++        error_report("qemu: could not load OPAL '%s'", fw_filename);
+         exit(1);
+     }
+     g_free(fw_filename);
+@@ -393,8 +393,8 @@ static void ppc_powernv_init(MachineState *machine)
+         kernel_size = load_image_targphys(machine->kernel_filename,
+                                           KERNEL_LOAD_ADDR, 0x2000000);
+         if (kernel_size < 0) {
+-            hw_error("qemu: could not load kernel'%s'\n",
+-                     machine->kernel_filename);
++            error_report("qemu: could not load kernel'%s'",
++                         machine->kernel_filename);
+             exit(1);
+         }
+     }
+-- 
+1.8.3.1
