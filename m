@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYtsC-00062J-TB
+	(envelope-from <batuzovk@ispras.ru>) id 1cYtsD-000639-KB
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005dv-2N
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:52 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:46096 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005dq-1G
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:53 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:46121 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005cF-N6
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005d0-MV
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:48 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Wed,  1 Feb 2017 15:18:20 +0300
-Message-Id: <1485951502-28774-19-git-send-email-batuzovk@ispras.ru>
+Date: Wed,  1 Feb 2017 15:18:16 +0300
+Message-Id: <1485951502-28774-15-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
 References: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2 18/20] tcg/i386: add support for
- qemu_ld_v128/qemu_st_v128 ops
+Subject: [Qemu-devel] [PATCH v2 14/20] tcg: do not rely on exact values of
+ MO_BSWAP or MO_SIGN in backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,156 +29,229 @@ Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Pe
 
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- tcg/i386/tcg-target.inc.c | 68 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 61 insertions(+), 7 deletions(-)
+ tcg/aarch64/tcg-target.inc.c |  4 ++--
+ tcg/arm/tcg-target.inc.c     |  4 ++--
+ tcg/i386/tcg-target.inc.c    |  4 ++--
+ tcg/mips/tcg-target.inc.c    |  4 ++--
+ tcg/ppc/tcg-target.inc.c     |  4 ++--
+ tcg/s390/tcg-target.inc.c    |  4 ++--
+ tcg/sparc/tcg-target.inc.c   | 12 ++++++------
+ tcg/tcg-op.c                 |  4 ++--
+ tcg/tcg.h                    |  1 +
+ 9 files changed, 21 insertions(+), 20 deletions(-)
 
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 6d227a5..2b0b548 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -1032,7 +1032,7 @@ static void tcg_out_cltz(TCGContext *s, TCGType ext, TCGReg d,
+ /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+  *                                     TCGMemOpIdx oi, uintptr_t ra)
+  */
+-static void * const qemu_ld_helpers[16] = {
++static void * const qemu_ld_helpers[] = {
+     [MO_UB]   = helper_ret_ldub_mmu,
+     [MO_LEUW] = helper_le_lduw_mmu,
+     [MO_LEUL] = helper_le_ldul_mmu,
+@@ -1046,7 +1046,7 @@ static void * const qemu_ld_helpers[16] = {
+  *                                     uintxx_t val, TCGMemOpIdx oi,
+  *                                     uintptr_t ra)
+  */
+-static void * const qemu_st_helpers[16] = {
++static void * const qemu_st_helpers[] = {
+     [MO_UB]   = helper_ret_stb_mmu,
+     [MO_LEUW] = helper_le_stw_mmu,
+     [MO_LEUL] = helper_le_stl_mmu,
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index e75a6d4..f603f02 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -1058,7 +1058,7 @@ static inline void tcg_out_mb(TCGContext *s, TCGArg a0)
+ /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+  *                                     int mmu_idx, uintptr_t ra)
+  */
+-static void * const qemu_ld_helpers[16] = {
++static void * const qemu_ld_helpers[] = {
+     [MO_UB]   = helper_ret_ldub_mmu,
+     [MO_SB]   = helper_ret_ldsb_mmu,
+ 
+@@ -1078,7 +1078,7 @@ static void * const qemu_ld_helpers[16] = {
+ /* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
+  *                                     uintxx_t val, int mmu_idx, uintptr_t ra)
+  */
+-static void * const qemu_st_helpers[16] = {
++static void * const qemu_st_helpers[] = {
+     [MO_UB]   = helper_ret_stb_mmu,
+     [MO_LEUW] = helper_le_stw_mmu,
+     [MO_LEUL] = helper_le_stl_mmu,
 diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 1e6edc0..4647e97 100644
+index d8f0d81..263c15e 100644
 --- a/tcg/i386/tcg-target.inc.c
 +++ b/tcg/i386/tcg-target.inc.c
-@@ -1342,6 +1342,7 @@ static void * const qemu_ld_helpers[] = {
-     [MO_BEUW] = helper_be_lduw_mmu,
-     [MO_BEUL] = helper_be_ldul_mmu,
-     [MO_BEQ]  = helper_be_ldq_mmu,
-+    [MO_128]  = helper_te_ldv128_mmu,
- };
- 
+@@ -1334,7 +1334,7 @@ static void tcg_out_nopn(TCGContext *s, int n)
+ /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+  *                                     int mmu_idx, uintptr_t ra)
+  */
+-static void * const qemu_ld_helpers[16] = {
++static void * const qemu_ld_helpers[] = {
+     [MO_UB]   = helper_ret_ldub_mmu,
+     [MO_LEUW] = helper_le_lduw_mmu,
+     [MO_LEUL] = helper_le_ldul_mmu,
+@@ -1347,7 +1347,7 @@ static void * const qemu_ld_helpers[16] = {
  /* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
-@@ -1355,6 +1356,7 @@ static void * const qemu_st_helpers[] = {
-     [MO_BEUW] = helper_be_stw_mmu,
-     [MO_BEUL] = helper_be_stl_mmu,
-     [MO_BEQ]  = helper_be_stq_mmu,
-+    [MO_128]  = helper_te_stv128_mmu,
+  *                                     uintxx_t val, int mmu_idx, uintptr_t ra)
+  */
+-static void * const qemu_st_helpers[16] = {
++static void * const qemu_st_helpers[] = {
+     [MO_UB]   = helper_ret_stb_mmu,
+     [MO_LEUW] = helper_le_stw_mmu,
+     [MO_LEUL] = helper_le_stl_mmu,
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+index 01ac7b2..4f2d5d1 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc.c
+@@ -1108,7 +1108,7 @@ static void tcg_out_call(TCGContext *s, tcg_insn_unit *arg)
+ }
+ 
+ #if defined(CONFIG_SOFTMMU)
+-static void * const qemu_ld_helpers[16] = {
++static void * const qemu_ld_helpers[] = {
+     [MO_UB]   = helper_ret_ldub_mmu,
+     [MO_SB]   = helper_ret_ldsb_mmu,
+     [MO_LEUW] = helper_le_lduw_mmu,
+@@ -1125,7 +1125,7 @@ static void * const qemu_ld_helpers[16] = {
+ #endif
  };
  
- /* Perform the TLB load and compare.
-@@ -1521,12 +1523,30 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
-         ofs += 4;
+-static void * const qemu_st_helpers[16] = {
++static void * const qemu_st_helpers[] = {
+     [MO_UB]   = helper_ret_stb_mmu,
+     [MO_LEUW] = helper_le_stw_mmu,
+     [MO_LEUL] = helper_le_stl_mmu,
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 64f67d2..680050b 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -1419,7 +1419,7 @@ static const uint32_t qemu_exts_opc[4] = {
+ /* helper signature: helper_ld_mmu(CPUState *env, target_ulong addr,
+  *                                 int mmu_idx, uintptr_t ra)
+  */
+-static void * const qemu_ld_helpers[16] = {
++static void * const qemu_ld_helpers[] = {
+     [MO_UB]   = helper_ret_ldub_mmu,
+     [MO_LEUW] = helper_le_lduw_mmu,
+     [MO_LEUL] = helper_le_ldul_mmu,
+@@ -1432,7 +1432,7 @@ static void * const qemu_ld_helpers[16] = {
+ /* helper signature: helper_st_mmu(CPUState *env, target_ulong addr,
+  *                                 uintxx_t val, int mmu_idx, uintptr_t ra)
+  */
+-static void * const qemu_st_helpers[16] = {
++static void * const qemu_st_helpers[] = {
+     [MO_UB]   = helper_ret_stb_mmu,
+     [MO_LEUW] = helper_le_stw_mmu,
+     [MO_LEUL] = helper_le_stl_mmu,
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index a679280..ec3491a 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -309,7 +309,7 @@ static const uint8_t tcg_cond_to_ltr_cond[] = {
+ };
  
-         tcg_out_sti(s, TCG_TYPE_PTR, (uintptr_t)l->raddr, TCG_REG_ESP, ofs);
-+
-+        if ((opc & MO_SSIZE) == MO_128) {
-+            ofs += 4;
-+            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
-+            tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+            tcg_out_st(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP, ofs);
-+        }
-     } else {
-         tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[0], TCG_AREG0);
-         /* The second argument is already loaded with addrlo.  */
-         tcg_out_movi(s, TCG_TYPE_I32, tcg_target_call_iarg_regs[2], oi);
-         tcg_out_movi(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[3],
-                      (uintptr_t)l->raddr);
-+        if ((opc & MO_SSIZE) == MO_128) {
-+            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
-+            tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+            if (ARRAY_SIZE(tcg_target_call_iarg_regs) > 4) {
-+                tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[4],
-+                            TCG_REG_EAX);
-+            } else {
-+                tcg_out_st(s, TCG_TYPE_PTR, TCG_REG_EAX,
-+                            TCG_REG_ESP, TCG_TARGET_CALL_STACK_OFFSET);
-+            }
-+        }
+ #ifdef CONFIG_SOFTMMU
+-static void * const qemu_ld_helpers[16] = {
++static void * const qemu_ld_helpers[] = {
+     [MO_UB]   = helper_ret_ldub_mmu,
+     [MO_SB]   = helper_ret_ldsb_mmu,
+     [MO_LEUW] = helper_le_lduw_mmu,
+@@ -324,7 +324,7 @@ static void * const qemu_ld_helpers[16] = {
+     [MO_BEQ]  = helper_be_ldq_mmu,
+ };
+ 
+-static void * const qemu_st_helpers[16] = {
++static void * const qemu_st_helpers[] = {
+     [MO_UB]   = helper_ret_stb_mmu,
+     [MO_LEUW] = helper_le_stw_mmu,
+     [MO_LEUL] = helper_le_stl_mmu,
+diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+index d1f4c0d..1b115d2 100644
+--- a/tcg/sparc/tcg-target.inc.c
++++ b/tcg/sparc/tcg-target.inc.c
+@@ -840,12 +840,12 @@ static void tcg_out_mb(TCGContext *s, TCGArg a0)
+ }
+ 
+ #ifdef CONFIG_SOFTMMU
+-static tcg_insn_unit *qemu_ld_trampoline[16];
+-static tcg_insn_unit *qemu_st_trampoline[16];
++static tcg_insn_unit *qemu_ld_trampoline[MO_ALL];
++static tcg_insn_unit *qemu_st_trampoline[MO_ALL];
+ 
+ static void build_trampolines(TCGContext *s)
+ {
+-    static void * const qemu_ld_helpers[16] = {
++    static void * const qemu_ld_helpers[MO_ALL] = {
+         [MO_UB]   = helper_ret_ldub_mmu,
+         [MO_SB]   = helper_ret_ldsb_mmu,
+         [MO_LEUW] = helper_le_lduw_mmu,
+@@ -857,7 +857,7 @@ static void build_trampolines(TCGContext *s)
+         [MO_BEUL] = helper_be_ldul_mmu,
+         [MO_BEQ]  = helper_be_ldq_mmu,
+     };
+-    static void * const qemu_st_helpers[16] = {
++    static void * const qemu_st_helpers[MO_ALL] = {
+         [MO_UB]   = helper_ret_stb_mmu,
+         [MO_LEUW] = helper_le_stw_mmu,
+         [MO_LEUL] = helper_le_stl_mmu,
+@@ -870,7 +870,7 @@ static void build_trampolines(TCGContext *s)
+     int i;
+     TCGReg ra;
+ 
+-    for (i = 0; i < 16; ++i) {
++    for (i = 0; i < MO_ALL; ++i) {
+         if (qemu_ld_helpers[i] == NULL) {
+             continue;
+         }
+@@ -898,7 +898,7 @@ static void build_trampolines(TCGContext *s)
+         tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_O7, ra);
      }
  
-     tcg_out_call(s, qemu_ld_helpers[opc & (MO_BSWAP | MO_SIZE)]);
-@@ -1562,6 +1582,11 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
-             tcg_out_mov(s, TCG_TYPE_I32, l->datahi_reg, TCG_REG_EDX);
+-    for (i = 0; i < 16; ++i) {
++    for (i = 0; i < MO_ALL; ++i) {
+         if (qemu_st_helpers[i] == NULL) {
+             continue;
          }
-         break;
-+    case MO_128:
-+        tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
-+        tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+        tcg_out_ld(s, TCG_TYPE_V128, l->datalo_reg, TCG_REG_EAX, 0);
-+        break;
-     default:
-         tcg_abort();
-     }
-@@ -1601,12 +1626,20 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
-             ofs += 4;
-         }
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 8a19eee..0dfe611 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -2767,7 +2767,7 @@ typedef void (*gen_atomic_op_i64)(TCGv_i64, TCGv_env, TCGv, TCGv_i64);
+ # define WITH_ATOMIC64(X)
+ #endif
  
--        tcg_out_st(s, TCG_TYPE_I32, l->datalo_reg, TCG_REG_ESP, ofs);
--        ofs += 4;
--
--        if (s_bits == MO_64) {
--            tcg_out_st(s, TCG_TYPE_I32, l->datahi_reg, TCG_REG_ESP, ofs);
-+        if (s_bits == MO_128) {
-+            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
-+            tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+            tcg_out_st(s, TCG_TYPE_V128, l->datalo_reg, TCG_REG_EAX, 0);
-+            tcg_out_st(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP, ofs);
-             ofs += 4;
-+        } else {
-+            tcg_out_st(s, TCG_TYPE_I32, l->datalo_reg, TCG_REG_ESP, ofs);
-+            ofs += 4;
-+
-+            if (s_bits == MO_64) {
-+                tcg_out_st(s, TCG_TYPE_I32, l->datahi_reg, TCG_REG_ESP, ofs);
-+                ofs += 4;
-+            }
-         }
+-static void * const table_cmpxchg[16] = {
++static void * const table_cmpxchg[] = {
+     [MO_8] = gen_helper_atomic_cmpxchgb,
+     [MO_16 | MO_LE] = gen_helper_atomic_cmpxchgw_le,
+     [MO_16 | MO_BE] = gen_helper_atomic_cmpxchgw_be,
+@@ -2985,7 +2985,7 @@ static void do_atomic_op_i64(TCGv_i64 ret, TCGv addr, TCGv_i64 val,
+ }
  
-         tcg_out_sti(s, TCG_TYPE_I32, oi, TCG_REG_ESP, ofs);
-@@ -1618,8 +1651,16 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
-     } else {
-         tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[0], TCG_AREG0);
-         /* The second argument is already loaded with addrlo.  */
--        tcg_out_mov(s, (s_bits == MO_64 ? TCG_TYPE_I64 : TCG_TYPE_I32),
--                    tcg_target_call_iarg_regs[2], l->datalo_reg);
-+        if (s_bits == MO_128) {
-+            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_RAX, TCG_REG_ESP);
-+            tcg_out_addi(s, TCG_REG_RAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+            tcg_out_st(s, TCG_TYPE_V128, l->datalo_reg, TCG_REG_RAX, 0);
-+            tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[2],
-+                        TCG_REG_RAX);
-+        } else {
-+            tcg_out_mov(s, (s_bits == MO_64 ? TCG_TYPE_I64 : TCG_TYPE_I32),
-+                        tcg_target_call_iarg_regs[2], l->datalo_reg);
-+        }
-         tcg_out_movi(s, TCG_TYPE_I32, tcg_target_call_iarg_regs[3], oi);
+ #define GEN_ATOMIC_HELPER(NAME, OP, NEW)                                \
+-static void * const table_##NAME[16] = {                                \
++static void * const table_##NAME[] = {                                  \
+     [MO_8] = gen_helper_atomic_##NAME##b,                               \
+     [MO_16 | MO_LE] = gen_helper_atomic_##NAME##w_le,                   \
+     [MO_16 | MO_BE] = gen_helper_atomic_##NAME##w_be,                   \
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index fd43f15..5e0c6da 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -386,6 +386,7 @@ typedef enum TCGMemOp {
+     MO_TEQ   = MO_TE | MO_Q,
  
-         if (ARRAY_SIZE(tcg_target_call_iarg_regs) > 4) {
-@@ -1751,6 +1792,10 @@ static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
-             }
-         }
-         break;
-+    case MO_128:
-+        tcg_out_modrm_sib_offset(s, OPC_MOVDQU_M2R + seg, datalo,
-+                                 base, index, 0, ofs);
-+        break;
-     default:
-         tcg_abort();
-     }
-@@ -1894,6 +1939,9 @@ static void tcg_out_qemu_st_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
-             tcg_out_modrm_offset(s, movop + seg, datahi, base, ofs+4);
-         }
-         break;
-+    case MO_128:
-+        tcg_out_modrm_offset(s, OPC_MOVDQU_R2M + seg, datalo, base, ofs);
-+        break;
-     default:
-         tcg_abort();
-     }
-@@ -2264,12 +2312,18 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_qemu_ld_i64:
-         tcg_out_qemu_ld(s, args, 1);
-         break;
-+    case INDEX_op_qemu_ld_v128:
-+        tcg_out_qemu_ld(s, args, 0);
-+        break;
-     case INDEX_op_qemu_st_i32:
-         tcg_out_qemu_st(s, args, 0);
-         break;
-     case INDEX_op_qemu_st_i64:
-         tcg_out_qemu_st(s, args, 1);
-         break;
-+    case INDEX_op_qemu_st_v128:
-+        tcg_out_qemu_st(s, args, 0);
-+        break;
+     MO_SSIZE = MO_SIZE | MO_SIGN,
++    MO_ALL   = MO_SIZE | MO_SIGN | MO_BSWAP | MO_AMASK,
+ } TCGMemOp;
  
-     OP_32_64(mulu2):
-         tcg_out_modrm(s, OPC_GRP3_Ev + rexw, EXT3_MUL, args[3]);
+ /**
 -- 
 2.1.4
