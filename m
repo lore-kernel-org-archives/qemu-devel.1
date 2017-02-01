@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cYvoo-00058d-9T
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 09:23:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1cYtVp-0005F6-Lo
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:55:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cYvok-00061C-6G
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 09:23:30 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:1784 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cYvoj-000616-Pu
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 09:23:26 -0500
-References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
-	<20170123121036.4823-24-vsementsov@virtuozzo.com>
-	<6ff8e50e-c6d8-d3b6-f900-3700bbe30dee@redhat.com>
-	<cceeb174-5fae-9012-a430-209d59a0bac7@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b1d67ded-214f-89b1-7a11-1a96942b9b0b@virtuozzo.com>
-Date: Wed, 1 Feb 2017 17:23:11 +0300
+	(envelope-from <bounces@canonical.com>) id 1cYtVm-0007hZ-HC
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:55:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54080)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cYtVm-0007h8-3W
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:55:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cYtVk-0005x2-V0
+	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 11:55:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DFEEA2E80BF
+	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 11:55:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <cceeb174-5fae-9012-a430-209d59a0bac7@virtuozzo.com>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 23/24] qcow2: add
- .bdrv_remove_persistent_dirty_bitmap
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 01 Feb 2017 11:46:49 -0000
+From: Rafael Folco <rfolco@linux.vnet.ibm.com>
+Reply-To: Bug 1660946 <1660946@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170201114649.1137.53576.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1660946] [NEW] [nested] virt-install falls to SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,137 +35,497 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
-01.02.2017 16:57, Vladimir Sementsov-Ogievskiy wrote:
-> 01.02.2017 02:20, Max Reitz wrote:
->> On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
->>> Realize .bdrv_remove_persistent_dirty_bitmap interface.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>   block/qcow2-bitmap.c | 40 ++++++++++++++++++++++++++++++++++++++++
->>>   block/qcow2.c        |  1 +
->>>   block/qcow2.h        |  3 +++
->>>   3 files changed, 44 insertions(+)
->>>
->>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->>> index 2687a3acd5..be026fc80e 100644
->>> --- a/block/qcow2-bitmap.c
->>> +++ b/block/qcow2-bitmap.c
->>> @@ -1064,6 +1064,46 @@ static Qcow2Bitmap 
->>> *find_bitmap_by_name(Qcow2BitmapList *bm_list,
->>>       return NULL;
->>>   }
->>>   +void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
->>> +                                          const char *name,
->>> +                                          Error **errp)
->>> +{
->>> +    int ret;
->>> +    BDRVQcow2State *s = bs->opaque;
->>> +    Qcow2Bitmap *bm;
->>> +    Qcow2BitmapList *bm_list;
->>> +
->>> +    if (s->nb_bitmaps == 0) {
->>> +        /* No bitmaps - nothing to do */
->> Shouldn't it be an error? I.e. "bitmap not found"?
->>
->>> +        return;
->>> +    }
->>> +
->>> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
->>> +                               s->bitmap_directory_size, errp);
->>> +    if (bm_list == NULL) {
->>> +        return;
->>> +    }
->>> +
->>> +    bm = find_bitmap_by_name(bm_list, name);
->>> +    if (bm == NULL) {
->>> +        goto fail;
->> What about setting errp? Or do you not consider this an error?
->>
->> I think it should be an error.
->
-> Hmm. The following scenery should not be an error:
-> 1. qmp create dirty bitmap with persistent = true (bitmap not exists 
-> and not created  in the storage, it will be saved only on storage close)
-> 2. qmp remove dirty bitmap. persistent = true, so we will try to 
-> remove it from storage..
->
-> So, I see following variants:
-> 1. as is, just add comment "remove if exists"
-> 2. add return value to this function, return ENOENT if bitmap not 
-> found and ignore this ENOENT in qmp_remove_bitmap
-> 3. add additional bool field 'exist_in_storage' to BdrvDirtyBitmap.
-
-Also, I can call remove_persistent...() from 
-bdrv_dirty_bitmap_set_persistance( ..., false), and use this function in 
-qmp block-remove-dirty-bitmap
-
->
->>
->>> +    }
->>> +
->>> +    QSIMPLEQ_REMOVE(bm_list, bm, Qcow2Bitmap, entry);
->> bm->name is leaked here.
->>
->> Max
->>
->>> +
->>> +    ret = update_ext_header_and_dir(bs, bm_list);
->>> +    if (ret < 0) {
->>> +        error_setg_errno(errp, -ret, "Failed to update bitmap 
->>> extension");
->>> +        goto fail;
->>> +    }
->>> +
->>> +    free_bitmap_clusters(bs, &bm->table);
->>> +
->>> +fail:
->>> +    bitmap_free(bm);
->>> +    bitmap_list_free(bm_list);
->>> +}
->>> +
->>>   void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, 
->>> Error **errp)
->>>   {
->>>       BdrvDirtyBitmap *bitmap;
->>> diff --git a/block/qcow2.c b/block/qcow2.c
->>> index 76a6a2ba28..f6bac38e51 100644
->>> --- a/block/qcow2.c
->>> +++ b/block/qcow2.c
->>> @@ -3544,6 +3544,7 @@ BlockDriver bdrv_qcow2 = {
->>>       .bdrv_load_autoloading_dirty_bitmaps = 
->>> qcow2_load_autoloading_dirty_bitmaps,
->>>       .bdrv_store_persistent_dirty_bitmaps = 
->>> qcow2_store_persistent_dirty_bitmaps,
->>>       .bdrv_can_store_new_dirty_bitmap = 
->>> qcow2_can_store_new_dirty_bitmap,
->>> +    .bdrv_remove_persistent_dirty_bitmap = 
->>> qcow2_remove_persistent_dirty_bitmap,
->>>   };
->>>     static void bdrv_qcow2_init(void)
->>> diff --git a/block/qcow2.h b/block/qcow2.h
->>> index eaad34a527..a009827f60 100644
->>> --- a/block/qcow2.h
->>> +++ b/block/qcow2.h
->>> @@ -627,5 +627,8 @@ bool 
->>> qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
->>>   int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, 
->>> BdrvCheckResult *res,
->>>                                     void **refcount_table,
->>>                                     int64_t *refcount_table_size);
->>> +void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
->>> +                                          const char *name,
->>> +                                          Error **errp);
->>>     #endif
->>>
->>
->
->
+Public bug reported:
 
 
--- 
-Best regards,
-Vladimir
+[nested] virt-install falls to SLOF: after starting installer (ISO/CDROM), =
+it crashes w/ a kernel panic due to an HTM (Hardware Transactional Memory) =
+exception.
+
+Scenario:
+Host=3DUbuntu 16.04 Xenial (Ubuntu KVM ppc64el POWER8E 8247-22L)
+Guest=3DUbuntu 16.04 Xenial (Ubuntu Xenial Cloud Image QCOW2)
+Nested=3DUbuntu 16.04 Xenial (Ubuntu Xenial Server ISO *or* NetInstall mini=
+.iso)
+
+Inside Guest (1st level), run virt-install as shown below to reproduce
+the bug.
+
+Facts:
+ * ISO images (from both Server or netinstall mini.iso) fail to boot on xen=
+ial/yakkety
+ * Cloud image (xenial/yakkety/zesty) on nested virt boots fine, the login =
+prompt is seen.
+ * Reproducible with Xenial and Yakkety
+ * NOT reproducible with Zesty (Installer menu starts just normally)
+ * virtio-scsi, virtio-net and virtio-blk modules are seen in zesty. Only v=
+irtio-scsi is seen on xenial/yakkety (-net and -blk are built-in modules?)
+ * kvm-pr is loaded for all tested scenarios
+ * This patch[1] rings a bell, however, it doesn't explain how cloud images=
+ boot just fine and don't hit the bug, since the kernel used in the cloud i=
+mages also enable HTM[2].
+
+[1] https://lists.ozlabs.org/pipermail/linuxppc-
+dev/2016-April/141292.html
+
+[2] grep TRANSA /boot/config-4.8.0-26-generic
+CONFIG_PPC_TRANSACTIONAL_MEM=3Dy
+
+
+# cat virt-inst.sh
+virt-install --virt-type=3Dkvm --cpu=3Dhost --name=3Dnested-xenial --contro=
+ller type=3Dscsi,model=3Dvirtio-scsi --graphics none --console pty,target_t=
+ype=3Dserial --disk path=3D/home/nested-xenial.qcow2,size=3D20 --vcpus=3D4 =
+--ram=3D4096 --os-type=3Dlinux --os-variant ubuntu16.04 --network bridge=3D=
+virbr0,model=3Dvirtio --cdrom=3D$1
+
+
+# ./virt-inst.sh ubuntu-16.04-server-ppc64el.iso
+WARNING  CDROM media does not print to the text console by default, so you =
+likely will not see text install output. You might want to use --location. =
+See the man page for examples of using --location with CDROM media
+
+Starting install...
+Creating domain...                                                         =
+                                                                           =
+       |    0 B  00:00:00
+Connected to domain nested-xenial
+Escape character is ^]
+Populating /vdevice methods
+Populating /vdevice/vty@30000000
+Populating /vdevice/nvram@71000000
+Populating /pci@800000020000000
+                     00 2800 (D) : 1af4 1002    unknown-legacy-device*
+                     00 2000 (D) : 1af4 1001    virtio [ block ]
+                     00 1800 (D) : 106b 003f    serial bus [ usb-ohci ]
+                     00 1000 (D) : 1af4 1004    virtio [ scsi ]
+Populating /pci@800000020000000/scsi@2
+       SCSI: Looking for devices
+          100000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
+                     00 0800 (D) : 10ec 8139    network [ ethernet ]
+No NVRAM common partition, re-initializing...
+Scanning USB
+  OHCI: initializing
+Using default console: /vdevice/vty@30000000
+
+  Welcome to Open Firmware
+
+  Copyright (c) 2004, 2011 IBM Corporation All rights reserved.
+  This program and the accompanying materials are made available
+  under the terms of the BSD License available at
+  http://www.opensource.org/licenses/bsd-license.php
+
+
+Trying to load:  from: /pci@800000020000000/scsi@2/disk@100000000000000 ...=
+   Successfully loaded
+
+                     GNU GRUB  version 2.02~beta2-36ubuntu3
+
+ +-------------------------------------------------------------------------=
+---+
+ |*Install                                                                 =
+   |
+ | Rescue mode                                                             =
+   |
+ |                                                                         =
+   |
+ |                                                                         =
+   |
+ |                                                                         =
+   |
+ |                                                                         =
+   |
+ |                                                                         =
+   |
+ |                                                                         =
+   |
+ |                                                                         =
+   |
+ |                                                                         =
+   |
+ |                                                                         =
+   |
+ |                                                                         =
+   |
+ +-------------------------------------------------------------------------=
+---+
+
+      Use the ^ and v keys to select which entry is highlighted.
+      Press enter to boot the selected OS, `e' to edit the commands
+      before booting or `c' for a command-line.
+
+
+OF stdout device is: /vdevice/vty@30000000
+Preparing to boot Linux version 4.4.0-21-generic (buildd@bos01-ppc64el-017)=
+ (gcc version 5.3.1 20160413 (Ubuntu/IBM 5.3.1-14ubuntu2) ) #37-Ubuntu SMP =
+Mon Apr 18 18:30:22 UTC 2016 (Ubuntu 4.4.0-21.37-generic 4.4.6)
+Detected machine type: 0000000000000101
+Max number of cores passed to firmware: 2048 (NR_CPUS =3D 2048)
+Calling ibm,client-architecture-support... done
+command line: BOOT_IMAGE=3D/install/vmlinux tasks=3Dstandard pkgsel/languag=
+e-pack-patterns=3D pkgsel/install-language-support=3Dfalse --- quiet
+memory layout at init:
+  memory_limit : 0000000000000000 (16 MB aligned)
+  alloc_bottom : 0000000004640000
+  alloc_top    : 0000000030000000
+  alloc_top_hi : 0000000100000000
+  rmo_top      : 0000000030000000
+  ram_top      : 0000000100000000
+instantiating rtas at 0x000000002fff0000... done
+prom_hold_cpus: skipped
+copying OF device tree...
+Building dt strings...
+Building dt structure...
+Device tree strings 0x0000000004650000 -> 0x0000000004650a5b
+Device tree struct  0x0000000004660000 -> 0x0000000004670000
+Quiescing Open Firmware ...
+Booting Linux via __start() ...
+ -> smp_release_cpus()
+spinning_secondaries =3D 3
+ <- smp_release_cpus()
+ <- setup_system()
+Linux ppc64le
+#37-Ubuntu SMP M[    2.155665] Facility 'TM' unavailable, exception at 0x3f=
+ff9f3d8644, MSR=3Db00000014280f033
+[    2.161582] Facility 'TM' unavailable, exception at 0x3fff8a488644, MSR=
+=3Db00000014280f033
+[    2.168973] Facility 'TM' unavailable, exception at 0x3fffb2df8644, MSR=
+=3Db00000014280f033
+[    2.174818] Facility 'TM' unavailable, exception at 0x3fff902f8644, MSR=
+=3Db00000014280f033
+[    2.180887] Facility 'TM' unavailable, exception at 0x3fff84728644, MSR=
+=3Db00000014280f033
+[    2.186023] Facility 'TM' unavailable, exception at 0x3fff8f1f8644, MSR=
+=3Db00000014280f033
+[    2.193073] Facility 'TM' unavailable, exception at 0x3fffa8ecfe30, MSR=
+=3Db00000014280f033
+[    2.193697] Kernel panic - not syncing: Attempted to kill init! exitcode=
+=3D0x00000004
+[    2.193697]
+[    2.193751] CPU: 3 PID: 1 Comm: init Not tainted 4.4.0-21-generic #37-Ub=
+untu
+[    2.193788] Call Trace:
+[    2.193826] [c0000000fea83a50] [c000000000aedc1c] dump_stack+0xb0/0xf0 (=
+unreliable)
+[    2.193868] [c0000000fea83a90] [c000000000ae9e50] panic+0x100/0x2c0
+[    2.193914] [c0000000fea83b20] [c0000000000bd474] do_exit+0xc24/0xc30
+[    2.193945] [c0000000fea83be0] [c0000000000bd564] do_group_exit+0x64/0x1=
+00
+[    2.193979] [c0000000fea83c20] [c0000000000ce9cc] get_signal+0x55c/0x7b0
+[    2.194012] [c0000000fea83d10] [c000000000017424] do_signal+0x54/0x2b0
+[    2.194043] [c0000000fea83e00] [c00000000001787c] do_notify_resume+0xbc/=
+0xd0
+[    2.194072] [c0000000fea83e30] [c000000000009838] ret_from_except_lite+0=
+x64/0x68
+
+Domain creation completed.
+Restarting guest.
+Connected to domain nested-xenial
+Escape character is ^]
+Populating /vdevice methods
+Populating /vdevice/vty@30000000
+Populating /vdevice/nvram@71000000
+Populating /pci@800000020000000
+                     00 2800 (D) : 1af4 1002    unknown-legacy-device*
+                     00 2000 (D) : 1af4 1001    virtio [ block ]
+                     00 1800 (D) : 106b 003f    serial bus [ usb-ohci ]
+                     00 1000 (D) : 1af4 1004    virtio [ scsi ]
+Populating /pci@800000020000000/scsi@2
+       SCSI: Looking for devices
+          100000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
+                     00 0800 (D) : 10ec 8139    network [ ethernet ]
+No NVRAM common partition, re-initializing...
+Scanning USB
+  OHCI: initializing
+Using default console: /vdevice/vty@30000000
+
+  Welcome to Open Firmware
+
+  Copyright (c) 2004, 2011 IBM Corporation All rights reserved.
+  This program and the accompanying materials are made available
+  under the terms of the BSD License available at
+  http://www.opensource.org/licenses/bsd-license.php
+
+
+Trying to load:  from: /pci@800000020000000/scsi@4 ...
+E3404: Not a bootable device!
+Trying to load:  from: HALT ...
+E3405: No such device
+
+E3407: Load failed
+
+        ..`. ..     .......  ..           ......      .......
+    ..`...`''.`'. .''``````..''.       .`''```''`.  `''``````
+       .`` .:' ': `''.....  .''.       ''`     .''..''.......
+         ``.':.';. ``````''`.''.      .''.      ''``''`````'`
+         ``.':':`   .....`''.`'`...... `'`.....`''.`'`
+        .`.`'``   .'`'`````.  ``''''''  ``''`'''`. `'`
+  Type 'boot'  and press return  to  continue  booting  the system.
+  Type 'reset-all'  and  press  return  to   reboot   the   system.
+
+
+Ready!
+0 >
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: htm
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1660946
+
+Title:
+  [nested] virt-install falls to SLOF
+
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  [nested] virt-install falls to SLOF: after starting installer (ISO/CDROM)=
+, it crashes w/ a kernel panic due to an HTM (Hardware Transactional Memory=
+) exception.
+
+  Scenario:
+  Host=3DUbuntu 16.04 Xenial (Ubuntu KVM ppc64el POWER8E 8247-22L)
+  Guest=3DUbuntu 16.04 Xenial (Ubuntu Xenial Cloud Image QCOW2)
+  Nested=3DUbuntu 16.04 Xenial (Ubuntu Xenial Server ISO *or* NetInstall mi=
+ni.iso)
+
+  Inside Guest (1st level), run virt-install as shown below to reproduce
+  the bug.
+
+  Facts:
+   * ISO images (from both Server or netinstall mini.iso) fail to boot on x=
+enial/yakkety
+   * Cloud image (xenial/yakkety/zesty) on nested virt boots fine, the logi=
+n prompt is seen.
+   * Reproducible with Xenial and Yakkety
+   * NOT reproducible with Zesty (Installer menu starts just normally)
+   * virtio-scsi, virtio-net and virtio-blk modules are seen in zesty. Only=
+ virtio-scsi is seen on xenial/yakkety (-net and -blk are built-in modules?)
+   * kvm-pr is loaded for all tested scenarios
+   * This patch[1] rings a bell, however, it doesn't explain how cloud imag=
+es boot just fine and don't hit the bug, since the kernel used in the cloud=
+ images also enable HTM[2].
+
+  [1] https://lists.ozlabs.org/pipermail/linuxppc-
+  dev/2016-April/141292.html
+
+  [2] grep TRANSA /boot/config-4.8.0-26-generic
+  CONFIG_PPC_TRANSACTIONAL_MEM=3Dy
+
+  =
+
+  # cat virt-inst.sh
+  virt-install --virt-type=3Dkvm --cpu=3Dhost --name=3Dnested-xenial --cont=
+roller type=3Dscsi,model=3Dvirtio-scsi --graphics none --console pty,target=
+_type=3Dserial --disk path=3D/home/nested-xenial.qcow2,size=3D20 --vcpus=3D=
+4 --ram=3D4096 --os-type=3Dlinux --os-variant ubuntu16.04 --network bridge=
+=3Dvirbr0,model=3Dvirtio --cdrom=3D$1
+
+  =
+
+  # ./virt-inst.sh ubuntu-16.04-server-ppc64el.iso
+  WARNING  CDROM media does not print to the text console by default, so yo=
+u likely will not see text install output. You might want to use --location=
+. See the man page for examples of using --location with CDROM media
+
+  Starting install...
+  Creating domain...                                                       =
+                                                                           =
+         |    0 B  00:00:00
+  Connected to domain nested-xenial
+  Escape character is ^]
+  Populating /vdevice methods
+  Populating /vdevice/vty@30000000
+  Populating /vdevice/nvram@71000000
+  Populating /pci@800000020000000
+                       00 2800 (D) : 1af4 1002    unknown-legacy-device*
+                       00 2000 (D) : 1af4 1001    virtio [ block ]
+                       00 1800 (D) : 106b 003f    serial bus [ usb-ohci ]
+                       00 1000 (D) : 1af4 1004    virtio [ scsi ]
+  Populating /pci@800000020000000/scsi@2
+         SCSI: Looking for devices
+            100000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
+                       00 0800 (D) : 10ec 8139    network [ ethernet ]
+  No NVRAM common partition, re-initializing...
+  Scanning USB
+    OHCI: initializing
+  Using default console: /vdevice/vty@30000000
+
+    Welcome to Open Firmware
+
+    Copyright (c) 2004, 2011 IBM Corporation All rights reserved.
+    This program and the accompanying materials are made available
+    under the terms of the BSD License available at
+    http://www.opensource.org/licenses/bsd-license.php
+
+  =
+
+  Trying to load:  from: /pci@800000020000000/scsi@2/disk@100000000000000 .=
+..   Successfully loaded
+
+                       GNU GRUB  version 2.02~beta2-36ubuntu3
+
+   +-----------------------------------------------------------------------=
+-----+
+   |*Install                                                               =
+     |
+   | Rescue mode                                                           =
+     |
+   |                                                                       =
+     |
+   |                                                                       =
+     |
+   |                                                                       =
+     |
+   |                                                                       =
+     |
+   |                                                                       =
+     |
+   |                                                                       =
+     |
+   |                                                                       =
+     |
+   |                                                                       =
+     |
+   |                                                                       =
+     |
+   |                                                                       =
+     |
+   +-----------------------------------------------------------------------=
+-----+
+
+        Use the ^ and v keys to select which entry is highlighted.
+        Press enter to boot the selected OS, `e' to edit the commands
+        before booting or `c' for a command-line.
+
+  =
+
+  OF stdout device is: /vdevice/vty@30000000
+  Preparing to boot Linux version 4.4.0-21-generic (buildd@bos01-ppc64el-01=
+7) (gcc version 5.3.1 20160413 (Ubuntu/IBM 5.3.1-14ubuntu2) ) #37-Ubuntu SM=
+P Mon Apr 18 18:30:22 UTC 2016 (Ubuntu 4.4.0-21.37-generic 4.4.6)
+  Detected machine type: 0000000000000101
+  Max number of cores passed to firmware: 2048 (NR_CPUS =3D 2048)
+  Calling ibm,client-architecture-support... done
+  command line: BOOT_IMAGE=3D/install/vmlinux tasks=3Dstandard pkgsel/langu=
+age-pack-patterns=3D pkgsel/install-language-support=3Dfalse --- quiet
+  memory layout at init:
+    memory_limit : 0000000000000000 (16 MB aligned)
+    alloc_bottom : 0000000004640000
+    alloc_top    : 0000000030000000
+    alloc_top_hi : 0000000100000000
+    rmo_top      : 0000000030000000
+    ram_top      : 0000000100000000
+  instantiating rtas at 0x000000002fff0000... done
+  prom_hold_cpus: skipped
+  copying OF device tree...
+  Building dt strings...
+  Building dt structure...
+  Device tree strings 0x0000000004650000 -> 0x0000000004650a5b
+  Device tree struct  0x0000000004660000 -> 0x0000000004670000
+  Quiescing Open Firmware ...
+  Booting Linux via __start() ...
+   -> smp_release_cpus()
+  spinning_secondaries =3D 3
+   <- smp_release_cpus()
+   <- setup_system()
+  Linux ppc64le
+  #37-Ubuntu SMP M[    2.155665] Facility 'TM' unavailable, exception at 0x=
+3fff9f3d8644, MSR=3Db00000014280f033
+  [    2.161582] Facility 'TM' unavailable, exception at 0x3fff8a488644, MS=
+R=3Db00000014280f033
+  [    2.168973] Facility 'TM' unavailable, exception at 0x3fffb2df8644, MS=
+R=3Db00000014280f033
+  [    2.174818] Facility 'TM' unavailable, exception at 0x3fff902f8644, MS=
+R=3Db00000014280f033
+  [    2.180887] Facility 'TM' unavailable, exception at 0x3fff84728644, MS=
+R=3Db00000014280f033
+  [    2.186023] Facility 'TM' unavailable, exception at 0x3fff8f1f8644, MS=
+R=3Db00000014280f033
+  [    2.193073] Facility 'TM' unavailable, exception at 0x3fffa8ecfe30, MS=
+R=3Db00000014280f033
+  [    2.193697] Kernel panic - not syncing: Attempted to kill init! exitco=
+de=3D0x00000004
+  [    2.193697]
+  [    2.193751] CPU: 3 PID: 1 Comm: init Not tainted 4.4.0-21-generic #37-=
+Ubuntu
+  [    2.193788] Call Trace:
+  [    2.193826] [c0000000fea83a50] [c000000000aedc1c] dump_stack+0xb0/0xf0=
+ (unreliable)
+  [    2.193868] [c0000000fea83a90] [c000000000ae9e50] panic+0x100/0x2c0
+  [    2.193914] [c0000000fea83b20] [c0000000000bd474] do_exit+0xc24/0xc30
+  [    2.193945] [c0000000fea83be0] [c0000000000bd564] do_group_exit+0x64/0=
+x100
+  [    2.193979] [c0000000fea83c20] [c0000000000ce9cc] get_signal+0x55c/0x7=
+b0
+  [    2.194012] [c0000000fea83d10] [c000000000017424] do_signal+0x54/0x2b0
+  [    2.194043] [c0000000fea83e00] [c00000000001787c] do_notify_resume+0xb=
+c/0xd0
+  [    2.194072] [c0000000fea83e30] [c000000000009838] ret_from_except_lite=
++0x64/0x68
+
+  Domain creation completed.
+  Restarting guest.
+  Connected to domain nested-xenial
+  Escape character is ^]
+  Populating /vdevice methods
+  Populating /vdevice/vty@30000000
+  Populating /vdevice/nvram@71000000
+  Populating /pci@800000020000000
+                       00 2800 (D) : 1af4 1002    unknown-legacy-device*
+                       00 2000 (D) : 1af4 1001    virtio [ block ]
+                       00 1800 (D) : 106b 003f    serial bus [ usb-ohci ]
+                       00 1000 (D) : 1af4 1004    virtio [ scsi ]
+  Populating /pci@800000020000000/scsi@2
+         SCSI: Looking for devices
+            100000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
+                       00 0800 (D) : 10ec 8139    network [ ethernet ]
+  No NVRAM common partition, re-initializing...
+  Scanning USB
+    OHCI: initializing
+  Using default console: /vdevice/vty@30000000
+
+    Welcome to Open Firmware
+
+    Copyright (c) 2004, 2011 IBM Corporation All rights reserved.
+    This program and the accompanying materials are made available
+    under the terms of the BSD License available at
+    http://www.opensource.org/licenses/bsd-license.php
+
+  =
+
+  Trying to load:  from: /pci@800000020000000/scsi@4 ...
+  E3404: Not a bootable device!
+  Trying to load:  from: HALT ...
+  E3405: No such device
+
+  E3407: Load failed
+
+          ..`. ..     .......  ..           ......      .......
+      ..`...`''.`'. .''``````..''.       .`''```''`.  `''``````
+         .`` .:' ': `''.....  .''.       ''`     .''..''.......
+           ``.':.';. ``````''`.''.      .''.      ''``''`````'`
+           ``.':':`   .....`''.`'`...... `'`.....`''.`'`
+          .`.`'``   .'`'`````.  ``''''''  ``''`'''`. `'`
+    Type 'boot'  and press return  to  continue  booting  the system.
+    Type 'reset-all'  and  press  return  to   reboot   the   system.
+
+  =
+
+  Ready!
+  0 >
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1660946/+subscriptions
