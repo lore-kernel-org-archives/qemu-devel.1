@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZ1P8-00011M-7B
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 15:21:23 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cZ1Sh-0002oW-IM
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 15:25:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZ1P5-0007qs-F7
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 15:21:20 -0500
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:34966)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cZ1Sc-0001Hy-L7
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 15:25:03 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33601)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZ1P5-0007qY-9r
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 15:21:19 -0500
-Received: by mail-ua0-x22d.google.com with SMTP id y9so306518462uae.2
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 12:21:19 -0800 (PST)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cZ1Sc-0001Hd-Fo
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 15:24:58 -0500
+Received: by mail-pf0-x244.google.com with SMTP id e4so32471265pfg.0
+	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 12:24:58 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
+	<20170201102013.GC3232@redhat.com>
+	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
+	<20170201110320.GD3232@redhat.com>
+	<CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
+	<15e45a8d-852e-97da-65c5-3f69258dd59b@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5554a4fb-c7e7-aa36-ea82-32931233f56f@redhat.com>
+Date: Wed, 1 Feb 2017 12:24:53 -0800
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1702011134020.17946@sstabellini-ThinkPad-X260>
-References: <20170201065202.7746-1-jgross@suse.com>
-	<alpine.DEB.2.10.1702011134020.17946@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 1 Feb 2017 20:20:57 +0000
-Message-ID: <CAFEAcA_ZxP8iq-vcuBHUzVa7EmjCtqyZ6t8Meu1ypyusnJYACA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] xen: use qdev_unplug() instead of
- g_free() in xen_pv_find_xendev()
+In-Reply-To: <15e45a8d-852e-97da-65c5-3f69258dd59b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +35,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, xen-devel@lists.xenproject.org, Anthony PERARD <anthony.perard@citrix.com>, Gerd Hoffmann <kraxel@redhat.com>, Juergen Gross <jgross@suse.com>
+To: Eric Blake <eblake@redhat.com>, Ladi Prosek <lprosek@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
 
-On 1 February 2017 at 19:37, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> Hi Peter,
->
-> do you think this is acceptable?
 
-The set of operations here is basically what I suggested
-in review of v1, so I think it is the right thing.
-OTOH this is a bit of an odd corner of the QOM model
-so it might be worth doing some testing to make sure
-the reference counts are doing what you (I) expect and
-that the object does get correctly freed both in the
-error-handling path here and when the device is
-unplugged via xen_pv_del_xendev().
 
-thanks
--- PMM
+On 01/02/2017 06:43, Eric Blake wrote:
+>>> It would be possible to design a ioctl API that is more usable if you
+>>> didn't try to do generic passthrough of arbitrary ioctl commands. Instead
+>>> provide a QAPI schema that uses a union to provide strongly typed arguments
+>>> for the ioctl commands you care about using. Or completely separate QAPI
+>>> commands instead of multiplexing everything into an ioctl command.
+>>
+>> I can add a QAPI command for my specific use case if it's acceptable,
+> 
+> Certainly more palatable, and more likely to gain my acceptance.
+> 
+>> that's not a problem. Although at that point I would probably just go
+>> back to my plan b and use regular file I/O and guest-file-read. I just
+>> wanted to be as generic as possible to benefit other use cases as well
+>> and I ended up with what's basically my stab at RPC ioctl.
+> 
+> The problem is that RPC ioctl is not sanely possible.
+
+Windows ioctl (DeviceIoControl) is a little different from POSIX ioctl,
+more RPC and less one-size-fits-all bucket for syscallish stuff.  It is
+still a leaky abstraction though.
+
+Paolo
