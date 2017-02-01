@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYrU5-0004zO-Lm
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:45:50 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cYra5-0007qE-Px
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:52:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYrU2-0006iW-GQ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:45:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cYrU2-0006iM-AJ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:45:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cYrU0-0006rQ-US
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 09:45:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E3F102E80C4
-	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 09:45:44 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1cYra4-00005G-Vp
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 04:52:01 -0500
+References: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
+	<20170122142959.GA12419@lemon.Home>
+	<ff2fd02a-09ea-a28f-eb6e-e1858efff552@redhat.com>
+	<20170124120957.GC13714@lemon.Home>
+	<e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
+	<b57d8de7-394d-5446-8d5b-ea4e0ec85cc3@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c5c3cb7e-0e89-f9b4-468a-ba2a4cf0fc20@redhat.com>
+Date: Wed, 1 Feb 2017 04:51:50 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Feb 2017 09:30:07 -0000
-From: Thomas Huth <1207228@bugs.launchpad.net>
-Reply-To: Bug 1207228 <1207228@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130801084204.30116.68647.malonedeb@soybean.canonical.com>
-Message-Id: <20170201093007.26559.24387.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1207228] Re: Qemu (trunk code) crashes when using
- --soundhw all option in ioport.c
+In-Reply-To: <b57d8de7-394d-5446-8d5b-ea4e0ec85cc3@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/3] scsi-generic and
+ BLKSECTGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kwolf@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Please always specify the exact version (git commit ID) that you are
-using... can you still reproduce this issue with the latest version of
-QEMU?
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
 
--- =
+On 01/31/2017 06:47 PM, Max Reitz wrote:
+> On 31.01.2017 12:37, John Snow wrote:
+>>
+>>
+>> On 01/24/2017 07:09 AM, Fam Zheng wrote:
+>>> On Tue, 01/24 12:23, Paolo Bonzini wrote:
+>>>>
+>>>>
+>>>> On 22/01/2017 15:29, Fam Zheng wrote:
+>>>>> On Fri, 01/20 17:25, Eric Farman wrote:
+>>>>>> Changes:
+>>>>>>  v2->v3:
+>>>>>>   - Move byte/sector conversions to patch 2 [Fam Zheng]
+>>>>>>   - Rename "max_sectors" when holding a byte value [Fam Zheng]
+>>>>>>  v1->v2:
+>>>>>>   - Patch 3, make hdev_get_max_transfer_length return bytes [Fam Zheng]
+>>>>>
+>>>>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>>>>
+>>>> Looks good, who's merging this? :)
+>>>
+>>> All I know is not me :) Adding Kevin and Max who maintain block/file-posix.c.
+>>>
+>>> Fam
+>>>
+>>
+>> Kevin's traveling for DevConf.cz, so how about Max? :)
+> 
+> Did Kevin tell you to write that? If so, tell him he's got to merge all
+> of my patches once he's back. :-P
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1207228
+He didn't, and I am unaware of whatever your current arrangements are!
 
-Title:
-  Qemu (trunk code) crashes when using --soundhw all option in ioport.c
+> Ooooh, I see, he's trying to get me to merge so many patches I'll have
+> to send my own pull request. Cleverrr. Verrry clever. ;-)
+> 
+> Max
+> 
 
-Status in QEMU:
-  Incomplete
+I guess you two will sort it out between yourselves...
 
-Bug description:
-  After not building qemu (git version) for about 3 weeks, I've done it
-  again this morning.
-
-  With up-to-date trunk code, I got this error on start, when using
-  --soundhw all option
-
-  $ qemu-system-i386 -soundhw all
-  qemu-system-i386: /home/fred/T=C3=A9l=C3=A9chargements/logs/qemu-git/src/=
-qemu/ioport.c:240: portio_list_add: Assertion `pio->offset >=3D off_last' f=
-ailed.
-  Abandon (core dumped)
-
-  And if I use only soundhw with one or more options, it doesn't crash.
-
-  Tell me what you'll need to fix this bug.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1207228/+subscriptions
+--js
