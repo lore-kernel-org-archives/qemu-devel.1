@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYvDc-0006Lb-3k
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:45:06 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cYvDi-0006SR-36
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:45:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYvDb-0004k7-6V
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:45:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32966)
+	(envelope-from <stefanha@redhat.com>) id 1cYvDh-0004oS-5T
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:45:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47902)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cYvDb-0004jw-0i
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:45:03 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cYvDg-0004nE-Ty
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:45:09 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  1 Feb 2017 13:44:47 +0000
-Message-Id: <20170201134453.11963-5-stefanha@redhat.com>
+Date: Wed,  1 Feb 2017 13:44:50 +0000
+Message-Id: <20170201134453.11963-8-stefanha@redhat.com>
 In-Reply-To: <20170201134453.11963-1-stefanha@redhat.com>
 References: <20170201134453.11963-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 04/10] trace: move hw/i386/xen events to correct
- subdir
+Subject: [Qemu-devel] [PULL 07/10] trace: update docs to reflect new code
+ generation approach
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,88 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@red
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The trace-events for a given source file should generally
-always live in the same directory as the source file.
+Describe use of per-subdir trace events files and how it impacts
+code generation.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170125161417.31949-5-berrange@redhat.com
+Message-id: 20170125161417.31949-8-berrange@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- Makefile.objs            | 1 +
- hw/i386/trace-events     | 7 -------
- hw/i386/xen/trace-events | 6 ++++++
- 3 files changed, 7 insertions(+), 7 deletions(-)
- create mode 100644 hw/i386/xen/trace-events
+ docs/tracing.txt | 51 ++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 42 insertions(+), 9 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 9ac11e7..6abe0b9 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -144,6 +144,7 @@ trace-events-y += hw/sd/trace-events
- trace-events-y += hw/isa/trace-events
- trace-events-y += hw/mem/trace-events
- trace-events-y += hw/i386/trace-events
-+trace-events-y += hw/i386/xen/trace-events
- trace-events-y += hw/9pfs/trace-events
- trace-events-y += hw/ppc/trace-events
- trace-events-y += hw/pci/trace-events
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index d2b4973..a3568ee 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -1,12 +1,5 @@
- # See docs/tracing.txt for syntax documentation.
+diff --git a/docs/tracing.txt b/docs/tracing.txt
+index f351998a..e14bb6d 100644
+--- a/docs/tracing.txt
++++ b/docs/tracing.txt
+@@ -27,18 +27,44 @@ for debugging, profiling, and observing execution.
  
--# hw/i386/xen/xen_platform.c
--xen_platform_log(char *s) "xen platform: %s"
--
--# hw/i386/xen/xen_pvdevice.c
--xen_pv_mmio_read(uint64_t addr) "WARNING: read from Xen PV Device MMIO space (address %"PRIx64")"
--xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (address %"PRIx64")"
--
- # hw/i386/x86-iommu.c
- x86_iommu_iec_notify(bool global, uint32_t index, uint32_t mask) "Notify IEC invalidation: global=%d index=%" PRIu32 " mask=%" PRIu32
+ == Trace events ==
  
-diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
-new file mode 100644
-index 0000000..321fe60
---- /dev/null
-+++ b/hw/i386/xen/trace-events
-@@ -0,0 +1,6 @@
-+# hw/i386/xen/xen_platform.c
-+xen_platform_log(char *s) "xen platform: %s"
++=== Sub-directory setup ===
 +
-+# hw/i386/xen/xen_pvdevice.c
-+xen_pv_mmio_read(uint64_t addr) "WARNING: read from Xen PV Device MMIO space (address %"PRIx64")"
-+xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (address %"PRIx64")"
+ Each directory in the source tree can declare a set of static trace events
+-in a "trace-events" file. Each trace event declaration names the event, its
+-arguments, and the format string which can be used for pretty-printing:
++in a local "trace-events" file. All directories which contain "trace-events"
++files must be listed in the "trace-events-subdirs" make variable in the top
++level Makefile.objs. During build, the "trace-events" file in each listed
++subdirectory will be processed by the "tracetool" script to generate code for
++the trace events.
+ 
+-    qemu_vmalloc(size_t size, void *ptr) "size %zu ptr %p"
+-    qemu_vfree(void *ptr) "ptr %p"
++The individual "trace-events" files are merged into a "trace-events-all" file,
++which is also installed into "/usr/share/qemu" with the name "trace-events".
++This merged file is to be used by the "simpletrace.py" script to later analyse
++traces in the simpletrace data format.
+ 
+-All "trace-events" files must be listed in the "trace-event-y" make variable
+-in the top level Makefile.objs. During build the individual files are combined
+-to create a "trace-events-all" file, which is processed by the "tracetool"
+-script during build to generate code for the trace events. The
+-"trace-events-all" file is also installed into "/usr/share/qemu".
++In the sub-directory the following files will be automatically generated
++
++ - trace.c - the trace event state declarations
++ - trace.h - the trace event enums and probe functions
++ - trace-dtrace.h - DTrace event probe specification
++ - trace-dtrace.dtrace - DTrace event probe helper declaration
++ - trace-dtrace.o - binary DTrace provider (generated by dtrace)
++ - trace-ust.h - UST event probe helper declarations
++
++Source files in the sub-directory should #include the local 'trace.h' file,
++without any sub-directory path prefix. eg io/channel-buffer.c would do
++
++  #include "trace.h"
++
++To access the 'io/trace.h' file. While it is possible to include a trace.h
++file from outside a source files' own sub-directory, this is discouraged in
++general. It is strongly preferred that all events be declared directly in
++the sub-directory that uses them. The only exception is where there are some
++shared trace events defined in the top level directory trace-events file.
++The top level directory generates trace files with a filename prefix of
++"trace-root" instead of just "trace". This is to avoid ambiguity between
++a trace.h in the current directory, vs the top level directory.
++
++=== Using trace events ===
+ 
+ Trace events are invoked directly from source code like this:
+ 
+@@ -83,6 +109,13 @@ Format strings should reflect the types defined in the trace event.  Take
+ special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
+ respectively.  This ensures portability between 32- and 64-bit platforms.
+ 
++Each event declaration will start with the event name, then its arguments,
++finally a format string for pretty-printing. For example:
++
++    qemu_vmalloc(size_t size, void *ptr) "size %zu ptr %p"
++    qemu_vfree(void *ptr) "ptr %p"
++
++
+ === Hints for adding new trace events ===
+ 
+ 1. Trace state changes in the code.  Interesting points in the code usually
 -- 
 2.9.3
