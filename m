@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYv0B-0007DN-VU
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:31:18 -0500
+	(envelope-from <lprosek@redhat.com>) id 1cYv9m-0004Oh-V9
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:41:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cYv0A-0001BJ-OJ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:31:11 -0500
-Date: Wed, 1 Feb 2017 13:31:00 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170201133100.GA11677@stefanha-x1.localdomain>
-References: <20170131112308.54189-1-vsementsov@virtuozzo.com>
+	(envelope-from <lprosek@redhat.com>) id 1cYv9j-0003ve-MD
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:41:06 -0500
+Received: from mail-ua0-f175.google.com ([209.85.217.175]:35192)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cYv9j-0003va-G2
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:41:03 -0500
+Received: by mail-ua0-f175.google.com with SMTP id y9so297703415uae.2
+	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 05:41:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="W/nzBZO5zC0uMSeA"
-Content-Disposition: inline
-In-Reply-To: <20170131112308.54189-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] block: bdrv_invalidate_cache: invalidate
- children first
+In-Reply-To: <20170201110320.GD3232@redhat.com>
+References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
+	<20170201102013.GC3232@redhat.com>
+	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
+	<20170201110320.GD3232@redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Wed, 1 Feb 2017 14:41:01 +0100
+Message-ID: <CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +30,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
 
+On Wed, Feb 1, 2017 at 12:03 PM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Wed, Feb 01, 2017 at 11:50:43AM +0100, Ladi Prosek wrote:
+>> On Wed, Feb 1, 2017 at 11:20 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+>> > On Wed, Feb 01, 2017 at 11:06:46AM +0100, Ladi Prosek wrote:
+>> >> Analogous to guest-file-read and guest-file-write, this commit adds
+>> >> support for issuing IOCTLs to files in the guest. With the goal of
+>> >> abstracting away the differences between Posix ioctl() and Win32
+>> >> DeviceIoControl() to provide one unified API, the schema distinguishes
+>> >> between input and output buffer sizes (as required by Win32) and
+>> >> allows the caller to supply either a 'buffer', pointer to which will
+>> >> be passed to the Posix ioctl(), or an integer argument, passed to
+>> >> ioctl() directly.
+>> >
+>> > What is the intended usage scenario for this ?
+>>
+>> My specific case is extracting a piece of data from Windows guests.
+>> Guest driver exposes a file object with a well-known IOCTL code to
+>> return a data structure from the kernel.
+>
+> Please provide more information about what you're trying to do.
+>
+> If we can understand the full details it might suggest a different
+> approach that exposing a generic ioctl passthrough facility.
 
---W/nzBZO5zC0uMSeA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The end goal is to be able to create a Window crash dump file from a
+running (or crashed, but running is more interesting because Windows
+can't do that by itself) Windows VM. To do that without resorting to
+hacks, the host application driving this needs to get the crash dump
+header, which Windows provides in its KeInitializeCrashDumpHeader
+kernel API.
 
-On Tue, Jan 31, 2017 at 02:23:08PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Current implementation invalidates firstly parent bds and then its
-> children. This leads to the following bug:
->=20
-> after incoming migration, in bdrv_invalidate_cache_all:
-> 1. invalidate parent bds - reopen it with BDRV_O_INACTIVE cleared
-> 2. child is not yet invalidated
-> 3. parent check that its BDRV_O_INACTIVE is cleared
-> 4. parent writes to child
-> 5. assert in bdrv_co_pwritev, as BDRV_O_INACTIVE is set for child
->=20
-> This patch fixes it by just changing invalidate sequence: invalidate
-> children first.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->=20
-> v2: I've missed that bdrv_invalidate_cache is already recursive, so we
-> can change sequence here. Also v1 doesn't cover the case when
-> bdrv_invalidate_cache is called not from bdrv_invalidate_cache_all.
->=20
->  block.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
+I believe that the most natural way to do this is to have
+1) a driver installed in the guest providing a way to call
+KeInitializeCrashDumpHeader from user space
+2) an agent in the guest, running in user space, calling the driver
+and passing the result back to the host
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Now 2) may as well be an existing agent, such as the QEMU guest agent,
+and that's why I am here :)
 
---W/nzBZO5zC0uMSeA
-Content-Type: application/pgp-signature; name="signature.asc"
+KeInitializeCrashDumpHeader returns an opaque byte array, happens to
+be 8192 bytes at the moment. My first choice for the kernel-user
+interface in the guest is IOCTL because what I'm trying to get across
+is a block, a "datagram", not a stream, and I have the option for
+easily adding more functionality later by adding more IOCTL codes with
+the file object still representing "the driver".
 
------BEGIN PGP SIGNATURE-----
+I could use regular file I/O as well. I would either have to devise a
+protocol for talking to the driver, have a way of delimiting messages,
+re-syncing the channel etc., or make a slight semantic shift and
+instead of the file object representing the driver, it would represent
+this one particular function of the driver. Opening the file and
+reading from it until eof would yield the crash dump header.
 
-iQEcBAEBAgAGBQJYkeMUAAoJEJykq7OBq3PISm4H/AxHGMItHqfWU2SG1TpoSt6D
-n/2x4w2flveCY5ZEpZ8iM2AcFvCDhY9shpN89e/9Cs5t7mGPV+bv6prOTKF0HbRO
-MJ1eQPJg09kItntQRlRCWaZHSrBxCFltN4al1vLEbckWIn4grTe5ughuFK+mZ/3n
-8IeWEQAKEVL37sex4BefPeq3OkCkCnnjxc8Bw+Nr9hQTlnf6WXMTCvVzpGRoa7+q
-jriHSS5VLNry0fWf7ev4YWKCADpSS1u+0KjqOnXKhJinqAnUVnWWR6e/ed8S5JqI
-sfw6+ERy0ZtMmcwho1ICupvZ4V79wa4iEkyJCfNGoIRDIuUzmgdyYReO7NmS0eo=
-=oDQl
------END PGP SIGNATURE-----
+>> > The size of arguments that need to be provided to ioctl()s vary on
+>> > the architecture of the guest kernel that's running, which cannot be
+>> > assumed to be the same as the architecture of the QEMU binary. ie
+>> > you can be running i686 kernel in an x86_64 QEMU.  So it feels like
+>> > it is going to be hard for applications to reliably use this feature
+>> > unless they have more information about the guest OS, that is not
+>> > currently provided by QEMU guest agent. So it feels like this design
+>> > is not likely to be satisfactory to me.
+>>
+>> I can turn this around and say that guest-file-read and
+>> guest-file-write shouldn't exist because applications can't reliably
+>> know what the format of files on the guest is.
+>
+> No that's not the same thing at all. From the POV of the QEMU API, the
+> contents of the files do not matter - it is just a byte stream and the
+> guest agent API lets you read it in the same way no matter what is in
+> the files, or what OS is running. There's no need to know anything about
+> the guest OS in order to successfully read/write the entire file.
 
---W/nzBZO5zC0uMSeA--
+Ok, so there are two different aspects that should probably be
+separated. The actual semantics of IOCTL calls is equivalent to the
+semantics of files in general. For files it's stream in, stream out
+(and seeking and such). For IOCTL it's a buffer in, buffer out (and a
+return code). The content is file specific, IOCTL code specific,
+whatever. Definitely not guest agent's business to interpret it. Here
+I think my analogy holds.
+
+> The ioctl design you've proposed here is different because you need to
+> know precise operating system details before you can use the API. I
+> think that's really flawed.
+
+Yes, maybe. Maybe the concept of the IOCTL syscall is just too
+different across the guest operating systems supported by the agent. I
+tried to abstract away the differences between Posix and Windows.
+Perhaps I didn't do it right or there's more OSes to worry about. Yes,
+in theory the data passed to or from IOCTL may contain pointers and
+not be easily remotable. But it's not common. Files can also be opened
+with all kinds of obscure flags on different OSes, many of which are
+not supported by guest-file-open.
+
+> It would be possible to design a ioctl API that is more usable if you
+> didn't try to do generic passthrough of arbitrary ioctl commands. Instead
+> provide a QAPI schema that uses a union to provide strongly typed arguments
+> for the ioctl commands you care about using. Or completely separate QAPI
+> commands instead of multiplexing everything into an ioctl command.
+
+I can add a QAPI command for my specific use case if it's acceptable,
+that's not a problem. Although at that point I would probably just go
+back to my plan b and use regular file I/O and guest-file-read. I just
+wanted to be as generic as possible to benefit other use cases as well
+and I ended up with what's basically my stab at RPC ioctl.
+
+> Regards,
+> Daniel
+> --
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.org :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
