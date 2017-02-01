@@ -1,15 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cYuBc-0000Nx-PB
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:38:58 -0500
+	(envelope-from <berrange@redhat.com>) id 1cYuD4-0001dt-To
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:40:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cYuBY-0002rZ-RW
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:38:56 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  1 Feb 2017 14:38:28 +0200
-Message-Id: <20170201123828.4815-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2] qcow2: Optimize the refcount-block overlap
- check
+	(envelope-from <berrange@redhat.com>) id 1cYuD3-0003TX-MC
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:40:26 -0500
+Date: Wed, 1 Feb 2017 12:40:14 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170201124014.GH3232@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170126110435.2777-1-berrange@redhat.com>
+	<20170126110435.2777-4-berrange@redhat.com>
+	<20170126123530.GB23095@lemon.Home>
+	<20170126132708.GB29127@redhat.com>
+	<6a9aeec8-d4ee-a0aa-7e04-0ee4295fef80@redhat.com>
+	<8a13c995-c094-2704-c770-214132b2d6cf@redhat.com>
+	<20170201121658.GF3232@redhat.com>
+	<c4d38998-b862-90e6-6c4b-4b96a8d17bb4@redhat.com>
+	<20170201122854.GG3232@redhat.com>
+	<37f445c0-c174-bca4-7073-7aa6c64046b0@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <37f445c0-c174-bca4-7073-7aa6c64046b0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] qemu-img: add support for -n arg to
+ dd command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,147 +33,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-The metadata overlap checks introduced in a40f1c2add help detect
-corruption in the qcow2 image by verifying that data writes don't
-overlap with existing metadata sections.
+On Wed, Feb 01, 2017 at 01:31:01PM +0100, Max Reitz wrote:
+> On 01.02.2017 13:28, Daniel P. Berrange wrote:
+> > On Wed, Feb 01, 2017 at 01:23:54PM +0100, Max Reitz wrote:
+> >> On 01.02.2017 13:16, Daniel P. Berrange wrote:
+> >>> On Wed, Feb 01, 2017 at 01:13:39PM +0100, Max Reitz wrote:
+> >>>> On 30.01.2017 19:37, Eric Blake wrote:
+> >>>>> On 01/26/2017 07:27 AM, Daniel P. Berrange wrote:
+> >>>>>> On Thu, Jan 26, 2017 at 08:35:30PM +0800, Fam Zheng wrote:
+> >>>>>>> On Thu, 01/26 11:04, Daniel P. Berrange wrote:
+> >>>>>>>> The -n arg to the convert command allows use of a pre-existing image,
+> >>>>>>>> rather than creating a new image. This adds a -n arg to the dd command
+> >>>>>>>> to get feature parity.
+> >>>>>>>
+> >>>>>>> I remember there was a discussion about changing qemu-img dd's default to a
+> >>>>>>> "conv=nocreat" semantic, if so, "-n" might not be that useful. But that part
+> >>>>>>> hasn't made it into the tree, and I'm not sure which direction we should take.
+> >>>>>>> (Personally I think default to nocreat is a good idea).
+> >>>>>>
+> >>>>>> Use nocreat by default would be semantically different from real "dd"
+> >>>>>> binary which feels undesirable if the goal is to make "qemu-img dd"
+> >>>>>> be as consistent with "dd" as possible.
+> >>>>>>
+> >>>>>> It would be trivial to rewrite this patch to add support for the "conv"
+> >>>>>> option, allowing the user to explicitly give 'qemu-img dd conv=nocreat'
+> >>>>>> instead of my 'qemu-img dd -n' syntax, without changing default semantics.
+> >>>>>
+> >>>>> Adding 'conv=nocreat' (and not '-n') feels like the right way to me.
+> >>>>
+> >>>> The original idea was to make conv=nocreat a mandatory option, I think.
+> >>>> qemu-img was supposed error out if the user did not specify it.
+> >>>
+> >>> I'm not really seeing a benefit in doing that - it would just break
+> >>> existing usage of qemu-img dd for no obvious benefit.
+> >>
+> >> Well... Is there existing usage?
+> > 
+> > It shipped in 2.8.0 though, so imho that means we have to assume there
+> > are users, and thus additions must to be backwards compatible from now
+> > on.
+> 
+> Depends. I don't think there are too many users, so we could still
+> justify a change if there's a very good reason for it.
+> 
+> I do agree that it's probably not a very good reason, though.
+> 
+> >> The benefit would be that one could (should?) expect qemu-img dd to
+> >> behave on disk images as if they were block devices; and dd to a block
+> >> device will not truncate or "recreate" it.
+> >>
+> >> If you don't give nocreat, it's thus a bit unclear whether you want to
+> >> delete and recreate the target or whether you want to write into it.
+> >> Some may expect qemu-img dd to behave as if the target is a normal file
+> >> (delete and recreate it), others may expect it's treated like a block
+> >> device (just write into it). If you force the user to specify nocreat,
+> >> it would make the behavior clear.
+> >>
+> >> (And you can always delete+recreate the target with qemu-img create.)
+> >>
+> >> It's all a bit complicated. :-/
+> > 
+> > If the goal is to be compatible with /usr/bin/dd then IIUC, the behaviour
+> > needs to be
+> > 
+> >  - If target is a block device, then silently assume nocreat|notrunc
+> >    is set, even if not specified by user
+> > 
+> >  - If target is a file, then silently create & truncate the file
+> >    unless nocreat or notrunc are set
+> 
+> Yes. But you could easily argue that every image file is a "block device".
 
-The 'refcount-block' check in particular iterates over the refcount
-table in order to get the addresses of all refcount blocks and check
-that none of them overlap with the region where we want to write.
+IMHO that would be a bad idea as it would mean different behaviour
+from dd vs qemu-img dd, when run on raw files.
 
-The problem with the refcount table is that since it always occupies
-complete clusters its size is usually very big. With the default
-values of cluster_size=64KB and refcount_bits=16 this table holds 8192
-entries, each one of them enough to map 2GB worth of host clusters.
+If we assume nocreat|notrunc behaviour by default, then we would  likely
+need to invent new "creat|trunc" flags to let people turn the previous
+behaviour back on, which would diverge from 'dd' command.
 
-So unless we're using images with several TB of allocated data this
-table is going to be mostly empty, and iterating over it is a waste of
-CPU. If the storage backend is fast enough this can have an effect on
-I/O performance.
-
-This patch keeps the index of the last used (i.e. non-zero) entry in
-the refcount table and updates it every time the table changes. The
-refcount-block overlap check then uses that index instead of reading
-the whole table.
-
-In my tests with a 4GB qcow2 file stored in RAM this doubles the
-amount of write IOPS.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
-Changes:
-
-v2:
-- Handle tables with holes correctly in alloc_refcount_block()
-
- block/qcow2-refcount.c | 24 +++++++++++++++++++++++-
- block/qcow2.c          |  1 +
- block/qcow2.h          |  1 +
- 3 files changed, 25 insertions(+), 1 deletion(-)
-
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index cbfb3fe064..3dbde18612 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -83,6 +83,16 @@ static Qcow2SetRefcountFunc *const set_refcount_funcs[] = {
- /*********************************************************/
- /* refcount handling */
- 
-+static void update_max_refcount_table_index(BDRVQcow2State *s)
-+{
-+    unsigned i = s->refcount_table_size - 1;
-+    while (i > 0 && (s->refcount_table[i] & REFT_OFFSET_MASK) == 0) {
-+        i--;
-+    }
-+    /* Set s->max_refcount_table_index to the index of the last used entry */
-+    s->max_refcount_table_index = i;
-+}
-+
- int qcow2_refcount_init(BlockDriverState *bs)
- {
-     BDRVQcow2State *s = bs->opaque;
-@@ -111,6 +121,7 @@ int qcow2_refcount_init(BlockDriverState *bs)
-         }
-         for(i = 0; i < s->refcount_table_size; i++)
-             be64_to_cpus(&s->refcount_table[i]);
-+        update_max_refcount_table_index(s);
-     }
-     return 0;
-  fail:
-@@ -439,6 +450,10 @@ static int alloc_refcount_block(BlockDriverState *bs,
-         }
- 
-         s->refcount_table[refcount_table_index] = new_block;
-+        /* If there's a hole in s->refcount_table then it can happen
-+         * that refcount_table_index < s->max_refcount_table_index */
-+        s->max_refcount_table_index =
-+            MAX(s->max_refcount_table_index, refcount_table_index);
- 
-         /* The new refcount block may be where the caller intended to put its
-          * data, so let it restart the search. */
-@@ -580,6 +595,7 @@ static int alloc_refcount_block(BlockDriverState *bs,
-     s->refcount_table = new_table;
-     s->refcount_table_size = table_size;
-     s->refcount_table_offset = table_offset;
-+    update_max_refcount_table_index(s);
- 
-     /* Free old table. */
-     qcow2_free_clusters(bs, old_table_offset, old_table_size * sizeof(uint64_t),
-@@ -2171,6 +2187,7 @@ write_refblocks:
-     s->refcount_table = on_disk_reftable;
-     s->refcount_table_offset = reftable_offset;
-     s->refcount_table_size = reftable_size;
-+    update_max_refcount_table_index(s);
- 
-     return 0;
- 
-@@ -2383,7 +2400,11 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
-     }
- 
-     if ((chk & QCOW2_OL_REFCOUNT_BLOCK) && s->refcount_table) {
--        for (i = 0; i < s->refcount_table_size; i++) {
-+        unsigned last_entry = s->max_refcount_table_index;
-+        assert(last_entry < s->refcount_table_size);
-+        assert(last_entry + 1 == s->refcount_table_size ||
-+               (s->refcount_table[last_entry + 1] & REFT_OFFSET_MASK) == 0);
-+        for (i = 0; i <= last_entry; i++) {
-             if ((s->refcount_table[i] & REFT_OFFSET_MASK) &&
-                 overlaps_with(s->refcount_table[i] & REFT_OFFSET_MASK,
-                 s->cluster_size)) {
-@@ -2871,6 +2892,7 @@ int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
-     /* Now update the rest of the in-memory information */
-     old_reftable = s->refcount_table;
-     s->refcount_table = new_reftable;
-+    update_max_refcount_table_index(s);
- 
-     s->refcount_bits = 1 << refcount_order;
-     s->refcount_max = UINT64_C(1) << (s->refcount_bits - 1);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 96fb8a8f16..3e274bd1ba 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2743,6 +2743,7 @@ static int make_completely_empty(BlockDriverState *bs)
- 
-     s->refcount_table_offset = s->cluster_size;
-     s->refcount_table_size   = s->cluster_size / sizeof(uint64_t);
-+    s->max_refcount_table_index = 0;
- 
-     g_free(s->refcount_table);
-     s->refcount_table = new_reftable;
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 182341483a..f8aeb08794 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -251,6 +251,7 @@ typedef struct BDRVQcow2State {
-     uint64_t *refcount_table;
-     uint64_t refcount_table_offset;
-     uint32_t refcount_table_size;
-+    uint32_t max_refcount_table_index; /* Last used entry in refcount_table */
-     uint64_t free_cluster_index;
-     uint64_t free_byte_offset;
- 
+Regards,
+Daniel
 -- 
-2.11.0
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
