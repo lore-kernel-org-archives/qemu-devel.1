@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cYpWL-0007bm-IT
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 02:40:05 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cYpYu-00010Y-Gc
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 02:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cYpWH-0008I7-MU
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 02:40:01 -0500
-References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
-	<1485868319-16151-2-git-send-email-thuth@redhat.com>
-	<20170201001028.GA30639@umbus.fritz.box>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <632092c8-aedf-c97b-8363-9a65ce86160e@redhat.com>
-Date: Wed, 1 Feb 2017 08:39:47 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1cYpYr-0000MV-Aw
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 02:42:40 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35282)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cYpYr-0000Kq-1H
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 02:42:37 -0500
+Received: by mail-wm0-x236.google.com with SMTP id b65so25520904wmf.0
+	for <qemu-devel@nongnu.org>; Tue, 31 Jan 2017 23:42:36 -0800 (PST)
+References: <20170127103922.19658-1-alex.bennee@linaro.org>
+	<20170127103922.19658-17-alex.bennee@linaro.org>
+	<70fe24bb-c8f1-43c4-010f-a682bdd507ef@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <70fe24bb-c8f1-43c4-010f-a682bdd507ef@twiddle.net>
+Date: Wed, 01 Feb 2017 07:42:36 +0000
+Message-ID: <87inou4as3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170201001028.GA30639@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="sMSLveMd8JEcUo3eQeF8h2Kh2fwlxwGXR"
-Subject: Re: [Qemu-devel] [PATCH 1/2] ppc/kvm: Handle the "family" CPU via
- alias instead of registering new types
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v8 16/25] cputlb and arm/sparc targets:
+ convert mmuidx flushes from varg to bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +32,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, peter.maydell@linaro.org, claudio.fontana@huawei.com, bamvor.zhangjian@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sMSLveMd8JEcUo3eQeF8h2Kh2fwlxwGXR
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 01.02.2017 01:10, David Gibson wrote:
-> On Tue, Jan 31, 2017 at 02:11:58PM +0100, Thomas Huth wrote:
->> When running with KVM on POWER, we are registering a "family" CPU
->> type for the host CPU that we are running on. For example, on all
->> POWER8-compatible hosts, we register a "POWER8" CPU type, so that
->> you can always start QEMU with "-cpu POWER8" there, without the
->> need to know whether you are running on a POWER8, POWER8E or POWER8NVL=
+Richard Henderson <rth@twiddle.net> writes:
 
->> host machine.
->> However, we also have a "POWER8" CPU alias in the ppc_cpu_aliases list=
-
->> (that is mainly useful for TCG). This leads to two cosmetical drawback=
-s:
->> If the user runs QEMU with "-cpu ?", we always claim that POWER8 is an=
-
->> "alias for POWER8_v2.0" - which is simply not true when running with
->> KVM on POWER. And when using the 'query-cpu-definitions' QMP call,
->> there are currently two entries for "POWER8", one for the alias, and
->> one for the additional registered type.
->> To solve the two problems, we should rather update the "family" alias
->> instead of registering a new types. We then only have one "POWER8"
->> CPU definition around, an alias, which also points to the right
->> destination.
+> On 01/27/2017 02:39 AM, Alex Bennée wrote:
+>> +    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
 >>
->> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1396536
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->=20
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Updating the otherwise static table of aliases is kind of ugly, but
-> then so is registering an extra full type as we do now.
->=20
-> Is this safe to apply without the follow up patch to vl.c.
+>> -        tlb_debug("%d\n", mmu_idx);
+>> +        if (test_bit(mmu_idx, &mmu_idx_bitmask)) {
+>> +            tlb_debug("%d\n", mmu_idx);
+>>
+>> -        memset(env->tlb_table[mmu_idx], -1, sizeof(env->tlb_table[0]));
+>> -        memset(env->tlb_v_table[mmu_idx], -1, sizeof(env->tlb_v_table[0]));
+>> +            memset(env->tlb_table[mmu_idx], -1, sizeof(env->tlb_table[0]));
+>> +            memset(env->tlb_v_table[mmu_idx], -1, sizeof(env->tlb_v_table[0]));
+>> +        }
+>
+> Perhaps it doesn't matter since NB_MMU_MODES is so small but
+>
+>    for (; idxmap != 0; idxmap &= idxmap - 1) {
+>      int mmu_idx = ctz32(idxmap);
+>      ...
+>    }
+>
+> iterates only for the bits that are set.
+>
+>> -typedef enum ARMMMUIdx {
+>> -    ARMMMUIdx_S12NSE0 = 0,
+>> -    ARMMMUIdx_S12NSE1 = 1,
+>> -    ARMMMUIdx_S1E2 = 2,
+>> -    ARMMMUIdx_S1E3 = 3,
+>> -    ARMMMUIdx_S1SE0 = 4,
+>> -    ARMMMUIdx_S1SE1 = 5,
+>> -    ARMMMUIdx_S2NS = 6,
+>> +typedef enum ARMMMUBitMap {
+>> +    ARMMMUBit_S12NSE0 = 1 << 0,
+>> +    ARMMMUBit_S12NSE1 = 1 << 1,
+>> +    ARMMMUBit_S1E2 = 1 << 2,
+>> +    ARMMMUBit_S1E3 = 1 << 3,
+>> +    ARMMMUBit_S1SE0 = 1 << 4,
+>> +    ARMMMUBit_S1SE1 = 1 << 5,
+>> +    ARMMMUBit_S2NS = 1 << 6,
+>>      /* Indexes below here don't have TLBs and are used only for AT system
+>>       * instructions or for the first stage of an S12 page table walk.
+>>       */
+>> -    ARMMMUIdx_S1NSE0 = 7,
+>> -    ARMMMUIdx_S1NSE1 = 8,
+>> -} ARMMMUIdx;
+>> +    ARMMMUBit_S1NSE0 = 1 << 7,
+>> +    ARMMMUBit_S1NSE1 = 1 << 8,
+>> +} ARMMMUBitMap;
+>>
+>> -#define MMU_USER_IDX 0
+>> +typedef int ARMMMUIdx;
+>> +
+>> +static inline ARMMMUIdx arm_mmu_bit_to_idx(ARMMMUBitMap bit)
+>> +{
+>> +    g_assert(ctpop16(bit) == 1);
+>> +    return ctz32(bit);
+>> +}
+>> +
+>> +static inline ARMMMUBitMap arm_mmu_idx_to_bit(ARMMMUIdx idx)
+>> +{
+>> +    return 1 << idx;
+>> +}
+>
+> I don't understand this redefinition though, causing...
+>
+>> @@ -2109,13 +2109,13 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>>          /* stage 1 current state PL1: ATS1CPR, ATS1CPW */
+>>          switch (el) {
+>>          case 3:
+>> -            mmu_idx = ARMMMUIdx_S1E3;
+>> +            mmu_bit = ARMMMUBit_S1E3;
+>>              break;
+>>          case 2:
+>> -            mmu_idx = ARMMMUIdx_S1NSE1;
+>> +            mmu_bit = ARMMMUBit_S1NSE1;
+>>              break;
+>>          case 1:
+>> -            mmu_idx = secure ? ARMMMUIdx_S1SE1 : ARMMMUIdx_S1NSE1;
+>> +            mmu_bit = secure ? ARMMMUBit_S1SE1 : ARMMMUBit_S1NSE1;
+>>              break;
+>>          default:
+>>              g_assert_not_reached();
+>> @@ -2125,13 +2125,13 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>>          /* stage 1 current state PL0: ATS1CUR, ATS1CUW */
+>>          switch (el) {
+>>          case 3:
+>> -            mmu_idx = ARMMMUIdx_S1SE0;
+>> +            mmu_bit = ARMMMUBit_S1SE0;
+>>              break;
+>>          case 2:
+>> -            mmu_idx = ARMMMUIdx_S1NSE0;
+>> +            mmu_bit = ARMMMUBit_S1NSE0;
+>>              break;
+>>          case 1:
+>> -            mmu_idx = secure ? ARMMMUIdx_S1SE0 : ARMMMUIdx_S1NSE0;
+>> +            mmu_bit = secure ? ARMMMUBit_S1SE0 : ARMMMUBit_S1NSE0;
+>>              break;
+>>          default:
+>>              g_assert_not_reached();
+>> @@ -2139,17 +2139,17 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>>          break;
+>>      case 4:
+>>          /* stage 1+2 NonSecure PL1: ATS12NSOPR, ATS12NSOPW */
+>> -        mmu_idx = ARMMMUIdx_S12NSE1;
+>> +        mmu_bit = ARMMMUBit_S12NSE1;
+>>          break;
+>>      case 6:
+>>          /* stage 1+2 NonSecure PL0: ATS12NSOUR, ATS12NSOUW */
+>> -        mmu_idx = ARMMMUIdx_S12NSE0;
+>> +        mmu_bit = ARMMMUBit_S12NSE0;
+>>          break;
+>>      default:
+>>          g_assert_not_reached();
+>>      }
+>>
+>> -    par64 = do_ats_write(env, value, access_type, mmu_idx);
+>> +    par64 = do_ats_write(env, value, access_type, arm_mmu_bit_to_idx(mmu_bit));
+>
+> ... this sort of churn, only to convert *back* to an index.
 
-Yes. It fixes the problem with "query-cpu-definitions" already. You just
-need the other patch to get the output of "-cpu ?" right, too.
+Yeah I've dropped this is v9, ARM now justs does 1 << ARMMMUIdx_foo at
+the tlb_flush call sites.
 
- Thomas
+>
+>> @@ -2185,26 +2186,26 @@ static void ats_write64(CPUARMState *env, const ARMCPRegInfo *ri,
+>>      case 0:
+>>          switch (ri->opc1) {
+>>          case 0: /* AT S1E1R, AT S1E1W */
+>> -            mmu_idx = secure ? ARMMMUIdx_S1SE1 : ARMMMUIdx_S1NSE1;
+>> +            mmu_idx = secure ? ARMMMUBit_S1SE1 : ARMMMUBit_S1NSE1;
+>>              break;
+>>          case 4: /* AT S1E2R, AT S1E2W */
+>> -            mmu_idx = ARMMMUIdx_S1E2;
+>> +            mmu_idx = ARMMMUBit_S1E2;
+>>              break;
+>>          case 6: /* AT S1E3R, AT S1E3W */
+>> -            mmu_idx = ARMMMUIdx_S1E3;
+>> +            mmu_idx = ARMMMUBit_S1E3;
+>>              break;
+>>          default:
+>>              g_assert_not_reached();
+>>          }
+>>          break;
+>>      case 2: /* AT S1E0R, AT S1E0W */
+>> -        mmu_idx = secure ? ARMMMUIdx_S1SE0 : ARMMMUIdx_S1NSE0;
+>> +        mmu_idx = secure ? ARMMMUBit_S1SE0 : ARMMMUBit_S1NSE0;
+>>          break;
+>>      case 4: /* AT S12E1R, AT S12E1W */
+>> -        mmu_idx = secure ? ARMMMUIdx_S1SE1 : ARMMMUIdx_S12NSE1;
+>> +        mmu_idx = secure ? ARMMMUBit_S1SE1 : ARMMMUBit_S12NSE1;
+>>          break;
+>>      case 6: /* AT S12E0R, AT S12E0W */
+>> -        mmu_idx = secure ? ARMMMUIdx_S1SE0 : ARMMMUIdx_S12NSE0;
+>> +        mmu_idx = secure ? ARMMMUBit_S1SE0 : ARMMMUBit_S12NSE0;
+>>          break;
+>>      default:
+>>          g_assert_not_reached();
+>> @@ -2499,8 +2500,8 @@ static void vttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>
+> ... and then there's this one where you don't rename the variable, and as far
+> as I can tell don't adjust the argument for do_ats_write.
+>
+> Which is probably a mistake?
+>
+> Just define both Idx and Bit symbols and be done with it.
+>
+>
+> r~
 
 
-
---sMSLveMd8JEcUo3eQeF8h2Kh2fwlxwGXR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJYkZDJAAoJEC7Z13T+cC21EV8QAInJz6kOrJvLxlEQH2ga0Jcd
-DQC6tR98QVKkMhJwPWGf91NynjUAKj7wa1Mpp8y2JivohFClUfc+JP2WFEwSPpRP
-LrYpJncZ4Z8hmrbFUAN+dMTcFokDYJ5GCnK05VUI3WNPAl/iuNYcLPByxHFidyBZ
-7kV9uI52cn+aK99u2xds58lI3J0JG7awKGXzgdZXyad4rlxjCXwrH32XuAlhktiS
-NEw94mz2bKgLN9K8Kd7Vzt6Dfne2Y6mRQzdcxok7BeAsNlPKT7oNz0ThsCAAzUJ0
-IH6U18b28BDXuOK7F1MiZRjxG3+mEW2mzFGVYRUs4vovMPfX844HIrKwTLIurwpc
-eEWU38CqvceX63x0cnvRElJYnIrco69w4UV0iTWxD1R5xobUyMjudWEDBCRb0ZCq
-R7Z6DO1wt3HQy9p3ElywRQcF1ZWHNPX3WAEanMsY7pqflV5ZokA28KMbX3sqsdiW
-imFe+veArPoL6sBXbopOTdiIFDUQ+5CT0+wNsqTq1g/xQD8h8NyHkkkmPPMbFAyz
-yVssEHE61qSv/aZ+1LQzkOV6o6au7OszXZxttq9p1uv7lw71iQHeNFl4x8Usik0h
-kN40BXDcO15C49FTBhpPEcmTytTveOULXKiiVEMzHa8Xq9JuxJQ9vR9p1XV8dq7p
-aBNTnFafk822iG4kyoeA
-=rEI5
------END PGP SIGNATURE-----
-
---sMSLveMd8JEcUo3eQeF8h2Kh2fwlxwGXR--
+--
+Alex Bennée
