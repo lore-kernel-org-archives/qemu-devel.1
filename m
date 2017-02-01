@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYxa5-0004Dx-IQ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:16:26 -0500
+	(envelope-from <mst@redhat.com>) id 1cYxbT-00057E-N3
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:17:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYxa0-0001BG-IJ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:16:25 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55415)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cYxa0-0001BB-CQ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:16:20 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cYxZy-00064K-Id
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 16:16:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7F1472E80C2
-	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 16:16:18 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1cYxbO-0001Q7-L9
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:17:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42836)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cYxbO-0001Q3-De
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 11:17:46 -0500
+Date: Wed, 1 Feb 2017 18:17:45 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170201181609-mutt-send-email-mst@kernel.org>
+References: <20170118181918.783cb7bd@nial.brq.redhat.com>
+	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
+	<20170131165802-mutt-send-email-mst@kernel.org>
+	<fe787fcc-0c92-5842-1a67-b50466b6f38f@redhat.com>
+	<20170131201333-mutt-send-email-mst@kernel.org>
+	<20170201123739.387de47b@nial.brq.redhat.com>
+	<6e912456-9d9c-7084-c4b4-91596216d3dd@redhat.com>
+	<e158344b-b3e7-253b-f919-e48f6490c7b0@redhat.com>
+	<20170201161636.28f1e2dc@nial.brq.redhat.com>
+	<7c950267-9cd6-2e85-8b5e-218c0c7f7bdb@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Feb 2017 16:00:11 -0000
-From: Uqbar <1583421@bugs.launchpad.net>
-Reply-To: Bug 1583421 <1583421@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160519041741.20886.94270.malonedeb@wampee.canonical.com>
-Message-Id: <20170201160011.17471.13376.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1583421] Re: Please provide an option to print
- the default hardware configuration as command-line options,
- to make -nodefaults easier to use
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c950267-9cd6-2e85-8b5e-218c0c7f7bdb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,39 +35,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 
-I think that just plain configuration in the manual could be enough.
-The command line option is a very good idea, indeed.
-Maybe also a monitor command could be helpful.
+On Wed, Feb 01, 2017 at 05:03:38PM +0100, Laszlo Ersek wrote:
+> On 02/01/17 16:16, Igor Mammedov wrote:
+> > On Wed, 1 Feb 2017 14:03:52 +0100
+> > Laszlo Ersek <lersek@redhat.com> wrote:
+> > 
+> >> On 02/01/17 13:52, Laszlo Ersek wrote:
+> >>> On 02/01/17 12:37, Igor Mammedov wrote:  
+> >>>> On Tue, 31 Jan 2017 20:17:02 +0200
+> >>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >>>>  
+> >>>>> On Tue, Jan 31, 2017 at 05:28:57PM +0100, Laszlo Ersek wrote:  
+> >>>>>> The ACPI 6.1 spec says,
+> >>>>>>
+> >>>>>> - DSDT: [...] If the X_DSDT field contains a non-zero value then this
+> >>>>>>   field must be zero.
+> >>>>>> - X_DSDT: [...] If the DSDT field contains a non-zero value then this
+> >>>>>>   field must be zero.    
+> >>>>>
+> >>>>> But that's only 6.1. 6.0 and earlier did not say this.
+> >>>>> The errata they wanted to address was:
+> >>>>> 1393 In FADT: if X_DSDT field is non-zero, DSDT
+> >>>>> field should be ignored or deprecated
+> >>>>>
+> >>>>> I would class this as a spec bug.
+> >>>>>  
+> >>>>
+> >>>> The same applies to X_PM1a_EVT_BLK and co,
+> >>>> for example 5.1 spec "This is a required
+> >>>> field."
+> >>>>
+> >>>> And looks like Windows implemented it as mandatory
+> >>>> to boot perhaps to be compatible with 5.1 and earlier
+> >>>> specs.
+> >>>>
+> >>>> It appears fw would be forced to fill fields depending
+> >>>> on table revision.  
+> >>>
+> >>> Sounds like a valid point.
+> >>>
+> >>> I compared the FADT defintion between ACPI 5.1 and ACPI 6.1. Indeed, the
+> >>> former says:
+> >>>
+> >>> - FADT Major Version: 5; Major Version of this FADT structure, [...]
+> >>> - DSDT: Physical memory address (0-4 GB) of the DSDT.
+> >>> - X_DSDT: 64bit physical address of the DSDT.
+> >>>
+> >>> the latter says:
+> >>>
+> >>> - FADT Major Version: 6; Major Version of this FADT structure, [...]
+> >>>
+> >>> - DSDT: Physical memory address of the DSDT. If the X_DSDT field
+> >>>   contains a non-zero value then this field must be zero.
+> >>>
+> >>> - X_DSDT: Extended physical address of the DSDT. If the DSDT field
+> >>>   contains a non-zero value then this field must be zero.
+> >>>
+> >>> I will ask on edk2-devel whether the
+> >>> "MdeModulePkg/Universal/Acpi/AcpiTableDxe" maintainers can think of a
+> >>> way to accommodate this.  
+> >>
+> >> Sigh, this looks nasty.
+> >>
+> >> Considering specifically the DSDT <-> X_DSDT question, Mantis ticket
+> >> #1393 (which requires the mutual exclusion) went into 5.1B. In version
+> >> 5.1A, the mutual exclusion is not required.
+> >>
+> >> Unfortuantely, the FADT Major.Minor version, as reported through the
+> >> bytes at offsets 8 and 131 decimal in the table, is "5.1" for *both*
+> >> 5.1A and 5.1B. In other words, looking at just Major.Minor, it cannot be
+> >> determined with full precision whether the DSDT and X_DSDT fields should
+> >> be exclusive or not. :/
+> > The same applies to 6.0 vs 6.0A 
+> 
+> Thanks for the info; I've updated the patch!
+> 
+> Laszlo
 
--- =
+Same applies for firmware control. There, the difference would be
+between 3.0 and 4.0 where they made the incompatible change.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1583421
-
-Title:
-  Please provide an option to print the default hardware configuration
-  as command-line options, to make -nodefaults easier to use
-
-Status in QEMU:
-  New
-
-Bug description:
-  For full customization of the default set of hardware qemu supports, a
-  user can pass -nodefaults and then manually specify each device they
-  want.  Many specific options document what they translate to in terms
-  of the full configuration model; however, the defaults for any given
-  platform don't.
-
-  I'd love to have documentation of the default hardware configuration,
-  in terms of qemu command-line options, to make it easy to run qemu
-  -nodefaults, paste in the default command-line, and edit it.
-
-  As this varies by emulated machine, perhaps qemu could have a command-
-  line option to print a specific machine (e.g. pc-i440fx-2.5) in the
-  form of qemu command-line options?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1583421/+subscriptions
+-- 
+MST
