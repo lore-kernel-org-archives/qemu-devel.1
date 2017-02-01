@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cYi9I-0008Hv-Eb
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:47:45 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYik0-0007y2-OA
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 19:25:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cYi9H-00082p-LN
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 18:47:44 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYijz-0007hM-Fc
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 19:25:40 -0500
 References: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
-	<20170122142959.GA12419@lemon.Home>
-	<ff2fd02a-09ea-a28f-eb6e-e1858efff552@redhat.com>
-	<20170124120957.GC13714@lemon.Home>
-	<e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
+	<20170120162527.66075-3-farman@linux.vnet.ibm.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b57d8de7-394d-5446-8d5b-ea4e0ec85cc3@redhat.com>
-Date: Wed, 1 Feb 2017 00:47:33 +0100
+Message-ID: <758554c2-62d9-dc1d-088e-cb68933e9d0b@redhat.com>
+Date: Wed, 1 Feb 2017 01:25:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
+In-Reply-To: <20170120162527.66075-3-farman@linux.vnet.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="oPHLkdTcXkpdkIVUqPGwnQFhwg43MxDtl"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/3] scsi-generic and
- BLKSECTGET
+	boundary="XjkrajD9fE0Die3OaX7Gw7oRhldLADqoi"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 2/3] block: Fix target
+ variable of BLKSECTGET ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +25,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kwolf@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eric Farman <farman@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oPHLkdTcXkpdkIVUqPGwnQFhwg43MxDtl
+--XjkrajD9fE0Die3OaX7Gw7oRhldLADqoi
 From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kwolf@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <b57d8de7-394d-5446-8d5b-ea4e0ec85cc3@redhat.com>
-Subject: Re: [Qemu-block] [Qemu-devel] [PATCH v3 0/3] scsi-generic and
- BLKSECTGET
+To: Eric Farman <farman@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+Cc: kwolf@redhat.com
+Message-ID: <758554c2-62d9-dc1d-088e-cb68933e9d0b@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v3 2/3] block: Fix target variable of
+ BLKSECTGET ioctl
 References: <20170120162527.66075-1-farman@linux.vnet.ibm.com>
- <20170122142959.GA12419@lemon.Home>
- <ff2fd02a-09ea-a28f-eb6e-e1858efff552@redhat.com>
- <20170124120957.GC13714@lemon.Home>
- <e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
-In-Reply-To: <e63adc3a-ca01-705a-c21a-d3ead5eb4472@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+ <20170120162527.66075-3-farman@linux.vnet.ibm.com>
+In-Reply-To: <20170120162527.66075-3-farman@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 31.01.2017 12:37, John Snow wrote:
->=20
->=20
-> On 01/24/2017 07:09 AM, Fam Zheng wrote:
->> On Tue, 01/24 12:23, Paolo Bonzini wrote:
->>>
->>>
->>> On 22/01/2017 15:29, Fam Zheng wrote:
->>>> On Fri, 01/20 17:25, Eric Farman wrote:
->>>>> Changes:
->>>>>  v2->v3:
->>>>>   - Move byte/sector conversions to patch 2 [Fam Zheng]
->>>>>   - Rename "max_sectors" when holding a byte value [Fam Zheng]
->>>>>  v1->v2:
->>>>>   - Patch 3, make hdev_get_max_transfer_length return bytes [Fam Zh=
-eng]
->>>>
->>>> Reviewed-by: Fam Zheng <famz@redhat.com>
->>>
->>> Looks good, who's merging this? :)
->>
->> All I know is not me :) Adding Kevin and Max who maintain block/file-p=
-osix.c.
->>
->> Fam
->>
->=20
-> Kevin's traveling for DevConf.cz, so how about Max? :)
+On 20.01.2017 17:25, Eric Farman wrote:
+> Commit 6f6071745bd0 ("raw-posix: Fetch max sectors for host block devic=
+e")
+> introduced a routine to call the kernel BLKSECTGET ioctl, which stores =
+the
+> result back to user space.  However, the size of the data returned depe=
+nds
+> on the routine handling the ioctl.  The (compat_)blkdev_ioctl returns a=
 
-Did Kevin tell you to write that? If so, tell him he's got to merge all
-of my patches once he's back. :-P
+> short, while sg_ioctl returns an int.  Thus, on big-endian systems, we =
+can
+> find ourselves accidentally shifting the result to a much larger value.=
 
-Ooooh, I see, he's trying to get me to merge so many patches I'll have
-to send my own pull request. Cleverrr. Verrry clever. ;-)
+> (On s390x, a short is 16 bits while an int is 32 bits.)
+>=20
+> Also, the two ioctl handlers return values in different scales (block
+> returns sectors, while sg returns bytes), so some tweaking of the outpu=
+ts
+> is required such that hdev_get_max_transfer_length returns a value in a=
+
+> consistent set of units.
+>=20
+> Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
+> ---
+>  block/file-posix.c    | 17 ++++++++++-------
+>  include/block/block.h |  1 +
+>  2 files changed, 11 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 28b47d9..9f83725 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -651,12 +651,15 @@ static void raw_reopen_abort(BDRVReopenState *sta=
+te)
+>      state->opaque =3D NULL;
+>  }
+> =20
+> -static int hdev_get_max_transfer_length(int fd)
+> +static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
+>  {
+>  #ifdef BLKSECTGET
+> -    int max_sectors =3D 0;
+> -    if (ioctl(fd, BLKSECTGET, &max_sectors) =3D=3D 0) {
+> -        return max_sectors;
+> +    int max_bytes =3D 0;
+> +    short max_sectors =3D 0;
+> +    if (bs->sg && ioctl(fd, BLKSECTGET, &max_bytes) =3D=3D 0) {
+> +        return max_bytes;
+> +    } else if (!bs->sg && ioctl(fd, BLKSECTGET, &max_sectors) =3D=3D 0=
+) {
+> +        return max_sectors << BDRV_SECTOR_BITS;
+>      } else {
+>          return -errno;
+>      }
+> @@ -672,9 +675,9 @@ static void raw_refresh_limits(BlockDriverState *bs=
+, Error **errp)
+> =20
+>      if (!fstat(s->fd, &st)) {
+>          if (S_ISBLK(st.st_mode)) {
+> -            int ret =3D hdev_get_max_transfer_length(s->fd);
+> -            if (ret > 0 && ret <=3D BDRV_REQUEST_MAX_SECTORS) {
+> -                bs->bl.max_transfer =3D pow2floor(ret << BDRV_SECTOR_B=
+ITS);
+> +            int ret =3D hdev_get_max_transfer_length(bs, s->fd);
+> +            if (ret > 0 && ret <=3D BDRV_REQUEST_MAX_BYTES) {
+> +                bs->bl.max_transfer =3D pow2floor(ret);
+>              }
+>          }
+>      }
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 8b0dcda..4e81f20 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -116,6 +116,7 @@ typedef struct HDGeometry {
+> =20
+>  #define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BITS, \
+>                                       INT_MAX >> BDRV_SECTOR_BITS)
+> +#define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECTO=
+R_BITS)
+
+I'd rather like it the other way round (i.e.
+
+#define BDRV_REQUEST_MAX_BYTES MIN(SIZE_MAX, INT_MAX)
+#define BDRV_REQUEST_MAX_SECTORS (BDRV_REQUEST_MAX_BYTES >>
+BDRV_SECTOR_BITS)
+
+), but I don't suppose I can interest you in a respin, can I? Would it
+be OK with you if I changed you commit when I apply it?
 
 Max
 
+> =20
+>  /*
+>   * Allocation status flags
+>=20
 
---oPHLkdTcXkpdkIVUqPGwnQFhwg43MxDtl
+
+
+--XjkrajD9fE0Die3OaX7Gw7oRhldLADqoi
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRIhUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AescIALesBYRtkVZSVpmMhi14r4LfrivUwkyV
-qw1b8heHCOYHSn9VmPj+aE/WJPWs9cZ4ZC4cW+w0ZQ40AsALtlhz370X3z7Y1LEK
-G5DIwGBuw/lMIjX7YqSGFCf23pjQtTbrhlW4bdsxhIBf2m0rSAp39MJfOuL/HIIl
-sBLYlo3r927sIsK3HjVyNfNx8xt7B9Q/uN6A2wkXHhHNTf8F6hQOpr9CRfWzSxAp
-FkmV0l15mFsD29kgtJbnpnn0ollXQV6abADF5CwKm23b6bb0K0WX91St1sPcBYLe
-zcCZNl+yuiYN3Dux5MR22DDc39de0qQbzent2QZivML/y0Ee7hp7C6M=
-=jXne
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRKvoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AgR4H/3Z5X9Rjwbl4tdlsPczRUAqacbTaIMWQ
+hpUjomyRJCq/A57ewuNFGoxeZdWoSqN1DgRkoLaJD9BHkZ4zfVjmZd9WreeRi353
+PrSTCIpNsqfV/RyMablngXZa00oGb2ZyPgpeTnDIUE158OkASVeFfZY4xw7bMwcn
+YklzgtpSFXTPdo+hwa43W1Mzz16QLBQXO217D9uL+UnFh1PARV5H/F9IKS1c3/FB
+YtGG/jTU0+60UUD3V1KJ2/IdE7vyQhRIVMYUJSficUpBjh6zQEkQmHT+HygWZZBc
+HB0Gdq9y/gEUAjatyJqmy11OvA859QZgwLlXgpEe9GAcimCESN+EHS8=
+=lvYB
 -----END PGP SIGNATURE-----
 
---oPHLkdTcXkpdkIVUqPGwnQFhwg43MxDtl--
+--XjkrajD9fE0Die3OaX7Gw7oRhldLADqoi--
