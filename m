@@ -1,41 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kumar.shubham@research.iiit.ac.in>)
-	id 1cYyuL-0001yn-0p
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:41:25 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cYz5l-0006Tb-4r
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:53:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kumar.shubham@research.iiit.ac.in>)
-	id 1cYyuI-0005wT-0K
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:41:25 -0500
-Received: from research.iiit.ac.in ([196.12.53.8]:37408)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kumar.shubham@research.iiit.ac.in>)
-	id 1cYyuH-0005vY-C5
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:41:21 -0500
-Received: from localhost (localhost [127.0.0.1])
-	by research.iiit.ac.in (Postfix) with ESMTP id C78C6741EBE
-	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 23:11:17 +0530 (IST)
-Received: from research.iiit.ac.in ([127.0.0.1])
-	by localhost (research.iiit.ac.in [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id 4N0_RKiG3oQ4 for <qemu-devel@nongnu.org>;
-	Wed,  1 Feb 2017 23:11:17 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by research.iiit.ac.in (Postfix) with ESMTP id EA6B7745532
-	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 23:11:16 +0530 (IST)
-Received: from research.iiit.ac.in ([127.0.0.1])
-	by localhost (research.iiit.ac.in [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 5WVLFHEJwVIz for <qemu-devel@nongnu.org>;
-	Wed,  1 Feb 2017 23:11:16 +0530 (IST)
-Received: from research.iiit.ac.in (localhost [127.0.0.1])
-	by research.iiit.ac.in (Postfix) with ESMTP id D237E741EBE
-	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 23:11:16 +0530 (IST)
-Date: Wed, 1 Feb 2017 23:11:16 +0530 (IST)
-From: Shubham Kumar <kumar.shubham@research.iiit.ac.in>
-Message-ID: <1536595150.585126.1485970876796.JavaMail.zimbra@research.iiit.ac.in>
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cYz5k-0000V6-5c
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:53:13 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:32947)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1cYz5k-0000Us-0n
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:53:12 -0500
+Received: by mail-ot0-x241.google.com with SMTP id f9so46237122otd.0
+	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 09:53:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] WIKI account
+In-Reply-To: <f950c6d5-2972-c844-8bbd-47dfe2aa7074@redhat.com>
+References: <1485422212-31546-1-git-send-email-ashijeetacharya@gmail.com>
+	<20170128194157.0c82cc8a@bahia.lan>
+	<CAC2QTZZaaMgiiJbXgnLzBF+02=XnzKsofP7fwK7oF56maXY8Gg@mail.gmail.com>
+	<20170129140329.3646dee3@bahia.lan>
+	<CAC2QTZZA53iu0q09D+WA9Sn4q9K2pFXmT0CiU9a4=TPiMM9EzQ@mail.gmail.com>
+	<f950c6d5-2972-c844-8bbd-47dfe2aa7074@redhat.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Wed, 1 Feb 2017 23:23:10 +0530
+Message-ID: <CAC2QTZZ836DU5zQ+mryDDWGnTMgFJT+Ni1CKkpXqC0Y1HDEUAA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] migrate: Migration aborts abruptly for
+ machine "none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,11 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-Sir
+On Tue, Jan 31, 2017 at 2:18 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 29/01/2017 08:19, Ashijeet Acharya wrote:
+>> Also, Paolo has a similar opinion to yours that we should fix it
+>> instead of blocking it. He suggests to migrate only the device states
+>> and skip all the RAM related stuff. Maybe he can explain it better
+>> when he is available.
+>
+> Yes, there is even support already in ram_migration_cleanup for not
+> allocating the bitmap:
+>
+>     struct BitmapRcu *bitmap = migration_bitmap_rcu;
+>     atomic_rcu_set(&migration_bitmap_rcu, NULL);
+>     if (bitmap) {
+>         memory_global_dirty_log_stop();
+>         call_rcu(bitmap, migration_bitmap_free, rcu);
+>     }
+>
+> I think you should just iterate until you find no more misbehaving code.
+>  The allocation is one, but ram_find_and_save_block should also return 0
+> if QLIST_FIRST_RCU(&ram_list.blocks) is NULL, for example.
+>
 
-Can someone make an account for me on QEMU wiki ?? I would like to contribute on QEMU wiki.
+Okay, I will drop the idea of adding a migration blocker in this case
+and proceed as you say.
 
-regards
-Shubham Kumar 
+Ashijeet
+> Paolo
