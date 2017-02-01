@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYyRe-0006An-6D
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:11:56 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cYyVC-0000GP-CY
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:15:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cYyRN-0005bu-09
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:11:46 -0500
-From: Markus Armbruster <armbru@redhat.com>
-Date: Wed,  1 Feb 2017 18:08:53 +0100
-Message-Id: <1485968933-9162-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH] block: Crude initial implementation of
+	(envelope-from <no-reply@patchew.org>) id 1cYyV6-0006he-Ij
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 12:15:26 -0500
+Resent-Message-Id: <E1cYyV6-0006he-Ij@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1485968933-9162-1-git-send-email-armbru@redhat.com>
+Message-ID: <148596930587.33.9673954101894114513@eba24e3a0d7f>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 1 Feb 2017 09:15:07 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC PATCH] block: Crude initial implementation of
  -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -18,122 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org
 
-The new command line option -blockdev works like QMP command
-blockdev-add.  The option argument is JSON.  Example usage:
-
-    -blockdev '{"node-name": "foo", "driver": "raw", "file": {"driver": "file", "filename": "foo.img"} }'
-
-The JSON argument doesn't exactly blend into the existing option
-syntax.  Alternative syntax is TBD.
-
-Note that calling qmp_blockdev_add() (say via qmp_marshal_block_add())
-right away would crash.  We need to stash the configuration for later
-instead.  This is crudely done, and bypasses QemuOpts, even though
-storing configuration is what QemuOpts is for.  Need to revamp option
-infrastructure to support QAPI types like BlockdevOptions.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
-We need -blockdev to complete the blockdev-add job.  I'm working on it
-for 2.9.  This patch is a quick hack to give people something to play
-while I work on the real thing.
-
-We need to agree on option argument syntax.  I'm going to post a
-summary of our previous discussion.
-
- qemu-options.hx |  3 +++
- vl.c            | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+)
-
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ad2f8fc..a66bd65 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -512,6 +512,9 @@ Use @var{file} as CD-ROM image (you cannot use @option{-hdc} and
- using @file{/dev/cdrom} as filename (@pxref{host_drives}).
- ETEXI
- 
-+DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
-+    "-blockdev FIXME document\n", QEMU_OPTION_blockdev)
-+
- DEF("drive", HAS_ARG, QEMU_OPTION_drive,
-     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
-     "       [,cyls=c,heads=h,secs=s[,trans=t]][,snapshot=on|off]\n"
-diff --git a/vl.c b/vl.c
-index 0b72b12..51345c8 100644
---- a/vl.c
-+++ b/vl.c
-@@ -94,6 +94,9 @@ int main(int argc, char **argv)
- #include "migration/colo.h"
- #include "sysemu/kvm.h"
- #include "sysemu/hax.h"
-+#include "qapi/qobject-input-visitor.h"
-+#include "qapi/qobject-input-visitor.h"
-+#include "qapi-visit.h"
- #include "qapi/qmp/qjson.h"
- #include "qemu/option.h"
- #include "qemu/config-file.h"
-@@ -2965,6 +2968,12 @@ int main(int argc, char **argv, char **envp)
-     Error *main_loop_err = NULL;
-     Error *err = NULL;
-     bool list_data_dirs = false;
-+    typedef struct BlockdevOptions_queue {
-+        BlockdevOptions *bdo;
-+        Location loc;
-+        QSIMPLEQ_ENTRY(BlockdevOptions_queue) entry;
-+    } BlockdevOptions_queue;
-+    QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
- 
-     module_call_init(MODULE_INIT_TRACE);
- 
-@@ -3106,6 +3115,28 @@ int main(int argc, char **argv, char **envp)
-                 drive_add(IF_DEFAULT, popt->index - QEMU_OPTION_hda, optarg,
-                           HD_OPTS);
-                 break;
-+            case QEMU_OPTION_blockdev:
-+                {
-+                    QObject *args = qobject_from_json(optarg);
-+                    Visitor *v;
-+                    BlockdevOptions_queue *bdo;
-+
-+                    // TODO get error out of parser
-+                    if (!args) {
-+                        error_report("invalid JSON");
-+                        exit(1);
-+                    }
-+
-+                    bdo = g_new(BlockdevOptions_queue, 1);
-+                    v = qobject_input_visitor_new(args, true);
-+                    visit_type_BlockdevOptions(v, NULL, &bdo->bdo,
-+                                               &error_fatal);
-+                    visit_free(v);
-+                    qobject_decref(args);
-+                    loc_save(&bdo->loc);
-+                    QSIMPLEQ_INSERT_TAIL(&bdo_queue, bdo, entry);
-+                    break;
-+                }
-             case QEMU_OPTION_drive:
-                 if (drive_def(optarg) == NULL) {
-                     exit(1);
-@@ -4418,6 +4449,16 @@ int main(int argc, char **argv, char **envp)
-         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-                           NULL, NULL);
-     }
-+    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
-+        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
-+
-+        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
-+        loc_push_restore(&bdo->loc);
-+        qmp_blockdev_add(bdo->bdo, &error_fatal);
-+        loc_pop(&bdo->loc);
-+        qapi_free_BlockdevOptions(bdo->bdo);
-+        g_free(bdo);
-+    }
-     if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
-                           &machine_class->block_default_type, NULL)) {
-         exit(1);
--- 
-2.7.4
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIFBBVENIXSBibG9jazogQ3J1ZGUgaW5pdGlhbCBpbXBs
+ZW1lbnRhdGlvbiBvZiAtYmxvY2tkZXYKTWVzc2FnZS1pZDogMTQ4NTk2ODkzMy05MTYyLTEtZ2l0
+LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
+Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
+ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
+LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
+ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
+bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
+bS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0ODU4
+MDAwMzItMjQ0MDQtMS1naXQtc2VuZC1lbWFpbC1oY2hAbHN0LmRlIC0+IHBhdGNoZXcvMTQ4NTgw
+MDAzMi0yNDQwNC0xLWdpdC1zZW5kLWVtYWlsLWhjaEBsc3QuZGUKIC0gW3RhZyB1cGRhdGVdICAg
+ICAgcGF0Y2hldy8xNDg1OTQyODI5LTEwNzU2LTEtZ2l0LXNlbmQtZW1haWwtcGxAa2FtcC5kZSAt
+PiBwYXRjaGV3LzE0ODU5NDI4MjktMTA3NTYtMS1naXQtc2VuZC1lbWFpbC1wbEBrYW1wLmRlCiAq
+IFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NTk2ODkzMy05MTYyLTEtZ2l0LXNlbmQtZW1h
+aWwtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNDg1OTY4OTMzLTkxNjItMS1naXQtc2Vu
+ZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjdmNDE2NTAgYmxvY2s6IENydWRlIGluaXRpYWwgaW1wbGVtZW50YXRpb24gb2YgLWJsb2NrZGV2
+Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGJsb2NrOiBDcnVkZSBp
+bml0aWFsIGltcGxlbWVudGF0aW9uIG9mIC1ibG9ja2Rldi4uLgpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzYwOiBGSUxFOiB2bC5jOjI5NzY6CisgICAgUVNJTVBMRVFfSEVBRCgsIEJs
+b2NrZGV2T3B0aW9uc19xdWV1ZSkgYmRvX3F1ZXVlID0gUVNJTVBMRVFfSEVBRF9JTklUSUFMSVpF
+UihiZG9fcXVldWUpOwoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM3NDogRklM
+RTogdmwuYzozMTI0OgorICAgICAgICAgICAgICAgICAgICAvLyBUT0RPIGdldCBlcnJvciBvdXQg
+b2YgcGFyc2VyCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDc0IGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
