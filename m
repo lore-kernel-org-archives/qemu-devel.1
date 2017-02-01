@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cYkob-0002uJ-0q
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 21:38:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYktP-00064t-6I
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 21:43:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cYkoX-0004sT-4C
-	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 21:38:33 -0500
-Date: Wed, 1 Feb 2017 13:25:45 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170201022545.GK30639@umbus.fritz.box>
-References: <1485868446-10587-1-git-send-email-mst@redhat.com>
-	<1485868446-10587-4-git-send-email-mst@redhat.com>
-	<20170131221628.GN14879@umbus.fritz.box>
-	<20170201033722-mutt-send-email-mst@kernel.org>
+	(envelope-from <mreitz@redhat.com>) id 1cYktO-000668-Af
+	for qemu-devel@nongnu.org; Tue, 31 Jan 2017 21:43:31 -0500
+References: <cover.1485392617.git.jcody@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1c281dc7-a4de-4bd0-a2dc-6cfddd3ccb5b@redhat.com>
+Date: Wed, 1 Feb 2017 03:43:21 +0100
 MIME-Version: 1.0
+In-Reply-To: <cover.1485392617.git.jcody@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="J2pR2RtFp0tAjF3C"
-Content-Disposition: inline
-In-Reply-To: <20170201033722-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PULL v3 03/21] ppc: switch to constants within
- BUILD_BUG_ON
+	protocol="application/pgp-signature";
+	boundary="n3vtXJEimC3bBalVtnLtu2mE6WeiT9IQa"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] block: check full backing filename
+ when searching protocol filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,117 +24,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com
 
-
---J2pR2RtFp0tAjF3C
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--n3vtXJEimC3bBalVtnLtu2mE6WeiT9IQa
+From: Max Reitz <mreitz@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com
+Message-ID: <1c281dc7-a4de-4bd0-a2dc-6cfddd3ccb5b@redhat.com>
+Subject: Re: [PATCH v2 0/3] block: check full backing filename when searching
+ protocol filenames
+References: <cover.1485392617.git.jcody@redhat.com>
+In-Reply-To: <cover.1485392617.git.jcody@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 01, 2017 at 03:37:54AM +0200, Michael S. Tsirkin wrote:
-> On Wed, Feb 01, 2017 at 09:16:28AM +1100, David Gibson wrote:
-> > On Tue, Jan 31, 2017 at 03:14:29PM +0200, Michael S. Tsirkin wrote:
-> > > We are switching BUILD_BUG_ON to verify that it's parameter is a
-> > > compile-time constant, and it turns out that some gcc versions
-> > > (specifically gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609) are
-> > > not smart enough to figure it out for expressions involving local
-> > > variables. This is harmless but means that the check is ineffective f=
-or
-> > > these platforms.  To fix, replace the variable with macros.
-> > >=20
-> > > Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >=20
-> > Ugh.. I pulled this into my tree already (I've been having trouble
-> > with my test setup, which is why I haven't sent my own pullreq yet).
-> > However, it needs a s/%u/%llu/ to compile correctly on some platforms.
+On 26.01.2017 02:08, Jeff Cody wrote:
+> Differences from v1:
 >=20
-> I need it to avoid breaking build. I fixed it up - want to drop it
-> from you tree? Or leave it there - git will resolve the trivial
-> conflict.
-
-Since you've already sent a pull, I'm guessing it will be merged by
-the time I'm able to get my pullreq together.  Since I'll rebase
-before that, I expect it will drop out of my tree naturally.
-
->=20
-> > > ---
-> > >  hw/ppc/spapr.c | 14 ++++++++------
-> > >  1 file changed, 8 insertions(+), 6 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index a642e66..b81f2ac 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2630,8 +2630,8 @@ static void spapr_phb_placement(sPAPRMachineSta=
-te *spapr, uint32_t index,
-> > >       * 1TiB 64-bit MMIO windows for each PHB.
-> > >       */
-> > >      const uint64_t base_buid =3D 0x800000020000000ULL;
-> > > -    const int max_phbs =3D
-> > > -        (SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / SPAPR_PCI_MEM64_WIN_SIZ=
-E - 1;
-> > > +#define SPAPR_MAX_PHBS ((SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / \
-> > > +                        SPAPR_PCI_MEM64_WIN_SIZE - 1)
-> > >      int i;
-> > > =20
-> > >      /* Sanity check natural alignments */
-> > > @@ -2640,12 +2640,14 @@ static void spapr_phb_placement(sPAPRMachineS=
-tate *spapr, uint32_t index,
-> > >      QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM64_WIN_SIZE % SPAPR_PCI_MEM32_WI=
-N_SIZE) !=3D 0);
-> > >      QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM32_WIN_SIZE % SPAPR_PCI_IO_WIN_S=
-IZE) !=3D 0);
-> > >      /* Sanity check bounds */
-> > > -    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_IO_WIN_SIZE) > SPAPR_PCI=
-_MEM32_WIN_SIZE);
-> > > -    QEMU_BUILD_BUG_ON((max_phbs * SPAPR_PCI_MEM32_WIN_SIZE) > SPAPR_=
-PCI_MEM64_WIN_SIZE);
-> > > +    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_IO_WIN_SIZE) >
-> > > +                      SPAPR_PCI_MEM32_WIN_SIZE);
-> > > +    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_MEM32_WIN_SIZE) >
-> > > +                      SPAPR_PCI_MEM64_WIN_SIZE);
-> > > =20
-> > > -    if (index >=3D max_phbs) {
-> > > +    if (index >=3D SPAPR_MAX_PHBS) {
-> > >          error_setg(errp, "\"index\" for PAPR PHB is too large (max %=
-u)",
-> > > -                   max_phbs - 1);
-> > > +                   SPAPR_MAX_PHBS - 1);
-> > >          return;
-> > >      }
-> > > =20
-> >=20
+> Patch 1: set local_error =3D NULL after freeing (Thanks Eric)
+> Patch 2: new patch, groundwork for qemu-iotest in patch 3
+> Patch 3: qemu-iotest, as requested (Thanks Max)
 >=20
 >=20
+> Jeff Cody (3):
+>   block: check full backing filename when searching protocol filenames
+>   qemu-iotests: Don't create fifos / pidfiles with protocol paths
+>   qemu-iotest: test to lookup protocol-based image with relative backin=
+g
+>=20
+>  block.c                          | 13 ++++++
+>  tests/qemu-iotests/173           | 97 ++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/173.out       | 12 +++++
+>  tests/qemu-iotests/common.config |  6 ++-
+>  tests/qemu-iotests/common.qemu   | 10 ++---
+>  tests/qemu-iotests/common.rc     |  6 +--
+>  tests/qemu-iotests/group         |  1 +
+>  7 files changed, 135 insertions(+), 10 deletions(-)
+>  create mode 100755 tests/qemu-iotests/173
+>  create mode 100644 tests/qemu-iotests/173.out
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks, applied to my block tree:
 
---J2pR2RtFp0tAjF3C
+https://github.com/XanClic/qemu/commits/block
+
+Max
+
+
+--n3vtXJEimC3bBalVtnLtu2mE6WeiT9IQa
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYkUcpAAoJEGw4ysog2bOS6lkP/3L2d8Z1w/erZ/5TJCQwU7I/
-f5SLVED3/6IEqg5OYNDVSuKCmNpxdFwU3Lmry46RrBBXjoVzkujk1bbrwGXH8SlR
-w1qP6PXLzVLxf32QK2qBoGVkxgvrrKVRt8Eer1evxH13YEfgGoLLgzxaU+aLbvcc
-TJnMRWIW9CU/ew+0k/dVaXID6XOQ2fwCIWQ2ItEHw3PzCK4+YD5bMTI+KzyxICLA
-qRbUXbbv0ECIG/vdd0lYoesY2R+cFlqe8iXs6fwiWg0ExFHZnCG8tICZMQiINfwX
-HnKrh1On6NfkPNrUnSnAbbOh7D0HME8anwO/4IdI59NSYUWazwSTepsGsvIUIzyz
-rLAaAn6alP3R4C497Sc5KPNGKbZ7b6JVKpLN8WBqkwJn4AH+h8AXFluvKsHXzArA
-oFTSMRhlh5G+GtBVDnKDn7ls0gKI3Tbek367/FTot+f4vCxxX4+38zmUs6S3DCDv
-6mtxMH1ev9nrXZDf3+WnooDg7m0gRdiFjCH4h6xH8wZ5upEhNdEGgSENnYrkNuQA
-aQP4x2kbYaNwxjBS3MXZiCpS/7o2mIzn7Bc4VVXeOJrID/smcDyALvJ/CIe3E4uE
-cc/cuG6XgENpd2C6YOpw2Z73t3bqwzJPqujcLxluKeTdZ8PzCepmRvcbEzJBsByQ
-ip+L9bpqsn1CkxOenwTv
-=4mPN
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliRS0kSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A0/wH/1bBWYFOPmu7/vNywFiJEQupVeiWW6FS
+wKDiUQeBJjStvP9vrYPU0642DBCRFLUCt04Nb4eUWbfbj0jP8ZDI/W6ptjXU7zJ/
+jg2hDk/yOW3Wsw5SLAePklpPn7X4IQEBQf9FoX1uSRqDAmPhgWNNUANCiKs/SXF2
+UTbfeAizbR4toG51MHgV2v3cnrWMTvrx7Ak5bN3oOSZoZ7JQDafTFU/h5rJTRHG9
+iMo+KBM6Knicqjot3W7ATCYwlpdBgR9FWtmdthAiQEJCOMwzUvIoZvU1ho4eDeF9
+3EFEbBJq2a257l3Cpp7krBpr5VtWqBwCZpotYHsISOyCeH+7VjcS0Mk=
+=8m/W
 -----END PGP SIGNATURE-----
 
---J2pR2RtFp0tAjF3C--
+--n3vtXJEimC3bBalVtnLtu2mE6WeiT9IQa--
