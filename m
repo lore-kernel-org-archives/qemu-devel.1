@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cYv9m-0004Oh-V9
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:41:08 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cYvDX-0006Id-56
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:45:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cYv9j-0003ve-MD
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:41:06 -0500
-Received: from mail-ua0-f175.google.com ([209.85.217.175]:35192)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cYv9j-0003va-G2
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:41:03 -0500
-Received: by mail-ua0-f175.google.com with SMTP id y9so297703415uae.2
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 05:41:02 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170201110320.GD3232@redhat.com>
-References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
-	<20170201102013.GC3232@redhat.com>
-	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
-	<20170201110320.GD3232@redhat.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Wed, 1 Feb 2017 14:41:01 +0100
-Message-ID: <CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
+	(envelope-from <stefanha@redhat.com>) id 1cYvDV-0004gM-Lm
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:44:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55128)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cYvDV-0004fC-Cf
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:44:57 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed,  1 Feb 2017 13:44:44 +0000
+Message-Id: <20170201134453.11963-2-stefanha@redhat.com>
+In-Reply-To: <20170201134453.11963-1-stefanha@redhat.com>
+References: <20170201134453.11963-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 01/10] make: move top level dir to end of
+ include search path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +24,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, Feb 1, 2017 at 12:03 PM, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Wed, Feb 01, 2017 at 11:50:43AM +0100, Ladi Prosek wrote:
->> On Wed, Feb 1, 2017 at 11:20 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
->> > On Wed, Feb 01, 2017 at 11:06:46AM +0100, Ladi Prosek wrote:
->> >> Analogous to guest-file-read and guest-file-write, this commit adds
->> >> support for issuing IOCTLs to files in the guest. With the goal of
->> >> abstracting away the differences between Posix ioctl() and Win32
->> >> DeviceIoControl() to provide one unified API, the schema distinguishes
->> >> between input and output buffer sizes (as required by Win32) and
->> >> allows the caller to supply either a 'buffer', pointer to which will
->> >> be passed to the Posix ioctl(), or an integer argument, passed to
->> >> ioctl() directly.
->> >
->> > What is the intended usage scenario for this ?
->>
->> My specific case is extracting a piece of data from Windows guests.
->> Guest driver exposes a file object with a well-known IOCTL code to
->> return a data structure from the kernel.
->
-> Please provide more information about what you're trying to do.
->
-> If we can understand the full details it might suggest a different
-> approach that exposing a generic ioctl passthrough facility.
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The end goal is to be able to create a Window crash dump file from a
-running (or crashed, but running is more interesting because Windows
-can't do that by itself) Windows VM. To do that without resorting to
-hacks, the host application driving this needs to get the crash dump
-header, which Windows provides in its KeInitializeCrashDumpHeader
-kernel API.
+Currently the search path is
 
-I believe that the most natural way to do this is to have
-1) a driver installed in the guest providing a way to call
-KeInitializeCrashDumpHeader from user space
-2) an agent in the guest, running in user space, calling the driver
-and passing the result back to the host
+  1. source dir corresponding to input file (implicit by compiler)
+  2. top level build dir
+  3. top level source dir
+  4. top level source include/ dir
+  5. source dir corresponding to input file
+  6. build dir corresponding to output file
 
-Now 2) may as well be an existing agent, such as the QEMU guest agent,
-and that's why I am here :)
+Search item 5 is an effective no-op, since it duplicates item 1.
+When srcdir == builddir, item 6 also duplicates item 1, which
+causes a semantic difference between VPATH and non-VPATH builds.
 
-KeInitializeCrashDumpHeader returns an opaque byte array, happens to
-be 8192 bytes at the moment. My first choice for the kernel-user
-interface in the guest is IOCTL because what I'm trying to get across
-is a block, a "datagram", not a stream, and I have the option for
-easily adding more functionality later by adding more IOCTL codes with
-the file object still representing "the driver".
+Thus to ensure consistent semantics we need item 6 to be present
+immediately after item 1. e.g.
 
-I could use regular file I/O as well. I would either have to devise a
-protocol for talking to the driver, have a way of delimiting messages,
-re-syncing the channel etc., or make a slight semantic shift and
-instead of the file object representing the driver, it would represent
-this one particular function of the driver. Opening the file and
-reading from it until eof would yield the crash dump header.
+  1. source dir corresponding to input file (implicit by compiler)
+  2. build dir corresponding to output file
+  3. top level build dir
+  4. top level source dir
+  5. top level source include/ dir
 
->> > The size of arguments that need to be provided to ioctl()s vary on
->> > the architecture of the guest kernel that's running, which cannot be
->> > assumed to be the same as the architecture of the QEMU binary. ie
->> > you can be running i686 kernel in an x86_64 QEMU.  So it feels like
->> > it is going to be hard for applications to reliably use this feature
->> > unless they have more information about the guest OS, that is not
->> > currently provided by QEMU guest agent. So it feels like this design
->> > is not likely to be satisfactory to me.
->>
->> I can turn this around and say that guest-file-read and
->> guest-file-write shouldn't exist because applications can't reliably
->> know what the format of files on the guest is.
->
-> No that's not the same thing at all. From the POV of the QEMU API, the
-> contents of the files do not matter - it is just a byte stream and the
-> guest agent API lets you read it in the same way no matter what is in
-> the files, or what OS is running. There's no need to know anything about
-> the guest OS in order to successfully read/write the entire file.
+When srcdir == builddir, items 1 & 2 collapse into one, and items
+3 & 4 collapse into one, but the overall search order is still
+consistent with srcdir != builddir
 
-Ok, so there are two different aspects that should probably be
-separated. The actual semantics of IOCTL calls is equivalent to the
-semantics of files in general. For files it's stream in, stream out
-(and seeking and such). For IOCTL it's a buffer in, buffer out (and a
-return code). The content is file specific, IOCTL code specific,
-whatever. Definitely not guest agent's business to interpret it. Here
-I think my analogy holds.
+A further complication is that while most of the source files
+are built with a current directory of $BUILD_DIR, target dependant
+files are built with a current directory of $BUILD_DIR/$TARGET.
 
-> The ioctl design you've proposed here is different because you need to
-> know precise operating system details before you can use the API. I
-> think that's really flawed.
+As a result, search item 2 resolves to a different location for
+target independant vs target dependant files. For example when
+building 'migration/ram.o', the use of '-I$(@D)' (which expands
+to '-Imigration') would not find '$BUILD_DIR/migration', but
+rather '$BUILD_DIR/$TARGET/migration'.
 
-Yes, maybe. Maybe the concept of the IOCTL syscall is just too
-different across the guest operating systems supported by the agent. I
-tried to abstract away the differences between Posix and Windows.
-Perhaps I didn't do it right or there's more OSes to worry about. Yes,
-in theory the data passed to or from IOCTL may contain pointers and
-not be easily remotable. But it's not common. Files can also be opened
-with all kinds of obscure flags on different OSes, many of which are
-not supported by guest-file-open.
+If there are generated headers files to be used by the migration
+code in '$BUILD_DIR/migration', these will not be found by the
+relative include, an absolute include is needed instead. This
+has not been a problem so far, since nothing has been generating
+headers in sub-dirs, but the trace code will shortly be doing
+that. So it is needed to list '-I$(BUILD_DIR)/$(@D)' as well as
+'-I$(@D)' to ensure both directories are searched when building
+target dependant code. So the search order ends up being:
 
-> It would be possible to design a ioctl API that is more usable if you
-> didn't try to do generic passthrough of arbitrary ioctl commands. Instead
-> provide a QAPI schema that uses a union to provide strongly typed arguments
-> for the ioctl commands you care about using. Or completely separate QAPI
-> commands instead of multiplexing everything into an ioctl command.
+  1. source dir corresponding to input file (implicit by compiler)
+  2. build dir corresponding to output file (absolute)
+  3. build dir corresponding to output file (relative to cwd)
+  4. top level build dir
+  5. top level source dir
+  6. top level source include/ dir
 
-I can add a QAPI command for my specific use case if it's acceptable,
-that's not a problem. Although at that point I would probably just go
-back to my plan b and use regular file I/O and guest-file-read. I just
-wanted to be as generic as possible to benefit other use cases as well
-and I ended up with what's basically my stab at RPC ioctl.
+One final complication is that the absolute '-I$(BUILD_DIR)/$(@D)'
+will sometimes end up pointing to a non-existant directory if
+that sub-dir does not have any target-independant files to be
+built. Rather than try to dynamically filter this, a simple
+'mkdir' ensures $(BUILD_DIR)/$(@D) is guaranteed to exist at
+all times.
 
-> Regards,
-> Daniel
-> --
-> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-> |: http://libvirt.org              -o-             http://virt-manager.org :|
-> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20170125161417.31949-2-berrange@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ rules.mak | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
+
+diff --git a/rules.mak b/rules.mak
+index d5c516c..575a3af 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -26,8 +26,13 @@ QEMU_CXXFLAGS = -D__STDC_LIMIT_MACROS $(filter-out -Wstrict-prototypes -Wmissing
+ # Flags for dependency generation
+ QEMU_DGFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
+ 
+-# Same as -I$(SRC_PATH) -I., but for the nested source/object directories
+-QEMU_INCLUDES += -I$(<D) -I$(@D)
++# Compiler searches the source file dir first, but in vpath builds
++# we need to make it search the build dir too, before any other
++# explicit search paths. There are two search locations in the build
++# dir, one absolute and the other relative to the compiler working
++# directory. These are the same for target-independent files, but
++# different for target-dependent ones.
++QEMU_LOCAL_INCLUDES = -I$(BUILD_DIR)/$(@D) -I$(@D)
+ 
+ WL_U := -Wl,-u,
+ find-symbols = $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
+@@ -61,7 +66,9 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
+                   $(filter-out %.o %.mo,$1))
+ 
+ %.o: %.c
+-	$(call quiet-command,$(CC) $(QEMU_INCLUDES) $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
++	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
++	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
++	       -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+ %.o: %.rc
+ 	$(call quiet-command,$(WINDRES) -I. -o $@ $<,"RC","$(TARGET_DIR)$@")
+ 
+@@ -74,16 +81,24 @@ LINK = $(call quiet-command, $(LINKPROG) $(QEMU_CFLAGS) $(CFLAGS) $(LDFLAGS) -o
+        $(version-obj-y) $(call extract-libs,$1) $(LIBS),"LINK","$(TARGET_DIR)$@")
+ 
+ %.o: %.S
+-	$(call quiet-command,$(CCAS) $(QEMU_INCLUDES) $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) -c -o $@ $<,"CCAS","$(TARGET_DIR)$@")
++	$(call quiet-command,$(CCAS) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
++	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) \
++	       -c -o $@ $<,"CCAS","$(TARGET_DIR)$@")
+ 
+ %.o: %.cc
+-	$(call quiet-command,$(CXX) $(QEMU_INCLUDES) $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) -c -o $@ $<,"CXX","$(TARGET_DIR)$@")
++	$(call quiet-command,$(CXX) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
++	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
++	       -c -o $@ $<,"CXX","$(TARGET_DIR)$@")
+ 
+ %.o: %.cpp
+-	$(call quiet-command,$(CXX) $(QEMU_INCLUDES) $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) -c -o $@ $<,"CXX","$(TARGET_DIR)$@")
++	$(call quiet-command,$(CXX) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
++	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
++	       -c -o $@ $<,"CXX","$(TARGET_DIR)$@")
+ 
+ %.o: %.m
+-	$(call quiet-command,$(OBJCC) $(QEMU_INCLUDES) $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) -c -o $@ $<,"OBJC","$(TARGET_DIR)$@")
++	$(call quiet-command,$(OBJCC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
++	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
++	       -c -o $@ $<,"OBJC","$(TARGET_DIR)$@")
+ 
+ %.o: %.dtrace
+ 	$(call quiet-command,dtrace -o $@ -G -s $<,"GEN","$(TARGET_DIR)$@")
+@@ -359,6 +374,7 @@ define unnest-vars
+                 $(eval $(o:%.mo=%$(DSOSUF)): module-common.o $($o-objs)),
+                 $(error $o added in $v but $o-objs is not set)))
+         $(shell mkdir -p ./ $(sort $(dir $($v))))
++        $(shell cd $(BUILD_DIR) && mkdir -p ./ $(sort $(dir $($v))))
+         # Include all the .d files
+         $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$($v))))
+         $(eval $v := $(filter-out %/,$($v))))
+-- 
+2.9.3
