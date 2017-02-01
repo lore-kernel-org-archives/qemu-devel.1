@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cYvLW-0005ab-PQ
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:53:16 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cYvQ3-0000in-9u
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:57:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cYvLU-0007Jh-5P
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:53:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40758)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cYvQ2-0008Iq-8u
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:57:55 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:36003 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cYvLT-0007JU-TH
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:53:12 -0500
-Date: Wed, 1 Feb 2017 13:53:06 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170201135306.GI3232@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1485954928-22287-1-git-send-email-den@openvz.org>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cYvQ1-0008Ih-T8
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 08:57:54 -0500
+References: <20170123121036.4823-1-vsementsov@virtuozzo.com>
+	<20170123121036.4823-24-vsementsov@virtuozzo.com>
+	<6ff8e50e-c6d8-d3b6-f900-3700bbe30dee@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <cceeb174-5fae-9012-a430-209d59a0bac7@virtuozzo.com>
+Date: Wed, 1 Feb 2017 16:57:39 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1485954928-22287-1-git-send-email-den@openvz.org>
-Subject: Re: [Qemu-devel] [PATCH 1/1] qemu_char: socket backend: disconnect
- on EPIPE
+In-Reply-To: <6ff8e50e-c6d8-d3b6-f900-3700bbe30dee@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 23/24] qcow2: add
+ .bdrv_remove_persistent_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +30,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On Wed, Feb 01, 2017 at 04:15:28PM +0300, Denis V. Lunev wrote:
-> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> 
-> Socket backend read handler should normally perform a disconnect, however
-> the read handler may not get a chance to run if the frontend is not ready
-> (qemu_chr_be_can_write == 0).
-> 
-> This means that in virtio-serial frontend case if
->  - the host has disconnected (giving EPIPE on socket write)
->  - and the guest has disconnected (-> frontend not ready -> backend
->    will not read)
->  - and there is still data (frontend->backend) to flush (has to be a really
->    tricky timing but nevertheless, we have observed the case in production)
-> 
-> This results in virtio-serial trying to flush this data continiously forming
-> a busy loop.
-> 
-> Solution: react on EPIPE in the socket write handler. We must not disconnect
-> right away though, there still may be data to read (see 4bf1cb0).
-> 
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-char.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qemu-char.c b/qemu-char.c
-> index 6b4a299..f1f7a07 100644
-> --- a/qemu-char.c
-> +++ b/qemu-char.c
-> @@ -1202,7 +1202,7 @@ static int io_channel_send_full(QIOChannel *ioc,
->              errno = EAGAIN;
->              return -1;
->          } else if (ret < 0) {
-> -            errno = EINVAL;
-> +            errno = errno == EPIPE ? EPIPE : EINVAL;
+01.02.2017 02:20, Max Reitz wrote:
+> On 23.01.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
+>> Realize .bdrv_remove_persistent_dirty_bitmap interface.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/qcow2-bitmap.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>>   block/qcow2.c        |  1 +
+>>   block/qcow2.h        |  3 +++
+>>   3 files changed, 44 insertions(+)
+>>
+>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+>> index 2687a3acd5..be026fc80e 100644
+>> --- a/block/qcow2-bitmap.c
+>> +++ b/block/qcow2-bitmap.c
+>> @@ -1064,6 +1064,46 @@ static Qcow2Bitmap *find_bitmap_by_name(Qcow2BitmapList *bm_list,
+>>       return NULL;
+>>   }
+>>   
+>> +void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+>> +                                          const char *name,
+>> +                                          Error **errp)
+>> +{
+>> +    int ret;
+>> +    BDRVQcow2State *s = bs->opaque;
+>> +    Qcow2Bitmap *bm;
+>> +    Qcow2BitmapList *bm_list;
+>> +
+>> +    if (s->nb_bitmaps == 0) {
+>> +        /* No bitmaps - nothing to do */
+> Shouldn't it be an error? I.e. "bitmap not found"?
+>
+>> +        return;
+>> +    }
+>> +
+>> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+>> +                               s->bitmap_directory_size, errp);
+>> +    if (bm_list == NULL) {
+>> +        return;
+>> +    }
+>> +
+>> +    bm = find_bitmap_by_name(bm_list, name);
+>> +    if (bm == NULL) {
+>> +        goto fail;
+> What about setting errp? Or do you not consider this an error?
+>
+> I think it should be an error.
 
-You can't rely on 'errno' being valid after qio_channel_writev_full().
+Hmm. The following scenery should not be an error:
+1. qmp create dirty bitmap with persistent = true (bitmap not exists and 
+not created  in the storage, it will be saved only on storage close)
+2. qmp remove dirty bitmap. persistent = true, so we will try to remove 
+it from storage..
 
-The 'Error **errp' arg to that function is the only error reporting
-mechanism that's supported. In particular since the TCP channel can
-be wrapped in TLS, the errno can easily have been clobbered by time
-you get here.
+So, I see following variants:
+1. as is, just add comment "remove if exists"
+2. add return value to this function, return ENOENT if bitmap not found 
+and ignore this ENOENT in qmp_remove_bitmap
+3. add additional bool field 'exist_in_storage' to BdrvDirtyBitmap.
 
-> @@ -2854,6 +2854,9 @@ static gboolean tcp_chr_accept(QIOChannel *chan,
->                                 GIOCondition cond,
->                                 void *opaque);
->  
-> +static int tcp_chr_read_poll(void *opaque);
-> +static void tcp_chr_disconnect(Chardev *chr);
-> +
->  /* Called with chr_write_lock held.  */
->  static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
->  {
-> @@ -2871,6 +2874,13 @@ static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
->              s->write_msgfds_num = 0;
->          }
->  
-> +        if (ret < 0 && errno == EPIPE) {
+>
+>> +    }
+>> +
+>> +    QSIMPLEQ_REMOVE(bm_list, bm, Qcow2Bitmap, entry);
+> bm->name is leaked here.
+>
+> Max
+>
+>> +
+>> +    ret = update_ext_header_and_dir(bs, bm_list);
+>> +    if (ret < 0) {
+>> +        error_setg_errno(errp, -ret, "Failed to update bitmap extension");
+>> +        goto fail;
+>> +    }
+>> +
+>> +    free_bitmap_clusters(bs, &bm->table);
+>> +
+>> +fail:
+>> +    bitmap_free(bm);
+>> +    bitmap_list_free(bm_list);
+>> +}
+>> +
+>>   void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+>>   {
+>>       BdrvDirtyBitmap *bitmap;
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index 76a6a2ba28..f6bac38e51 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -3544,6 +3544,7 @@ BlockDriver bdrv_qcow2 = {
+>>       .bdrv_load_autoloading_dirty_bitmaps = qcow2_load_autoloading_dirty_bitmaps,
+>>       .bdrv_store_persistent_dirty_bitmaps = qcow2_store_persistent_dirty_bitmaps,
+>>       .bdrv_can_store_new_dirty_bitmap = qcow2_can_store_new_dirty_bitmap,
+>> +    .bdrv_remove_persistent_dirty_bitmap = qcow2_remove_persistent_dirty_bitmap,
+>>   };
+>>   
+>>   static void bdrv_qcow2_init(void)
+>> diff --git a/block/qcow2.h b/block/qcow2.h
+>> index eaad34a527..a009827f60 100644
+>> --- a/block/qcow2.h
+>> +++ b/block/qcow2.h
+>> @@ -627,5 +627,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>>   int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+>>                                     void **refcount_table,
+>>                                     int64_t *refcount_table_size);
+>> +void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+>> +                                          const char *name,
+>> +                                          Error **errp);
+>>   
+>>   #endif
+>>
+>
 
-IMHO you should just remove "&& errno == EPIPE" and it'd be fine.
 
-> +            if (tcp_chr_read_poll(chr) <= 0) {
-> +                tcp_chr_disconnect(chr);
-> +                return len;
-> +            } /* else let the read handler finish it properly */
-> +        }
-> +
->          return ret;
->      } else {
->          /* XXX: indicate an error ? */
-
-Regards,
-Daniel
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Best regards,
+Vladimir
