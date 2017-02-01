@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYtsA-00060G-Ud
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:53 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cYtsB-000618-Pv
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts6-0005cL-S4
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:50 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:46085 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005d6-H7
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:51 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:46096 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts6-0005cD-HR
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:46 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005cF-9T
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:48 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Wed,  1 Feb 2017 15:18:07 +0300
-Message-Id: <1485951502-28774-6-git-send-email-batuzovk@ispras.ru>
+Date: Wed,  1 Feb 2017 15:18:14 +0300
+Message-Id: <1485951502-28774-13-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
 References: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2 05/20] tcg: add simple alias analysis
+Subject: [Qemu-devel] [PATCH v2 12/20] tcg/i386: support 64-bit vector
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,231 +27,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kirill Batuzov <batuzovk@ispras.ru>
 
-Add a simple alias analysis to TCG which finds out memory loads and stores
-that overlap with CPUState. This information can be used later in liveness
-analysis to ensure correctness of register allocation. In particular, if load
-or store overlaps with memory location of some global variable, this variable
-should be spilled and reloaded at appropriate times.
-
-Previously no such analysis was performed and for correctness reasons it was
-required that no load/store operations overlap with memory locations of global
-variables.
-
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- tcg/optimize.c | 146 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg.h      |  17 +++++++
- 2 files changed, 163 insertions(+)
+ tcg/i386/tcg-target.h     |  1 +
+ tcg/i386/tcg-target.inc.c | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index adfc56c..2347ce3 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -34,6 +34,7 @@
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index b0704e8..755ebaa 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -31,6 +31,7 @@
+ #ifdef __x86_64__
+ # if defined(TARGET_WORDS_BIGENDIAN) == defined(HOST_WORDS_BIGENDIAN)
+ #  define TCG_TARGET_HAS_REG128 1
++#  define TCG_TARGET_HAS_REGV64 1
+ # endif
+ # ifdef TCG_TARGET_HAS_REG128
+ #  define TCG_TARGET_REG_BITS  64
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 3e718f3..208bb81 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -390,6 +390,9 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define OPC_MOVDQU_M2R  (0x6f | P_SSE_F30F)  /* store 128-bit value */
+ #define OPC_MOVDQU_R2M  (0x7f | P_SSE_F30F)  /* load 128-bit value */
+ #define OPC_MOVDQA_R2R  (0x6f | P_SSE_660F)  /* reg-to-reg 128-bit mov */
++#define OPC_MOVQ_M2R    (0x7e | P_SSE_F30F)
++#define OPC_MOVQ_R2M    (0xd6 | P_SSE_660F)
++#define OPC_MOVQ_R2R    (0x7e | P_SSE_F30F)
+ #define OPC_PADDD       (0xfe | P_SSE_660F)
  
- struct tcg_temp_info {
-     bool is_const;
-+    bool is_base;
-     uint16_t prev_copy;
-     uint16_t next_copy;
-     tcg_target_ulong val;
-@@ -61,6 +62,7 @@ static void reset_temp(TCGArg temp)
-     temps[temp].next_copy = temp;
-     temps[temp].prev_copy = temp;
-     temps[temp].is_const = false;
-+    temps[temp].is_base = false;
-     temps[temp].mask = -1;
- }
- 
-@@ -1429,3 +1431,147 @@ void tcg_optimize(TCGContext *s)
-         }
-     }
- }
-+
-+/* Simple alias analysis. It finds out which load/store operations overlap
-+   with CPUArchState. The result is stored in TCGContext and can be used
-+   during liveness analysis and register allocation. */
-+void tcg_alias_analysis(TCGContext *s)
-+{
-+    int oi, oi_next;
-+
-+    reset_all_temps(s->nb_temps);
-+    temps[GET_TCGV_PTR(s->tcg_env)].is_base = true;
-+    temps[GET_TCGV_PTR(s->tcg_env)].val = 0;
-+
-+    for (oi = s->gen_op_buf[0].next; oi != 0; oi = oi_next) {
-+        int nb_oargs, i;
-+        int size;
-+        TCGAliasType tp;
-+
-+        TCGOp * const op = &s->gen_op_buf[oi];
-+        TCGArg * const args = &s->gen_opparam_buf[op->args];
-+        TCGOpcode opc = op->opc;
-+        const TCGOpDef *def = &tcg_op_defs[opc];
-+
-+        oi_next = op->next;
-+
-+        if (opc == INDEX_op_call) {
-+            nb_oargs = op->callo;
-+        } else {
-+            nb_oargs = def->nb_oargs;
-+        }
-+
-+        s->alias_info[oi] = (TCGAliasInfo){
-+                TCG_NOT_ALIAS,
-+                false,
-+                0,
-+                0
-+            };
-+
-+        switch (opc) {
-+        CASE_OP_32_64(movi):
-+            temps[args[0]].is_const = 1;
-+            temps[args[0]].val = args[1];
-+            break;
-+        CASE_OP_32_64(mov):
-+            temps[args[0]].is_const = temps[args[1]].is_const;
-+            temps[args[0]].is_base = temps[args[1]].is_base;
-+            temps[args[0]].val = temps[args[1]].val;
-+            break;
-+        CASE_OP_32_64(add):
-+        CASE_OP_32_64(sub):
-+            if (temps[args[1]].is_base && temps[args[2]].is_const) {
-+                temps[args[0]].is_base = true;
-+                temps[args[0]].is_const = false;
-+                temps[args[0]].val =
-+                    do_constant_folding(opc, temps[args[1]].val,
-+                                        temps[args[2]].val);
+ /* Group 1 opcode extensions for 0x80-0x83.
+@@ -700,6 +703,15 @@ static inline void tcg_out_mov(TCGContext *s, TCGType type,
+                 tcg_out_modrm(s, OPC_MOVDQA_R2R, ret, arg);
+             }
+             break;
++        case TCG_TYPE_V64:
++            ret -= TCG_REG_XMM0;
++            arg -= TCG_REG_XMM0;
++            if (have_avx) {
++                tcg_out_vex_modrm(s, OPC_MOVQ_R2R, ret, 15, arg);
 +            } else {
-+                reset_temp(args[0]);
-+            }
-+        CASE_OP_32_64(ld8s):
-+        CASE_OP_32_64(ld8u):
-+            size = 1;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        CASE_OP_32_64(ld16s):
-+        CASE_OP_32_64(ld16u):
-+            size = 2;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        case INDEX_op_ld_i32:
-+        case INDEX_op_ld32s_i64:
-+        case INDEX_op_ld32u_i64:
-+            size = 4;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        case INDEX_op_ld_i64:
-+            size = 8;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        case INDEX_op_ld_v128:
-+            size = 16;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        CASE_OP_32_64(st8):
-+            size = 1;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        CASE_OP_32_64(st16):
-+            size = 2;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        case INDEX_op_st_i32:
-+        case INDEX_op_st32_i64:
-+            size = 4;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        case INDEX_op_st_i64:
-+            size = 8;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        case INDEX_op_st_v128:
-+            size = 16;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        do_ldst:
-+            if (temps[args[1]].is_base) {
-+                TCGArg val;
-+#if TCG_TARGET_REG_BITS == 32
-+                val = do_constant_folding(INDEX_op_add_i32,
-+                                          temps[args[1]].val,
-+                                          args[2]);
-+#else
-+                val = do_constant_folding(INDEX_op_add_i64,
-+                                          temps[args[1]].val,
-+                                          args[2]);
-+#endif
-+                if ((tcg_target_long)val < sizeof(CPUArchState) &&
-+                    (tcg_target_long)val + size > 0) {
-+                    s->alias_info[oi].alias_type = tp;
-+                    s->alias_info[oi].fixed_offset = true;
-+                    s->alias_info[oi].offset = val;
-+                    s->alias_info[oi].size = size;
-+                } else {
-+                    s->alias_info[oi].alias_type = TCG_NOT_ALIAS;
-+                }
-+            } else {
-+                s->alias_info[oi].alias_type = tp;
-+                s->alias_info[oi].fixed_offset = false;
-+            }
-+            goto do_reset_output;
-+        default:
-+            if (def->flags & TCG_OPF_BB_END) {
-+                reset_all_temps(s->nb_temps);
-+                temps[GET_TCGV_PTR(s->tcg_env)].is_base = true;
-+                temps[GET_TCGV_PTR(s->tcg_env)].val = 0;
-+            } else {
-+        do_reset_output:
-+                for (i = 0; i < nb_oargs; i++) {
-+                    reset_temp(args[i]);
-+                }
++                tcg_out_modrm(s, OPC_MOVQ_R2R, ret, arg);
 +            }
 +            break;
-+        }
-+    }
-+}
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index fa455ae..0e1fbe9 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -678,6 +678,20 @@ QEMU_BUILD_BUG_ON(OPPARAM_BUF_SIZE > (1 << 14));
- /* Make sure that we don't overflow 64 bits without noticing.  */
- QEMU_BUILD_BUG_ON(sizeof(TCGOp) > 8);
+         case TCG_TYPE_I32:
+         case TCG_TYPE_I64:
+             opc = OPC_MOVL_GvEv + (type == TCG_TYPE_I64 ? P_REXW : 0);
+@@ -788,6 +800,10 @@ static inline void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
+         ret -= TCG_REG_XMM0;
+         tcg_out_modrm_offset(s, OPC_MOVDQU_M2R, ret, arg1, arg2);
+         break;
++    case TCG_TYPE_V64:
++        ret -= TCG_REG_XMM0;
++        tcg_out_modrm_offset(s, OPC_MOVQ_M2R, ret, arg1, arg2);
++        break;
+     case TCG_TYPE_I32:
+     case TCG_TYPE_I64:
+         opc = OPC_MOVL_GvEv + (type == TCG_TYPE_I64 ? P_REXW : 0);
+@@ -807,6 +823,10 @@ static inline void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
+         arg -= TCG_REG_XMM0;
+         tcg_out_modrm_offset(s, OPC_MOVDQU_R2M, arg, arg1, arg2);
+         break;
++    case TCG_TYPE_V64:
++        arg -= TCG_REG_XMM0;
++        tcg_out_modrm_offset(s, OPC_MOVQ_R2M, arg, arg1, arg2);
++        break;
+     case TCG_TYPE_I32:
+     case TCG_TYPE_I64:
+         opc = OPC_MOVL_EvGv + (type == TCG_TYPE_I64 ? P_REXW : 0);
+@@ -2407,6 +2427,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
  
-+typedef enum TCGAliasType {
-+    TCG_NOT_ALIAS = 0,
-+    TCG_ALIAS_READ = 1,
-+    TCG_ALIAS_WRITE = 2,
-+    TCG_ALIAS_RW = TCG_ALIAS_READ | TCG_ALIAS_WRITE
-+} TCGAliasType;
-+
-+typedef struct TCGAliasInfo {
-+    TCGAliasType alias_type;
-+    bool fixed_offset;
-+    tcg_target_long offset;
-+    tcg_target_long size;
-+} TCGAliasInfo;
-+
- struct TCGContext {
-     uint8_t *pool_cur, *pool_end;
-     TCGPool *pool_first, *pool_current, *pool_first_large;
-@@ -762,6 +776,8 @@ struct TCGContext {
-     TCGOp gen_op_buf[OPC_BUF_SIZE];
-     TCGArg gen_opparam_buf[OPPARAM_BUF_SIZE];
+     case INDEX_op_ld_v128:
+     case INDEX_op_st_v128:
++    case INDEX_op_ld_v64:
++    case INDEX_op_st_v64:
+         return &V_r;
  
-+    TCGAliasInfo alias_info[OPC_BUF_SIZE];
-+
-     uint16_t gen_insn_end_off[TCG_MAX_INSNS];
-     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
- };
-@@ -1009,6 +1025,7 @@ TCGOp *tcg_op_insert_before(TCGContext *s, TCGOp *op, TCGOpcode opc, int narg);
- TCGOp *tcg_op_insert_after(TCGContext *s, TCGOp *op, TCGOpcode opc, int narg);
- 
- void tcg_optimize(TCGContext *s);
-+void tcg_alias_analysis(TCGContext *s);
- 
- /* only used for debugging purposes */
- void tcg_dump_ops(TCGContext *s);
+     case INDEX_op_st8_i32:
 -- 
 2.1.4
