@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cZ4g7-00064N-UG
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:51:08 -0500
+	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cZ4oh-0001z1-QJ
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 19:00:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cZ4g4-0005Fj-SN
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:51:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57092)
+	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cZ4oe-0000gc-P3
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:59:59 -0500
+Received: from mail1.bemta8.messagelabs.com ([216.82.243.200]:37217)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cZ4g4-0005FF-Mx
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:51:04 -0500
-References: <mailman.205.1485450031.31314.qemu-devel@nongnu.org>
-	<E8A8BF62-0E39-4401-B330-2E27CFA3A83F@gmail.com>
-	<8ae107ad-0f3f-46ef-e734-2f88b14bad9a@redhat.com>
-	<265EAA01-0C75-45D5-A55D-481DAC288AE5@gmail.com>
-	<58763C1D-20EB-4C1F-86EC-C9903F87BDB3@gmail.com>
-	<97ae663a-f2d1-c45d-bb8d-8be352d8f84c@redhat.com>
-	<87B90AC4-A4F9-4A6B-83F9-4E351BC71F80@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1d27660e-84a3-d200-aa50-5bce1ab56046@redhat.com>
-Date: Wed, 1 Feb 2017 15:50:58 -0800
+	(Exim 4.71) (envelope-from <Ketan.Nilangekar@veritas.com>)
+	id 1cZ4oe-0000fq-JT
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 18:59:56 -0500
+From: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
+Date: Wed, 1 Feb 2017 23:59:53 +0000
+Message-ID: <D1304CAA-9C32-4E42-AA65-27B3277130E8@veritas.com>
+References: <CAAo6VWMJAYeLdtEmyQ43vYeYjvNzCP80Wufe4=eNRUZum0rYdQ@mail.gmail.com>
+	<CAJSP0QV7QCLwih+F30hcohmwYQ1Ci+6bMPuCj_Kk9hwbmgWzUA@mail.gmail.com>
+	<E05FEFD5-A72D-4FC5-B600-58AAD2900A02@veritas.com>
+	<CAJSP0QUWmU_XbB9TGxvL0hH-SCzRSWDciNhpZrarDDcE22RF_w@mail.gmail.com>
+In-Reply-To: <CAJSP0QUWmU_XbB9TGxvL0hH-SCzRSWDciNhpZrarDDcE22RF_w@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0661A0CF40D77742B182052D5C9ACBD7@veritas.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <87B90AC4-A4F9-4A6B-83F9-4E351BC71F80@gmail.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Qemu-devel] Poll on QEMU documentation project
+Subject: Re: [Qemu-devel] [PATCH v7 RFC] block/vxhs: Initial commit to add
+ Veritas HyperScale VxHS block device support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +33,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: G 3 <programmingkidx@gmail.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>
+Cc: ashish mittal <ashmit602@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Markus
+	Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Gaurav Bhandarkar <Gaurav.Bhandarkar@veritas.com>, Abhishek Kane <Abhishek.Kane@veritas.com>, Ketan Mahajan <Ketan.Mahajan@veritas.com>, Niranjan Pendharkar <Niranjan.Pendharkar@veritas.com>, Nirendra Awasthi <Nirendra.Awasthi@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-
-
-On 01/02/2017 15:36, G 3 wrote:
-> On Feb 1, 2017, at 6:17 PM, Paolo Bonzini wrote:
->> The requirements for the format are:
->>
->> * support for HTML and man as output formats, optionally PDF and text
->> * support for QEMU's usual submission workflow
->> * producing documentation with a consistent look
->> * tool support and extensibility
->> * being easy to use and not too obscure
->>
->> in this order.  Based on this, the only formats we could plausibly use
->> are Texinfo (if only because that's what we use now), Markdown,
->> restructuredText, Docbook and Asciidoc.  The poll mentioned all of these
->> except Asciidoc, plus LaTeX as a "control group".
-> 
-> Ok. I understand.
-> 
-> For the above requirements of "tool support and extensibility", what do
-> you mean by this? Do you mean command-line tool support? What do you
-> mean by extensibility?
-
-Basically, easily integrating QEMU-specific code in the build.  This
-way, we don't need 20 different steps in the Makefile; instead a single
-tool invocation will do everything from parsing the input, to extracting
-documentation comments from C source, to finally generating the output.
-
-Of course you need to find the right balance between redoing the same
-work over and over (a solution purely based on Make can do that best)
-and ease of use.
-
-Paolo
+UGF0Y2ggZm9yIHNlY3VyZSBpbXBsZW1lbnRhdGlvbiBpbiBsaWJxbmlvIGlzIGF2YWlsYWJsZSBm
+b3IgcmV2aWV3IGhlcmU6DQoNCmh0dHBzOi8vZ2l0aHViLmNvbS9WZXJpdGFzSHlwZXJTY2FsZS9s
+aWJxbmlvL3B1bGwvMTINCg0KbGlicW5pbyBjbGllbnQgaW5pdGlhbGl6YXRpb24gbm93IGhhcyBh
+biBvcHRpb24gdG8gdXNlIFguNTA5IGNlcnRpZmljYXRlcyB0byBhdXRoZW50aWNhdGUgaXRzZWxm
+IHRvIHRoZSB2eGhzIHNlcnZlci4gIA0KQWxzbyBlYWNoIGNsaWVudCBJTyByZXF1ZXN0IG5vdyBp
+bmNsdWRlcyBhbiBpbnN0YW5jZSBpZCB0aGF0IGlzIHVzZWQgYnkgdGhlIHZ4aHMgc2VydmVyIHRv
+IGF1dGhvcml6ZSB0aGUgcmVxdWVzdC4NCkEgdGVzdCBjbGllbnQgaGFzIGFsc28gYmVlbiBhZGRl
+ZC4NCkxpYnFuaW8uc28gc28gaXMgcmVuYW1lZCB0byBsaWJ2eGhzLnNvLiBXZSB3aWxsIHJlbmFt
+ZSB0aGUgcmVwb3NpdG9yeSBvbmNlIHRoZSBsYXRlc3QgcGF0Y2hlcyBhcmUgbWVyZ2VkLg0KUUVN
+VSBwYXRjaCB0byB1c2UgdGhlIG5ldyBzZWN1cmUgaW50ZXJmYWNlIHdpbGwgZm9sbG93IHNob3J0
+bHkuDQoNCktldGFuLg0KDQoNCk9uIDEyLzE2LzE2LCAxMjowOSBBTSwgIlN0ZWZhbiBIYWpub2N6
+aSIgPHN0ZWZhbmhhQGdtYWlsLmNvbT4gd3JvdGU6DQoNCiAgICBPbiBGcmksIERlYyAxNiwgMjAx
+NiBhdCAxOjQyIEFNLCBCdWRkaGkgTWFkaGF2DQogICAgPEJ1ZGRoaS5NYWRoYXZAdmVyaXRhcy5j
+b20+IHdyb3RlOg0KICAgID4gICAgICAgICBEb2VzIHRoaXMgYXV0aGVudGljYXRpb24gc2NoZW1l
+IHdvcmtzPw0KICAgID4NCiAgICA+IDEpIFBhc3MgdGhlIGVuY3J5cHRlZCBwYXNzd29yZCB0byBx
+ZW11LWt2bSBhcyBmb2xsb3dzOg0KICAgID4NCiAgICA+ICMgLiAvcWVtdS1pbyAtLW9iamVjdCBz
+ZWNyZXQsaWQ9c2VjbWFzdGVyMCxmb3JtYXQ9YmFzZTY0LGZpbGU9a2V5LmI2NA0KICAgID4gICAg
+ICAgIC0tb2JqZWN0IHNlY3JldCxpZD1wYXNzd29yZC1zZWNyZXQsa2V5aWQ9c2VjbWFzdGVyMCxm
+aWxlPXB3LmFlcyxpdj0kKDxpdi5iNjQpDQogICAgPg0KICAgID4gMikgUUVNVSBwcm9jZXNzIHdp
+bGwgZGVjcnlwdCB0aGUgcGFzc3dvcmQuIChjYWxsIHFjcnlwdG9fc2VjcmV0X2xvb2t1cF9hc191
+dGY4KCkpLg0KICAgIA0KICAgIEknbSBub3Qgc3VyZSBpZiBBRVMgZW5jcnlwdGluZyB0aGUgcGFz
+c3dvcmQgc2VjcmV0IGZpbGUgYWRkcyBhbnl0aGluZy4NCiAgICBJZiBhbiBhdHRhY2tlciBpcyBh
+YmxlIHRvIHJlYWQgcHcuYWVzIHRoZXkgY2FuIGFsc28gcmVhZCBrZXkuYjY0IGFuZA0KICAgIHNl
+ZSB0aGUgaW5pdGlhbGl6YXRpb24gdmVjdG9yIG9uIHRoZSBjb21tYW5kLWxpbmUgKHVzaW5nIHBz
+KDEpKS4NCiAgICBUaGVyZWZvcmUgdGhleSB3b3VsZCBiZSBhYmxlIHRvIGRlY3J5cHQgdGhlIHBh
+c3N3b3JkLg0KICAgIA0KICAgIFRoZSBtYWluIGJlbmVmaXQgb2YgdXNpbmcgLW9iamVjdCBzZWNy
+ZXQsZmlsZT0gaXMgdG8gbGltaXQgYWNjZXNzIHRvDQogICAgdGhlIHNlY3JldCB2aWEgVU5JWCBm
+aWxlIHBlcm1pc3Npb25zIGFuZCB0byBwcmV2ZW50IGV4cG9zaW5nIHRoZQ0KICAgIHNlY3JldCBv
+biB0aGUgY29tbWFuZC1saW5lLiAgWW91IGdldCB0aG9zZSBiZW5lZml0cyB3aXRob3V0IEFFUzoN
+CiAgICANCiAgICAtLW9iamVjdCBzZWNyZXQsaWQ9cGFzc3dvcmQtc2VjcmV0LGZpbGU9cHcNCiAg
+ICANCiAgICBEYW46IEFtIEkgbWlzc2luZyBzb21ldGhpbmc/DQogICAgDQogICAgPiAzKSBGb3Ig
+ZXZlcnkgZGlzayBvcGVuLCBRRU1VIHByb2Nlc3Mgc2VuZHMgVk0gSUQsIHZkaXNrIElELCBhbmQg
+ZGVjcnlwdGVkIHBhc3N3b3JkLiBIeXBlcnNjYWxlIHNlcnZlcg0KICAgID4gICAgdmFsaWRhdGVz
+IHRoZSBwYXNzd29yZCwgYW5kIHNlbmRzIGJhY2sgdGhlIGFjY2VzcyB0b2tlbih1bmlxdWUgMzJi
+aXQgSUQpLg0KICAgIA0KICAgIFR3byBpc3N1ZXM6DQogICAgDQogICAgMS4gVGhpcyBpcyBzZWN1
+cmUgb25seSBpZiB0aGUgdHJhbnNwb3J0IG9mZmVycyBjb25maWRlbnRpYWxpdHkgKGUuZy4NCiAg
+ICBlbmNyeXB0aW9uIG92ZXIgVENQKS4gIE90aGVyd2lzZSBhbiBhdHRhY2tlciBjYW4gaW50ZXJj
+ZXB0IHRoZSB0cmFmZmljDQogICAgYW5kIHN0ZWFsIHRoZSBkZWNyeXB0ZWQgcGFzc3dvcmQuDQog
+ICAgDQogICAgMi4gVGhpcyBpcyBzZWN1cmUgb25seSBpZiB0aGUgY2xpZW50IGF1dGhlbnRpY2F0
+ZXMgdGhlIHNlcnZlci4NCiAgICBPdGhlcndpc2UgdGhlIHNlcnZlciBjb3VsZCBiZSBhIG1hbi1p
+bi10aGUtbWlkZGxlIHRoYXQgc3RlYWxzIHRoZQ0KICAgIHBhc3N3b3JkLg0KICAgIA0KICAgIFlv
+dXIgc2NoZW1lIGlzIHNlY3VyZSBvdmVyIEFGX1VOSVggd2hlcmUgdGhlIFVOSVggZG9tYWluIHNv
+Y2tldCBpcw0KICAgIGxvY2F0ZWQgaW4gYSBkaXJlY3Rvcnkgd2hlcmUgb25seSB0aGUgcmVhbCBz
+ZXJ2ZXIgcHJvY2VzcyBoYXMNCiAgICBwZXJtaXNzaW9uIHRvIGNyZWF0ZSBmaWxlcy4gIEFGX1VO
+SVggY2Fubm90IGJlIGludGVyY2VwdGVkIGJ5IGV4dGVybmFsDQogICAgYXR0YWNrZXJzIG9yIHVu
+cHJpdmlsZWdlZCB1c2Vycywgc28gdGhlIHRyYW5zcG9ydCBvZmZlcnMNCiAgICBjb25maWRlbnRp
+YWxpdHkuDQogICAgDQogICAgVGhpcyBzY2hlbWUgaXMgbm90IHNlY3VyZSBvdmVyIFRDUC9JUC9F
+dGhlcm5ldCBzaW5jZSB0aGUgc2VydmVyIGlzIG5vdA0KICAgIGJlaW5nIGF1dGhlbnRpY2F0ZWQg
+YW5kIHRoZXJlIGlzIG5vIGNvbmZpZGVudGlhbGl0eS4NCiAgICANCiAgICBBcmUgdGhlcmUgbmV0
+d29yayBwcm90b2NvbCBhbmQgc2VjdXJpdHkgZm9sa3MgYXQgVmVyaXRhcyB3aG8gY2FuDQogICAg
+YWR2aXNlIHlvdT8gIFRoaXMgaXNuJ3QgYSBRRU1VLXNwZWNpZmljIGlzc3VlLCBpdCdzIGEgVnhI
+UyBuZXR3b3JrDQogICAgcHJvdG9jb2wgaXNzdWUuICBZb3UgbmVlZCB0byBjaG9vc2UgYSBtb2Rl
+cm4sIHNlY3VyZSBhcHByb2FjaCB0bw0KICAgIG5ldHdvcmtpbmcuDQogICAgDQogICAgU3RlZmFu
+DQogICAgDQoNCg==
