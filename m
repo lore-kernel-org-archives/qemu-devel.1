@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ3l9-0003Yv-Jm
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ3l9-0003YS-6a
 	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 17:52:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ3l6-0000Y4-HW
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 17:52:15 -0500
-Date: Thu, 2 Feb 2017 09:27:55 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ3l6-0000YD-I8
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 17:52:13 -0500
+Date: Thu, 2 Feb 2017 09:30:23 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170201222755.GB13219@umbus.fritz.box>
-References: <1485946990-11090-1-git-send-email-thuth@redhat.com>
+Message-ID: <20170201223023.GC13219@umbus.fritz.box>
+References: <587D4171.6@linux.intel.com> <587D4329.5020702@linux.intel.com>
+	<20170130235210.GA4681@tungsten.ozlabs.ibm.com>
+	<CAFEAcA-FPmqw0pt7kT=eHR_osfFbZNhrDdGAb87VxUWD_XXSNw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="uZ3hkaAS1mZxFaxD"
+	protocol="application/pgp-signature"; boundary="GZVR6ND4mMseVXL/"
 Content-Disposition: inline
-In-Reply-To: <1485946990-11090-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc/pnv: Use error_report instead of
- hw_error if a ROM file can't be found
+In-Reply-To: <CAFEAcA-FPmqw0pt7kT=eHR_osfFbZNhrDdGAb87VxUWD_XXSNw@mail.gmail.com>
+Subject: Re: [Qemu-devel] qemu-pcc 2.8.0 linux-user segfaults
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Sam Bobroff <sam.bobroff@au1.ibm.com>, =?iso-8859-1?Q?An=EDbal_Lim=F3n?= <anibal.limon@linux.intel.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
 
---uZ3hkaAS1mZxFaxD
-Content-Type: text/plain; charset=us-ascii
+--GZVR6ND4mMseVXL/
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 01, 2017 at 12:03:10PM +0100, Thomas Huth wrote:
-> hw_error() is for CPU related errors only (it dumps the CPU registers
-> and  calls abort()!), so using error_report() is the better choice
-> of reporting an error in case we simply did not find a file.
+On Wed, Feb 01, 2017 at 03:25:05PM +0000, Peter Maydell wrote:
+> On 30 January 2017 at 23:52, Sam Bobroff <sam.bobroff@au1.ibm.com> wrote:
+> >> On 01/16/2017 03:56 PM, An=EDbal Lim=F3n wrote:
+> >> > I'm trying to upgrade qemu to 2.8.0 in Openembedded-core and segfaul=
+ts
+> >> > in qemu-ppc when is executing:
 >=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Applied to ppc-for-2.9.
-
-> ---
->  hw/ppc/pnv.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> > I've recently encountered a similar problem and I've posted a fix. If
+> > you'd like to try it, it's here:
+> >
+> > https://lists.gnu.org/archive/html/qemu-ppc/2017-01/msg00413.html
 >=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 83597fe..4fab5c0 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -381,7 +381,7 @@ static void ppc_powernv_init(MachineState *machine)
-> =20
->      fw_size =3D load_image_targphys(fw_filename, FW_LOAD_ADDR, FW_MAX_SI=
-ZE);
->      if (fw_size < 0) {
-> -        hw_error("qemu: could not load OPAL '%s'\n", fw_filename);
-> +        error_report("qemu: could not load OPAL '%s'", fw_filename);
->          exit(1);
->      }
->      g_free(fw_filename);
-> @@ -393,8 +393,8 @@ static void ppc_powernv_init(MachineState *machine)
->          kernel_size =3D load_image_targphys(machine->kernel_filename,
->                                            KERNEL_LOAD_ADDR, 0x2000000);
->          if (kernel_size < 0) {
-> -            hw_error("qemu: could not load kernel'%s'\n",
-> -                     machine->kernel_filename);
-> +            error_report("qemu: could not load kernel'%s'",
-> +                         machine->kernel_filename);
->              exit(1);
->          }
->      }
+> Hmm, I missed that patch (it doesn't seem to have made it
+> to the qemu-devel list), but it isn't correct, I'm afraid.
+> In the patch for handling TARGET_USER_ESIGRETURN you must
+> not change the nip register, because we will have just
+> set it from the signal context that the guest provided
+> to the sigreturn syscall. (The patch as it stands will
+> cause us to reexecute an instruction after return from
+> a signal handler, which isn't going to go very well).
+>=20
+> David, can you drop that patch from your ppc queue, please?
+
+Ok, dropped, pending discussion of what the right fix is.
+
+> (I think the change is good otherwise but I couldn't
+> seem to find the bit in the ppc linux kernel that
+> corresponds to moving the NIP value around.)
+>=20
+> thanks
+> -- PMM
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -78,25 +73,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---uZ3hkaAS1mZxFaxD
+--GZVR6ND4mMseVXL/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYkmDrAAoJEGw4ysog2bOS/mMQAKApfNO+eeFvmgY30tFkWKEE
-b7JlHThP9gRgBuFA4d0B5JISzkw9xD2qZUy8aeZN0jYXBteMbVsYHVU4NvlEhehO
-BZbi37pF8XwLIKeBwzPRt3SAA0JuwR0/Aakiyie329/S3f0k/t7ueoSZMz1VYuKx
-cr6MLXTU84f5ii9Ad0h9PAqeD5RHtZu53Mv5sCjXCvF1I2XfPS8LzTwpa7CI8YOy
-v0SyPwA11amY1PQNjt7nGrdnhEszOfWbcxiJII6tLAGzqqPVnz9aFHJdrW71ANUu
-psAciE60mQXUh2T4PffwqNadzOpsuIsfdXb8Q3Lu51kqPv8kvT2qiqv0NFhCLIWD
-Gkj+WPmNBGdaR5oCY+ARH7KHA/U8XuuAAKqxgixvmsZHo0SMdHfC5Jf8fhS85RPJ
-4O/P8gYee5LqasDWi4gFsmaXsF8cccIBf9VIewg8VR4f+4tOdriCn3094jxJhJZJ
-5eT/FcZZywnA9IXgb9oeQjnxbCc5+lpdwo3XsTbdXLOoxiiX0wR4Gqc0L2E5wV8h
-aMuXOd/s/brxBwEzdD1D6NXmUaYnZY9R6U+/bp61QU/yTnKynpYnML9REe+Wrcax
-HCefm/9aCTfanhzVOaRzdU2aG0E9kus4Z0d4eqjhV07deoJmH4Cv8xmRYSpFsqOZ
-PbiyBkCzemGXn9A9Zkro
-=f2rb
+iQIcBAEBCAAGBQJYkmF/AAoJEGw4ysog2bOShG4P/RCz83PjiSh7nnOP8YkTUtlM
+K8UaKsl7Ibj+cvCAkj2O48qnAz1IlEZsv4kx/wTek/I2+u9J7MjYBFJRq5O2fsII
+rj2IKO4avh2vEYq+aOEUDq/WFBYRAi7Un430AbjJGACHNULiGUaJkA7n4jziIYsA
+8kIryA+ZE4vO2o25M1V+9w+bqK04hon8MlJOnCmKw5+fVZaD054qmlOiDZP66g4G
+wuzHDwuqj/BPBt6rLobEImzr4LXs5fAXSJcTbGwZ5j01uQCoy6g+xIvV3geedY2c
+iDO6hRGg+C8/SG4lcHOHLU+VLcLbyueTcRZJRL1SrQ2WQN4eOcAJZFTkudpN4BT5
+CCKk6BuHA4nBSCuH8NfT0SfG+x0EDxiIxWH59pL3L1TsUqEgfRoDRXZt3lA1mACF
+Be7UdjC978rpmZHkWSF4xNHR8SPvtpvmK1WAsykFnoohXR8AO4jK+fmkMHOZUSXX
+2AIBXENS/Hgz3Opgps0ULvvkYuxXL/5C2qwvFqI5T1JVZY90ZBCCAPdxoHQEDhUn
+i4yRUQt98ndVHTGHcBHwwSV5kGbLPs8CjkM0NG35gkb+MhUS4VfAU2Dy+wt88vQX
+5SFumqS1F9biJN6p2slFCQZ+IE6/Lx10Tnh+zP7AdxB9pH6yKNyjRCleTermL7E9
+kcHGQ2AYZX7C5gF16VKP
+=CR3B
 -----END PGP SIGNATURE-----
 
---uZ3hkaAS1mZxFaxD--
+--GZVR6ND4mMseVXL/--
