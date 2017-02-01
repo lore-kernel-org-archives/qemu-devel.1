@@ -1,41 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cYptw-0007B5-IR
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:04:26 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cYqIN-0005Xw-Fk
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:29:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cYptt-0004uH-FK
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:04:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32773)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1cYptt-0004u4-6v
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:04:21 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v117suWg080589
-	for <qemu-devel@nongnu.org>; Wed, 1 Feb 2017 03:04:19 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28ba36ua61-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 03:04:18 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 1 Feb 2017 03:04:17 -0500
-References: <20170130145025.26475-1-david@redhat.com>
-	<89891b01-8d50-98ac-c26c-2a769b22b400@weilnetz.de>
-	<CAFEAcA86o3ohxZj0qqHKSxqxmo1mCtwKPa_j78xdO2izynEopA@mail.gmail.com>
-	<2d18251c-395e-641e-30d1-e44d7be9c012@weilnetz.de>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 1 Feb 2017 09:04:10 +0100
+	(envelope-from <eric.auger@redhat.com>) id 1cYqIL-0006rn-SS
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 03:29:39 -0500
+References: <1485880595-16376-1-git-send-email-thuth@redhat.com>
+	<20170131103044.66316989@t450s.home>
+	<5f0bafdc-6bb8-d936-e38c-5be92c46efc6@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <d2491c49-f124-7939-64bc-dc5547c2b53b@redhat.com>
+Date: Wed, 1 Feb 2017 09:29:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <2d18251c-395e-641e-30d1-e44d7be9c012@weilnetz.de>
+In-Reply-To: <5f0bafdc-6bb8-d936-e38c-5be92c46efc6@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <c0e1d939-774c-485b-b9b5-1e3631309358@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: use "qemu" cpu model in user
- mode
+Subject: Re: [Qemu-devel] [PATCH] hw/vfio: Add CONFIG switches for
+ calxeda-xgmac and amd-xgbe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,45 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>
-Cc: David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cornelia.huck@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>, pkg-qemu-devel@lists.alioth.debian.org, qemu-stable <qemu-stable@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On 01/30/2017 04:23 PM, Stefan Weil wrote:
-> Am 30.01.2017 um 16:11 schrieb Peter Maydell:
->> On 30 January 2017 at 15:09, Stefan Weil <sw@weilnetz.de> wrote:
->>> Am 30.01.2017 um 15:50 schrieb David Hildenbrand:
->>>> "any" does not exist, therefore resulting in a misleading error message.
->>>>
->>>> Reported-by: Stefan Weil <sw@weilnetz.de>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  linux-user/main.c | 2 ++
->>>>  1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/linux-user/main.c b/linux-user/main.c
->>>> index 3004958..e588f58 100644
->>>> --- a/linux-user/main.c
->>>> +++ b/linux-user/main.c
->>>> @@ -4322,6 +4322,8 @@ int main(int argc, char **argv, char **envp)
->>>>  # endif
->>>>  #elif defined TARGET_SH4
->>>>          cpu_model = TYPE_SH7785_CPU;
->>>> +#elif defined TARGET_S390X
->>>> +        cpu_model = "qemu";
->>>>  #else
->>>>          cpu_model = "any";
->>>>  #endif
->>>
->>> Thanks.
->>>
->>> Reviewed-by: Stefan Weil <sw@weilnetz.de>
->>>
->>> This fix is also needed for Debian's QEMU user emulation.
->> Does it merit a cc: qemu-stable ?
+Hi Thomas,
+
+On 31/01/2017 19:51, Thomas Huth wrote:
+> On 31.01.2017 18:30, Alex Williamson wrote:
+>> On Tue, 31 Jan 2017 17:36:35 +0100
+>> Thomas Huth <thuth@redhat.com> wrote:
 >>
->> thanks
->> -- PMM
+>>> Both devices seem to be specific to the ARM platform. It's confusing
+>>> for the users if they show up on other target architectures, too
+>>> (e.g. when the user runs QEMU with "-device ?" to get a list of
+>>> supported devices). Thus let's introduce proper configuration switches
+>>> so that the devices are only compiled and included when they are
+>>> really required.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  default-configs/arm-softmmu.mak | 2 ++
+>>>  hw/vfio/Makefile.objs           | 4 ++--
+>>>  2 files changed, 4 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+>>> index 6de3e16..a78be51 100644
+>>> --- a/default-configs/arm-softmmu.mak
+>>> +++ b/default-configs/arm-softmmu.mak
+>>> @@ -94,6 +94,8 @@ CONFIG_VERSATILE_PCI=y
+>>>  CONFIG_VERSATILE_I2C=y
+>>>  
+>>>  CONFIG_PCI_GENERIC=y
+>>> +CONFIG_VFIO_XGMAC=y
+>>> +CONFIG_VFIO_AMD_XGBE=y
+>>>  
+>>>  CONFIG_SDHCI=y
+>>>  CONFIG_INTEGRATOR_DEBUG=y
+>>> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+>>> index c25e32b..05e7fbb 100644
+>>> --- a/hw/vfio/Makefile.objs
+>>> +++ b/hw/vfio/Makefile.objs
+>>> @@ -2,7 +2,7 @@ ifeq ($(CONFIG_LINUX), y)
+>>>  obj-$(CONFIG_SOFTMMU) += common.o
+>>>  obj-$(CONFIG_PCI) += pci.o pci-quirks.o
+>>>  obj-$(CONFIG_SOFTMMU) += platform.o
+>>> -obj-$(CONFIG_SOFTMMU) += calxeda-xgmac.o
+>>> -obj-$(CONFIG_SOFTMMU) += amd-xgbe.o
+>>> +obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+>>> +obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+>>>  obj-$(CONFIG_SOFTMMU) += spapr.o
+>>>  endif
+>>
+>> I can't say that I fully agree that this is a good idea.  How many
+>> users are actually confused by this, versus the benefit of ensuring
+>> that it builds across all architectures?
 > 
-> Yes, of course. Thanks for the reminder - I added that list now as cc.
+> Why do you want this to be build on all architectures? The devices are
+> only available on ARM as far as I know, so I can't see any real use for
+> this. And it slows down compilation time, too, if we compile it
+> everywhere (well, a little bit at least ;-)).
+> 
+>> Do we want to make platform also specific to ARM
+> 
+> I did not notice that one yet, since it does not show up in the "-device
+> ?" help text (it's apparently an abstract device), so it also does not
+> really bother me.
+> But if I remove the device from the build, I get a funny error when I
+> try to view the device help text:
+> 
+> $ qemu-system-tricore -device ?
+> **
+> ERROR:/home/thuth/devel/qemu/qom/object.c:168:type_get_parent: assertion
+> failed: (type->parent_type != NULL)
+> Aborted (core dumped)
+> 
+> So I guess we should rather keep that one for now.
 
-Added to the kvm/s390 tree (since this tree introduced the regression)
+FYI I will send patches to make VFIO platform device non abstract.
+
+Thanks
+
+Eric
+> 
+>> and spapr specific to ppc64?
+> 
+> I already tried that (with the already existing CONFIG_PSERIES), but the
+> code in common.c depends on the code in spapr.c, so it can't be removed
+> without reworking the code quite a bit. But spapr.c also does not really
+> bug me, since it does not register a type that shows up in the "-device
+> ?" help text, so I think it is not worth the effort here.
+> 
+>  Thomas
+> 
