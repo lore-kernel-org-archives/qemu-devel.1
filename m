@@ -1,35 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1cYrmC-00026T-Q8
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:04:33 -0500
+	(envelope-from <lprosek@redhat.com>) id 1cYroV-0004WR-6r
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:06:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1cYrm7-0004j4-UU
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:04:32 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:32883)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cYrm7-0004it-Pc
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:04:27 -0500
-Received: by mail-pg0-x242.google.com with SMTP id 194so33752504pgd.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 02:04:27 -0800 (PST)
-Date: Wed, 1 Feb 2017 19:04:23 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170201100423.GE21641@lianli.shorne-pla.net>
-References: <CAJBMM-sX4fGckYy-eNRdZ9dKamOoJoK2fQ4TLS80T5n6jCkpFg@mail.gmail.com>
-	<20170114080435.GF25986@lianli.shorne-pla.net>
-	<20170120163918.GD7836@lianli.shorne-pla.net>
-	<d27b7c60-a9fe-e92e-a937-d2d13b78f290@twiddle.net>
-	<20170124102625.GF7836@lianli.shorne-pla.net>
-	<01f7a18d-f4f5-18f3-0932-b32c06ad0b0c@twiddle.net>
-	<20170125123430.GG7836@lianli.shorne-pla.net>
-	<39f927aa-26fe-0e43-7c6b-efe1b70bc5fa@twiddle.net>
-	<20170126131229.GB16014@lianli.shorne-pla.net>
-	<ddb9c656-aa3e-5d90-c8fc-0058af5b603b@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ddb9c656-aa3e-5d90-c8fc-0058af5b603b@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH] target-openrisc: Fix exception handling
- status registers
+	(envelope-from <lprosek@redhat.com>) id 1cYroQ-0005QV-8G
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:06:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cYroQ-0005Q1-02
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:06:50 -0500
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Wed,  1 Feb 2017 11:06:46 +0100
+Message-Id: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
+Subject: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,37 +21,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org, openrisc@lists.librecores.org
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-On Thu, Jan 26, 2017 at 09:26:55AM -0800, Richard Henderson wrote:
-> On 01/26/2017 05:12 AM, Stafford Horne wrote:
-> > I just sent you a mail with a link to my kernel for download.
-> > 
-> > One thing I noticed is you passed '-append console=ttyS0' I think that
-> > does nothing on openrisc since as far as I know openrisc only gets boot
-> > params from the device tree file. I tried with and without it and got no
-> > differences.
-> 
-> That was just reflex, wondering where the output went.
-> 
-> > Another thing, I am using a 'late' version of gcc built with musl cross [1]
-> > , I dont think it would make a difference, but maybe?
-> 
-> I think that's likely the difference.  I can indeed boot your kernel.
+Analogous to guest-file-read and guest-file-write, this commit adds
+support for issuing IOCTLs to files in the guest. With the goal of
+abstracting away the differences between Posix ioctl() and Win32
+DeviceIoControl() to provide one unified API, the schema distinguishes
+between input and output buffer sizes (as required by Win32) and
+allows the caller to supply either a 'buffer', pointer to which will
+be passed to the Posix ioctl(), or an integer argument, passed to
+ioctl() directly.
 
-Hi Richard,
+Examples:
 
-For kernel builds I have created toolchain binaries here:
+To issue an IOCTL that takes const int * as its argument, one would
+call guest-file-ioctl with:
+out-count = 0
+in-buf-b64 = <base64-encoded binary representation of an integer>
 
-  http://shorne.noip.me/crosstool/files/bin/x86_64/5.4.0/
+To issue an IOCTL that takes int * as its argument, one would use:
+out-count = sizeof(int)
+in-buf-b64 = <empty string if the argument is output-only>
+and the returned GuestFileIOCTL will contain:
+count = sizeof(int)
+buf-b64 = <base64-encoded binary representation of an integer>
 
-These should work.
+To issue an IOCTL that takes int as its argument, one would use:
+out-count = 0
+in-buf-b64 = <empty string>
+int-arg = <an integer>
+This last example will work only with the Posix guest agent as
+Win32 always uses indirect input and output data.
 
-If all is ok with the qemu patch I sent what is the next step to get them
-incorporated.  Do you need any help from me?
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+---
+ qga/commands-posix.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ qga/commands-win32.c | 66 ++++++++++++++++++++++++++++++++++++++++++++
+ qga/qapi-schema.json | 45 ++++++++++++++++++++++++++++++
+ 3 files changed, 189 insertions(+)
 
-... Actually I just checked your branch on github, it looks like you are
-doing a few updates.  Let me know if you want me to review anything.
-
--Stafford
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index ea37c09..4fb6edc 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -547,6 +547,84 @@ GuestFileWrite *qmp_guest_file_write(int64_t handle, const char *buf_b64,
+     return write_data;
+ }
+ 
++GuestFileIOCTL *qmp_guest_file_ioctl(int64_t handle, int64_t code,
++                                     int64_t out_count, const char *in_buf_b64,
++                                     bool has_in_count, int64_t in_count,
++                                     bool has_int_arg, int64_t int_arg,
++                                     Error **errp)
++{
++    GuestFileIOCTL *ioctl_data = NULL;
++    guchar *buf;
++    gsize buf_len;
++    int ioctl_retval;
++    GuestFileHandle *gfh = guest_file_handle_find(handle, errp);
++    int fd;
++
++    if (!gfh) {
++        return NULL;
++    }
++    fd = fileno(gfh->fh);
++    if (fd < 0) {
++        error_setg_errno(errp, errno, "failed to get fd");
++        return NULL;
++    }
++
++    buf = qbase64_decode(in_buf_b64, -1, &buf_len, errp);
++    if (!buf) {
++        return NULL;
++    }
++    if (has_int_arg && buf_len) {
++        error_setg(errp,
++            "int-arg and non-empty in-buf-b64 must not be specified at the same time");
++        g_free(buf);
++        return NULL;
++    }
++    if (has_int_arg && out_count) {
++        error_setg(errp,
++            "int-arg and non-zero out-count must not be specified at the same time");
++        g_free(buf);
++        return NULL;
++    }
++
++    if (!has_in_count) {
++        in_count = buf_len;
++    } else if (in_count < 0 || in_count > buf_len) {
++        error_setg(errp, "value '%" PRId64 "' is invalid for argument in-count",
++                   in_count);
++        g_free(buf);
++        return NULL;
++    }
++
++    /* there's only one input/output buffer so make sure it's large enough */
++    if (out_count > buf_len) {
++        guchar *old_buf = buf;
++        buf = g_malloc(out_count);
++
++        memcpy(buf, old_buf, buf_len);
++        memset(buf + buf_len, 0, out_count - buf_len);
++        g_free(old_buf);
++    }
++
++    if (has_int_arg) {
++        ioctl_retval = ioctl(fd, code, int_arg);
++    } else {
++        ioctl_retval = ioctl(fd, code, buf);
++    }
++
++    if (ioctl_retval < 0) {
++        error_setg_errno(errp, errno, "failed to issue IOCTL to file");
++        slog("guest-file-ioctl failed, handle: %" PRId64, handle);
++    } else {
++        ioctl_data = g_new0(GuestFileIOCTL, 1);
++        ioctl_data->retcode = ioctl_retval;
++        ioctl_data->count = out_count;
++        ioctl_data->buf_b64 = g_base64_encode(buf, out_count);
++    }
++    g_free(buf);
++
++    return ioctl_data;
++}
++
+ struct GuestFileSeek *qmp_guest_file_seek(int64_t handle, int64_t offset,
+                                           GuestFileWhence *whence_code,
+                                           Error **errp)
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 19d72b2..7d1ad35 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -381,6 +381,72 @@ done:
+     return write_data;
+ }
+ 
++GuestFileIOCTL *qmp_guest_file_ioctl(int64_t handle, int64_t code,
++                                     int64_t out_count, const char *in_buf_b64,
++                                     bool has_in_count, int64_t in_count,
++                                     bool has_int_arg, int64_t int_arg,
++                                     Error **errp)
++{
++    GuestFileIOCTL *ioctl_data = NULL;
++    guchar *in_buf = NULL, *out_buf = NULL;
++    gsize in_buf_len;
++    BOOL is_ok;
++    GuestFileHandle *gfh = guest_file_handle_find(handle, errp);
++    DWORD bytes_returned;
++    HANDLE fh;
++
++    if (!gfh) {
++        return NULL;
++    }
++    fh = gfh->fh;
++    in_buf = qbase64_decode(in_buf_b64, -1, &in_buf_len, errp);
++    if (!in_buf) {
++        return NULL;
++    }
++    if (has_int_arg) {
++        error_setg(errp, "integer arguments are not supported");
++        goto done;
++    }
++
++    if (!has_in_count) {
++        in_count = in_buf_len;
++    } else if (in_count < 0 || in_count > in_buf_len) {
++        error_setg(errp, "value '%" PRId64
++                   "' is invalid for argument in-count", in_count);
++        goto done;
++    }
++
++    if (out_count < 0) {
++        error_setg(errp, "value '%" PRId64
++                   "' is invalid for argument out-count", out_count);
++        goto done;
++    }
++    if (out_count > 0) {
++        out_buf = g_malloc(out_count);
++    }
++
++    is_ok = DeviceIoControl(fh, code, in_buf, in_count, out_buf, out_count,
++                            &bytes_returned, NULL);
++    if (!is_ok) {
++        error_setg_win32(errp, GetLastError(), "failed to issue IOCTL to file");
++        slog("guest-file-ioctl-failed, handle: %" PRId64, handle);
++    } else {
++        ioctl_data = g_new0(GuestFileIOCTL, 1);
++        ioctl_data->retcode = is_ok;
++        ioctl_data->count = bytes_returned;
++        if (out_buf) {
++            ioctl_data->buf_b64 = g_base64_encode(out_buf, bytes_returned);
++        } else {
++            ioctl_data->buf_b64 = g_strdup("");
++        }
++    }
++
++done:
++    g_free(in_buf);
++    g_free(out_buf);
++    return ioctl_data;
++}
++
+ GuestFileSeek *qmp_guest_file_seek(int64_t handle, int64_t offset,
+                                    GuestFileWhence *whence_code,
+                                    Error **errp)
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index d421609..efef6d9 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -298,6 +298,51 @@
+   'data':    { 'handle': 'int', 'buf-b64': 'str', '*count': 'int' },
+   'returns': 'GuestFileWrite' }
+ 
++##
++# @GuestFileIOCTL:
++#
++# Result of guest agent file-ioctl operation
++#
++# @retcode: return value of the IOCTL call
++#
++# @count: number of output bytes (note: count is *before*
++#         base64-encoding is applied)
++#
++# @buf-b64: base64-encoded output bytes
++#
++# Since: 2.9
++##
++{ 'struct': 'GuestFileIOCTL',
++  'data': { 'retcode': 'int', 'count': 'int', 'buf-b64': 'str' } }
++
++##
++# @guest-file-ioctl:
++#
++# Issue an IOCTL to an open file in the guest.
++#
++# @handle: filehandle returned by guest-file-open
++#
++# @code: device-dependent request code
++#
++# @out-count: output bytes expected to be returned by the IOCTL
++#
++# @in-buf-b64: base64-encoded string representing input data
++#
++# @in-count: #optional input bytes (actual bytes, after base64-decode),
++#            default is all content in in-buf-b64 buffer after base64 decoding
++#
++# @int-arg: #optional integer input argument to be used instead of buf-b64,
++#           it is an error to pass both a non-empty in-buf-b64 and int-arg
++#           and to pass both a non-zero out-count and int-arg
++#
++# Returns: @GuestFileIOCTL on success.
++#
++# Since: 2.9
++##
++{ 'command': 'guest-file-ioctl',
++  'data':    { 'handle': 'int', 'code': 'int', 'out-count': 'int',
++               'in-buf-b64': 'str', '*in-count': 'int', '*int-arg': 'int' },
++  'returns': 'GuestFileIOCTL' }
+ 
+ ##
+ # @GuestFileSeek:
+-- 
+2.7.4
