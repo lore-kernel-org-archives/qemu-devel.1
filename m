@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYtsE-00064M-Fk
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:58 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cYtsA-00060F-UR
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005e9-E2
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:54 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:46124 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts7-0005cU-Au
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:50 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:46096 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005dE-Ts
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:49 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cYts6-0005cF-Vp
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:47 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Wed,  1 Feb 2017 15:18:19 +0300
-Message-Id: <1485951502-28774-18-git-send-email-batuzovk@ispras.ru>
+Date: Wed,  1 Feb 2017 15:18:08 +0300
+Message-Id: <1485951502-28774-7-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
 References: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2 17/20] softmmu: create helpers for vector
- loads
+Subject: [Qemu-devel] [PATCH v2 06/20] tcg: use results of alias analysis in
+ liveness analysis
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,314 +29,101 @@ Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Pe
 
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- cputlb.c                  |   4 +
- softmmu_template_vector.h | 266 ++++++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg.h                 |   5 +
- 3 files changed, 275 insertions(+)
- create mode 100644 softmmu_template_vector.h
+ tcg/tcg.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
-diff --git a/cputlb.c b/cputlb.c
-index 6c39927..41c9a01 100644
---- a/cputlb.c
-+++ b/cputlb.c
-@@ -660,6 +660,10 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
- #define DATA_SIZE 8
- #include "softmmu_template.h"
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 18d97ec..27e5944 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -564,6 +564,11 @@ static intptr_t tcg_type_size(TCGType type)
+     }
+ }
  
-+#define SHIFT 4
-+#include "softmmu_template_vector.h"
-+#undef MMUSUFFIX
++static intptr_t tcg_temp_size(const TCGTemp *tmp)
++{
++    return tcg_type_size(tmp->type);
++}
 +
- /* First set of helpers allows passing in of OI and RETADDR.  This makes
-    them callable from other helpers.  */
+ int tcg_global_mem_new_internal(TCGType base_type, TCGv_ptr base,
+                                 intptr_t offset, const char *name)
+ {
+@@ -1472,6 +1477,43 @@ static inline void tcg_la_bb_end(TCGContext *s, uint8_t *temp_state)
+     }
+ }
  
-diff --git a/softmmu_template_vector.h b/softmmu_template_vector.h
-new file mode 100644
-index 0000000..b286d65
---- /dev/null
-+++ b/softmmu_template_vector.h
-@@ -0,0 +1,266 @@
-+/*
-+ *  Software MMU support
-+ *
-+ * Generate helpers used by TCG for qemu_ld/st vector ops and code
-+ * load functions.
-+ *
-+ * Included from target op helpers and exec.c.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/timer.h"
-+#include "exec/address-spaces.h"
-+#include "exec/memory.h"
-+
-+#define DATA_SIZE (1 << SHIFT)
-+
-+#if DATA_SIZE == 16
-+#define SUFFIX v128
-+#else
-+#error unsupported data size
-+#endif
-+
-+
-+#ifdef SOFTMMU_CODE_ACCESS
-+#define READ_ACCESS_TYPE MMU_INST_FETCH
-+#define ADDR_READ addr_code
-+#else
-+#define READ_ACCESS_TYPE MMU_DATA_LOAD
-+#define ADDR_READ addr_read
-+#endif
-+
-+#define helper_te_ld_name  glue(glue(helper_te_ld, SUFFIX), MMUSUFFIX)
-+#define helper_te_st_name  glue(glue(helper_te_st, SUFFIX), MMUSUFFIX)
-+
-+#ifndef SOFTMMU_CODE_ACCESS
-+static inline void glue(io_read, SUFFIX)(CPUArchState *env,
-+                                         CPUIOTLBEntry *iotlbentry,
-+                                         target_ulong addr,
-+                                         uintptr_t retaddr,
-+                                         uint8_t *res)
++/* Check if memory write completely overwrites temp's memory location.
++   If this is the case then the temp can be considered dead. */
++static int tcg_temp_overwrite(TCGContext *s, const TCGTemp *tmp,
++                               const TCGAliasInfo *ai)
 +{
-+    CPUState *cpu = ENV_GET_CPU(env);
-+    hwaddr physaddr = iotlbentry->addr;
-+    MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
-+    int i;
-+
-+    assert(0); /* Needs testing */
-+
-+    physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
-+    cpu->mem_io_pc = retaddr;
-+    if (mr != &io_mem_rom && mr != &io_mem_notdirty && !cpu->can_do_io) {
-+        cpu_io_recompile(cpu, retaddr);
++    if (!(ai->alias_type & TCG_ALIAS_WRITE) || !ai->fixed_offset) {
++        return 0;
 +    }
-+
-+    cpu->mem_io_vaddr = addr;
-+    for (i = 0; i < (1 << SHIFT); i += 8) {
-+        memory_region_dispatch_read(mr, physaddr + i, (uint64_t *)(res + i),
-+                                    8, iotlbentry->attrs);
++    if (tmp->mem_base != &s->temps[GET_TCGV_PTR(s->tcg_env)]) {
++        return 0;
 +    }
++    if (ai->offset > tmp->mem_offset
++        || ai->offset + ai->size < tmp->mem_offset + tcg_temp_size(tmp)) {
++            return 0;
++    }
++    return 1;
 +}
-+#endif
 +
-+void helper_te_ld_name(CPUArchState *env, target_ulong addr,
-+                       TCGMemOpIdx oi, uintptr_t retaddr, uint8_t *res)
++/* Check if memory read or write overlaps with temp's memory location.
++   If this is the case then the temp must be synced to memory. */
++static int tcg_temp_overlap(TCGContext *s, const TCGTemp *tmp,
++                            const TCGAliasInfo *ai)
 +{
-+    unsigned mmu_idx = get_mmuidx(oi);
-+    int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-+    target_ulong tlb_addr = env->tlb_table[mmu_idx][index].ADDR_READ;
-+    uintptr_t haddr;
-+    int i;
-+
-+    /* Adjust the given return address.  */
-+    retaddr -= GETPC_ADJ;
-+
-+    /* If the TLB entry is for a different page, reload and try again.  */
-+    if ((addr & TARGET_PAGE_MASK)
-+         != (tlb_addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
-+        if ((addr & (DATA_SIZE - 1)) != 0
-+            && (get_memop(oi) & MO_AMASK) == MO_ALIGN) {
-+            cpu_unaligned_access(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
-+                                 mmu_idx, retaddr);
-+        }
-+        if (!VICTIM_TLB_HIT(ADDR_READ, addr)) {
-+            tlb_fill(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
-+                     mmu_idx, retaddr);
-+        }
-+        tlb_addr = env->tlb_table[mmu_idx][index].ADDR_READ;
++    if (!ai->fixed_offset || tmp->fixed_reg) {
++        return 0;
 +    }
-+
-+    /* Handle an IO access.  */
-+    if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
-+        CPUIOTLBEntry *iotlbentry;
-+        if ((addr & (DATA_SIZE - 1)) != 0) {
-+            goto do_unaligned_access;
-+        }
-+        iotlbentry = &env->iotlb[mmu_idx][index];
-+
-+        /* ??? Note that the io helpers always read data in the target
-+           byte ordering.  We should push the LE/BE request down into io.  */
-+        glue(io_read, SUFFIX)(env, iotlbentry, addr, retaddr, res);
-+        return ;
++    if (tmp->mem_base != &s->temps[GET_TCGV_PTR(s->tcg_env)]) {
++        return 1;
 +    }
-+
-+    /* Handle slow unaligned access (it spans two pages or IO).  */
-+    if (DATA_SIZE > 1
-+        && unlikely((addr & ~TARGET_PAGE_MASK) + DATA_SIZE - 1
-+                    >= TARGET_PAGE_SIZE)) {
-+        target_ulong addr1, addr2;
-+        uint8_t res1[DATA_SIZE * 2];
-+        unsigned shift;
-+    do_unaligned_access:
-+        if ((get_memop(oi) & MO_AMASK) == MO_ALIGN) {
-+            cpu_unaligned_access(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
-+                                 mmu_idx, retaddr);
-+        }
-+        addr1 = addr & ~(DATA_SIZE - 1);
-+        addr2 = addr1 + DATA_SIZE;
-+        /* Note the adjustment at the beginning of the function.
-+           Undo that for the recursion.  */
-+        helper_te_ld_name(env, addr1, oi, retaddr + GETPC_ADJ, res1);
-+        helper_te_ld_name(env, addr2, oi, retaddr + GETPC_ADJ,
-+                          res1 + DATA_SIZE);
-+        shift = addr & (DATA_SIZE - 1);
-+
-+        for (i = 0; i < DATA_SIZE; i++) {
-+            res[i] = res1[i + shift];
-+        }
-+        return;
-+    }
-+
-+    /* Handle aligned access or unaligned access in the same page.  */
-+    if ((addr & (DATA_SIZE - 1)) != 0
-+        && (get_memop(oi) & MO_AMASK) == MO_ALIGN) {
-+        cpu_unaligned_access(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
-+                             mmu_idx, retaddr);
-+    }
-+
-+    haddr = addr + env->tlb_table[mmu_idx][index].addend;
-+    for (i = 0; i < DATA_SIZE; i++) {
-+        res[i] = ((uint8_t *)haddr)[i];
++    if (ai->offset >= tmp->mem_offset + tcg_temp_size(tmp)
++        || ai->offset + ai->size <= tmp->mem_offset) {
++            return 0;
++    } else {
++        return 1;
 +    }
 +}
 +
-+#ifndef SOFTMMU_CODE_ACCESS
-+
-+static inline void glue(io_write, SUFFIX)(CPUArchState *env,
-+                                          CPUIOTLBEntry *iotlbentry,
-+                                          uint8_t *val,
-+                                          target_ulong addr,
-+                                          uintptr_t retaddr)
-+{
-+    CPUState *cpu = ENV_GET_CPU(env);
-+    hwaddr physaddr = iotlbentry->addr;
-+    MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
-+    int i;
-+
-+    assert(0); /* Needs testing */
-+
-+    physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
-+    if (mr != &io_mem_rom && mr != &io_mem_notdirty && !cpu->can_do_io) {
-+        cpu_io_recompile(cpu, retaddr);
-+    }
-+
-+    cpu->mem_io_vaddr = addr;
-+    cpu->mem_io_pc = retaddr;
-+    for (i = 0; i < (1 << SHIFT); i += 8) {
-+        memory_region_dispatch_write(mr, physaddr + i, *(uint64_t *)(val + i),
-+                                     8, iotlbentry->attrs);
-+    }
-+}
-+
-+void helper_te_st_name(CPUArchState *env, target_ulong addr, uint8_t *val,
-+                       TCGMemOpIdx oi, uintptr_t retaddr)
-+{
-+    unsigned mmu_idx = get_mmuidx(oi);
-+    int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-+    target_ulong tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
-+    uintptr_t haddr;
-+    int i;
-+
-+    /* Adjust the given return address.  */
-+    retaddr -= GETPC_ADJ;
-+
-+    /* If the TLB entry is for a different page, reload and try again.  */
-+    if ((addr & TARGET_PAGE_MASK)
-+        != (tlb_addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
-+        if ((addr & (DATA_SIZE - 1)) != 0
-+            && (get_memop(oi) & MO_AMASK) == MO_ALIGN) {
-+            cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
-+                                 mmu_idx, retaddr);
-+        }
-+        if (!VICTIM_TLB_HIT(addr_write, addr)) {
-+            tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
-+        }
-+        tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
-+    }
-+
-+    /* Handle an IO access.  */
-+    if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
-+        CPUIOTLBEntry *iotlbentry;
-+        if ((addr & (DATA_SIZE - 1)) != 0) {
-+            goto do_unaligned_access;
-+        }
-+        iotlbentry = &env->iotlb[mmu_idx][index];
-+
-+        /* ??? Note that the io helpers always read data in the target
-+           byte ordering.  We should push the LE/BE request down into io.  */
-+        glue(io_write, SUFFIX)(env, iotlbentry, val, addr, retaddr);
-+        return;
-+    }
-+
-+    /* Handle slow unaligned access (it spans two pages or IO).  */
-+    if (DATA_SIZE > 1
-+        && unlikely((addr & ~TARGET_PAGE_MASK) + DATA_SIZE - 1
-+                     >= TARGET_PAGE_SIZE)) {
-+        int i;
-+    do_unaligned_access:
-+        if ((get_memop(oi) & MO_AMASK) == MO_ALIGN) {
-+            cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
-+                                 mmu_idx, retaddr);
-+        }
-+        /* XXX: not efficient, but simple */
-+        /* Note: relies on the fact that tlb_fill() does not remove the
-+         * previous page from the TLB cache.  */
-+        for (i = DATA_SIZE - 1; i >= 0; i--) {
-+            /* Note the adjustment at the beginning of the function.
-+               Undo that for the recursion.  */
-+            glue(helper_ret_stb, MMUSUFFIX)(env, addr + i, val[i],
-+                                            oi, retaddr + GETPC_ADJ);
-+        }
-+        return;
-+    }
-+
-+    /* Handle aligned access or unaligned access in the same page.  */
-+    if ((addr & (DATA_SIZE - 1)) != 0
-+        && (get_memop(oi) & MO_AMASK) == MO_ALIGN) {
-+        cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
-+                             mmu_idx, retaddr);
-+    }
-+
-+    haddr = addr + env->tlb_table[mmu_idx][index].addend;
-+    for (i = 0; i < DATA_SIZE; i++) {
-+        ((uint8_t *)haddr)[i] = val[i];
-+    }
-+}
-+
-+#endif /* !defined(SOFTMMU_CODE_ACCESS) */
-+
-+#undef READ_ACCESS_TYPE
-+#undef SHIFT
-+#undef SUFFIX
-+#undef DATA_SIZE
-+#undef ADDR_READ
-+#undef helper_te_ld_name
-+#undef helper_te_st_name
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 63a83f9..8dee5c2 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -1330,6 +1330,11 @@ uint32_t helper_be_ldl_cmmu(CPUArchState *env, target_ulong addr,
- uint64_t helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr,
-                             TCGMemOpIdx oi, uintptr_t retaddr);
+ /* Liveness analysis : update the opc_arg_life array to tell if a
+    given input arguments is dead. Instructions updating dead
+    temporaries are removed. */
+@@ -1674,6 +1716,23 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
+                     temp_state[arg] = TS_DEAD;
+                 }
  
-+void helper_te_ldv128_mmu(CPUArchState *env, target_ulong addr,
-+                          TCGMemOpIdx oi, uintptr_t retaddr, uint8_t *res);
-+void helper_te_stv128_mmu(CPUArchState *env, target_ulong addr, uint8_t *val,
-+                          TCGMemOpIdx oi, uintptr_t retaddr);
++                /* record if the operation uses some globals' memory location */
++                if (s->alias_info[oi].alias_type != TCG_NOT_ALIAS) {
++                    for (i = 0; i < s->nb_globals; i++) {
++                        if (tcg_temp_overwrite(s, &s->temps[i],
++                                               &s->alias_info[oi])) {
++                            temp_state[i] = TS_DEAD;
++                        } else if (tcg_temp_overlap(s, &s->temps[i],
++                                                    &s->alias_info[oi])) {
++                            if (s->alias_info[oi].alias_type & TCG_ALIAS_READ) {
++                                temp_state[i] = TS_MEM | TS_DEAD;
++                            } else if (!(temp_state[i] & TS_DEAD)) {
++                                temp_state[i] |= TS_MEM;
++                            }
++                        }
++                    }
++                }
 +
- /* Temporary aliases until backends are converted.  */
- #ifdef TARGET_WORDS_BIGENDIAN
- # define helper_ret_ldsw_mmu  helper_be_ldsw_mmu
+                 /* if end of basic block, update */
+                 if (def->flags & TCG_OPF_BB_END) {
+                     tcg_la_bb_end(s, temp_state);
+@@ -2622,6 +2681,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+     s->la_time -= profile_getclock();
+ #endif
+ 
++    tcg_alias_analysis(s);
++
+     {
+         uint8_t *temp_state = tcg_malloc(s->nb_temps + s->nb_indirects);
+ 
 -- 
 2.1.4
