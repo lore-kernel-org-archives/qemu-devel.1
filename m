@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cYsUS-0004FH-4v
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:50:17 -0500
+	(envelope-from <lprosek@redhat.com>) id 1cYsUz-0004WW-LD
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:50:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cYsUP-0008Dx-1d
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:50:16 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49389
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cYsUO-0008DR-Rp
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:50:12 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v11AmksV073136
-	for <qemu-devel@nongnu.org>; Wed, 1 Feb 2017 05:50:11 -0500
-Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28b8wv2ygb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 05:50:10 -0500
-Received: from localhost
-	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 1 Feb 2017 20:50:07 +1000
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Wed,  1 Feb 2017 16:19:06 +0530
-Message-Id: <1485946146-21639-1-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v0] softfloat: Add
- float128_to_uint64_round_to_zero()
+	(envelope-from <lprosek@redhat.com>) id 1cYsUv-0008HW-AM
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:50:48 -0500
+Received: from mail-ua0-f177.google.com ([209.85.217.177]:33047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cYsUv-0008HS-62
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 05:50:45 -0500
+Received: by mail-ua0-f177.google.com with SMTP id i68so292756013uad.0
+	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 02:50:45 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170201102013.GC3232@redhat.com>
+References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
+	<20170201102013.GC3232@redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Wed, 1 Feb 2017 11:50:43 +0100
+Message-ID: <CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,108 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
 
-Implement float128_to_uint64() and use that to implement
-float128_to_uint64_round_to_zero()
+On Wed, Feb 1, 2017 at 11:20 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Wed, Feb 01, 2017 at 11:06:46AM +0100, Ladi Prosek wrote:
+>> Analogous to guest-file-read and guest-file-write, this commit adds
+>> support for issuing IOCTLs to files in the guest. With the goal of
+>> abstracting away the differences between Posix ioctl() and Win32
+>> DeviceIoControl() to provide one unified API, the schema distinguishes
+>> between input and output buffer sizes (as required by Win32) and
+>> allows the caller to supply either a 'buffer', pointer to which will
+>> be passed to the Posix ioctl(), or an integer argument, passed to
+>> ioctl() directly.
+>
+> What is the intended usage scenario for this ?
 
-This is required by xscvqpudz instruction of PowerPC ISA 3.0.
+My specific case is extracting a piece of data from Windows guests.
+Guest driver exposes a file object with a well-known IOCTL code to
+return a data structure from the kernel.
 
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
----
- fpu/softfloat.c         | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/fpu/softfloat.h |  2 ++
- 2 files changed, 67 insertions(+)
+> The size of arguments that need to be provided to ioctl()s vary on
+> the architecture of the guest kernel that's running, which cannot be
+> assumed to be the same as the architecture of the QEMU binary. ie
+> you can be running i686 kernel in an x86_64 QEMU.  So it feels like
+> it is going to be hard for applications to reliably use this feature
+> unless they have more information about the guest OS, that is not
+> currently provided by QEMU guest agent. So it feels like this design
+> is not likely to be satisfactory to me.
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index c295f31..49a06c5 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -6110,6 +6110,71 @@ int64_t float128_to_int64_round_to_zero(float128 a, float_status *status)
- 
- /*----------------------------------------------------------------------------
- | Returns the result of converting the quadruple-precision floating-point
-+| value `a' to the 64-bit unsigned integer format.  The conversion
-+| is performed according to the IEC/IEEE Standard for Binary Floating-Point
-+| Arithmetic---which means in particular that the conversion is rounded
-+| according to the current rounding mode.  If `a' is a NaN, the largest
-+| positive integer is returned.  Otherwise, if the conversion overflows, the
-+| largest unsigned integer is returned. If 'a' is negative, the value is
-+| rounded and zero is returned; negative values that do not round to zero
-+| will raise the inexact exception.
-+*----------------------------------------------------------------------------*/
-+
-+uint64_t float128_to_uint64(float128 a, float_status *status)
-+{
-+    flag aSign;
-+    int32_t aExp, shiftCount;
-+    uint64_t aSig0, aSig1;
-+
-+    aSig1 = extractFloat128Frac1( a );
-+    aSig0 = extractFloat128Frac0( a );
-+    aExp = extractFloat128Exp( a );
-+    aSign = extractFloat128Sign( a );
-+    if ( aExp ) aSig0 |= LIT64( 0x0001000000000000 );
-+    shiftCount = 0x402F - aExp;
-+    if ( shiftCount <= 0 ) {
-+        if ( 0x403E < aExp ) {
-+            float_raise(float_flag_invalid, status);
-+            if (    ! aSign
-+                 || (    ( aExp == 0x7FFF )
-+                      && ( aSig1 || ( aSig0 != LIT64( 0x0001000000000000 ) ) )
-+                    )
-+               ) {
-+                return LIT64( 0xFFFFFFFFFFFFFFFF );
-+            }
-+            return 0;
-+        }
-+        shortShift128Left( aSig0, aSig1, - shiftCount, &aSig0, &aSig1 );
-+    }
-+    else {
-+        shift64ExtraRightJamming( aSig0, aSig1, shiftCount, &aSig0, &aSig1 );
-+    }
-+    return roundAndPackUint64(aSign, aSig0, aSig1, status);
-+}
-+
-+/*----------------------------------------------------------------------------
-+| Returns the result of converting the quadruple-precision floating-point
-+| value `a' to the 64-bit unsigned integer format.  The conversion
-+| is performed according to the IEC/IEEE Standard for Binary Floating-Point
-+| Arithmetic, except that the conversion is always rounded toward zero.
-+| according to the current rounding mode.  If `a' is a NaN, the largest
-+| positive integer is returned.  Otherwise, if the conversion overflows, the
-+| largest unsigned integer is returned. If 'a' is negative, the value is
-+| rounded and zero is returned; negative values that do not round to zero
-+| will raise the inexact exception.
-+*----------------------------------------------------------------------------*/
-+
-+uint64_t float128_to_uint64_round_to_zero(float128 a, float_status *status)
-+{
-+    signed char current_rounding_mode = status->float_rounding_mode;
-+    set_float_rounding_mode(float_round_to_zero, status);
-+    uint64_t v = float128_to_uint64(a, status);
-+    set_float_rounding_mode(current_rounding_mode, status);
-+    return v;
-+}
-+
-+/*----------------------------------------------------------------------------
-+| Returns the result of converting the quadruple-precision floating-point
- | value `a' to the single-precision floating-point format.  The conversion
- | is performed according to the IEC/IEEE Standard for Binary Floating-Point
- | Arithmetic.
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 842ec6b..4e99253 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -712,6 +712,8 @@ int32_t float128_to_int32(float128, float_status *status);
- int32_t float128_to_int32_round_to_zero(float128, float_status *status);
- int64_t float128_to_int64(float128, float_status *status);
- int64_t float128_to_int64_round_to_zero(float128, float_status *status);
-+uint64_t float128_to_uint64(float128, float_status *status);
-+uint64_t float128_to_uint64_round_to_zero(float128, float_status *status);
- float32 float128_to_float32(float128, float_status *status);
- float64 float128_to_float64(float128, float_status *status);
- floatx80 float128_to_floatx80(float128, float_status *status);
--- 
-2.7.4
+I can turn this around and say that guest-file-read and
+guest-file-write shouldn't exist because applications can't reliably
+know what the format of files on the guest is.
+
+This is just a transport, it doesn't need to understand the data it's
+transporting. Yes, I get it that ioctl tends to be associated with
+system-y things with tighter ties to the OS, bitness, endianness and
+so on. But, it doesn't have to be. In my case I chose ioctl as opposed
+to regular file I/O because what I'm reading is not a stream in
+nature, it's a fixed size data structure.
+
+Thanks!
+Ladi
+
+> Regards,
+> Daniel
+> --
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.org :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
