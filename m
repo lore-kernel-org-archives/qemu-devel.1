@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYtsD-000639-KB
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:58 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cYtxG-0002Cy-H4
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:24:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts9-0005dq-1G
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:53 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:46121 helo=smtp.ispras.ru)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cYts8-0005d0-MV
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:18:48 -0500
-From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Wed,  1 Feb 2017 15:18:16 +0300
-Message-Id: <1485951502-28774-15-git-send-email-batuzovk@ispras.ru>
-In-Reply-To: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-References: <1485951502-28774-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2 14/20] tcg: do not rely on exact values of
- MO_BSWAP or MO_SIGN in backend
+	(envelope-from <mreitz@redhat.com>) id 1cYtxF-0006hi-Ky
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 07:24:06 -0500
+References: <20170126110435.2777-1-berrange@redhat.com>
+	<20170126110435.2777-4-berrange@redhat.com>
+	<20170126123530.GB23095@lemon.Home> <20170126132708.GB29127@redhat.com>
+	<6a9aeec8-d4ee-a0aa-7e04-0ee4295fef80@redhat.com>
+	<8a13c995-c094-2704-c770-214132b2d6cf@redhat.com>
+	<20170201121658.GF3232@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c4d38998-b862-90e6-6c4b-4b96a8d17bb4@redhat.com>
+Date: Wed, 1 Feb 2017 13:23:54 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170201121658.GF3232@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NvRJfseOF9ihcDdC2q9hHrrV0hn4G8ai0"
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] qemu-img: add support for -n arg to
+ dd command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,234 +29,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kirill Batuzov <batuzovk@ispras.ru>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
----
- tcg/aarch64/tcg-target.inc.c |  4 ++--
- tcg/arm/tcg-target.inc.c     |  4 ++--
- tcg/i386/tcg-target.inc.c    |  4 ++--
- tcg/mips/tcg-target.inc.c    |  4 ++--
- tcg/ppc/tcg-target.inc.c     |  4 ++--
- tcg/s390/tcg-target.inc.c    |  4 ++--
- tcg/sparc/tcg-target.inc.c   | 12 ++++++------
- tcg/tcg-op.c                 |  4 ++--
- tcg/tcg.h                    |  1 +
- 9 files changed, 21 insertions(+), 20 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NvRJfseOF9ihcDdC2q9hHrrV0hn4G8ai0
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <c4d38998-b862-90e6-6c4b-4b96a8d17bb4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] qemu-img: add support for -n arg to
+ dd command
+References: <20170126110435.2777-1-berrange@redhat.com>
+ <20170126110435.2777-4-berrange@redhat.com>
+ <20170126123530.GB23095@lemon.Home> <20170126132708.GB29127@redhat.com>
+ <6a9aeec8-d4ee-a0aa-7e04-0ee4295fef80@redhat.com>
+ <8a13c995-c094-2704-c770-214132b2d6cf@redhat.com>
+ <20170201121658.GF3232@redhat.com>
+In-Reply-To: <20170201121658.GF3232@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index 6d227a5..2b0b548 100644
---- a/tcg/aarch64/tcg-target.inc.c
-+++ b/tcg/aarch64/tcg-target.inc.c
-@@ -1032,7 +1032,7 @@ static void tcg_out_cltz(TCGContext *s, TCGType ext, TCGReg d,
- /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
-  *                                     TCGMemOpIdx oi, uintptr_t ra)
-  */
--static void * const qemu_ld_helpers[16] = {
-+static void * const qemu_ld_helpers[] = {
-     [MO_UB]   = helper_ret_ldub_mmu,
-     [MO_LEUW] = helper_le_lduw_mmu,
-     [MO_LEUL] = helper_le_ldul_mmu,
-@@ -1046,7 +1046,7 @@ static void * const qemu_ld_helpers[16] = {
-  *                                     uintxx_t val, TCGMemOpIdx oi,
-  *                                     uintptr_t ra)
-  */
--static void * const qemu_st_helpers[16] = {
-+static void * const qemu_st_helpers[] = {
-     [MO_UB]   = helper_ret_stb_mmu,
-     [MO_LEUW] = helper_le_stw_mmu,
-     [MO_LEUL] = helper_le_stl_mmu,
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index e75a6d4..f603f02 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -1058,7 +1058,7 @@ static inline void tcg_out_mb(TCGContext *s, TCGArg a0)
- /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
-  *                                     int mmu_idx, uintptr_t ra)
-  */
--static void * const qemu_ld_helpers[16] = {
-+static void * const qemu_ld_helpers[] = {
-     [MO_UB]   = helper_ret_ldub_mmu,
-     [MO_SB]   = helper_ret_ldsb_mmu,
- 
-@@ -1078,7 +1078,7 @@ static void * const qemu_ld_helpers[16] = {
- /* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
-  *                                     uintxx_t val, int mmu_idx, uintptr_t ra)
-  */
--static void * const qemu_st_helpers[16] = {
-+static void * const qemu_st_helpers[] = {
-     [MO_UB]   = helper_ret_stb_mmu,
-     [MO_LEUW] = helper_le_stw_mmu,
-     [MO_LEUL] = helper_le_stl_mmu,
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index d8f0d81..263c15e 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -1334,7 +1334,7 @@ static void tcg_out_nopn(TCGContext *s, int n)
- /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
-  *                                     int mmu_idx, uintptr_t ra)
-  */
--static void * const qemu_ld_helpers[16] = {
-+static void * const qemu_ld_helpers[] = {
-     [MO_UB]   = helper_ret_ldub_mmu,
-     [MO_LEUW] = helper_le_lduw_mmu,
-     [MO_LEUL] = helper_le_ldul_mmu,
-@@ -1347,7 +1347,7 @@ static void * const qemu_ld_helpers[16] = {
- /* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
-  *                                     uintxx_t val, int mmu_idx, uintptr_t ra)
-  */
--static void * const qemu_st_helpers[16] = {
-+static void * const qemu_st_helpers[] = {
-     [MO_UB]   = helper_ret_stb_mmu,
-     [MO_LEUW] = helper_le_stw_mmu,
-     [MO_LEUL] = helper_le_stl_mmu,
-diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index 01ac7b2..4f2d5d1 100644
---- a/tcg/mips/tcg-target.inc.c
-+++ b/tcg/mips/tcg-target.inc.c
-@@ -1108,7 +1108,7 @@ static void tcg_out_call(TCGContext *s, tcg_insn_unit *arg)
- }
- 
- #if defined(CONFIG_SOFTMMU)
--static void * const qemu_ld_helpers[16] = {
-+static void * const qemu_ld_helpers[] = {
-     [MO_UB]   = helper_ret_ldub_mmu,
-     [MO_SB]   = helper_ret_ldsb_mmu,
-     [MO_LEUW] = helper_le_lduw_mmu,
-@@ -1125,7 +1125,7 @@ static void * const qemu_ld_helpers[16] = {
- #endif
- };
- 
--static void * const qemu_st_helpers[16] = {
-+static void * const qemu_st_helpers[] = {
-     [MO_UB]   = helper_ret_stb_mmu,
-     [MO_LEUW] = helper_le_stw_mmu,
-     [MO_LEUL] = helper_le_stl_mmu,
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 64f67d2..680050b 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -1419,7 +1419,7 @@ static const uint32_t qemu_exts_opc[4] = {
- /* helper signature: helper_ld_mmu(CPUState *env, target_ulong addr,
-  *                                 int mmu_idx, uintptr_t ra)
-  */
--static void * const qemu_ld_helpers[16] = {
-+static void * const qemu_ld_helpers[] = {
-     [MO_UB]   = helper_ret_ldub_mmu,
-     [MO_LEUW] = helper_le_lduw_mmu,
-     [MO_LEUL] = helper_le_ldul_mmu,
-@@ -1432,7 +1432,7 @@ static void * const qemu_ld_helpers[16] = {
- /* helper signature: helper_st_mmu(CPUState *env, target_ulong addr,
-  *                                 uintxx_t val, int mmu_idx, uintptr_t ra)
-  */
--static void * const qemu_st_helpers[16] = {
-+static void * const qemu_st_helpers[] = {
-     [MO_UB]   = helper_ret_stb_mmu,
-     [MO_LEUW] = helper_le_stw_mmu,
-     [MO_LEUL] = helper_le_stl_mmu,
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index a679280..ec3491a 100644
---- a/tcg/s390/tcg-target.inc.c
-+++ b/tcg/s390/tcg-target.inc.c
-@@ -309,7 +309,7 @@ static const uint8_t tcg_cond_to_ltr_cond[] = {
- };
- 
- #ifdef CONFIG_SOFTMMU
--static void * const qemu_ld_helpers[16] = {
-+static void * const qemu_ld_helpers[] = {
-     [MO_UB]   = helper_ret_ldub_mmu,
-     [MO_SB]   = helper_ret_ldsb_mmu,
-     [MO_LEUW] = helper_le_lduw_mmu,
-@@ -324,7 +324,7 @@ static void * const qemu_ld_helpers[16] = {
-     [MO_BEQ]  = helper_be_ldq_mmu,
- };
- 
--static void * const qemu_st_helpers[16] = {
-+static void * const qemu_st_helpers[] = {
-     [MO_UB]   = helper_ret_stb_mmu,
-     [MO_LEUW] = helper_le_stw_mmu,
-     [MO_LEUL] = helper_le_stl_mmu,
-diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
-index d1f4c0d..1b115d2 100644
---- a/tcg/sparc/tcg-target.inc.c
-+++ b/tcg/sparc/tcg-target.inc.c
-@@ -840,12 +840,12 @@ static void tcg_out_mb(TCGContext *s, TCGArg a0)
- }
- 
- #ifdef CONFIG_SOFTMMU
--static tcg_insn_unit *qemu_ld_trampoline[16];
--static tcg_insn_unit *qemu_st_trampoline[16];
-+static tcg_insn_unit *qemu_ld_trampoline[MO_ALL];
-+static tcg_insn_unit *qemu_st_trampoline[MO_ALL];
- 
- static void build_trampolines(TCGContext *s)
- {
--    static void * const qemu_ld_helpers[16] = {
-+    static void * const qemu_ld_helpers[MO_ALL] = {
-         [MO_UB]   = helper_ret_ldub_mmu,
-         [MO_SB]   = helper_ret_ldsb_mmu,
-         [MO_LEUW] = helper_le_lduw_mmu,
-@@ -857,7 +857,7 @@ static void build_trampolines(TCGContext *s)
-         [MO_BEUL] = helper_be_ldul_mmu,
-         [MO_BEQ]  = helper_be_ldq_mmu,
-     };
--    static void * const qemu_st_helpers[16] = {
-+    static void * const qemu_st_helpers[MO_ALL] = {
-         [MO_UB]   = helper_ret_stb_mmu,
-         [MO_LEUW] = helper_le_stw_mmu,
-         [MO_LEUL] = helper_le_stl_mmu,
-@@ -870,7 +870,7 @@ static void build_trampolines(TCGContext *s)
-     int i;
-     TCGReg ra;
- 
--    for (i = 0; i < 16; ++i) {
-+    for (i = 0; i < MO_ALL; ++i) {
-         if (qemu_ld_helpers[i] == NULL) {
-             continue;
-         }
-@@ -898,7 +898,7 @@ static void build_trampolines(TCGContext *s)
-         tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_O7, ra);
-     }
- 
--    for (i = 0; i < 16; ++i) {
-+    for (i = 0; i < MO_ALL; ++i) {
-         if (qemu_st_helpers[i] == NULL) {
-             continue;
-         }
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 8a19eee..0dfe611 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -2767,7 +2767,7 @@ typedef void (*gen_atomic_op_i64)(TCGv_i64, TCGv_env, TCGv, TCGv_i64);
- # define WITH_ATOMIC64(X)
- #endif
- 
--static void * const table_cmpxchg[16] = {
-+static void * const table_cmpxchg[] = {
-     [MO_8] = gen_helper_atomic_cmpxchgb,
-     [MO_16 | MO_LE] = gen_helper_atomic_cmpxchgw_le,
-     [MO_16 | MO_BE] = gen_helper_atomic_cmpxchgw_be,
-@@ -2985,7 +2985,7 @@ static void do_atomic_op_i64(TCGv_i64 ret, TCGv addr, TCGv_i64 val,
- }
- 
- #define GEN_ATOMIC_HELPER(NAME, OP, NEW)                                \
--static void * const table_##NAME[16] = {                                \
-+static void * const table_##NAME[] = {                                  \
-     [MO_8] = gen_helper_atomic_##NAME##b,                               \
-     [MO_16 | MO_LE] = gen_helper_atomic_##NAME##w_le,                   \
-     [MO_16 | MO_BE] = gen_helper_atomic_##NAME##w_be,                   \
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index fd43f15..5e0c6da 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -386,6 +386,7 @@ typedef enum TCGMemOp {
-     MO_TEQ   = MO_TE | MO_Q,
- 
-     MO_SSIZE = MO_SIZE | MO_SIGN,
-+    MO_ALL   = MO_SIZE | MO_SIGN | MO_BSWAP | MO_AMASK,
- } TCGMemOp;
- 
- /**
--- 
-2.1.4
+On 01.02.2017 13:16, Daniel P. Berrange wrote:
+> On Wed, Feb 01, 2017 at 01:13:39PM +0100, Max Reitz wrote:
+>> On 30.01.2017 19:37, Eric Blake wrote:
+>>> On 01/26/2017 07:27 AM, Daniel P. Berrange wrote:
+>>>> On Thu, Jan 26, 2017 at 08:35:30PM +0800, Fam Zheng wrote:
+>>>>> On Thu, 01/26 11:04, Daniel P. Berrange wrote:
+>>>>>> The -n arg to the convert command allows use of a pre-existing ima=
+ge,
+>>>>>> rather than creating a new image. This adds a -n arg to the dd com=
+mand
+>>>>>> to get feature parity.
+>>>>>
+>>>>> I remember there was a discussion about changing qemu-img dd's defa=
+ult to a
+>>>>> "conv=3Dnocreat" semantic, if so, "-n" might not be that useful. Bu=
+t that part
+>>>>> hasn't made it into the tree, and I'm not sure which direction we s=
+hould take.
+>>>>> (Personally I think default to nocreat is a good idea).
+>>>>
+>>>> Use nocreat by default would be semantically different from real "dd=
+"
+>>>> binary which feels undesirable if the goal is to make "qemu-img dd"
+>>>> be as consistent with "dd" as possible.
+>>>>
+>>>> It would be trivial to rewrite this patch to add support for the "co=
+nv"
+>>>> option, allowing the user to explicitly give 'qemu-img dd conv=3Dnoc=
+reat'
+>>>> instead of my 'qemu-img dd -n' syntax, without changing default sema=
+ntics.
+>>>
+>>> Adding 'conv=3Dnocreat' (and not '-n') feels like the right way to me=
+=2E
+>>
+>> The original idea was to make conv=3Dnocreat a mandatory option, I thi=
+nk.
+>> qemu-img was supposed error out if the user did not specify it.
+>=20
+> I'm not really seeing a benefit in doing that - it would just break
+> existing usage of qemu-img dd for no obvious benefit.
+
+Well... Is there existing usage?
+
+The benefit would be that one could (should?) expect qemu-img dd to
+behave on disk images as if they were block devices; and dd to a block
+device will not truncate or "recreate" it.
+
+If you don't give nocreat, it's thus a bit unclear whether you want to
+delete and recreate the target or whether you want to write into it.
+Some may expect qemu-img dd to behave as if the target is a normal file
+(delete and recreate it), others may expect it's treated like a block
+device (just write into it). If you force the user to specify nocreat,
+it would make the behavior clear.
+
+(And you can always delete+recreate the target with qemu-img create.)
+
+It's all a bit complicated. :-/
+
+Max
+
+> FYI, I've implemented "conv" with "nocreat" and "notrunc" options
+> which i'll post once i've tested some more.
+>=20
+> Regards,
+> Daniel
+>=20
+
+
+
+--NvRJfseOF9ihcDdC2q9hHrrV0hn4G8ai0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliR01oSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AdEUH/1YJqJqgH88HI6NZ6/85VMD1K7p5Qckh
+iLTa8JlfhlPCvppS/QYE8/LqWdC4tTcxzDBLcuGiaiwpl7Vj6eXW6Yw6FOYsRmHo
+xvX4bIOH1CxluUQ9fFOD3euogTF1b5MQQuyLOD9Lk0WiJmSN+ciztJyB9DBv2Ek9
+WEjRJC6rU8tp/ARX7mcf46N+siLJEoM17lUqarBruyo1GuWIu9PPkCukU3rbzLF2
+F8XnMiHzLE9PPhSejKXBG3WtY1qiRE4/rblhOaTJF4I273E7s0m9GqTr1A81Xm5W
+5gL7hsdAedJp7ggmL0aslhiTthtVqNOHBkY+qPhTwh7kTV5sWYbSsbA=
+=53os
+-----END PGP SIGNATURE-----
+
+--NvRJfseOF9ihcDdC2q9hHrrV0hn4G8ai0--
