@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cYzRn-0006uW-NB
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 13:16:03 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cYzUt-0000fW-5I
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 13:19:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cYzRm-0007QN-Gl
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 13:15:59 -0500
-Received: from mail-yw0-x241.google.com ([2607:f8b0:4002:c05::241]:34924)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cYzRm-0007QJ-CD
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 13:15:58 -0500
-Received: by mail-yw0-x241.google.com with SMTP id l16so11583196ywb.2
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 10:15:58 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <CAJBMM-sX4fGckYy-eNRdZ9dKamOoJoK2fQ4TLS80T5n6jCkpFg@mail.gmail.com>
-	<20170114080435.GF25986@lianli.shorne-pla.net>
-	<20170120163918.GD7836@lianli.shorne-pla.net>
-	<d27b7c60-a9fe-e92e-a937-d2d13b78f290@twiddle.net>
-	<20170124102625.GF7836@lianli.shorne-pla.net>
-	<01f7a18d-f4f5-18f3-0932-b32c06ad0b0c@twiddle.net>
-	<20170125123430.GG7836@lianli.shorne-pla.net>
-	<39f927aa-26fe-0e43-7c6b-efe1b70bc5fa@twiddle.net>
-	<20170126131229.GB16014@lianli.shorne-pla.net>
-	<ddb9c656-aa3e-5d90-c8fc-0058af5b603b@twiddle.net>
-	<20170201100423.GE21641@lianli.shorne-pla.net>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <c840eff0-2be7-07d7-eae9-4cded569d146@twiddle.net>
-Date: Wed, 1 Feb 2017 10:15:54 -0800
+	(envelope-from <dgilbert@redhat.com>) id 1cYzUn-000847-3C
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 13:19:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44578)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cYzUm-000842-QM
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 13:19:05 -0500
+Date: Wed, 1 Feb 2017 18:18:59 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170201181859.GA15789@work-vm>
+References: <20161108095603.72301-1-pasic@linux.vnet.ibm.com>
+	<20161108095603.72301-8-pasic@linux.vnet.ibm.com>
+	<20161215123259.GH2509@work-vm>
+	<d0e0673d-a838-f4ab-58a9-ec57265d8d3a@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170201100423.GE21641@lianli.shorne-pla.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-openrisc: Fix exception handling
- status registers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d0e0673d-a838-f4ab-58a9-ec57265d8d3a@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 7/8] migration/vmstate: fix array of
+ pointers to struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,49 +30,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org, openrisc@lists.librecores.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, Guenther Hutzl <hutzl@linux.vnet.ibm.com>
 
-On 02/01/2017 02:04 AM, Stafford Horne wrote:
-> On Thu, Jan 26, 2017 at 09:26:55AM -0800, Richard Henderson wrote:
->> On 01/26/2017 05:12 AM, Stafford Horne wrote:
->>> I just sent you a mail with a link to my kernel for download.
->>>
->>> One thing I noticed is you passed '-append console=ttyS0' I think that
->>> does nothing on openrisc since as far as I know openrisc only gets boot
->>> params from the device tree file. I tried with and without it and got no
->>> differences.
->>
->> That was just reflex, wondering where the output went.
->>
->>> Another thing, I am using a 'late' version of gcc built with musl cross [1]
->>> , I dont think it would make a difference, but maybe?
->>
->> I think that's likely the difference.  I can indeed boot your kernel.
+* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
 > 
-> Hi Richard,
 > 
-> For kernel builds I have created toolchain binaries here:
+> On 12/15/2016 01:33 PM, Dr. David Alan Gilbert wrote:
+> > * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+> >> Make VMS_ARRAY_OF_POINTER cope with null pointers. Previously the reward
+> >> for trying to migrate an array with some null pointers in it was an
+> >> illegal memory access, that is a swift and painless death of the process.
+> >> Let's make vmstate cope with this scenario at least for pointers to
+> >> structs. The general approach is when we encounter a null pointer
+> >> (element) instead of following the pointer to save/load the data behind
+> >> it we save/load a placeholder. This way we can detect if we expected a
+> >> null pointer at the load side but not null data was saved instead. Sadly
+> >> all other error scenarios are not detected by this scheme (and would
+> >> require the usage of the JSON meta data).
+> >>
+> >> Limitations: Does not work for pointers to primitives.
+> > 
+> > Please document that limitation in a comment in the vmstate.h near the
+> > macros that use it.
+> > 
 > 
->   http://shorne.noip.me/crosstool/files/bin/x86_64/5.4.0/
+> After looking at this again I do not know what was my intention whit the
+> limitations statement. It was probably about arrays of pointers to
+> primitives, but then the statement is wrong. The same scheme does work
+> for primitives too. It just that I had a previous version which had this
+> limitation. 
 > 
-> These should work.
+> It could also be about just pointer (not array of pointers), but the
+> commit message does not mention this case at all. 
 > 
-> If all is ok with the qemu patch I sent what is the next step to get them
-> incorporated.  Do you need any help from me?
+> I will just drop the limitations statement.
 > 
-> ... Actually I just checked your branch on github, it looks like you are
-> doing a few updates.  Let me know if you want me to review anything.
+> >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com> Reviewed-by:
+> >> Guenther Hutzl <hutzl@linux.vnet.ibm.com> ---
+> >>
+> >> We will need this to load/save some on demand created state from within
+> >> the channel subsystem (see ChannelSubSys.css in hw/s390x/css.c for an
+> >> example).
+> >> ---
+> >>  include/migration/vmstate.h |  5 +++++
+> >>  migration/vmstate.c         | 32 ++++++++++++++++++++++++++++++--
+> >>  2 files changed, 35 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> >> index 5940db0..86d4aca 100644
+> >> --- a/include/migration/vmstate.h
+> >> +++ b/include/migration/vmstate.h
+> >> @@ -236,6 +236,10 @@ extern const VMStateInfo vmstate_info_uint16;
+> >>  extern const VMStateInfo vmstate_info_uint32;
+> >>  extern const VMStateInfo vmstate_info_uint64;
+> >>  
+> >> +/** Put this in the stream when migrating a null pointer.*/
+> >> +#define VMS_NULLPTR_MARKER ((int8_t) -1)
+> > 
+> > You seem to be making things harder by using a signed int everywhere
+> > when you just want a byte;  I suggest using '0'
+> > 
+> 
+> I'm fine with byte 0x30, but I have an irrational bad feeling about
+> using a character literal here. I know, in practice should
+> not matter, but the C11 standard says nothing about how members of the
+> basic execution character set are represented, and it's also not among
+> the 'usual QEMU platform assumptions' (AFAIK). Are you OK defining
+> the constant/macro as Ox30U instead of '0'? 
 
-Yes, I've been attempting to revive a patch set from 2013 that cleans up the
-implementation, fixing a few other bugs in the process.
+0x30 is fine if you prefer (although I'd be pretty surprised if we worked
+on a non-ASCII system!);  My only requirements are it's just a plain normal
+unsigned char and it's not the type of value that's common (like 0x00).
 
-However, testing it properly has been tricky.  It appears as if I'm debugging
-qemu and gcc simultaneously, while your gdb branch doesn't want to compile for
-me.  So I've been limited to instruction traces from qemu, which is slow going.
+> >> +extern const VMStateInfo vmstate_info_nullptr;
+> >> +
+> >>  extern const VMStateInfo vmstate_info_float64;
+> >>  extern const VMStateInfo vmstate_info_cpudouble;
+> >>  
+> >> @@ -453,6 +457,7 @@ extern const VMStateInfo vmstate_info_bitmap;
+> >>      .size       = sizeof(_type *),                                    \
+> >>      .flags      = VMS_ARRAY|VMS_STRUCT|VMS_ARRAY_OF_POINTER,         \
+> >>      .offset     = vmstate_offset_array(_s, _f, _type*, _n),          \
+> >> +    .info       = &vmstate_info_nullptr,                              \
+> > 
+> > What's this change for?
+> 
+> It's garbage. A remainder of a previous version I mentioned above. Will
+> remove. Good catch!
+> 
+> > 
+> >>  }
+> >>  
+> >>  #define VMSTATE_STRUCT_SUB_ARRAY(_field, _state, _start, _num, _version, _vmsd, _type) { \
+> >> diff --git a/migration/vmstate.c b/migration/vmstate.c
+> >> index 10a7645..ce3490a 100644
+> >> --- a/migration/vmstate.c
+> >> +++ b/migration/vmstate.c
+> >> @@ -109,7 +109,11 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+> >>                  if (field->flags & VMS_ARRAY_OF_POINTER) {
+> >>                      curr_elem = *(void **)curr_elem;
+> >>                  }
+> >> -                if (field->flags & VMS_STRUCT) {
+> >> +                if (!curr_elem) {
+> >> +                    /* if null pointer check placeholder and do not follow */
+> >> +                    assert(field->flags & VMS_ARRAY_OF_POINTER);
+> >> +                    vmstate_info_nullptr.get(f, curr_elem, size);
+> >> +                } else if (field->flags & VMS_STRUCT) {
+> >>                      ret = vmstate_load_state(f, field->vmsd, curr_elem,
+> >>                                               field->vmsd->version_id);
+> >>                  } else {
+> >> @@ -320,7 +324,11 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+> >>                      assert(curr_elem);
+> >>                      curr_elem = *(void **)curr_elem;
+> >>                  }
+> >> -                if (field->flags & VMS_STRUCT) {
+> >> +                if (!curr_elem) {
+> >> +                    /* if null pointer write placeholder and do not follow */
+> >> +                    assert(field->flags & VMS_ARRAY_OF_POINTER);
+> >> +                    vmstate_info_nullptr.put(f, curr_elem, size);
+> >> +                } else if (field->flags & VMS_STRUCT) {
+> >>                      vmstate_save_state(f, field->vmsd, curr_elem, vmdesc_loop);
+> >>                  } else {
+> >>                      field->info->put(f, curr_elem, size);
+> >> @@ -708,6 +716,26 @@ const VMStateInfo vmstate_info_uint64 = {
+> >>      .put  = put_uint64,
+> >>  };
+> >>  
+> >> +static int get_nullptr(QEMUFile *f, void *pv, size_t size)
+> >> +{
+> >> +    int8_t tmp;
+> >> +    qemu_get_s8s(f, &tmp);
+> > 
+> > Now that I've suggested using just a character you can turn that
+> > into:
+> > 
+> >   return qemu_get_byte(f) == VMS_NULLPTR_MARKER ? 0 : -EINVAL;
+> > 
+> 
+> You are right! I was over-complicating. Will do.
+> 
+> >> +    return tmp == VMS_NULLPTR_MARKER ? 0 : -EINVAL;
+> >> +}
+> >> +
+> >> +static void put_nullptr(QEMUFile *f, void *pv, size_t size)
+> >> +{
+> >> +    int8_t tmp = VMS_NULLPTR_MARKER;
+> >> +    assert(pv == NULL);
+> >> +    qemu_put_s8s(f, &tmp);
+> > 
+> > and similarly put_byte.
+> > 
+> 
+> Will do.
+> 
+> > Dave
+> > 
+> 
+> Thanks for the review. I have already adopted mostly your proposals,
+> but I will wait a bit in the hope that the fate of this patch borrowed
+> form my other patch set (subject:"[PATCH v2 2/2] migration: drop unused
+> VMStateField.start" gets resolved.
 
-If you'd like to do your own testing on my tgt-or1k-2 branch, that would be
-appreciated.
+Yep, I'll look at that in a minute.
 
+Dave
 
-r~
+> By the way you could answer my question regarding that yourself, since
+> you became co-maintainer for migration starting 2017-01-24. Congrats :).
+> 
+> 
+> Regards,
+> Halil
+> 
+> >> +}
+> >> +
+> >> +const VMStateInfo vmstate_info_nullptr = {
+> >> +    .name = "uint64",
+> >> +    .get  = get_nullptr,
+> >> +    .put  = put_nullptr,
+> >> +};
+> >> +
+> >>  /* 64 bit unsigned int. See that the received value is the same than the one
+> >>     in the field */
+> >>  
+> >> -- 
+> >> 2.8.4
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
