@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cYnaF-0004uM-An
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 00:35:56 -0500
+	(envelope-from <armbru@redhat.com>) id 1cYojq-0001jd-SY
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 01:49:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cYnaE-0006qS-Eu
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 00:35:55 -0500
-Date: Wed, 1 Feb 2017 00:35:48 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170201053548.GA6500@localhost.localdomain>
-References: <20161129113245.32724-1-pbonzini@redhat.com>
-	<3f948687-3169-c304-3ef8-31347f08857f@redhat.com>
-	<20170104040728.GA30425@localhost.localdomain>
-	<d4ad8370-cbcb-e4fd-b89d-5d7cb63569e6@redhat.com>
-	<20170104164752.GC30425@localhost.localdomain>
-	<b0cb1300-a561-a315-03d0-f64596940ce2@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1cYojm-0005yB-2E
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 01:49:54 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1485879287-12548-1-git-send-email-peter.maydell@linaro.org>
+	<87wpdbw2ki.fsf@dusky.pond.sub.org>
+	<157b55c5-2927-5f4e-0c43-820abd75a6d2@redhat.com>
+Date: Wed, 01 Feb 2017 07:49:46 +0100
+In-Reply-To: <157b55c5-2927-5f4e-0c43-820abd75a6d2@redhat.com> (Paolo
+	Bonzini's message of "Tue, 31 Jan 2017 18:27:10 -0500")
+Message-ID: <874m0ejth1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b0cb1300-a561-a315-03d0-f64596940ce2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v3 0/5] Sheepdog cleanups
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] Drop QEMU_GNUC_PREREQ() checks for gcc
+ older than 4.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +26,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
 
-On Mon, Jan 30, 2017 at 07:48:56PM -0600, Paolo Bonzini wrote:
-> 
-> 
-> On 04/01/2017 11:47, Jeff Cody wrote:
-> > On Wed, Jan 04, 2017 at 12:42:53PM +0100, Paolo Bonzini wrote:
-> >>
-> >>
-> >> On 04/01/2017 05:07, Jeff Cody wrote:
-> >>> On Wed, Dec 21, 2016 at 03:07:07PM +0100, Paolo Bonzini wrote:
-> >>>>
-> >>>>
-> >>>> On 29/11/2016 12:32, Paolo Bonzini wrote:
-> >>>>> Cleaning up the code and removing duplication makes it simpler to
-> >>>>> later adapt it for the multiqueue work.
-> >>>>>
-> >>>>> Tested against sheepdog 1.0.  I also tested taking snapshots and reverting
-> >>>>> to older snapshots, but the latter only worked with "dog vdi rollback".
-> >>>>> Neither loadvm nor qemu-img worked for me.
-> >>>>>
-> >>>>> Paolo
-> >>>>>
-> >>>>>         v1->v2: placate patchew
-> >>>>>         v2->v3: rebase
-> >>>>>
-> >>>>> Paolo Bonzini (5):
-> >>>>>   sheepdog: remove unused cancellation support
-> >>>>>   sheepdog: reorganize coroutine flow
-> >>>>>   sheepdog: do not use BlockAIOCB
-> >>>>>   sheepdog: simplify inflight_aio_head management
-> >>>>>   sheepdog: reorganize check for overlapping requests
-> >>>>>
-> >>>>>  block/sheepdog.c | 289 ++++++++++++++++---------------------------------------
-> >>>>>  1 file changed, 83 insertions(+), 206 deletions(-)
-> >>>>>
-> >>>>
-> >>>> 2.8 is now out, so ping.
-> >>>>
-> >>>
-> >>> I don't have a functional sheepdog setup at the moment; have you tested
-> >>> these patches, or should I set up a test rig for them? (I am guessing I
-> >>> should do the latter; either way, I'll pull the patches in once I or someone
-> >>> else has tested them).
-> >>
-> >> Yes, I have tested them.  Fedora's sheepdog package is fubar right now.
-> >> I've built an updated one and asked for ownership but haven't had any
-> >> answer yet.
-> >>
-> >> Paolo
-> > 
-> > Great, thanks.
-> > 
-> > Applied to my block branch:
-> > 
-> > git://github.com/codyprime/qemu-kvm-jtc.git block
-> > 
-> > -Jeff
-> > 
-> > 
-> 
-> Ping?
-> 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Sorry, never flushed my pull request queue.  Flushed now.
+> On 31/01/2017 12:40, Markus Armbruster wrote:
+>>>  
+>>>  #define QEMU_NORETURN __attribute__ ((__noreturn__))
+>>>  
+>>> -#if QEMU_GNUC_PREREQ(3, 4)
+>>>  #define QEMU_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+>>> -#else
+>>> -#define QEMU_WARN_UNUSED_RESULT
+>>> -#endif
+>> Should we inline this macro?
+>> 
+>>>  
+>>> -#if QEMU_GNUC_PREREQ(4, 0)
+>>>  #define QEMU_SENTINEL __attribute__((sentinel))
+>>> -#else
+>>> -#define QEMU_SENTINEL
+>>> -#endif
+>> Likewise.
+>
+> Why, since we don't do that for QEMU_NORETURN, QEMU_PACKED, etc.?
 
-Thanks,
-Jeff
+Because we do it for aligned, always_inline, constructor, format, mode,
+noinline, and in places even noreturn and packed:
+
+    $ git-grep __attribute__ | sed '/define/d;s/.*__attribute__ *((\([A-Za-z0-9_]*\).*/\1/' | sort -u
