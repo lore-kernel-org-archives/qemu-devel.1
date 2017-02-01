@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYtVp-0005F6-Lo
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:55:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1cYw8H-0004S7-6x
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 09:43:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cYtVm-0007hZ-HC
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:55:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54080)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cYtVm-0007h8-3W
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 06:55:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cYtVk-0005x2-V0
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 11:55:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DFEEA2E80BF
-	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 11:55:40 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1cYw8E-00020A-JI
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 09:43:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cYw8E-0001zy-Ad
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 09:43:34 -0500
+References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
+	<20170201102013.GC3232@redhat.com>
+	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
+	<20170201110320.GD3232@redhat.com>
+	<CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <15e45a8d-852e-97da-65c5-3f69258dd59b@redhat.com>
+Date: Wed, 1 Feb 2017 08:43:28 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Feb 2017 11:46:49 -0000
-From: Rafael Folco <rfolco@linux.vnet.ibm.com>
-Reply-To: Bug 1660946 <1660946@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170201114649.1137.53576.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1660946] [NEW] [nested] virt-install falls to SLOF
+In-Reply-To: <CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xQqFh1T0Di0TqS2HM5DnsxkiF9tcx4MJG"
+Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,497 +31,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
-
-
-[nested] virt-install falls to SLOF: after starting installer (ISO/CDROM), =
-it crashes w/ a kernel panic due to an HTM (Hardware Transactional Memory) =
-exception.
-
-Scenario:
-Host=3DUbuntu 16.04 Xenial (Ubuntu KVM ppc64el POWER8E 8247-22L)
-Guest=3DUbuntu 16.04 Xenial (Ubuntu Xenial Cloud Image QCOW2)
-Nested=3DUbuntu 16.04 Xenial (Ubuntu Xenial Server ISO *or* NetInstall mini=
-.iso)
-
-Inside Guest (1st level), run virt-install as shown below to reproduce
-the bug.
-
-Facts:
- * ISO images (from both Server or netinstall mini.iso) fail to boot on xen=
-ial/yakkety
- * Cloud image (xenial/yakkety/zesty) on nested virt boots fine, the login =
-prompt is seen.
- * Reproducible with Xenial and Yakkety
- * NOT reproducible with Zesty (Installer menu starts just normally)
- * virtio-scsi, virtio-net and virtio-blk modules are seen in zesty. Only v=
-irtio-scsi is seen on xenial/yakkety (-net and -blk are built-in modules?)
- * kvm-pr is loaded for all tested scenarios
- * This patch[1] rings a bell, however, it doesn't explain how cloud images=
- boot just fine and don't hit the bug, since the kernel used in the cloud i=
-mages also enable HTM[2].
-
-[1] https://lists.ozlabs.org/pipermail/linuxppc-
-dev/2016-April/141292.html
-
-[2] grep TRANSA /boot/config-4.8.0-26-generic
-CONFIG_PPC_TRANSACTIONAL_MEM=3Dy
-
-
-# cat virt-inst.sh
-virt-install --virt-type=3Dkvm --cpu=3Dhost --name=3Dnested-xenial --contro=
-ller type=3Dscsi,model=3Dvirtio-scsi --graphics none --console pty,target_t=
-ype=3Dserial --disk path=3D/home/nested-xenial.qcow2,size=3D20 --vcpus=3D4 =
---ram=3D4096 --os-type=3Dlinux --os-variant ubuntu16.04 --network bridge=3D=
-virbr0,model=3Dvirtio --cdrom=3D$1
-
-
-# ./virt-inst.sh ubuntu-16.04-server-ppc64el.iso
-WARNING  CDROM media does not print to the text console by default, so you =
-likely will not see text install output. You might want to use --location. =
-See the man page for examples of using --location with CDROM media
-
-Starting install...
-Creating domain...                                                         =
-                                                                           =
-       |    0 B  00:00:00
-Connected to domain nested-xenial
-Escape character is ^]
-Populating /vdevice methods
-Populating /vdevice/vty@30000000
-Populating /vdevice/nvram@71000000
-Populating /pci@800000020000000
-                     00 2800 (D) : 1af4 1002    unknown-legacy-device*
-                     00 2000 (D) : 1af4 1001    virtio [ block ]
-                     00 1800 (D) : 106b 003f    serial bus [ usb-ohci ]
-                     00 1000 (D) : 1af4 1004    virtio [ scsi ]
-Populating /pci@800000020000000/scsi@2
-       SCSI: Looking for devices
-          100000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
-                     00 0800 (D) : 10ec 8139    network [ ethernet ]
-No NVRAM common partition, re-initializing...
-Scanning USB
-  OHCI: initializing
-Using default console: /vdevice/vty@30000000
-
-  Welcome to Open Firmware
-
-  Copyright (c) 2004, 2011 IBM Corporation All rights reserved.
-  This program and the accompanying materials are made available
-  under the terms of the BSD License available at
-  http://www.opensource.org/licenses/bsd-license.php
-
-
-Trying to load:  from: /pci@800000020000000/scsi@2/disk@100000000000000 ...=
-   Successfully loaded
-
-                     GNU GRUB  version 2.02~beta2-36ubuntu3
-
- +-------------------------------------------------------------------------=
----+
- |*Install                                                                 =
-   |
- | Rescue mode                                                             =
-   |
- |                                                                         =
-   |
- |                                                                         =
-   |
- |                                                                         =
-   |
- |                                                                         =
-   |
- |                                                                         =
-   |
- |                                                                         =
-   |
- |                                                                         =
-   |
- |                                                                         =
-   |
- |                                                                         =
-   |
- |                                                                         =
-   |
- +-------------------------------------------------------------------------=
----+
-
-      Use the ^ and v keys to select which entry is highlighted.
-      Press enter to boot the selected OS, `e' to edit the commands
-      before booting or `c' for a command-line.
-
-
-OF stdout device is: /vdevice/vty@30000000
-Preparing to boot Linux version 4.4.0-21-generic (buildd@bos01-ppc64el-017)=
- (gcc version 5.3.1 20160413 (Ubuntu/IBM 5.3.1-14ubuntu2) ) #37-Ubuntu SMP =
-Mon Apr 18 18:30:22 UTC 2016 (Ubuntu 4.4.0-21.37-generic 4.4.6)
-Detected machine type: 0000000000000101
-Max number of cores passed to firmware: 2048 (NR_CPUS =3D 2048)
-Calling ibm,client-architecture-support... done
-command line: BOOT_IMAGE=3D/install/vmlinux tasks=3Dstandard pkgsel/languag=
-e-pack-patterns=3D pkgsel/install-language-support=3Dfalse --- quiet
-memory layout at init:
-  memory_limit : 0000000000000000 (16 MB aligned)
-  alloc_bottom : 0000000004640000
-  alloc_top    : 0000000030000000
-  alloc_top_hi : 0000000100000000
-  rmo_top      : 0000000030000000
-  ram_top      : 0000000100000000
-instantiating rtas at 0x000000002fff0000... done
-prom_hold_cpus: skipped
-copying OF device tree...
-Building dt strings...
-Building dt structure...
-Device tree strings 0x0000000004650000 -> 0x0000000004650a5b
-Device tree struct  0x0000000004660000 -> 0x0000000004670000
-Quiescing Open Firmware ...
-Booting Linux via __start() ...
- -> smp_release_cpus()
-spinning_secondaries =3D 3
- <- smp_release_cpus()
- <- setup_system()
-Linux ppc64le
-#37-Ubuntu SMP M[    2.155665] Facility 'TM' unavailable, exception at 0x3f=
-ff9f3d8644, MSR=3Db00000014280f033
-[    2.161582] Facility 'TM' unavailable, exception at 0x3fff8a488644, MSR=
-=3Db00000014280f033
-[    2.168973] Facility 'TM' unavailable, exception at 0x3fffb2df8644, MSR=
-=3Db00000014280f033
-[    2.174818] Facility 'TM' unavailable, exception at 0x3fff902f8644, MSR=
-=3Db00000014280f033
-[    2.180887] Facility 'TM' unavailable, exception at 0x3fff84728644, MSR=
-=3Db00000014280f033
-[    2.186023] Facility 'TM' unavailable, exception at 0x3fff8f1f8644, MSR=
-=3Db00000014280f033
-[    2.193073] Facility 'TM' unavailable, exception at 0x3fffa8ecfe30, MSR=
-=3Db00000014280f033
-[    2.193697] Kernel panic - not syncing: Attempted to kill init! exitcode=
-=3D0x00000004
-[    2.193697]
-[    2.193751] CPU: 3 PID: 1 Comm: init Not tainted 4.4.0-21-generic #37-Ub=
-untu
-[    2.193788] Call Trace:
-[    2.193826] [c0000000fea83a50] [c000000000aedc1c] dump_stack+0xb0/0xf0 (=
-unreliable)
-[    2.193868] [c0000000fea83a90] [c000000000ae9e50] panic+0x100/0x2c0
-[    2.193914] [c0000000fea83b20] [c0000000000bd474] do_exit+0xc24/0xc30
-[    2.193945] [c0000000fea83be0] [c0000000000bd564] do_group_exit+0x64/0x1=
-00
-[    2.193979] [c0000000fea83c20] [c0000000000ce9cc] get_signal+0x55c/0x7b0
-[    2.194012] [c0000000fea83d10] [c000000000017424] do_signal+0x54/0x2b0
-[    2.194043] [c0000000fea83e00] [c00000000001787c] do_notify_resume+0xbc/=
-0xd0
-[    2.194072] [c0000000fea83e30] [c000000000009838] ret_from_except_lite+0=
-x64/0x68
-
-Domain creation completed.
-Restarting guest.
-Connected to domain nested-xenial
-Escape character is ^]
-Populating /vdevice methods
-Populating /vdevice/vty@30000000
-Populating /vdevice/nvram@71000000
-Populating /pci@800000020000000
-                     00 2800 (D) : 1af4 1002    unknown-legacy-device*
-                     00 2000 (D) : 1af4 1001    virtio [ block ]
-                     00 1800 (D) : 106b 003f    serial bus [ usb-ohci ]
-                     00 1000 (D) : 1af4 1004    virtio [ scsi ]
-Populating /pci@800000020000000/scsi@2
-       SCSI: Looking for devices
-          100000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
-                     00 0800 (D) : 10ec 8139    network [ ethernet ]
-No NVRAM common partition, re-initializing...
-Scanning USB
-  OHCI: initializing
-Using default console: /vdevice/vty@30000000
-
-  Welcome to Open Firmware
-
-  Copyright (c) 2004, 2011 IBM Corporation All rights reserved.
-  This program and the accompanying materials are made available
-  under the terms of the BSD License available at
-  http://www.opensource.org/licenses/bsd-license.php
-
-
-Trying to load:  from: /pci@800000020000000/scsi@4 ...
-E3404: Not a bootable device!
-Trying to load:  from: HALT ...
-E3405: No such device
-
-E3407: Load failed
-
-        ..`. ..     .......  ..           ......      .......
-    ..`...`''.`'. .''``````..''.       .`''```''`.  `''``````
-       .`` .:' ': `''.....  .''.       ''`     .''..''.......
-         ``.':.';. ``````''`.''.      .''.      ''``''`````'`
-         ``.':':`   .....`''.`'`...... `'`.....`''.`'`
-        .`.`'``   .'`'`````.  ``''''''  ``''`'''`. `'`
-  Type 'boot'  and press return  to  continue  booting  the system.
-  Type 'reset-all'  and  press  return  to   reboot   the   system.
-
-
-Ready!
-0 >
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: htm
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1660946
-
-Title:
-  [nested] virt-install falls to SLOF
-
-Status in QEMU:
-  New
-
-Bug description:
-  =
-
-  [nested] virt-install falls to SLOF: after starting installer (ISO/CDROM)=
-, it crashes w/ a kernel panic due to an HTM (Hardware Transactional Memory=
-) exception.
-
-  Scenario:
-  Host=3DUbuntu 16.04 Xenial (Ubuntu KVM ppc64el POWER8E 8247-22L)
-  Guest=3DUbuntu 16.04 Xenial (Ubuntu Xenial Cloud Image QCOW2)
-  Nested=3DUbuntu 16.04 Xenial (Ubuntu Xenial Server ISO *or* NetInstall mi=
-ni.iso)
-
-  Inside Guest (1st level), run virt-install as shown below to reproduce
-  the bug.
-
-  Facts:
-   * ISO images (from both Server or netinstall mini.iso) fail to boot on x=
-enial/yakkety
-   * Cloud image (xenial/yakkety/zesty) on nested virt boots fine, the logi=
-n prompt is seen.
-   * Reproducible with Xenial and Yakkety
-   * NOT reproducible with Zesty (Installer menu starts just normally)
-   * virtio-scsi, virtio-net and virtio-blk modules are seen in zesty. Only=
- virtio-scsi is seen on xenial/yakkety (-net and -blk are built-in modules?)
-   * kvm-pr is loaded for all tested scenarios
-   * This patch[1] rings a bell, however, it doesn't explain how cloud imag=
-es boot just fine and don't hit the bug, since the kernel used in the cloud=
- images also enable HTM[2].
-
-  [1] https://lists.ozlabs.org/pipermail/linuxppc-
-  dev/2016-April/141292.html
-
-  [2] grep TRANSA /boot/config-4.8.0-26-generic
-  CONFIG_PPC_TRANSACTIONAL_MEM=3Dy
-
-  =
-
-  # cat virt-inst.sh
-  virt-install --virt-type=3Dkvm --cpu=3Dhost --name=3Dnested-xenial --cont=
-roller type=3Dscsi,model=3Dvirtio-scsi --graphics none --console pty,target=
-_type=3Dserial --disk path=3D/home/nested-xenial.qcow2,size=3D20 --vcpus=3D=
-4 --ram=3D4096 --os-type=3Dlinux --os-variant ubuntu16.04 --network bridge=
-=3Dvirbr0,model=3Dvirtio --cdrom=3D$1
-
-  =
-
-  # ./virt-inst.sh ubuntu-16.04-server-ppc64el.iso
-  WARNING  CDROM media does not print to the text console by default, so yo=
-u likely will not see text install output. You might want to use --location=
-. See the man page for examples of using --location with CDROM media
-
-  Starting install...
-  Creating domain...                                                       =
-                                                                           =
-         |    0 B  00:00:00
-  Connected to domain nested-xenial
-  Escape character is ^]
-  Populating /vdevice methods
-  Populating /vdevice/vty@30000000
-  Populating /vdevice/nvram@71000000
-  Populating /pci@800000020000000
-                       00 2800 (D) : 1af4 1002    unknown-legacy-device*
-                       00 2000 (D) : 1af4 1001    virtio [ block ]
-                       00 1800 (D) : 106b 003f    serial bus [ usb-ohci ]
-                       00 1000 (D) : 1af4 1004    virtio [ scsi ]
-  Populating /pci@800000020000000/scsi@2
-         SCSI: Looking for devices
-            100000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
-                       00 0800 (D) : 10ec 8139    network [ ethernet ]
-  No NVRAM common partition, re-initializing...
-  Scanning USB
-    OHCI: initializing
-  Using default console: /vdevice/vty@30000000
-
-    Welcome to Open Firmware
-
-    Copyright (c) 2004, 2011 IBM Corporation All rights reserved.
-    This program and the accompanying materials are made available
-    under the terms of the BSD License available at
-    http://www.opensource.org/licenses/bsd-license.php
-
-  =
-
-  Trying to load:  from: /pci@800000020000000/scsi@2/disk@100000000000000 .=
-..   Successfully loaded
-
-                       GNU GRUB  version 2.02~beta2-36ubuntu3
-
-   +-----------------------------------------------------------------------=
------+
-   |*Install                                                               =
-     |
-   | Rescue mode                                                           =
-     |
-   |                                                                       =
-     |
-   |                                                                       =
-     |
-   |                                                                       =
-     |
-   |                                                                       =
-     |
-   |                                                                       =
-     |
-   |                                                                       =
-     |
-   |                                                                       =
-     |
-   |                                                                       =
-     |
-   |                                                                       =
-     |
-   |                                                                       =
-     |
-   +-----------------------------------------------------------------------=
------+
-
-        Use the ^ and v keys to select which entry is highlighted.
-        Press enter to boot the selected OS, `e' to edit the commands
-        before booting or `c' for a command-line.
-
-  =
-
-  OF stdout device is: /vdevice/vty@30000000
-  Preparing to boot Linux version 4.4.0-21-generic (buildd@bos01-ppc64el-01=
-7) (gcc version 5.3.1 20160413 (Ubuntu/IBM 5.3.1-14ubuntu2) ) #37-Ubuntu SM=
-P Mon Apr 18 18:30:22 UTC 2016 (Ubuntu 4.4.0-21.37-generic 4.4.6)
-  Detected machine type: 0000000000000101
-  Max number of cores passed to firmware: 2048 (NR_CPUS =3D 2048)
-  Calling ibm,client-architecture-support... done
-  command line: BOOT_IMAGE=3D/install/vmlinux tasks=3Dstandard pkgsel/langu=
-age-pack-patterns=3D pkgsel/install-language-support=3Dfalse --- quiet
-  memory layout at init:
-    memory_limit : 0000000000000000 (16 MB aligned)
-    alloc_bottom : 0000000004640000
-    alloc_top    : 0000000030000000
-    alloc_top_hi : 0000000100000000
-    rmo_top      : 0000000030000000
-    ram_top      : 0000000100000000
-  instantiating rtas at 0x000000002fff0000... done
-  prom_hold_cpus: skipped
-  copying OF device tree...
-  Building dt strings...
-  Building dt structure...
-  Device tree strings 0x0000000004650000 -> 0x0000000004650a5b
-  Device tree struct  0x0000000004660000 -> 0x0000000004670000
-  Quiescing Open Firmware ...
-  Booting Linux via __start() ...
-   -> smp_release_cpus()
-  spinning_secondaries =3D 3
-   <- smp_release_cpus()
-   <- setup_system()
-  Linux ppc64le
-  #37-Ubuntu SMP M[    2.155665] Facility 'TM' unavailable, exception at 0x=
-3fff9f3d8644, MSR=3Db00000014280f033
-  [    2.161582] Facility 'TM' unavailable, exception at 0x3fff8a488644, MS=
-R=3Db00000014280f033
-  [    2.168973] Facility 'TM' unavailable, exception at 0x3fffb2df8644, MS=
-R=3Db00000014280f033
-  [    2.174818] Facility 'TM' unavailable, exception at 0x3fff902f8644, MS=
-R=3Db00000014280f033
-  [    2.180887] Facility 'TM' unavailable, exception at 0x3fff84728644, MS=
-R=3Db00000014280f033
-  [    2.186023] Facility 'TM' unavailable, exception at 0x3fff8f1f8644, MS=
-R=3Db00000014280f033
-  [    2.193073] Facility 'TM' unavailable, exception at 0x3fffa8ecfe30, MS=
-R=3Db00000014280f033
-  [    2.193697] Kernel panic - not syncing: Attempted to kill init! exitco=
-de=3D0x00000004
-  [    2.193697]
-  [    2.193751] CPU: 3 PID: 1 Comm: init Not tainted 4.4.0-21-generic #37-=
-Ubuntu
-  [    2.193788] Call Trace:
-  [    2.193826] [c0000000fea83a50] [c000000000aedc1c] dump_stack+0xb0/0xf0=
- (unreliable)
-  [    2.193868] [c0000000fea83a90] [c000000000ae9e50] panic+0x100/0x2c0
-  [    2.193914] [c0000000fea83b20] [c0000000000bd474] do_exit+0xc24/0xc30
-  [    2.193945] [c0000000fea83be0] [c0000000000bd564] do_group_exit+0x64/0=
-x100
-  [    2.193979] [c0000000fea83c20] [c0000000000ce9cc] get_signal+0x55c/0x7=
-b0
-  [    2.194012] [c0000000fea83d10] [c000000000017424] do_signal+0x54/0x2b0
-  [    2.194043] [c0000000fea83e00] [c00000000001787c] do_notify_resume+0xb=
-c/0xd0
-  [    2.194072] [c0000000fea83e30] [c000000000009838] ret_from_except_lite=
-+0x64/0x68
-
-  Domain creation completed.
-  Restarting guest.
-  Connected to domain nested-xenial
-  Escape character is ^]
-  Populating /vdevice methods
-  Populating /vdevice/vty@30000000
-  Populating /vdevice/nvram@71000000
-  Populating /pci@800000020000000
-                       00 2800 (D) : 1af4 1002    unknown-legacy-device*
-                       00 2000 (D) : 1af4 1001    virtio [ block ]
-                       00 1800 (D) : 106b 003f    serial bus [ usb-ohci ]
-                       00 1000 (D) : 1af4 1004    virtio [ scsi ]
-  Populating /pci@800000020000000/scsi@2
-         SCSI: Looking for devices
-            100000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
-                       00 0800 (D) : 10ec 8139    network [ ethernet ]
-  No NVRAM common partition, re-initializing...
-  Scanning USB
-    OHCI: initializing
-  Using default console: /vdevice/vty@30000000
-
-    Welcome to Open Firmware
-
-    Copyright (c) 2004, 2011 IBM Corporation All rights reserved.
-    This program and the accompanying materials are made available
-    under the terms of the BSD License available at
-    http://www.opensource.org/licenses/bsd-license.php
-
-  =
-
-  Trying to load:  from: /pci@800000020000000/scsi@4 ...
-  E3404: Not a bootable device!
-  Trying to load:  from: HALT ...
-  E3405: No such device
-
-  E3407: Load failed
-
-          ..`. ..     .......  ..           ......      .......
-      ..`...`''.`'. .''``````..''.       .`''```''`.  `''``````
-         .`` .:' ': `''.....  .''.       ''`     .''..''.......
-           ``.':.';. ``````''`.''.      .''.      ''``''`````'`
-           ``.':':`   .....`''.`'`...... `'`.....`''.`'`
-          .`.`'``   .'`'`````.  ``''''''  ``''`'''`. `'`
-    Type 'boot'  and press return  to  continue  booting  the system.
-    Type 'reset-all'  and  press  return  to   reboot   the   system.
-
-  =
-
-  Ready!
-  0 >
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1660946/+subscriptions
+To: Ladi Prosek <lprosek@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xQqFh1T0Di0TqS2HM5DnsxkiF9tcx4MJG
+From: Eric Blake <eblake@redhat.com>
+To: Ladi Prosek <lprosek@redhat.com>, "Daniel P. Berrange"
+ <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+Message-ID: <15e45a8d-852e-97da-65c5-3f69258dd59b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
+References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
+ <20170201102013.GC3232@redhat.com>
+ <CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
+ <20170201110320.GD3232@redhat.com>
+ <CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
+In-Reply-To: <CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 02/01/2017 07:41 AM, Ladi Prosek wrote:
+
+>=20
+> Ok, so there are two different aspects that should probably be
+> separated. The actual semantics of IOCTL calls is equivalent to the
+> semantics of files in general. For files it's stream in, stream out
+> (and seeking and such). For IOCTL it's a buffer in, buffer out (and a
+> return code). The content is file specific, IOCTL code specific,
+> whatever. Definitely not guest agent's business to interpret it. Here
+> I think my analogy holds.
+
+I don't.  ioctl() is a leaky abstraction - it exists as the blanket
+catch-all do-anything-else-that-doesn't-have-a-dedicated-API.  It is, by
+its very nature, non-portable and VERY hard to abstract - because there
+is no one abstraction for every possible ioctl code.  I strongly agree
+with Dan here that you are going to get nowhere by adding a qga-ioctl
+command, because there is no SANE way that you can specify it in QAPI.
+Rather, add specific commands for the specific actions you want to
+expose, and if the implementation of those specific commands uses a
+particular ioctl() under the hood, fine.  But don't directly expose
+ioctl() over the wire.
+
+
+>> It would be possible to design a ioctl API that is more usable if you
+>> didn't try to do generic passthrough of arbitrary ioctl commands. Inst=
+ead
+>> provide a QAPI schema that uses a union to provide strongly typed argu=
+ments
+>> for the ioctl commands you care about using. Or completely separate QA=
+PI
+>> commands instead of multiplexing everything into an ioctl command.
+>=20
+> I can add a QAPI command for my specific use case if it's acceptable,
+
+Certainly more palatable, and more likely to gain my acceptance.
+
+> that's not a problem. Although at that point I would probably just go
+> back to my plan b and use regular file I/O and guest-file-read. I just
+> wanted to be as generic as possible to benefit other use cases as well
+> and I ended up with what's basically my stab at RPC ioctl.
+
+The problem is that RPC ioctl is not sanely possible.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--xQqFh1T0Di0TqS2HM5DnsxkiF9tcx4MJG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYkfQQAAoJEKeha0olJ0Nqsr0H/2/uaMTfux789n4amk3iool0
+3p9YCJAgAnsltbDj9+/Ay5TPSWviBXOswbiCChIK7gBlii+oyz4FH93FwDwiFHKa
+eYTgaoK2BeeAnOahenbN19K+yMV0DtD8YVbzkDXZpEHcmucrmh2Y3w80FgjYsxKy
+CR9R7dMI2yYxo3HlZF6egozvluHDn6eR9IgT8T4ZshLfPSnQM4SPIaJmJ3nWOdcd
+uPT2C965u3nLtqD+tdAfD9tRfSSzTqmb5ympNJQLvms/T7WpKrplKf1PE02gDCnl
+lD0X1Ov5bVmU2lmZGEzCG8YoutMIWhg6j8/LmXpaGiwoEntr0ctcCWfGGzBWBxs=
+=NVnG
+-----END PGP SIGNATURE-----
+
+--xQqFh1T0Di0TqS2HM5DnsxkiF9tcx4MJG--
