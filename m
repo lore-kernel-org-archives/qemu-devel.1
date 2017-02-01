@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYwmm-0000sv-FK
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:25:30 -0500
+	(envelope-from <thuth@redhat.com>) id 1cYwrg-0005wP-KO
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:30:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cYwml-0004K3-BL
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:25:28 -0500
-Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:32794)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cYwml-0004Jj-7o
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:25:27 -0500
-Received: by mail-ua0-x22b.google.com with SMTP id i68so297943494uad.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Feb 2017 07:25:27 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1cYwrb-0005qU-LW
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:30:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46962)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cYwrb-0005qK-FL
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 10:30:27 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E593946C
+	for <qemu-devel@nongnu.org>; Wed,  1 Feb 2017 15:30:26 +0000 (UTC)
+References: <1485852398-2327-1-git-send-email-thuth@redhat.com>
+	<1485955513.1076.59.camel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7ba960b7-4235-8036-7f48-974819775292@redhat.com>
+Date: Wed, 1 Feb 2017 16:30:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170130235210.GA4681@tungsten.ozlabs.ibm.com>
-References: <587D4171.6@linux.intel.com> <587D4329.5020702@linux.intel.com>
-	<20170130235210.GA4681@tungsten.ozlabs.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 1 Feb 2017 15:25:05 +0000
-Message-ID: <CAFEAcA-FPmqw0pt7kT=eHR_osfFbZNhrDdGAb87VxUWD_XXSNw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1485955513.1076.59.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu-pcc 2.8.0 linux-user segfaults
+Subject: Re: [Qemu-devel] [RFC PATCH] audio/sdlaudio: Allow audio playback
+ with SDL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Cc: =?UTF-8?B?QW7DrWJhbCBMaW3Ds24=?= <anibal.limon@linux.intel.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 30 January 2017 at 23:52, Sam Bobroff <sam.bobroff@au1.ibm.com> wrote:
->> On 01/16/2017 03:56 PM, An=C3=ADbal Lim=C3=B3n wrote:
->> > I'm trying to upgrade qemu to 2.8.0 in Openembedded-core and segfaults
->> > in qemu-ppc when is executing:
+On 01.02.2017 14:25, Gerd Hoffmann wrote:
+> On Di, 2017-01-31 at 09:46 +0100, Thomas Huth wrote:
+>> When compiling with SDL2, the semaphore trick used in sdlaudio.c
+>> does not work - QEMU locks up completely in this case. To avoid
+>> the hang and get at least some audio playback up and running (it's
+>> a little bit crackling, but better than nothing), we can use the
+>> SDL locking functions SDL_LockAudio() and SDL_UnlockAudio() to sync
+>> with the sound playback thread instead.
+>=20
+> Does SDL_LockAudio work with sdl1 too?
+> So we can possibly avoid having all those #ifdefs?
 
-> I've recently encountered a similar problem and I've posted a fix. If
-> you'd like to try it, it's here:
->
-> https://lists.gnu.org/archive/html/qemu-ppc/2017-01/msg00413.html
+It somehow works, too, but sound quality is - at least for me - much
+worse here than with the semaphore code. Maybe it can be fixed, too, but
+I am really not familiar enough with the QEMU internal audio API to
+figure out how to fix this (e.g. I don't understand why the run_out
+function is called way more often than the callback function, but its
+"live" parameter never reaches the full buffer size).
+So maybe we can start with the #ifdefs for now and remove them once
+somebody figured out how to improve sound quality for SDL1, too? (or
+once we remove support for SDL1 from QEMU completely ... or do we want
+to carry that with us forever?).
 
-Hmm, I missed that patch (it doesn't seem to have made it
-to the qemu-devel list), but it isn't correct, I'm afraid.
-In the patch for handling TARGET_USER_ESIGRETURN you must
-not change the nip register, because we will have just
-set it from the signal context that the guest provided
-to the sigreturn syscall. (The patch as it stands will
-cause us to reexecute an instruction after return from
-a signal handler, which isn't going to go very well).
-
-David, can you drop that patch from your ppc queue, please?
-
-(I think the change is good otherwise but I couldn't
-seem to find the bit in the ppc linux kernel that
-corresponds to moving the NIP value around.)
-
-thanks
--- PMM
+ Thomas
