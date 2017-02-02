@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cZMdq-0000AO-9n
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:01:59 -0500
+	(envelope-from <cota@braap.org>) id 1cZMiU-0001tV-DM
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:06:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cZMdm-0006Wy-CL
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:01:58 -0500
-Received: from mail.weilnetz.de ([37.120.169.71]:48894
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1cZMdm-0006Vq-5P
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:01:54 -0500
-From: Stefan Weil <sw@weilnetz.de>
-References: <1485893872-26524-1-git-send-email-mst@redhat.com>
-	<CAFEAcA9zEaATTwGLNCB=X_mhqjapC-0jxPpv8OjDt=zqaFBnjA@mail.gmail.com>
-	<CAFEAcA_SCHQ06uON3pEgpt2ku4HO2C-fUTHr7TZAVmZ1PEq09Q@mail.gmail.com>
-Message-ID: <0be14960-0364-fc89-33f0-5ff2d1f8d781@weilnetz.de>
-Date: Thu, 2 Feb 2017 20:01:45 +0100
+	(envelope-from <cota@braap.org>) id 1cZMiT-0001JT-Hj
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:06:46 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20161206014943.GA25612@flamenco>
+References: <20161129114707.2975-1-pbonzini@redhat.com>
+	<20161129114707.2975-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_SCHQ06uON3pEgpt2ku4HO2C-fUTHr7TZAVmZ1PEq09Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v5 00/22] virtio, vhost, pci: fixes, features
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161129114707.2975-3-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/10] qemu-thread: introduce QemuLockCnt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +22,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Date: Thu, 02 Feb 2017 19:06:47 -0000
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Am 02.02.2017 um 17:25 schrieb Peter Maydell:
-> On 2 February 2017 at 13:56, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
->> On 31 January 2017 at 20:18, Michael S. Tsirkin <mst@redhat.com> wrote=
-:
->>> virtio, vhost, pci: fixes, features
->>>
->>> generic pci root port support
->>> disable shpc by default
->>> safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
->>> fixes and cleanups all over the place
->>>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
->> Applied, thanks.
->
-> ...travis builds now fail for the --enable-tcg-interpreter config:
-> https://travis-ci.org/qemu/qemu/jobs/197648661
->
-> In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
-> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c: In function =E2=80=
-=98tcg_out_op=E2=80=99:
-> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:117: error:
-> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
-> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:255: error:
-> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
-> In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
-> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:115: error:
-> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
-> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:255: error:
-> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
->
-> These look to be because we were trying to use ARRAY_SIZE()
-> on a non-array, which was previously undetected. The use is
-> only in an assert() so fairly harmless.
->
-> Would somebody who cares about TCI like to provide a fix?
->
-> thanks
-> -- PMM
+On Tue, Nov 29, 2016 at 12:46:59 +0100, Paolo Bonzini wrote:
+> A QemuLockCnt comprises a counter and a mutex, with primitives
+> to increment and decrement the counter, and to take and release the
+> mutex.  It can be used to do lock-free visits to a data structure
+> whenever mutexes would be too heavy-weight and the critical section
+> is too long for RCU.
+> 
+> This could be implemented simply by protecting the counter with the
+> mutex, but QemuLockCnt is harder to misuse and more efficient.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(snip)
+> +++ b/docs/lockcnt.txt
+> @@ -0,0 +1,343 @@
+> +DOCUMENTATION FOR LOCKED COUNTERS (aka QemuLockCnt)
+> +===================================================
+(snip)
+> +    bool qemu_lockcnt_dec_if_lock(QemuLockCnt *lockcnt);
+> +
+> +        If the count is 1, decrement the count to zero, lock
+> +        the mutex and return true.  Otherwise, return false.
+> +
+(snip)
+> +++ b/util/lockcnt.c
+(snip)
+> +void qemu_lockcnt_init(QemuLockCnt *lockcnt)
+> +{
+> +    qemu_mutex_init(&lockcnt->mutex);
+> +    lockcnt->count = 0;
 
+Minor nit: a release barrier here wouldn't harm.
 
+> +}
+> +
+> +void qemu_lockcnt_destroy(QemuLockCnt *lockcnt)
+> +{
+> +    qemu_mutex_destroy(&lockcnt->mutex);
+> +}
+> +
+> +void qemu_lockcnt_inc(QemuLockCnt *lockcnt)
+> +{
+> +    int old;
+> +    for (;;) {
+> +        old = atomic_read(&lockcnt->count);
+> +        if (old == 0) {
+> +            qemu_lockcnt_lock(lockcnt);
+> +            qemu_lockcnt_inc_and_unlock(lockcnt);
+> +            return;
+> +        } else {
+> +            if (atomic_cmpxchg(&lockcnt->count, old, old + 1) == old) {
+> +                return;
+> +            }
+> +        }
+> +    }
+> +}
+> +
+> +void qemu_lockcnt_dec(QemuLockCnt *lockcnt)
+> +{
+> +    atomic_dec(&lockcnt->count);
+> +}
+> +
+> +/* Decrement a counter, and return locked if it is decremented to zero.
+> + * It is impossible for the counter to become nonzero while the mutex
+> + * is taken.
+> + */
+> +bool qemu_lockcnt_dec_and_lock(QemuLockCnt *lockcnt)
+> +{
+> +    int val = atomic_read(&lockcnt->count);
+> +    while (val > 1) {
+> +        int old = atomic_cmpxchg(&lockcnt->count, val, val - 1);
+> +        if (old != val) {
+> +            val = old;
+> +            continue;
+> +        }
+> +
+> +        return false;
+> +    }
 
-Other architectures either no longer use an assertion or
-use tcg_debug_assert(s->tb_jmp_insn_offset !=3D NULL), see
-tcg/aarch64/tcg-target.inc.c and tcg/ppc/tcg-target.inc.c.
+Minor nit:
+	while (val > 1) {
+		int old = cmpxchg();
+		if (old == val) {
+			return false;
+		}
+		val = old;
+	}
+seems to me a little easier to read.
 
-As the majority thinks that there is no longer a need for
-an assertion here, I think that is the best solution for
-TCI, too.
+> +    qemu_lockcnt_lock(lockcnt);
+> +    if (atomic_fetch_dec(&lockcnt->count) == 1) {
+> +        return true;
+> +    }
+> +
+> +    qemu_lockcnt_unlock(lockcnt);
+> +    return false;
+> +}
+> +
+> +/* Decrement a counter and return locked if it is decremented to zero.
+> + * Otherwise do nothing.
 
-I'll send a patch.
+This comment doesn't match the code below nor the description in the
+.txt file (quoted above) [we might not decrement the counter at all!]
 
-Regards
-Stefan
+> + *
+> + * It is impossible for the counter to become nonzero while the mutex
+> + * is taken.
+> + */
+> +bool qemu_lockcnt_dec_if_lock(QemuLockCnt *lockcnt)
+> +{
+> +    int val = atomic_mb_read(&lockcnt->count);
+> +    if (val > 1) {
+> +        return false;
+> +    }
+> +
+> +    qemu_lockcnt_lock(lockcnt);
+> +    if (atomic_fetch_dec(&lockcnt->count) == 1) {
+> +        return true;
+> +    }
+> +
+> +    qemu_lockcnt_inc_and_unlock(lockcnt);
+
+The choice of dec+(maybe)inc over cmpxchg seems a little odd to me.
+
+		Emilio
