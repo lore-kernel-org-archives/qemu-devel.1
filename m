@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cZMEb-0003qC-5F
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:35:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZMPl-0004Gx-13
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:47:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cZMEZ-0004fw-78
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:35:53 -0500
-Received: from mail.kernel.org ([198.145.29.136]:45150)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cZMEZ-0004fX-0p
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:35:51 -0500
-From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Thu,  2 Feb 2017 10:35:40 -0800
-Message-Id: <1486060541-29146-4-git-send-email-sstabellini@kernel.org>
-In-Reply-To: <1486060541-29146-1-git-send-email-sstabellini@kernel.org>
-References: <alpine.DEB.2.10.1702021024200.17946@sstabellini-ThinkPad-X260>
-	<1486060541-29146-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL 4/5] MAINTAINERS: Update xen-devel mailing list
- address
+	(envelope-from <peter.maydell@linaro.org>) id 1cZMPk-0001Q4-DU
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:47:25 -0500
+Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:36076)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZMPk-0001Pl-7W
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:47:24 -0500
+Received: by mail-ua0-x22e.google.com with SMTP id 96so18053428uaq.3
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 10:47:24 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170201134453.11963-1-stefanha@redhat.com>
+References: <20170201134453.11963-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Feb 2017 18:47:03 +0000
+Message-ID: <CAFEAcA_sDwqTiAdUF=U5J9Haxe0OFxx_n8HBrP+xRYChiaaf3w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/10] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, peter.maydell@linaro.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: Anthony PERARD <anthony.perard@citrix.com>
+On 1 February 2017 at 13:44, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit a0def594286d9110a6035e02eef558cf3cf5d847:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-01-30 10:23:20 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/tracing-pull-request
+>
+> for you to fetch changes up to 7f4076c1bb16d0d6f81a085ecc9c9d0b9da74c7d:
+>
+>   trace: clean up trace-events files (2017-01-31 17:12:15 +0000)
+>
+> ----------------------------------------------------------------
 
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied, thanks.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a428cb2..baea7c7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -323,7 +323,7 @@ Guest CPU Cores (Xen):
- X86
- M: Stefano Stabellini <sstabellini@kernel.org>
- M: Anthony Perard <anthony.perard@citrix.com>
--L: xen-devel@lists.xensource.com
-+L: xen-devel@lists.xenproject.org
- S: Supported
- F: xen-*
- F: */xen*
--- 
-1.9.1
+-- PMM
