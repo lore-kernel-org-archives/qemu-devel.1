@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9je-00077Q-Vx
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jg-0007A5-Fi
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jb-0003Uf-Te
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:06 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9je-0003Xi-Kd
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:08 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:07 +1100
-Message-Id: <20170202051445.5735-10-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:18 +1100
+Message-Id: <20170202051445.5735-21-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 009/107] target-ppc: implement lxv/lxvx and
- stxv/stxvx
+Subject: [Qemu-devel] [PULL 020/107] target-ppc: move ppc_vsr_t to common
+ header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,179 +25,116 @@ Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com,
 
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-lxv:  Load VSX Vector
-lxvx: Load VSX Vector Indexed
+The structure and corresponding defines and functions need to be used
+outside of fpu_helper.c as well.
 
-    Little/Big-endian Storage
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-
-    Vector load results:
-    BE:
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-
-    LE:
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-    |E7|E6|E5|E4|E3|E2|E1|E0|F7|F6|F5|F4|F3|F2|F1|F0|
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-
-stxv: Store VSX Vector
-stxvx: Store VSX Vector Indexed
-
-    Vector (8-bit elements) in BE:
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-
-    Vector (8-bit elements) in LE:
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-    |E7|E6|E5|E4|E3|E2|E1|E0|F7|F6|F5|F4|F3|F2|F1|F0|
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-
-    Store results in following:
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+Add u8, u16, u32 and Int128 to the structure.
 
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/internal.h               |  1 +
- target/ppc/translate.c              | 10 ++++++--
- target/ppc/translate/vsx-impl.inc.c | 50 +++++++++++++++++++++++++++++++++++++
- target/ppc/translate/vsx-ops.inc.c  |  2 ++
- 4 files changed, 61 insertions(+), 2 deletions(-)
+ target/ppc/fpu_helper.c | 37 -------------------------------------
+ target/ppc/internal.h   | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+), 37 deletions(-)
 
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 696f537..3b867cf 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -1777,43 +1777,6 @@ uint32_t helper_efdcmpeq(CPUPPCState *env, uint64_t op1, uint64_t op2)
+     return helper_efdtsteq(env, op1, op2);
+ }
+ 
+-typedef union _ppc_vsr_t {
+-    uint64_t u64[2];
+-    uint32_t u32[4];
+-    float32 f32[4];
+-    float64 f64[2];
+-} ppc_vsr_t;
+-
+-#if defined(HOST_WORDS_BIGENDIAN)
+-#define VsrW(i) u32[i]
+-#define VsrD(i) u64[i]
+-#else
+-#define VsrW(i) u32[3-(i)]
+-#define VsrD(i) u64[1-(i)]
+-#endif
+-
+-static void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+-{
+-    if (n < 32) {
+-        vsr->VsrD(0) = env->fpr[n];
+-        vsr->VsrD(1) = env->vsr[n];
+-    } else {
+-        vsr->u64[0] = env->avr[n-32].u64[0];
+-        vsr->u64[1] = env->avr[n-32].u64[1];
+-    }
+-}
+-
+-static void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+-{
+-    if (n < 32) {
+-        env->fpr[n] = vsr->VsrD(0);
+-        env->vsr[n] = vsr->VsrD(1);
+-    } else {
+-        env->avr[n-32].u64[0] = vsr->u64[0];
+-        env->avr[n-32].u64[1] = vsr->u64[1];
+-    }
+-}
+-
+ #define float64_to_float64(x, env) x
+ 
+ 
 diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index 9a4a74a..e83ea45 100644
+index e83ea45..66cde46 100644
 --- a/target/ppc/internal.h
 +++ b/target/ppc/internal.h
-@@ -187,6 +187,7 @@ EXTRACT_HELPER(DCM, 10, 6)
- /* DFP Z23-form */
- EXTRACT_HELPER(RMC, 9, 2)
+@@ -199,4 +199,46 @@ EXTRACT_HELPER(SHW, 8, 2);
+ EXTRACT_HELPER(SP, 19, 2);
+ EXTRACT_HELPER(IMM8, 11, 8);
  
-+EXTRACT_HELPER_SPLIT(DQxT, 3, 1, 21, 5);
- EXTRACT_HELPER_SPLIT(xT, 0, 1, 21, 5);
- EXTRACT_HELPER_SPLIT(xS, 0, 1, 21, 5);
- EXTRACT_HELPER_SPLIT(xA, 2, 1, 16, 5);
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 8032dc9..87fc153 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6095,14 +6095,20 @@ static void gen_dform39(DisasContext *ctx)
-     return gen_invalid(ctx);
- }
- 
--/* handles stfdp, stxsd, stxssp */
-+/* handles stfdp, lxv, stxsd, stxssp lxvx */
- static void gen_dform3D(DisasContext *ctx)
- {
-     if ((ctx->opcode & 3) == 1) { /* DQ-FORM */
-         switch (ctx->opcode & 0x7) {
-         case 1: /* lxv */
-+            if (ctx->insns_flags2 & PPC2_ISA300) {
-+                return gen_lxv(ctx);
-+            }
-             break;
-         case 5: /* stxv */
-+            if (ctx->insns_flags2 & PPC2_ISA300) {
-+                return gen_stxv(ctx);
-+            }
-             break;
-         }
-     } else { /* DS-FORM */
-@@ -6201,7 +6207,7 @@ GEN_HANDLER(std, 0x3E, 0xFF, 0xFF, 0x00000000, PPC_64B),
- #endif
- /* handles lfdp, lxsd, lxssp */
- GEN_HANDLER_E(dform39, 0x39, 0xFF, 0xFF, 0x00000000, PPC_NONE, PPC2_ISA205),
--/* handles stfdp, stxsd, stxssp */
-+/* handles stfdp, lxv, stxsd, stxssp, stxv */
- GEN_HANDLER_E(dform3D, 0x3D, 0xFF, 0xFF, 0x00000000, PPC_NONE, PPC2_ISA205),
- GEN_HANDLER(lmw, 0x2E, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
- GEN_HANDLER(stmw, 0x2F, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 8ee44cf..2fbdbd2 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -190,6 +190,56 @@ static void gen_lxvb16x(DisasContext *ctx)
-     tcg_temp_free(EA);
- }
- 
-+#define VSX_VECTOR_LOAD_STORE(name, op, indexed)            \
-+static void gen_##name(DisasContext *ctx)                   \
-+{                                                           \
-+    int xt;                                                 \
-+    TCGv EA;                                                \
-+    TCGv_i64 xth, xtl;                                      \
-+                                                            \
-+    if (indexed) {                                          \
-+        xt = xT(ctx->opcode);                               \
-+    } else {                                                \
-+        xt = DQxT(ctx->opcode);                             \
-+    }                                                       \
-+    xth = cpu_vsrh(xt);                                     \
-+    xtl = cpu_vsrl(xt);                                     \
-+                                                            \
-+    if (xt < 32) {                                          \
-+        if (unlikely(!ctx->vsx_enabled)) {                  \
-+            gen_exception(ctx, POWERPC_EXCP_VSXU);          \
-+            return;                                         \
-+        }                                                   \
-+    } else {                                                \
-+        if (unlikely(!ctx->altivec_enabled)) {              \
-+            gen_exception(ctx, POWERPC_EXCP_VPU);           \
-+            return;                                         \
-+        }                                                   \
-+    }                                                       \
-+    gen_set_access_type(ctx, ACCESS_INT);                   \
-+    EA = tcg_temp_new();                                    \
-+    if (indexed) {                                          \
-+        gen_addr_reg_index(ctx, EA);                        \
-+    } else {                                                \
-+        gen_addr_imm_index(ctx, EA, 0x0F);                  \
-+    }                                                       \
-+    if (ctx->le_mode) {                                     \
-+        tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_LEQ);   \
-+        tcg_gen_addi_tl(EA, EA, 8);                         \
-+        tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_LEQ);   \
-+    } else {                                                \
-+        tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_BEQ);   \
-+        tcg_gen_addi_tl(EA, EA, 8);                         \
-+        tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_BEQ);   \
-+    }                                                       \
-+    tcg_temp_free(EA);                                      \
++typedef union _ppc_vsr_t {
++    uint8_t u8[16];
++    uint16_t u16[8];
++    uint32_t u32[4];
++    uint64_t u64[2];
++    float32 f32[4];
++    float64 f64[2];
++    Int128  s128;
++} ppc_vsr_t;
++
++#if defined(HOST_WORDS_BIGENDIAN)
++#define VsrB(i) u8[i]
++#define VsrW(i) u32[i]
++#define VsrD(i) u64[i]
++#else
++#define VsrB(i) u8[15 - (i)]
++#define VsrW(i) u32[3 - (i)]
++#define VsrD(i) u64[1 - (i)]
++#endif
++
++static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
++{
++    if (n < 32) {
++        vsr->VsrD(0) = env->fpr[n];
++        vsr->VsrD(1) = env->vsr[n];
++    } else {
++        vsr->u64[0] = env->avr[n - 32].u64[0];
++        vsr->u64[1] = env->avr[n - 32].u64[1];
++    }
 +}
 +
-+VSX_VECTOR_LOAD_STORE(lxv, ld_i64, 0)
-+VSX_VECTOR_LOAD_STORE(stxv, st_i64, 0)
-+VSX_VECTOR_LOAD_STORE(lxvx, ld_i64, 1)
-+VSX_VECTOR_LOAD_STORE(stxvx, st_i64, 1)
++static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
++{
++    if (n < 32) {
++        env->fpr[n] = vsr->VsrD(0);
++        env->vsr[n] = vsr->VsrD(1);
++    } else {
++        env->avr[n - 32].u64[0] = vsr->u64[0];
++        env->avr[n - 32].u64[1] = vsr->u64[1];
++    }
++}
 +
- #define VSX_LOAD_SCALAR_DS(name, operation)                       \
- static void gen_##name(DisasContext *ctx)                         \
- {                                                                 \
-diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index 7f09527..8a1cbe0 100644
---- a/target/ppc/translate/vsx-ops.inc.c
-+++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -9,6 +9,7 @@ GEN_HANDLER_E(lxvdsx, 0x1F, 0x0C, 0x0A, 0, PPC_NONE, PPC2_VSX),
- GEN_HANDLER_E(lxvw4x, 0x1F, 0x0C, 0x18, 0, PPC_NONE, PPC2_VSX),
- GEN_HANDLER_E(lxvh8x, 0x1F, 0x0C, 0x19, 0, PPC_NONE,  PPC2_ISA300),
- GEN_HANDLER_E(lxvb16x, 0x1F, 0x0C, 0x1B, 0, PPC_NONE, PPC2_ISA300),
-+GEN_HANDLER_E(lxvx, 0x1F, 0x0C, 0x08, 0x00000040, PPC_NONE, PPC2_ISA300),
- 
- GEN_HANDLER_E(stxsdx, 0x1F, 0xC, 0x16, 0, PPC_NONE, PPC2_VSX),
- GEN_HANDLER_E(stxsibx, 0x1F, 0xD, 0x1C, 0, PPC_NONE, PPC2_ISA300),
-@@ -19,6 +20,7 @@ GEN_HANDLER_E(stxvd2x, 0x1F, 0xC, 0x1E, 0, PPC_NONE, PPC2_VSX),
- GEN_HANDLER_E(stxvw4x, 0x1F, 0xC, 0x1C, 0, PPC_NONE, PPC2_VSX),
- GEN_HANDLER_E(stxvh8x, 0x1F, 0x0C, 0x1D, 0, PPC_NONE,  PPC2_ISA300),
- GEN_HANDLER_E(stxvb16x, 0x1F, 0x0C, 0x1F, 0, PPC_NONE, PPC2_ISA300),
-+GEN_HANDLER_E(stxvx, 0x1F, 0x0C, 0x0C, 0, PPC_NONE, PPC2_ISA300),
- 
- GEN_HANDLER_E(mfvsrwz, 0x1F, 0x13, 0x03, 0x0000F800, PPC_NONE, PPC2_VSX207),
- GEN_HANDLER_E(mtvsrwa, 0x1F, 0x13, 0x06, 0x0000F800, PPC_NONE, PPC2_VSX207),
+ #endif /* PPC_INTERNAL_H */
 -- 
 2.9.3
