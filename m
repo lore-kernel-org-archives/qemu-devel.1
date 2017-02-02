@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kO-00086a-EV
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:59 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kN-00085R-NY
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kF-0004PD-MI
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:52 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kF-0004QC-W6
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:51 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:14:33 +1100
-Message-Id: <20170202051445.5735-96-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:14:45 +1100
+Message-Id: <20170202051445.5735-108-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 095/107] spapr: clock should count only if vm is
- running
+Subject: [Qemu-devel] [PULL 107/107] hw/ppc/pnv: Use error_report instead of
+ hw_error if a ROM file can't be found
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,193 +23,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-This is a port to ppc of the i386 commit:
-    00f4d64 kvmclock: clock should count only if vm is running
+hw_error() is for CPU related errors only (it dumps the CPU registers
+and  calls abort()!), so using error_report() is the better choice
+of reporting an error in case we simply did not find a file.
 
-We remove timebase_post_load function, and use the VM state
-change handler to save and restore the guest_timebase (on stop
-and continue).
-
-We keep timebase_pre_save to reduce the clock difference on
-migration like in:
-    6053a86 kvmclock: reduce kvmclock difference on migration
-
-Time base offset has originally been introduced by commit
-    98a8b52 spapr: Add support for time base offset migration
-
-So while VM is paused, the time is stopped. This allows to have
-the same result with date (based on Time Base Register) and
-hwclock (based on "get-time-of-day" RTAS call).
-
-Moreover in TCG mode, the Time Base is always paused, so this
-patch also adjust the behavior between TCG and KVM.
-
-VM state field "time_of_the_day_ns" is now useless but we keep
-it to be able to migrate to older version of the machine.
-
-As vmstate_ppc_timebase structure (with timebase_pre_save() and
-timebase_post_load() functions) was only used by vmstate_spapr,
-we register the VM state change handler only in ppc_spapr_init().
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc.c         | 66 ++++++++++++++++++++++++++++++++++------------------
- hw/ppc/spapr.c       |  6 +++++
- target/ppc/cpu-qom.h |  3 +++
- 3 files changed, 52 insertions(+), 23 deletions(-)
+ hw/ppc/pnv.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index f9a4b51..d171e60 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -847,9 +847,8 @@ static void cpu_ppc_set_tb_clk (void *opaque, uint32_t freq)
-     cpu_ppc_store_purr(cpu, 0x0000000000000000ULL);
- }
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 83597fe..4fab5c0 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -381,7 +381,7 @@ static void ppc_powernv_init(MachineState *machine)
  
--static void timebase_pre_save(void *opaque)
-+static void timebase_save(PPCTimebase *tb)
- {
--    PPCTimebase *tb = opaque;
-     uint64_t ticks = cpu_get_host_ticks();
-     PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
- 
-@@ -858,43 +857,30 @@ static void timebase_pre_save(void *opaque)
-         return;
+     fw_size = load_image_targphys(fw_filename, FW_LOAD_ADDR, FW_MAX_SIZE);
+     if (fw_size < 0) {
+-        hw_error("qemu: could not load OPAL '%s'\n", fw_filename);
++        error_report("qemu: could not load OPAL '%s'", fw_filename);
+         exit(1);
      }
- 
-+    /* not used anymore, we keep it for compatibility */
-     tb->time_of_the_day_ns = qemu_clock_get_ns(QEMU_CLOCK_HOST);
-     /*
--     * tb_offset is only expected to be changed by migration so
-+     * tb_offset is only expected to be changed by QEMU so
-      * there is no need to update it from KVM here
-      */
-     tb->guest_timebase = ticks + first_ppc_cpu->env.tb_env->tb_offset;
- }
- 
--static int timebase_post_load(void *opaque, int version_id)
-+static void timebase_load(PPCTimebase *tb)
- {
--    PPCTimebase *tb_remote = opaque;
-     CPUState *cpu;
-     PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
--    int64_t tb_off_adj, tb_off, ns_diff;
--    int64_t migration_duration_ns, migration_duration_tb, guest_tb, host_ns;
-+    int64_t tb_off_adj, tb_off;
-     unsigned long freq;
- 
-     if (!first_ppc_cpu->env.tb_env) {
-         error_report("No timebase object");
--        return -1;
-+        return;
+     g_free(fw_filename);
+@@ -393,8 +393,8 @@ static void ppc_powernv_init(MachineState *machine)
+         kernel_size = load_image_targphys(machine->kernel_filename,
+                                           KERNEL_LOAD_ADDR, 0x2000000);
+         if (kernel_size < 0) {
+-            hw_error("qemu: could not load kernel'%s'\n",
+-                     machine->kernel_filename);
++            error_report("qemu: could not load kernel'%s'",
++                         machine->kernel_filename);
+             exit(1);
+         }
      }
- 
-     freq = first_ppc_cpu->env.tb_env->tb_freq;
--    /*
--     * Calculate timebase on the destination side of migration.
--     * The destination timebase must be not less than the source timebase.
--     * We try to adjust timebase by downtime if host clocks are not
--     * too much out of sync (1 second for now).
--     */
--    host_ns = qemu_clock_get_ns(QEMU_CLOCK_HOST);
--    ns_diff = MAX(0, host_ns - tb_remote->time_of_the_day_ns);
--    migration_duration_ns = MIN(NANOSECONDS_PER_SECOND, ns_diff);
--    migration_duration_tb = muldiv64(freq, migration_duration_ns,
--                                     NANOSECONDS_PER_SECOND);
--    guest_tb = tb_remote->guest_timebase + MIN(0, migration_duration_tb);
- 
--    tb_off_adj = guest_tb - cpu_get_host_ticks();
-+    tb_off_adj = tb->guest_timebase - cpu_get_host_ticks();
- 
-     tb_off = first_ppc_cpu->env.tb_env->tb_offset;
-     trace_ppc_tb_adjust(tb_off, tb_off_adj, tb_off_adj - tb_off,
-@@ -904,9 +890,44 @@ static int timebase_post_load(void *opaque, int version_id)
-     CPU_FOREACH(cpu) {
-         PowerPCCPU *pcpu = POWERPC_CPU(cpu);
-         pcpu->env.tb_env->tb_offset = tb_off_adj;
-+#if defined(CONFIG_KVM)
-+        kvm_set_one_reg(cpu, KVM_REG_PPC_TB_OFFSET,
-+                        &pcpu->env.tb_env->tb_offset);
-+#endif
-     }
-+}
- 
--    return 0;
-+void cpu_ppc_clock_vm_state_change(void *opaque, int running,
-+                                   RunState state)
-+{
-+    PPCTimebase *tb = opaque;
-+
-+    if (running) {
-+        timebase_load(tb);
-+    } else {
-+        timebase_save(tb);
-+    }
-+}
-+
-+/*
-+ * When migrating, read the clock just before migration,
-+ * so that the guest clock counts during the events
-+ * between:
-+ *
-+ *  * vm_stop()
-+ *  *
-+ *  * pre_save()
-+ *
-+ *  This reduces clock difference on migration from 5s
-+ *  to 0.1s (when max_downtime == 5s), because sending the
-+ *  final pages of memory (which happens between vm_stop()
-+ *  and pre_save()) takes max_downtime.
-+ */
-+static void timebase_pre_save(void *opaque)
-+{
-+    PPCTimebase *tb = opaque;
-+
-+    timebase_save(tb);
- }
- 
- const VMStateDescription vmstate_ppc_timebase = {
-@@ -915,7 +936,6 @@ const VMStateDescription vmstate_ppc_timebase = {
-     .minimum_version_id = 1,
-     .minimum_version_id_old = 1,
-     .pre_save = timebase_pre_save,
--    .post_load = timebase_post_load,
-     .fields      = (VMStateField []) {
-         VMSTATE_UINT64(guest_timebase, PPCTimebase),
-         VMSTATE_INT64(time_of_the_day_ns, PPCTimebase),
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b71cd7a..9fc3fb9 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2129,6 +2129,12 @@ static void ppc_spapr_init(MachineState *machine)
-     qemu_register_reset(spapr_ccs_reset_hook, spapr);
- 
-     qemu_register_boot_set(spapr_boot_set, spapr);
-+
-+    /* to stop and start vmclock */
-+    if (kvm_enabled()) {
-+        qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
-+                                         &spapr->tb);
-+    }
- }
- 
- static int spapr_kvm_type(const char *vm_type)
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index d46c31a..b7977ba 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -214,6 +214,9 @@ extern const struct VMStateDescription vmstate_ppc_timebase;
-     .flags      = VMS_STRUCT,                                         \
-     .offset     = vmstate_offset_value(_state, _field, PPCTimebase),  \
- }
-+
-+void cpu_ppc_clock_vm_state_change(void *opaque, int running,
-+                                   RunState state);
- #endif
- 
- #endif
 -- 
 2.9.3
