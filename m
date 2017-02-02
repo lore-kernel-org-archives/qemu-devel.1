@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZIU1-0005Ke-1x
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:43 -0500
+	(envelope-from <marcel@redhat.com>) id 1cZIbK-0004IO-3H
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:43:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZITx-0005PF-1A
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:33 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:39801 helo=smtp.ispras.ru)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZITw-0005OZ-Ez
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:28 -0500
-From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Thu,  2 Feb 2017 17:34:43 +0300
-Message-Id: <1486046099-17726-6-git-send-email-batuzovk@ispras.ru>
-In-Reply-To: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
-References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2.1 05/21] tcg: add simple alias analysis
+	(envelope-from <marcel@redhat.com>) id 1cZIbF-0000KD-4H
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:43:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cZIbE-0000Iv-Ra
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:43:01 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0FA01804E4
+	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 14:43:00 +0000 (UTC)
+References: <1485969640-8149-1-git-send-email-abologna@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <25c8a78b-1d81-2a62-61ac-722d22999c41@redhat.com>
+Date: Thu, 2 Feb 2017 16:42:52 +0200
+MIME-Version: 1.0
+In-Reply-To: <1485969640-8149-1-git-send-email-abologna@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] q35: Improve sample configuration files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,238 +32,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kirill Batuzov <batuzovk@ispras.ru>
+To: Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, drjones@redhat.com
 
-Add a simple alias analysis to TCG which finds out memory loads and stores
-that overlap with CPUState. This information can be used later in liveness
-analysis to ensure correctness of register allocation. In particular, if load
-or store overlaps with memory location of some global variable, this variable
-should be spilled and reloaded at appropriate times.
+On 02/01/2017 07:20 PM, Andrea Bolognani wrote:
+> Instead of having a single sample configuration file,
+> we now have several:
+>
+>   * q35-emulated.cfg documents the default devices QEMU
+>     adds to a q35 guest and the additional devices that
+>     are pretty much guaranteed to be present in a
+>     physical q35-based machine;
+>
 
-Previously no such analysis was performed and for correctness reasons it was
-required that no load/store operations overlap with memory locations of global
-variables.
+Hi Andrea,
 
-Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
----
 
-I believe checkpatch warning here to be false-positive.
 
----
- tcg/optimize.c | 146 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg.h      |  17 +++++++
- 2 files changed, 163 insertions(+)
+>   * q35-virtio-graphical.cfg can be used to start a
+>     fully-featured (USB, graphical console, audio, etc.)
+>     guest that uses VirtIO instead of emulated devices;
+>
+>   * q35-virtio-serial.cfg is similar but has a minimal
+>     set of devices and uses the serial console.
+>
+> All configuration files are fully commented and neatly
+> organized.
 
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index adfc56c..2347ce3 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -34,6 +34,7 @@
- 
- struct tcg_temp_info {
-     bool is_const;
-+    bool is_base;
-     uint16_t prev_copy;
-     uint16_t next_copy;
-     tcg_target_ulong val;
-@@ -61,6 +62,7 @@ static void reset_temp(TCGArg temp)
-     temps[temp].next_copy = temp;
-     temps[temp].prev_copy = temp;
-     temps[temp].is_const = false;
-+    temps[temp].is_base = false;
-     temps[temp].mask = -1;
- }
- 
-@@ -1429,3 +1431,147 @@ void tcg_optimize(TCGContext *s)
-         }
-     }
- }
-+
-+/* Simple alias analysis. It finds out which load/store operations overlap
-+   with CPUArchState. The result is stored in TCGContext and can be used
-+   during liveness analysis and register allocation. */
-+void tcg_alias_analysis(TCGContext *s)
-+{
-+    int oi, oi_next;
-+
-+    reset_all_temps(s->nb_temps);
-+    temps[GET_TCGV_PTR(s->tcg_env)].is_base = true;
-+    temps[GET_TCGV_PTR(s->tcg_env)].val = 0;
-+
-+    for (oi = s->gen_op_buf[0].next; oi != 0; oi = oi_next) {
-+        int nb_oargs, i;
-+        int size;
-+        TCGAliasType tp;
-+
-+        TCGOp * const op = &s->gen_op_buf[oi];
-+        TCGArg * const args = &s->gen_opparam_buf[op->args];
-+        TCGOpcode opc = op->opc;
-+        const TCGOpDef *def = &tcg_op_defs[opc];
-+
-+        oi_next = op->next;
-+
-+        if (opc == INDEX_op_call) {
-+            nb_oargs = op->callo;
-+        } else {
-+            nb_oargs = def->nb_oargs;
-+        }
-+
-+        s->alias_info[oi] = (TCGAliasInfo){
-+                TCG_NOT_ALIAS,
-+                false,
-+                0,
-+                0
-+            };
-+
-+        switch (opc) {
-+        CASE_OP_32_64(movi):
-+            temps[args[0]].is_const = 1;
-+            temps[args[0]].val = args[1];
-+            break;
-+        CASE_OP_32_64(mov):
-+            temps[args[0]].is_const = temps[args[1]].is_const;
-+            temps[args[0]].is_base = temps[args[1]].is_base;
-+            temps[args[0]].val = temps[args[1]].val;
-+            break;
-+        CASE_OP_32_64(add):
-+        CASE_OP_32_64(sub):
-+            if (temps[args[1]].is_base && temps[args[2]].is_const) {
-+                temps[args[0]].is_base = true;
-+                temps[args[0]].is_const = false;
-+                temps[args[0]].val =
-+                    do_constant_folding(opc, temps[args[1]].val,
-+                                        temps[args[2]].val);
-+            } else {
-+                reset_temp(args[0]);
-+            }
-+        CASE_OP_32_64(ld8s):
-+        CASE_OP_32_64(ld8u):
-+            size = 1;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        CASE_OP_32_64(ld16s):
-+        CASE_OP_32_64(ld16u):
-+            size = 2;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        case INDEX_op_ld_i32:
-+        case INDEX_op_ld32s_i64:
-+        case INDEX_op_ld32u_i64:
-+            size = 4;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        case INDEX_op_ld_i64:
-+            size = 8;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        case INDEX_op_ld_v128:
-+            size = 16;
-+            tp = TCG_ALIAS_READ;
-+            goto do_ldst;
-+        CASE_OP_32_64(st8):
-+            size = 1;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        CASE_OP_32_64(st16):
-+            size = 2;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        case INDEX_op_st_i32:
-+        case INDEX_op_st32_i64:
-+            size = 4;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        case INDEX_op_st_i64:
-+            size = 8;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        case INDEX_op_st_v128:
-+            size = 16;
-+            tp = TCG_ALIAS_WRITE;
-+            goto do_ldst;
-+        do_ldst:
-+            if (temps[args[1]].is_base) {
-+                TCGArg val;
-+#if TCG_TARGET_REG_BITS == 32
-+                val = do_constant_folding(INDEX_op_add_i32,
-+                                          temps[args[1]].val,
-+                                          args[2]);
-+#else
-+                val = do_constant_folding(INDEX_op_add_i64,
-+                                          temps[args[1]].val,
-+                                          args[2]);
-+#endif
-+                if ((tcg_target_long)val < sizeof(CPUArchState) &&
-+                    (tcg_target_long)val + size > 0) {
-+                    s->alias_info[oi].alias_type = tp;
-+                    s->alias_info[oi].fixed_offset = true;
-+                    s->alias_info[oi].offset = val;
-+                    s->alias_info[oi].size = size;
-+                } else {
-+                    s->alias_info[oi].alias_type = TCG_NOT_ALIAS;
-+                }
-+            } else {
-+                s->alias_info[oi].alias_type = tp;
-+                s->alias_info[oi].fixed_offset = false;
-+            }
-+            goto do_reset_output;
-+        default:
-+            if (def->flags & TCG_OPF_BB_END) {
-+                reset_all_temps(s->nb_temps);
-+                temps[GET_TCGV_PTR(s->tcg_env)].is_base = true;
-+                temps[GET_TCGV_PTR(s->tcg_env)].val = 0;
-+            } else {
-+        do_reset_output:
-+                for (i = 0; i < nb_oargs; i++) {
-+                    reset_temp(args[i]);
-+                }
-+            }
-+            break;
-+        }
-+    }
-+}
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index fa455ae..0e1fbe9 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -678,6 +678,20 @@ QEMU_BUILD_BUG_ON(OPPARAM_BUF_SIZE > (1 << 14));
- /* Make sure that we don't overflow 64 bits without noticing.  */
- QEMU_BUILD_BUG_ON(sizeof(TCGOp) > 8);
- 
-+typedef enum TCGAliasType {
-+    TCG_NOT_ALIAS = 0,
-+    TCG_ALIAS_READ = 1,
-+    TCG_ALIAS_WRITE = 2,
-+    TCG_ALIAS_RW = TCG_ALIAS_READ | TCG_ALIAS_WRITE
-+} TCGAliasType;
-+
-+typedef struct TCGAliasInfo {
-+    TCGAliasType alias_type;
-+    bool fixed_offset;
-+    tcg_target_long offset;
-+    tcg_target_long size;
-+} TCGAliasInfo;
-+
- struct TCGContext {
-     uint8_t *pool_cur, *pool_end;
-     TCGPool *pool_first, *pool_current, *pool_first_large;
-@@ -762,6 +776,8 @@ struct TCGContext {
-     TCGOp gen_op_buf[OPC_BUF_SIZE];
-     TCGArg gen_opparam_buf[OPPARAM_BUF_SIZE];
- 
-+    TCGAliasInfo alias_info[OPC_BUF_SIZE];
-+
-     uint16_t gen_insn_end_off[TCG_MAX_INSNS];
-     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
- };
-@@ -1009,6 +1025,7 @@ TCGOp *tcg_op_insert_before(TCGContext *s, TCGOp *op, TCGOpcode opc, int narg);
- TCGOp *tcg_op_insert_after(TCGContext *s, TCGOp *op, TCGOpcode opc, int narg);
- 
- void tcg_optimize(TCGContext *s);
-+void tcg_alias_analysis(TCGContext *s);
- 
- /* only used for debugging purposes */
- void tcg_dump_ops(TCGContext *s);
--- 
-2.1.4
+Appreciated.
+
+> ---
+> Changes since [v1]
+>
+>   * Address review comments:
+>     - improve the existing configuration file instead
+>       of removing it;
+>     - split off the common part for VirtIO guests;
+>     - plug all ioh3420 devices in a single slot;
+>     - use slot 1c for ioh3420 devices;
+>     - remove useless USB keyboard.
+>
+>   * Improve usage description:
+>     - make sure the OS disk actually uses the VirtIO
+>       SCSI controller, as intended, rather than the
+>       built-in SATA one;
+>     - provide a command line for running live CDs.
+>
+>   * Document more devices:
+>     - the video card is added by default;
+>     - so is the Ethernet adapter, apparently.
+>
+> The last part seems to clash with some of Gerd's comments,
+> so I'm kinda puzzled.
+>
+>
+> [v1] http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg06342.html
+>
+>
+
+[...]
+
+> +
+> +# Machine options
+> +# =========================================================
+> +#
+> +# We use the q35 machine type and enable KVM acceleration
+> +# for better performance.
+> +
+> +[machine]
+> +  type = "q35"
+> +  accel = "kvm"
+> +
+> +
+> +# PCI Express controllers
+> +# =========================================================
+> +#
+> +# We add four PCIe Root Ports, all sharing the same slot
+> +# on the PCIe Root Bus. These ports support hotplug.
+> +
+> +[device "ich9-pcie-port-1"]
+
+I would use the new generic root port.
+
+> +  driver = "ioh3420"
+> +  multifunction = "on"
+> +  bus = "pcie.0"
+> +  addr = "1c.0"
+> +  port = "1"
+> +  chassis = "1"
+> +
+> +[device "ich9-pcie-port-2"]
+> +  driver = "ioh3420"
+> +  multifunction = "on"
+> +  bus = "pcie.0"
+> +  addr = "1c.1"
+> +  port = "2"
+> +  chassis = "2"
+> +
+> +[device "ich9-pcie-port-3"]
+> +  driver = "ioh3420"
+> +  multifunction = "on"
+> +  bus = "pcie.0"
+> +  addr = "1c.2"
+> +  port = "3"
+> +  chassis = "3"
+> +
+> +[device "ich9-pcie-port-4"]
+> +  driver = "ioh3420"
+> +  multifunction = "on"
+> +  bus = "pcie.0"
+> +  addr = "1c.3"
+> +  port = "4"
+> +  chassis = "4"
+> +
+> +
+> +# Legacy PCI controllers
+> +# =========================================================
+> +#
+> +# This bridge can be used to build an independent topology
+> +# for legacy PCI devices.
+> +
+> +[device "ich9-pci-bridge"]
+> +  driver = "i82801b11-bridge"
+> +  bus = "pcie.0"
+> +  addr = "1e.0"
+> +
+
+I am not sure about having the DMI-PCI bridge "by default".
+Users can understand is actually a good idea to have it by default
+while we don't really want them to use legacy PCI devices on Q35;
+and even if so, they should use them as Integrated Endpoints.
+They don't have hotplug for the DMI-PCI bridge anyway.
+
+[...]
+
+> --- /dev/null
+> +++ b/docs/q35-virtio-common.cfg
+> @@ -0,0 +1,82 @@
+> +# q35 - VirtIO guest (common bits)
+> +# =========================================================
+> +#
+> +# Not very useful on its own. See q35-virtio-graphical.cfg
+> +# and q35-virtio-serial.cfg for usage instructions.
+> +
+> +
+> +# Machine options
+> +# =========================================================
+> +#
+> +# We use the q35 machine type and enable KVM acceleration
+> +# for better performance.
+> +
+> +[machine]
+> +  type = "q35"
+> +  accel = "kvm"
+> +
+> +
+> +# PCIe controllers
+> +# =========================================================
+> +#
+> +# We create eight PCIe Root Ports, and we plug them all
+> +# into separate functions of the same slot. Some of them
+> +# will be used by devices, the rest will remain available
+> +# for hotplug.
+> +
+> +[device "pci.1"]
+> +  driver = "ioh3420"
+
+Same here, maybe we can use the new generic port.
+
+Thanks for taking your time to update the configuration files!
+Marcel
+
+
+I personally don't use them because every time I try, I
+find something with no config support....
+
+
+> +  bus = "pcie.0"
+> +  addr = "0x1c.0x0"
+> +  port = "0x10"
+> +  chassis = "1"
+> +  multifunction = "on"
+> +
+> +[device "pci.2"]
+> +  driver = "ioh3420"
+> +  bus = "pcie.0"
+> +  addr = "0x1c.0x1"
+> +  port = "0x11"
+> +  chassis = "2"
+> +
+> +[device "pci.3"]
+> +  driver = "ioh3420"
+> +  bus = "pcie.0"
+> +  addr = "0x1c.0x2"
+> +  port = "0x12"
+> +  chassis = "3"
+> +
+> +[device "pci.4"]
+> +  driver = "ioh3420"
+> +  bus = "pcie.0"
+> +  addr = "0x1c.0x3"
+> +  port = "0x13"
+> +  chassis = "4"
+> +
+> +[device "pci.5"]
+> +  driver = "ioh3420"
+> +  bus = "pcie.0"
+> +  addr = "0x1c.0x4"
+> +  port = "0x14"
+> +  chassis = "5"
+> +
+> +[device "pci.6"]
+> +  driver = "ioh3420"
+> +  bus = "pcie.0"
+> +  addr = "0x1c.0x5"
+> +  port = "0x15"
+> +  chassis = "6"
+> +
+> +[device "pci.7"]
+> +  driver = "ioh3420"
+> +  bus = "pcie.0"
+> +  addr = "0x1c.0x6"
+> +  port = "0x16"
+> +  chassis = "7"
+> +
+> +[device "pci.8"]
+> +  driver = "ioh3420"
+> +  bus = "pcie.0"
+> +  addr = "0x1c.0x7"
+> +  port = "0x17"
+> +  chassis = "8"
+
+[...]
