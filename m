@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZMPl-0004Gx-13
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:47:25 -0500
+	(envelope-from <sw@weilnetz.de>) id 1cZMdq-0000AO-9n
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:01:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZMPk-0001Q4-DU
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:47:25 -0500
-Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:36076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZMPk-0001Pl-7W
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:47:24 -0500
-Received: by mail-ua0-x22e.google.com with SMTP id 96so18053428uaq.3
-	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 10:47:24 -0800 (PST)
+	(envelope-from <sw@weilnetz.de>) id 1cZMdm-0006Wy-CL
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:01:58 -0500
+Received: from mail.weilnetz.de ([37.120.169.71]:48894
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1cZMdm-0006Vq-5P
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:01:54 -0500
+From: Stefan Weil <sw@weilnetz.de>
+References: <1485893872-26524-1-git-send-email-mst@redhat.com>
+	<CAFEAcA9zEaATTwGLNCB=X_mhqjapC-0jxPpv8OjDt=zqaFBnjA@mail.gmail.com>
+	<CAFEAcA_SCHQ06uON3pEgpt2ku4HO2C-fUTHr7TZAVmZ1PEq09Q@mail.gmail.com>
+Message-ID: <0be14960-0364-fc89-33f0-5ff2d1f8d781@weilnetz.de>
+Date: Thu, 2 Feb 2017 20:01:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170201134453.11963-1-stefanha@redhat.com>
-References: <20170201134453.11963-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Feb 2017 18:47:03 +0000
-Message-ID: <CAFEAcA_sDwqTiAdUF=U5J9Haxe0OFxx_n8HBrP+xRYChiaaf3w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/10] Tracing patches
+In-Reply-To: <CAFEAcA_SCHQ06uON3pEgpt2ku4HO2C-fUTHr7TZAVmZ1PEq09Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v5 00/22] virtio, vhost, pci: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 1 February 2017 at 13:44, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit a0def594286d9110a6035e02eef558cf3cf5d847:
+Am 02.02.2017 um 17:25 schrieb Peter Maydell:
+> On 2 February 2017 at 13:56, Peter Maydell <peter.maydell@linaro.org> w=
+rote:
+>> On 31 January 2017 at 20:18, Michael S. Tsirkin <mst@redhat.com> wrote=
+:
+>>> virtio, vhost, pci: fixes, features
+>>>
+>>> generic pci root port support
+>>> disable shpc by default
+>>> safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
+>>> fixes and cleanups all over the place
+>>>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 >
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-01-30 10:23:20 +0000)
+>> Applied, thanks.
 >
-> are available in the git repository at:
+> ...travis builds now fail for the --enable-tcg-interpreter config:
+> https://travis-ci.org/qemu/qemu/jobs/197648661
 >
->   git://github.com/stefanha/qemu.git tags/tracing-pull-request
+> In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c: In function =E2=80=
+=98tcg_out_op=E2=80=99:
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:117: error:
+> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:255: error:
+> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+> In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:115: error:
+> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:255: error:
+> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
 >
-> for you to fetch changes up to 7f4076c1bb16d0d6f81a085ecc9c9d0b9da74c7d:
+> These look to be because we were trying to use ARRAY_SIZE()
+> on a non-array, which was previously undetected. The use is
+> only in an assert() so fairly harmless.
 >
->   trace: clean up trace-events files (2017-01-31 17:12:15 +0000)
+> Would somebody who cares about TCI like to provide a fix?
 >
-> ----------------------------------------------------------------
+> thanks
+> -- PMM
 
-Applied, thanks.
 
--- PMM
+
+Other architectures either no longer use an assertion or
+use tcg_debug_assert(s->tb_jmp_insn_offset !=3D NULL), see
+tcg/aarch64/tcg-target.inc.c and tcg/ppc/tcg-target.inc.c.
+
+As the majority thinks that there is no longer a need for
+an assertion here, I think that is the best solution for
+TCI, too.
+
+I'll send a patch.
+
+Regards
+Stefan
