@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZGzo-0001G2-IX
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:00:19 -0500
+	(envelope-from <den@openvz.org>) id 1cZHHW-0001PW-Ov
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:18:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZGzb-000088-FX
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:00:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:21623)
+	(envelope-from <den@openvz.org>) id 1cZHHR-0007LU-E4
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:18:34 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:5751 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cZGzb-00006P-A6
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:00:03 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 633F6C05092E
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 13:00:03 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu,  2 Feb 2017 12:59:56 +0000
-Message-Id: <20170202125956.21942-4-dgilbert@redhat.com>
-In-Reply-To: <20170202125956.21942-1-dgilbert@redhat.com>
-References: <20170202125956.21942-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] vmstate registration: check return
- values
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cZHHR-0007Kh-1z
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:18:29 -0500
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Thu,  2 Feb 2017 16:18:24 +0300
+Message-Id: <1486041504-23627-1-git-send-email-den@openvz.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 1/1] qemu-char: socket backend: disconnect
+ on write error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Check qdev's call to vmstate_register_with_alias_id; that gets
-most of the common uses; there's hundreds of calls via vmstate_register
-which could get fixed over time.
+Socket backend read handler should normally perform a disconnect, however
+the read handler may not get a chance to run if the frontend is not ready
+(qemu_chr_be_can_write() =3D=3D 0).
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+This means that in virtio-serial frontend case if
+ - the host has disconnected (giving EPIPE on socket write)
+ - and the guest has disconnected (-> frontend not ready -> backend
+   will not read)
+ - and there is still data (frontend->backend) to flush (has to be a real=
+ly
+   tricky timing but nevertheless, we have observed the case in productio=
+n)
+
+This results in virtio-serial trying to flush this data continiously form=
+ing
+a busy loop.
+
+Solution: react on write error in the socket write handler.
+errno is not reliable after qio_channel_writev_full(), so we may not get
+the exact EPIPE, so disconnect on any error but QIO_CHANNEL_ERR_BLOCK whi=
+ch
+io_channel_send_full() converts to errno EAGAIN.
+We must not disconnect right away though, there still may be data to read
+(see 4bf1cb0).
+
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Daniel P. Berrange <berrange@redhat.com>
+CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/core/qdev.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Changes from v1:
+- we do not rely on EPIPE anynore. Socket should be closed on all errors
+  except EAGAIN
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index ea97b15..06ba02e 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -933,10 +933,12 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+ chardev/char-socket.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 4068dc5..e2137aa 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -97,6 +97,9 @@ static gboolean tcp_chr_accept(QIOChannel *chan,
+                                GIOCondition cond,
+                                void *opaque);
+=20
++static int tcp_chr_read_poll(void *opaque);
++static void tcp_chr_disconnect(CharDriverState *chr);
++
+ /* Called with chr_write_lock held.  */
+ static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
+ {
+@@ -114,6 +117,13 @@ static int tcp_chr_write(Chardev *chr, const uint8_t=
+ *buf, int len)
+             s->write_msgfds_num =3D 0;
          }
- 
-         if (qdev_get_vmsd(dev)) {
--            vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(dev), dev,
--                                           dev->instance_id_alias,
--                                           dev->alias_required_for_version,
--                                           NULL);
-+            if (vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(dev), dev,
-+                                               dev->instance_id_alias,
-+                                               dev->alias_required_for_version,
-+                                               &local_err) < 0) {
-+                goto post_realize_fail;
-+            }
-         }
- 
-         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
--- 
-2.9.3
+=20
++        if (ret < 0 && errno !=3D EAGAIN) {
++            if (tcp_chr_read_poll(chr) <=3D 0) {
++                tcp_chr_disconnect(chr);
++                return len;
++            } /* else let the read handler finish it properly */
++        }
++
+         return ret;
+     } else {
+         /* XXX: indicate an error ? */
+--=20
+2.7.4
