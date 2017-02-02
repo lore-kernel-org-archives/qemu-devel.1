@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZFt2-0000Od-O4
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:49:13 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cZG6u-0006SG-5Q
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:03:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZFsx-0004I6-Uu
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:49:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51148)
+	(envelope-from <dgilbert@redhat.com>) id 1cZG6q-0001vp-5R
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:03:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cZFsx-0004HX-Oe
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:49:07 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cZG6p-0001sa-T0
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:03:28 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9D3CC05005F
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 11:49:07 +0000 (UTC)
-Message-ID: <1486036144.20628.40.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 02 Feb 2017 12:49:04 +0100
-In-Reply-To: <1486031975.3484.17.camel@redhat.com>
-References: <1485969640-8149-1-git-send-email-abologna@redhat.com>
-	<1486021764.20628.29.camel@redhat.com>
-	<1486031975.3484.17.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] q35: Improve sample configuration files
+	by mx1.redhat.com (Postfix) with ESMTPS id D98A213A60
+	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 12:03:24 +0000 (UTC)
+Date: Thu, 2 Feb 2017 12:03:20 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170202120319.GB2549@work-vm>
+References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
+	<1485207141-1941-12-git-send-email-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485207141-1941-12-git-send-email-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 11/17] migration: Create thread
+ infrastructure for multifd send side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +34,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, drjones@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
 
-  Hi,
+* Juan Quintela (quintela@redhat.com) wrote:
+> We make the locking and the transfer of information specific, even if we
+> are still transmiting things through the main thread.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 52 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index c71929e..9d7bc64 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -392,17 +392,25 @@ void migrate_compress_threads_create(void)
+>  /* Multiple fd's */
+> 
+>  struct MultiFDSendParams {
+> +    /* not changed */
+>      QemuThread thread;
+>      QIOChannel *c;
+>      QemuCond cond;
+>      QemuMutex mutex;
+> +    /* protected by param mutex */
+>      bool quit;
+>      bool started;
+> +    uint8_t *address;
+> +    /* protected by multifd mutex */
+> +    bool done;
+>  };
+>  typedef struct MultiFDSendParams MultiFDSendParams;
+> 
+>  static MultiFDSendParams *multifd_send;
+> 
+> +QemuMutex multifd_send_mutex;
+> +QemuCond multifd_send_cond;
+> +
+>  static void *multifd_send_thread(void *opaque)
+>  {
+>      MultiFDSendParams *params = opaque;
+> @@ -416,7 +424,17 @@ static void *multifd_send_thread(void *opaque)
+> 
+>      qemu_mutex_lock(&params->mutex);
+>      while (!params->quit){
+> -        qemu_cond_wait(&params->cond, &params->mutex);
+> +        if (params->address) {
+> +            params->address = 0;
 
-> > If you add a video card manually (via -device or config file entry) qem=
-u
-> > will not add the default video card.
-> >=20
-> > Likewise, if you add a NIC manually, qemu will not add the default
-> > ethernet device (and IIRC creating the default netdev will be skipped
-> > too).
->=20
-> This has the potential to give you some unexpected results
+This confused me (I wondered what happens to the 1st block) but
+I see in the next patch this gets replaced by something more complex;
+so I suggest just using params->dummy and commented it's about
+to get replaced.
 
-Indeed.
+> +            qemu_mutex_unlock(&params->mutex);
+> +            qemu_mutex_lock(&multifd_send_mutex);
+> +            params->done = true;
+> +            qemu_cond_signal(&multifd_send_cond);
+> +            qemu_mutex_unlock(&multifd_send_mutex);
+> +            qemu_mutex_lock(&params->mutex);
+> +        } else {
+> +            qemu_cond_wait(&params->cond, &params->mutex);
+> +        }
+>      }
+>      qemu_mutex_unlock(&params->mutex);
+> 
+> @@ -464,12 +482,16 @@ void migrate_multifd_send_threads_create(void)
+>      }
+>      thread_count = migrate_multifd_threads();
+>      multifd_send = g_new0(MultiFDSendParams, thread_count);
+> +    qemu_mutex_init(&multifd_send_mutex);
+> +    qemu_cond_init(&multifd_send_cond);
+>      for (i = 0; i < thread_count; i++) {
+>          char thread_name[15];
+>          qemu_mutex_init(&multifd_send[i].mutex);
+>          qemu_cond_init(&multifd_send[i].cond);
+>          multifd_send[i].quit = false;
+>          multifd_send[i].started = false;
+> +        multifd_send[i].done = true;
+> +        multifd_send[i].address = 0;
+>          multifd_send[i].c = socket_send_channel_create();
+>          if(!multifd_send[i].c) {
+>              error_report("Error creating a send channel");
+> @@ -487,6 +509,34 @@ void migrate_multifd_send_threads_create(void)
+>      }
+>  }
+> 
+> +static int multifd_send_page(uint8_t *address)
+> +{
+> +    int i, thread_count;
+> +    bool found = false;
+> +
+> +    thread_count = migrate_multifd_threads();
+> +    qemu_mutex_lock(&multifd_send_mutex);
+> +    while (!found) {
+> +        for (i = 0; i < thread_count; i++) {
+> +            if (multifd_send[i].done) {
+> +                multifd_send[i].done = false;
+> +                found = true;
+> +                break;
+> +            }
+> +        }
+> +        if (!found) {
+> +            qemu_cond_wait(&multifd_send_cond, &multifd_send_mutex);
+> +        }
+> +    }
+> +    qemu_mutex_unlock(&multifd_send_mutex);
+> +    qemu_mutex_lock(&multifd_send[i].mutex);
 
-> but I'd say it's still entirely reasonable.
+Having a 'multifd_send_mutex' and a
+         'multifd_send[i].mutex'
+is pretty confusing!
 
-Well, makes it easy for users to get started, just "qemu -cdrom $live"
-gives you a usable virtual machine without having to worry too much
-about what devices you want plug in.
+> +    multifd_send[i].address = address;
+> +    qemu_cond_signal(&multifd_send[i].cond);
+> +    qemu_mutex_unlock(&multifd_send[i].mutex);
+> +
+> +    return 0;
+> +}
+> +
+>  struct MultiFDRecvParams {
+>      QemuThread thread;
+>      QIOChannel *c;
+> @@ -1015,6 +1065,7 @@ static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
+>          *bytes_transferred +=
+>              save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+>          qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
+> +        multifd_send_page(p);
+>          *bytes_transferred += TARGET_PAGE_SIZE;
+>          pages = 1;
+>          acct_info.norm_pages++;
+> -- 
+> 2.9.3
 
-But that kind of magic -- while convenient at times -- can also easily
-get into the way.  Guess why the -nodefaults switch exists ...
+I think I'm pretty OK with this; but we'll see what it looks like
+after you think about Paolo's suggestion; it does feel like it should
+be possible to do the locking etc simpler; I just don't know how.
 
-> So what do you think, should q35-emulated.cfg recommend the
-> use of -nodefaults the same way q35-virtio-*.cfg do and add
-> the video card (cirrus-vga?) and Ethernet adapter explicitly?
+Dave
 
-I think that would be good, for consistency across all q35*.cfg files.
-
-But please don't use cirrus[1], it isn't the default any more for good
-reasons.  I'd suggest to go with our new default, which is stdvga
-(-device VGA), as we don't have intel graphics emulation.
-
-> The advantage in doing so would be that we would provide
-> maybe slightly more documentation, and we would be able to
-> plug the Ethernet adapter at 19.0 instead of 02.0, which as
-> I understand it matches real hardware better.
-
-Yes.
-
-cheers,
-  Gerd
-
-[1]
-https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful/
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
