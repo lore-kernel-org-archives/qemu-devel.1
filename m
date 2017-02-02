@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cZ5te-0004ZS-TP
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 20:09:11 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cZ5vr-0005i1-41
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 20:11:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cZ5tb-0001YD-KN
-	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 20:09:10 -0500
-References: <1485879287-12548-1-git-send-email-peter.maydell@linaro.org>
-	<87wpdbw2ki.fsf@dusky.pond.sub.org>
-	<157b55c5-2927-5f4e-0c43-820abd75a6d2@redhat.com>
-	<874m0ejth1.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1cZ5vo-0002Za-0R
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 20:11:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48164)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cZ5vn-0002ZI-Qg
+	for qemu-devel@nongnu.org; Wed, 01 Feb 2017 20:11:23 -0500
+References: <1485870329-79428-1-git-send-email-eswierk@skyportsystems.com>
+	<421566746.771522.1485871592528.JavaMail.zimbra@redhat.com>
+	<CAO_EM_=PLhSB4JxQitC1zev+RQuSdJqpYyo8rOdVDSvyuoCgkw@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6c841220-8219-69fc-413f-c6ad320fe2ed@redhat.com>
-Date: Wed, 1 Feb 2017 17:09:00 -0800
+Message-ID: <e42229ac-9c41-cdf2-6dbb-112086efd70c@redhat.com>
+Date: Wed, 1 Feb 2017 17:11:15 -0800
 MIME-Version: 1.0
-In-Reply-To: <874m0ejth1.fsf@dusky.pond.sub.org>
+In-Reply-To: <CAO_EM_=PLhSB4JxQitC1zev+RQuSdJqpYyo8rOdVDSvyuoCgkw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Drop QEMU_GNUC_PREREQ() checks for gcc
- older than 4.1
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] char: drop data written to a disconnected
+ pty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
+To: Ed Swierk <eswierk@skyportsystems.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <mlureau@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, marcandre lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Benjamin Warren <ben@skyportsystems.com>
 
 
 
-On 31/01/2017 22:49, Markus Armbruster wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->=20
->> On 31/01/2017 12:40, Markus Armbruster wrote:
->>>> =20
->>>>  #define QEMU_NORETURN __attribute__ ((__noreturn__))
->>>> =20
->>>> -#if QEMU_GNUC_PREREQ(3, 4)
->>>>  #define QEMU_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
->>>> -#else
->>>> -#define QEMU_WARN_UNUSED_RESULT
->>>> -#endif
->>> Should we inline this macro?
->>>
->>>> =20
->>>> -#if QEMU_GNUC_PREREQ(4, 0)
->>>>  #define QEMU_SENTINEL __attribute__((sentinel))
->>>> -#else
->>>> -#define QEMU_SENTINEL
->>>> -#endif
->>> Likewise.
->>
->> Why, since we don't do that for QEMU_NORETURN, QEMU_PACKED, etc.?
->=20
-> Because we do it for aligned, always_inline, constructor, format, mode,
-> noinline, and in places even noreturn and packed:
->=20
->     $ git-grep __attribute__ | sed '/define/d;s/.*__attribute__ *((\([A=
--Za-z0-9_]*\).*/\1/' | sort -u
->=20
+On 31/01/2017 14:19, Ed Swierk wrote:
+> Either way, when a pty is disconnected data will get dropped, whether
+> by the pty backend (as proposed) or by the serial port device or other
+> frontend (as currently).
+> 
+> The only difference from a user's perspective is whether the dropped
+> data gets written to the log file, which is the main motivation for
+> this change. The backward compatibility concern would be an existing
+> application that relies on data not being logged when the pty is
+> disconnected.
 
-Uh oh. :)  You have to remove uses in firmware and in imported code
-(which covers mode, format and noreturn), but there's certainly room for
-some BiteSizedTasks.
-
-For sure noinline should be wrapped by a macro so that you also include
-noclone (usually you want to thwart some compiler optimization so both
-are needed).
-
-That leaves aligned, always_inline and constructor.  always_inline has
-three users, constructors has many, aligned has many and there's
-QEMU_ALIGNED too.  The smallest work would be to convert these three to
-QEMU_* rather than convert QEMU_* to __attribute__.
-
-Thanks,
+Which is clearly a bug and a pointless difference between TCP and pty
+backends, so the patch is okay.
 
 Paolo
