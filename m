@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZJn2-0001YY-5u
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:59:17 -0500
+	(envelope-from <stephane.chazelas@gmail.com>) id 1cZJqq-0004yj-Tj
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:03:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZJn1-00033J-Fh
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:59:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cZJn1-000330-9X
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:59:15 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu,  2 Feb 2017 15:59:09 +0000
-Message-Id: <20170202155909.31784-3-dgilbert@redhat.com>
-In-Reply-To: <20170202155909.31784-1-dgilbert@redhat.com>
-References: <20170202155909.31784-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] postcopy: Recover block devices on early
- failure
+	(envelope-from <stephane.chazelas@gmail.com>) id 1cZJqm-0004Jg-HQ
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:03:12 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33858)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stephane.chazelas@gmail.com>)
+	id 1cZJqm-0004J6-73
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:03:08 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so4958960wmi.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 08:03:07 -0800 (PST)
+Date: Thu, 2 Feb 2017 16:03:04 +0000
+From: Stephane Chazelas <stephane.chazelas@gmail.com>
+Message-ID: <20170202160304.GB24699@chaz.gmail.com>
+References: <20170202123045.GA24714@chaz.gmail.com>
+	<8ec657d7-3f46-1caa-9961-7127b0d99e12@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ec657d7-3f46-1caa-9961-7127b0d99e12@redhat.com>
+Subject: Re: [Qemu-devel] [qcow2] how to avoid qemu doing
+ lseek(SEEK_DATA/SEEK_HOLE)?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com
-Cc: zhang.zhanghailiang@huawei.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+2017-02-02 16:23:53 +0100, Laszlo Ersek:
+[...]
+> You didn't mention what qcow2 features you use -- vmstate, snapshots,
+> backing files (chains of them), compression?
+> 
+> Since commit 2928abce6d1d only modifies "block/qcow2.c", you could
+> switch / convert the images to "raw". "raw" still benefits from sparse
+> files (which ZFS-on-Linux apparently supports). Sparse files (i.e., the
+> disk space savings) are the most important feature to me at least.
+[...]
 
-An early postcopy failure can be recovered from as long as we know
-we haven't sent the command to run the destination.
-We have to undo the bdrv_inactivate_all by calling
-bdrv_invalidate_cache_all
+Thanks for the feedback.
 
-Note that I'm not using ms->block_inactive because once we've
-sent the postcopy package we dont want anything else to try
-and recover the block storage on the source; the destination
-might have started writing to it.
+Sorry for not mentioning it in the first place, but I do need
+the vmstate and snapshots (even non-linear snapshots which means
+even ZFS zvol snapshots as done by Proxmox VE are not an option
+either, neither is vmdk)
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 2766d2f..283677c 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1605,6 +1605,7 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-     QIOChannelBuffer *bioc;
-     QEMUFile *fb;
-     int64_t time_at_stop = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    bool restart_block = false;
-     migrate_set_state(&ms->state, MIGRATION_STATUS_ACTIVE,
-                       MIGRATION_STATUS_POSTCOPY_ACTIVE);
- 
-@@ -1624,6 +1625,7 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-     if (ret < 0) {
-         goto fail;
-     }
-+    restart_block = true;
- 
-     /*
-      * Cause any non-postcopiable, but iterative devices to
-@@ -1680,6 +1682,18 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
- 
-     /* <><> end of stuff going into the package */
- 
-+    /* Last point of recovery; as soon as we send the package the destination
-+     * can open devices and potentially start running.
-+     * Lets just check again we've not got any errors.
-+     */
-+    ret = qemu_file_get_error(ms->to_dst_file);
-+    if (ret) {
-+        error_report("postcopy_start: Migration stream errored (pre package)");
-+        goto fail_closefb;
-+    }
-+
-+    restart_block = false;
-+
-     /* Now send that blob */
-     if (qemu_savevm_send_packaged(ms->to_dst_file, bioc->data, bioc->usage)) {
-         goto fail_closefb;
-@@ -1717,6 +1731,17 @@ fail_closefb:
- fail:
-     migrate_set_state(&ms->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-                           MIGRATION_STATUS_FAILED);
-+    if (restart_block) {
-+        /* A failure happened early enough that we know the destination hasn't
-+         * accessed block devices, so we're safe to recover.
-+         */
-+        Error *local_err = NULL;
-+
-+        bdrv_invalidate_cache_all(&local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
-+    }
-     qemu_mutex_unlock_iothread();
-     return -1;
- }
+I hadn't tested before now, but what I observe with raw
+devices and discard=on,detect-zeroes=unmap (and the virtio-scsi
+interface), is that upon those "synced writes of zeroes" into
+allocated data, qemu does some
+
+[pid 10535] fallocate(14, FALLOC_FL_KEEP_SIZE|FALLOC_FL_PUNCH_HOLE, 136314880, 4096) = 0
+
+into the disk image.
+
+(and no lseek(SEEK_DATA/SEEK_HOLE))
+
+which I don't see when using qcow2 images.
+
+If the qcow2 interface was updated to do the same (punch holes
+regardless instead of checking if the data is allocated
+beforehand), that would also solve my problem (anything that
+avoid those lseek()s being called).
+
+Another thing I've not mentioned clearly is the versions of qemu
+I have been testing with: 2.7, 2.7.1 (those two on Proxmox VE
+4.4 (based on Debian jessie)) and 2.8.0 (the latter for
+verification on a Debian unstable system, not with zfs).
+
 -- 
-2.9.3
+Stephane
