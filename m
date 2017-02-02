@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cZIxl-0000wc-1v
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:06:18 -0500
+	(envelope-from <christoffer.dall@linaro.org>) id 1cZJ3S-0006Qo-NT
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:12:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cZIxh-0003M1-Ri
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:06:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cZIxh-0003Ll-J6
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:06:13 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF8C580465
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 15:06:13 +0000 (UTC)
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-7-git-send-email-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <03f9756e-971f-3b30-36d6-4b65d859479e@redhat.com>
-Date: Thu, 2 Feb 2017 09:06:11 -0600
+	(envelope-from <christoffer.dall@linaro.org>) id 1cZJ3O-0005rd-D2
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:12:10 -0500
+Received: from mail-yw0-x22a.google.com ([2607:f8b0:4002:c05::22a]:34245)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <christoffer.dall@linaro.org>)
+	id 1cZJ3O-0005rO-8j
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:12:06 -0500
+Received: by mail-yw0-x22a.google.com with SMTP id w75so13021769ywg.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 07:12:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1485207141-1941-7-git-send-email-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uLoP48vlvJnXlFx5svdCfhMGiVlgpUmGN"
-Subject: Re: [Qemu-devel] [PATCH 06/17] migration: Create x-multifd-threads
- parameter
+In-Reply-To: <fd9dbed6-2a65-24e8-2f76-f6f814cef1d5@arm.com>
+References: <32ff6fa9-696a-f4a2-e884-3b22f91506e5@iki.fi>
+	<fd9dbed6-2a65-24e8-2f76-f6f814cef1d5@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Date: Thu, 2 Feb 2017 16:12:04 +0100
+Message-ID: <CAMJs5B8k3h5BTT3Y7g6XrX+wqo7_xZt0kdQb4do95hWi0xCDiA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] KVM/QEMU on Raspberry Pi 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,73 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: amit.shah@redhat.com, dgilbert@redhat.com
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Pekka Enberg <penberg@iki.fi>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uLoP48vlvJnXlFx5svdCfhMGiVlgpUmGN
-From: Eric Blake <eblake@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: amit.shah@redhat.com, dgilbert@redhat.com
-Message-ID: <03f9756e-971f-3b30-36d6-4b65d859479e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/17] migration: Create x-multifd-threads
- parameter
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
- <1485207141-1941-7-git-send-email-quintela@redhat.com>
-In-Reply-To: <1485207141-1941-7-git-send-email-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Feb 2, 2017 at 3:59 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> [+Christoffer]
+>
+> Hi Pekka,
+>
+> On 02/02/17 14:44, Pekka Enberg wrote:
+>> Hi,
+>>
+>> Has anyone been able to successfully run QEMU/KVM under Raspberry Pi 3?
+>>
+>> I have installed 64-bit Fedora 24 by Gerd Hoffmann on the hardware:
+>>
+>>    https://www.kraxel.org/blog/2016/04/fedora-on-raspberry-pi-updates/
+>>
+>> and built a VM image using virt-builder:
+>>
+>>    virt-builder --root-password password:root --arch aarch64 fedora-24
+>>
+>> I also built the latest UEFI for QEMU from sources:
+>>
+>>    https://wiki.linaro.org/LEG/UEFIforQEMU
+>>
+>> and updated to QEMU 2.8.0 from rawhide:
+>>
+>>    [root@fedora-rpi2 ~]# qemu-system-aarch64 -version
+>>    QEMU emulator version 2.8.0(qemu-2.8.0-1.fc26)
+>>    Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project develope=
+rs
+>>
+>> The VM image should be fine because I=E2=80=99m able to boot to it under=
+ CPU
+>> emulation:
+>>
+>> qemu-system-aarch64 \
+>>            -nographic \
+>>            -M virt \
+>>            -cpu cortex-a57 \
+>>            -smp 1 \
+>>            -m 512 \
+>>            -bios QEMU_EFI.fd \
+>>            -device virtio-blk-device,drive=3Dimage -drive
+>> if=3Dnone,id=3Dimage,file=3Dfedora-24.img \
+>>            -netdev bridge,id=3Dhn0,br=3Dvirbr0 -device
+>> virtio-net-pci,netdev=3Dhn0,romfile=3D \
+>>            -device virtio-rng-pci
+>>
+>> However, when I enable KVM, keyboard stops working (interrupt delivery
+>> issue?) and Fedora boot process hangs at random places before reaching
+>> login:
+>
+> [snip]
+>
+> TL;DR: as it stands now, none of the RPi{2,3} can run KVM out of the
+> box, as they lack a virtualization capable interrupt controller. This
+> means that timer interrupts cannot be reported to the core, and things
+> die a painful death.
+>
+> The longer story: we have a set of patches somewhere on the list that do
+> enable the timer interrupts to be reported to userspace (QEMU), which
+> can then inject them into its on GIC emulation and kick the vcpu. So
+> far, work on this seems to have stopped (API issues? QEMU patches?)
+>
+> Christoffer was about to revive the kernel patches, but we need someone
+> to pick up the QEMU part, and work with us and the QEMU people so that
+> we agree once and for all on the ABI to signal PPIs to userspace.
 
-On 01/23/2017 03:32 PM, Juan Quintela wrote:
-> Indicates the number of threads that we would create.  By default we
-> create 2 threads.
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
+Interesting timing.  I just revived the patches today, but I reworked
+the ABI slightly and rebased the work on top of support for the
+physical timer in the guest and ran into two issues: First, turning of
+the in-kernel irqchip no longer works, and I also lost track of how
+the patches should look, so indeed I need help from a QEMU person to
+look at that.  Second, there is some sort of regression on the 32-bit
+side using the physical timer patches.
 
-> +++ b/qapi-schema.json
-> @@ -981,13 +981,17 @@
->  # @x-checkpoint-delay: The delay time (in ms) between two COLO checkpo=
-ints in
->  #          periodic mode. (Since 2.8)
->  #
-> +# @x-multifd-threads: Number of threads used to migrate data in parall=
-el
-> +#                     The default value is 2 (since 2.9)
+Once I've sorted some of this out, I can send out the patch series.
+At least I want to figure out the 32-bit breakage first, and then I
+may simply send out the patches with a big fat UNTESTED warning in
+hope that someone will work on the qemu side with me.
 
-
-> +#
-> +# @x-multifd-threads: Number of threads used to migrate data in parall=
-el
-> +#                     The default value is 1 (since 2.9)
-
-So which is it? I understand why you document it twice (one for setting
-the value, and one for listing the current setting), but not why you
-have two different defaults.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---uLoP48vlvJnXlFx5svdCfhMGiVlgpUmGN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYk0rjAAoJEKeha0olJ0NqmTIH/3u9d/M5U3sJv8hyPlCj8u8R
-YSC7e78ONkcvVR/TMy4dfLhWd5cxWxW7nGDtSFV3uZDNJ9yQP/GCy5MX141CmnX5
-GvLW7zIsDYdZB7/UFcLAydIxX2FNlk3E8cLZCrZOrKYScReBDaHqmdqi1d/SJkhi
-HXMpzl+H+b9cz1/fjfVOMYPVQqlgntItm3Y6eeHiOG1kByJqkgFYoUGKVYq9z9cr
-JXo75y9R/m/Q0xHe7eB3XXUVl14782blMPu6suYdt4c+fL5dh0FY3ClbJfOw+6kM
-KomI/tkJmj2WnX8S/YeD2fo/jEx4QV1bj1QwZdpIwVABghjRHMn1YkcTmlq0Qa0=
-=alD2
------END PGP SIGNATURE-----
-
---uLoP48vlvJnXlFx5svdCfhMGiVlgpUmGN--
+Thanks,
+-Christoffer
