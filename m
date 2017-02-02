@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZIU1-0005Ko-2C
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:37 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cZIU4-0005NW-DP
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZITw-0005OH-1W
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:32 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:39739 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cZIU0-0005SJ-VX
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:36 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:39804 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZITv-0005NA-JY
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:27 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cZIU0-0005Ow-H0
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:32 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Thu,  2 Feb 2017 17:34:38 +0300
-Message-Id: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2.1 00/20] Emulate guest vector operations
- with host vector operations
+Date: Thu,  2 Feb 2017 17:34:59 +0300
+Message-Id: <1486046099-17726-22-git-send-email-batuzovk@ispras.ru>
+In-Reply-To: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
+References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
+Subject: [Qemu-devel] [PATCH v2.1 21/21] tcg/README: update README to
+ include information about vector opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,148 +27,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kirill Batuzov <batuzovk@ispras.ru>
 
-The goal of these patch series is to set up an infrastructure to emulate
-guest vector operations using host vector operations. Preliminary
-experiments show that simply translating loads and stores increases
-performance of x264 video codec by 10%. The performance of a gcc vectorized
-for loop increased 2x.
+Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
+---
+ tcg/README | 47 ++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 42 insertions(+), 5 deletions(-)
 
-To be able to emulate guest vector operations using host vector operations,
-several things need to be done.
-
-1. Corresponding vector types should be added to TCG. These series add
-TCG_v128 and TCG_v64. I've made TCG_v64 a different type than TCG_i64
-because it usually needs to be allocated to different registers and
-supports different operations.
-
-2. Load/store operations for these new types need to be implemented.
-
-3. For seamless transition from current model to a new one we need to
-handle cases where memory occupied by global variable can be accessed via
-pointer to the CPUArchState structure. A very simple conservative alias
-analysis has been added to do it. This analysis tracks memory loads and
-stores that overlap with fields of CPUArchState and provides this
-information to the register allocator. The allocator then spills and
-reloads affected globals when needed.
-
-4. Allow overlapping globals. For scalar registers this is a rare case, and
-overlapping registers can ba handled as a single one (ah, al, ax, eax,
-rax). In ARM every Q-register consists of two D-register each consisting of
-two S-registers. Handling 4 S-registers as one because they are parts of
-the same Q-register is way too inefficient.
-
-5. Add new memory addressing mode to MMU code for large accesses and create
-needed helpers. Only 128-bit vectors have been handled for now.
-
-6. Create TCG opcodes for vector operations. Only addition has beed handled
-in these series. Each operation has a wrapper that checks if the backend
-supports the corresponding operation or not. In one case the vector opcode
-is generated, in the other the operation is emulated with scalar
-operations. The emulation code is generated inline for performance reasons
-(there is a huge performance difference between inline generation
-and calling a helper). As a positive side effect this will eventually allow
- to merge similar emulation code for vector instructions from different
-frontends to target-independent implementation.
-
-7. Use new operations in the frontend (ARM was used in these series).
-
-8. Support new operations in the backend (x86_64 was used in these series).
-
-For experiments I have used ARM guest on x86_64 host. I wanted some pair of
-different architectures with vector extensions both. ARM and x86_64 pair
-fits well.
-
-v1 -> v2:
- - represent v128 type with smaller types when it is not supported by the host
- - detect AVX support and use AVX instructions when available
- - tcg/README updated
- - generate two v64 adds instead of one v128 when applicable
- - rebased to newer master
- - overlap detection for temps added (it needs to be explicitly called from
-   <arch>_translate_init)
- - the stack is used to temporary store 128 bit variables to memory
-   (instead of the TCGContext field)
-
-v2 -> v2.1
- - automatic build failure fixed
-
-Outstanding issues:
- - qemu_ld_v128 and qemu_st_v128 do not generate fallback code if the host
-   does not support 128 bit registers. The reason is that I do not know how to
-   handle the host/guest different endianness (whether do we swap only bytes
-   in elements or whole vectors?). Different targets seem to have different
-   ideas on how this should be done.
-
-Kirill Batuzov (20):
-  tcg: add support for 128bit vector type
-  tcg: add support for 64bit vector type
-  tcg: support representing vector type with smaller vector or scalar
-    types
-  tcg: add ld_v128, ld_v64, st_v128 and st_v64 opcodes
-  tcg: add simple alias analysis
-  tcg: use results of alias analysis in liveness analysis
-  tcg: allow globals to overlap
-  tcg: add vector addition operations
-  target/arm: support access to vector guest registers as globals
-  target/arm: use vector opcode to handle vadd.<size> instruction
-  tcg/i386: add support for vector opcodes
-  tcg/i386: support 64-bit vector operations
-  tcg/i386: support remaining vector addition operations
-  tcg: do not rely on exact values of MO_BSWAP or MO_SIGN in backend
-  tcg: introduce new TCGMemOp - MO_128
-  tcg: introduce qemu_ld_v128 and qemu_st_v128 opcodes
-  softmmu: create helpers for vector loads
-  tcg/i386: add support for qemu_ld_v128/qemu_st_v128 ops
-  target/arm: load two consecutive 64-bits vector regs as a 128-bit
-    vector reg
-  tcg/README: update README to include information about vector opcodes
-
-Kirill Batuzov (21):
-  tcg: add support for 128bit vector type
-  tcg: add support for 64bit vector type
-  tcg: support representing vector type with smaller vector or scalar
-    types
-  tcg: add ld_v128, ld_v64, st_v128 and st_v64 opcodes
-  tcg: add simple alias analysis
-  tcg: use results of alias analysis in liveness analysis
-  tcg: allow globals to overlap
-  tcg: add vector addition operations
-  target/arm: support access to vector guest registers as globals
-  target/arm: use vector opcode to handle vadd.<size> instruction
-  tcg/i386: add support for vector opcodes
-  tcg/i386: support 64-bit vector operations
-  tcg/i386: support remaining vector addition operations
-  tcg: do not rely on exact values of MO_BSWAP or MO_SIGN in backend
-  target/aarch64: do not check for non-existent TCGMemOp
-  tcg: introduce new TCGMemOp - MO_128
-  tcg: introduce qemu_ld_v128 and qemu_st_v128 opcodes
-  softmmu: create helpers for vector loads
-  tcg/i386: add support for qemu_ld_v128/qemu_st_v128 ops
-  target/arm: load two consecutive 64-bits vector regs as a 128-bit
-    vector reg
-  tcg/README: update README to include information about vector opcodes
-
- cputlb.c                     |   4 +
- softmmu_template_vector.h    | 266 +++++++++++++++++++++++++++++++
- target/arm/translate-a64.c   |   1 -
- target/arm/translate.c       |  76 ++++++++-
- tcg/README                   |  47 +++++-
- tcg/aarch64/tcg-target.inc.c |   4 +-
- tcg/arm/tcg-target.inc.c     |   4 +-
- tcg/i386/tcg-target.h        |  45 +++++-
- tcg/i386/tcg-target.inc.c    | 260 +++++++++++++++++++++++++++++--
- tcg/mips/tcg-target.inc.c    |   4 +-
- tcg/optimize.c               | 165 +++++++++++++++++++-
- tcg/ppc/tcg-target.inc.c     |   4 +-
- tcg/s390/tcg-target.inc.c    |   4 +-
- tcg/sparc/tcg-target.inc.c   |  12 +-
- tcg/tcg-op.c                 |  92 ++++++++++-
- tcg/tcg-op.h                 | 267 +++++++++++++++++++++++++++++++
- tcg/tcg-opc.h                |  34 ++++
- tcg/tcg.c                    | 363 +++++++++++++++++++++++++++++++++++++------
- tcg/tcg.h                    | 163 ++++++++++++++++++-
- 19 files changed, 1722 insertions(+), 93 deletions(-)
- create mode 100644 softmmu_template_vector.h
-
+diff --git a/tcg/README b/tcg/README
+index a9858c2..209dbc4 100644
+--- a/tcg/README
++++ b/tcg/README
+@@ -53,9 +53,18 @@ an "undefined result".
+ 
+ TCG instructions operate on variables which are temporaries, local
+ temporaries or globals. TCG instructions and variables are strongly
+-typed. Two types are supported: 32 bit integers and 64 bit
+-integers. Pointers are defined as an alias to 32 bit or 64 bit
+-integers depending on the TCG target word size.
++typed. Several types are supported:
++
++* 32 bit integers,
++
++* 64 bit integers,
++
++* 64 bit vectors,
++
++* 128 bit vectors.
++
++Pointers are defined as an alias to 32 bit or 64 bit integers
++depending on the TCG target word size.
+ 
+ Each instruction has a fixed number of output variable operands, input
+ variable operands and always constant operands.
+@@ -208,6 +217,22 @@ t0=t1%t2 (signed). Undefined behavior if division by zero or overflow.
+ 
+ t0=t1%t2 (unsigned). Undefined behavior if division by zero.
+ 
++* add_i8x16 t0, t1, t2
++add_i16x8 t0, t1, t2
++add_i32x4 t0, t1, t2
++add_i64x2 t0, t1, t2
++
++t0=t1+t2 where t0, t1 and t2 are 128 bit vectors of 8, 16, 32 or 64 bit
++integers.
++
++* add_i8x8 t0, t1, t2
++add_i16x4 t0, t1, t2
++add_i32x2 t0, t1, t2
++add_i64x1 t0, t1, t2
++
++t0=t1+t2 where t0, t1 and t2 are 64 bit vectors of 8, 16, 32 or 64 bit
++integers.
++
+ ********* Logical
+ 
+ * and_i32/i64 t0, t1, t2
+@@ -477,8 +502,8 @@ current TB was linked to this TB. Otherwise execute the next
+ instructions. Only indices 0 and 1 are valid and tcg_gen_goto_tb may be issued
+ at most once with each slot index per TB.
+ 
+-* qemu_ld_i32/i64 t0, t1, flags, memidx
+-* qemu_st_i32/i64 t0, t1, flags, memidx
++* qemu_ld_i32/i64/v128 t0, t1, flags, memidx
++* qemu_st_i32/i64/v128 t0, t1, flags, memidx
+ 
+ Load data at the guest address t1 into t0, or store data in t0 at guest
+ address t1.  The _i32/_i64 size applies to the size of the input/output
+@@ -488,6 +513,9 @@ and the width of the memory operation is controlled by flags.
+ Both t0 and t1 may be split into little-endian ordered pairs of registers
+ if dealing with 64-bit quantities on a 32-bit host.
+ 
++The _v128 size can only be used to read exactly 128 bit. Host and target
++are required to be of the same endianness for it to work.
++
+ The memidx selects the qemu tlb index to use (e.g. user or kernel access).
+ The flags are the TCGMemOp bits, selecting the sign, width, and endianness
+ of the memory access.
+@@ -538,6 +566,15 @@ Floating point operations are not supported in this version. A
+ previous incarnation of the code generator had full support of them,
+ but it is better to concentrate on integer operations first.
+ 
++To support vector operations, the backend must define:
++- TCG_TARGET_HAS_REGV64 for the 64 bit vector type and/or
++- TCG_TARGET_HAS_REG128 for the 128 bit vector type.
++For supported types, load and store operations must be supported. An
++arbitrary set of other vector operations may be supported. Vector operations
++that were not explicitly declared as supported (by defining
++TCG_TARGET_HAS_<operation> to 1) will never appear in the intermediate
++representation. In this case, the emulation code will be emitted instead.
++
+ 4.2) Constraints
+ 
+ GCC like constraints are used to define the constraints of every
 -- 
 2.1.4
