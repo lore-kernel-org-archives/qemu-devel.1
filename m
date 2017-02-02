@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cZIFL-0004ZJ-OZ
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:20:24 -0500
+	(envelope-from <den@openvz.org>) id 1cZIKL-0008Vh-Et
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:25:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cZIFI-0007VC-JQ
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:20:23 -0500
-References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-	<20170202051445.5735-96-david@gibson.dropbear.id.au>
-	<922cc254-3d39-c21e-3ac6-7f8bd3b95d90@ilande.co.uk>
-	<b8c77dc9-6083-bf26-3750-f0847ad1d6ed@redhat.com>
-	<83f44e87-d1aa-3c9f-f383-e06717dfa54c@ilande.co.uk>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <999b15a2-2388-4397-64f4-06875f7f6d92@redhat.com>
-Date: Thu, 2 Feb 2017 15:20:15 +0100
-MIME-Version: 1.0
-In-Reply-To: <83f44e87-d1aa-3c9f-f383-e06717dfa54c@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 095/107] spapr: clock should count only if
- vm is running
+	(envelope-from <den@openvz.org>) id 1cZIKI-0001Qu-A5
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:25:33 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:28714 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cZIKH-0001Pr-UO
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:25:30 -0500
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Thu,  2 Feb 2017 17:25:15 +0300
+Message-Id: <1486045515-8009-1-git-send-email-den@openvz.org>
+Subject: [Qemu-devel] [PATCH v2 1/1] mirror: do not increase offset during
+ initial zero_or_discard phase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +22,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
-Cc: thuth@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 02/02/2017 11:40, Mark Cave-Ayland wrote:
-> On 02/02/17 09:13, Laurent Vivier wrote:
-> 
->> On 02/02/2017 09:37, Mark Cave-Ayland wrote:
->>> On 02/02/17 05:14, David Gibson wrote:
->>>
->> ...
->>> Hi David/Laurent,
->>
->> Hi Mark,
->>
->>> I just noticed this in your pull request today - this looks like it is
->>> along similar lines to the prototype patch I proposed last year as part
->>> of the decrementer migration thread discussion, i.e. use a
->>> vm_change_state_handler() to sync the clock on pause/resume.
->>>
->>> Am I right in thinking this now solves the timebase migration problem,
->>> and so the only part required is to encode the decrementer relative to
->>> the timebase during migration to ensure its value is also migrated
->>> correctly?
->>
->> Do you have a link to this thread discussion?
->>
->> The main purpose of this patch was only to stop the clock (TBR) while
->> the machine is paused, so I'd like to know what is the problem you are
->> speaking about.
-> 
-> Hi Laurent,
-> 
-> Yes indeed. The discussion spanned a couple of threads last year, but
-> the start of it was my patch to migrate the decrementer to fix an issue
-> I was seeing when migrating Darwin images on the Mac machines under TCG:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg00544.html
-> 
-> This then eventually became a separate thread here:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg04622.html
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-I think adding the the PPCTimebase field and the VMSTATE_PPC_TIMEBASE_V
-macro to the PMac machines should fix your issue.
+If explicit zeroing out before mirroring is required for the target image,
+it moves the block job offset counter to EOF, then offset and len counters
+count the image size twice. There is no harm but stats are confusing,
+specifically the progress of the operation is always reported as 99% by
+management tools.
 
-Do you have a test case I can try?
+The patch skips offset increase for the first "technical" pass over the
+image. This should not cause any further harm.
 
-Laurent
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Jeff Cody <jcody@redhat.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
+---
+Changes from v1:
+- changed the approach - we do not allow to increase the offset rather then
+  to move it back
+- description rewritten
+- kludges to tests are removed as not actually needed with this approach
+
+ block/mirror.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/block/mirror.c b/block/mirror.c
+index 301ba92..f100f5d 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -69,6 +69,7 @@ typedef struct MirrorBlockJob {
+     bool waiting_for_io;
+     int target_cluster_sectors;
+     int max_iov;
++    bool initial_zeroing_ongoing;
+ } MirrorBlockJob;
+ 
+ typedef struct MirrorOp {
+@@ -117,9 +118,10 @@ static void mirror_iteration_done(MirrorOp *op, int ret)
+         if (s->cow_bitmap) {
+             bitmap_set(s->cow_bitmap, chunk_num, nb_chunks);
+         }
+-        s->common.offset += (uint64_t)op->nb_sectors * BDRV_SECTOR_SIZE;
++        if (!s->initial_zeroing_ongoing) {
++            s->common.offset += (uint64_t)op->nb_sectors * BDRV_SECTOR_SIZE;
++        }
+     }
+-
+     qemu_iovec_destroy(&op->qiov);
+     g_free(op);
+ 
+@@ -566,6 +568,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             return 0;
+         }
+ 
++        s->initial_zeroing_ongoing = true;
+         for (sector_num = 0; sector_num < end; ) {
+             int nb_sectors = MIN(end - sector_num,
+                 QEMU_ALIGN_DOWN(INT_MAX, s->granularity) >> BDRV_SECTOR_BITS);
+@@ -573,6 +576,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             mirror_throttle(s);
+ 
+             if (block_job_is_cancelled(&s->common)) {
++                s->initial_zeroing_ongoing = false;
+                 return 0;
+             }
+ 
+@@ -587,6 +591,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+         }
+ 
+         mirror_wait_for_all_io(s);
++        s->initial_zeroing_ongoing = false;
+     }
+ 
+     /* First part, loop on the sectors and initialize the dirty bitmap.  */
+-- 
+2.7.4
