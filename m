@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cZJzy-0005uB-Jv
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:12:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZKCq-0001Sw-S7
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:25:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cZJzs-0000Sq-GP
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:12:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47498)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cZJzs-0000RN-7w
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:12:32 -0500
-Date: Thu, 2 Feb 2017 18:12:30 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170202181156-mutt-send-email-mst@kernel.org>
-References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
-	<20170118175335-mutt-send-email-mst@kernel.org>
-	<20170118181918.783cb7bd@nial.brq.redhat.com>
-	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
-	<20170131165802-mutt-send-email-mst@kernel.org>
-	<20170131164102.583323d7@nial.brq.redhat.com>
-	<CAAibmn1T=3A5wdenc=8H7G2OAMZVPjTHiM8XCO27BCAfpPYvpQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cZKCp-0006NB-BV
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:25:56 -0500
+Received: from mail-vk0-x22a.google.com ([2607:f8b0:400c:c05::22a]:34353)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZKCp-0006Mz-61
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:25:55 -0500
+Received: by mail-vk0-x22a.google.com with SMTP id r136so14297106vke.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 08:25:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAibmn1T=3A5wdenc=8H7G2OAMZVPjTHiM8XCO27BCAfpPYvpQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
+In-Reply-To: <CAFEAcA9zEaATTwGLNCB=X_mhqjapC-0jxPpv8OjDt=zqaFBnjA@mail.gmail.com>
+References: <1485893872-26524-1-git-send-email-mst@redhat.com>
+	<CAFEAcA9zEaATTwGLNCB=X_mhqjapC-0jxPpv8OjDt=zqaFBnjA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Feb 2017 16:25:34 +0000
+Message-ID: <CAFEAcA_SCHQ06uON3pEgpt2ku4HO2C-fUTHr7TZAVmZ1PEq09Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v5 00/22] virtio, vhost, pci: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,114 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phil Dennis-Jordan <phil@philjordan.eu>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, lersek@redhat.com, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>
 
-On Tue, Jan 31, 2017 at 04:04:58PM +0000, Phil Dennis-Jordan wrote:
-> 
-> On Tue, 31 Jan 2017 at 16:41, Igor Mammedov <imammedo@redhat.com> wrote:
-> 
->     On Tue, 31 Jan 2017 16:58:22 +0200
->     "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
->     > On Tue, Jan 31, 2017 at 03:31:46PM +0100, Phil Dennis-Jordan wrote:
->     > > On 18 January 2017 at 18:19, Igor Mammedov <imammedo@redhat.com> wrote:
->     > > > On Wed, 18 Jan 2017 18:30:59 +0200
->     > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
->     > > >
->     > > >> On Wed, Jan 18, 2017 at 12:45:54PM +0100, Phil Dennis-Jordan wrote:
->     > > > [...]
->     > > >
->     > > >> > I suspect more might be involved in enabling ACPI 2.0, and it
->     should probably be an option so as to avoid regressions. I don't know what
->     the best approach would be for this, so comments welcome. Should adding the
->     reset register to the FADT also be configurable?
->     > > >>
->     > > >> I would say an option to make FADT use rev 3 format would be a good
->     > > >> idea.
->     > > >>
->     > > >> I'd make it the default if XP survives.
->     > > > if XP and legacy linux survive,
->     > > > I'd skip adding option as probably there won't be any users,
->     > > > in unlikely case such user surfaces we always can add option later
->     > > > but we can't do it other way around (i.e. take it away).
->     > >
->     > > I have now finally solved the mystery of why my FADT patch has been
->     > > going so disastrously wrong - I've now got working code, but I'd
->     > > appreciate some guidance on the best way to structure a patch to
->     > > minimise further back-and forth.
->     >
->     > + lersek
->     >
->     > > The culprit turned out to be OVMF,
->     > > specifically 2 bugs/shortcomings:
->     > >
->     > > 1. It completely gives up on parsing Qemu's ACPI tables if more than
->     > > one "add pointer" linker command points to the same table. In this
->     > > case, if you add a command for both the DSDT and X_DSDT fields of the
->     > > FADT, it aborts completely and uses fallback tables. (The following
->     > > InstallAcpiTable call fails if called twice with the same table type.)
->     > > https://github.com/tianocore/edk2/blob/master/OvmfPkg/AcpiPlatformDxe/
->     QemuFwCfgAcpi.c#L518
->     > >
->     > > 2. After applying all the linker commands, it goes and rewrites part
->     > > of the FADT anyway. Specifically, it rewrites the DSDT and X_DSDT
->     > > fields - and it always sets one of them to 0. Which one depends on
->     > > whether the DSDT is above the 4G barrier:
->     > > https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Universal/
->     Acpi/AcpiTableDxe/AcpiTableProtocol.c#L650
->     > >
->     > > Both of these are easily fixed, and I will submit a corresponding patch
->     to EDK2.
->     > >
->     > > With that fixed, the rest of the FADT provided by Qemu is accepted by
->     > > OVMF and the operating systems. On the Qemu side, it does mean we'll
->     > > need to still retain the ACPI 1.0 tables for backwards compatibility.
->     > >
->     > > Q1: How should the option be structured and named? Should the FADT
->     > > revision be selectable via a sub-option on -machine? Or as a
->     > > standalone option? Something else?
->     WinXP is main reason why we are using 1.0 revisions,
->     but if bumping revision doesn't affect it or later versions
->     and linux kernel (ancient/contemporary) boots fine,
->     I wouldn't bother with yet another option.
-> 
-> 
-> 
-> XP is fine. My concern is that setups with OVMF+Windows (10 confirmed, but
-> probably 7/8 too) will suddenly bluescreen on boot because unpatched OVMF
-> delivers a non-compliant FADT.
+On 2 February 2017 at 13:56, Peter Maydell <peter.maydell@linaro.org> wrote=
+:
+> On 31 January 2017 at 20:18, Michael S. Tsirkin <mst@redhat.com> wrote:
+>> virtio, vhost, pci: fixes, features
+>>
+>> generic pci root port support
+>> disable shpc by default
+>> safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
+>> fixes and cleanups all over the place
+>>
+>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-So for that, there might be a work around if you reorder the
-tables in the file.
+> Applied, thanks.
 
+...travis builds now fail for the --enable-tcg-interpreter config:
+https://travis-ci.org/qemu/qemu/jobs/197648661
 
-> 
-> 
->     > > Q2: To avoid any more confusion, I'd appreciate
->     > > confirmation/clarification on the X_ and non-X FADT fields in the case
->     > > where 32-bit pointers suffice.
->     > >
->     > > Q2a: DSDT/X_DSDT: Both variants appear to be de-facto required.
->     spec doesn't say that X_DSDT is optional and Windows requires it if field
->     is present.
-> 
->     > >
->     > > Q2b: FIRMWARE_CTRL/X_FIRMWARE_CTRL: leave X_FIRMWARE_CTRL zero.
->     > >
->     > > Q2c: X_PM1a_EVT_BLK, X_PM1a_CNT_BLK, X_PM_TMR_BLK: These all state
->     > > "This is a required field" for both variants.
->     > >
->     > > Q2d: GPE0_BLK/X_GPE0_BLK: Both variants state "if this register block
->     > > is not supported, this field contains zero." - I understand this to
->     > > mean that when the register block IS supported and 32-bit, both
->     > > variants must be filled.
->     > >
->     > > In other words, only X_FIRMWARE_CTRL stays zero in Qemu's x86 case.
->     > >
->     > >
->     > > I'll come up with a revised patch in the next few days.
->     > >
->     > > Thanks for your help and patience so far, everyone!
-> 
-> 
+In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
+/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c: In function =E2=80=
+=98tcg_out_op=E2=80=99:
+/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:117: error:
+negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:255: error:
+negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
+/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:115: error:
+negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:255: error:
+negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+
+These look to be because we were trying to use ARRAY_SIZE()
+on a non-array, which was previously undetected. The use is
+only in an assert() so fairly harmless.
+
+Would somebody who cares about TCI like to provide a fix?
+
+thanks
+-- PMM
