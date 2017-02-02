@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZE4o-0004Ip-My
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:53:15 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cZEMZ-0000hV-0d
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 05:11:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZE4n-00089P-O4
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:53:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40156)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cZE4n-00088w-I9
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:53:13 -0500
-Date: Thu, 2 Feb 2017 09:53:02 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170202095302.GC2915@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAAo6VWMJAYeLdtEmyQ43vYeYjvNzCP80Wufe4=eNRUZum0rYdQ@mail.gmail.com>
-	<CAJSP0QV7QCLwih+F30hcohmwYQ1Ci+6bMPuCj_Kk9hwbmgWzUA@mail.gmail.com>
-	<E05FEFD5-A72D-4FC5-B600-58AAD2900A02@veritas.com>
-	<CAJSP0QUWmU_XbB9TGxvL0hH-SCzRSWDciNhpZrarDDcE22RF_w@mail.gmail.com>
-	<D1304CAA-9C32-4E42-AA65-27B3277130E8@veritas.com>
+	(envelope-from <stefanha@gmail.com>) id 1cZEK4-0007wC-Bw
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 05:09:03 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35388)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cZEK4-0007w0-5Q
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 05:09:00 -0500
+Received: by mail-wm0-x242.google.com with SMTP id u63so3180064wmu.2
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 02:09:00 -0800 (PST)
+Date: Thu, 2 Feb 2017 10:08:56 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170202100856.GA22164@stefanha-x1.localdomain>
+References: <20161115124417.GC9226@lemon>
+	<20161115144551.GB17672@stefanha-x1.localdomain>
+	<20161115150016.GD9226@lemon>
+	<20161115192026.GA26428@stefanha-x1.localdomain>
+	<CAAo6VWN9uO9-jjEfHxLHCBE5V5tr5Sx52tGY5vu3g8JgcCRqvQ@mail.gmail.com>
+	<87eg2bokx0.fsf@dusky.pond.sub.org> <20161116094901.GA31999@lemon>
+	<CAJSP0QWvsO8480gsOa=1jiY-8WLwTt6cgPtP6O-CAOfehZab3A@mail.gmail.com>
+	<CAAo6VWNMw2GdR-MznT5np7ov+hSGZZ-6t69bm5+TqAjmHZJZPQ@mail.gmail.com>
+	<CAAo6VWM26xdQhjX9YGiPAXBBxzUNwSi+AUohWyO1HEXxfPv+LQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
 Content-Disposition: inline
-In-Reply-To: <D1304CAA-9C32-4E42-AA65-27B3277130E8@veritas.com>
-Subject: Re: [Qemu-devel] [PATCH v7 RFC] block/vxhs: Initial commit to add
- Veritas HyperScale VxHS block device support
+In-Reply-To: <CAAo6VWM26xdQhjX9YGiPAXBBxzUNwSi+AUohWyO1HEXxfPv+LQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +38,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, ashish mittal <ashmit602@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Gaurav Bhandarkar <Gaurav.Bhandarkar@veritas.com>, Abhishek Kane <Abhishek.Kane@veritas.com>, Ketan Mahajan <Ketan.Mahajan@veritas.com>, Niranjan Pendharkar <Niranjan.Pendharkar@veritas.com>, Nirendra Awasthi <Nirendra.Awasthi@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
-
-On Wed, Feb 01, 2017 at 11:59:53PM +0000, Ketan Nilangekar wrote:
-> Patch for secure implementation in libqnio is available for review here:
-> 
-> https://github.com/VeritasHyperScale/libqnio/pull/12
-
-IMHO, we really don't want libqnio to be doing the SSL handling
-itself. QEMU has a standardized API for doing SSL that the vxhs
-layer should be using, so that its behaviour & configuration is
-exactly the same as other bits of QEMU using SSL.
-
-To do this, libqnio would have to delegate all socket I/O to
-QEMU, by providing a set of callback APIs that QEMU can provide
-implementations for.
-
-The QEMU block driver for vxhs would use qio_channel_socket and
-qio_channel_tls APIs to setup the socket & do SSL handshakes,
-etc.
+To: ashish mittal <ashmit602@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Ashish Mittal <ashish.mittal@veritas.com>, Jeff Cody <jcody@redhat.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, Paolo Bonzini <pbonzini@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, John Ferlan <jferlan@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Peter Krempa <pkrempa@redhat.com>
 
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+--BOKacYhQ+x31HxR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jan 31, 2017 at 05:55:47PM -0800, ashish mittal wrote:
+> Hi,
+>=20
+> There has been some work going on on the VxHS libvirt patches and we
+> are making good progress.
+>=20
+> A suggestion has been made on the libvirt community to check if we can
+> change the qemu VxHS device specification syntax as follows.
+>=20
+> Replace
+>=20
+> (a) +file.server.host=3D192.168.0.1,file.server.port=3D9999
+>=20
+> with
+>=20
+> (b) +file.host=3D192.168.0.1,file.port=3D9999
+>=20
+> The reasoning being that since we have only one host (true as the
+> failover is now being handled completely/transparently) within the
+> libqnio library), the "server" part is redundant.
+
+Sounds good to me.
+
+Stefan
+
+--BOKacYhQ+x31HxR3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYkwU4AAoJEJykq7OBq3PIta8H/3L7PG/8iRsrm6xf9gtQZYqK
+02mjMHJZUzTM2AggbA60/y92icvAniqwNwNvWdYAju/hf+jkSnOre9rNFU1KKspe
+Y5qBcH99SuTD9Myj7WUJtMnBF1XQavdbTNkjkukv8jJG2T74289Vmd4djYNFel5A
+4j5kkEgOWMv3EAQSWSd7jNTbiLunt13+XtsnDivcGXJe/h7h9lZ60jduT8kOyPWh
+EU4D1CG4M4w8fPOD3ZxseDUnqaIw0AYFXdOpftAT+oydDUZgsbrtAT83DCsSTnMx
+n2O5E8tpYt6KXJHxU7JSmwLKYJmnfkJWsCzsAXIPwxGq+mzSfQM9irB85HvyrKM=
+=pXW5
+-----END PGP SIGNATURE-----
+
+--BOKacYhQ+x31HxR3--
