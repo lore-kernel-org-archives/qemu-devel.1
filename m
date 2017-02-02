@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZCfz-0001MT-Et
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:23:36 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cZCto-0000uM-AZ
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:37:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZCfv-0006do-Hk
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:23:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cZCfv-0006cS-9k
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:23:27 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  2 Feb 2017 09:23:07 +0100
-Message-Id: <1486023789-28995-3-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1486023789-28995-1-git-send-email-kraxel@redhat.com>
-References: <1486023789-28995-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] cirrus: allow zero source pitch in pattern
- fill rops
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cZCtn-0004uv-1Q
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:37:48 -0500
+References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
+	<20170202051445.5735-96-david@gibson.dropbear.id.au>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <922cc254-3d39-c21e-3ac6-7f8bd3b95d90@ilande.co.uk>
+Date: Thu, 2 Feb 2017 08:37:11 +0000
+MIME-Version: 1.0
+In-Reply-To: <20170202051445.5735-96-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 095/107] spapr: clock should count only if
+ vm is running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +24,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
+Cc: lvivier@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, qemu-ppc@nongnu.org
 
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+On 02/02/17 05:14, David Gibson wrote:
 
-The rops used by cirrus_bitblt_common_patterncopy only use
-the destination pitch, so the source pitch shoul allowed to
-be zero and the blit with used for the range check around the
-source address.
+> From: Laurent Vivier <lvivier@redhat.com>
+> 
+> This is a port to ppc of the i386 commit:
+>     00f4d64 kvmclock: clock should count only if vm is running
+> 
+> We remove timebase_post_load function, and use the VM state
+> change handler to save and restore the guest_timebase (on stop
+> and continue).
+> 
+> We keep timebase_pre_save to reduce the clock difference on
+> migration like in:
+>     6053a86 kvmclock: reduce kvmclock difference on migration
+> 
+> Time base offset has originally been introduced by commit
+>     98a8b52 spapr: Add support for time base offset migration
+> 
+> So while VM is paused, the time is stopped. This allows to have
+> the same result with date (based on Time Base Register) and
+> hwclock (based on "get-time-of-day" RTAS call).
+> 
+> Moreover in TCG mode, the Time Base is always paused, so this
+> patch also adjust the behavior between TCG and KVM.
+> 
+> VM state field "time_of_the_day_ns" is now useless but we keep
+> it to be able to migrate to older version of the machine.
+> 
+> As vmstate_ppc_timebase structure (with timebase_pre_save() and
+> timebase_post_load() functions) was only used by vmstate_spapr,
+> we register the VM state change handler only in ppc_spapr_init().
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/ppc.c         | 66 ++++++++++++++++++++++++++++++++++------------------
+>  hw/ppc/spapr.c       |  6 +++++
+>  target/ppc/cpu-qom.h |  3 +++
+>  3 files changed, 52 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> index f9a4b51..d171e60 100644
+> --- a/hw/ppc/ppc.c
+> +++ b/hw/ppc/ppc.c
+> @@ -847,9 +847,8 @@ static void cpu_ppc_set_tb_clk (void *opaque, uint32_t freq)
+>      cpu_ppc_store_purr(cpu, 0x0000000000000000ULL);
+>  }
+>  
+> -static void timebase_pre_save(void *opaque)
+> +static void timebase_save(PPCTimebase *tb)
+>  {
+> -    PPCTimebase *tb = opaque;
+>      uint64_t ticks = cpu_get_host_ticks();
+>      PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
+>  
+> @@ -858,43 +857,30 @@ static void timebase_pre_save(void *opaque)
+>          return;
+>      }
+>  
+> +    /* not used anymore, we keep it for compatibility */
+>      tb->time_of_the_day_ns = qemu_clock_get_ns(QEMU_CLOCK_HOST);
+>      /*
+> -     * tb_offset is only expected to be changed by migration so
+> +     * tb_offset is only expected to be changed by QEMU so
+>       * there is no need to update it from KVM here
+>       */
+>      tb->guest_timebase = ticks + first_ppc_cpu->env.tb_env->tb_offset;
+>  }
+>  
+> -static int timebase_post_load(void *opaque, int version_id)
+> +static void timebase_load(PPCTimebase *tb)
+>  {
+> -    PPCTimebase *tb_remote = opaque;
+>      CPUState *cpu;
+>      PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
+> -    int64_t tb_off_adj, tb_off, ns_diff;
+> -    int64_t migration_duration_ns, migration_duration_tb, guest_tb, host_ns;
+> +    int64_t tb_off_adj, tb_off;
+>      unsigned long freq;
+>  
+>      if (!first_ppc_cpu->env.tb_env) {
+>          error_report("No timebase object");
+> -        return -1;
+> +        return;
+>      }
+>  
+>      freq = first_ppc_cpu->env.tb_env->tb_freq;
+> -    /*
+> -     * Calculate timebase on the destination side of migration.
+> -     * The destination timebase must be not less than the source timebase.
+> -     * We try to adjust timebase by downtime if host clocks are not
+> -     * too much out of sync (1 second for now).
+> -     */
+> -    host_ns = qemu_clock_get_ns(QEMU_CLOCK_HOST);
+> -    ns_diff = MAX(0, host_ns - tb_remote->time_of_the_day_ns);
+> -    migration_duration_ns = MIN(NANOSECONDS_PER_SECOND, ns_diff);
+> -    migration_duration_tb = muldiv64(freq, migration_duration_ns,
+> -                                     NANOSECONDS_PER_SECOND);
+> -    guest_tb = tb_remote->guest_timebase + MIN(0, migration_duration_tb);
+>  
+> -    tb_off_adj = guest_tb - cpu_get_host_ticks();
+> +    tb_off_adj = tb->guest_timebase - cpu_get_host_ticks();
+>  
+>      tb_off = first_ppc_cpu->env.tb_env->tb_offset;
+>      trace_ppc_tb_adjust(tb_off, tb_off_adj, tb_off_adj - tb_off,
+> @@ -904,9 +890,44 @@ static int timebase_post_load(void *opaque, int version_id)
+>      CPU_FOREACH(cpu) {
+>          PowerPCCPU *pcpu = POWERPC_CPU(cpu);
+>          pcpu->env.tb_env->tb_offset = tb_off_adj;
+> +#if defined(CONFIG_KVM)
+> +        kvm_set_one_reg(cpu, KVM_REG_PPC_TB_OFFSET,
+> +                        &pcpu->env.tb_env->tb_offset);
+> +#endif
+>      }
+> +}
+>  
+> -    return 0;
+> +void cpu_ppc_clock_vm_state_change(void *opaque, int running,
+> +                                   RunState state)
+> +{
+> +    PPCTimebase *tb = opaque;
+> +
+> +    if (running) {
+> +        timebase_load(tb);
+> +    } else {
+> +        timebase_save(tb);
+> +    }
+> +}
+> +
+> +/*
+> + * When migrating, read the clock just before migration,
+> + * so that the guest clock counts during the events
+> + * between:
+> + *
+> + *  * vm_stop()
+> + *  *
+> + *  * pre_save()
+> + *
+> + *  This reduces clock difference on migration from 5s
+> + *  to 0.1s (when max_downtime == 5s), because sending the
+> + *  final pages of memory (which happens between vm_stop()
+> + *  and pre_save()) takes max_downtime.
+> + */
+> +static void timebase_pre_save(void *opaque)
+> +{
+> +    PPCTimebase *tb = opaque;
+> +
+> +    timebase_save(tb);
+>  }
+>  
+>  const VMStateDescription vmstate_ppc_timebase = {
+> @@ -915,7 +936,6 @@ const VMStateDescription vmstate_ppc_timebase = {
+>      .minimum_version_id = 1,
+>      .minimum_version_id_old = 1,
+>      .pre_save = timebase_pre_save,
+> -    .post_load = timebase_post_load,
+>      .fields      = (VMStateField []) {
+>          VMSTATE_UINT64(guest_timebase, PPCTimebase),
+>          VMSTATE_INT64(time_of_the_day_ns, PPCTimebase),
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index b71cd7a..9fc3fb9 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2129,6 +2129,12 @@ static void ppc_spapr_init(MachineState *machine)
+>      qemu_register_reset(spapr_ccs_reset_hook, spapr);
+>  
+>      qemu_register_boot_set(spapr_boot_set, spapr);
+> +
+> +    /* to stop and start vmclock */
+> +    if (kvm_enabled()) {
+> +        qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
+> +                                         &spapr->tb);
+> +    }
+>  }
+>  
+>  static int spapr_kvm_type(const char *vm_type)
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index d46c31a..b7977ba 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -214,6 +214,9 @@ extern const struct VMStateDescription vmstate_ppc_timebase;
+>      .flags      = VMS_STRUCT,                                         \
+>      .offset     = vmstate_offset_value(_state, _field, PPCTimebase),  \
+>  }
+> +
+> +void cpu_ppc_clock_vm_state_change(void *opaque, int running,
+> +                                   RunState state);
+>  #endif
+>  
+>  #endif
 
-Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Message-id: 1485272138-23249-1-git-send-email-w.bumiller@proxmox.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/cirrus_vga.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+Hi David/Laurent,
 
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 0f05e45..98f089e 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -272,9 +272,6 @@ static void cirrus_update_memory_access(CirrusVGAState *s);
- static bool blit_region_is_unsafe(struct CirrusVGAState *s,
-                                   int32_t pitch, int32_t addr)
- {
--    if (!pitch) {
--        return true;
--    }
-     if (pitch < 0) {
-         int64_t min = addr
-             + ((int64_t)s->cirrus_blt_height-1) * pitch;
-@@ -294,8 +291,11 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
-     return false;
- }
- 
--static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
-+static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only,
-+                           bool zero_src_pitch_ok)
- {
-+    int32_t check_pitch;
-+
-     /* should be the case, see cirrus_bitblt_start */
-     assert(s->cirrus_blt_width > 0);
-     assert(s->cirrus_blt_height > 0);
-@@ -304,6 +304,10 @@ static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
-         return true;
-     }
- 
-+    if (!s->cirrus_blt_dstpitch) {
-+        return true;
-+    }
-+
-     if (blit_region_is_unsafe(s, s->cirrus_blt_dstpitch,
-                               s->cirrus_blt_dstaddr & s->cirrus_addr_mask)) {
-         return true;
-@@ -311,7 +315,13 @@ static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
-     if (dst_only) {
-         return false;
-     }
--    if (blit_region_is_unsafe(s, s->cirrus_blt_srcpitch,
-+
-+    check_pitch = s->cirrus_blt_srcpitch;
-+    if (!zero_src_pitch_ok && !check_pitch) {
-+        check_pitch = s->cirrus_blt_width;
-+    }
-+
-+    if (blit_region_is_unsafe(s, check_pitch,
-                               s->cirrus_blt_srcaddr & s->cirrus_addr_mask)) {
-         return true;
-     }
-@@ -681,8 +691,9 @@ static int cirrus_bitblt_common_patterncopy(CirrusVGAState * s,
- 
-     dst = s->vga.vram_ptr + (s->cirrus_blt_dstaddr & s->cirrus_addr_mask);
- 
--    if (blit_is_unsafe(s, false))
-+    if (blit_is_unsafe(s, false, true)) {
-         return 0;
-+    }
- 
-     (*s->cirrus_rop) (s, dst, src,
-                       s->cirrus_blt_dstpitch, 0,
-@@ -699,7 +710,7 @@ static int cirrus_bitblt_solidfill(CirrusVGAState *s, int blt_rop)
- {
-     cirrus_fill_t rop_func;
- 
--    if (blit_is_unsafe(s, true)) {
-+    if (blit_is_unsafe(s, true, true)) {
-         return 0;
-     }
-     rop_func = cirrus_fill[rop_to_index[blt_rop]][s->cirrus_blt_pixelwidth - 1];
-@@ -803,7 +814,7 @@ static int cirrus_do_copy(CirrusVGAState *s, int dst, int src, int w, int h)
- 
- static int cirrus_bitblt_videotovideo_copy(CirrusVGAState * s)
- {
--    if (blit_is_unsafe(s, false))
-+    if (blit_is_unsafe(s, false, false))
-         return 0;
- 
-     return cirrus_do_copy(s, s->cirrus_blt_dstaddr - s->vga.start_addr,
--- 
-1.8.3.1
+I just noticed this in your pull request today - this looks like it is
+along similar lines to the prototype patch I proposed last year as part
+of the decrementer migration thread discussion, i.e. use a
+vm_change_state_handler() to sync the clock on pause/resume.
+
+Am I right in thinking this now solves the timebase migration problem,
+and so the only part required is to encode the decrementer relative to
+the timebase during migration to ensure its value is also migrated
+correctly?
+
+
+ATB,
+
+Mark.
