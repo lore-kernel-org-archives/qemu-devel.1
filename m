@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKk-0002cG-Em
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKm-0002cS-Ka
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKj-0008He-8I
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:54 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:4102 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKk-0008JA-55
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:56 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:48210 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZHKi-0008GN-PL
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:53 -0500
+	id 1cZHKj-0008GZ-Ib
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:54 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  2 Feb 2017 16:21:29 +0300
-Message-Id: <20170202132145.168790-9-vsementsov@virtuozzo.com>
+Date: Thu,  2 Feb 2017 16:21:42 +0300
+Message-Id: <20170202132145.168790-22-vsementsov@virtuozzo.com>
 In-Reply-To: <20170202132145.168790-1-vsementsov@virtuozzo.com>
 References: <20170202132145.168790-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 08/24] block: introduce auto-loading bitmaps
+Subject: [Qemu-devel] [PATCH 21/24] qcow2-bitmap: refcounts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +27,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Auto loading bitmaps are bitmaps stored in the disk image, which should
-be loaded when the image is opened and become BdrvDirtyBitmaps for the
-corresponding drive.
+Calculate refcounts for qcow2 bitmaps. It is needed for qcow2's qemu-img
+check implementation.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c                   | 14 ++++++++++++++
- include/block/block.h     |  2 ++
- include/block/block_int.h |  3 +++
- 3 files changed, 19 insertions(+)
+ block/qcow2-bitmap.c   | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2-refcount.c |  6 ++++
+ block/qcow2.h          |  3 ++
+ 3 files changed, 85 insertions(+)
 
-diff --git a/block.c b/block.c
-index a0346c80c6..56f030c562 100644
---- a/block.c
-+++ b/block.c
-@@ -1141,6 +1141,13 @@ static int bdrv_open_common(BlockDriverState *bs, BdrvChild *file,
-     assert(bdrv_min_mem_align(bs) != 0);
-     assert(is_power_of_2(bs->bl.request_alignment));
- 
-+    bdrv_load_autoloading_dirty_bitmaps(bs, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto free_and_fail;
-+    }
-+
-     qemu_opts_del(opts);
-     return 0;
- 
-@@ -4093,3 +4100,10 @@ void bdrv_del_child(BlockDriverState *parent_bs, BdrvChild *child, Error **errp)
- 
-     parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 6f56267bde..8bb7f3e621 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1232,3 +1232,79 @@ common_errp:
+                name, bdrv_get_device_or_node_name(bs), reason);
+     return false;
  }
 +
-+void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
++int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
++                                  void **refcount_table,
++                                  int64_t *refcount_table_size)
 +{
-+    if (bs->drv && bs->drv->bdrv_load_autoloading_dirty_bitmaps) {
-+        bs->drv->bdrv_load_autoloading_dirty_bitmaps(bs, errp);
++    int ret;
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2BitmapList *bm_list;
++    Qcow2Bitmap *bm;
++
++    if (s->nb_bitmaps == 0) {
++        return 0;
 +    }
++
++    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount_table_size,
++                                   s->bitmap_directory_offset,
++                                   s->bitmap_directory_size);
++    if (ret < 0) {
++        return ret;
++    }
++
++    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
++                               s->bitmap_directory_size, NULL);
++    if (bm_list == NULL) {
++        res->corruptions++;
++        return -EINVAL;
++    }
++
++    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
++        uint64_t *bitmap_table = NULL;
++        int i;
++
++        ret = qcow2_inc_refcounts_imrt(bs, res,
++                                       refcount_table, refcount_table_size,
++                                       bm->table.offset,
++                                       bm->table.size * sizeof(uint64_t));
++        if (ret < 0) {
++            goto out;
++        }
++
++        ret = bitmap_table_load(bs, &bm->table, &bitmap_table);
++        if (ret < 0) {
++            res->corruptions++;
++            goto out;
++        }
++
++        for (i = 0; i < bm->table.size; ++i) {
++            uint64_t entry = bitmap_table[i];
++            uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
++
++            if (check_table_entry(entry, s->cluster_size) < 0) {
++                res->corruptions++;
++                continue;
++            }
++
++            if (offset == 0) {
++                continue;
++            }
++
++            ret = qcow2_inc_refcounts_imrt(bs, res,
++                                           refcount_table, refcount_table_size,
++                                           offset, s->cluster_size);
++            if (ret < 0) {
++                g_free(bitmap_table);
++                goto out;
++            }
++        }
++
++        g_free(bitmap_table);
++    }
++
++out:
++    bitmap_list_free(bm_list);
++
++    return ret;
 +}
-diff --git a/include/block/block.h b/include/block/block.h
-index 4e81f2069b..154ac7f955 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -551,4 +551,6 @@ void bdrv_add_child(BlockDriverState *parent, BlockDriverState *child,
-                     Error **errp);
- void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 14a736d245..cdb74ba4de 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1846,6 +1846,12 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+         return ret;
+     }
  
-+void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++    /* bitmaps */
++    ret = qcow2_check_bitmaps_refcounts(bs, res, refcount_table, nb_clusters);
++    if (ret < 0) {
++        return ret;
++    }
 +
+     return check_refblocks(bs, res, fix, rebuild, refcount_table, nb_clusters);
+ }
+ 
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 0a3708d890..eaad34a527 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -624,5 +624,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+                                       const char *name,
+                                       uint32_t granularity,
+                                       Error **errp);
++int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
++                                  void **refcount_table,
++                                  int64_t *refcount_table_size);
+ 
  #endif
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 2d92d7edfe..6b2b50c6a2 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -320,6 +320,9 @@ struct BlockDriver {
-     void (*bdrv_del_child)(BlockDriverState *parent, BdrvChild *child,
-                            Error **errp);
- 
-+    void (*bdrv_load_autoloading_dirty_bitmaps)(BlockDriverState *bs,
-+                                                Error **errp);
-+
-     QLIST_ENTRY(BlockDriver) list;
- };
- 
 -- 
 2.11.0
