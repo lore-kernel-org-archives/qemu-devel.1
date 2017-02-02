@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZIwk-00006v-H3
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:05:19 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cZIwk-00006y-HY
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:05:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZIwh-0002r4-G5
+	(envelope-from <kraxel@redhat.com>) id 1cZIwh-0002rA-Gq
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:05:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55830)
+Received: from mx1.redhat.com ([209.132.183.28]:44584)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cZIwh-0002qh-BG
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cZIwh-0002qe-9Z
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 10:05:11 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  2 Feb 2017 16:05:04 +0100
-Message-Id: <1486047907-26685-2-git-send-email-kraxel@redhat.com>
+Date: Thu,  2 Feb 2017 16:05:05 +0100
+Message-Id: <1486047907-26685-3-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1486047907-26685-1-git-send-email-kraxel@redhat.com>
 References: <1486047907-26685-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] cirrus: handle negative pitch in
- cirrus_invalidate_region()
+Subject: [Qemu-devel] [PULL 2/4] cirrus: allow zero source pitch in pattern
+ fill rops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +29,99 @@ Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>, Gerd Hoffmann <kraxel@redhat.com
 
 From: Wolfgang Bumiller <w.bumiller@proxmox.com>
 
-cirrus_invalidate_region() calls memory_region_set_dirty()
-on a per-line basis, always ranging from off_begin to
-off_begin+bytesperline. With a negative pitch off_begin
-marks the top most used address and thus we need to do an
-initial shift backwards by a line for negative pitches of
-backward blits, otherwise the first iteration covers the
-line going from the start offset forwards instead of
-backwards.
-Additionally since the start address is inclusive, if we
-shift by a full `bytesperline` we move to the first address
-*not* included in the blit, so we only shift by one less
-than bytesperline.
+The rops used by cirrus_bitblt_common_patterncopy only use
+the destination pitch, so the source pitch shoul allowed to
+be zero and the blit with used for the range check around the
+source address.
 
 Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Message-id: 1485352137-29367-1-git-send-email-w.bumiller@proxmox.com
-
-[ kraxel: codestyle fixes ]
-
+Message-id: 1485272138-23249-1-git-send-email-w.bumiller@proxmox.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/cirrus_vga.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/display/cirrus_vga.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
 diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 379910d..0f05e45 100644
+index 0f05e45..98f089e 100644
 --- a/hw/display/cirrus_vga.c
 +++ b/hw/display/cirrus_vga.c
-@@ -661,9 +661,14 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
-     int off_cur;
-     int off_cur_end;
+@@ -272,9 +272,6 @@ static void cirrus_update_memory_access(CirrusVGAState *s);
+ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+                                   int32_t pitch, int32_t addr)
+ {
+-    if (!pitch) {
+-        return true;
+-    }
+     if (pitch < 0) {
+         int64_t min = addr
+             + ((int64_t)s->cirrus_blt_height-1) * pitch;
+@@ -294,8 +291,11 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+     return false;
+ }
  
-+    if (off_pitch < 0) {
-+        off_begin -= bytesperline - 1;
+-static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
++static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only,
++                           bool zero_src_pitch_ok)
+ {
++    int32_t check_pitch;
++
+     /* should be the case, see cirrus_bitblt_start */
+     assert(s->cirrus_blt_width > 0);
+     assert(s->cirrus_blt_height > 0);
+@@ -304,6 +304,10 @@ static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
+         return true;
+     }
+ 
++    if (!s->cirrus_blt_dstpitch) {
++        return true;
 +    }
 +
-     for (y = 0; y < lines; y++) {
- 	off_cur = off_begin;
- 	off_cur_end = (off_cur + bytesperline) & s->cirrus_addr_mask;
-+        assert(off_cur_end >= off_cur);
-         memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
- 	off_begin += off_pitch;
+     if (blit_region_is_unsafe(s, s->cirrus_blt_dstpitch,
+                               s->cirrus_blt_dstaddr & s->cirrus_addr_mask)) {
+         return true;
+@@ -311,7 +315,13 @@ static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
+     if (dst_only) {
+         return false;
      }
+-    if (blit_region_is_unsafe(s, s->cirrus_blt_srcpitch,
++
++    check_pitch = s->cirrus_blt_srcpitch;
++    if (!zero_src_pitch_ok && !check_pitch) {
++        check_pitch = s->cirrus_blt_width;
++    }
++
++    if (blit_region_is_unsafe(s, check_pitch,
+                               s->cirrus_blt_srcaddr & s->cirrus_addr_mask)) {
+         return true;
+     }
+@@ -681,8 +691,9 @@ static int cirrus_bitblt_common_patterncopy(CirrusVGAState * s,
+ 
+     dst = s->vga.vram_ptr + (s->cirrus_blt_dstaddr & s->cirrus_addr_mask);
+ 
+-    if (blit_is_unsafe(s, false))
++    if (blit_is_unsafe(s, false, true)) {
+         return 0;
++    }
+ 
+     (*s->cirrus_rop) (s, dst, src,
+                       s->cirrus_blt_dstpitch, 0,
+@@ -699,7 +710,7 @@ static int cirrus_bitblt_solidfill(CirrusVGAState *s, int blt_rop)
+ {
+     cirrus_fill_t rop_func;
+ 
+-    if (blit_is_unsafe(s, true)) {
++    if (blit_is_unsafe(s, true, true)) {
+         return 0;
+     }
+     rop_func = cirrus_fill[rop_to_index[blt_rop]][s->cirrus_blt_pixelwidth - 1];
+@@ -803,7 +814,7 @@ static int cirrus_do_copy(CirrusVGAState *s, int dst, int src, int w, int h)
+ 
+ static int cirrus_bitblt_videotovideo_copy(CirrusVGAState * s)
+ {
+-    if (blit_is_unsafe(s, false))
++    if (blit_is_unsafe(s, false, false))
+         return 0;
+ 
+     return cirrus_do_copy(s, s->cirrus_blt_dstaddr - s->vga.start_addr,
 -- 
 1.8.3.1
