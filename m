@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cZG7z-0006vb-VT
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:04:40 -0500
+	(envelope-from <er209@kent.ac.uk>) id 1cZGCK-00015y-MM
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:09:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cZG7v-0002WA-UZ
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:04:39 -0500
-Date: Thu, 2 Feb 2017 07:04:21 -0500 (EST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1666046970.16239766.1486037061141.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170202101758.GC22164@stefanha-x1.localdomain>
-References: <1485800032-24404-1-git-send-email-hch@lst.de>
-	<1485800032-24404-2-git-send-email-hch@lst.de>
-	<20170201164050.GD12283@stefanha-x1.localdomain>
-	<af5d7115-1b30-41aa-f3e5-0c4e4271d52c@redhat.com>
-	<20170202101758.GC22164@stefanha-x1.localdomain>
+	(envelope-from <er209@kent.ac.uk>) id 1cZGCG-0005oR-Jc
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:09:08 -0500
+Received: from mx0.kent.ac.uk ([129.12.21.32]:60629)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <er209@kent.ac.uk>) id 1cZGCG-0005nU-DO
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:09:04 -0500
+Received: from ex13-live-mbn2.kent.ac.uk ([129.12.20.195]
+	helo=ex13-live-mbn2.ad.kent.ac.uk)
+	by mx0.kent.ac.uk with esmtps (TLSv1.2:DHE-RSA-AES256-GCM-SHA384:256)
+	(Exim 4.84_2) (envelope-from <er209@kent.ac.uk>) id 1cZGCE-0002b9-QJ
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 12:09:02 +0000
+From: E.Robbins <er209@kent.ac.uk>
+Date: Thu, 2 Feb 2017 12:09:02 +0000
+Message-ID: <24f4e37d0c554e379d13a13026efb36f@ex13-live-mbn2.ad.kent.ac.uk>
+Content-Language: en-GB
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] nvme: implement the DSM command
+Subject: [Qemu-devel] TCG semantics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +30,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, keith busch <keith.busch@intel.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-> On Wed, Feb 01, 2017 at 12:29:22PM -0800, Paolo Bonzini wrote:
-> > On 01/02/2017 08:40, Stefan Hajnoczi wrote:
-> > >> +        goto out_free_range;
-> > >> +    }
-> > >> +
-> > >> +    if (dma_buf_write((uint8_t *)range, sizeof(range), &qsg)) {
-> > > 
-> > > Did you mean sizeof(*range) * nr?
-> > 
-> > Did you also mean dma_buf_read (you want to read from device to range)?
-> 
-> uint64_t dma_buf_write(uint8_t *ptr, int32_t len, QEMUSGList *sg)
-> {
->     return dma_buf_rw(ptr, len, sg, DMA_DIRECTION_TO_DEVICE);
-> }
-> 
-> DMA_DIRECTION_TO_DEVICE seems correct.
+Hello,
+I having been looking for prior work on a formalised semantics for the TCG =
+language. I have seen passing references, and wondered if anyone can provid=
+e any pointers?
 
-Yes, it is.
+If this is the wrong list for this question, apologies, please direct me el=
+sewhere.
 
-Paolo
+Best,
+Ed=
