@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cZIk7-0004NC-Ca
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:13 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cZIkA-0004Wm-AF
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cZIk5-00046f-S2
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54626)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cZIk9-00048L-6K
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54690)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cZIk5-000463-J0
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:09 -0500
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Date: Thu,  2 Feb 2017 14:51:59 +0000
-Message-Id: <20170202145159.20440-2-rjones@redhat.com>
-In-Reply-To: <20170202145159.20440-1-rjones@redhat.com>
-References: <20170202145159.20440-1-rjones@redhat.com>
-Subject: [Qemu-devel] [PATCH] qemu-nbd: Implement socket activation.
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cZIk8-000480-VC
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:13 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 13779274873
+	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 14:52:13 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  2 Feb 2017 18:51:25 +0400
+Message-Id: <20170202145141.17138-7-marcandre.lureau@redhat.com>
+In-Reply-To: <20170202145141.17138-1-marcandre.lureau@redhat.com>
+References: <20170202145141.17138-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 06/22] char: add a /chardevs container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,251 +33,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, den@openvz.org, rkagan@virtuozzo.com, dplotnikov@virtuozzo.com, berrange@redhat.com, stefanha@gmail.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Socket activation (sometimes known as systemd socket activation)
-allows an Internet superserver to pass a pre-opened listening socket
-to the process, instead of having qemu-nbd open a socket itself.  This
-is done via the LISTEN_FDS and LISTEN_PID environment variables, and a
-standard file descriptor range.
+Add a /chardevs container object to hold the list of chardevs.
+(Note: QTAILQ chardevs is going away in the following commits)
 
-This change partially implements socket activation for qemu-nbd.  If
-the environment variables are set correctly, then socket activation
-will happen automatically, otherwise everything works as before.  The
-limitation is that LISTEN_FDS must be 1.
-
-Signed-off-by: Richard W.M. Jones.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qemu-nbd.c | 174 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 162 insertions(+), 12 deletions(-)
-
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index c734f62..bfa52c3 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -386,9 +386,9 @@ static void nbd_update_server_watch(void)
- }
- 
- 
--static SocketAddress *nbd_build_socket_address(const char *sockpath,
--                                               const char *bindto,
--                                               const char *port)
-+static SocketAddress *nbd_build_socket_fd(const char *sockpath,
-+                                          const char *bindto,
-+                                          const char *port)
- {
-     SocketAddress *saddr;
- 
-@@ -463,6 +463,131 @@ static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, Error **errp)
-     return creds;
- }
- 
-+static void setup_address_and_port(const char **address, const char **port)
-+{
-+    if (*address == NULL) {
-+        *address = "0.0.0.0";
-+    }
-+
-+    if (*port == NULL) {
-+        *port = g_strdup_printf("%d", NBD_DEFAULT_PORT);;
-+    }
-+}
-+
-+#define FIRST_SOCKET_ACTIVATION_FD 3 /* defined by systemd ABI */
-+
-+#ifndef _WIN32
-+/*
-+ * Check if socket activation was requested via use of the
-+ * LISTEN_FDS and LISTEN_PID environment variables.
-+ *
-+ * Returns 0 if no socket activation, or the number of FDs.
-+ */
-+static unsigned int check_socket_activation(void)
-+{
-+    const char *s;
-+    unsigned int pid;
-+    unsigned int nr_fds;
-+    unsigned int i;
-+    int fd;
-+
-+    s = getenv("LISTEN_PID");
-+    if (s == NULL) {
-+        return 0;
-+    }
-+    if (sscanf(s, "%u", &pid) != 1) {
-+        if (verbose) {
-+            fprintf(stderr, "malformed %s environment variable (ignored)\n",
-+                    "LISTEN_PID");
-+        }
-+        return 0;
-+    }
-+    if (pid != getpid()) {
-+        if (verbose) {
-+            fprintf(stderr, "%s was not for us (ignored)\n",
-+                    "LISTEN_PID");
-+        }
-+        return 0;
-+    }
-+
-+    s = getenv("LISTEN_FDS");
-+    if (s == NULL) {
-+        return 0;
-+    }
-+    if (sscanf(s, "%u", &nr_fds) != 1) {
-+        if (verbose) {
-+            fprintf(stderr, "malformed %s environment variable (ignored)\n",
-+                    "LISTEN_FDS");
-+        }
-+        return 0;
-+    }
-+
-+    /* A limitation of current qemu-nbd is that it can only listen on
-+     * a single socket.  When that limitation is lifted, we can change
-+     * this function to allow LISTEN_FDS > 1, and remove the assertion
-+     * in the main function below.
-+     */
-+    if (nr_fds > 1) {
-+        error_report("qemu-nbd does not support socket activation with %s > 1",
-+                     "LISTEN_FDS");
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    /* So these are not passed to any child processes we might start. */
-+    unsetenv("LISTEN_FDS");
-+    unsetenv("LISTEN_PID");
-+
-+    /* So the file descriptors don't leak into child processes. */
-+    for (i = 0; i < nr_fds; ++i) {
-+        fd = FIRST_SOCKET_ACTIVATION_FD + i;
-+        if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1) {
-+            /* If we cannot set FD_CLOEXEC then it probably means the file
-+             * descriptor is invalid, so socket activation has gone wrong
-+             * and we should exit.
-+             */
-+            error_report("Socket activation failed: "
-+                         "invalid file descriptor fd = %d: %m",
-+                         fd);
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-+    return nr_fds;
-+}
-+
-+#else /* !_WIN32 */
-+static unsigned int check_socket_activation(void)
-+{
-+    return 0;
-+}
-+#endif
-+
-+/*
-+ * Check socket parameters compatibility when socket activation is used.
-+ */
-+static const char *socket_activation_validate_opts(const char *device,
-+                                                   const char *sockpath,
-+                                                   const char *address,
-+                                                   const char *port)
-+{
-+    if (device != NULL) {
-+        return "NBD device can't be set when using socket activation";
-+    }
-+
-+    if (sockpath != NULL) {
-+        return "Unix socket can't be set when using socket activation";
-+    }
-+
-+    if (address != NULL) {
-+        return "The interface can't be set when using socket activation";
-+    }
-+
-+    if (port != NULL) {
-+        return "TCP port number can't be set when using socket activation";
-+    }
-+
-+    return NULL;
-+}
- 
- int main(int argc, char **argv)
- {
-@@ -471,7 +596,7 @@ int main(int argc, char **argv)
-     off_t dev_offset = 0;
-     uint16_t nbdflags = 0;
-     bool disconnect = false;
--    const char *bindto = "0.0.0.0";
-+    const char *bindto = NULL;
-     const char *port = NULL;
-     char *sockpath = NULL;
-     char *device = NULL;
-@@ -533,6 +658,7 @@ int main(int argc, char **argv)
-     char *trace_file = NULL;
-     bool fork_process = false;
-     int old_stderr = -1;
-+    unsigned socket_activation;
- 
-     /* The client thread uses SIGTERM to interrupt the server.  A signal
-      * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
-@@ -751,6 +877,19 @@ int main(int argc, char **argv)
-     trace_init_file(trace_file);
-     qemu_set_log(LOG_TRACE);
- 
-+    socket_activation = check_socket_activation();
-+    if (socket_activation == 0) {
-+        setup_address_and_port(&bindto, &port);
-+    } else {
-+        /* Using socket activation - check user didn't use -p etc. */
-+        const char *err_msg = socket_activation_validate_opts(device, sockpath,
-+                                                              bindto, port);
-+        if (err_msg != NULL) {
-+            error_report("%s", err_msg);
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-     if (tlscredsid) {
-         if (sockpath) {
-             error_report("TLS is only supported with IPv4/IPv6");
-@@ -855,7 +994,25 @@ int main(int argc, char **argv)
-         snprintf(sockpath, 128, SOCKET_PATH, basename(device));
-     }
- 
--    saddr = nbd_build_socket_address(sockpath, bindto, port);
-+    if (socket_activation == 0) {
-+        server_ioc = qio_channel_socket_new();
-+        saddr = nbd_build_socket_fd(sockpath, bindto, port);
-+        if (qio_channel_socket_listen_sync(server_ioc, saddr, &local_err) < 0) {
-+            object_unref(OBJECT(server_ioc));
-+            error_report_err(local_err);
-+            return 1;
-+        }
-+    } else {
-+        /* See comment in check_socket_activation above. */
-+        assert(socket_activation == 1);
-+        server_ioc = qio_channel_socket_new_fd(FIRST_SOCKET_ACTIVATION_FD,
-+                                               &local_err);
-+        if (server_ioc == NULL) {
-+            error_report("Failed to use socket activation: %s",
-+                         error_get_pretty(local_err));
-+            exit(EXIT_FAILURE);
-+        }
-+    }
- 
-     if (qemu_init_main_loop(&local_err)) {
-         error_report_err(local_err);
-@@ -950,13 +1107,6 @@ int main(int argc, char **argv)
-         exit(EXIT_FAILURE);
-     }
- 
--    server_ioc = qio_channel_socket_new();
--    if (qio_channel_socket_listen_sync(server_ioc, saddr, &local_err) < 0) {
--        object_unref(OBJECT(server_ioc));
--        error_report_err(local_err);
--        return 1;
--    }
+ include/sysemu/char.h |  3 ++-
+ chardev/char.c        | 46 ++++++++++++++++++++++++++++++++++++++-------=
 -
-     if (device) {
-         int ret;
- 
--- 
-2.10.2
+ gdbstub.c             |  2 +-
+ hw/bt/hci-csr.c       |  2 +-
+ 4 files changed, 42 insertions(+), 11 deletions(-)
+
+diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+index a30ff3fa80..e3f3a10d17 100644
+--- a/include/sysemu/char.h
++++ b/include/sysemu/char.h
+@@ -490,7 +490,8 @@ typedef struct ChardevClass {
+ } ChardevClass;
+=20
+ Chardev *qemu_chardev_new(const char *id, const char *typename,
+-                          ChardevBackend *backend, Error **errp);
++                          ChardevBackend *backend, bool enlist,
++                          Error **errp);
+=20
+ extern int term_escape_char;
+=20
+diff --git a/chardev/char.c b/chardev/char.c
+index 9f02c6d5f1..5a12a79c3b 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -45,6 +45,11 @@
+ static QTAILQ_HEAD(ChardevHead, Chardev) chardevs =3D
+     QTAILQ_HEAD_INITIALIZER(chardevs);
+=20
++static Object *get_chardevs_root(void)
++{
++    return container_get(object_get_root(), "/chardevs");
++}
++
+ void qemu_chr_be_event(Chardev *s, int event)
+ {
+     CharBackend *be =3D s->be;
+@@ -804,7 +809,7 @@ static Chardev *qemu_chardev_add(const char *id, cons=
+t char *typename,
+         return NULL;
+     }
+=20
+-    chr =3D qemu_chardev_new(id, typename, backend, errp);
++    chr =3D qemu_chardev_new(id, typename, backend, true, errp);
+     if (!chr) {
+         return NULL;
+     }
+@@ -1061,8 +1066,14 @@ void qemu_chr_fe_disconnect(CharBackend *be)
+=20
+ void qemu_chr_delete(Chardev *chr)
+ {
+-    QTAILQ_REMOVE(&chardevs, chr, next);
+-    object_unref(OBJECT(chr));
++    if (QTAILQ_IN_USE(chr, next)) {
++        QTAILQ_REMOVE(&chardevs, chr, next);
++    }
++    if (OBJECT(chr)->parent) {
++        object_unparent(OBJECT(chr));
++    } else {
++        object_unref(OBJECT(chr));
++    }
+ }
+=20
+ ChardevInfoList *qmp_query_chardev(Error **errp)
+@@ -1224,22 +1235,33 @@ void qemu_chr_set_feature(Chardev *chr,
+ }
+=20
+ Chardev *qemu_chardev_new(const char *id, const char *typename,
+-                          ChardevBackend *backend, Error **errp)
++                          ChardevBackend *backend, bool enlist,
++                          Error **errp)
+ {
++    Object *obj;
+     Chardev *chr =3D NULL;
+     Error *local_err =3D NULL;
+     bool be_opened =3D true;
+=20
+     assert(g_str_has_prefix(typename, "chardev-"));
+=20
+-    chr =3D CHARDEV(object_new(typename));
++    if (enlist) {
++        obj =3D object_new_with_props(typename, get_chardevs_root(),
++                                    id, &local_err, NULL);
++    } else {
++        obj =3D object_new(typename);
++    }
++    if (local_err) {
++        assert(!obj);
++        goto end;
++    }
++
++    chr =3D CHARDEV(obj);
+     chr->label =3D g_strdup(id);
+=20
+     qemu_char_open(chr, backend, &be_opened, &local_err);
+     if (local_err) {
+-        error_propagate(errp, local_err);
+-        object_unref(OBJECT(chr));
+-        return NULL;
++        goto end;
+     }
+=20
+     if (!chr->filename) {
+@@ -1249,6 +1271,14 @@ Chardev *qemu_chardev_new(const char *id, const ch=
+ar *typename,
+         qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+     }
+=20
++end:
++    if (local_err) {
++        error_propagate(errp, local_err);
++        if (chr) {
++            qemu_chr_delete(chr);
++        }
++        return NULL;
++    }
+     return chr;
+ }
+=20
+diff --git a/gdbstub.c b/gdbstub.c
+index 755a8e378d..613ac48fed 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1793,7 +1793,7 @@ int gdbserver_start(const char *device)
+=20
+         /* Initialize a monitor terminal for gdb */
+         mon_chr =3D qemu_chardev_new(NULL, TYPE_CHARDEV_GDB,
+-                                   NULL, &error_abort);
++                                   NULL, false, &error_abort);
+         monitor_init(mon_chr, 0);
+     } else {
+         if (qemu_chr_fe_get_driver(&s->chr)) {
+diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
+index 3c193848fc..9c211e89c4 100644
+--- a/hw/bt/hci-csr.c
++++ b/hw/bt/hci-csr.c
+@@ -503,7 +503,7 @@ static const TypeInfo char_hci_type_info =3D {
+ Chardev *uart_hci_init(void)
+ {
+     return qemu_chardev_new(NULL, TYPE_CHARDEV_HCI,
+-                            NULL, &error_abort);
++                            NULL, false, &error_abort);
+ }
+=20
+ static void register_types(void)
+--=20
+2.11.0.295.gd7dffce1c.dirty
