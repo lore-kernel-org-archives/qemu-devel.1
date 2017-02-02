@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jg-0007A4-Et
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:11 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jk-0007GA-28
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9je-0003Wn-1w
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:08 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9ji-0003dr-8C
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:12 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:10 +1100
-Message-Id: <20170202051445.5735-13-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:19 +1100
+Message-Id: <20170202051445.5735-22-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 012/107] target-ppc: Implement bcdcpsgn.
- instruction
+Subject: [Qemu-devel] [PULL 021/107] target-ppc: implement stop instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,102 +20,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-bcdcpsgn.: Decimal copy sign. Given two registers vra and vrb, it
-copies the vra value with vrb sign to the result register vrt.
+Use the nap code.
 
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/helper.h                 |  1 +
- target/ppc/int_helper.c             | 23 +++++++++++++++++++++++
- target/ppc/translate/vmx-impl.inc.c |  3 +++
- target/ppc/translate/vmx-ops.inc.c  |  2 +-
- 4 files changed, 28 insertions(+), 1 deletion(-)
+ target/ppc/translate.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index daf5a6e..7957633 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -379,6 +379,7 @@ DEF_HELPER_3(bcdcfz, i32, avr, avr, i32)
- DEF_HELPER_3(bcdctz, i32, avr, avr, i32)
- DEF_HELPER_3(bcdcfsq, i32, avr, avr, i32)
- DEF_HELPER_3(bcdctsq, i32, avr, avr, i32)
-+DEF_HELPER_4(bcdcpsgn, i32, avr, avr, avr, i32)
- 
- DEF_HELPER_2(xsadddp, void, env, i32)
- DEF_HELPER_2(xssubdp, void, env, i32)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index fa7cfdd..61762ee 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -2920,6 +2920,29 @@ uint32_t helper_bcdctsq(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     return cr;
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 87fc153..772929e 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -3172,6 +3172,11 @@ static void gen_nap(DisasContext *ctx)
+ #endif /* defined(CONFIG_USER_ONLY) */
  }
  
-+uint32_t helper_bcdcpsgn(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
++static void gen_stop(DisasContext *ctx)
 +{
-+    int i;
-+    int invalid = 0;
-+
-+    if (bcd_get_sgn(a) == 0 || bcd_get_sgn(b) == 0) {
-+        return CRF_SO;
-+    }
-+
-+    *r = *a;
-+    bcd_put_digit(r, b->u8[BCD_DIG_BYTE(0)] & 0xF, 0);
-+
-+    for (i = 1; i < 32; i++) {
-+        bcd_get_digit(a, i, &invalid);
-+        bcd_get_digit(b, i, &invalid);
-+        if (unlikely(invalid)) {
-+            return CRF_SO;
-+        }
-+    }
-+
-+    return bcd_cmp_zero(r);
++    gen_nap(ctx);
 +}
 +
- void helper_vsbox(ppc_avr_t *r, ppc_avr_t *a)
+ static void gen_sleep(DisasContext *ctx)
  {
-     int i;
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 1579b58..c14b666 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -991,6 +991,7 @@ GEN_BCD2(bcdcfz)
- GEN_BCD2(bcdctz)
- GEN_BCD2(bcdcfsq)
- GEN_BCD2(bcdctsq)
-+GEN_BCD(bcdcpsgn);
- 
- static void gen_xpnd04_1(DisasContext *ctx)
- {
-@@ -1056,6 +1057,8 @@ GEN_VXFORM_DUAL(vsubuhm, PPC_ALTIVEC, PPC_NONE, \
-                 bcdsub, PPC_NONE, PPC2_ALTIVEC_207)
- GEN_VXFORM_DUAL(vsubuhs, PPC_ALTIVEC, PPC_NONE, \
-                 bcdsub, PPC_NONE, PPC2_ALTIVEC_207)
-+GEN_VXFORM_DUAL(vaddshs, PPC_ALTIVEC, PPC_NONE, \
-+                bcdcpsgn, PPC_NONE, PPC2_ISA300)
- 
- static void gen_vsbox(DisasContext *ctx)
- {
-diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
-index f02b3be..70d7d2b 100644
---- a/target/ppc/translate/vmx-ops.inc.c
-+++ b/target/ppc/translate/vmx-ops.inc.c
-@@ -131,7 +131,7 @@ GEN_VXFORM_DUAL(vaddubs, vmul10uq, 0, 8, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM_DUAL(vadduhs, vmul10euq, 0, 9, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM(vadduws, 0, 10),
- GEN_VXFORM(vaddsbs, 0, 12),
--GEN_VXFORM(vaddshs, 0, 13),
-+GEN_VXFORM_DUAL(vaddshs, bcdcpsgn, 0, 13, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM(vaddsws, 0, 14),
- GEN_VXFORM_DUAL(vsububs, bcdadd, 0, 24, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM_DUAL(vsubuhs, bcdsub, 0, 25, PPC_ALTIVEC, PPC_NONE),
+ #if defined(CONFIG_USER_ONLY)
+@@ -6240,6 +6245,7 @@ GEN_HANDLER(mcrf, 0x13, 0x00, 0xFF, 0x00000001, PPC_INTEGER),
+ GEN_HANDLER(rfi, 0x13, 0x12, 0x01, 0x03FF8001, PPC_FLOW),
+ #if defined(TARGET_PPC64)
+ GEN_HANDLER(rfid, 0x13, 0x12, 0x00, 0x03FF8001, PPC_64B),
++GEN_HANDLER_E(stop, 0x13, 0x12, 0x0b, 0x03FFF801, PPC_NONE, PPC2_ISA300),
+ GEN_HANDLER_E(doze, 0x13, 0x12, 0x0c, 0x03FFF801, PPC_NONE, PPC2_PM_ISA206),
+ GEN_HANDLER_E(nap, 0x13, 0x12, 0x0d, 0x03FFF801, PPC_NONE, PPC2_PM_ISA206),
+ GEN_HANDLER_E(sleep, 0x13, 0x12, 0x0e, 0x03FFF801, PPC_NONE, PPC2_PM_ISA206),
 -- 
 2.9.3
