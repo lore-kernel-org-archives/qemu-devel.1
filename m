@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZIU3-0005MO-7z
+	(envelope-from <batuzovk@ispras.ru>) id 1cZIU1-0005Ko-2C
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZITy-0005QP-LT
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:35 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:39804 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cZITw-0005OH-1W
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:32 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:39739 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZITy-0005Ow-9r
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:30 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cZITv-0005NA-JY
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:27 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Thu,  2 Feb 2017 17:34:51 +0300
-Message-Id: <1486046099-17726-14-git-send-email-batuzovk@ispras.ru>
-In-Reply-To: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
-References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2.1 13/21] tcg/i386: support remaining vector
- addition operations
+Date: Thu,  2 Feb 2017 17:34:38 +0300
+Message-Id: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
+Subject: [Qemu-devel] [PATCH v2.1 00/20] Emulate guest vector operations
+ with host vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,153 +25,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kirill Batuzov <batuzovk@ispras.ru>
 
-Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
----
+The goal of these patch series is to set up an infrastructure to emulate
+guest vector operations using host vector operations. Preliminary
+experiments show that simply translating loads and stores increases
+performance of x264 video codec by 10%. The performance of a gcc vectorized
+for loop increased 2x.
 
-I believe checkpatch warning here to be false-positive.
+To be able to emulate guest vector operations using host vector operations,
+several things need to be done.
 
----
- tcg/i386/tcg-target.h     | 10 +++++++++
- tcg/i386/tcg-target.inc.c | 54 +++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 62 insertions(+), 2 deletions(-)
+1. Corresponding vector types should be added to TCG. These series add
+TCG_v128 and TCG_v64. I've made TCG_v64 a different type than TCG_i64
+because it usually needs to be allocated to different registers and
+supports different operations.
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 755ebaa..bd6cfe1 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -172,7 +172,17 @@ extern bool have_popcnt;
- #endif
- 
- #ifdef TCG_TARGET_HAS_REG128
-+#define TCG_TARGET_HAS_add_i8x16        1
-+#define TCG_TARGET_HAS_add_i16x8        1
- #define TCG_TARGET_HAS_add_i32x4        1
-+#define TCG_TARGET_HAS_add_i64x2        1
-+#endif
-+
-+#ifdef TCG_TARGET_HAS_REGV64
-+#define TCG_TARGET_HAS_add_i8x8         1
-+#define TCG_TARGET_HAS_add_i16x4        1
-+#define TCG_TARGET_HAS_add_i32x2        1
-+#define TCG_TARGET_HAS_add_i64x1        1
- #endif
- 
- #define TCG_TARGET_deposit_i32_valid(ofs, len) \
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 208bb81..d8f0d81 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -168,6 +168,11 @@ static bool have_lzcnt;
- #else
- # define have_lzcnt 0
- #endif
-+#if defined(CONFIG_CPUID_H) && defined(bit_AVX) && defined(bit_OSXSAVE)
-+static bool have_avx;
-+#else
-+# define have_avx 0
-+#endif
- 
- static tcg_insn_unit *tb_ret_addr;
- 
-@@ -393,7 +398,10 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_MOVQ_M2R    (0x7e | P_SSE_F30F)
- #define OPC_MOVQ_R2M    (0xd6 | P_SSE_660F)
- #define OPC_MOVQ_R2R    (0x7e | P_SSE_F30F)
-+#define OPC_PADDB       (0xfc | P_SSE_660F)
-+#define OPC_PADDW       (0xfd | P_SSE_660F)
- #define OPC_PADDD       (0xfe | P_SSE_660F)
-+#define OPC_PADDQ       (0xd4 | P_SSE_660F)
- 
- /* Group 1 opcode extensions for 0x80-0x83.
-    These are also used as modifiers for OPC_ARITH.  */
-@@ -1963,6 +1971,19 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     TCGArg a0, a1, a2;
-     int c, const_a2, vexop, rexw = 0;
- 
-+    static const int vect_binop[] = {
-+        [INDEX_op_add_i8x16] = OPC_PADDB,
-+        [INDEX_op_add_i16x8] = OPC_PADDW,
-+        [INDEX_op_add_i32x4] = OPC_PADDD,
-+        [INDEX_op_add_i64x2] = OPC_PADDQ,
-+
-+        [INDEX_op_add_i8x8]  = OPC_PADDB,
-+        [INDEX_op_add_i16x4] = OPC_PADDW,
-+        [INDEX_op_add_i32x2] = OPC_PADDD,
-+        [INDEX_op_add_i64x1] = OPC_PADDQ,
-+    };
-+
-+
- #if TCG_TARGET_REG_BITS == 64
- # define OP_32_64(x) \
-         case glue(glue(INDEX_op_, x), _i64): \
-@@ -1972,6 +1993,17 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
- # define OP_32_64(x) \
-         case glue(glue(INDEX_op_, x), _i32)
- #endif
-+#define OP_V128_ALL(x) \
-+        case glue(glue(INDEX_op_, x), _i8x16): \
-+        case glue(glue(INDEX_op_, x), _i16x8): \
-+        case glue(glue(INDEX_op_, x), _i32x4): \
-+        case glue(glue(INDEX_op_, x), _i64x2)
-+
-+#define OP_V64_ALL(x) \
-+        case glue(glue(INDEX_op_, x), _i8x8):  \
-+        case glue(glue(INDEX_op_, x), _i16x4): \
-+        case glue(glue(INDEX_op_, x), _i32x2): \
-+        case glue(glue(INDEX_op_, x), _i64x1)
- 
-     /* Hoist the loads of the most common arguments.  */
-     a0 = args[0];
-@@ -2369,8 +2401,13 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         tcg_out_mb(s, a0);
-         break;
- 
--    case INDEX_op_add_i32x4:
--        tcg_out_modrm(s, OPC_PADDD, args[0], args[2]);
-+    OP_V128_ALL(add):
-+    OP_V64_ALL(add):
-+        if (have_avx) {
-+            tcg_out_vex_modrm(s, vect_binop[opc], args[0], args[1], args[2]);
-+        } else {
-+            tcg_out_modrm(s, vect_binop[opc], args[0], args[2]);
-+        }
-         break;
- 
-     case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
-@@ -2383,6 +2420,8 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     }
- 
- #undef OP_32_64
-+#undef OP_V128_ALL
-+#undef OP_V64_ALL
- }
- 
- static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-@@ -2613,7 +2652,14 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-             return &s2;
-         }
- 
-+    case INDEX_op_add_i8x16:
-+    case INDEX_op_add_i16x8:
-     case INDEX_op_add_i32x4:
-+    case INDEX_op_add_i64x2:
-+    case INDEX_op_add_i8x8:
-+    case INDEX_op_add_i16x4:
-+    case INDEX_op_add_i32x2:
-+    case INDEX_op_add_i64x1:
-         return &V_0_V;
- 
-     default:
-@@ -2728,6 +2774,10 @@ static void tcg_target_init(TCGContext *s)
- #ifdef bit_POPCNT
-         have_popcnt = (c & bit_POPCNT) != 0;
- #endif
-+#if defined(bit_AVX) && defined(bit_OSXSAVE)
-+        have_avx = (c & (bit_AVX | bit_OSXSAVE)) == (bit_AVX | bit_OSXSAVE);
-+#endif
-+
-     }
- 
-     if (max >= 7) {
+2. Load/store operations for these new types need to be implemented.
+
+3. For seamless transition from current model to a new one we need to
+handle cases where memory occupied by global variable can be accessed via
+pointer to the CPUArchState structure. A very simple conservative alias
+analysis has been added to do it. This analysis tracks memory loads and
+stores that overlap with fields of CPUArchState and provides this
+information to the register allocator. The allocator then spills and
+reloads affected globals when needed.
+
+4. Allow overlapping globals. For scalar registers this is a rare case, and
+overlapping registers can ba handled as a single one (ah, al, ax, eax,
+rax). In ARM every Q-register consists of two D-register each consisting of
+two S-registers. Handling 4 S-registers as one because they are parts of
+the same Q-register is way too inefficient.
+
+5. Add new memory addressing mode to MMU code for large accesses and create
+needed helpers. Only 128-bit vectors have been handled for now.
+
+6. Create TCG opcodes for vector operations. Only addition has beed handled
+in these series. Each operation has a wrapper that checks if the backend
+supports the corresponding operation or not. In one case the vector opcode
+is generated, in the other the operation is emulated with scalar
+operations. The emulation code is generated inline for performance reasons
+(there is a huge performance difference between inline generation
+and calling a helper). As a positive side effect this will eventually allow
+ to merge similar emulation code for vector instructions from different
+frontends to target-independent implementation.
+
+7. Use new operations in the frontend (ARM was used in these series).
+
+8. Support new operations in the backend (x86_64 was used in these series).
+
+For experiments I have used ARM guest on x86_64 host. I wanted some pair of
+different architectures with vector extensions both. ARM and x86_64 pair
+fits well.
+
+v1 -> v2:
+ - represent v128 type with smaller types when it is not supported by the host
+ - detect AVX support and use AVX instructions when available
+ - tcg/README updated
+ - generate two v64 adds instead of one v128 when applicable
+ - rebased to newer master
+ - overlap detection for temps added (it needs to be explicitly called from
+   <arch>_translate_init)
+ - the stack is used to temporary store 128 bit variables to memory
+   (instead of the TCGContext field)
+
+v2 -> v2.1
+ - automatic build failure fixed
+
+Outstanding issues:
+ - qemu_ld_v128 and qemu_st_v128 do not generate fallback code if the host
+   does not support 128 bit registers. The reason is that I do not know how to
+   handle the host/guest different endianness (whether do we swap only bytes
+   in elements or whole vectors?). Different targets seem to have different
+   ideas on how this should be done.
+
+Kirill Batuzov (20):
+  tcg: add support for 128bit vector type
+  tcg: add support for 64bit vector type
+  tcg: support representing vector type with smaller vector or scalar
+    types
+  tcg: add ld_v128, ld_v64, st_v128 and st_v64 opcodes
+  tcg: add simple alias analysis
+  tcg: use results of alias analysis in liveness analysis
+  tcg: allow globals to overlap
+  tcg: add vector addition operations
+  target/arm: support access to vector guest registers as globals
+  target/arm: use vector opcode to handle vadd.<size> instruction
+  tcg/i386: add support for vector opcodes
+  tcg/i386: support 64-bit vector operations
+  tcg/i386: support remaining vector addition operations
+  tcg: do not rely on exact values of MO_BSWAP or MO_SIGN in backend
+  tcg: introduce new TCGMemOp - MO_128
+  tcg: introduce qemu_ld_v128 and qemu_st_v128 opcodes
+  softmmu: create helpers for vector loads
+  tcg/i386: add support for qemu_ld_v128/qemu_st_v128 ops
+  target/arm: load two consecutive 64-bits vector regs as a 128-bit
+    vector reg
+  tcg/README: update README to include information about vector opcodes
+
+Kirill Batuzov (21):
+  tcg: add support for 128bit vector type
+  tcg: add support for 64bit vector type
+  tcg: support representing vector type with smaller vector or scalar
+    types
+  tcg: add ld_v128, ld_v64, st_v128 and st_v64 opcodes
+  tcg: add simple alias analysis
+  tcg: use results of alias analysis in liveness analysis
+  tcg: allow globals to overlap
+  tcg: add vector addition operations
+  target/arm: support access to vector guest registers as globals
+  target/arm: use vector opcode to handle vadd.<size> instruction
+  tcg/i386: add support for vector opcodes
+  tcg/i386: support 64-bit vector operations
+  tcg/i386: support remaining vector addition operations
+  tcg: do not rely on exact values of MO_BSWAP or MO_SIGN in backend
+  target/aarch64: do not check for non-existent TCGMemOp
+  tcg: introduce new TCGMemOp - MO_128
+  tcg: introduce qemu_ld_v128 and qemu_st_v128 opcodes
+  softmmu: create helpers for vector loads
+  tcg/i386: add support for qemu_ld_v128/qemu_st_v128 ops
+  target/arm: load two consecutive 64-bits vector regs as a 128-bit
+    vector reg
+  tcg/README: update README to include information about vector opcodes
+
+ cputlb.c                     |   4 +
+ softmmu_template_vector.h    | 266 +++++++++++++++++++++++++++++++
+ target/arm/translate-a64.c   |   1 -
+ target/arm/translate.c       |  76 ++++++++-
+ tcg/README                   |  47 +++++-
+ tcg/aarch64/tcg-target.inc.c |   4 +-
+ tcg/arm/tcg-target.inc.c     |   4 +-
+ tcg/i386/tcg-target.h        |  45 +++++-
+ tcg/i386/tcg-target.inc.c    | 260 +++++++++++++++++++++++++++++--
+ tcg/mips/tcg-target.inc.c    |   4 +-
+ tcg/optimize.c               | 165 +++++++++++++++++++-
+ tcg/ppc/tcg-target.inc.c     |   4 +-
+ tcg/s390/tcg-target.inc.c    |   4 +-
+ tcg/sparc/tcg-target.inc.c   |  12 +-
+ tcg/tcg-op.c                 |  92 ++++++++++-
+ tcg/tcg-op.h                 | 267 +++++++++++++++++++++++++++++++
+ tcg/tcg-opc.h                |  34 ++++
+ tcg/tcg.c                    | 363 +++++++++++++++++++++++++++++++++++++------
+ tcg/tcg.h                    | 163 ++++++++++++++++++-
+ 19 files changed, 1722 insertions(+), 93 deletions(-)
+ create mode 100644 softmmu_template_vector.h
+
 -- 
 2.1.4
