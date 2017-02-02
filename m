@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cZOL2-0007Ws-72
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 15:50:41 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cZP8N-0007Y7-5K
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 16:41:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cZOKz-0003tq-G2
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 15:50:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cZOKz-0003t8-5u
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 15:50:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cZOKw-00011w-W6
-	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 20:50:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D697B2E80C2
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 20:50:34 +0000 (UTC)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cZP8M-0005XO-H5
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 16:41:39 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1485876994-14555-1-git-send-email-pl@kamp.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea032a8a-1429-bd95-5b68-4634a0fb0a57@redhat.com>
+Date: Thu, 2 Feb 2017 13:41:30 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Feb 2017 20:45:10 -0000
-From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
-Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1661386] [NEW] Assertion `ret ==
- cpu->kvm_msr_buf->nmsrs' failed
+In-Reply-To: <1485876994-14555-1-git-send-email-pl@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qga: ignore EBUSY when freezing a
+ filesystem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,151 +24,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
-
-Hello,
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, mdroth@linux.vnet.ibm.com, ct@flyingcircus.io
 
 
-I see the following when try to run qemu from master as the following:
 
-# ./x86_64-softmmu/qemu-system-x86_64 --version
-QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
-Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
-# ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
--no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
--initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
-loglevel=3D7' -m 1024 -serial stdio
-qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
-kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+On 31/01/2017 07:36, Peter Lieven wrote:
+> the current implementation fails if we try to freeze an
+> already frozen filesystem. This can happen if a filesystem
+> is mounted more than once (e.g. with a bind mount).
+> 
+> Suggested-by: Christian Theune <ct@flyingcircus.io>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Lieven <pl@kamp.de>
 
-First broken commit has been bisected:
+What happens when you thaw?
 
-commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed Mar 30 22:55:29 2016 +0200
-
-    target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-    =
-
-    This would have caught the bug in the previous patch.
-    =
-
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-My cpuinfo is the following:
-
-processor       : 0
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 44
-model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
-stepping        : 2
-microcode       : 0x14
-cpu MHz         : 3066.775
-cache size      : 12288 KB
-physical id     : 0
-siblings        : 2
-core id         : 0
-cpu cores       : 2
-apicid          : 0
-initial apicid  : 0
-fpu             : yes
-fpu_exception   : yes
-cpuid level     : 11
-wp              : yes
-flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
-cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm con=
-stant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc ape=
-rfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor la=
-hf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
-bugs            :
-bogomips        : 6133.55
-clflush size    : 64
-cache_alignment : 64
-address sizes   : 40 bits physical, 48 bits virtual
-power management:
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1661386
-
-Title:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  =
-
-  I see the following when try to run qemu from master as the following:
-
-  # ./x86_64-softmmu/qemu-system-x86_64 --version
-  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
-  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
-  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
-  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
-  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
-  loglevel=3D7' -m 1024 -serial stdio
-  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
-  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  First broken commit has been bisected:
-
-  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Mar 30 22:55:29 2016 +0200
-
-      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-      =
-
-      This would have caught the bug in the previous patch.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  My cpuinfo is the following:
-
-  processor       : 0
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 44
-  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
-  stepping        : 2
-  microcode       : 0x14
-  cpu MHz         : 3066.775
-  cache size      : 12288 KB
-  physical id     : 0
-  siblings        : 2
-  core id         : 0
-  cpu cores       : 2
-  apicid          : 0
-  initial apicid  : 0
-  fpu             : yes
-  fpu_exception   : yes
-  cpuid level     : 11
-  wp              : yes
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
-onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
-perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
-lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
-  bugs            :
-  bogomips        : 6133.55
-  clflush size    : 64
-  cache_alignment : 64
-  address sizes   : 40 bits physical, 48 bits virtual
-  power management:
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
+Paolo
