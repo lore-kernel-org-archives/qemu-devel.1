@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jo-0007M5-I7
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jm-0007Jk-Ug
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jk-0003hB-GW
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:16 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9ji-0003eW-Q9
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:14 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:35 +1100
-Message-Id: <20170202051445.5735-38-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:26 +1100
+Message-Id: <20170202051445.5735-29-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 037/107] qtest: add netfilter tests for ppc64
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 028/107] target-ppc: implement lxvll instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,32 +23,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Tested-by: Greg Kurz <groug@kaod.org>
+lxvll: Load VSX Vector Left-justified with Length
+
+Little/Big-endian Storage:
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+|=E2=80=9CT=E2=80=9D|=E2=80=9Ch=E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=E2=
+=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=E2=80=9D|=E2=80=
+=9C =E2=80=9D|=E2=80=9Ca=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9CT=E2=80=9D=
+|=E2=80=9CE=E2=80=9D|=E2=80=9CS=E2=80=9D|=E2=80=9CT=E2=80=9D|FF|FF|
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+
+Loading 14 bytes to vector (8-bit elements) in BE/LE:
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+|=E2=80=9CT=E2=80=9D|=E2=80=9Ch=E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=E2=
+=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=E2=80=9D|=E2=80=
+=9C =E2=80=9D|=E2=80=9Ca=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9CT=E2=80=9D=
+|=E2=80=9CE=E2=80=9D|=E2=80=9CS=E2=80=9D|=E2=80=9CT=E2=80=9D|00|00|
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- tests/Makefile.include | 3 +++
- 1 file changed, 3 insertions(+)
+ target/ppc/helper.h                 | 1 +
+ target/ppc/mem_helper.c             | 1 +
+ target/ppc/translate/vsx-impl.inc.c | 1 +
+ target/ppc/translate/vsx-ops.inc.c  | 1 +
+ 4 files changed, 4 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 33b4f88..92f89b0 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -285,6 +285,9 @@ gcov-files-ppc64-y += hw/usb/hcd-uhci.c
- check-qtest-ppc64-y += tests/usb-hcd-xhci-test$(EXESUF)
- gcov-files-ppc64-y += hw/usb/hcd-xhci.c
- check-qtest-ppc64-y += $(check-qtest-virtio-y)
-+check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
-+check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
-+check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
- 
- check-qtest-sh4-y = tests/endianness-test$(EXESUF)
- 
--- 
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 1c70815..6a9344e 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -314,6 +314,7 @@ DEF_HELPER_3(stvehx, void, env, avr, tl)
+ DEF_HELPER_3(stvewx, void, env, avr, tl)
+ #if defined(TARGET_PPC64)
+ DEF_HELPER_4(lxvl, void, env, tl, tl, tl)
++DEF_HELPER_4(lxvll, void, env, tl, tl, tl)
+ #endif
+ DEF_HELPER_4(vsumsws, void, env, avr, avr, avr)
+ DEF_HELPER_4(vsum2sws, void, env, avr, avr, avr)
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index c4ddc5b..da51465 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -315,6 +315,7 @@ void helper_##name(CPUPPCState *env, target_ulong add=
+r,                 \
+ }
+=20
+ VSX_LXVL(lxvl, 0)
++VSX_LXVL(lxvll, 1)
+ #undef VSX_LXVL
+ #undef GET_NB
+ #endif /* TARGET_PPC64 */
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+index 1f64fb7..ce20579 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -267,6 +267,7 @@ static void gen_##name(DisasContext *ctx)            =
+           \
+ }
+=20
+ VSX_VECTOR_LOAD_STORE_LENGTH(lxvl)
++VSX_VECTOR_LOAD_STORE_LENGTH(lxvll)
+ #endif
+=20
+ #define VSX_LOAD_SCALAR_DS(name, operation)                       \
+diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vs=
+x-ops.inc.c
+index 62a0afc..c207804 100644
+--- a/target/ppc/translate/vsx-ops.inc.c
++++ b/target/ppc/translate/vsx-ops.inc.c
+@@ -12,6 +12,7 @@ GEN_HANDLER_E(lxvb16x, 0x1F, 0x0C, 0x1B, 0, PPC_NONE, P=
+PC2_ISA300),
+ GEN_HANDLER_E(lxvx, 0x1F, 0x0C, 0x08, 0x00000040, PPC_NONE, PPC2_ISA300)=
+,
+ #if defined(TARGET_PPC64)
+ GEN_HANDLER_E(lxvl, 0x1F, 0x0D, 0x08, 0, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(lxvll, 0x1F, 0x0D, 0x09, 0, PPC_NONE, PPC2_ISA300),
+ #endif
+=20
+ GEN_HANDLER_E(stxsdx, 0x1F, 0xC, 0x16, 0, PPC_NONE, PPC2_VSX),
+--=20
 2.9.3
