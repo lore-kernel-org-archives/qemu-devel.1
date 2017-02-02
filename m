@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cZMxx-0008Qm-0K
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:22:45 -0500
+	(envelope-from <penberg@iki.fi>) id 1cZN0G-0001bJ-0r
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:25:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cZMxs-00070N-Qi
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:22:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36628)
+	(envelope-from <penberg@iki.fi>) id 1cZN0B-0007vs-2O
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:25:08 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:57994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cZMxs-000708-Kk
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:22:40 -0500
-From: P J P <ppandit@redhat.com>
-Date: Fri,  3 Feb 2017 00:52:28 +0530
-Message-Id: <20170202192228.10847-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH] usb: ccid: check ccid apdu length
+	(Exim 4.71) (envelope-from <penberg@iki.fi>) id 1cZN0A-0007vP-Up
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:25:02 -0500
+References: <32ff6fa9-696a-f4a2-e884-3b22f91506e5@iki.fi>
+	<128aeca5-099c-e82b-5cc7-314c899231de@redhat.com>
+	<CAKv+Gu-k6ZS=+jd5eQ58_M44gzOCJzQhm212ASVr1espiB167A@mail.gmail.com>
+From: Pekka Enberg <penberg@iki.fi>
+Message-ID: <14eb3fc8-e163-922b-8663-1611d8abf5b9@iki.fi>
+Date: Thu, 2 Feb 2017 21:24:57 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAKv+Gu-k6ZS=+jd5eQ58_M44gzOCJzQhm212ASVr1espiB167A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] KVM/QEMU on Raspberry Pi 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,35 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Li Qiang <liqiang6-s@360.cn>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laszlo Ersek <lersek@redhat.com>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+Hi,
 
-CCID device emulator uses Application Protocol Data Units(APDU)
-to exchange command and responses to and from the host.
-The length in these units couldn't be greater than 65536. Add
-check to ensure the same. It'd also avoid potential integer
-overflow in emulated_apdu_from_guest.
+On 02/02/2017 19.48, Ard Biesheuvel wrote:
+> $ git grep -C5 -ni 0x1DE7EC7EDBADC0DE
+> arch/arm64/kvm/sys_regs.h-105-static inline void reset_unknown(struct
+> kvm_vcpu *vcpu,
+> arch/arm64/kvm/sys_regs.h-106-                           const struct
+> sys_reg_desc *r)
+> arch/arm64/kvm/sys_regs.h-107-{
+> arch/arm64/kvm/sys_regs.h-108-  BUG_ON(!r->reg);
+> arch/arm64/kvm/sys_regs.h-109-  BUG_ON(r->reg >= NR_SYS_REGS);
+> arch/arm64/kvm/sys_regs.h:110:  vcpu_sys_reg(vcpu, r->reg) =
+> 0x1de7ec7edbadc0deULL;
+> arch/arm64/kvm/sys_regs.h-111-}
+> arch/arm64/kvm/sys_regs.h-112-
+>
+> In other words (or rather, in words), KVM is triggering this exception
+> in the guest deliberately, which I suspect has something to do with
+> the lack of a GIC? Are you using these patches Peter mentions?
 
-Reported-by: Li Qiang <liqiang6-s@360.cn>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/usb/dev-smartcard-reader.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No, I'm not using Peter's patches. It's mainline Fedora 24 and rawhide QEMU.
 
-diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
-index 89e11b6..1325ea1 100644
---- a/hw/usb/dev-smartcard-reader.c
-+++ b/hw/usb/dev-smartcard-reader.c
-@@ -967,7 +967,7 @@ static void ccid_on_apdu_from_guest(USBCCIDState *s, CCID_XferBlock *recv)
-     DPRINTF(s, 1, "%s: seq %d, len %d\n", __func__,
-                 recv->hdr.bSeq, len);
-     ccid_add_pending_answer(s, (CCID_Header *)recv);
--    if (s->card) {
-+    if (s->card && len <= BULK_OUT_DATA_SIZE) {
-         ccid_card_apdu_from_guest(s->card, recv->abData, len);
-     } else {
-         DPRINTF(s, D_WARN, "warning: discarded apdu\n");
--- 
-2.9.3
+- Pekka
