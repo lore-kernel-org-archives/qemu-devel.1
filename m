@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cZMiU-0001tV-DM
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:06:47 -0500
+	(envelope-from <mst@redhat.com>) id 1cZMkV-0003Uk-3o
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:08:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cZMiT-0001JT-Hj
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:06:46 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20161206014943.GA25612@flamenco>
-References: <20161129114707.2975-1-pbonzini@redhat.com>
-	<20161129114707.2975-3-pbonzini@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1cZMkR-0002bP-Ro
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:08:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41162)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cZMkR-0002aQ-Iu
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:08:47 -0500
+Date: Thu, 2 Feb 2017 21:08:46 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170202210558-mutt-send-email-mst@kernel.org>
+References: <1485893872-26524-1-git-send-email-mst@redhat.com>
+	<CAFEAcA9zEaATTwGLNCB=X_mhqjapC-0jxPpv8OjDt=zqaFBnjA@mail.gmail.com>
+	<CAFEAcA_SCHQ06uON3pEgpt2ku4HO2C-fUTHr7TZAVmZ1PEq09Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20161129114707.2975-3-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/10] qemu-thread: introduce QemuLockCnt
+In-Reply-To: <CAFEAcA_SCHQ06uON3pEgpt2ku4HO2C-fUTHr7TZAVmZ1PEq09Q@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] tci build failure (was Re:  [PULL v5 00/22] virtio,
+ vhost, pci: fixes, features)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,131 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Date: Thu, 02 Feb 2017 19:06:47 -0000
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Nov 29, 2016 at 12:46:59 +0100, Paolo Bonzini wrote:
-> A QemuLockCnt comprises a counter and a mutex, with primitives
-> to increment and decrement the counter, and to take and release the
-> mutex.  It can be used to do lock-free visits to a data structure
-> whenever mutexes would be too heavy-weight and the critical section
-> is too long for RCU.
-> 
-> This could be implemented simply by protecting the counter with the
-> mutex, but QemuLockCnt is harder to misuse and more efficient.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(snip)
-> +++ b/docs/lockcnt.txt
-> @@ -0,0 +1,343 @@
-> +DOCUMENTATION FOR LOCKED COUNTERS (aka QemuLockCnt)
-> +===================================================
-(snip)
-> +    bool qemu_lockcnt_dec_if_lock(QemuLockCnt *lockcnt);
-> +
-> +        If the count is 1, decrement the count to zero, lock
-> +        the mutex and return true.  Otherwise, return false.
-> +
-(snip)
-> +++ b/util/lockcnt.c
-(snip)
-> +void qemu_lockcnt_init(QemuLockCnt *lockcnt)
-> +{
-> +    qemu_mutex_init(&lockcnt->mutex);
-> +    lockcnt->count = 0;
+On Thu, Feb 02, 2017 at 04:25:34PM +0000, Peter Maydell wrote:
+> On 2 February 2017 at 13:56, Peter Maydell <peter.maydell@linaro.org> w=
+rote:
+> > On 31 January 2017 at 20:18, Michael S. Tsirkin <mst@redhat.com> wrot=
+e:
+> >> virtio, vhost, pci: fixes, features
+> >>
+> >> generic pci root port support
+> >> disable shpc by default
+> >> safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
+> >> fixes and cleanups all over the place
+> >>
+> >> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>=20
+> > Applied, thanks.
+>=20
+> ...travis builds now fail for the --enable-tcg-interpreter config:
+> https://travis-ci.org/qemu/qemu/jobs/197648661
+>=20
+> In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c: In function =E2=80=
+=98tcg_out_op=E2=80=99:
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:117: error:
+> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:255: error:
+> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+> In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:115: error:
+> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+> /home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:255: error:
+> negative width in bit-field =E2=80=98<anonymous>=E2=80=99
+>=20
+> These look to be because we were trying to use ARRAY_SIZE()
+> on a non-array, which was previously undetected. The use is
+> only in an assert() so fairly harmless.
+>=20
+> Would somebody who cares about TCI like to provide a fix?
+>=20
+> thanks
+> -- PMM
 
-Minor nit: a release barrier here wouldn't harm.
+I think the following should do it. Completely untested.
 
-> +}
-> +
-> +void qemu_lockcnt_destroy(QemuLockCnt *lockcnt)
-> +{
-> +    qemu_mutex_destroy(&lockcnt->mutex);
-> +}
-> +
-> +void qemu_lockcnt_inc(QemuLockCnt *lockcnt)
-> +{
-> +    int old;
-> +    for (;;) {
-> +        old = atomic_read(&lockcnt->count);
-> +        if (old == 0) {
-> +            qemu_lockcnt_lock(lockcnt);
-> +            qemu_lockcnt_inc_and_unlock(lockcnt);
-> +            return;
-> +        } else {
-> +            if (atomic_cmpxchg(&lockcnt->count, old, old + 1) == old) {
-> +                return;
-> +            }
-> +        }
-> +    }
-> +}
-> +
-> +void qemu_lockcnt_dec(QemuLockCnt *lockcnt)
-> +{
-> +    atomic_dec(&lockcnt->count);
-> +}
-> +
-> +/* Decrement a counter, and return locked if it is decremented to zero.
-> + * It is impossible for the counter to become nonzero while the mutex
-> + * is taken.
-> + */
-> +bool qemu_lockcnt_dec_and_lock(QemuLockCnt *lockcnt)
-> +{
-> +    int val = atomic_read(&lockcnt->count);
-> +    while (val > 1) {
-> +        int old = atomic_cmpxchg(&lockcnt->count, val, val - 1);
-> +        if (old != val) {
-> +            val = old;
-> +            continue;
-> +        }
-> +
-> +        return false;
-> +    }
+-->
 
-Minor nit:
-	while (val > 1) {
-		int old = cmpxchg();
-		if (old == val) {
-			return false;
-		}
-		val = old;
-	}
-seems to me a little easier to read.
+tcg/tci: fix ARRAY_SIZE misuse
 
-> +    qemu_lockcnt_lock(lockcnt);
-> +    if (atomic_fetch_dec(&lockcnt->count) == 1) {
-> +        return true;
-> +    }
-> +
-> +    qemu_lockcnt_unlock(lockcnt);
-> +    return false;
-> +}
-> +
-> +/* Decrement a counter and return locked if it is decremented to zero.
-> + * Otherwise do nothing.
+tb_jmp_insn_offset and tb_jmp_reset_offset are
+pointers, not arrays, so using ARRAY_SIZE on them will
+not do the right thing.
 
-This comment doesn't match the code below nor the description in the
-.txt file (quoted above) [we might not decrement the counter at all!]
+They point to arrays within TranslationBlock so check
+the size of these instead.
 
-> + *
-> + * It is impossible for the counter to become nonzero while the mutex
-> + * is taken.
-> + */
-> +bool qemu_lockcnt_dec_if_lock(QemuLockCnt *lockcnt)
-> +{
-> +    int val = atomic_mb_read(&lockcnt->count);
-> +    if (val > 1) {
-> +        return false;
-> +    }
-> +
-> +    qemu_lockcnt_lock(lockcnt);
-> +    if (atomic_fetch_dec(&lockcnt->count) == 1) {
-> +        return true;
-> +    }
-> +
-> +    qemu_lockcnt_inc_and_unlock(lockcnt);
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-The choice of dec+(maybe)inc over cmpxchg seems a little odd to me.
+--
 
-		Emilio
+diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
+index 26ee9b1..a2ba654 100644
+--- a/tcg/tci/tcg-target.inc.c
++++ b/tcg/tci/tcg-target.inc.c
+@@ -556,6 +556,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, =
+const TCGArg *args,
+                        const int *const_args)
+ {
+     uint8_t *old_code_ptr =3D s->code_ptr;
++    TranslationBlock *tb;
+=20
+     tcg_out_op_t(s, opc);
+=20
+@@ -566,7 +567,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, =
+const TCGArg *args,
+     case INDEX_op_goto_tb:
+         if (s->tb_jmp_insn_offset) {
+             /* Direct jump method. */
+-            tcg_debug_assert(args[0] < ARRAY_SIZE(s->tb_jmp_insn_offset)=
+);
++            tcg_debug_assert(args[0] < ARRAY_SIZE(tb->jmp_insn_offset));
+             /* Align for atomic patching and thread safety */
+             s->code_ptr =3D QEMU_ALIGN_PTR_UP(s->code_ptr, 4);
+             s->tb_jmp_insn_offset[args[0]] =3D tcg_current_code_size(s);
+@@ -575,7 +576,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, =
+const TCGArg *args,
+             /* Indirect jump method. */
+             TODO();
+         }
+-        tcg_debug_assert(args[0] < ARRAY_SIZE(s->tb_jmp_reset_offset));
++        tcg_debug_assert(args[0] < ARRAY_SIZE(tb->jmp_reset_offset));
+         s->tb_jmp_reset_offset[args[0]] =3D tcg_current_code_size(s);
+         break;
+     case INDEX_op_br:
