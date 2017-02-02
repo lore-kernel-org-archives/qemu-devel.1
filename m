@@ -1,18 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cZIk6-0004Lj-5f
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cZIk6-0004Lk-5m
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cZIk4-00045U-Hj
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cZIk5-000469-2v
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44152)
+Received: from mx1.redhat.com ([209.132.183.28]:44174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cZIk4-000447-C7
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cZIk4-00045B-SX
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:08 -0500
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Date: Thu,  2 Feb 2017 14:51:58 +0000
-Message-Id: <20170202145159.20440-1-rjones@redhat.com>
-Subject: [Qemu-devel] [PATCH] qemu-nbd: Implement socket activation.
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F3B1A3E9
+	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 14:52:08 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  2 Feb 2017 18:51:24 +0400
+Message-Id: <20170202145141.17138-6-marcandre.lureau@redhat.com>
+In-Reply-To: <20170202145141.17138-1-marcandre.lureau@redhat.com>
+References: <20170202145141.17138-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 05/22] main: free root container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,64 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, den@openvz.org, rkagan@virtuozzo.com, dplotnikov@virtuozzo.com, berrange@redhat.com, stefanha@gmail.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Socket activation (sometimes known as systemd socket activation)
-allows an Internet superserver to pass a pre-opened listening socket
-to the process, instead of having qemu-nbd open a socket itself.  This
-is done via the LISTEN_FDS and LISTEN_PID environment variables, and a
-standard file descriptor range.
+This should eventually free all objects that are only referenced by
+their parents.
 
-This patch partially implements socket activation.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ vl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The limitation of this implementation is that qemu-nbd can only listen
-on a single file descriptor, and so if LISTEN_FDS > 1 (eg. for
-listening on multiple interfaces or ports) socket activation will
-fail.  However for the simple case of listening on a single port, and
-either all interfaces with IPv4+IPv6, or just a loopback interface,
-the current implementation works fine.  Fixing this properly would
-require considerable changes throughout qemu, since qemu's currently
-handling of getaddrinfo is plainly wrong.
-
-To use qemu-nbd from systemd, you create
-/etc/systemd/system/nbd.socket:
-
-  [Unit]
-  Description=QEMU Network Block Device server
-  [Socket]
-  ListenStream=10809
-  [Install]
-  WantedBy=sockets.target
-
-and /etc/systemd/system/nbd.service:
-
-  [Service]
-  ExecStart=/usr/sbin/qemu-nbd -v -t /path/to/file
-
-and enable the socket service (only):
-
-  systemctl enable nbd.socket
-  systemctl start nbd.socket
-
-and then connecting to port 10809 will start qemu-nbd and service the
-file, with systemd opening the listening socket.
-
-In the ExecStart line, the qemu-nbd -v option is only needed if you
-want enhanced debugging.  The -t option is required unless you want to
-fiddle with systemd settings for rate-limiting.
-
-If you try to use the -p and similar options with socket activation
-then qemu-nbd will give an error.
-
-(I wasn't sure where to document this -- there is no obvious
-documentation for qemu-nbd beyond the simple list of command line
-arguments)
-
-This is based on the implementations in
-libvirt (src/util/virutil.c:virGetListenFDs) and
-nbdkit (src/main.c:get_socket_activation), and also on Denis Plotnikov's
-implementation of --server-sock-fd
-(https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg07781.html).
-
-Rich.
+diff --git a/vl.c b/vl.c
+index 0b72b12878..945df1d17f 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4640,6 +4640,7 @@ int main(int argc, char **argv, char **envp)
+     audio_cleanup();
+     monitor_cleanup();
+     qemu_chr_cleanup();
++    object_unref(object_get_root());
+=20
+     return 0;
+ }
+--=20
+2.11.0.295.gd7dffce1c.dirty
