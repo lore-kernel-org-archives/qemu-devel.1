@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cZM2Z-0008OZ-NM
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:23:28 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1cZMEQ-0003lI-Dp
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:35:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cZM2W-0000jo-IE
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:23:27 -0500
-Received: from mail.kernel.org ([198.145.29.136]:42286)
+	(envelope-from <sstabellini@kernel.org>) id 1cZMEL-0004dE-FH
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:35:42 -0500
+Received: from mail.kernel.org ([198.145.29.136]:44988)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cZM2W-0000il-Ct
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:23:24 -0500
-Date: Thu, 2 Feb 2017 10:23:20 -0800 (PST)
+	id 1cZMEL-0004cp-48
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:35:37 -0500
+Date: Thu, 2 Feb 2017 10:35:33 -0800 (PST)
 From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <e5bbae6e-fff6-c05c-a151-deb592769680@suse.com>
-Message-ID: <alpine.DEB.2.10.1702021023050.17946@sstabellini-ThinkPad-X260>
-References: <20170201065202.7746-1-jgross@suse.com>
-	<alpine.DEB.2.10.1702011134020.17946@sstabellini-ThinkPad-X260>
-	<CAFEAcA_ZxP8iq-vcuBHUzVa7EmjCtqyZ6t8Meu1ypyusnJYACA@mail.gmail.com>
-	<e5bbae6e-fff6-c05c-a151-deb592769680@suse.com>
+Message-ID: <alpine.DEB.2.10.1702021024200.17946@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2] xen: use qdev_unplug() instead of
- g_free() in xen_pv_find_xendev()
+Subject: [Qemu-devel] [PULL 0/5] xen-20170202
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juergen Gross <jgross@suse.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, xen-devel@lists.xenproject.org, Anthony PERARD <anthony.perard@citrix.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: stefanha@gmail.com
+Cc: sstabellini@kernel.org, stefanha@redhat.com, peter.maydell@linaro.orgsstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On Thu, 2 Feb 2017, Juergen Gross wrote:
-> On 01/02/17 21:20, Peter Maydell wrote:
-> > On 1 February 2017 at 19:37, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> >> Hi Peter,
-> >>
-> >> do you think this is acceptable?
-> > 
-> > The set of operations here is basically what I suggested
-> > in review of v1, so I think it is the right thing.
-> > OTOH this is a bit of an odd corner of the QOM model
-> > so it might be worth doing some testing to make sure
-> > the reference counts are doing what you (I) expect and
-> > that the object does get correctly freed both in the
-> > error-handling path here and when the device is
-> > unplugged via xen_pv_del_xendev().
-> 
-> I've used my_g_free() printing a log message when called instead of
-> g_free() in a test. I could verify it has been called when the
-> device was unplugged. This test covered xen_pv_del_xendev() and
-> an error handling path.
+The following changes since commit 3aca12f841fcd6f3a7477076dad0d564360500de:
 
-Thanks Juergen for testing. I'll commit shortly.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170127' into staging (2017-01-27 16:59:17 +0000)
+
+are available in the git repository at:
+
+
+  git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170202
+
+for you to fetch changes up to e9dcbc86d614018923e26e31319b0a54c9e5abac:
+
+  xen: use qdev_unplug() instead of g_free() in xen_pv_find_xendev() (2017-02-02 10:23:53 -0800)
+
+----------------------------------------------------------------
+Xen 2017/02/02
+
+----------------------------------------------------------------
+Anthony PERARD (1):
+      MAINTAINERS: Update xen-devel mailing list address
+
+Juergen Gross (1):
+      xen: use qdev_unplug() instead of g_free() in xen_pv_find_xendev()
+
+Paul Durrant (3):
+      xen-platform: re-structure unplug_disks
+      xen-platform: add support for unplugging NVMe disks...
+      xen-platform: add missing disk unplug option
+
+ MAINTAINERS                |  2 +-
+ hw/i386/xen/xen_platform.c | 51 ++++++++++++++++++++++++++++------------------
+ hw/ide/piix.c              |  4 ++--
+ hw/xen/xen_backend.c       | 13 ++++++------
+ include/hw/ide.h           |  2 +-
+ 5 files changed, 42 insertions(+), 30 deletions(-)
