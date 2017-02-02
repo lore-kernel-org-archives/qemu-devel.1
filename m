@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cZHHW-0001PW-Ov
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:18:35 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKk-0002cB-75
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cZHHR-0007LU-E4
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:18:34 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:5751 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKi-0008HH-PF
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:54 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:31474 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cZHHR-0007Kh-1z
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:18:29 -0500
-From: "Denis V. Lunev" <den@openvz.org>
-Date: Thu,  2 Feb 2017 16:18:24 +0300
-Message-Id: <1486041504-23627-1-git-send-email-den@openvz.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/1] qemu-char: socket backend: disconnect
- on write error
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cZHKi-0008G1-CF
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:52 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu,  2 Feb 2017 16:21:35 +0300
+Message-Id: <20170202132145.168790-15-vsementsov@virtuozzo.com>
+In-Reply-To: <20170202132145.168790-1-vsementsov@virtuozzo.com>
+References: <20170202132145.168790-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 14/24] block: add
+ bdrv_can_store_new_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+This will be needed to check some restrictions before making bitmap
+persistent in qmp-block-dirty-bitmap-add (this functionality will be
+added by future patch)
 
-Socket backend read handler should normally perform a disconnect, however
-the read handler may not get a chance to run if the frontend is not ready
-(qemu_chr_be_can_write() =3D=3D 0).
-
-This means that in virtio-serial frontend case if
- - the host has disconnected (giving EPIPE on socket write)
- - and the guest has disconnected (-> frontend not ready -> backend
-   will not read)
- - and there is still data (frontend->backend) to flush (has to be a real=
-ly
-   tricky timing but nevertheless, we have observed the case in productio=
-n)
-
-This results in virtio-serial trying to flush this data continiously form=
-ing
-a busy loop.
-
-Solution: react on write error in the socket write handler.
-errno is not reliable after qio_channel_writev_full(), so we may not get
-the exact EPIPE, so disconnect on any error but QIO_CHANNEL_ERR_BLOCK whi=
-ch
-io_channel_send_full() converts to errno EAGAIN.
-We must not disconnect right away though, there still may be data to read
-(see 4bf1cb0).
-
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Daniel P. Berrange <berrange@redhat.com>
-CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
-Changes from v1:
-- we do not rely on EPIPE anynore. Socket should be closed on all errors
-  except EAGAIN
+ block.c                   | 22 ++++++++++++++++++++++
+ include/block/block.h     |  2 ++
+ include/block/block_int.h |  2 ++
+ 3 files changed, 26 insertions(+)
 
- chardev/char-socket.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 4068dc5..e2137aa 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -97,6 +97,9 @@ static gboolean tcp_chr_accept(QIOChannel *chan,
-                                GIOCondition cond,
-                                void *opaque);
-=20
-+static int tcp_chr_read_poll(void *opaque);
-+static void tcp_chr_disconnect(CharDriverState *chr);
+diff --git a/block.c b/block.c
+index 970e4ca50e..d5f8af82bf 100644
+--- a/block.c
++++ b/block.c
+@@ -4139,3 +4139,25 @@ void bdrv_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+ 
+     drv->bdrv_store_persistent_dirty_bitmaps(bs, errp);
+ }
 +
- /* Called with chr_write_lock held.  */
- static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
- {
-@@ -114,6 +117,13 @@ static int tcp_chr_write(Chardev *chr, const uint8_t=
- *buf, int len)
-             s->write_msgfds_num =3D 0;
-         }
-=20
-+        if (ret < 0 && errno !=3D EAGAIN) {
-+            if (tcp_chr_read_poll(chr) <=3D 0) {
-+                tcp_chr_disconnect(chr);
-+                return len;
-+            } /* else let the read handler finish it properly */
-+        }
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
++                                     uint32_t granularity, Error **errp)
++{
++    BlockDriver *drv = bs->drv;
 +
-         return ret;
-     } else {
-         /* XXX: indicate an error ? */
---=20
-2.7.4
++    if (!drv) {
++        error_setg_errno(errp, ENOMEDIUM,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
++    }
++
++    if (!drv->bdrv_can_store_new_dirty_bitmap) {
++        error_setg_errno(errp, ENOTSUP,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
++    }
++
++    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
++}
+diff --git a/include/block/block.h b/include/block/block.h
+index 0a20d68f0f..ebf99b38ad 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -553,5 +553,7 @@ void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
+ 
+ void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ void bdrv_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
++                                     uint32_t granularity, Error **errp);
+ 
+ #endif
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index c3505da56e..a09c6e90c9 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -324,6 +324,8 @@ struct BlockDriver {
+                                                 Error **errp);
+     void (*bdrv_store_persistent_dirty_bitmaps)(BlockDriverState *bs,
+                                                 Error **errp);
++    bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs, const char *name,
++                                            uint32_t granularity, Error **errp);
+ 
+     QLIST_ENTRY(BlockDriver) list;
+ };
+-- 
+2.11.0
