@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cZCwi-00020b-0Z
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:40:49 -0500
+	(envelope-from <berto@igalia.com>) id 1cZDIe-0008MM-G1
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:03:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cZCwe-0006Qs-SW
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:40:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46524)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cZCwe-0006QZ-Mm
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:40:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cZCwd-0006m1-KL
-	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 08:40:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 988CA2E80C4
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 08:40:43 +0000 (UTC)
+	(envelope-from <berto@igalia.com>) id 1cZD8O-0003Lc-1c
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:52:57 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <5c316901-5632-ff05-7700-6427cd33bf74@redhat.com>
+References: <cover.1485878688.git.berto@igalia.com>
+	<79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+	<5c316901-5632-ff05-7700-6427cd33bf74@redhat.com>
+Date: Thu, 02 Feb 2017 09:52:46 +0100
+Message-ID: <w5137fxoty9.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Feb 2017 08:34:19 -0000
-From: Uqbar <1661176@bugs.launchpad.net>
-Reply-To: Bug 1661176 <1661176@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170202083419.1225.82778.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1661176] [NEW] [2.8.0] Under VNC CTRL-ALT-2
- doesn't get to the monitor
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-io: don't allow I/O operations
+ larger than INT_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,40 +24,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Public bug reported:
+On Wed 01 Feb 2017 11:16:38 PM CET, Max Reitz <mreitz@redhat.com> wrote:
 
-With version 2.6.2 I could access the monitor via VNC by pressing CTRL-ALT-=
-2, while CTRL-ALT-3 brought me to the "serial0 console". CTRL-ALT-1 brought=
- me back to the VGA console.
-Since 2.8.0 CTRL-ALT-2 brings me to the "serial0 console" and CTRL-ALT-3 to=
- the "parallel0 console". The monitor is not available any more, to any CTR=
-L-ALT-1stROW.
+> Thanks, applied to my block tree, with
+> %s/INT_MAX/BDRV_REQUEST_MAX_BYTES/g:
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+I think you can use %d to print BDRV_REQUEST_MAX_BYTES, after all the
+definition guarantees that it won't be larger than MIN(SIZE_MAX,INT_MAX)
 
--- =
+But it's fine with me if you prefer to cast it to uint64_t, that way
+it'll remain valid if BDRV_REQUEST_MAX_BYTES is increased in the future.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1661176
-
-Title:
-  [2.8.0] Under VNC CTRL-ALT-2 doesn't get to the monitor
-
-Status in QEMU:
-  New
-
-Bug description:
-  With version 2.6.2 I could access the monitor via VNC by pressing CTRL-AL=
-T-2, while CTRL-ALT-3 brought me to the "serial0 console". CTRL-ALT-1 broug=
-ht me back to the VGA console.
-  Since 2.8.0 CTRL-ALT-2 brings me to the "serial0 console" and CTRL-ALT-3 =
-to the "parallel0 console". The monitor is not available any more, to any C=
-TRL-ALT-1stROW.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1661176/+subscriptions
+Berto
