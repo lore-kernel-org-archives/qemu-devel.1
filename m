@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jc-00075F-VJ
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9ja-00073j-V2
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jb-0003TX-0G
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jX-0003Oy-OF
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:02 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:05 +1100
-Message-Id: <20170202051445.5735-8-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:00 +1100
+Message-Id: <20170202051445.5735-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 007/107] target-ppc: implement lxsd and lxssp
- instructions
+Subject: [Qemu-devel] [PULL 002/107] target-ppc: Consolidate instruction
+ decode helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,113 +21,375 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Bharata B Rao <bharata@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-lxsd: Load VSX Scalar Dword
-lxssp: Load VSX Scalar Single
+Move instruction decode helpers to target-ppc/internal.h so that some
+of these can be used from outside of translate.c. This movement also
+helps to get rid of some duplicate helpers from target-ppc/fpu_helper.c.
 
-Moreover, DS-Form instructions shares the same primary opcode, bits
-30:31 are used to decode the instruction. Use a common routine to decode
-primary opcode(0x39) - ds-form instructions and branch-out depending on
-bits 30:31.
-
+Suggested-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c              | 25 +++++++++++++++++++++++++
- target/ppc/translate/fp-ops.inc.c   |  1 -
- target/ppc/translate/vsx-impl.inc.c | 21 +++++++++++++++++++++
- 3 files changed, 46 insertions(+), 1 deletion(-)
+ target/ppc/fpu_helper.c |  11 +---
+ target/ppc/internal.h   | 151 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/ppc/translate.c  | 151 ------------------------------------------------
+ 3 files changed, 152 insertions(+), 161 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index e55a5dc..06ac0e9 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6072,6 +6072,29 @@ GEN_TM_PRIV_NOOP(trechkpt);
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 8a389e1..d3741b4 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -20,6 +20,7 @@
+ #include "cpu.h"
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
++#include "internal.h"
  
- #include "translate/spe-impl.inc.c"
- 
-+/* Handles lfdp, lxsd, lxssp */
-+static void gen_dform39(DisasContext *ctx)
-+{
-+    switch (ctx->opcode & 0x3) {
-+    case 0: /* lfdp */
-+        if (ctx->insns_flags2 & PPC2_ISA205) {
-+            return gen_lfdp(ctx);
-+        }
-+        break;
-+    case 2: /* lxsd */
-+        if (ctx->insns_flags2 & PPC2_ISA300) {
-+            return gen_lxsd(ctx);
-+        }
-+        break;
-+    case 3: /* lxssp */
-+        if (ctx->insns_flags2 & PPC2_ISA300) {
-+            return gen_lxssp(ctx);
-+        }
-+        break;
-+    }
-+    return gen_invalid(ctx);
-+}
-+
- static opcode_t opcodes[] = {
- GEN_HANDLER(invalid, 0x00, 0x00, 0x00, 0xFFFFFFFF, PPC_NONE),
- GEN_HANDLER(cmp, 0x1F, 0x00, 0x00, 0x00400000, PPC_INTEGER),
-@@ -6144,6 +6167,8 @@ GEN_HANDLER(ld, 0x3A, 0xFF, 0xFF, 0x00000000, PPC_64B),
- GEN_HANDLER(lq, 0x38, 0xFF, 0xFF, 0x00000000, PPC_64BX),
- GEN_HANDLER(std, 0x3E, 0xFF, 0xFF, 0x00000000, PPC_64B),
- #endif
-+/* handles lfdp, lxsd, lxssp */
-+GEN_HANDLER_E(dform39, 0x39, 0xFF, 0xFF, 0x00000000, PPC_NONE, PPC2_ISA205),
- GEN_HANDLER(lmw, 0x2E, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
- GEN_HANDLER(stmw, 0x2F, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
- GEN_HANDLER(lswi, 0x1F, 0x15, 0x12, 0x00000001, PPC_STRING),
-diff --git a/target/ppc/translate/fp-ops.inc.c b/target/ppc/translate/fp-ops.inc.c
-index d36ab4e..3127fa0 100644
---- a/target/ppc/translate/fp-ops.inc.c
-+++ b/target/ppc/translate/fp-ops.inc.c
-@@ -68,7 +68,6 @@ GEN_LDFS(lfd, ld64, 0x12, PPC_FLOAT)
- GEN_LDFS(lfs, ld32fs, 0x10, PPC_FLOAT)
- GEN_HANDLER_E(lfiwax, 0x1f, 0x17, 0x1a, 0x00000001, PPC_NONE, PPC2_ISA205),
- GEN_HANDLER_E(lfiwzx, 0x1f, 0x17, 0x1b, 0x1, PPC_NONE, PPC2_FP_CVT_ISA206),
--GEN_HANDLER_E(lfdp, 0x39, 0xFF, 0xFF, 0x00200003, PPC_NONE, PPC2_ISA205),
- GEN_HANDLER_E(lfdpx, 0x1F, 0x17, 0x18, 0x00200001, PPC_NONE, PPC2_ISA205),
- 
- #define GEN_STF(name, stop, opc, type)                                        \
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index ed9588e..1d7cd23 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -190,6 +190,27 @@ static void gen_lxvb16x(DisasContext *ctx)
-     tcg_temp_free(EA);
+ #define float64_snan_to_qnan(x) ((x) | 0x0008000000000000ULL)
+ #define float32_snan_to_qnan(x) ((x) | 0x00400000)
+@@ -1776,16 +1777,6 @@ uint32_t helper_efdcmpeq(CPUPPCState *env, uint64_t op1, uint64_t op2)
+     return helper_efdtsteq(env, op1, op2);
  }
  
-+#define VSX_LOAD_SCALAR_DS(name, operation)                       \
-+static void gen_##name(DisasContext *ctx)                         \
-+{                                                                 \
-+    TCGv EA;                                                      \
-+    TCGv_i64 xth = cpu_vsrh(rD(ctx->opcode) + 32);                \
-+                                                                  \
-+    if (unlikely(!ctx->altivec_enabled)) {                        \
-+        gen_exception(ctx, POWERPC_EXCP_VPU);                     \
-+        return;                                                   \
-+    }                                                             \
-+    gen_set_access_type(ctx, ACCESS_INT);                         \
-+    EA = tcg_temp_new();                                          \
-+    gen_addr_imm_index(ctx, EA, 0x03);                            \
-+    gen_qemu_##operation(ctx, xth, EA);                           \
-+    /* NOTE: cpu_vsrl is undefined */                             \
-+    tcg_temp_free(EA);                                            \
+-#define DECODE_SPLIT(opcode, shift1, nb1, shift2, nb2) \
+-    (((((opcode) >> (shift1)) & ((1 << (nb1)) - 1)) << nb2) |    \
+-     (((opcode) >> (shift2)) & ((1 << (nb2)) - 1)))
+-
+-#define xT(opcode) DECODE_SPLIT(opcode, 0, 1, 21, 5)
+-#define xA(opcode) DECODE_SPLIT(opcode, 2, 1, 16, 5)
+-#define xB(opcode) DECODE_SPLIT(opcode, 1, 1, 11, 5)
+-#define xC(opcode) DECODE_SPLIT(opcode, 3, 1,  6, 5)
+-#define BF(opcode) (((opcode) >> (31-8)) & 7)
+-
+ typedef union _ppc_vsr_t {
+     uint64_t u64[2];
+     uint32_t u32[4];
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index 1ff4896..9a4a74a 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -47,4 +47,155 @@ FUNC_MASK(MASK, target_ulong, 32, UINT32_MAX);
+ FUNC_MASK(mask_u32, uint32_t, 32, UINT32_MAX);
+ FUNC_MASK(mask_u64, uint64_t, 64, UINT64_MAX);
+ 
++/*****************************************************************************/
++/***                           Instruction decoding                        ***/
++#define EXTRACT_HELPER(name, shift, nb)                                       \
++static inline uint32_t name(uint32_t opcode)                                  \
++{                                                                             \
++    return (opcode >> (shift)) & ((1 << (nb)) - 1);                           \
 +}
 +
-+VSX_LOAD_SCALAR_DS(lxsd, ld64_i64)
-+VSX_LOAD_SCALAR_DS(lxssp, ld32fs)
++#define EXTRACT_SHELPER(name, shift, nb)                                      \
++static inline int32_t name(uint32_t opcode)                                   \
++{                                                                             \
++    return (int16_t)((opcode >> (shift)) & ((1 << (nb)) - 1));                \
++}
 +
- #define VSX_STORE_SCALAR(name, operation)                     \
- static void gen_##name(DisasContext *ctx)                     \
- {                                                             \
++#define EXTRACT_HELPER_SPLIT(name, shift1, nb1, shift2, nb2)                  \
++static inline uint32_t name(uint32_t opcode)                                  \
++{                                                                             \
++    return (((opcode >> (shift1)) & ((1 << (nb1)) - 1)) << nb2) |             \
++            ((opcode >> (shift2)) & ((1 << (nb2)) - 1));                      \
++}
++
++#define EXTRACT_HELPER_DXFORM(name,                                           \
++                              d0_bits, shift_op_d0, shift_d0,                 \
++                              d1_bits, shift_op_d1, shift_d1,                 \
++                              d2_bits, shift_op_d2, shift_d2)                 \
++static inline int16_t name(uint32_t opcode)                                   \
++{                                                                             \
++    return                                                                    \
++        (((opcode >> (shift_op_d0)) & ((1 << (d0_bits)) - 1)) << (shift_d0)) | \
++        (((opcode >> (shift_op_d1)) & ((1 << (d1_bits)) - 1)) << (shift_d1)) | \
++        (((opcode >> (shift_op_d2)) & ((1 << (d2_bits)) - 1)) << (shift_d2));  \
++}
++
++
++/* Opcode part 1 */
++EXTRACT_HELPER(opc1, 26, 6);
++/* Opcode part 2 */
++EXTRACT_HELPER(opc2, 1, 5);
++/* Opcode part 3 */
++EXTRACT_HELPER(opc3, 6, 5);
++/* Opcode part 4 */
++EXTRACT_HELPER(opc4, 16, 5);
++/* Update Cr0 flags */
++EXTRACT_HELPER(Rc, 0, 1);
++/* Update Cr6 flags (Altivec) */
++EXTRACT_HELPER(Rc21, 10, 1);
++/* Destination */
++EXTRACT_HELPER(rD, 21, 5);
++/* Source */
++EXTRACT_HELPER(rS, 21, 5);
++/* First operand */
++EXTRACT_HELPER(rA, 16, 5);
++/* Second operand */
++EXTRACT_HELPER(rB, 11, 5);
++/* Third operand */
++EXTRACT_HELPER(rC, 6, 5);
++/***                               Get CRn                                 ***/
++EXTRACT_HELPER(crfD, 23, 3);
++EXTRACT_HELPER(BF, 23, 3);
++EXTRACT_HELPER(crfS, 18, 3);
++EXTRACT_HELPER(crbD, 21, 5);
++EXTRACT_HELPER(crbA, 16, 5);
++EXTRACT_HELPER(crbB, 11, 5);
++/* SPR / TBL */
++EXTRACT_HELPER(_SPR, 11, 10);
++static inline uint32_t SPR(uint32_t opcode)
++{
++    uint32_t sprn = _SPR(opcode);
++
++    return ((sprn >> 5) & 0x1F) | ((sprn & 0x1F) << 5);
++}
++/***                              Get constants                            ***/
++/* 16 bits signed immediate value */
++EXTRACT_SHELPER(SIMM, 0, 16);
++/* 16 bits unsigned immediate value */
++EXTRACT_HELPER(UIMM, 0, 16);
++/* 5 bits signed immediate value */
++EXTRACT_HELPER(SIMM5, 16, 5);
++/* 5 bits signed immediate value */
++EXTRACT_HELPER(UIMM5, 16, 5);
++/* 4 bits unsigned immediate value */
++EXTRACT_HELPER(UIMM4, 16, 4);
++/* Bit count */
++EXTRACT_HELPER(NB, 11, 5);
++/* Shift count */
++EXTRACT_HELPER(SH, 11, 5);
++/* Vector shift count */
++EXTRACT_HELPER(VSH, 6, 4);
++/* Mask start */
++EXTRACT_HELPER(MB, 6, 5);
++/* Mask end */
++EXTRACT_HELPER(ME, 1, 5);
++/* Trap operand */
++EXTRACT_HELPER(TO, 21, 5);
++
++EXTRACT_HELPER(CRM, 12, 8);
++
++#ifndef CONFIG_USER_ONLY
++EXTRACT_HELPER(SR, 16, 4);
++#endif
++
++/* mtfsf/mtfsfi */
++EXTRACT_HELPER(FPBF, 23, 3);
++EXTRACT_HELPER(FPIMM, 12, 4);
++EXTRACT_HELPER(FPL, 25, 1);
++EXTRACT_HELPER(FPFLM, 17, 8);
++EXTRACT_HELPER(FPW, 16, 1);
++
++/* addpcis */
++EXTRACT_HELPER_DXFORM(DX, 10, 6, 6, 5, 16, 1, 1, 0, 0)
++#if defined(TARGET_PPC64)
++/* darn */
++EXTRACT_HELPER(L, 16, 2);
++#endif
++
++/***                            Jump target decoding                       ***/
++/* Immediate address */
++static inline target_ulong LI(uint32_t opcode)
++{
++    return (opcode >> 0) & 0x03FFFFFC;
++}
++
++static inline uint32_t BD(uint32_t opcode)
++{
++    return (opcode >> 0) & 0xFFFC;
++}
++
++EXTRACT_HELPER(BO, 21, 5);
++EXTRACT_HELPER(BI, 16, 5);
++/* Absolute/relative address */
++EXTRACT_HELPER(AA, 1, 1);
++/* Link */
++EXTRACT_HELPER(LK, 0, 1);
++
++/* DFP Z22-form */
++EXTRACT_HELPER(DCM, 10, 6)
++
++/* DFP Z23-form */
++EXTRACT_HELPER(RMC, 9, 2)
++
++EXTRACT_HELPER_SPLIT(xT, 0, 1, 21, 5);
++EXTRACT_HELPER_SPLIT(xS, 0, 1, 21, 5);
++EXTRACT_HELPER_SPLIT(xA, 2, 1, 16, 5);
++EXTRACT_HELPER_SPLIT(xB, 1, 1, 11, 5);
++EXTRACT_HELPER_SPLIT(xC, 3, 1,  6, 5);
++EXTRACT_HELPER(DM, 8, 2);
++EXTRACT_HELPER(UIM, 16, 2);
++EXTRACT_HELPER(SHW, 8, 2);
++EXTRACT_HELPER(SP, 19, 2);
++EXTRACT_HELPER(IMM8, 11, 8);
++
+ #endif /* PPC_INTERNAL_H */
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 1212180..8c99ea3 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -422,157 +422,6 @@ typedef struct opcode_t {
+ 
+ #define CHK_NONE
+ 
+-
+-/*****************************************************************************/
+-/***                           Instruction decoding                        ***/
+-#define EXTRACT_HELPER(name, shift, nb)                                       \
+-static inline uint32_t name(uint32_t opcode)                                  \
+-{                                                                             \
+-    return (opcode >> (shift)) & ((1 << (nb)) - 1);                           \
+-}
+-
+-#define EXTRACT_SHELPER(name, shift, nb)                                      \
+-static inline int32_t name(uint32_t opcode)                                   \
+-{                                                                             \
+-    return (int16_t)((opcode >> (shift)) & ((1 << (nb)) - 1));                \
+-}
+-
+-#define EXTRACT_HELPER_SPLIT(name, shift1, nb1, shift2, nb2)                  \
+-static inline uint32_t name(uint32_t opcode)                                  \
+-{                                                                             \
+-    return (((opcode >> (shift1)) & ((1 << (nb1)) - 1)) << nb2) |             \
+-            ((opcode >> (shift2)) & ((1 << (nb2)) - 1));                      \
+-}
+-
+-#define EXTRACT_HELPER_DXFORM(name,                                           \
+-                              d0_bits, shift_op_d0, shift_d0,                 \
+-                              d1_bits, shift_op_d1, shift_d1,                 \
+-                              d2_bits, shift_op_d2, shift_d2)                 \
+-static inline int16_t name(uint32_t opcode)                                   \
+-{                                                                             \
+-    return                                                                    \
+-        (((opcode >> (shift_op_d0)) & ((1 << (d0_bits)) - 1)) << (shift_d0)) | \
+-        (((opcode >> (shift_op_d1)) & ((1 << (d1_bits)) - 1)) << (shift_d1)) | \
+-        (((opcode >> (shift_op_d2)) & ((1 << (d2_bits)) - 1)) << (shift_d2));  \
+-}
+-
+-
+-/* Opcode part 1 */
+-EXTRACT_HELPER(opc1, 26, 6);
+-/* Opcode part 2 */
+-EXTRACT_HELPER(opc2, 1, 5);
+-/* Opcode part 3 */
+-EXTRACT_HELPER(opc3, 6, 5);
+-/* Opcode part 4 */
+-EXTRACT_HELPER(opc4, 16, 5);
+-/* Update Cr0 flags */
+-EXTRACT_HELPER(Rc, 0, 1);
+-/* Update Cr6 flags (Altivec) */
+-EXTRACT_HELPER(Rc21, 10, 1);
+-/* Destination */
+-EXTRACT_HELPER(rD, 21, 5);
+-/* Source */
+-EXTRACT_HELPER(rS, 21, 5);
+-/* First operand */
+-EXTRACT_HELPER(rA, 16, 5);
+-/* Second operand */
+-EXTRACT_HELPER(rB, 11, 5);
+-/* Third operand */
+-EXTRACT_HELPER(rC, 6, 5);
+-/***                               Get CRn                                 ***/
+-EXTRACT_HELPER(crfD, 23, 3);
+-EXTRACT_HELPER(crfS, 18, 3);
+-EXTRACT_HELPER(crbD, 21, 5);
+-EXTRACT_HELPER(crbA, 16, 5);
+-EXTRACT_HELPER(crbB, 11, 5);
+-/* SPR / TBL */
+-EXTRACT_HELPER(_SPR, 11, 10);
+-static inline uint32_t SPR(uint32_t opcode)
+-{
+-    uint32_t sprn = _SPR(opcode);
+-
+-    return ((sprn >> 5) & 0x1F) | ((sprn & 0x1F) << 5);
+-}
+-/***                              Get constants                            ***/
+-/* 16 bits signed immediate value */
+-EXTRACT_SHELPER(SIMM, 0, 16);
+-/* 16 bits unsigned immediate value */
+-EXTRACT_HELPER(UIMM, 0, 16);
+-/* 5 bits signed immediate value */
+-EXTRACT_HELPER(SIMM5, 16, 5);
+-/* 5 bits signed immediate value */
+-EXTRACT_HELPER(UIMM5, 16, 5);
+-/* 4 bits unsigned immediate value */
+-EXTRACT_HELPER(UIMM4, 16, 4);
+-/* Bit count */
+-EXTRACT_HELPER(NB, 11, 5);
+-/* Shift count */
+-EXTRACT_HELPER(SH, 11, 5);
+-/* Vector shift count */
+-EXTRACT_HELPER(VSH, 6, 4);
+-/* Mask start */
+-EXTRACT_HELPER(MB, 6, 5);
+-/* Mask end */
+-EXTRACT_HELPER(ME, 1, 5);
+-/* Trap operand */
+-EXTRACT_HELPER(TO, 21, 5);
+-
+-EXTRACT_HELPER(CRM, 12, 8);
+-
+-#ifndef CONFIG_USER_ONLY
+-EXTRACT_HELPER(SR, 16, 4);
+-#endif
+-
+-/* mtfsf/mtfsfi */
+-EXTRACT_HELPER(FPBF, 23, 3);
+-EXTRACT_HELPER(FPIMM, 12, 4);
+-EXTRACT_HELPER(FPL, 25, 1);
+-EXTRACT_HELPER(FPFLM, 17, 8);
+-EXTRACT_HELPER(FPW, 16, 1);
+-
+-/* addpcis */
+-EXTRACT_HELPER_DXFORM(DX, 10, 6, 6, 5, 16, 1, 1, 0, 0)
+-#if defined(TARGET_PPC64)
+-/* darn */
+-EXTRACT_HELPER(L, 16, 2);
+-#endif
+-
+-/***                            Jump target decoding                       ***/
+-/* Immediate address */
+-static inline target_ulong LI(uint32_t opcode)
+-{
+-    return (opcode >> 0) & 0x03FFFFFC;
+-}
+-
+-static inline uint32_t BD(uint32_t opcode)
+-{
+-    return (opcode >> 0) & 0xFFFC;
+-}
+-
+-EXTRACT_HELPER(BO, 21, 5);
+-EXTRACT_HELPER(BI, 16, 5);
+-/* Absolute/relative address */
+-EXTRACT_HELPER(AA, 1, 1);
+-/* Link */
+-EXTRACT_HELPER(LK, 0, 1);
+-
+-/* DFP Z22-form */
+-EXTRACT_HELPER(DCM, 10, 6)
+-
+-/* DFP Z23-form */
+-EXTRACT_HELPER(RMC, 9, 2)
+-
+-EXTRACT_HELPER_SPLIT(xT, 0, 1, 21, 5);
+-EXTRACT_HELPER_SPLIT(xS, 0, 1, 21, 5);
+-EXTRACT_HELPER_SPLIT(xA, 2, 1, 16, 5);
+-EXTRACT_HELPER_SPLIT(xB, 1, 1, 11, 5);
+-EXTRACT_HELPER_SPLIT(xC, 3, 1,  6, 5);
+-EXTRACT_HELPER(DM, 8, 2);
+-EXTRACT_HELPER(UIM, 16, 2);
+-EXTRACT_HELPER(SHW, 8, 2);
+-EXTRACT_HELPER(SP, 19, 2);
+-EXTRACT_HELPER(IMM8, 11, 8);
+-
+ /*****************************************************************************/
+ /* PowerPC instructions table                                                */
+ 
 -- 
 2.9.3
