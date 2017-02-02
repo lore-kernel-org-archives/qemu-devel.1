@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cZILK-0000gM-GV
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:26:39 -0500
+	(envelope-from <shorne@gmail.com>) id 1cZITY-0004zi-J5
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cZILH-0001sB-A9
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:26:34 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:1512 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cZILG-0001ri-Ug
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:26:31 -0500
-From: "Denis V. Lunev" <den@openvz.org>
-Date: Thu,  2 Feb 2017 17:26:29 +0300
-Message-Id: <1486045589-8074-1-git-send-email-den@openvz.org>
+	(envelope-from <shorne@gmail.com>) id 1cZITU-00059D-2X
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:04 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cZITT-000592-Sn
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:00 -0500
+Received: by mail-pg0-x244.google.com with SMTP id 75so1987405pgf.3
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 06:34:59 -0800 (PST)
+Date: Thu, 2 Feb 2017 23:34:55 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20170202143455.GB32144@lianli.shorne-pla.net>
+References: <20170120163918.GD7836@lianli.shorne-pla.net>
+	<d27b7c60-a9fe-e92e-a937-d2d13b78f290@twiddle.net>
+	<20170124102625.GF7836@lianli.shorne-pla.net>
+	<01f7a18d-f4f5-18f3-0932-b32c06ad0b0c@twiddle.net>
+	<20170125123430.GG7836@lianli.shorne-pla.net>
+	<39f927aa-26fe-0e43-7c6b-efe1b70bc5fa@twiddle.net>
+	<20170126131229.GB16014@lianli.shorne-pla.net>
+	<ddb9c656-aa3e-5d90-c8fc-0058af5b603b@twiddle.net>
+	<20170201100423.GE21641@lianli.shorne-pla.net>
+	<c840eff0-2be7-07d7-eae9-4cded569d146@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 1/1] qemu-char: socket backend: disconnect
- on write error
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c840eff0-2be7-07d7-eae9-4cded569d146@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH] target-openrisc: Fix exception handling
+ status registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +38,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org, openrisc@lists.librecores.org
 
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+On Wed, Feb 01, 2017 at 10:15:54AM -0800, Richard Henderson wrote:
+> On 02/01/2017 02:04 AM, Stafford Horne wrote:
+> > On Thu, Jan 26, 2017 at 09:26:55AM -0800, Richard Henderson wrote:
+> >> On 01/26/2017 05:12 AM, Stafford Horne wrote:
+> >>> I just sent you a mail with a link to my kernel for download.
+> >>>
+> >>> One thing I noticed is you passed '-append console=ttyS0' I think that
+> >>> does nothing on openrisc since as far as I know openrisc only gets boot
+> >>> params from the device tree file. I tried with and without it and got no
+> >>> differences.
+> >>
+> >> That was just reflex, wondering where the output went.
+> >>
+> >>> Another thing, I am using a 'late' version of gcc built with musl cross [1]
+> >>> , I dont think it would make a difference, but maybe?
+> >>
+> >> I think that's likely the difference.  I can indeed boot your kernel.
+> > 
+> > Hi Richard,
+> > 
+> > For kernel builds I have created toolchain binaries here:
+> > 
+> >   http://shorne.noip.me/crosstool/files/bin/x86_64/5.4.0/
+> > 
+> > These should work.
+> > 
+> > If all is ok with the qemu patch I sent what is the next step to get them
+> > incorporated.  Do you need any help from me?
+> > 
+> > ... Actually I just checked your branch on github, it looks like you are
+> > doing a few updates.  Let me know if you want me to review anything.
+> 
+> Yes, I've been attempting to revive a patch set from 2013 that cleans up the
+> implementation, fixing a few other bugs in the process.
+> 
+> However, testing it properly has been tricky.  It appears as if I'm debugging
+> qemu and gcc simultaneously, while your gdb branch doesn't want to compile for
+> me.  So I've been limited to instruction traces from qemu, which is slow going.
 
-Socket backend read handler should normally perform a disconnect, however
-the read handler may not get a chance to run if the frontend is not ready
-(qemu_chr_be_can_write() =3D=3D 0).
+What issue are you having compiling gdb?
 
-This means that in virtio-serial frontend case if
- - the host has disconnected (giving EPIPE on socket write)
- - and the guest has disconnected (-> frontend not ready -> backend
-   will not read)
- - and there is still data (frontend->backend) to flush (has to be a real=
-ly
-   tricky timing but nevertheless, we have observed the case in productio=
-n)
+I compile gdb with these flags.
 
-This results in virtio-serial trying to flush this data continiously form=
-ing
-a busy loop.
+  ../binutils-gdb/configure --target=or1k-musl-linux \
+    --prefix=$PREFIX \
+    --disable-itcl \
+    --disable-tk \
+    --disable-tcl \
+    --disable-winsup \
+    --disable-gdbtk \
+    --disable-libgui \
+    --disable-rda \
+    --disable-sid \
+    --with-sysroot \
+    --disable-newlib \
+    --disable-libgloss \
+    --disable-gas \
+    --disable-ld \
+    --disable-binutils \
+    --disable-gprof \
+    --with-system-zlib
 
-Solution: react on write error in the socket write handler.
-errno is not reliable after qio_channel_writev_full(), so we may not get
-the exact EPIPE, so disconnect on any error but QIO_CHANNEL_ERR_BLOCK whi=
-ch
-io_channel_send_full() converts to errno EAGAIN.
-We must not disconnect right away though, there still may be data to read
-(see 4bf1cb0).
+Also, I uploaded my binaries just in case:
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Daniel P. Berrange <berrange@redhat.com>
-CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
-Changes from v2:
-- fixed prototype of tcp_chr_disconnect
+  http://shorne.noip.me/crosstool/files/bin/x86_64/5.4.0/
 
-Changes from v1:
-- we do not rely on EPIPE anynore. Socket should be closed on all errors
-  except EAGAIN
+My host gcc is "6.3.1 20161221", I used musl-cross and my gdb branch
 
- chardev/char-socket.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+  https://github.com/openrisc/musl-cross.git or1k
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 4068dc5..865c527 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -97,6 +97,9 @@ static gboolean tcp_chr_accept(QIOChannel *chan,
-                                GIOCondition cond,
-                                void *opaque);
-=20
-+static int tcp_chr_read_poll(void *opaque);
-+static void tcp_chr_disconnect(Chardev *chr);
-+
- /* Called with chr_write_lock held.  */
- static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
- {
-@@ -114,6 +117,13 @@ static int tcp_chr_write(Chardev *chr, const uint8_t=
- *buf, int len)
-             s->write_msgfds_num =3D 0;
-         }
-=20
-+        if (ret < 0 && errno !=3D EAGAIN) {
-+            if (tcp_chr_read_poll(chr) <=3D 0) {
-+                tcp_chr_disconnect(chr);
-+                return len;
-+            } /* else let the read handler finish it properly */
-+        }
-+
-         return ret;
-     } else {
-         /* XXX: indicate an error ? */
---=20
-2.7.4
+  git@github.com:stffrdhrn/binutils-gdb.git or1k-upstream
+
+> If you'd like to do your own testing on my tgt-or1k-2 branch, that would be
+> appreciated.
+
+I will have a look tomorrow if I can.
+
+-Stafford
