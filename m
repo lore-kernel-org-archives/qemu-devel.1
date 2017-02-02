@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZE1A-0000la-1C
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:49:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZE1S-0000w5-JQ
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:49:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZE16-0007BM-Bn
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:49:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58460)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cZE16-0007BI-5O
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:49:24 -0500
-Date: Thu, 2 Feb 2017 09:49:18 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170202094918.GB2915@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1485954928-22287-1-git-send-email-den@openvz.org>
-	<20170201135306.GI3232@redhat.com>
-	<f9e50c49-4a25-ad69-0317-08e99b8fada1@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cZE1R-0007Cz-Gc
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:49:46 -0500
+Received: from mail-vk0-x22e.google.com ([2607:f8b0:400c:c05::22e]:33508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZE1R-0007Cp-8Z
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:49:45 -0500
+Received: by mail-vk0-x22e.google.com with SMTP id k127so7066119vke.0
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 01:49:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f9e50c49-4a25-ad69-0317-08e99b8fada1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] qemu_char: socket backend: disconnect
- on EPIPE
+In-Reply-To: <1485877831-28786-1-git-send-email-kraxel@redhat.com>
+References: <1485877831-28786-1-git-send-email-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Feb 2017 09:49:23 +0000
+Message-ID: <CAFEAcA-wqKtfanrVYnyaWv6m=xYvV5=3gbsJ4JbzkrJwegd-BQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL v2 00/11] ui patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Feb 01, 2017 at 04:54:28PM -0800, Paolo Bonzini wrote:
-> 
-> 
-> On 01/02/2017 05:53, Daniel P. Berrange wrote:
-> >>  
-> >> +        if (ret < 0 && errno == EPIPE) {
-> > IMHO you should just remove "&& errno == EPIPE" and it'd be fine.
-> 
-> It should be errno != EAGAIN.
+On 31 January 2017 at 15:50, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+> Here comes the ui patch queue.  Nothing outstanding here.  Bugfixes and
+> small improvements all user interfaces.
+>
+> v2 updates:
+>   * change "C.utf-8" locale to "C.UTF-8".
+>   * add forgotten "fix console resize" patch.
+>
+> please pull,
+>   Gerd
+>
+> The following changes since commit a0def594286d9110a6035e02eef558cf3cf5d847:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-01-30 10:23:20 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://git.kraxel.org/qemu tags/pull-ui-20170131-2
+>
+> for you to fetch changes up to 3ef0c573d37b117867352a8bd8c567d3b774fe37:
+>
+>   console: fix console resize (2017-01-31 16:09:16 +0100)
+>
+> ----------------------------------------------------------------
+> ui: bugfixes and small improvements all over the place.
+>
 
-Oh, yes, thats right.
+Applied, thanks.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+-- PMM
