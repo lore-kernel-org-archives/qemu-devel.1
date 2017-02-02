@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cZKnR-0002aP-MW
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 12:03:50 -0500
+	(envelope-from <brak@gameservers.com>) id 1cZKxs-0007LB-Lv
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 12:14:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cZKnQ-0003tp-NP
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 12:03:45 -0500
-Resent-Message-Id: <E1cZKnQ-0003tp-NP@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1486051604-32310-1-git-send-email-pl@kamp.de>
-Message-ID: <148605500543.33.14943713502653422816@eba24e3a0d7f>
+	(envelope-from <brak@gameservers.com>) id 1cZKxp-00012q-HZ
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 12:14:32 -0500
+Received: from mail2015.choopa.net ([208.167.225.251]:11209)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brak@gameservers.com>)
+	id 1cZKxp-00012L-CQ
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 12:14:29 -0500
+From: Brian Rak <brak@gameservers.com>
+Message-ID: <95bdbbb7-e0b7-b932-52a8-93d35b3e1294@gameservers.com>
+Date: Thu, 2 Feb 2017 12:14:24 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 2 Feb 2017 09:03:26 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC][PATCH] qemu-img: make convert async
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] VirtIO issues after
+ 83d768b5640946b7da55ce8335509df297e2c7cd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pl@kamp.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: pbonzini@redhat.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDXVtQQVRDSF0gcWVtdS1pbWc6IG1ha2UgY29udmVydCBh
-c3luYwpNZXNzYWdlLWlkOiAxNDg2MDUxNjA0LTMyMzEwLTEtZ2l0LXNlbmQtZW1haWwtcGxAa2Ft
-cC5kZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
-MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMg
-VXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKM2ExNjdlYiBxZW11LWlt
-ZzogbWFrZSBjb252ZXJ0IGFzeW5jCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzE6IHFlbXUtaW1nOiBtYWtlIGNvbnZlcnQgYXN5bmMuLi4KRVJST1I6IHN1c3BlY3QgY29k
-ZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDQsIDkpCiMxMTg6IEZJTEU6IHFl
-bXUtaW1nLmM6MTU4MDoKKyAgICBmb3IgKGkgPSAwOyBpIDwgQ09OVkVSVF9NQVhfUkVRUzsgaSsr
-KSB7CisgICAgICAgICBpZiAocy0+cmVxc1tpXS5zZWN0b3JfbnVtID09IHMtPndyX29mZnMgJiYg
-cy0+cmVxc1tpXS5yZF9jb21wbGV0ZWQpIHsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
-cwojMTQ3OiBGSUxFOiBxZW11LWltZy5jOjE2MDk6CisgICAgICAgIHByaW50ZigiY29udmVydF9m
-aWxsX3JlYWRfcXVldWUgcmVxICMlZCBAJXAgc2VjdG9yX251bSAlbGQgbmJfc2VjdG9ycyAlZCBz
-dGF0dXMgJWRcbiIsIGksIHJlcSwgZWx0LT5zZWN0b3JfbnVtLCBlbHQtPm5iX3NlY3RvcnMsIGVs
-dC0+c3RhdHVzKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNDk6IEZJTEU6
-IHFlbXUtaW1nLmM6MTYxMToKKyAgICAgICAgaWYgKGVsdC0+c3RhdHVzID09IEJMS19EQVRBIHx8
-ICghcy0+bWluX3NwYXJzZSAmJiBlbHQtPnN0YXR1cyA9PSBCTEtfWkVSTykpCgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTUyOiBGSUxFOiBxZW11LWltZy5jOjE2MTQ6CisgICAg
-ICAgICAgICBxZW11X3Byb2dyZXNzX3ByaW50KDEwMC4wICogcy0+YWxsb2NhdGVkX2RvbmUgLyBz
-LT5hbGxvY2F0ZWRfc2VjdG9ycywKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYg
-Y29uZGl0aW9uCiMxNjE6IEZJTEU6IHFlbXUtaW1nLmM6MTYyMzoKKyAgICAgICAgaWYgKChlbHQg
-PSBRU0lNUExFUV9GSVJTVCgmcy0+cXVldWUpKSkgewoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFy
-YWN0ZXJzCiMxODk6IEZJTEU6IHFlbXUtaW1nLmM6MTY1MDoKKyAgICBwcmludGYoImNvbnZlcnRf
-YWlvX3JlYWQgZW50ZXIgcmVxICVwIHNlY3Rvcl9udW0gJWxkIG5iX3NlY3RvcnMgJWQgb2ZmcyAl
-bGQgcmV0ICVkXG4iLCByZXEsIHNlY3Rvcl9udW0sIG5iX3NlY3RvcnMsIHJlcS0+c2VjdG9yX29m
-ZnMsIHJldCk7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI0NTogRklMRTogcWVt
-dS1pbWcuYzoxNjk1OgorICAgIHByaW50ZigiY29udmVydF9haW9fd3JpdGUgZW50ZXIgcmVxICVw
-IHNlY3Rvcl9udW0gJWxkIG5iX3NlY3RvcnMgJWQgb2ZmcyAlbGQgcmV0ICVkXG4iLCByZXEsIHNl
-Y3Rvcl9udW0sIG5iX3NlY3RvcnMsIHJlcS0+c2VjdG9yX29mZnMsIHJldCk7CgpFUlJPUjogZG8g
-bm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzI2ODogRklMRTogcWVtdS1pbWcuYzoxNzIyOgorICAg
-ICAgICAgICAgICAgIGFzc2VydCgwKTsgLy9YWFggVE9ETwoKRVJST1I6IGRvIG5vdCB1c2UgQzk5
-IC8vIGNvbW1lbnRzCiMzMTE6IEZJTEU6IHFlbXUtaW1nLmM6MTc2NjoKKyAgICAgICAgICAgIGFz
-c2VydCgwKTsgLy9YWFggVE9ETwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM1
-ODogRklMRTogcWVtdS1pbWcuYzoxODIzOgorICAgICAgICBzLT5yZXFzW2ldLmJ1ZiA9IGJsa19i
-bG9ja2FsaWduKHMtPnRhcmdldCwgcy0+YnVmX3NlY3RvcnMgKiBCRFJWX1NFQ1RPUl9TSVpFKTsK
-CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzc4OiBGSUxFOiBxZW11LWltZy5jOjE4
-NDM6CisgICAgICAgIHByaW50ZigiY29udmVydF9pdGVyYXRpb25fc2VjdG9ycyAlbGQgbiAlZCBz
-dGF0dXMgJWRcbiIsIHNlY3Rvcl9udW0sIG4sIHMtPnN0YXR1cyk7CgpFUlJPUjogc3VzcGVjdCBj
-b2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgOSkKIzQ1MjogRklMRTog
-cWVtdS1pbWcuYzoxODc5OgorICAgIGZvciAoaSA9IDA7IGkgPCBDT05WRVJUX01BWF9SRVFTOyBp
-KyspIHsKKyAgICAgICAgIHFlbXVfaW92ZWNfZGVzdHJveSgmcy0+cmVxc1tpXS5xaW92KTsKCnRv
-dGFsOiA5IGVycm9ycywgMyB3YXJuaW5ncywgMzk3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+We recently upgraded to qemu 2.8.0, and noticed a bunch of issues with 
+various non-linux operating systems.
+
+I was able to bisect this down to 
+83d768b5640946b7da55ce8335509df297e2c7cd being the commit that breaks 
+things (0687c37c5eeef8580b31cc6e1202d874833ae38a which is immediately 
+prior still works ok).
+
+The issue here seems to be that guests stop receiving packets, and this 
+only happens with vhost_net enabled.
+
+
+I've been consistently able to reproduce this with by booting the 
+OpenBSD 5.8 ISO ( 
+http://mirrors.evowise.com/pub/OpenBSD/5.8/amd64/install58.iso ), and 
+pressing 'A' at the first prompt.  It'll attempt to do a DHCP lease, and 
+will succeed prior to 83d7.  After that commit, it'll continue to 
+transit DHCP requests, but never actually receive the reply.
+
+So far, we've seen this same problem manifest on the following operating 
+systems:
+
+* OpenBSD 5.8
+* pfSense 2.2.6 (seems to be FreeBSD 10.1 underneath)
+* Windows XP
+* "9front" (fork of Plan 9)
+
+More modern operating systems did work, including
+
+* Various Linux distributions (CentOS 6+, Ubuntu 12.04+)
+* Modern windows distributions (Server 2012)
+* OpenBSD 6
+
+I was pointed to this thread - 
+https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg04532.html , 
+and if I apply that patch network connectivity begins working normally 
+again. (I am running under x86-64 btw)
