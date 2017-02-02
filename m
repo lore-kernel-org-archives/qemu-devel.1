@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k8-0007mZ-Jw
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k5-0007iL-Ak
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k0-000469-WC
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:36 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jz-00044m-Ct
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:33 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:55 +1100
-Message-Id: <20170202051445.5735-58-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:53 +1100
+Message-Id: <20170202051445.5735-56-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 057/107] target-ppc: Add xsxexpqp instruction
+Subject: [Qemu-devel] [PULL 055/107] target-ppc: Use correct precision for
+ FPRF setting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,56 +21,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Bharata B Rao <bharata@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-xsxexpqp: VSX Scalar Extract Exponent Quad Precision
+Use correct FP precision when setting FPRF in FP conversion helpers
+instead of always assuming float64 precision.
 
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate/vsx-impl.inc.c | 15 +++++++++++++++
- target/ppc/translate/vsx-ops.inc.c  |  1 +
- 2 files changed, 16 insertions(+)
+ target/ppc/fpu_helper.c | 4 ++--
+ target/ppc/internal.h   | 1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 33ca177..228e2a5 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1224,6 +1224,21 @@ static void gen_xsxexpdp(DisasContext *ctx)
-     tcg_gen_shri_i64(rt, cpu_vsrh(xB(ctx->opcode)), 52);
-     tcg_gen_andi_i64(rt, rt, 0x7FF);
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index f4103f5..01b335f 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -109,6 +109,7 @@ void helper_compute_fprf_##tp(CPUPPCState *env, tp arg)        \
  }
-+
-+static void gen_xsxexpqp(DisasContext *ctx)
-+{
-+    TCGv_i64 xth = cpu_vsrh(rD(ctx->opcode) + 32);
-+    TCGv_i64 xtl = cpu_vsrl(rD(ctx->opcode) + 32);
-+    TCGv_i64 xbh = cpu_vsrh(rB(ctx->opcode) + 32);
-+
-+    if (unlikely(!ctx->vsx_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_VSXU);
-+        return;
-+    }
-+    tcg_gen_shri_i64(xth, xbh, 48);
-+    tcg_gen_andi_i64(xth, xth, 0x7FFF);
-+    tcg_gen_movi_i64(xtl, 0);
-+}
- #endif
  
- #undef GEN_XX2FORM
-diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index 85d3b7d..87f1852 100644
---- a/target/ppc/translate/vsx-ops.inc.c
-+++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -115,6 +115,7 @@ GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
+ COMPUTE_FPRF(float16)
++COMPUTE_FPRF(float32)
+ COMPUTE_FPRF(float64)
  
- #ifdef TARGET_PPC64
- GEN_XX2FORM_EO(xsxexpdp, 0x16, 0x15, 0x00, PPC2_ISA300),
-+GEN_VSX_XFORM_300_EO(xsxexpqp, 0x04, 0x19, 0x02, 0x00000001),
- #endif
+ /* Floating-point invalid operations exception */
+@@ -2652,8 +2653,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                \
+             xt.tfld = ttp##_snan_to_qnan(xt.tfld);                 \
+         }                                                          \
+         if (sfprf) {                                               \
+-            helper_compute_fprf_float64(env, ttp##_to_float64(xt.tfld, \
+-                                &env->fp_status));                 \
++            helper_compute_fprf_##ttp(env, xt.tfld);               \
+         }                                                          \
+     }                                                              \
+                                                                    \
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index 1e27209..187f024 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -244,4 +244,5 @@ static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+ }
  
- GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
+ void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
++void helper_compute_fprf_float32(CPUPPCState *env, float32 arg);
+ #endif /* PPC_INTERNAL_H */
 -- 
 2.9.3
