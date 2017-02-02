@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZPXG-0006nD-Ji
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 17:07:23 -0500
+	(envelope-from <mst@redhat.com>) id 1cZPck-0000rU-IR
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 17:13:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZPXC-0007J6-KN
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 17:07:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42560)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cZPXC-0007In-Dw
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 17:07:18 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6B32580F99
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 22:07:18 +0000 (UTC)
-Message-ID: <1486073234.20628.51.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 02 Feb 2017 23:07:14 +0100
-In-Reply-To: <1486049722.3484.25.camel@redhat.com>
-References: <1486046738-26059-1-git-send-email-abologna@redhat.com>
-	<1486047322.20628.42.camel@redhat.com>
-	<1486049722.3484.25.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] q35: Improve sample configuration files
+	(envelope-from <mst@redhat.com>) id 1cZPci-0001ZC-NA
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 17:13:02 -0500
+Date: Fri, 3 Feb 2017 00:12:57 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170203000618-mutt-send-email-mst@kernel.org>
+References: <20170202195601.11286-1-sw@weilnetz.de>
+	<bdfbc0e6-e630-a1ac-5132-24b6a2dd6122@redhat.com>
+	<a5309467-337b-2827-489d-2abbce8356e4@weilnetz.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a5309467-337b-2827-489d-2abbce8356e4@weilnetz.de>
+Subject: Re: [Qemu-devel] [PATCH] tci: Remove invalid assertions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, drjones@redhat.com
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
-On Do, 2017-02-02 at 16:35 +0100, Andrea Bolognani wrote:
-> On Thu, 2017-02-02 at 15:55 +0100, Gerd Hoffmann wrote:
-> > > +++ b/docs/q35-emulated.cfg
-> > >=20
-> > > +#   00:01.0 VGA compatible controller
-> > >=20
-> > > +[device "video"]
-> > > +  driver =3D "VGA"
-> > > +  bus =3D "pcie.0"
-> > > +  addr =3D "02.0"
-> >=20
-> > Here is a address mismatch ;)
->=20
-> Oh, wait, I realize where the mismatch comes from now:
-> on real hardware (my laptop) the video card is plugged
-> into 00:02.0, but the default one you get when you don't
-> pass -nodefault to QEMU is plugged into 00:01.0!
+On Thu, Feb 02, 2017 at 09:10:26PM +0100, Stefan Weil wrote:
+> Am 02.02.2017 um 21:00 schrieb Eric Blake:
+> > On 02/02/2017 01:56 PM, Stefan Weil wrote:
+> > > tb_jmp_insn_offset and tb_jmp_reset_offset are pointers
+> > > and cannot be used with ARRAY_SIZE.
+> > > 
+> > > Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> > > ---
+> > >  tcg/tci/tcg-target.inc.c | 2 --
+> > >  1 file changed, 2 deletions(-)
+> > 
+> > mst posted an alternative patch:
+> > https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00551.html
+> 
+> 
+> Yes, I noticed that, too. It's not obvious that this new
+> assertion will be correct, and none of the other targets
+> has that kind of assertion. Only two targets use an
+> assertion which detects NULL pointers, but NULL pointers
+> will result in an abort anyway.
+> 
+> Do you think that there are reasons why TCI should use
+> the assertion suggested by Michael?
+> 
+> Stefan
 
-And that depends on the chipset.  On q35 it is 01.0, whereas on pc it is
-02.0 because 01.0 is occupied by the piix southbridge.
+You know what this code does and I don't, not really.
+I just did a monkey patch guessing at what was intended
+(value is used as an array index, so we do a bounds check).
 
-> I think we should use 00:02.0, do you agree? I would
-> also use the same slot in q35-virtio-graphical.cfg.
+I sent the patch before I saw yours simply to fix the build in a way
+that's as unintrusive as possible: args[0] seemed to come from guest so
+I thought it might be prudent to do a bounds check.
 
-Matter of taste really.  I have some guests where the vga is at 04.0,
-works fine too.  But being consistent across all configurations makes
-sense.
+So feel free to ignore mine. Here's an ack for yours
 
-cheers,
-  Gerd
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+-- 
+MST
