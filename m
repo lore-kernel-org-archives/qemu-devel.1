@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZIU7-0005RI-PN
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:45 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cZIU1-0005Ke-1x
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZIU0-0005Ry-HR
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:39 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:39800 helo=smtp.ispras.ru)
+	(envelope-from <batuzovk@ispras.ru>) id 1cZITx-0005PF-1A
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:33 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:39801 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZIU0-0005OW-7l
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:32 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cZITw-0005OZ-Ez
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:28 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Thu,  2 Feb 2017 17:34:58 +0300
-Message-Id: <1486046099-17726-21-git-send-email-batuzovk@ispras.ru>
+Date: Thu,  2 Feb 2017 17:34:43 +0300
+Message-Id: <1486046099-17726-6-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
 References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2.1 20/21] target/arm: load two consecutive
- 64-bits vector regs as a 128-bit vector reg
+Subject: [Qemu-devel] [PATCH v2.1 05/21] tcg: add simple alias analysis
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +26,235 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kirill Batuzov <batuzovk@ispras.ru>
 
-ARM instruction set does not have loads to 128-bit vector register (q-regs).
-Instead it can read several consecutive 64-bit vector register (d-regs)
-which is used by GCC to load 128-bit registers from memory.
+Add a simple alias analysis to TCG which finds out memory loads and stores
+that overlap with CPUState. This information can be used later in liveness
+analysis to ensure correctness of register allocation. In particular, if load
+or store overlaps with memory location of some global variable, this variable
+should be spilled and reloaded at appropriate times.
 
-For vector operations to work we need to detect such loads and transform them
-into 128-bit loads to 128-bit temporaries.
+Previously no such analysis was performed and for correctness reasons it was
+required that no load/store operations overlap with memory locations of global
+variables.
 
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- target/arm/translate.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 90e14df..5bd0b1c 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4710,6 +4710,21 @@ static int disas_neon_ls_insn(DisasContext *s, uint32_t insn)
-                 tcg_gen_addi_i32(addr, addr, 1 << size);
-             }
-             if (size == 3) {
-+#ifdef TCG_TARGET_HAS_REG128
-+                if (rd % 2 == 0 && nregs == 2) {
-+                    TCGv aa32addr = gen_aa32_addr(s, addr, MO_TE | MO_128);
-+                    /* 128-bit load */
-+                    if (load) {
-+                        tcg_gen_qemu_ld_v128(cpu_Q[rd / 2], aa32addr,
-+                                             get_mem_index(s), MO_TE | MO_128);
-+                    } else {
-+                        tcg_gen_qemu_st_v128(cpu_Q[rd / 2], aa32addr,
-+                                             get_mem_index(s), MO_TE | MO_128);
-+                    }
-+                    tcg_temp_free(aa32addr);
-+                    break;
-+                }
+I believe checkpatch warning here to be false-positive.
+
+---
+ tcg/optimize.c | 146 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.h      |  17 +++++++
+ 2 files changed, 163 insertions(+)
+
+diff --git a/tcg/optimize.c b/tcg/optimize.c
+index adfc56c..2347ce3 100644
+--- a/tcg/optimize.c
++++ b/tcg/optimize.c
+@@ -34,6 +34,7 @@
+ 
+ struct tcg_temp_info {
+     bool is_const;
++    bool is_base;
+     uint16_t prev_copy;
+     uint16_t next_copy;
+     tcg_target_ulong val;
+@@ -61,6 +62,7 @@ static void reset_temp(TCGArg temp)
+     temps[temp].next_copy = temp;
+     temps[temp].prev_copy = temp;
+     temps[temp].is_const = false;
++    temps[temp].is_base = false;
+     temps[temp].mask = -1;
+ }
+ 
+@@ -1429,3 +1431,147 @@ void tcg_optimize(TCGContext *s)
+         }
+     }
+ }
++
++/* Simple alias analysis. It finds out which load/store operations overlap
++   with CPUArchState. The result is stored in TCGContext and can be used
++   during liveness analysis and register allocation. */
++void tcg_alias_analysis(TCGContext *s)
++{
++    int oi, oi_next;
++
++    reset_all_temps(s->nb_temps);
++    temps[GET_TCGV_PTR(s->tcg_env)].is_base = true;
++    temps[GET_TCGV_PTR(s->tcg_env)].val = 0;
++
++    for (oi = s->gen_op_buf[0].next; oi != 0; oi = oi_next) {
++        int nb_oargs, i;
++        int size;
++        TCGAliasType tp;
++
++        TCGOp * const op = &s->gen_op_buf[oi];
++        TCGArg * const args = &s->gen_opparam_buf[op->args];
++        TCGOpcode opc = op->opc;
++        const TCGOpDef *def = &tcg_op_defs[opc];
++
++        oi_next = op->next;
++
++        if (opc == INDEX_op_call) {
++            nb_oargs = op->callo;
++        } else {
++            nb_oargs = def->nb_oargs;
++        }
++
++        s->alias_info[oi] = (TCGAliasInfo){
++                TCG_NOT_ALIAS,
++                false,
++                0,
++                0
++            };
++
++        switch (opc) {
++        CASE_OP_32_64(movi):
++            temps[args[0]].is_const = 1;
++            temps[args[0]].val = args[1];
++            break;
++        CASE_OP_32_64(mov):
++            temps[args[0]].is_const = temps[args[1]].is_const;
++            temps[args[0]].is_base = temps[args[1]].is_base;
++            temps[args[0]].val = temps[args[1]].val;
++            break;
++        CASE_OP_32_64(add):
++        CASE_OP_32_64(sub):
++            if (temps[args[1]].is_base && temps[args[2]].is_const) {
++                temps[args[0]].is_base = true;
++                temps[args[0]].is_const = false;
++                temps[args[0]].val =
++                    do_constant_folding(opc, temps[args[1]].val,
++                                        temps[args[2]].val);
++            } else {
++                reset_temp(args[0]);
++            }
++        CASE_OP_32_64(ld8s):
++        CASE_OP_32_64(ld8u):
++            size = 1;
++            tp = TCG_ALIAS_READ;
++            goto do_ldst;
++        CASE_OP_32_64(ld16s):
++        CASE_OP_32_64(ld16u):
++            size = 2;
++            tp = TCG_ALIAS_READ;
++            goto do_ldst;
++        case INDEX_op_ld_i32:
++        case INDEX_op_ld32s_i64:
++        case INDEX_op_ld32u_i64:
++            size = 4;
++            tp = TCG_ALIAS_READ;
++            goto do_ldst;
++        case INDEX_op_ld_i64:
++            size = 8;
++            tp = TCG_ALIAS_READ;
++            goto do_ldst;
++        case INDEX_op_ld_v128:
++            size = 16;
++            tp = TCG_ALIAS_READ;
++            goto do_ldst;
++        CASE_OP_32_64(st8):
++            size = 1;
++            tp = TCG_ALIAS_WRITE;
++            goto do_ldst;
++        CASE_OP_32_64(st16):
++            size = 2;
++            tp = TCG_ALIAS_WRITE;
++            goto do_ldst;
++        case INDEX_op_st_i32:
++        case INDEX_op_st32_i64:
++            size = 4;
++            tp = TCG_ALIAS_WRITE;
++            goto do_ldst;
++        case INDEX_op_st_i64:
++            size = 8;
++            tp = TCG_ALIAS_WRITE;
++            goto do_ldst;
++        case INDEX_op_st_v128:
++            size = 16;
++            tp = TCG_ALIAS_WRITE;
++            goto do_ldst;
++        do_ldst:
++            if (temps[args[1]].is_base) {
++                TCGArg val;
++#if TCG_TARGET_REG_BITS == 32
++                val = do_constant_folding(INDEX_op_add_i32,
++                                          temps[args[1]].val,
++                                          args[2]);
++#else
++                val = do_constant_folding(INDEX_op_add_i64,
++                                          temps[args[1]].val,
++                                          args[2]);
 +#endif
-                 tmp64 = tcg_temp_new_i64();
-                 if (load) {
-                     gen_aa32_ld64(s, tmp64, addr, get_mem_index(s));
++                if ((tcg_target_long)val < sizeof(CPUArchState) &&
++                    (tcg_target_long)val + size > 0) {
++                    s->alias_info[oi].alias_type = tp;
++                    s->alias_info[oi].fixed_offset = true;
++                    s->alias_info[oi].offset = val;
++                    s->alias_info[oi].size = size;
++                } else {
++                    s->alias_info[oi].alias_type = TCG_NOT_ALIAS;
++                }
++            } else {
++                s->alias_info[oi].alias_type = tp;
++                s->alias_info[oi].fixed_offset = false;
++            }
++            goto do_reset_output;
++        default:
++            if (def->flags & TCG_OPF_BB_END) {
++                reset_all_temps(s->nb_temps);
++                temps[GET_TCGV_PTR(s->tcg_env)].is_base = true;
++                temps[GET_TCGV_PTR(s->tcg_env)].val = 0;
++            } else {
++        do_reset_output:
++                for (i = 0; i < nb_oargs; i++) {
++                    reset_temp(args[i]);
++                }
++            }
++            break;
++        }
++    }
++}
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index fa455ae..0e1fbe9 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -678,6 +678,20 @@ QEMU_BUILD_BUG_ON(OPPARAM_BUF_SIZE > (1 << 14));
+ /* Make sure that we don't overflow 64 bits without noticing.  */
+ QEMU_BUILD_BUG_ON(sizeof(TCGOp) > 8);
+ 
++typedef enum TCGAliasType {
++    TCG_NOT_ALIAS = 0,
++    TCG_ALIAS_READ = 1,
++    TCG_ALIAS_WRITE = 2,
++    TCG_ALIAS_RW = TCG_ALIAS_READ | TCG_ALIAS_WRITE
++} TCGAliasType;
++
++typedef struct TCGAliasInfo {
++    TCGAliasType alias_type;
++    bool fixed_offset;
++    tcg_target_long offset;
++    tcg_target_long size;
++} TCGAliasInfo;
++
+ struct TCGContext {
+     uint8_t *pool_cur, *pool_end;
+     TCGPool *pool_first, *pool_current, *pool_first_large;
+@@ -762,6 +776,8 @@ struct TCGContext {
+     TCGOp gen_op_buf[OPC_BUF_SIZE];
+     TCGArg gen_opparam_buf[OPPARAM_BUF_SIZE];
+ 
++    TCGAliasInfo alias_info[OPC_BUF_SIZE];
++
+     uint16_t gen_insn_end_off[TCG_MAX_INSNS];
+     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
+ };
+@@ -1009,6 +1025,7 @@ TCGOp *tcg_op_insert_before(TCGContext *s, TCGOp *op, TCGOpcode opc, int narg);
+ TCGOp *tcg_op_insert_after(TCGContext *s, TCGOp *op, TCGOpcode opc, int narg);
+ 
+ void tcg_optimize(TCGContext *s);
++void tcg_alias_analysis(TCGContext *s);
+ 
+ /* only used for debugging purposes */
+ void tcg_dump_ops(TCGContext *s);
 -- 
 2.1.4
