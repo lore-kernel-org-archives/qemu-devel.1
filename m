@@ -1,29 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZC95-0000x6-MN
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 02:49:32 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cZCfz-0001MV-FL
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:23:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZC92-0007pk-NI
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 02:49:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cZC92-0007p0-HC
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 02:49:28 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5AED4C04B935
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 07:49:28 +0000 (UTC)
-Message-ID: <1486021764.20628.29.camel@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1cZCfv-0006eT-VJ
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:23:31 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 02 Feb 2017 08:49:24 +0100
-In-Reply-To: <1485969640-8149-1-git-send-email-abologna@redhat.com>
-References: <1485969640-8149-1-git-send-email-abologna@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] q35: Improve sample configuration files
+Date: Thu,  2 Feb 2017 09:23:09 +0100
+Message-Id: <1486023789-28995-5-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1486023789-28995-1-git-send-email-kraxel@redhat.com>
+References: <1486023789-28995-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 4/4] cirrus: fix oob access issue (CVE-2017-2615)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +19,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, drjones@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Li Qiang <liqiang6-s@360.cn>, Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org, P J P <ppandit@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Wolfgang Bumiller <w.bumiller@proxmox.com>
 
-  Hi,
+From: Li Qiang <liqiang6-s@360.cn>
 
->   * Document more devices:
->     - the video card is added by default;
->     - so is the Ethernet adapter, apparently.
->=20
-> The last part seems to clash with some of Gerd's comments,
-> so I'm kinda puzzled.
+When doing bitblt copy in backward mode, we should minus the
+blt width first just like the adding in the forward mode. This
+can avoid the oob access of the front of vga's vram.
 
-Oh yes, the wonderful confusing world of default devices ;)
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 1485938101-26602-1-git-send-email-kraxel@redhat.com
+Message-id: 5887254f.863a240a.2c122.5500@mx.google.com
 
-So, if you run qemu with "-nodefaults" it will not add those two
-devices.
+{ kraxel: with backward blits (negative pitch) addr is the topmost
+          address, so check it as-is against vram size ]
 
-If you add a video card manually (via -device or config file entry) qemu
-will not add the default video card.
+Cc: qemu-stable@nongnu.org
+Cc: P J P <ppandit@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Fixes: d3532a0db02296e687711b8cdc7791924efccea0 (CVE-2014-8106)
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/cirrus_vga.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-Likewise, if you add a NIC manually, qemu will not add the default
-ethernet device (and IIRC creating the default netdev will be skipped
-too).
-
-cheers,
-  Gerd
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index 7db6409..16f27e8 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -274,10 +274,9 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+ {
+     if (pitch < 0) {
+         int64_t min = addr
+-            + ((int64_t)s->cirrus_blt_height-1) * pitch;
+-        int32_t max = addr
+-            + s->cirrus_blt_width;
+-        if (min < 0 || max > s->vga.vram_size) {
++            + ((int64_t)s->cirrus_blt_height - 1) * pitch
++            - s->cirrus_blt_width;
++        if (min < -1 || addr >= s->vga.vram_size) {
+             return true;
+         }
+     } else {
+-- 
+1.8.3.1
