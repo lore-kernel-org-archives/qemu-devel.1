@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k8-0007mY-JO
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:44 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kA-0007pQ-T5
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k1-00046V-7t
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:36 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k5-0004BQ-EX
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:38 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:14:00 +1100
-Message-Id: <20170202051445.5735-63-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:14:13 +1100
+Message-Id: <20170202051445.5735-76-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 062/107] ppc: Add ppc_set_compat_all()
+Subject: [Qemu-devel] [PULL 075/107] target-ppc: Add xsiexpdp instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,155 +20,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Once a compatiblity mode is negotiated with the guest,
-h_client_architecture_support() uses run_on_cpu() to update each CPU to
-the new mode.  We're going to want this logic somewhere else shortly,
-so make a helper function to do this global update.
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-We put it in target-ppc/compat.c - it makes as much sense at the CPU level
-as it does at the machine level.  We also move the cpu_synchronize_state()
-into ppc_set_compat(), since it doesn't really make any sense to call that
-without synchronizing state.
+xsiexpdp: VSX Scalar Insert Exponent Double Precision
 
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_hcall.c | 31 +++++--------------------------
- target/ppc/compat.c  | 35 +++++++++++++++++++++++++++++++++++
- target/ppc/cpu.h     |  3 +++
- 3 files changed, 43 insertions(+), 26 deletions(-)
+ target/ppc/translate/vsx-impl.inc.c | 20 ++++++++++++++++++++
+ target/ppc/translate/vsx-ops.inc.c  |  1 +
+ 2 files changed, 21 insertions(+)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index f4531c5..42d20e0 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -921,20 +921,6 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
-     }
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index 2d9fe50..2d09225 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1243,6 +1243,26 @@ static void gen_xsxexpqp(DisasContext *ctx)
+     tcg_gen_movi_i64(xtl, 0);
  }
  
--typedef struct {
--    uint32_t compat_pvr;
--    Error *err;
--} SetCompatState;
--
--static void do_set_compat(CPUState *cs, run_on_cpu_data arg)
--{
--    PowerPCCPU *cpu = POWERPC_CPU(cs);
--    SetCompatState *s = arg.host_ptr;
--
--    cpu_synchronize_state(cs);
--    ppc_set_compat(cpu, s->compat_pvr, &s->err);
--}
--
- static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-                                                   sPAPRMachineState *spapr,
-                                                   target_ulong opcode,
-@@ -942,7 +928,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
- {
-     target_ulong list = ppc64_phys_to_real(args[0]);
-     target_ulong ov_table;
--    CPUState *cs;
-     bool explicit_match = false; /* Matched the CPU's real PVR */
-     uint32_t max_compat = cpu->max_compat;
-     uint32_t best_compat = 0;
-@@ -986,18 +971,12 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
- 
-     /* Update CPUs */
-     if (cpu->compat_pvr != best_compat) {
--        CPU_FOREACH(cs) {
--            SetCompatState s = {
--                .compat_pvr = best_compat,
--                .err = NULL,
--            };
-+        Error *local_err = NULL;
- 
--            run_on_cpu(cs, do_set_compat, RUN_ON_CPU_HOST_PTR(&s));
--
--            if (s.err) {
--                error_report_err(s.err);
--                return H_HARDWARE;
--            }
-+        ppc_set_compat_all(best_compat, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            return H_HARDWARE;
-         }
-     }
- 
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-index 1059555..458da26 100644
---- a/target/ppc/compat.c
-+++ b/target/ppc/compat.c
-@@ -18,6 +18,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm.h"
- #include "kvm_ppc.h"
- #include "sysemu/cpus.h"
-@@ -124,6 +125,8 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
-         pcr = compat->pcr;
-     }
- 
-+    cpu_synchronize_state(CPU(cpu));
-+
-     cpu->compat_pvr = compat_pvr;
-     env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
- 
-@@ -136,6 +139,38 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
-     }
- }
- 
-+typedef struct {
-+    uint32_t compat_pvr;
-+    Error *err;
-+} SetCompatState;
-+
-+static void do_set_compat(CPUState *cs, run_on_cpu_data arg)
++static void gen_xsiexpdp(DisasContext *ctx)
 +{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    SetCompatState *s = arg.host_ptr;
++    TCGv_i64 xth = cpu_vsrh(xT(ctx->opcode));
++    TCGv ra = cpu_gpr[rA(ctx->opcode)];
++    TCGv rb = cpu_gpr[rB(ctx->opcode)];
++    TCGv_i64 t0;
 +
-+    ppc_set_compat(cpu, s->compat_pvr, &s->err);
-+}
-+
-+void ppc_set_compat_all(uint32_t compat_pvr, Error **errp)
-+{
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        SetCompatState s = {
-+            .compat_pvr = compat_pvr,
-+            .err = NULL,
-+        };
-+
-+        run_on_cpu(cs, do_set_compat, RUN_ON_CPU_HOST_PTR(&s));
-+
-+        if (s.err) {
-+            error_propagate(errp, s.err);
-+            return;
-+        }
++    if (unlikely(!ctx->vsx_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_VSXU);
++        return;
 +    }
++    t0 = tcg_temp_new_i64();
++    tcg_gen_andi_i64(xth, ra, 0x800FFFFFFFFFFFFF);
++    tcg_gen_andi_i64(t0, rb, 0x7FF);
++    tcg_gen_shli_i64(t0, t0, 52);
++    tcg_gen_or_i64(xth, xth, t0);
++    /* dword[1] is undefined */
++    tcg_temp_free_i64(t0);
 +}
 +
- int ppc_compat_max_threads(PowerPCCPU *cpu)
+ static void gen_xsxsigdp(DisasContext *ctx)
  {
-     const CompatInfo *compat = compat_by_pvr(cpu->compat_pvr);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 22842dd..4d72d75 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1326,6 +1326,9 @@ static inline int cpu_mmu_index (CPUPPCState *env, bool ifetch)
- bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-                       uint32_t min_compat_pvr, uint32_t max_compat_pvr);
- void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
-+#if !defined(CONFIG_USER_ONLY)
-+void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
-+#endif
- int ppc_compat_max_threads(PowerPCCPU *cpu);
- #endif /* defined(TARGET_PPC64) */
+     TCGv rt = cpu_gpr[rD(ctx->opcode)];
+diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
+index aeeaff2..5980ac6 100644
+--- a/target/ppc/translate/vsx-ops.inc.c
++++ b/target/ppc/translate/vsx-ops.inc.c
+@@ -120,6 +120,7 @@ GEN_XX2FORM_EO(xsxexpdp, 0x16, 0x15, 0x00, PPC2_ISA300),
+ GEN_VSX_XFORM_300_EO(xsxexpqp, 0x04, 0x19, 0x02, 0x00000001),
+ GEN_XX2FORM_EO(xsxsigdp, 0x16, 0x15, 0x01, PPC2_ISA300),
+ GEN_VSX_XFORM_300_EO(xsxsigqp, 0x04, 0x19, 0x12, 0x00000001),
++GEN_HANDLER_E(xsiexpdp, 0x3C, 0x16, 0x1C, 0, PPC_NONE, PPC2_ISA300),
+ #endif
  
+ GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
 -- 
 2.9.3
