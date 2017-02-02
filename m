@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jh-0007Aj-6p
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jg-0007AH-Kf
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9je-0003Wu-4S
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9je-0003X7-7T
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:08 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:14 +1100
-Message-Id: <20170202051445.5735-17-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:11 +1100
+Message-Id: <20170202051445.5735-14-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 016/107] pseries: Make cpu_update during CAS
- unconditional
+Subject: [Qemu-devel] [PULL 013/107] target-ppc: Implement bcdsetsgn.
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,94 +21,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-spapr_h_cas_compose_response() includes a cpu_update parameter which
-controls whether it includes updated information on the CPUs in the device
-tree fragment returned from the ibm,client-architecture-support (CAS) call.
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-Providing the updated information is essential when CAS has negotiated
-compatibility options which require different cpu information to be
-presented to the guest.  However, it should be safe to provide in other
-cases (it will just override the existing data in the device tree with
-identical data).  This simplifies the code by removing the parameter and
-always providing the cpu update information.
+bcdsetsgn.: Decimal set sign. This instruction copies the register
+value to the result register but adjust the signal according to
+the preferred sign value.
 
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- hw/ppc/spapr.c         | 5 +----
- hw/ppc/spapr_hcall.c   | 8 ++------
- include/hw/ppc/spapr.h | 1 -
- 3 files changed, 3 insertions(+), 11 deletions(-)
+ target/ppc/helper.h                 |  1 +
+ target/ppc/int_helper.c             | 19 +++++++++++++++++++
+ target/ppc/translate/vmx-impl.inc.c |  8 ++++++++
+ 3 files changed, 28 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index cef696c..ca78e31 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -685,7 +685,6 @@ out:
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 7957633..de515ea 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -380,6 +380,7 @@ DEF_HELPER_3(bcdctz, i32, avr, avr, i32)
+ DEF_HELPER_3(bcdcfsq, i32, avr, avr, i32)
+ DEF_HELPER_3(bcdctsq, i32, avr, avr, i32)
+ DEF_HELPER_4(bcdcpsgn, i32, avr, avr, avr, i32)
++DEF_HELPER_3(bcdsetsgn, i32, avr, avr, i32)
  
- int spapr_h_cas_compose_response(sPAPRMachineState *spapr,
-                                  target_ulong addr, target_ulong size,
--                                 bool cpu_update,
-                                  sPAPROptionVector *ov5_updates)
+ DEF_HELPER_2(xsadddp, void, env, i32)
+ DEF_HELPER_2(xssubdp, void, env, i32)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 61762ee..00d04c1 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -2943,6 +2943,25 @@ uint32_t helper_bcdcpsgn(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
+     return bcd_cmp_zero(r);
+ }
+ 
++uint32_t helper_bcdsetsgn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
++{
++    int i;
++    int invalid = 0;
++    int sgnb = bcd_get_sgn(b);
++
++    *r = *b;
++    bcd_put_digit(r, bcd_preferred_sgn(sgnb, ps), 0);
++
++    for (i = 1; i < 32; i++) {
++        bcd_get_digit(b, i, &invalid);
++        if (unlikely(invalid)) {
++            return CRF_SO;
++        }
++    }
++
++    return bcd_cmp_zero(r);
++}
++
+ void helper_vsbox(ppc_avr_t *r, ppc_avr_t *a)
  {
-     void *fdt, *fdt_skel;
-@@ -704,9 +703,7 @@ int spapr_h_cas_compose_response(sPAPRMachineState *spapr,
-     g_free(fdt_skel);
+     int i;
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index c14b666..b188e60 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -991,6 +991,7 @@ GEN_BCD2(bcdcfz)
+ GEN_BCD2(bcdctz)
+ GEN_BCD2(bcdcfsq)
+ GEN_BCD2(bcdctsq)
++GEN_BCD2(bcdsetsgn)
+ GEN_BCD(bcdcpsgn);
  
-     /* Fixup cpu nodes */
--    if (cpu_update) {
--        _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
--    }
-+    _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
- 
-     if (spapr_dt_cas_updates(spapr, fdt, ov5_updates)) {
-         return -1;
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index b2a8e48..1333110 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -945,7 +945,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
-     target_ulong ov_table;
-     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu_);
-     CPUState *cs;
--    bool cpu_match = false, cpu_update = true;
-+    bool cpu_match = false;
-     unsigned old_cpu_version = cpu_->cpu_version;
-     unsigned compat_lvl = 0, cpu_version = 0;
-     unsigned max_lvl = get_compat_level(cpu_->max_compat);
-@@ -999,10 +999,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
-         }
+ static void gen_xpnd04_1(DisasContext *ctx)
+@@ -1014,6 +1015,9 @@ static void gen_xpnd04_1(DisasContext *ctx)
+     case 7:
+         gen_bcdcfn(ctx);
+         break;
++    case 31:
++        gen_bcdsetsgn(ctx);
++        break;
+     default:
+         gen_invalid(ctx);
+         break;
+@@ -1038,12 +1042,16 @@ static void gen_xpnd04_2(DisasContext *ctx)
+     case 7:
+         gen_bcdcfn(ctx);
+         break;
++    case 31:
++        gen_bcdsetsgn(ctx);
++        break;
+     default:
+         gen_invalid(ctx);
+         break;
      }
+ }
  
--    if (!cpu_version) {
--        cpu_update = false;
--    }
--
-     /* For the future use: here @ov_table points to the first option vector */
-     ov_table = list;
- 
-@@ -1028,7 +1024,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
- 
-     if (!spapr->cas_reboot) {
-         spapr->cas_reboot =
--            (spapr_h_cas_compose_response(spapr, args[1], args[2], cpu_update,
-+            (spapr_h_cas_compose_response(spapr, args[1], args[2],
-                                           ov5_updates) != 0);
-     }
-     spapr_ovec_cleanup(ov5_updates);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index f8d444d..04d2821 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -589,7 +589,6 @@ void spapr_events_init(sPAPRMachineState *sm);
- void spapr_dt_events(sPAPRMachineState *sm, void *fdt);
- int spapr_h_cas_compose_response(sPAPRMachineState *sm,
-                                  target_ulong addr, target_ulong size,
--                                 bool cpu_update,
-                                  sPAPROptionVector *ov5_updates);
- sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn);
- void spapr_tce_table_enable(sPAPRTCETable *tcet,
++
+ GEN_VXFORM_DUAL(vsubcuw, PPC_ALTIVEC, PPC_NONE, \
+                 xpnd04_1, PPC_NONE, PPC2_ISA300)
+ GEN_VXFORM_DUAL(vsubsws, PPC_ALTIVEC, PPC_NONE, \
 -- 
 2.9.3
