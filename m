@@ -1,41 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kumar.shubham@research.iiit.ac.in>)
-	id 1cZNK0-0001aO-8K
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:45:42 -0500
+	(envelope-from <stefan@weilnetz.de>) id 1cZNUI-0004ie-Gn
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:56:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kumar.shubham@research.iiit.ac.in>)
-	id 1cZNJt-0008Ty-9r
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:45:32 -0500
-Received: from research.iiit.ac.in ([196.12.53.8]:39064)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kumar.shubham@research.iiit.ac.in>)
-	id 1cZNJs-0008Oa-Ou
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:45:25 -0500
-Received: from localhost (localhost [127.0.0.1])
-	by research.iiit.ac.in (Postfix) with ESMTP id 4B132745505
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 01:15:18 +0530 (IST)
-Received: from research.iiit.ac.in ([127.0.0.1])
-	by localhost (research.iiit.ac.in [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id SXGrGWIjTH1H for <qemu-devel@nongnu.org>;
-	Fri,  3 Feb 2017 01:15:16 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by research.iiit.ac.in (Postfix) with ESMTP id 445957454FE
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 01:15:16 +0530 (IST)
-Received: from research.iiit.ac.in ([127.0.0.1])
-	by localhost (research.iiit.ac.in [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id bhDWF84sLIOy for <qemu-devel@nongnu.org>;
-	Fri,  3 Feb 2017 01:15:16 +0530 (IST)
-Received: from research.iiit.ac.in (localhost [127.0.0.1])
-	by research.iiit.ac.in (Postfix) with ESMTP id 21E727454EB
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 01:15:16 +0530 (IST)
-Date: Fri, 3 Feb 2017 01:15:16 +0530 (IST)
-From: Shubham Kumar <kumar.shubham@research.iiit.ac.in>
-Message-ID: <1000152322.892904.1486064716073.JavaMail.zimbra@research.iiit.ac.in>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] regarding QEMU cloning
+	(envelope-from <stefan@weilnetz.de>) id 1cZNUF-00065i-DL
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 14:56:10 -0500
+From: Stefan Weil <sw@weilnetz.de>
+Date: Thu,  2 Feb 2017 20:56:01 +0100
+Message-Id: <20170202195601.11286-1-sw@weilnetz.de>
+Subject: [Qemu-devel] [PATCH] tci: Remove invalid assertions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,17 +17,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>
 
-sir
+tb_jmp_insn_offset and tb_jmp_reset_offset are pointers
+and cannot be used with ARRAY_SIZE.
 
-I'm unable to clone QEMU using this command on my terminal  " git clone git://git.qemu-project.org/qemu.git ".
-The error I'm receiving is
-           " fatal: unable to access 'https://git.qemu-project.org/qemu.git/': Received HTTP code 503 from proxy after CONNECT".
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
+ tcg/tci/tcg-target.inc.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-I have tried many solutions given on internet but it doesn't work out.
-
-Regards
-Shubham Kumar
- 
- 
+diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
+index 26ee9b1664..b6a15569f8 100644
+--- a/tcg/tci/tcg-target.inc.c
++++ b/tcg/tci/tcg-target.inc.c
+@@ -566,7 +566,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+     case INDEX_op_goto_tb:
+         if (s->tb_jmp_insn_offset) {
+             /* Direct jump method. */
+-            tcg_debug_assert(args[0] < ARRAY_SIZE(s->tb_jmp_insn_offset));
+             /* Align for atomic patching and thread safety */
+             s->code_ptr = QEMU_ALIGN_PTR_UP(s->code_ptr, 4);
+             s->tb_jmp_insn_offset[args[0]] = tcg_current_code_size(s);
+@@ -575,7 +574,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+             /* Indirect jump method. */
+             TODO();
+         }
+-        tcg_debug_assert(args[0] < ARRAY_SIZE(s->tb_jmp_reset_offset));
+         s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
+         break;
+     case INDEX_op_br:
+-- 
+2.11.0
