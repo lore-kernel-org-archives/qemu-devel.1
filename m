@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZKCq-0001Sw-S7
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:25:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZKEq-0003kx-RK
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:28:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZKCp-0006NB-BV
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:25:56 -0500
-Received: from mail-vk0-x22a.google.com ([2607:f8b0:400c:c05::22a]:34353)
+	(envelope-from <peter.maydell@linaro.org>) id 1cZKEq-00075l-2E
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:28:00 -0500
+Received: from mail-ua0-x236.google.com ([2607:f8b0:400c:c08::236]:34767)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZKCp-0006Mz-61
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:25:55 -0500
-Received: by mail-vk0-x22a.google.com with SMTP id r136so14297106vke.1
-	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 08:25:55 -0800 (PST)
+	id 1cZKEp-00075P-U8
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:27:59 -0500
+Received: by mail-ua0-x236.google.com with SMTP id 35so15085058uak.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 08:27:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9zEaATTwGLNCB=X_mhqjapC-0jxPpv8OjDt=zqaFBnjA@mail.gmail.com>
-References: <1485893872-26524-1-git-send-email-mst@redhat.com>
-	<CAFEAcA9zEaATTwGLNCB=X_mhqjapC-0jxPpv8OjDt=zqaFBnjA@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8ACTcbJOdXnkfM=okG_WCOuqdF6MPv4jxCTq-4y_4e3Q@mail.gmail.com>
+References: <32ff6fa9-696a-f4a2-e884-3b22f91506e5@iki.fi>
+	<128aeca5-099c-e82b-5cc7-314c899231de@redhat.com>
+	<CAKv+Gu8ACTcbJOdXnkfM=okG_WCOuqdF6MPv4jxCTq-4y_4e3Q@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Feb 2017 16:25:34 +0000
-Message-ID: <CAFEAcA_SCHQ06uON3pEgpt2ku4HO2C-fUTHr7TZAVmZ1PEq09Q@mail.gmail.com>
+Date: Thu, 2 Feb 2017 16:27:39 +0000
+Message-ID: <CAFEAcA9OVuT-w177UdcyNJRKOMs5Rb8tT18m1zWgg=+7z=oihA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v5 00/22] virtio, vhost, pci: fixes, features
+Subject: Re: [Qemu-devel] KVM/QEMU on Raspberry Pi 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +30,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, Pekka Enberg <penberg@iki.fi>, KVM devel mailing list <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 2 February 2017 at 13:56, Peter Maydell <peter.maydell@linaro.org> wrote=
-:
-> On 31 January 2017 at 20:18, Michael S. Tsirkin <mst@redhat.com> wrote:
->> virtio, vhost, pci: fixes, features
->>
->> generic pci root port support
->> disable shpc by default
->> safer version of ARRAY_SIZE and QEMU_BUILD_BUG_ON
->> fixes and cleanups all over the place
->>
->> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On 2 February 2017 at 15:52, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> How is this supposed to work? RPI3 does not have a GIC at all, but a
+> proprietary interrupt controller that is not supported by KVM
 
-> Applied, thanks.
-
-...travis builds now fail for the --enable-tcg-interpreter config:
-https://travis-ci.org/qemu/qemu/jobs/197648661
-
-In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
-/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c: In function =E2=80=
-=98tcg_out_op=E2=80=99:
-/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:117: error:
-negative width in bit-field =E2=80=98<anonymous>=E2=80=99
-/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:569:255: error:
-negative width in bit-field =E2=80=98<anonymous>=E2=80=99
-In file included from /home/travis/build/qemu/qemu/tcg/tcg.c:255:0:
-/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:115: error:
-negative width in bit-field =E2=80=98<anonymous>=E2=80=99
-/home/travis/build/qemu/qemu/tcg/tci/tcg-target.inc.c:578:255: error:
-negative width in bit-field =E2=80=98<anonymous>=E2=80=99
-
-These look to be because we were trying to use ARRAY_SIZE()
-on a non-array, which was previously undetected. The use is
-only in an assert() so fairly harmless.
-
-Would somebody who cares about TCI like to provide a fix?
+The idea is that (with the relevant not-yet-in-master patchsets)
+you can fall back to "use a userspace interrupt controller model".
+The performance will probably not be great.
 
 thanks
 -- PMM
