@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cZIKL-0008Vh-Et
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:25:34 -0500
+	(envelope-from <den@openvz.org>) id 1cZILK-0000gM-GV
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:26:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cZIKI-0001Qu-A5
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:25:33 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:28714 helo=relay.sw.ru)
+	(envelope-from <den@openvz.org>) id 1cZILH-0001sB-A9
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:26:34 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:1512 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cZIKH-0001Pr-UO
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:25:30 -0500
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cZILG-0001ri-Ug
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:26:31 -0500
 From: "Denis V. Lunev" <den@openvz.org>
-Date: Thu,  2 Feb 2017 17:25:15 +0300
-Message-Id: <1486045515-8009-1-git-send-email-den@openvz.org>
-Subject: [Qemu-devel] [PATCH v2 1/1] mirror: do not increase offset during
- initial zero_or_discard phase
+Date: Thu,  2 Feb 2017 17:26:29 +0300
+Message-Id: <1486045589-8074-1-git-send-email-den@openvz.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 1/1] qemu-char: socket backend: disconnect
+ on write error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +26,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-If explicit zeroing out before mirroring is required for the target image,
-it moves the block job offset counter to EOF, then offset and len counters
-count the image size twice. There is no harm but stats are confusing,
-specifically the progress of the operation is always reported as 99% by
-management tools.
+Socket backend read handler should normally perform a disconnect, however
+the read handler may not get a chance to run if the frontend is not ready
+(qemu_chr_be_can_write() =3D=3D 0).
 
-The patch skips offset increase for the first "technical" pass over the
-image. This should not cause any further harm.
+This means that in virtio-serial frontend case if
+ - the host has disconnected (giving EPIPE on socket write)
+ - and the guest has disconnected (-> frontend not ready -> backend
+   will not read)
+ - and there is still data (frontend->backend) to flush (has to be a real=
+ly
+   tricky timing but nevertheless, we have observed the case in productio=
+n)
+
+This results in virtio-serial trying to flush this data continiously form=
+ing
+a busy loop.
+
+Solution: react on write error in the socket write handler.
+errno is not reliable after qio_channel_writev_full(), so we may not get
+the exact EPIPE, so disconnect on any error but QIO_CHANNEL_ERR_BLOCK whi=
+ch
+io_channel_send_full() converts to errno EAGAIN.
+We must not disconnect right away though, there still may be data to read
+(see 4bf1cb0).
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Jeff Cody <jcody@redhat.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Daniel P. Berrange <berrange@redhat.com>
+CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
+Changes from v2:
+- fixed prototype of tcp_chr_disconnect
+
 Changes from v1:
-- changed the approach - we do not allow to increase the offset rather then
-  to move it back
-- description rewritten
-- kludges to tests are removed as not actually needed with this approach
+- we do not rely on EPIPE anynore. Socket should be closed on all errors
+  except EAGAIN
 
- block/mirror.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ chardev/char-socket.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 301ba92..f100f5d 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -69,6 +69,7 @@ typedef struct MirrorBlockJob {
-     bool waiting_for_io;
-     int target_cluster_sectors;
-     int max_iov;
-+    bool initial_zeroing_ongoing;
- } MirrorBlockJob;
- 
- typedef struct MirrorOp {
-@@ -117,9 +118,10 @@ static void mirror_iteration_done(MirrorOp *op, int ret)
-         if (s->cow_bitmap) {
-             bitmap_set(s->cow_bitmap, chunk_num, nb_chunks);
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 4068dc5..865c527 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -97,6 +97,9 @@ static gboolean tcp_chr_accept(QIOChannel *chan,
+                                GIOCondition cond,
+                                void *opaque);
+=20
++static int tcp_chr_read_poll(void *opaque);
++static void tcp_chr_disconnect(Chardev *chr);
++
+ /* Called with chr_write_lock held.  */
+ static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
+ {
+@@ -114,6 +117,13 @@ static int tcp_chr_write(Chardev *chr, const uint8_t=
+ *buf, int len)
+             s->write_msgfds_num =3D 0;
          }
--        s->common.offset += (uint64_t)op->nb_sectors * BDRV_SECTOR_SIZE;
-+        if (!s->initial_zeroing_ongoing) {
-+            s->common.offset += (uint64_t)op->nb_sectors * BDRV_SECTOR_SIZE;
+=20
++        if (ret < 0 && errno !=3D EAGAIN) {
++            if (tcp_chr_read_poll(chr) <=3D 0) {
++                tcp_chr_disconnect(chr);
++                return len;
++            } /* else let the read handler finish it properly */
 +        }
-     }
--
-     qemu_iovec_destroy(&op->qiov);
-     g_free(op);
- 
-@@ -566,6 +568,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-             return 0;
-         }
- 
-+        s->initial_zeroing_ongoing = true;
-         for (sector_num = 0; sector_num < end; ) {
-             int nb_sectors = MIN(end - sector_num,
-                 QEMU_ALIGN_DOWN(INT_MAX, s->granularity) >> BDRV_SECTOR_BITS);
-@@ -573,6 +576,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-             mirror_throttle(s);
- 
-             if (block_job_is_cancelled(&s->common)) {
-+                s->initial_zeroing_ongoing = false;
-                 return 0;
-             }
- 
-@@ -587,6 +591,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-         }
- 
-         mirror_wait_for_all_io(s);
-+        s->initial_zeroing_ongoing = false;
-     }
- 
-     /* First part, loop on the sectors and initialize the dirty bitmap.  */
--- 
++
+         return ret;
+     } else {
+         /* XXX: indicate an error ? */
+--=20
 2.7.4
