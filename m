@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9je-000768-2E
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:08 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9je-00077Q-Vx
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jb-0003UW-PJ
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jb-0003Uf-Te
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:06 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:03 +1100
-Message-Id: <20170202051445.5735-6-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:07 +1100
+Message-Id: <20170202051445.5735-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 005/107] target-ppc: Add xscmpexp[dp,
- qp] instructions
+Subject: [Qemu-devel] [PULL 009/107] target-ppc: implement lxv/lxvx and
+ stxv/stxvx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,147 +21,183 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Bharata B Rao <bharata@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-xscmpexpdp: VSX Scalar Compare Exponents Double-Precision
-xscmpexpqp: VSX Scalar Compare Exponents Quad-Precision
+lxv:  Load VSX Vector
+lxvx: Load VSX Vector Indexed
 
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+    Little/Big-endian Storage
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    Vector load results:
+    BE:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    LE:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |E7|E6|E5|E4|E3|E2|E1|E0|F7|F6|F5|F4|F3|F2|F1|F0|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+stxv: Store VSX Vector
+stxvx: Store VSX Vector Indexed
+
+    Vector (8-bit elements) in BE:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    Vector (8-bit elements) in LE:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |E7|E6|E5|E4|E3|E2|E1|E0|F7|F6|F5|F4|F3|F2|F1|F0|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    Store results in following:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c             | 64 +++++++++++++++++++++++++++++++++++++
- target/ppc/helper.h                 |  2 ++
- target/ppc/translate/vsx-impl.inc.c |  2 ++
- target/ppc/translate/vsx-ops.inc.c  |  6 ++++
- 4 files changed, 74 insertions(+)
+ target/ppc/internal.h               |  1 +
+ target/ppc/translate.c              | 10 ++++++--
+ target/ppc/translate/vsx-impl.inc.c | 50 +++++++++++++++++++++++++++++++++++++
+ target/ppc/translate/vsx-ops.inc.c  |  2 ++
+ 4 files changed, 61 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index fdd3216..8bffafb 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -2405,6 +2405,70 @@ VSX_SCALAR_CMP_DP(xscmpgedp, le, 1, 1)
- VSX_SCALAR_CMP_DP(xscmpgtdp, lt, 1, 1)
- VSX_SCALAR_CMP_DP(xscmpnedp, eq, 0, 0)
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index 9a4a74a..e83ea45 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -187,6 +187,7 @@ EXTRACT_HELPER(DCM, 10, 6)
+ /* DFP Z23-form */
+ EXTRACT_HELPER(RMC, 9, 2)
  
-+void helper_xscmpexpdp(CPUPPCState *env, uint32_t opcode)
-+{
-+    ppc_vsr_t xa, xb;
-+    int64_t exp_a, exp_b;
-+    uint32_t cc;
-+
-+    getVSR(xA(opcode), &xa, env);
-+    getVSR(xB(opcode), &xb, env);
-+
-+    exp_a = extract64(xa.VsrD(0), 52, 11);
-+    exp_b = extract64(xb.VsrD(0), 52, 11);
-+
-+    if (unlikely(float64_is_any_nan(xa.VsrD(0)) ||
-+                 float64_is_any_nan(xb.VsrD(0)))) {
-+        cc = CRF_SO;
-+    } else {
-+        if (exp_a < exp_b) {
-+            cc = CRF_LT;
-+        } else if (exp_a > exp_b) {
-+            cc = CRF_GT;
-+        } else {
-+            cc = CRF_EQ;
-+        }
-+    }
-+
-+    env->fpscr &= ~(0x0F << FPSCR_FPRF);
-+    env->fpscr |= cc << FPSCR_FPRF;
-+    env->crf[BF(opcode)] = cc;
-+
-+    helper_float_check_status(env);
-+}
-+
-+void helper_xscmpexpqp(CPUPPCState *env, uint32_t opcode)
-+{
-+    ppc_vsr_t xa, xb;
-+    int64_t exp_a, exp_b;
-+    uint32_t cc;
-+
-+    getVSR(rA(opcode) + 32, &xa, env);
-+    getVSR(rB(opcode) + 32, &xb, env);
-+
-+    exp_a = extract64(xa.VsrD(0), 48, 15);
-+    exp_b = extract64(xb.VsrD(0), 48, 15);
-+
-+    if (unlikely(float128_is_any_nan(make_float128(xa.VsrD(0), xa.VsrD(1))) ||
-+                 float128_is_any_nan(make_float128(xb.VsrD(0), xb.VsrD(1))))) {
-+        cc = CRF_SO;
-+    } else {
-+        if (exp_a < exp_b) {
-+            cc = CRF_LT;
-+        } else if (exp_a > exp_b) {
-+            cc = CRF_GT;
-+        } else {
-+            cc = CRF_EQ;
-+        }
-+    }
-+
-+    env->fpscr &= ~(0x0F << FPSCR_FPRF);
-+    env->fpscr |= cc << FPSCR_FPRF;
-+    env->crf[BF(opcode)] = cc;
-+
-+    helper_float_check_status(env);
-+}
-+
- #define VSX_SCALAR_CMP(op, ordered)                                      \
- void helper_##op(CPUPPCState *env, uint32_t opcode)                      \
- {                                                                        \
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 0a8fbba..042b8c1 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -399,6 +399,8 @@ DEF_HELPER_2(xscmpeqdp, void, env, i32)
- DEF_HELPER_2(xscmpgtdp, void, env, i32)
- DEF_HELPER_2(xscmpgedp, void, env, i32)
- DEF_HELPER_2(xscmpnedp, void, env, i32)
-+DEF_HELPER_2(xscmpexpdp, void, env, i32)
-+DEF_HELPER_2(xscmpexpqp, void, env, i32)
- DEF_HELPER_2(xscmpodp, void, env, i32)
- DEF_HELPER_2(xscmpudp, void, env, i32)
- DEF_HELPER_2(xsmaxdp, void, env, i32)
++EXTRACT_HELPER_SPLIT(DQxT, 3, 1, 21, 5);
+ EXTRACT_HELPER_SPLIT(xT, 0, 1, 21, 5);
+ EXTRACT_HELPER_SPLIT(xS, 0, 1, 21, 5);
+ EXTRACT_HELPER_SPLIT(xA, 2, 1, 16, 5);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 8032dc9..87fc153 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6095,14 +6095,20 @@ static void gen_dform39(DisasContext *ctx)
+     return gen_invalid(ctx);
+ }
+ 
+-/* handles stfdp, stxsd, stxssp */
++/* handles stfdp, lxv, stxsd, stxssp lxvx */
+ static void gen_dform3D(DisasContext *ctx)
+ {
+     if ((ctx->opcode & 3) == 1) { /* DQ-FORM */
+         switch (ctx->opcode & 0x7) {
+         case 1: /* lxv */
++            if (ctx->insns_flags2 & PPC2_ISA300) {
++                return gen_lxv(ctx);
++            }
+             break;
+         case 5: /* stxv */
++            if (ctx->insns_flags2 & PPC2_ISA300) {
++                return gen_stxv(ctx);
++            }
+             break;
+         }
+     } else { /* DS-FORM */
+@@ -6201,7 +6207,7 @@ GEN_HANDLER(std, 0x3E, 0xFF, 0xFF, 0x00000000, PPC_64B),
+ #endif
+ /* handles lfdp, lxsd, lxssp */
+ GEN_HANDLER_E(dform39, 0x39, 0xFF, 0xFF, 0x00000000, PPC_NONE, PPC2_ISA205),
+-/* handles stfdp, stxsd, stxssp */
++/* handles stfdp, lxv, stxsd, stxssp, stxv */
+ GEN_HANDLER_E(dform3D, 0x3D, 0xFF, 0xFF, 0x00000000, PPC_NONE, PPC2_ISA205),
+ GEN_HANDLER(lmw, 0x2E, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
+ GEN_HANDLER(stmw, 0x2F, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
 diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 5a27be4..5206258 100644
+index 8ee44cf..2fbdbd2 100644
 --- a/target/ppc/translate/vsx-impl.inc.c
 +++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -624,6 +624,8 @@ GEN_VSX_HELPER_2(xscmpeqdp, 0x0C, 0x00, 0, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscmpgtdp, 0x0C, 0x01, 0, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscmpgedp, 0x0C, 0x02, 0, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscmpnedp, 0x0C, 0x03, 0, PPC2_ISA300)
-+GEN_VSX_HELPER_2(xscmpexpdp, 0x0C, 0x07, 0, PPC2_ISA300)
-+GEN_VSX_HELPER_2(xscmpexpqp, 0x04, 0x05, 0, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscmpodp, 0x0C, 0x05, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xscmpudp, 0x0C, 0x04, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xsmaxdp, 0x00, 0x14, 0, PPC2_VSX)
+@@ -190,6 +190,56 @@ static void gen_lxvb16x(DisasContext *ctx)
+     tcg_temp_free(EA);
+ }
+ 
++#define VSX_VECTOR_LOAD_STORE(name, op, indexed)            \
++static void gen_##name(DisasContext *ctx)                   \
++{                                                           \
++    int xt;                                                 \
++    TCGv EA;                                                \
++    TCGv_i64 xth, xtl;                                      \
++                                                            \
++    if (indexed) {                                          \
++        xt = xT(ctx->opcode);                               \
++    } else {                                                \
++        xt = DQxT(ctx->opcode);                             \
++    }                                                       \
++    xth = cpu_vsrh(xt);                                     \
++    xtl = cpu_vsrl(xt);                                     \
++                                                            \
++    if (xt < 32) {                                          \
++        if (unlikely(!ctx->vsx_enabled)) {                  \
++            gen_exception(ctx, POWERPC_EXCP_VSXU);          \
++            return;                                         \
++        }                                                   \
++    } else {                                                \
++        if (unlikely(!ctx->altivec_enabled)) {              \
++            gen_exception(ctx, POWERPC_EXCP_VPU);           \
++            return;                                         \
++        }                                                   \
++    }                                                       \
++    gen_set_access_type(ctx, ACCESS_INT);                   \
++    EA = tcg_temp_new();                                    \
++    if (indexed) {                                          \
++        gen_addr_reg_index(ctx, EA);                        \
++    } else {                                                \
++        gen_addr_imm_index(ctx, EA, 0x0F);                  \
++    }                                                       \
++    if (ctx->le_mode) {                                     \
++        tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_LEQ);   \
++        tcg_gen_addi_tl(EA, EA, 8);                         \
++        tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_LEQ);   \
++    } else {                                                \
++        tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_BEQ);   \
++        tcg_gen_addi_tl(EA, EA, 8);                         \
++        tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_BEQ);   \
++    }                                                       \
++    tcg_temp_free(EA);                                      \
++}
++
++VSX_VECTOR_LOAD_STORE(lxv, ld_i64, 0)
++VSX_VECTOR_LOAD_STORE(stxv, st_i64, 0)
++VSX_VECTOR_LOAD_STORE(lxvx, ld_i64, 1)
++VSX_VECTOR_LOAD_STORE(stxvx, st_i64, 1)
++
+ #define VSX_LOAD_SCALAR_DS(name, operation)                       \
+ static void gen_##name(DisasContext *ctx)                         \
+ {                                                                 \
 diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index 3d91041..2468ee9 100644
+index 7f09527..8a1cbe0 100644
 --- a/target/ppc/translate/vsx-ops.inc.c
 +++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -83,6 +83,10 @@ GEN_HANDLER2_E(name, #name, 0x3C, opc2|0x01, opc3|0x0C, 0, PPC_NONE, PPC2_VSX),\
- GEN_HANDLER2_E(name, #name, 0x3C, opc2|0x02, opc3|0x0C, 0, PPC_NONE, PPC2_VSX),\
- GEN_HANDLER2_E(name, #name, 0x3C, opc2|0x03, opc3|0x0C, 0, PPC_NONE, PPC2_VSX)
+@@ -9,6 +9,7 @@ GEN_HANDLER_E(lxvdsx, 0x1F, 0x0C, 0x0A, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(lxvw4x, 0x1F, 0x0C, 0x18, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(lxvh8x, 0x1F, 0x0C, 0x19, 0, PPC_NONE,  PPC2_ISA300),
+ GEN_HANDLER_E(lxvb16x, 0x1F, 0x0C, 0x1B, 0, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(lxvx, 0x1F, 0x0C, 0x08, 0x00000040, PPC_NONE, PPC2_ISA300),
  
-+#define GEN_VSX_XFORM_300(name, opc2, opc3, inval) \
-+GEN_HANDLER_E(name, 0x3F, opc2, opc3, inval, PPC_NONE, PPC2_ISA300)
-+
-+
- GEN_XX2FORM(xsabsdp, 0x12, 0x15, PPC2_VSX),
- GEN_XX2FORM(xsnabsdp, 0x12, 0x16, PPC2_VSX),
- GEN_XX2FORM(xsnegdp, 0x12, 0x17, PPC2_VSX),
-@@ -118,6 +122,8 @@ GEN_XX3FORM(xscmpeqdp, 0x0C, 0x00, PPC2_ISA300),
- GEN_XX3FORM(xscmpgtdp, 0x0C, 0x01, PPC2_ISA300),
- GEN_XX3FORM(xscmpgedp, 0x0C, 0x02, PPC2_ISA300),
- GEN_XX3FORM(xscmpnedp, 0x0C, 0x03, PPC2_ISA300),
-+GEN_XX3FORM(xscmpexpdp, 0x0C, 0x07, PPC2_ISA300),
-+GEN_VSX_XFORM_300(xscmpexpqp, 0x04, 0x05, 0x00600001),
- GEN_XX2IFORM(xscmpodp,  0x0C, 0x05, PPC2_VSX),
- GEN_XX2IFORM(xscmpudp,  0x0C, 0x04, PPC2_VSX),
- GEN_XX3FORM(xsmaxdp, 0x00, 0x14, PPC2_VSX),
+ GEN_HANDLER_E(stxsdx, 0x1F, 0xC, 0x16, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(stxsibx, 0x1F, 0xD, 0x1C, 0, PPC_NONE, PPC2_ISA300),
+@@ -19,6 +20,7 @@ GEN_HANDLER_E(stxvd2x, 0x1F, 0xC, 0x1E, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(stxvw4x, 0x1F, 0xC, 0x1C, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(stxvh8x, 0x1F, 0x0C, 0x1D, 0, PPC_NONE,  PPC2_ISA300),
+ GEN_HANDLER_E(stxvb16x, 0x1F, 0x0C, 0x1F, 0, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(stxvx, 0x1F, 0x0C, 0x0C, 0, PPC_NONE, PPC2_ISA300),
+ 
+ GEN_HANDLER_E(mfvsrwz, 0x1F, 0x13, 0x03, 0x0000F800, PPC_NONE, PPC2_VSX207),
+ GEN_HANDLER_E(mtvsrwa, 0x1F, 0x13, 0x06, 0x0000F800, PPC_NONE, PPC2_VSX207),
 -- 
 2.9.3
