@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cZIe4-0006mV-I9
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:45:59 -0500
+	(envelope-from <gceq-qemu-devel@m.gmane.org>) id 1cZGbc-0002Ha-3D
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:35:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cZIdz-0001T5-Ik
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:45:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cZIdz-0001Sd-A0
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:45:51 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E407113A60
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 14:45:50 +0000 (UTC)
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu,  2 Feb 2017 15:45:38 +0100
-Message-Id: <1486046738-26059-1-git-send-email-abologna@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] q35: Improve sample configuration files
+	(envelope-from <gceq-qemu-devel@m.gmane.org>) id 1cZGbY-0004WC-VW
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:35:16 -0500
+Received: from [195.159.176.226] (port=55201 helo=blaine.gmane.org)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gceq-qemu-devel@m.gmane.org>)
+	id 1cZGbY-0004VA-LJ
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 07:35:12 -0500
+Received: from list by blaine.gmane.org with local (Exim 4.84_2)
+	(envelope-from <gceq-qemu-devel@m.gmane.org>) id 1cZGbP-0002WM-P2
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 13:35:03 +0100
+From: Stephane Chazelas <stephane.chazelas@gmail.com>
+Date: Thu, 2 Feb 2017 12:30:45 +0000
+Message-ID: <20170202123045.GA24714@chaz.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [qcow2] how to avoid qemu doing
+ lseek(SEEK_DATA/SEEK_HOLE)?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,874 +30,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcel@redhat.com, drjones@redhat.com, kraxel@redhat.com
 
-Instead of having a single sample configuration file,
-we now have several:
+Hello,
 
-  * q35-emulated.cfg documents the default devices QEMU
-    adds to a q35 guest and the additional devices that
-    are pretty much guaranteed to be present in a
-    physical q35-based machine;
+since qemu-2.7.0, doing synchronised I/O in a VM (tested with
+Ubuntu 16.04 amd64 VM)  while the disk is backed by a qcow2
+file sitting on a ZFS filesystem (zfs on Linux on Debian jessie
+(PVE)), the performances are dreadful:
 
-  * q35-virtio-graphical.cfg can be used to start a
-    fully-featured (USB, graphical console, audio, etc.)
-    guest that uses VirtIO instead of emulated devices;
+# time dd if=/dev/zero count=1000  of=b oflag=dsync
+1000+0 records in
+1000+0 records out
+512000 bytes (512 kB, 500 KiB) copied, 21.9908 s, 23.3 kB/s
+dd if=/dev/zero count=1000 of=b oflag=dsync  0.00s user 0.04s system 0% cpu 21.992 total
 
-  * q35-virtio-serial.cfg is similar but has a minimal
-    set of devices and uses the serial console.
+(22 seconds to write that half megabyte). Same with O_SYNC or
+O_DIRECT, or doing fsync() or sync_file_range() after each
+write().
 
-All configuration files are fully commented and neatly
-organized.
----
-Changes since [v2]
+I first noticed it for dpkg unpacking kernel headers where dpkg
+does a sync_file_range() after each file is extracted.
 
-  * Address review comments:
-    - use -nodefaults in q35-emulated.cfg too;
-    - add explicit VGA and Ethernet.
+Note that it doesn't happen when writing anything else than
+zeroes (like tr '\0' x < /dev/zero | dd count=1000  of=b
+oflag=dsync). In the case of the kernel headers, I suppose the
+zeroes come from the non-filled parts of the ext4 blocks.
 
-  * Improvements:
-    - use virtconsole and virtio-serial instead of
-      isa-serial in q35-virtio-serial.cfg.
+Doing strace -fc on the qemu process, 98% of the time is spent
+in the lseek() system call.
 
-  * Possibily controversial:
-    - get rid of q35-virtio-common.cfg and add the PCIe
-      Root Ports back into q35-virtio-*.cfg: while this
-      leads to having some duplicated content, I feel like
-      the sample configurations are much more useful when
-      they can stand entirely on their own, especially now
-      that they start with a detailed hardware listing.
+That's the lseek(SEEK_DATA) followed by lseek(SEEK_HOLE) done by
+find_allocation() called to find out whether sectors are within
+a hole in a sparse file.
 
-  * Cosmetic stuff:
-    - hardware listing looks like the output of lspci;
-    - section names match what's used in the hardware
-      listing so it's faster to jump to the section;
-    - PCI addresses also match the output of lspci;
-    - PCI Express is used instead of PCIe.
+#0  lseek64 () at ../sysdeps/unix/syscall-template.S:81
+#1  0x0000561287cf4ca8 in find_allocation (bs=0x7fd898d70000, hole=<synthetic pointer>, data=<synthetic pointer>, start=<optimized out>)
+    at block/raw-posix.c:1702
+#2  raw_co_get_block_status (bs=0x7fd898d70000, sector_num=<optimized out>, nb_sectors=40, pnum=0x7fd80dd05aac, file=0x7fd80dd05ab0) at block/raw-posix.c:1765
+#3  0x0000561287cfae92 in bdrv_co_get_block_status (bs=0x7fd898d70000, sector_num=sector_num@entry=1303680, nb_sectors=40, pnum=pnum@entry=0x7fd80dd05aac,
+    file=file@entry=0x7fd80dd05ab0) at block/io.c:1709
+#4  0x0000561287cfafaa in bdrv_co_get_block_status (bs=bs@entry=0x7fd898d66000, sector_num=sector_num@entry=33974144, nb_sectors=<optimized out>,
+    nb_sectors@entry=40, pnum=pnum@entry=0x7fd80dd05bbc, file=file@entry=0x7fd80dd05bc0) at block/io.c:1742
+#5  0x0000561287cfb0bb in bdrv_co_get_block_status_above (file=0x7fd80dd05bc0, pnum=0x7fd80dd05bbc, nb_sectors=40, sector_num=33974144, base=0x0,
+    bs=<optimized out>) at block/io.c:1776
+#6  bdrv_get_block_status_above_co_entry (opaque=opaque@entry=0x7fd80dd05b40) at block/io.c:1792
+#7  0x0000561287cfae08 in bdrv_get_block_status_above (bs=0x7fd898d66000, base=base@entry=0x0, sector_num=<optimized out>, nb_sectors=nb_sectors@entry=40,
+    pnum=pnum@entry=0x7fd80dd05bbc, file=file@entry=0x7fd80dd05bc0) at block/io.c:1824
+#8  0x0000561287cd372d in is_zero_sectors (bs=<optimized out>, start=<optimized out>, count=40) at block/qcow2.c:2428
+#9  0x0000561287cd38ed in is_zero_sectors (count=<optimized out>, start=<optimized out>, bs=<optimized out>) at block/qcow2.c:2471
+#10 qcow2_co_pwrite_zeroes (bs=0x7fd898d66000, offset=33974144, count=24576, flags=2724114573) at block/qcow2.c:2452
+#11 0x0000561287cfcb7f in bdrv_co_do_pwrite_zeroes (bs=bs@entry=0x7fd898d66000, offset=offset@entry=17394782208, count=count@entry=4096,
+    flags=flags@entry=BDRV_REQ_ZERO_WRITE) at block/io.c:1218
+#12 0x0000561287cfd0cb in bdrv_aligned_pwritev (bs=0x7fd898d66000, req=<optimized out>, offset=17394782208, bytes=4096, align=1, qiov=0x0,
+    flags=<optimized out>) at block/io.c:1320
+#13 0x0000561287cfe450 in bdrv_co_do_zero_pwritev (req=<optimized out>, flags=<optimized out>, bytes=<optimized out>, offset=<optimized out>,
+    bs=<optimized out>) at block/io.c:1422
+#14 bdrv_co_pwritev (child=0x15, offset=17394782208, bytes=4096, qiov=0x7fd8a25eb08d <lseek64+45>, qiov@entry=0x0, flags=231758512) at block/io.c:1492
+#15 0x0000561287cefdc7 in blk_co_pwritev (blk=0x7fd898cad540, offset=17394782208, bytes=4096, qiov=0x0, flags=<optimized out>) at block/block-backend.c:788
+#16 0x0000561287cefeeb in blk_aio_write_entry (opaque=0x7fd812941440) at block/block-backend.c:982
+#17 0x0000561287d67c7a in coroutine_trampoline (i0=<optimized out>, i1=<optimized out>) at util/coroutine-ucontext.c:78
 
-Changes since [v1]
+Now, performance is really bad on ZFS for those lseek().
+I believe that's https://github.com/zfsonlinux/zfs/issues/4306
 
-  * Address review comments:
-    - improve the existing configuration file instead
-      of removing it;
-    - split off the common part for VirtIO guests;
-    - plug all ioh3420 devices in a single slot;
-    - use slot 1c for ioh3420 devices;
-    - remove useless USB keyboard.
+Until that's fixed in ZFS, I need to find a way to avoid those
+lseek()s in the first place.
 
-  * Improve usage description:
-    - make sure the OS disk actually uses the VirtIO
-      SCSI controller, as intended, rather than the
-      built-in SATA one;
-    - provide a command line for running live CDs.
+One way is to downgrade to 2.6.2 where those lseek()s are not
+called. The change that introduced them seems to be:
 
-  * Document more devices:
-    - the video card is added by default;
-    - so is the Ethernet adapter, apparently.
+https://github.com/qemu/qemu/commit/2928abce6d1d426d37c0a9bd5f85fb95cf33f709
+(and there have been further changes to improve it later).
 
-[v1] http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg06342.html
-[v2] http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg00184.html
+If I understand correctly, that change was about preventing data
+from being allocated when the user is writing unaligned zeroes.
 
- docs/q35-chipset.cfg          | 152 ---------------------------
- docs/q35-emulated.cfg         | 234 ++++++++++++++++++++++++++++++++++++++++++
- docs/q35-virtio-graphical.cfg | 203 ++++++++++++++++++++++++++++++++++++
- docs/q35-virtio-serial.cfg    | 178 ++++++++++++++++++++++++++++++++
- 4 files changed, 615 insertions(+), 152 deletions(-)
- delete mode 100644 docs/q35-chipset.cfg
- create mode 100644 docs/q35-emulated.cfg
- create mode 100644 docs/q35-virtio-graphical.cfg
- create mode 100644 docs/q35-virtio-serial.cfg
+I suppose the idea is that if something is trying to write
+zeroes in the middle of an _allocated_ qcow2 cluster, but the
+corresponding sectors in the file underneath are in a hole, we
+don't want to write those zeros as that would allocate the data
+at the file level.
 
-diff --git a/docs/q35-chipset.cfg b/docs/q35-chipset.cfg
-deleted file mode 100644
-index e4ddb7d..0000000
---- a/docs/q35-chipset.cfg
-+++ /dev/null
-@@ -1,152 +0,0 @@
--################################################################
--#
--# qemu -M q35 creates a bare machine with just the very essential
--# chipset devices being present:
--#
--#     00.0 - Host bridge
--#     1f.0 - ISA bridge / LPC
--#     1f.2 - SATA (AHCI) controller
--#     1f.3 - SMBus controller
--#
--# This config file documents the other devices and how they are
--# created.  You can simply use "-readconfig $thisfile" to create
--# them all.  Here is a overview:
--#
--#     19.0 - Ethernet controller (not created, our e1000 emulation
--#                                 doesn't emulate the ich9 device).
--#     1a.* - USB Controller #2 (ehci + uhci companions)
--#     1b.0 - HD Audio Controller
--#     1c.* - PCI Express Ports
--#     1d.* - USB Controller #1 (ehci + uhci companions,
--#                               "qemu -M q35 -usb" creates these too)
--#     1e.0 - PCI Bridge
--#
--
--[device "ich9-ehci-2"]
--  driver = "ich9-usb-ehci2"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1a.7"
--
--[device "ich9-uhci-4"]
--  driver = "ich9-usb-uhci4"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1a.0"
--  masterbus = "ich9-ehci-2.0"
--  firstport = "0"
--
--[device "ich9-uhci-5"]
--  driver = "ich9-usb-uhci5"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1a.1"
--  masterbus = "ich9-ehci-2.0"
--  firstport = "2"
--
--[device "ich9-uhci-6"]
--  driver = "ich9-usb-uhci6"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1a.2"
--  masterbus = "ich9-ehci-2.0"
--  firstport = "4"
--
--
--[device "ich9-hda-audio"]
--  driver = "ich9-intel-hda"
--  bus = "pcie.0"
--  addr = "1b.0"
--
--
--[device "ich9-pcie-port-1"]
--  driver = "ioh3420"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1c.0"
--  port = "1"
--  chassis = "1"
--
--[device "ich9-pcie-port-2"]
--  driver = "ioh3420"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1c.1"
--  port = "2"
--  chassis = "2"
--
--[device "ich9-pcie-port-3"]
--  driver = "ioh3420"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1c.2"
--  port = "3"
--  chassis = "3"
--
--[device "ich9-pcie-port-4"]
--  driver = "ioh3420"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1c.3"
--  port = "4"
--  chassis = "4"
--
--##
--# Example PCIe switch with two downstream ports
--#
--#[device "pcie-switch-upstream-port-1"]
--#  driver = "x3130-upstream"
--#  bus = "ich9-pcie-port-4"
--#  addr = "00.0"
--#
--#[device "pcie-switch-downstream-port-1-1"]
--#  driver = "xio3130-downstream"
--#  multifunction = "on"
--#  bus = "pcie-switch-upstream-port-1"
--#  addr = "00.0"
--#  port = "1"
--#  chassis = "5"
--#
--#[device "pcie-switch-downstream-port-1-2"]
--#  driver = "xio3130-downstream"
--#  multifunction = "on"
--#  bus = "pcie-switch-upstream-port-1"
--#  addr = "00.1"
--#  port = "1"
--#  chassis = "6"
--
--[device "ich9-ehci-1"]
--  driver = "ich9-usb-ehci1"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1d.7"
--
--[device "ich9-uhci-1"]
--  driver = "ich9-usb-uhci1"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1d.0"
--  masterbus = "ich9-ehci-1.0"
--  firstport = "0"
--
--[device "ich9-uhci-2"]
--  driver = "ich9-usb-uhci2"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1d.1"
--  masterbus = "ich9-ehci-1.0"
--  firstport = "2"
--
--[device "ich9-uhci-3"]
--  driver = "ich9-usb-uhci3"
--  multifunction = "on"
--  bus = "pcie.0"
--  addr = "1d.2"
--  masterbus = "ich9-ehci-1.0"
--  firstport = "4"
--
--
--[device "ich9-pci-bridge"]
--  driver = "i82801b11-bridge"
--  bus = "pcie.0"
--  addr = "1e.0"
-diff --git a/docs/q35-emulated.cfg b/docs/q35-emulated.cfg
-new file mode 100644
-index 0000000..af5e88b
---- /dev/null
-+++ b/docs/q35-emulated.cfg
-@@ -0,0 +1,234 @@
-+# q35 - Emulated guest (graphical console)
-+# =========================================================
-+#
-+# Usage:
-+#
-+#   $ qemu-system-x86_64 \
-+#     -nodefaults \
-+#     -readconfig q35-emulated.cfg \
-+#     -drive file=os.qcow2,format=qcow2
-+#
-+# Or:
-+#
-+#   $ qemu-system-x86_64 \
-+#     -nodefaults \
-+#     -readconfig q35-emulated.cfg \
-+#     -cdrom live.iso
-+#
-+# The guest will have a selection of emulated devices that
-+# closely resembles that of a physical machine, and will be
-+# accessed through a graphical console.
-+#
-+# ---------------------------------------------------------
-+#
-+# This file is intended to document the default devices
-+# QEMU will add to any q35 guest along with additional
-+# devices that are useful on such guests. Moreover, it can
-+# be used as a starting point to build more specific
-+# configurations.
-+#
-+# Using -nodefaults is required to have full control over
-+# the virtual hardware: when it's specified, QEMU will
-+# create a bare machine with just the very essential
-+# chipset devices being present:
-+#
-+#   00:00.0 Host bridge
-+#   00:1f.0 ISA bridge / LPC
-+#   00:1f.2 SATA (AHCI) controller
-+#   00:1f.3 SMBus controller
-+#
-+# This configuration file adds a number of devices that
-+# are pretty much guaranteed to be present in every single
-+# physical machine based on q35, more specifically:
-+#
-+#   00:01.0 VGA compatible controller
-+#   00:19.0 Ethernet controller
-+#   00:1a.* USB controller (#2)
-+#   00:1b.0 Audio device
-+#   00:1c.* PCI bridge (PCI Express Root Ports)
-+#   00:1d.* USB Controller (#1)
-+#   00:1e.0 PCI bridge (legacy PCI bridge)
-+#
-+# More information about these devices is available below.
-+
-+
-+# Machine options
-+# =========================================================
-+#
-+# We use the q35 machine type and enable KVM acceleration
-+# for better performance.
-+
-+[machine]
-+  type = "q35"
-+  accel = "kvm"
-+
-+
-+# PCI bridge (PCI Express Root Ports)
-+# =========================================================
-+#
-+# We add four PCI Express Root Ports, all sharing the same
-+# slot on the PCI Express  Root Bus. These ports support
-+# hotplug.
-+
-+[device "ich9-pcie-port-1"]
-+  driver = "ioh3420"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1c.0"
-+  port = "1"
-+  chassis = "1"
-+
-+[device "ich9-pcie-port-2"]
-+  driver = "ioh3420"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1c.1"
-+  port = "2"
-+  chassis = "2"
-+
-+[device "ich9-pcie-port-3"]
-+  driver = "ioh3420"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1c.2"
-+  port = "3"
-+  chassis = "3"
-+
-+[device "ich9-pcie-port-4"]
-+  driver = "ioh3420"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1c.3"
-+  port = "4"
-+  chassis = "4"
-+
-+
-+# PCI bridge (legacy PCI bridge)
-+# =========================================================
-+#
-+# This bridge can be used to build an independent topology
-+# for legacy PCI devices.
-+
-+[device "ich9-pci-bridge"]
-+  driver = "i82801b11-bridge"
-+  bus = "pcie.0"
-+  addr = "1e.0"
-+
-+
-+# USB controller (#1)
-+# =========================================================
-+#
-+# EHCI controller + UHCI companion controllers.
-+
-+[device "ich9-ehci-1"]
-+  driver = "ich9-usb-ehci1"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1d.7"
-+
-+[device "ich9-uhci-1"]
-+  driver = "ich9-usb-uhci1"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1d.0"
-+  masterbus = "ich9-ehci-1.0"
-+  firstport = "0"
-+
-+[device "ich9-uhci-2"]
-+  driver = "ich9-usb-uhci2"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1d.1"
-+  masterbus = "ich9-ehci-1.0"
-+  firstport = "2"
-+
-+[device "ich9-uhci-3"]
-+  driver = "ich9-usb-uhci3"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1d.2"
-+  masterbus = "ich9-ehci-1.0"
-+  firstport = "4"
-+
-+
-+# USB controller (#2)
-+# =========================================================
-+#
-+# EHCI controller + UHCI companion controllers.
-+
-+[device "ich9-ehci-2"]
-+  driver = "ich9-usb-ehci2"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1a.7"
-+
-+[device "ich9-uhci-4"]
-+  driver = "ich9-usb-uhci4"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1a.0"
-+  masterbus = "ich9-ehci-2.0"
-+  firstport = "0"
-+
-+[device "ich9-uhci-5"]
-+  driver = "ich9-usb-uhci5"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1a.1"
-+  masterbus = "ich9-ehci-2.0"
-+  firstport = "2"
-+
-+[device "ich9-uhci-6"]
-+  driver = "ich9-usb-uhci6"
-+  multifunction = "on"
-+  bus = "pcie.0"
-+  addr = "1a.2"
-+  masterbus = "ich9-ehci-2.0"
-+  firstport = "4"
-+
-+
-+# Ethernet controller
-+# =========================================================
-+#
-+# We add a Gigabit Ethernet interface to the guest; on the
-+# host side, we take advantage of user networking so that
-+# the QEMU process doesn't require any additional
-+# privileges.
-+
-+[netdev "hostnet"]
-+  type = "user"
-+
-+[device "net"]
-+  driver = "e1000"
-+  netdev = "hostnet"
-+  bus = "pcie.0"
-+  addr = "19.0"
-+
-+
-+# VGA compatible controller
-+# =========================================================
-+#
-+# We use stdvga instead of Cirrus as it supports more video
-+# modes and is closer to what actual hardware looks like.
-+
-+[device "video"]
-+  driver = "VGA"
-+  bus = "pcie.0"
-+  addr = "02.0"
-+
-+
-+# Audio device
-+# =========================================================
-+#
-+# The sound card is a legacy PCI device that is plugged
-+# directly into the PCI Express Root Bus.
-+
-+[device "ich9-hda-audio"]
-+  driver = "ich9-intel-hda"
-+  bus = "pcie.0"
-+  addr = "1b.0"
-+
-+[device "ich9-hda-duplex"]
-+  driver = "hda-duplex"
-+  bus = "ich9-hda-audio.0"
-+  cad = "0"
-diff --git a/docs/q35-virtio-graphical.cfg b/docs/q35-virtio-graphical.cfg
-new file mode 100644
-index 0000000..60b8d98
---- /dev/null
-+++ b/docs/q35-virtio-graphical.cfg
-@@ -0,0 +1,203 @@
-+# q35 - VirtIO guest (graphical console)
-+# =========================================================
-+#
-+# Usage:
-+#
-+#   $ qemu-system-x86_64 \
-+#     -nodefaults \
-+#     -readconfig q35-virtio-graphical.cfg \
-+#     -device scsi-hd,bus=scsi.0,drive=disk \
-+#     -drive file=os.qcow2,format=qcow2,id=disk,if=none
-+#
-+# Or:
-+#
-+#   $ qemu-system-x86_64 \
-+#     -nodefaults \
-+#     -readconfig q35-virtio-graphical.cfg \
-+#     -cdrom live.iso
-+#
-+# The guest will have a selection of VirtIO devices
-+# tailored towards optimal performance with modern guests,
-+# and will be accessed through a graphical console.
-+#
-+# ---------------------------------------------------------
-+#
-+# Using -nodefaults is required to have full control over
-+# the virtual hardware: when it's specified, QEMU will
-+# create a bare machine with just the very essential
-+# chipset devices being present:
-+#
-+#   00:00.0 Host bridge
-+#   00:1f.0 ISA bridge / LPC
-+#   00:1f.2 SATA (AHCI) controller
-+#   00:1f.3 SMBus controller
-+#
-+# This configuration file adds a number of other useful
-+# devices, more specifically:
-+#
-+#   00:01.0 VGA compatible controller
-+#   00:1b.0 Audio device
-+#   00.1c.* PCI bridge (PCI Express Root Ports)
-+#   01:00.0 SCSI storage controller
-+#   02:00.0 Ethernet controller
-+#   03:00.0 USB controller
-+#
-+# More information about these devices is available below.
-+
-+
-+# Machine options
-+# =========================================================
-+#
-+# We use the q35 machine type and enable KVM acceleration
-+# for better performance.
-+
-+[machine]
-+  type = "q35"
-+  accel = "kvm"
-+
-+
-+# PCI bridge (PCI Express Root Ports)
-+# =========================================================
-+#
-+# We create eight PCI Express Root Ports, and we plug them
-+# all into separate functions of the same slot. Some of
-+# them will be used by devices, the rest will remain
-+# available for hotplug.
-+
-+[device "pci.1"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.0"
-+  port = "1"
-+  chassis = "1"
-+  multifunction = "on"
-+
-+[device "pci.2"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.1"
-+  port = "22"
-+  chassis = "2"
-+
-+[device "pci.3"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.2"
-+  port = "3"
-+  chassis = "3"
-+
-+[device "pci.4"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.3"
-+  port = "4"
-+  chassis = "4"
-+
-+[device "pci.5"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.4"
-+  port = "5"
-+  chassis = "5"
-+
-+[device "pci.6"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.5"
-+  port = "6"
-+  chassis = "6"
-+
-+[device "pci.7"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.6"
-+  port = "7"
-+  chassis = "7"
-+
-+[device "pci.8"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.7"
-+  port = "8"
-+  chassis = "8"
-+
-+
-+# SCSI storage controller
-+# =========================================================
-+#
-+# We use virtio-scsi here so that we can (hot)plug a large
-+# number of disks without running into issues. QEMU will
-+# automatically plug any guest disk into this controller.
-+
-+[device "scsi"]
-+  driver = "virtio-scsi-pci"
-+  bus = "pci.1"
-+  addr = "00.0"
-+
-+
-+# Ethernet controller
-+# =========================================================
-+#
-+# We use virtio-net for improved performance over emulated
-+# hardware; on the host side, we take advantage of user
-+# networking so that the QEMU process doesn't require any
-+# additional privileges.
-+
-+[netdev "hostnet"]
-+  type = "user"
-+
-+[device "net"]
-+  driver = "virtio-net-pci"
-+  netdev = "hostnet"
-+  bus = "pci.2"
-+  addr = "00.0"
-+
-+
-+# USB controller (and input devices)
-+# =========================================================
-+#
-+# We add a virtualization-friendly USB 3.0 controller and
-+# a USB tablet so that graphical guests can be controlled
-+# appropriately. A USB keyboard is not needed, as q35
-+# guests get a PS/2 one added automatically.
-+
-+[device "usb"]
-+  driver = "nec-usb-xhci"
-+  bus = "pci.3"
-+  addr = "00.0"
-+
-+[device "tablet"]
-+  driver = "usb-tablet"
-+  bus = "usb.0"
-+
-+
-+# VGA compatible controller
-+# =========================================================
-+#
-+# We plug the QXL video card directly into the PCI Express
-+# Root Bus as it is a legacy PCI device; this way, we can
-+# reduce the number of PCI Express controllers in the
-+# guest.
-+
-+[device "video"]
-+  driver = "qxl-vga"
-+  bus = "pcie.0"
-+  addr = "01.0"
-+
-+
-+# Audio device
-+# =========================================================
-+#
-+# Like the video card, the sound card is a legacy PCI
-+# device and as such can be plugged directly into the PCI
-+# Express Root Bus.
-+
-+[device "sound"]
-+  driver = "ich9-intel-hda"
-+  bus = "pcie.0"
-+  addr = "1b.0"
-+
-+[device "duplex"]
-+  driver = "hda-duplex"
-+  bus = "sound.0"
-+  cad = "0"
-diff --git a/docs/q35-virtio-serial.cfg b/docs/q35-virtio-serial.cfg
-new file mode 100644
-index 0000000..3572238
---- /dev/null
-+++ b/docs/q35-virtio-serial.cfg
-@@ -0,0 +1,178 @@
-+# q35 - VirtIO guest (serial console)
-+# =========================================================
-+#
-+# Usage:
-+#
-+#   $ qemu-system-x86_64 \
-+#     -nographic -nodefaults \
-+#     -readconfig q35-virtio-serial.cfg \
-+#     -device scsi-hd,bus=scsi.0,drive=disk \
-+#     -drive file=os.qcow2,format=qcow2,id=disk,if=none
-+#
-+# Or:
-+#
-+#   $ qemu-system-x86_64 \
-+#     -nographic -nodefaults \
-+#     -readconfig q35-virtio-serial.cfg \
-+#     -cdrom live.iso
-+#
-+# The guest will have a selection of VirtIO devices
-+# tailored towards optimal performance with modern guests,
-+# and will be accessed through the serial console.
-+#
-+# ---------------------------------------------------------
-+#
-+# We need -nographic to prevent QEMU from creating an empty
-+# display window, which we're not interested in.
-+#
-+# Using -nodefaults is required to have full control over
-+# the virtual hardware: when it's specified, QEMU will
-+# create a bare machine with just the very essential
-+# chipset devices being present:
-+#
-+#   00:00.0 Host bridge
-+#   00:1f.0 ISA bridge / LPC
-+#   00:1f.2 SATA (AHCI) controller
-+#   00:1f.3 SMBus controller
-+#
-+# This configuration file adds a number of other useful
-+# devices, more specifically:
-+#
-+#   00.1c.* PCI bridge (PCI Express Root Ports)
-+#   01:00.0 SCSI storage controller
-+#   02:00.0 Ethernet controller
-+#   03:00.0 Communication controller (serial)
-+#
-+# More information about these devices is available below.
-+
-+
-+# Machine options
-+# =========================================================
-+#
-+# We use the q35 machine type and enable KVM acceleration
-+# for better performance.
-+
-+[machine]
-+  type = "q35"
-+  accel = "kvm"
-+
-+
-+# PCI bridge (PCI Express Root Ports)
-+# =========================================================
-+#
-+# We create eight PCI Express Root Ports, and we plug them
-+# all into separate functions of the same slot. Some of
-+# them will be used by devices, the rest will remain
-+# available for hotplug.
-+
-+[device "pci.1"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.0"
-+  port = "1"
-+  chassis = "1"
-+  multifunction = "on"
-+
-+[device "pci.2"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.1"
-+  port = "2"
-+  chassis = "2"
-+
-+[device "pci.3"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.2"
-+  port = "3"
-+  chassis = "3"
-+
-+[device "pci.4"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.3"
-+  port = "4"
-+  chassis = "4"
-+
-+[device "pci.5"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.4"
-+  port = "5"
-+  chassis = "5"
-+
-+[device "pci.6"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.5"
-+  port = "6"
-+  chassis = "6"
-+
-+[device "pci.7"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.6"
-+  port = "7"
-+  chassis = "7"
-+
-+[device "pci.8"]
-+  driver = "ioh3420"
-+  bus = "pcie.0"
-+  addr = "1c.7"
-+  port = "8"
-+  chassis = "8"
-+
-+
-+# SCSI storage controller
-+# =========================================================
-+#
-+# We use virtio-scsi here so that we can (hot)plug a large
-+# number of disks without running into issues. The user
-+# will have to create a scsi-hd device for the drive, as
-+# shown above, to prevent QEMU from attaching it to the
-+# built-in SATA controller.
-+
-+[device "scsi"]
-+  driver = "virtio-scsi-pci"
-+  bus = "pci.1"
-+  addr = "00.0"
-+
-+
-+# Ethernet controller
-+# =========================================================
-+#
-+# We use virtio-net for improved performance over emulated
-+# hardware; on the host side, we take advantage of user
-+# networking so that the QEMU process doesn't require any
-+# additional privileges.
-+
-+[netdev "hostnet"]
-+  type = "user"
-+
-+[device "net"]
-+  driver = "virtio-net-pci"
-+  netdev = "hostnet"
-+  bus = "pci.2"
-+  addr = "00.0"
-+
-+
-+# Communication controller (serial)
-+# =========================================================
-+#
-+# We use virtconsole along with virtio-serial, and connect
-+# it with the host's standard input / output channels. In
-+# this configuration, the guest will behave pretty much
-+# like any other Unix utility: that includes terminating
-+# as soon as Ctrl-C is pressed, so caution is advised.
-+
-+[chardev "hostconsole"]
-+  backend = "stdio"
-+
-+[device "serial"]
-+  driver = "virtio-serial-pci"
-+  bus = "pci.3"
-+  addr = "00.0"
-+
-+[device "console"]
-+  driver = "virtconsole"
-+  chardev = "hostconsole"
--- 
-2.7.4
+I can see it makes sense, but in my case, the little space
+efficiency it brings is largely overshadowed by the sharp
+decrease in performance.
+
+For now, I work around it by changing the "#ifdef SEEK_DATA"
+to "#if 0" in find_allocation().
+
+Note that passing detect-zeroes=off or detect-zeroes=unmap (with
+discard) doesn't help (even though FALLOC_FL_PUNCH_HOLE is
+supported on ZFS on Linux).
+
+Is there any other way I could use to prevent those lseek()s
+without having to rebuild qemu?
+
+Would you consider adding an option to disable that behaviour
+(skip checking allocation at file level for qcow2 image)?
+
+Thanks,
+Stephane
