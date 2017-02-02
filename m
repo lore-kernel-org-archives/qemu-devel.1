@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZFqX-0007FR-D5
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:46:38 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cZFt2-0000Od-O4
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:49:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZFqU-0003T3-8w
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:46:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54142)
+	(envelope-from <kraxel@redhat.com>) id 1cZFsx-0004I6-Uu
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:49:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51148)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cZFqU-0003Sf-1H
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:46:34 -0500
-Date: Thu, 2 Feb 2017 11:46:27 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170202114627.GH2915@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1485954928-22287-1-git-send-email-den@openvz.org>
-	<20170201135306.GI3232@redhat.com>
-	<c8da8d7c-8cfd-2a80-5825-2601a9b31c60@openvz.org>
-	<20170202094751.GA2915@redhat.com>
-	<1bfcbccd-3bea-a7a5-3cbd-99782873c4ef@openvz.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1bfcbccd-3bea-a7a5-3cbd-99782873c4ef@openvz.org>
-Subject: Re: [Qemu-devel] [PATCH 1/1] qemu_char: socket backend: disconnect
- on EPIPE
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cZFsx-0004HX-Oe
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:49:07 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9D3CC05005F
+	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 11:49:07 +0000 (UTC)
+Message-ID: <1486036144.20628.40.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 02 Feb 2017 12:49:04 +0100
+In-Reply-To: <1486031975.3484.17.camel@redhat.com>
+References: <1485969640-8149-1-git-send-email-abologna@redhat.com>
+	<1486021764.20628.29.camel@redhat.com>
+	<1486031975.3484.17.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2] q35: Improve sample configuration files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,77 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: qemu-devel@nongnu.org, marcel@redhat.com, drjones@redhat.com
 
-On Thu, Feb 02, 2017 at 02:43:18PM +0300, Denis V. Lunev wrote:
-> On 02/02/2017 12:47 PM, Daniel P. Berrange wrote:
-> > On Thu, Feb 02, 2017 at 11:59:22AM +0300, Denis V. Lunev wrote:
-> >> On 02/01/2017 04:53 PM, Daniel P. Berrange wrote:
-> >>> On Wed, Feb 01, 2017 at 04:15:28PM +0300, Denis V. Lunev wrote:
-> >>>> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> >>>>
-> >>>> Socket backend read handler should normally perform a disconnect, however
-> >>>> the read handler may not get a chance to run if the frontend is not ready
-> >>>> (qemu_chr_be_can_write == 0).
-> >>>>
-> >>>> This means that in virtio-serial frontend case if
-> >>>>  - the host has disconnected (giving EPIPE on socket write)
-> >>>>  - and the guest has disconnected (-> frontend not ready -> backend
-> >>>>    will not read)
-> >>>>  - and there is still data (frontend->backend) to flush (has to be a really
-> >>>>    tricky timing but nevertheless, we have observed the case in production)
-> >>>>
-> >>>> This results in virtio-serial trying to flush this data continiously forming
-> >>>> a busy loop.
-> >>>>
-> >>>> Solution: react on EPIPE in the socket write handler. We must not disconnect
-> >>>> right away though, there still may be data to read (see 4bf1cb0).
-> >>>>
-> >>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> >>>> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> >>>> CC: Paolo Bonzini <pbonzini@redhat.com>
-> >>>> CC: Daniel P. Berrange <berrange@redhat.com>
-> >>>> ---
-> >>>>  qemu-char.c | 12 +++++++++++-
-> >>>>  1 file changed, 11 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/qemu-char.c b/qemu-char.c
-> >>>> index 6b4a299..f1f7a07 100644
-> >>>> --- a/qemu-char.c
-> >>>> +++ b/qemu-char.c
-> >>>> @@ -1202,7 +1202,7 @@ static int io_channel_send_full(QIOChannel *ioc,
-> >>>>              errno = EAGAIN;
-> >>>>              return -1;
-> >>>>          } else if (ret < 0) {
-> >>>> -            errno = EINVAL;
-> >>>> +            errno = errno == EPIPE ? EPIPE : EINVAL;
-> >>> You can't rely on 'errno' being valid after qio_channel_writev_full().
-> >>>
-> >>> The 'Error **errp' arg to that function is the only error reporting
-> >>> mechanism that's supported. In particular since the TCP channel can
-> >>> be wrapped in TLS, the errno can easily have been clobbered by time
-> >>> you get here.
-> >> can we return errno directly from this call and pass exit code to the upper
-> >> layer? This will be fair and much more straightforward.
-> > No, the qio APIs explicitly do *not* use errno because their implementations
-> > may be calling APIs which in turn do not provide errnos. errno is only a
-> > useful concept if your always calling into system calls. As soon as you need
-> > to deal with higher level libraries, errno is woefully inadequate as a
-> > concept, hence using Error ** instead.
-> >
-> > Regards,
-> > Daniel
-> But the problem is that Error does not have error code field inside.
-> Should we play with ErrorClass enum?
+  Hi,
 
-No, don't try to distinguish different types of errors. As mentioned
-elsewhere just use the same logic for all errors, except when seeing
-QIO_ERR_WOULD_BLOCK
+> > If you add a video card manually (via -device or config file entry) qem=
+u
+> > will not add the default video card.
+> >=20
+> > Likewise, if you add a NIC manually, qemu will not add the default
+> > ethernet device (and IIRC creating the default netdev will be skipped
+> > too).
+>=20
+> This has the potential to give you some unexpected results
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Indeed.
+
+> but I'd say it's still entirely reasonable.
+
+Well, makes it easy for users to get started, just "qemu -cdrom $live"
+gives you a usable virtual machine without having to worry too much
+about what devices you want plug in.
+
+But that kind of magic -- while convenient at times -- can also easily
+get into the way.  Guess why the -nodefaults switch exists ...
+
+> So what do you think, should q35-emulated.cfg recommend the
+> use of -nodefaults the same way q35-virtio-*.cfg do and add
+> the video card (cirrus-vga?) and Ethernet adapter explicitly?
+
+I think that would be good, for consistency across all q35*.cfg files.
+
+But please don't use cirrus[1], it isn't the default any more for good
+reasons.  I'd suggest to go with our new default, which is stdvga
+(-device VGA), as we don't have intel graphics emulation.
+
+> The advantage in doing so would be that we would provide
+> maybe slightly more documentation, and we would be able to
+> plug the Ethernet adapter at 19.0 instead of 02.0, which as
+> I understand it matches real hardware better.
+
+Yes.
+
+cheers,
+  Gerd
+
+[1]
+https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful/
