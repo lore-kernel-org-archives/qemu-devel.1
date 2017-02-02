@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cZEnn-0000An-9G
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 05:39:44 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cZEow-0000mV-FD
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 05:40:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cZEnk-0004vI-5V
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 05:39:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cZEnj-0004uk-Ux
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 05:39:40 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CCD90804E5
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 10:39:38 +0000 (UTC)
-Message-ID: <1486031975.3484.17.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 02 Feb 2017 11:39:35 +0100
-In-Reply-To: <1486021764.20628.29.camel@redhat.com>
-References: <1485969640-8149-1-git-send-email-abologna@redhat.com>
-	<1486021764.20628.29.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] q35: Improve sample configuration files
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cZEov-0005Sw-E0
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 05:40:54 -0500
+References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
+	<20170202051445.5735-96-david@gibson.dropbear.id.au>
+	<922cc254-3d39-c21e-3ac6-7f8bd3b95d90@ilande.co.uk>
+	<b8c77dc9-6083-bf26-3750-f0847ad1d6ed@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <83f44e87-d1aa-3c9f-f383-e06717dfa54c@ilande.co.uk>
+Date: Thu, 2 Feb 2017 10:40:29 +0000
+MIME-Version: 1.0
+In-Reply-To: <b8c77dc9-6083-bf26-3750-f0847ad1d6ed@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 095/107] spapr: clock should count only if
+ vm is running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, drjones@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
+Cc: thuth@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Thu, 2017-02-02 at 08:49 +0100, Gerd Hoffmann wrote:
-> Oh yes, the wonderful confusing world of default devices ;)
->=C2=A0
-> So, if you run qemu with "-nodefaults" it will not add those two
-> devices.
+On 02/02/17 09:13, Laurent Vivier wrote:
 
-And I wouldn't have it any other way ;)
+> On 02/02/2017 09:37, Mark Cave-Ayland wrote:
+>> On 02/02/17 05:14, David Gibson wrote:
+>>
+> ...
+>> Hi David/Laurent,
+> 
+> Hi Mark,
+> 
+>> I just noticed this in your pull request today - this looks like it is
+>> along similar lines to the prototype patch I proposed last year as part
+>> of the decrementer migration thread discussion, i.e. use a
+>> vm_change_state_handler() to sync the clock on pause/resume.
+>>
+>> Am I right in thinking this now solves the timebase migration problem,
+>> and so the only part required is to encode the decrementer relative to
+>> the timebase during migration to ensure its value is also migrated
+>> correctly?
+> 
+> Do you have a link to this thread discussion?
+> 
+> The main purpose of this patch was only to stop the clock (TBR) while
+> the machine is paused, so I'd like to know what is the problem you are
+> speaking about.
 
-> If you add a video card manually (via -device or config file entry) qem=
-u
-> will not add the default video card.
->=C2=A0
-> Likewise, if you add a NIC manually, qemu will not add the default
-> ethernet device (and IIRC creating the default netdev will be skipped
-> too).
+Hi Laurent,
 
-This has the potential to give you some unexpected results
-but I'd say it's still entirely reasonable.
+Yes indeed. The discussion spanned a couple of threads last year, but
+the start of it was my patch to migrate the decrementer to fix an issue
+I was seeing when migrating Darwin images on the Mac machines under TCG:
 
-So what do you think, should q35-emulated.cfg recommend the
-use of -nodefaults the same way q35-virtio-*.cfg do and add
-the video card (cirrus-vga?) and Ethernet adapter explicitly?
+https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg00544.html
 
-The advantage in doing so would be that we would provide
-maybe slightly more documentation, and we would be able to
-plug the Ethernet adapter at 19.0 instead of 02.0, which as
-I understand it matches real hardware better.
+This then eventually became a separate thread here:
 
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg04622.html
+
+
+ATB,
+
+Mark.
