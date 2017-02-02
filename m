@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kN-00084k-3V
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kJ-00080w-Gi
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kF-0004P1-Ij
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:51 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kC-0004KM-4o
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:47 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:14:40 +1100
-Message-Id: <20170202051445.5735-103-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:14:29 +1100
+Message-Id: <20170202051445.5735-92-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 102/107] target/ppc/debug: Print LPCR register
- value if register exists
+Subject: [Qemu-devel] [PULL 091/107] target-ppc: Add xvcv[hpsp,
+ sphp] instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,34 +21,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-It can be useful when debugging to print the LPCR value.
+xvcvhpsp: VSX Vector Convert Half Precision to Single Precision
+xvcvsphp: VSX Vector Convert Single Precision to Half Precision
 
-Thus we add the LPCR to the "info registers" output if the register had
-been defined.
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 3 +++
- 1 file changed, 3 insertions(+)
+ target/ppc/fpu_helper.c             | 27 ++++++++++++++++++---------
+ target/ppc/helper.h                 |  2 ++
+ target/ppc/translate/vsx-impl.inc.c |  2 ++
+ target/ppc/translate/vsx-ops.inc.c  |  2 ++
+ 4 files changed, 24 insertions(+), 9 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 772929e..5934185 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6830,6 +6830,9 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     }
- #endif
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index e7e1024..ffcf9ca 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2817,33 +2817,42 @@ VSX_CVT_FP_TO_FP_VECTOR(xscvdpqp, 1, float64, float128, VsrD(0), f128, 1)
+ /* VSX_CVT_FP_TO_FP_HP - VSX floating point/floating point conversion
+  *                       involving one half precision value
+  *   op    - instruction mnemonic
++ *   nels  - number of elements (1, 2 or 4)
+  *   stp   - source type
+  *   ttp   - target type
+  *   sfld  - source vsr_t field
+  *   tfld  - target vsr_t field
++ *   sfprf - set FPRF
+  */
+-#define VSX_CVT_FP_TO_FP_HP(op, stp, ttp, sfld, tfld)              \
++#define VSX_CVT_FP_TO_FP_HP(op, nels, stp, ttp, sfld, tfld, sfprf) \
+ void helper_##op(CPUPPCState *env, uint32_t opcode)                \
+ {                                                                  \
+     ppc_vsr_t xt, xb;                                              \
++    int i;                                                         \
+                                                                    \
+     getVSR(xB(opcode), &xb, env);                                  \
+     memset(&xt, 0, sizeof(xt));                                    \
+                                                                    \
+-    xt.tfld = stp##_to_##ttp(xb.sfld, 1, &env->fp_status);         \
+-    if (unlikely(stp##_is_signaling_nan(xb.sfld,                   \
+-                                        &env->fp_status))) {       \
+-        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);     \
+-        xt.tfld = ttp##_snan_to_qnan(xt.tfld);                     \
++    for (i = 0; i < nels; i++) {                                   \
++        xt.tfld = stp##_to_##ttp(xb.sfld, 1, &env->fp_status);     \
++        if (unlikely(stp##_is_signaling_nan(xb.sfld,               \
++                                            &env->fp_status))) {   \
++            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0); \
++            xt.tfld = ttp##_snan_to_qnan(xt.tfld);                 \
++        }                                                          \
++        if (sfprf) {                                               \
++            helper_compute_fprf_##ttp(env, xt.tfld);               \
++        }                                                          \
+     }                                                              \
+-    helper_compute_fprf_##ttp(env, xt.tfld);                       \
+                                                                    \
+     putVSR(xT(opcode), &xt, env);                                  \
+     float_check_status(env);                                       \
+ }
  
-+    if (env->spr_cb[SPR_LPCR].name)
-+        cpu_fprintf(f, " LPCR " TARGET_FMT_lx "\n", env->spr[SPR_LPCR]);
-+
-     switch (env->mmu_model) {
-     case POWERPC_MMU_32B:
-     case POWERPC_MMU_601:
+-VSX_CVT_FP_TO_FP_HP(xscvdphp, float64, float16, VsrD(0), VsrH(3))
+-VSX_CVT_FP_TO_FP_HP(xscvhpdp, float16, float64, VsrH(3), VsrD(0))
++VSX_CVT_FP_TO_FP_HP(xscvdphp, 1, float64, float16, VsrD(0), VsrH(3), 1)
++VSX_CVT_FP_TO_FP_HP(xscvhpdp, 1, float16, float64, VsrH(3), VsrD(0), 1)
++VSX_CVT_FP_TO_FP_HP(xvcvsphp, 4, float32, float16, VsrW(i), VsrH(2 * i  + 1), 0)
++VSX_CVT_FP_TO_FP_HP(xvcvhpsp, 4, float16, float32, VsrH(2 * i + 1), VsrW(i), 0)
+ 
+ /*
+  * xscvqpdp isn't using VSX_CVT_FP_TO_FP() because xscvqpdpo will be
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 9f8f0ed..9d4ed08 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -536,6 +536,8 @@ DEF_HELPER_2(xvcmpgesp, void, env, i32)
+ DEF_HELPER_2(xvcmpgtsp, void, env, i32)
+ DEF_HELPER_2(xvcmpnesp, void, env, i32)
+ DEF_HELPER_2(xvcvspdp, void, env, i32)
++DEF_HELPER_2(xvcvsphp, void, env, i32)
++DEF_HELPER_2(xvcvhpsp, void, env, i32)
+ DEF_HELPER_2(xvcvspsxds, void, env, i32)
+ DEF_HELPER_2(xvcvspsxws, void, env, i32)
+ DEF_HELPER_2(xvcvspuxds, void, env, i32)
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index d75474e..9bcc5af 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -913,6 +913,8 @@ GEN_VSX_HELPER_2(xvcmpgtsp, 0x0C, 0x09, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvcmpgesp, 0x0C, 0x0A, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvcmpnesp, 0x0C, 0x0B, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvcvspdp, 0x12, 0x1C, 0, PPC2_VSX)
++GEN_VSX_HELPER_2(xvcvhpsp, 0x16, 0x1D, 0x18, PPC2_ISA300)
++GEN_VSX_HELPER_2(xvcvsphp, 0x16, 0x1D, 0x19, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xvcvspsxds, 0x10, 0x19, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvcvspsxws, 0x10, 0x09, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvcvspuxds, 0x10, 0x18, 0, PPC2_VSX)
+diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
+index 589b505..ee74312 100644
+--- a/target/ppc/translate/vsx-ops.inc.c
++++ b/target/ppc/translate/vsx-ops.inc.c
+@@ -291,6 +291,8 @@ GEN_XX2FORM(xvrspiz, 0x12, 0x09, PPC2_VSX),
+ GEN_XX2FORM_EO(xxbrh, 0x16, 0x1D, 0x07, PPC2_ISA300),
+ GEN_XX2FORM_EO(xxbrw, 0x16, 0x1D, 0x0F, PPC2_ISA300),
+ GEN_XX2FORM_EO(xxbrd, 0x16, 0x1D, 0x17, PPC2_ISA300),
++GEN_XX2FORM_EO(xvcvhpsp, 0x16, 0x1D, 0x18, PPC2_ISA300),
++GEN_XX2FORM_EO(xvcvsphp, 0x16, 0x1D, 0x19, PPC2_ISA300),
+ GEN_XX2FORM_EO(xxbrq, 0x16, 0x1D, 0x1F, PPC2_ISA300),
+ 
+ #define VSX_LOGICAL(name, opc2, opc3, fl2) \
 -- 
 2.9.3
