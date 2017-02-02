@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cZDoK-0002pn-Hl
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:36:13 -0500
+	(envelope-from <berrange@redhat.com>) id 1cZDzl-0000A6-92
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:48:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cZDoF-0003jd-MF
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:36:12 -0500
-Received: from g4t3427.houston.hpe.com ([15.241.140.73]:8535)
+	(envelope-from <berrange@redhat.com>) id 1cZDzh-0006wF-Mq
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:48:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jitendra.kolhe@hpe.com>)
-	id 1cZDoF-0003g5-HB
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:36:07 -0500
-References: <1483601042-6435-1-git-send-email-jitendra.kolhe@hpe.com>
-	<20170127132650.GA31231@redhat.com>
-From: Jitendra Kolhe <jitendra.kolhe@hpe.com>
-Message-ID: <67bd733e-5974-327b-25f4-c83b8e379313@hpe.com>
-Date: Thu, 2 Feb 2017 15:05:54 +0530
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cZDzh-0006vN-FM
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 04:47:57 -0500
+Date: Thu, 2 Feb 2017 09:47:51 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170202094751.GA2915@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1485954928-22287-1-git-send-email-den@openvz.org>
+	<20170201135306.GI3232@redhat.com>
+	<c8da8d7c-8cfd-2a80-5825-2601a9b31c60@openvz.org>
 MIME-Version: 1.0
-In-Reply-To: <20170127132650.GA31231@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] mem-prealloc: Reduce large guest
- start-up and migration time.
+Content-Disposition: inline
+In-Reply-To: <c8da8d7c-8cfd-2a80-5825-2601a9b31c60@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH 1/1] qemu_char: socket backend: disconnect
+ on EPIPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "armbru@redhat.com" <armbru@redhat.com>, "MeenakshiSundaram, Renganathan" <renganathan.meenakshisundaram@hpe.com>, "Parthasarathy, Mohan (HPE Servers)" <mohan_parthasarathy@hpe.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 1/27/2017 6:56 PM, Daniel P. Berrange wrote:
-> On Thu, Jan 05, 2017 at 12:54:02PM +0530, Jitendra Kolhe wrote:
->> Using "-mem-prealloc" option for a very large guest leads to huge guest
->> start-up and migration time. This is because with "-mem-prealloc" option
->> qemu tries to map every guest page (create address translations), and
->> make sure the pages are available during runtime. virsh/libvirt by
->> default, seems to use "-mem-prealloc" option in case the guest is
->> configured to use huge pages. The patch tries to map all guest pages
->> simultaneously by spawning multiple threads. Given the problem is more
->> prominent for large guests, the patch limits the changes to the guests
->> of at-least 64GB of memory size. Currently limiting the change to QEMU
->> library functions on POSIX compliant host only, as we are not sure if
->> the problem exists on win32. Below are some stats with "-mem-prealloc"
->> option for guest configured to use huge pages.
->>
->> ------------------------------------------------------------------------
->> Idle Guest      | Start-up time | Migration time
->> ------------------------------------------------------------------------
->> Guest stats with 2M HugePage usage - single threaded (existing code)
->> ------------------------------------------------------------------------
->> 64 Core - 4TB   | 54m11.796s    | 75m43.843s
->> 64 Core - 1TB   | 8m56.576s     | 14m29.049s
->> 64 Core - 256GB | 2m11.245s     | 3m26.598s
->> ------------------------------------------------------------------------
->> Guest stats with 2M HugePage usage - map guest pages using 8 threads
->> ------------------------------------------------------------------------
->> 64 Core - 4TB   | 5m1.027s      | 34m10.565s
->> 64 Core - 1TB   | 1m10.366s     | 8m28.188s
->> 64 Core - 256GB | 0m19.040s     | 2m10.148s
->> -----------------------------------------------------------------------
->> Guest stats with 2M HugePage usage - map guest pages using 16 threads
->> -----------------------------------------------------------------------
->> 64 Core - 4TB   | 1m58.970s     | 31m43.400s
->> 64 Core - 1TB   | 0m39.885s     | 7m55.289s
->> 64 Core - 256GB | 0m11.960s     | 2m0.135s
->> -----------------------------------------------------------------------
-> 
-> For comparison, what is performance like if you replace memset() in
-> the current code with a call to mlock().
-> 
+On Thu, Feb 02, 2017 at 11:59:22AM +0300, Denis V. Lunev wrote:
+> On 02/01/2017 04:53 PM, Daniel P. Berrange wrote:
+> > On Wed, Feb 01, 2017 at 04:15:28PM +0300, Denis V. Lunev wrote:
+> >> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> >>
+> >> Socket backend read handler should normally perform a disconnect, however
+> >> the read handler may not get a chance to run if the frontend is not ready
+> >> (qemu_chr_be_can_write == 0).
+> >>
+> >> This means that in virtio-serial frontend case if
+> >>  - the host has disconnected (giving EPIPE on socket write)
+> >>  - and the guest has disconnected (-> frontend not ready -> backend
+> >>    will not read)
+> >>  - and there is still data (frontend->backend) to flush (has to be a really
+> >>    tricky timing but nevertheless, we have observed the case in production)
+> >>
+> >> This results in virtio-serial trying to flush this data continiously forming
+> >> a busy loop.
+> >>
+> >> Solution: react on EPIPE in the socket write handler. We must not disconnect
+> >> right away though, there still may be data to read (see 4bf1cb0).
+> >>
+> >> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> >> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> >> CC: Paolo Bonzini <pbonzini@redhat.com>
+> >> CC: Daniel P. Berrange <berrange@redhat.com>
+> >> ---
+> >>  qemu-char.c | 12 +++++++++++-
+> >>  1 file changed, 11 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/qemu-char.c b/qemu-char.c
+> >> index 6b4a299..f1f7a07 100644
+> >> --- a/qemu-char.c
+> >> +++ b/qemu-char.c
+> >> @@ -1202,7 +1202,7 @@ static int io_channel_send_full(QIOChannel *ioc,
+> >>              errno = EAGAIN;
+> >>              return -1;
+> >>          } else if (ret < 0) {
+> >> -            errno = EINVAL;
+> >> +            errno = errno == EPIPE ? EPIPE : EINVAL;
+> > You can't rely on 'errno' being valid after qio_channel_writev_full().
+> >
+> > The 'Error **errp' arg to that function is the only error reporting
+> > mechanism that's supported. In particular since the TCP channel can
+> > be wrapped in TLS, the errno can easily have been clobbered by time
+> > you get here.
+> can we return errno directly from this call and pass exit code to the upper
+> layer? This will be fair and much more straightforward.
 
-It doesn't look like we get much benefit by replacing memset() for loop, 
-with a single instance of mlock(). Here are some numbers from my system.
+No, the qio APIs explicitly do *not* use errno because their implementations
+may be calling APIs which in turn do not provide errnos. errno is only a
+useful concept if your always calling into system calls. As soon as you need
+to deal with higher level libraries, errno is woefully inadequate as a
+concept, hence using Error ** instead.
 
-#hugepages    | memset 	    | memset      | memset 	| mlock (entire range)
-(2M size)     | (1 thread)  | (8 threads) | (16 threads)| (1 thread)
---------------|-------------|-------------|-------------|--------------------
-1048576 (2TB) |	1790661 ms  | 105577 ms   | 37331 ms    | 1789580 ms
-524288 (1TB)  |	 895119 ms  | 52795 ms	  | 18686 ms	| 894199 ms
-131072 (256G) |	 173081 ms  | 9337 ms	  | 4667 ms	| 172506 ms
------------------------------------------------------------------------------
-
-> IIUC, huge pages are non-swappable once allocated, so it feels like
-> we ought to be able to just call mlock() to preallocate them with
-> no downside, rather than spawning many threads to memset() them.
-> 
-
-yes, for me too it looks like mlock() should do the job in case of
-hugepages.
-
-> Of course you'd still need the memset() trick if qemu was given
-> non-hugepages in combination with --mem-prealloc, as you don't
-> want to lock normal pages into ram permanently.
-> 
-
-given above numbers, I think we can stick to memset() implementation for
-both hugepage and non-hugepage cases?
-
-Thanks,
-- Jitendra
-
-> Regards,
-> Daniel
-> 
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
