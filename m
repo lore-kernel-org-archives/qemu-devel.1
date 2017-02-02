@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cZIkA-0004Wm-AF
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:15 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cZIkH-0004eZ-KN
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cZIk9-00048L-6K
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54690)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cZIkD-0004A8-H2
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54712)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cZIk8-000480-VC
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:13 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	id 1cZIkD-00049n-8t
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:52:17 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 13779274873
-	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 14:52:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59AE86196E
+	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 14:52:17 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  2 Feb 2017 18:51:25 +0400
-Message-Id: <20170202145141.17138-7-marcandre.lureau@redhat.com>
+Date: Thu,  2 Feb 2017 18:51:26 +0400
+Message-Id: <20170202145141.17138-8-marcandre.lureau@redhat.com>
 In-Reply-To: <20170202145141.17138-1-marcandre.lureau@redhat.com>
 References: <20170202145141.17138-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 06/22] char: add a /chardevs container
+Subject: [Qemu-devel] [PATCH 07/22] char: use /chardevs container instead of
+ chardevs list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,155 +37,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add a /chardevs container object to hold the list of chardevs.
-(Note: QTAILQ chardevs is going away in the following commits)
+Use object_resolve_path_component() and object_child_foreach() on
+/chardevs container instead of iterating over chardevs list.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/sysemu/char.h |  3 ++-
- chardev/char.c        | 46 ++++++++++++++++++++++++++++++++++++++-------=
--
- gdbstub.c             |  2 +-
- hw/bt/hci-csr.c       |  2 +-
- 4 files changed, 42 insertions(+), 11 deletions(-)
+ chardev/char.c | 66 ++++++++++++++++++++++++++++++++--------------------=
+------
+ 1 file changed, 36 insertions(+), 30 deletions(-)
 
-diff --git a/include/sysemu/char.h b/include/sysemu/char.h
-index a30ff3fa80..e3f3a10d17 100644
---- a/include/sysemu/char.h
-+++ b/include/sysemu/char.h
-@@ -490,7 +490,8 @@ typedef struct ChardevClass {
- } ChardevClass;
-=20
- Chardev *qemu_chardev_new(const char *id, const char *typename,
--                          ChardevBackend *backend, Error **errp);
-+                          ChardevBackend *backend, bool enlist,
-+                          Error **errp);
-=20
- extern int term_escape_char;
-=20
 diff --git a/chardev/char.c b/chardev/char.c
-index 9f02c6d5f1..5a12a79c3b 100644
+index 5a12a79c3b..bdba808188 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
-@@ -45,6 +45,11 @@
- static QTAILQ_HEAD(ChardevHead, Chardev) chardevs =3D
-     QTAILQ_HEAD_INITIALIZER(chardevs);
+@@ -452,21 +452,24 @@ static const TypeInfo char_type_info =3D {
+  * mux will receive CHR_EVENT_OPENED notifications for the BE
+  * immediately.
+  */
+-static void muxes_realize_done(Notifier *notifier, void *unused)
++static int open_muxes(Object *child, void *opaque)
+ {
+-    Chardev *chr;
++    if (CHARDEV_IS_MUX(child)) {
++        /* send OPENED to all already-attached FEs */
++        mux_chr_send_all_event(CHARDEV(child), CHR_EVENT_OPENED);
++        /* mark mux as OPENED so any new FEs will immediately receive
++         * OPENED event
++         */
++        qemu_chr_be_event(CHARDEV(child), CHR_EVENT_OPENED);
++    }
 =20
-+static Object *get_chardevs_root(void)
-+{
-+    return container_get(object_get_root(), "/chardevs");
++    return 0;
 +}
 +
- void qemu_chr_be_event(Chardev *s, int event)
- {
-     CharBackend *be =3D s->be;
-@@ -804,7 +809,7 @@ static Chardev *qemu_chardev_add(const char *id, cons=
-t char *typename,
-         return NULL;
-     }
-=20
--    chr =3D qemu_chardev_new(id, typename, backend, errp);
-+    chr =3D qemu_chardev_new(id, typename, backend, true, errp);
-     if (!chr) {
-         return NULL;
-     }
-@@ -1061,8 +1066,14 @@ void qemu_chr_fe_disconnect(CharBackend *be)
-=20
- void qemu_chr_delete(Chardev *chr)
- {
--    QTAILQ_REMOVE(&chardevs, chr, next);
--    object_unref(OBJECT(chr));
-+    if (QTAILQ_IN_USE(chr, next)) {
-+        QTAILQ_REMOVE(&chardevs, chr, next);
-+    }
-+    if (OBJECT(chr)->parent) {
-+        object_unparent(OBJECT(chr));
-+    } else {
-+        object_unref(OBJECT(chr));
-+    }
++static void muxes_realize_done(Notifier *notifier, void *unused)
++{
+     muxes_realized =3D true;
+-    QTAILQ_FOREACH(chr, &chardevs, next) {
+-        if (CHARDEV_IS_MUX(chr)) {
+-            /* send OPENED to all already-attached FEs */
+-            mux_chr_send_all_event(CHARDEV(chr), CHR_EVENT_OPENED);
+-            /* mark mux as OPENED so any new FEs will immediately receiv=
+e
+-             * OPENED event
+-             */
+-            qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+-        }
+-    }
++    object_child_foreach(get_chardevs_root(), open_muxes, NULL);
  }
 =20
- ChardevInfoList *qmp_query_chardev(Error **errp)
-@@ -1224,22 +1235,33 @@ void qemu_chr_set_feature(Chardev *chr,
+ static Notifier muxes_realize_notify =3D {
+@@ -1076,21 +1079,29 @@ void qemu_chr_delete(Chardev *chr)
+     }
  }
 =20
- Chardev *qemu_chardev_new(const char *id, const char *typename,
--                          ChardevBackend *backend, Error **errp)
-+                          ChardevBackend *backend, bool enlist,
-+                          Error **errp)
- {
-+    Object *obj;
-     Chardev *chr =3D NULL;
-     Error *local_err =3D NULL;
-     bool be_opened =3D true;
-=20
-     assert(g_str_has_prefix(typename, "chardev-"));
-=20
--    chr =3D CHARDEV(object_new(typename));
-+    if (enlist) {
-+        obj =3D object_new_with_props(typename, get_chardevs_root(),
-+                                    id, &local_err, NULL);
-+    } else {
-+        obj =3D object_new(typename);
-+    }
-+    if (local_err) {
-+        assert(!obj);
-+        goto end;
-+    }
++static int qmp_query_chardev_foreach(Object *obj, void *data)
++{
++    Chardev *chr =3D CHARDEV(obj);
++    ChardevInfoList **list =3D data;
++    ChardevInfoList *info =3D g_malloc0(sizeof(*info));
 +
-+    chr =3D CHARDEV(obj);
-     chr->label =3D g_strdup(id);
-=20
-     qemu_char_open(chr, backend, &be_opened, &local_err);
-     if (local_err) {
--        error_propagate(errp, local_err);
--        object_unref(OBJECT(chr));
--        return NULL;
-+        goto end;
-     }
-=20
-     if (!chr->filename) {
-@@ -1249,6 +1271,14 @@ Chardev *qemu_chardev_new(const char *id, const ch=
-ar *typename,
-         qemu_chr_be_event(chr, CHR_EVENT_OPENED);
-     }
-=20
-+end:
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        if (chr) {
-+            qemu_chr_delete(chr);
-+        }
-+        return NULL;
-+    }
-     return chr;
- }
-=20
-diff --git a/gdbstub.c b/gdbstub.c
-index 755a8e378d..613ac48fed 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1793,7 +1793,7 @@ int gdbserver_start(const char *device)
-=20
-         /* Initialize a monitor terminal for gdb */
-         mon_chr =3D qemu_chardev_new(NULL, TYPE_CHARDEV_GDB,
--                                   NULL, &error_abort);
-+                                   NULL, false, &error_abort);
-         monitor_init(mon_chr, 0);
-     } else {
-         if (qemu_chr_fe_get_driver(&s->chr)) {
-diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
-index 3c193848fc..9c211e89c4 100644
---- a/hw/bt/hci-csr.c
-+++ b/hw/bt/hci-csr.c
-@@ -503,7 +503,7 @@ static const TypeInfo char_hci_type_info =3D {
- Chardev *uart_hci_init(void)
++    info->value =3D g_malloc0(sizeof(*info->value));
++    info->value->label =3D g_strdup(chr->label);
++    info->value->filename =3D g_strdup(chr->filename);
++    info->value->frontend_open =3D chr->be && chr->be->fe_open;
++
++    info->next =3D *list;
++    *list =3D info;
++
++    return 0;
++}
++
+ ChardevInfoList *qmp_query_chardev(Error **errp)
  {
-     return qemu_chardev_new(NULL, TYPE_CHARDEV_HCI,
--                            NULL, &error_abort);
-+                            NULL, false, &error_abort);
+     ChardevInfoList *chr_list =3D NULL;
+-    Chardev *chr;
+-
+-    QTAILQ_FOREACH(chr, &chardevs, next) {
+-        ChardevInfoList *info =3D g_malloc0(sizeof(*info));
+-        info->value =3D g_malloc0(sizeof(*info->value));
+-        info->value->label =3D g_strdup(chr->label);
+-        info->value->filename =3D g_strdup(chr->filename);
+-        info->value->frontend_open =3D chr->be && chr->be->fe_open;
+=20
+-        info->next =3D chr_list;
+-        chr_list =3D info;
+-    }
++    object_child_foreach(get_chardevs_root(),
++                         qmp_query_chardev_foreach, &chr_list);
+=20
+     return chr_list;
+ }
+@@ -1118,14 +1129,9 @@ ChardevBackendInfoList *qmp_query_chardev_backends=
+(Error **errp)
+=20
+ Chardev *qemu_chr_find(const char *name)
+ {
+-    Chardev *chr;
++    Object *obj =3D object_resolve_path_component(get_chardevs_root(), n=
+ame);
+=20
+-    QTAILQ_FOREACH(chr, &chardevs, next) {
+-        if (strcmp(chr->label, name) !=3D 0)
+-            continue;
+-        return chr;
+-    }
+-    return NULL;
++    return obj ? CHARDEV(obj) : NULL;
  }
 =20
- static void register_types(void)
+ QemuOptsList qemu_chardev_opts =3D {
 --=20
 2.11.0.295.gd7dffce1c.dirty
