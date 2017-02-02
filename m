@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9js-0007Qj-HM
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9js-0007Qt-Kn
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jn-0003mk-FC
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jp-0003ou-5h
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:20 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:41 +1100
-Message-Id: <20170202051445.5735-44-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:42 +1100
+Message-Id: <20170202051445.5735-45-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 043/107] hw/ppc: QOM'ify e500.c
+Subject: [Qemu-devel] [PULL 044/107] hw/ppc: QOM'ify ppce500_spin.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +29,61 @@ Drop the old SysBus init function and use instance_init
 Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/e500.c | 17 ++++-------------
- 1 file changed, 4 insertions(+), 13 deletions(-)
+ hw/ppc/ppce500_spin.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index cf8b122..792bd79 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -1049,27 +1049,18 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     boot_info->dt_size = dt_size;
- }
+diff --git a/hw/ppc/ppce500_spin.c b/hw/ppc/ppce500_spin.c
+index eb219ab..69ca2d0 100644
+--- a/hw/ppc/ppce500_spin.c
++++ b/hw/ppc/ppce500_spin.c
+@@ -54,9 +54,9 @@ typedef struct SpinState {
+     SpinInfo spin[MAX_CPUS];
+ } SpinState;
  
--static int e500_ccsr_initfn(SysBusDevice *dev)
-+static void e500_ccsr_initfn(Object *obj)
+-static void spin_reset(void *opaque)
++static void spin_reset(DeviceState *dev)
  {
--    PPCE500CCSRState *ccsr;
--
--    ccsr = CCSR(dev);
--    memory_region_init(&ccsr->ccsr_space, OBJECT(ccsr), "e500-ccsr",
-+    PPCE500CCSRState *ccsr = CCSR(obj);
-+    memory_region_init(&ccsr->ccsr_space, obj, "e500-ccsr",
-                        MPC8544_CCSRBAR_SIZE);
--    return 0;
--}
--
--static void e500_ccsr_class_init(ObjectClass *klass, void *data)
--{
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
--    k->init = e500_ccsr_initfn;
- }
+-    SpinState *s = opaque;
++    SpinState *s = E500_SPIN(dev);
+     int i;
  
- static const TypeInfo e500_ccsr_info = {
-     .name          = TYPE_CCSR,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(PPCE500CCSRState),
--    .class_init    = e500_ccsr_class_init,
-+    .instance_init = e500_ccsr_initfn,
+     for (i = 0; i < MAX_CPUS; i++) {
+@@ -174,30 +174,28 @@ static const MemoryRegionOps spin_rw_ops = {
+     .endianness = DEVICE_BIG_ENDIAN,
  };
  
- static void e500_register_types(void)
+-static int ppce500_spin_initfn(SysBusDevice *dev)
++static void ppce500_spin_initfn(Object *obj)
+ {
++    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+     SpinState *s = E500_SPIN(dev);
+ 
+-    memory_region_init_io(&s->iomem, OBJECT(s), &spin_rw_ops, s,
++    memory_region_init_io(&s->iomem, obj, &spin_rw_ops, s,
+                           "e500 spin pv device", sizeof(SpinInfo) * MAX_CPUS);
+     sysbus_init_mmio(dev, &s->iomem);
+-
+-    qemu_register_reset(spin_reset, s);
+-
+-    return 0;
+ }
+ 
+ static void ppce500_spin_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    k->init = ppce500_spin_initfn;
++    dc->reset = spin_reset;
+ }
+ 
+ static const TypeInfo ppce500_spin_info = {
+     .name          = TYPE_E500_SPIN,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(SpinState),
++    .instance_init = ppce500_spin_initfn,
+     .class_init    = ppce500_spin_class_init,
+ };
+ 
 -- 
 2.9.3
