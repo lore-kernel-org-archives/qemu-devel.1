@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cZFAn-00027A-Dh
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:03:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZFAx-00029f-BU
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cZFAi-0004bc-G1
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:03:29 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37433)
+	(envelope-from <peter.maydell@linaro.org>) id 1cZFAw-0004gx-DU
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:03:39 -0500
+Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:35025)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cZFAi-0004ax-6L
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:03:24 -0500
-Received: by mail-wm0-x230.google.com with SMTP id v77so82349936wmv.0
-	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 03:03:23 -0800 (PST)
-References: <CAFEAcA9j47hSCHyYh5TzNh5P-V3_ddcmA=XMcini+d8PnqruZA@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA9j47hSCHyYh5TzNh5P-V3_ddcmA=XMcini+d8PnqruZA@mail.gmail.com>
-Date: Thu, 02 Feb 2017 11:03:24 +0000
-Message-ID: <87bmuk4zyb.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZFAw-0004gd-9K
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:03:38 -0500
+Received: by mail-ua0-x22e.google.com with SMTP id y9so8595950uae.2
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 03:03:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 23/25] target-arm: introduce
- ARM_CP_EXIT_PC
+In-Reply-To: <CAJ+F1CKmAKmiiM5LvLGaT51kJUp4=jKU_=QAqo7JOtxDuso9CQ@mail.gmail.com>
+References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
+	<CAFEAcA9jzxGZXXoFWxrDztb4or=0LaqpeNa3YH9rpZePa2mFdA@mail.gmail.com>
+	<CAJ+F1CJzchr6f9nfCsHyOUFmz-08e4R-8BLi4QWc3q0h0+9Quw@mail.gmail.com>
+	<3fdd19c5-2017-7c5d-22ad-a44bd15414d6@redhat.com>
+	<CAJ+F1CKmAKmiiM5LvLGaT51kJUp4=jKU_=QAqo7JOtxDuso9CQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Feb 2017 11:03:17 +0000
+Message-ID: <CAFEAcA-Z8d4oxb_qGA9dbLR0myu3C0uKseb1-j_Yq5zNUwkfpA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/41] Chr split patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,143 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: MTTCG Devel <mttcg@listserver.greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, KONRAD =?utf-8?B?RnLDqWTDqXJpYw==?= <fred.konrad@greensocs.com>, Alvise Rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Mark Burton <mark.burton@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Fedorov Sergey <serge.fdrv@gmail.com>, Richard Henderson <rth@twiddle.net>, Claudio Fontana <claudio.fontana@huawei.com>, bamvor.zhangjian@linaro.org, "open
-	list:ARM" <qemu-arm@nongnu.org>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 27 January 2017 at 10:39, Alex Bennée <alex.bennee@linaro.org> wrote:
->> Some helpers may trigger an immediate exit of the cpu_loop. If this
->> happens the PC need to be rectified to ensure the restart will begin
->> on the next instruction.
+On 31 January 2017 at 19:37, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+> Hi
+>
+> On Tue, Jan 31, 2017 at 11:00 PM Eric Blake <eblake@redhat.com> wrote:
 >>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  target/arm/cpu.h           | 3 ++-
->>  target/arm/translate-a64.c | 4 ++++
->>  target/arm/translate.c     | 4 ++++
->>  3 files changed, 10 insertions(+), 1 deletion(-)
+>> On 01/31/2017 12:55 PM, Marc-Andr=C3=A9 Lureau wrote:
 >>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index f56a96c675..1b0670ae11 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -1411,7 +1411,8 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
->>  #define ARM_CP_NZCV            (ARM_CP_SPECIAL | (3 << 8))
->>  #define ARM_CP_CURRENTEL       (ARM_CP_SPECIAL | (4 << 8))
->>  #define ARM_CP_DC_ZVA          (ARM_CP_SPECIAL | (5 << 8))
->> -#define ARM_LAST_SPECIAL       ARM_CP_DC_ZVA
->> +#define ARM_CP_EXIT_PC         (ARM_CP_SPECIAL | (6 << 8))
->> +#define ARM_LAST_SPECIAL       ARM_CP_EXIT_PC
+>> >> 'make check' fails on a linux-user-targets-only build:
+>> >>
+>> >> tests/test-char.o: In function `char_stdio_test_subprocess':
+>> >> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:47: undefined
+>> >> reference to `qemu_chr_new'
+>> >> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:50: undefined
+>> >> reference to `qemu_chr_fe_init'
+>> >> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:51: undefined
+>> >> reference to `qemu_chr_fe_set_open'
+>> >> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:52: undefined
+>> >> reference to `qemu_chr_fe_write'
+>> >> [etc etc etc]
+>> >>
+>> >>
+>> > Oh good catch. We want to have chardev-obj-y defined globally, but onl=
+y
+>> > linked with -softmmu target.
+>> >
+>> > A possible fix to squash with chardev-obj-j patch is:
+>> >
+>> > Eric, do you want me to resend the patch for review or is that enough
+>> > for
+>> > you to ack?
+>> >
+>>
+>> I'm okay ack'ing the interdiff (that is, squash this in, and you can
+>> keep the R-b you already have).
+>>
 >
-> There's a comment above this list of defines that documents
-> what all the flags mean; can you add an entry to it for the
-> new flag?
-
-Sure - given your comment bellow maybe AP_CP_SYNC_REGS is a better name?
-
+> Thanks, patch updated, tag updated.
 >
->>  /* Used only as a terminator for ARMCPRegInfo lists */
->>  #define ARM_CP_SENTINEL 0xffff
->>  /* Mask of only the flag bits in a type field */
->> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
->> index 05162f335e..a3f37d8bec 100644
->> --- a/target/arm/translate-a64.c
->> +++ b/target/arm/translate-a64.c
->> @@ -1561,6 +1561,10 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
->>          tcg_rt = cpu_reg(s, rt);
->>          gen_helper_dc_zva(cpu_env, tcg_rt);
->>          return;
->> +    case ARM_CP_EXIT_PC:
->> +        /* The helper may exit the cpu_loop so ensure PC is correct */
->> +        gen_a64_set_pc_im(s->pc);
->> +        break;
->
-> This will work, but it's a little odd because it breaks the
-> existing invariant that cp helpers never throw exceptions
-> (except in the access function).
+> Peter, let me know if you want me to resend the pull request.
 
-We don't throw an exception but we do exit the CPU loop which has work
-waiting for it.
+Now applied, thanks.
 
->
-> Does single-stepping (of the emulated architectural
-> debug step, and gdbstub singlestep) work across one of
-> these instructions?
-
-I'll have to test but I don't see why not. The instruction is fully
-executed we just ensure we have exited the run loop to process the flush
-before we get to the next instruction/
-
-> Should we also set dc->is_jmp to force ending the TB here?
-
-Probably - there is no reason to keep translating as the next
-instruction will be in its own block.
-
-> This is probably a question answered in the rest of the series,
-> but why do we need the helper to be able to longjump out to the
-> top level? Can't we just have the helper do its work and then
-> end the TB with tcg_gen_exit_tb(0) so we return to the top level
-> loop in the normal way?
-
-Well I guess this is a philosophical question. The cputlb API is
-offering the guarantee that when an *_all_cpus_synced() flush is done
-everything will be complete with respect to all vCPUS. This is reliant
-on the source vCPU executing an exclusive safe work which ensures all
-other vCPUs have halted and therefor will have run their safe work
-before returning to execution.
-
-If ARM wanted to it could call the *_all_cpus() variant, schedule its
-own exclusive safe work (a null function - as cputlb will have scheduled
-the flush) and exit the TB in the usual way. In fact this is the
-mechanism ARM could use if it wanted to defer the sync point to a later
-DMB instruction.
-
-I haven't implemented it yet as the flush stuff only comes up high in
-the perf runs with my aggressive TLB flush microbenchmarks.
-
-However I'm wary of having a _synched() variant which will only work
-correctly if the guest also does a bunch of other steps.
-
->
->>      default:
->>          break;
->>      }
->> diff --git a/target/arm/translate.c b/target/arm/translate.c
->> index 444a24c2b6..7bd18cd25d 100644
->> --- a/target/arm/translate.c
->> +++ b/target/arm/translate.c
->> @@ -7508,6 +7508,10 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
->>              gen_set_pc_im(s, s->pc);
->>              s->is_jmp = DISAS_WFI;
->>              return 0;
->> +        case ARM_CP_EXIT_PC:
->> +            /* The helper may exit the cpu_loop so ensure PC is correct */
->> +            gen_set_pc_im(s, s->pc);
->> +            break;
->
-> Do we also need to gen_set_condexec() ?
-
-Do we? This isn't an exception so we don't need to resolve the condition
-flags as long as there is enough information preserved so the next TB
-can resolve if it needs to.
-
-I'm afraid my knowledge of the condition code is "it is deferred until
-it is needed as it is an expensive calculation". I'll dig into the
-implementation.
-
->
->>          default:
->>              break;
->>          }
->> --
->> 2.11.0
->
-> thanks
-> -- PMM
-
-
---
-Alex Bennée
+-- PMM
