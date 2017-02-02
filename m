@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kD-0007ss-B0
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:49 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kF-0007vy-TY
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k6-0004Df-MB
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k9-0004Gd-5b
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:43 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:14:17 +1100
-Message-Id: <20170202051445.5735-80-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:14:31 +1100
+Message-Id: <20170202051445.5735-94-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 079/107] target-ppc: Add xvxexpsp instruction
+Subject: [Qemu-devel] [PULL 093/107] target/ppc: Add pcr_supported to POWER9
+ cpu class definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +21,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-xvxexpsp: VSX Vector Extract Exponent Single Precision
+pcr_supported is used to define the supported PCR values for a given
+processor. A POWER9 processor can support 3.00, 2.07, 2.06 and 2.05
+compatibility modes, thus we set this accordingly.
 
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate/vsx-impl.inc.c | 17 +++++++++++++++++
- target/ppc/translate/vsx-ops.inc.c  |  1 +
- 2 files changed, 18 insertions(+)
+ target/ppc/cpu.h            | 1 +
+ target/ppc/translate_init.c | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index b66272e..160a80c 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1396,6 +1396,23 @@ static void gen_xviexpdp(DisasContext *ctx)
-     tcg_temp_free_i64(t0);
- }
- 
-+static void gen_xvxexpsp(DisasContext *ctx)
-+{
-+    TCGv_i64 xth = cpu_vsrh(xT(ctx->opcode));
-+    TCGv_i64 xtl = cpu_vsrl(xT(ctx->opcode));
-+    TCGv_i64 xbh = cpu_vsrh(xB(ctx->opcode));
-+    TCGv_i64 xbl = cpu_vsrl(xB(ctx->opcode));
-+
-+    if (unlikely(!ctx->vsx_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_VSXU);
-+        return;
-+    }
-+    tcg_gen_shri_i64(xth, xbh, 23);
-+    tcg_gen_andi_i64(xth, xth, 0xFF000000FF);
-+    tcg_gen_shri_i64(xtl, xbl, 23);
-+    tcg_gen_andi_i64(xtl, xtl, 0xFF000000FF);
-+}
-+
- #undef GEN_XX2FORM
- #undef GEN_XX3FORM
- #undef GEN_XX2IFORM
-diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index 253a5c4..eb7334a 100644
---- a/target/ppc/translate/vsx-ops.inc.c
-+++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -126,6 +126,7 @@ GEN_VSX_XFORM_300(xsiexpqp, 0x4, 0x1B, 0x00000001),
- 
- GEN_XX3FORM(xviexpsp, 0x00, 0x1B, PPC2_ISA300),
- GEN_XX3FORM(xviexpdp, 0x00, 0x1F, PPC2_ISA300),
-+GEN_XX2FORM_EO(xvxexpsp, 0x16, 0x1D, 0x08, PPC2_ISA300),
- 
- GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
- GEN_XX2FORM(xvnabsdp, 0x12, 0x1E, PPC2_VSX),
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 4d72d75..bc2a2ce 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -2290,6 +2290,7 @@ enum {
+     PCR_COMPAT_2_05     = 1ull << (63-62),
+     PCR_COMPAT_2_06     = 1ull << (63-61),
+     PCR_COMPAT_2_07     = 1ull << (63-60),
++    PCR_COMPAT_3_00     = 1ull << (63-59),
+     PCR_VEC_DIS         = 1ull << (63-0), /* Vec. disable (bit NA since POWER8) */
+     PCR_VSX_DIS         = 1ull << (63-1), /* VSX disable (bit NA since POWER8) */
+     PCR_TM_DIS          = 1ull << (63-2), /* Trans. memory disable (POWER8) */
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 388a3e8..c7f7624 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8797,6 +8797,8 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+     dc->props = powerpc_servercpu_properties;
+     pcc->pvr_match = ppc_pvr_match_power9;
+     pcc->pcr_mask = PCR_COMPAT_2_05 | PCR_COMPAT_2_06 | PCR_COMPAT_2_07;
++    pcc->pcr_supported = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
++                         PCR_COMPAT_2_05;
+     pcc->init_proc = init_proc_POWER9;
+     pcc->check_pow = check_pow_nocheck;
+     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
 -- 
 2.9.3
