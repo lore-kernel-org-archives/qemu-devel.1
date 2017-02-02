@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kD-0007si-5J
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kD-0007sQ-02
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k6-0004DR-IH
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k6-0004Ch-1s
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:40 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:14:37 +1100
-Message-Id: <20170202051445.5735-100-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:14:35 +1100
+Message-Id: <20170202051445.5735-98-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 099/107] target-ppc: Add MMU model check for
- booke machines
+Subject: [Qemu-devel] [PULL 097/107] target/ppc/cpu-models: Fix/remove bad
+ CPU aliases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,78 +21,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Valentin Plotkin <caliborn@sdf.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-From: Valentin Plotkin <caliborn@sdf.org>
+From: Thomas Huth <thuth@redhat.com>
 
-Machines bamboo, e500 and virtex-ml507 assume a certain MMU model,
-otherwise resulting in unpredictable behavior. Add apropriate checks
-into *_init functions.
+There is no CPU model called "7447_v1.2" in our list, so the
+"7447" alias should point to "7447_v1.1" instead. Let's also
+remove the "codename" aliases that point to non-implemented
+CPU models - they are really of no use here.
 
-Signed-off-by: Valentin Plotkin <caliborn@sdf.org>
-
-[regarding virtex parts]
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/e500.c          | 6 ++++++
- hw/ppc/ppc440_bamboo.c | 6 ++++++
- hw/ppc/virtex_ml507.c  | 7 +++++++
- 3 files changed, 19 insertions(+)
+ target/ppc/cpu-models.c | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 792bd79..f7df238 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -827,6 +827,12 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-         env = &cpu->env;
-         cs = CPU(cpu);
+diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
+index 506dee1..4d3e635 100644
+--- a/target/ppc/cpu-models.c
++++ b/target/ppc/cpu-models.c
+@@ -1375,19 +1375,15 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
+     { "7445", "7445_v3.2" },
+     { "7455", "7455_v3.2" },
+     { "Apollo6", "7455" },
+-    { "7447", "7447_v1.2" },
++    { "7447", "7447_v1.1" },
+     { "7457", "7457_v1.2" },
+     { "Apollo7", "7457" },
+     { "7447A", "7447A_v1.2" },
+     { "7457A", "7457A_v1.2" },
+     { "Apollo7PM", "7457A_v1.0" },
+ #if defined(TARGET_PPC64)
+-    { "Trident", "620" },
+     { "POWER3", "630" },
+-    { "Boxer", "POWER3" },
+-    { "Dino",  "POWER3" },
+     { "POWER3+", "631" },
+-    { "POWER5gr", "POWER5" },
+     { "POWER5+", "POWER5+_v2.1" },
+     { "POWER5gs", "POWER5+_v2.1" },
+     { "POWER7", "POWER7_v2.3" },
+@@ -1399,21 +1395,7 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
+     { "970", "970_v2.2" },
+     { "970fx", "970fx_v3.1" },
+     { "970mp", "970mp_v1.1" },
+-    { "Apache", "RS64" },
+-    { "A35",    "RS64" },
+-    { "NorthStar", "RS64-II" },
+-    { "A50",       "RS64-II" },
+-    { "Pulsar", "RS64-III" },
+-    { "IceStar", "RS64-IV" },
+-    { "IStar",   "RS64-IV" },
+-    { "SStar",   "RS64-IV" },
+-#endif
+-    { "RIOS",    "POWER" },
+-    { "RSC",     "POWER" },
+-    { "RSC3308", "POWER" },
+-    { "RSC4608", "POWER" },
+-    { "RSC2", "POWER2" },
+-    { "P2SC", "POWER2" },
++#endif
  
-+        if (env->mmu_model != POWERPC_MMU_BOOKE206) {
-+            fprintf(stderr, "MMU model %i not supported by this machine.\n",
-+                env->mmu_model);
-+            exit(1);
-+        }
-+
-         if (!firstenv) {
-             firstenv = env;
-         }
-diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-index 5c535b1..9d997bf 100644
---- a/hw/ppc/ppc440_bamboo.c
-+++ b/hw/ppc/ppc440_bamboo.c
-@@ -193,6 +193,12 @@ static void bamboo_init(MachineState *machine)
-     }
-     env = &cpu->env;
- 
-+    if (env->mmu_model != POWERPC_MMU_BOOKE) {
-+        fprintf(stderr, "MMU model %i not supported by this machine.\n",
-+            env->mmu_model);
-+        exit(1);
-+    }
-+
-     qemu_register_reset(main_cpu_reset, cpu);
-     ppc_booke_timers_init(cpu, 400000000, 0);
-     ppc_dcr_init(env, NULL, NULL);
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index b97d966..fdbcf22 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -221,6 +221,13 @@ static void virtex_init(MachineState *machine)
- 
-     cpu = ppc440_init_xilinx(&ram_size, 1, machine->cpu_model, 400000000);
-     env = &cpu->env;
-+
-+    if (env->mmu_model != POWERPC_MMU_BOOKE) {
-+        fprintf(stderr, "MMU model %i not supported by this machine.\n",
-+            env->mmu_model);
-+        exit(1);
-+    }
-+
-     qemu_register_reset(main_cpu_reset, cpu);
- 
-     memory_region_allocate_system_memory(phys_ram, NULL, "ram", ram_size);
+     /* Generic PowerPCs */
+ #if defined(TARGET_PPC64)
 -- 
 2.9.3
