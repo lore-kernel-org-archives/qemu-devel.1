@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZBYm-0006H9-RE
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 02:12:01 -0500
+	(envelope-from <armbru@redhat.com>) id 1cZBsf-000707-BA
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 02:32:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZBYj-00087S-MR
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 02:12:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51850)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cZBYj-00086t-Gn
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 02:11:57 -0500
-Message-ID: <1486019510.20628.10.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 02 Feb 2017 08:11:50 +0100
-In-Reply-To: <alpine.GSO.2.00.1702012023540.5038@dmz.c-home.cz>
-References: <alpine.GSO.2.00.1702012023540.5038@dmz.c-home.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] usb3 - xhci - Assertion `intr->er_full' failed
+	(envelope-from <armbru@redhat.com>) id 1cZBse-0006aD-FS
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 02:32:33 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170126110435.2777-1-berrange@redhat.com>
+	<20170126110435.2777-4-berrange@redhat.com>
+	<20170126123530.GB23095@lemon.Home>
+	<20170126132708.GB29127@redhat.com>
+	<6a9aeec8-d4ee-a0aa-7e04-0ee4295fef80@redhat.com>
+	<8a13c995-c094-2704-c770-214132b2d6cf@redhat.com>
+	<20170201121658.GF3232@redhat.com>
+	<c4d38998-b862-90e6-6c4b-4b96a8d17bb4@redhat.com>
+	<20170201122854.GG3232@redhat.com>
+	<37f445c0-c174-bca4-7073-7aa6c64046b0@redhat.com>
+Date: Thu, 02 Feb 2017 08:32:23 +0100
+In-Reply-To: <37f445c0-c174-bca4-7073-7aa6c64046b0@redhat.com> (Max Reitz's
+	message of "Wed, 1 Feb 2017 13:31:01 +0100")
+Message-ID: <87bmul9hfc.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] qemu-img: add support for -n arg to
+ dd command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +32,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Martin Cerveny <M.Cerveny@computer.org>
-Cc: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-  Hi,
-> - usb with usbredir 0.7.1
+Max Reitz <mreitz@redhat.com> writes:
 
-What kind of device do you assign to the guest?
+> On 01.02.2017 13:28, Daniel P. Berrange wrote:
+>> On Wed, Feb 01, 2017 at 01:23:54PM +0100, Max Reitz wrote:
+>>> On 01.02.2017 13:16, Daniel P. Berrange wrote:
+>>>> On Wed, Feb 01, 2017 at 01:13:39PM +0100, Max Reitz wrote:
+>>>>> On 30.01.2017 19:37, Eric Blake wrote:
+>>>>>> On 01/26/2017 07:27 AM, Daniel P. Berrange wrote:
+>>>>>>> On Thu, Jan 26, 2017 at 08:35:30PM +0800, Fam Zheng wrote:
+>>>>>>>> On Thu, 01/26 11:04, Daniel P. Berrange wrote:
+>>>>>>>>> The -n arg to the convert command allows use of a pre-existing image,
+>>>>>>>>> rather than creating a new image. This adds a -n arg to the dd command
+>>>>>>>>> to get feature parity.
+>>>>>>>>
+>>>>>>>> I remember there was a discussion about changing qemu-img dd's default to a
+>>>>>>>> "conv=nocreat" semantic, if so, "-n" might not be that useful. But that part
+>>>>>>>> hasn't made it into the tree, and I'm not sure which direction we should take.
+>>>>>>>> (Personally I think default to nocreat is a good idea).
+>>>>>>>
+>>>>>>> Use nocreat by default would be semantically different from real "dd"
+>>>>>>> binary which feels undesirable if the goal is to make "qemu-img dd"
+>>>>>>> be as consistent with "dd" as possible.
+>>>>>>>
+>>>>>>> It would be trivial to rewrite this patch to add support for the "conv"
+>>>>>>> option, allowing the user to explicitly give 'qemu-img dd conv=nocreat'
+>>>>>>> instead of my 'qemu-img dd -n' syntax, without changing default semantics.
+>>>>>>
+>>>>>> Adding 'conv=nocreat' (and not '-n') feels like the right way to me.
+>>>>>
+>>>>> The original idea was to make conv=nocreat a mandatory option, I think.
+>>>>> qemu-img was supposed error out if the user did not specify it.
+>>>>
+>>>> I'm not really seeing a benefit in doing that - it would just break
+>>>> existing usage of qemu-img dd for no obvious benefit.
+>>>
+>>> Well... Is there existing usage?
+>> 
+>> It shipped in 2.8.0 though, so imho that means we have to assume there
+>> are users, and thus additions must to be backwards compatible from now
+>> on.
+>
+> Depends. I don't think there are too many users, so we could still
+> justify a change if there's a very good reason for it.
+>
+> I do agree that it's probably not a very good reason, though.
+>
+>>> The benefit would be that one could (should?) expect qemu-img dd to
+>>> behave on disk images as if they were block devices; and dd to a block
+>>> device will not truncate or "recreate" it.
+>>>
+>>> If you don't give nocreat, it's thus a bit unclear whether you want to
+>>> delete and recreate the target or whether you want to write into it.
+>>> Some may expect qemu-img dd to behave as if the target is a normal file
+>>> (delete and recreate it), others may expect it's treated like a block
+>>> device (just write into it). If you force the user to specify nocreat,
+>>> it would make the behavior clear.
+>>>
+>>> (And you can always delete+recreate the target with qemu-img create.)
+>>>
+>>> It's all a bit complicated. :-/
+>> 
+>> If the goal is to be compatible with /usr/bin/dd then IIUC, the behaviour
+>> needs to be
+>> 
+>>  - If target is a block device, then silently assume nocreat|notrunc
+>>    is set, even if not specified by user
+>> 
+>>  - If target is a file, then silently create & truncate the file
+>>    unless nocreat or notrunc are set
+>
+> Yes. But you could easily argue that every image file is a "block device".
 
-> - guest windows 7 - renesas driver 2.1.36 or 2.1.39
+No.  /bin/dd treats exactly block special files as block special files,
+so the qemu-img command that tries to behave like it should do, too.
 
-ok.
-
-> Where is the verfied windows driver that is compatible/tested with xhci c=
-ode ?
-
-Usually I test with the drivers shipped by the operating system, i.e.
-linux kernel or windows 8 (or newer).
-
-> I see some movement on xhci sources (https://www.kraxel.org/cgit/qemu/log=
-/?h=3Dwork/qemu-xhci) -=20
-> Is there some special driver for "PCI_DEVICE_ID_REDHAT_XHCI" "1b36:000c P=
-CI xhci usb host adapter" for Windows Guests
-> that is compatible with xhci qemu code ?
-
-Generic xhci drivers should work with any xhci controller, no matter
-what pci ids it has.
-
-> ---------------------------------- USB keyboard + qemu-xen-4.8.0 + 2.1.39=
- driver + DEBUG_XHCI + DEBUG_DATA ---------------------------
-
-Is the usb keyboard enough to trigger this?
-
-enabling usb_xhci_* trace events would be more helpful than DEBUG_XHCI
-(see qemu.git/docs/tracing.txt).
-
-cheers,
-  Gerd
+In case you say that's inconvenient: pretty much everything about dd's
+archaic user interface is inconvenient.  If you want convenient, roll
+your own.  If you want familiar, stick to the original.
