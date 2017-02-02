@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cZKWA-00017i-Am
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:45:55 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cZKnR-0002aP-MW
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 12:03:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cZKW7-0001aX-0I
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:45:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53016)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cZKW6-0001Zq-R5
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 11:45:50 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170202155909.31784-3-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Thu, 2 Feb 2017 15:59:09 +0000")
-References: <20170202155909.31784-1-dgilbert@redhat.com>
-	<20170202155909.31784-3-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Thu, 02 Feb 2017 17:45:43 +0100
-Message-ID: <8737fwr16w.fsf@emacs.mitica>
+	(envelope-from <no-reply@patchew.org>) id 1cZKnQ-0003tp-NP
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 12:03:45 -0500
+Resent-Message-Id: <E1cZKnQ-0003tp-NP@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1486051604-32310-1-git-send-email-pl@kamp.de>
+Message-ID: <148605500543.33.14943713502653422816@eba24e3a0d7f>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] postcopy: Recover block devices on
- early failure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 2 Feb 2017 09:03:26 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC][PATCH] qemu-img: make convert async
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, zhang.zhanghailiang@huawei.com
+To: pl@kamp.de
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> An early postcopy failure can be recovered from as long as we know
-> we haven't sent the command to run the destination.
-> We have to undo the bdrv_inactivate_all by calling
-> bdrv_invalidate_cache_all
->
-> Note that I'm not using ms->block_inactive because once we've
-> sent the postcopy package we dont want anything else to try
-> and recover the block storage on the source; the destination
-> might have started writing to it.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDXVtQQVRDSF0gcWVtdS1pbWc6IG1ha2UgY29udmVydCBh
+c3luYwpNZXNzYWdlLWlkOiAxNDg2MDUxNjA0LTMyMzEwLTEtZ2l0LXNlbmQtZW1haWwtcGxAa2Ft
+cC5kZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
+MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMg
+VXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
+LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
+IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
+JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
+ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKM2ExNjdlYiBxZW11LWlt
+ZzogbWFrZSBjb252ZXJ0IGFzeW5jCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
+SCAxLzE6IHFlbXUtaW1nOiBtYWtlIGNvbnZlcnQgYXN5bmMuLi4KRVJST1I6IHN1c3BlY3QgY29k
+ZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDQsIDkpCiMxMTg6IEZJTEU6IHFl
+bXUtaW1nLmM6MTU4MDoKKyAgICBmb3IgKGkgPSAwOyBpIDwgQ09OVkVSVF9NQVhfUkVRUzsgaSsr
+KSB7CisgICAgICAgICBpZiAocy0+cmVxc1tpXS5zZWN0b3JfbnVtID09IHMtPndyX29mZnMgJiYg
+cy0+cmVxc1tpXS5yZF9jb21wbGV0ZWQpIHsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
+cwojMTQ3OiBGSUxFOiBxZW11LWltZy5jOjE2MDk6CisgICAgICAgIHByaW50ZigiY29udmVydF9m
+aWxsX3JlYWRfcXVldWUgcmVxICMlZCBAJXAgc2VjdG9yX251bSAlbGQgbmJfc2VjdG9ycyAlZCBz
+dGF0dXMgJWRcbiIsIGksIHJlcSwgZWx0LT5zZWN0b3JfbnVtLCBlbHQtPm5iX3NlY3RvcnMsIGVs
+dC0+c3RhdHVzKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNDk6IEZJTEU6
+IHFlbXUtaW1nLmM6MTYxMToKKyAgICAgICAgaWYgKGVsdC0+c3RhdHVzID09IEJMS19EQVRBIHx8
+ICghcy0+bWluX3NwYXJzZSAmJiBlbHQtPnN0YXR1cyA9PSBCTEtfWkVSTykpCgpXQVJOSU5HOiBs
+aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTUyOiBGSUxFOiBxZW11LWltZy5jOjE2MTQ6CisgICAg
+ICAgICAgICBxZW11X3Byb2dyZXNzX3ByaW50KDEwMC4wICogcy0+YWxsb2NhdGVkX2RvbmUgLyBz
+LT5hbGxvY2F0ZWRfc2VjdG9ycywKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYg
+Y29uZGl0aW9uCiMxNjE6IEZJTEU6IHFlbXUtaW1nLmM6MTYyMzoKKyAgICAgICAgaWYgKChlbHQg
+PSBRU0lNUExFUV9GSVJTVCgmcy0+cXVldWUpKSkgewoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFy
+YWN0ZXJzCiMxODk6IEZJTEU6IHFlbXUtaW1nLmM6MTY1MDoKKyAgICBwcmludGYoImNvbnZlcnRf
+YWlvX3JlYWQgZW50ZXIgcmVxICVwIHNlY3Rvcl9udW0gJWxkIG5iX3NlY3RvcnMgJWQgb2ZmcyAl
+bGQgcmV0ICVkXG4iLCByZXEsIHNlY3Rvcl9udW0sIG5iX3NlY3RvcnMsIHJlcS0+c2VjdG9yX29m
+ZnMsIHJldCk7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI0NTogRklMRTogcWVt
+dS1pbWcuYzoxNjk1OgorICAgIHByaW50ZigiY29udmVydF9haW9fd3JpdGUgZW50ZXIgcmVxICVw
+IHNlY3Rvcl9udW0gJWxkIG5iX3NlY3RvcnMgJWQgb2ZmcyAlbGQgcmV0ICVkXG4iLCByZXEsIHNl
+Y3Rvcl9udW0sIG5iX3NlY3RvcnMsIHJlcS0+c2VjdG9yX29mZnMsIHJldCk7CgpFUlJPUjogZG8g
+bm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzI2ODogRklMRTogcWVtdS1pbWcuYzoxNzIyOgorICAg
+ICAgICAgICAgICAgIGFzc2VydCgwKTsgLy9YWFggVE9ETwoKRVJST1I6IGRvIG5vdCB1c2UgQzk5
+IC8vIGNvbW1lbnRzCiMzMTE6IEZJTEU6IHFlbXUtaW1nLmM6MTc2NjoKKyAgICAgICAgICAgIGFz
+c2VydCgwKTsgLy9YWFggVE9ETwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM1
+ODogRklMRTogcWVtdS1pbWcuYzoxODIzOgorICAgICAgICBzLT5yZXFzW2ldLmJ1ZiA9IGJsa19i
+bG9ja2FsaWduKHMtPnRhcmdldCwgcy0+YnVmX3NlY3RvcnMgKiBCRFJWX1NFQ1RPUl9TSVpFKTsK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzc4OiBGSUxFOiBxZW11LWltZy5jOjE4
+NDM6CisgICAgICAgIHByaW50ZigiY29udmVydF9pdGVyYXRpb25fc2VjdG9ycyAlbGQgbiAlZCBz
+dGF0dXMgJWRcbiIsIHNlY3Rvcl9udW0sIG4sIHMtPnN0YXR1cyk7CgpFUlJPUjogc3VzcGVjdCBj
+b2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgOSkKIzQ1MjogRklMRTog
+cWVtdS1pbWcuYzoxODc5OgorICAgIGZvciAoaSA9IDA7IGkgPCBDT05WRVJUX01BWF9SRVFTOyBp
+KyspIHsKKyAgICAgICAgIHFlbXVfaW92ZWNfZGVzdHJveSgmcy0+cmVxc1tpXS5xaW92KTsKCnRv
+dGFsOiA5IGVycm9ycywgMyB3YXJuaW5ncywgMzk3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
