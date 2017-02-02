@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZFAx-00029f-BU
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:03:44 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cZFBf-0002SM-Rz
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:04:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZFAw-0004gx-DU
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:03:39 -0500
-Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:35025)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZFAw-0004gd-9K
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:03:38 -0500
-Received: by mail-ua0-x22e.google.com with SMTP id y9so8595950uae.2
-	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 03:03:38 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1cZFBa-00055P-Uu
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:04:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35940)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cZFBa-00055H-QN
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 06:04:18 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 17074C04BD34
+	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 11:04:18 +0000 (UTC)
+Date: Thu, 2 Feb 2017 11:04:13 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170202110413.GA2549@work-vm>
+References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
+	<1485207141-1941-11-git-send-email-quintela@redhat.com>
+	<20170127180255.GI3323@work-vm> <87r33k276h.fsf@emacs.mitica>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CKmAKmiiM5LvLGaT51kJUp4=jKU_=QAqo7JOtxDuso9CQ@mail.gmail.com>
-References: <20170131162122.29408-1-marcandre.lureau@redhat.com>
-	<CAFEAcA9jzxGZXXoFWxrDztb4or=0LaqpeNa3YH9rpZePa2mFdA@mail.gmail.com>
-	<CAJ+F1CJzchr6f9nfCsHyOUFmz-08e4R-8BLi4QWc3q0h0+9Quw@mail.gmail.com>
-	<3fdd19c5-2017-7c5d-22ad-a44bd15414d6@redhat.com>
-	<CAJ+F1CKmAKmiiM5LvLGaT51kJUp4=jKU_=QAqo7JOtxDuso9CQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Feb 2017 11:03:17 +0000
-Message-ID: <CAFEAcA-Z8d4oxb_qGA9dbLR0myu3C0uKseb1-j_Yq5zNUwkfpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/41] Chr split patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r33k276h.fsf@emacs.mitica>
+Subject: Re: [Qemu-devel] [PATCH 10/17] migration: create ram_multifd_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
 
-On 31 January 2017 at 19:37, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
-> Hi
->
-> On Tue, Jan 31, 2017 at 11:00 PM Eric Blake <eblake@redhat.com> wrote:
->>
->> On 01/31/2017 12:55 PM, Marc-Andr=C3=A9 Lureau wrote:
->>
->> >> 'make check' fails on a linux-user-targets-only build:
->> >>
->> >> tests/test-char.o: In function `char_stdio_test_subprocess':
->> >> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:47: undefined
->> >> reference to `qemu_chr_new'
->> >> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:50: undefined
->> >> reference to `qemu_chr_fe_init'
->> >> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:51: undefined
->> >> reference to `qemu_chr_fe_set_open'
->> >> /home/petmay01/linaro/qemu-for-merges/tests/test-char.c:52: undefined
->> >> reference to `qemu_chr_fe_write'
->> >> [etc etc etc]
->> >>
->> >>
->> > Oh good catch. We want to have chardev-obj-y defined globally, but onl=
-y
->> > linked with -softmmu target.
->> >
->> > A possible fix to squash with chardev-obj-j patch is:
->> >
->> > Eric, do you want me to resend the patch for review or is that enough
->> > for
->> > you to ack?
->> >
->>
->> I'm okay ack'ing the interdiff (that is, squash this in, and you can
->> keep the R-b you already have).
->>
->
-> Thanks, patch updated, tag updated.
->
-> Peter, let me know if you want me to resend the pull request.
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> The function still don't use multifd, but we have simplified
+> >> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
+> >> counter and a new flag for this type of pages.
+> >> 
+> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> >> --- a/migration/ram.c
+> >> +++ b/migration/ram.c
+> >> @@ -61,6 +61,7 @@ static uint64_t bitmap_sync_count;
+> >>  #define RAM_SAVE_FLAG_XBZRLE   0x40
+> >>  /* 0x80 is reserved in migration.h start with 0x100 next */
+> >>  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
+> >> +#define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
+> >
+> > I think a similar reminder from the last iteration of this patch;
+> > I think we're out of bits here - I'm not sure if 0x200 is even
+> > available.
+> 
+> In previous iteration, I used *two* bits.  As per your recomendation, I
+> "reused" and old one for doing the synchronization.
 
-Now applied, thanks.
+Hmm OK, but that's still the last free bit; given TARGET_PAGE_BITS 10
+on 3 targets, we can't use 0x400.
+I guess the next user of a new bit will need to use RAM_SAVE_FLAG_FULL
+which has never really been used and that will have to be some
+magic that caused another block of bits to be read.
 
--- PMM
+Dave
+
+> 
+> Later, Juan.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
