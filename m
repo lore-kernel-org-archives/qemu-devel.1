@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZIU3-0005Ms-P4
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:39 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cZIU1-0005Kg-1w
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZIU0-0005S5-Hh
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:35 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cZITx-0005PP-3c
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:33 -0500
 Received: from bran.ispras.ru ([83.149.199.196]:39802 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cZITz-0005Ok-Uj
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:32 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cZITw-0005Ok-IU
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 09:35:29 -0500
 From: Kirill Batuzov <batuzovk@ispras.ru>
-Date: Thu,  2 Feb 2017 17:34:57 +0300
-Message-Id: <1486046099-17726-20-git-send-email-batuzovk@ispras.ru>
+Date: Thu,  2 Feb 2017 17:34:45 +0300
+Message-Id: <1486046099-17726-8-git-send-email-batuzovk@ispras.ru>
 In-Reply-To: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
 References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
-Subject: [Qemu-devel] [PATCH v2.1 19/21] tcg/i386: add support for
- qemu_ld_v128/qemu_st_v128 ops
+Subject: [Qemu-devel] [PATCH v2.1 07/21] tcg: allow globals to overlap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,158 +26,280 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kirill Batuzov <batuzovk@ispras.ru>
 
+Sometimes the target architecture may allow some parts of a register to be
+accessed as a different register. If both of these registers are
+implemented as globals in QEMU, then their content will overlap and the
+change to one global will also change the value of the other. To handle
+such situation properly, some fixes are needed in the register allocator
+and liveness analysis.
+
 Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
 ---
- tcg/i386/tcg-target.inc.c | 68 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 61 insertions(+), 7 deletions(-)
+ tcg/optimize.c |  19 ++++++++-
+ tcg/tcg.c      | 128 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.h      |  20 +++++++++
+ 3 files changed, 166 insertions(+), 1 deletion(-)
 
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 1e6edc0..4647e97 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -1342,6 +1342,7 @@ static void * const qemu_ld_helpers[] = {
-     [MO_BEUW] = helper_be_lduw_mmu,
-     [MO_BEUL] = helper_be_ldul_mmu,
-     [MO_BEQ]  = helper_be_ldq_mmu,
-+    [MO_128]  = helper_te_ldv128_mmu,
- };
+diff --git a/tcg/optimize.c b/tcg/optimize.c
+index 2347ce3..7a69ff0 100644
+--- a/tcg/optimize.c
++++ b/tcg/optimize.c
+@@ -55,7 +55,7 @@ static inline bool temp_is_copy(TCGArg arg)
+ }
  
- /* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
-@@ -1355,6 +1356,7 @@ static void * const qemu_st_helpers[] = {
-     [MO_BEUW] = helper_be_stw_mmu,
-     [MO_BEUL] = helper_be_stl_mmu,
-     [MO_BEQ]  = helper_be_stq_mmu,
-+    [MO_128]  = helper_te_stv128_mmu,
- };
+ /* Reset TEMP's state, possibly removing the temp for the list of copies.  */
+-static void reset_temp(TCGArg temp)
++static void reset_this_temp(TCGArg temp)
+ {
+     temps[temps[temp].next_copy].prev_copy = temps[temp].prev_copy;
+     temps[temps[temp].prev_copy].next_copy = temps[temp].next_copy;
+@@ -66,6 +66,23 @@ static void reset_temp(TCGArg temp)
+     temps[temp].mask = -1;
+ }
  
- /* Perform the TLB load and compare.
-@@ -1521,12 +1523,30 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
-         ofs += 4;
- 
-         tcg_out_sti(s, TCG_TYPE_PTR, (uintptr_t)l->raddr, TCG_REG_ESP, ofs);
++static void reset_temp(TCGArg temp)
++{
++    int i;
++    TCGTemp *ts = &tcg_ctx.temps[temp];
++    reset_this_temp(temp);
++    if (ts->sub_temps) {
++        for (i = 0; ts->sub_temps[i] != (TCGArg)-1; i++) {
++            reset_this_temp(ts->sub_temps[i]);
++        }
++    }
++    if (ts->overlap_temps) {
++        for (i = 0; ts->overlap_temps[i] != (TCGArg)-1; i++) {
++            reset_this_temp(ts->overlap_temps[i]);
++        }
++    }
++}
 +
-+        if ((opc & MO_SSIZE) == MO_128) {
-+            ofs += 4;
-+            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
-+            tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+            tcg_out_st(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP, ofs);
-+        }
-     } else {
-         tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[0], TCG_AREG0);
-         /* The second argument is already loaded with addrlo.  */
-         tcg_out_movi(s, TCG_TYPE_I32, tcg_target_call_iarg_regs[2], oi);
-         tcg_out_movi(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[3],
-                      (uintptr_t)l->raddr);
-+        if ((opc & MO_SSIZE) == MO_128) {
-+            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
-+            tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+            if (ARRAY_SIZE(tcg_target_call_iarg_regs) > 4) {
-+                tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[4],
-+                            TCG_REG_EAX);
-+            } else {
-+                tcg_out_st(s, TCG_TYPE_PTR, TCG_REG_EAX,
-+                            TCG_REG_ESP, TCG_TARGET_CALL_STACK_OFFSET);
-+            }
-+        }
-     }
- 
-     tcg_out_call(s, qemu_ld_helpers[opc & (MO_BSWAP | MO_SIZE)]);
-@@ -1562,6 +1582,11 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
-             tcg_out_mov(s, TCG_TYPE_I32, l->datahi_reg, TCG_REG_EDX);
+ /* Reset all temporaries, given that there are NB_TEMPS of them.  */
+ static void reset_all_temps(int nb_temps)
+ {
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 27e5944..a8df040 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -623,9 +623,13 @@ int tcg_global_mem_new_internal(TCGType base_type, TCGv_ptr base,
+             ts2->mem_base = base_ts;
+             ts2->mem_offset = offset + cur_offset;
+             ts2->name = g_strdup_printf("%s_%d", name, i);
++            ts2->sub_temps = NULL;
++            ts2->overlap_temps = NULL;
+             ts1 = ts2;
          }
-         break;
-+    case MO_128:
-+        tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
-+        tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+        tcg_out_ld(s, TCG_TYPE_V128, l->datalo_reg, TCG_REG_EAX, 0);
-+        break;
-     default:
-         tcg_abort();
      }
-@@ -1601,12 +1626,20 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
-             ofs += 4;
-         }
++    ts->sub_temps = NULL;
++    ts->overlap_temps = NULL;
+     return temp_idx(s, ts);
+ }
  
--        tcg_out_st(s, TCG_TYPE_I32, l->datalo_reg, TCG_REG_ESP, ofs);
--        ofs += 4;
--
--        if (s_bits == MO_64) {
--            tcg_out_st(s, TCG_TYPE_I32, l->datahi_reg, TCG_REG_ESP, ofs);
-+        if (s_bits == MO_128) {
-+            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP);
-+            tcg_out_addi(s, TCG_REG_EAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+            tcg_out_st(s, TCG_TYPE_V128, l->datalo_reg, TCG_REG_EAX, 0);
-+            tcg_out_st(s, TCG_TYPE_PTR, TCG_REG_EAX, TCG_REG_ESP, ofs);
-             ofs += 4;
-+        } else {
-+            tcg_out_st(s, TCG_TYPE_I32, l->datalo_reg, TCG_REG_ESP, ofs);
-+            ofs += 4;
+@@ -1514,6 +1518,35 @@ static int tcg_temp_overlap(TCGContext *s, const TCGTemp *tmp,
+     }
+ }
+ 
++static void tcg_temp_arr_apply(const TCGArg *arr, uint8_t *temp_state,
++                               uint8_t temp_val)
++{
++    TCGArg i;
++    if (!arr) {
++        return ;
++    }
++    for (i = 0; arr[i] != (TCGArg)-1; i++) {
++        temp_state[arr[i]] = temp_val;
++    }
++}
 +
-+            if (s_bits == MO_64) {
-+                tcg_out_st(s, TCG_TYPE_I32, l->datahi_reg, TCG_REG_ESP, ofs);
-+                ofs += 4;
-+            }
-         }
++static void tcg_sub_temps_dead(TCGContext *s, TCGArg tmp, uint8_t *temp_state)
++{
++    tcg_temp_arr_apply(s->temps[tmp].sub_temps, temp_state, TS_DEAD);
++}
++
++static void tcg_sub_temps_sync(TCGContext *s, TCGArg tmp, uint8_t *temp_state)
++{
++    tcg_temp_arr_apply(s->temps[tmp].sub_temps, temp_state, TS_MEM | TS_DEAD);
++}
++
++static void tcg_overlap_temps_sync(TCGContext *s, TCGArg tmp,
++                                   uint8_t *temp_state)
++{
++    tcg_temp_arr_apply(s->temps[tmp].overlap_temps, temp_state,
++                       TS_MEM | TS_DEAD);
++}
++
+ /* Liveness analysis : update the opc_arg_life array to tell if a
+    given input arguments is dead. Instructions updating dead
+    temporaries are removed. */
+@@ -1568,6 +1601,11 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
+                         if (temp_state[arg] & TS_MEM) {
+                             arg_life |= SYNC_ARG << i;
+                         }
++                        /* sub_temps are also dead */
++                        tcg_sub_temps_dead(&tcg_ctx, arg, temp_state);
++                        /* overlap_temps need to go to memory */
++                        tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
++
+                         temp_state[arg] = TS_DEAD;
+                     }
  
-         tcg_out_sti(s, TCG_TYPE_I32, oi, TCG_REG_ESP, ofs);
-@@ -1618,8 +1651,16 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
-     } else {
-         tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[0], TCG_AREG0);
-         /* The second argument is already loaded with addrlo.  */
--        tcg_out_mov(s, (s_bits == MO_64 ? TCG_TYPE_I64 : TCG_TYPE_I32),
--                    tcg_target_call_iarg_regs[2], l->datalo_reg);
-+        if (s_bits == MO_128) {
-+            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_RAX, TCG_REG_ESP);
-+            tcg_out_addi(s, TCG_REG_RAX, TCG_STATIC_CALL_ARGS_SIZE - 16);
-+            tcg_out_st(s, TCG_TYPE_V128, l->datalo_reg, TCG_REG_RAX, 0);
-+            tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[2],
-+                        TCG_REG_RAX);
-+        } else {
-+            tcg_out_mov(s, (s_bits == MO_64 ? TCG_TYPE_I64 : TCG_TYPE_I32),
-+                        tcg_target_call_iarg_regs[2], l->datalo_reg);
-+        }
-         tcg_out_movi(s, TCG_TYPE_I32, tcg_target_call_iarg_regs[3], oi);
+@@ -1595,6 +1633,11 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
+                     for (i = nb_oargs; i < nb_iargs + nb_oargs; i++) {
+                         arg = args[i];
+                         if (arg != TCG_CALL_DUMMY_ARG) {
++                            /* both sub_temps and overlap_temps need to go
++                               to memory */
++                            tcg_sub_temps_sync(&tcg_ctx, arg, temp_state);
++                            tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
++
+                             temp_state[arg] &= ~TS_DEAD;
+                         }
+                     }
+@@ -1713,6 +1756,11 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
+                     if (temp_state[arg] & TS_MEM) {
+                         arg_life |= SYNC_ARG << i;
+                     }
++                    /* sub_temps are also dead */
++                    tcg_sub_temps_dead(&tcg_ctx, arg, temp_state);
++                    /* overlap_temps need to go to memory */
++                    tcg_overlap_temps_sync(&tcg_ctx, arg, temp_state);
++
+                     temp_state[arg] = TS_DEAD;
+                 }
  
-         if (ARRAY_SIZE(tcg_target_call_iarg_regs) > 4) {
-@@ -1751,6 +1792,10 @@ static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
+@@ -1753,6 +1801,9 @@ static void liveness_pass_1(TCGContext *s, uint8_t *temp_state)
+                 /* input arguments are live for preceding opcodes */
+                 for (i = nb_oargs; i < nb_oargs + nb_iargs; i++) {
+                     temp_state[args[i]] &= ~TS_DEAD;
++                    /* both sub_temps and overlap_temps need to go to memory */
++                    tcg_sub_temps_sync(&tcg_ctx, args[i], temp_state);
++                    tcg_overlap_temps_sync(&tcg_ctx, args[i], temp_state);
+                 }
              }
-         }
-         break;
-+    case MO_128:
-+        tcg_out_modrm_sib_offset(s, OPC_MOVDQU_M2R + seg, datalo,
-+                                 base, index, 0, ofs);
-+        break;
-     default:
-         tcg_abort();
-     }
-@@ -1894,6 +1939,9 @@ static void tcg_out_qemu_st_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
-             tcg_out_modrm_offset(s, movop + seg, datahi, base, ofs+4);
-         }
-         break;
-+    case MO_128:
-+        tcg_out_modrm_offset(s, OPC_MOVDQU_R2M + seg, datalo, base, ofs);
-+        break;
-     default:
-         tcg_abort();
-     }
-@@ -2264,12 +2312,18 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_qemu_ld_i64:
-         tcg_out_qemu_ld(s, args, 1);
-         break;
-+    case INDEX_op_qemu_ld_v128:
-+        tcg_out_qemu_ld(s, args, 0);
-+        break;
-     case INDEX_op_qemu_st_i32:
-         tcg_out_qemu_st(s, args, 0);
-         break;
-     case INDEX_op_qemu_st_i64:
-         tcg_out_qemu_st(s, args, 1);
-         break;
-+    case INDEX_op_qemu_st_v128:
-+        tcg_out_qemu_st(s, args, 0);
-+        break;
+             break;
+@@ -3139,3 +3190,80 @@ void tcg_register_jit(void *buf, size_t buf_size)
+ {
+ }
+ #endif /* ELF_HOST_MACHINE */
++
++static int tcg_temp_is_sub_temp(const TCGTemp *t1, const TCGTemp *t2)
++{
++    if (t2->mem_offset < t1->mem_offset) {
++        return 0;
++    }
++    if (t2->mem_offset + tcg_temp_size(t2) >
++        t1->mem_offset + tcg_temp_size(t1)) {
++        return 0;
++    }
++    return 1;
++}
++
++static int tcg_temp_is_overlap_temp(const TCGTemp *t1, const TCGTemp *t2)
++{
++    if (t2->mem_offset >= t1->mem_offset + tcg_temp_size(t1)) {
++        return 0;
++    }
++    if (t2->mem_offset + tcg_temp_size(t2) <= t1->mem_offset) {
++        return 0;
++    }
++    return 1;
++}
++
++void tcg_detect_overlapping_temps(TCGContext *s)
++{
++    int i, j;
++    int overlap_count, subtemps_count;
++    TCGArg *sub_temps, *overlap_temps;
++    TCGTemp *ts;
++    for (i = 0; i < s->nb_globals; i++) {
++        ts = &s->temps[i];
++        if (ts->fixed_reg ||
++            ts->mem_base != &s->temps[GET_TCGV_PTR(s->tcg_env)]) {
++            continue;
++        }
++        overlap_count = 0;
++        subtemps_count = 0;
++        overlap_temps = NULL;
++        sub_temps = NULL;
++        for (j = 0; j < s->nb_globals; j++) {
++            if (i != j && !s->temps[j].fixed_reg &&
++                s->temps[j].mem_base == &s->temps[GET_TCGV_PTR(s->tcg_env)]) {
++                if (tcg_temp_is_sub_temp(ts, &s->temps[j])) {
++                    subtemps_count++;
++                } else if (tcg_temp_is_overlap_temp(ts, &s->temps[j])) {
++                    overlap_count++;
++                }
++            }
++        }
++        if (subtemps_count == 0 && overlap_count == 0) {
++            continue;
++        }
++        if (subtemps_count > 0) {
++            sub_temps = g_malloc0((subtemps_count + 1) * sizeof(TCGArg));
++            sub_temps[subtemps_count] = (TCGArg)-1;
++            tcg_temp_set_sub_temps(i, sub_temps);
++        }
++        if (overlap_count > 0) {
++            overlap_temps = g_malloc0((overlap_count + 1) * sizeof(TCGArg));
++            overlap_temps[overlap_count] = (TCGArg)-1;
++            tcg_temp_set_overlap_temps(i, overlap_temps);
++        }
++        overlap_count = 0;
++        subtemps_count = 0;
++        for (j = 0; j < s->nb_globals; j++) {
++            if (i != j && !s->temps[j].fixed_reg &&
++                s->temps[j].mem_base == &s->temps[GET_TCGV_PTR(s->tcg_env)]) {
++                if (tcg_temp_is_sub_temp(ts, &s->temps[j])) {
++                    sub_temps[subtemps_count++] = (TCGArg)j;
++                } else if (tcg_temp_is_overlap_temp(ts, &s->temps[j])) {
++                    overlap_temps[overlap_count++] = (TCGArg)j;
++                }
++            }
++        }
++    }
++}
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 0e1fbe9..01299cc 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -634,6 +634,14 @@ typedef struct TCGTemp {
+     struct TCGTemp *mem_base;
+     intptr_t mem_offset;
+     const char *name;
++
++    /* -1 terminated array of temps that are parts of this temp.
++       All bits of them are part of this temp. */
++    const TCGArg *sub_temps;
++    /* -1 terminated array of temps that overlap with this temp.
++       Some bits of them are part of this temp, but some are not. sub_temps
++       are not included here. */
++    const TCGArg *overlap_temps;
+ } TCGTemp;
  
-     OP_32_64(mulu2):
-         tcg_out_modrm(s, OPC_GRP3_Ev + rexw, EXT3_MUL, args[3]);
+ typedef struct TCGContext TCGContext;
+@@ -837,6 +845,16 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb);
+ 
+ void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size);
+ 
++static inline void tcg_temp_set_sub_temps(TCGArg temp, const TCGArg *arr)
++{
++    tcg_ctx.temps[temp].sub_temps = arr;
++}
++
++static inline void tcg_temp_set_overlap_temps(TCGArg temp, const TCGArg *arr)
++{
++    tcg_ctx.temps[temp].overlap_temps = arr;
++}
++
+ int tcg_global_mem_new_internal(TCGType, TCGv_ptr, intptr_t, const char *);
+ 
+ TCGv_i32 tcg_global_reg_new_i32(TCGReg reg, const char *name);
+@@ -1382,4 +1400,6 @@ void helper_atomic_sto_be_mmu(CPUArchState *env, target_ulong addr, Int128 val,
+ 
+ #endif /* CONFIG_ATOMIC128 */
+ 
++void tcg_detect_overlapping_temps(TCGContext *s);
++
+ #endif /* TCG_H */
 -- 
 2.1.4
