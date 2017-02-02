@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jw-0007W1-Jc
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:29 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k5-0007ig-Hb
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jr-0003sc-DW
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jz-00045C-QA
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:33 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:39 +1100
-Message-Id: <20170202051445.5735-42-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:14:03 +1100
+Message-Id: <20170202051445.5735-66-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 041/107] qtest: add ivshmem-test for ppc64
+Subject: [Qemu-devel] [PULL 065/107] target-ppc: Add xscvqpdp instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,108 +20,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Bharata B Rao <bharata@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-The test has been converted to use libqos, we can
-now use it on ppc64. We also make the test fail on
-all other architectures.
-As libqos on ppc64 is not able to manage hotplug
-and IRQ/MSI, we disable this part in the test on ppc64.
+xscvqpdp:  VSX Scalar round & Convert Quad-Precision format to
+           Double-Precision format
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-[dwg: Make test conditional on CONFIG_EVENTFD]
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- tests/Makefile.include |  3 ++-
- tests/ivshmem-test.c   | 17 +++++++++++++----
- 2 files changed, 15 insertions(+), 5 deletions(-)
+ target/ppc/fpu_helper.c             | 28 ++++++++++++++++++++++++++++
+ target/ppc/helper.h                 |  1 +
+ target/ppc/translate/vsx-impl.inc.c |  1 +
+ target/ppc/translate/vsx-ops.inc.c  |  1 +
+ 4 files changed, 31 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3f9b1d6..c35fa75 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -289,6 +289,7 @@ check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
- check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
- check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
- check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
-+check-qtest-ppc64-$(CONFIG_EVENTFD) += tests/ivshmem-test$(EXESUF)
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 16397ef..8c8e3c5 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2778,6 +2778,34 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                \
+ VSX_CVT_FP_TO_FP_HP(xscvdphp, float64, float16, VsrD(0), VsrH(3))
+ VSX_CVT_FP_TO_FP_HP(xscvhpdp, float16, float64, VsrH(3), VsrD(0))
  
- check-qtest-sh4-y = tests/endianness-test$(EXESUF)
- 
-@@ -715,7 +716,7 @@ tests/test-netfilter$(EXESUF): tests/test-netfilter.o $(qtest-obj-y)
- tests/test-filter-mirror$(EXESUF): tests/test-filter-mirror.o $(qtest-obj-y)
- tests/test-filter-redirector$(EXESUF): tests/test-filter-redirector.o $(qtest-obj-y)
- tests/test-x86-cpuid-compat$(EXESUF): tests/test-x86-cpuid-compat.o $(qtest-obj-y)
--tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y)
-+tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
- tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o contrib/libvhost-user/libvhost-user.o $(test-util-obj-y)
- tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
- tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index 8095d72..3776342 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -12,6 +12,7 @@
- #include <glib/gstdio.h>
- #include "contrib/ivshmem-server/ivshmem-server.h"
- #include "libqos/libqos-pc.h"
-+#include "libqos/libqos-spapr.h"
- #include "libqtest.h"
- #include "qemu-common.h"
- 
-@@ -124,8 +125,10 @@ static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
- 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-         s->qs = qtest_pc_boot(cmd);
-+    } else if (strcmp(arch, "ppc64") == 0) {
-+        s->qs = qtest_spapr_boot(cmd);
-     } else {
--        g_printerr("ivshmem-test tests are only available on x86\n");
-+        g_printerr("ivshmem-test tests are only available on x86 or ppc64\n");
-         exit(EXIT_FAILURE);
-     }
-     s->dev = get_device(s->qs->pcibus);
-@@ -415,6 +418,7 @@ static void test_ivshmem_server_irq(void)
- 
- static void test_ivshmem_hotplug(void)
- {
-+    const char *arch = qtest_get_arch();
-     gchar *opts;
- 
-     qtest_start("");
-@@ -422,7 +426,9 @@ static void test_ivshmem_hotplug(void)
-     opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
- 
-     qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
--    qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-+    if (strcmp(arch, "ppc64") != 0) {
-+        qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
++/*
++ * xscvqpdp isn't using VSX_CVT_FP_TO_FP() because xscvqpdpo will be
++ * added to this later.
++ */
++void helper_xscvqpdp(CPUPPCState *env, uint32_t opcode)
++{
++    ppc_vsr_t xt, xb;
++
++    getVSR(rB(opcode) + 32, &xb, env);
++    getVSR(rD(opcode) + 32, &xt, env);
++
++    if (unlikely(Rc(opcode) != 0)) {
++        /* TODO: Support xscvqpdpo after round-to-odd is implemented */
++        abort();
 +    }
- 
-     qtest_end();
-     g_free(opts);
-@@ -494,6 +500,7 @@ static gchar *mktempshm(int size, int *fd)
- int main(int argc, char **argv)
++
++    xt.VsrD(0) = float128_to_float64(xb.f128, &env->fp_status);
++    if (unlikely(float128_is_signaling_nan(xb.f128,
++                                           &env->fp_status))) {
++        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);
++        xt.VsrD(0) = float64_snan_to_qnan(xt.VsrD(0));
++    }
++    helper_compute_fprf_float64(env, xt.VsrD(0));
++
++    putVSR(rD(opcode) + 32, &xt, env);
++    float_check_status(env);
++}
++
+ uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
  {
-     int ret, fd;
-+    const char *arch = qtest_get_arch();
-     gchar dir[] = "/tmp/ivshmem-test.XXXXXX";
+     float_status tstat = env->fp_status;
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index d185eb0..ec0ae8a 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -428,6 +428,7 @@ DEF_HELPER_2(xscvdphp, void, env, i32)
+ DEF_HELPER_2(xscvdpqp, void, env, i32)
+ DEF_HELPER_2(xscvdpsp, void, env, i32)
+ DEF_HELPER_2(xscvdpspn, i64, env, i64)
++DEF_HELPER_2(xscvqpdp, void, env, i32)
+ DEF_HELPER_2(xscvhpdp, void, env, i32)
+ DEF_HELPER_2(xscvspdp, void, env, i32)
+ DEF_HELPER_2(xscvspdpn, i64, env, i64)
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index 01b5621..2d9fe50 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -810,6 +810,7 @@ GEN_VSX_HELPER_2(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xscvdpsp, 0x12, 0x10, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xscvdpqp, 0x04, 0x1A, 0x16, PPC2_ISA300)
+ GEN_VSX_HELPER_XT_XB_ENV(xscvdpspn, 0x16, 0x10, 0, PPC2_VSX207)
++GEN_VSX_HELPER_2(xscvqpdp, 0x04, 0x1A, 0x14, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xscvhpdp, 0x16, 0x15, 0x10, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xscvspdp, 0x12, 0x14, 0, PPC2_VSX)
+ GEN_VSX_HELPER_XT_XB_ENV(xscvspdpn, 0x16, 0x14, 0, PPC2_VSX207)
+diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
+index e75ecd1..aeeaff2 100644
+--- a/target/ppc/translate/vsx-ops.inc.c
++++ b/target/ppc/translate/vsx-ops.inc.c
+@@ -113,6 +113,7 @@ GEN_VSX_XFORM_300_EO(xsnabsqp, 0x04, 0x19, 0x08, 0x00000001),
+ GEN_VSX_XFORM_300_EO(xsnegqp, 0x04, 0x19, 0x10, 0x00000001),
+ GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
+ GEN_VSX_XFORM_300_EO(xscvdpqp, 0x04, 0x1A, 0x16, 0x00000001),
++GEN_VSX_XFORM_300_EO(xscvqpdp, 0x04, 0x1A, 0x14, 0x0),
  
- #if !GLIB_CHECK_VERSION(2, 31, 0)
-@@ -524,8 +531,10 @@ int main(int argc, char **argv)
-     qtest_add_func("/ivshmem/memdev", test_ivshmem_memdev);
-     if (g_test_slow()) {
-         qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
--        qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
--        qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
-+        if (strcmp(arch, "ppc64") != 0) {
-+            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
-+            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
-+        }
-     }
- 
-     ret = g_test_run();
+ #ifdef TARGET_PPC64
+ GEN_XX2FORM_EO(xsxexpdp, 0x16, 0x15, 0x00, PPC2_ISA300),
 -- 
 2.9.3
