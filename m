@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKk-0002cI-Id
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:57 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKl-0002cK-M6
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKj-0008Hy-Au
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:54 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:3297 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKj-0008IX-Gc
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:55 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:21982 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZHKi-0008Fr-Uw
+	id 1cZHKj-0008G8-5E
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:53 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  2 Feb 2017 16:21:31 +0300
-Message-Id: <20170202132145.168790-11-vsementsov@virtuozzo.com>
+Date: Thu,  2 Feb 2017 16:21:38 +0300
+Message-Id: <20170202132145.168790-18-vsementsov@virtuozzo.com>
 In-Reply-To: <20170202132145.168790-1-vsementsov@virtuozzo.com>
 References: <20170202132145.168790-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 10/24] block/dirty-bitmap: add autoload field
- to BdrvDirtyBitmap
+Subject: [Qemu-devel] [PATCH 17/24] qmp: add autoload parameter to
+ block-dirty-bitmap-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +28,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Mirror AUTO flag from Qcow2 bitmap in BdrvDirtyBitmap. This will be
-needed in future, to save this flag back to Qcow2 for persistent
-bitmaps.
+Optional. Default is false.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/dirty-bitmap.c         | 16 ++++++++++++++++
- block/qcow2-bitmap.c         |  2 ++
- include/block/dirty-bitmap.h |  2 ++
- 3 files changed, 20 insertions(+)
+ blockdev.c           | 18 ++++++++++++++++--
+ qapi/block-core.json |  6 +++++-
+ 2 files changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 90af37287f..2d27494dc7 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -44,6 +44,8 @@ struct BdrvDirtyBitmap {
-     int64_t size;               /* Size of the bitmap (Number of sectors) */
-     bool disabled;              /* Bitmap is read-only */
-     int active_iterators;       /* How many iterators are active */
-+    bool autoload;              /* For persistent bitmaps: bitmap must be
-+                                   autoloaded on image opening */
-     QLIST_ENTRY(BdrvDirtyBitmap) list;
- };
+diff --git a/blockdev.c b/blockdev.c
+index 40605faccc..e32ac69e4b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1968,6 +1968,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
+     qmp_block_dirty_bitmap_add(action->node, action->name,
+                                action->has_granularity, action->granularity,
+                                action->has_persistent, action->persistent,
++                               action->has_autoload, action->autoload,
+                                &local_err);
  
-@@ -70,6 +72,8 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
-     assert(!bdrv_dirty_bitmap_frozen(bitmap));
-     g_free(bitmap->name);
-     bitmap->name = NULL;
-+
-+    bitmap->autoload = false;
- }
- 
- BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
-@@ -238,6 +242,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
-     bitmap->name = NULL;
-     successor->name = name;
-     bitmap->successor = NULL;
-+    successor->autoload = bitmap->autoload;
-+    bitmap->autoload = false;
-     bdrv_release_dirty_bitmap(bs, bitmap);
- 
-     return successor;
-@@ -540,3 +546,13 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
+     if (!local_err) {
+@@ -2698,6 +2699,7 @@ out:
+ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+                                 bool has_granularity, uint32_t granularity,
+                                 bool has_persistent, bool persistent,
++                                bool has_autoload, bool autoload,
+                                 Error **errp)
  {
-     return hbitmap_count(bitmap->meta);
- }
+     AioContext *aio_context;
+@@ -2731,6 +2733,15 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     if (!has_persistent) {
+         persistent = false;
+     }
++    if (!has_autoload) {
++        autoload = false;
++    }
 +
-+void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload)
-+{
-+    bitmap->autoload = autoload;
-+}
-+
-+bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
-+{
-+    return bitmap->autoload;
-+}
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index eeeec1aa7f..bcbb0491ee 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -706,6 +706,8 @@ void qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-             if (bitmap == NULL) {
-                 goto fail;
-             }
-+
-+            bdrv_dirty_bitmap_set_autoload(bitmap, true);
-             bm->flags |= BME_FLAG_IN_USE;
-             created_dirty_bitmaps =
-                     g_slist_append(created_dirty_bitmaps, bitmap);
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 1e17729ac2..45a389a20a 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -75,4 +75,6 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-                                         bool finish);
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
++    if (has_autoload && !persistent) {
++        error_setg(errp, "Autoload flag must be used only for persistent "
++                         "bitmaps");
++        goto out;
++    }
  
-+void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload);
-+bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
- #endif
+     if (persistent &&
+         !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
+@@ -2739,10 +2750,13 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     }
+ 
+     bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
+-    if (bitmap != NULL) {
+-        bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
++    if (bitmap == NULL) {
++        goto out;
+     }
+ 
++    bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
++    bdrv_dirty_bitmap_set_autoload(bitmap, autoload);
++
+  out:
+     aio_context_release(aio_context);
+ }
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 535df20212..09dcf4e6ae 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1564,11 +1564,15 @@
+ #              Qcow2 disks support persistent bitmaps. Default is false.
+ #              (Since 2.9)
+ #
++# @autoload: #optional the bitmap will be automatically loaded when the image
++#            it is stored in is opened. This flag may only be specified for
++#            persistent bitmaps. Default is false. (Since 2.9)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'BlockDirtyBitmapAdd',
+   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
+-            '*persistent': 'bool' } }
++            '*persistent': 'bool', '*autoload': 'bool' } }
+ 
+ ##
+ # @block-dirty-bitmap-add:
 -- 
 2.11.0
