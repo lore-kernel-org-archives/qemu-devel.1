@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jh-0007BZ-Vk
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jj-0007Fa-KX
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9je-0003Wb-03
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jg-0003aD-3E
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:11 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:13 +1100
-Message-Id: <20170202051445.5735-16-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:15 +1100
+Message-Id: <20170202051445.5735-18-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 015/107] pseries: Always use core objects for
- CPU construction
+Subject: [Qemu-devel] [PULL 017/107] ppc: Clean up and QOMify hypercall
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,289 +23,218 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-Currently the pseries machine has two paths for constructing CPUs.  On
-newer machine type versions, which support cpu hotplug, it constructs
-cpu core objects, which in turn construct CPU threads.  For older machine
-versions it individually constructs the CPU threads.
+The pseries machine type is a bit unusual in that it runs a paravirtualized
+guest.  The guest expects to interact with a hypervisor, and qemu
+emulates the functions of that hypervisor directly, rather than executing
+hypervisor code within the emulated system.
 
-This division is going to make some future changes to the cpu construction
-harder, so this patch unifies them.  Now cpu core objects are always
-created.  This requires some updates to allow core objects to be created
-without a full complement of threads (since older versions allowed a
-number of cpus not a multiple of the threads-per-core).  Likewise it needs
-some changes to the cpu core hot/cold plug path so as not to choke on the
-old machine types without hotplug support.
+To implement this in TCG, we need to intercept hypercall instructions and
+direct them to the machine's hypercall handlers, rather than attempting to
+perform a privilege change within TCG.  This is controlled by a global
+hook - cpu_ppc_hypercall.
 
-For good measure, we move the cpu construction to its own subfunction,
-spapr_init_cpus().
+This cleanup makes the handling a little cleaner and more extensible than
+a single global variable.  Instead, each CPU to have hypercalls intercepted
+has a pointer set to a QOM object implementing a new virtual hypervisor
+interface.  A method in that interface is called by TCG when it sees a
+hypercall instruction.  It's possible we may want to add other methods in
+future.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- hw/ppc/spapr.c          | 125 +++++++++++++++++++++++++++---------------------
- hw/ppc/spapr_cpu_core.c |  37 +++++++-------
- include/hw/ppc/spapr.h  |   1 -
- 3 files changed, 90 insertions(+), 73 deletions(-)
+ hw/ppc/spapr.c              |  8 +++++---
+ hw/ppc/spapr_cpu_core.c     |  1 +
+ target/ppc/cpu.h            | 26 ++++++++++++++++++++++++--
+ target/ppc/excp_helper.c    | 11 ++++-------
+ target/ppc/translate_init.c | 12 ++++++++++++
+ 5 files changed, 46 insertions(+), 12 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a642e66..cef696c 100644
+index ca78e31..a4774fb 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1753,11 +1753,80 @@ static void spapr_validate_node_memory(MachineState *machine, Error **errp)
-     }
+@@ -1005,7 +1005,8 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+     return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
  }
  
-+static void spapr_init_cpus(sPAPRMachineState *spapr)
-+{
-+    MachineState *machine = MACHINE(spapr);
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    char *type = spapr_get_cpu_core_type(machine->cpu_model);
-+    int smt = kvmppc_smt_threads();
-+    int spapr_max_cores, spapr_cores;
-+    int i;
-+
-+    if (!type) {
-+        error_report("Unable to find sPAPR CPU Core definition");
-+        exit(1);
-+    }
-+
-+    if (mc->query_hotpluggable_cpus) {
-+        if (smp_cpus % smp_threads) {
-+            error_report("smp_cpus (%u) must be multiple of threads (%u)",
-+                         smp_cpus, smp_threads);
-+            exit(1);
-+        }
-+        if (max_cpus % smp_threads) {
-+            error_report("max_cpus (%u) must be multiple of threads (%u)",
-+                         max_cpus, smp_threads);
-+            exit(1);
-+        }
-+
-+        spapr_max_cores = max_cpus / smp_threads;
-+        spapr_cores = smp_cpus / smp_threads;
-+    } else {
-+        if (max_cpus != smp_cpus) {
-+            error_report("This machine version does not support CPU hotplug");
-+            exit(1);
-+        }
-+
-+        spapr_max_cores = QEMU_ALIGN_UP(smp_cpus, smp_threads) / smp_threads;
-+        spapr_cores = spapr_max_cores;
-+    }
-+
-+    spapr->cores = g_new0(Object *, spapr_max_cores);
-+    for (i = 0; i < spapr_max_cores; i++) {
-+        int core_id = i * smp_threads;
-+
-+        if (mc->query_hotpluggable_cpus) {
-+            sPAPRDRConnector *drc =
-+                spapr_dr_connector_new(OBJECT(spapr),
-+                                       SPAPR_DR_CONNECTOR_TYPE_CPU,
-+                                       (core_id / smp_threads) * smt);
-+
-+            qemu_register_reset(spapr_drc_reset, drc);
-+        }
-+
-+        if (i < spapr_cores) {
-+            Object *core  = object_new(type);
-+            int nr_threads = smp_threads;
-+
-+            /* Handle the partially filled core for older machine types */
-+            if ((i + 1) * smp_threads >= smp_cpus) {
-+                nr_threads = smp_cpus - i * smp_threads;
-+            }
-+
-+            object_property_set_int(core, nr_threads, "nr-threads",
-+                                    &error_fatal);
-+            object_property_set_int(core, core_id, CPU_CORE_PROP_CORE_ID,
-+                                    &error_fatal);
-+            object_property_set_bool(core, true, "realized", &error_fatal);
-+        }
-+    }
-+    g_free(type);
-+}
-+
- /* pSeries LPAR / sPAPR hardware init */
- static void ppc_spapr_init(MachineState *machine)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
--    MachineClass *mc = MACHINE_GET_CLASS(machine);
-     sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
-     const char *kernel_filename = machine->kernel_filename;
-     const char *initrd_filename = machine->initrd_filename;
-@@ -1772,21 +1841,6 @@ static void ppc_spapr_init(MachineState *machine)
-     long load_limit, fw_size;
-     char *filename;
-     int smt = kvmppc_smt_threads();
--    int spapr_cores = smp_cpus / smp_threads;
--    int spapr_max_cores = max_cpus / smp_threads;
--
--    if (mc->query_hotpluggable_cpus) {
--        if (smp_cpus % smp_threads) {
--            error_report("smp_cpus (%u) must be multiple of threads (%u)",
--                         smp_cpus, smp_threads);
--            exit(1);
--        }
--        if (max_cpus % smp_threads) {
--            error_report("max_cpus (%u) must be multiple of threads (%u)",
--                         max_cpus, smp_threads);
--            exit(1);
--        }
--    }
- 
-     msi_nonbroken = true;
- 
-@@ -1866,44 +1920,7 @@ static void ppc_spapr_init(MachineState *machine)
- 
-     ppc_cpu_parse_features(machine->cpu_model);
- 
--    if (mc->query_hotpluggable_cpus) {
--        char *type = spapr_get_cpu_core_type(machine->cpu_model);
--
--        if (type == NULL) {
--            error_report("Unable to find sPAPR CPU Core definition");
--            exit(1);
--        }
--
--        spapr->cores = g_new0(Object *, spapr_max_cores);
--        for (i = 0; i < spapr_max_cores; i++) {
--            int core_id = i * smp_threads;
--            sPAPRDRConnector *drc =
--                spapr_dr_connector_new(OBJECT(spapr),
--                                       SPAPR_DR_CONNECTOR_TYPE_CPU,
--                                       (core_id / smp_threads) * smt);
--
--            qemu_register_reset(spapr_drc_reset, drc);
--
--            if (i < spapr_cores) {
--                Object *core  = object_new(type);
--                object_property_set_int(core, smp_threads, "nr-threads",
--                                        &error_fatal);
--                object_property_set_int(core, core_id, CPU_CORE_PROP_CORE_ID,
--                                        &error_fatal);
--                object_property_set_bool(core, true, "realized", &error_fatal);
--            }
--        }
--        g_free(type);
--    } else {
--        for (i = 0; i < smp_cpus; i++) {
--            PowerPCCPU *cpu = cpu_ppc_init(machine->cpu_model);
--            if (cpu == NULL) {
--                error_report("Unable to find PowerPC CPU definition");
--                exit(1);
--            }
--            spapr_cpu_init(spapr, cpu, &error_fatal);
--       }
--    }
-+    spapr_init_cpus(spapr);
- 
-     if (kvm_enabled()) {
-         /* Enable H_LOGICAL_CI_* so SLOF can talk to in-kernel devices */
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c18632b..f532689 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -46,7 +46,8 @@ static void spapr_cpu_destroy(PowerPCCPU *cpu)
-     qemu_unregister_reset(spapr_cpu_reset, cpu);
- }
- 
--void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu, Error **errp)
-+static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
-+                           Error **errp)
+-static void emulate_spapr_hypercall(PowerPCCPU *cpu)
++static void emulate_spapr_hypercall(PPCVirtualHypervisor *vhyp,
++                                    PowerPCCPU *cpu)
  {
      CPUPPCState *env = &cpu->env;
-     CPUState *cs = CPU(cpu);
-@@ -166,11 +167,11 @@ void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                      Error **errp)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
-+    MachineClass *mc = MACHINE_GET_CLASS(spapr);
-     sPAPRCPUCore *core = SPAPR_CPU_CORE(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(dev);
-     CPUState *cs = CPU(core->threads);
-     sPAPRDRConnector *drc;
--    sPAPRDRConnectorClass *drck;
-     Error *local_err = NULL;
-     void *fdt = NULL;
-     int fdt_offset = 0;
-@@ -180,7 +181,7 @@ void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, index * smt);
-     spapr->cores[index] = OBJECT(dev);
  
--    g_assert(drc);
-+    g_assert(drc || !mc->query_hotpluggable_cpus);
+@@ -1843,8 +1844,6 @@ static void ppc_spapr_init(MachineState *machine)
  
-     /*
-      * Setup CPU DT entries only for hotplugged CPUs. For boot time or
-@@ -190,13 +191,15 @@ void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         fdt = spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
-     }
+     QLIST_INIT(&spapr->phbs);
  
--    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--    drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, &local_err);
--    if (local_err) {
--        g_free(fdt);
--        spapr->cores[index] = NULL;
--        error_propagate(errp, local_err);
--        return;
-+    if (drc) {
-+        sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-+        drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, &local_err);
-+        if (local_err) {
-+            g_free(fdt);
-+            spapr->cores[index] = NULL;
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-     }
+-    cpu_ppc_hypercall = emulate_spapr_hypercall;
+-
+     /* Allocate RMA if necessary */
+     rma_alloc_size = kvmppc_alloc_rma(&rma);
  
-     if (dev->hotplugged) {
-@@ -209,8 +212,11 @@ void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         /*
-          * Set the right DRC states for cold plugged CPU.
-          */
--        drck->set_allocation_state(drc, SPAPR_DR_ALLOCATION_STATE_USABLE);
--        drck->set_isolation_state(drc, SPAPR_DR_ISOLATION_STATE_UNISOLATED);
-+        if (drc) {
-+            sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-+            drck->set_allocation_state(drc, SPAPR_DR_ALLOCATION_STATE_USABLE);
-+            drck->set_isolation_state(drc, SPAPR_DR_ISOLATION_STATE_UNISOLATED);
-+        }
-     }
+@@ -2680,6 +2679,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(oc);
+     NMIClass *nc = NMI_CLASS(oc);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
++    PPCVirtualHypervisorClass *vhc = PPC_VIRTUAL_HYPERVISOR_CLASS(oc);
+ 
+     mc->desc = "pSeries Logical Partition (PAPR compliant)";
+ 
+@@ -2711,6 +2711,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     fwc->get_dev_path = spapr_get_fw_dev_path;
+     nc->nmi_monitor_handler = spapr_nmi;
+     smc->phb_placement = spapr_phb_placement;
++    vhc->hypercall = emulate_spapr_hypercall;
  }
  
-@@ -227,7 +233,7 @@ void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
-     const char *type = object_get_typename(OBJECT(dev));
+ static const TypeInfo spapr_machine_info = {
+@@ -2726,6 +2727,7 @@ static const TypeInfo spapr_machine_info = {
+         { TYPE_FW_PATH_PROVIDER },
+         { TYPE_NMI },
+         { TYPE_HOTPLUG_HANDLER },
++        { TYPE_PPC_VIRTUAL_HYPERVISOR },
+         { }
+     },
+ };
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index f532689..9dddaeb 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -57,6 +57,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
  
--    if (!mc->query_hotpluggable_cpus) {
-+    if (dev->hotplugged && !mc->query_hotpluggable_cpus) {
-         error_setg(&local_err, "CPU hotplug not supported for this machine");
-         goto out;
-     }
-@@ -237,11 +243,6 @@ void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         goto out;
-     }
+     /* Enable PAPR mode in TCG or KVM */
++    cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+     cpu_ppc_set_papr(cpu);
  
--    if (cc->nr_threads != smp_threads) {
--        error_setg(&local_err, "threads must be %d", smp_threads);
--        goto out;
--    }
+     if (cpu->max_compat) {
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 7a6ee3f..4fb4c20 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1150,6 +1150,9 @@ do {                                            \
+     env->wdt_period[3] = (d_);                  \
+  } while (0)
+ 
++typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
++typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
++
+ /**
+  * PowerPCCPU:
+  * @env: #CPUPPCState
+@@ -1168,6 +1171,7 @@ struct PowerPCCPU {
+     int cpu_dt_id;
+     uint32_t max_compat;
+     uint32_t cpu_version;
++    PPCVirtualHypervisor *vhyp;
+ 
+     /* Fields related to migration compatibility hacks */
+     bool pre_2_8_migration;
+@@ -1189,6 +1193,25 @@ static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
+ PowerPCCPUClass *ppc_cpu_class_by_pvr(uint32_t pvr);
+ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr);
+ 
++struct PPCVirtualHypervisor {
++    Object parent;
++};
++
++struct PPCVirtualHypervisorClass {
++    InterfaceClass parent;
++    void (*hypercall)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
++};
++
++#define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
++#define PPC_VIRTUAL_HYPERVISOR(obj)                 \
++    OBJECT_CHECK(PPCVirtualHypervisor, (obj), TYPE_PPC_VIRTUAL_HYPERVISOR)
++#define PPC_VIRTUAL_HYPERVISOR_CLASS(klass)         \
++    OBJECT_CLASS_CHECK(PPCVirtualHypervisorClass, (klass), \
++                       TYPE_PPC_VIRTUAL_HYPERVISOR)
++#define PPC_VIRTUAL_HYPERVISOR_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(PPCVirtualHypervisorClass, (obj), \
++                     TYPE_PPC_VIRTUAL_HYPERVISOR)
++
+ void ppc_cpu_do_interrupt(CPUState *cpu);
+ bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
+ void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+@@ -1261,6 +1284,7 @@ void store_booke_tcr (CPUPPCState *env, target_ulong val);
+ void store_booke_tsr (CPUPPCState *env, target_ulong val);
+ void ppc_tlb_invalidate_all (CPUPPCState *env);
+ void ppc_tlb_invalidate_one (CPUPPCState *env, target_ulong addr);
++void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
+ void cpu_ppc_set_papr(PowerPCCPU *cpu);
+ #endif
+ #endif
+@@ -2435,8 +2459,6 @@ static inline bool lsw_reg_in_range(int start, int nregs, int rx)
+            (start + nregs > 32 && (rx >= start || rx < start + nregs - 32));
+ }
+ 
+-extern void (*cpu_ppc_hypercall)(PowerPCCPU *);
 -
-     if (cc->core_id % smp_threads) {
-         error_setg(&local_err, "invalid core id %d", cc->core_id);
-         goto out;
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index bd5bcf7..f8d444d 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -614,7 +614,6 @@ void spapr_hotplug_req_add_by_count_indexed(sPAPRDRConnectorType drc_type,
-                                             uint32_t count, uint32_t index);
- void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_type,
-                                                uint32_t count, uint32_t index);
--void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu, Error **errp);
- void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
-                                     sPAPRMachineState *spapr);
+ void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env);
  
+ /**
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index 93369d4..f4ee7aa 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -35,11 +35,6 @@
+ #endif
+ 
+ /*****************************************************************************/
+-/* PowerPC Hypercall emulation */
+-
+-void (*cpu_ppc_hypercall)(PowerPCCPU *);
+-
+-/*****************************************************************************/
+ /* Exception processing */
+ #if defined(CONFIG_USER_ONLY)
+ void ppc_cpu_do_interrupt(CPUState *cs)
+@@ -318,8 +313,10 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+         env->nip += 4;
+ 
+         /* "PAPR mode" built-in hypercall emulation */
+-        if ((lev == 1) && cpu_ppc_hypercall) {
+-            cpu_ppc_hypercall(cpu);
++        if ((lev == 1) && cpu->vhyp) {
++            PPCVirtualHypervisorClass *vhc =
++                PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++            vhc->hypercall(cpu->vhyp, cpu);
+             return;
+         }
+         if (lev == 1) {
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 94dfcd7..2e921ca 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8857,6 +8857,11 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+ 
+ #if !defined(CONFIG_USER_ONLY)
+ 
++void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
++{
++    cpu->vhyp = vhyp;
++}
++
+ void cpu_ppc_set_papr(PowerPCCPU *cpu)
+ {
+     CPUPPCState *env = &cpu->env;
+@@ -10591,9 +10596,16 @@ static const TypeInfo ppc_cpu_type_info = {
+     .class_init = ppc_cpu_class_init,
+ };
+ 
++static const TypeInfo ppc_vhyp_type_info = {
++    .name = TYPE_PPC_VIRTUAL_HYPERVISOR,
++    .parent = TYPE_INTERFACE,
++    .class_size = sizeof(PPCVirtualHypervisorClass),
++};
++
+ static void ppc_cpu_register_types(void)
+ {
+     type_register_static(&ppc_cpu_type_info);
++    type_register_static(&ppc_vhyp_type_info);
+ }
+ 
+ type_init(ppc_cpu_register_types)
 -- 
 2.9.3
