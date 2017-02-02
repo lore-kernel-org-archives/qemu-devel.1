@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKm-0002cS-Ka
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKm-0002cT-Pj
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKk-0008JA-55
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKk-0008JG-5D
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:56 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:48210 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:35115 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZHKj-0008GZ-Ib
+	id 1cZHKj-0008GH-IQ
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:54 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  2 Feb 2017 16:21:42 +0300
-Message-Id: <20170202132145.168790-22-vsementsov@virtuozzo.com>
+Date: Thu,  2 Feb 2017 16:21:43 +0300
+Message-Id: <20170202132145.168790-23-vsementsov@virtuozzo.com>
 In-Reply-To: <20170202132145.168790-1-vsementsov@virtuozzo.com>
 References: <20170202132145.168790-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 21/24] qcow2-bitmap: refcounts
+Subject: [Qemu-devel] [PATCH 22/24] block/dirty-bitmap: add
+ bdrv_remove_persistent_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,130 +28,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Calculate refcounts for qcow2 bitmaps. It is needed for qcow2's qemu-img
-check implementation.
+Interface for removing persistent bitmap from its storage.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-bitmap.c   | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2-refcount.c |  6 ++++
- block/qcow2.h          |  3 ++
- 3 files changed, 85 insertions(+)
+ block/dirty-bitmap.c         | 19 +++++++++++++++++++
+ include/block/block_int.h    |  3 +++
+ include/block/dirty-bitmap.h |  3 +++
+ 3 files changed, 25 insertions(+)
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 6f56267bde..8bb7f3e621 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1232,3 +1232,79 @@ common_errp:
-                name, bdrv_get_device_or_node_name(bs), reason);
-     return false;
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 775181c9ab..7147a44bb7 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -328,12 +328,31 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+ /**
+  * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
+  * There must not be any frozen bitmaps attached.
++ * This function does not remove persistent bitmaps from the storage.
+  */
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
+ {
+     bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
  }
-+
-+int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-+                                  void **refcount_table,
-+                                  int64_t *refcount_table_size)
+ 
++/**
++ * Remove persistent dirty bitmap from the storage if it exists.
++ * Absence of bitmap is not an error, because we have the following scenario:
++ * BdrvDirtyBitmap can have .persistent = true but not yet saved and have no
++ * stored version. For such bitmap bdrv_remove_persistent_dirty_bitmap() should
++ * not fail.
++ * This function doesn't release corresponding BdrvDirtyBitmap.
++ */
++void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
++                                         const char *name,
++                                         Error **errp)
 +{
-+    int ret;
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2BitmapList *bm_list;
-+    Qcow2Bitmap *bm;
-+
-+    if (s->nb_bitmaps == 0) {
-+        return 0;
++    if (bs->drv && bs->drv->bdrv_remove_persistent_dirty_bitmap)
++    {
++        bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
 +    }
-+
-+    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount_table_size,
-+                                   s->bitmap_directory_offset,
-+                                   s->bitmap_directory_size);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-+                               s->bitmap_directory_size, NULL);
-+    if (bm_list == NULL) {
-+        res->corruptions++;
-+        return -EINVAL;
-+    }
-+
-+    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-+        uint64_t *bitmap_table = NULL;
-+        int i;
-+
-+        ret = qcow2_inc_refcounts_imrt(bs, res,
-+                                       refcount_table, refcount_table_size,
-+                                       bm->table.offset,
-+                                       bm->table.size * sizeof(uint64_t));
-+        if (ret < 0) {
-+            goto out;
-+        }
-+
-+        ret = bitmap_table_load(bs, &bm->table, &bitmap_table);
-+        if (ret < 0) {
-+            res->corruptions++;
-+            goto out;
-+        }
-+
-+        for (i = 0; i < bm->table.size; ++i) {
-+            uint64_t entry = bitmap_table[i];
-+            uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-+
-+            if (check_table_entry(entry, s->cluster_size) < 0) {
-+                res->corruptions++;
-+                continue;
-+            }
-+
-+            if (offset == 0) {
-+                continue;
-+            }
-+
-+            ret = qcow2_inc_refcounts_imrt(bs, res,
-+                                           refcount_table, refcount_table_size,
-+                                           offset, s->cluster_size);
-+            if (ret < 0) {
-+                g_free(bitmap_table);
-+                goto out;
-+            }
-+        }
-+
-+        g_free(bitmap_table);
-+    }
-+
-+out:
-+    bitmap_list_free(bm_list);
-+
-+    return ret;
 +}
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 14a736d245..cdb74ba4de 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1846,6 +1846,12 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-         return ret;
-     }
- 
-+    /* bitmaps */
-+    ret = qcow2_check_bitmaps_refcounts(bs, res, refcount_table, nb_clusters);
-+    if (ret < 0) {
-+        return ret;
-+    }
 +
-     return check_refblocks(bs, res, fix, rebuild, refcount_table, nb_clusters);
- }
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+     assert(!bdrv_dirty_bitmap_frozen(bitmap));
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index a09c6e90c9..f6835cd6d2 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -326,6 +326,9 @@ struct BlockDriver {
+                                                 Error **errp);
+     bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs, const char *name,
+                                             uint32_t granularity, Error **errp);
++    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
++                                                const char *name,
++                                                Error **errp);
  
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 0a3708d890..eaad34a527 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -624,5 +624,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
-                                       const char *name,
-                                       uint32_t granularity,
-                                       Error **errp);
-+int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-+                                  void **refcount_table,
-+                                  int64_t *refcount_table_size);
- 
- #endif
+     QLIST_ENTRY(BlockDriver) list;
+ };
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index b022b34964..ce126109e0 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -25,6 +25,9 @@ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
+ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
++void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
++                                         const char *name,
++                                         Error **errp);
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
 -- 
 2.11.0
