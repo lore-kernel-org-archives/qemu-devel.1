@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9ja-00073i-Tl
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9ja-00073d-S6
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jX-0003Ox-OD
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jX-0003Op-Nv
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:02 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:01 +1100
-Message-Id: <20170202051445.5735-4-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:02 +1100
+Message-Id: <20170202051445.5735-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 003/107] target-ppc: rename CRF_* defines as
- CRF_*_BIT
+Subject: [Qemu-devel] [PULL 004/107] target-ppc: Fix xscmpodp and xscmpudp
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,216 +21,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Bharata B Rao <bharata@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-Add _BIT to CRF_[GT,LT,EQ_SO] and introduce CRF_[GT,LT,EQ,SO] for usage
-without shifts in the code. This would simplify the code.
+- xscmpodp & xscmpudp are missing flags reset.
+- In xscmpodp, VXCC should be set only if VE is 0 for signalling NaN case
+  and VXCC should be set by explicitly checking for quiet NaN case.
+- Comparison is being done only if the operands are not NaNs. However as
+  per ISA, it should be done even when operands are NaNs.
 
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h        | 21 +++++++++++++--------
- target/ppc/int_helper.c | 30 +++++++++++++++---------------
- target/ppc/translate.c  | 14 +++++++-------
- 3 files changed, 35 insertions(+), 30 deletions(-)
+ target/ppc/fpu_helper.c | 40 +++++++++++++++++++++++++---------------
+ 1 file changed, 25 insertions(+), 15 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 2a50c43..b6782ba 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1301,14 +1301,19 @@ static inline int cpu_mmu_index (CPUPPCState *env, bool ifetch)
- 
- /*****************************************************************************/
- /* CRF definitions */
--#define CRF_LT        3
--#define CRF_GT        2
--#define CRF_EQ        1
--#define CRF_SO        0
--#define CRF_CH        (1 << CRF_LT)
--#define CRF_CL        (1 << CRF_GT)
--#define CRF_CH_OR_CL  (1 << CRF_EQ)
--#define CRF_CH_AND_CL (1 << CRF_SO)
-+#define CRF_LT_BIT    3
-+#define CRF_GT_BIT    2
-+#define CRF_EQ_BIT    1
-+#define CRF_SO_BIT    0
-+#define CRF_LT        (1 << CRF_LT_BIT)
-+#define CRF_GT        (1 << CRF_GT_BIT)
-+#define CRF_EQ        (1 << CRF_EQ_BIT)
-+#define CRF_SO        (1 << CRF_SO_BIT)
-+/* For SPE extensions */
-+#define CRF_CH        (1 << CRF_LT_BIT)
-+#define CRF_CL        (1 << CRF_GT_BIT)
-+#define CRF_CH_OR_CL  (1 << CRF_EQ_BIT)
-+#define CRF_CH_AND_CL (1 << CRF_SO_BIT)
- 
- /* XER definitions */
- #define XER_SO  31
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 1871792..fbc84e2 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -157,7 +157,7 @@ uint64_t helper_divde(CPUPPCState *env, uint64_t rau, uint64_t rbu, uint32_t oe)
- 
- uint32_t helper_cmpeqb(target_ulong ra, target_ulong rb)
- {
--    return hasvalue(rb, ra) ? 1 << CRF_GT : 0;
-+    return hasvalue(rb, ra) ? CRF_GT : 0;
- }
- 
- #undef pattern
-@@ -2531,9 +2531,9 @@ static void bcd_put_digit(ppc_avr_t *bcd, uint8_t digit, int n)
- static int bcd_cmp_zero(ppc_avr_t *bcd)
- {
-     if (bcd->u64[HI_IDX] == 0 && (bcd->u64[LO_IDX] >> 4) == 0) {
--        return 1 << CRF_EQ;
-+        return CRF_EQ;
-     } else {
--        return (bcd_get_sgn(bcd) == 1) ? 1 << CRF_GT : 1 << CRF_LT;
-+        return (bcd_get_sgn(bcd) == 1) ? CRF_GT : CRF_LT;
-     }
- }
- 
-@@ -2645,25 +2645,25 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-         if (sgna == sgnb) {
-             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
-             zero = bcd_add_mag(&result, a, b, &invalid, &overflow);
--            cr = (sgna > 0) ? 1 << CRF_GT : 1 << CRF_LT;
-+            cr = (sgna > 0) ? CRF_GT : CRF_LT;
-         } else if (bcd_cmp_mag(a, b) > 0) {
-             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
-             zero = bcd_sub_mag(&result, a, b, &invalid, &overflow);
--            cr = (sgna > 0) ? 1 << CRF_GT : 1 << CRF_LT;
-+            cr = (sgna > 0) ? CRF_GT : CRF_LT;
-         } else {
-             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgnb, ps);
-             zero = bcd_sub_mag(&result, b, a, &invalid, &overflow);
--            cr = (sgnb > 0) ? 1 << CRF_GT : 1 << CRF_LT;
-+            cr = (sgnb > 0) ? CRF_GT : CRF_LT;
-         }
-     }
- 
-     if (unlikely(invalid)) {
-         result.u64[HI_IDX] = result.u64[LO_IDX] = -1;
--        cr = 1 << CRF_SO;
-+        cr = CRF_SO;
-     } else if (overflow) {
--        cr |= 1 << CRF_SO;
-+        cr |= CRF_SO;
-     } else if (zero) {
--        cr = 1 << CRF_EQ;
-+        cr = CRF_EQ;
-     }
- 
-     *r = result;
-@@ -2713,7 +2713,7 @@ uint32_t helper_bcdcfn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     cr = bcd_cmp_zero(&ret);
- 
-     if (unlikely(invalid)) {
--        cr = 1 << CRF_SO;
-+        cr = CRF_SO;
-     }
- 
-     *r = ret;
-@@ -2743,11 +2743,11 @@ uint32_t helper_bcdctn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     cr = bcd_cmp_zero(b);
- 
-     if (ox_flag) {
--        cr |= 1 << CRF_SO;
-+        cr |= CRF_SO;
-     }
- 
-     if (unlikely(invalid)) {
--        cr = 1 << CRF_SO;
-+        cr = CRF_SO;
-     }
- 
-     *r = ret;
-@@ -2791,7 +2791,7 @@ uint32_t helper_bcdcfz(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     cr = bcd_cmp_zero(&ret);
- 
-     if (unlikely(invalid)) {
--        cr = 1 << CRF_SO;
-+        cr = CRF_SO;
-     }
- 
-     *r = ret;
-@@ -2830,11 +2830,11 @@ uint32_t helper_bcdctz(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     cr = bcd_cmp_zero(b);
- 
-     if (ox_flag) {
--        cr |= 1 << CRF_SO;
-+        cr |= CRF_SO;
-     }
- 
-     if (unlikely(invalid)) {
--        cr = 1 << CRF_SO;
-+        cr = CRF_SO;
-     }
- 
-     *r = ret;
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 8c99ea3..e55a5dc 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -612,17 +612,17 @@ static inline void gen_op_cmp(TCGv arg0, TCGv arg1, int s, int crf)
- 
-     tcg_gen_setcond_tl((s ? TCG_COND_LT: TCG_COND_LTU), t0, arg0, arg1);
-     tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_LT);
-+    tcg_gen_shli_i32(t1, t1, CRF_LT_BIT);
-     tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
- 
-     tcg_gen_setcond_tl((s ? TCG_COND_GT: TCG_COND_GTU), t0, arg0, arg1);
-     tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_GT);
-+    tcg_gen_shli_i32(t1, t1, CRF_GT_BIT);
-     tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
- 
-     tcg_gen_setcond_tl(TCG_COND_EQ, t0, arg0, arg1);
-     tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_EQ);
-+    tcg_gen_shli_i32(t1, t1, CRF_EQ_BIT);
-     tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
- 
-     tcg_temp_free(t0);
-@@ -748,7 +748,7 @@ static void gen_cmprb(DisasContext *ctx)
-         tcg_gen_and_i32(src2lo, src2lo, src2hi);
-         tcg_gen_or_i32(crf, crf, src2lo);
-     }
--    tcg_gen_shli_i32(crf, crf, CRF_GT);
-+    tcg_gen_shli_i32(crf, crf, CRF_GT_BIT);
-     tcg_temp_free_i32(src1);
-     tcg_temp_free_i32(src2);
-     tcg_temp_free_i32(src2lo);
-@@ -2997,7 +2997,7 @@ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
-     tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
-     l1 = gen_new_label();
-     tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, l1);
--    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], 1 << CRF_EQ);
-+    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
-     tcg_gen_qemu_st_tl(cpu_gpr[reg], EA, ctx->mem_idx, memop);
-     gen_set_label(l1);
-     tcg_gen_movi_tl(cpu_reserve, -1);
-@@ -3091,7 +3091,7 @@ static void gen_stqcx_(DisasContext *ctx)
-     tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
-     l1 = gen_new_label();
-     tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, l1);
--    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], 1 << CRF_EQ);
-+    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
- 
-     if (unlikely(ctx->le_mode)) {
-         gpr1 = cpu_gpr[reg + 1];
-@@ -4272,7 +4272,7 @@ static void gen_slbfee_(DisasContext *ctx)
-     l2 = gen_new_label();
-     tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
-     tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_gpr[rS(ctx->opcode)], -1, l1);
--    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], 1 << CRF_EQ);
-+    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
-     tcg_gen_br(l2);
-     gen_set_label(l1);
-     tcg_gen_movi_tl(cpu_gpr[rS(ctx->opcode)], 0);
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index d3741b4..fdd3216 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2410,29 +2410,39 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                      \
+ {                                                                        \
+     ppc_vsr_t xa, xb;                                                    \
+     uint32_t cc = 0;                                                     \
++    bool vxsnan_flag = false, vxvc_flag = false;                         \
+                                                                          \
++    helper_reset_fpstatus(env);                                          \
+     getVSR(xA(opcode), &xa, env);                                        \
+     getVSR(xB(opcode), &xb, env);                                        \
+                                                                          \
+-    if (unlikely(float64_is_any_nan(xa.VsrD(0)) ||                       \
+-                 float64_is_any_nan(xb.VsrD(0)))) {                      \
+-        if (float64_is_signaling_nan(xa.VsrD(0), &env->fp_status) ||     \
+-            float64_is_signaling_nan(xb.VsrD(0), &env->fp_status)) {     \
+-            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);       \
++    if (float64_is_signaling_nan(xa.VsrD(0), &env->fp_status) ||         \
++        float64_is_signaling_nan(xb.VsrD(0), &env->fp_status)) {         \
++        vxsnan_flag = true;                                              \
++        cc = CRF_SO;                                                     \
++        if (fpscr_ve == 0 && ordered) {                                  \
++            vxvc_flag = true;                                            \
+         }                                                                \
++    } else if (float64_is_quiet_nan(xa.VsrD(0), &env->fp_status) ||      \
++               float64_is_quiet_nan(xb.VsrD(0), &env->fp_status)) {      \
++        cc = CRF_SO;                                                     \
+         if (ordered) {                                                   \
+-            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXVC, 0);         \
++            vxvc_flag = true;                                            \
+         }                                                                \
+-        cc = 1;                                                          \
++    }                                                                    \
++    if (vxsnan_flag) {                                                   \
++        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);           \
++    }                                                                    \
++    if (vxvc_flag) {                                                     \
++        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXVC, 0);             \
++    }                                                                    \
++                                                                         \
++    if (float64_lt(xa.VsrD(0), xb.VsrD(0), &env->fp_status)) {           \
++        cc |= CRF_LT;                                                    \
++    } else if (!float64_le(xa.VsrD(0), xb.VsrD(0), &env->fp_status)) {   \
++        cc |= CRF_GT;                                                    \
+     } else {                                                             \
+-        if (float64_lt(xa.VsrD(0), xb.VsrD(0), &env->fp_status)) {       \
+-            cc = 8;                                                      \
+-        } else if (!float64_le(xa.VsrD(0), xb.VsrD(0),                   \
+-                               &env->fp_status)) { \
+-            cc = 4;                                                      \
+-        } else {                                                         \
+-            cc = 2;                                                      \
+-        }                                                                \
++        cc |= CRF_EQ;                                                    \
+     }                                                                    \
+                                                                          \
+     env->fpscr &= ~(0x0F << FPSCR_FPRF);                                 \
 -- 
 2.9.3
