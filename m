@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cZNac-0000FM-M4
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 15:02:43 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cZNaZ-0000BO-77
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 15:02:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cZNab-000831-Ny
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 15:02:42 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cZNaY-00080c-CG
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 15:02:39 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  2 Feb 2017 20:02:17 +0000
-Message-Id: <1486065742-28639-5-git-send-email-peter.maydell@linaro.org>
+Date: Thu,  2 Feb 2017 20:02:21 +0000
+Message-Id: <1486065742-28639-9-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
 References: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 4/9] armv7m: Fix condition check for taking
- exceptions
+Subject: [Qemu-devel] [PATCH 8/9] armv7m: Simpler and faster exception start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +22,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Michael Davidsaver <mdavidsaver@gmail.com>, Liviu Ionescu <ilg@livius.net>
 
-The M profile condition for when we can take a pending exception or
-interrupt is not the same as that for A/R profile.  The code
-originally copied from the A/R profile version of the
-cpu_exec_interrupt function only worked by chance for the
-very simple case of exceptions being masked by PRIMASK.
-Replace it with a call to a function in the NVIC code that
-correctly compares the priority of the pending exception
-against the current execution priority of the CPU.
+From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-[Michael Davidsaver's patchset had a patch to do something
-similar but the implementation ended up being a rewrite.]
+All the places in armv7m_cpu_do_interrupt() which pend an
+exception in the NVIC are doing so for synchronous
+exceptions. We know that we will always take some
+exception in this case, so we can just acknowledge it
+immediately, rather than returning and then immediately
+being called again because the NVIC has raised its outbound
+IRQ line.
 
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+[PMM: tweaked commit message; added DEBUG to the set of
+exceptions we handle immediately, since it is synchronous
+when it results from the BKPT instruction]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h      |  8 ++++++++
- hw/intc/armv7m_nvic.c |  7 +++++++
- target/arm/cpu.c      | 16 ++++++++--------
- 3 files changed, 23 insertions(+), 8 deletions(-)
+ target/arm/helper.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 39bff86..ac20a56 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1335,6 +1335,14 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
-                                  uint32_t cur_el, bool secure);
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 78bf9ab..8bdd99c 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6071,22 +6071,22 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+     case EXCP_UDEF:
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+         env->v7m.cfsr |= R_V7M_CFSR_UNDEFINSTR_MASK;
+-        return;
++        break;
+     case EXCP_NOCP:
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+         env->v7m.cfsr |= R_V7M_CFSR_NOCP_MASK;
+-        return;
++        break;
+     case EXCP_SWI:
+         /* The PC already points to the next instruction.  */
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SVC);
+-        return;
++        break;
+     case EXCP_PREFETCH_ABORT:
+     case EXCP_DATA_ABORT:
+         /* TODO: if we implemented the MPU registers, this is where we
+          * should set the MMFAR, etc from exception.fsr and exception.vaddress.
+          */
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM);
+-        return;
++        break;
+     case EXCP_BKPT:
+         if (semihosting_enabled()) {
+             int nr;
+@@ -6101,9 +6101,8 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+             }
+         }
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_DEBUG);
+-        return;
++        break;
+     case EXCP_IRQ:
+-        armv7m_nvic_acknowledge_irq(env->nvic);
+         break;
+     case EXCP_EXCEPTION_EXIT:
+         do_v7m_exception_exit(env);
+@@ -6113,6 +6112,10 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+         return; /* Never happens.  Keep compiler happy.  */
+     }
  
- /* Interface between CPU and Interrupt controller.  */
-+#ifndef CONFIG_USER_ONLY
-+bool armv7m_nvic_can_take_pending_exception(void *opaque);
-+#else
-+static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
-+{
-+    return true;
-+}
-+#endif
- void armv7m_nvic_set_pending(void *opaque, int irq);
- int armv7m_nvic_acknowledge_irq(void *opaque);
- void armv7m_nvic_complete_irq(void *opaque, int irq);
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index e319077..3d77cbf 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -268,6 +268,13 @@ static inline int nvic_exec_prio(NVICState *s)
-     return MIN(running, s->exception_prio);
- }
- 
-+bool armv7m_nvic_can_take_pending_exception(void *opaque)
-+{
-+    NVICState *s = opaque;
++    armv7m_nvic_acknowledge_irq(env->nvic);
 +
-+    return nvic_exec_prio(s) > nvic_pending_prio(s);
-+}
++    qemu_log_mask(CPU_LOG_INT, "... as %d\n", env->v7m.exception);
 +
- /* caller must call nvic_irq_update() after this */
- static void set_prio(NVICState *s, unsigned irq, uint8_t prio)
- {
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index e9f10f7..7713d88 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -338,13 +338,6 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     CPUARMState *env = &cpu->env;
-     bool ret = false;
- 
--
--    if (interrupt_request & CPU_INTERRUPT_FIQ
--        && !(env->daif & PSTATE_F)) {
--        cs->exception_index = EXCP_FIQ;
--        cc->do_interrupt(cs);
--        ret = true;
--    }
-     /* ARMv7-M interrupt return works by loading a magic value
-      * into the PC.  On real hardware the load causes the
-      * return to occur.  The qemu implementation performs the
-@@ -354,9 +347,16 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-      * the stack if an interrupt occurred at the wrong time.
-      * We avoid this by disabling interrupts when
-      * pc contains a magic address.
-+     *
-+     * ARMv7-M interrupt masking works differently than -A or -R.
-+     * There is no FIQ/IRQ distinction. Instead of I and F bits
-+     * masking FIQ and IRQ interrupts, an exception is taken only
-+     * if it is higher priority than the current execution priority
-+     * (which depends on state like BASEPRI, FAULTMASK and the
-+     * currently active exception).
-      */
-     if (interrupt_request & CPU_INTERRUPT_HARD
--        && !(env->daif & PSTATE_I)
-+        && (armv7m_nvic_can_take_pending_exception(env->nvic))
-         && (env->regs[15] < 0xfffffff0)) {
-         cs->exception_index = EXCP_IRQ;
-         cc->do_interrupt(cs);
+     /* Align stack pointer if the guest wants that */
+     if ((env->regs[13] & 4) && (env->v7m.ccr & R_V7M_CCR_STKALIGN_MASK)) {
+         env->regs[13] -= 4;
 -- 
 2.7.4
