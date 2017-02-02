@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kG-0007wp-Hl
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:53 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kJ-00080u-Fw
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9k9-0004GG-0E
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:44 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9kC-0004Le-VP
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:47 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:14:38 +1100
-Message-Id: <20170202051445.5735-101-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:14:15 +1100
+Message-Id: <20170202051445.5735-78-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 100/107] target-ppc: Add xvtstdc[sp,
- dp] instructions
+Subject: [Qemu-devel] [PULL 077/107] target-ppc: Add xviexpsp instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +24,61 @@ Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com,
 
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-xvtstdcsp: VSX Vector Test Data Class Single-Precision
-xvtstdcdp: VSX Vector Test Data Class Double-Precision
+xviexpsp: VSX Vector Insert Exponent Single Precision
 
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c             | 40 +++++++++++++++++++++++++++++++++++++
- target/ppc/helper.h                 |  2 ++
- target/ppc/internal.h               |  5 +++--
- target/ppc/translate/vsx-impl.inc.c |  2 ++
- target/ppc/translate/vsx-ops.inc.c  |  8 ++++++++
- 5 files changed, 55 insertions(+), 2 deletions(-)
+ target/ppc/translate/vsx-impl.inc.c | 26 ++++++++++++++++++++++++++
+ target/ppc/translate/vsx-ops.inc.c  |  2 ++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index ffcf9ca..45bc93c 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -3187,3 +3187,43 @@ void helper_xvxsigsp(CPUPPCState *env, uint32_t opcode)
-     }
-     putVSR(xT(opcode), &xt, env);
- }
-+
-+/* VSX_TEST_DC - VSX floating point test data class
-+ *   op    - instruction mnemonic
-+ *   nels  - number of elements (1, 2 or 4)
-+ *   xbn   - VSR register number
-+ *   tp    - type (float32 or float64)
-+ *   fld   - vsr_t field (VsrD(*) or VsrW(*))
-+ *   tfld   - target vsr_t field (VsrD(*) or VsrW(*))
-+ *   fld_max - target field max
-+ */
-+#define VSX_TEST_DC(op, nels, xbn, tp, fld, tfld, fld_max)  \
-+void helper_##op(CPUPPCState *env, uint32_t opcode)         \
-+{                                                           \
-+    ppc_vsr_t xt, xb;                                       \
-+    uint32_t i, sign, dcmx;                                 \
-+    uint32_t match = 0;                                     \
-+                                                            \
-+    getVSR(xbn, &xb, env);                                  \
-+    memset(&xt, 0, sizeof(xt));                             \
-+    dcmx = DCMX_XV(opcode);                                 \
-+                                                            \
-+    for (i = 0; i < nels; i++) {                            \
-+        sign = tp##_is_neg(xb.fld);                         \
-+        if (tp##_is_any_nan(xb.fld)) {                      \
-+            match = extract32(dcmx, 6, 1);                  \
-+        } else if (tp##_is_infinity(xb.fld)) {              \
-+            match = extract32(dcmx, 4 + !sign, 1);          \
-+        } else if (tp##_is_zero(xb.fld)) {                  \
-+            match = extract32(dcmx, 2 + !sign, 1);          \
-+        } else if (tp##_is_zero_or_denormal(xb.fld)) {      \
-+            match = extract32(dcmx, 0 + !sign, 1);          \
-+        }                                                   \
-+        xt.tfld = match ? fld_max : 0;                      \
-+        match = 0;                                          \
-+    }                                                       \
-+    putVSR(xT(opcode), &xt, env);                           \
-+}
-+
-+VSX_TEST_DC(xvtstdcdp, 2, xB(opcode), float64, VsrD(i), VsrD(i), UINT64_MAX)
-+VSX_TEST_DC(xvtstdcsp, 4, xB(opcode), float32, VsrW(i), VsrW(i), UINT32_MAX)
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 9d4ed08..165e4a5 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -546,6 +546,8 @@ DEF_HELPER_2(xvcvsxdsp, void, env, i32)
- DEF_HELPER_2(xvcvuxdsp, void, env, i32)
- DEF_HELPER_2(xvcvsxwsp, void, env, i32)
- DEF_HELPER_2(xvcvuxwsp, void, env, i32)
-+DEF_HELPER_2(xvtstdcsp, void, env, i32)
-+DEF_HELPER_2(xvtstdcdp, void, env, i32)
- DEF_HELPER_2(xvrspi, void, env, i32)
- DEF_HELPER_2(xvrspic, void, env, i32)
- DEF_HELPER_2(xvrspim, void, env, i32)
-diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index c22d74e..4c3811a 100644
---- a/target/ppc/internal.h
-+++ b/target/ppc/internal.h
-@@ -68,7 +68,7 @@ static inline uint32_t name(uint32_t opcode)                                  \
-             ((opcode >> (shift2)) & ((1 << (nb2)) - 1));                      \
- }
- 
--#define EXTRACT_HELPER_DXFORM(name,                                           \
-+#define EXTRACT_HELPER_SPLIT_3(name,                                          \
-                               d0_bits, shift_op_d0, shift_d0,                 \
-                               d1_bits, shift_op_d1, shift_d1,                 \
-                               d2_bits, shift_op_d2, shift_d2)                 \
-@@ -156,7 +156,7 @@ EXTRACT_HELPER(FPFLM, 17, 8);
- EXTRACT_HELPER(FPW, 16, 1);
- 
- /* addpcis */
--EXTRACT_HELPER_DXFORM(DX, 10, 6, 6, 5, 16, 1, 1, 0, 0)
-+EXTRACT_HELPER_SPLIT_3(DX, 10, 6, 6, 5, 16, 1, 1, 0, 0)
- #if defined(TARGET_PPC64)
- /* darn */
- EXTRACT_HELPER(L, 16, 2);
-@@ -198,6 +198,7 @@ EXTRACT_HELPER(UIM, 16, 2);
- EXTRACT_HELPER(SHW, 8, 2);
- EXTRACT_HELPER(SP, 19, 2);
- EXTRACT_HELPER(IMM8, 11, 8);
-+EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
- 
- typedef union _ppc_vsr_t {
-     uint8_t u8[16];
 diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 9bcc5af..adb6fc7 100644
+index ed392aa..c86f1b5 100644
 --- a/target/ppc/translate/vsx-impl.inc.c
 +++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -928,6 +928,8 @@ GEN_VSX_HELPER_2(xvrspic, 0x16, 0x0A, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xvrspim, 0x12, 0x0B, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xvrspip, 0x12, 0x0A, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xvrspiz, 0x12, 0x09, 0, PPC2_VSX)
-+GEN_VSX_HELPER_2(xvtstdcsp, 0x14, 0x1A, 0, PPC2_VSX)
-+GEN_VSX_HELPER_2(xvtstdcdp, 0x14, 0x1E, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xxperm, 0x08, 0x03, 0, PPC2_ISA300)
- GEN_VSX_HELPER_2(xxpermr, 0x08, 0x07, 0, PPC2_ISA300)
+@@ -1344,6 +1344,32 @@ static void gen_xsxsigqp(DisasContext *ctx)
+ }
+ #endif
  
++static void gen_xviexpsp(DisasContext *ctx)
++{
++    TCGv_i64 xth = cpu_vsrh(xT(ctx->opcode));
++    TCGv_i64 xtl = cpu_vsrl(xT(ctx->opcode));
++    TCGv_i64 xah = cpu_vsrh(xA(ctx->opcode));
++    TCGv_i64 xal = cpu_vsrl(xA(ctx->opcode));
++    TCGv_i64 xbh = cpu_vsrh(xB(ctx->opcode));
++    TCGv_i64 xbl = cpu_vsrl(xB(ctx->opcode));
++    TCGv_i64 t0;
++
++    if (unlikely(!ctx->vsx_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_VSXU);
++        return;
++    }
++    t0 = tcg_temp_new_i64();
++    tcg_gen_andi_i64(xth, xah, 0x807FFFFF807FFFFF);
++    tcg_gen_andi_i64(t0, xbh, 0xFF000000FF);
++    tcg_gen_shli_i64(t0, t0, 23);
++    tcg_gen_or_i64(xth, xth, t0);
++    tcg_gen_andi_i64(xtl, xal, 0x807FFFFF807FFFFF);
++    tcg_gen_andi_i64(t0, xbl, 0xFF000000FF);
++    tcg_gen_shli_i64(t0, t0, 23);
++    tcg_gen_or_i64(xtl, xtl, t0);
++    tcg_temp_free_i64(t0);
++}
++
+ #undef GEN_XX2FORM
+ #undef GEN_XX3FORM
+ #undef GEN_XX2IFORM
 diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index ee74312..6dd5d72 100644
+index 09b91c3..93752f0 100644
 --- a/target/ppc/translate/vsx-ops.inc.c
 +++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -133,6 +133,14 @@ GEN_XX2FORM_EO(xvxsigdp, 0x16, 0x1D, 0x01, PPC2_ISA300),
- GEN_XX2FORM_EO(xvxexpsp, 0x16, 0x1D, 0x08, PPC2_ISA300),
- GEN_XX2FORM_EO(xvxsigsp, 0x16, 0x1D, 0x09, PPC2_ISA300),
+@@ -124,6 +124,8 @@ GEN_HANDLER_E(xsiexpdp, 0x3C, 0x16, 0x1C, 0, PPC_NONE, PPC2_ISA300),
+ GEN_VSX_XFORM_300(xsiexpqp, 0x4, 0x1B, 0x00000001),
+ #endif
  
-+/* DCMX  =  bit[25] << 6 | bit[29] << 5 | bit[11:15] */
-+#define GEN_XX2FORM_DCMX(name, opc2, opc3, fl2) \
-+GEN_XX3FORM(name, opc2, opc3 | 0, fl2),         \
-+GEN_XX3FORM(name, opc2, opc3 | 1, fl2)
-+
-+GEN_XX2FORM_DCMX(xvtstdcdp, 0x14, 0x1E, PPC2_ISA300),
-+GEN_XX2FORM_DCMX(xvtstdcsp, 0x14, 0x1A, PPC2_ISA300),
++GEN_XX3FORM(xviexpsp, 0x00, 0x1B, PPC2_ISA300),
 +
  GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
  GEN_XX2FORM(xvnabsdp, 0x12, 0x1E, PPC2_VSX),
