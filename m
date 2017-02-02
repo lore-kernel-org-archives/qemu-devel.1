@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZCfz-0001MV-FL
+	(envelope-from <kraxel@redhat.com>) id 1cZCfz-0001MS-Ed
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:23:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cZCfv-0006eT-VJ
+	(envelope-from <kraxel@redhat.com>) id 1cZCfv-0006dR-FE
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:23:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cZCfv-0006bv-9c
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 03:23:27 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7B5C73B722
+	for <qemu-devel@nongnu.org>; Thu,  2 Feb 2017 08:23:26 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  2 Feb 2017 09:23:09 +0100
-Message-Id: <1486023789-28995-5-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1486023789-28995-1-git-send-email-kraxel@redhat.com>
-References: <1486023789-28995-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 4/4] cirrus: fix oob access issue (CVE-2017-2615)
+Date: Thu,  2 Feb 2017 09:23:05 +0100
+Message-Id: <1486023789-28995-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 0/4] cirrus: multiple bugfixes,
+ including CVE-2017-2615 fix.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,51 +29,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Li Qiang <liqiang6-s@360.cn>, Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org, P J P <ppandit@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Wolfgang Bumiller <w.bumiller@proxmox.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Li Qiang <liqiang6-s@360.cn>
+  Hi,
 
-When doing bitblt copy in backward mode, we should minus the
-blt width first just like the adding in the forward mode. This
-can avoid the oob access of the front of vga's vram.
+Here is the vga patch queue, finally bringing the cirrus fixes.
 
-Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 1485938101-26602-1-git-send-email-kraxel@redhat.com
-Message-id: 5887254f.863a240a.2c122.5500@mx.google.com
+please pull,
+  Gerd
 
-{ kraxel: with backward blits (negative pitch) addr is the topmost
-          address, so check it as-is against vram size ]
+The following changes since commit a0def594286d9110a6035e02eef558cf3cf5d847:
 
-Cc: qemu-stable@nongnu.org
-Cc: P J P <ppandit@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Fixes: d3532a0db02296e687711b8cdc7791924efccea0 (CVE-2014-8106)
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/cirrus_vga.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-01-30 10:23:20 +0000)
 
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 7db6409..16f27e8 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -274,10 +274,9 @@ static bool blit_region_is_unsafe(struct CirrusVGAState *s,
- {
-     if (pitch < 0) {
-         int64_t min = addr
--            + ((int64_t)s->cirrus_blt_height-1) * pitch;
--        int32_t max = addr
--            + s->cirrus_blt_width;
--        if (min < 0 || max > s->vga.vram_size) {
-+            + ((int64_t)s->cirrus_blt_height - 1) * pitch
-+            - s->cirrus_blt_width;
-+        if (min < -1 || addr >= s->vga.vram_size) {
-             return true;
-         }
-     } else {
--- 
-1.8.3.1
+are available in the git repository at:
+
+
+  git://git.kraxel.org/qemu tags/pull-vga-20170202-1
+
+for you to fetch changes up to 31b1a6bb0f8ead5c0b21f23daf3054e3ccbc215e:
+
+  cirrus: fix oob access issue (CVE-2017-2615) (2017-02-01 14:43:10 +0100)
+
+----------------------------------------------------------------
+cirrus: multiple bugfixes, including CVE-2017-2615 fix.
+
+----------------------------------------------------------------
+Gerd Hoffmann (1):
+      cirrus: fix blit address mask handling
+
+Li Qiang (1):
+      cirrus: fix oob access issue (CVE-2017-2615)
+
+Wolfgang Bumiller (2):
+      cirrus: handle negative pitch in cirrus_invalidate_region()
+      cirrus: allow zero source pitch in pattern fill rops
+
+ hw/display/cirrus_vga.c | 64 ++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 39 insertions(+), 25 deletions(-)
