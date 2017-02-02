@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jj-0007Fa-KX
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:16 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jg-0003aD-3E
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9jh-0007Aj-6p
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:11 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1cZ9je-0003Wu-4S
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 00:15:09 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  2 Feb 2017 16:13:15 +1100
-Message-Id: <20170202051445.5735-18-david@gibson.dropbear.id.au>
+Date: Thu,  2 Feb 2017 16:13:14 +1100
+Message-Id: <20170202051445.5735-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
 References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 017/107] ppc: Clean up and QOMify hypercall
- emulation
+Subject: [Qemu-devel] [PULL 016/107] pseries: Make cpu_update during CAS
+ unconditional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,218 +23,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-The pseries machine type is a bit unusual in that it runs a paravirtualized
-guest.  The guest expects to interact with a hypervisor, and qemu
-emulates the functions of that hypervisor directly, rather than executing
-hypervisor code within the emulated system.
+spapr_h_cas_compose_response() includes a cpu_update parameter which
+controls whether it includes updated information on the CPUs in the device
+tree fragment returned from the ibm,client-architecture-support (CAS) call.
 
-To implement this in TCG, we need to intercept hypercall instructions and
-direct them to the machine's hypercall handlers, rather than attempting to
-perform a privilege change within TCG.  This is controlled by a global
-hook - cpu_ppc_hypercall.
-
-This cleanup makes the handling a little cleaner and more extensible than
-a single global variable.  Instead, each CPU to have hypercalls intercepted
-has a pointer set to a QOM object implementing a new virtual hypervisor
-interface.  A method in that interface is called by TCG when it sees a
-hypercall instruction.  It's possible we may want to add other methods in
-future.
+Providing the updated information is essential when CAS has negotiated
+compatibility options which require different cpu information to be
+presented to the guest.  However, it should be safe to provide in other
+cases (it will just override the existing data in the device tree with
+identical data).  This simplifies the code by removing the parameter and
+always providing the cpu update information.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- hw/ppc/spapr.c              |  8 +++++---
- hw/ppc/spapr_cpu_core.c     |  1 +
- target/ppc/cpu.h            | 26 ++++++++++++++++++++++++--
- target/ppc/excp_helper.c    | 11 ++++-------
- target/ppc/translate_init.c | 12 ++++++++++++
- 5 files changed, 46 insertions(+), 12 deletions(-)
+ hw/ppc/spapr.c         | 5 +----
+ hw/ppc/spapr_hcall.c   | 8 ++------
+ include/hw/ppc/spapr.h | 1 -
+ 3 files changed, 3 insertions(+), 11 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ca78e31..a4774fb 100644
+index cef696c..ca78e31 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1005,7 +1005,8 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
-     return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
- }
+@@ -685,7 +685,6 @@ out:
  
--static void emulate_spapr_hypercall(PowerPCCPU *cpu)
-+static void emulate_spapr_hypercall(PPCVirtualHypervisor *vhyp,
-+                                    PowerPCCPU *cpu)
+ int spapr_h_cas_compose_response(sPAPRMachineState *spapr,
+                                  target_ulong addr, target_ulong size,
+-                                 bool cpu_update,
+                                  sPAPROptionVector *ov5_updates)
  {
-     CPUPPCState *env = &cpu->env;
+     void *fdt, *fdt_skel;
+@@ -704,9 +703,7 @@ int spapr_h_cas_compose_response(sPAPRMachineState *spapr,
+     g_free(fdt_skel);
  
-@@ -1843,8 +1844,6 @@ static void ppc_spapr_init(MachineState *machine)
+     /* Fixup cpu nodes */
+-    if (cpu_update) {
+-        _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
+-    }
++    _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
  
-     QLIST_INIT(&spapr->phbs);
- 
--    cpu_ppc_hypercall = emulate_spapr_hypercall;
--
-     /* Allocate RMA if necessary */
-     rma_alloc_size = kvmppc_alloc_rma(&rma);
- 
-@@ -2680,6 +2679,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(oc);
-     NMIClass *nc = NMI_CLASS(oc);
-     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
-+    PPCVirtualHypervisorClass *vhc = PPC_VIRTUAL_HYPERVISOR_CLASS(oc);
- 
-     mc->desc = "pSeries Logical Partition (PAPR compliant)";
- 
-@@ -2711,6 +2711,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     fwc->get_dev_path = spapr_get_fw_dev_path;
-     nc->nmi_monitor_handler = spapr_nmi;
-     smc->phb_placement = spapr_phb_placement;
-+    vhc->hypercall = emulate_spapr_hypercall;
- }
- 
- static const TypeInfo spapr_machine_info = {
-@@ -2726,6 +2727,7 @@ static const TypeInfo spapr_machine_info = {
-         { TYPE_FW_PATH_PROVIDER },
-         { TYPE_NMI },
-         { TYPE_HOTPLUG_HANDLER },
-+        { TYPE_PPC_VIRTUAL_HYPERVISOR },
-         { }
-     },
- };
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index f532689..9dddaeb 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -57,6 +57,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
-     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
- 
-     /* Enable PAPR mode in TCG or KVM */
-+    cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
-     cpu_ppc_set_papr(cpu);
- 
-     if (cpu->max_compat) {
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 7a6ee3f..4fb4c20 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1150,6 +1150,9 @@ do {                                            \
-     env->wdt_period[3] = (d_);                  \
-  } while (0)
- 
-+typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
-+typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
-+
- /**
-  * PowerPCCPU:
-  * @env: #CPUPPCState
-@@ -1168,6 +1171,7 @@ struct PowerPCCPU {
-     int cpu_dt_id;
-     uint32_t max_compat;
-     uint32_t cpu_version;
-+    PPCVirtualHypervisor *vhyp;
- 
-     /* Fields related to migration compatibility hacks */
-     bool pre_2_8_migration;
-@@ -1189,6 +1193,25 @@ static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
- PowerPCCPUClass *ppc_cpu_class_by_pvr(uint32_t pvr);
- PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr);
- 
-+struct PPCVirtualHypervisor {
-+    Object parent;
-+};
-+
-+struct PPCVirtualHypervisorClass {
-+    InterfaceClass parent;
-+    void (*hypercall)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
-+};
-+
-+#define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
-+#define PPC_VIRTUAL_HYPERVISOR(obj)                 \
-+    OBJECT_CHECK(PPCVirtualHypervisor, (obj), TYPE_PPC_VIRTUAL_HYPERVISOR)
-+#define PPC_VIRTUAL_HYPERVISOR_CLASS(klass)         \
-+    OBJECT_CLASS_CHECK(PPCVirtualHypervisorClass, (klass), \
-+                       TYPE_PPC_VIRTUAL_HYPERVISOR)
-+#define PPC_VIRTUAL_HYPERVISOR_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(PPCVirtualHypervisorClass, (obj), \
-+                     TYPE_PPC_VIRTUAL_HYPERVISOR)
-+
- void ppc_cpu_do_interrupt(CPUState *cpu);
- bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
- void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-@@ -1261,6 +1284,7 @@ void store_booke_tcr (CPUPPCState *env, target_ulong val);
- void store_booke_tsr (CPUPPCState *env, target_ulong val);
- void ppc_tlb_invalidate_all (CPUPPCState *env);
- void ppc_tlb_invalidate_one (CPUPPCState *env, target_ulong addr);
-+void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
- void cpu_ppc_set_papr(PowerPCCPU *cpu);
- #endif
- #endif
-@@ -2435,8 +2459,6 @@ static inline bool lsw_reg_in_range(int start, int nregs, int rx)
-            (start + nregs > 32 && (rx >= start || rx < start + nregs - 32));
- }
- 
--extern void (*cpu_ppc_hypercall)(PowerPCCPU *);
--
- void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env);
- 
- /**
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 93369d4..f4ee7aa 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -35,11 +35,6 @@
- #endif
- 
- /*****************************************************************************/
--/* PowerPC Hypercall emulation */
--
--void (*cpu_ppc_hypercall)(PowerPCCPU *);
--
--/*****************************************************************************/
- /* Exception processing */
- #if defined(CONFIG_USER_ONLY)
- void ppc_cpu_do_interrupt(CPUState *cs)
-@@ -318,8 +313,10 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
-         env->nip += 4;
- 
-         /* "PAPR mode" built-in hypercall emulation */
--        if ((lev == 1) && cpu_ppc_hypercall) {
--            cpu_ppc_hypercall(cpu);
-+        if ((lev == 1) && cpu->vhyp) {
-+            PPCVirtualHypervisorClass *vhc =
-+                PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+            vhc->hypercall(cpu->vhyp, cpu);
-             return;
+     if (spapr_dt_cas_updates(spapr, fdt, ov5_updates)) {
+         return -1;
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index b2a8e48..1333110 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -945,7 +945,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
+     target_ulong ov_table;
+     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu_);
+     CPUState *cs;
+-    bool cpu_match = false, cpu_update = true;
++    bool cpu_match = false;
+     unsigned old_cpu_version = cpu_->cpu_version;
+     unsigned compat_lvl = 0, cpu_version = 0;
+     unsigned max_lvl = get_compat_level(cpu_->max_compat);
+@@ -999,10 +999,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
          }
-         if (lev == 1) {
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 94dfcd7..2e921ca 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8857,6 +8857,11 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+     }
  
- #if !defined(CONFIG_USER_ONLY)
+-    if (!cpu_version) {
+-        cpu_update = false;
+-    }
+-
+     /* For the future use: here @ov_table points to the first option vector */
+     ov_table = list;
  
-+void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
-+{
-+    cpu->vhyp = vhyp;
-+}
-+
- void cpu_ppc_set_papr(PowerPCCPU *cpu)
- {
-     CPUPPCState *env = &cpu->env;
-@@ -10591,9 +10596,16 @@ static const TypeInfo ppc_cpu_type_info = {
-     .class_init = ppc_cpu_class_init,
- };
+@@ -1028,7 +1024,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
  
-+static const TypeInfo ppc_vhyp_type_info = {
-+    .name = TYPE_PPC_VIRTUAL_HYPERVISOR,
-+    .parent = TYPE_INTERFACE,
-+    .class_size = sizeof(PPCVirtualHypervisorClass),
-+};
-+
- static void ppc_cpu_register_types(void)
- {
-     type_register_static(&ppc_cpu_type_info);
-+    type_register_static(&ppc_vhyp_type_info);
- }
- 
- type_init(ppc_cpu_register_types)
+     if (!spapr->cas_reboot) {
+         spapr->cas_reboot =
+-            (spapr_h_cas_compose_response(spapr, args[1], args[2], cpu_update,
++            (spapr_h_cas_compose_response(spapr, args[1], args[2],
+                                           ov5_updates) != 0);
+     }
+     spapr_ovec_cleanup(ov5_updates);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index f8d444d..04d2821 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -589,7 +589,6 @@ void spapr_events_init(sPAPRMachineState *sm);
+ void spapr_dt_events(sPAPRMachineState *sm, void *fdt);
+ int spapr_h_cas_compose_response(sPAPRMachineState *sm,
+                                  target_ulong addr, target_ulong size,
+-                                 bool cpu_update,
+                                  sPAPROptionVector *ov5_updates);
+ sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn);
+ void spapr_tce_table_enable(sPAPRTCETable *tcet,
 -- 
 2.9.3
