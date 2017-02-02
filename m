@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKk-0002cF-ER
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKk-0002cA-6q
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKj-0008Hm-9T
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZHKi-0008HP-Tx
 	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:54 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:11772 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:30344 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZHKi-0008Fj-TQ
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:53 -0500
+	id 1cZHKi-0008G7-I2
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 08:21:52 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  2 Feb 2017 16:21:26 +0300
-Message-Id: <20170202132145.168790-6-vsementsov@virtuozzo.com>
+Date: Thu,  2 Feb 2017 16:21:23 +0300
+Message-Id: <20170202132145.168790-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20170202132145.168790-1-vsementsov@virtuozzo.com>
 References: <20170202132145.168790-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 05/24] block: fix bdrv_dirty_bitmap_granularity
- signature
+Subject: [Qemu-devel] [PATCH 02/24] specs/qcow2: do not use wording 'bitmap
+ header'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +28,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Make getter signature const-correct. This allows other functions with
-const dirty bitmap parameter use bdrv_dirty_bitmap_granularity().
+A bitmap directory entry is sometimes called a 'bitmap header'. This
+patch leaves only one name - 'bitmap directory entry'. The name 'bitmap
+header' creates misunderstandings with 'qcow2 header' and 'qcow2 bitmap
+header extension' (which is extension of qcow2 header)
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/dirty-bitmap.c         | 2 +-
- include/block/dirty-bitmap.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ docs/specs/qcow2.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 519737c8d3..186941cfc3 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -388,7 +388,7 @@ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs)
-     return granularity;
- }
+diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
+index dda53dd2a3..8874e8c774 100644
+--- a/docs/specs/qcow2.txt
++++ b/docs/specs/qcow2.txt
+@@ -201,7 +201,7 @@ The fields of the bitmaps extension are:
  
--uint32_t bdrv_dirty_bitmap_granularity(BdrvDirtyBitmap *bitmap)
-+uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap)
- {
-     return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->bitmap);
- }
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 9dea14ba03..7cbe623ba7 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -29,7 +29,7 @@ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
- uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
--uint32_t bdrv_dirty_bitmap_granularity(BdrvDirtyBitmap *bitmap);
-+uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap);
- uint32_t bdrv_dirty_bitmap_meta_granularity(BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap);
+           8 - 15:  bitmap_directory_size
+                    Size of the bitmap directory in bytes. It is the cumulative
+-                   size of all (nb_bitmaps) bitmap headers.
++                   size of all (nb_bitmaps) bitmap directory entries.
+ 
+          16 - 23:  bitmap_directory_offset
+                    Offset into the image file at which the bitmap directory
+@@ -426,8 +426,7 @@ Each bitmap saved in the image is described in a bitmap directory entry. The
+ bitmap directory is a contiguous area in the image file, whose starting offset
+ and length are given by the header extension fields bitmap_directory_offset and
+ bitmap_directory_size. The entries of the bitmap directory have variable
+-length, depending on the lengths of the bitmap name and extra data. These
+-entries are also called bitmap headers.
++length, depending on the lengths of the bitmap name and extra data.
+ 
+ Structure of a bitmap directory entry:
+ 
 -- 
 2.11.0
