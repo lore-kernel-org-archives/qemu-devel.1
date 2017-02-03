@@ -1,42 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cZiGX-0005sV-0L
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:07:21 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cZiJu-0007aj-Jz
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:10:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cZiGS-0002KL-24
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:07:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37352
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cZiGR-0002KA-Sn
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:07:16 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v13I3iP0112160
-	for <qemu-devel@nongnu.org>; Fri, 3 Feb 2017 13:07:15 -0500
-Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28cxs388fs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 13:07:14 -0500
-Received: from localhost
-	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 3 Feb 2017 18:07:12 -0000
-References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
-	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
-	<20170203103316.GA29200@stefanha-x1.localdomain>
-	<20170203173607-mutt-send-email-mst@kernel.org>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 3 Feb 2017 19:07:02 +0100
+	(envelope-from <alex.williamson@redhat.com>) id 1cZiJr-0003pa-Dx
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:10:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45434)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cZiJr-0003pK-7Y
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:10:47 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1F4C265727
+	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 18:10:47 +0000 (UTC)
+Date: Fri, 3 Feb 2017 11:10:45 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170203111045.4367eb34@t450s.home>
+In-Reply-To: <1485244958-25911-1-git-send-email-thuth@redhat.com>
+References: <1485244958-25911-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170203173607-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <1fdc2663-2090-9e19-5ea9-1f5b8eef4eb1@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v16 1/2] virtio-crypto: Add virtio crypto
- device specification
+Subject: Re: [Qemu-devel] [PATCH] hw/vfio/pci-quirks: Set category of the
+ "vfio-pci-igd-lpc-bridge" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,38 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: weidong.huang@huawei.com, qemu-devel@nongnu.org, john.griffin@intel.com, jianjay.zhou@huawei.com, Varun.Sethi@freescale.com, denglingli@chinamobile.com, arei.gonglei@hotmail.com, virtio-dev@lists.oasis-open.org, agraf@suse.de, Gonglei <arei.gonglei@huawei.com>, nmorey@kalray.eu, longpeng2@huawei.com, vincent.jardin@6wind.com, Ola.Liljedahl@arm.com, luonengjun@huawei.com, xin.zeng@intel.com, liang.j.ma@intel.com, stefanha@redhat.com, cornelia.huck@de.ibm.com, Jani.Kokkonen@huawei.com, brian.a.keating@intel.com, claudio.fontana@huawei.com, mike.caraman@nxp.com, wu.wubin@huawei.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+On Tue, 24 Jan 2017 09:02:38 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
+> The device has "bridge" in its name, so it should obviously be in
+> the category DEVICE_CATEGORY_BRIDGE.
 
-On 02/03/2017 04:37 PM, Michael S. Tsirkin wrote:
-> On Fri, Feb 03, 2017 at 10:33:16AM +0000, Stefan Hajnoczi wrote:
->>> +\begin{description}
->>> +\item[0] dataq1
->>> +\item[\ldots]
->>> +\item[N-1] dataqN
->>> +\item[N] controlq
->>> +\end{description}
->>> +
->>> +N is set by \field{max_dataqueues}.
->>> +
->>> +\subsection{Feature bits}\label{sec:Device Types / Crypto Device / Feature bits}
->>> +
->>> +VIRTIO_CRYPTO_F_NON_SESSION_MODE (0) non-session mode is available.
->>> +VIRTIO_CRYPTO_F_CIPHER_NON_SESSION_MODE (1) non-session mode is available for CIPHER service.
->>> +VIRTIO_CRYPTO_F_HASH_NON_SESSION_MODE (2) non-session mode is available for HASH service.
->>> +VIRTIO_CRYPTO_F_MAC_NON_SESSION_MODE (3) non-session mode is available for MAC service.
->>> +VIRTIO_CRYPTO_F_AEAD_NON_SESSION_MODE (4) non-session mode is available for AEAD service.
->>
->> Bits 1-4 require bit 0.  Is bit 0 necessary at all?  Or may bits 1-4 can
->> be eliminated in favor of just bit 0.
+Well, physical device is a bridge, but this is really just a stub.
+Does that count?  It doesn't create a subordinate bus that can actually
+host devices.  Thanks,
+
+Alex
+
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/vfio/pci-quirks.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> Too late to change it as QEMU released a device with that feature.
-> 
-
-When was this introduced to QEMU? Can't find it in current master
-and I do not remember seeing the patches.
-
-Regards,
-Halil
+> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> index 811eecd..4891b37 100644
+> --- a/hw/vfio/pci-quirks.c
+> +++ b/hw/vfio/pci-quirks.c
+> @@ -1185,6 +1185,7 @@ static void vfio_pci_igd_lpc_bridge_class_init(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>  
+> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>      dc->desc = "VFIO dummy ISA/LPC bridge for IGD assignment";
+>      dc->hotpluggable = false;
+>      k->realize = vfio_pci_igd_lpc_bridge_realize;
