@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cZm0p-0002bJ-6e
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:07:24 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cZm50-00066h-Mh
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:11:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cZm0o-0008TF-CV
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:07:23 -0500
-References: <20170203120254.15062-1-berrange@redhat.com>
-	<20170203120254.15062-5-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a022512c-83c6-2059-bee9-dd7dc368d6f6@redhat.com>
-Date: Fri, 3 Feb 2017 23:07:13 +0100
+	(envelope-from <no-reply@patchew.org>) id 1cZm4z-0002UG-Eh
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:11:42 -0500
+Resent-Message-Id: <E1cZm4z-0002UG-Eh@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1486159277-25949-1-git-send-email-joserz@linux.vnet.ibm.com>
+Message-ID: <148615989046.33.5463181790096988546@eba24e3a0d7f>
 MIME-Version: 1.0
-In-Reply-To: <20170203120254.15062-5-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oHkVdcGj0PIPwgxdjWRn8a0AfrhdD9b5I"
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] qemu-img: add support for -o arg to
- dd command
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 3 Feb 2017 14:11:31 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] POWER9 TCG enablements - part 13
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
+To: joserz@linux.vnet.ibm.com
+Cc: famz@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, nikunj@linux.vnet.ibm.com, david@gibson.dropbear.id.au
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oHkVdcGj0PIPwgxdjWRn8a0AfrhdD9b5I
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
-Message-ID: <a022512c-83c6-2059-bee9-dd7dc368d6f6@redhat.com>
-Subject: Re: [PATCH v2 4/6] qemu-img: add support for -o arg to dd command
-References: <20170203120254.15062-1-berrange@redhat.com>
- <20170203120254.15062-5-berrange@redhat.com>
-In-Reply-To: <20170203120254.15062-5-berrange@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
-
-On 03.02.2017 13:02, Daniel P. Berrange wrote:
-> The -o arg to the convert command allows specification of format/protoc=
-ol
-> options for the newly created image. This adds a -o arg to the dd comma=
-nd
-> to get feature parity.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-img-cmds.hx |  2 +-
->  qemu-img.c       | 32 +++++++++++++++++++++++++++++++-
->  qemu-img.texi    |  6 ++++--
->  3 files changed, 36 insertions(+), 4 deletions(-)
-
-I don't like this patch for the same reasons as for patch 3, but I like
-it a bit better. The code introduced here is exactly the same as for
-img_convert(), so merging the two would (or "is going to", I hope) be
-trivial.
-
-So a pretty weak
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---oHkVdcGj0PIPwgxdjWRn8a0AfrhdD9b5I
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliU/xESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AwE4IAKG8s909l/KRtAyUaFdjAiimHFRftJl8
-+o1dPsVWpyY5TKVNiEF930q93TWJSwZvPfNgHA09K3jW56ogoGpU+HdRfhWXRfsU
-BkHyhMWLt3Pr789CkBolQK4iamqTdMy0ehkmaezl3o8rxnXwx2RkYmPAB0X2lojf
-P2YcD3g4QJImkf5urvT79nu+PH95DYJ6j24JuG07Bm1qYmWyi1Zyah+dsC1MLWna
-cJztfxjztaZvvC6QN9nZYFKtqLvDrYd23Gv9faC73A2ndCUotF2vqQ9YIgTn1G85
-FqEnN/oa0ad2HQcNxKcsdZirgQLpx3WJ6bafCT4yaN3ml+kCy3I1Qz0=
-=ObQh
------END PGP SIGNATURE-----
-
---oHkVdcGj0PIPwgxdjWRn8a0AfrhdD9b5I--
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSBQT1dFUjkgVENHIGVuYWJsZW1lbnRzIC0g
+cGFydCAxMwpNZXNzYWdlLWlkOiAxNDg2MTU5Mjc3LTI1OTQ5LTEtZ2l0LXNlbmQtZW1haWwtam9z
+ZXJ6QGxpbnV4LnZuZXQuaWJtLmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NjE1OTI3Ny0y
+NTk0OS0xLWdpdC1zZW5kLWVtYWlsLWpvc2VyekBsaW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hl
+dy8xNDg2MTU5Mjc3LTI1OTQ5LTEtZ2l0LXNlbmQtZW1haWwtam9zZXJ6QGxpbnV4LnZuZXQuaWJt
+LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwMjAzMTIwMjU0LjE1MDYyLTEt
+YmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwMjAzMTIwMjU0LjE1MDYyLTEtYmVy
+cmFuZ2VAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjUyZjYxOGEg
+cHBjOiBpbXBsZW1lbnQgeHNzdWJxcCBpbnN0cnVjdGlvbgpmN2RmZGJmIHBwYzogaW1wbGVtZW50
+IHhzc3FydHFwIGluc3RydWN0aW9uCjRkODk1YTQgcHBjOiBpbXBsZW1lbnQgeHNycXB4cCBpbnN0
+cnVjdGlvbgo1ZDQ5YzA3IHBwYzogaW1wbGVtZW50IHhzcnFwaVt4XSBpbnN0cnVjdGlvbgoKPT09
+IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBwcGM6IGltcGxlbWVudCB4c3Jx
+cGlbeF0gaW5zdHJ1Y3Rpb24uLi4KRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNo
+b3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTI1OiBGSUxFOiB0YXJnZXQvcHBjL3Ry
+YW5zbGF0ZS92c3gtb3BzLmluYy5jOjEwNjoKKyNkZWZpbmUgR0VOX1ZTWF9aMjNGT1JNXzMwMChu
+YW1lLCBvcGMyLCBvcGMzLCBvcGM0LCBpbnZhbCkgXAorR0VOX1ZTWF9YRk9STV8zMDBfRU8obmFt
+ZSwgb3BjMiwgb3BjMyB8IDB4MDAsIG9wYzQgfCAweDAsIGludmFsKSwgXAorR0VOX1ZTWF9YRk9S
+TV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MDgsIG9wYzQgfCAweDAsIGludmFsKSwgXAor
+R0VOX1ZTWF9YRk9STV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MTAsIG9wYzQgfCAweDAs
+IGludmFsKSwgXAorR0VOX1ZTWF9YRk9STV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MTgs
+IG9wYzQgfCAweDAsIGludmFsKSwgXAorR0VOX1ZTWF9YRk9STV8zMDBfRU8obmFtZSwgb3BjMiwg
+b3BjMyB8IDB4MDAsIG9wYzQgfCAweDEsIGludmFsKSwgXAorR0VOX1ZTWF9YRk9STV8zMDBfRU8o
+bmFtZSwgb3BjMiwgb3BjMyB8IDB4MDgsIG9wYzQgfCAweDEsIGludmFsKSwgXAorR0VOX1ZTWF9Y
+Rk9STV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MTAsIG9wYzQgfCAweDEsIGludmFsKSwg
+XAorR0VOX1ZTWF9YRk9STV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MTgsIG9wYzQgfCAw
+eDEsIGludmFsKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDMgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
+Mi80OiBwcGM6IGltcGxlbWVudCB4c3JxcHhwIGluc3RydWN0aW9uLi4uCkNoZWNraW5nIFBBVENI
+IDMvNDogcHBjOiBpbXBsZW1lbnQgeHNzcXJ0cXAgaW5zdHJ1Y3Rpb24uLi4KQ2hlY2tpbmcgUEFU
+Q0ggNC80OiBwcGM6IGltcGxlbWVudCB4c3N1YnFwIGluc3RydWN0aW9uLi4uCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
