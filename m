@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cZaVX-0004BI-KT
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:50:20 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cZaXj-00065V-Pw
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:52:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cZaVT-0002YW-6o
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:50:19 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cZaXf-00041r-D9
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:52:35 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Fri,  3 Feb 2017 12:50:02 +0300
-Message-Id: <1486115402-9288-1-git-send-email-mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PATCH] vnc: do not disconnect on EAGAIN
+Date: Fri,  3 Feb 2017 12:52:29 +0300
+Message-Id: <1486115549-9398-1-git-send-email-mjt@msgid.tls.msk.ru>
+Subject: [Qemu-devel] [PATCH v2] vnc: do not disconnect on EAGAIN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -65,22 +65,24 @@ Cc: Daniel P. Berrange <berrange@redhat.com>
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 Cc: qemu-stable@nongnu.org
 ---
+v2: previous patch was tab/space-damaged, fixing this now
+
  ui/vnc.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/ui/vnc.c b/ui/vnc.c
-index cdeb79c..66fde39 100644
+index cdeb79c..f2701e5 100644
 --- a/ui/vnc.c
 +++ b/ui/vnc.c
 @@ -1256,12 +1256,13 @@ ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
      if (ret <= 0) {
          if (ret == 0) {
              VNC_DEBUG("Closing down client sock: EOF\n");
-+	    vnc_disconnect_start(vs);
++            vnc_disconnect_start(vs);
          } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
              VNC_DEBUG("Closing down client sock: ret %zd (%s)\n",
                        ret, errp ? error_get_pretty(*errp) : "Unknown");
-+	    vnc_disconnect_start(vs);
++            vnc_disconnect_start(vs);
          }
  
 -        vnc_disconnect_start(vs);
