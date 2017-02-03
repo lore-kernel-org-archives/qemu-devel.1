@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZbq6-0005wK-12
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:15:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZbsE-0007eD-OY
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZbq4-0003JO-SG
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:15:37 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:37655)
+	(envelope-from <peter.maydell@linaro.org>) id 1cZbsD-0004tl-Ug
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:17:50 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35805)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZbq4-0003Ia-IH
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:15:36 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id v77so22765600wmv.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 03:15:36 -0800 (PST)
+	id 1cZbsD-0004tE-O9
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:17:49 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id b65so23672738wmf.0
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 03:17:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170201150553.9381-21-alex.bennee@linaro.org>
+In-Reply-To: <20170201150553.9381-22-alex.bennee@linaro.org>
 References: <20170201150553.9381-1-alex.bennee@linaro.org>
-	<20170201150553.9381-21-alex.bennee@linaro.org>
+	<20170201150553.9381-22-alex.bennee@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 11:15:14 +0000
-Message-ID: <CAFEAcA82=VUZF5DHBe+bEu0GBeM-Yg50TRkSHmDsgdAJ_YdgBw@mail.gmail.com>
+Date: Fri, 3 Feb 2017 11:17:28 +0000
+Message-ID: <CAFEAcA_TviTHP-WkppW342wSHRMHX8P9wqGd1UA6bdLG6n8_oQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 20/25] target-arm/powerctl: defer cpu
- reset work to CPU context
+Subject: Re: [Qemu-devel] [PATCH v9 21/25] target-arm: don't generate
+ WFE/YIELD calls for MTTCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,26 +36,22 @@ Cc: MTTCG Devel <mttcg@listserver.greensocs.com>, QEMU Developers <qemu-devel@no
 
 On 1 February 2017 at 15:05, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
 e:
-> When switching a new vCPU on we want to complete a bunch of the setup
-> work before we start scheduling the vCPU thread. To do this cleanly we
-> defer vCPU setup to async work which will run the vCPUs execution
-> context as the thread is woken up. The scheduling of the work will kick
-> the vCPU awake.
->
-> This avoids potential races in MTTCG system emulation.
+> The WFE and YIELD instructions are really only hints and in TCG's case
+> they were useful to move the scheduling on from one vCPU to the next. In
+> the parallel context (MTTCG) this just causes an unnecessary cpu_exit
+> and contention of the BQL.
 >
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > Reviewed-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/arm/op_helper.c     |  7 +++++++
+>  target/arm/translate-a64.c |  8 ++++++--
+>  target/arm/translate.c     | 20 ++++++++++++++++----
+>  3 files changed, 29 insertions(+), 6 deletions(-)
 
-Can we now have races between arm_set_cpu_on() and
-arm_set_cpu_off() ? It's not clear to me what prevents that.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-With this change our PSCI CPU_ON is no longer effectively
-atomic, which means we need to think about the races
-between PSCI CPU_ON and CPU_OFF, and the fact that the
-core might be in what the PSCI spec section 6.6
-calls an ON_PENDING state (ie CPU_ON has been called
-for it but it hasn't actually booted yet).
+though I'm not much of a fan of yet another global variable :-(
 
 thanks
 -- PMM
