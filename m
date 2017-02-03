@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cZfeY-0000s7-9O
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:19:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZffX-0001Qt-1a
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:20:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cZfeX-0003k3-DV
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:19:58 -0500
-References: <1485875745-27741-1-git-send-email-wei@redhat.com>
-	<1485875745-27741-5-git-send-email-wei@redhat.com>
-	<CAFEAcA8-Lt4z1uiN9dcuak3-hA3d_1fL7+iL2dOm9msrrq69NA@mail.gmail.com>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <01ec995f-fdb7-8516-b209-627f8aa3478c@redhat.com>
-Date: Fri, 3 Feb 2017 09:19:50 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cZffW-00045v-7Q
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:20:59 -0500
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:37083)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZffV-00045Z-Vv
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:20:58 -0500
+Received: by mail-wm0-x22d.google.com with SMTP id v77so32826331wmv.0
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 07:20:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8-Lt4z1uiN9dcuak3-hA3d_1fL7+iL2dOm9msrrq69NA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 4/5] target-arm: Add support for PMU
- register PMINTENSET_EL1
+In-Reply-To: <20170203143753.9903-1-stefanha@redhat.com>
+References: <20170203143753.9903-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Feb 2017 15:20:36 +0000
+Message-ID: <CAFEAcA8quNqirSu1vnkGA76eHxQL3tQ4-9=hOaQFpXCrWEaskQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/1] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 3 February 2017 at 14:37, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 4100a344eb3d50d88f9da85cae334afc47aee134:
+>
+>   Merge remote-tracking branch 'remotes/sstabellini/tags/xen-20170202' into staging (2017-02-03 12:31:40 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to cdd7abfdba9287a289c404dfdcb02316f9ffee7d:
+>
+>   iothread: enable AioContext polling by default (2017-02-03 14:23:38 +0000)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
 
+Applied, thanks.
 
-On 02/03/2017 07:30 AM, Peter Maydell wrote:
-> On 31 January 2017 at 15:15, Wei Huang <wei@redhat.com> wrote:
->> This patch adds access support for PMINTENSET_EL1.
->>
->> Signed-off-by: Wei Huang <wei@redhat.com>
->> ---
->>  target/arm/cpu.h    |  2 +-
->>  target/arm/helper.c | 10 +++++++++-
->>  2 files changed, 10 insertions(+), 2 deletions(-)
->>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index ce02044..42aaea9 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -310,7 +310,7 @@ typedef struct CPUARMState {
->>          uint64_t c9_pmxevtyper; /* perf monitor event type */
->>          uint32_t c9_pmuserenr; /* perf monitor user enable */
->>          uint64_t c9_pmselr; /* perf monitor counter selection register */
->> -        uint32_t c9_pminten; /* perf monitor interrupt enables */
->> +        uint64_t c9_pminten; /* perf monitor interrupt enables */
->>          union { /* Memory attribute redirection */
->>              struct {
->>  #ifdef HOST_WORDS_BIGENDIAN
->> diff --git a/target/arm/helper.c b/target/arm/helper.c
->> index 6b8460a..b028042 100644
->> --- a/target/arm/helper.c
->> +++ b/target/arm/helper.c
->> @@ -1272,9 +1272,17 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
->>        .writefn = pmuserenr_write, .raw_writefn = raw_write },
->>      { .name = "PMINTENSET", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 1,
->>        .access = PL1_RW, .accessfn = access_tpm,
->> -      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
->> +      .type = ARM_CP_ALIAS,
->> +      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pminten),
->>        .resetvalue = 0,
->>        .writefn = pmintenset_write, .raw_writefn = raw_write },
->> +    { .name = "PMINTENSET_EL1", .state = ARM_CP_STATE_AA64,
->> +      .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 1,
->> +      .access = PL1_RW, .accessfn = access_tpm,
->> +      .type = ARM_CP_IO,
->> +      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
->> +      .writefn = pmintenset_write, .raw_writefn = raw_write,
->> +      .resetvalue = 0x0 },
->>      { .name = "PMINTENCLR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 2,
->>        .access = PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
->>        .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
-> 
-> Add PMINTENCLR_EL1 as well, please.
-
-It was already defined in target-arm/helper.c file. Could you elaborate
-which part is missing?
-
-    { .name = "PMINTENCLR_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 2,
-      .access = PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
-      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
-      .writefn = pmintenclr_write },
-
-
-
-
-> 
-> thanks
-> -- PMM
-> 
+-- PMM
