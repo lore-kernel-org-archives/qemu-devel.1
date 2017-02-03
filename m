@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cZhyv-0006KB-Lm
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:49:11 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cZi2A-0000Bw-Sa
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:52:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cZhys-0003kL-VC
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:49:09 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  3 Feb 2017 17:48:55 +0000
-Message-Id: <1486144135-4894-3-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1486144135-4894-1-git-send-email-peter.maydell@linaro.org>
-References: <1486144135-4894-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 2/2] target/arm: A32,
- T32: Create Instruction Syndromes for Data Aborts
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cZi27-0004mp-PP
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:52:30 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53139
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cZi27-0004mg-IU
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:52:27 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v13HhkE5044692
+	for <qemu-devel@nongnu.org>; Fri, 3 Feb 2017 12:52:26 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28cthjjhdv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 12:52:26 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 3 Feb 2017 17:52:24 -0000
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri,  3 Feb 2017 18:52:17 +0100
+Message-Id: <20170203175217.45562-1-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] migration: consolidate VMStateField.start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,435 +36,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Add support for generating the ISS (Instruction Specific Syndrome)
-for Data Abort exceptions taken from AArch32. These syndromes are
-used by hypervisors for example to trap and emulate memory accesses.
+The member VMStateField.start is used for two things, partial data
+migration for VBUFFER data (basically provide migration for a
+sub-buffer) and for locating next in QTAILQ.
 
-This is the equivalent for AArch32 guests of the work done for AArch64
-guests in commit aaa1f954d4cab243.
+The implementation of the VBUFFER feature is broken when VMSTATE_ALLOC
+is used. This however goes unnoticed because actually partial migration
+for VBUFFER is not used at all.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Let's consolidate the usage of VMStateField.start by removing support
+for partial migration for VBUFFER.
+
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+
 ---
- target/arm/translate.c | 198 +++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 149 insertions(+), 49 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 175b4c1..fc0ddcd 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -102,6 +102,63 @@ void arm_translate_init(void)
-     a64_translate_init();
+I had a very similar patch named "migration: drop unused
+VMStateField.start" on the list. What changed since then is that we need
+to keep VMStateField.start now becasue of the new usage introduced in
+the meanwhile. I dropped al r-b's the patch had.
+---
+ hw/char/exynos4210_uart.c   |  2 +-
+ hw/display/g364fb.c         |  2 +-
+ hw/dma/pl330.c              |  8 ++++----
+ hw/intc/exynos4210_gic.c    |  2 +-
+ hw/ipmi/isa_ipmi_bt.c       |  6 ++----
+ hw/net/vmxnet3.c            |  2 +-
+ hw/nvram/mac_nvram.c        |  2 +-
+ hw/nvram/spapr_nvram.c      |  2 +-
+ hw/sd/sdhci.c               |  2 +-
+ hw/timer/m48t59.c           |  2 +-
+ include/migration/vmstate.h | 21 ++++++++-------------
+ migration/savevm.c          |  2 +-
+ migration/vmstate.c         |  4 ++--
+ target/s390x/machine.c      |  2 +-
+ util/fifo8.c                |  2 +-
+ 15 files changed, 27 insertions(+), 34 deletions(-)
+
+diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
+index 7c16e89..b75f28d 100644
+--- a/hw/char/exynos4210_uart.c
++++ b/hw/char/exynos4210_uart.c
+@@ -561,7 +561,7 @@ static const VMStateDescription vmstate_exynos4210_uart_fifo = {
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(sp, Exynos4210UartFIFO),
+         VMSTATE_UINT32(rp, Exynos4210UartFIFO),
+-        VMSTATE_VBUFFER_UINT32(data, Exynos4210UartFIFO, 1, NULL, 0, size),
++        VMSTATE_VBUFFER_UINT32(data, Exynos4210UartFIFO, 1, NULL, size),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
+index 70ef2c7..8cdc205 100644
+--- a/hw/display/g364fb.c
++++ b/hw/display/g364fb.c
+@@ -464,7 +464,7 @@ static const VMStateDescription vmstate_g364fb = {
+     .minimum_version_id = 1,
+     .post_load = g364fb_post_load,
+     .fields = (VMStateField[]) {
+-        VMSTATE_VBUFFER_UINT32(vram, G364State, 1, NULL, 0, vram_size),
++        VMSTATE_VBUFFER_UINT32(vram, G364State, 1, NULL, vram_size),
+         VMSTATE_BUFFER_UNSAFE(color_palette, G364State, 0, 256 * 3),
+         VMSTATE_BUFFER_UNSAFE(cursor_palette, G364State, 0, 9),
+         VMSTATE_UINT16_ARRAY(cursor, G364State, 512),
+diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
+index c0bd9fe..32cf839 100644
+--- a/hw/dma/pl330.c
++++ b/hw/dma/pl330.c
+@@ -173,8 +173,8 @@ static const VMStateDescription vmstate_pl330_fifo = {
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+-        VMSTATE_VBUFFER_UINT32(buf, PL330Fifo, 1, NULL, 0, buf_size),
+-        VMSTATE_VBUFFER_UINT32(tag, PL330Fifo, 1, NULL, 0, buf_size),
++        VMSTATE_VBUFFER_UINT32(buf, PL330Fifo, 1, NULL, buf_size),
++        VMSTATE_VBUFFER_UINT32(tag, PL330Fifo, 1, NULL, buf_size),
+         VMSTATE_UINT32(head, PL330Fifo),
+         VMSTATE_UINT32(num, PL330Fifo),
+         VMSTATE_UINT32(buf_size, PL330Fifo),
+@@ -282,8 +282,8 @@ static const VMStateDescription vmstate_pl330 = {
+         VMSTATE_STRUCT(manager, PL330State, 0, vmstate_pl330_chan, PL330Chan),
+         VMSTATE_STRUCT_VARRAY_UINT32(chan, PL330State, num_chnls, 0,
+                                      vmstate_pl330_chan, PL330Chan),
+-        VMSTATE_VBUFFER_UINT32(lo_seqn, PL330State, 1, NULL, 0, num_chnls),
+-        VMSTATE_VBUFFER_UINT32(hi_seqn, PL330State, 1, NULL, 0, num_chnls),
++        VMSTATE_VBUFFER_UINT32(lo_seqn, PL330State, 1, NULL, num_chnls),
++        VMSTATE_VBUFFER_UINT32(hi_seqn, PL330State, 1, NULL, num_chnls),
+         VMSTATE_STRUCT(fifo, PL330State, 0, vmstate_pl330_fifo, PL330Fifo),
+         VMSTATE_STRUCT(read_queue, PL330State, 0, vmstate_pl330_queue,
+                        PL330Queue),
+diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
+index fd7a8f3..2a55817 100644
+--- a/hw/intc/exynos4210_gic.c
++++ b/hw/intc/exynos4210_gic.c
+@@ -393,7 +393,7 @@ static const VMStateDescription vmstate_exynos4210_irq_gate = {
+     .version_id = 2,
+     .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
+-        VMSTATE_VBUFFER_UINT32(level, Exynos4210IRQGateState, 1, NULL, 0, n_in),
++        VMSTATE_VBUFFER_UINT32(level, Exynos4210IRQGateState, 1, NULL, n_in),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
+index f036617..1c69cb3 100644
+--- a/hw/ipmi/isa_ipmi_bt.c
++++ b/hw/ipmi/isa_ipmi_bt.c
+@@ -471,10 +471,8 @@ static const VMStateDescription vmstate_ISAIPMIBTDevice = {
+         VMSTATE_BOOL(bt.use_irq, ISAIPMIBTDevice),
+         VMSTATE_BOOL(bt.irqs_enabled, ISAIPMIBTDevice),
+         VMSTATE_UINT32(bt.outpos, ISAIPMIBTDevice),
+-        VMSTATE_VBUFFER_UINT32(bt.outmsg, ISAIPMIBTDevice, 1, NULL, 0,
+-                               bt.outlen),
+-        VMSTATE_VBUFFER_UINT32(bt.inmsg, ISAIPMIBTDevice, 1, NULL, 0,
+-                               bt.inlen),
++        VMSTATE_VBUFFER_UINT32(bt.outmsg, ISAIPMIBTDevice, 1, NULL, bt.outlen),
++        VMSTATE_VBUFFER_UINT32(bt.inmsg, ISAIPMIBTDevice, 1, NULL, bt.inlen),
+         VMSTATE_UINT8(bt.control_reg, ISAIPMIBTDevice),
+         VMSTATE_UINT8(bt.mask_reg, ISAIPMIBTDevice),
+         VMSTATE_UINT8(bt.waiting_rsp, ISAIPMIBTDevice),
+diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+index 7dd4565..e13a798 100644
+--- a/hw/net/vmxnet3.c
++++ b/hw/net/vmxnet3.c
+@@ -2397,7 +2397,7 @@ static const VMStateDescription vmxstate_vmxnet3_mcast_list = {
+     .pre_load = vmxnet3_mcast_list_pre_load,
+     .needed = vmxnet3_mc_list_needed,
+     .fields = (VMStateField[]) {
+-        VMSTATE_VBUFFER_UINT32(mcast_list, VMXNET3State, 0, NULL, 0,
++        VMSTATE_VBUFFER_UINT32(mcast_list, VMXNET3State, 0, NULL,
+             mcast_list_buff_size),
+         VMSTATE_END_OF_LIST()
+     }
+diff --git a/hw/nvram/mac_nvram.c b/hw/nvram/mac_nvram.c
+index 63f9ed1..aef80e6 100644
+--- a/hw/nvram/mac_nvram.c
++++ b/hw/nvram/mac_nvram.c
+@@ -82,7 +82,7 @@ static const VMStateDescription vmstate_macio_nvram = {
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+-        VMSTATE_VBUFFER_UINT32(data, MacIONVRAMState, 0, NULL, 0, size),
++        VMSTATE_VBUFFER_UINT32(data, MacIONVRAMState, 0, NULL, size),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
+index eb42ea3..65ba188 100644
+--- a/hw/nvram/spapr_nvram.c
++++ b/hw/nvram/spapr_nvram.c
+@@ -224,7 +224,7 @@ static const VMStateDescription vmstate_spapr_nvram = {
+     .post_load = spapr_nvram_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(size, sPAPRNVRAM),
+-        VMSTATE_VBUFFER_ALLOC_UINT32(buf, sPAPRNVRAM, 1, NULL, 0, size),
++        VMSTATE_VBUFFER_ALLOC_UINT32(buf, sPAPRNVRAM, 1, NULL, size),
+         VMSTATE_END_OF_LIST()
+     },
+ };
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 01fbf22..c0d7de7 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1253,7 +1253,7 @@ const VMStateDescription sdhci_vmstate = {
+         VMSTATE_UINT16(data_count, SDHCIState),
+         VMSTATE_UINT64(admasysaddr, SDHCIState),
+         VMSTATE_UINT8(stopped_state, SDHCIState),
+-        VMSTATE_VBUFFER_UINT32(fifo_buffer, SDHCIState, 1, NULL, 0, buf_maxsz),
++        VMSTATE_VBUFFER_UINT32(fifo_buffer, SDHCIState, 1, NULL, buf_maxsz),
+         VMSTATE_TIMER_PTR(insert_timer, SDHCIState),
+         VMSTATE_TIMER_PTR(transfer_timer, SDHCIState),
+         VMSTATE_END_OF_LIST()
+diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
+index e46ca88..40a9e18 100644
+--- a/hw/timer/m48t59.c
++++ b/hw/timer/m48t59.c
+@@ -634,7 +634,7 @@ static const VMStateDescription vmstate_m48t59 = {
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT8(lock, M48t59State),
+         VMSTATE_UINT16(addr, M48t59State),
+-        VMSTATE_VBUFFER_UINT32(buffer, M48t59State, 0, NULL, 0, size),
++        VMSTATE_VBUFFER_UINT32(buffer, M48t59State, 0, NULL, size),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 3bbe3ed..17ecad1 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -587,7 +587,8 @@ extern const VMStateInfo vmstate_info_qtailq;
+     .offset       = vmstate_offset_buffer(_state, _field) + _start,  \
  }
  
-+static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
-+{
-+    /* We don't need to save all of the syndrome so we mask and shift
-+     * out uneeded bits to help the sleb128 encoder do a better job.
-+     */
-+    syn &= ARM_INSN_START_WORD2_MASK;
-+    syn >>= ARM_INSN_START_WORD2_SHIFT;
-+
-+    /* We check and clear insn_start_idx to catch multiple updates.  */
-+    assert(s->insn_start_idx != 0);
-+    tcg_set_insn_param(s->insn_start_idx, 2, syn);
-+    s->insn_start_idx = 0;
-+}
-+
-+/* Flags for the disas_set_da_iss info argument:
-+ * lower bits hold the Rt register number, higher bits are flags.
-+ */
-+typedef enum ISSInfo {
-+    ISSNone = 0,
-+    ISSRegMask = 0x1f,
-+    ISSInvalid = (1 << 5),
-+    ISSIsAcqRel = (1 << 6),
-+    ISSIsWrite = (1 << 7),
-+    ISSIs16Bit = (1 << 8),
-+} ISSInfo;
-+
-+/* Save the syndrome information for a Data Abort */
-+static void disas_set_da_iss(DisasContext *s, TCGMemOp memop, ISSInfo issinfo)
-+{
-+    uint32_t syn;
-+    int sas = memop & MO_SIZE;
-+    bool sse = memop & MO_SIGN;
-+    bool is_acqrel = issinfo & ISSIsAcqRel;
-+    bool is_write = issinfo & ISSIsWrite;
-+    bool is_16bit = issinfo & ISSIs16Bit;
-+    int srt = issinfo & ISSRegMask;
-+
-+    if (issinfo & ISSInvalid) {
-+        /* Some callsites want to conditionally provide ISS info,
-+         * eg "only if this was not a writeback"
-+         */
-+        return;
-+    }
-+
-+    if (srt == 15) {
-+        /* For AArch32, insns where the src/dest is R15 never generate
-+         * ISS information. Catching that here saves checking at all
-+         * the call sites.
-+         */
-+        return;
-+    }
-+
-+    syn = syn_data_abort_with_iss(0, sas, sse, srt, 0, is_acqrel,
-+                                  0, 0, 0, is_write, 0, is_16bit);
-+    disas_set_insn_syndrome(s, syn);
-+}
-+
- static inline ARMMMUIdx get_a32_user_mem_index(DisasContext *s)
- {
-     /* Return the mmu_idx to use for A32/T32 "unprivileged load/store"
-@@ -933,6 +990,14 @@ static inline void gen_aa32_ld##SUFF(DisasContext *s, TCGv_i32 val,      \
-                                      TCGv_i32 a32, int index)            \
- {                                                                        \
-     gen_aa32_ld_i32(s, val, a32, index, OPC | s->be_data);               \
-+}                                                                        \
-+static inline void gen_aa32_ld##SUFF##_iss(DisasContext *s,              \
-+                                           TCGv_i32 val,                 \
-+                                           TCGv_i32 a32, int index,      \
-+                                           ISSInfo issinfo)              \
-+{                                                                        \
-+    gen_aa32_ld_i32(s, val, a32, index, OPC | s->be_data);               \
-+    disas_set_da_iss(s, OPC, issinfo);                                   \
+-#define VMSTATE_VBUFFER_MULTIPLY(_field, _state, _version, _test, _start, _field_size, _multiply) { \
++#define VMSTATE_VBUFFER_MULTIPLY(_field, _state, _version, _test,    \
++                                 _field_size, _multiply) {           \
+     .name         = (stringify(_field)),                             \
+     .version_id   = (_version),                                      \
+     .field_exists = (_test),                                         \
+@@ -596,10 +597,9 @@ extern const VMStateInfo vmstate_info_qtailq;
+     .info         = &vmstate_info_buffer,                            \
+     .flags        = VMS_VBUFFER|VMS_POINTER|VMS_MULTIPLY,            \
+     .offset       = offsetof(_state, _field),                        \
+-    .start        = (_start),                                        \
  }
  
- #define DO_GEN_ST(SUFF, OPC)                                             \
-@@ -940,6 +1005,14 @@ static inline void gen_aa32_st##SUFF(DisasContext *s, TCGv_i32 val,      \
-                                      TCGv_i32 a32, int index)            \
- {                                                                        \
-     gen_aa32_st_i32(s, val, a32, index, OPC | s->be_data);               \
-+}                                                                        \
-+static inline void gen_aa32_st##SUFF##_iss(DisasContext *s,              \
-+                                           TCGv_i32 val,                 \
-+                                           TCGv_i32 a32, int index,      \
-+                                           ISSInfo issinfo)              \
-+{                                                                        \
-+    gen_aa32_st_i32(s, val, a32, index, OPC | s->be_data);               \
-+    disas_set_da_iss(s, OPC, issinfo | ISSIsWrite);                      \
+-#define VMSTATE_VBUFFER(_field, _state, _version, _test, _start, _field_size) { \
++#define VMSTATE_VBUFFER(_field, _state, _version, _test, _field_size) { \
+     .name         = (stringify(_field)),                             \
+     .version_id   = (_version),                                      \
+     .field_exists = (_test),                                         \
+@@ -607,10 +607,9 @@ extern const VMStateInfo vmstate_info_qtailq;
+     .info         = &vmstate_info_buffer,                            \
+     .flags        = VMS_VBUFFER|VMS_POINTER,                         \
+     .offset       = offsetof(_state, _field),                        \
+-    .start        = (_start),                                        \
  }
  
- static inline void gen_aa32_frob64(DisasContext *s, TCGv_i64 val)
-@@ -8682,16 +8755,19 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                                 tmp = tcg_temp_new_i32();
-                                 switch (op1) {
-                                 case 0: /* lda */
--                                    gen_aa32_ld32u(s, tmp, addr,
--                                                   get_mem_index(s));
-+                                    gen_aa32_ld32u_iss(s, tmp, addr,
-+                                                       get_mem_index(s),
-+                                                       rd | ISSIsAcqRel);
-                                     break;
-                                 case 2: /* ldab */
--                                    gen_aa32_ld8u(s, tmp, addr,
--                                                  get_mem_index(s));
-+                                    gen_aa32_ld8u_iss(s, tmp, addr,
-+                                                      get_mem_index(s),
-+                                                      rd | ISSIsAcqRel);
-                                     break;
-                                 case 3: /* ldah */
--                                    gen_aa32_ld16u(s, tmp, addr,
--                                                   get_mem_index(s));
-+                                    gen_aa32_ld16u_iss(s, tmp, addr,
-+                                                       get_mem_index(s),
-+                                                       rd | ISSIsAcqRel);
-                                     break;
-                                 default:
-                                     abort();
-@@ -8702,16 +8778,19 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                                 tmp = load_reg(s, rm);
-                                 switch (op1) {
-                                 case 0: /* stl */
--                                    gen_aa32_st32(s, tmp, addr,
--                                                  get_mem_index(s));
-+                                    gen_aa32_st32_iss(s, tmp, addr,
-+                                                      get_mem_index(s),
-+                                                      rm | ISSIsAcqRel);
-                                     break;
-                                 case 2: /* stlb */
--                                    gen_aa32_st8(s, tmp, addr,
--                                                 get_mem_index(s));
-+                                    gen_aa32_st8_iss(s, tmp, addr,
-+                                                     get_mem_index(s),
-+                                                     rm | ISSIsAcqRel);
-                                     break;
-                                 case 3: /* stlh */
--                                    gen_aa32_st16(s, tmp, addr,
--                                                  get_mem_index(s));
-+                                    gen_aa32_st16_iss(s, tmp, addr,
-+                                                      get_mem_index(s),
-+                                                      rm | ISSIsAcqRel);
-                                     break;
-                                 default:
-                                     abort();
-@@ -8785,10 +8864,15 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                 bool wbit = insn & (1 << 21);
-                 bool pbit = insn & (1 << 24);
-                 bool doubleword = false;
-+                ISSInfo issinfo;
-+
-                 /* Misc load/store */
-                 rn = (insn >> 16) & 0xf;
-                 rd = (insn >> 12) & 0xf;
+-#define VMSTATE_VBUFFER_UINT32(_field, _state, _version, _test, _start, _field_size) { \
++#define VMSTATE_VBUFFER_UINT32(_field, _state, _version, _test, _field_size) { \
+     .name         = (stringify(_field)),                             \
+     .version_id   = (_version),                                      \
+     .field_exists = (_test),                                         \
+@@ -618,10 +617,10 @@ extern const VMStateInfo vmstate_info_qtailq;
+     .info         = &vmstate_info_buffer,                            \
+     .flags        = VMS_VBUFFER|VMS_POINTER,                         \
+     .offset       = offsetof(_state, _field),                        \
+-    .start        = (_start),                                        \
+ }
  
-+                /* ISS not valid if writeback */
-+                issinfo = (pbit & !wbit) ? rd : ISSInvalid;
-+
-                 if (!load && (sh & 2)) {
-                     /* doubleword */
-                     ARCH(5TE);
-@@ -8832,20 +8916,23 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                     tmp = tcg_temp_new_i32();
-                     switch (sh) {
-                     case 1:
--                        gen_aa32_ld16u(s, tmp, addr, get_mem_index(s));
-+                        gen_aa32_ld16u_iss(s, tmp, addr, get_mem_index(s),
-+                                           issinfo);
-                         break;
-                     case 2:
--                        gen_aa32_ld8s(s, tmp, addr, get_mem_index(s));
-+                        gen_aa32_ld8s_iss(s, tmp, addr, get_mem_index(s),
-+                                          issinfo);
-                         break;
-                     default:
-                     case 3:
--                        gen_aa32_ld16s(s, tmp, addr, get_mem_index(s));
-+                        gen_aa32_ld16s_iss(s, tmp, addr, get_mem_index(s),
-+                                           issinfo);
-                         break;
-                     }
-                 } else {
-                     /* store */
-                     tmp = load_reg(s, rd);
--                    gen_aa32_st16(s, tmp, addr, get_mem_index(s));
-+                    gen_aa32_st16_iss(s, tmp, addr, get_mem_index(s), issinfo);
-                     tcg_temp_free_i32(tmp);
-                 }
-                 /* Perform base writeback before the loaded value to
-@@ -9198,17 +9285,17 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                 /* load */
-                 tmp = tcg_temp_new_i32();
-                 if (insn & (1 << 22)) {
--                    gen_aa32_ld8u(s, tmp, tmp2, i);
-+                    gen_aa32_ld8u_iss(s, tmp, tmp2, i, rd);
-                 } else {
--                    gen_aa32_ld32u(s, tmp, tmp2, i);
-+                    gen_aa32_ld32u_iss(s, tmp, tmp2, i, rd);
-                 }
-             } else {
-                 /* store */
-                 tmp = load_reg(s, rd);
-                 if (insn & (1 << 22)) {
--                    gen_aa32_st8(s, tmp, tmp2, i);
-+                    gen_aa32_st8_iss(s, tmp, tmp2, i, rd);
-                 } else {
--                    gen_aa32_st32(s, tmp, tmp2, i);
-+                    gen_aa32_st32_iss(s, tmp, tmp2, i, rd);
-                 }
-                 tcg_temp_free_i32(tmp);
-             }
-@@ -9669,13 +9756,16 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
-                         tmp = tcg_temp_new_i32();
-                         switch (op) {
-                         case 0: /* ldab */
--                            gen_aa32_ld8u(s, tmp, addr, get_mem_index(s));
-+                            gen_aa32_ld8u_iss(s, tmp, addr, get_mem_index(s),
-+                                              rs | ISSIsAcqRel);
-                             break;
-                         case 1: /* ldah */
--                            gen_aa32_ld16u(s, tmp, addr, get_mem_index(s));
-+                            gen_aa32_ld16u_iss(s, tmp, addr, get_mem_index(s),
-+                                               rs | ISSIsAcqRel);
-                             break;
-                         case 2: /* lda */
--                            gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
-+                            gen_aa32_ld32u_iss(s, tmp, addr, get_mem_index(s),
-+                                               rs | ISSIsAcqRel);
-                             break;
-                         default:
-                             abort();
-@@ -9685,13 +9775,16 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
-                         tmp = load_reg(s, rs);
-                         switch (op) {
-                         case 0: /* stlb */
--                            gen_aa32_st8(s, tmp, addr, get_mem_index(s));
-+                            gen_aa32_st8_iss(s, tmp, addr, get_mem_index(s),
-+                                             rs | ISSIsAcqRel);
-                             break;
-                         case 1: /* stlh */
--                            gen_aa32_st16(s, tmp, addr, get_mem_index(s));
-+                            gen_aa32_st16_iss(s, tmp, addr, get_mem_index(s),
-+                                              rs | ISSIsAcqRel);
-                             break;
-                         case 2: /* stl */
--                            gen_aa32_st32(s, tmp, addr, get_mem_index(s));
-+                            gen_aa32_st32_iss(s, tmp, addr, get_mem_index(s),
-+                                              rs | ISSIsAcqRel);
-                             break;
-                         default:
-                             abort();
-@@ -10637,6 +10730,8 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
-         int postinc = 0;
-         int writeback = 0;
-         int memidx;
-+        ISSInfo issinfo;
-+
-         if ((insn & 0x01100000) == 0x01000000) {
-             if (disas_neon_ls_insn(s, insn)) {
-                 goto illegal_op;
-@@ -10740,24 +10835,27 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
+-#define VMSTATE_VBUFFER_ALLOC_UINT32(_field, _state, _version, _test, _start, _field_size) { \
++#define VMSTATE_VBUFFER_ALLOC_UINT32(_field, _state, _version,       \
++                                     _test, _field_size) {           \
+     .name         = (stringify(_field)),                             \
+     .version_id   = (_version),                                      \
+     .field_exists = (_test),                                         \
+@@ -629,7 +628,6 @@ extern const VMStateInfo vmstate_info_qtailq;
+     .info         = &vmstate_info_buffer,                            \
+     .flags        = VMS_VBUFFER|VMS_POINTER|VMS_ALLOC,               \
+     .offset       = offsetof(_state, _field),                        \
+-    .start        = (_start),                                        \
+ }
+ 
+ #define VMSTATE_BUFFER_UNSAFE_INFO_TEST(_field, _state, _test, _version, _info, _size) { \
+@@ -948,13 +946,10 @@ extern const VMStateInfo vmstate_info_qtailq;
+     VMSTATE_BUFFER_START_MIDDLE_V(_f, _s, _start, 0)
+ 
+ #define VMSTATE_PARTIAL_VBUFFER(_f, _s, _size)                        \
+-    VMSTATE_VBUFFER(_f, _s, 0, NULL, 0, _size)
++    VMSTATE_VBUFFER(_f, _s, 0, NULL, _size)
+ 
+ #define VMSTATE_PARTIAL_VBUFFER_UINT32(_f, _s, _size)                        \
+-    VMSTATE_VBUFFER_UINT32(_f, _s, 0, NULL, 0, _size)
+-
+-#define VMSTATE_SUB_VBUFFER(_f, _s, _start, _size)                    \
+-    VMSTATE_VBUFFER(_f, _s, 0, NULL, _start, _size)
++    VMSTATE_VBUFFER_UINT32(_f, _s, 0, NULL, _size)
+ 
+ #define VMSTATE_BUFFER_TEST(_f, _s, _test)                            \
+     VMSTATE_STATIC_BUFFER(_f, _s, 0, _test, 0, sizeof(typeof_field(_s, _f)))
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 204012e..6c580a2 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -356,7 +356,7 @@ static const VMStateDescription vmstate_configuration = {
+     .pre_save = configuration_pre_save,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(len, SaveState),
+-        VMSTATE_VBUFFER_ALLOC_UINT32(name, SaveState, 0, NULL, 0, len),
++        VMSTATE_VBUFFER_ALLOC_UINT32(name, SaveState, 0, NULL, len),
+         VMSTATE_END_OF_LIST()
+     },
+     .subsections = (const VMStateDescription*[]) {
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index 2b2b3a5..520341a 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -68,10 +68,10 @@ static void *vmstate_base_addr(void *opaque, VMStateField *field, bool alloc)
                  }
              }
+             if (size) {
+-                *((void **)base_addr + field->start) = g_malloc(size);
++                *(void **)base_addr = g_malloc(size);
+             }
          }
-+
-+        issinfo = writeback ? ISSInvalid : rs;
-+
-         if (insn & (1 << 20)) {
-             /* Load.  */
-             tmp = tcg_temp_new_i32();
-             switch (op) {
-             case 0:
--                gen_aa32_ld8u(s, tmp, addr, memidx);
-+                gen_aa32_ld8u_iss(s, tmp, addr, memidx, issinfo);
-                 break;
-             case 4:
--                gen_aa32_ld8s(s, tmp, addr, memidx);
-+                gen_aa32_ld8s_iss(s, tmp, addr, memidx, issinfo);
-                 break;
-             case 1:
--                gen_aa32_ld16u(s, tmp, addr, memidx);
-+                gen_aa32_ld16u_iss(s, tmp, addr, memidx, issinfo);
-                 break;
-             case 5:
--                gen_aa32_ld16s(s, tmp, addr, memidx);
-+                gen_aa32_ld16s_iss(s, tmp, addr, memidx, issinfo);
-                 break;
-             case 2:
--                gen_aa32_ld32u(s, tmp, addr, memidx);
-+                gen_aa32_ld32u_iss(s, tmp, addr, memidx, issinfo);
-                 break;
-             default:
-                 tcg_temp_free_i32(tmp);
-@@ -10774,13 +10872,13 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
-             tmp = load_reg(s, rs);
-             switch (op) {
-             case 0:
--                gen_aa32_st8(s, tmp, addr, memidx);
-+                gen_aa32_st8_iss(s, tmp, addr, memidx, issinfo);
-                 break;
-             case 1:
--                gen_aa32_st16(s, tmp, addr, memidx);
-+                gen_aa32_st16_iss(s, tmp, addr, memidx, issinfo);
-                 break;
-             case 2:
--                gen_aa32_st32(s, tmp, addr, memidx);
-+                gen_aa32_st32_iss(s, tmp, addr, memidx, issinfo);
-                 break;
-             default:
-                 tcg_temp_free_i32(tmp);
-@@ -10917,7 +11015,8 @@ static void disas_thumb_insn(CPUARMState *env, DisasContext *s)
-             addr = tcg_temp_new_i32();
-             tcg_gen_movi_i32(addr, val);
-             tmp = tcg_temp_new_i32();
--            gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_ld32u_iss(s, tmp, addr, get_mem_index(s),
-+                               rd | ISSIs16Bit);
-             tcg_temp_free_i32(addr);
-             store_reg(s, rd, tmp);
-             break;
-@@ -11120,28 +11219,28 @@ static void disas_thumb_insn(CPUARMState *env, DisasContext *s)
+-        base_addr = *(void **)base_addr + field->start;
++        base_addr = *(void **)base_addr;
+     }
  
-         switch (op) {
-         case 0: /* str */
--            gen_aa32_st32(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_st32_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             break;
-         case 1: /* strh */
--            gen_aa32_st16(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_st16_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             break;
-         case 2: /* strb */
--            gen_aa32_st8(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_st8_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             break;
-         case 3: /* ldrsb */
--            gen_aa32_ld8s(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_ld8s_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             break;
-         case 4: /* ldr */
--            gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_ld32u_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             break;
-         case 5: /* ldrh */
--            gen_aa32_ld16u(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_ld16u_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             break;
-         case 6: /* ldrb */
--            gen_aa32_ld8u(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_ld8u_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             break;
-         case 7: /* ldrsh */
--            gen_aa32_ld16s(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_ld16s_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             break;
-         }
-         if (op >= 3) { /* load */
-@@ -11185,12 +11284,12 @@ static void disas_thumb_insn(CPUARMState *env, DisasContext *s)
-         if (insn & (1 << 11)) {
-             /* load */
-             tmp = tcg_temp_new_i32();
--            gen_aa32_ld8u(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_ld8u_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             store_reg(s, rd, tmp);
-         } else {
-             /* store */
-             tmp = load_reg(s, rd);
--            gen_aa32_st8(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_st8_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             tcg_temp_free_i32(tmp);
-         }
-         tcg_temp_free_i32(addr);
-@@ -11207,12 +11306,12 @@ static void disas_thumb_insn(CPUARMState *env, DisasContext *s)
-         if (insn & (1 << 11)) {
-             /* load */
-             tmp = tcg_temp_new_i32();
--            gen_aa32_ld16u(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_ld16u_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             store_reg(s, rd, tmp);
-         } else {
-             /* store */
-             tmp = load_reg(s, rd);
--            gen_aa32_st16(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_st16_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             tcg_temp_free_i32(tmp);
-         }
-         tcg_temp_free_i32(addr);
-@@ -11228,12 +11327,12 @@ static void disas_thumb_insn(CPUARMState *env, DisasContext *s)
-         if (insn & (1 << 11)) {
-             /* load */
-             tmp = tcg_temp_new_i32();
--            gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_ld32u_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             store_reg(s, rd, tmp);
-         } else {
-             /* store */
-             tmp = load_reg(s, rd);
--            gen_aa32_st32(s, tmp, addr, get_mem_index(s));
-+            gen_aa32_st32_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
-             tcg_temp_free_i32(tmp);
-         }
-         tcg_temp_free_i32(addr);
-@@ -11715,6 +11814,7 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-         store_cpu_field(tmp, condexec_bits);
-       }
-     do {
-+        dc->insn_start_idx = tcg_op_buf_count();
-         tcg_gen_insn_start(dc->pc,
-                            (dc->condexec_cond << 4) | (dc->condexec_mask >> 1),
-                            0);
+     return base_addr;
+diff --git a/target/s390x/machine.c b/target/s390x/machine.c
+index edc3a47..8503fa1 100644
+--- a/target/s390x/machine.c
++++ b/target/s390x/machine.c
+@@ -180,7 +180,7 @@ const VMStateDescription vmstate_s390_cpu = {
+         VMSTATE_UINT8(env.cpu_state, S390CPU),
+         VMSTATE_UINT8(env.sigp_order, S390CPU),
+         VMSTATE_UINT32_V(irqstate_saved_size, S390CPU, 4),
+-        VMSTATE_VBUFFER_UINT32(irqstate, S390CPU, 4, NULL, 0,
++        VMSTATE_VBUFFER_UINT32(irqstate, S390CPU, 4, NULL,
+                                irqstate_saved_size),
+         VMSTATE_END_OF_LIST()
+     },
+diff --git a/util/fifo8.c b/util/fifo8.c
+index 5c64101..d38b3bd 100644
+--- a/util/fifo8.c
++++ b/util/fifo8.c
+@@ -118,7 +118,7 @@ const VMStateDescription vmstate_fifo8 = {
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+-        VMSTATE_VBUFFER_UINT32(data, Fifo8, 1, NULL, 0, capacity),
++        VMSTATE_VBUFFER_UINT32(data, Fifo8, 1, NULL, capacity),
+         VMSTATE_UINT32(head, Fifo8),
+         VMSTATE_UINT32(num, Fifo8),
+         VMSTATE_END_OF_LIST()
 -- 
-2.7.4
+2.8.4
