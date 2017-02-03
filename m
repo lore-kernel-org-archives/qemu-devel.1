@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cZZRB-0004xx-Lj
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:41:46 -0500
+	(envelope-from <armbru@redhat.com>) id 1cZZri-00017E-QO
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:09:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cZZRA-0003sK-I8
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:41:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cZZRA-0003rx-Bn
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:41:44 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 678D5883A6
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 08:41:44 +0000 (UTC)
-Message-ID: <1486111301.3484.29.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Fri, 03 Feb 2017 09:41:41 +0100
-In-Reply-To: <1486073234.20628.51.camel@redhat.com>
-References: <1486046738-26059-1-git-send-email-abologna@redhat.com>
-	<1486047322.20628.42.camel@redhat.com>
-	<1486049722.3484.25.camel@redhat.com>
-	<1486073234.20628.51.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] q35: Improve sample configuration files
+	(envelope-from <armbru@redhat.com>) id 1cZZre-0007lJ-Oz
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:09:10 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1485778972-20924-1-git-send-email-thuth@redhat.com>
+Date: Fri, 03 Feb 2017 10:09:03 +0100
+In-Reply-To: <1485778972-20924-1-git-send-email-thuth@redhat.com> (Thomas
+	Huth's message of "Mon, 30 Jan 2017 13:22:52 +0100")
+Message-ID: <87lgtnd4k0.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] hw/core/or-irq: Mark the device with
+ cannot_instantiate_with_device_add_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,29 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, drjones@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On Thu, 2017-02-02 at 23:07 +0100, Gerd Hoffmann wrote:
-> > Oh, wait, I realize where the mismatch comes from now:
-> > on real hardware (my laptop) the video card is plugged
-> > into 00:02.0, but the default one you get when you don't
-> > pass -nodefault to QEMU is plugged into 00:01.0!
->=C2=A0
-> And that depends on the chipset.=C2=A0=C2=A0On q35 it is 01.0, whereas =
-on pc it is
-> 02.0 because 01.0 is occupied by the piix southbridge.
->=C2=A0
-> > I think we should use 00:02.0, do you agree? I would
-> > also use the same slot in q35-virtio-graphical.cfg.
->=C2=A0
-> Matter of taste really.=C2=A0=C2=A0I have some guests where the vga is =
-at 04.0,
-> works fine too.=C2=A0=C2=A0But being consistent across all configuratio=
-ns makes
-> sense.
+Thomas Huth <thuth@redhat.com> writes:
 
-Cool, I will stick to 00:01.0 across the board then.
+> The "or-irq" device needs to be wired up in source code, there is no
+> way the user can add this device with the "-device" parameter or the
+> "device_add" monitor command yet.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2: Changed patch description and comment
+>
+>  hw/core/or-irq.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
+> index 1ac090d..808c8d1 100644
+> --- a/hw/core/or-irq.c
+> +++ b/hw/core/or-irq.c
+> @@ -89,6 +89,9 @@ static void or_irq_class_init(ObjectClass *klass, void *data)
+>      dc->props = or_irq_properties;
+>      dc->realize = or_irq_realize;
+>      dc->vmsd = &vmstate_or_irq;
+> +
+> +    /* Reason: Needs to be wired up in source code, e.g. see stm32f205_soc.c */
 
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+This line is a bit long, and it could be shortened easily: drop "in
+source code", or replace it by "to work".  This is how similar comments
+elsewhere are phrased.
+
+> +    dc->cannot_instantiate_with_device_add_yet = true;
+>  }
+>  
+>  static const TypeInfo or_irq_type_info = {
+
+Preferably with the comment touched up:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
