@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZgO3-0007RB-7M
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:07:00 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cZgO5-0007T4-5Z
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:07:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZgO2-0007SM-0C
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:06:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58062)
+	(envelope-from <dgilbert@redhat.com>) id 1cZgO3-0007Sn-7n
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:07:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49128)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cZgO1-0007SD-Nv
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:06:57 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cZgO2-0007SQ-Vk
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:06:59 -0500
 Received: from int-mx13.intmail.prod.int.phx2.redhat.com
 	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EEC9A83F40
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 16:06:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 280B23B731
+	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 16:06:59 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  3 Feb 2017 16:06:50 +0000
-Message-Id: <20170203160651.19917-4-dgilbert@redhat.com>
+Date: Fri,  3 Feb 2017 16:06:51 +0000
+Message-Id: <20170203160651.19917-5-dgilbert@redhat.com>
 In-Reply-To: <20170203160651.19917-1-dgilbert@redhat.com>
 References: <20170203160651.19917-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] tests/migration: Add test for
- VMSTATE_WITH_TMP
+Subject: [Qemu-devel] [PATCH 4/4] virtio/migration: Migrate virtio-net to
+ VMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,163 +34,385 @@ To: qemu-devel@nongnu.org, mst@redhat.com, quintela@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add a test for VMSTATE_WITH_TMP to tests/test-vmstate.c
-
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/test-vmstate.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 92 insertions(+), 6 deletions(-)
+ hw/net/virtio-net.c            | 316 +++++++++++++++++++++++++++--------------
+ include/hw/virtio/virtio-net.h |   4 +-
+ 2 files changed, 213 insertions(+), 107 deletions(-)
 
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index 9d87faf..d0dd390 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -90,7 +90,7 @@ static void save_buffer(const uint8_t *buf, size_t buf_size)
-     qemu_fclose(fsave);
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 7b3ad4a..41723a4 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -1557,119 +1557,22 @@ static void virtio_net_set_multiqueue(VirtIONet *n, int multiqueue)
+     virtio_net_set_queues(n);
  }
  
--static void compare_vmstate(uint8_t *wire, size_t size)
-+static void compare_vmstate(const uint8_t *wire, size_t size)
+-static void virtio_net_save_device(VirtIODevice *vdev, QEMUFile *f)
++static int virtio_net_post_load_device(void *opaque, int version_id)
  {
-     QEMUFile *f = open_test_file(false);
-     uint8_t result[size];
-@@ -113,7 +113,7 @@ static void compare_vmstate(uint8_t *wire, size_t size)
- }
- 
- static int load_vmstate_one(const VMStateDescription *desc, void *obj,
--                            int version, uint8_t *wire, size_t size)
-+                            int version, const uint8_t *wire, size_t size)
- {
-     QEMUFile *f;
-     int ret;
-@@ -137,7 +137,7 @@ static int load_vmstate_one(const VMStateDescription *desc, void *obj,
- static int load_vmstate(const VMStateDescription *desc,
-                         void *obj, void *obj_clone,
-                         void (*obj_copy)(void *, void*),
--                        int version, uint8_t *wire, size_t size)
-+                        int version, const uint8_t *wire, size_t size)
- {
-     /* We test with zero size */
-     obj_copy(obj_clone, obj);
-@@ -289,7 +289,6 @@ static void test_simple_primitive(void)
-     FIELD_EQUAL(i64_1);
-     FIELD_EQUAL(i64_2);
- }
--#undef FIELD_EQUAL
- 
- typedef struct TestStruct {
-     uint32_t a, b, c, e;
-@@ -474,7 +473,6 @@ static void test_load_skip(void)
-     qemu_fclose(loading);
- }
- 
+-    VirtIONet *n = VIRTIO_NET(vdev);
+-    int i;
 -
- typedef struct {
-     int32_t i;
- } TestStructTriv;
-@@ -688,6 +686,94 @@ static void test_load_q(void)
-     qemu_fclose(fload);
+-    qemu_put_buffer(f, n->mac, ETH_ALEN);
+-    qemu_put_be32(f, n->vqs[0].tx_waiting);
+-    qemu_put_be32(f, n->mergeable_rx_bufs);
+-    qemu_put_be16(f, n->status);
+-    qemu_put_byte(f, n->promisc);
+-    qemu_put_byte(f, n->allmulti);
+-    qemu_put_be32(f, n->mac_table.in_use);
+-    qemu_put_buffer(f, n->mac_table.macs, n->mac_table.in_use * ETH_ALEN);
+-    qemu_put_buffer(f, (uint8_t *)n->vlans, MAX_VLAN >> 3);
+-    qemu_put_be32(f, n->has_vnet_hdr);
+-    qemu_put_byte(f, n->mac_table.multi_overflow);
+-    qemu_put_byte(f, n->mac_table.uni_overflow);
+-    qemu_put_byte(f, n->alluni);
+-    qemu_put_byte(f, n->nomulti);
+-    qemu_put_byte(f, n->nouni);
+-    qemu_put_byte(f, n->nobcast);
+-    qemu_put_byte(f, n->has_ufo);
+-    if (n->max_queues > 1) {
+-        qemu_put_be16(f, n->max_queues);
+-        qemu_put_be16(f, n->curr_queues);
+-        for (i = 1; i < n->curr_queues; i++) {
+-            qemu_put_be32(f, n->vqs[i].tx_waiting);
+-        }
+-    }
+-
+-    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS)) {
+-        qemu_put_be64(f, n->curr_guest_offloads);
+-    }
+-}
+-
+-static int virtio_net_load_device(VirtIODevice *vdev, QEMUFile *f,
+-                                  int version_id)
+-{
+-    VirtIONet *n = VIRTIO_NET(vdev);
++    VirtIONet *n = opaque;
++    VirtIODevice *vdev = VIRTIO_DEVICE(n);
+     int i, link_down;
+ 
+-    qemu_get_buffer(f, n->mac, ETH_ALEN);
+-    n->vqs[0].tx_waiting = qemu_get_be32(f);
+-
+-    virtio_net_set_mrg_rx_bufs(n, qemu_get_be32(f),
++    virtio_net_set_mrg_rx_bufs(n, n->mergeable_rx_bufs,
+                                virtio_vdev_has_feature(vdev,
+                                                        VIRTIO_F_VERSION_1));
+ 
+-    n->status = qemu_get_be16(f);
+-
+-    n->promisc = qemu_get_byte(f);
+-    n->allmulti = qemu_get_byte(f);
+-
+-    n->mac_table.in_use = qemu_get_be32(f);
+     /* MAC_TABLE_ENTRIES may be different from the saved image */
+-    if (n->mac_table.in_use <= MAC_TABLE_ENTRIES) {
+-        qemu_get_buffer(f, n->mac_table.macs,
+-                        n->mac_table.in_use * ETH_ALEN);
+-    } else {
+-        int64_t i;
+-
+-        /* Overflow detected - can happen if source has a larger MAC table.
+-         * We simply set overflow flag so there's no need to maintain the
+-         * table of addresses, discard them all.
+-         * Note: 64 bit math to avoid integer overflow.
+-         */
+-        for (i = 0; i < (int64_t)n->mac_table.in_use * ETH_ALEN; ++i) {
+-            qemu_get_byte(f);
+-        }
+-        n->mac_table.multi_overflow = n->mac_table.uni_overflow = 1;
++    if (n->mac_table.in_use > MAC_TABLE_ENTRIES) {
+         n->mac_table.in_use = 0;
+     }
+- 
+-    qemu_get_buffer(f, (uint8_t *)n->vlans, MAX_VLAN >> 3);
+-
+-    if (qemu_get_be32(f) && !peer_has_vnet_hdr(n)) {
+-        error_report("virtio-net: saved image requires vnet_hdr=on");
+-        return -1;
+-    }
+-
+-    n->mac_table.multi_overflow = qemu_get_byte(f);
+-    n->mac_table.uni_overflow = qemu_get_byte(f);
+-
+-    n->alluni = qemu_get_byte(f);
+-    n->nomulti = qemu_get_byte(f);
+-    n->nouni = qemu_get_byte(f);
+-    n->nobcast = qemu_get_byte(f);
+-
+-    if (qemu_get_byte(f) && !peer_has_ufo(n)) {
+-        error_report("virtio-net: saved image requires TUN_F_UFO support");
+-        return -1;
+-    }
+ 
+-    if (n->max_queues > 1) {
+-        if (n->max_queues != qemu_get_be16(f)) {
+-            error_report("virtio-net: different max_queues ");
+-            return -1;
+-        }
+-
+-        n->curr_queues = qemu_get_be16(f);
+-        if (n->curr_queues > n->max_queues) {
+-            error_report("virtio-net: curr_queues %x > max_queues %x",
+-                         n->curr_queues, n->max_queues);
+-            return -1;
+-        }
+-        for (i = 1; i < n->curr_queues; i++) {
+-            n->vqs[i].tx_waiting = qemu_get_be32(f);
+-        }
+-    }
+-
+-    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS)) {
+-        n->curr_guest_offloads = qemu_get_be64(f);
+-    } else {
++    if (!virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS)) {
+         n->curr_guest_offloads = virtio_net_supported_guest_offloads(n);
+     }
+ 
+@@ -1703,6 +1606,210 @@ static int virtio_net_load_device(VirtIODevice *vdev, QEMUFile *f,
+     return 0;
  }
  
-+typedef struct TmpTestStruct {
-+    TestStruct *parent;
-+    int64_t diff;
-+} TmpTestStruct;
++/* tx_waiting field of a VirtIONetQueue */
++static const VMStateDescription vmstate_virtio_net_queue_tx_waiting = {
++    .name = "virtio-net-queue-tx_waiting",
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(tx_waiting, VirtIONetQueue),
++        VMSTATE_END_OF_LIST()
++   },
++};
 +
-+static void tmp_child_pre_save(void *opaque)
++static bool max_queues_gt_1(void *opaque, int version_id)
 +{
-+    struct TmpTestStruct *tts = opaque;
-+
-+    tts->diff = tts->parent->b - tts->parent->a;
++    return VIRTIO_NET(opaque)->max_queues > 1;
 +}
 +
-+static int tmp_child_post_load(void *opaque, int version_id)
++static bool has_ctrl_guest_offloads(void *opaque, int version_id)
 +{
-+    struct TmpTestStruct *tts = opaque;
++    return virtio_vdev_has_feature(VIRTIO_DEVICE(opaque),
++                                   VIRTIO_NET_F_CTRL_GUEST_OFFLOADS);
++}
 +
-+    tts->parent->b = tts->parent->a + tts->diff;
++static bool mac_table_fits(void *opaque, int version_id)
++{
++    return VIRTIO_NET(opaque)->mac_table.in_use <= MAC_TABLE_ENTRIES;
++}
++
++static bool mac_table_doesnt_fit(void *opaque, int version_id)
++{
++    return !mac_table_fits(opaque, version_id);
++}
++
++/* This temporary type is shared by all the WITH_TMP methods
++ * although only some fields are used by each.
++ */
++struct VirtIONetMigTmp {
++    VirtIONet      *parent;
++    VirtIONetQueue *vqs_1;
++    uint16_t        curr_queues_1;
++    uint8_t         has_ufo;
++    uint32_t        has_vnet_hdr;
++};
++
++/* The 2nd and subsequent tx_waiting flags are loaded later than
++ * the 1st entry in the queues and only if there's more than one
++ * entry.  We use the tmp mechanism to calculate a temporary
++ * pointer and count and also validate the count.
++ */
++
++static void virtio_net_tx_waiting_pre_save(void *opaque)
++{
++    struct VirtIONetMigTmp *tmp = opaque;
++
++    tmp->vqs_1 = tmp->parent->vqs + 1;
++    tmp->curr_queues_1 = tmp->parent->curr_queues - 1;
++    if (tmp->parent->curr_queues == 0) {
++        tmp->curr_queues_1 = 0;
++    }
++}
++
++static int virtio_net_tx_waiting_pre_load(void *opaque)
++{
++    struct VirtIONetMigTmp *tmp = opaque;
++
++    /* Reuse the pointer setup from save */
++    virtio_net_tx_waiting_pre_save(opaque);
++
++    if (tmp->parent->curr_queues > tmp->parent->max_queues) {
++        error_report("virtio-net: curr_queues %x > max_queues %x",
++            tmp->parent->curr_queues, tmp->parent->max_queues);
++
++        return -EINVAL;
++    }
++
++    return 0; /* all good */
++}
++
++static const VMStateDescription vmstate_virtio_net_tx_waiting = {
++    .name      = "virtio-net-tx_waiting",
++    .pre_load  = virtio_net_tx_waiting_pre_load,
++    .pre_save  = virtio_net_tx_waiting_pre_save,
++    .fields    = (VMStateField[]) {
++        VMSTATE_STRUCT_VARRAY_POINTER_UINT16(vqs_1, struct VirtIONetMigTmp,
++                                     curr_queues_1,
++                                     vmstate_virtio_net_queue_tx_waiting,
++                                     struct VirtIONetQueue),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++/* the 'has_ufo' flag is just tested; if the incoming stream has the
++ * flag set we need to check that we have it
++ */
++static int virtio_net_ufo_post_load(void *opaque, int version_id)
++{
++    struct VirtIONetMigTmp *tmp = opaque;
++
++    if (tmp->has_ufo && !peer_has_ufo(tmp->parent)) {
++        error_report("virtio-net: saved image requires TUN_F_UFO support");
++        return -EINVAL;
++    }
 +
 +    return 0;
 +}
 +
-+static const VMStateDescription vmstate_tmp_back_to_parent = {
-+    .name = "test/tmp_child_parent",
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(f, TestStruct),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_tmp_child = {
-+    .name = "test/tmp_child",
-+    .pre_save = tmp_child_pre_save,
-+    .post_load = tmp_child_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_INT64(diff, TmpTestStruct),
-+        VMSTATE_STRUCT_POINTER(parent, TmpTestStruct,
-+                               vmstate_tmp_back_to_parent, TestStruct),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_with_tmp = {
-+    .name = "test/with_tmp",
-+    .version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(a, TestStruct),
-+        VMSTATE_UINT64(d, TestStruct),
-+        VMSTATE_WITH_TMP(TestStruct, TmpTestStruct, vmstate_tmp_child),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void obj_tmp_copy(void *target, void *source)
++static void virtio_net_ufo_pre_save(void *opaque)
 +{
-+    memcpy(target, source, sizeof(TestStruct));
++    struct VirtIONetMigTmp *tmp = opaque;
++
++    tmp->has_ufo = tmp->parent->has_ufo;
 +}
 +
-+static void test_tmp_struct(void)
++static const VMStateDescription vmstate_virtio_net_has_ufo = {
++    .name      = "virtio-net-ufo",
++    .post_load = virtio_net_ufo_post_load,
++    .pre_save  = virtio_net_ufo_pre_save,
++    .fields    = (VMStateField[]) {
++        VMSTATE_UINT8(has_ufo, struct VirtIONetMigTmp),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++/* the 'has_vnet_hdr' flag is just tested; if the incoming stream has the
++ * flag set we need to check that we have it
++ */
++static int virtio_net_vnet_post_load(void *opaque, int version_id)
 +{
-+    TestStruct obj, obj_clone;
++    struct VirtIONetMigTmp *tmp = opaque;
 +
-+    uint8_t const wire_with_tmp[] = {
-+        /* u32 a */ 0x00, 0x00, 0x00, 0x02,
-+        /* u64 d */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-+        /* diff  */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
-+        /* u64 f */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
-+        QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely */
-+    };
++    if (tmp->has_vnet_hdr && !peer_has_vnet_hdr(tmp->parent)) {
++        error_report("virtio-net: saved image requires vnet_hdr=on");
++        return -EINVAL;
++    }
 +
-+    memset(&obj, 0, sizeof(obj));
-+    obj.a = 2;
-+    obj.b = 4;
-+    obj.d = 1;
-+    obj.f = 8;
-+    save_vmstate(&vmstate_with_tmp, &obj);
-+
-+    compare_vmstate(wire_with_tmp, sizeof(wire_with_tmp));
-+
-+    memset(&obj, 0, sizeof(obj));
-+    SUCCESS(load_vmstate(&vmstate_with_tmp, &obj, &obj_clone,
-+                         obj_tmp_copy, 1, wire_with_tmp,
-+                         sizeof(wire_with_tmp)));
-+    g_assert_cmpint(obj.a, ==, 2); /* From top level vmsd */
-+    g_assert_cmpint(obj.b, ==, 4); /* from the post_load */
-+    g_assert_cmpint(obj.d, ==, 1); /* From top level vmsd */
-+    g_assert_cmpint(obj.f, ==, 8); /* From the child->parent */
++    return 0;
 +}
 +
- int main(int argc, char **argv)
- {
-     temp_fd = mkstemp(temp_file);
-@@ -708,7 +794,7 @@ int main(int argc, char **argv)
-                     test_arr_ptr_str_no0_load);
-     g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
-     g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
--
-+    g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
-     g_test_run();
++static void virtio_net_vnet_pre_save(void *opaque)
++{
++    struct VirtIONetMigTmp *tmp = opaque;
++
++    tmp->has_vnet_hdr = tmp->parent->has_vnet_hdr;
++}
++
++static const VMStateDescription vmstate_virtio_net_has_vnet = {
++    .name      = "virtio-net-vnet",
++    .post_load = virtio_net_vnet_post_load,
++    .pre_save  = virtio_net_vnet_pre_save,
++    .fields    = (VMStateField[]) {
++        VMSTATE_UINT32(has_vnet_hdr, struct VirtIONetMigTmp),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static const VMStateDescription vmstate_virtio_net_device = {
++    .name = "virtio-net-device",
++    .version_id = VIRTIO_NET_VM_VERSION,
++    .minimum_version_id = VIRTIO_NET_VM_VERSION,
++    .post_load = virtio_net_post_load_device,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8_ARRAY(mac, VirtIONet, ETH_ALEN),
++        VMSTATE_STRUCT_POINTER(vqs, VirtIONet,
++                               vmstate_virtio_net_queue_tx_waiting,
++                               VirtIONetQueue),
++        VMSTATE_UINT32(mergeable_rx_bufs, VirtIONet),
++        VMSTATE_UINT16(status, VirtIONet),
++        VMSTATE_UINT8(promisc, VirtIONet),
++        VMSTATE_UINT8(allmulti, VirtIONet),
++        VMSTATE_UINT32(mac_table.in_use, VirtIONet),
++
++        /* Guarded pair: If it fits we load it, else we throw it away
++         * - can happen if source has a larger MAC table.; post-load
++         *  sets flags in this case.
++         */
++        VMSTATE_VBUFFER_MULTIPLY(mac_table.macs, VirtIONet,
++                                0, mac_table_fits, 0, mac_table.in_use,
++                                 ETH_ALEN),
++        VMSTATE_UNUSED_VARRAY_UINT32(VirtIONet, mac_table_doesnt_fit, 0,
++                                     mac_table.in_use, ETH_ALEN),
++
++        /* Note: This is an array of uint32's that's always been saved as a
++         * buffer; hold onto your endiannesses; it's actually used as a bitmap
++         * but based on the uint.
++         */
++        VMSTATE_BUFFER_POINTER_UNSAFE(vlans, VirtIONet, 0, MAX_VLAN >> 3),
++        VMSTATE_WITH_TMP(VirtIONet, struct VirtIONetMigTmp,
++                         vmstate_virtio_net_has_vnet),
++        VMSTATE_UINT8(mac_table.multi_overflow, VirtIONet),
++        VMSTATE_UINT8(mac_table.uni_overflow, VirtIONet),
++        VMSTATE_UINT8(alluni, VirtIONet),
++        VMSTATE_UINT8(nomulti, VirtIONet),
++        VMSTATE_UINT8(nouni, VirtIONet),
++        VMSTATE_UINT8(nobcast, VirtIONet),
++        VMSTATE_WITH_TMP(VirtIONet, struct VirtIONetMigTmp,
++                         vmstate_virtio_net_has_ufo),
++        VMSTATE_SINGLE_TEST(max_queues, VirtIONet, max_queues_gt_1, 0,
++                            vmstate_info_uint16_equal, uint16_t),
++        VMSTATE_UINT16_TEST(curr_queues, VirtIONet, max_queues_gt_1),
++        VMSTATE_WITH_TMP(VirtIONet, struct VirtIONetMigTmp,
++                         vmstate_virtio_net_tx_waiting),
++        VMSTATE_UINT64_TEST(curr_guest_offloads, VirtIONet,
++                            has_ctrl_guest_offloads),
++        VMSTATE_END_OF_LIST()
++   },
++};
++
+ static NetClientInfo net_virtio_info = {
+     .type = NET_CLIENT_DRIVER_NIC,
+     .size = sizeof(NICState),
+@@ -1989,9 +2096,8 @@ static void virtio_net_class_init(ObjectClass *klass, void *data)
+     vdc->set_status = virtio_net_set_status;
+     vdc->guest_notifier_mask = virtio_net_guest_notifier_mask;
+     vdc->guest_notifier_pending = virtio_net_guest_notifier_pending;
+-    vdc->load = virtio_net_load_device;
+-    vdc->save = virtio_net_save_device;
+     vdc->legacy_features |= (0x1 << VIRTIO_NET_F_GSO);
++    vdc->vmsd = &vmstate_virtio_net_device;
+ }
  
-     close(temp_fd);
+ static const TypeInfo virtio_net_info = {
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index 8ea56a8..1eec9a2 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -47,7 +47,7 @@ typedef struct VirtIONetQueue {
+     VirtQueue *tx_vq;
+     QEMUTimer *tx_timer;
+     QEMUBH *tx_bh;
+-    int tx_waiting;
++    uint32_t tx_waiting;
+     struct {
+         VirtQueueElement *elem;
+     } async_tx;
+@@ -68,7 +68,7 @@ typedef struct VirtIONet {
+     size_t guest_hdr_len;
+     uint32_t host_features;
+     uint8_t has_ufo;
+-    int mergeable_rx_bufs;
++    uint32_t mergeable_rx_bufs;
+     uint8_t promisc;
+     uint8_t allmulti;
+     uint8_t alluni;
 -- 
 2.9.3
