@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZcOr-0005DI-CY
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:51:34 -0500
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1cZcVQ-0007LT-M9
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:58:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZcOq-0007tG-G7
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:51:33 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37288)
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1cZcVN-0004Lw-Kl
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:58:20 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34893)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZcOq-0007sg-9d
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:51:32 -0500
-Received: by mail-wm0-x230.google.com with SMTP id v77so24192375wmv.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 03:51:32 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1485504213-21632-2-git-send-email-bharata@linux.vnet.ibm.com>
-References: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1485504213-21632-2-git-send-email-bharata@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 11:51:10 +0000
-Message-ID: <CAFEAcA9WZeX8BnDz5g2K7iv7U-=fenvUkspoYqbhkjVx-iEDCA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/2] softfloat: Handle float64
- rounding properly for underflow case
+	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
+	id 1cZcVN-0004LW-Eq
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:58:17 -0500
+Received: by mail-wm0-x243.google.com with SMTP id u63so3899295wmu.2
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 03:58:17 -0800 (PST)
+From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Date: Fri,  3 Feb 2017 06:57:21 -0500
+Message-Id: <1486123043-26493-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: [Qemu-devel] [PATCH 0/2 v16] fsdev: add IO throttle support to
+ fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
-On 27 January 2017 at 08:03, Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
-> When rounding a floating point result to float64 precision, the
-> existing code doesn't re-calculate the required round increment
-> for the underflow case. Fix this.
->
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> ---
->  fpu/softfloat.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
->
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index c295f31..b04699c 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -651,6 +651,23 @@ static float64 roundAndPackFloat64(flag zSign, int zExp, uint64_t zSig,
->              if (isTiny && roundBits) {
->                  float_raise(float_flag_underflow, status);
->              }
-> +            switch (roundingMode) {
-> +            case float_round_nearest_even:
-> +            case float_round_ties_away:
-> +                roundIncrement = 0x200;
-> +                break;
-> +            case float_round_to_zero:
-> +                roundIncrement = 0;
-> +                break;
-> +            case float_round_up:
-> +                roundIncrement = zSign ? 0 : 0x3ff;
-> +                break;
-> +            case float_round_down:
-> +                roundIncrement = zSign ? 0x3ff : 0;
-> +                break;
-> +            default:
-> +                abort();
-> +            }
->          }
->      }
->      if (roundBits) {
+This patch set adds the IO throttling functionality to fsdev/9p devices.
+So far cgroups were used for throttling IO opertions on the fsdev/9p devices.
+It is difficult to use cgroups for throttling because we have to set up 
+cgroups externally before we start the qemu process.
+Qemu provides the throttling apis for implementing the throttling. 
+Block devices already make use of these APIs for throtting the IO operations.
+So, we use the same APIs to enable the throttling functionality for
+fsdevices.As of now the feature is enabled only on 9p-local driver.
 
-When does this give a different value to what roundIncrement
-was before? As far as I can see the only data-dependency
-here is on zSign, and underflowing doesn't affect zSign.
+This feature can be used as shown in the below example:
 
-thanks
--- PMM
+-fsdev local,id=sdb1,path=PATH_TO_DEVICE,security_model=none,writeout=immediate,
+ throttling.bps-read=4194304,throttling.bps-write=4194304  -device
+ virtio-9p-pci,fsdev=sdb1,mount_tag=sdb1
+
+The main advantages are:
+ 
+- Easy to use because the throttling options are part of qemu cli options
+- Provides a uniform way of using throttling options across block and
+    fsdev/9p devices
+- No need to setup cgroup to provide throttling functionality for the fsdev
+  devices.
+- Removes the redundant throttling code that was present in block and fsdev
+  files
+
+Missing features:
+
+-QMP support
+-Throttling support for other fsdev/9p drivers.
+
+Thanks,
+Pradeep
+
+Pradeep Jagadeesh (2):
+  fsdev: add IO throttle support to fsdev devices
+  throttle: factor out duplicate code
+
+ blockdev.c                      |  81 ++-------------------------
+ fsdev/Makefile.objs             |   2 +-
+ fsdev/file-op-9p.h              |   3 +
+ fsdev/qemu-fsdev-opts.c         |   3 +
+ fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++++++++++++++++
+ fsdev/qemu-fsdev-throttle.h     |  39 +++++++++++++
+ hw/9pfs/9p-local.c              |   8 +++
+ hw/9pfs/9p.c                    |   5 ++
+ hw/9pfs/cofile.c                |   2 +
+ include/qemu/throttle-options.h |  92 +++++++++++++++++++++++++++++++
+ 10 files changed, 275 insertions(+), 78 deletions(-)
+ create mode 100644 fsdev/qemu-fsdev-throttle.c
+ create mode 100644 fsdev/qemu-fsdev-throttle.h
+ create mode 100644 include/qemu/throttle-options.h
+
+-- 
+1.8.3.1
