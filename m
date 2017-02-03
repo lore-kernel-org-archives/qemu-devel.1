@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5n-0007nb-BX
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:09 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5n-0007nv-T1
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5j-00081U-1l
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5j-00081q-45
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:07 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:43037 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:22640 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZg5i-0007zK-Mk
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:02 -0500
+	id 1cZg5i-0007zl-Na
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:03 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  3 Feb 2017 18:47:49 +0300
-Message-Id: <20170203154757.36140-11-vsementsov@virtuozzo.com>
+Date: Fri,  3 Feb 2017 18:47:45 +0300
+Message-Id: <20170203154757.36140-7-vsementsov@virtuozzo.com>
 In-Reply-To: <20170203154757.36140-1-vsementsov@virtuozzo.com>
 References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 10/18] block/dirty-bitmap: add
- bdrv_load_dirty_bitmap
+Subject: [Qemu-devel] [PATCH 06/18] nbd/client: refactor drop_sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +27,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
+Return 0 on success to simplify success checking.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/dirty-bitmap.c         | 53 ++++++++++++++++++++++++++++++++++++++++++++
- include/block/block_int.h    |  4 ++++
- include/block/dirty-bitmap.h |  3 +++
- 3 files changed, 60 insertions(+)
+ nbd/client.c | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 3b7db1d78c..394d4328d5 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -545,3 +545,56 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-     return bitmap == NULL ? QLIST_FIRST(&bs->dirty_bitmaps) :
-                             QLIST_NEXT(bitmap, list);
- }
-+
-+typedef struct BDRVLoadBitmapCo {
-+    BlockDriverState *bs;
-+    const char *name;
-+    Error **errp;
-+    BdrvDirtyBitmap *ret;
-+    bool in_progress;
-+} BDRVLoadBitmapCo;
-+
-+static void bdrv_load_dity_bitmap_co_entry(void *opaque)
-+{
-+    BDRVLoadBitmapCo *lbco = opaque;
-+    BlockDriver *drv = lbco->bs->drv;
-+
-+    if (!!drv && !!drv->bdrv_dirty_bitmap_load) {
-+        lbco->ret = drv->bdrv_dirty_bitmap_load(lbco->bs, lbco->name,
-+                                                lbco->errp);
-+    } else if (lbco->bs->file)  {
-+        BlockDriverState *bs = lbco->bs;
-+        lbco->bs = lbco->bs->file->bs;
-+        bdrv_load_dity_bitmap_co_entry(lbco);
-+        if (lbco->ret != NULL) {
-+            QLIST_REMOVE(lbco->ret, list);
-+            QLIST_INSERT_HEAD(&bs->dirty_bitmaps, lbco->ret, list);
+diff --git a/nbd/client.c b/nbd/client.c
+index 351731bc63..1c274f3012 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -86,31 +86,34 @@ static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
+ 
+ */
+ 
+-/* Discard length bytes from channel.  Return -errno on failure, or
+- * the amount of bytes consumed. */
+-static ssize_t drop_sync(QIOChannel *ioc, size_t size)
++/* Discard length bytes from channel.
++ * Return 0 on success and -errno on fail.
++ */
++static int drop_sync(QIOChannel *ioc, size_t size)
+ {
+-    ssize_t ret = 0;
++    ssize_t ret;
+     char small[1024];
+     char *buffer;
+ 
+     buffer = sizeof(small) > size ? small : g_malloc(MIN(65536, size));
+     while (size > 0) {
+-        ssize_t count = read_sync(ioc, buffer, MIN(65536, size));
+-
+-        if (count <= 0) {
+-            goto cleanup;
++        ret = read_sync(ioc, buffer, MIN(65536, size));
++        if (ret == 0) {
++            ret = -EIO;
 +        }
-+    } else {
-+        lbco->ret = NULL;
-+    }
++        if (ret < 0) {
++            break;
+         }
+-        assert(count <= size);
+-        size -= count;
+-        ret += count;
 +
-+    lbco->in_progress = false;
-+}
-+
-+BdrvDirtyBitmap *bdrv_load_dirty_bitmap(BlockDriverState *bs, const char *name,
-+                                        Error **errp)
-+{
-+    Coroutine *co;
-+    BDRVLoadBitmapCo lbco = {
-+        .bs = bs,
-+        .name = name,
-+        .errp = errp,
-+        .in_progress = true
-+    };
-+
-+    if (qemu_in_coroutine()) {
-+        bdrv_load_dity_bitmap_co_entry(&lbco);
-+    } else {
-+        co = qemu_coroutine_create(bdrv_load_dity_bitmap_co_entry, &lbco);
-+        qemu_coroutine_enter(co);
-+        BDRV_POLL_WHILE(bs, lbco.in_progress);
-+    }
-+
-+    return lbco.ret;
-+}
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 83a423c580..d3770db539 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -222,6 +222,10 @@ struct BlockDriver {
-     int (*bdrv_get_info)(BlockDriverState *bs, BlockDriverInfo *bdi);
-     ImageInfoSpecific *(*bdrv_get_specific_info)(BlockDriverState *bs);
++        assert(ret <= size);
++        size -= ret;
+     }
  
-+    BdrvDirtyBitmap *(*bdrv_dirty_bitmap_load)(BlockDriverState *bs,
-+                                               const char *name,
-+                                               Error **errp);
+- cleanup:
+     if (buffer != small) {
+         g_free(buffer);
+     }
+-    return ret;
 +
-     int coroutine_fn (*bdrv_save_vmstate)(BlockDriverState *bs,
-                                           QEMUIOVector *qiov,
-                                           int64_t pos);
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index ff8163ba02..c0c70a8c67 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -77,4 +77,7 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start);
- BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-                                         BdrvDirtyBitmap *bitmap);
++    return ret < 0 ? ret : 0;
+ }
  
-+BdrvDirtyBitmap *bdrv_load_dirty_bitmap(BlockDriverState *bs, const char *name,
-+                                        Error **errp);
-+
- #endif
+ /* Send an option request.
+@@ -334,7 +337,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
+         return -1;
+     }
+     if (namelen != strlen(want)) {
+-        if (drop_sync(ioc, len) != len) {
++        if (drop_sync(ioc, len) < 0) {
+             error_setg(errp, "failed to skip export name with wrong length");
+             nbd_send_opt_abort(ioc);
+             return -1;
+@@ -350,7 +353,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
+     }
+     name[namelen] = '\0';
+     len -= namelen;
+-    if (drop_sync(ioc, len) != len) {
++    if (drop_sync(ioc, len) < 0) {
+         error_setg(errp, "failed to read export description");
+         nbd_send_opt_abort(ioc);
+         return -1;
+@@ -635,7 +638,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+     }
+ 
+     TRACE("Size is %" PRIu64 ", export flags %" PRIx16, *size, *flags);
+-    if (zeroes && drop_sync(ioc, 124) != 124) {
++    if (zeroes && drop_sync(ioc, 124) < 0) {
+         error_setg(errp, "Failed to read reserved block");
+         goto fail;
+     }
 -- 
 2.11.0
