@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZaM2-00044B-Bo
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:32 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZaM4-00045R-4P
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZaLx-0004Pf-M7
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:30 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:39120 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZaM0-0004S5-LX
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:32 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:26703 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZaLx-0004NX-Aa
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:25 -0500
+	id 1cZaM0-0004RU-Ar
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:28 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  3 Feb 2017 12:40:13 +0300
-Message-Id: <20170203094018.15493-20-vsementsov@virtuozzo.com>
+Date: Fri,  3 Feb 2017 12:40:18 +0300
+Message-Id: <20170203094018.15493-25-vsementsov@virtuozzo.com>
 In-Reply-To: <20170203094018.15493-1-vsementsov@virtuozzo.com>
 References: <20170203094018.15493-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 19/24] iotests: test qcow2 persistent dirty
- bitmap
+Subject: [Qemu-devel] [PATCH 24/24] qmp: block-dirty-bitmap-remove: remove
+ persistent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +28,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/165     | 89 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/165.out |  5 +++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 95 insertions(+)
- create mode 100755 tests/qemu-iotests/165
- create mode 100644 tests/qemu-iotests/165.out
+Remove persistent bitmap from the storage on block-dirty-bitmap-remove.
 
-diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
-new file mode 100755
-index 0000000000..d583b33733
---- /dev/null
-+++ b/tests/qemu-iotests/165
-@@ -0,0 +1,89 @@
-+#!/usr/bin/env python
-+#
-+# Tests for persistent dirty bitmaps.
-+#
-+# Copyright: Vladimir Sementsov-Ogievskiy 2015-2017
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ blockdev.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/blockdev.c b/blockdev.c
+index c41b791289..a365cdf3ed 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2767,6 +2767,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+     AioContext *aio_context;
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *bitmap;
++    Error *local_err = NULL;
+ 
+     bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
+     if (!bitmap || !bs) {
+@@ -2779,6 +2780,15 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+                    name);
+         goto out;
+     }
 +
-+import os
-+import iotests
-+from iotests import qemu_img
++    if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
++        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
++        if (local_err != NULL) {
++            error_propagate(errp, local_err);
++            goto out;
++        }
++    }
 +
-+disk = os.path.join(iotests.test_dir, 'disk')
-+disk_size = 0x40000000 # 1G
-+
-+# regions for qemu_io: (start, count) in bytes
-+regions1 = ((0,        0x100000),
-+            (0x200000, 0x100000))
-+
-+regions2 = ((0x10000000, 0x20000),
-+            (0x3fff0000, 0x10000))
-+
-+class TestPersistentDirtyBitmap(iotests.QMPTestCase):
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, disk, str(disk_size))
-+
-+    def tearDown(self):
-+        os.remove(disk)
-+
-+    def mkVm(self):
-+        return iotests.VM().add_drive(disk)
-+
-+    def getSha256(self):
-+        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
-+                             node='drive0', name='bitmap0')
-+        return result['return']['sha256']
-+
-+    def checkBitmap(self, sha256):
-+        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
-+                             node='drive0', name='bitmap0')
-+        self.assert_qmp(result, 'return/sha256', sha256);
-+
-+    def writeRegions(self, regions):
-+        for r in regions:
-+            self.vm.hmp_qemu_io('drive0',
-+                                'write %d %d' % r)
-+
-+    def qmpAddBitmap(self):
-+        self.vm.qmp('block-dirty-bitmap-add', node='drive0',
-+                    name='bitmap0', persistent=True, autoload=True)
-+
-+    def test_persistent(self):
-+        self.vm = self.mkVm()
-+        self.vm.launch()
-+        self.qmpAddBitmap()
-+
-+        self.writeRegions(regions1)
-+        sha256 = self.getSha256()
-+
-+        self.vm.shutdown()
-+        self.vm = self.mkVm()
-+        self.vm.launch()
-+
-+        self.checkBitmap(sha256)
-+        self.writeRegions(regions2)
-+        sha256 = self.getSha256()
-+
-+        self.vm.shutdown()
-+        self.vm.launch()
-+
-+        self.checkBitmap(sha256)
-+
-+        self.vm.shutdown()
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['qcow2'])
-diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
-new file mode 100644
-index 0000000000..ae1213e6f8
---- /dev/null
-+++ b/tests/qemu-iotests/165.out
-@@ -0,0 +1,5 @@
-+.
-+----------------------------------------------------------------------
-+Ran 1 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 866c1a032d..8bd7a84f5a 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -162,6 +162,7 @@
- 159 rw auto quick
- 160 rw auto quick
- 162 auto quick
-+165 rw auto quick
- 170 rw auto quick
- 171 rw auto quick
- 172 auto
+     bdrv_dirty_bitmap_make_anon(bitmap);
+     bdrv_release_dirty_bitmap(bs, bitmap);
+ 
 -- 
 2.11.0
