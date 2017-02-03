@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <awirth@akamai.com>) id 1cZgRs-0002H9-6u
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:10:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1cZgl5-0002cP-5G
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:30:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <awirth@akamai.com>) id 1cZgRn-0000gU-Uw
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:10:56 -0500
-Received: from prod-mail-xrelay06.akamai.com ([96.6.114.98]:50907)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <awirth@akamai.com>) id 1cZgRn-0000fH-KS
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:10:51 -0500
-From: "Wirth, Allan" <awirth@akamai.com>
-Date: Fri, 3 Feb 2017 16:10:42 +0000
-Message-ID: <9A2D4A25-ACA7-4A6C-9C0B-92248C8D30E4@akamai.com>
-References: <20170125001041.14029-1-bobby.prani@gmail.com>
-	<CAFEAcA-pdY6J_e035PGj5nxYrtN7V0SJMxMuaE0VECNJVKg5iQ@mail.gmail.com>
-	<87y3xnp8u9.fsf@gmail.com>
-In-Reply-To: <87y3xnp8u9.fsf@gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CB055E8D20517043821CF2614B69EC06@akamai.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1cZgl2-0000Zx-05
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:30:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41308)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cZgl1-0000ZN-Ee
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 11:30:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cZgkz-0000Qe-CN
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 16:30:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 54BD02E80C6
+	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 16:30:41 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH] linux-user: Add signal handling for
- x86_64
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Feb 2017 16:25:15 -0000
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
+	<20170203125716.9045.84939.malone@gac.canonical.com>
+Message-Id: <CAJs94EbYCb4XyY0H0Nefwbvt5iuPg_R3QOkCJBf4n5JHsOy_Fg@mail.gmail.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
+ cpu->kvm_msr_buf->nmsrs' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +38,312 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
 
-UHJhbml0aCwNCg0KVGhhbmtzIGZvciBkb2luZyB0aGlzLiBJIHRvdGFsbHkgZm9yZ290IGFib3V0
-IHRoaXMgKG15IHdvcmsgaGFzIG1vdmVkIGVsc2V3aGVyZSkgc28gdGhhbmsgeW91IGZvciBwaWNr
-aW5nIGl0IGJhY2sgdXAuDQoNClBsZWFzZSBkb27igJl0IHdvcnJ5IGFib3V0IHRoZSBhdHRyaWJ1
-dGlvbi4NCg0KVGhlIHBhdGNoIExHVE0uIDopDQoNCkNoZWVycywNCkFsbGFuDQoNCk9uIDIvMy8x
-NywgMTA6NTUgQU0sICJQcmFuaXRoIEt1bWFyIiA8Ym9iYnkucHJhbmlAZ21haWwuY29tPiB3cm90
-ZToNCg0KICAgIA0KICAgIFBldGVyIE1heWRlbGwgd3JpdGVzOg0KICAgIA0KICAgID4gT24gMjUg
-SmFudWFyeSAyMDE3IGF0IDAwOjEwLCBQcmFuaXRoIEt1bWFyIDxib2JieS5wcmFuaUBnbWFpbC5j
-b20+IHdyb3RlOg0KICAgID4+IEFkb3B0ZWQgZnJvbSBhIHByZXZpb3VzIHBhdGNoIHBvc3Rpbmc6
-DQogICAgPj4gaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIw
-MTYtMDcvbXNnMDIwNzkuaHRtbA0KICAgID4+DQogICAgPj4gQ0M6IEFsbGFuIFdpcnRoIDxhd2ly
-dGhAYWthbWFpLmNvbT4NCiAgICA+PiBDQzogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBs
-aW5hcm8ub3JnPg0KICAgID4+IFNpZ25lZC1vZmYtYnk6IFByYW5pdGggS3VtYXIgPGJvYmJ5LnBy
-YW5pQGdtYWlsLmNvbT4NCiAgICA+DQogICAgPiBUaGFua3MgZm9yIHBpY2tpbmcgdGhpcyBwYXRj
-aCB1cC4gQSBuaXQgYWJvdXQgY29tbWl0IG1lc3NhZ2UgZm9ybWF0Og0KICAgID4gYmVjYXVzZSB0
-aGlzICBpcyBtb3N0bHkgQWxsYW4ncyB3b3JrIHlvdSBuZWVkIHRvIGFkZCBoaXMgc2lnbmVkLW9m
-Zi1ieToNCiAgICA+IGxpbmUgKHdoaWNoIGhlIHByb3ZpZGVkIG9uIGhpcyBvcmlnaW5hbCBwYXRj
-aCBwb3N0aW5nKSwgYW5kIG1ha2UNCiAgICA+IGEgYnJpZWYgbm90IG9mIHdoYXQgd2FzIGNoYW5n
-ZWQsIHNvIGl0IGxvb2tzIGxpa2U6DQogICAgPg0KICAgID4gICBTaWduZWQtb2ZmLWJ5OiBPcmln
-aW5hbCBBdXRob3IgPG9hQGV4YW1wbGUuY29tPg0KICAgID4gICBbT1A6IGNoYW5nZWQgWCwgWSwg
-Wl0NCiAgICA+ICAgU2lnbmVkLW9mZi1ieTogT3RoZXIgUGVyc29uIDxvdGhlckBwZXJzb24ub3Jn
-Pg0KICAgID4NCiAgICA+IEl0J3MgYWxzbyBpbiB0aGlzIGtpbmQgb2Ygc2l0dWF0aW9uIHdvcnRo
-IGNvbnNpZGVyaW5nIHdoZXRoZXIgdGhlDQogICAgPiBwYXRjaCB3b3VsZCBiZSBiZXR0ZXIgYXR0
-cmlidXRlZCB0byBBbGxhbiBhcyB0aGUgZ2l0IGNvbW1pdCAnYXV0aG9yJy4NCiAgICA+IElmIEkn
-dmUgdGFrZW4gc29tZWJvZHkgZWxzZSdzIHdvcmsgYW5kIG1hZGUgbW9zdGx5IG1pbm9yIG92ZXJo
-YXVscw0KICAgID4gdG8gaXQgSSB0ZW5kIHRvIGdvIGZvciBnaXZpbmcgdGhlbSBjcmVkaXQgaW4g
-dGhlIGdpdCBjb21taXQgbG9nLg0KICAgIA0KICAgIE9LLCBJJ2xsIGFkZCB0aGVzZSBTT0IgbGlu
-ZXMgYW5kIGF0dHJpYnV0ZSBpdCB0byBBbGxhbiBhcyBoZSBkaWQgbW9zdCBvZiB0aGUgd29yay4N
-CiAgICANCiAgICA+DQogICAgPj4gLS0tDQogICAgPj4gIGxpbnV4LXVzZXIvc2lnbmFsLmMgICAg
-ICB8IDI2NCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLQ0K
-ICAgID4+ICB0YXJnZXQvaTM4Ni9jcHUuaCAgICAgICAgfCAgIDIgKw0KICAgID4+ICB0YXJnZXQv
-aTM4Ni9mcHVfaGVscGVyLmMgfCAgMTIgKysrDQogICAgPj4gIDMgZmlsZXMgY2hhbmdlZCwgMjQy
-IGluc2VydGlvbnMoKyksIDM2IGRlbGV0aW9ucygtKQ0KICAgID4+DQogICAgPj4gZGlmZiAtLWdp
-dCBhL2xpbnV4LXVzZXIvc2lnbmFsLmMgYi9saW51eC11c2VyL3NpZ25hbC5jDQogICAgPj4gaW5k
-ZXggMGE1YmI0ZTI2Yi4uMDI0ODYyMWQ2NiAxMDA2NDQNCiAgICA+PiAtLS0gYS9saW51eC11c2Vy
-L3NpZ25hbC5jDQogICAgPj4gKysrIGIvbGludXgtdXNlci9zaWduYWwuYw0KICAgID4+IEBAIC0y
-NTMsOCArMjUzLDcgQEAgaW50IGRvX3NpZ3Byb2NtYXNrKGludCBob3csIGNvbnN0IHNpZ3NldF90
-ICpzZXQsIHNpZ3NldF90ICpvbGRzZXQpDQogICAgPj4gICAgICByZXR1cm4gMDsNCiAgICA+PiAg
-fQ0KICAgID4+DQogICAgPj4gLSNpZiAhZGVmaW5lZChUQVJHRVRfT1BFTlJJU0MpICYmICFkZWZp
-bmVkKFRBUkdFVF9VTklDT1JFMzIpICYmIFwNCiAgICA+PiAtICAgICFkZWZpbmVkKFRBUkdFVF9Y
-ODZfNjQpDQogICAgPj4gKyNpZiAhZGVmaW5lZChUQVJHRVRfT1BFTlJJU0MpICYmICFkZWZpbmVk
-KFRBUkdFVF9VTklDT1JFMzIpDQogICAgPj4gIC8qIEp1c3Qgc2V0IHRoZSBndWVzdCdzIHNpZ25h
-bCBtYXNrIHRvIHRoZSBzcGVjaWZpZWQgdmFsdWU7IHRoZQ0KICAgID4+ICAgKiBjYWxsZXIgaXMg
-YXNzdW1lZCB0byBoYXZlIGNhbGxlZCBibG9ja19zaWduYWxzKCkgYWxyZWFkeS4NCiAgICA+PiAg
-ICovDQogICAgPg0KICAgID4gVGhlcmUncyBhIG1pbm9yIGNvbmZsaWN0IGhlcmUgd2l0aCB0aGUg
-TmlvczIgY29kZSB0aGF0J3Mgbm93DQogICAgPiBpbiBtYXN0ZXIgKHdoaWNoIGFkZGVkIGFub3Ro
-ZXIgY2xhdXNlIHRvIHRoaXMgI2lmKSwgYnV0IGl0J3MNCiAgICA+IHRyaXZpYWwgdG8gcmVzb2x2
-ZS4NCiAgICANCiAgICBJJ2xsIHJlYmFzZSBteSBwYXRjaCBvbiBtYXN0ZXIgYW5kIGZpeCB1cCB0
-aGUgY29uZmxpY3RzIGFuZCBzZW5kIGEgdjIuDQogICAgDQogICAgPg0KICAgID4gT3RoZXJ3aXNl
-Og0KICAgID4NCiAgICA+IFJldmlld2VkLWJ5OiBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxs
-QGxpbmFyby5vcmc+DQogICAgDQogICAgVGhhbmtzIGZvciB0aGUgcmV2aWV3IQ0KICAgIC0tIA0K
-ICAgIFByYW5pdGgNCiAgICANCg0K
+Hello,
+
+The output is the following:
+
+kvm_msr_entry_add: @0 index=3D174 value=3D0
+kvm_msr_entry_add: @1 index=3D175 value=3D0
+kvm_msr_entry_add: @2 index=3D176 value=3D0
+kvm_msr_entry_add: @3 index=3D277 value=3D7040600070406
+kvm_msr_entry_add: @4 index=3Dc0000081 value=3D0
+kvm_msr_entry_add: @5 index=3Dc0010117 value=3D0
+kvm_msr_entry_add: @6 index=3D3b value=3D0
+kvm_msr_entry_add: @7 index=3D1a0 value=3D1
+kvm_msr_entry_add: @8 index=3Dc0000083 value=3D0
+kvm_msr_entry_add: @9 index=3Dc0000102 value=3D0
+kvm_msr_entry_add: @10 index=3Dc0000084 value=3D0
+kvm_msr_entry_add: @11 index=3Dc0000082 value=3D0
+kvm_msr_entry_add: @12 index=3D10 value=3D0
+kvm_msr_entry_add: @13 index=3D12 value=3D0
+kvm_msr_entry_add: @14 index=3D11 value=3D0
+kvm_msr_entry_add: @15 index=3D4b564d02 value=3D0
+kvm_msr_entry_add: @16 index=3D4b564d04 value=3D0
+kvm_msr_entry_add: @17 index=3D4b564d03 value=3D0
+kvm_msr_entry_add: @18 index=3D38d value=3D0
+kvm_msr_entry_add: @19 index=3D38f value=3D0
+kvm_msr_entry_add: @20 index=3D309 value=3D0
+kvm_msr_entry_add: @21 index=3D30a value=3D0
+kvm_msr_entry_add: @22 index=3D30b value=3D0
+kvm_msr_entry_add: @23 index=3Dc1 value=3D0
+kvm_msr_entry_add: @24 index=3D186 value=3D0
+kvm_msr_entry_add: @25 index=3Dc2 value=3D0
+kvm_msr_entry_add: @26 index=3D187 value=3D0
+kvm_msr_entry_add: @27 index=3Dc3 value=3D0
+kvm_msr_entry_add: @28 index=3D188 value=3D0
+kvm_msr_entry_add: @29 index=3Dc4 value=3D0
+kvm_msr_entry_add: @30 index=3D189 value=3D0
+kvm_msr_entry_add: @31 index=3D38e value=3D0
+kvm_msr_entry_add: @32 index=3D390 value=3D0
+kvm_msr_entry_add: @33 index=3D38d value=3D0
+kvm_msr_entry_add: @34 index=3D38f value=3D0
+kvm_msr_entry_add: @35 index=3D2ff value=3D0
+kvm_msr_entry_add: @36 index=3D250 value=3D0
+kvm_msr_entry_add: @37 index=3D258 value=3D0
+kvm_msr_entry_add: @38 index=3D259 value=3D0
+kvm_msr_entry_add: @39 index=3D268 value=3D0
+kvm_msr_entry_add: @40 index=3D269 value=3D0
+kvm_msr_entry_add: @41 index=3D26a value=3D0
+kvm_msr_entry_add: @42 index=3D26b value=3D0
+kvm_msr_entry_add: @43 index=3D26c value=3D0
+kvm_msr_entry_add: @44 index=3D26d value=3D0
+kvm_msr_entry_add: @45 index=3D26e value=3D0
+kvm_msr_entry_add: @46 index=3D26f value=3D0
+kvm_msr_entry_add: @47 index=3D200 value=3D0
+kvm_msr_entry_add: @48 index=3D201 value=3D0
+kvm_msr_entry_add: @49 index=3D202 value=3D0
+kvm_msr_entry_add: @50 index=3D203 value=3D0
+kvm_msr_entry_add: @51 index=3D204 value=3D0
+kvm_msr_entry_add: @52 index=3D205 value=3D0
+kvm_msr_entry_add: @53 index=3D206 value=3D0
+kvm_msr_entry_add: @54 index=3D207 value=3D0
+kvm_msr_entry_add: @55 index=3D208 value=3D0
+kvm_msr_entry_add: @56 index=3D209 value=3D0
+kvm_msr_entry_add: @57 index=3D20a value=3D0
+kvm_msr_entry_add: @58 index=3D20b value=3D0
+kvm_msr_entry_add: @59 index=3D20c value=3D0
+kvm_msr_entry_add: @60 index=3D20d value=3D0
+kvm_msr_entry_add: @61 index=3D20e value=3D0
+kvm_msr_entry_add: @62 index=3D20f value=3D0
+kvm_msr_entry_add: @63 index=3D17a value=3D0
+kvm_msr_entry_add: @64 index=3D17b value=3Dffffffffffffffff
+kvm_msr_entry_add: @65 index=3D400 value=3Dffffffffffffffff
+kvm_msr_entry_add: @66 index=3D401 value=3D0
+kvm_msr_entry_add: @67 index=3D402 value=3D0
+kvm_msr_entry_add: @68 index=3D403 value=3D0
+kvm_msr_entry_add: @69 index=3D404 value=3Dffffffffffffffff
+kvm_msr_entry_add: @70 index=3D405 value=3D0
+kvm_msr_entry_add: @71 index=3D406 value=3D0
+kvm_msr_entry_add: @72 index=3D407 value=3D0
+kvm_msr_entry_add: @73 index=3D408 value=3Dffffffffffffffff
+kvm_msr_entry_add: @74 index=3D409 value=3D0
+kvm_msr_entry_add: @75 index=3D40a value=3D0
+kvm_msr_entry_add: @76 index=3D40b value=3D0
+kvm_msr_entry_add: @77 index=3D40c value=3Dffffffffffffffff
+kvm_msr_entry_add: @78 index=3D40d value=3D0
+kvm_msr_entry_add: @79 index=3D40e value=3D0
+kvm_msr_entry_add: @80 index=3D40f value=3D0
+kvm_msr_entry_add: @81 index=3D410 value=3Dffffffffffffffff
+kvm_msr_entry_add: @82 index=3D411 value=3D0
+kvm_msr_entry_add: @83 index=3D412 value=3D0
+kvm_msr_entry_add: @84 index=3D413 value=3D0
+kvm_msr_entry_add: @85 index=3D414 value=3Dffffffffffffffff
+kvm_msr_entry_add: @86 index=3D415 value=3D0
+kvm_msr_entry_add: @87 index=3D416 value=3D0
+kvm_msr_entry_add: @88 index=3D417 value=3D0
+kvm_msr_entry_add: @89 index=3D418 value=3Dffffffffffffffff
+kvm_msr_entry_add: @90 index=3D419 value=3D0
+kvm_msr_entry_add: @91 index=3D41a value=3D0
+kvm_msr_entry_add: @92 index=3D41b value=3D0
+kvm_msr_entry_add: @93 index=3D41c value=3Dffffffffffffffff
+kvm_msr_entry_add: @94 index=3D41d value=3D0
+kvm_msr_entry_add: @95 index=3D41e value=3D0
+kvm_msr_entry_add: @96 index=3D41f value=3D0
+kvm_msr_entry_add: @97 index=3D420 value=3Dffffffffffffffff
+kvm_msr_entry_add: @98 index=3D421 value=3D0
+kvm_msr_entry_add: @99 index=3D422 value=3D0
+kvm_msr_entry_add: @100 index=3D423 value=3D0
+kvm_msr_entry_add: @101 index=3D424 value=3Dffffffffffffffff
+kvm_msr_entry_add: @102 index=3D425 value=3D0
+kvm_msr_entry_add: @103 index=3D426 value=3D0
+kvm_msr_entry_add: @104 index=3D427 value=3D0
+kvm_put_msrs: ret=3D18 expected=3D105
+qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1852:
+kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+2017-02-03 15:57 GMT+03:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
+> Hi Matwey,
+>   That shouldn't happen!  The patch you've bisected to is just the one th=
+at complains if the ioctl fails rather than silently ignoring the failure -=
+ it means the failure probably previously existed and was ignored and that =
+causes random other problems.
+>
+> What kernel are you using on the host?
+>
+> We need to figure out which MSR it's objecting to; probably the easiest
+> way is to :
+>
+> 1) Edit mvm_msr_entry_add in target/i386/kvm.c to something like:
+>
+>     assert((void *)(entry + 1) <=3D limit);
+>     fprintf(stderr,"kvm_msr_entry_add: @%d index=3D%x value=3D%lx\n", msr=
+s->nmsrs, index, value);
+>     entry->index =3D index;
+>
+> 2) edit kvm_put_msrs near the bottom:
+>
+>     fprintf(stderr,"kvm_put_msrs: ret=3D%d expected=3D%d\n", ret, cpu->kv=
+m_msr_buf->nmsrs);
+>     assert(ret =3D=3D cpu->kvm_msr_buf->nmsrs);
+>
+> Now with any luck the 'ret' value will tell you the entry which is bad, a=
+nd you can match
+> that to the @%d value (or maybe it's the entry before that one which fail=
+ed?) then we get the index, look it up in the intel docs and figure out whi=
+ch MSR it's complaining about.
+>
+> Dave
+>
+> --
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1661386
+>
+> Title:
+>   Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   Hello,
+>
+>
+>   I see the following when try to run qemu from master as the following:
+>
+>   # ./x86_64-softmmu/qemu-system-x86_64 --version
+>   QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+>   Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+>   # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+>   -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+>   -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+>   loglevel=3D7' -m 1024 -serial stdio
+>   qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+>   kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+>
+>   First broken commit has been bisected:
+>
+>   commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+>   Author: Paolo Bonzini <pbonzini@redhat.com>
+>   Date:   Wed Mar 30 22:55:29 2016 +0200
+>
+>       target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+>
+>       This would have caught the bug in the previous patch.
+>
+>       Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+>   My cpuinfo is the following:
+>
+>   processor       : 0
+>   vendor_id       : GenuineIntel
+>   cpu family      : 6
+>   model           : 44
+>   model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+>   stepping        : 2
+>   microcode       : 0x14
+>   cpu MHz         : 3066.775
+>   cache size      : 12288 KB
+>   physical id     : 0
+>   siblings        : 2
+>   core id         : 0
+>   cpu cores       : 2
+>   apicid          : 0
+>   initial apicid  : 0
+>   fpu             : yes
+>   fpu_exception   : yes
+>   cpuid level     : 11
+>   wp              : yes
+>   flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge =
+mca cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm=
+ constant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc=
+ aperfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hyperviso=
+r lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+>   bugs            :
+>   bogomips        : 6133.55
+>   clflush size    : 64
+>   cache_alignment : 64
+>   address sizes   : 40 bits physical, 48 bits virtual
+>   power management:
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
+
+
+-- =
+
+With best regards,
+Matwey V. Kornilov
+http://blog.matwey.name
+xmpp://0x2207@jabber.ru
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661386
+
+Title:
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  =
+
+  I see the following when try to run qemu from master as the following:
+
+  # ./x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+  loglevel=3D7' -m 1024 -serial stdio
+  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  First broken commit has been bisected:
+
+  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Mar 30 22:55:29 2016 +0200
+
+      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+      =
+
+      This would have caught the bug in the previous patch.
+      =
+
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  My cpuinfo is the following:
+
+  processor       : 0
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 44
+  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+  stepping        : 2
+  microcode       : 0x14
+  cpu MHz         : 3066.775
+  cache size      : 12288 KB
+  physical id     : 0
+  siblings        : 2
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 0
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 11
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
+onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
+perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
+lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+  bugs            :
+  bogomips        : 6133.55
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 40 bits physical, 48 bits virtual
+  power management:
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
