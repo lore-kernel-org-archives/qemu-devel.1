@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKb-0004jh-77
+	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKX-0004fA-9A
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKX-0002gy-7h
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:29 -0500
-Received: from greensocs.com ([193.104.36.180]:39115)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKW-0002go-T5
+	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKW-0002gh-7V
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:25 -0500
+Received: from greensocs.com ([193.104.36.180]:39100)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKV-0002gW-TB
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:24 -0500
 From: fred.konrad@greensocs.com
-Date: Fri,  3 Feb 2017 18:06:37 +0100
-Message-Id: <1486141597-13941-6-git-send-email-fred.konrad@greensocs.com>
+Date: Fri,  3 Feb 2017 18:06:36 +0100
+Message-Id: <1486141597-13941-5-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1486141597-13941-1-git-send-email-fred.konrad@greensocs.com>
 References: <1486141597-13941-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [RFC 5/5] xilinx_spips: allow mmio execution
+Subject: [Qemu-devel] [RFC 4/5] exec: allow to get a pointer for some mmio
+ memory region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,130 +29,150 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This allows to execute from the lqspi area.
+This introduces a special callback which allows to run code from some MMIO
+devices.
 
-When the request_ptr is called the device loads 1024bytes from the SPI device.
-Then this code can be executed by the guest.
+SysBusDevice with a MemoryRegion which implements the request_ptr callback will
+be notified when the guest try to execute code from their offset. Then it will
+be able to eg: pre-load some code from an SPI device or ask a pointer from an
+external simulator, etc..
+
+When the pointer or the data in it are no longer valid the device has to
+invalidate it.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
 ---
- hw/ssi/xilinx_spips.c | 74 ++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 55 insertions(+), 19 deletions(-)
+ cputlb.c              |  7 +++++++
+ include/exec/memory.h | 35 +++++++++++++++++++++++++++++++++++
+ memory.c              | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 87 insertions(+)
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index da8adfa..e833028 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -496,6 +496,18 @@ static const MemoryRegionOps spips_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+diff --git a/cputlb.c b/cputlb.c
+index 846341e..9077247 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -545,6 +545,13 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+     if (memory_region_is_unassigned(mr)) {
+         CPUClass *cc = CPU_GET_CLASS(cpu);
  
-+static void xilinx_qspips_invalidate_mmio_ptr(XilinxQSPIPS *q)
-+{
-+    XilinxSPIPS *s = &q->parent_obj;
++        if (memory_region_request_mmio_ptr(mr, addr)) {
++            /* A MemoryRegion is potentially added so re-run the
++             * get_page_addr_code.
++             */
++            return get_page_addr_code(env, addr);
++        }
 +
-+    if (q->lqspi_cached_addr != ~0ULL) {
-+        /* Invalidate the current mapped mmio */
-+        memory_region_invalidate_mmio_ptr(&s->mmlqspi, q->lqspi_cached_addr,
-+                                          LQSPI_CACHE_SIZE);
-+        q->lqspi_cached_addr = ~0ULL;
+         if (cc->do_unassigned_access) {
+             cc->do_unassigned_access(cpu, addr, false, true, 0, 4);
+         } else {
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 987f925..36b0eec 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -120,6 +120,15 @@ struct MemoryRegionOps {
+                                     uint64_t data,
+                                     unsigned size,
+                                     MemTxAttrs attrs);
++    /* Instruction execution pre-callback:
++     * @addr is the address of the access relative to the @mr.
++     * @size is the size of the area returned by the callback.
++     * @offset is the location of the pointer inside @mr.
++     *
++     * Returns a pointer to a location which contains guest code.
++     */
++    void *(*request_ptr)(void *opaque, hwaddr addr, unsigned *size,
++                         unsigned *offset);
+ 
+     enum device_endian endianness;
+     /* Guest-visible constraints: */
+@@ -1253,6 +1262,32 @@ void memory_global_dirty_log_stop(void);
+ void mtree_info(fprintf_function mon_printf, void *f, bool flatview);
+ 
+ /**
++ * memory_region_request_mmio_ptr: request a pointer to an mmio
++ * MemoryRegion. If it is possible map a RAM MemoryRegion with this pointer.
++ * When the device wants to invalidate the pointer it will call
++ * memory_region_invalidate_mmio_ptr.
++ *
++ * @mr: #MemoryRegion to check
++ * @addr: address within that region
++ *
++ * Returns true on success, false otherwise.
++ */
++bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
++
++/**
++ * memory_region_invalidate_mmio_ptr: invalidate the pointer to an mmio
++ * previously requested.
++ * In the end that means that if something wants to execute from this area it
++ * will need to request the pointer again.
++ *
++ * @mr: #MemoryRegion associated to the pointer.
++ * @addr: address within that region
++ * @size: size of that area.
++ */
++void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
++                                       unsigned size);
++
++/**
+  * memory_region_dispatch_read: perform a read directly to the specified
+  * MemoryRegion.
+  *
+diff --git a/memory.c b/memory.c
+index 6c58373..eb3e8ec 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2375,6 +2375,51 @@ void memory_listener_unregister(MemoryListener *listener)
+     QTAILQ_REMOVE(&listener->address_space->listeners, listener, link_as);
+ }
+ 
++bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr)
++{
++    void *host;
++    unsigned size = 0;
++    unsigned offset = 0;
++    MemoryRegion *sub;
++
++    if (!mr || !mr->ops->request_ptr) {
++        return false;
++    }
++
++    /*
++     * Avoid an update if the request_ptr call
++     * memory_region_invalidate_mmio_ptr which seems to be likely when we use
++     * a cache.
++     */
++    memory_region_transaction_begin();
++
++    host = mr->ops->request_ptr(mr->opaque, addr - mr->addr, &size, &offset);
++
++    if (!host || !size) {
++        memory_region_transaction_commit();
++        return false;
++    }
++
++    sub = g_new(MemoryRegion, 1);
++    memory_region_init_ram_ptr(sub, OBJECT(mr), "mmio-map", size, host);
++    memory_region_add_subregion(mr, offset, sub);
++    memory_region_transaction_commit();
++    return true;
++}
++
++void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
++                                       unsigned size)
++{
++    MemoryRegionSection section = memory_region_find(mr, offset, size);
++
++    if (section.mr != mr) {
++        memory_region_del_subregion(mr, section.mr);
++        /* memory_region_find add a ref on section.mr */
++        memory_region_unref(section.mr);
++        object_unparent(OBJECT(section.mr));
 +    }
 +}
 +
- static void xilinx_qspips_write(void *opaque, hwaddr addr,
-                                 uint64_t value, unsigned size)
+ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
  {
-@@ -505,7 +517,7 @@ static void xilinx_qspips_write(void *opaque, hwaddr addr,
-     addr >>= 2;
- 
-     if (addr == R_LQSPI_CFG) {
--        q->lqspi_cached_addr = ~0ULL;
-+        xilinx_qspips_invalidate_mmio_ptr(q);
-     }
- }
- 
-@@ -517,27 +529,20 @@ static const MemoryRegionOps qspips_ops = {
- 
- #define LQSPI_CACHE_SIZE 1024
- 
--static uint64_t
--lqspi_read(void *opaque, hwaddr addr, unsigned int size)
-+static void lqspi_load_cache(void *opaque, hwaddr addr)
- {
--    int i;
-     XilinxQSPIPS *q = opaque;
-     XilinxSPIPS *s = opaque;
--    uint32_t ret;
--
--    if (addr >= q->lqspi_cached_addr &&
--            addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
--        uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
--        ret = cpu_to_le32(*(uint32_t *)retp);
--        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
--                   (unsigned)ret);
--        return ret;
--    } else {
--        int flash_addr = (addr / num_effective_busses(s));
--        int slave = flash_addr >> LQSPI_ADDRESS_BITS;
--        int cache_entry = 0;
--        uint32_t u_page_save = s->regs[R_LQSPI_STS] & ~LQSPI_CFG_U_PAGE;
--
-+    int i;
-+    int flash_addr = ((addr & ~(LQSPI_CACHE_SIZE - 1))
-+                   / num_effective_busses(s));
-+    int slave = flash_addr >> LQSPI_ADDRESS_BITS;
-+    int cache_entry = 0;
-+    uint32_t u_page_save = s->regs[R_LQSPI_STS] & ~LQSPI_CFG_U_PAGE;
-+
-+    if (addr < q->lqspi_cached_addr ||
-+            addr > q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
-+        xilinx_qspips_invalidate_mmio_ptr(q);
-         s->regs[R_LQSPI_STS] &= ~LQSPI_CFG_U_PAGE;
-         s->regs[R_LQSPI_STS] |= slave ? LQSPI_CFG_U_PAGE : 0;
- 
-@@ -589,12 +594,43 @@ lqspi_read(void *opaque, hwaddr addr, unsigned int size)
-         xilinx_spips_update_cs_lines(s);
- 
-         q->lqspi_cached_addr = flash_addr * num_effective_busses(s);
-+    }
-+}
-+
-+static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
-+                                    unsigned *offset)
-+{
-+    XilinxQSPIPS *q = opaque;
-+    hwaddr offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
-+
-+    lqspi_load_cache(opaque, offset_within_the_region);
-+    *size = LQSPI_CACHE_SIZE;
-+    *offset = offset_within_the_region;
-+    return q->lqspi_buf;
-+}
-+
-+static uint64_t
-+lqspi_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    XilinxQSPIPS *q = opaque;
-+    uint32_t ret;
-+
-+    if (addr >= q->lqspi_cached_addr &&
-+            addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
-+        uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
-+        ret = cpu_to_le32(*(uint32_t *)retp);
-+        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
-+                   (unsigned)ret);
-+        return ret;
-+    } else {
-+        lqspi_load_cache(opaque, addr);
-         return lqspi_read(opaque, addr, size);
-     }
- }
- 
- static const MemoryRegionOps lqspi_ops = {
-     .read = lqspi_read,
-+    .request_ptr = lqspi_request_mmio_ptr,
-     .endianness = DEVICE_NATIVE_ENDIAN,
-     .valid = {
-         .min_access_size = 1,
+     memory_region_ref(root);
 -- 
 1.8.3.1
