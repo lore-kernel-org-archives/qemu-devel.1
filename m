@@ -1,39 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cZUM3-0001xa-Fu
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 22:16:08 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cZUdF-0004zg-9u
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 22:33:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cZUM0-0004kw-LU
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 22:16:07 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33480)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cZUM0-0004kL-Cs
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 22:16:04 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v133Drt9095529
-	for <qemu-devel@nongnu.org>; Thu, 2 Feb 2017 22:16:01 -0500
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28ccsu16r8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 22:16:01 -0500
-Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Fri, 3 Feb 2017 13:15:59 +1000
-Date: Fri, 3 Feb 2017 08:45:01 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
+	(envelope-from <jasowang@redhat.com>) id 1cZUdC-0004Bn-5T
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 22:33:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cZUdC-0004Bb-00
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 22:33:50 -0500
+References: <1485248026-9628-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <c59a3873-b431-522f-d7bd-2c91a12b6735@redhat.com>
+Date: Fri, 3 Feb 2017 11:33:44 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
-Message-Id: <20170203031501.GA12744@in.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/2] softfloat: Add round-to-odd
- rounding mode
+In-Reply-To: <1485248026-9628-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] colo-compare: sort TCP packet queue by
+ sequence number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,23 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Peter,
 
-On Fri, Jan 27, 2017 at 01:33:31PM +0530, Bharata B Rao wrote:
-> 
-> Changes in v2:
-> -------------
-> - Do odd or even for the right precision bit in 64bit rounding. (Peter Maydell)
-> - Handle the overflow case correctly in 64bit rounding. (Peter Maydell)
 
-Does this version of round-to-odd implementation look correct now ?
+On 2017=E5=B9=B401=E6=9C=8824=E6=97=A5 16:53, Zhang Chen wrote:
+> Improve efficiency of TCP packet comparison.
+>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> ---
+>   net/colo-compare.c | 19 +++++++++++++++++++
+>   1 file changed, 19 insertions(+)
+>
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 9bfc736..5a4f335 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -101,6 +101,15 @@ static int compare_chr_send(CharBackend *out,
+>                               const uint8_t *buf,
+>                               uint32_t size);
+>  =20
+> +static gint seq_sorter(Packet *a, Packet *b, gpointer data)
+> +{
+> +    struct tcphdr *atcp, *btcp;
+> +
+> +    atcp =3D (struct tcphdr *)(a->transport_header);
+> +    btcp =3D (struct tcphdr *)(b->transport_header);
+> +    return ntohl(atcp->th_seq) - ntohl(btcp->th_seq);
+> +}
+> +
+>   /*
+>    * Return 0 on success, if return -1 means the pkt
+>    * is unsupported(arp and ipv6) and will be sent later
+> @@ -137,6 +146,11 @@ static int packet_enqueue(CompareState *s, int mod=
+e)
+>           if (g_queue_get_length(&conn->primary_list) <=3D
+>                                  MAX_QUEUE_SIZE) {
+>               g_queue_push_tail(&conn->primary_list, pkt);
+> +            if (conn->ip_proto =3D=3D IPPROTO_TCP) {
+> +                g_queue_sort(&conn->primary_list,
+> +                             (GCompareDataFunc)seq_sorter,
+> +                             NULL);
+> +            }
+>           } else {
+>               error_report("colo compare primary queue size too big,"
+>                            "drop packet");
+> @@ -145,6 +159,11 @@ static int packet_enqueue(CompareState *s, int mod=
+e)
+>           if (g_queue_get_length(&conn->secondary_list) <=3D
+>                                  MAX_QUEUE_SIZE) {
+>               g_queue_push_tail(&conn->secondary_list, pkt);
+> +            if (conn->ip_proto =3D=3D IPPROTO_TCP) {
+> +                g_queue_sort(&conn->secondary_list,
+> +                             (GCompareDataFunc)seq_sorter,
+> +                             NULL);
+> +            }
+>           } else {
+>               error_report("colo compare secondary queue size too big,"
+>                            "drop packet");
 
-> - Add a patch to handle underflow case correctly in 64bit rounding.
-
-Does this fix for underflow case make sense ?
-
-Regards,
-Bharata.
+Applied. Thanks
