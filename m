@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cZkyG-0001EW-Dj
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:00:41 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cZkzg-0002Tf-B3
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:02:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cZkyD-0000M0-61
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:00:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cZkyC-0000Lp-N7
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:00:37 -0500
-References: <c327fa49-67c4-5e01-29f8-cbe9c883e157@grammatech.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <5dcfdc9f-c12d-1b21-8c32-227436e0d627@redhat.com>
-Date: Fri, 3 Feb 2017 22:00:33 +0100
+	(envelope-from <mreitz@redhat.com>) id 1cZkzf-00012y-FR
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:02:08 -0500
+References: <20170203120254.15062-1-berrange@redhat.com>
+	<20170203120254.15062-2-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <506e3e55-ef59-ae96-51de-c8c98ef3953e@redhat.com>
+Date: Fri, 3 Feb 2017 22:01:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <c327fa49-67c4-5e01-29f8-cbe9c883e157@grammatech.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU + OVMF, bootable linux image
+In-Reply-To: <20170203120254.15062-2-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kIQTkkXCvgjjiWCHvRS3e30Lw7I3XR9MQ"
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] qemu-img: add support for --object
+ with 'dd' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,118 +25,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Dickens <jdickens@grammatech.com>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On 02/03/17 19:20, Jason Dickens wrote:
-> I am trying to create a raw Linux image that is bootable by QEMU using
-> the OVMF firmware image.
-> 
-> Basically, I have used a standard Ubuntu ISO  and a empty raw image.
-> Executing qemu-system-x86_64 with the ISO as CD and the other image as a
-> hardrive I have been able to install Ubuntu on the image, no problem.
-> 
-> However, when trying to boot the created image I simply get the UEFI shell?
-> 
-> I've noticed the following:
-> 
-> 1. The ISO image which boots with OVMF in UEFI just fine has the
-> following format (from fdisk):
-> 
-> Disk ubuntu-14.04.3-desktop-amd64.iso: 1006 MiB, 1054867456 bytes,
-> 2060288 sectors
-> Units: sectors of 1 * 512 = 512 bytes
-> Sector size (logical/physical): 512 bytes / 512 bytes
-> I/O size (minimum/optimal): 512 bytes / 512 bytes
-> Disklabel type: dos
-> Disk identifier: 0x6a6216fc
-> 
-> Device                           Boot   Start     End Sectors Size Id Type
-> ubuntu-14.04.3-desktop-amd64.iso1  *        0 2060287 2060288 1006M  0
-> Empty
-> ubuntu-14.04.3-desktop-amd64.iso2     2038760 2043303 4544 2.2M ef EFI
-> (FAT-12/16/32)
-> 
-> 2. The image created by the linux install has the following(from fdisk):
-> 
-> Disk ovmf_test_image: 10 GiB, 10737418240 bytes, 20971520 sectors
-> Units: sectors of 1 * 512 = 512 bytes
-> Sector size (logical/physical): 512 bytes / 512 bytes
-> I/O size (minimum/optimal): 512 bytes / 512 bytes
-> Disklabel type: gpt
-> Disk identifier: 36240C48-C008-4619-BE31-26D271000490
-> 
-> Device              Start      End  Sectors  Size Type
-> ovmf_test_image1     2048  1050623  1048576  512M EFI System
-> ovmf_test_image2  1050624 12584959 11534336  5.5G Linux filesystem
-> ovmf_test_image3 12584960 20969471  8384512    4G Linux swap
-> 
-> 
-> Can someone help me understand the format requirements to boot using
-> OVMF in UEFI mode? Clearly these two images are dramatically different.
-> However, I would expect #2 to be the more modern method and more likely
-> to work? As for QEMU command I use literally the same command switching
-> only between the file names to get the different results it looks
-> something like this:
-> 
-> qemu-system-x86_64 -drive file=ovmf_test_image,format=raw -m 4G
-> --bios.bin -net none
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kIQTkkXCvgjjiWCHvRS3e30Lw7I3XR9MQ
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
+Message-ID: <506e3e55-ef59-ae96-51de-c8c98ef3953e@redhat.com>
+Subject: Re: [PATCH v2 1/6] qemu-img: add support for --object with 'dd'
+ command
+References: <20170203120254.15062-1-berrange@redhat.com>
+ <20170203120254.15062-2-berrange@redhat.com>
+In-Reply-To: <20170203120254.15062-2-berrange@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-"something like this" is quite likely where the bug is.
+On 03.02.2017 13:02, Daniel P. Berrange wrote:
+> The qemu-img dd command added --image-opts support, but missed
+> the corresponding --object support. This prevented passing
+> secrets (eg auth passwords) needed by certain disk images.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  qemu-img.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>=20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 74e3362..391a141 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -3949,6 +3949,7 @@ static int img_dd(int argc, char **argv)
+>      };
+>      const struct option long_options[] =3D {
+>          { "help", no_argument, 0, 'h'},
+> +        { "object", required_argument, 0, OPTION_OBJECT},
+>          { "image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+>          { 0, 0, 0, 0 }
+>      };
+> @@ -3971,6 +3972,14 @@ static int img_dd(int argc, char **argv)
+>          case 'h':
+>              help();
+>              break;
+> +        case OPTION_OBJECT: {
+> +            QemuOpts *opts;
+> +            opts =3D qemu_opts_parse_noisily(&qemu_object_opts,
+> +                                           optarg, true);
+> +            if (!opts) {
+> +                return 1;
+> +            }
+> +        }   break;
+>          case OPTION_IMAGE_OPTS:
+>              image_opts =3D true;
+>              break;
+> @@ -4015,6 +4024,13 @@ static int img_dd(int argc, char **argv)
+>          ret =3D -1;
+>          goto out;
+>      }
+> +
+> +    if (qemu_opts_foreach(&qemu_object_opts,
+> +                          user_creatable_add_opts_foreach,
+> +                          NULL, NULL)) {
+> +        return 1;
 
-I downloaded "ubuntu-14.04.3-desktop-amd64.iso". I also have Gerd's
-build of OVMF installed. The RPM is called "edk2.git-ovmf-x64", and the
-repository is at <http://www.kraxel.org/repos/> (see the instructions
-there). Before running the test, I upgraded the package to
-"20170126.b2442.gf1d91f3".
+Why not ret =3D -1; goto out; like the other code around this block?
 
-The following script works flawlessly for me. You can use the same
-script both for installation and then to boot the installed guest.
+(Same for the case block above.)
 
-------------------------
-ISO=ubuntu-14.04.3-desktop-amd64.iso
-IMG=ubuntu-14.04.3-desktop-amd64.img
-VARS=ubuntu-14.04.3-desktop-amd64.vars
-DBG=ubuntu-14.04.3-desktop-amd64.dbg
-CODE=/usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-efi.fd
-TMPL=/usr/share/edk2.git/ovmf-x64/OVMF_VARS-pure-efi.fd
+Max
 
-if ! [ -e "$VARS" ]; then
-  cp $TMPL "$VARS"
-fi
+> +    }
+> +
+>      blk1 =3D img_open(image_opts, in.filename, fmt, 0, false, false);
+> =20
+>      if (!blk1) {
+>=20
 
-if ! [ -e "$IMG" ]; then
-  qemu-img create -f raw "$IMG" 20G
-fi
 
-qemu-system-x86_64 \
-  \
-  -machine accel=kvm \
-  -m 4096 \
-  \
-  -drive if=pflash,readonly,format=raw,file=$CODE \
-  -drive if=pflash,format=raw,file="$VARS" \
-  \
-  -drive id=disk,if=none,format=raw,file=$IMG \
-  -drive id=cdrom,if=none,readonly,format=raw,file=$ISO \
-  \
-  -device virtio-scsi-pci,id=scsi0 \
-  -device scsi-hd,bus=scsi0.0,drive=disk,bootindex=0 \
-  -device scsi-cd,bus=scsi0.0,drive=cdrom,bootindex=1 \
-  \
-  -chardev file,id=debug,path="$DBG" \
-  -device isa-debugcon,iobase=0x402,chardev=debug
-------------------------
 
-If you wish, after installation (and powering off the guest), you can
-simply drop the two lines from the script that contain the word "cdrom";
-the guest will remain bootable just the same.
+--kIQTkkXCvgjjiWCHvRS3e30Lw7I3XR9MQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-In general, I strongly suggest using libvirt. The QEMU command line is
-too complex if you don't know exactly what you are doing.
+-----BEGIN PGP SIGNATURE-----
 
-(I'm not being arrogant: the vast majority of the QEMU command line
-options freak me out, so I insist on using libvirt even for my own
-development purposes.)
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliU78ESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AL88IAKc8GotaFHASN9xA+C/YMEvNgJcs31vz
+kilaU8D+JpAPWdpxPgzOwnQXnDwc5O4P2vJ/UuUQo/bY4Ij0j+elIF4FT+1FAkgb
+/sYcNZ/EOjBsrojxbykL2CslO1miHUWAzi4B5UBo5Ttk4dLb/JvZH8f9lIsm7GXF
+/6KnNCggbdKIYVCI/CPZMXJNoTgjLDNaMVzgPZ8AC0Uq7LWYV1GQFQdBSJEnaVQi
+q082tDNoTElQfs42aBFFejER01JawOaimnIbSsM3S6NovVYPUafo3xrF2jG0JOW0
+1pQKPvfdQMYYJghZlH+OyMmTQIMy5Z9ij4CmQLOnJmIpB7aeEnhEqHg=
+=G0/v
+-----END PGP SIGNATURE-----
 
-HTH,
-Laszlo
+--kIQTkkXCvgjjiWCHvRS3e30Lw7I3XR9MQ--
