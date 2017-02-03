@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZdfe-0005jQ-8Y
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:12:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZdhQ-0006qM-Q8
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:15:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZdfc-0002uw-Ta
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:12:58 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36529)
+	(envelope-from <peter.maydell@linaro.org>) id 1cZdh9-0004bH-PS
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:14:48 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZdfc-0002uS-Mk
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:12:56 -0500
-Received: by mail-wm0-x234.google.com with SMTP id c85so28316481wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 05:12:56 -0800 (PST)
+	id 1cZdh9-0004a1-Fu
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:14:31 -0500
+Received: by mail-wm0-x229.google.com with SMTP id b65so28495503wmf.0
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 05:14:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170125001041.14029-1-bobby.prani@gmail.com>
-References: <20170125001041.14029-1-bobby.prani@gmail.com>
+In-Reply-To: <CAFEAcA9H8NTnHaQEUUbuC0VC4oSfPywWR3aTDzymRc+A84yfrw@mail.gmail.com>
+References: <20170130064736.9236-1-ppandit@redhat.com>
+	<CAFEAcA9H8NTnHaQEUUbuC0VC4oSfPywWR3aTDzymRc+A84yfrw@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 13:12:35 +0000
-Message-ID: <CAFEAcA-pdY6J_e035PGj5nxYrtN7V0SJMxMuaE0VECNJVKg5iQ@mail.gmail.com>
+Date: Fri, 3 Feb 2017 13:14:09 +0000
+Message-ID: <CAFEAcA_3zVuneY_6VF4RaDST1uGH5ZCNZVz5YxMJAEOPF-s6YQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC PATCH] linux-user: Add signal handling for
- x86_64
+Subject: Re: [Qemu-devel] [PATCH] sd: sdhci: check data length during
+ dma_memory_read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Allan Wirth <awirth@akamai.com>, Laurent Vivier <lvivier@redhat.com>
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On 25 January 2017 at 00:10, Pranith Kumar <bobby.prani@gmail.com> wrote:
-> Adopted from a previous patch posting:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg02079.html
+On 30 January 2017 at 10:30, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 30 January 2017 at 06:47, P J P <ppandit@redhat.com> wrote:
+>> From: Prasad J Pandit <pjp@fedoraproject.org>
+>>
+>> While doing multi block SDMA transfer in routine
+>> 'sdhci_sdma_transfer_multi_blocks', the 's->fifo_buffer' starting
+>> index 'begin' and data length 's->data_count' could end up to be same.
+>> This could lead to an OOB access issue. Correct transfer data length
+>> to avoid it.
+>>
+>> Reported-by: Jiang Xin <jiangxin1@huawei.com>
+>> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+>> ---
+>>  hw/sd/sdhci.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+>> index 01fbf22..5bd5ab6 100644
+>> --- a/hw/sd/sdhci.c
+>> +++ b/hw/sd/sdhci.c
+>> @@ -536,7 +536,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+>>                  boundary_count -= block_size - begin;
+>>              }
+>>              dma_memory_read(&address_space_memory, s->sdmasysad,
+>> -                            &s->fifo_buffer[begin], s->data_count);
+>> +                            &s->fifo_buffer[begin], s->data_count - begin);
+>>              s->sdmasysad += s->data_count - begin;
+>>              if (s->data_count == block_size) {
+>>                  for (n = 0; n < block_size; n++) {
 >
-> CC: Allan Wirth <awirth@akamai.com>
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-stable@nongnu.org
 
-Thanks for picking this patch up. A nit about commit message format:
-because this  is mostly Allan's work you need to add his signed-off-by:
-line (which he provided on his original patch posting), and make
-a brief not of what was changed, so it looks like:
 
-  Signed-off-by: Original Author <oa@example.com>
-  [OP: changed X, Y, Z]
-  Signed-off-by: Other Person <other@person.org>
 
-It's also in this kind of situation worth considering whether the
-patch would be better attributed to Allan as the git commit 'author'.
-If I've taken somebody else's work and made mostly minor overhauls
-to it I tend to go for giving them credit in the git commit log.
+Applied to target-arm.next, thanks.
 
-> ---
->  linux-user/signal.c      | 264 ++++++++++++++++++++++++++++++++++++++++-------
->  target/i386/cpu.h        |   2 +
->  target/i386/fpu_helper.c |  12 +++
->  3 files changed, 242 insertions(+), 36 deletions(-)
->
-> diff --git a/linux-user/signal.c b/linux-user/signal.c
-> index 0a5bb4e26b..0248621d66 100644
-> --- a/linux-user/signal.c
-> +++ b/linux-user/signal.c
-> @@ -253,8 +253,7 @@ int do_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
->      return 0;
->  }
->
-> -#if !defined(TARGET_OPENRISC) && !defined(TARGET_UNICORE32) && \
-> -    !defined(TARGET_X86_64)
-> +#if !defined(TARGET_OPENRISC) && !defined(TARGET_UNICORE32)
->  /* Just set the guest's signal mask to the specified value; the
->   * caller is assumed to have called block_signals() already.
->   */
-
-There's a minor conflict here with the Nios2 code that's now
-in master (which added another clause to this #if), but it's
-trivial to resolve.
-
-Otherwise:
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
 -- PMM
