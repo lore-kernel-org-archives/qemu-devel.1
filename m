@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZcFI-0000sU-Qg
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:41:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZcLi-0004CS-7J
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:48:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZcFF-0000dk-Kr
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:41:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43156)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cZcFF-0000cj-Bm
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:41:37 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 47E7C3D945
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 11:41:37 +0000 (UTC)
-Date: Fri, 3 Feb 2017 11:41:32 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170203114132.GH3208@work-vm>
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-17-git-send-email-quintela@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cZcLh-0005hO-Ad
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:48:18 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35972)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZcLh-0005fv-2O
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:48:17 -0500
+Received: by mail-wm0-x235.google.com with SMTP id c85so24822691wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 03:48:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485207141-1941-17-git-send-email-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 16/17] migration: [HACK]Transfer pages over
- new channels
+In-Reply-To: <1485744457-10324-3-git-send-email-joserz@linux.vnet.ibm.com>
+References: <1485744457-10324-1-git-send-email-joserz@linux.vnet.ibm.com>
+	<1485744457-10324-3-git-send-email-joserz@linux.vnet.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Feb 2017 11:47:55 +0000
+Message-ID: <CAFEAcA-GzRRz1jFj14cjEyXHTmE7RKr=1ocN5JckbNcmOtK9WQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH Risu 2/2] risu_ppc64: Compare FPSCR flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,151 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We switch for sending the page number to send real pages.
-> 
-> [HACK]
-> How we calculate the bandwidth is beyond repair, there is a hack there
-> that would work for x86 and archs that have 4kb pages.
-> 
-> If you are having a nice day just go to migration/ram.c and look at
-> acct_update_position().  Now you are depressed, right?
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 30 January 2017 at 02:47, Jose Ricardo Ziviani
+<joserz@linux.vnet.ibm.com> wrote:
+> When running FP operations, FPSCR flag must be compared to make sure
+> that any exception will behave consistently.
+>
+> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 > ---
->  migration/migration.c | 15 +++++++++++----
->  migration/ram.c       | 25 +++++++++----------------
->  2 files changed, 20 insertions(+), 20 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 1d62b91..cbbf2a3 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1839,7 +1839,8 @@ static void *migration_thread(void *opaque)
->      /* Used by the bandwidth calcs, updated later */
->      int64_t initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->      int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
-> -    int64_t initial_bytes = 0;
-> +    int64_t qemu_file_bytes = 0;
-> +    int64_t multifd_pages = 0;
->      int64_t max_size = 0;
->      int64_t start_time = initial_time;
->      int64_t end_time;
-> @@ -1923,9 +1924,14 @@ static void *migration_thread(void *opaque)
+>  risu_reginfo_ppc64le.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/risu_reginfo_ppc64le.c b/risu_reginfo_ppc64le.c
+> index 4dc509c..ee0e55e 100644
+> --- a/risu_reginfo_ppc64le.c
+> +++ b/risu_reginfo_ppc64le.c
+> @@ -21,6 +21,7 @@
+>
+>  #define XER 37
+>  #define CCR 38
+> +#define FPREG 32
+>
+>  /* reginfo_init: initialize with a ucontext */
+>  void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+> @@ -82,6 +83,10 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a, ucontext_t *uc)
 >          }
->          current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->          if (current_time >= initial_time + BUFFER_DELAY) {
-> -            uint64_t transferred_bytes = qemu_ftell(s->to_dst_file) -
-> -                                         initial_bytes;
->              uint64_t time_spent = current_time - initial_time;
-> +            uint64_t qemu_file_bytes_now = qemu_ftell(s->to_dst_file);
-> +            uint64_t multifd_pages_now = multifd_mig_pages_transferred();
-> +            /* Hack ahead.  Why the hell we don't have a function to now the
-> +               target_page_size.  Hard coding it to 4096 */
-> +            uint64_t transferred_bytes =
-> +                (qemu_file_bytes_now - qemu_file_bytes) +
-> +                (multifd_pages_now - multifd_pages) * 4096;
+>      }
+>
+> +    if (m->fpregs[FPREG] != a->fpregs[FPREG]) {
+> +        return 0;
+> +    }
+> +
+>      for (i = 0; i < 32; i++) {
+>          if (m->vrregs.vrregs[i][0] != a->vrregs.vrregs[i][0] ||
+>                  m->vrregs.vrregs[i][1] != a->vrregs.vrregs[i][1] ||
+> --
 
-The problem was that it was target specific so the macros aren't allowed in
-migration.c that's target independent; but you'll see I added the
-qemu_target_page_bits() function, so you can do  1ul << qemu_target_page_bits()
+Do we also need to add something to reginfo_dump_mismatch()
+to print the mismatching FPSCR values ?
 
-Still, I don't quite understand why we need the transferred_bytes hack;
-can't you just accumulate them as you pass them to multifd_send_page ?
-
->              double bandwidth = (double)transferred_bytes / time_spent;
->              max_size = bandwidth * s->parameters.downtime_limit;
-> 
-> @@ -1942,7 +1948,8 @@ static void *migration_thread(void *opaque)
-> 
->              qemu_file_reset_rate_limit(s->to_dst_file);
->              initial_time = current_time;
-> -            initial_bytes = qemu_ftell(s->to_dst_file);
-> +            qemu_file_bytes = qemu_file_bytes_now;
-> +            multifd_pages = multifd_pages_now;
->          }
->          if (qemu_file_rate_limit(s->to_dst_file)) {
->              /* usleep expects microseconds */
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 95af694..28d099f 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -441,9 +441,9 @@ static void *multifd_send_thread(void *opaque)
-> 
->              for(i=0; i < num; i++) {
->                  if (qio_channel_write(params->c,
-> -                                      (const char *)&params->pages.address[i],
-> -                                      sizeof(uint8_t *), &error_abort)
-> -                    != sizeof(uint8_t*)) {
-> +                                      (const char *)params->pages.address[i],
-> +                                      TARGET_PAGE_SIZE, &error_abort)
-> +                    != TARGET_PAGE_SIZE) {
->                      /* Shuoudn't ever happen */
->                      exit(-1);
->                  }
-> @@ -608,7 +608,6 @@ QemuCond  multifd_recv_cond;
->  static void *multifd_recv_thread(void *opaque)
->  {
->      MultiFDRecvParams *params = opaque;
-> -    uint8_t *recv_address;
->      char start;
-> 
->      qio_channel_read(params->c, &start, 1, &error_abort);
-> @@ -629,20 +628,13 @@ static void *multifd_recv_thread(void *opaque)
-> 
->              for(i = 0; i < num; i++) {
->                  if (qio_channel_read(params->c,
-> -                                     (char *)&recv_address,
-> -                                     sizeof(uint8_t*), &error_abort)
-> -                    != sizeof(uint8_t *)) {
-> +                                     (char *)params->pages.address[i],
-> +                                     TARGET_PAGE_SIZE, &error_abort)
-> +                    != TARGET_PAGE_SIZE) {
->                      /* shouldn't ever happen */
->                      exit(-1);
->                  }
-> -                if (recv_address != params->pages.address[i]) {
-> -                    printf("We received %p what we were expecting %p (%d)\n",
-> -                           recv_address,
-> -                           params->pages.address[i], i);
-> -                    exit(-1);
-> -                }
->              }
-> -
->              qemu_mutex_lock(&multifd_recv_mutex);
->              params->done = true;
->              qemu_cond_signal(&multifd_recv_cond);
-> @@ -1195,8 +1187,10 @@ static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
->              save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
->          fd_num = multifd_send_page(p, migration_dirty_pages == 1);
->          qemu_put_be16(f, fd_num);
-> +        if (fd_num != UINT16_MAX) {
-> +            qemu_fflush(f);
-> +        }
->          *bytes_transferred += 2; /* size of fd_num */
-> -        qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
->          *bytes_transferred += TARGET_PAGE_SIZE;
->          pages = 1;
->          acct_info.norm_pages++;
-> @@ -3017,7 +3011,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->          case RAM_SAVE_FLAG_MULTIFD_PAGE:
->              fd_num = qemu_get_be16(f);
->              multifd_recv_page(host, fd_num);
-
-I think also at some point you need to validate that fd_num that's
-come off the wire.
-
-Dave
-
-> -            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
->              break;
-> 
->          case RAM_SAVE_FLAG_EOS:
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
