@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cZbEO-0001Nj-QU
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:36:41 -0500
+	(envelope-from <berto@igalia.com>) id 1cZbFm-0002ku-IK
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:38:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cZbEM-0002mv-7s
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:36:40 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1cZbEM-0002lr-0P
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:36:38 -0500
-Received: by mail-pg0-x241.google.com with SMTP id 204so1688662pge.2
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 02:36:37 -0800 (PST)
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Fri,  3 Feb 2017 16:06:38 +0530
-Message-Id: <1486118198-8965-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] migrate: Introduce zero RAM checks to skip
- RAM migration
+	(envelope-from <berto@igalia.com>) id 1cZbFk-0004IJ-07
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:38:06 -0500
+Received: from smtp3.mundo-r.com ([212.51.32.191]:6111 helo=smtp4.mundo-r.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berto@igalia.com>) id 1cZbFj-0004Fu-Ic
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:38:03 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1486116298-25046-3-git-send-email-pradeep.jagadeesh@huawei.com>
+References: <1486116298-25046-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1486116298-25046-3-git-send-email-pradeep.jagadeesh@huawei.com>
+Date: Fri, 03 Feb 2017 11:38:01 +0100
+Message-ID: <w51o9yjwody.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/2 v15] throttle: factor out duplicate code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: quintela@redhat.com, dgilbert@redhat.com, amit.shah@redhat.com, berrange@redhat.com, pbonzini@redhat.com, groug@kaod.org, qemu-devel@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
 
-Migration of a "none" machine with no RAM crashes abruptly as
-bitmap_new() fails and thus aborts. Instead place zero RAM checks at
-appropriate places to skip migration of RAM in this case and complete
-migration successfully for devices only.
+On Fri 03 Feb 2017 11:04:58 AM CET, Pradeep Jagadeesh wrote:
 
-Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
----
-Changes in v2:
-- try to migrate successfully by skipping RAM (Paolo, Greg)
-- drop the idea of erroring out and failing nicely
- migration/ram.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+> This patch removes the redundant throttle code that was present in
+> block and fsdev device files. Now the common code is moved to a single
+> file.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index ef8fadf..2f19566 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1325,6 +1325,11 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
-     ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
-                                  ram_addr_t space */
- 
-+    /* No dirty page as there is zero RAM */
-+    if (!ram_bytes_total()) {
-+        return pages;
-+    }
-+
-     pss.block = last_seen_block;
-     pss.offset = last_offset;
-     pss.complete_round = false;
-@@ -1912,14 +1917,17 @@ static int ram_save_init_globals(void)
-     bytes_transferred = 0;
-     reset_ram_globals();
- 
--    ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
--    migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
--    migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
--    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
-+    /* Skip setting bitmap if there is no RAM */
-+    if (ram_bytes_total()) {
-+        ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
-+        migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
-+        migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
-+        bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
- 
--    if (migrate_postcopy_ram()) {
--        migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
--        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
-+        if (migrate_postcopy_ram()) {
-+            migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
-+            bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
-+        }
-     }
- 
-     /*
--- 
-2.6.2
+Here it says that this patch moves common code to a separate file,
+however:
+
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 920eb05..22a6a99 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -3532,7 +3532,6 @@ out:
+>          if (s->ops && s->ops->cleanup && s->ctx.private) {
+>              s->ops->cleanup(&s->ctx);
+>          }
+> -        fsdev_throttle_cleanup(s->ctx.fst);
+>          g_free(s->tag);
+>          g_free(s->ctx.fs_root);
+>          v9fs_path_free(&path);
+> @@ -3545,6 +3544,7 @@ void v9fs_device_unrealize_common(V9fsState *s, Error **errp)
+>      if (s->ops->cleanup) {
+>          s->ops->cleanup(&s->ctx);
+>      }
+> +    fsdev_throttle_cleanup(s->ctx.fst);
+>      g_free(s->tag);
+>      g_free(s->ctx.fs_root);
+>  }
+
+This doesn't belong here. In patch 1 you add a fsdev_throttle_cleanup()
+in v9fs_device_realize_common(), and in patch 2 you remove it from there
+and put it in v9fs_device_unrealize_common().
+
+It looks like you wanted to fix patch 1 but added the fix to patch 2
+instead.
+
+Berto
