@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cZc4D-0000i3-Tx
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:30:18 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cZc7J-0002Tv-C7
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:33:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cZc49-00076j-Vc
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:30:13 -0500
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35409)
+	(envelope-from <alex.bennee@linaro.org>) id 1cZc7F-0001rH-CY
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:33:25 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:34782)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cZc49-00075F-PK
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:30:09 -0500
-Received: by mail-wm0-x22f.google.com with SMTP id b65so24177067wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 03:30:09 -0800 (PST)
+	id 1cZc7F-0001qQ-5Q
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:33:21 -0500
+Received: by mail-wm0-x233.google.com with SMTP id 196so13899396wmm.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 03:33:20 -0800 (PST)
 References: <20170201150553.9381-1-alex.bennee@linaro.org>
-	<20170201150553.9381-22-alex.bennee@linaro.org>
-	<CAFEAcA_TviTHP-WkppW342wSHRMHX8P9wqGd1UA6bdLG6n8_oQ@mail.gmail.com>
+	<20170201150553.9381-24-alex.bennee@linaro.org>
+	<CAFEAcA9J4KgFLD5QiEjarw6HZY-T5WX4eSeSdGY6G2Y9ZAMOqQ@mail.gmail.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA_TviTHP-WkppW342wSHRMHX8P9wqGd1UA6bdLG6n8_oQ@mail.gmail.com>
-Date: Fri, 03 Feb 2017 11:30:12 +0000
-Message-ID: <87tw8bfr5n.fsf@linaro.org>
+In-reply-to: <CAFEAcA9J4KgFLD5QiEjarw6HZY-T5WX4eSeSdGY6G2Y9ZAMOqQ@mail.gmail.com>
+Date: Fri, 03 Feb 2017 11:33:23 +0000
+Message-ID: <87shnvfr0c.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v9 21/25] target-arm: don't generate
- WFE/YIELD calls for MTTCG
+Subject: Re: [Qemu-devel] [PATCH v9 23/25] target-arm: introduce
+ ARM_CP_EXIT_PC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,28 +39,91 @@ Cc: MTTCG Devel <mttcg@listserver.greensocs.com>, QEMU Developers <qemu-devel@no
 Peter Maydell <peter.maydell@linaro.org> writes:
 
 > On 1 February 2017 at 15:05, Alex Bennée <alex.bennee@linaro.org> wrote:
->> The WFE and YIELD instructions are really only hints and in TCG's case
->> they were useful to move the scheduling on from one vCPU to the next. In
->> the parallel context (MTTCG) this just causes an unnecessary cpu_exit
->> and contention of the BQL.
+>> Some helpers may trigger an immediate exit of the cpu_loop. If this
+>> happens the PC need to be rectified to ensure the restart will begin
+>> on the next instruction.
 >>
 >> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> Reviewed-by: Richard Henderson <rth@twiddle.net>
 >> ---
->>  target/arm/op_helper.c     |  7 +++++++
->>  target/arm/translate-a64.c |  8 ++++++--
->>  target/arm/translate.c     | 20 ++++++++++++++++----
->>  3 files changed, 29 insertions(+), 6 deletions(-)
+>>  target/arm/cpu.h           | 3 ++-
+>>  target/arm/translate-a64.c | 4 ++++
+>>  target/arm/translate.c     | 4 ++++
+>>  3 files changed, 10 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index d61793ca06..a3c4d07817 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -1465,7 +1465,8 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
+>>  #define ARM_CP_NZCV            (ARM_CP_SPECIAL | (3 << 8))
+>>  #define ARM_CP_CURRENTEL       (ARM_CP_SPECIAL | (4 << 8))
+>>  #define ARM_CP_DC_ZVA          (ARM_CP_SPECIAL | (5 << 8))
+>> -#define ARM_LAST_SPECIAL       ARM_CP_DC_ZVA
+>> +#define ARM_CP_EXIT_PC         (ARM_CP_SPECIAL | (6 << 8))
+>> +#define ARM_LAST_SPECIAL       ARM_CP_EXIT_PC
 >
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> This shouldn't be a "special", because those are for
+> "this is a special case that is handled entirely in the translate
+> code", not "I need some extra behaviour on the code generated
+> for calling the helper functions" (which is what the
+> plain non-special ARM_CP flags do). Notice that all the other
+> "special" cases completely define the behaviour of the cp that
+> uses them, and the code implementing them ends the case
+> statement with "return", not "break".
 >
-> though I'm not much of a fan of yet another global variable :-(
+> Missing documentation comment change.
 
-It's unfortunate but I think justified in the case. parallel_cpus is a
-global state that controls the emission of barriers and generation of
-atomics. It does sometime get turned off for the EXCP_ATOMIC processing
-(but only in a temporary exclusive region).
+I posted this before you commented on the last version. Anyway see
+bellow.
 
+>
+> That said, I'm definitely becoming more strongly of the
+> opinion that longjumping out of this helper is not the
+> best way to implement this, so these remarks are a bit moot.
+
+Yep the tree:
+
+  https://github.com/stsquad/qemu/commits/mttcg/base-patches-v10
+
+Reverts the this change and changes the cputlb flush code to return and
+let the guest translation code exit the normal way. I was hoping to get
+some feedback from Paolo and Richard before I roll the fixes together
+and post v10 which will be later today.
+
+>
+>>  /* Used only as a terminator for ARMCPRegInfo lists */
+>>  #define ARM_CP_SENTINEL 0xffff
+>>  /* Mask of only the flag bits in a type field */
+>> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+>> index 7e7131fe2f..98d4fac070 100644
+>> --- a/target/arm/translate-a64.c
+>> +++ b/target/arm/translate-a64.c
+>> @@ -1561,6 +1561,10 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
+>>          tcg_rt = cpu_reg(s, rt);
+>>          gen_helper_dc_zva(cpu_env, tcg_rt);
+>>          return;
+>> +    case ARM_CP_EXIT_PC:
+>> +        /* The helper may exit the cpu_loop so ensure PC is correct */
+>> +        gen_a64_set_pc_im(s->pc);
+>> +        break;
+>>      default:
+>>          break;
+>>      }
+>> diff --git a/target/arm/translate.c b/target/arm/translate.c
+>> index 24faa7c60c..e1f4a48720 100644
+>> --- a/target/arm/translate.c
+>> +++ b/target/arm/translate.c
+>> @@ -7510,6 +7510,10 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
+>>              gen_set_pc_im(s, s->pc);
+>>              s->is_jmp = DISAS_WFI;
+>>              return 0;
+>> +        case ARM_CP_EXIT_PC:
+>> +            /* The helper may exit the cpu_loop so ensure PC is correct */
+>> +            gen_set_pc_im(s, s->pc);
+>> +            break;
+>>          default:
+>>              break;
+>>          }
 >
 > thanks
 > -- PMM
