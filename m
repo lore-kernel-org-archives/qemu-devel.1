@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cZf1l-0008NM-1M
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:39:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZf2Q-0000b7-8T
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:40:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cZf1g-0003hz-Bh
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:39:53 -0500
-Date: Fri, 3 Feb 2017 14:39:44 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170203143944.GC642@stefanha-x1.localdomain>
-References: <20170202114101.2655-1-philipp.gesang@intra2net.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cZf2O-00041I-G8
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:40:34 -0500
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:38411)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZf2O-00040g-76
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:40:32 -0500
+Received: by mail-wm0-x22d.google.com with SMTP id r141so30498717wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 06:40:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="kfjH4zxOES6UT95V"
-Content-Disposition: inline
-In-Reply-To: <20170202114101.2655-1-philipp.gesang@intra2net.com>
-Subject: Re: [Qemu-devel] [PATCH] docs: update manpage for stderr->log rename
+In-Reply-To: <1485946146-21639-1-git-send-email-bharata@linux.vnet.ibm.com>
+References: <1485946146-21639-1-git-send-email-bharata@linux.vnet.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Feb 2017 14:40:09 +0000
+Message-ID: <CAFEAcA_gno6etAWKkssBYSzYethD7_qNQh6CJCdviTNPqn2x9Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC PATCH v0] softfloat: Add
+ float128_to_uint64_round_to_zero()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +29,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philipp Gesang <philipp.gesang@intra2net.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-
---kfjH4zxOES6UT95V
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Feb 02, 2017 at 12:41:01PM +0100, Philipp Gesang wrote:
-> With commit ed7f5f1d8db06fc31352a5ef4f54985e630c575a the name of
-> this backend changed from =E2=80=9Cstderr=E2=80=9D to =E2=80=9Clog=E2=80=
-=9D.
->=20
-> Signed-off-by: Philipp Gesang <philipp.gesang@intra2net.com>
+On 1 February 2017 at 10:49, Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
+> Implement float128_to_uint64() and use that to implement
+> float128_to_uint64_round_to_zero()
+>
+> This is required by xscvqpudz instruction of PowerPC ISA 3.0.
+>
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 > ---
->  qemu-option-trace.texi | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  fpu/softfloat.c         | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/fpu/softfloat.h |  2 ++
+>  2 files changed, 67 insertions(+)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index c295f31..49a06c5 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -6110,6 +6110,71 @@ int64_t float128_to_int64_round_to_zero(float128 a, float_status *status)
+>
+>  /*----------------------------------------------------------------------------
+>  | Returns the result of converting the quadruple-precision floating-point
+> +| value `a' to the 64-bit unsigned integer format.  The conversion
+> +| is performed according to the IEC/IEEE Standard for Binary Floating-Point
+> +| Arithmetic---which means in particular that the conversion is rounded
+> +| according to the current rounding mode.  If `a' is a NaN, the largest
+> +| positive integer is returned.  Otherwise, if the conversion overflows, the
+> +| largest unsigned integer is returned. If 'a' is negative, the value is
+> +| rounded and zero is returned; negative values that do not round to zero
+> +| will raise the inexact exception.
+> +*----------------------------------------------------------------------------*/
+> +
+> +uint64_t float128_to_uint64(float128 a, float_status *status)
+> +{
+> +    flag aSign;
+> +    int32_t aExp, shiftCount;
+> +    uint64_t aSig0, aSig1;
 
-Thanks, applied to my tracing tree:
-https://github.com/stefanha/qemu/commits/tracing
+I think we should have a float128_squash_input_denormal() function
+which we call here (compare float64_to_uint64).
 
-Stefan
+> +
+> +    aSig1 = extractFloat128Frac1( a );
 
---kfjH4zxOES6UT95V
-Content-Type: application/pgp-signature; name="signature.asc"
+Can you use the QEMU coding style for this rather than following
+the softfloat weird one, please?
 
------BEGIN PGP SIGNATURE-----
+> +    aSig0 = extractFloat128Frac0( a );
+> +    aExp = extractFloat128Exp( a );
+> +    aSign = extractFloat128Sign( a );
+> +    if ( aExp ) aSig0 |= LIT64( 0x0001000000000000 );
+> +    shiftCount = 0x402F - aExp;
+> +    if ( shiftCount <= 0 ) {
+> +        if ( 0x403E < aExp ) {
+> +            float_raise(float_flag_invalid, status);
+> +            if (    ! aSign
+> +                 || (    ( aExp == 0x7FFF )
+> +                      && ( aSig1 || ( aSig0 != LIT64( 0x0001000000000000 ) ) )
+> +                    )
+> +               ) {
+> +                return LIT64( 0xFFFFFFFFFFFFFFFF );
+> +            }
+> +            return 0;
+> +        }
+> +        shortShift128Left( aSig0, aSig1, - shiftCount, &aSig0, &aSig1 );
+> +    }
+> +    else {
+> +        shift64ExtraRightJamming( aSig0, aSig1, shiftCount, &aSig0, &aSig1 );
+> +    }
+> +    return roundAndPackUint64(aSign, aSig0, aSig1, status);
 
-iQEcBAEBAgAGBQJYlJYvAAoJEJykq7OBq3PIKzgIALY+RFz7vW5JFugL1SxQmfqI
-pANXTyhNi20h0Hj6jUw1c6GJPYGX9UsAtco9rZmKXOWpc4slwkmCvhq3HpYzngUH
-3aHD5FsdcolwQqcgvcMGykoCCQV1BadyXQ3X47NoTroKB9voSuLYJg6FNk3W7ZhP
-15TamXqQS2ZPU4Rsx4WeXAOqBgtVRDl6sX7OUFVcn82QiTkkq2NbR/DiRHGVIere
-692z+nFKYtkMnzYQmfwxyL/+visKadpLyBp+CRiJFYoTHz5aHO6V52NqnR7N0Tys
-JQoVRgJRugDxMSD414XXu7Mi+1145neEXHT+Lm3R2rTWfII0K3T40PnjeZS/LQo=
-=ialI
------END PGP SIGNATURE-----
+I'm finding this a bit difficult to understand, because it doesn't
+follow the code pattern of (for instance) float64_to_uint64().
+Is it based on some other existing function?
 
---kfjH4zxOES6UT95V--
+> +}
+> +
+> +/*----------------------------------------------------------------------------
+> +| Returns the result of converting the quadruple-precision floating-point
+> +| value `a' to the 64-bit unsigned integer format.  The conversion
+> +| is performed according to the IEC/IEEE Standard for Binary Floating-Point
+> +| Arithmetic, except that the conversion is always rounded toward zero.
+> +| according to the current rounding mode.  If `a' is a NaN, the largest
+> +| positive integer is returned.  Otherwise, if the conversion overflows, the
+> +| largest unsigned integer is returned. If 'a' is negative, the value is
+> +| rounded and zero is returned; negative values that do not round to zero
+> +| will raise the inexact exception.
+> +*----------------------------------------------------------------------------*/
+> +
+> +uint64_t float128_to_uint64_round_to_zero(float128 a, float_status *status)
+> +{
+> +    signed char current_rounding_mode = status->float_rounding_mode;
+> +    set_float_rounding_mode(float_round_to_zero, status);
+> +    uint64_t v = float128_to_uint64(a, status);
+> +    set_float_rounding_mode(current_rounding_mode, status);
+> +    return v;
+> +}
+
+This function is OK, though our coding style would suggest putting
+the declaration of 'uint64_t v;' at the top of the function.
+
+> +
+> +/*----------------------------------------------------------------------------
+> +| Returns the result of converting the quadruple-precision floating-point
+>  | value `a' to the single-precision floating-point format.  The conversion
+>  | is performed according to the IEC/IEEE Standard for Binary Floating-Point
+>  | Arithmetic.
+> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+> index 842ec6b..4e99253 100644
+> --- a/include/fpu/softfloat.h
+> +++ b/include/fpu/softfloat.h
+> @@ -712,6 +712,8 @@ int32_t float128_to_int32(float128, float_status *status);
+>  int32_t float128_to_int32_round_to_zero(float128, float_status *status);
+>  int64_t float128_to_int64(float128, float_status *status);
+>  int64_t float128_to_int64_round_to_zero(float128, float_status *status);
+> +uint64_t float128_to_uint64(float128, float_status *status);
+> +uint64_t float128_to_uint64_round_to_zero(float128, float_status *status);
+>  float32 float128_to_float32(float128, float_status *status);
+>  float64 float128_to_float64(float128, float_status *status);
+>  floatx80 float128_to_floatx80(float128, float_status *status);
+> --
+> 2.7.4
+
+thanks
+-- PMM
