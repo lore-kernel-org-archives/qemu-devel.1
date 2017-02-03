@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cZlSw-0005dP-DM
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:32:23 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cZlf8-00088q-5M
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:44:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cZlSs-0003kq-DH
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:32:22 -0500
-Received: from mail1.bemta8.messagelabs.com ([216.82.243.198]:10329)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Ketan.Nilangekar@veritas.com>)
-	id 1cZlSs-0003kB-8c
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:32:18 -0500
-From: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
-Date: Fri, 3 Feb 2017 21:32:11 +0000
-Message-ID: <75317A00-6AB8-4890-905B-D6A93BEFFD0F@veritas.com>
-References: <CAAo6VWMJAYeLdtEmyQ43vYeYjvNzCP80Wufe4=eNRUZum0rYdQ@mail.gmail.com>
-	<CAJSP0QV7QCLwih+F30hcohmwYQ1Ci+6bMPuCj_Kk9hwbmgWzUA@mail.gmail.com>
-	<E05FEFD5-A72D-4FC5-B600-58AAD2900A02@veritas.com>
-	<CAJSP0QUWmU_XbB9TGxvL0hH-SCzRSWDciNhpZrarDDcE22RF_w@mail.gmail.com>
-	<D1304CAA-9C32-4E42-AA65-27B3277130E8@veritas.com>
-	<20170202100728.GA20760@stefanha-x1.localdomain>
-	<20170202101537.GE2915@redhat.com>
-	<49FDD34F-2649-4437-AC4F-4C1C91FEA15C@veritas.com>
-	<231FC4E3-0EEB-4BD5-A541-1ABFAB592EEC@veritas.com>
-	<20170203094509.GB10350@redhat.com>
-In-Reply-To: <20170203094509.GB10350@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3E1584A0D6A7D244B730A234EC9BD049@veritas.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mreitz@redhat.com>) id 1cZlf6-00009K-Vk
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:44:58 -0500
+References: <20170203120254.15062-1-berrange@redhat.com>
+	<20170203120254.15062-4-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5c7df424-d78e-650f-3045-c87fd645b611@redhat.com>
+Date: Fri, 3 Feb 2017 22:44:46 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v7 RFC] block/vxhs: Initial commit to add
- Veritas HyperScale VxHS block device support
+In-Reply-To: <20170203120254.15062-4-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nBrdV0Atkxr4APOQrQg43phtDtQv6Fk0o"
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] qemu-img: add support for
+ conv=nocreat, notrunc args to dd command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,38 +25,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, ashish mittal <ashmit602@gmail.com>, Paolo
-	Bonzini <pbonzini@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Gaurav Bhandarkar <Gaurav.Bhandarkar@veritas.com>, Abhishek Kane <Abhishek.Kane@veritas.com>, Ketan Mahajan <Ketan.Mahajan@veritas.com>, Niranjan Pendharkar <Niranjan.Pendharkar@veritas.com>, Nirendra Awasthi <Nirendra.Awasthi@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
 
-DQoNCk9uIDIvMy8xNywgMTo0NSBBTSwgIkRhbmllbCBQLiBCZXJyYW5nZSIgPGJlcnJhbmdlQHJl
-ZGhhdC5jb20+IHdyb3RlOg0KDQogICAgT24gVGh1LCBGZWIgMDIsIDIwMTcgYXQgMDk6MjI6NDZQ
-TSArMDAwMCwgS2V0YW4gTmlsYW5nZWthciB3cm90ZToNCiAgICA+IA0KICAgID4gT24gMi8yLzE3
-LCAxMjo1NyBQTSwgIktldGFuIE5pbGFuZ2VrYXIiIDxLZXRhbi5OaWxhbmdla2FyQHZlcml0YXMu
-Y29tPiB3cm90ZToNCiAgICA+ICAgICAgICAgDQogICAgPiAgICAgW0tldGFuXQ0KICAgID4gICAg
-IERvZXMgdGhlIFFJTyBpbnRlcmZhY2UgYWxsb3cgZm9yIHJlYWR2L3dyaXRldiBvdmVyIG5ldHdv
-cmsgZm9yIHVuc2VjdXJlIHNvY2tldHM/DQogICAgPiAgICAgDQogICAgPiBbS2V0YW5dDQogICAg
-PiBJIGNoZWNrZWQgdGhlIHFpbyBpbXBsZW1lbnRhdGlvbiBhbmQgaXQgc2VlbXMgdGhhdCB0aGVy
-ZSBpcyBhIHBzZXVkbw0KICAgID4gaW1wbGVtZW50YXRpb24gb2YgcmVhZHYvd3JpdGV2IHdoaWNo
-IGl0ZXJhdGVzIG92ZXIgdGhlIGluZGl2aWR1YWwNCiAgICA+IGlvdmVjcyB0byBtYWtlIHNlbmQv
-cmVjdiBzeXNjYWxscy4gVGhpcyBjYW7igJl0IGJlIHRvbyBnb29kIGZvciBwZXJmb3JtYW5jZS4N
-CiAgICANCiAgICBJIHRoaW5rIHlvdSBsb29rZWQgYXQgdGhlIFdpbjMyIGNvZGUgLSB0aGUgcWlv
-X2NoYW5uZWxfc29ja2V0X3dyaXRldg0KICAgIGFuZCBxaW9fY2hhbm5lbF9zb2NrZXRfcmVhZHYg
-bWV0aG9kcyB3aGljaCBhcmUgYnVpbHQgb24gbm9uLVdpbjMyDQogICAgcGxhdGZvcm1zIHVzZSBy
-ZWN2bXNnL3NlbmRtc2cgdG8gaGFuZGxlIGlvdmVjcyBpbiBhIHNpbmdsZSBvcGVyYXRpb24uDQoN
-CltLZXRhbl0NCk9rIEkgc2VlIHRoYXQuDQogICAgDQogICAgPiBBcmUgeW91IHN1Z2dlc3Rpbmcg
-d2UgdXNlIHRoZSBxaW8gaW50ZXJmYWNlIGZvciBzZWN1cmUgY29tbXVuaWNhdGlvbiBvbmx5DQog
-ICAgPiBhbmQgbGVhdmUgdGhlIHVuc2VjdXJlIGNvbW11bmljYXRpb24gdG8gbGlicW5pbz8NCiAg
-ICANCiAgICBJZiB5b3UgZXhwZWN0IG5vbi1RRU1VIGFwcHMgdG8gdXNlIGxpYnFuaW8sIHRoZW4g
-eW91IGNvdWxkIGtlZXAgc3VwcG9ydA0KICAgIGZvciBwbGFpbiAmIFRMUyBzb2NrZXRzIGluIGxp
-YnFuaW8uIEp1c3QgcHJvdmlkZSB0aGUgSS9PIGNhbGxiYWNrcyBmYWNpbGl0eQ0KICAgIGFzIGFu
-IGFsdGVybmF0aXZlIGFwcHJvYWNoIHdoaWNoIGNhbiBiZSB1c2VkIGJ5IFFFTVUgZm9yIHNlY3Vy
-ZSAmIGluc2VjdXJlDQogICAgSS9PIGhhbmRsaW5nLg0KDQpbS2V0YW5dDQpXZSBkbyBleHBlY3Qg
-bm9uLXFlbXUgYXBwbGljYXRpb25zIHRvIHVzZSBsaWJxbmlvLiANCkhvd2V2ZXIsIGlmIHRoaXMg
-aXMgYSAibmljZSB0byBoYXZlIiBmcm9tIFFFTVUgcGVyc3BlY3RpdmUsIEknZCBsaWtlIHRvIHRh
-a2UgdGhpcyB1cCBsYXRlci4NCg0KDQpSZWdhcmRzLA0KICAgIERhbmllbA0KICAgIC0tIA0KICAg
-IHw6IGh0dHA6Ly9iZXJyYW5nZS5jb20gICAgICAtby0gICAgaHR0cDovL3d3dy5mbGlja3IuY29t
-L3Bob3Rvcy9kYmVycmFuZ2UvIDp8DQogICAgfDogaHR0cDovL2xpYnZpcnQub3JnICAgICAgICAg
-ICAgICAtby0gICAgICAgICAgICAgaHR0cDovL3ZpcnQtbWFuYWdlci5vcmcgOnwNCiAgICB8OiBo
-dHRwOi8vZW50YW5nbGUtcGhvdG8ub3JnICAgICAgIC1vLSAgICBodHRwOi8vc2VhcmNoLmNwYW4u
-b3JnL35kYW5iZXJyLyA6fA0KICAgIA0KDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nBrdV0Atkxr4APOQrQg43phtDtQv6Fk0o
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
+Message-ID: <5c7df424-d78e-650f-3045-c87fd645b611@redhat.com>
+Subject: Re: [PATCH v2 3/6] qemu-img: add support for conv=nocreat,notrunc
+ args to dd command
+References: <20170203120254.15062-1-berrange@redhat.com>
+ <20170203120254.15062-4-berrange@redhat.com>
+In-Reply-To: <20170203120254.15062-4-berrange@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 03.02.2017 13:02, Daniel P. Berrange wrote:
+> The -n arg to the convert command allows use of a pre-existing image,
+> rather than creating a new image. This adds equivalent functionality
+> to the dd command using the 'conv' arg. If 'conv=3Dnocreat' is used,
+> then it will assume the image already exists. The existing image
+> will be truncated to match the required output size. 'conv=3Dnotrunc'
+> cna be used to preserve the existing image size.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  qemu-img-cmds.hx |   4 +-
+>  qemu-img.c       | 137 +++++++++++++++++++++++++++++++++++++++++------=
+--------
+>  qemu-img.texi    |  10 +++-
+>  3 files changed, 115 insertions(+), 36 deletions(-)
+
+Quite frankly I don't like this patch very much. It's not bad in itself,
+but I don't like the idea of giving qemu-img dd new features until it's
+an interface for qemu-img convert. Everything that we add now encourages
+new users to use it and will make the conversion a bit more difficult.
+
+As long as qemu-img convert gets a --target-image-opts, I don't think we
+need all of this functionality in qemu-img dd.
+
+Anyway, I won't block/NACK this patch, so resuming review.
+
+> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+> index f054599..b2c5424 100644
+> --- a/qemu-img-cmds.hx
+> +++ b/qemu-img-cmds.hx
+> @@ -46,9 +46,9 @@ STEXI
+>  ETEXI
+> =20
+>  DEF("dd", img_dd,
+> -    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=3Dblock_size] [cou=
+nt=3Dblocks] [skip=3Dblocks] if=3Dinput of=3Doutput")
+> +    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=3Dblock_size] [cou=
+nt=3Dblocks] [skip=3Dblocks] [conv=3Dnocreat,notrunc] if=3Dinput of=3Dout=
+put")
+>  STEXI
+> -@item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=3D@va=
+r{block_size}] [count=3D@var{blocks}] [skip=3D@var{blocks}] if=3D@var{inp=
+ut} of=3D@var{output}
+> +@item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=3D@va=
+r{block_size}] [count=3D@var{blocks}] [skip=3D@var{blocks}] [conv=3Dnocre=
+at,notrunc] if=3D@var{input} of=3D@var{output}
+
+I'd just write something like conv=3D@var{convs} or I don't know. There
+are other conversion specifiers (or however it's called) that we may
+want to support in the future, e.g. sparse or noerror.
+
+>  ETEXI
+> =20
+>  DEF("info", img_info,
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 629f9e9..c9ab9e5 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+
+
+[...]
+
+> @@ -3906,6 +3910,31 @@ static int img_dd_skip(const char *arg,
+>      return 0;
+>  }
+> =20
+> +static int img_dd_conv(const char *arg,
+> +                       struct DdIo *in, struct DdIo *out,
+> +                       struct DdInfo *dd)
+> +{
+> +    char **flags, **tmp;
+> +
+> +    tmp =3D flags =3D g_strsplit(arg, ",", 0);
+
+"flag_pointer", "cur_flag_pointer" or "flat_iterator" instead of "tmp"
+might be more suitable names.
+
+> +
+> +    while (tmp && *tmp) {
+> +        if (g_str_equal(*tmp, "noconv")) {
+> +            dd->flags |=3D C_NOCREAT;
+> +        } else if (g_str_equal(*tmp, "notrunc")) {
+> +            dd->flags |=3D C_NOTRUNC;
+> +        } else {
+> +            error_report("invalid conv argument: '%s'", *tmp);
+> +            g_strfreev(flags);
+> +            return 1;
+> +        }
+> +        tmp++;
+> +    }
+> +
+> +    g_strfreev(flags);
+> +    return 0;
+> +}
+> +
+>  static int img_dd(int argc, char **argv)
+>  {
+>      int ret =3D 0;
+
+[...]
+
+> @@ -3954,7 +3984,7 @@ static int img_dd(int argc, char **argv)
+>          { 0, 0, 0, 0 }
+>      };
+> =20
+> -    while ((c =3D getopt_long(argc, argv, "hf:O:", long_options, NULL)=
+)) {
+> +    while ((c =3D getopt_long(argc, argv, "hnf:O:", long_options, NULL=
+))) {
+
+Looks like a relic from v1.
+
+>          if (c =3D=3D EOF) {
+>              break;
+>          }
+
+[...]
+
+> diff --git a/qemu-img.texi b/qemu-img.texi
+> index 174aae3..9f10562 100644
+> --- a/qemu-img.texi
+> +++ b/qemu-img.texi
+> @@ -326,7 +326,7 @@ skipped. This is useful for formats such as @code{r=
+bd} if the target
+>  volume has already been created with site specific options that cannot=
+
+>  be supplied through qemu-img.
+> =20
+> -@item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=3D@var{block_size}] =
+[count=3D@var{blocks}] [skip=3D@var{blocks}] if=3D@var{input} of=3D@var{o=
+utput}
+> +@item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=3D@var{block_size}] =
+[count=3D@var{blocks}] [skip=3D@var{blocks}] [conv=3Dnocreat,notrunc] if=3D=
+@var{input} of=3D@var{output}
+> =20
+>  Dd copies from @var{input} file to @var{output} file converting it fro=
+m
+>  @var{fmt} format to @var{output_fmt} format.
+> @@ -337,6 +337,14 @@ dd will stop reading input after reading @var{bloc=
+ks} input blocks.
+> =20
+>  The size syntax is similar to dd(1)'s size syntax.
+> =20
+> +If the @code{conv=3Dnocreat} option is specified, the target volume cr=
+eation
+> +will be skipped. Its length will be truncated to match data length, if=
+ it
+> +is longer than the required data size. If the @code{conv=3Dnotrunc} op=
+tion
+> +is specified, no file size shrinking will be done. If the existing out=
+put
+> +file is too small it will be enlarged to fit. These options are useful=
+ for
+> +formats such as @code{rbd} if the target volume has already been creat=
+ed
+> +with site specific options that cannot be supplied through qemu-img.
+> +
+
+Good enough for now, but a list/table would probably be more extensible
+in the future.
+
+So all in all a patch that does well what it's supposed to do -- I just
+don't quite agree on whether that goal is right.
+
+Max
+
+>  @item info [-f @var{fmt}] [--output=3D@var{ofmt}] [--backing-chain] @v=
+ar{filename}
+> =20
+>  Give information about the disk image @var{filename}. Use it in
+>=20
+
+
+
+--nBrdV0Atkxr4APOQrQg43phtDtQv6Fk0o
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliU+c4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AyM0H/3GurGcm2e+LaLmkIpTFCrHgvhmPPvQ6
+lXTEnvwwFW3TIUXrHmYbhOMaN5+Ap3BrJj6lUWV/0Tfo6CHmmZQ10jytt0BCSI5M
+LylorD2fX3vZ4B8+bmuqp2/uNvXeayYroq/IWdV1a45PvAkxnAkfnUEJiOgaOgpG
+1/VSyn3U7hS1N3hs8ipfEQaYojPSAVxeS8j2Tm8K0P7PJKR03wrdBbvAICKb++Tg
+/pypqwCadbkMWrImYRDodGZ904M4dl5MI0WXn2uAFjrrJsR/In2zu97nk4uktOW5
+c+HdZkN06Gv8nMF7L9sxHvwQ9fNciaKBZhODqonTqMgNtDEL42B13dM=
+=fvov
+-----END PGP SIGNATURE-----
+
+--nBrdV0Atkxr4APOQrQg43phtDtQv6Fk0o--
