@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cZf89-00034r-Ci
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:46:30 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cZf8B-00034x-09
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:46:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cZf84-00066e-DB
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:46:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cZf84-000669-6Y
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:46:24 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  3 Feb 2017 14:37:53 +0000
-Message-Id: <20170203143753.9903-2-stefanha@redhat.com>
-In-Reply-To: <20170203143753.9903-1-stefanha@redhat.com>
-References: <20170203143753.9903-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] iothread: enable AioContext polling by
- default
+	(envelope-from <stefanha@gmail.com>) id 1cZf86-000671-2b
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:46:31 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35785)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cZf85-00066t-R8
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:46:25 -0500
+Received: by mail-wm0-x235.google.com with SMTP id b65so32371228wmf.0
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 06:46:25 -0800 (PST)
+Date: Fri, 3 Feb 2017 14:46:15 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170203144615.GD642@stefanha-x1.localdomain>
+References: <24f4e37d0c554e379d13a13026efb36f@ex13-live-mbn2.ad.kent.ac.uk>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jCrbxBqMcLqd4mOl"
+Content-Disposition: inline
+In-Reply-To: <24f4e37d0c554e379d13a13026efb36f@ex13-live-mbn2.ad.kent.ac.uk>
+Subject: Re: [Qemu-devel] TCG semantics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Karl Rister <krister@redhat.com>
+To: "E.Robbins" <er209@kent.ac.uk>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-IOThread AioContexts are likely to consist only of event sources like
-virtqueue ioeventfds and LinuxAIO completion eventfds that are pollable
-from userspace (without system calls).
 
-We recently merged the AioContext polling feature but didn't enable it
-by default yet.  I have gone back over the performance data on the
-mailing list and picked a default polling value that gave good results.
+--jCrbxBqMcLqd4mOl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Let's enable AioContext polling by default so users don't have another
-switch they need to set manually.  If performance regressions are found
-we can still disable this for the QEMU 2.9 release.
+On Thu, Feb 02, 2017 at 12:09:02PM +0000, E.Robbins wrote:
+> I having been looking for prior work on a formalised semantics for the TC=
+G language. I have seen passing references, and wondered if anyone can prov=
+ide any pointers?
+>=20
+> If this is the wrong list for this question, apologies, please direct me =
+elsewhere.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Karl Rister <krister@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20170126170119.27876-1-stefanha@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- iothread.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+This is the right list.  Welcome!
 
-diff --git a/iothread.c b/iothread.c
-index 7bedde8..257b01d 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -30,6 +30,12 @@ typedef ObjectClass IOThreadClass;
- #define IOTHREAD_CLASS(klass) \
-    OBJECT_CLASS_CHECK(IOThreadClass, klass, TYPE_IOTHREAD)
- 
-+/* Benchmark results from 2016 on NVMe SSD drives show max polling times around
-+ * 16-32 microseconds yield IOPS improvements for both iodepth=1 and iodepth=32
-+ * workloads.
-+ */
-+#define IOTHREAD_POLL_MAX_NS_DEFAULT 32768ULL
-+
- static __thread IOThread *my_iothread;
- 
- AioContext *qemu_get_current_aio_context(void)
-@@ -71,6 +77,13 @@ static int iothread_stop(Object *object, void *opaque)
-     return 0;
- }
- 
-+static void iothread_instance_init(Object *obj)
-+{
-+    IOThread *iothread = IOTHREAD(obj);
-+
-+    iothread->poll_max_ns = IOTHREAD_POLL_MAX_NS_DEFAULT;
-+}
-+
- static void iothread_instance_finalize(Object *obj)
- {
-     IOThread *iothread = IOTHREAD(obj);
-@@ -215,6 +228,7 @@ static const TypeInfo iothread_info = {
-     .parent = TYPE_OBJECT,
-     .class_init = iothread_class_init,
-     .instance_size = sizeof(IOThread),
-+    .instance_init = iothread_instance_init,
-     .instance_finalize = iothread_instance_finalize,
-     .interfaces = (InterfaceInfo[]) {
-         {TYPE_USER_CREATABLE},
--- 
-2.9.3
+Have you seen tcg/README?  It describes the TCG ops.
+
+If it's out of date or missing information, then improving the document
+seems worthwhile.
+
+--jCrbxBqMcLqd4mOl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYlJe3AAoJEJykq7OBq3PI5awH/iwU5qC+/5MKs+XXCt5UWW3W
+5x/C2kuRRGUf0a44oABWAmyZTfKKCht2foJkQixn4Ke+8me6B+SrUgam2gvNriq8
+0KsWb9WqF6iqaC2RLvWk5O4uV+GBVp50s9KTbS1RPUcdONB+4VPDjLhJYSCoy7Vf
+DSZqRXY4/0hTBM2yjY4Dtwl3Mv3sbLvi9zwbQdQ5913I2jiorG+iozCF8V3NUpcT
+igpPvWmanu1C70aOd7CmvGtNiInMMF3s8j6mtf86592nbniFbclX4Ate8F0H6Mid
+wuAAPSeRsOv/cf68ZNnfniSFq6Ca8yJPfGYhlWA7JQwUgLJjbaihQ6u76bL0Wnw=
+=3q2k
+-----END PGP SIGNATURE-----
+
+--jCrbxBqMcLqd4mOl--
