@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cZm50-00066h-Mh
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:11:43 -0500
+	(envelope-from <bounces@canonical.com>) id 1cZmIY-0001gN-4p
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:25:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cZm4z-0002UG-Eh
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:11:42 -0500
-Resent-Message-Id: <E1cZm4z-0002UG-Eh@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1486159277-25949-1-git-send-email-joserz@linux.vnet.ibm.com>
-Message-ID: <148615989046.33.5463181790096988546@eba24e3a0d7f>
+	(envelope-from <bounces@canonical.com>) id 1cZmIU-00089O-Lz
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:25:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43513)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cZmIU-00088o-DS
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:25:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cZmIS-0004yA-4q
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 22:25:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1F6262E80C8
+	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 22:25:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 3 Feb 2017 14:11:31 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/4] POWER9 TCG enablements - part 13
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Feb 2017 22:20:29 -0000
+From: Jean-Paul Larocque <1661758@bugs.launchpad.net>
+Reply-To: Bug 1661758 <1661758@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170203222029.20222.70658.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1661758] [NEW] qemu-nbd causes data corruption in
+ VDI-format disk images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +36,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: joserz@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, nikunj@linux.vnet.ibm.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSBQT1dFUjkgVENHIGVuYWJsZW1lbnRzIC0g
-cGFydCAxMwpNZXNzYWdlLWlkOiAxNDg2MTU5Mjc3LTI1OTQ5LTEtZ2l0LXNlbmQtZW1haWwtam9z
-ZXJ6QGxpbnV4LnZuZXQuaWJtLmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
-b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
-biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
-bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
-dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
-ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
-dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NjE1OTI3Ny0y
-NTk0OS0xLWdpdC1zZW5kLWVtYWlsLWpvc2VyekBsaW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hl
-dy8xNDg2MTU5Mjc3LTI1OTQ5LTEtZ2l0LXNlbmQtZW1haWwtam9zZXJ6QGxpbnV4LnZuZXQuaWJt
-LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwMjAzMTIwMjU0LjE1MDYyLTEt
-YmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwMjAzMTIwMjU0LjE1MDYyLTEtYmVy
-cmFuZ2VAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjUyZjYxOGEg
-cHBjOiBpbXBsZW1lbnQgeHNzdWJxcCBpbnN0cnVjdGlvbgpmN2RmZGJmIHBwYzogaW1wbGVtZW50
-IHhzc3FydHFwIGluc3RydWN0aW9uCjRkODk1YTQgcHBjOiBpbXBsZW1lbnQgeHNycXB4cCBpbnN0
-cnVjdGlvbgo1ZDQ5YzA3IHBwYzogaW1wbGVtZW50IHhzcnFwaVt4XSBpbnN0cnVjdGlvbgoKPT09
-IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBwcGM6IGltcGxlbWVudCB4c3Jx
-cGlbeF0gaW5zdHJ1Y3Rpb24uLi4KRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNo
-b3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTI1OiBGSUxFOiB0YXJnZXQvcHBjL3Ry
-YW5zbGF0ZS92c3gtb3BzLmluYy5jOjEwNjoKKyNkZWZpbmUgR0VOX1ZTWF9aMjNGT1JNXzMwMChu
-YW1lLCBvcGMyLCBvcGMzLCBvcGM0LCBpbnZhbCkgXAorR0VOX1ZTWF9YRk9STV8zMDBfRU8obmFt
-ZSwgb3BjMiwgb3BjMyB8IDB4MDAsIG9wYzQgfCAweDAsIGludmFsKSwgXAorR0VOX1ZTWF9YRk9S
-TV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MDgsIG9wYzQgfCAweDAsIGludmFsKSwgXAor
-R0VOX1ZTWF9YRk9STV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MTAsIG9wYzQgfCAweDAs
-IGludmFsKSwgXAorR0VOX1ZTWF9YRk9STV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MTgs
-IG9wYzQgfCAweDAsIGludmFsKSwgXAorR0VOX1ZTWF9YRk9STV8zMDBfRU8obmFtZSwgb3BjMiwg
-b3BjMyB8IDB4MDAsIG9wYzQgfCAweDEsIGludmFsKSwgXAorR0VOX1ZTWF9YRk9STV8zMDBfRU8o
-bmFtZSwgb3BjMiwgb3BjMyB8IDB4MDgsIG9wYzQgfCAweDEsIGludmFsKSwgXAorR0VOX1ZTWF9Y
-Rk9STV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MTAsIG9wYzQgfCAweDEsIGludmFsKSwg
-XAorR0VOX1ZTWF9YRk9STV8zMDBfRU8obmFtZSwgb3BjMiwgb3BjMyB8IDB4MTgsIG9wYzQgfCAw
-eDEsIGludmFsKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDMgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
-Mi80OiBwcGM6IGltcGxlbWVudCB4c3JxcHhwIGluc3RydWN0aW9uLi4uCkNoZWNraW5nIFBBVENI
-IDMvNDogcHBjOiBpbXBsZW1lbnQgeHNzcXJ0cXAgaW5zdHJ1Y3Rpb24uLi4KQ2hlY2tpbmcgUEFU
-Q0ggNC80OiBwcGM6IGltcGxlbWVudCB4c3N1YnFwIGluc3RydWN0aW9uLi4uCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Public bug reported:
+
+Hi,
+
+This is a duplicate of #1422307.  I can't figure out a way to re-open
+it--the status of "Fix Released" is changeable only by a project
+maintainer or bug supervisor--so I'm opening a new bug to make sure
+this gets looked at again.
+
+qemu-nbd will sometimes corrupt VDI disk images.  The bug was thought
+to be fixed in commit f0ab6f109630940146cbaf47d0cd99993ddba824, but
+I'm able to reproduce it in both that commit and in the latest commit
+(a951316b8a5c3c63254f20a826afeed940dd4cba).  I just needed to run more
+iterations of the test.  It's possible that it was partially fixed, or
+that the added serialization made it harder to catch this
+non-deterministic bug, but the same symptoms persist: data corruption
+of VDI-format disk images.
+
+This affects at least qemu-nbd.  I haven't tried reproducing the issue
+with qemu proper or qemu-img, but the original bug report suggests
+that the bug in the common VDI backend may corrupt data written by
+those programs.
+
+Please let me know if I can provide any further information or help
+with testing.  Thank you very much for looking into this!
+
+Test procedure
+**************
+
+The procedure used is the one given by Max Reitz (xanclic) in the
+original bug report, comment 3
+(https://bugs.launchpad.net/qemu/+bug/1422307/comments/3), in the
+section "VDI and NBD over /dev/nbd0", but with up to 1000 iterations
+instead of 10:
+
+  $ cd ~/qemu-origfix-f0ab6f1/bin
+  $ dd if=3D/dev/urandom of=3Dblob.raw bs=3D1M count=3D64
+  64+0 records in
+  64+0 records out
+  67108864 bytes (67 MB) copied, 4.36475 s, 15.4 MB/s
+  $ sudo sh -c 'for i in $(seq 0 999); do ./qemu-img create -f vdi test.vdi=
+ 64M > /dev/null; ./qemu-nbd -c /dev/nbd0 test.vdi; sleep 1; ./qemu-img con=
+vert -n blob.raw /dev/nbd0; ./qemu-img convert /dev/nbd0 test1.raw; sync; e=
+cho 1 > /proc/sys/vm/drop_caches; ./qemu-img convert /dev/nbd0 test2.raw; .=
+/qemu-nbd -d /dev/nbd0 > /dev/null; if ! ./qemu-img compare -q test1.raw te=
+st2.raw; then md5sum test1.raw test2.raw; echo "$i failed"; break; fi; done=
+; echo "done"'
+27a66c3a8ac2cf06f2c925968ea9e964  test1.raw
+2da9bf169041a7c2bd144c4ab3a29aea  test2.raw
+64 failed
+done
+
+I've run this process a handful of times, and I've seen it take as
+little as 10 iterations and as many as 161 (taking 32 minutes in the
+latter case).  Please be patient.  Putting the images on tmpfs will
+probably help it go faster, and I have successfully reproduced the
+issue on tmpfs in addition to ext4.
+
+Nothing different was needed to reproduce the issue in a directory
+containing a build of the latest commit.  It still takes somewhere
+around 1-200 iterations to find, in my testing.
+
+Build procedure
+***************
+
+  $ git clone git://git.qemu-project.org/qemu.git
+  [omitted]
+  $ git clone qemu qemu-origfix-f0ab6f1
+  Cloning into 'qemu-origfix-f0ab6f1'...
+  done.
+  $ cd qemu-origfix-f0ab6f1
+  $ git checkout f0ab6f109630940146cbaf47d0cd99993ddba824
+  Note: checking out 'f0ab6f109630940146cbaf47d0cd99993ddba824'.
+  =
+
+  You are in 'detached HEAD' state. You can look around, make experimental
+  changes and commit them, and you can discard any commits you make in this
+  state without impacting any branches by performing another checkout.
+  =
+
+  If you want to create a new branch to retain commits you create, you may
+  do so (now or later) by using -b with the checkout command again. Example:
+  =
+
+    git checkout -b new_branch_name
+  =
+
+  HEAD is now at f0ab6f1... block/vdi: Add locking for parallel requests
+  $ mkdir bin
+  $ cd bin
+  $ script -c'time (../configure --enable-debug --target-list=3Dx86_64-soft=
+mmu && make -j6; echo "result: $?")'
+  Script started, file is typescript
+  [omitted; the build typescript is attached separately]
+    LINK  x86_64-softmmu/qemu-system-x86_64
+  result: 0
+  =
+
+  real    1m5.733s
+  user    2m3.904s
+  sys     0m13.828s
+  Script done, file is typescript
+
+Nothing different was done when building the latest commit (besides
+cloning to a different directory, and not running `git checkout`).
+
+Environment
+***********
+
+  * Machine: x86_64
+  =
+
+  * Hypervisor: Xen 4.4 (Debian package xen-hypervisor-4.4-amd64,
+    version 4.4.1-9+deb8u8)
+  =
+
+  * A Xen domU (guest) for building QEMU and reproducing the issue.
+    All testing was done within the virtual machine for convenience
+    and access to better hardware than what I have for my development
+    machine (I expected the build to take much longer than it really
+    does).
+  =
+
+      - x86_64 architecture with six VCPUs and 1.2 GiB RAM allocated,
+        operating in HVM (fully virtualized) mode.
+      =
+
+      - Distribution: Debian 8.7 Jessie amd64
+      =
+
+      - Kernel: Linux 3.16.0 x86_64 (Debian package
+        linux-image-3.16.0-4-amd64, version 3.16.39-1)
+      =
+
+      - Compiler: GCC 4.9.2 (Debian package gcc-4.9, version 4.9.2-10)
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "Output of configure script and make"
+   https://bugs.launchpad.net/bugs/1661758/+attachment/4812784/+files/build=
+-typescript.txt
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661758
+
+Title:
+  qemu-nbd causes data corruption in VDI-format disk images
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  This is a duplicate of #1422307.  I can't figure out a way to re-open
+  it--the status of "Fix Released" is changeable only by a project
+  maintainer or bug supervisor--so I'm opening a new bug to make sure
+  this gets looked at again.
+
+  qemu-nbd will sometimes corrupt VDI disk images.  The bug was thought
+  to be fixed in commit f0ab6f109630940146cbaf47d0cd99993ddba824, but
+  I'm able to reproduce it in both that commit and in the latest commit
+  (a951316b8a5c3c63254f20a826afeed940dd4cba).  I just needed to run more
+  iterations of the test.  It's possible that it was partially fixed, or
+  that the added serialization made it harder to catch this
+  non-deterministic bug, but the same symptoms persist: data corruption
+  of VDI-format disk images.
+
+  This affects at least qemu-nbd.  I haven't tried reproducing the issue
+  with qemu proper or qemu-img, but the original bug report suggests
+  that the bug in the common VDI backend may corrupt data written by
+  those programs.
+
+  Please let me know if I can provide any further information or help
+  with testing.  Thank you very much for looking into this!
+
+  Test procedure
+  **************
+
+  The procedure used is the one given by Max Reitz (xanclic) in the
+  original bug report, comment 3
+  (https://bugs.launchpad.net/qemu/+bug/1422307/comments/3), in the
+  section "VDI and NBD over /dev/nbd0", but with up to 1000 iterations
+  instead of 10:
+
+    $ cd ~/qemu-origfix-f0ab6f1/bin
+    $ dd if=3D/dev/urandom of=3Dblob.raw bs=3D1M count=3D64
+    64+0 records in
+    64+0 records out
+    67108864 bytes (67 MB) copied, 4.36475 s, 15.4 MB/s
+    $ sudo sh -c 'for i in $(seq 0 999); do ./qemu-img create -f vdi test.v=
+di 64M > /dev/null; ./qemu-nbd -c /dev/nbd0 test.vdi; sleep 1; ./qemu-img c=
+onvert -n blob.raw /dev/nbd0; ./qemu-img convert /dev/nbd0 test1.raw; sync;=
+ echo 1 > /proc/sys/vm/drop_caches; ./qemu-img convert /dev/nbd0 test2.raw;=
+ ./qemu-nbd -d /dev/nbd0 > /dev/null; if ! ./qemu-img compare -q test1.raw =
+test2.raw; then md5sum test1.raw test2.raw; echo "$i failed"; break; fi; do=
+ne; echo "done"'
+  27a66c3a8ac2cf06f2c925968ea9e964  test1.raw
+  2da9bf169041a7c2bd144c4ab3a29aea  test2.raw
+  64 failed
+  done
+
+  I've run this process a handful of times, and I've seen it take as
+  little as 10 iterations and as many as 161 (taking 32 minutes in the
+  latter case).  Please be patient.  Putting the images on tmpfs will
+  probably help it go faster, and I have successfully reproduced the
+  issue on tmpfs in addition to ext4.
+
+  Nothing different was needed to reproduce the issue in a directory
+  containing a build of the latest commit.  It still takes somewhere
+  around 1-200 iterations to find, in my testing.
+
+  Build procedure
+  ***************
+
+    $ git clone git://git.qemu-project.org/qemu.git
+    [omitted]
+    $ git clone qemu qemu-origfix-f0ab6f1
+    Cloning into 'qemu-origfix-f0ab6f1'...
+    done.
+    $ cd qemu-origfix-f0ab6f1
+    $ git checkout f0ab6f109630940146cbaf47d0cd99993ddba824
+    Note: checking out 'f0ab6f109630940146cbaf47d0cd99993ddba824'.
+    =
+
+    You are in 'detached HEAD' state. You can look around, make experimental
+    changes and commit them, and you can discard any commits you make in th=
+is
+    state without impacting any branches by performing another checkout.
+    =
+
+    If you want to create a new branch to retain commits you create, you may
+    do so (now or later) by using -b with the checkout command again. Examp=
+le:
+    =
+
+      git checkout -b new_branch_name
+    =
+
+    HEAD is now at f0ab6f1... block/vdi: Add locking for parallel requests
+    $ mkdir bin
+    $ cd bin
+    $ script -c'time (../configure --enable-debug --target-list=3Dx86_64-so=
+ftmmu && make -j6; echo "result: $?")'
+    Script started, file is typescript
+    [omitted; the build typescript is attached separately]
+      LINK  x86_64-softmmu/qemu-system-x86_64
+    result: 0
+    =
+
+    real    1m5.733s
+    user    2m3.904s
+    sys     0m13.828s
+    Script done, file is typescript
+
+  Nothing different was done when building the latest commit (besides
+  cloning to a different directory, and not running `git checkout`).
+
+  Environment
+  ***********
+
+    * Machine: x86_64
+    =
+
+    * Hypervisor: Xen 4.4 (Debian package xen-hypervisor-4.4-amd64,
+      version 4.4.1-9+deb8u8)
+    =
+
+    * A Xen domU (guest) for building QEMU and reproducing the issue.
+      All testing was done within the virtual machine for convenience
+      and access to better hardware than what I have for my development
+      machine (I expected the build to take much longer than it really
+      does).
+    =
+
+        - x86_64 architecture with six VCPUs and 1.2 GiB RAM allocated,
+          operating in HVM (fully virtualized) mode.
+        =
+
+        - Distribution: Debian 8.7 Jessie amd64
+        =
+
+        - Kernel: Linux 3.16.0 x86_64 (Debian package
+          linux-image-3.16.0-4-amd64, version 3.16.39-1)
+        =
+
+        - Compiler: GCC 4.9.2 (Debian package gcc-4.9, version 4.9.2-10)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661758/+subscriptions
