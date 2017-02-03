@@ -1,24 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cZTqk-0005Ak-GQ
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 21:43:47 -0500
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cZUM3-0001xa-Fu
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 22:16:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cZTqh-00073t-FS
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 21:43:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49806)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cZTqh-00073O-9c
-	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 21:43:43 -0500
-References: <20170126101010.6375-1-pbonzini@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f419ad0c-e4bb-0dcb-203d-944aeccc8c7f@redhat.com>
-Date: Fri, 3 Feb 2017 10:43:37 +0800
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cZUM0-0004kw-LU
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 22:16:07 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33480)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1cZUM0-0004kL-Cs
+	for qemu-devel@nongnu.org; Thu, 02 Feb 2017 22:16:04 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v133Drt9095529
+	for <qemu-devel@nongnu.org>; Thu, 2 Feb 2017 22:16:01 -0500
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28ccsu16r8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 02 Feb 2017 22:16:01 -0500
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Fri, 3 Feb 2017 13:15:59 +1000
+Date: Fri, 3 Feb 2017 08:45:01 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170126101010.6375-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net: e1000e: fix dead code in
- e1000e_write_packet_to_guest
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485504213-21632-1-git-send-email-bharata@linux.vnet.ibm.com>
+Message-Id: <20170203031501.GA12744@in.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/2] softfloat: Add round-to-odd
+ rounding mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +42,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: dmitry@daynix.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org
 
+Peter,
 
+On Fri, Jan 27, 2017 at 01:33:31PM +0530, Bharata B Rao wrote:
+> 
+> Changes in v2:
+> -------------
+> - Do odd or even for the right precision bit in 64bit rounding. (Peter Maydell)
+> - Handle the overflow case correctly in 64bit rounding. (Peter Maydell)
 
-On 2017=E5=B9=B401=E6=9C=8826=E6=97=A5 18:10, Paolo Bonzini wrote:
-> Because is_first is declared inside a loop, it is always true.  The sto=
-re
-> is dead, and so is the "else" branch of "if (is_first)".  is_last is
-> okay though.
->
-> Reported by Coverity.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   hw/net/e1000e_core.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> index 2b11499..c99e2fb 100644
-> --- a/hw/net/e1000e_core.c
-> +++ b/hw/net/e1000e_core.c
-> @@ -1507,6 +1507,7 @@ e1000e_write_packet_to_guest(E1000ECore *core, st=
-ruct NetRxPkt *pkt,
->       const E1000E_RingInfo *rxi;
->       size_t ps_hdr_len =3D 0;
->       bool do_ps =3D e1000e_do_ps(core, pkt, &ps_hdr_len);
-> +    bool is_first =3D true;
->  =20
->       rxi =3D rxr->i;
->  =20
-> @@ -1514,7 +1515,6 @@ e1000e_write_packet_to_guest(E1000ECore *core, st=
-ruct NetRxPkt *pkt,
->           hwaddr ba[MAX_PS_BUFFERS];
->           e1000e_ba_state bastate =3D { { 0 } };
->           bool is_last =3D false;
-> -        bool is_first =3D true;
->  =20
->           desc_size =3D total_size - desc_offset;
->  =20
+Does this version of round-to-odd implementation look correct now ?
 
-Applied, thanks.
+> - Add a patch to handle underflow case correctly in 64bit rounding.
+
+Does this fix for underflow case make sense ?
+
+Regards,
+Bharata.
