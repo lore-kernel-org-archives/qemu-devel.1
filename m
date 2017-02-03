@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cZj5I-00076V-0k
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:59:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cZj5v-0007hl-C2
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 14:00:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cZj5F-0007Uv-KM
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:59:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53604)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cZj5F-0007Uk-F9
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:59:45 -0500
-References: <1483601042-6435-1-git-send-email-jitendra.kolhe@hpe.com>
-	<20170127132650.GA31231@redhat.com>
-	<67bd733e-5974-327b-25f4-c83b8e379313@hpe.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <13f0f2e5-7c1d-b050-e3d6-0b504a803ae4@redhat.com>
-Date: Fri, 3 Feb 2017 10:59:37 -0800
+	(envelope-from <mreitz@redhat.com>) id 1cZj5u-0007gO-OJ
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 14:00:27 -0500
+References: <cover.1485878688.git.berto@igalia.com>
+	<79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+	<5c316901-5632-ff05-7700-6427cd33bf74@redhat.com>
+	<w5137fxoty9.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <afe2bd4b-130e-4d0d-88fb-861d6cf6639a@redhat.com>
+Date: Fri, 3 Feb 2017 20:00:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <67bd733e-5974-327b-25f4-c83b8e379313@hpe.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] mem-prealloc: Reduce large guest
- start-up and migration time.
+In-Reply-To: <w5137fxoty9.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="d6VjITn91PxJhkWACOjAQmWepl4bRoAf6"
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-io: don't allow I/O operations
+ larger than INT_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jitendra Kolhe <jitendra.kolhe@hpe.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "armbru@redhat.com" <armbru@redhat.com>, "MeenakshiSundaram, Renganathan" <renganathan.meenakshisundaram@hpe.com>, "Parthasarathy, Mohan (HPE Servers)" <mohan_parthasarathy@hpe.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--d6VjITn91PxJhkWACOjAQmWepl4bRoAf6
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <afe2bd4b-130e-4d0d-88fb-861d6cf6639a@redhat.com>
+Subject: Re: [PATCH 1/2] qemu-io: don't allow I/O operations larger than
+ INT_MAX
+References: <cover.1485878688.git.berto@igalia.com>
+ <79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com>
+ <5c316901-5632-ff05-7700-6427cd33bf74@redhat.com>
+ <w5137fxoty9.fsf@maestria.local.igalia.com>
+In-Reply-To: <w5137fxoty9.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 02.02.2017 09:52, Alberto Garcia wrote:
+> On Wed 01 Feb 2017 11:16:38 PM CET, Max Reitz <mreitz@redhat.com> wrote=
+:
+>=20
+>> Thanks, applied to my block tree, with
+>> %s/INT_MAX/BDRV_REQUEST_MAX_BYTES/g:
+>=20
+> I think you can use %d to print BDRV_REQUEST_MAX_BYTES, after all the
+> definition guarantees that it won't be larger than MIN(SIZE_MAX,INT_MAX=
+)
+
+I'm not sure what C makes of that expression. I'd think it becomes a
+size_t, probably, regardless of whether it would fit into an int.
+
+Max
 
 
+--d6VjITn91PxJhkWACOjAQmWepl4bRoAf6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 02/02/2017 01:35, Jitendra Kolhe wrote:
->> Of course you'd still need the memset() trick if qemu was given
->> non-hugepages in combination with --mem-prealloc, as you don't
->> want to lock normal pages into ram permanently.
->>
-> given above numbers, I think we can stick to memset() implementation for
-> both hugepage and non-hugepage cases?
+-----BEGIN PGP SIGNATURE-----
 
-Yes, of course!
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliU0z8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AssEH/2hGFdsdd/pMkztt+4EUHIBSCZT0OovJ
+1TWouJ/WCdWcI9I5eoTMNzmICl6+AGH4lUP4/6LJkbUf1s1yX4igEsjTz4OrkqIo
+gw8jxNylIb1qnFia/YLnfAM1ZRPMat92htTedxh6I30dpqIdILmXPLuK9hkfQh0s
+A2JIORaQICasuws4BXevsXE6m9psqyEeiFe1f+K20LBi2sSjKCEP0HQrIljYtlaz
+35mvWXLg6jkRzCYZtBMmLsh3tSNFnRvVCOV1MALOsKKO8o4Xm72lOR+XAFQYBWPh
+5bUBO2MaJCSOx57ZjBlmmdsyXVfN0xe/RBJGhE5OeZITgEw5gn6+wkQ=
+=Yqj8
+-----END PGP SIGNATURE-----
 
-Paolo
+--d6VjITn91PxJhkWACOjAQmWepl4bRoAf6--
