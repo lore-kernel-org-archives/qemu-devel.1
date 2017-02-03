@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ct@flyingcircus.io>) id 1cZZ8W-0005fa-GZ
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:22:29 -0500
+	(envelope-from <ct@flyingcircus.io>) id 1cZZ4u-0004Bq-Vt
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:18:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ct@flyingcircus.io>) id 1cZZ8T-0004Ec-C3
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:22:28 -0500
+	(envelope-from <ct@flyingcircus.io>) id 1cZZ4r-00033c-RT
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:18:44 -0500
 From: Christian Theune <ct@flyingcircus.io>
-Message-Id: <2BB6EFE6-C476-4A48-AFC9-52B9B9F8433F@flyingcircus.io>
+Message-Id: <BDD49697-FEDC-4088-BB5B-EB4D6D274730@flyingcircus.io>
 Content-Type: multipart/signed;
-	boundary="Apple-Mail=_A7C72EFD-BE92-478A-A329-763C6955F7B6";
+	boundary="Apple-Mail=_8753B396-C43B-49DA-9800-EA6E1AD919D4";
 	protocol="application/pgp-signature"; micalg=pgp-sha512
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Date: Fri, 3 Feb 2017 09:22:22 +0100
-In-Reply-To: <03b2194a-ea37-c025-53c2-53b030b593f6@kamp.de>
+Date: Fri, 3 Feb 2017 09:18:36 +0100
+In-Reply-To: <ea032a8a-1429-bd95-5b68-4634a0fb0a57@redhat.com>
 References: <1485876994-14555-1-git-send-email-pl@kamp.de>
 	<ea032a8a-1429-bd95-5b68-4634a0fb0a57@redhat.com>
-	<03b2194a-ea37-c025-53c2-53b030b593f6@kamp.de>
 Subject: Re: [Qemu-devel] [PATCH] qga: ignore EBUSY when freezing a
  filesystem
 List-Id: <qemu-devel.nongnu.org>
@@ -26,39 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, mdroth@linux.vnet.ibm.com
 
 
---Apple-Mail=_A7C72EFD-BE92-478A-A329-763C6955F7B6
+--Apple-Mail=_8753B396-C43B-49DA-9800-EA6E1AD919D4
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=utf-8
 
 Hi,
 
-> On 3 Feb 2017, at 09:20, Peter Lieven <pl@kamp.de> wrote:
->=20
-> If you try to THAW an unfrozen FS you get EINVAL.
->=20
-> The current code thaws until an error is returned.
->=20
->=20
-> So it should work as is.
->=20
->=20
-> If you feel uncomfortable with the EBUSY approach. The other idea =
-would
->=20
-> be to track all devices which have been successfully frozen and skip =
-consecutive
->=20
-> tries to freeze them.
+to clarify: I guess you ask about what happens when you thaw with the =
+same condition: a filesystem that is mounted multiple times.
 
-Which will be subject to race conditions as other processes may call =
-freeze/thaw on any device. Those are completely out of our control.
+When I created the patch initially I looked at the thaw code and found =
+it to already expect that thaws may happen outside its control and that =
+the error handling is fine.
+
+The code definitely does not have an early exit upon encountering an =
+issue with thawing/double thawing.
 
 Christian
+
+> On 2 Feb 2017, at 22:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+>=20
+>=20
+> On 31/01/2017 07:36, Peter Lieven wrote:
+>> the current implementation fails if we try to freeze an
+>> already frozen filesystem. This can happen if a filesystem
+>> is mounted more than once (e.g. with a bind mount).
+>>=20
+>> Suggested-by: Christian Theune <ct@flyingcircus.io>
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Peter Lieven <pl@kamp.de>
+>=20
+> What happens when you thaw?
+>=20
+> Paolo
 
 --
 Christian Theune =C2=B7 ct@flyingcircus.io =C2=B7 +49 345 219401 0
@@ -68,7 +73,7 @@ HR Stendal HRB 21169 =C2=B7 Gesch=C3=A4ftsf=C3=BChrer: Christian. =
 Theune, Christian. Zagrodnick
 
 
---Apple-Mail=_A7C72EFD-BE92-478A-A329-763C6955F7B6
+--Apple-Mail=_8753B396-C43B-49DA-9800-EA6E1AD919D4
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -79,13 +84,13 @@ Content-Description: Message signed with OpenPGP
 -----BEGIN PGP SIGNATURE-----
 Comment: GPGTools - https://gpgtools.org
 
-iQEcBAEBCgAGBQJYlD2+AAoJEKuh8lKpfGLOP9kIANxNT+d6acKCC2/HYah+W8E3
-h8LKy4uZKcip1EZejfE72hZFdl6/p0fn+I4fTSCDiOoHlQ+Lv2sDp6T25kIZn1ZA
-gEYh+4YDfBaBOnRT8a99YPGvkS6p8H+U5RYSqw+c64xFBg5YeW1Dq1w3cmqV111x
-s0w/qnCqDLBXRD1+jqhvUCDG3Y91QtHTLIFSk5pPxqKluCZe4aaFVr7fYuNlGyiP
-PxNN0uYPoPRCgOzRThXnRLz5pIHnwlBymaV8Lu1knGSCfpBWkfhQd1A2FqsI749z
-tMuhy1QWSxu95BcacApXNQfxU0/J17JGJgd8tyEHfgDkMKli8ocw0Wkz+1kEy1c=
-=E4Ks
+iQEcBAEBCgAGBQJYlDzcAAoJEKuh8lKpfGLO1EQIAKVeRnXVej1DG/P4kI9yspGF
+1sgka6ZTdiIpoTZXcOekF+f2yShSx/iQINHKPx0Xrg0gmxyzK1xkxHlQtB3Ozoaa
+/tcr94jkFcwMUvM3Yv1wgvYnplK4idnzJFDmn/GPTG3DNjfXWhIMyWU6X7CCDQrH
+K5vttglP4eRc/NwKnneptaexO0wqm2fFA7vqgcmJne/RleBuA2w7+YNxf46//gWQ
+K/NerhzwR3PJZHHioaA/a/dWkDUNklg2WQVwKkORuIt6WUGEYvigtOLkv6M66CJR
+7RAkDNw3Pe6+UYWLsyAG+xrvluPsHfHMFBh3PW1HqJ6Y5YQka+3SIzkiJhFl9wc=
+=Tmef
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_A7C72EFD-BE92-478A-A329-763C6955F7B6--
+--Apple-Mail=_8753B396-C43B-49DA-9800-EA6E1AD919D4--
