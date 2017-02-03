@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZbxQ-0003N4-Ft
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:23:13 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cZbyO-00047z-4Q
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZbxP-0001JK-CX
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:23:12 -0500
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36605)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZbxP-0001IZ-5D
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:23:11 -0500
-Received: by mail-wm0-x233.google.com with SMTP id c85so23797067wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 03:23:11 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1cZbyK-00020Z-4F
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:24:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46370)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cZbyJ-0001zg-SD
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:24:08 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 700E861B9A
+	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 11:24:07 +0000 (UTC)
+Date: Fri, 3 Feb 2017 11:24:02 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170203112402.GD3208@work-vm>
+References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
+	<1485207141-1941-15-git-send-email-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170201150553.9381-24-alex.bennee@linaro.org>
-References: <20170201150553.9381-1-alex.bennee@linaro.org>
-	<20170201150553.9381-24-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 11:22:49 +0000
-Message-ID: <CAFEAcA9J4KgFLD5QiEjarw6HZY-T5WX4eSeSdGY6G2Y9ZAMOqQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 23/25] target-arm: introduce
- ARM_CP_EXIT_PC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1485207141-1941-15-git-send-email-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 14/17] migration: Create thread
+ infrastructure for multifd recv side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +34,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: MTTCG Devel <mttcg@listserver.greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>, Alvise Rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Mark Burton <mark.burton@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Fedorov Sergey <serge.fdrv@gmail.com>, Richard Henderson <rth@twiddle.net>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
 
-On 1 February 2017 at 15:05, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> Some helpers may trigger an immediate exit of the cpu_loop. If this
-> happens the PC need to be rectified to ensure the restart will begin
-> on the next instruction.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+* Juan Quintela (quintela@redhat.com) wrote:
+> We make the locking and the transfer of information specific, even if we
+> are still receiving things through the main thread.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  target/arm/cpu.h           | 3 ++-
->  target/arm/translate-a64.c | 4 ++++
->  target/arm/translate.c     | 4 ++++
->  3 files changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index d61793ca06..a3c4d07817 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1465,7 +1465,8 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpr=
-egid)
->  #define ARM_CP_NZCV            (ARM_CP_SPECIAL | (3 << 8))
->  #define ARM_CP_CURRENTEL       (ARM_CP_SPECIAL | (4 << 8))
->  #define ARM_CP_DC_ZVA          (ARM_CP_SPECIAL | (5 << 8))
-> -#define ARM_LAST_SPECIAL       ARM_CP_DC_ZVA
-> +#define ARM_CP_EXIT_PC         (ARM_CP_SPECIAL | (6 << 8))
-> +#define ARM_LAST_SPECIAL       ARM_CP_EXIT_PC
-
-This shouldn't be a "special", because those are for
-"this is a special case that is handled entirely in the translate
-code", not "I need some extra behaviour on the code generated
-for calling the helper functions" (which is what the
-plain non-special ARM_CP flags do). Notice that all the other
-"special" cases completely define the behaviour of the cp that
-uses them, and the code implementing them ends the case
-statement with "return", not "break".
-
-Missing documentation comment change.
-
-That said, I'm definitely becoming more strongly of the
-opinion that longjumping out of this helper is not the
-best way to implement this, so these remarks are a bit moot.
-
->  /* Used only as a terminator for ARMCPRegInfo lists */
->  #define ARM_CP_SENTINEL 0xffff
->  /* Mask of only the flag bits in a type field */
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 7e7131fe2f..98d4fac070 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1561,6 +1561,10 @@ static void handle_sys(DisasContext *s, uint32_t i=
-nsn, bool isread,
->          tcg_rt =3D cpu_reg(s, rt);
->          gen_helper_dc_zva(cpu_env, tcg_rt);
->          return;
-> +    case ARM_CP_EXIT_PC:
-> +        /* The helper may exit the cpu_loop so ensure PC is correct */
-> +        gen_a64_set_pc_im(s->pc);
-> +        break;
->      default:
->          break;
+>  migration/ram.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 67 insertions(+), 10 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index ca94704..4e530ea 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -523,7 +523,7 @@ void migrate_multifd_send_threads_create(void)
 >      }
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 24faa7c60c..e1f4a48720 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -7510,6 +7510,10 @@ static int disas_coproc_insn(DisasContext *s, uint=
-32_t insn)
->              gen_set_pc_im(s, s->pc);
->              s->is_jmp =3D DISAS_WFI;
->              return 0;
-> +        case ARM_CP_EXIT_PC:
-> +            /* The helper may exit the cpu_loop so ensure PC is correct =
-*/
-> +            gen_set_pc_im(s, s->pc);
-> +            break;
->          default:
->              break;
->          }
+>  }
+> 
+> -static int multifd_send_page(uint8_t *address)
+> +static uint16_t multifd_send_page(uint8_t *address, bool last_page)
+>  {
+>      int i, j, thread_count;
+>      bool found = false;
+> @@ -538,8 +538,10 @@ static int multifd_send_page(uint8_t *address)
+>      pages.address[pages.num] = address;
+>      pages.num++;
+> 
+> -    if (pages.num < (pages.size - 1)) {
+> -        return UINT16_MAX;
+> +    if (!last_page) {
+> +        if (pages.num < (pages.size - 1)) {
+> +            return UINT16_MAX;
+> +        }
+>      }
 
-thanks
--- PMM
+This should be in the previous patch?
+(and the place that adds the last_page parameter below)?
+
+> 
+>      thread_count = migrate_multifd_threads();
+> @@ -570,17 +572,25 @@ static int multifd_send_page(uint8_t *address)
+>  }
+> 
+>  struct MultiFDRecvParams {
+> +    /* not changed */
+>      QemuThread thread;
+>      QIOChannel *c;
+>      QemuCond cond;
+>      QemuMutex mutex;
+> +    /* proteced by param mutex */
+>      bool quit;
+>      bool started;
+> +    multifd_pages_t pages;
+> +    /* proteced by multifd mutex */
+> +    bool done;
+>  };
+>  typedef struct MultiFDRecvParams MultiFDRecvParams;
+> 
+>  static MultiFDRecvParams *multifd_recv;
+> 
+> +QemuMutex multifd_recv_mutex;
+> +QemuCond  multifd_recv_cond;
+> +
+>  static void *multifd_recv_thread(void *opaque)
+>  {
+>      MultiFDRecvParams *params = opaque;
+> @@ -594,7 +604,17 @@ static void *multifd_recv_thread(void *opaque)
+> 
+>      qemu_mutex_lock(&params->mutex);
+>      while (!params->quit){
+> -        qemu_cond_wait(&params->cond, &params->mutex);
+> +        if (params->pages.num) {
+> +            params->pages.num = 0;
+> +            qemu_mutex_unlock(&params->mutex);
+> +            qemu_mutex_lock(&multifd_recv_mutex);
+> +            params->done = true;
+> +            qemu_cond_signal(&multifd_recv_cond);
+> +            qemu_mutex_unlock(&multifd_recv_mutex);
+> +            qemu_mutex_lock(&params->mutex);
+> +        } else {
+> +            qemu_cond_wait(&params->cond, &params->mutex);
+> +        }
+>      }
+>      qemu_mutex_unlock(&params->mutex);
+> 
+> @@ -647,8 +667,9 @@ void migrate_multifd_recv_threads_create(void)
+>          qemu_cond_init(&multifd_recv[i].cond);
+>          multifd_recv[i].quit = false;
+>          multifd_recv[i].started = false;
+> +        multifd_recv[i].done = true;
+> +        multifd_init_group(&multifd_recv[i].pages);
+>          multifd_recv[i].c = socket_recv_channel_create();
+> -
+>          if(!multifd_recv[i].c) {
+>              error_report("Error creating a recv channel");
+>              exit(0);
+> @@ -664,6 +685,45 @@ void migrate_multifd_recv_threads_create(void)
+>      }
+>  }
+> 
+> +static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
+> +{
+> +    int i, thread_count;
+> +    MultiFDRecvParams *params;
+> +    static multifd_pages_t pages;
+> +    static bool once = false;
+> +
+> +    if (!once) {
+> +        multifd_init_group(&pages);
+> +        once = true;
+> +    }
+> +
+> +    pages.address[pages.num] = address;
+> +    pages.num++;
+> +
+> +    if (fd_num == UINT16_MAX) {
+> +        return;
+> +    }
+> +
+> +    thread_count = migrate_multifd_threads();
+> +    assert(fd_num < thread_count);
+> +    params = &multifd_recv[fd_num];
+> +
+> +    qemu_mutex_lock(&multifd_recv_mutex);
+> +    while (!params->done) {
+> +        qemu_cond_wait(&multifd_recv_cond, &multifd_recv_mutex);
+> +    }
+> +    params->done = false;
+> +    qemu_mutex_unlock(&multifd_recv_mutex);
+> +    qemu_mutex_lock(&params->mutex);
+> +    for(i = 0; i < pages.num; i++) {
+> +        params->pages.address[i] = pages.address[i];
+> +    }
+> +    params->pages.num = pages.num;
+> +    pages.num = 0;
+> +    qemu_cond_signal(&params->cond);
+> +    qemu_mutex_unlock(&params->mutex);
+> +}
+> +
+>  /**
+>   * save_page_header: Write page header to wire
+>   *
+> @@ -1097,7 +1157,7 @@ static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
+>      if (pages == -1) {
+>          *bytes_transferred +=
+>              save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+> -        fd_num = multifd_send_page(p);
+> +        fd_num = multifd_send_page(p, migration_dirty_pages == 1);
+>          qemu_put_be16(f, fd_num);
+>          *bytes_transferred += 2; /* size of fd_num */
+>          qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
+> @@ -2920,10 +2980,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> 
+>          case RAM_SAVE_FLAG_MULTIFD_PAGE:
+>              fd_num = qemu_get_be16(f);
+> -            if (fd_num != 0) {
+> -                /* this is yet an unused variable, changed later */
+> -                fd_num = fd_num;
+> -            }
+> +            multifd_recv_page(host, fd_num);
+
+This is going to be quite tricky to fit into ram_load_postcopy
+in this form; somehow it's going to have to find addresses to use for place page
+and with anything with a page size != target page size it gets messy.
+
+Dave
+
+>              qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+>              break;
+> 
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
