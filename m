@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZfzk-00037a-4N
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:41:53 -0500
+	(envelope-from <den@virtuozzo.com>) id 1cZg14-0004Ih-It
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:43:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZfzj-0004cK-3W
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:41:52 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:38081)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZfzi-0004bp-TT
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:41:51 -0500
-Received: by mail-wm0-x230.google.com with SMTP id r141so32931643wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 07:41:50 -0800 (PST)
+	(envelope-from <den@virtuozzo.com>) id 1cZg0z-0005SD-Ly
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:43:14 -0500
+Received: from mail-db5eur01on0137.outbound.protection.outlook.com
+	([104.47.2.137]:17521
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cZg0z-0005R3-An
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:43:09 -0500
+References: <1486045515-8009-1-git-send-email-den@openvz.org>
+	<20170203145218.GE642@stefanha-x1.localdomain>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <9845dd75-9901-e6e4-b890-85fd7608bcfb@openvz.org>
+Date: Fri, 3 Feb 2017 18:09:36 +0300
 MIME-Version: 1.0
-In-Reply-To: <01ec995f-fdb7-8516-b209-627f8aa3478c@redhat.com>
-References: <1485875745-27741-1-git-send-email-wei@redhat.com>
-	<1485875745-27741-5-git-send-email-wei@redhat.com>
-	<CAFEAcA8-Lt4z1uiN9dcuak3-hA3d_1fL7+iL2dOm9msrrq69NA@mail.gmail.com>
-	<01ec995f-fdb7-8516-b209-627f8aa3478c@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 15:41:21 +0000
-Message-ID: <CAFEAcA-tJDnAnuTD=txp2AkNSCRX4H+oPVvxunX1FJ1EOr1VdQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH V2 4/5] target-arm: Add support for PMU
- register PMINTENSET_EL1
+In-Reply-To: <20170203145218.GE642@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] mirror: do not increase offset
+ during initial zero_or_discard phase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 3 February 2017 at 15:19, Wei Huang <wei@redhat.com> wrote:
->
->
-> On 02/03/2017 07:30 AM, Peter Maydell wrote:
->> On 31 January 2017 at 15:15, Wei Huang <wei@redhat.com> wrote:
->>> This patch adds access support for PMINTENSET_EL1.
->>>
->>> Signed-off-by: Wei Huang <wei@redhat.com>
->>> ---
->>>  target/arm/cpu.h    |  2 +-
->>>  target/arm/helper.c | 10 +++++++++-
->>>  2 files changed, 10 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->>> index ce02044..42aaea9 100644
->>> --- a/target/arm/cpu.h
->>> +++ b/target/arm/cpu.h
->>> @@ -310,7 +310,7 @@ typedef struct CPUARMState {
->>>          uint64_t c9_pmxevtyper; /* perf monitor event type */
->>>          uint32_t c9_pmuserenr; /* perf monitor user enable */
->>>          uint64_t c9_pmselr; /* perf monitor counter selection register */
->>> -        uint32_t c9_pminten; /* perf monitor interrupt enables */
->>> +        uint64_t c9_pminten; /* perf monitor interrupt enables */
->>>          union { /* Memory attribute redirection */
->>>              struct {
->>>  #ifdef HOST_WORDS_BIGENDIAN
->>> diff --git a/target/arm/helper.c b/target/arm/helper.c
->>> index 6b8460a..b028042 100644
->>> --- a/target/arm/helper.c
->>> +++ b/target/arm/helper.c
->>> @@ -1272,9 +1272,17 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
->>>        .writefn = pmuserenr_write, .raw_writefn = raw_write },
->>>      { .name = "PMINTENSET", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 1,
->>>        .access = PL1_RW, .accessfn = access_tpm,
->>> -      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
->>> +      .type = ARM_CP_ALIAS,
->>> +      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pminten),
->>>        .resetvalue = 0,
->>>        .writefn = pmintenset_write, .raw_writefn = raw_write },
->>> +    { .name = "PMINTENSET_EL1", .state = ARM_CP_STATE_AA64,
->>> +      .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 1,
->>> +      .access = PL1_RW, .accessfn = access_tpm,
->>> +      .type = ARM_CP_IO,
->>> +      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
->>> +      .writefn = pmintenset_write, .raw_writefn = raw_write,
->>> +      .resetvalue = 0x0 },
->>>      { .name = "PMINTENCLR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 2,
->>>        .access = PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
->>>        .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
+On 02/03/2017 05:52 PM, Stefan Hajnoczi wrote:
+> On Thu, Feb 02, 2017 at 05:25:15PM +0300, Denis V. Lunev wrote:
+>> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 >>
->> Add PMINTENCLR_EL1 as well, please.
+>> If explicit zeroing out before mirroring is required for the target im=
+age,
+>> it moves the block job offset counter to EOF, then offset and len coun=
+ters
+>> count the image size twice. There is no harm but stats are confusing,
+>> specifically the progress of the operation is always reported as 99% b=
+y
+>> management tools.
+>>
+>> The patch skips offset increase for the first "technical" pass over th=
+e
+>> image. This should not cause any further harm.
+>>
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: Jeff Cody <jcody@redhat.com>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Max Reitz <mreitz@redhat.com>
+>> CC: Eric Blake <eblake@redhat.com>
+>> ---
+>> Changes from v1:
+>> - changed the approach - we do not allow to increase the offset rather=
+ then
+>>   to move it back
+>> - description rewritten
+>> - kludges to tests are removed as not actually needed with this approa=
+ch
+>>
+>>  block/mirror.c | 9 +++++++--
+>>  1 file changed, 7 insertions(+), 2 deletions(-)
+> Another option is to put the flag in MirrorOp instead of MirrorBlockJob=
+=2E
+> That reduces the scope of the variable, but this is okay too:
 >
-> It was already defined in target-arm/helper.c file. Could you elaborate
-> which part is missing?
->
->     { .name = "PMINTENCLR_EL1", .state = ARM_CP_STATE_AA64,
->       .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 2,
->       .access = PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
->       .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
->       .writefn = pmintenclr_write },
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+In this case we will have to pass argument through several
+layers on request creation path. Current approach is better.
 
-I'm sorry, you're right. I assumed that because we didn't have
-a 64-bit version of the SET we didn't have a 64-bit version
-of the CLR either.
+Thank you for the review :)
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+Den
