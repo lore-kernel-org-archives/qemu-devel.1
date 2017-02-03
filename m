@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZf2Q-0000b7-8T
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:40:35 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cZf89-00034r-Ci
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:46:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZf2O-00041I-G8
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:40:34 -0500
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:38411)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZf2O-00040g-76
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:40:32 -0500
-Received: by mail-wm0-x22d.google.com with SMTP id r141so30498717wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 06:40:32 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1485946146-21639-1-git-send-email-bharata@linux.vnet.ibm.com>
-References: <1485946146-21639-1-git-send-email-bharata@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 14:40:09 +0000
-Message-ID: <CAFEAcA_gno6etAWKkssBYSzYethD7_qNQh6CJCdviTNPqn2x9Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC PATCH v0] softfloat: Add
- float128_to_uint64_round_to_zero()
+	(envelope-from <stefanha@redhat.com>) id 1cZf84-00066e-DB
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:46:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cZf84-000669-6Y
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:46:24 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri,  3 Feb 2017 14:37:53 +0000
+Message-Id: <20170203143753.9903-2-stefanha@redhat.com>
+In-Reply-To: <20170203143753.9903-1-stefanha@redhat.com>
+References: <20170203143753.9903-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 1/1] iothread: enable AioContext polling by
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,129 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Karl Rister <krister@redhat.com>
 
-On 1 February 2017 at 10:49, Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
-> Implement float128_to_uint64() and use that to implement
-> float128_to_uint64_round_to_zero()
->
-> This is required by xscvqpudz instruction of PowerPC ISA 3.0.
->
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> ---
->  fpu/softfloat.c         | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
->  include/fpu/softfloat.h |  2 ++
->  2 files changed, 67 insertions(+)
->
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index c295f31..49a06c5 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -6110,6 +6110,71 @@ int64_t float128_to_int64_round_to_zero(float128 a, float_status *status)
->
->  /*----------------------------------------------------------------------------
->  | Returns the result of converting the quadruple-precision floating-point
-> +| value `a' to the 64-bit unsigned integer format.  The conversion
-> +| is performed according to the IEC/IEEE Standard for Binary Floating-Point
-> +| Arithmetic---which means in particular that the conversion is rounded
-> +| according to the current rounding mode.  If `a' is a NaN, the largest
-> +| positive integer is returned.  Otherwise, if the conversion overflows, the
-> +| largest unsigned integer is returned. If 'a' is negative, the value is
-> +| rounded and zero is returned; negative values that do not round to zero
-> +| will raise the inexact exception.
-> +*----------------------------------------------------------------------------*/
-> +
-> +uint64_t float128_to_uint64(float128 a, float_status *status)
-> +{
-> +    flag aSign;
-> +    int32_t aExp, shiftCount;
-> +    uint64_t aSig0, aSig1;
+IOThread AioContexts are likely to consist only of event sources like
+virtqueue ioeventfds and LinuxAIO completion eventfds that are pollable
+from userspace (without system calls).
 
-I think we should have a float128_squash_input_denormal() function
-which we call here (compare float64_to_uint64).
+We recently merged the AioContext polling feature but didn't enable it
+by default yet.  I have gone back over the performance data on the
+mailing list and picked a default polling value that gave good results.
 
-> +
-> +    aSig1 = extractFloat128Frac1( a );
+Let's enable AioContext polling by default so users don't have another
+switch they need to set manually.  If performance regressions are found
+we can still disable this for the QEMU 2.9 release.
 
-Can you use the QEMU coding style for this rather than following
-the softfloat weird one, please?
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Karl Rister <krister@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20170126170119.27876-1-stefanha@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ iothread.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-> +    aSig0 = extractFloat128Frac0( a );
-> +    aExp = extractFloat128Exp( a );
-> +    aSign = extractFloat128Sign( a );
-> +    if ( aExp ) aSig0 |= LIT64( 0x0001000000000000 );
-> +    shiftCount = 0x402F - aExp;
-> +    if ( shiftCount <= 0 ) {
-> +        if ( 0x403E < aExp ) {
-> +            float_raise(float_flag_invalid, status);
-> +            if (    ! aSign
-> +                 || (    ( aExp == 0x7FFF )
-> +                      && ( aSig1 || ( aSig0 != LIT64( 0x0001000000000000 ) ) )
-> +                    )
-> +               ) {
-> +                return LIT64( 0xFFFFFFFFFFFFFFFF );
-> +            }
-> +            return 0;
-> +        }
-> +        shortShift128Left( aSig0, aSig1, - shiftCount, &aSig0, &aSig1 );
-> +    }
-> +    else {
-> +        shift64ExtraRightJamming( aSig0, aSig1, shiftCount, &aSig0, &aSig1 );
-> +    }
-> +    return roundAndPackUint64(aSign, aSig0, aSig1, status);
-
-I'm finding this a bit difficult to understand, because it doesn't
-follow the code pattern of (for instance) float64_to_uint64().
-Is it based on some other existing function?
-
-> +}
-> +
-> +/*----------------------------------------------------------------------------
-> +| Returns the result of converting the quadruple-precision floating-point
-> +| value `a' to the 64-bit unsigned integer format.  The conversion
-> +| is performed according to the IEC/IEEE Standard for Binary Floating-Point
-> +| Arithmetic, except that the conversion is always rounded toward zero.
-> +| according to the current rounding mode.  If `a' is a NaN, the largest
-> +| positive integer is returned.  Otherwise, if the conversion overflows, the
-> +| largest unsigned integer is returned. If 'a' is negative, the value is
-> +| rounded and zero is returned; negative values that do not round to zero
-> +| will raise the inexact exception.
-> +*----------------------------------------------------------------------------*/
-> +
-> +uint64_t float128_to_uint64_round_to_zero(float128 a, float_status *status)
-> +{
-> +    signed char current_rounding_mode = status->float_rounding_mode;
-> +    set_float_rounding_mode(float_round_to_zero, status);
-> +    uint64_t v = float128_to_uint64(a, status);
-> +    set_float_rounding_mode(current_rounding_mode, status);
-> +    return v;
-> +}
-
-This function is OK, though our coding style would suggest putting
-the declaration of 'uint64_t v;' at the top of the function.
-
-> +
-> +/*----------------------------------------------------------------------------
-> +| Returns the result of converting the quadruple-precision floating-point
->  | value `a' to the single-precision floating-point format.  The conversion
->  | is performed according to the IEC/IEEE Standard for Binary Floating-Point
->  | Arithmetic.
-> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-> index 842ec6b..4e99253 100644
-> --- a/include/fpu/softfloat.h
-> +++ b/include/fpu/softfloat.h
-> @@ -712,6 +712,8 @@ int32_t float128_to_int32(float128, float_status *status);
->  int32_t float128_to_int32_round_to_zero(float128, float_status *status);
->  int64_t float128_to_int64(float128, float_status *status);
->  int64_t float128_to_int64_round_to_zero(float128, float_status *status);
-> +uint64_t float128_to_uint64(float128, float_status *status);
-> +uint64_t float128_to_uint64_round_to_zero(float128, float_status *status);
->  float32 float128_to_float32(float128, float_status *status);
->  float64 float128_to_float64(float128, float_status *status);
->  floatx80 float128_to_floatx80(float128, float_status *status);
-> --
-> 2.7.4
-
-thanks
--- PMM
+diff --git a/iothread.c b/iothread.c
+index 7bedde8..257b01d 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -30,6 +30,12 @@ typedef ObjectClass IOThreadClass;
+ #define IOTHREAD_CLASS(klass) \
+    OBJECT_CLASS_CHECK(IOThreadClass, klass, TYPE_IOTHREAD)
+ 
++/* Benchmark results from 2016 on NVMe SSD drives show max polling times around
++ * 16-32 microseconds yield IOPS improvements for both iodepth=1 and iodepth=32
++ * workloads.
++ */
++#define IOTHREAD_POLL_MAX_NS_DEFAULT 32768ULL
++
+ static __thread IOThread *my_iothread;
+ 
+ AioContext *qemu_get_current_aio_context(void)
+@@ -71,6 +77,13 @@ static int iothread_stop(Object *object, void *opaque)
+     return 0;
+ }
+ 
++static void iothread_instance_init(Object *obj)
++{
++    IOThread *iothread = IOTHREAD(obj);
++
++    iothread->poll_max_ns = IOTHREAD_POLL_MAX_NS_DEFAULT;
++}
++
+ static void iothread_instance_finalize(Object *obj)
+ {
+     IOThread *iothread = IOTHREAD(obj);
+@@ -215,6 +228,7 @@ static const TypeInfo iothread_info = {
+     .parent = TYPE_OBJECT,
+     .class_init = iothread_class_init,
+     .instance_size = sizeof(IOThread),
++    .instance_init = iothread_instance_init,
+     .instance_finalize = iothread_instance_finalize,
+     .interfaces = (InterfaceInfo[]) {
+         {TYPE_USER_CREATABLE},
+-- 
+2.9.3
