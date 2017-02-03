@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cZZ9A-0005yw-Lc
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:23:09 -0500
+	(envelope-from <peterx@redhat.com>) id 1cZZ9H-000638-2b
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:23:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cZZ99-0004VF-CB
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:23:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34042)
+	(envelope-from <peterx@redhat.com>) id 1cZZ9D-0004WX-W1
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:23:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54968)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cZZ99-0004UZ-3p
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:23:07 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cZZ9D-0004WJ-N5
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:23:11 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  3 Feb 2017 16:22:27 +0800
-Message-Id: <1486110164-13797-2-git-send-email-peterx@redhat.com>
+Date: Fri,  3 Feb 2017 16:22:28 +0800
+Message-Id: <1486110164-13797-3-git-send-email-peterx@redhat.com>
 In-Reply-To: <1486110164-13797-1-git-send-email-peterx@redhat.com>
 References: <1486110164-13797-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 01/18] vfio: trace map/unmap for notify as
- well
+Subject: [Qemu-devel] [PATCH v6 02/18] vfio: introduce vfio_get_vaddr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +26,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-We traces its range, but we don't know whether it's a MAP/UNMAP. Let's
-dump it as well.
+A cleanup for vfio_iommu_map_notify(). Now we will fetch vaddr even if
+the operation is unmap, but it won't hurt much.
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
+One thing to mention is that we need the RCU read lock to protect the
+whole translation and map/unmap procedure.
+
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/vfio/common.c     | 3 ++-
- hw/vfio/trace-events | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ hw/vfio/common.c | 65 +++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 45 insertions(+), 20 deletions(-)
 
 diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 801578b..174f351 100644
+index 174f351..42c4790 100644
 --- a/hw/vfio/common.c
 +++ b/hw/vfio/common.c
-@@ -305,7 +305,8 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-     void *vaddr;
-     int ret;
+@@ -294,54 +294,79 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+            section->offset_within_address_space & (1ULL << 63);
+ }
  
--    trace_vfio_iommu_map_notify(iova, iova + iotlb->addr_mask);
+-static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
++/* Called with rcu_read_lock held.  */
++static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
++                           bool *read_only)
+ {
+-    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+-    VFIOContainer *container = giommu->container;
+-    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+     MemoryRegion *mr;
+     hwaddr xlat;
+     hwaddr len = iotlb->addr_mask + 1;
+-    void *vaddr;
+-    int ret;
+-
+-    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
+-                                iova, iova + iotlb->addr_mask);
+-
+-    if (iotlb->target_as != &address_space_memory) {
+-        error_report("Wrong target AS \"%s\", only system memory is allowed",
+-                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+-        return;
+-    }
++    bool writable = iotlb->perm & IOMMU_WO;
+ 
+     /*
+      * The IOMMU TLB entry we have just covers translation through
+      * this IOMMU to its immediate target.  We need to translate
+      * it the rest of the way through to memory.
+      */
+-    rcu_read_lock();
+     mr = address_space_translate(&address_space_memory,
+                                  iotlb->translated_addr,
+-                                 &xlat, &len, iotlb->perm & IOMMU_WO);
++                                 &xlat, &len, writable);
+     if (!memory_region_is_ram(mr)) {
+         error_report("iommu map to non memory area %"HWADDR_PRIx"",
+                      xlat);
+-        goto out;
++        return false;
+     }
++
+     /*
+      * Translation truncates length to the IOMMU page size,
+      * check that it did not truncate too much.
+      */
+     if (len & iotlb->addr_mask) {
+         error_report("iommu has granularity incompatible with target AS");
++        return false;
++    }
++
++    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
++    *read_only = !writable || mr->readonly;
++
++    return true;
++}
++
++static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
++{
++    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
++    VFIOContainer *container = giommu->container;
++    hwaddr iova = iotlb->iova + giommu->iommu_offset;
++    bool read_only;
++    void *vaddr;
++    int ret;
++
 +    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
 +                                iova, iova + iotlb->addr_mask);
++
++    if (iotlb->target_as != &address_space_memory) {
++        error_report("Wrong target AS \"%s\", only system memory is allowed",
++                     iotlb->target_as->name ? iotlb->target_as->name : "none");
++        return;
++    }
++
++    rcu_read_lock();
++
++    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
+         goto out;
+     }
  
-     if (iotlb->target_as != &address_space_memory) {
-         error_report("Wrong target AS \"%s\", only system memory is allowed",
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 8de8281..2561c6d 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -84,7 +84,7 @@ vfio_pci_igd_lpc_bridge_enabled(const char *name) "%s"
- # hw/vfio/common.c
- vfio_region_write(const char *name, int index, uint64_t addr, uint64_t data, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
- vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t data) " (%s:region%d+0x%"PRIx64", %d) = 0x%"PRIx64
--vfio_iommu_map_notify(uint64_t iova_start, uint64_t iova_end) "iommu map @ %"PRIx64" - %"PRIx64
-+vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "iommu %s @ %"PRIx64" - %"PRIx64
- vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add %"PRIx64" - %"PRIx64
- vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] %"PRIx64" - %"PRIx64
- vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] %"PRIx64" - %"PRIx64" [%p]"
+     if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+-        vaddr = memory_region_get_ram_ptr(mr) + xlat;
++        /*
++         * vaddr is only valid until rcu_read_unlock(). But after
++         * vfio_dma_map has set up the mapping the pages will be
++         * pinned by the kernel. This makes sure that the RAM backend
++         * of vaddr will always be there, even if the memory object is
++         * destroyed and its backing memory munmap-ed.
++         */
+         ret = vfio_dma_map(container, iova,
+                            iotlb->addr_mask + 1, vaddr,
+-                           !(iotlb->perm & IOMMU_WO) || mr->readonly);
++                           read_only);
+         if (ret) {
+             error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+                          "0x%"HWADDR_PRIx", %p) = %d (%m)",
 -- 
 2.7.4
