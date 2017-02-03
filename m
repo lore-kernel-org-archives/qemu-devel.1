@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZdhQ-0006qM-Q8
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:15:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZdnT-0000JN-Kx
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:21:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZdh9-0004bH-PS
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:14:48 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35715)
+	(envelope-from <peter.maydell@linaro.org>) id 1cZdnS-0000jq-JU
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:21:03 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:36283)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZdh9-0004a1-Fu
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:14:31 -0500
-Received: by mail-wm0-x229.google.com with SMTP id b65so28495503wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 05:14:31 -0800 (PST)
+	id 1cZdnS-0000j7-C9
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:21:02 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id c85so28657783wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 05:21:02 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9H8NTnHaQEUUbuC0VC4oSfPywWR3aTDzymRc+A84yfrw@mail.gmail.com>
-References: <20170130064736.9236-1-ppandit@redhat.com>
-	<CAFEAcA9H8NTnHaQEUUbuC0VC4oSfPywWR3aTDzymRc+A84yfrw@mail.gmail.com>
+In-Reply-To: <1485875745-27741-2-git-send-email-wei@redhat.com>
+References: <1485875745-27741-1-git-send-email-wei@redhat.com>
+	<1485875745-27741-2-git-send-email-wei@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 13:14:09 +0000
-Message-ID: <CAFEAcA_3zVuneY_6VF4RaDST1uGH5ZCNZVz5YxMJAEOPF-s6YQ@mail.gmail.com>
+Date: Fri, 3 Feb 2017 13:20:40 +0000
+Message-ID: <CAFEAcA_K4Rmsno3hWjmSXYe9fg=cUeGZL0VEi2C29VUYNpORVA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] sd: sdhci: check data length during
- dma_memory_read
+Subject: Re: [Qemu-devel] [PATCH V2 1/5] target-arm: Add support for PMU
+ register PMSELR_EL0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-stable <qemu-stable@nongnu.org>
+To: Wei Huang <wei@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 30 January 2017 at 10:30, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 30 January 2017 at 06:47, P J P <ppandit@redhat.com> wrote:
->> From: Prasad J Pandit <pjp@fedoraproject.org>
->>
->> While doing multi block SDMA transfer in routine
->> 'sdhci_sdma_transfer_multi_blocks', the 's->fifo_buffer' starting
->> index 'begin' and data length 's->data_count' could end up to be same.
->> This could lead to an OOB access issue. Correct transfer data length
->> to avoid it.
->>
->> Reported-by: Jiang Xin <jiangxin1@huawei.com>
->> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
->> ---
->>  hw/sd/sdhci.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
->> index 01fbf22..5bd5ab6 100644
->> --- a/hw/sd/sdhci.c
->> +++ b/hw/sd/sdhci.c
->> @@ -536,7 +536,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
->>                  boundary_count -= block_size - begin;
->>              }
->>              dma_memory_read(&address_space_memory, s->sdmasysad,
->> -                            &s->fifo_buffer[begin], s->data_count);
->> +                            &s->fifo_buffer[begin], s->data_count - begin);
->>              s->sdmasysad += s->data_count - begin;
->>              if (s->data_count == block_size) {
->>                  for (n = 0; n < block_size; n++) {
+On 31 January 2017 at 15:15, Wei Huang <wei@redhat.com> wrote:
+> This patch adds support for AArch64 register PMSELR_EL0. The existing
+> PMSELR definition is revised accordingly.
 >
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  target/arm/cpu.h    |  1 +
+>  target/arm/helper.c | 25 ++++++++++++++++++++-----
+>  2 files changed, 21 insertions(+), 5 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 39bff86..8a82c73 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -309,6 +309,7 @@ typedef struct CPUARMState {
+>          uint32_t c9_pmovsr; /* perf monitor overflow status */
+>          uint32_t c9_pmxevtyper; /* perf monitor event type */
+>          uint32_t c9_pmuserenr; /* perf monitor user enable */
+> +        uint64_t c9_pmselr; /* perf monitor counter selection register */
+>          uint32_t c9_pminten; /* perf monitor interrupt enables */
+>          union { /* Memory attribute redirection */
+>              struct {
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index c23df1b..67520ea 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -975,6 +975,17 @@ static uint64_t pmccntr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+>      return total_ticks - env->cp15.c15_ccnt;
+>  }
+>
+> +static void pmselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                         uint64_t value)
+> +{
+> +    /* The value of PMSELR.SEL affects the behavior of PMXEVTYPER and
+> +     * PMXEVCNTR. We allow [0..31] to be written to PMSELR here; in the
+> +     * meanwhile, we check PMSELR.SEL when PMXEVTYPER and PMXEVCNTR are
+> +     * accessed.
+> +     */
+> +    env->cp15.c9_pmselr = value & 0x1f;
+> +}
+> +
+>  static void pmccntr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                          uint64_t value)
+>  {
+> @@ -1194,12 +1205,16 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+>      /* Unimplemented so WI. */
+>      { .name = "PMSWINC", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 4,
+>        .access = PL0_W, .accessfn = pmreg_access, .type = ARM_CP_NOP },
+> -    /* Since we don't implement any events, writing to PMSELR is UNPREDICTABLE.
+> -     * We choose to RAZ/WI.
+> -     */
+>      { .name = "PMSELR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 5,
+> -      .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
+> -      .accessfn = pmreg_access },
+> +      .access = PL0_RW, .type = ARM_CP_ALIAS,
+> +      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmselr),
+> +      .accessfn = pmreg_access, .writefn = pmselr_write,
+> +      .raw_writefn = raw_write},
+> +    { .name = "PMSELR_EL0", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 5,
+> +      .access = PL0_RW, .accessfn = pmreg_access,
+> +      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmselr),
+> +      .writefn = pmselr_write, .raw_writefn = raw_write, },
+>  #ifndef CONFIG_USER_ONLY
+>      { .name = "PMCCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 0,
+>        .access = PL0_RW, .resetvalue = 0, .type = ARM_CP_IO,
+> --
+> 1.8.3.1
+>
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-
-Applied to target-arm.next, thanks.
-
+thanks
 -- PMM
