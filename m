@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cZaUO-00039P-BN
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:49:09 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cZaVX-0004BI-KT
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:50:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cZaUJ-0001ma-D6
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:49:08 -0500
-Received: from smtp3.mundo-r.com ([212.51.32.191]:49069 helo=smtp4.mundo-r.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cZaUI-0001MO-WC
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:49:03 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <b8467f6a-6cca-4b24-50f3-dd2dbafa8c02@huawei.com>
-References: <1485249848-13854-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<w51d1f2rmx9.fsf@maestria.local.igalia.com>
-	<b8467f6a-6cca-4b24-50f3-dd2dbafa8c02@huawei.com>
-Date: Fri, 03 Feb 2017 10:48:22 +0100
-Message-ID: <w51tw8bwqop.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/2 v14] fsdev: add IO throttle support to
- fsdev devices
+	(envelope-from <mjt@tls.msk.ru>) id 1cZaVT-0002YW-6o
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:50:19 -0500
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Fri,  3 Feb 2017 12:50:02 +0300
+Message-Id: <1486115402-9288-1-git-send-email-mjt@msgid.tls.msk.ru>
+Subject: [Qemu-devel] [PATCH] vnc: do not disconnect on EAGAIN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +17,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org
 
-On Fri 03 Feb 2017 10:41:33 AM CET, Pradeep Jagadeesh wrote:
+When qemu vnc server is trying to send large update to clients,
+there might be a situation when system responds with something
+like EAGAIN, indicating that there's no system memory to send
+that much data (depending on the network speed, client and server
+and what is happening).  In this case, something like this happens
+on qemu side (from strace):
 
->> I cannot find the second patch in this thread (v14), did you forget
->> to send it?
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg04913.html
->
-> I did send all the both patch files and the cover letter.
-> Don't know how the patch missed in that link.
+sendmsg(16, {msg_name(0)=NULL,
+        msg_iov(1)=[{"\244\"..., 729186}],
+        msg_controllen=0, msg_flags=0}, 0) = 103950
+sendmsg(16, {msg_name(0)=NULL,
+        msg_iov(1)=[{"lz\346"..., 1559618}],
+        msg_controllen=0, msg_flags=0}, 0) = -1 EAGAIN
+sendmsg(-1, {msg_name(0)=NULL,
+        msg_iov(1)=[{"lz\346"..., 1559618}],
+        msg_controllen=0, msg_flags=0}, 0) = -1 EBADF
 
-I haven't received anything, but since patch 1 needs to be corrected you
-can send both again in v15.
+qemu closes the socket before the retry, and obviously it gets EBADF
+when trying to send to -1.
 
-Regards,
+This is because there WAS a special handling for EAGAIN, but now it doesn't
+work anymore, after commit 04d2529da27db512dcbd5e99d0e26d333f16efcc, because
+now in all error-like cases we initiate vnc disconnect.
 
-Berto
+This change were introduced in qemu 2.6, and caused numerous grief for many
+people, resulting in their vnc clients reporting sporadic random disconnects
+from vnc server.
+
+Fix that by doing the disconnect only when necessary, i.e. omitting this
+very case of EAGAIN.
+
+Hopefully the existing condition (comparing with QIO_CHANNEL_ERR_BLOCK)
+is sufficient, as the original code (before the above commit) were
+checking for other errno values too.
+
+Apparently there's another (semi?)bug exist somewhere here, since the
+code tries to write to fd# -1, it probably should check if the connection
+is open before. But this isn't important.
+
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+Fixes: 04d2529da27db512dcbd5e99d0e26d333f16efcc
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-stable@nongnu.org
+---
+ ui/vnc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/ui/vnc.c b/ui/vnc.c
+index cdeb79c..66fde39 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1256,12 +1256,13 @@ ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
+     if (ret <= 0) {
+         if (ret == 0) {
+             VNC_DEBUG("Closing down client sock: EOF\n");
++	    vnc_disconnect_start(vs);
+         } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
+             VNC_DEBUG("Closing down client sock: ret %zd (%s)\n",
+                       ret, errp ? error_get_pretty(*errp) : "Unknown");
++	    vnc_disconnect_start(vs);
+         }
+ 
+-        vnc_disconnect_start(vs);
+         if (errp) {
+             error_free(*errp);
+             *errp = NULL;
+-- 
+2.1.4
