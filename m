@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jdickens@grammatech.com>) id 1cZiTa-0002NC-CI
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:20:51 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cZiX3-00044t-2T
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:24:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jdickens@grammatech.com>) id 1cZiTW-0007Cr-DO
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:20:50 -0500
-Received: from placid1.grammatech.com ([98.159.213.246]:44888
-	helo=placid.grammatech.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jdickens@grammatech.com>)
-	id 1cZiTW-0007Cm-8I
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:20:46 -0500
-Received: from placid.grammatech.com (placid1 [192.168.219.7])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by placid.grammatech.com (Postfix) with ESMTPS id DBF0FB20A5
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 13:20:44 -0500 (EST)
-Received: from [10.233.218.30] (barracuda.grammatech.com [192.168.219.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by placid.grammatech.com (Postfix) with ESMTPSA id D0443B2086
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 13:20:44 -0500 (EST)
-From: Jason Dickens <jdickens@grammatech.com>
-Message-ID: <c327fa49-67c4-5e01-29f8-cbe9c883e157@grammatech.com>
-Date: Fri, 3 Feb 2017 13:20:44 -0500
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] QEMU + OVMF, bootable linux image
+	(envelope-from <pm215@archaic.org.uk>) id 1cZiX2-0000iy-0t
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:24:25 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1cZiX1-0000iV-Px
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 13:24:23 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  3 Feb 2017 18:24:20 +0000
+Message-Id: <1486146260-8092-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] ui/vnc: Drop unused vnc_has_job() and
+ vnc_jobs_clear()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +24,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-I am trying to create a raw Linux image that is bootable by QEMU using 
-the OVMF firmware image.
+The functions vnc_has_job() and vnc_jobs_clear() are
+never used; remove them.
 
-Basically, I have used a standard Ubuntu ISO  and a empty raw image. 
-Executing qemu-system-x86_64 with the ISO as CD and the other image as a 
-hardrive I have been able to install Ubuntu on the image, no problem.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
 
-However, when trying to boot the created image I simply get the UEFI shell?
+I last had a go at this five years ago:
+http://patchwork.ozlabs.org/patch/192335/
 
-I've noticed the following:
+Since then vnc_stop_worker_thread() got removed anyway in
+commit 09526058d, but the vnc_jobs_clear() function that
+it was the only caller of got left behind.
 
-1. The ISO image which boots with OVMF in UEFI just fine has the 
-following format (from fdisk):
+vnc_has_job() has never been used by anybody, and it's
+impossible to use in a non-racy way, so drop it too.
 
-Disk ubuntu-14.04.3-desktop-amd64.iso: 1006 MiB, 1054867456 bytes, 
-2060288 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disklabel type: dos
-Disk identifier: 0x6a6216fc
+ ui/vnc-jobs.h |  2 --
+ ui/vnc-jobs.c | 23 -----------------------
+ 2 files changed, 25 deletions(-)
 
-Device                           Boot   Start     End Sectors Size Id Type
-ubuntu-14.04.3-desktop-amd64.iso1  *        0 2060287 2060288 1006M  0 
-Empty
-ubuntu-14.04.3-desktop-amd64.iso2     2038760 2043303 4544 2.2M ef EFI 
-(FAT-12/16/32)
-
-2. The image created by the linux install has the following(from fdisk):
-
-Disk ovmf_test_image: 10 GiB, 10737418240 bytes, 20971520 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disklabel type: gpt
-Disk identifier: 36240C48-C008-4619-BE31-26D271000490
-
-Device              Start      End  Sectors  Size Type
-ovmf_test_image1     2048  1050623  1048576  512M EFI System
-ovmf_test_image2  1050624 12584959 11534336  5.5G Linux filesystem
-ovmf_test_image3 12584960 20969471  8384512    4G Linux swap
-
-
-Can someone help me understand the format requirements to boot using 
-OVMF in UEFI mode? Clearly these two images are dramatically different. 
-However, I would expect #2 to be the more modern method and more likely 
-to work? As for QEMU command I use literally the same command switching 
-only between the file names to get the different results it looks 
-something like this:
-
-qemu-system-x86_64 -drive file=ovmf_test_image,format=raw -m 4G 
---bios.bin -net none
-
-Thanks,
-
-Jason
+diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
+index 044bf9f..59f66bc 100644
+--- a/ui/vnc-jobs.h
++++ b/ui/vnc-jobs.h
+@@ -34,8 +34,6 @@
+ VncJob *vnc_job_new(VncState *vs);
+ int vnc_job_add_rect(VncJob *job, int x, int y, int w, int h);
+ void vnc_job_push(VncJob *job);
+-bool vnc_has_job(VncState *vs);
+-void vnc_jobs_clear(VncState *vs);
+ void vnc_jobs_join(VncState *vs);
+ 
+ void vnc_jobs_consume_buffer(VncState *vs);
+diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
+index 98ca978..f786777 100644
+--- a/ui/vnc-jobs.c
++++ b/ui/vnc-jobs.c
+@@ -128,29 +128,6 @@ static bool vnc_has_job_locked(VncState *vs)
+     return false;
+ }
+ 
+-bool vnc_has_job(VncState *vs)
+-{
+-    bool ret;
+-
+-    vnc_lock_queue(queue);
+-    ret = vnc_has_job_locked(vs);
+-    vnc_unlock_queue(queue);
+-    return ret;
+-}
+-
+-void vnc_jobs_clear(VncState *vs)
+-{
+-    VncJob *job, *tmp;
+-
+-    vnc_lock_queue(queue);
+-    QTAILQ_FOREACH_SAFE(job, &queue->jobs, next, tmp) {
+-        if (job->vs == vs || !vs) {
+-            QTAILQ_REMOVE(&queue->jobs, job, next);
+-        }
+-    }
+-    vnc_unlock_queue(queue);
+-}
+-
+ void vnc_jobs_join(VncState *vs)
+ {
+     vnc_lock_queue(queue);
+-- 
+2.7.4
