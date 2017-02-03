@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKR-0004bA-NI
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:20 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKV-0004cP-1F
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKQ-0002dl-Ny
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:19 -0500
-Received: from greensocs.com ([193.104.36.180]:39021)
+	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKU-0002fr-6s
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:23 -0500
+Received: from greensocs.com ([193.104.36.180]:39070)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKQ-0002dV-CC
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:18 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cZhKT-0002fR-Qr
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 12:07:22 -0500
 From: fred.konrad@greensocs.com
-Date: Fri,  3 Feb 2017 18:06:33 +0100
-Message-Id: <1486141597-13941-2-git-send-email-fred.konrad@greensocs.com>
+Date: Fri,  3 Feb 2017 18:06:35 +0100
+Message-Id: <1486141597-13941-4-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1486141597-13941-1-git-send-email-fred.konrad@greensocs.com>
 References: <1486141597-13941-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [RFC 1/5] cputlb: cleanup get_page_addr_code to use
- VICTIM_TLB_HIT
+Subject: [Qemu-devel] [RFC 3/5] cputlb: fix the way get_page_addr_code fills
+ the tlb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +29,32 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This replaces env1 and page_index variables by env and index
-so we can use VICTIM_TLB_HIT macro later.
+get_page_addr_code(..) does a cpu_ldub_code to fill the tlb:
+This can lead to some side effects if a device is mapped at this address.
+
+So this patch replaces the cpu_memory_ld by a tlb_fill.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
 ---
- cputlb.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ cputlb.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/cputlb.c b/cputlb.c
-index 6c39927..665caea 100644
+index b3a5f47..846341e 100644
 --- a/cputlb.c
 +++ b/cputlb.c
-@@ -457,21 +457,21 @@ static void report_bad_exec(CPUState *cpu, target_ulong addr)
-  * is actually a ram_addr_t (in system mode; the user mode emulation
-  * version of this function returns a guest virtual address).
-  */
--tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
-+tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
- {
--    int mmu_idx, page_index, pd;
-+    int mmu_idx, index, pd;
-     void *p;
-     MemoryRegion *mr;
--    CPUState *cpu = ENV_GET_CPU(env1);
-+    CPUState *cpu = ENV_GET_CPU(env);
-     CPUIOTLBEntry *iotlbentry;
- 
--    page_index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
--    mmu_idx = cpu_mmu_index(env1, true);
--    if (unlikely(env1->tlb_table[mmu_idx][page_index].addr_code !=
-+    index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-+    mmu_idx = cpu_mmu_index(env, true);
-+    if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
-                  (addr & TARGET_PAGE_MASK))) {
--        cpu_ldub_code(env1, addr);
-+        cpu_ldub_code(env, addr);
+@@ -534,8 +534,10 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+     index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+     mmu_idx = cpu_mmu_index(env, true);
+     if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
+-                 (addr & TARGET_PAGE_MASK))) {
+-        cpu_ldub_code(env, addr);
++                 (addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK)))) {
++        if (!VICTIM_TLB_HIT(addr_read, addr)) {
++            tlb_fill(ENV_GET_CPU(env), addr, MMU_INST_FETCH, mmu_idx, 0);
++        }
      }
--    iotlbentry = &env1->iotlb[mmu_idx][page_index];
-+    iotlbentry = &env->iotlb[mmu_idx][index];
+     iotlbentry = &env->iotlb[mmu_idx][index];
      pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
-     mr = iotlb_to_region(cpu, pd, iotlbentry->attrs);
-     if (memory_region_is_unassigned(mr)) {
-@@ -484,7 +484,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
-             exit(1);
-         }
-     }
--    p = (void *)((uintptr_t)addr + env1->tlb_table[mmu_idx][page_index].addend);
-+    p = (void *)((uintptr_t)addr + env->tlb_table[mmu_idx][index].addend);
-     return qemu_ram_addr_from_host_nofail(p);
- }
- 
 -- 
 1.8.3.1
