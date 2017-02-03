@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZcbT-000382-EB
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:04:37 -0500
+	(envelope-from <berrange@redhat.com>) id 1cZcbT-00037g-6a
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:04:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZcbR-0001nZ-IQ
+	(envelope-from <berrange@redhat.com>) id 1cZcbR-0001nM-99
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:04:35 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri,  3 Feb 2017 12:02:48 +0000
-Message-Id: <20170203120254.15062-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/6] qemu-img: improve convert & dd commands
+Date: Fri,  3 Feb 2017 12:02:54 +0000
+Message-Id: <20170203120254.15062-7-berrange@redhat.com>
+In-Reply-To: <20170203120254.15062-1-berrange@redhat.com>
+References: <20170203120254.15062-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 6/6] qemu-img: copy *key-secret opts when
+ opening newly created files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,61 +23,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Update to
+The qemu-img dd/convert commands will create a image file and
+then try to open it. Historically it has been possible to open
+new files without passing any options. With encrypted files
+though, the *key-secret options are mandatory, so we need to
+provide those options when opening the newly created file.
 
-  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05699.html
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qemu-img.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 47 insertions(+), 4 deletions(-)
 
-This series is in response to Max pointing out that you cannot
-use 'convert' for an encrypted target image.
-
-The 'convert' and 'dd' commands need to first create the image
-and then open it. The bdrv_create() method takes a set of options
-for creating the image, which let us provide a key-secret for the
-encryption key. When the commands then open the new image, they
-don't provide any options, so the image is unable to be opened
-due to lack of encryption key. It is also not possible to use
-the --image-opts argument to provide structured options in the
-target image name - it must be a plain filename to satisfy the
-bdrv_create() API contract.
-
-This series addresses these problems to some extent
-
- - Adds a new --target-image-opts flag which is used to say
-   that the target filename is using structured options.
-   It is *only* permitted to use this when -n is also set.
-   ie the target image must be pre-created so convert/dd
-   don't need to run bdrv_create().
-
- - When --target-image-opts is not used, add special case
-   code that identifies options passed to bdrv_create()
-   named "*key-secret" and adds them to the options used
-   to open the new image
-
-In future it is desirable to make --target-image-opts work
-even when -n is *not* given. This requires considerable
-work to create a new bdrv_create() API impl.
-
-The first four patches improve the 'dd' command to address
-feature gaps wrt the 'convert' command. The last two patches
-implement the improvements described above.
-
-Changed in v2:
-
- - Replace dd -n flag with support for conv=nocreat,notrunc
- - Misc typos (Eric, Fam)
-
-Daniel P. Berrange (6):
-  qemu-img: add support for --object with 'dd' command
-  qemu-img: fix --image-opts usage with dd command
-  qemu-img: add support for conv=nocreat,notrunc args to dd command
-  qemu-img: add support for -o arg to dd command
-  qemu-img: introduce --target-image-opts for 'convert' command
-  qemu-img: copy *key-secret opts when opening newly created files
-
- qemu-img-cmds.hx |   8 +-
- qemu-img.c       | 342 ++++++++++++++++++++++++++++++++++++++++++++-----------
- qemu-img.texi    |  26 ++++-
- 3 files changed, 299 insertions(+), 77 deletions(-)
-
+diff --git a/qemu-img.c b/qemu-img.c
+index dc4c6eb..98522dd 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -319,6 +319,49 @@ static BlockBackend *img_open_file(const char *filename,
+ }
+ 
+ 
++static int img_add_key_secrets(void *opaque,
++                               const char *name, const char *value,
++                               Error **errp)
++{
++    QDict **options = opaque;
++
++    if (g_str_has_suffix(name, "key-secret")) {
++        if (!*options) {
++            *options = qdict_new();
++        }
++        qdict_put(*options, name, qstring_from_str(value));
++    }
++
++    return 0;
++}
++
++static BlockBackend *img_open_new_file(const char *filename,
++                                       QemuOpts *create_opts,
++                                       const char *fmt, int flags,
++                                       bool writethrough, bool quiet)
++{
++    BlockBackend *blk;
++    Error *local_err = NULL;
++    QDict *options = NULL;
++
++    if (fmt) {
++        options = qdict_new();
++        qdict_put(options, "driver", qstring_from_str(fmt));
++    }
++
++    qemu_opt_foreach(create_opts, img_add_key_secrets, &options, NULL);
++
++    blk = blk_new_open(filename, NULL, options, flags, &local_err);
++    if (!blk) {
++        error_reportf_err(local_err, "Could not open '%s': ", filename);
++        return NULL;
++    }
++    blk_set_enable_write_cache(blk, !writethrough);
++
++    return blk;
++}
++
++
+ static BlockBackend *img_open(bool image_opts,
+                               const char *filename,
+                               const char *fmt, int flags, bool writethrough,
+@@ -2115,8 +2158,8 @@ static int img_convert(int argc, char **argv)
+          * That has to wait for bdrv_create to be improved
+          * to allow filenames in option syntax
+          */
+-        out_blk = img_open_file(out_filename, out_fmt,
+-                                flags, writethrough, quiet);
++        out_blk = img_open_new_file(out_filename, opts, out_fmt,
++                                    flags, writethrough, quiet);
+     }
+     if (!out_blk) {
+         ret = -1;
+@@ -4206,8 +4249,8 @@ static int img_dd(int argc, char **argv)
+          * That has to wait for bdrv_create to be improved
+          * to allow filenames in option syntax
+          */
+-        blk2 = img_open_file(out.filename, out_fmt,
+-                             BDRV_O_RDWR, false, false);
++        blk2 = img_open_new_file(out.filename, opts, out_fmt,
++                                 BDRV_O_RDWR, false, false);
+     }
+ 
+     if (!blk2) {
 -- 
 2.9.3
