@@ -1,40 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cZfYd-0005RC-ON
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:13:53 -0500
+	(envelope-from <shorne@gmail.com>) id 1cZfZg-00063Q-Ta
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:14:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cZfYa-00017Y-EV
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:13:51 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58547)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cZfYa-00017K-4V
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:13:48 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v13F9W9d022918
-	for <qemu-devel@nongnu.org>; Fri, 3 Feb 2017 10:13:46 -0500
-Received: from e23smtp02.au.ibm.com (e23smtp02.au.ibm.com [202.81.31.144])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28c9093073-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 10:13:46 -0500
-Received: from localhost
-	by e23smtp02.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Sat, 4 Feb 2017 01:13:43 +1000
-Date: Fri, 3 Feb 2017 20:42:47 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1485946146-21639-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<CAFEAcA_gno6etAWKkssBYSzYethD7_qNQh6CJCdviTNPqn2x9Q@mail.gmail.com>
+	(envelope-from <shorne@gmail.com>) id 1cZfZd-0001dk-Jq
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:14:56 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35447)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cZfZd-0001d4-Dj
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:14:53 -0500
+Received: by mail-pf0-x241.google.com with SMTP id f144so1761870pfa.2
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 07:14:53 -0800 (PST)
+Date: Sat, 4 Feb 2017 00:14:49 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20170203151449.GC32144@lianli.shorne-pla.net>
+References: <d27b7c60-a9fe-e92e-a937-d2d13b78f290@twiddle.net>
+	<20170124102625.GF7836@lianli.shorne-pla.net>
+	<01f7a18d-f4f5-18f3-0932-b32c06ad0b0c@twiddle.net>
+	<20170125123430.GG7836@lianli.shorne-pla.net>
+	<39f927aa-26fe-0e43-7c6b-efe1b70bc5fa@twiddle.net>
+	<20170126131229.GB16014@lianli.shorne-pla.net>
+	<ddb9c656-aa3e-5d90-c8fc-0058af5b603b@twiddle.net>
+	<20170201100423.GE21641@lianli.shorne-pla.net>
+	<c840eff0-2be7-07d7-eae9-4cded569d146@twiddle.net>
+	<20170202143455.GB32144@lianli.shorne-pla.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_gno6etAWKkssBYSzYethD7_qNQh6CJCdviTNPqn2x9Q@mail.gmail.com>
-Message-Id: <20170203151246.GD12744@in.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v0] softfloat: Add
- float128_to_uint64_round_to_zero()
+In-Reply-To: <20170202143455.GB32144@lianli.shorne-pla.net>
+Subject: Re: [Qemu-devel] [PATCH] target-openrisc: Fix exception handling
+ status registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,145 +38,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org, openrisc@lists.librecores.org
 
-On Fri, Feb 03, 2017 at 02:40:09PM +0000, Peter Maydell wrote:
-> On 1 February 2017 at 10:49, Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
-> > Implement float128_to_uint64() and use that to implement
-> > float128_to_uint64_round_to_zero()
-> >
-> > This is required by xscvqpudz instruction of PowerPC ISA 3.0.
-> >
-> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > ---
-> >  fpu/softfloat.c         | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
-> >  include/fpu/softfloat.h |  2 ++
-> >  2 files changed, 67 insertions(+)
-> >
-> > diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> > index c295f31..49a06c5 100644
-> > --- a/fpu/softfloat.c
-> > +++ b/fpu/softfloat.c
-> > @@ -6110,6 +6110,71 @@ int64_t float128_to_int64_round_to_zero(float128 a, float_status *status)
-> >
-> >  /*----------------------------------------------------------------------------
-> >  | Returns the result of converting the quadruple-precision floating-point
-> > +| value `a' to the 64-bit unsigned integer format.  The conversion
-> > +| is performed according to the IEC/IEEE Standard for Binary Floating-Point
-> > +| Arithmetic---which means in particular that the conversion is rounded
-> > +| according to the current rounding mode.  If `a' is a NaN, the largest
-> > +| positive integer is returned.  Otherwise, if the conversion overflows, the
-> > +| largest unsigned integer is returned. If 'a' is negative, the value is
-> > +| rounded and zero is returned; negative values that do not round to zero
-> > +| will raise the inexact exception.
-> > +*----------------------------------------------------------------------------*/
-> > +
-> > +uint64_t float128_to_uint64(float128 a, float_status *status)
-> > +{
-> > +    flag aSign;
-> > +    int32_t aExp, shiftCount;
-> > +    uint64_t aSig0, aSig1;
+On Thu, Feb 02, 2017 at 11:34:55PM +0900, Stafford Horne wrote:
+> On Wed, Feb 01, 2017 at 10:15:54AM -0800, Richard Henderson wrote:
+> > On 02/01/2017 02:04 AM, Stafford Horne wrote:
+> > > On Thu, Jan 26, 2017 at 09:26:55AM -0800, Richard Henderson wrote:
+> > >> On 01/26/2017 05:12 AM, Stafford Horne wrote:
+> > >>> I just sent you a mail with a link to my kernel for download.
+> > >>>
+> > >>> One thing I noticed is you passed '-append console=ttyS0' I think that
+> > >>> does nothing on openrisc since as far as I know openrisc only gets boot
+> > >>> params from the device tree file. I tried with and without it and got no
+> > >>> differences.
+> > >>
+> > >> That was just reflex, wondering where the output went.
+> > >>
+> > >>> Another thing, I am using a 'late' version of gcc built with musl cross [1]
+> > >>> , I dont think it would make a difference, but maybe?
+> > >>
+> > >> I think that's likely the difference.  I can indeed boot your kernel.
+> > > 
+> > > Hi Richard,
+> > > 
+> > > For kernel builds I have created toolchain binaries here:
+> > > 
+> > >   http://shorne.noip.me/crosstool/files/bin/x86_64/5.4.0/
+> > > 
+> > > These should work.
+> > > 
+> > > If all is ok with the qemu patch I sent what is the next step to get them
+> > > incorporated.  Do you need any help from me?
+> > > 
+> > > ... Actually I just checked your branch on github, it looks like you are
+> > > doing a few updates.  Let me know if you want me to review anything.
+> > 
+> > Yes, I've been attempting to revive a patch set from 2013 that cleans up the
+> > implementation, fixing a few other bugs in the process.
+> > 
+> > However, testing it properly has been tricky.  It appears as if I'm debugging
+> > qemu and gcc simultaneously, while your gdb branch doesn't want to compile for
+> > me.  So I've been limited to instruction traces from qemu, which is slow going.
 > 
-> I think we should have a float128_squash_input_denormal() function
-> which we call here (compare float64_to_uint64).
-
-I followed float128_to_int64() which doesn't have that _denormal() call.
-
+> What issue are you having compiling gdb?
 > 
-> > +
-> > +    aSig1 = extractFloat128Frac1( a );
+> I compile gdb with these flags.
 > 
-> Can you use the QEMU coding style for this rather than following
-> the softfloat weird one, please?
-
-Sure, I will henceforth switch to QEMU coding style, I was under the
-impression that we should stick to the existing style since almost
-entire softfloat.c is in different style.
-
+>   ../binutils-gdb/configure --target=or1k-musl-linux \
+>     --prefix=$PREFIX \
+>     --disable-itcl \
+>     --disable-tk \
+>     --disable-tcl \
+>     --disable-winsup \
+>     --disable-gdbtk \
+>     --disable-libgui \
+>     --disable-rda \
+>     --disable-sid \
+>     --with-sysroot \
+>     --disable-newlib \
+>     --disable-libgloss \
+>     --disable-gas \
+>     --disable-ld \
+>     --disable-binutils \
+>     --disable-gprof \
+>     --with-system-zlib
 > 
-> > +    aSig0 = extractFloat128Frac0( a );
-> > +    aExp = extractFloat128Exp( a );
-> > +    aSign = extractFloat128Sign( a );
-> > +    if ( aExp ) aSig0 |= LIT64( 0x0001000000000000 );
-> > +    shiftCount = 0x402F - aExp;
-> > +    if ( shiftCount <= 0 ) {
-> > +        if ( 0x403E < aExp ) {
-> > +            float_raise(float_flag_invalid, status);
-> > +            if (    ! aSign
-> > +                 || (    ( aExp == 0x7FFF )
-> > +                      && ( aSig1 || ( aSig0 != LIT64( 0x0001000000000000 ) ) )
-> > +                    )
-> > +               ) {
-> > +                return LIT64( 0xFFFFFFFFFFFFFFFF );
-> > +            }
-> > +            return 0;
-> > +        }
-> > +        shortShift128Left( aSig0, aSig1, - shiftCount, &aSig0, &aSig1 );
-> > +    }
-> > +    else {
-> > +        shift64ExtraRightJamming( aSig0, aSig1, shiftCount, &aSig0, &aSig1 );
-> > +    }
-> > +    return roundAndPackUint64(aSign, aSig0, aSig1, status);
+> Also, I uploaded my binaries just in case:
 > 
-> I'm finding this a bit difficult to understand, because it doesn't
-> follow the code pattern of (for instance) float64_to_uint64().
-> Is it based on some other existing function?
-
-As I said above, it is based on float128_to_int64()
-
-Actually what I really need is float128_to_uint64_round_to_zero().
-
-However it is a bit confusing as to which existing routine to follow here.
-I see there are 3 different ways floatXX_to_uintYY_round_to_zero is done:
-
-1. Eg float64_to_uint32_round_to_zero()
-   Uses float64_to_uint64_round_to_zero()
-
-2. Eg float128_to_int32_round_to_zero()
-   Doesn't use float128_to_int32() but instead is implemented
-   fully separately.
-
-3. Eg float64_to_uint64_round_to_zero()
-   Sets the rounding mode to round-to-zero
-   Uses float64_to_uint64()
-
-I don't know if the above variants came about during different points
-in time or they are actually implemented that way due to some
-subtlety involved. I am following the 3rd pattern above as
-I found it to be easier for this particular case (float128_to_uint128)
-
-In fact I need float128_to_uint32() also next, but haven't yet been
-able to figure out which way to do it.
-
+>   http://shorne.noip.me/crosstool/files/bin/x86_64/5.4.0/
 > 
-> > +}
-> > +
-> > +/*----------------------------------------------------------------------------
-> > +| Returns the result of converting the quadruple-precision floating-point
-> > +| value `a' to the 64-bit unsigned integer format.  The conversion
-> > +| is performed according to the IEC/IEEE Standard for Binary Floating-Point
-> > +| Arithmetic, except that the conversion is always rounded toward zero.
-> > +| according to the current rounding mode.  If `a' is a NaN, the largest
-> > +| positive integer is returned.  Otherwise, if the conversion overflows, the
-> > +| largest unsigned integer is returned. If 'a' is negative, the value is
-> > +| rounded and zero is returned; negative values that do not round to zero
-> > +| will raise the inexact exception.
-> > +*----------------------------------------------------------------------------*/
-> > +
-> > +uint64_t float128_to_uint64_round_to_zero(float128 a, float_status *status)
-> > +{
-> > +    signed char current_rounding_mode = status->float_rounding_mode;
-> > +    set_float_rounding_mode(float_round_to_zero, status);
-> > +    uint64_t v = float128_to_uint64(a, status);
-> > +    set_float_rounding_mode(current_rounding_mode, status);
-> > +    return v;
-> > +}
+> My host gcc is "6.3.1 20161221", I used musl-cross and my gdb branch
 > 
-> This function is OK, though our coding style would suggest putting
-> the declaration of 'uint64_t v;' at the top of the function.
+>   https://github.com/openrisc/musl-cross.git or1k
+> 
+>   git@github.com:stffrdhrn/binutils-gdb.git or1k-upstream
+> 
+> > If you'd like to do your own testing on my tgt-or1k-2 branch, that would be
+> > appreciated.
+> 
+> I will have a look tomorrow if I can.
 
-Sure will change in the next iteration when I switch to QEMU style.
+I tried your tgt-or1k-2 branch with my latest kernel and have no issues.
 
-Regards,
-Bharata.
+What are you having issues with?  If you have some example code I could
+have a look.
+
+-Stafford
