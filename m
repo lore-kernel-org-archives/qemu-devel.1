@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZcbU-00039V-O5
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:04:39 -0500
+	(envelope-from <berrange@redhat.com>) id 1cZcdl-0005JU-VN
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:06:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZcbR-0001nh-IM
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:04:36 -0500
+	(envelope-from <berrange@redhat.com>) id 1cZcdk-00040y-JG
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:06:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cZcdk-00040M-DH
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:06:56 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9541C85540
+	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 12:06:56 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri,  3 Feb 2017 12:02:52 +0000
-Message-Id: <20170203120254.15062-5-berrange@redhat.com>
-In-Reply-To: <20170203120254.15062-1-berrange@redhat.com>
-References: <20170203120254.15062-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/6] qemu-img: add support for -o arg to dd
- command
+Date: Fri,  3 Feb 2017 12:06:42 +0000
+Message-Id: <20170203120649.15637-2-berrange@redhat.com>
+In-Reply-To: <20170203120649.15637-1-berrange@redhat.com>
+References: <20170203120649.15637-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/8] ui: fix regression handling bare
+ 'websocket' option to -vnc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,128 +31,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The -o arg to the convert command allows specification of format/protocol
-options for the newly created image. This adds a -o arg to the dd command
-to get feature parity.
+The -vnc argument is documented as accepting two syntaxes for
+the 'websocket' option, either a bare option name, or a port
+number. If using the bare option name, it is supposed to apply
+the display number as an offset to base port 5700. e.g.
 
+  -vnc localhost:3,websocket
+
+should listen on port 5703, however, this was broken in 2.3.0 since
+
+  commit 4db14629c38611061fc19ec6927405923de84f08
+  Author: Gerd Hoffmann <kraxel@redhat.com>
+  Date:   Tue Sep 16 12:33:03 2014 +0200
+
+    vnc: switch to QemuOpts, allow multiple servers
+
+instead qemu tries to listen on port "on" which gets looked up in
+/etc/services and fails.
+
+Fixes bug: #1455912
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- qemu-img-cmds.hx |  2 +-
- qemu-img.c       | 32 +++++++++++++++++++++++++++++++-
- qemu-img.texi    |  6 ++++--
- 3 files changed, 36 insertions(+), 4 deletions(-)
+ ui/vnc.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index b2c5424..2488cbe 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -46,7 +46,7 @@ STEXI
- ETEXI
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 29aa9c4..c82e476 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3586,7 +3586,13 @@ void vnc_display_open(const char *id, Error **errp)
+                 wsaddr->type = SOCKET_ADDRESS_KIND_INET;
+                 inet = wsaddr->u.inet.data = g_new0(InetSocketAddress, 1);
+                 inet->host = g_strdup(saddr->u.inet.data->host);
+-                inet->port = g_strdup(websocket);
++                if (g_str_equal(websocket, "") ||
++                    g_str_equal(websocket, "on")) {
++                    inet->port = g_strdup_printf(
++                        "%d", (int)baseport + 5700);
++                } else {
++                    inet->port = g_strdup(websocket);
++                }
  
- DEF("dd", img_dd,
--    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] [conv=nocreat,notrunc] if=input of=output")
-+    "dd [--image-opts] [-f fmt] [-O output_fmt] [-o options] [bs=block_size] [count=blocks] [skip=blocks] [conv=nocreat,notrunc] if=input of=output")
- STEXI
- @item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] [conv=nocreat,notrunc] if=@var{input} of=@var{output}
- ETEXI
-diff --git a/qemu-img.c b/qemu-img.c
-index c9ab9e5..39fcf09 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3949,6 +3949,7 @@ static int img_dd(int argc, char **argv)
-     int c, i;
-     const char *out_fmt = "raw";
-     const char *fmt = NULL;
-+    char *optionstr = NULL;
-     int64_t size = 0, out_size;
-     int64_t block_count = 0, out_pos, in_pos;
-     struct DdInfo dd = {
-@@ -3984,7 +3985,7 @@ static int img_dd(int argc, char **argv)
-         { 0, 0, 0, 0 }
-     };
- 
--    while ((c = getopt_long(argc, argv, "hnf:O:", long_options, NULL))) {
-+    while ((c = getopt_long(argc, argv, "hno:f:O:", long_options, NULL))) {
-         if (c == EOF) {
-             break;
-         }
-@@ -3995,6 +3996,20 @@ static int img_dd(int argc, char **argv)
-         case 'f':
-             fmt = optarg;
-             break;
-+        case 'o':
-+            if (!is_valid_option_list(optarg)) {
-+                error_report("Invalid option list: %s", optarg);
-+                ret = -1;
-+                goto out;
-+            }
-+            if (!optionstr) {
-+                optionstr = g_strdup(optarg);
-+            } else {
-+                char *old_options = optionstr;
-+                optionstr = g_strdup_printf("%s,%s", optionstr, optarg);
-+                g_free(old_options);
-+            }
-+            break;
-         case '?':
-             error_report("Try 'qemu-img --help' for more information.");
-             ret = -1;
-@@ -4055,6 +4070,11 @@ static int img_dd(int argc, char **argv)
-         goto out;
-     }
- 
-+    if (optionstr && has_help_option(optionstr)) {
-+        ret = print_block_option_help(out.filename, out_fmt);
-+        goto out;
-+    }
-+
-     if (qemu_opts_foreach(&qemu_object_opts,
-                           user_creatable_add_opts_foreach,
-                           NULL, NULL)) {
-@@ -4099,6 +4119,15 @@ static int img_dd(int argc, char **argv)
-         create_opts = qemu_opts_append(create_opts, proto_drv->create_opts);
- 
-         opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
-+
-+        if (optionstr) {
-+            qemu_opts_do_parse(opts, optionstr, NULL, &local_err);
-+            if (local_err) {
-+                error_report_err(local_err);
-+                ret = -1;
-+                goto out;
-+            }
-+        }
-     }
- 
-     size = blk_getlength(blk1);
-@@ -4224,6 +4253,7 @@ static int img_dd(int argc, char **argv)
- 
- out:
-     g_free(arg);
-+    g_free(optionstr);
-     qemu_opts_del(opts);
-     qemu_opts_free(create_opts);
-     blk_unref(blk1);
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 9f10562..01acfb8 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -326,10 +326,12 @@ skipped. This is useful for formats such as @code{rbd} if the target
- volume has already been created with site specific options that cannot
- be supplied through qemu-img.
- 
--@item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] [conv=nocreat,notrunc] if=@var{input} of=@var{output}
-+@item dd [-f @var{fmt}] [-O @var{output_fmt}] [-o @var{options}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] [conv=nocreat,notrunc] if=@var{input} of=@var{output}
- 
- Dd copies from @var{input} file to @var{output} file converting it from
--@var{fmt} format to @var{output_fmt} format.
-+@var{fmt} format to @var{output_fmt} format. Depending on the output file
-+format, you can add one or more @var{options} that enable additional
-+features of this format.
- 
- The data is by default read and written using blocks of 512 bytes but can be
- modified by specifying @var{block_size}. If count=@var{blocks} is specified
+                 if (to) {
+                     inet->has_to = true;
 -- 
 2.9.3
