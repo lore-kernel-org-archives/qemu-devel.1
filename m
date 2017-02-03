@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cZceR-0005vw-VQ
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:07:40 -0500
+	(envelope-from <quintela@redhat.com>) id 1cZco0-0006Q0-VT
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:17:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cZceO-0004Uz-RE
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:07:39 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35531)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cZceO-0004U1-K3
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:07:36 -0500
-Received: by mail-wm0-x232.google.com with SMTP id b65so25716889wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 04:07:36 -0800 (PST)
-References: <20170201150553.9381-1-alex.bennee@linaro.org>
-	<20170201150553.9381-26-alex.bennee@linaro.org>
-	<CAFEAcA8nAQy4NNZ0RG0wOJ6rQoKz54UN22Z9LL2o2EgMdtpObQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8nAQy4NNZ0RG0wOJ6rQoKz54UN22Z9LL2o2EgMdtpObQ@mail.gmail.com>
-Date: Fri, 03 Feb 2017 12:07:39 +0000
-Message-ID: <87r33ffpf8.fsf@linaro.org>
+	(envelope-from <quintela@redhat.com>) id 1cZcnv-00053m-Nn
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:17:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cZcnv-000537-Hl
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:17:27 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1486120416-11566-1-git-send-email-amit.shah@redhat.com> (Amit
+	Shah's message of "Fri, 3 Feb 2017 16:43:36 +0530")
+References: <1486120416-11566-1-git-send-email-amit.shah@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Fri, 03 Feb 2017 13:17:18 +0100
+Message-ID: <87y3xnpiy9.fsf@emacs.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v9 25/25] tcg: enable MTTCG by default for
- ARM on x86 hosts
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] migration: remove myself as maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +27,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: MTTCG Devel <mttcg@listserver.greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, KONRAD =?utf-8?B?RnLDqWTDqXJpYw==?= <fred.konrad@greensocs.com>, Alvise Rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Mark Burton <mark.burton@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Fedorov Sergey <serge.fdrv@gmail.com>, Richard Henderson <rth@twiddle.net>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Amit Shah <amit.shah@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu list <qemu-devel@nongnu.org>
 
+Amit Shah <amit.shah@redhat.com> wrote:
+> I'm switching jobs, and I'm not sure I can continue maintaining migration.
+>
+> Signed-off-by: Amit Shah <amit.shah@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 1 February 2017 at 15:05, Alex Bennée <alex.bennee@linaro.org> wrote:
->> This enables the multi-threaded system emulation by default for ARMv7
->> and ARMv8 guests using the x86_64 TCG backend. This is because on the
->> guest side:
->>
->>   - The ARM translate.c/translate-64.c have been converted to
->>     - use MTTCG safe atomic primitives
->>     - emit the appropriate barrier ops
->>   - The ARM machine has been updated to
->>     - hold the BQL when modifying shared cross-vCPU state
->>     - defer cpu_reset to async safe work
->>
->> All the host backends support the barrier and atomic primitives but
->> need to provide same-or-better support for normal load/store
->> operations.
->
->> diff --git a/cpus.c b/cpus.c
->> index e3d9f3fe21..e1b82bcd49 100644
->> --- a/cpus.c
->> +++ b/cpus.c
->> @@ -176,8 +176,8 @@ bool mttcg_enabled;
->>
->>  static bool check_tcg_memory_orders_compatible(void)
->>  {
->> -#if defined(TCG_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
->> -    return (TCG_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
->> +#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
->> +    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
->
-> This looks like maybe something that should have been squashed
-> into an earlier part of the patchset?
-
-Good catch. I shall fix that up.
-
->
->>  #else
->>      return false;
->>  #endif
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index a3c4d07817..0ef31db3e0 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -30,6 +30,9 @@
->>  #  define TARGET_LONG_BITS 32
->>  #endif
->>
->> +/* ARM processors have a weak memory model */
->> +#define TCG_GUEST_DEFAULT_MO      (0)
->
-> Do you need the () ?
->
->
-> That said, if Richard is happy with turning this on then
-> I'm happy to do so.
->
-> Acked-by: Peter Maydell <peter.maydell@linaro.org>
->
-> thanks
-> -- PMM
-
-
---
-Alex Bennée
+Reviewed-by: Juan Quintela <quintela@redhat.com>
