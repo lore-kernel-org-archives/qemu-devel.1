@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZaO6-00064Z-Nj
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:42:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZaOx-0006w5-AZ
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:43:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZaO1-0005Gp-W0
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:42:38 -0500
-Received: from lhrrgout.huawei.com ([194.213.3.17]:5990)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZaO1-0005CA-Mb
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:42:33 -0500
-References: <1485249848-13854-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<w51d1f2rmx9.fsf@maestria.local.igalia.com>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <b8467f6a-6cca-4b24-50f3-dd2dbafa8c02@huawei.com>
-Date: Fri, 3 Feb 2017 10:41:33 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cZaOw-0005zn-AW
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:43:31 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36565)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZaOw-0005z3-2f
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:43:30 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id c85so19771626wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 01:43:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <w51d1f2rmx9.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2 v14] fsdev: add IO throttle support to
- fsdev devices
+In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
+References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Feb 2017 09:43:08 +0000
+Message-ID: <CAFEAcA-Lmb-5Y2Z1i+g6d3+S1Fi-YJtBwXCwUNDUpHWPCecyRw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 000/107] ppc-for-2.9 queue 20170202
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-On 2/1/2017 3:44 PM, Alberto Garcia wrote:
-> On Tue 24 Jan 2017 10:24:06 AM CET, Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
+On 2 February 2017 at 05:12, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit a0def594286d9110a6035e02eef558cf3cf5d847:
 >
->> Pradeep Jagadeesh (2):
->>   fsdev: add IO throttle support to fsdev devices
->>   throttle: removed duplicate throtlle code from block and fsdev files
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-01-30 10:23:20 +0000)
 >
-> I cannot find the second patch in this thread (v14), did you forget to
-> send it?
+> are available in the git repository at:
 >
-> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg04913.html
-
-Sorry for the late reply.
-
-I did send all the both patch files and the cover letter.
-Don't know how the patch missed in that link.
-
-I have received independent e-mails for each patch, with version 14.
-Am I missing something here?
-
-Regards,
-Pradeep
-
-
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170202
 >
-> Berto
+> for you to fetch changes up to 7c6e8797337c24520b48d8b50a900a747e50f974:
 >
+>   hw/ppc/pnv: Use error_report instead of hw_error if a ROM file can't be found (2017-02-02 09:30:07 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2017-02-02
+>
+> This obsoletes ppc-for-2.9-20170112, which had a MacOS build bug.
+>
+> This is a long overdue ppc pull request for qemu-2.9.  It's been a
+> long time coming due to some holidays and inconveniently timed
+> problems with testing.  So, there's a lot in here:
+>
+>     * More POWER9 instruction implementations for TCG
+>     * The simpler parts of my CPU compatibility mode cleanup
+>         * This changes behaviour to prefer compatibility modes over
+>           "raW" mode for new machine type versions
+>     * New "40p" machine type which is essentially a modernized and
+>       cleaned up "prep".  The intention is that it will replace "prep"
+>       once it has some more testing and polish.
+>     * Add pseries-2.9 machine type
+>     * Implement H_SIGNAL_SYS_RESET hypercall
+>     * Consolidate the two alternate CPU init paths in pseries by
+>       making it always go through CPU core objects to initialize CPU
+>     * A number of bugfixes and cleanups
+>     * Stop the guest timebase when the guest is stopped under KVM.
+>       This makes the guest system clock also stop when paused, which
+>       matches the x86 behaviour.
+>     * Some preliminary cleanups leading towards implementation of the
+>       POWER9 MMU.
+>
+> There are also some changes not strictly related to ppc code, but for
+> its benefit:
+>
+>     * Limit the pxi-expander-bridge (PXB) device to x86 guests only
+>       (it's essentially a hack to work around historical x86
+>       limitations)
+>     * Some additions to the 128-bit math in host_utils, necessary for
+>       some of the new instructions.
+>     * Revise a number of qtests and enable them for ppc
+
+Applied, thanks.
+
+-- PMM
