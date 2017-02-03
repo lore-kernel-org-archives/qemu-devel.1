@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZe7o-0000s8-Ak
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:42:05 -0500
+	(envelope-from <lersek@redhat.com>) id 1cZe9r-0001tN-FQ
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:44:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZe7l-0008P9-7n
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:42:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37914)
+	(envelope-from <lersek@redhat.com>) id 1cZe9o-0000oa-Cm
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:44:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cZe7l-0008P3-2O
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:42:01 -0500
-Date: Fri, 3 Feb 2017 13:41:55 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170203134155.GJ10350@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170203120649.15637-1-berrange@redhat.com>
-	<e33cb32f-b767-3f40-6543-33a7af513514@msgid.tls.msk.ru>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cZe9o-0000na-3h
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:44:08 -0500
+References: <1486104705-13761-1-git-send-email-kraxel@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <c77a6d6b-5903-3964-4b82-4b88d8b65dbe@redhat.com>
+Date: Fri, 3 Feb 2017 14:44:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e33cb32f-b767-3f40-6543-33a7af513514@msgid.tls.msk.ru>
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] Support multiple listening sockets
- per VNC server
+In-Reply-To: <1486104705-13761-1-git-send-email-kraxel@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] xhci: fix event queue IRQ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, M.Cerveny@computer.org
 
-On Fri, Feb 03, 2017 at 04:29:43PM +0300, Michael Tokarev wrote:
-> 03.02.2017 15:06, Daniel P. Berrange wrote:
+trivial comments:
+
+On 02/03/17 07:51, Gerd Hoffmann wrote:
+> The qemu xhci emulation doesn't handle the ERDP_EHB flag correctly.
 > 
-> >  - If a DNS name resolves to multiple distinct IP addresses,
-> >    the VNC server is now able to listen on all of them
-> > 
-> >  - The -vnc argument syntax is extended to allow the 'vnc'
-> >    and 'websocket' arguments to be listed multiple times.
-> >    This allows a single VNC server to listen on multiple
-> >    different names / addresses.
+> When the host adapter queues a new event the ERDP_EHB flag is set.  The
+> flag is cleared (via w1c) by the guest when it updates the ERDP (event
+> ring dequeue pointer) register to notify the host adapter which events
+> it has fetched.
 > 
-> Why it's needed? To me it looks like to much for a very rarely
-> useful thing, no? (Just thinking out loud, nothing more)
+> An IRQ must raised in case the ERDP_EHB flag flips from clear to set.
 
-It is very common to have virtualization hosts with multiple network
-interfaces and multiple address protocols. Wanting to restrict VNC
-to listen on a subset of interfaces/addresses is pretty reasonable
+s/must raised/must be raised/
 
-eg, consider a host with
+> If the flag is set already (which implies there are events queued up
+> which are not yet processed by the guest) xhci must *not* raise a IRQ.
+> 
+> Qemu got that wrong and raised an IRQ on every event, thereby generating
+> suspious interrupts in case we've queued events faster than the guest
 
-  eth0:  10.0.0.1
-         2001:beef:1
+s/suspious/spurious/ (3 occurrences in total)
 
-  eth1:  192.168.0.1
-         feed:beef:1
+Thanks
+Laszlo
 
-And you want VNC to only listen on the IP addresses associated with
-the public interface eth1. With current QEMU this is impossible.
-
-Even if you setup DNS e.g.
-
-  internal.example.com A    10.0.0.1
-                       AAAA 2001:beef:1
-
-  public.example.com   A    192.168.0.1
-                       AAAA feed:beef:1
-
-and pass hostname public.example.com to QEMU -vnc, it'll only listen on
-one of the two addresses the hostname resolves to. This series addresses
-that flaw by making us open multiple listener sockets for all addresses
-that are resolved.
-
-Even with that flaw fixed, it is still unreasonable limited. There may
-be multiple hostnames you wish VNC to listen on, or you may not have DNS
-entries for the particular addresses you want VNC to listen on. Thus there
-is need to allow for multiple addresses to be given to -vnc.
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> processed them.  This patch fixes that.
+> 
+> With that change in place we also have to check ERDP updates, to see
+> whenever the guest has fetched all queued events.  In case there are
+> still pending events set ERDP_EHB and raise an IRQ again, to make sure
+> the events don't linger unseen forever.
+> 
+> The linux kernel driver and the microsoft windows driver (shipped with
+> win8+) can deal with the suspious interrupts without problems.  The
+> renesas windows driver (v2.1.39) which can be used on older windows
+> versions is quite upset though.  It does suspious ERDP updates now and
+> then (not every time, seems we must hit a race window for this to
+> happen), which in turn makes the qemu xhci emulation think the event
+> ring is full.  Things go south from here ...
+> 
+> tl;dr: This is the "fix xhci on win7" patch.
+> 
+> Cc: M.Cerveny@computer.org
+> Cc: 1373228@bugs.launchpad.net
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/usb/hcd-xhci.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index df75907..4f05747 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -789,11 +789,15 @@ static void xhci_msix_update(XHCIState *xhci, int v)
+>  static void xhci_intr_raise(XHCIState *xhci, int v)
+>  {
+>      PCIDevice *pci_dev = PCI_DEVICE(xhci);
+> +    bool pending = (xhci->intr[v].erdp_low & ERDP_EHB);
+>  
+>      xhci->intr[v].erdp_low |= ERDP_EHB;
+>      xhci->intr[v].iman |= IMAN_IP;
+>      xhci->usbsts |= USBSTS_EINT;
+>  
+> +    if (pending) {
+> +        return;
+> +    }
+>      if (!(xhci->intr[v].iman & IMAN_IE)) {
+>          return;
+>      }
+> @@ -3352,6 +3356,15 @@ static void xhci_runtime_write(void *ptr, hwaddr reg,
+>              intr->erdp_low &= ~ERDP_EHB;
+>          }
+>          intr->erdp_low = (val & ~ERDP_EHB) | (intr->erdp_low & ERDP_EHB);
+> +        if (val & ERDP_EHB) {
+> +            dma_addr_t erdp = xhci_addr64(intr->erdp_low, intr->erdp_high);
+> +            unsigned int dp_idx = (erdp - intr->er_start) / TRB_SIZE;
+> +            if (erdp >= intr->er_start &&
+> +                erdp < (intr->er_start + TRB_SIZE * intr->er_size) &&
+> +                dp_idx != intr->er_ep_idx) {
+> +                xhci_intr_raise(xhci, v);
+> +            }
+> +        }
+>          break;
+>      case 0x1c: /* ERDP high */
+>          intr->erdp_high = val;
+> 
