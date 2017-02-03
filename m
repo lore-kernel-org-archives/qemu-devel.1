@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cZYK3-0002k8-GH
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 02:30:20 -0500
+	(envelope-from <armbru@redhat.com>) id 1cZYdj-0006Sw-GS
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 02:50:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cZYJy-0004YP-G7
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 02:30:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cZYJy-0004Xa-7h
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 02:30:14 -0500
-Date: Fri, 3 Feb 2017 15:30:07 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170203073007.GO5151@pxdev.xzpeter.org>
-References: <1485253571-19058-1-git-send-email-peterx@redhat.com>
-	<1485253571-19058-4-git-send-email-peterx@redhat.com>
-	<20170124093207.18444a86@t450s.home>
-	<20170131033500.GL14879@umbus.fritz.box>
+	(envelope-from <armbru@redhat.com>) id 1cZYdh-0006T3-4M
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 02:50:38 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<20170202202739.GA15804@work-vm>
+Date: Fri, 03 Feb 2017 08:50:27 +0100
+In-Reply-To: <20170202202739.GA15804@work-vm> (David Alan Gilbert's message of
+	"Thu, 2 Feb 2017 20:27:39 +0000")
+Message-ID: <87shnvhfwc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170131033500.GL14879@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH v5 03/18] vfio: allow to notify unmap for
- very large region
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +23,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Tue, Jan 31, 2017 at 02:35:00PM +1100, David Gibson wrote:
-> On Tue, Jan 24, 2017 at 09:32:07AM -0700, Alex Williamson wrote:
-> > On Tue, 24 Jan 2017 18:25:56 +0800
-> > Peter Xu <peterx@redhat.com> wrote:
-> > 
-> > > Linux vfio driver supports to do VFIO_IOMMU_UNMAP_DMA for a very big
-> > > region. This can be leveraged by QEMU IOMMU implementation to cleanup
-> > > existing page mappings for an entire iova address space (by notifying
-> > > with an IOTLB with extremely huge addr_mask). However current
-> > > vfio_iommu_map_notify() does not allow that. It make sure that all the
-> > > translated address in IOTLB is falling into RAM range.
-> > > 
-> > > The check makes sense, but it should only be a sensible checker for
-> > > mapping operations, and mean little for unmap operations.
-> > > 
-> > > This patch moves this check into map logic only, so that we'll get
-> > > faster unmap handling (no need to translate again), and also we can then
-> > > better support unmapping a very big region when it covers non-ram ranges
-> > > or even not-existing ranges.
-> > > 
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  hw/vfio/common.c | 7 +++----
-> > >  1 file changed, 3 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > > index ce55dff..4d90844 100644
-> > > --- a/hw/vfio/common.c
-> > > +++ b/hw/vfio/common.c
-> > > @@ -354,11 +354,10 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > >          return;
-> > >      }
-> > >  
-> > > -    if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-> > > -        return;
-> > > -    }
-> > > -
-> > >      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
-> > > +        if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-> > > +            return;
-> > > +        }
-> > 
-> > 
-> > David, is SPAPR going to freak out if it sees unmaps to ranges that
-> > extend beyond individual mappings, or perhaps include no mappings?
-> > This effectively allows unmapping the entire address space of the iommu
-> > in one pass, without validating or translating the backing.
-> 
-> Extending beyond an individual mapping will be fine.  However, if the
-> unmap extends beyond the extent of IOVAs mapped by a single TCE table,
-> then the unmap will fail (with ENXIO or EINVAL depending on whether
-> there's a problem with origin or only size).
-> 
-> With holidays I've lost the context of this thread, so I can't easily
-> find the whole patch series this relates to.  From your brief
-> description above it sounds likes it should be ok - a range covering
-> just the IOVA space (as long as that's actually correct for spapr tce)
-> should be ok.
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-Thanks for the confirmation! Then I'll move ahead for the next spin.
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> = Introduction =
+>> 
+>
+> <snip>
+>
+>> = Structured option argument syntax =
+>> 
+>> == JSON ==
+>> 
+>> The obvious way to provide the expressiveness of JSON on the command
+>> line is JSON.  Easy enough[2].  However, besides not being compatible,
+>> it's rather heavy on syntax, at least for simple cases.  Compare:
+>> 
+>>     -machine q35,accel=kvm
+>>     -machine '{ "type": "q35", "accel": "kvm"}'
+>> 
+>> It compares a bit more favourably in cases that use our non-flat hacks.
+>> Here's a flat list as KEY=VALUE,... with repeated keys, and as JSON:
+>> 
+>>     -semihosting-config enable,arg=eins,arg=zwei,arg=drei
+>>     -semihosting-config '{ "enable": true, "arg": [ "eins", "zwei", "drei" ] }'
+>> 
+>> Arbitrary nesting with dotted key convention:
+>> 
+>>     -drive driver=qcow2,file.driver=gluster,
+>>            file.volume=testvol,file.path=/path/a.qcow2,file.debug=9,
+>>            file.server.0.type=tcp,
+>>            file.server.0.host=1.2.3.4,
+>>            file.server.0.port=24007,
+>>            file.server.1.type=unix,
+>>            file.server.1.socket=/var/run/glusterd.socket
+>>     -drive '{ "driver": "qcow2",
+>>               "file": {
+>>                   "driver": "gluster", "volume": "testvol",
+>>                   "path": "/path/a.qcow2", "debug": 9,
+>>                   "server": [ { "type": "tcp",
+>>                                 "host": "1.2.3.4", "port": "24007"},
+>>                               { "type": "unix",
+>>                                 "socket": "/var/run/glusterd.socket" } ] } }'
+>
+> So while I generally hate JSON, the -drive dotted key syntax makes
+> me mad when it gets like this;  have a look
+> at the block replication and quorum setups especially, that can end up
+> with (from docs/COLO-FT.txt):
+>
+>   -drive if=virtio,id=primary-disk0,driver=quorum,read-pattern=fifo,vote-threshold=1,\
+>          children.0.file.filename=1.raw,\
+>          children.0.driver=raw -S
+>
+>    that's just way too many .'s to ever properly understand.
+> (I'm sure it used to be more complex).
 
-Thanks,
+Here's an idea to cut down on the dottery that drives you mad (and me
+too): if KEY starts with '.', combine it with a prefix of the previous
+one so that the result has the same number of name components.
 
--- peterx
+Your example becomes
+
+    -drive if=virtio,id=primary-disk0,driver=quorum,read-pattern=fifo,vote-threshold=1,\
+           children.0.file.filename=1.raw,.driver=raw -S
+
+My example
+
+     -drive driver=qcow2,file.driver=gluster,
+            file.volume=testvol,file.path=/path/a.qcow2,file.debug=9,
+            file.server.0.type=tcp,
+            file.server.0.host=1.2.3.4,
+            file.server.0.port=24007,
+            file.server.1.type=unix,
+            file.server.1.socket=/var/run/glusterd.socket
+
+becomes
+
+     -drive driver=qcow2,
+            file.driver=gluster,
+                .volume=testvol,
+                .path=/path/a.qcow2,
+                .debug=9,
+            file.server.0.type=tcp,
+                         .host=1.2.3.4,
+                         .port=24007,
+            file.server.1.type=unix,
+                         .socket=/var/run/glusterd.socket
+
+Mind, I'm not at all sure this is a *good* idea.  I suspect it's more
+magic than it's worth.
+
+>> Lines broken and indented for legibility; you need to join them for
+>> actual use.
+>
+> Why? What's a \n between friends for JSON?
+
+You're right, the JSON works as is.  Only the KEY=VALUE example doesn't.
+
+>> Once you do, both variants are basically illegible.  This
+>> is simply something that belongs into a config file rather than the
+>> command line.  In a config file, JSON would be a better choice.
+>> 
+>> There's also the -drive file=json:... syntax.  It's a bad fit for
+>> QemuOpts, because QemuOpts and JSON fight for the comma.  I'd show you
+>> if I could get it to work.
+>> 
+>> We obviously can't replace QemuOpts with JSON.  But accepting JSON in
+>> addition to QemuOpts is a debatable feature: it lets management
+>> applications reuse the code to build QMP arguments for option arguments.
+>> 
+>> Since structured option arguments are always dictionaries, a JSON option
+>> argument always starts with '{'.  If no QemuOpts argument can ever start
+>> with '{', accepting either QemuOpts or a JSON object is unambiguous.
+>> For a more detailed discussion of the following argument, see [3].
+>> 
+>> A QemuOpts argument normally starts with KEY.  We need to outlaw KEYs
+>> starting with '{'.  QAPI outlaws such names, see docs/qapi-code-gen.txt.
+>> QOM doesn't, but no such keys exist as far as I know.
+>> 
+>> QemuOpts permit abbreviating KEY=VALUE to just VALUE for one specific
+>> KEY (the "implied" key).  We need to limit this to KEYs whose VALUE
+>> can't start with '{'.  Most implied keys can't have such values.
+>> Troublemakers include qemu-img's use of implied "file" keys.  You'd have
+>> to say "file={my-tastelessly-named-file}" instead of just
+>> "{my-tastelessly-named-file}".
+>
+> What worries me a bit is building shell scripts which include ['s and {'s
+> tends to be painful.
+
+No more than it already is if your builder copes with arbitrary
+filenames and such.  But point well taken.
+
+> <snip>
+>
+>> === Structured values ===
+>> 
+>> The dotted key convention messes with KEY syntax to permit structured
+>> values.  Works, but the more conventional way to support structured
+>> values is a syntax for structured values.  
+>> 
+>> An obvious one is to use { KEY=VALUE, ...} for objects, and [ VALUE,
+>> ... ] for arrays.  Looks like this:
+>> 
+>>     -drive 'driver=quorum,
+>>             child=[{ driver=file, filename=disk1.img },
+>>                    { driver=host_device, filename=/dev/sdb },
+>>                    { driver=nbd, host=localhost } ]'
+>> 
+>> Again, lines broken and indented for legibility; you need to join them
+>> for actual use.
+>> 
+>> There's a syntactic catch, though: a value of the form [ ... ] can
+>> either be an array or a string.  Which one it is depends on the type of
+>> the key.  To parse this syntax, you need to know the types, unlike JSON
+>> or traditional QemuOpts.  Unless we outlaw strings starting with '{' or
+>> '[', which feels impractical.
+>
+> I don't understand why [ could imply a string.
+
+Consider
+
+    -drive 'driver=quorum,
+            child=[{ driver=file, filename={"foolish":"name"} },
+                   { driver=host_device, filename=/dev/sdb },
+                   { driver=nbd, host=[::1] } ]'
+
+Three KEY=VALUE have their VALUE start with '[' or '{':
+
+* child=[{ driver=file, ...
+
+  This is an array, not a string, because child is an array.
+
+* host=[::1]
+
+  This is a string, not an array containing the string "::1", because
+  host is a string.
+
+* filename={"foolish":"name"}
+
+  This is a string, not an object, because filename is a string.
+
+Clearer now?
+
+>> But wait, there's another syntactic catch: in traditional QemuOpts, a
+>> value ends at the next unescaped ',' or '\0'.  Inside an object, it now
+>> also ends at the next unescaped '}', and inside an array, at the next
+>> unescaped ']'.  Or perhaps at the next space (the example above assumes
+>> it does).  That means we either have to provide a way to escape '}', ']'
+>> and space, or find another way to delimit string values, say require '"'
+>> around strings whenever the string contains "funny" characters.
+>
+> How about a tighter rule that if you've got a structured value -
+> i.e. you're inside either of [ or {, then you must " all strings
+> (except keys that we keep clean).
+
+Matter of taste.
+
+Regardless, we need a way to escape '"'.  Doubling it would be
+consistent with the existing escape of ','.
+
+>> So, if escaped ',' wasn't ugly and confusing enough for you...
+>> 
+>> === Comparison ===
+>> 
+>> In my opinion, dotted keys are weird and ugly, but at least they don't
+>> add to the quoting mess.  Structured values look better, except when
+>> they do add to the quoting mess.
+>> 
+>> I'm having a hard time deciding which one I like less :)
+>> 
+>> Opinions?  Other ideas?
+>
+> Dave
+>
+>> 
+>> 
+>> 
+>> 
+>> [1] [PATCH v14 00/21] QAPI/QOM work for non-scalar object properties
+>> (actually v15)
+>> Message-Id: <1475246744-29302-1-git-send-email-berrange@redhat.com>
+>> http://lists.gnu.org/archive/html/qemu-devel/2016-09/msg08238.html
+>> 
+>> [2] [RFC PATCH] block: Crude initial implementation of -blockdev
+>> Message-Id: <1485968933-9162-1-git-send-email-armbru@redhat.com>
+>> http://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00182.html
+>> 
+>> [3] Message-ID: <87h989ncse.fsf@dusky.pond.sub.org>
+>> http://lists.gnu.org/archive/html/qemu-devel/2016-10/msg04046.html
+>> 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
