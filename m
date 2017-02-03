@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cZbfO-0000ko-Hn
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:04:35 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZbjS-0002Eo-LH
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:08:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cZbfN-000076-97
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:04:34 -0500
-Date: Fri, 3 Feb 2017 19:04:23 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170203110423.GC28271@lemon>
-References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
-	<1485443388-27253-9-git-send-email-armbru@redhat.com>
-	<9684a908-f425-82d8-046b-19cc17d01f55@redhat.com>
-	<87r33o3emm.fsf@dusky.pond.sub.org>
-	<2bcf4c7c-5c29-fda5-1ba3-5828600a8995@redhat.com>
-	<8760l0ebgq.fsf@dusky.pond.sub.org>
-	<e0f2369d-6ebf-ae73-abf1-7021b257748c@redhat.com>
-	<87a8a9vuhu.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZbjR-0004VC-1Z
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 06:08:46 -0500
+References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479837270-79005-17-git-send-email-vsementsov@virtuozzo.com>
+	<59237595-78d7-5aa2-c38a-d986564b5ed0@redhat.com>
+	<e25c6fb7-0d1f-a91a-9680-e206f6db2cd8@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <99233c16-4881-2fca-77f7-5cb7633d0f83@virtuozzo.com>
+Date: Fri, 3 Feb 2017 14:08:29 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a8a9vuhu.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] hw: Drop superfluous special checks
- for orphaned -drive
+In-Reply-To: <e25c6fb7-0d1f-a91a-9680-e206f6db2cd8@virtuozzo.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 16/17] iotests: add dirty bitmap migration
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +26,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mreitz@redhat.com, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On Mon, 01/30 09:10, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
-> > On 01/27/2017 11:04 AM, Markus Armbruster wrote:
-> >> John Snow <jsnow@redhat.com> writes:
-> >> 
-> >>> On 01/27/2017 06:51 AM, Markus Armbruster wrote:
-> >>>> John Snow <jsnow@redhat.com> writes:
-> >>>>
-> >>>>> On 01/26/2017 10:09 AM, Markus Armbruster wrote:
-> >>>>>> We've traditionally rejected orphans here and there, but not
-> >>>>>> systematically.  For instance, the sun4m machines have an onboard SCSI
-> >>>>>> HBA (bus=0), and have always rejected bus>0.  Other machines with an
-> >>>>>> onboard SCSI HBA don't.
-> >>>>>>
-> >>>>>> Commit a66c9dc made all orphans trigger a warning, and the previous
-> >>>>>> commit turned this into an error.  The checks "here and there" are now
-> >>>>>> redundant.  Drop them.
-> >>>>>>
-> >>>>>> Note that the one in mips_jazz.c was wrong: it rejected bus > MAX_FD,
-> >>>>>> but MAX_FD is the number of floppy drives per bus.
-> >>>>>>
-> >>>>>> Error messages change from
-> >>>>>>
-> >>>>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
-> >>>>>>     qemu-system-x86_64: Too many IDE buses defined (3 > 2)
-> >>>>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
-> >>>>>>     qemu: too many floppy drives
-> >>>>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
-> >>>>>>     qemu: too many SCSI bus
-> >>>>>>
-> >>>>>> to
-> >>>>>>
-> >>>>>>     $ qemu-system-x86_64 -drive if=ide,bus=2
-> >>>>>>     qemu-system-x86_64: -drive if=ide,bus=2: machine type does not support this drive
-> >>>>>>     $ qemu-system-mips64 -M magnum,accel=qtest -drive if=floppy,bus=2,id=fd1
-> >>>>>>     qemu-system-mips64: -drive if=floppy,bus=2,id=fd1: machine type does not support this drive
-> >>>>>>     $ qemu-system-sparc -M LX -drive if=scsi,bus=1
-> >>>>>>     qemu-system-sparc: -drive if=scsi,bus=1: machine type does not support this drive
-> >>>>>>
-> >>>>>
-> >>>>> Hm, that's a lot less helpful, isn't it? Can we augment with hints?
-> >>>>
-> >>>> The message itself may be less specific, but it now comes with a precise
-> >>>> location.  Personally, I'd even find
-> >>>>
-> >>>>     qemu-system-sparc: -drive if=scsi,bus=1: *mumble* *mumble*
-> >>>>
-> >>>> more helpful than
-> >>>>
-> >>>>     qemu: too many SCSI bus
-> >>>>
-> >>>> because the former tells me *which* of the options is bad.  We tend to
-> >>>> have lots and lots of them.
-> >>>>
-> >>>> The deleted special case errors cover only a minority of "orphan"
-> >>>> -drive.  If these cases need improvement, then so will the general case.
-> >>>> If you can come up with a hint that makes the general case message more
-> >>>> useful, I'm more than happy to squash it into PATCH 6.
-> >>>>
-> >>>
-> >>> The old error had "why" and the new error has "where" but neither has
-> >>> both. I would suggest that from the "why" you can divine the "where,"
-> >>> but the opposite is not as easily true.
-> >> 
-> >> Some users will be able to divine more easily than others.  Consider my
-> >> "too many floppy drives" example.  There's just one, and the machine
-> >> actually supports two.  The user has to make the connection to "bus=2"
-> >> somehow.  Now, anybody crazy enough to mess with bus= can probably be
-> >> expected to figure this out, but still, the deleted error messages
-> >> aren't exactly wonderful.
-> >> 
-> >>> The new error even suggests information I think is wrong and misleading:
-> >>> We do support SCSI! (Just not this many of them.)
-> >> 
-> >> Well, the error doesn't say "machine doesn't support SCSI", only
-> >> "doesn't support this particular -drive".  Perhaps it could be worded
-> >> more clearly.  Ideas?
-> >> 
-> >
-> > Ah, I see what you mean now. I interpreted "this drive" to mean SCSI,
-> > not this SCSI *instance*.
-> 
-> Uh, I would've written "does not support if=scsi" then.  But I see where
-> you come from.
-> 
-> >                           If it can be made clearer that QEMU is simply
-> > unable to instantiate this particular instance, that'd be fine.
-> >
-> > Instead of "Machine type does not support this drive,"
-> >
-> > how about
-> >
-> > "Machine type cannot instantiate this drive instance"
-> 
-> Hmm.
-> 
-> > Or ... follow your own best judgement. This is really YOUR wheelhouse.
-> > My example is a little wordy.
-> 
-> All I can come up with is even wordier: "Machine type doesn't support
-> this combination of if, bus, unit", or "if=scsi,bus=%d,unit=%d not
-> supported with this machine type".  Could also be confusing when the
-> user specified index instead of bus, unit.
-> 
-> Good error messages are hard...
+03.02.2017 13:10, Vladimir Sementsov-Ogievskiy wrote:
+> 02.02.2017 02:12, Max Reitz wrote:
+>> On 22.11.2016 18:54, Vladimir Sementsov-Ogievskiy wrote:
+>>> The test starts two vms (vm_a, vm_b), create dirty bitmap in
+>>> the first one, do several writes to corresponding device and
+>>> then migrate vm_a to vm_b with dirty bitmaps.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>   tests/qemu-iotests/169     | 86 
+>>> ++++++++++++++++++++++++++++++++++++++++++++++
+>>>   tests/qemu-iotests/169.out |  5 +++
+>>>   tests/qemu-iotests/group   |  1 +
+>>>   3 files changed, 92 insertions(+)
+>>>   create mode 100755 tests/qemu-iotests/169
+>>>   create mode 100644 tests/qemu-iotests/169.out
+>>>
+>>> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+>>> new file mode 100755
+>>> index 0000000..58b1ab1
+>>> --- /dev/null
+>>> +++ b/tests/qemu-iotests/169
+>>> @@ -0,0 +1,86 @@
+>>> +#!/usr/bin/env python
+>>> +#
+>>> +# Tests for dirty bitmaps migration.
+>>> +#
+>>> +# Copyright (C) Vladimir Sementsov-Ogievskiy 2015-2016
+>>> +#
+>>> +# This program is free software; you can redistribute it and/or modify
+>>> +# it under the terms of the GNU General Public License as published by
+>>> +# the Free Software Foundation; either version 2 of the License, or
+>>> +# (at your option) any later version.
+>>> +#
+>>> +# This program is distributed in the hope that it will be useful,
+>>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>> +# GNU General Public License for more details.
+>>> +#
+>>> +# You should have received a copy of the GNU General Public License
+>>> +# along with this program.  If not, see 
+>>> <http://www.gnu.org/licenses/>.
+>>> +#
+>>> +
+>>> +import os
+>>> +import iotests
+>>> +import time
+>>> +from iotests import qemu_img
+>>> +
+>>> +disk_a = os.path.join(iotests.test_dir, 'disk_a')
+>>> +disk_b = os.path.join(iotests.test_dir, 'disk_b')
+>>> +fifo = os.path.join(iotests.test_dir, 'mig_fifo')
+>>> +
+>>> +class TestDirtyBitmapMigration(iotests.QMPTestCase):
+>>> +
+>>> +    def setUp(self):
+>>> +        size = 0x400000000 # 1G
+>> I can already see someone on macOS complaining that this test eats their
+>> hard drive when running it for raw images... But we can still amend it
+>> once somebody complains. O:-)
+>>
+>> I think 1 GB is not overly large, but it's reasonable to use such a
+>> rather large value for this test.
+>>
+>>> +        os.mkfifo(fifo)
+>>> +        qemu_img('create', '-f', iotests.imgfmt, disk_a, str(size))
+>>> +        qemu_img('create', '-f', iotests.imgfmt, disk_b, str(size))
+>>> +        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk_a)
+>>> +        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk_b)
+>>> +        self.vm_b.add_incoming_migration("exec: cat " + fifo)
+>> I guess this will break if the path contains white space. Is there
+>> something we can do about that?
+>>
+>> (You don't need to protect against quotes or something, just white 
+>> space.)
+>>
+>>> +        self.vm_a.launch()
+>>> +        self.vm_b.launch()
+>>> +
+>>> +    def tearDown(self):
+>>> +        self.vm_a.shutdown()
+>>> +        self.vm_b.shutdown()
+>>> +        os.remove(disk_a)
+>>> +        os.remove(disk_b)
+>>> +        os.remove(fifo)
+>>> +
+>>> +    def test_migration(self):
+>>> +        granularity = 512
+>>> +        regions = [
+>>> +            { 'start': 0,           'count': 0x100000 },
+>>> +            { 'start': 0x100000000, 'count': 0x200000  },
+>>> +            { 'start': 0x399900000, 'count': 0x100000  }
+>>> +            ]
+>>> +
+>>> +        result = self.vm_a.qmp('block-dirty-bitmap-add', 
+>>> node='drive0',
+>>> +                               name='bitmap', granularity=granularity)
+>>> +        self.assert_qmp(result, 'return', {});
+>>> +
+>>> +        for r in regions:
+>>> +          self.vm_a.hmp_qemu_io('drive0',
+>> This line isn't aligned to four spaces.
+>>
+>> With that fixed, and if you deem fixing the white space issue too
+>> complicated:
+>
+> may be, just add quotes, like
+>
+> self.vm_b.add_incoming_migration("exec: cat '" + fifo + "'")
+>
+>
+> ?
 
-I guess the painpoint is "okay, what the heck does the machine support then?" -
-that "3 > 2" is the good part of the old message.
+looks like ./check doesn't work with spaces anyway:
 
-Do we have a user documentation for this? Or, can we give a hint how to figure
-that out?
+[root@kvm qemu-iotests]# ./check -qcow2 -nocache 169
+QEMU          -- "/work/src/post 
+copy/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64" 
+-nodefaults -machine accel=qtest
+QEMU_IMG      -- "/work/src/post copy/tests/qemu-iotests/../../qemu-img"
+QEMU_IO       -- "/work/src/post copy/tests/qemu-iotests/../../qemu-io"  
+-f qcow2 --cache none
+QEMU_NBD      -- "/work/src/post copy/tests/qemu-iotests/../../qemu-nbd"
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/x86_64 kvm 3.10.0-327.36.1.vz7.20.9
+TEST_DIR      -- /work/src/post copy/tests/qemu-iotests/scratch
+SOCKET_SCM_HELPER -- /work/src/post 
+copy/tests/qemu-iotests/socket_scm_helper
 
-Fam
+169 33s ..../check: line 306: $tmp.out: ambiguous redirect
+  [failed, exit status 1] - output mismatch (see 169.out.bad)
+mv: target '169.out.bad' is not a directory
+diff: 169.out.bad: No such file or directory
+./check: line 158: [: too many arguments
+./check: line 171: [: /work/src/post: binary operator expected
+Failures: 169
+Failed 1 of 1 tests
+[root@kvm qemu-iotests]# pwd
+/work/src/post copy/tests/qemu-iotests
+
+>
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>>> +                                'write %d %d' % (r['start'], 
+>>> r['count']))
+>>> +
+>>> +        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
+>>> +                               node='drive0', name='bitmap')
+>>> +        sha256 = result['return']['sha256']
+>>> +
+>>> +        result = self.vm_a.qmp('migrate-set-capabilities',
+>>> +                               capabilities=[{'capability': 
+>>> 'dirty-bitmaps',
+>>> +                                              'state': True}])
+>>> +        self.assert_qmp(result, 'return', {})
+>>> +
+>>> +        result = self.vm_a.qmp('migrate', uri='exec:cat>' + fifo)
+>>> +        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
+>>> +        self.assertNotEqual(self.vm_b.event_wait("RESUME"), None)
+>>> +        time.sleep(2)
+>>> +
+>>> +        result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
+>>> +                               node='drive0', name='bitmap')
+>>> +        self.assert_qmp(result, 'return/sha256', sha256);
+>>> +
+>>> +
+>>> +if __name__ == '__main__':
+>>> +    iotests.main()
+>>> diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
+>>> new file mode 100644
+>>> index 0000000..ae1213e
+>>> --- /dev/null
+>>> +++ b/tests/qemu-iotests/169.out
+>>> @@ -0,0 +1,5 @@
+>>> +.
+>>> +----------------------------------------------------------------------
+>>> +Ran 1 tests
+>>> +
+>>> +OK
+>>> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+>>> index 866c1a0..5dc75ef 100644
+>>> --- a/tests/qemu-iotests/group
+>>> +++ b/tests/qemu-iotests/group
+>>> @@ -162,6 +162,7 @@
+>>>   159 rw auto quick
+>>>   160 rw auto quick
+>>>   162 auto quick
+>>> +169 rw auto quick
+>>>   170 rw auto quick
+>>>   171 rw auto quick
+>>>   172 auto
+>>>
+>>
+>
+>
+
+
+-- 
+Best regards,
+Vladimir
