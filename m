@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cZfPM-0000hY-6a
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:04:17 -0500
+	(envelope-from <den@openvz.org>) id 1cZfS2-0002hh-DT
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:07:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cZfPI-0005dN-4p
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:04:16 -0500
-References: <1485875745-27741-1-git-send-email-wei@redhat.com>
-	<1485875745-27741-3-git-send-email-wei@redhat.com>
-	<CAFEAcA_Mgebwv8G_QM7owVm+HuNpLs-QfmXz4=Ac7xg9DKiUVg@mail.gmail.com>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <9cf29949-2609-2f8d-cc8d-ffa90a8dd11d@redhat.com>
-Date: Fri, 3 Feb 2017 09:03:58 -0600
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Mgebwv8G_QM7owVm+HuNpLs-QfmXz4=Ac7xg9DKiUVg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 2/5] target-arm: Add support for AArch64
- PMU register PMXEVTYPER_EL0
+	(envelope-from <den@openvz.org>) id 1cZfRy-0006U5-A3
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:07:02 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:8955 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cZfRx-0006T6-Tg
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:06:58 -0500
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Fri,  3 Feb 2017 18:06:53 +0300
+Message-Id: <1486134413-19988-1-git-send-email-den@openvz.org>
+Subject: [Qemu-devel] [PATCH 1/1] mirror: do not increase offset during
+ initial zero_or_discard phase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +22,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
+If explicit zeroing out before mirroring is required for the target image,
+it moves the block job offset counter to EOF, then offset and len counters
+count the image size twice. There is no harm but stats are confusing,
+specifically the progress of the operation is always reported as 99% by
+management tools.
 
-On 02/03/2017 07:24 AM, Peter Maydell wrote:
-> On 31 January 2017 at 15:15, Wei Huang <wei@redhat.com> wrote:
->> In order to support Linux perf, which uses PMXEVTYPER register,
->> this patch adds access support for PMXEVTYPER_EL0.
->>
->> Signed-off-by: Wei Huang <wei@redhat.com>
->> ---
->>  target/arm/cpu.h    |  2 +-
->>  target/arm/helper.c | 19 ++++++++++++++++---
->>  2 files changed, 17 insertions(+), 4 deletions(-)
->>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index 8a82c73..ce02044 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -307,7 +307,7 @@ typedef struct CPUARMState {
->>          uint64_t c9_pmcr; /* performance monitor control register */
->>          uint64_t c9_pmcnten; /* perf monitor counter enables */
->>          uint32_t c9_pmovsr; /* perf monitor overflow status */
->> -        uint32_t c9_pmxevtyper; /* perf monitor event type */
->> +        uint64_t c9_pmxevtyper; /* perf monitor event type */
->>          uint32_t c9_pmuserenr; /* perf monitor user enable */
->>          uint64_t c9_pmselr; /* perf monitor counter selection register */
->>          uint32_t c9_pminten; /* perf monitor interrupt enables */
->> diff --git a/target/arm/helper.c b/target/arm/helper.c
->> index 67520ea..c8620d9 100644
->> --- a/target/arm/helper.c
->> +++ b/target/arm/helper.c
->> @@ -1054,7 +1054,13 @@ static void pmovsr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->>  static void pmxevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
->>                               uint64_t value)
->>  {
->> -    env->cp15.c9_pmxevtyper = value & 0xff;
->> +    /* Attempts to access PMXEVTYPER are CONSTRAINED UNPREDICTABLE when
->> +     * PMSELR value is equal to or greater than the number of implemented
->> +     * counters, but not euqal to 0x1f. We opt to behave as a NOP.
-> 
-> "equal"
-> 
->> +     */
->> +    if (env->cp15.c9_pmselr == 0x1f) {
->> +        pmccfiltr_write(env, ri, value);
->> +    }
->>  }
->>
->>  static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->> @@ -1234,10 +1240,17 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
->>        .fieldoffset = offsetof(CPUARMState, cp15.pmccfiltr_el0),
->>        .resetvalue = 0, },
->>      { .name = "PMXEVTYPER", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 1,
->> -      .access = PL0_RW,
->> -      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmxevtyper),
->> +      .access = PL0_RW, .type = ARM_CP_ALIAS,
->> +      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmxevtyper),
->>        .accessfn = pmreg_access, .writefn = pmxevtyper_write,
->>        .raw_writefn = raw_write },
->> +    { .name = "PMXEVTYPER_EL0", .state = ARM_CP_STATE_AA64,
->> +      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 13, .opc2 = 1,
->> +      .access = PL0_RW, .accessfn = pmreg_access,
->> +      .type = ARM_CP_IO,
->> +      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmxevtyper),
->> +      .writefn = pmxevtyper_write, .raw_writefn = raw_write,
->> +      .resetvalue = 0x0 },
-> 
-> Reads also need to give you PMCCFILTR_EL0, if PMSELR is set to 31,
-> so you need a readfn as well. (That also means that the c9_pmxevtyper
-> field in the struct becomes unused, so you can drop it, and
-> the .fieldoffset setting, and mark both the A32 and A64 reg structs
-> as ARM_CP_NO_RAW.)
+The patch skips offset increase for the first "technical" pass over the
+image. This should not cause any further harm.
 
-OK. I will redo this one. Since we are changing the design, I will
-revise the CONSTRAINED UNPREDICTABLE behavior of pmxevtyper access to
-RAZ/WI instead of NOP.
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Jeff Cody <jcody@redhat.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+---
+ block/mirror.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-> 
->>      /* Unimplemented, RAZ/WI. */
->>      { .name = "PMXEVCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 2,
->>        .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
->> --
->> 1.8.3.1
->>
-> 
-> thanks
-> -- PMM
-> 
+diff --git a/block/mirror.c b/block/mirror.c
+index 301ba92..688bc91 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -69,6 +69,7 @@ typedef struct MirrorBlockJob {
+     bool waiting_for_io;
+     int target_cluster_sectors;
+     int max_iov;
++    bool init_pass;
+ } MirrorBlockJob;
+ 
+ typedef struct MirrorOp {
+@@ -117,7 +118,9 @@ static void mirror_iteration_done(MirrorOp *op, int ret)
+         if (s->cow_bitmap) {
+             bitmap_set(s->cow_bitmap, chunk_num, nb_chunks);
+         }
+-        s->common.offset += (uint64_t)op->nb_sectors * BDRV_SECTOR_SIZE;
++        if (!s->init_pass) {
++            s->common.offset += (uint64_t)op->nb_sectors * BDRV_SECTOR_SIZE;
++        }
+     }
+ 
+     qemu_iovec_destroy(&op->qiov);
+@@ -566,6 +569,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             return 0;
+         }
+ 
++        s->init_pass = true;
+         for (sector_num = 0; sector_num < end; ) {
+             int nb_sectors = MIN(end - sector_num,
+                 QEMU_ALIGN_DOWN(INT_MAX, s->granularity) >> BDRV_SECTOR_BITS);
+@@ -573,6 +577,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             mirror_throttle(s);
+ 
+             if (block_job_is_cancelled(&s->common)) {
++                s->init_pass = false;
+                 return 0;
+             }
+ 
+@@ -587,6 +592,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+         }
+ 
+         mirror_wait_for_all_io(s);
++        s->init_pass = false;
+     }
+ 
+     /* First part, loop on the sectors and initialize the dirty bitmap.  */
+-- 
+2.7.4
