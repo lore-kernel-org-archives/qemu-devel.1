@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5n-0007nX-Bg
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5n-0007nV-Aj
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5i-00080f-Bj
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5i-000814-RV
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:07 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:40088 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:22012 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZg5i-0007xa-0N
+	id 1cZg5i-0007ys-Fe
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:02 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  3 Feb 2017 18:47:41 +0300
-Message-Id: <20170203154757.36140-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 02/18] nbd-server: refactor simple reply sending
+Date: Fri,  3 Feb 2017 18:47:39 +0300
+Message-Id: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 00/18] nbd: BLOCK_STATUS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,136 +25,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-Rename functions appropriately and also make a separate copy of NBDReply
-- NBDSimpleReply, to replace NBDReply for the server. NBDReply itself
-will be upgraded in future patches to handle both simple and structured
-replies in the client.
+Hi all!
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/nbd.h |  7 +++++++
- nbd/server.c        | 25 +++++++++++++------------
- 2 files changed, 20 insertions(+), 12 deletions(-)
+We really need exporting dirty bitmaps feature as well as remote
+get_block_status for nbd devices. So, here is minimalistic and restricted
+realization of 'structured reply' and 'block status' nbd protocol extension
+(as second is developed over the first the combined spec may be found here:
+https://github.com/NetworkBlockDevice/nbd/blob/extension-blockstatus/doc/proto.md)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 3e373f0498..3c65cf8d87 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -63,6 +63,13 @@ struct NBDReply {
- };
- typedef struct NBDReply NBDReply;
- 
-+struct NBDSimpleReply {
-+    /* uint32_t NBD_SIMPLE_REPLY_MAGIC */
-+    uint64_t handle;
-+    uint32_t error;
-+};
-+typedef struct NBDSimpleReply NBDSimpleReply;
-+
- /* Transmission (export) flags: sent from server to client during handshake,
-    but describe what will happen during transmission */
- #define NBD_FLAG_HAS_FLAGS      (1 << 0)        /* Flags are there */
-diff --git a/nbd/server.c b/nbd/server.c
-index b63a8b85e3..4cfc02123b 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -738,7 +738,7 @@ static ssize_t nbd_receive_request(QIOChannel *ioc, NBDRequest *request)
-     return 0;
- }
- 
--static ssize_t nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
-+static ssize_t nbd_send_simple_reply(QIOChannel *ioc, NBDSimpleReply *reply)
- {
-     uint8_t buf[NBD_REPLY_SIZE];
-     ssize_t ret;
-@@ -1036,8 +1036,8 @@ void nbd_export_close_all(void)
-     }
- }
- 
--static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
--                                 int len)
-+static ssize_t nbd_co_send_simple_reply(NBDRequestData *req,
-+                                        NBDSimpleReply *reply, int len)
- {
-     NBDClient *client = req->client;
-     ssize_t rc, ret;
-@@ -1048,10 +1048,10 @@ static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
-     nbd_set_handlers(client);
- 
-     if (!len) {
--        rc = nbd_send_reply(client->ioc, reply);
-+        rc = nbd_send_simple_reply(client->ioc, reply);
-     } else {
-         qio_channel_set_cork(client->ioc, true);
--        rc = nbd_send_reply(client->ioc, reply);
-+        rc = nbd_send_simple_reply(client->ioc, reply);
-         if (rc >= 0) {
-             ret = write_sync(client->ioc, req->data, len);
-             if (ret != len) {
-@@ -1174,7 +1174,7 @@ static void nbd_trip(void *opaque)
-     NBDExport *exp = client->exp;
-     NBDRequestData *req;
-     NBDRequest request;
--    NBDReply reply;
-+    NBDSimpleReply reply;
-     ssize_t ret;
-     int flags;
- 
-@@ -1231,8 +1231,9 @@ static void nbd_trip(void *opaque)
-         }
- 
-         TRACE("Read %" PRIu32" byte(s)", request.len);
--        if (nbd_co_send_reply(req, &reply, request.len) < 0)
-+        if (nbd_co_send_simple_reply(req, &reply, request.len) < 0) {
-             goto out;
-+        }
-         break;
-     case NBD_CMD_WRITE:
-         TRACE("Request type is WRITE");
-@@ -1257,7 +1258,7 @@ static void nbd_trip(void *opaque)
-             goto error_reply;
-         }
- 
--        if (nbd_co_send_reply(req, &reply, 0) < 0) {
-+        if (nbd_co_send_simple_reply(req, &reply, 0) < 0) {
-             goto out;
-         }
-         break;
-@@ -1288,7 +1289,7 @@ static void nbd_trip(void *opaque)
-             goto error_reply;
-         }
- 
--        if (nbd_co_send_reply(req, &reply, 0) < 0) {
-+        if (nbd_co_send_simple_reply(req, &reply, 0) < 0) {
-             goto out;
-         }
-         break;
-@@ -1305,7 +1306,7 @@ static void nbd_trip(void *opaque)
-             LOG("flush failed");
-             reply.error = -ret;
-         }
--        if (nbd_co_send_reply(req, &reply, 0) < 0) {
-+        if (nbd_co_send_simple_reply(req, &reply, 0) < 0) {
-             goto out;
-         }
-         break;
-@@ -1317,7 +1318,7 @@ static void nbd_trip(void *opaque)
-             LOG("discard failed");
-             reply.error = -ret;
-         }
--        if (nbd_co_send_reply(req, &reply, 0) < 0) {
-+        if (nbd_co_send_simple_reply(req, &reply, 0) < 0) {
-             goto out;
-         }
-         break;
-@@ -1328,7 +1329,7 @@ static void nbd_trip(void *opaque)
-         /* We must disconnect after NBD_CMD_WRITE if we did not
-          * read the payload.
-          */
--        if (nbd_co_send_reply(req, &reply, 0) < 0 || !req->complete) {
-+        if (nbd_co_send_simple_reply(req, &reply, 0) < 0 || !req->complete) {
-             goto out;
-         }
-         break;
+What is done:
+
+server:
+ - can send not fragmented structured replies for CMD_READ (this was done only
+   because the spec doesn't allow structure reply feature without maintaining
+   structured read)
+ - can export dirty bitmap through BLOCK_STATUS. Only one bitmap can be exported,
+   negotiation query should be 'qemu-dirty-bitmap:<bitmap name>'
+ - cab export block status through BLOCK_STATUS. Client can negotiate only one
+   entity for exporting through BLOCK_STATUS - bitmap _or_ block status.
+   negotiation query should be 'base:allocation', as defined in the spec.
+   server sends only one extent on each BLOCK_STATUS query.
+
+client:
+ - can receive not fragmented structured replies for CMD_READ
+ - can get load dirty bitmap through nbd. Be careful: bitmap for export is
+   is selected during nbd negotiation - actually in open(). So, name argument for
+   qmp block-dirty-bitmap-load is just a _new_ name for loaded bitmap.
+   (any way, for us block-dirty-bitmap-load is just a way to test the feature,
+    really we need only server part)
+ - get_block_status works now through nbd CMD_BLOCK_STATUS, if base:allocation is
+   negotiated for export.
+
+It should be minimal but fully compatible realization of the spec.
+
+web: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=nbd-block-status-v1
+git: https://src.openvz.org/scm/~vsementsov/qemu.git (tag nbd-block-status-v1)
+
+Vladimir Sementsov-Ogievskiy (18):
+  nbd: rename NBD_REPLY_MAGIC to NBD_SIMPLE_REPLY_MAGIC
+  nbd-server: refactor simple reply sending
+  nbd: Minimal structured read for server
+  nbd/client: refactor nbd_receive_starttls
+  nbd/client: fix drop_sync
+  nbd/client: refactor drop_sync
+  nbd: Minimal structured read for client
+  hbitmap: add next_zero function
+  block/dirty-bitmap: add bdrv_dirty_bitmap_next()
+  block/dirty-bitmap: add bdrv_load_dirty_bitmap
+  nbd: BLOCK_STATUS for bitmap export: server part
+  nbd: BLOCK_STATUS for bitmap export: client part
+  nbd: add nbd_dirty_bitmap_load
+  qmp: add x-debug-block-dirty-bitmap-sha256
+  qmp: add block-dirty-bitmap-load
+  iotests: add test for nbd dirty bitmap export
+  nbd: BLOCK_STATUS for standard get_block_status function: server part
+  nbd: BLOCK_STATUS for standard get_block_status function: client part
+
+ block/dirty-bitmap.c                     |  70 ++++
+ block/nbd-client.c                       | 230 ++++++++++-
+ block/nbd-client.h                       |  13 +
+ block/nbd.c                              |  44 +-
+ blockdev.c                               |  57 +++
+ include/block/block_int.h                |   4 +
+ include/block/dirty-bitmap.h             |  10 +
+ include/block/nbd.h                      |  73 +++-
+ include/qemu/hbitmap.h                   |  16 +
+ nbd/client.c                             | 373 ++++++++++++++---
+ nbd/nbd-internal.h                       |  25 +-
+ nbd/server.c                             | 661 ++++++++++++++++++++++++++++++-
+ qapi/block-core.json                     |  46 ++-
+ qemu-nbd.c                               |   2 +-
+ tests/Makefile.include                   |   2 +-
+ tests/qemu-iotests/180                   | 133 +++++++
+ tests/qemu-iotests/180.out               |   5 +
+ tests/qemu-iotests/group                 |   1 +
+ tests/qemu-iotests/nbd-fault-injector.py |   4 +-
+ util/hbitmap.c                           |  37 ++
+ 20 files changed, 1713 insertions(+), 93 deletions(-)
+ create mode 100755 tests/qemu-iotests/180
+ create mode 100644 tests/qemu-iotests/180.out
+
 -- 
 2.11.0
