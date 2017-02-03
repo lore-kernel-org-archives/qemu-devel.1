@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cZffv-0001hN-N0
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:21:25 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cZfih-0003dF-Du
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:24:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cZffs-0004Dv-ET
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:21:23 -0500
-Received: from greensocs.com ([193.104.36.180]:55465)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cZffr-0004DA-W8
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:21:20 -0500
-References: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
-From: Frederic Konrad <fred.konrad@greensocs.com>
-Message-ID: <6cb0ed4c-27f6-eec1-64b0-6fa2b685400d@greensocs.com>
-Date: Fri, 3 Feb 2017 16:21:12 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cZfic-0005Rq-98
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:24:15 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36153)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cZfic-0005RE-2P
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:24:10 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r18so5025574wmd.3
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 07:24:09 -0800 (PST)
+Date: Fri, 3 Feb 2017 15:24:07 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170203152407.GH642@stefanha-x1.localdomain>
+References: <165854135.894789.1486069129896.JavaMail.zimbra@research.iiit.ac.in>
 MIME-Version: 1.0
-In-Reply-To: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 00/10] Clock framework API.
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="YrlhzR9YrZtruaFS"
+Content-Disposition: inline
+In-Reply-To: <165854135.894789.1486069129896.JavaMail.zimbra@research.iiit.ac.in>
+Subject: Re: [Qemu-devel] regarding codebase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx.com, mark.burton@greensocs.com
+To: Shubham Kumar <kumar.shubham@research.iiit.ac.in>
+Cc: qemu-devel@nongnu.org
 
-Ping!
 
-Thanks,
-Fred
+--YrlhzR9YrZtruaFS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 01/26/2017 10:47 AM, fred.konrad@greensocs.com wrote:
-> From: KONRAD Frederic <fred.konrad@greensocs.com>
-> 
-> Hi,
-> 
-> This is the second version of the clock framework API it contains:
-> 
->   * The first 6 patches which introduce the framework.
->   * The 7th patch which introduces a fixed-clock model.
->   * The rest which gives an example how to model a PLL from the existing
->     zynqmp-crf extracted from the qemu xilinx tree.
-> 
-> No specific behavior is expected yet when the CRF register set is accessed but
-> the user can see for example the dp_video_ref and vpll_to_lpd rate changing in
-> the monitor with the "info qtree" command when the vpll_ctrl register is
-> modified.
-> 
-> bus: main-system-bus
->   type System
->   dev: xlnx.zynqmp_crf, id ""
->     gpio-out "sysbus-irq" 1
->     qemu-clk "dbg_trace" 0
->     qemu-clk "dp_stc_ref" 0
->     qemu-clk "dpll_to_lpd" 12500000
->     qemu-clk "acpu_clk" 0
->     qemu-clk "pcie_ref" 0
->     qemu-clk "topsw_main" 0
->     qemu-clk "topsw_lsbus" 0
->     qemu-clk "dp_audio_ref" 0
->     qemu-clk "sata_ref" 0
->     qemu-clk "dp_video_ref" 1428571
->     qemu-clk "vpll_clk" 50000000
->     qemu-clk "apll_to_lpd" 12500000
->     qemu-clk "dpll_clk" 50000000
->     qemu-clk "gpu_ref" 0
->     qemu-clk "aux_refclk" 0
->     qemu-clk "video_clk" 27000000
->     qemu-clk "gdma_ref" 0
->     qemu-clk "gt_crx_ref_clk" 0
->     qemu-clk "dbg_fdp" 0
->     qemu-clk "apll_clk" 50000000
->     qemu-clk "pss_alt_ref_clk" 0
->     qemu-clk "ddr" 0
->     qemu-clk "dbg_tstmp" 0
->     qemu-clk "pss_ref_clk" 50000000
->     qemu-clk "dpdma_ref" 0
->     qemu-clk "vpll_to_lpd" 12500000
->     mmio 00000000fd1a0000/000000000000010c
->     
-> This series is based on the current master
-> (a9e404600a9bd1e6a26431fc89e5069092e67f14).
-> 
-> Thanks,
-> Fred
-> 
-> V1 -> V2:
->   * Rebased on current master.
->   * Some function renamed and documentation fixed.
-> 
-> RFC -> V1:
->   * Rebased on current master.
->   * The docs has been fixed.
->   * qemu_clk_init_device helper has been provided to ease the initialization
->     of the devices.
-> 
-> KONRAD Frederic (10):
->   qemu-clk: introduce qemu-clk qom object
->   qemu-clk: allow to add a clock to a device
->   qemu-clk: allow to bind two clocks together
->   qemu-clk: introduce an init array to help the device construction
->   qdev-monitor: print the device's clock with info qtree
->   docs: add qemu-clock documentation
->   introduce fixed-clock
->   introduce zynqmp_crf
->   zynqmp: add the zynqmp_crf to the platform
->   zynqmp: add reference clock
-> 
->  Makefile.objs                 |   1 +
->  docs/clock.txt                | 108 +++++
->  hw/arm/xlnx-zynqmp.c          |  56 +++
->  hw/misc/Makefile.objs         |   2 +
->  hw/misc/fixed-clock.c         |  88 ++++
->  hw/misc/xilinx_zynqmp_crf.c   | 968 ++++++++++++++++++++++++++++++++++++++++++
->  include/hw/arm/xlnx-zynqmp.h  |   8 +
->  include/hw/misc/fixed-clock.h |  30 ++
->  include/qemu/qemu-clock.h     | 161 +++++++
->  qdev-monitor.c                |   2 +
->  qemu-clock.c                  | 174 ++++++++
->  11 files changed, 1598 insertions(+)
->  create mode 100644 docs/clock.txt
->  create mode 100644 hw/misc/fixed-clock.c
->  create mode 100644 hw/misc/xilinx_zynqmp_crf.c
->  create mode 100644 include/hw/misc/fixed-clock.h
->  create mode 100644 include/qemu/qemu-clock.h
->  create mode 100644 qemu-clock.c
-> 
+On Fri, Feb 03, 2017 at 02:28:49AM +0530, Shubham Kumar wrote:
+> I'm having difficulty in understanding the codebase of QEMU .There seem t=
+o have hundreds of code files and header files in the directory and I'm una=
+ble to figure out the functionality of each file.Is there any way to unders=
+tand the function of each file ??
+
+vl.c is the main() function for the qemu-system-* family of programs
+(the "system emulators").  You could start exploring the source code
+=66rom there.  That's what I did when I first started hacking on QEMU.
+
+Be prepared to read code.  QEMU isn't an educational codebase and the
+code reflects the requirements of many contributors over the years.
+Most of their requirements may not be relevant to you.  You will learn
+to skip the stuff that doesn't affect you and to see the big picture.
+
+If you have a specific area you are interested in, let us know and we
+can tell you which source files are involved.
+
+Stefan
+
+--YrlhzR9YrZtruaFS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYlKCXAAoJEJykq7OBq3PIZK4H/j5zWhvc+P4oZWTfrw/IJ1T2
+9YSlcnvFYQqmeOvGCHEhsxGNZIJGeR46ewa5RNklD08YtIcrvwPPbdGcGYReNOIR
+d/sWircJfr8ri9Ej9CJ3fe2FSVSzCanqcqGSDxT3E2IBucu3DDXUV/KLbgbyR7gz
+y8wTlaAFtSzVxITn5IhLV2MDIqX34+enVGyB3WFioKCaY1pt7ncyv4X/acU5zuhR
+NIzEkqgOKNpnSaP4qaT0QxbqXMSX7y6ij/s1+BiAw1z9dgsWoLsxOsoeE2x+Kcyi
+oNQOYwyEhA5UMswfHTcUzXCbQGaBqiKdjf8HPkSwSZTwO1yesBPrOMvFEftWDiA=
+=cLZ3
+-----END PGP SIGNATURE-----
+
+--YrlhzR9YrZtruaFS--
