@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZcyh-00074N-Ok
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:28:39 -0500
+	(envelope-from <gerg@uclinux.org>) id 1cZd1A-0000mH-V5
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:31:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cZcyd-00066Q-Rg
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:28:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48922)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cZcyd-00065o-IU
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:28:31 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A15AF4E341
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 12:28:31 +0000 (UTC)
-Date: Fri, 3 Feb 2017 12:28:27 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170203122826.GI3208@work-vm>
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-18-git-send-email-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1485207141-1941-18-git-send-email-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 17/17] migration: flush receive queue
+	(envelope-from <gerg@uclinux.org>) id 1cZd17-0008He-1q
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:31:09 -0500
+Received: from icp-osb-irony-out1.external.iinet.net.au ([203.59.1.210]:1404)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <gerg@uclinux.org>) id 1cZd16-0008Ee-1T
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 07:31:04 -0500
+From: Greg Ungerer <gerg@uclinux.org>
+Date: Fri,  3 Feb 2017 22:31:00 +1000
+Message-Id: <1486125060-24923-1-git-send-email-gerg@uclinux.org>
+Subject: [Qemu-devel] [PATCH] hw/net: implement MIB counters in mcf_fec
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,149 +22,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
+To: qemu-devel@nongnu.org, jasowang@redhat.com, laurent@vivier.eu
+Cc: Greg Ungerer <gerg@uclinux.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Each time that we sync the bitmap, it is a possiblity that we receive
-> a page that is being processed by a different thread.  We fix this
-> problem just making sure that we wait for all receiving threads to
-> finish its work before we procedeed with the next stage.
-> 
-> We are low on page flags, so we use a combination that is not valid to
-> emit that message:  MULTIFD_PAGE and COMPRESSED.
-> 
-> I tried to make a migration command for it, but it don't work because
-> we sync the bitmap sometimes when we have already sent the beggining
-> of the section, so I just added a new page flag.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+The FEC ethernet hardware module used on ColdFire SoC parts contains a
+block of RAM used to maintain hardware counters. This block is accessible
+via the usual FEC register address space. There is currently no support
+for this in the QEMU mcf_fec driver.
 
-Is there something that makes sure that the very last page is marked
-with a flush to ensure that the read completes before we start
-trying to do anything after ram_load ?
-As I read this the flag gets added to the first page of the next round.
+Add support for storing a MIB RAM block, and provide register level
+access to it. Also implement a basic set of stats collection functions
+to populate MIB data fields.
 
-Dave
+This support tested running a Linux target and using the net-tools
+"ethtool -S" option. As of linux-4.9 the kernels FEC driver makes
+accesses to the MIB counters during its initialization (which it never
+did before), and so this version of Linux will now fail with the QEMU
+error:
 
-> ---
->  include/migration/migration.h |  1 +
->  migration/ram.c               | 46 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 47 insertions(+)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index b3e4f31..1bd6bc0 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -259,6 +259,7 @@ void migrate_multifd_send_threads_create(void);
->  void migrate_multifd_send_threads_join(void);
->  void migrate_multifd_recv_threads_create(void);
->  void migrate_multifd_recv_threads_join(void);
-> +void qemu_savevm_send_multifd_flush(QEMUFile *f);
-> 
->  void migrate_compress_threads_create(void);
->  void migrate_compress_threads_join(void);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 28d099f..3baead8 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -63,6 +63,13 @@ static uint64_t bitmap_sync_count;
->  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
->  #define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
-> 
-> +/* We are getting low on pages flags, so we start using combinations 
-> +   When we need to flush a page, we sent it as
-> +   RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_COMPRESS_PAGE
-> +   We don't allow that combination
-> +*/
-> +
-> +
->  static uint8_t *ZERO_TARGET_PAGE;
-> 
->  static inline bool is_zero_range(uint8_t *p, uint64_t size)
-> @@ -391,6 +398,9 @@ void migrate_compress_threads_create(void)
-> 
->  /* Multiple fd's */
-> 
-> +/* Indicates if we have synced the bitmap and we need to assure that
-> +   target has processeed all previous pages */
-> +bool multifd_needs_flush = false;
-> 
->  typedef struct {
->      int num;
-> @@ -752,6 +762,25 @@ static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
->      qemu_mutex_unlock(&params->mutex);
->  }
-> 
-> +
-> +static int multifd_flush(void)
-> +{
-> +    int i, thread_count;
-> +
-> +    if (!migrate_use_multifd()) {
-> +        return 0;
-> +    }
-> +    thread_count = migrate_multifd_threads();
-> +    qemu_mutex_lock(&multifd_recv_mutex);
-> +    for (i = 0; i < thread_count; i++) {
-> +        while(!multifd_recv[i].done) {
-> +            qemu_cond_wait(&multifd_recv_cond, &multifd_recv_mutex);
-> +        }
-> +    }
-> +    qemu_mutex_unlock(&multifd_recv_mutex);
-> +    return 0;
-> +}
-> +
->  /**
->   * save_page_header: Write page header to wire
->   *
-> @@ -768,6 +797,12 @@ static size_t save_page_header(QEMUFile *f, RAMBlock *block, ram_addr_t offset)
->  {
->      size_t size, len;
-> 
-> +    if (multifd_needs_flush &&
-> +        (offset & RAM_SAVE_FLAG_MULTIFD_PAGE)) {
-> +        offset |= RAM_SAVE_FLAG_COMPRESS;
-> +        multifd_needs_flush = false;
-> +    }
-> +
->      qemu_put_be64(f, offset);
->      size = 8;
-> 
-> @@ -2450,6 +2485,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
-> 
->      if (!migration_in_postcopy(migrate_get_current())) {
->          migration_bitmap_sync();
-> +        if (migrate_use_multifd()) {
-> +            multifd_needs_flush = true;
-> +        }
->      }
-> 
->      ram_control_before_iterate(f, RAM_CONTROL_FINISH);
-> @@ -2491,6 +2529,9 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
->          qemu_mutex_lock_iothread();
->          rcu_read_lock();
->          migration_bitmap_sync();
-> +        if (migrate_use_multifd()) {
-> +            multifd_needs_flush = true;
-> +        }
->          rcu_read_unlock();
->          qemu_mutex_unlock_iothread();
->          remaining_size = ram_save_remaining() * TARGET_PAGE_SIZE;
-> @@ -2930,6 +2971,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->              break;
->          }
-> 
-> +        if ((flags & (RAM_SAVE_FLAG_MULTIFD_PAGE|RAM_SAVE_FLAG_COMPRESS))
-> +                  == (RAM_SAVE_FLAG_MULTIFD_PAGE|RAM_SAVE_FLAG_COMPRESS)) {
-> +            multifd_flush();
-> +            flags = flags & ~RAM_SAVE_FLAG_COMPRESS;
-> +        }
->          if (flags & (RAM_SAVE_FLAG_COMPRESS | RAM_SAVE_FLAG_PAGE |
->                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
->                       RAM_SAVE_FLAG_MULTIFD_PAGE)) {
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+    qemu: hardware error: mcf_fec_read: Bad address 0x200
+
+This MIB counter support fixes this problem.
+
+Signed-off-by: Greg Ungerer <gerg@uclinux.org>
+---
+ hw/net/mcf_fec.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 115 insertions(+)
+
+diff --git a/hw/net/mcf_fec.c b/hw/net/mcf_fec.c
+index a3eca7e..bfa6b4b 100644
+--- a/hw/net/mcf_fec.c
++++ b/hw/net/mcf_fec.c
+@@ -27,6 +27,7 @@ do { printf("mcf_fec: " fmt , ## __VA_ARGS__); } while (0)
+ 
+ #define FEC_MAX_DESC 1024
+ #define FEC_MAX_FRAME_SIZE 2032
++#define FEC_MIB_SIZE 64
+ 
+ typedef struct {
+     SysBusDevice parent_obj;
+@@ -51,6 +52,7 @@ typedef struct {
+     uint32_t erdsr;
+     uint32_t etdsr;
+     uint32_t emrbr;
++    uint32_t mib[FEC_MIB_SIZE];
+ } mcf_fec_state;
+ 
+ #define FEC_INT_HB   0x80000000
+@@ -111,6 +113,63 @@ typedef struct {
+ #define FEC_BD_OV   0x0002
+ #define FEC_BD_TR   0x0001
+ 
++#define MIB_RMON_T_DROP         0
++#define MIB_RMON_T_PACKETS      1
++#define MIB_RMON_T_BC_PKT       2
++#define MIB_RMON_T_MC_PKT       3
++#define MIB_RMON_T_CRC_ALIGN    4
++#define MIB_RMON_T_UNDERSIZE    5
++#define MIB_RMON_T_OVERSIZE     6
++#define MIB_RMON_T_FRAG         7
++#define MIB_RMON_T_JAB          8
++#define MIB_RMON_T_COL          9
++#define MIB_RMON_T_P64          10
++#define MIB_RMON_T_P65TO127     11
++#define MIB_RMON_T_P128TO255    12
++#define MIB_RMON_T_P256TO511    13
++#define MIB_RMON_T_P512TO1023   14
++#define MIB_RMON_T_P1024TO2047  15
++#define MIB_RMON_T_P_GTE2048    16
++#define MIB_RMON_T_OCTETS       17
++#define MIB_IEEE_T_DROP         18
++#define MIB_IEEE_T_FRAME_OK     19
++#define MIB_IEEE_T_1COL         20
++#define MIB_IEEE_T_MCOL         21
++#define MIB_IEEE_T_DEF          22
++#define MIB_IEEE_T_LCOL         23
++#define MIB_IEEE_T_EXCOL        24
++#define MIB_IEEE_T_MACERR       25
++#define MIB_IEEE_T_CSERR        26
++#define MIB_IEEE_T_SQE          27
++#define MIB_IEEE_T_FDXFC        28
++#define MIB_IEEE_T_OCTETS_OK    29
++
++#define MIB_RMON_R_DROP         32
++#define MIB_RMON_R_PACKETS      33
++#define MIB_RMON_R_BC_PKT       34
++#define MIB_RMON_R_MC_PKT       35
++#define MIB_RMON_R_CRC_ALIGN    36
++#define MIB_RMON_R_UNDERSIZE    37
++#define MIB_RMON_R_OVERSIZE     38
++#define MIB_RMON_R_FRAG         39
++#define MIB_RMON_R_JAB          40
++#define MIB_RMON_R_RESVD_0      41
++#define MIB_RMON_R_P64          42
++#define MIB_RMON_R_P65TO127     43
++#define MIB_RMON_R_P128TO255    44
++#define MIB_RMON_R_P256TO511    45
++#define MIB_RMON_R_P512TO1023   46
++#define MIB_RMON_R_P1024TO2047  47
++#define MIB_RMON_R_P_GTE2048    48
++#define MIB_RMON_R_OCTETS       49
++#define MIB_IEEE_R_DROP         50
++#define MIB_IEEE_R_FRAME_OK     51
++#define MIB_IEEE_R_CRC          52
++#define MIB_IEEE_R_ALIGN        53
++#define MIB_IEEE_R_MACERR       54
++#define MIB_IEEE_R_FDXFC        55
++#define MIB_IEEE_R_OCTETS_OK    56
++
+ static void mcf_fec_read_bd(mcf_fec_bd *bd, uint32_t addr)
+ {
+     cpu_physical_memory_read(addr, bd, sizeof(*bd));
+@@ -147,6 +206,31 @@ static void mcf_fec_update(mcf_fec_state *s)
+     s->irq_state = active;
+ }
+ 
++static void mcf_fec_tx_stats(mcf_fec_state *s, int size)
++{
++    s->mib[MIB_RMON_T_PACKETS]++;
++    s->mib[MIB_RMON_T_OCTETS] += size;
++    if (size < 64) {
++        s->mib[MIB_RMON_T_FRAG]++;
++    } else if (size == 64) {
++        s->mib[MIB_RMON_T_P64]++;
++    } else if (size < 128) {
++        s->mib[MIB_RMON_T_P65TO127]++;
++    } else if (size < 256) {
++        s->mib[MIB_RMON_T_P128TO255]++;
++    } else if (size < 512) {
++        s->mib[MIB_RMON_T_P256TO511]++;
++    } else if (size < 1024) {
++        s->mib[MIB_RMON_T_P512TO1023]++;
++    } else if (size < 2048) {
++        s->mib[MIB_RMON_T_P1024TO2047]++;
++    } else {
++        s->mib[MIB_RMON_T_P_GTE2048]++;
++    }
++    s->mib[MIB_IEEE_T_FRAME_OK]++;
++    s->mib[MIB_IEEE_T_OCTETS_OK] += size;
++}
++
+ static void mcf_fec_do_tx(mcf_fec_state *s)
+ {
+     uint32_t addr;
+@@ -180,6 +264,7 @@ static void mcf_fec_do_tx(mcf_fec_state *s)
+             /* Last buffer in frame.  */
+             DPRINTF("Sending packet\n");
+             qemu_send_packet(qemu_get_queue(s->nic), frame, frame_size);
++            mcf_fec_tx_stats(s, frame_size);
+             ptr = frame;
+             frame_size = 0;
+             s->eir |= FEC_INT_TXF;
+@@ -302,6 +387,7 @@ static uint64_t mcf_fec_read(void *opaque, hwaddr addr,
+     case 0x180: return s->erdsr;
+     case 0x184: return s->etdsr;
+     case 0x188: return s->emrbr;
++    case 0x200 ... 0x2e0: return s->mib[(addr & 0x1ff) / 4];
+     default:
+         hw_error("mcf_fec_read: Bad address 0x%x\n", (int)addr);
+         return 0;
+@@ -399,12 +485,40 @@ static void mcf_fec_write(void *opaque, hwaddr addr,
+     case 0x188:
+         s->emrbr = value > 0 ? value & 0x7F0 : 0x7F0;
+         break;
++    case 0x200 ... 0x2e0:
++        s->mib[(addr & 0x1ff) / 4] = value;
++        break;
+     default:
+         hw_error("mcf_fec_write Bad address 0x%x\n", (int)addr);
+     }
+     mcf_fec_update(s);
+ }
+ 
++static void mcf_fec_rx_stats(mcf_fec_state *s, int size)
++{
++    s->mib[MIB_RMON_R_PACKETS]++;
++    s->mib[MIB_RMON_R_OCTETS] += size;
++    if (size < 64) {
++        s->mib[MIB_RMON_R_FRAG]++;
++    } else if (size == 64) {
++        s->mib[MIB_RMON_R_P64]++;
++    } else if (size < 128) {
++        s->mib[MIB_RMON_R_P65TO127]++;
++    } else if (size < 256) {
++        s->mib[MIB_RMON_R_P128TO255]++;
++    } else if (size < 512) {
++        s->mib[MIB_RMON_R_P256TO511]++;
++    } else if (size < 1024) {
++        s->mib[MIB_RMON_R_P512TO1023]++;
++    } else if (size < 2048) {
++        s->mib[MIB_RMON_R_P1024TO2047]++;
++    } else {
++        s->mib[MIB_RMON_R_P_GTE2048]++;
++    }
++    s->mib[MIB_IEEE_R_FRAME_OK]++;
++    s->mib[MIB_IEEE_R_OCTETS_OK] += size;
++}
++
+ static int mcf_fec_have_receive_space(mcf_fec_state *s, size_t want)
+ {
+     mcf_fec_bd bd;
+@@ -500,6 +614,7 @@ static ssize_t mcf_fec_receive(NetClientState *nc, const uint8_t *buf, size_t si
+         }
+     }
+     s->rx_descriptor = addr;
++    mcf_fec_rx_stats(s, retsize);
+     mcf_fec_enable_rx(s);
+     mcf_fec_update(s);
+     return retsize;
+-- 
+1.9.1
