@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cZjRb-0001gU-Ep
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 14:22:52 -0500
+	(envelope-from <nirsof@gmail.com>) id 1cZjt0-0008Jl-Ko
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 14:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cZjRX-00018q-Gj
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 14:22:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57018)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cZjRX-00018U-9y
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 14:22:47 -0500
-Date: Fri, 3 Feb 2017 19:22:44 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170203192244.GC13825@redhat.com>
-References: <20170203170925.12554-1-rjones@redhat.com>
-	<20170203170925.12554-2-rjones@redhat.com>
-	<2f5ef524-02d7-e0e8-c693-db932f8270b9@redhat.com>
-	<20170203185624.GB13825@redhat.com>
-	<25dc57d6-ded3-9e4a-92cf-e678d0c92a27@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <25dc57d6-ded3-9e4a-92cf-e678d0c92a27@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-nbd: Implement socket activation.
+	(envelope-from <nirsof@gmail.com>) id 1cZjsx-0004T1-JU
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 14:51:10 -0500
+From: Nir Soffer <nirsof@gmail.com>
+Date: Fri,  3 Feb 2017 21:50:37 +0200
+Message-Id: <20170203195037.4238-1-nirsof@gmail.com>
+Subject: [Qemu-devel] [PATCH] qemu-img: Do not truncate before preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +17,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: den@openvz.org, stefanha@gmail.com, dplotnikov@virtuozzo.com, qemu-devel@nongnu.org, rkagan@virtuozzo.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Nir Soffer <nirsof@gmail.com>
 
-On Fri, Feb 03, 2017 at 10:58:15AM -0800, Paolo Bonzini wrote:
-> On 03/02/2017 10:56, Richard W.M. Jones wrote:
-> > On Fri, Feb 03, 2017 at 09:31:43AM -0800, Paolo Bonzini wrote:
-> >> On 03/02/2017 09:09, Richard W.M. Jones wrote:
-> >>> +    if (fork_process) {
-> >>> +        return "Fork (--fork) can't be used with socket activation";
-> >>> +    }
-> >>
-> >> Why not?  You could have a Type=forking foo.service, which makes little
-> >> sense but would work.
-> > 
-> > The answer, I think, is because systemd will lose track of the PID of
-> > the qemu-nbd process.  This would be important because systemd can
-> > kill a socket-activated service which is idle.
-> > 
-> > Normally you would work around that by using PIDFile=... in the unit
-> > file, but it looks like qemu-nbd doesn't support pid files.
-> 
-> PIDFile is recommended indeed but GuessMainPID=yes (the default for no
-> PIDFile) should work, since qemu-nbd only has one parent process.
+When using file system that does not support fallocate() (e.g. NFS <
+4.2), truncating the file only when preallocation=OFF speeds up creating
+raw file.
 
-Another reason:
+Here is example run, tested on Fedora 24 machine, creating raw file on
+NFS version 3 server.
 
-I think that the --fork option is mainly intended for command line use
-of qemu-nbd.  If you're running qemu-nbd from a program there's no
-real reason to use --fork, since you can control the fork process
-better yourself.
+$ time ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 1g
+Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
 
-LISTEN_PID isn't settable from the command line.  It's also not
-settable from a shell script (as far as I can tell when I was trying
-to write a shell script to test nbdkit).  It has to be set between the
-fork and exec calls, because it is set to the qemu-nbd PID.
+real	0m21.185s
+user	0m0.022s
+sys	0m0.574s
 
-So I don't think --fork and socket activation are really features that
-it makes any sense to mix.
+$ time ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 1g
+Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
 
-Rich.
+real	0m11.601s
+user	0m0.016s
+sys	0m0.525s
 
+$ time dd if=/dev/zero of=mnt/test bs=1M count=1024 oflag=direct
+1024+0 records in
+1024+0 records out
+1073741824 bytes (1.1 GB, 1.0 GiB) copied, 15.6627 s, 68.6 MB/s
+
+real	0m16.104s
+user	0m0.009s
+sys	0m0.220s
+
+Running with strace we can see that without this change we do one
+pread() and one pwrite() for each block. With this change, we do only
+one pwrite() per block.
+
+$ strace ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 8192
+...
+pread64(9, "\0", 1, 4095)               = 1
+pwrite64(9, "\0", 1, 4095)              = 1
+pread64(9, "\0", 1, 8191)               = 1
+pwrite64(9, "\0", 1, 8191)              = 1
+
+$ strace ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 8192
+...
+pwrite64(9, "\0", 1, 4095)              = 1
+pwrite64(9, "\0", 1, 8191)              = 1
+
+This happens because posix_fallocate is checking if each block is
+allocated before writing a byte to the block, and when truncating the
+file before preallocation, all blocks are unallocated.
+
+Signed-off-by: Nir Soffer <nirsof@gmail.com>
+---
+
+I sent this a week ago:
+http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg06123.html
+
+Sending again with improved commit message.
+
+ block/file-posix.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 2134e0e..442f080 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1591,12 +1591,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+ #endif
+     }
+ 
+-    if (ftruncate(fd, total_size) != 0) {
+-        result = -errno;
+-        error_setg_errno(errp, -result, "Could not resize file");
+-        goto out_close;
+-    }
+-
+     switch (prealloc) {
+ #ifdef CONFIG_POSIX_FALLOCATE
+     case PREALLOC_MODE_FALLOC:
+@@ -1636,6 +1630,10 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+         break;
+     }
+     case PREALLOC_MODE_OFF:
++        if (ftruncate(fd, total_size) != 0) {
++            result = -errno;
++            error_setg_errno(errp, -result, "Could not resize file");
++        }
+         break;
+     default:
+         result = -EINVAL;
+@@ -1644,7 +1642,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+         break;
+     }
+ 
+-out_close:
+     if (qemu_close(fd) != 0 && result == 0) {
+         result = -errno;
+         error_setg_errno(errp, -result, "Could not close the new file");
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+2.9.3
