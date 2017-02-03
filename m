@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5n-0007nZ-Bm
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5n-0007nX-Bg
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5j-00081z-4U
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5i-00080f-Bj
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:07 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:42403 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:40088 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZg5i-0007zf-P0
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:03 -0500
+	id 1cZg5i-0007xa-0N
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:02 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  3 Feb 2017 18:47:43 +0300
-Message-Id: <20170203154757.36140-5-vsementsov@virtuozzo.com>
+Date: Fri,  3 Feb 2017 18:47:41 +0300
+Message-Id: <20170203154757.36140-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20170203154757.36140-1-vsementsov@virtuozzo.com>
 References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 04/18] nbd/client: refactor nbd_receive_starttls
+Subject: [Qemu-devel] [PATCH 02/18] nbd-server: refactor simple reply sending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,118 +27,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-Split out nbd_receive_simple_option to be reused for structured reply
-option.
+Rename functions appropriately and also make a separate copy of NBDReply
+- NBDSimpleReply, to replace NBDReply for the server. NBDReply itself
+will be upgraded in future patches to handle both simple and structured
+replies in the client.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/client.c       | 54 +++++++++++++++++++++++++++++++++++-------------------
- nbd/nbd-internal.h | 14 ++++++++++++++
- 2 files changed, 49 insertions(+), 19 deletions(-)
+ include/block/nbd.h |  7 +++++++
+ nbd/server.c        | 25 +++++++++++++------------
+ 2 files changed, 20 insertions(+), 12 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index de5c9366c7..6caf6bda6d 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -395,39 +395,55 @@ static int nbd_receive_query_exports(QIOChannel *ioc,
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 3e373f0498..3c65cf8d87 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -63,6 +63,13 @@ struct NBDReply {
+ };
+ typedef struct NBDReply NBDReply;
+ 
++struct NBDSimpleReply {
++    /* uint32_t NBD_SIMPLE_REPLY_MAGIC */
++    uint64_t handle;
++    uint32_t error;
++};
++typedef struct NBDSimpleReply NBDSimpleReply;
++
+ /* Transmission (export) flags: sent from server to client during handshake,
+    but describe what will happen during transmission */
+ #define NBD_FLAG_HAS_FLAGS      (1 << 0)        /* Flags are there */
+diff --git a/nbd/server.c b/nbd/server.c
+index b63a8b85e3..4cfc02123b 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -738,7 +738,7 @@ static ssize_t nbd_receive_request(QIOChannel *ioc, NBDRequest *request)
+     return 0;
+ }
+ 
+-static ssize_t nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
++static ssize_t nbd_send_simple_reply(QIOChannel *ioc, NBDSimpleReply *reply)
+ {
+     uint8_t buf[NBD_REPLY_SIZE];
+     ssize_t ret;
+@@ -1036,8 +1036,8 @@ void nbd_export_close_all(void)
      }
  }
  
--static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
--                                        QCryptoTLSCreds *tlscreds,
--                                        const char *hostname, Error **errp)
-+static int nbd_receive_simple_option(QIOChannel *ioc, int opt,
-+                                     bool abort_on_notsup, Error **errp)
+-static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
+-                                 int len)
++static ssize_t nbd_co_send_simple_reply(NBDRequestData *req,
++                                        NBDSimpleReply *reply, int len)
  {
-     nbd_opt_reply reply;
--    QIOChannelTLS *tioc;
--    struct NBDTLSHandshakeData data = { 0 };
+     NBDClient *client = req->client;
+     ssize_t rc, ret;
+@@ -1048,10 +1048,10 @@ static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
+     nbd_set_handlers(client);
  
--    TRACE("Requesting TLS from server");
--    if (nbd_send_option_request(ioc, NBD_OPT_STARTTLS, 0, NULL, errp) < 0) {
--        return NULL;
-+    TRACE("Requesting '%s' option from server", nbd_opt_name(opt));
-+    if (nbd_send_option_request(ioc, opt, 0, NULL, errp) < 0) {
-+        return -1;
-     }
+     if (!len) {
+-        rc = nbd_send_reply(client->ioc, reply);
++        rc = nbd_send_simple_reply(client->ioc, reply);
+     } else {
+         qio_channel_set_cork(client->ioc, true);
+-        rc = nbd_send_reply(client->ioc, reply);
++        rc = nbd_send_simple_reply(client->ioc, reply);
+         if (rc >= 0) {
+             ret = write_sync(client->ioc, req->data, len);
+             if (ret != len) {
+@@ -1174,7 +1174,7 @@ static void nbd_trip(void *opaque)
+     NBDExport *exp = client->exp;
+     NBDRequestData *req;
+     NBDRequest request;
+-    NBDReply reply;
++    NBDSimpleReply reply;
+     ssize_t ret;
+     int flags;
  
--    TRACE("Getting TLS reply from server");
--    if (nbd_receive_option_reply(ioc, NBD_OPT_STARTTLS, &reply, errp) < 0) {
--        return NULL;
-+    TRACE("Getting '%s' option reply from server", nbd_opt_name(opt));
-+    if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
-+        return -1;
-     }
+@@ -1231,8 +1231,9 @@ static void nbd_trip(void *opaque)
+         }
  
-     if (reply.type != NBD_REP_ACK) {
--        error_setg(errp, "Server rejected request to start TLS %" PRIx32,
--                   reply.type);
--        nbd_send_opt_abort(ioc);
--        return NULL;
-+        error_setg(errp, "Server rejected request for '%s' option: %" PRIx32,
-+                   nbd_opt_name(opt), reply.type);
-+        if (abort_on_notsup) {
-+            nbd_send_opt_abort(ioc);
+         TRACE("Read %" PRIu32" byte(s)", request.len);
+-        if (nbd_co_send_reply(req, &reply, request.len) < 0)
++        if (nbd_co_send_simple_reply(req, &reply, request.len) < 0) {
+             goto out;
 +        }
-+        return -1;
-     }
+         break;
+     case NBD_CMD_WRITE:
+         TRACE("Request type is WRITE");
+@@ -1257,7 +1258,7 @@ static void nbd_trip(void *opaque)
+             goto error_reply;
+         }
  
-     if (reply.length != 0) {
--        error_setg(errp, "Start TLS response was not zero %" PRIu32,
--                   reply.length);
--        nbd_send_opt_abort(ioc);
-+        error_setg(errp, "'%s' option response was not zero %" PRIu32,
-+                   nbd_opt_name(opt), reply.length);
-+        if (abort_on_notsup) {
-+            nbd_send_opt_abort(ioc);
-+        }
-+        return -1;
-+    }
-+
-+    TRACE("%s 'option' approved", nbd_opt_name(opt));
-+    return 0;
-+}
-+
-+static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
-+                                        QCryptoTLSCreds *tlscreds,
-+                                        const char *hostname, Error **errp)
-+{
-+    QIOChannelTLS *tioc;
-+    struct NBDTLSHandshakeData data = { 0 };
-+
-+    if (nbd_receive_simple_option(ioc, NBD_OPT_STARTTLS, true, errp) < 0) {
-         return NULL;
-     }
+-        if (nbd_co_send_reply(req, &reply, 0) < 0) {
++        if (nbd_co_send_simple_reply(req, &reply, 0) < 0) {
+             goto out;
+         }
+         break;
+@@ -1288,7 +1289,7 @@ static void nbd_trip(void *opaque)
+             goto error_reply;
+         }
  
--    TRACE("TLS request approved, setting up TLS");
-+    TRACE("Setting up TLS");
-     tioc = qio_channel_tls_new_client(ioc, tlscreds, hostname, errp);
-     if (!tioc) {
-         return NULL;
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index 489eeaf887..3284bfc85a 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -96,6 +96,20 @@
- #define NBD_ENOSPC     28
- #define NBD_ESHUTDOWN  108
- 
-+static inline const char *nbd_opt_name(int opt)
-+{
-+    switch (opt) {
-+    case NBD_OPT_EXPORT_NAME: return "export_name";
-+    case NBD_OPT_ABORT: return "abort";
-+    case NBD_OPT_LIST: return "list";
-+    case NBD_OPT_PEEK_EXPORT: return "peek_export";
-+    case NBD_OPT_STARTTLS: return "tls";
-+    case NBD_OPT_STRUCTURED_REPLY: return "structured_reply";
-+    }
-+
-+    return "<unknown option>";
-+}
-+
- static inline ssize_t read_sync(QIOChannel *ioc, void *buffer, size_t size)
- {
-     struct iovec iov = { .iov_base = buffer, .iov_len = size };
+-        if (nbd_co_send_reply(req, &reply, 0) < 0) {
++        if (nbd_co_send_simple_reply(req, &reply, 0) < 0) {
+             goto out;
+         }
+         break;
+@@ -1305,7 +1306,7 @@ static void nbd_trip(void *opaque)
+             LOG("flush failed");
+             reply.error = -ret;
+         }
+-        if (nbd_co_send_reply(req, &reply, 0) < 0) {
++        if (nbd_co_send_simple_reply(req, &reply, 0) < 0) {
+             goto out;
+         }
+         break;
+@@ -1317,7 +1318,7 @@ static void nbd_trip(void *opaque)
+             LOG("discard failed");
+             reply.error = -ret;
+         }
+-        if (nbd_co_send_reply(req, &reply, 0) < 0) {
++        if (nbd_co_send_simple_reply(req, &reply, 0) < 0) {
+             goto out;
+         }
+         break;
+@@ -1328,7 +1329,7 @@ static void nbd_trip(void *opaque)
+         /* We must disconnect after NBD_CMD_WRITE if we did not
+          * read the payload.
+          */
+-        if (nbd_co_send_reply(req, &reply, 0) < 0 || !req->complete) {
++        if (nbd_co_send_simple_reply(req, &reply, 0) < 0 || !req->complete) {
+             goto out;
+         }
+         break;
 -- 
 2.11.0
