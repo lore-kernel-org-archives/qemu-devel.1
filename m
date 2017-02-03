@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZaM2-00044E-Bx
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:31 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZaM2-00044F-Cp
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZaLx-0004QJ-Vw
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZaLy-0004QX-0g
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:30 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:44929 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:48848 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZaLx-0004NZ-HA
+	id 1cZaLx-0004Mm-Jc
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:40:25 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  3 Feb 2017 12:39:58 +0300
-Message-Id: <20170203094018.15493-5-vsementsov@virtuozzo.com>
+Date: Fri,  3 Feb 2017 12:39:56 +0300
+Message-Id: <20170203094018.15493-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20170203094018.15493-1-vsementsov@virtuozzo.com>
 References: <20170203094018.15493-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 04/24] tests: add hbitmap iter test
+Subject: [Qemu-devel] [PATCH 02/24] specs/qcow2: do not use wording 'bitmap
+ header'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +28,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Test that hbitmap iter is resistant to bitmap resetting.
+A bitmap directory entry is sometimes called a 'bitmap header'. This
+patch leaves only one name - 'bitmap directory entry'. The name 'bitmap
+header' creates misunderstandings with 'qcow2 header' and 'qcow2 bitmap
+header extension' (which is extension of qcow2 header)
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- tests/test-hbitmap.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ docs/specs/qcow2.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index 23773d2051..1acb353889 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -909,6 +909,22 @@ static void hbitmap_test_add(const char *testpath,
-                hbitmap_test_teardown);
- }
+diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
+index dda53dd2a3..8874e8c774 100644
+--- a/docs/specs/qcow2.txt
++++ b/docs/specs/qcow2.txt
+@@ -201,7 +201,7 @@ The fields of the bitmaps extension are:
  
-+static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
-+                                        const void *unused)
-+{
-+    HBitmapIter hbi;
-+
-+    hbitmap_test_init(data, L1 * 2, 0);
-+    hbitmap_set(data->hb, 0, data->size);
-+
-+    hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
-+
-+    hbitmap_iter_next(&hbi);
-+
-+    hbitmap_reset_all(data->hb);
-+    hbitmap_iter_next(&hbi);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -966,6 +982,9 @@ int main(int argc, char **argv)
-                      test_hbitmap_serialize_part);
-     hbitmap_test_add("/hbitmap/serialize/zeroes",
-                      test_hbitmap_serialize_zeroes);
-+
-+    hbitmap_test_add("/hbitmap/iter/iter_and_reset",
-+                     test_hbitmap_iter_and_reset);
-     g_test_run();
+           8 - 15:  bitmap_directory_size
+                    Size of the bitmap directory in bytes. It is the cumulative
+-                   size of all (nb_bitmaps) bitmap headers.
++                   size of all (nb_bitmaps) bitmap directory entries.
  
-     return 0;
+          16 - 23:  bitmap_directory_offset
+                    Offset into the image file at which the bitmap directory
+@@ -426,8 +426,7 @@ Each bitmap saved in the image is described in a bitmap directory entry. The
+ bitmap directory is a contiguous area in the image file, whose starting offset
+ and length are given by the header extension fields bitmap_directory_offset and
+ bitmap_directory_size. The entries of the bitmap directory have variable
+-length, depending on the lengths of the bitmap name and extra data. These
+-entries are also called bitmap headers.
++length, depending on the lengths of the bitmap name and extra data.
+ 
+ Structure of a bitmap directory entry:
+ 
 -- 
 2.11.0
