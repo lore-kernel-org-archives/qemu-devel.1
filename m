@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cZlf8-00088q-5M
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:44:59 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cZlr4-0003Vl-Gw
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:57:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cZlf6-00009K-Vk
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:44:58 -0500
-References: <20170203120254.15062-1-berrange@redhat.com>
-	<20170203120254.15062-4-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <5c7df424-d78e-650f-3045-c87fd645b611@redhat.com>
-Date: Fri, 3 Feb 2017 22:44:46 +0100
+	(envelope-from <laurent@vivier.eu>) id 1cZlr1-000566-4b
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:57:18 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:53916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cZlr0-00055I-Q9
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 16:57:15 -0500
+References: <20170125001041.14029-1-bobby.prani@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <24151c6e-2c30-ae82-9b91-aa1c6cad6e81@vivier.eu>
+Date: Fri, 3 Feb 2017 22:56:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170203120254.15062-4-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nBrdV0Atkxr4APOQrQg43phtDtQv6Fk0o"
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] qemu-img: add support for
- conv=nocreat, notrunc args to dd command
+In-Reply-To: <20170125001041.14029-1-bobby.prani@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH] linux-user: Add signal handling for
+ x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,213 +27,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Pranith Kumar <bobby.prani@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Allan Wirth <awirth@akamai.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nBrdV0Atkxr4APOQrQg43phtDtQv6Fk0o
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
-Message-ID: <5c7df424-d78e-650f-3045-c87fd645b611@redhat.com>
-Subject: Re: [PATCH v2 3/6] qemu-img: add support for conv=nocreat,notrunc
- args to dd command
-References: <20170203120254.15062-1-berrange@redhat.com>
- <20170203120254.15062-4-berrange@redhat.com>
-In-Reply-To: <20170203120254.15062-4-berrange@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
-
-On 03.02.2017 13:02, Daniel P. Berrange wrote:
-> The -n arg to the convert command allows use of a pre-existing image,
-> rather than creating a new image. This adds equivalent functionality
-> to the dd command using the 'conv' arg. If 'conv=3Dnocreat' is used,
-> then it will assume the image already exists. The existing image
-> will be truncated to match the required output size. 'conv=3Dnotrunc'
-> cna be used to preserve the existing image size.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Le 25/01/2017 à 01:10, Pranith Kumar a écrit :
+> Adopted from a previous patch posting:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg02079.html
+> 
+> CC: Allan Wirth <awirth@akamai.com>
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
 > ---
->  qemu-img-cmds.hx |   4 +-
->  qemu-img.c       | 137 +++++++++++++++++++++++++++++++++++++++++------=
---------
->  qemu-img.texi    |  10 +++-
->  3 files changed, 115 insertions(+), 36 deletions(-)
-
-Quite frankly I don't like this patch very much. It's not bad in itself,
-but I don't like the idea of giving qemu-img dd new features until it's
-an interface for qemu-img convert. Everything that we add now encourages
-new users to use it and will make the conversion a bit more difficult.
-
-As long as qemu-img convert gets a --target-image-opts, I don't think we
-need all of this functionality in qemu-img dd.
-
-Anyway, I won't block/NACK this patch, so resuming review.
-
-> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-> index f054599..b2c5424 100644
-> --- a/qemu-img-cmds.hx
-> +++ b/qemu-img-cmds.hx
-> @@ -46,9 +46,9 @@ STEXI
->  ETEXI
-> =20
->  DEF("dd", img_dd,
-> -    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=3Dblock_size] [cou=
-nt=3Dblocks] [skip=3Dblocks] if=3Dinput of=3Doutput")
-> +    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=3Dblock_size] [cou=
-nt=3Dblocks] [skip=3Dblocks] [conv=3Dnocreat,notrunc] if=3Dinput of=3Dout=
-put")
->  STEXI
-> -@item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=3D@va=
-r{block_size}] [count=3D@var{blocks}] [skip=3D@var{blocks}] if=3D@var{inp=
-ut} of=3D@var{output}
-> +@item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=3D@va=
-r{block_size}] [count=3D@var{blocks}] [skip=3D@var{blocks}] [conv=3Dnocre=
-at,notrunc] if=3D@var{input} of=3D@var{output}
-
-I'd just write something like conv=3D@var{convs} or I don't know. There
-are other conversion specifiers (or however it's called) that we may
-want to support in the future, e.g. sparse or noerror.
-
->  ETEXI
-> =20
->  DEF("info", img_info,
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 629f9e9..c9ab9e5 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-
-
-[...]
-
-> @@ -3906,6 +3910,31 @@ static int img_dd_skip(const char *arg,
+>  linux-user/signal.c      | 264 ++++++++++++++++++++++++++++++++++++++++-------
+>  target/i386/cpu.h        |   2 +
+>  target/i386/fpu_helper.c |  12 +++
+>  3 files changed, 242 insertions(+), 36 deletions(-)
+> 
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 0a5bb4e26b..0248621d66 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -253,8 +253,7 @@ int do_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 >      return 0;
 >  }
-> =20
-> +static int img_dd_conv(const char *arg,
-> +                       struct DdIo *in, struct DdIo *out,
-> +                       struct DdInfo *dd)
-> +{
-> +    char **flags, **tmp;
-> +
-> +    tmp =3D flags =3D g_strsplit(arg, ",", 0);
+>  
+> -#if !defined(TARGET_OPENRISC) && !defined(TARGET_UNICORE32) && \
+> -    !defined(TARGET_X86_64)
+> +#if !defined(TARGET_OPENRISC) && !defined(TARGET_UNICORE32)
+>  /* Just set the guest's signal mask to the specified value; the
+>   * caller is assumed to have called block_signals() already.
+>   */
+> @@ -512,7 +511,7 @@ void signal_init(void)
+>      }
+>  }
+>  
+> -#if !(defined(TARGET_X86_64) || defined(TARGET_UNICORE32))
+> +#ifndef TARGET_UNICORE32
+>  /* Force a synchronously taken signal. The kernel force_sig() function
+>   * also forces the signal to "not blocked, not ignored", but for QEMU
+>   * that work is done in process_pending_signals().
+> @@ -819,9 +818,8 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+>      return ret;
+>  }
+>  
+> -#if defined(TARGET_I386) && TARGET_ABI_BITS == 32
+> -
+> -/* from the Linux kernel */
+> +#if defined(TARGET_I386)
+> +/* from the Linux kernel - /arch/x86/include/uapi/asm/sigcontext.h */
+>  
+>  struct target_fpreg {
+>      uint16_t significand[4];
+> @@ -835,7 +833,7 @@ struct target_fpxreg {
+>  };
+>  
+>  struct target_xmmreg {
+> -    abi_ulong element[4];
+> +    uint32_t element[4];
+>  };
+>  
+>  struct target_fpstate {
+> @@ -860,33 +858,117 @@ struct target_fpstate {
+>      abi_ulong padding[56];
+>  };
 
-"flag_pointer", "cur_flag_pointer" or "flat_iterator" instead of "tmp"
-might be more suitable names.
-
+I think you should remove the definition of the target_fpstate structure
+as you overwrite it with #define below:
+...
 > +
-> +    while (tmp && *tmp) {
-> +        if (g_str_equal(*tmp, "noconv")) {
-> +            dd->flags |=3D C_NOCREAT;
-> +        } else if (g_str_equal(*tmp, "notrunc")) {
-> +            dd->flags |=3D C_NOTRUNC;
-> +        } else {
-> +            error_report("invalid conv argument: '%s'", *tmp);
-> +            g_strfreev(flags);
-> +            return 1;
-> +        }
-> +        tmp++;
+> +#ifndef TARGET_X86_64
+> +# define target_fpstate target_fpstate_32
+> +#else
+> +# define target_fpstate target_fpstate_64
+> +#endif
+> +
+...
+> @@ -959,12 +1052,49 @@ static void setup_sigcontext(struct target_sigcontext *sc,
+>      /* non-iBCS2 extensions.. */
+>      __put_user(mask, &sc->oldmask);
+>      __put_user(env->cr[2], &sc->cr2);
+> +#else
+> +    __put_user(env->regs[8], &sc->r8);
+> +    __put_user(env->regs[9], &sc->r9);
+> +    __put_user(env->regs[10], &sc->r10);
+> +    __put_user(env->regs[11], &sc->r11);
+> +    __put_user(env->regs[12], &sc->r12);
+> +    __put_user(env->regs[13], &sc->r13);
+> +    __put_user(env->regs[14], &sc->r14);
+> +    __put_user(env->regs[15], &sc->r15);
+> +
+> +    __put_user(env->regs[R_EDI], &sc->rdi);
+> +    __put_user(env->regs[R_ESI], &sc->rsi);
+> +    __put_user(env->regs[R_EBP], &sc->rbp);
+> +    __put_user(env->regs[R_EBX], &sc->rbx);
+> +    __put_user(env->regs[R_EDX], &sc->rdx);
+> +    __put_user(env->regs[R_EAX], &sc->rax);
+> +    __put_user(env->regs[R_ECX], &sc->rcx);
+> +    __put_user(env->regs[R_ESP], &sc->rsp);
+> +    __put_user(env->eip, &sc->rip);
+> +
+> +    __put_user(env->eflags, &sc->eflags);
+> +
+> +    __put_user(env->segs[R_CS].selector, &sc->cs);
+> +    __put_user((uint16_t)0, &sc->gs);
+> +    __put_user((uint16_t)0, &sc->fs);
+> +    __put_user(env->segs[R_SS].selector, &sc->ss);
+> +
+> +    __put_user(env->error_code, &sc->err);
+> +    __put_user(cs->exception_index, &sc->trapno);
+> +    __put_user(mask, &sc->oldmask);
+> +    __put_user(env->cr[2], &sc->cr2);
+> +
+> +    /* fpstate_addr must be 16 byte aligned for fxsave */
+> +    assert(!(fpstate_addr & 0xf));
+> +
+> +    cpu_x86_fxsave(env, fpstate_addr);
+> +    __put_user(fpstate_addr, &sc->fpstate);
+> +#endif
+
+This part would be more readable if the registers were in the same order
+as  in the kernel function setup_sigcontext().
+...
+> +    if (info) {
+> +        tswap_siginfo(&frame->info, info);
 > +    }
-> +
-> +    g_strfreev(flags);
-> +    return 0;
-> +}
-> +
->  static int img_dd(int argc, char **argv)
->  {
->      int ret =3D 0;
 
-[...]
+kernel checks "ksig->ka.sa.sa_flags & SA_SIGINFO" to know if there is
+siginfo structure.
 
-> @@ -3954,7 +3984,7 @@ static int img_dd(int argc, char **argv)
->          { 0, 0, 0, 0 }
->      };
-> =20
-> -    while ((c =3D getopt_long(argc, argv, "hf:O:", long_options, NULL)=
-)) {
-> +    while ((c =3D getopt_long(argc, argv, "hnf:O:", long_options, NULL=
-))) {
+...
+>      /* Set up registers for signal handler */
+>      env->regs[R_ESP] = frame_addr;
+> +    env->regs[R_EAX] = 0;
+> +    env->regs[R_EDI] = sig;
+> +    env->regs[R_ESI] = (unsigned long)&frame->info;
+> +    env->regs[R_EDX] = (unsigned long)&frame->uc;
+>      env->eip = ka->_sa_handler;
 
-Looks like a relic from v1.
+In kernel, 32bit handler seems to not use the same registers as 64bit
+handler, for instance ax is sig, info is dx and uc is cx.
 
->          if (c =3D=3D EOF) {
->              break;
->          }
+...
+> @@ -6181,11 +6371,13 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
+>          || defined(TARGET_PPC64) || defined(TARGET_HPPA)
+>          /* These targets do not have traditional signals.  */
+>          setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
+> -#else
+> +#elif !defined(TARGET_X86_64)
+>          if (sa->sa_flags & TARGET_SA_SIGINFO)
+>              setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
+>          else
+>              setup_frame(sig, sa, &target_old_set, cpu_env);
+> +#else
+> +        setup_rt_frame(sig, sa, 0, &target_old_set, cpu_env);
 
-[...]
+Why do we use "0" instead of "&k->info"?
 
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index 174aae3..9f10562 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -326,7 +326,7 @@ skipped. This is useful for formats such as @code{r=
-bd} if the target
->  volume has already been created with site specific options that cannot=
-
->  be supplied through qemu-img.
-> =20
-> -@item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=3D@var{block_size}] =
-[count=3D@var{blocks}] [skip=3D@var{blocks}] if=3D@var{input} of=3D@var{o=
-utput}
-> +@item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=3D@var{block_size}] =
-[count=3D@var{blocks}] [skip=3D@var{blocks}] [conv=3Dnocreat,notrunc] if=3D=
-@var{input} of=3D@var{output}
-> =20
->  Dd copies from @var{input} file to @var{output} file converting it fro=
-m
->  @var{fmt} format to @var{output_fmt} format.
-> @@ -337,6 +337,14 @@ dd will stop reading input after reading @var{bloc=
-ks} input blocks.
-> =20
->  The size syntax is similar to dd(1)'s size syntax.
-> =20
-> +If the @code{conv=3Dnocreat} option is specified, the target volume cr=
-eation
-> +will be skipped. Its length will be truncated to match data length, if=
- it
-> +is longer than the required data size. If the @code{conv=3Dnotrunc} op=
-tion
-> +is specified, no file size shrinking will be done. If the existing out=
-put
-> +file is too small it will be enlarged to fit. These options are useful=
- for
-> +formats such as @code{rbd} if the target volume has already been creat=
-ed
-> +with site specific options that cannot be supplied through qemu-img.
-> +
-
-Good enough for now, but a list/table would probably be more extensible
-in the future.
-
-So all in all a patch that does well what it's supposed to do -- I just
-don't quite agree on whether that goal is right.
-
-Max
-
->  @item info [-f @var{fmt}] [--output=3D@var{ofmt}] [--backing-chain] @v=
-ar{filename}
-> =20
->  Give information about the disk image @var{filename}. Use it in
->=20
-
-
-
---nBrdV0Atkxr4APOQrQg43phtDtQv6Fk0o
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliU+c4SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AyM0H/3GurGcm2e+LaLmkIpTFCrHgvhmPPvQ6
-lXTEnvwwFW3TIUXrHmYbhOMaN5+Ap3BrJj6lUWV/0Tfo6CHmmZQ10jytt0BCSI5M
-LylorD2fX3vZ4B8+bmuqp2/uNvXeayYroq/IWdV1a45PvAkxnAkfnUEJiOgaOgpG
-1/VSyn3U7hS1N3hs8ipfEQaYojPSAVxeS8j2Tm8K0P7PJKR03wrdBbvAICKb++Tg
-/pypqwCadbkMWrImYRDodGZ904M4dl5MI0WXn2uAFjrrJsR/In2zu97nk4uktOW5
-c+HdZkN06Gv8nMF7L9sxHvwQ9fNciaKBZhODqonTqMgNtDEL42B13dM=
-=fvov
------END PGP SIGNATURE-----
-
---nBrdV0Atkxr4APOQrQg43phtDtQv6Fk0o--
+Laurent
