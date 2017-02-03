@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cZfw1-0008JS-Dz
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:38:05 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cZfwA-0008Of-MG
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:38:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cZfvy-0002e2-6F
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:38:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36918)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cZfvx-0002cw-Vx
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:37:58 -0500
-Date: Fri, 3 Feb 2017 17:37:50 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170203173607-mutt-send-email-mst@kernel.org>
-References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
-	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
-	<20170203103316.GA29200@stefanha-x1.localdomain>
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cZfw7-0002hZ-K0
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:38:10 -0500
+Received: from mail-db5eur01on0091.outbound.protection.outlook.com
+	([104.47.2.91]:60083
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
+	id 1cZfw7-0002hF-7z
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:38:07 -0500
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Fri, 3 Feb 2017 18:23:19 +0300
+Message-ID: <20170203152321.19739-2-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170203152321.19739-1-pbutsykin@virtuozzo.com>
+References: <20170203152321.19739-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170203103316.GA29200@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v16 1/2] virtio-crypto: Add virtio crypto
- device specification
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 1/3] migration: add MigrationState arg for
+ ram_save_/compressed_/page()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, weidong.huang@huawei.com, john.griffin@intel.com, jianjay.zhou@huawei.com, Varun.Sethi@freescale.com, denglingli@chinamobile.com, arei.gonglei@hotmail.com, agraf@suse.de, nmorey@kalray.eu, longpeng2@huawei.com, vincent.jardin@6wind.com, Ola.Liljedahl@arm.com, luonengjun@huawei.com, xin.zeng@intel.com, liang.j.ma@intel.com, stefanha@redhat.com, cornelia.huck@de.ibm.com, Jani.Kokkonen@huawei.com, pasic@linux.vnet.ibm.com, brian.a.keating@intel.com, claudio.fontana@huawei.com, mike.caraman@nxp.com, wu.wubin@huawei.com
+To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, amit.shah@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-On Fri, Feb 03, 2017 at 10:33:16AM +0000, Stefan Hajnoczi wrote:
-> > +\begin{description}
-> > +\item[0] dataq1
-> > +\item[\ldots]
-> > +\item[N-1] dataqN
-> > +\item[N] controlq
-> > +\end{description}
-> > +
-> > +N is set by \field{max_dataqueues}.
-> > +
-> > +\subsection{Feature bits}\label{sec:Device Types / Crypto Device / Feature bits}
-> > +
-> > +VIRTIO_CRYPTO_F_NON_SESSION_MODE (0) non-session mode is available.
-> > +VIRTIO_CRYPTO_F_CIPHER_NON_SESSION_MODE (1) non-session mode is available for CIPHER service.
-> > +VIRTIO_CRYPTO_F_HASH_NON_SESSION_MODE (2) non-session mode is available for HASH service.
-> > +VIRTIO_CRYPTO_F_MAC_NON_SESSION_MODE (3) non-session mode is available for MAC service.
-> > +VIRTIO_CRYPTO_F_AEAD_NON_SESSION_MODE (4) non-session mode is available for AEAD service.
-> 
-> Bits 1-4 require bit 0.  Is bit 0 necessary at all?  Or may bits 1-4 can
-> be eliminated in favor of just bit 0.
+Cosmetic patch. The use of ms variable instead of migrate_get_current()
+looks nicer, especially when there reuse.
 
-Too late to change it as QEMU released a device with that feature.
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+---
+ migration/ram.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
+diff --git a/migration/ram.c b/migration/ram.c
+index a683f4bb9e..d866b6518b 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -734,13 +734,14 @@ static int save_zero_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset,
+  *          >=0 - Number of pages written - this might legally be 0
+  *                if xbzrle noticed the page was the same.
+  *
++ * @ms: The current migration state.
+  * @f: QEMUFile where to send the data
+  * @block: block that contains the page we want to send
+  * @offset: offset inside the block for the page
+  * @last_stage: if we are at the completion stage
+  * @bytes_transferred: increase it with the number of transferred bytes
+  */
+-static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
++static int ram_save_page(MigrationState *ms, QEMUFile *f, PageSearchStatus *pss,
+                          bool last_stage, uint64_t *bytes_transferred)
+ {
+     int pages = -1;
+@@ -786,8 +787,7 @@ static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
+              */
+             xbzrle_cache_zero_page(current_addr);
+         } else if (!ram_bulk_stage &&
+-                   !migration_in_postcopy(migrate_get_current()) &&
+-                   migrate_use_xbzrle()) {
++                   !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
+             pages = save_xbzrle_page(f, &p, current_addr, block,
+                                      offset, last_stage, bytes_transferred);
+             if (!last_stage) {
+@@ -914,14 +914,15 @@ static int compress_page_with_multi_thread(QEMUFile *f, RAMBlock *block,
+  *
+  * Returns: Number of pages written.
+  *
++ * @ms: The current migration state.
+  * @f: QEMUFile where to send the data
+  * @block: block that contains the page we want to send
+  * @offset: offset inside the block for the page
+  * @last_stage: if we are at the completion stage
+  * @bytes_transferred: increase it with the number of transferred bytes
+  */
+-static int ram_save_compressed_page(QEMUFile *f, PageSearchStatus *pss,
+-                                    bool last_stage,
++static int ram_save_compressed_page(MigrationState *ms, QEMUFile *f,
++                                    PageSearchStatus *pss, bool last_stage,
+                                     uint64_t *bytes_transferred)
+ {
+     int pages = -1;
+@@ -1252,11 +1253,11 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
+     if (migration_bitmap_clear_dirty(dirty_ram_abs)) {
+         unsigned long *unsentmap;
+         if (compression_switch && migrate_use_compression()) {
+-            res = ram_save_compressed_page(f, pss,
++            res = ram_save_compressed_page(ms, f, pss,
+                                            last_stage,
+                                            bytes_transferred);
+         } else {
+-            res = ram_save_page(f, pss, last_stage,
++            res = ram_save_page(ms, f, pss, last_stage,
+                                 bytes_transferred);
+         }
+ 
 -- 
-MST
+2.11.0
