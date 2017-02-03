@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cZmIY-0001gN-4p
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:25:43 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cZmP2-0003QA-KJ
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:32:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cZmIU-00089O-Lz
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:25:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43513)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cZmIU-00088o-DS
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:25:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cZmIS-0004yA-4q
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 22:25:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1F6262E80C8
-	for <qemu-devel@nongnu.org>; Fri,  3 Feb 2017 22:25:36 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1cZmP1-0001yU-Cr
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:32:24 -0500
+References: <20170203120254.15062-1-berrange@redhat.com>
+	<20170203120254.15062-6-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <30f30db6-2bf4-44c6-5267-cd98e8d99bca@redhat.com>
+Date: Fri, 3 Feb 2017 23:32:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Feb 2017 22:20:29 -0000
-From: Jean-Paul Larocque <1661758@bugs.launchpad.net>
-Reply-To: Bug 1661758 <1661758@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170203222029.20222.70658.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1661758] [NEW] qemu-nbd causes data corruption in
- VDI-format disk images
+In-Reply-To: <20170203120254.15062-6-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hxUWmS1OOCvCxbGMEPMuOH3h6oaqDbKRn"
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] qemu-img: introduce
+ --target-image-opts for 'convert' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,300 +25,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
 
-Public bug reported:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hxUWmS1OOCvCxbGMEPMuOH3h6oaqDbKRn
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
+Message-ID: <30f30db6-2bf4-44c6-5267-cd98e8d99bca@redhat.com>
+Subject: Re: [PATCH v2 5/6] qemu-img: introduce --target-image-opts for
+ 'convert' command
+References: <20170203120254.15062-1-berrange@redhat.com>
+ <20170203120254.15062-6-berrange@redhat.com>
+In-Reply-To: <20170203120254.15062-6-berrange@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On 03.02.2017 13:02, Daniel P. Berrange wrote:
+> The '--image-opts' flags indicates whether the source filename
+> includes options. The target filename has to remain in the
+> plain filename format though, since it needs to be passed to
+> bdrv_create().  When using --skip-create though, it would be
+> possible to use image-opts syntax. This adds --target-image-opts
+> to indicate that the target filename includes options. Currently
+> this mandates use of the --skip-create flag too.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  qemu-img-cmds.hx |   6 +--
+>  qemu-img.c       | 131 ++++++++++++++++++++++++++++++++++++-----------=
+--------
+>  qemu-img.texi    |  12 ++++-
+>  3 files changed, 98 insertions(+), 51 deletions(-)
 
-This is a duplicate of #1422307.  I can't figure out a way to re-open
-it--the status of "Fix Released" is changeable only by a project
-maintainer or bug supervisor--so I'm opening a new bug to make sure
-this gets looked at again.
+Apart from what the commit message says, it also introduces that switch
+for dd, which I again don't like too much (quelle surprise), if only
+because it requires conv=3Dnocreat and thus patch 5 to be useful.
 
-qemu-nbd will sometimes corrupt VDI disk images.  The bug was thought
-to be fixed in commit f0ab6f109630940146cbaf47d0cd99993ddba824, but
-I'm able to reproduce it in both that commit and in the latest commit
-(a951316b8a5c3c63254f20a826afeed940dd4cba).  I just needed to run more
-iterations of the test.  It's possible that it was partially fixed, or
-that the added serialization made it harder to catch this
-non-deterministic bug, but the same symptoms persist: data corruption
-of VDI-format disk images.
+[...]
 
-This affects at least qemu-nbd.  I haven't tried reproducing the issue
-with qemu proper or qemu-img, but the original bug report suggests
-that the bug in the common VDI backend may corrupt data written by
-those programs.
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 39fcf09..dc4c6eb 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
 
-Please let me know if I can provide any further information or help
-with testing.  Thank you very much for looking into this!
+[...]
 
-Test procedure
-**************
+> @@ -1918,7 +1933,7 @@ static int img_convert(int argc, char **argv)
+>      bs_n =3D argc - optind - 1;
+>      out_filename =3D bs_n >=3D 1 ? argv[argc - 1] : NULL;
+> =20
+> -    if (options && has_help_option(options)) {
+> +    if (out_fmt && options && has_help_option(options)) {
 
-The procedure used is the one given by Max Reitz (xanclic) in the
-original bug report, comment 3
-(https://bugs.launchpad.net/qemu/+bug/1422307/comments/3), in the
-section "VDI and NBD over /dev/nbd0", but with up to 1000 iterations
-instead of 10:
+"!out_fmt && options && has_help_option(options)" should probably be an
+error.
 
-  $ cd ~/qemu-origfix-f0ab6f1/bin
-  $ dd if=3D/dev/urandom of=3Dblob.raw bs=3D1M count=3D64
-  64+0 records in
-  64+0 records out
-  67108864 bytes (67 MB) copied, 4.36475 s, 15.4 MB/s
-  $ sudo sh -c 'for i in $(seq 0 999); do ./qemu-img create -f vdi test.vdi=
- 64M > /dev/null; ./qemu-nbd -c /dev/nbd0 test.vdi; sleep 1; ./qemu-img con=
-vert -n blob.raw /dev/nbd0; ./qemu-img convert /dev/nbd0 test1.raw; sync; e=
-cho 1 > /proc/sys/vm/drop_caches; ./qemu-img convert /dev/nbd0 test2.raw; .=
-/qemu-nbd -d /dev/nbd0 > /dev/null; if ! ./qemu-img compare -q test1.raw te=
-st2.raw; then md5sum test1.raw test2.raw; echo "$i failed"; break; fi; done=
-; echo "done"'
-27a66c3a8ac2cf06f2c925968ea9e964  test1.raw
-2da9bf169041a7c2bd144c4ab3a29aea  test2.raw
-64 failed
-done
+>          ret =3D print_block_option_help(out_filename, out_fmt);
+>          goto out;
+>      }
+> @@ -1987,22 +2002,22 @@ static int img_convert(int argc, char **argv)
+>          goto out;
+>      }
+> =20
+> -    /* Find driver and parse its options */
+> -    drv =3D bdrv_find_format(out_fmt);
+> -    if (!drv) {
+> -        error_report("Unknown file format '%s'", out_fmt);
+> -        ret =3D -1;
+> -        goto out;
+> -    }
+> +    if (!skip_create) {
+> +        /* Find driver and parse its options */
+> +        drv =3D bdrv_find_format(out_fmt);
+> +        if (!drv) {
+> +            error_report("Unknown file format '%s'", out_fmt);
+> +            ret =3D -1;
+> +            goto out;
+> +        }
+> =20
+> -    proto_drv =3D bdrv_find_protocol(out_filename, true, &local_err);
+> -    if (!proto_drv) {
+> -        error_report_err(local_err);
+> -        ret =3D -1;
+> -        goto out;
+> -    }
+> +        proto_drv =3D bdrv_find_protocol(out_filename, true, &local_er=
+r);
+> +        if (!proto_drv) {
+> +            error_report_err(local_err);
+> +            ret =3D -1;
+> +            goto out;
+> +        }
+> =20
+> -    if (!skip_create) {
+>          if (!drv->create_opts) {
+>              error_report("Format driver '%s' does not support image cr=
+eation",
+>                           drv->format_name);
 
-I've run this process a handful of times, and I've seen it take as
-little as 10 iterations and as many as 161 (taking 32 minutes in the
-latter case).  Please be patient.  Putting the images on tmpfs will
-probably help it go faster, and I have successfully reproduced the
-issue on tmpfs in addition to ext4.
+Compression may be used with -n. This involves the check whether
+drv->bdrv_co_pwritev_compressed is NULL or not -- which is bad if drv is
+still NULL:
 
-Nothing different was needed to reproduce the issue in a directory
-containing a build of the latest commit.  It still takes somewhere
-around 1-200 iterations to find, in my testing.
+$ ./qemu-img create -f qcow2 foo.qcow2 64M
+Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D67108864 encryption=3Doff
+cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+$ ./qemu-img convert -c -O qcow2 -n null-co:// foo.qcow2
+[1]    17179 segmentation fault (core dumped)  ./qemu-img convert -c -O
+qcow2 -n null-co:// foo.qcow
 
-Build procedure
-***************
+Therefore, you should probably only do the check whether compression is
+supported if drv is non-NULL; and if it is NULL, do the check again
+after the target image has been opened and its driver is known.
 
-  $ git clone git://git.qemu-project.org/qemu.git
-  [omitted]
-  $ git clone qemu qemu-origfix-f0ab6f1
-  Cloning into 'qemu-origfix-f0ab6f1'...
-  done.
-  $ cd qemu-origfix-f0ab6f1
-  $ git checkout f0ab6f109630940146cbaf47d0cd99993ddba824
-  Note: checking out 'f0ab6f109630940146cbaf47d0cd99993ddba824'.
-  =
+[...]
 
-  You are in 'detached HEAD' state. You can look around, make experimental
-  changes and commit them, and you can discard any commits you make in this
-  state without impacting any branches by performing another checkout.
-  =
+> @@ -4064,13 +4090,22 @@ static int img_dd(int argc, char **argv)
+>          arg =3D NULL;
+>      }
+> =20
+> +    if (tgt_image_opts && !(dd.flags & C_NOCREAT)) {
+> +        error_report("--target-image-opts requires use of -n flag");
 
-  If you want to create a new branch to retain commits you create, you may
-  do so (now or later) by using -b with the checkout command again. Example:
-  =
+*conv=3Dnocreat
 
-    git checkout -b new_branch_name
-  =
+> +        goto out;
+> +    }
+> +
+> +    if (!out_fmt && !tgt_image_opts) {
+> +        out_fmt =3D "raw";
+> +    }
+> +
+>      if (!(dd.flags & C_IF && dd.flags & C_OF)) {
+>          error_report("Must specify both input and output files");
+>          ret =3D -1;
+>          goto out;
+>      }
+> =20
+> -    if (optionstr && has_help_option(optionstr)) {
+> +    if (out_fmt && optionstr && has_help_option(optionstr)) {
 
-  HEAD is now at f0ab6f1... block/vdi: Add locking for parallel requests
-  $ mkdir bin
-  $ cd bin
-  $ script -c'time (../configure --enable-debug --target-list=3Dx86_64-soft=
-mmu && make -j6; echo "result: $?")'
-  Script started, file is typescript
-  [omitted; the build typescript is attached separately]
-    LINK  x86_64-softmmu/qemu-system-x86_64
-  result: 0
-  =
+Same as in img_convert().
 
-  real    1m5.733s
-  user    2m3.904s
-  sys     0m13.828s
-  Script done, file is typescript
+>          ret =3D print_block_option_help(out.filename, out_fmt);
+>          goto out;
+>      }
 
-Nothing different was done when building the latest commit (besides
-cloning to a different directory, and not running `git checkout`).
+[...]
 
-Environment
-***********
+> @@ -4152,7 +4187,6 @@ static int img_dd(int argc, char **argv)
+> =20
+>      if (!(dd.flags & C_NOCREAT)) {
+>          qemu_opt_set_number(opts, BLOCK_OPT_SIZE, out_size, &error_abo=
+rt);
+> -
+>          ret =3D bdrv_create(drv, out.filename, opts, &local_err);
+>          if (ret < 0) {
+>              error_reportf_err(local_err,
 
-  * Machine: x86_64
-  =
+I'm not sure whether this hunk is necessary...
 
-  * Hypervisor: Xen 4.4 (Debian package xen-hypervisor-4.4-amd64,
-    version 4.4.1-9+deb8u8)
-  =
+[...]
 
-  * A Xen domU (guest) for building QEMU and reproducing the issue.
-    All testing was done within the virtual machine for convenience
-    and access to better hardware than what I have for my development
-    machine (I expected the build to take much longer than it really
-    does).
-  =
+> diff --git a/qemu-img.texi b/qemu-img.texi
+> index 01acfb8..bda3cc3 100644
+> --- a/qemu-img.texi
+> +++ b/qemu-img.texi
+> @@ -45,9 +45,17 @@ keys.
+> =20
+>  @item --image-opts
+> =20
+> -Indicates that the @var{filename} parameter is to be interpreted as a
+> +Indicates that the source @var{filename} parameter is to be interprete=
+d as a
+>  full option string, not a plain filename. This parameter is mutually
+> -exclusive with the @var{-f} and @var{-F} parameters.
+> +exclusive with the @var{-f} parameter.
 
-      - x86_64 architecture with six VCPUs and 1.2 GiB RAM allocated,
-        operating in HVM (fully virtualized) mode.
-      =
+-F is correct, that's the one for qemu-img compare, after all (which
+takes two source filenames).
 
-      - Distribution: Debian 8.7 Jessie amd64
-      =
+> +
+> +@item --target-image-opts
+> +
+> +Indicates that the target @var{filename} parameter(s) are to be interp=
+reted a
+> +a full option string, not a plain filename. This parameter is mutually=
 
-      - Kernel: Linux 3.16.0 x86_64 (Debian package
-        linux-image-3.16.0-4-amd64, version 3.16.39-1)
-      =
+> +exclusive with the @var{-F} or @var{-O} parameters. It is currently re=
+quired
 
-      - Compiler: GCC 4.9.2 (Debian package gcc-4.9, version 4.9.2-10)
+-F is unrelated to a target ("output") file.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Max
 
-** Attachment added: "Output of configure script and make"
-   https://bugs.launchpad.net/bugs/1661758/+attachment/4812784/+files/build=
--typescript.txt
+> +to also use the @var{-n} parameter to skip image creation. This restri=
+ction
+> +will be relaxed in a future release.
+> =20
+>  @item fmt
+>  is the disk image format. It is guessed automatically in most cases. S=
+ee below
+>=20
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1661758
 
-Title:
-  qemu-nbd causes data corruption in VDI-format disk images
+--hxUWmS1OOCvCxbGMEPMuOH3h6oaqDbKRn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Status in QEMU:
-  New
+-----BEGIN PGP SIGNATURE-----
 
-Bug description:
-  Hi,
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliVBO0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AWAsH/jy+lx4E+OdyKJbG/ombHV9KuBHMYjUG
+JvvzGVbVDjzPKe2JxiBZQmeLOXqLOwNjO2auIK5uAuBdavDimuu+uIg2uRKps7Xe
+5y2d6vO9ReW804/GBOiq89odiRJUfoIWbhJkcmj5A9GbCQck2R2AJ8vl/lbbdaaE
+L6zVHnDK3BqHieg+89JR1vRuOPDn7ep+t58RgFyIHMzut8h9pTn5Bl3wlihEvhx5
+zSGtSulYlcgBBGGyz0CnUM99VFXgd91T1+OmkXrzAseJEzwNjEJC9mEy6ZaXrA6m
+hOXIkX9Kexit5zzsgzYnu4Dp70oqzOIn/YjG+GlgBN9Pmk8CisPFaEI=
+=uGt+
+-----END PGP SIGNATURE-----
 
-  This is a duplicate of #1422307.  I can't figure out a way to re-open
-  it--the status of "Fix Released" is changeable only by a project
-  maintainer or bug supervisor--so I'm opening a new bug to make sure
-  this gets looked at again.
-
-  qemu-nbd will sometimes corrupt VDI disk images.  The bug was thought
-  to be fixed in commit f0ab6f109630940146cbaf47d0cd99993ddba824, but
-  I'm able to reproduce it in both that commit and in the latest commit
-  (a951316b8a5c3c63254f20a826afeed940dd4cba).  I just needed to run more
-  iterations of the test.  It's possible that it was partially fixed, or
-  that the added serialization made it harder to catch this
-  non-deterministic bug, but the same symptoms persist: data corruption
-  of VDI-format disk images.
-
-  This affects at least qemu-nbd.  I haven't tried reproducing the issue
-  with qemu proper or qemu-img, but the original bug report suggests
-  that the bug in the common VDI backend may corrupt data written by
-  those programs.
-
-  Please let me know if I can provide any further information or help
-  with testing.  Thank you very much for looking into this!
-
-  Test procedure
-  **************
-
-  The procedure used is the one given by Max Reitz (xanclic) in the
-  original bug report, comment 3
-  (https://bugs.launchpad.net/qemu/+bug/1422307/comments/3), in the
-  section "VDI and NBD over /dev/nbd0", but with up to 1000 iterations
-  instead of 10:
-
-    $ cd ~/qemu-origfix-f0ab6f1/bin
-    $ dd if=3D/dev/urandom of=3Dblob.raw bs=3D1M count=3D64
-    64+0 records in
-    64+0 records out
-    67108864 bytes (67 MB) copied, 4.36475 s, 15.4 MB/s
-    $ sudo sh -c 'for i in $(seq 0 999); do ./qemu-img create -f vdi test.v=
-di 64M > /dev/null; ./qemu-nbd -c /dev/nbd0 test.vdi; sleep 1; ./qemu-img c=
-onvert -n blob.raw /dev/nbd0; ./qemu-img convert /dev/nbd0 test1.raw; sync;=
- echo 1 > /proc/sys/vm/drop_caches; ./qemu-img convert /dev/nbd0 test2.raw;=
- ./qemu-nbd -d /dev/nbd0 > /dev/null; if ! ./qemu-img compare -q test1.raw =
-test2.raw; then md5sum test1.raw test2.raw; echo "$i failed"; break; fi; do=
-ne; echo "done"'
-  27a66c3a8ac2cf06f2c925968ea9e964  test1.raw
-  2da9bf169041a7c2bd144c4ab3a29aea  test2.raw
-  64 failed
-  done
-
-  I've run this process a handful of times, and I've seen it take as
-  little as 10 iterations and as many as 161 (taking 32 minutes in the
-  latter case).  Please be patient.  Putting the images on tmpfs will
-  probably help it go faster, and I have successfully reproduced the
-  issue on tmpfs in addition to ext4.
-
-  Nothing different was needed to reproduce the issue in a directory
-  containing a build of the latest commit.  It still takes somewhere
-  around 1-200 iterations to find, in my testing.
-
-  Build procedure
-  ***************
-
-    $ git clone git://git.qemu-project.org/qemu.git
-    [omitted]
-    $ git clone qemu qemu-origfix-f0ab6f1
-    Cloning into 'qemu-origfix-f0ab6f1'...
-    done.
-    $ cd qemu-origfix-f0ab6f1
-    $ git checkout f0ab6f109630940146cbaf47d0cd99993ddba824
-    Note: checking out 'f0ab6f109630940146cbaf47d0cd99993ddba824'.
-    =
-
-    You are in 'detached HEAD' state. You can look around, make experimental
-    changes and commit them, and you can discard any commits you make in th=
-is
-    state without impacting any branches by performing another checkout.
-    =
-
-    If you want to create a new branch to retain commits you create, you may
-    do so (now or later) by using -b with the checkout command again. Examp=
-le:
-    =
-
-      git checkout -b new_branch_name
-    =
-
-    HEAD is now at f0ab6f1... block/vdi: Add locking for parallel requests
-    $ mkdir bin
-    $ cd bin
-    $ script -c'time (../configure --enable-debug --target-list=3Dx86_64-so=
-ftmmu && make -j6; echo "result: $?")'
-    Script started, file is typescript
-    [omitted; the build typescript is attached separately]
-      LINK  x86_64-softmmu/qemu-system-x86_64
-    result: 0
-    =
-
-    real    1m5.733s
-    user    2m3.904s
-    sys     0m13.828s
-    Script done, file is typescript
-
-  Nothing different was done when building the latest commit (besides
-  cloning to a different directory, and not running `git checkout`).
-
-  Environment
-  ***********
-
-    * Machine: x86_64
-    =
-
-    * Hypervisor: Xen 4.4 (Debian package xen-hypervisor-4.4-amd64,
-      version 4.4.1-9+deb8u8)
-    =
-
-    * A Xen domU (guest) for building QEMU and reproducing the issue.
-      All testing was done within the virtual machine for convenience
-      and access to better hardware than what I have for my development
-      machine (I expected the build to take much longer than it really
-      does).
-    =
-
-        - x86_64 architecture with six VCPUs and 1.2 GiB RAM allocated,
-          operating in HVM (fully virtualized) mode.
-        =
-
-        - Distribution: Debian 8.7 Jessie amd64
-        =
-
-        - Kernel: Linux 3.16.0 x86_64 (Debian package
-          linux-image-3.16.0-4-amd64, version 3.16.39-1)
-        =
-
-        - Compiler: GCC 4.9.2 (Debian package gcc-4.9, version 4.9.2-10)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1661758/+subscriptions
+--hxUWmS1OOCvCxbGMEPMuOH3h6oaqDbKRn--
