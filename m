@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZatz-0001J8-5j
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:15:36 -0500
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZbCA-00087F-9I
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:34:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZaty-0006ir-92
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:15:35 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:34861)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZaty-0006i6-2T
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:15:34 -0500
-Received: by mail-wm0-x229.google.com with SMTP id b65so21162153wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 02:15:33 -0800 (PST)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZbC7-0000PP-NP
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:34:22 -0500
+Received: from lhrrgout.huawei.com ([194.213.3.17]:5992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZbC7-0000O2-FZ
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:34:19 -0500
+References: <1486116298-25046-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1486116298-25046-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<w51r33fwpn7.fsf@maestria.local.igalia.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <2937f5b6-b907-0de6-00fb-ee5fae675ed0@huawei.com>
+Date: Fri, 3 Feb 2017 11:33:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170201150553.9381-17-alex.bennee@linaro.org>
-References: <20170201150553.9381-1-alex.bennee@linaro.org>
-	<20170201150553.9381-17-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 10:15:12 +0000
-Message-ID: <CAFEAcA8pNB3HAFAeh8vjbD7KMD6d4MtHTASsKYazRuq_oaQtnQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 16/25] cputlb and arm/sparc targets:
- convert mmuidx flushes from varg to bitmap
+In-Reply-To: <w51r33fwpn7.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2 v15] fsdev: add IO throttle support to
+ fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: MTTCG Devel <mttcg@listserver.greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>, Alvise Rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Mark Burton <mark.burton@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Fedorov Sergey <serge.fdrv@gmail.com>, Richard Henderson <rth@twiddle.net>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org
 
-On 1 February 2017 at 15:05, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> While the vargs approach was flexible the original MTTCG ended up
-> having munge the bits to a bitmap so the data could be used in
-> deferred work helpers. Instead of hiding that in cputlb we push the
-> change to the API to make it take a bitmap of MMU indexes instead.
+On 2/3/2017 11:10 AM, Alberto Garcia wrote:
+> On Fri 03 Feb 2017 11:04:57 AM CET, Pradeep Jagadeesh wrote:
+>> This patchset adds the io throttle support for the 9p-local driver.
+>> For now this functionality can be used only through qemu cli options.
+>> QMP interface and support to other 9p drivers need further extensions.
+>> To make it simple for other 9p drivers, the throttle code has been put in
+>> separate files.
+>>
+>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
 >
-> For ARM some the resulting flushes end up being quite long so to aid
-> readability I've tended to move the index shifting to a new line so
-> all the bits being or-ed together line up nicely, for example:
->
->     tlb_flush_page_by_mmuidx(other_cs, pageaddr,
->                              (1 << ARMMMUIdx_S1SE1) |
->                              (1 << ARMMMUIdx_S1SE0));
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> [AT: SPARC part only]
-> Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> I don't see any difference between this patch and the one in v14...
 
-ARM parts:
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+I moved the fsdev_throttle_cleanup() inside the unrealize() function
 
-thanks
--- PMM
+You want me to clean up even here ?
+
+out:
+        if (rc) {
+            /* ... */
+            fsdev_throttle_cleanup(s->ctx.fst);
+            /* ... */
+        }
+
+I thought one place is enough.
+
+Or I did not understand your comment :)
+
+-Pradeep
+>
+>> +
+>> +    s->ctx.fst = &fse->fst;
+>> +    fsdev_throttle_init(s->ctx.fst);
+>> +
+>>      v9fs_path_free(&path);
+>>
+>>      rc = 0;
+>> @@ -3528,6 +3532,7 @@ out:
+>>          if (s->ops && s->ops->cleanup && s->ctx.private) {
+>>              s->ops->cleanup(&s->ctx);
+>>          }
+>> +        fsdev_throttle_cleanup(s->ctx.fst);
+>>          g_free(s->tag);
+>>          g_free(s->ctx.fs_root);
+>>          v9fs_path_free(&path);
+>
+> Berto
+>
