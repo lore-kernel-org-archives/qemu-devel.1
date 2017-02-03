@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZduj-0002xW-JL
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:28:34 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cZdvx-0003eG-Ag
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:29:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZdui-0005Lg-R9
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:28:33 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36670)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZdui-0005L7-KK
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:28:32 -0500
-Received: by mail-wm0-x234.google.com with SMTP id c85so28971923wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 05:28:32 -0800 (PST)
+	(envelope-from <mjt@tls.msk.ru>) id 1cZdvu-0006FR-6f
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:29:49 -0500
+Received: from isrv.corpit.ru ([86.62.121.231]:51521)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mjt@tls.msk.ru>) id 1cZdvt-0006EB-VM
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 08:29:46 -0500
+References: <20170203120649.15637-1-berrange@redhat.com>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <e33cb32f-b767-3f40-6543-33a7af513514@msgid.tls.msk.ru>
+Date: Fri, 3 Feb 2017 16:29:43 +0300
 MIME-Version: 1.0
-In-Reply-To: <1485875745-27741-4-git-send-email-wei@redhat.com>
-References: <1485875745-27741-1-git-send-email-wei@redhat.com>
-	<1485875745-27741-4-git-send-email-wei@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 13:28:11 +0000
-Message-ID: <CAFEAcA-UpfQExDL3uk5SGh4KOwuFXrpkV6sBhbBqKAJHs+wnVg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH V2 3/5] target-arm: Add support for PMU
- register PMXEVCNTR_EL0
+In-Reply-To: <20170203120649.15637-1-berrange@redhat.com>
+Content-Type: text/plain; charset=windows-1251
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] Support multiple listening sockets
+ per VNC server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +27,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 31 January 2017 at 15:15, Wei Huang <wei@redhat.com> wrote:
-> To make PMU register support complete, this patch adds support for
-> PMXEVCNTR_EL0.
->
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> ---
->  target/arm/helper.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index c8620d9..6b8460a 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -1255,6 +1255,10 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
->      { .name = "PMXEVCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 2,
->        .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
->        .accessfn = pmreg_access },
-> +    { .name = "PMXEVCNTR_EL0", .state = ARM_CP_STATE_AA64,
-> +      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 13, .opc2 = 2,
-> +      .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
-> +      .accessfn = pmreg_access },
+03.02.2017 15:06, Daniel P. Berrange wrote:
 
-We don't need to do this, because we're already spec-compliant.
-Since we only support the cycle counter, accesses to PMXEVCNTR
-are always CONSTRAINED UNPREDICTABLE and "accesses UNDEF" is
-a permitted choice, which is what we do at the moment.
-('Accesses are RAZ/WI' are also a permitted choice.)
+>  - If a DNS name resolves to multiple distinct IP addresses,
+>    the VNC server is now able to listen on all of them
+> 
+>  - The -vnc argument syntax is extended to allow the 'vnc'
+>    and 'websocket' arguments to be listed multiple times.
+>    This allows a single VNC server to listen on multiple
+>    different names / addresses.
 
-Is there a reason you've opted for the RAZ/WI here?
+Why it's needed? To me it looks like to much for a very rarely
+useful thing, no? (Just thinking out loud, nothing more)
 
-thanks
--- PMM
+/mjt
