@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZbCA-00087F-9I
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:34:23 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cZbEO-0001Nj-QU
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:36:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZbC7-0000PP-NP
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:34:22 -0500
-Received: from lhrrgout.huawei.com ([194.213.3.17]:5992)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZbC7-0000O2-FZ
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:34:19 -0500
-References: <1486116298-25046-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1486116298-25046-2-git-send-email-pradeep.jagadeesh@huawei.com>
-	<w51r33fwpn7.fsf@maestria.local.igalia.com>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <2937f5b6-b907-0de6-00fb-ee5fae675ed0@huawei.com>
-Date: Fri, 3 Feb 2017 11:33:33 +0100
-MIME-Version: 1.0
-In-Reply-To: <w51r33fwpn7.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2 v15] fsdev: add IO throttle support to
- fsdev devices
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cZbEM-0002mv-7s
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:36:40 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1cZbEM-0002lr-0P
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:36:38 -0500
+Received: by mail-pg0-x241.google.com with SMTP id 204so1688662pge.2
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 02:36:37 -0800 (PST)
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Fri,  3 Feb 2017 16:06:38 +0530
+Message-Id: <1486118198-8965-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: [Qemu-devel] [PATCH v2] migrate: Introduce zero RAM checks to skip
+ RAM migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org
+To: thuth@redhat.com
+Cc: quintela@redhat.com, dgilbert@redhat.com, amit.shah@redhat.com, berrange@redhat.com, pbonzini@redhat.com, groug@kaod.org, qemu-devel@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-On 2/3/2017 11:10 AM, Alberto Garcia wrote:
-> On Fri 03 Feb 2017 11:04:57 AM CET, Pradeep Jagadeesh wrote:
->> This patchset adds the io throttle support for the 9p-local driver.
->> For now this functionality can be used only through qemu cli options.
->> QMP interface and support to other 9p drivers need further extensions.
->> To make it simple for other 9p drivers, the throttle code has been put in
->> separate files.
->>
->> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
->
-> I don't see any difference between this patch and the one in v14...
+Migration of a "none" machine with no RAM crashes abruptly as
+bitmap_new() fails and thus aborts. Instead place zero RAM checks at
+appropriate places to skip migration of RAM in this case and complete
+migration successfully for devices only.
 
-I moved the fsdev_throttle_cleanup() inside the unrealize() function
+Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+---
+Changes in v2:
+- try to migrate successfully by skipping RAM (Paolo, Greg)
+- drop the idea of erroring out and failing nicely
+ migration/ram.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-You want me to clean up even here ?
-
-out:
-        if (rc) {
-            /* ... */
-            fsdev_throttle_cleanup(s->ctx.fst);
-            /* ... */
-        }
-
-I thought one place is enough.
-
-Or I did not understand your comment :)
-
--Pradeep
->
->> +
->> +    s->ctx.fst = &fse->fst;
->> +    fsdev_throttle_init(s->ctx.fst);
->> +
->>      v9fs_path_free(&path);
->>
->>      rc = 0;
->> @@ -3528,6 +3532,7 @@ out:
->>          if (s->ops && s->ops->cleanup && s->ctx.private) {
->>              s->ops->cleanup(&s->ctx);
->>          }
->> +        fsdev_throttle_cleanup(s->ctx.fst);
->>          g_free(s->tag);
->>          g_free(s->ctx.fs_root);
->>          v9fs_path_free(&path);
->
-> Berto
->
+diff --git a/migration/ram.c b/migration/ram.c
+index ef8fadf..2f19566 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1325,6 +1325,11 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
+     ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
+                                  ram_addr_t space */
+ 
++    /* No dirty page as there is zero RAM */
++    if (!ram_bytes_total()) {
++        return pages;
++    }
++
+     pss.block = last_seen_block;
+     pss.offset = last_offset;
+     pss.complete_round = false;
+@@ -1912,14 +1917,17 @@ static int ram_save_init_globals(void)
+     bytes_transferred = 0;
+     reset_ram_globals();
+ 
+-    ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+-    migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
+-    migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+-    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
++    /* Skip setting bitmap if there is no RAM */
++    if (ram_bytes_total()) {
++        ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
++        migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
++        migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
++        bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+ 
+-    if (migrate_postcopy_ram()) {
+-        migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
+-        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
++        if (migrate_postcopy_ram()) {
++            migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
++            bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
++        }
+     }
+ 
+     /*
+-- 
+2.6.2
