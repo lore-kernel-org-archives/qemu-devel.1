@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cZZri-00017E-QO
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:09:11 -0500
+	(envelope-from <armbru@redhat.com>) id 1cZZvl-0002zk-4j
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:13:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cZZre-0007lJ-Oz
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:09:10 -0500
+	(envelope-from <armbru@redhat.com>) id 1cZZvh-0001Nf-4B
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:13:21 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <1485778972-20924-1-git-send-email-thuth@redhat.com>
-Date: Fri, 03 Feb 2017 10:09:03 +0100
-In-Reply-To: <1485778972-20924-1-git-send-email-thuth@redhat.com> (Thomas
-	Huth's message of "Mon, 30 Jan 2017 13:22:52 +0100")
-Message-ID: <87lgtnd4k0.fsf@dusky.pond.sub.org>
+References: <1485778921-20869-1-git-send-email-thuth@redhat.com>
+Date: Fri, 03 Feb 2017 10:13:14 +0100
+In-Reply-To: <1485778921-20869-1-git-send-email-thuth@redhat.com> (Thomas
+	Huth's message of "Mon, 30 Jan 2017 13:22:01 +0100")
+Message-ID: <87h94bd4d1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] hw/core/or-irq: Mark the device with
+Subject: Re: [Qemu-devel] [PATCH v2] hw/core/register: Mark the device with
  cannot_instantiate_with_device_add_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,36 +28,49 @@ Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, qemu-
 
 Thomas Huth <thuth@redhat.com> writes:
 
-> The "or-irq" device needs to be wired up in source code, there is no
-> way the user can add this device with the "-device" parameter or the
-> "device_add" monitor command yet.
->
+> The "qemu,register" device needs to be wired up in source code, there
+> is no way the user can add this device with the "-device" parameter or
+> the "device_add" monitor command yet.
+
+Well, the user can (I tried), but it won't do squat then.
+
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
 >  v2: Changed patch description and comment
 >
->  hw/core/or-irq.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  hw/core/register.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
-> diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
-> index 1ac090d..808c8d1 100644
-> --- a/hw/core/or-irq.c
-> +++ b/hw/core/or-irq.c
-> @@ -89,6 +89,9 @@ static void or_irq_class_init(ObjectClass *klass, void *data)
->      dc->props = or_irq_properties;
->      dc->realize = or_irq_realize;
->      dc->vmsd = &vmstate_or_irq;
-> +
-> +    /* Reason: Needs to be wired up in source code, e.g. see stm32f205_soc.c */
-
-This line is a bit long, and it could be shortened easily: drop "in
-source code", or replace it by "to work".  This is how similar comments
-elsewhere are phrased.
-
-> +    dc->cannot_instantiate_with_device_add_yet = true;
+> diff --git a/hw/core/register.c b/hw/core/register.c
+> index 4bfbc50..1416691 100644
+> --- a/hw/core/register.c
+> +++ b/hw/core/register.c
+> @@ -274,9 +274,18 @@ void register_finalize_block(RegisterInfoArray *r_array)
+>      g_free(r_array);
 >  }
 >  
->  static const TypeInfo or_irq_type_info = {
+> +static void register_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    /* Needs to be wired up in source code, see register_init_block32() */
 
-Preferably with the comment touched up:
+Bear with me...  Please phrase this exactly like the similar comments
+elsewhere:
+
+       /* Reason: needs to be wired up by register_init_block32() to work */
+
+
+> +    dc->cannot_instantiate_with_device_add_yet = true;
+> +}
+> +
+>  static const TypeInfo register_info = {
+>      .name  = TYPE_REGISTER,
+>      .parent = TYPE_DEVICE,
+> +    .class_init = register_class_init,
+>  };
+>  
+>  static void register_register_types(void)
+
+With comment and commit message touched up:
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
