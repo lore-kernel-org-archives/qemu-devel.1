@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cZeWH-0002IO-Pm
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:07:22 -0500
+	(envelope-from <ct@flyingcircus.io>) id 1cZZ8W-0005fa-GZ
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:22:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cZeWD-0004cc-VS
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 09:07:21 -0500
-Date: Fri, 3 Feb 2017 22:07:06 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170203140706.GD28271@lemon>
-References: <1485443388-27253-1-git-send-email-armbru@redhat.com>
-	<1485443388-27253-9-git-send-email-armbru@redhat.com>
-	<9684a908-f425-82d8-046b-19cc17d01f55@redhat.com>
-	<87r33o3emm.fsf@dusky.pond.sub.org>
-	<2bcf4c7c-5c29-fda5-1ba3-5828600a8995@redhat.com>
-	<8760l0ebgq.fsf@dusky.pond.sub.org>
-	<e0f2369d-6ebf-ae73-abf1-7021b257748c@redhat.com>
-	<87a8a9vuhu.fsf@dusky.pond.sub.org> <20170203110423.GC28271@lemon>
-	<87vasrl7ls.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87vasrl7ls.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] hw: Drop superfluous special checks
- for orphaned -drive
+	(envelope-from <ct@flyingcircus.io>) id 1cZZ8T-0004Ec-C3
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 03:22:28 -0500
+From: Christian Theune <ct@flyingcircus.io>
+Message-Id: <2BB6EFE6-C476-4A48-AFC9-52B9B9F8433F@flyingcircus.io>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_A7C72EFD-BE92-478A-A329-763C6955F7B6";
+	protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Fri, 3 Feb 2017 09:22:22 +0100
+In-Reply-To: <03b2194a-ea37-c025-53c2-53b030b593f6@kamp.de>
+References: <1485876994-14555-1-git-send-email-pl@kamp.de>
+	<ea032a8a-1429-bd95-5b68-4634a0fb0a57@redhat.com>
+	<03b2194a-ea37-c025-53c2-53b030b593f6@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH] qga: ignore EBUSY when freezing a
+ filesystem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mreitz@redhat.com, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, John Snow <jsnow@redhat.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On Fri, 02/03 14:35, Markus Armbruster wrote:
-> > I guess the painpoint is "okay, what the heck does the machine support then?" -
-> 
-> At the place where we can reliably detect orphaned drives regardless of
-> what the machine initialization code does, we have no idea.
-> 
-> > that "3 > 2" is the good part of the old message.
-> 
-> At the places that actually adopt drives, we know.  But there are many
-> of them.  Just three check for orphans.  One of them gets it right
-> (ide/core.c), one of them gets it wrong (mips_jazz.c), and one of them
-> sets a problematic example (sun4m.c): if copied to a machine that lets
-> users configure additional SCSI HBAs, it would break if=scsi for those.
-> Dampens my enthusiasm for improving the error message by adding similar
-> checks to all the places that adopt drives.
-> 
-> We could make machines declare what they support.  Better, I think.  So
-> if you have a burning desire to leave your mark in git-blame for every
-> machine...
 
-Could you please remind me the situation about if=scsi across all machines? If
-it is simply legacy and it's recommended to use "-drive if=none" and "-device
-...", I think saying this in the error message is enough; or if "if=scsi" is a
-valid way for some machines, then maybe we can declare support limits found with
-your script?
+--Apple-Mail=_A7C72EFD-BE92-478A-A329-763C6955F7B6
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Fam
+Hi,
 
-> 
-> > Do we have a user documentation for this? Or, can we give a hint how to figure
-> > that out?
-> 
-> Try it out:
-> 
->     for i in ide scsi floppy pflash mtd sd virtio xen
->     do
->         for ((b=0; b<4; b++))
->         do
->             for ((u=0; u<10; u++))
->             do
->                 echo q | qemu-system-x86_64 -nodefaults -S -display none -monitor stdio -drive if=$i,bus=$b,unit=$u,file=tmp.qcow2 >/dev/null
->             done
->         done
->     done
-> 
-> My upper bounds for bus and unit are arbitrary.
+> On 3 Feb 2017, at 09:20, Peter Lieven <pl@kamp.de> wrote:
+>=20
+> If you try to THAW an unfrozen FS you get EINVAL.
+>=20
+> The current code thaws until an error is returned.
+>=20
+>=20
+> So it should work as is.
+>=20
+>=20
+> If you feel uncomfortable with the EBUSY approach. The other idea =
+would
+>=20
+> be to track all devices which have been successfully frozen and skip =
+consecutive
+>=20
+> tries to freeze them.
+
+Which will be subject to race conditions as other processes may call =
+freeze/thaw on any device. Those are completely out of our control.
+
+Christian
+
+--
+Christian Theune =C2=B7 ct@flyingcircus.io =C2=B7 +49 345 219401 0
+Flying Circus Internet Operations GmbH =C2=B7 http://flyingcircus.io
+Forsterstra=C3=9Fe 29 =C2=B7 06112 Halle (Saale) =C2=B7 Deutschland
+HR Stendal HRB 21169 =C2=B7 Gesch=C3=A4ftsf=C3=BChrer: Christian. =
+Theune, Christian. Zagrodnick
+
+
+--Apple-Mail=_A7C72EFD-BE92-478A-A329-763C6955F7B6
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - https://gpgtools.org
+
+iQEcBAEBCgAGBQJYlD2+AAoJEKuh8lKpfGLOP9kIANxNT+d6acKCC2/HYah+W8E3
+h8LKy4uZKcip1EZejfE72hZFdl6/p0fn+I4fTSCDiOoHlQ+Lv2sDp6T25kIZn1ZA
+gEYh+4YDfBaBOnRT8a99YPGvkS6p8H+U5RYSqw+c64xFBg5YeW1Dq1w3cmqV111x
+s0w/qnCqDLBXRD1+jqhvUCDG3Y91QtHTLIFSk5pPxqKluCZe4aaFVr7fYuNlGyiP
+PxNN0uYPoPRCgOzRThXnRLz5pIHnwlBymaV8Lu1knGSCfpBWkfhQd1A2FqsI749z
+tMuhy1QWSxu95BcacApXNQfxU0/J17JGJgd8tyEHfgDkMKli8ocw0Wkz+1kEy1c=
+=E4Ks
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_A7C72EFD-BE92-478A-A329-763C6955F7B6--
