@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5n-0007nv-T1
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5n-0007nk-EJ
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5j-00081q-45
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cZg5k-00083V-CJ
 	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:07 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:22640 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:12225 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cZg5i-0007zl-Na
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:03 -0500
+	id 1cZg5j-00080U-Pg
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 10:48:04 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  3 Feb 2017 18:47:45 +0300
-Message-Id: <20170203154757.36140-7-vsementsov@virtuozzo.com>
+Date: Fri,  3 Feb 2017 18:47:53 +0300
+Message-Id: <20170203154757.36140-15-vsementsov@virtuozzo.com>
 In-Reply-To: <20170203154757.36140-1-vsementsov@virtuozzo.com>
 References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 06/18] nbd/client: refactor drop_sync
+Subject: [Qemu-devel] [PATCH 14/18] qmp: add
+ x-debug-block-dirty-bitmap-sha256
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +28,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-Return 0 on success to simplify success checking.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/client.c | 35 +++++++++++++++++++----------------
- 1 file changed, 19 insertions(+), 16 deletions(-)
+ block/dirty-bitmap.c         |  5 +++++
+ blockdev.c                   | 29 +++++++++++++++++++++++++++++
+ include/block/dirty-bitmap.h |  2 ++
+ include/qemu/hbitmap.h       |  8 ++++++++
+ qapi/block-core.json         | 27 +++++++++++++++++++++++++++
+ tests/Makefile.include       |  2 +-
+ util/hbitmap.c               | 11 +++++++++++
+ 7 files changed, 83 insertions(+), 1 deletion(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index 351731bc63..1c274f3012 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -86,31 +86,34 @@ static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 394d4328d5..a4f77dcf73 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -598,3 +598,8 @@ BdrvDirtyBitmap *bdrv_load_dirty_bitmap(BlockDriverState *bs, const char *name,
  
- */
- 
--/* Discard length bytes from channel.  Return -errno on failure, or
-- * the amount of bytes consumed. */
--static ssize_t drop_sync(QIOChannel *ioc, size_t size)
-+/* Discard length bytes from channel.
-+ * Return 0 on success and -errno on fail.
-+ */
-+static int drop_sync(QIOChannel *ioc, size_t size)
- {
--    ssize_t ret = 0;
-+    ssize_t ret;
-     char small[1024];
-     char *buffer;
- 
-     buffer = sizeof(small) > size ? small : g_malloc(MIN(65536, size));
-     while (size > 0) {
--        ssize_t count = read_sync(ioc, buffer, MIN(65536, size));
--
--        if (count <= 0) {
--            goto cleanup;
-+        ret = read_sync(ioc, buffer, MIN(65536, size));
-+        if (ret == 0) {
-+            ret = -EIO;
-+        }
-+        if (ret < 0) {
-+            break;
-         }
--        assert(count <= size);
--        size -= count;
--        ret += count;
+     return lbco.ret;
+ }
 +
-+        assert(ret <= size);
-+        size -= ret;
-     }
- 
-- cleanup:
-     if (buffer != small) {
-         g_free(buffer);
-     }
--    return ret;
-+
-+    return ret < 0 ? ret : 0;
++char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
++{
++    return hbitmap_sha256(bitmap->bitmap, errp);
++}
+diff --git a/blockdev.c b/blockdev.c
+index 245e1e1d17..1bc3fe386a 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2790,6 +2790,35 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
+     aio_context_release(aio_context);
  }
  
- /* Send an option request.
-@@ -334,7 +337,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-         return -1;
-     }
-     if (namelen != strlen(want)) {
--        if (drop_sync(ioc, len) != len) {
-+        if (drop_sync(ioc, len) < 0) {
-             error_setg(errp, "failed to skip export name with wrong length");
-             nbd_send_opt_abort(ioc);
-             return -1;
-@@ -350,7 +353,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-     }
-     name[namelen] = '\0';
-     len -= namelen;
--    if (drop_sync(ioc, len) != len) {
-+    if (drop_sync(ioc, len) < 0) {
-         error_setg(errp, "failed to read export description");
-         nbd_send_opt_abort(ioc);
-         return -1;
-@@ -635,7 +638,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-     }
++BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
++                                                              const char *name,
++                                                              Error **errp)
++{
++    AioContext *aio_context;
++    BdrvDirtyBitmap *bitmap;
++    BlockDriverState *bs;
++    BlockDirtyBitmapSha256 *ret = NULL;
++    char *sha256;
++
++    bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
++    if (!bitmap || !bs) {
++        return NULL;
++    }
++
++    sha256 = bdrv_dirty_bitmap_sha256(bitmap, errp);
++    if (sha256 == NULL) {
++        goto out;
++    }
++
++    ret = g_new(BlockDirtyBitmapSha256, 1);
++    ret->sha256 = sha256;
++
++out:
++    aio_context_release(aio_context);
++
++    return ret;
++}
++
+ void hmp_drive_del(Monitor *mon, const QDict *qdict)
+ {
+     const char *id = qdict_get_str(qdict, "id");
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index c0c70a8c67..0efb5591d6 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -80,4 +80,6 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+ BdrvDirtyBitmap *bdrv_load_dirty_bitmap(BlockDriverState *bs, const char *name,
+                                         Error **errp);
  
-     TRACE("Size is %" PRIu64 ", export flags %" PRIx16, *size, *flags);
--    if (zeroes && drop_sync(ioc, 124) != 124) {
-+    if (zeroes && drop_sync(ioc, 124) < 0) {
-         error_setg(errp, "Failed to read reserved block");
-         goto fail;
-     }
++char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
++
+ #endif
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index d6fe553b12..42685b4289 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -225,6 +225,14 @@ void hbitmap_deserialize_zeroes(HBitmap *hb, uint64_t start, uint64_t count,
+ void hbitmap_deserialize_finish(HBitmap *hb);
+ 
+ /**
++ * hbitmap_sha256:
++ * @bitmap: HBitmap to operate on.
++ *
++ * Returns SHA256 hash of the last level.
++ */
++char *hbitmap_sha256(const HBitmap *bitmap, Error **errp);
++
++/**
+  * hbitmap_free:
+  * @hb: HBitmap to operate on.
+  *
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0e15c73774..b258c45595 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1280,6 +1280,33 @@
+   'data': 'BlockDirtyBitmap' }
+ 
+ ##
++# @BlockDirtyBitmapSha256:
++#
++# SHA256 hash of dirty bitmap data
++#
++# @sha256: bitmap SHA256 hash
++#
++# Since: 2.9
++##
++  { 'struct': 'BlockDirtyBitmapSha256',
++    'data': {'sha256': 'str'} }
++
++##
++# @x-debug-block-dirty-bitmap-sha256:
++#
++# Get bitmap SHA256
++#
++# Returns: BlockDirtyBitmapSha256 on success
++#          If @node is not a valid block device, DeviceNotFound
++#          If @name is not found or if hashing is failed, GenericError with an
++#          explanation
++#
++# Since: 2.9
++##
++  { 'command': 'x-debug-block-dirty-bitmap-sha256',
++    'data': 'BlockDirtyBitmap', 'returns': 'BlockDirtyBitmapSha256' }
++
++##
+ # @blockdev-mirror:
+ #
+ # Start mirroring a block device's writes to a new destination.
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 4841d582a1..0ee7e30a63 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -497,7 +497,7 @@ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-u
+ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
+ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+-tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y)
++tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+ tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
+ tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o page_cache.o $(test-util-obj-y)
+ tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index b850c2baf5..64078d94a1 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -13,6 +13,7 @@
+ #include "qemu/hbitmap.h"
+ #include "qemu/host-utils.h"
+ #include "trace.h"
++#include "crypto/hash.h"
+ 
+ /* HBitmaps provides an array of bits.  The bits are stored as usual in an
+  * array of unsigned longs, but HBitmap is also optimized to provide fast
+@@ -699,3 +700,13 @@ void hbitmap_free_meta(HBitmap *hb)
+     hbitmap_free(hb->meta);
+     hb->meta = NULL;
+ }
++
++char *hbitmap_sha256(const HBitmap *bitmap, Error **errp)
++{
++    size_t size = bitmap->sizes[HBITMAP_LEVELS - 1] * sizeof(unsigned long);
++    char *data = (char *)bitmap->levels[HBITMAP_LEVELS - 1];
++    char *hash = NULL;
++    qcrypto_hash_digest(QCRYPTO_HASH_ALG_SHA256, data, size, &hash, errp);
++
++    return hash;
++}
 -- 
 2.11.0
