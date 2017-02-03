@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZaQm-0000Ad-Pp
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:45:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZaSJ-0001NY-Fe
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:47:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZaQj-0007TB-6l
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:45:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46062)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cZaQj-0007SF-0H
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:45:21 -0500
-Date: Fri, 3 Feb 2017 09:45:09 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170203094509.GB10350@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAAo6VWMJAYeLdtEmyQ43vYeYjvNzCP80Wufe4=eNRUZum0rYdQ@mail.gmail.com>
-	<CAJSP0QV7QCLwih+F30hcohmwYQ1Ci+6bMPuCj_Kk9hwbmgWzUA@mail.gmail.com>
-	<E05FEFD5-A72D-4FC5-B600-58AAD2900A02@veritas.com>
-	<CAJSP0QUWmU_XbB9TGxvL0hH-SCzRSWDciNhpZrarDDcE22RF_w@mail.gmail.com>
-	<D1304CAA-9C32-4E42-AA65-27B3277130E8@veritas.com>
-	<20170202100728.GA20760@stefanha-x1.localdomain>
-	<20170202101537.GE2915@redhat.com>
-	<49FDD34F-2649-4437-AC4F-4C1C91FEA15C@veritas.com>
-	<231FC4E3-0EEB-4BD5-A541-1ABFAB592EEC@veritas.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cZaSH-0000FD-OD
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:46:59 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37523)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZaSH-0000ES-Hv
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:46:57 -0500
+Received: by mail-wm0-x236.google.com with SMTP id v77so19275880wmv.0
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 01:46:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <231FC4E3-0EEB-4BD5-A541-1ABFAB592EEC@veritas.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 RFC] block/vxhs: Initial commit to add
- Veritas HyperScale VxHS block device support
+In-Reply-To: <03266a2a-2ff8-458e-b6cc-67c3888a6b39@redhat.com>
+References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
+	<148602129908.33.4236801111127079549@eba24e3a0d7f>
+	<20170202224420.GA7754@umbus.fritz.box>
+	<03266a2a-2ff8-458e-b6cc-67c3888a6b39@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Feb 2017 09:46:35 +0000
+Message-ID: <CAFEAcA8KoBAT+=k0c299wQTD6PykSkxcFcDgB+jgNXQhY3qMWA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 000/107] ppc-for-2.9 queue
+ 20170202
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, ashish mittal <ashmit602@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Gaurav Bhandarkar <Gaurav.Bhandarkar@veritas.com>, Abhishek Kane <Abhishek.Kane@veritas.com>, Ketan Mahajan <Ketan.Mahajan@veritas.com>, Niranjan Pendharkar <Niranjan.Pendharkar@veritas.com>, Nirendra Awasthi <Nirendra.Awasthi@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-On Thu, Feb 02, 2017 at 09:22:46PM +0000, Ketan Nilangekar wrote:
->=20
-> On 2/2/17, 12:57 PM, "Ketan Nilangekar" <Ketan.Nilangekar@veritas.com> =
-wrote:
->        =20
->     [Ketan]
->     Does the QIO interface allow for readv/writev over network for unse=
-cure sockets?
->    =20
-> [Ketan]
-> I checked the qio implementation and it seems that there is a pseudo
-> implementation of readv/writev which iterates over the individual
-> iovecs to make send/recv syscalls. This can=E2=80=99t be too good for p=
-erformance.
+On 3 February 2017 at 08:36, Thomas Huth <thuth@redhat.com> wrote:
+> We've got lot's of C++ comments in the QEMU sources already, and the
+> CODING_STYLE document even does not mention this ... maybe this is just
+> a left-over from the Linux kernel's checkpatch.pl script? So IMHO:
+> Ignore this error. (and if we really agree that C++ comments are a
+> no-go, then somebody should send a patch to update the CODING_STYLE).
 
-I think you looked at the Win32 code - the qio_channel_socket_writev
-and qio_channel_socket_readv methods which are built on non-Win32
-platforms use recvmsg/sendmsg to handle iovecs in a single operation.
+I've always assumed //-comments are not part of QEMU's coding
+style, and we really don't have all that many in the codebase,
+so I would vote for keeping this rule. (The exceptions are
+mostly in 3rd-party code in disas/ and also in ui/cocoa.m
+which was written to ObjC conventions.)
 
-> Are you suggesting we use the qio interface for secure communication on=
-ly
-> and leave the unsecure communication to libqnio?
+(I find it useful locally that checkpatch complains because
+then I can write my todo comments as // TODO and they get
+picked up in checkpatch.)
 
-If you expect non-QEMU apps to use libqnio, then you could keep support
-for plain & TLS sockets in libqnio. Just provide the I/O callbacks facili=
-ty
-as an alternative approach which can be used by QEMU for secure & insecur=
-e
-I/O handling.
-
-Regards,
-Daniel
---=20
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
-/ :|
-|: http://libvirt.org              -o-             http://virt-manager.or=
-g :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
-/ :|
+thanks
+-- PMM
