@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZaOx-0006w5-AZ
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:43:32 -0500
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZaQ3-0007uH-2E
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:44:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cZaOw-0005zn-AW
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:43:31 -0500
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36565)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cZaOw-0005z3-2f
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:43:30 -0500
-Received: by mail-wm0-x22f.google.com with SMTP id c85so19771626wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 01:43:29 -0800 (PST)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZaPy-0006m2-19
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:44:39 -0500
+Received: from lhrrgout.huawei.com ([194.213.3.17]:5991)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cZaPx-0006l9-OX
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 04:44:33 -0500
+References: <1485249848-13854-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1485249848-13854-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<w51a8a6rlsb.fsf@maestria.local.igalia.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <ef2102fa-7bce-e966-520a-c492d5cb2e5f@huawei.com>
+Date: Fri, 3 Feb 2017 10:43:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Feb 2017 09:43:08 +0000
-Message-ID: <CAFEAcA-Lmb-5Y2Z1i+g6d3+S1Fi-YJtBwXCwUNDUpHWPCecyRw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 000/107] ppc-for-2.9 queue 20170202
+In-Reply-To: <w51a8a6rlsb.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2 v14] fsdev: add IO throttle support to
+ fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org
 
-On 2 February 2017 at 05:12, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit a0def594286d9110a6035e02eef558cf3cf5d847:
+On 2/1/2017 4:08 PM, Alberto Garcia wrote:
+> Hello, and sorry for being late reviewing these patches :)
 >
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-01-30 10:23:20 +0000)
+> On Tue 24 Jan 2017 10:24:07 AM CET, Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
 >
-> are available in the git repository at:
+>> This patchset adds the io throttle support for the 9p-local driver.
+>> For now this functionality can be used only through qemu cli options.
+>> QMP interface and support to other 9p drivers need further extensions.
+>> To make it simple for other 9p drivers, the throttle code has been put
+>> in separate files.
 >
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170202
+> Compared to the previous patch that I reviewed, you removed the
+> fsdev_throttle_cleanup() call from v9fs_device_unrealize_common(). Why
+> did you do that?
 >
-> for you to fetch changes up to 7c6e8797337c24520b48d8b50a900a747e50f974:
->
->   hw/ppc/pnv: Use error_report instead of hw_error if a ROM file can't be found (2017-02-02 09:30:07 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2017-02-02
->
-> This obsoletes ppc-for-2.9-20170112, which had a MacOS build bug.
->
-> This is a long overdue ppc pull request for qemu-2.9.  It's been a
-> long time coming due to some holidays and inconveniently timed
-> problems with testing.  So, there's a lot in here:
->
->     * More POWER9 instruction implementations for TCG
->     * The simpler parts of my CPU compatibility mode cleanup
->         * This changes behaviour to prefer compatibility modes over
->           "raW" mode for new machine type versions
->     * New "40p" machine type which is essentially a modernized and
->       cleaned up "prep".  The intention is that it will replace "prep"
->       once it has some more testing and polish.
->     * Add pseries-2.9 machine type
->     * Implement H_SIGNAL_SYS_RESET hypercall
->     * Consolidate the two alternate CPU init paths in pseries by
->       making it always go through CPU core objects to initialize CPU
->     * A number of bugfixes and cleanups
->     * Stop the guest timebase when the guest is stopped under KVM.
->       This makes the guest system clock also stop when paused, which
->       matches the x86 behaviour.
->     * Some preliminary cleanups leading towards implementation of the
->       POWER9 MMU.
->
-> There are also some changes not strictly related to ppc code, but for
-> its benefit:
->
->     * Limit the pxi-expander-bridge (PXB) device to x86 guests only
->       (it's essentially a hack to work around historical x86
->       limitations)
->     * Some additions to the 128-bit math in host_utils, necessary for
->       some of the new instructions.
->     * Revise a number of qtests and enable them for ppc
+I actually missed while merging the code to newer version. Instead of 
+putting inside the unrealize it went some other function.
 
-Applied, thanks.
+> I miss the list of changes in the cover letter
 
--- PMM
+>> --- a/hw/9pfs/9p.c
+>> +++ b/hw/9pfs/9p.c
+>> @@ -3520,6 +3520,10 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
+>>          error_setg(errp, "share path %s is not a directory", fse->path);
+>>          goto out;
+>>      }
+>> +
+>> +    s->ctx.fst = &fse->fst;
+>> +    fsdev_throttle_init(s->ctx.fst);
+>> +
+>>      v9fs_path_free(&path);
+>>
+>>      rc = 0;
+>> @@ -3528,6 +3532,7 @@ out:
+>>          if (s->ops && s->ops->cleanup && s->ctx.private) {
+>>              s->ops->cleanup(&s->ctx);
+>>          }
+>> +        fsdev_throttle_cleanup(s->ctx.fst);
+>>          g_free(s->tag);
+>>          g_free(s->ctx.fs_root);
+>>          v9fs_path_free(&path);
+>
+> You also added the fsdev_throttle_cleanup() here, but look at the code:
+>
+>        fsdev_throttle_init(s->ctx.fst);
+>
+>        v9fs_path_free(&path);
+>
+>        rc = 0;
+>    out:
+>        if (rc) {
+>            /* ... */
+>            fsdev_throttle_cleanup(s->ctx.fst);
+>            /* ... */
+>        }
+>
+> If rc != 0 you don't need to do the clean up, because there was never an
+> initialization.
+Fixed it, it was because of merging issue as I answered above.
+
+-Pradeep
+>
+> Berto
+>
