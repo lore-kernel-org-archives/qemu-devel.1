@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZamI-0002jv-EQ
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:07:39 -0500
+	(envelope-from <thuth@redhat.com>) id 1cZank-00041i-JI
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:09:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cZamE-0000Pk-Lj
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:07:38 -0500
-Date: Fri, 3 Feb 2017 10:07:27 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170203100727.GD10350@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1486115549-9398-1-git-send-email-mjt@msgid.tls.msk.ru>
+	(envelope-from <thuth@redhat.com>) id 1cZanh-0001b8-B2
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:09:08 -0500
+References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
+	<148602129908.33.4236801111127079549@eba24e3a0d7f>
+	<20170202224420.GA7754@umbus.fritz.box>
+	<03266a2a-2ff8-458e-b6cc-67c3888a6b39@redhat.com>
+	<CAFEAcA8KoBAT+=k0c299wQTD6PykSkxcFcDgB+jgNXQhY3qMWA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <bdaf6002-9a89-4b23-95eb-e9f91701f333@redhat.com>
+Date: Fri, 3 Feb 2017 11:09:01 +0100
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8KoBAT+=k0c299wQTD6PykSkxcFcDgB+jgNXQhY3qMWA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1486115549-9398-1-git-send-email-mjt@msgid.tls.msk.ru>
-Subject: Re: [Qemu-devel] [PATCH v2] vnc: do not disconnect on EAGAIN
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 000/107] ppc-for-2.9 queue
+ 20170202
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-On Fri, Feb 03, 2017 at 12:52:29PM +0300, Michael Tokarev wrote:
-> When qemu vnc server is trying to send large update to clients,
-> there might be a situation when system responds with something
-> like EAGAIN, indicating that there's no system memory to send
-> that much data (depending on the network speed, client and server
-> and what is happening).  In this case, something like this happens
-> on qemu side (from strace):
+On 03.02.2017 10:46, Peter Maydell wrote:
+> On 3 February 2017 at 08:36, Thomas Huth <thuth@redhat.com> wrote:
+>> We've got lot's of C++ comments in the QEMU sources already, and the
+>> CODING_STYLE document even does not mention this ... maybe this is just
+>> a left-over from the Linux kernel's checkpatch.pl script? So IMHO:
+>> Ignore this error. (and if we really agree that C++ comments are a
+>> no-go, then somebody should send a patch to update the CODING_STYLE).
 > 
-> sendmsg(16, {msg_name(0)=NULL,
->         msg_iov(1)=[{"\244\"..., 729186}],
->         msg_controllen=0, msg_flags=0}, 0) = 103950
-> sendmsg(16, {msg_name(0)=NULL,
->         msg_iov(1)=[{"lz\346"..., 1559618}],
->         msg_controllen=0, msg_flags=0}, 0) = -1 EAGAIN
-> sendmsg(-1, {msg_name(0)=NULL,
->         msg_iov(1)=[{"lz\346"..., 1559618}],
->         msg_controllen=0, msg_flags=0}, 0) = -1 EBADF
+> I've always assumed //-comments are not part of QEMU's coding
+> style, and we really don't have all that many in the codebase,
+> so I would vote for keeping this rule. (The exceptions are
+> mostly in 3rd-party code in disas/ and also in ui/cocoa.m
+> which was written to ObjC conventions.)
 > 
-> qemu closes the socket before the retry, and obviously it gets EBADF
-> when trying to send to -1.
-> 
-> This is because there WAS a special handling for EAGAIN, but now it doesn't
-> work anymore, after commit 04d2529da27db512dcbd5e99d0e26d333f16efcc, because
-> now in all error-like cases we initiate vnc disconnect.
-> 
-> This change were introduced in qemu 2.6, and caused numerous grief for many
-> people, resulting in their vnc clients reporting sporadic random disconnects
-> from vnc server.
-> 
-> Fix that by doing the disconnect only when necessary, i.e. omitting this
-> very case of EAGAIN.
-> 
-> Hopefully the existing condition (comparing with QIO_CHANNEL_ERR_BLOCK)
-> is sufficient, as the original code (before the above commit) were
-> checking for other errno values too.
+> (I find it useful locally that checkpatch complains because
+> then I can write my todo comments as // TODO and they get
+> picked up in checkpatch.)
 
-There's no need to check WSAEWOULDBLOCK anymore - our win32 portability
-code already remaps it to EAGAIN.
+OK, fine for me, too ... but could you then maybe send a patch for
+CODING_STYLE that states that //-comments should be avoided?
 
-Checking EINTR is not required because QIOChannelSocket already
-restarts the recvmsg/sendmsg when seeing EINTR
-
-> Apparently there's another (semi?)bug exist somewhere here, since the
-> code tries to write to fd# -1, it probably should check if the connection
-> is open before. But this isn't important.
-> 
-> Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
-> Fixes: 04d2529da27db512dcbd5e99d0e26d333f16efcc
-> Cc: Daniel P. Berrange <berrange@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: qemu-stable@nongnu.org
-> ---
-> v2: previous patch was tab/space-damaged, fixing this now
-> 
->  ui/vnc.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index cdeb79c..f2701e5 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -1256,12 +1256,13 @@ ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
->      if (ret <= 0) {
->          if (ret == 0) {
->              VNC_DEBUG("Closing down client sock: EOF\n");
-> +            vnc_disconnect_start(vs);
->          } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
->              VNC_DEBUG("Closing down client sock: ret %zd (%s)\n",
->                        ret, errp ? error_get_pretty(*errp) : "Unknown");
-> +            vnc_disconnect_start(vs);
->          }
->  
-> -        vnc_disconnect_start(vs);
->          if (errp) {
->              error_free(*errp);
->              *errp = NULL;
-
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+ Thanks,
+  Thomas
