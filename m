@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cZbFm-0002ku-IK
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:38:07 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cZbRb-0002Aa-Ni
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:50:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cZbFk-0004IJ-07
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:38:06 -0500
-Received: from smtp3.mundo-r.com ([212.51.32.191]:6111 helo=smtp4.mundo-r.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cZbFj-0004Fu-Ic
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:38:03 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1486116298-25046-3-git-send-email-pradeep.jagadeesh@huawei.com>
-References: <1486116298-25046-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1486116298-25046-3-git-send-email-pradeep.jagadeesh@huawei.com>
-Date: Fri, 03 Feb 2017 11:38:01 +0100
-Message-ID: <w51o9yjwody.fsf@maestria.local.igalia.com>
+	(envelope-from <no-reply@patchew.org>) id 1cZbRY-00024a-Lb
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:50:19 -0500
+Resent-Message-Id: <E1cZbRY-00024a-Lb@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21313)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cZbRY-00022w-D7
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 05:50:16 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1486116298-25046-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Message-ID: <148611900507.33.9067340497834157084@eba24e3a0d7f>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2 v15] throttle: factor out duplicate code
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 3 Feb 2017 02:50:06 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/2 v15] fsdev: add IO throttle support to
+ fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
+To: pradeepkiruvale@gmail.com
+Cc: famz@redhat.com, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, berto@igalia.com, pradeep.jagadeesh@huawei.com, qemu-devel@nongnu.org
 
-On Fri 03 Feb 2017 11:04:58 AM CET, Pradeep Jagadeesh wrote:
-
-> This patch removes the redundant throttle code that was present in
-> block and fsdev device files. Now the common code is moved to a single
-> file.
-
-Here it says that this patch moves common code to a separate file,
-however:
-
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 920eb05..22a6a99 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -3532,7 +3532,6 @@ out:
->          if (s->ops && s->ops->cleanup && s->ctx.private) {
->              s->ops->cleanup(&s->ctx);
->          }
-> -        fsdev_throttle_cleanup(s->ctx.fst);
->          g_free(s->tag);
->          g_free(s->ctx.fs_root);
->          v9fs_path_free(&path);
-> @@ -3545,6 +3544,7 @@ void v9fs_device_unrealize_common(V9fsState *s, Error **errp)
->      if (s->ops->cleanup) {
->          s->ops->cleanup(&s->ctx);
->      }
-> +    fsdev_throttle_cleanup(s->ctx.fst);
->      g_free(s->tag);
->      g_free(s->ctx.fs_root);
->  }
-
-This doesn't belong here. In patch 1 you add a fsdev_throttle_cleanup()
-in v9fs_device_realize_common(), and in patch 2 you remove it from there
-and put it in v9fs_device_unrealize_common().
-
-It looks like you wanted to fix patch 1 but added the fix to patch 2
-instead.
-
-Berto
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8yIHYxNV0gZnNkZXY6IGFkZCBJTyB0aHJvdHRs
+ZSBzdXBwb3J0IHRvIGZzZGV2IGRldmljZXMKTWVzc2FnZS1pZDogMTQ4NjExNjI5OC0yNTA0Ni0x
+LWdpdC1zZW5kLWVtYWlsLXByYWRlZXAuamFnYWRlZXNoQGh1YXdlaS5jb20KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
+IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9u
+cwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
+ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
+QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
+ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
+LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
+ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ5ODc3NDcgdGhyb3R0bGU6IGZhY3RvciBvdXQgZHVw
+bGljYXRlIGNvZGUKZjFkZDEzZSBmc2RldjogYWRkIElPIHRocm90dGxlIHN1cHBvcnQgdG8gZnNk
+ZXYgZGV2aWNlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yOiBmc2Rl
+djogYWRkIElPIHRocm90dGxlIHN1cHBvcnQgdG8gZnNkZXYgZGV2aWNlcy4uLgpDaGVja2luZyBQ
+QVRDSCAyLzI6IHRocm90dGxlOiBmYWN0b3Igb3V0IGR1cGxpY2F0ZSBjb2RlLi4uCkVSUk9SOiBN
+YWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRv
+IC0gd2hpbGUgbG9vcAojMjUxOiBGSUxFOiBpbmNsdWRlL3FlbXUvdGhyb3R0bGUtb3B0aW9ucy5o
+OjEzOgorI2RlZmluZSBUSFJPVFRMRV9PUFRTIFwKKyAgICAgICAgICB7IFwKKyAgICAgICAgICAg
+IC5uYW1lID0gInRocm90dGxpbmcuaW9wcy10b3RhbCIsXAorICAgICAgICAgICAgLnR5cGUgPSBR
+RU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGltaXQgdG90YWwgSS9PIG9w
+ZXJhdGlvbnMgcGVyIHNlY29uZCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUg
+PSAidGhyb3R0bGluZy5pb3BzLXJlYWQiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRf
+TlVNQkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gImxpbWl0IHJlYWQgb3BlcmF0aW9ucyBwZXIg
+c2Vjb25kIixcCisgICAgICAgIH0seyBcCisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5n
+LmlvcHMtd3JpdGUiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAg
+ICAgICAgICAgIC5oZWxwID0gImxpbWl0IHdyaXRlIG9wZXJhdGlvbnMgcGVyIHNlY29uZCIsXAor
+ICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUgPSAidGhyb3R0bGluZy5icHMtdG90YWwi
+LFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAgIC5o
+ZWxwID0gImxpbWl0IHRvdGFsIGJ5dGVzIHBlciBzZWNvbmQiLFwKKyAgICAgICAgfSx7IFwKKyAg
+ICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcuYnBzLXJlYWQiLFwKKyAgICAgICAgICAgIC50
+eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gImxpbWl0IHJlYWQg
+Ynl0ZXMgcGVyIHNlY29uZCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUgPSAi
+dGhyb3R0bGluZy5icHMtd3JpdGUiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVN
+QkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gImxpbWl0IHdyaXRlIGJ5dGVzIHBlciBzZWNvbmQi
+LFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcuaW9wcy10
+b3RhbC1tYXgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAg
+ICAgICAgIC5oZWxwID0gIkkvTyBvcGVyYXRpb25zIGJ1cnN0IixcCisgICAgICAgIH0seyBcCisg
+ICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmlvcHMtcmVhZC1tYXgiLFwKKyAgICAgICAg
+ICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gIkkvTyBv
+cGVyYXRpb25zIHJlYWQgYnVyc3QiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1l
+ID0gInRocm90dGxpbmcuaW9wcy13cml0ZS1tYXgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVN
+VV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0gIkkvTyBvcGVyYXRpb25zIHdyaXRl
+IGJ1cnN0IixcCisgICAgICAgIH0seyBcCisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5n
+LmJwcy10b3RhbC1tYXgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwK
+KyAgICAgICAgICAgIC5oZWxwID0gInRvdGFsIGJ5dGVzIGJ1cnN0IixcCisgICAgICAgIH0seyBc
+CisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmJwcy1yZWFkLW1heCIsXAorICAgICAg
+ICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAidG90
+YWwgYnl0ZXMgcmVhZCBidXJzdCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUg
+PSAidGhyb3R0bGluZy5icHMtd3JpdGUtbWF4IixcCisgICAgICAgICAgICAudHlwZSA9IFFFTVVf
+T1BUX05VTUJFUixcCisgICAgICAgICAgICAuaGVscCA9ICJ0b3RhbCBieXRlcyB3cml0ZSBidXJz
+dCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUgPSAidGhyb3R0bGluZy5pb3Bz
+LXRvdGFsLW1heC1sZW5ndGgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVS
+LFwKKyAgICAgICAgICAgIC5oZWxwID0gImxlbmd0aCBvZiB0aGUgaW9wcy10b3RhbC1tYXggYnVy
+c3QgcGVyaW9kLCBpbiBzZWNvbmRzIixcCisgICAgICAgIH0seyBcCisgICAgICAgICAgICAubmFt
+ZSA9ICJ0aHJvdHRsaW5nLmlvcHMtcmVhZC1tYXgtbGVuZ3RoIixcCisgICAgICAgICAgICAudHlw
+ZSA9IFFFTVVfT1BUX05VTUJFUixcCisgICAgICAgICAgICAuaGVscCA9ICJsZW5ndGggb2YgdGhl
+IGlvcHMtcmVhZC1tYXggYnVyc3QgcGVyaW9kLCBpbiBzZWNvbmRzIixcCisgICAgICAgIH0seyBc
+CisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmlvcHMtd3JpdGUtbWF4LWxlbmd0aCIs
+XAorICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhl
+bHAgPSAibGVuZ3RoIG9mIHRoZSBpb3BzLXdyaXRlLW1heCBidXJzdCBwZXJpb2QsIGluIHNlY29u
+ZHMiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcuYnBz
+LXRvdGFsLW1heC1sZW5ndGgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVS
+LFwKKyAgICAgICAgICAgIC5oZWxwID0gImxlbmd0aCBvZiB0aGUgYnBzLXRvdGFsLW1heCBidXJz
+dCBwZXJpb2QsIGluIHNlY29uZHMiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1l
+ID0gInRocm90dGxpbmcuYnBzLXJlYWQtbWF4LWxlbmd0aCIsXAorICAgICAgICAgICAgLnR5cGUg
+PSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGVuZ3RoIG9mIHRoZSBi
+cHMtcmVhZC1tYXggYnVyc3QgcGVyaW9kLCBpbiBzZWNvbmRzIixcCisgICAgICAgIH0seyBcCisg
+ICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmJwcy13cml0ZS1tYXgtbGVuZ3RoIixcCisg
+ICAgICAgICAgICAudHlwZSA9IFFFTVVfT1BUX05VTUJFUixcCisgICAgICAgICAgICAuaGVscCA9
+ICJsZW5ndGggb2YgdGhlIGJwcy13cml0ZS1tYXggYnVyc3QgcGVyaW9kLCBpbiBzZWNvbmRzIixc
+CisgICAgICAgIH0seyBcCisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmlvcHMtc2l6
+ZSIsXAorICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAg
+LmhlbHAgPSAid2hlbiBsaW1pdGluZyBieSBpb3BzIG1heCBzaXplIG9mIGFuIEkvTyBpbiBieXRl
+cyIsXAorICAgICAgICB9Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI5MiBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVU
+IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
