@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cZwXE-0006hO-6K
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 04:21:33 -0500
+	(envelope-from <armbru@redhat.com>) id 1cZwtf-0002Ma-Th
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 04:44:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cZwXA-0006Ui-5j
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 04:21:32 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33985)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cZwX9-0006UW-VR
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 04:21:28 -0500
-Received: by mail-pg0-x242.google.com with SMTP id v184so4130437pgv.1
-	for <qemu-devel@nongnu.org>; Sat, 04 Feb 2017 01:21:27 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1486198784-31523-1-git-send-email-ashijeetacharya@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a0b18acc-07ed-4444-63db-d54e76097171@redhat.com>
-Date: Sat, 4 Feb 2017 01:21:23 -0800
+	(envelope-from <armbru@redhat.com>) id 1cZwte-0005D8-QI
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 04:44:43 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<20170202202739.GA15804@work-vm> <87shnvhfwc.fsf@dusky.pond.sub.org>
+	<20170203165722.GC4674@work-vm>
+Date: Sat, 04 Feb 2017 10:44:34 +0100
+In-Reply-To: <20170203165722.GC4674@work-vm> (David Alan Gilbert's message of
+	"Fri, 3 Feb 2017 16:57:23 +0000")
+Message-ID: <8760kq8f3x.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1486198784-31523-1-git-send-email-ashijeetacharya@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] migrate: Introduce a 'dc->vmsd' check
- to avoid segfault for --only-migratable
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>, dgilbert@redhat.com
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, quintela@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+>> 
+>> > * Markus Armbruster (armbru@redhat.com) wrote:
+[...]
+>> >> === Structured values ===
+>> >> 
+>> >> The dotted key convention messes with KEY syntax to permit structured
+>> >> values.  Works, but the more conventional way to support structured
+>> >> values is a syntax for structured values.  
+>> >> 
+>> >> An obvious one is to use { KEY=VALUE, ...} for objects, and [ VALUE,
+>> >> ... ] for arrays.  Looks like this:
+>> >> 
+>> >>     -drive 'driver=quorum,
+>> >>             child=[{ driver=file, filename=disk1.img },
+>> >>                    { driver=host_device, filename=/dev/sdb },
+>> >>                    { driver=nbd, host=localhost } ]'
+>> >> 
+>> >> Again, lines broken and indented for legibility; you need to join them
+>> >> for actual use.
+>> >> 
+>> >> There's a syntactic catch, though: a value of the form [ ... ] can
+>> >> either be an array or a string.  Which one it is depends on the type of
+>> >> the key.  To parse this syntax, you need to know the types, unlike JSON
+>> >> or traditional QemuOpts.  Unless we outlaw strings starting with '{' or
+>> >> '[', which feels impractical.
+>> >
+>> > I don't understand why [ could imply a string.
+>> 
+>> Consider
+>> 
+>>     -drive 'driver=quorum,
+>>             child=[{ driver=file, filename={"foolish":"name"} },
+>>                    { driver=host_device, filename=/dev/sdb },
+>>                    { driver=nbd, host=[::1] } ]'
+>> 
+>> Three KEY=VALUE have their VALUE start with '[' or '{':
+>> 
+>> * child=[{ driver=file, ...
+>> 
+>>   This is an array, not a string, because child is an array.
+>> 
+>> * host=[::1]
+>> 
+>>   This is a string, not an array containing the string "::1", because
+>>   host is a string.
+>
+> Why is that accepted as valid input? Can't that just spit a
+> 'I wanted a string not an array' ?
 
-On 04/02/2017 00:59, Ashijeet Acharya wrote:
-> Commit a3a3d8c7 introduced a segfault bug while checking for
-> 'dc->vmsd->unmigratable' which caused QEMU to crash when trying to add
-> devices which do no set their 'dc->vmsd' yet while initialization.
-> Place a 'dc->vmsd' check prior to it so that we do not segfault for
-> such devices.
-> 
-> NOTE: This doesn't compromise the functioning of --only-migratable
-> option as all the unmigratable devices do set their 'dc->vmsd'.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> ---
-> Changes in v2:
-> - place dc->vmsd check in hw/usb/bus.c as well
-> ---
->  hw/usb/bus.c   | 2 +-
->  qdev-monitor.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> index 1dcc35c..1e39b2c 100644
-> --- a/hw/usb/bus.c
-> +++ b/hw/usb/bus.c
-> @@ -731,7 +731,7 @@ USBDevice *usbdevice_create(const char *cmdline)
->  
->      dc = DEVICE_CLASS(klass);
->  
-> -    if (only_migratable) {
-> +    if (only_migratable && dc->vmsd) {
->          if (dc->vmsd->unmigratable) {
->              error_report("Device %s is not migratable, but --only-migratable "
->                           "was specified", f->name);
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index 549f45f..b72e5a4 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -579,7 +579,7 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
->          return NULL;
->      }
->  
-> -    if (only_migratable) {
-> +    if (only_migratable && dc->vmsd) {
->          if (dc->vmsd->unmigratable) {
->              error_setg(errp, "Device %s is not migratable, but "
->                         "--only-migratable was specified", driver);
-> 
+Because "[::1]" is a perfectly valid string.
 
-Could you handle only_migratable in device_set_realized (inside "if
-(value && !dev->realized)"), to avoid the code duplication?  Separate
-patch from this one, of course.
+It's also a valid array.  Unless the parser knows what type to expect
+here, it cannot decide how to parse it.  That's why I wrote "to parse
+this syntax, you need to know the types".
 
-Thanks,
+>> * filename={"foolish":"name"}
+>> 
+>>   This is a string, not an object, because filename is a string.
+>> 
+>> Clearer now?
+>> 
+>> >> But wait, there's another syntactic catch: in traditional QemuOpts, a
+>> >> value ends at the next unescaped ',' or '\0'.  Inside an object, it now
+>> >> also ends at the next unescaped '}', and inside an array, at the next
+>> >> unescaped ']'.  Or perhaps at the next space (the example above assumes
+>> >> it does).  That means we either have to provide a way to escape '}', ']'
+>> >> and space, or find another way to delimit string values, say require '"'
+>> >> around strings whenever the string contains "funny" characters.
+>> >
+>> > How about a tighter rule that if you've got a structured value -
+>> > i.e. you're inside either of [ or {, then you must " all strings
+>> > (except keys that we keep clean).
+>> 
+>> Matter of taste.
+>> 
+>> Regardless, we need a way to escape '"'.  Doubling it would be
+>> consistent with the existing escape of ','.
+>
+> Doubling for escape feels hideous, especially for ".
 
-Paolo
+No argument, but it beats counting backslashes.
