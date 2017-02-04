@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1ca0sQ-0005bi-Vd
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 08:59:43 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1ca0u1-0006VU-It
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:01:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1ca0sN-0005y6-2O
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 08:59:43 -0500
-Received: from greensocs.com ([193.104.36.180]:43814)
+	(envelope-from <fred.konrad@greensocs.com>) id 1ca0ty-0006cW-GM
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:01:21 -0500
+Received: from greensocs.com ([193.104.36.180]:46983)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1ca0sM-0005xJ-MD
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 08:59:39 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1ca0ty-0006cR-50
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:01:18 -0500
 References: <1486141597-13941-1-git-send-email-fred.konrad@greensocs.com>
-	<1486141597-13941-5-git-send-email-fred.konrad@greensocs.com>
-	<d64a7dfd-cb55-ba59-9731-282bb98cf20e@redhat.com>
-	<1673015b-b059-8094-1b8c-b7039a45cf8e@greensocs.com>
-	<14c737f4-b965-a1b8-ba3c-003e5fa9e3fd@redhat.com>
+	<CAFEAcA9J-F4bVONk_Yhafx3T6R2POW9=pAbLdY+5iW_R_fmBCw@mail.gmail.com>
+	<b9eaacfd-74ab-68ef-dc46-488ef8427aa9@greensocs.com>
+	<CAFEAcA8XzkghP+p=QJj0Qba89m_-VtAN3CvGO6rqLZkTa-EHKQ@mail.gmail.com>
 From: Frederic Konrad <fred.konrad@greensocs.com>
-Message-ID: <d81969f9-1e64-22ff-80eb-e5da72f8ad76@greensocs.com>
-Date: Sat, 4 Feb 2017 14:59:35 +0100
+Message-ID: <577aeb06-4242-4c12-35db-6c4308cb9669@greensocs.com>
+Date: Sat, 4 Feb 2017 15:01:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <14c737f4-b965-a1b8-ba3c-003e5fa9e3fd@redhat.com>
+In-Reply-To: <CAFEAcA8XzkghP+p=QJj0Qba89m_-VtAN3CvGO6rqLZkTa-EHKQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 4/5] exec: allow to get a pointer for some
- mmio memory region
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/5] execute code from mmio area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, qemu-devel@nongnu.org, alistair.francis@xilinx.com, clg@kaod.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Mark Burton <mark.burton@greensocs.com>
 
-On 02/04/2017 01:41 PM, Paolo Bonzini wrote:
->=20
-...
->>
->> Doesn't hotplug use dynamic MemoryRegion? In which case we better
->> make that work with MTTCG. I wonder if we can't simply handle that
->> with a safe_work for this case?
->=20
-> Hot-unplug works because the backing memory is only freed when the
-> device gets instance_finalize, so at that point the region cannot have
-> any references.
->=20
-> What can go wrong is the following (from the docs):
->=20
-> - the memory region's owner had a reference taken via memory_region_ref
->   (for example by address_space_map)
->=20
-> - the region is unparented, and has no owner anymore
->=20
-> - when address_space_unmap is called, the reference to the memory
->   region's owner is leaked.
+On 02/04/2017 02:17 PM, Peter Maydell wrote:
+> On 4 February 2017 at 12:52, Frederic Konrad <fred.konrad@greensocs.com> wrote:
+>> Is that the case that we might get a Bad RAM address error or some such
+>> if we are not on a page boundary (or too small as you say)?
+>> I guess this is a limitation. Mapping on a page boundary shouldn't be
+>> too much restrictive.
+> 
+> Yeah. I really ought to look more closely at what the flow of
+> execution is here, because I think how it works right now
+> is a bit weird and works as much by luck as by judgement
+> (we can longjump out of the middle of translating code
+> right back to the cpu-exec.c loop, and in some cases
+> I think what happens is that we try to translate code,
+> and as part of the "load didn't work" code path we
+> nestedly try to translate the same thing again which
+> of course fails again, only the second time around we
+> realize and longjump out.
+> 
+> (At the moment for linux-user mode this is causing us to
+> assert about taking the tb lock twice, because we hold
+> the tb lock during translation and then try to grab it
+> again to do the cpu_restore_state() in the signal handler.)
+> 
 
-true.
-
->=20
-> In your case you have phys_section_add/phys_section_destroy instead of
-> address_space_map/unmap, but the problem is the same.
->=20
-> I am a bit unsure about using the same lqspi_buf for caching different
-> addresses, and about using the same buffer for MMIO execution and read.
-> What if you allocate a different buffer every time
-> lqspi_request_mmio_ptr is called (adding a char* argument to
-> lqspi_load_cache) and free the old one from the safe_work item, after a
-> global TLB flush?  Then you don't need the Notifiers which were the
-> complicated and handwavy part of my proposal.
-
-Actually this was just because it was the way xilinx_qspi worked.
-It load 1K of SPI data and fill the buffer.
-
-In some other case we don't want to free the pointer at all, just make
-it not accessible for execution / read.
-(BTW I'll add the read-only property to this).
-
-What about a simple Object eg: mmio-execution-interface which has a
-MemoryRegion? Instead of creating the MemoryRegion in request_pointer,
-We create a mmio-execution-interface object which create and map the
-region on the subregion.
-Then in invalidate: we unplug the mmio-execution-interface, unref it and
-it is freed all by magic when the map doesn't need it.
-
-This avoid the reference issue and probably the bug with MTTCG.
+Yes it seems there are some scary things happening there.
 
 Fred
 
->=20
-> Paolo
->=20
->>
->> BTW the tests I have seems to pass without issues.
->>
->>>
->>> An alternative design could be:
->>>
->>> - memory_region_request_mmio_ptr returns a MemoryRegionCache instead =
-of
->>> a pointer, so that the device can map a subset of the device (e.g. a
->>> single page)
->>
->> I'm not aware of this MemoryRegionCache yet, it seems pretty new.
->> I'll take a look.
->>
->> Thanks,
->> Fred
->>
->>>
->>> - memory_region_request_mmio_ptr and MemoryRegionOps.request_ptr acce=
-pt
->>> a Notifier
->>>
->>> - the device adds the Notifier to a NotifierList.  Before invalidatin=
-g,
->>> it invokes the Notifier and empties the NotifierList.
->>>
->>> - for the TLB case, the Notifier calls tlb_flush_page.
->>>
->>> I like the general idea though!
->>>
->>> Paolo
->>>
->>>> +    }
->>>> +}
->>
->>
->>
+> thanks
+> -- PMM
+> 
