@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ca13S-0000GY-4z
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:11:07 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ca16c-0001yp-91
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:14:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ca13R-0001Qb-7k
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:11:06 -0500
-Date: Sat, 4 Feb 2017 22:10:56 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170204141056.GB15362@lemon>
-References: <87bmukmlau.fsf@dusky.pond.sub.org> <20170204122150.GA15362@lemon>
-	<871sve13l4.fsf@dusky.pond.sub.org>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ca16b-00036Q-BF
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:14:22 -0500
+Date: Sat, 4 Feb 2017 15:14:13 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170204141413.GO9606@toto>
+References: <1486144135-4894-1-git-send-email-peter.maydell@linaro.org>
+	<1486144135-4894-2-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <871sve13l4.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
+In-Reply-To: <1486144135-4894-2-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] target/arm: Abstract out pbit/wbit
+ tests in ARM ldr/str decode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
 
-On Sat, 02/04 14:35, Markus Armbruster wrote:
-> Fam Zheng <famz@redhat.com> writes:
+On Fri, Feb 03, 2017 at 05:48:54PM +0000, Peter Maydell wrote:
+> In the ARM ldr/str decode path, rather than directly testing
+> "insn & (1 << 21)" and "insn & (1 << 24)", abstract these
+> bits out into wbit and pbit local flags. (We will want to
+> do more tests against them to determine whether we need to
+> provide syndrome information.)
 > 
-> > On Thu, 02/02 20:42, Markus Armbruster wrote:
-> >> === Comparison ===
-> >> 
-> >> In my opinion, dotted keys are weird and ugly, but at least they don't
-> >> add to the quoting mess.  Structured values look better, except when
-> >> they do add to the quoting mess.
-> >> 
-> >> I'm having a hard time deciding which one I like less :)
-> >> 
-> >> Opinions?  Other ideas?
-> >
-> > Here's my poor attempt:
-> >
-> > The dotted syntax, as the simpler of two, can cover everyday use very well.  If
-> > we introduce an "@reference" extension to it which can help the expresiveness,
-> > we can have a hybrid solution. It's not the cleanest interface and syntax, but
-> > escaping, nesting and quoting can all be divide-and-conqured in their optimal way.
-> > What I'm imagining is something like:
-> >
-> >     -json "id=children0,text=[
-> >                 { 'driver': 'null-co://' },
-> >                 { 'driver': 'null-co://' },
-> >                 { 'driver': 'null-co://' }
-> >             ]" \
-> >     -dot \
-> >       id=quorum0,driver=quorum,read-pattern=fifo,vote-threshold=1,children=@children0 \
-> >     -drive if=virtio,id=primary-disk0,driver=qcow2,file=@quorum0
-> >
-> > IOW "-json" and "-dot" define options that is intended to be referenced from
-> > other dotted keys (quorum0 uses children0, and in turn primary-disk0 uses
-> > quorum0).
-> >
-> > Note: "-dot" here could be replaced with a -blockdev in this specific case but
-> > I'm demostrating it just in case it is useful generically.
-> >
-> > Fam
-> 
-> KEY=@REF for references creates the same issue as KEY=[VALUE,...] for
-> arrays: you need to know the type of KEY to decide whether @REF is a
-> reference or a string, unless we outlaw strings starting with '@'.
-> 
-> Not a show-stopper, but it does preclude a design where a simple parser
-> feeds into a type-aware visitor, which is how the JSON -> QObject ->
-> QAPI pipeline works.
-> 
-> If you get creative in the VALUE part, you complicate the parser and/or
-> need to add quoting.
-> 
-> If you get creative in the KEY part, you need to restrict valid names.
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-How about KEY@=REF?
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Fam
+
+> ---
+>  target/arm/translate.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 493c627..175b4c1 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -8782,6 +8782,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>              } else {
+>                  int address_offset;
+>                  bool load = insn & (1 << 20);
+> +                bool wbit = insn & (1 << 21);
+> +                bool pbit = insn & (1 << 24);
+>                  bool doubleword = false;
+>                  /* Misc load/store */
+>                  rn = (insn >> 16) & 0xf;
+> @@ -8799,8 +8801,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>                  }
+>  
+>                  addr = load_reg(s, rn);
+> -                if (insn & (1 << 24))
+> +                if (pbit) {
+>                      gen_add_datah_offset(s, insn, 0, addr);
+> +                }
+>                  address_offset = 0;
+>  
+>                  if (doubleword) {
+> @@ -8849,10 +8852,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>                     ensure correct behavior with overlapping index registers.
+>                     ldrd with base writeback is undefined if the
+>                     destination and index registers overlap.  */
+> -                if (!(insn & (1 << 24))) {
+> +                if (!pbit) {
+>                      gen_add_datah_offset(s, insn, address_offset, addr);
+>                      store_reg(s, rn, addr);
+> -                } else if (insn & (1 << 21)) {
+> +                } else if (wbit) {
+>                      if (address_offset)
+>                          tcg_gen_addi_i32(addr, addr, address_offset);
+>                      store_reg(s, rn, addr);
+> -- 
+> 2.7.4
+> 
