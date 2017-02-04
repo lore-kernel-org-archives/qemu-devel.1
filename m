@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cZv1K-00078c-M0
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 02:44:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1cZvop-00051M-O0
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 03:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cZv1H-0000qP-F6
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 02:44:30 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:36852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cZv1H-0000qI-9I
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 02:44:27 -0500
-Received: by mail-pf0-x242.google.com with SMTP id 19so3112292pfo.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 23:44:26 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170203170925.12554-1-rjones@redhat.com>
-	<20170203170925.12554-2-rjones@redhat.com>
-	<2f5ef524-02d7-e0e8-c693-db932f8270b9@redhat.com>
-	<20170203185624.GB13825@redhat.com>
-	<25dc57d6-ded3-9e4a-92cf-e678d0c92a27@redhat.com>
-	<20170203192244.GC13825@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <21bdfce0-a140-e4ef-b2fe-4f5e188e44a4@redhat.com>
-Date: Fri, 3 Feb 2017 23:44:23 -0800
+	(envelope-from <bounces@canonical.com>) id 1cZvok-0004mQ-KN
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 03:35:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51667)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cZvok-0004lw-F8
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 03:35:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cZvoj-0002Md-DK
+	for <qemu-devel@nongnu.org>; Sat, 04 Feb 2017 08:35:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 55CBD2E80C3
+	for <qemu-devel@nongnu.org>; Sat,  4 Feb 2017 08:35:33 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170203192244.GC13825@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-nbd: Implement socket activation.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 04 Feb 2017 08:20:40 -0000
+From: shqking <1661815@bugs.launchpad.net>
+Reply-To: Bug 1661815 <1661815@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170204082040.20702.26524.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1661815] [NEW] Stack address is returned from
+ function translate_one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +36,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: den@openvz.org, stefanha@gmail.com, dplotnikov@virtuozzo.com, qemu-devel@nongnu.org, rkagan@virtuozzo.com
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
+The vulnerable version is qemu-2.8.0, and the vulnerable function is in
+"target-s390x/translate.c".
 
-On 03/02/2017 11:22, Richard W.M. Jones wrote:
-> 
-> I think that the --fork option is mainly intended for command line use
-> of qemu-nbd.  If you're running qemu-nbd from a program there's no
-> real reason to use --fork, since you can control the fork process
-> better yourself.
-> 
-> LISTEN_PID isn't settable from the command line.  It's also not
-> settable from a shell script (as far as I can tell when I was trying
-> to write a shell script to test nbdkit).  It has to be set between the
-> fork and exec calls, because it is set to the qemu-nbd PID.
-> 
-> So I don't think --fork and socket activation are really features that
-> it makes any sense to mix.
+The code snippet is as following.
 
-I agree it doesn't really make sense, but I also don't see why it
-wouldn't work.
+static ExitStatus translate_one(CPUS390XState *env, DisasContext *s)
+{
+    const DisasInsn *insn;
+    ExitStatus ret =3D NO_EXIT;
+    DisasFields f;
+    ...
+    s->fields =3D &f;
+    ...
+    s->pc =3D s->next_pc;
+    return ret;
+}
 
-Paolo
+A stack address, i.e. the address of local variable "f" is returned from
+current function through the output parameter "s->fields" as a side
+effect.
+
+This issue is one kind of undefined behaviors, according the C Standard,
+6.2.4 [ISO/IEC 9899:2011]
+(https://www.securecoding.cert.org/confluence/display/c/DCL30-C.+Declare+ob=
+jects+with+appropriate+storage+durations)
+
+This dangerous defect may lead to an exploitable vulnerability.
+We suggest sanitizing "s->fields" as null before return.
+
+Note that this issue is reported by shqking and Zhenwei Zou together.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661815
+
+Title:
+  Stack address is returned from function translate_one
+
+Status in QEMU:
+  New
+
+Bug description:
+  The vulnerable version is qemu-2.8.0, and the vulnerable function is
+  in "target-s390x/translate.c".
+
+  The code snippet is as following.
+
+  static ExitStatus translate_one(CPUS390XState *env, DisasContext *s)
+  {
+      const DisasInsn *insn;
+      ExitStatus ret =3D NO_EXIT;
+      DisasFields f;
+      ...
+      s->fields =3D &f;
+      ...
+      s->pc =3D s->next_pc;
+      return ret;
+  }
+
+  A stack address, i.e. the address of local variable "f" is returned
+  from current function through the output parameter "s->fields" as a
+  side effect.
+
+  This issue is one kind of undefined behaviors, according the C
+  Standard, 6.2.4 [ISO/IEC 9899:2011]
+  (https://www.securecoding.cert.org/confluence/display/c/DCL30-C.+Declare+=
+objects+with+appropriate+storage+durations)
+
+  This dangerous defect may lead to an exploitable vulnerability.
+  We suggest sanitizing "s->fields" as null before return.
+
+  Note that this issue is reported by shqking and Zhenwei Zou together.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661815/+subscriptions
