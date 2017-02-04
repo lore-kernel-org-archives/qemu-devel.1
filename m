@@ -1,22 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cZmW9-00051d-P7
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:39:46 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cZpAo-0004gb-OV
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 20:29:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cZmW8-0004FX-Px
-	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 17:39:45 -0500
-References: <20170203120254.15062-1-berrange@redhat.com>
-	<20170203120254.15062-7-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <2a209a6e-338c-f352-6634-555b36daafb9@redhat.com>
-Date: Fri, 3 Feb 2017 23:39:35 +0100
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cZpAl-0004yQ-KD
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 20:29:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54107)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1cZpAl-0004xA-Ar
+	for qemu-devel@nongnu.org; Fri, 03 Feb 2017 20:29:51 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v141T9i1020321
+	for <qemu-devel@nongnu.org>; Fri, 3 Feb 2017 20:29:49 -0500
+Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28cyk3svt2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 03 Feb 2017 20:29:49 -0500
+Received: from localhost
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Fri, 3 Feb 2017 23:29:46 -0200
+Date: Fri, 3 Feb 2017 23:29:37 -0200
+From: joserz@linux.vnet.ibm.com
+References: <1486159277-25949-1-git-send-email-joserz@linux.vnet.ibm.com>
+	<148615989046.33.5463181790096988546@eba24e3a0d7f>
 MIME-Version: 1.0
-In-Reply-To: <20170203120254.15062-7-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1se68XFloTNdCvEq4bWo4eaH26fjOQOrl"
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] qemu-img: copy *key-secret opts
- when opening newly created files
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <148615989046.33.5463181790096988546@eba24e3a0d7f>
+Message-Id: <20170204012937.GA7402@pacoca>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/4] POWER9 TCG enablements -
+ part 13
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,143 +42,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, famz@redhat.com, david@gibson.dropbear.id.au
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1se68XFloTNdCvEq4bWo4eaH26fjOQOrl
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
-Message-ID: <2a209a6e-338c-f352-6634-555b36daafb9@redhat.com>
-Subject: Re: [PATCH v2 6/6] qemu-img: copy *key-secret opts when opening newly
- created files
-References: <20170203120254.15062-1-berrange@redhat.com>
- <20170203120254.15062-7-berrange@redhat.com>
-In-Reply-To: <20170203120254.15062-7-berrange@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+On Fri, Feb 03, 2017 at 02:11:31PM -0800, no-reply@patchew.org wrote:
+> Hi,
+> 
+> Your series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Type: series
+> Subject: [Qemu-devel] [PATCH 0/4] POWER9 TCG enablements - part 13
+> Message-id: 1486159277-25949-1-git-send-email-joserz@linux.vnet.ibm.com
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> # Useful git options
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  * [new tag]         patchew/1486159277-25949-1-git-send-email-joserz@linux.vnet.ibm.com -> patchew/1486159277-25949-1-git-send-email-joserz@linux.vnet.ibm.com
+>  - [tag update]      patchew/20170203120254.15062-1-berrange@redhat.com -> patchew/20170203120254.15062-1-berrange@redhat.com
+> Switched to a new branch 'test'
+> 52f618a ppc: implement xssubqp instruction
+> f7dfdbf ppc: implement xssqrtqp instruction
+> 4d895a4 ppc: implement xsrqpxp instruction
+> 5d49c07 ppc: implement xsrqpi[x] instruction
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/4: ppc: implement xsrqpi[x] instruction...
+> ERROR: Macros with complex values should be enclosed in parenthesis
+> #125: FILE: target/ppc/translate/vsx-ops.inc.c:106:
+> +#define GEN_VSX_Z23FORM_300(name, opc2, opc3, opc4, inval) \
+> +GEN_VSX_XFORM_300_EO(name, opc2, opc3 | 0x00, opc4 | 0x0, inval), \
+> +GEN_VSX_XFORM_300_EO(name, opc2, opc3 | 0x08, opc4 | 0x0, inval), \
+> +GEN_VSX_XFORM_300_EO(name, opc2, opc3 | 0x10, opc4 | 0x0, inval), \
+> +GEN_VSX_XFORM_300_EO(name, opc2, opc3 | 0x18, opc4 | 0x0, inval), \
+> +GEN_VSX_XFORM_300_EO(name, opc2, opc3 | 0x00, opc4 | 0x1, inval), \
+> +GEN_VSX_XFORM_300_EO(name, opc2, opc3 | 0x08, opc4 | 0x1, inval), \
+> +GEN_VSX_XFORM_300_EO(name, opc2, opc3 | 0x10, opc4 | 0x1, inval), \
+> +GEN_VSX_XFORM_300_EO(name, opc2, opc3 | 0x18, opc4 | 0x1, inval)
+> 
 
-On 03.02.2017 13:02, Daniel P. Berrange wrote:
-> The qemu-img dd/convert commands will create a image file and
-> then try to open it. Historically it has been possible to open
-> new files without passing any options. With encrypted files
-> though, the *key-secret options are mandatory, so we need to
-> provide those options when opening the newly created file.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+I tried to improve it but this style is used everywhere
+
+> total: 1 errors, 0 warnings, 103 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 2/4: ppc: implement xsrqpxp instruction...
+> Checking PATCH 3/4: ppc: implement xssqrtqp instruction...
+> Checking PATCH 4/4: ppc: implement xssubqp instruction...
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
 > ---
->  qemu-img.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 47 insertions(+), 4 deletions(-)
->=20
-> diff --git a/qemu-img.c b/qemu-img.c
-> index dc4c6eb..98522dd 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -319,6 +319,49 @@ static BlockBackend *img_open_file(const char *fil=
-ename,
->  }
-> =20
-> =20
-> +static int img_add_key_secrets(void *opaque,
-> +                               const char *name, const char *value,
-> +                               Error **errp)
-> +{
-> +    QDict **options =3D opaque;
-> +
-> +    if (g_str_has_suffix(name, "key-secret")) {
-> +        if (!*options) {
-> +            *options =3D qdict_new();
-> +        }
-> +        qdict_put(*options, name, qstring_from_str(value));
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static BlockBackend *img_open_new_file(const char *filename,
-> +                                       QemuOpts *create_opts,
-> +                                       const char *fmt, int flags,
-> +                                       bool writethrough, bool quiet)
-> +{
-> +    BlockBackend *blk;
-> +    Error *local_err =3D NULL;
-> +    QDict *options =3D NULL;
-> +
-> +    if (fmt) {
-> +        options =3D qdict_new();
-> +        qdict_put(options, "driver", qstring_from_str(fmt));
-> +    }
-> +
-> +    qemu_opt_foreach(create_opts, img_add_key_secrets, &options, NULL)=
-;
-
-It would probably be easier to just unconditionally create an options
-QDict. It doesn't hurt if it's empty.
-
-Anyway:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +
-> +    blk =3D blk_new_open(filename, NULL, options, flags, &local_err);
-> +    if (!blk) {
-> +        error_reportf_err(local_err, "Could not open '%s': ", filename=
-);
-> +        return NULL;
-> +    }
-> +    blk_set_enable_write_cache(blk, !writethrough);
-> +
-> +    return blk;
-> +}
-> +
-> +
->  static BlockBackend *img_open(bool image_opts,
->                                const char *filename,
->                                const char *fmt, int flags, bool writeth=
-rough,
-> @@ -2115,8 +2158,8 @@ static int img_convert(int argc, char **argv)
->           * That has to wait for bdrv_create to be improved
->           * to allow filenames in option syntax
->           */
-> -        out_blk =3D img_open_file(out_filename, out_fmt,
-> -                                flags, writethrough, quiet);
-> +        out_blk =3D img_open_new_file(out_filename, opts, out_fmt,
-> +                                    flags, writethrough, quiet);
->      }
->      if (!out_blk) {
->          ret =3D -1;
-> @@ -4206,8 +4249,8 @@ static int img_dd(int argc, char **argv)
->           * That has to wait for bdrv_create to be improved
->           * to allow filenames in option syntax
->           */
-> -        blk2 =3D img_open_file(out.filename, out_fmt,
-> -                             BDRV_O_RDWR, false, false);
-> +        blk2 =3D img_open_new_file(out.filename, opts, out_fmt,
-> +                                 BDRV_O_RDWR, false, false);
->      }
-> =20
->      if (!blk2) {
->=20
-
-
-
---1se68XFloTNdCvEq4bWo4eaH26fjOQOrl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliVBqcSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AsNIH+wWsUfkFVT+3yNd8g0MgWCeR/HmGp84l
-OHyvwIN+Ak5Q7dHrO21eZvlIJsGV6aTGoMwJg0uBWGIgY1gh6QGEwbR/LHt7HO71
-ZamuIEuRkOkqks00kLzXSlXOeaoiHd0CCaS4W3nnTU7HxvJYGmiCGo2Xk1cLtetU
-FDxDrGKnrOtYhtc1gcJWz+AgefJV1P3YlFrU/47ZMQeBSLAYAw/RhXghvt0SwH+r
-Pbj1BUBl9ZR78VkrRU8n49QnQM++/xl5p5RwPAWK3n42bjYCRe6L1Bh6+guto9zr
-QthuuI4SXLfNmQ7hXZPu2cp7IooJ6Osv+egxtzJpEmvwZXKWgLL8ctM=
-=R5kl
------END PGP SIGNATURE-----
-
---1se68XFloTNdCvEq4bWo4eaH26fjOQOrl--
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
