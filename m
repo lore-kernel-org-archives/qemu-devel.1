@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cZxBc-0002XD-3k
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:03:17 -0500
+	(envelope-from <rjones@redhat.com>) id 1cZxBl-0002eI-HK
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:03:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cZxBY-0003ei-3R
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:03:16 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <87bmukmlau.fsf@dusky.pond.sub.org>
-	<20170202202739.GA15804@work-vm> <87shnvhfwc.fsf@dusky.pond.sub.org>
-	<6e65ad3c-db00-0ce5-a9c6-0e8ba84ad3c6@redhat.com>
-	<87zii270hm.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <da71759e-5bce-2089-3be7-f0d256468ee8@redhat.com>
-Date: Sat, 4 Feb 2017 02:03:07 -0800
-MIME-Version: 1.0
-In-Reply-To: <87zii270hm.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
+	(envelope-from <rjones@redhat.com>) id 1cZxBh-0003lM-JZ
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:03:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39774)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cZxBh-0003ks-E0
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:03:21 -0500
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Sat,  4 Feb 2017 10:03:16 +0000
+Message-Id: <20170204100317.32425-1-rjones@redhat.com>
+Subject: [Qemu-devel] [PATCH v5] qemu-nbd: Implement socket activation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +21,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, den@openvz.org, rkagan@virtuozzo.com, dplotnikov@virtuozzo.com, berrange@redhat.com, stefanha@gmail.com, armbru@redhat.com
 
+v3 -> v5:
 
+- Use stringify() macro (thanks Markus).
 
-On 04/02/2017 01:45, Markus Armbruster wrote:
->>>      -drive driver=qcow2,
->>>             file.driver=gluster,
->>>                 .volume=testvol,
->>>                 .path=/path/a.qcow2,
->>>                 .debug=9,
->>>             file.server.0.type=tcp,
->>>                          .host=1.2.3.4,
->>>                          .port=24007,
->>>             file.server.1.type=unix,
->>>                          .socket=/var/run/glusterd.socket
->>>
->>> Mind, I'm not at all sure this is a *good* idea.  I suspect it's more
->>> magic than it's worth.
->> As someone who likes dot syntax very much, I don't like it. If you
->> structure it like this, it's OK, but then you can just write the full
->> prefix (which gets the point across just as well because I can quickly
->> tell from a glance that it's the same prefix).
->>
->> OTOH, when joined into a single line it doesn't change much in terms of
->> legibility, in my opinion.
-> 
-> Thanks!
+- Remove --fork restriction again.
 
-Actually I think it does improve legibility.
+- Retest with virt-p2v.
 
-It doesn't improve writability though, as anecdotally proved by Markus's
-own mistake.
-
-I am a fan of the dot syntax too.  It seems to be the most incremental
-solution, and it's still as expressive as JSON.
-
-_However_ we could also extend -readconfig to support JSON, i.e. instead of
-
-	[drive "abc"]
-		file = "foo"
-
-it could support
-
-	{ 'drive': { 'file: 'foo' }, 'id': 'abc' }
-
-In other words [ would introduce key-value QemuOpts with dot syntax,
-while { would introduce JSON.
-
-Paolo
+Rich.
