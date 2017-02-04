@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cZzLt-0002Zx-4O
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 07:22:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cZzXR-0004tl-WF
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 07:33:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cZzLs-0005tn-8Z
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 07:22:01 -0500
-Date: Sat, 4 Feb 2017 20:21:50 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170204122150.GA15362@lemon>
-References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cZzXR-0001Gn-18
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 07:33:58 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:38416)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cZzXQ-0001GZ-PK
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 07:33:56 -0500
+Received: by mail-wm0-x236.google.com with SMTP id r141so65056606wmg.1
+	for <qemu-devel@nongnu.org>; Sat, 04 Feb 2017 04:33:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bmukmlau.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
+In-Reply-To: <1486141597-13941-1-git-send-email-fred.konrad@greensocs.com>
+References: <1486141597-13941-1-git-send-email-fred.konrad@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 4 Feb 2017 12:33:34 +0000
+Message-ID: <CAFEAcA9J-F4bVONk_Yhafx3T6R2POW9=pAbLdY+5iW_R_fmBCw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC 0/5] execute code from mmio area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org
+To: =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Mark Burton <mark.burton@greensocs.com>
 
-On Thu, 02/02 20:42, Markus Armbruster wrote:
-> === Comparison ===
-> 
-> In my opinion, dotted keys are weird and ugly, but at least they don't
-> add to the quoting mess.  Structured values look better, except when
-> they do add to the quoting mess.
-> 
-> I'm having a hard time deciding which one I like less :)
-> 
-> Opinions?  Other ideas?
+On 3 February 2017 at 17:06,  <fred.konrad@greensocs.com> wrote:
+> From: KONRAD Frederic <fred.konrad@greensocs.com>
+>
+> This patch-set allows to execute code from mmio areas.
+> The main goal of this is to be able to run code for example from an SPI device.
+>
+> The three first patch fixes the way get_page_addr_code fills the TLB.
+>
+> The fourth patch implements the mmio execution helpers: the device must
+> implement the request_ptr callback of the MemoryRegion and will be notified when
+> the guest wants to execute code from it.
+>
+> The fifth patch implements the execution from the SPI memories in the
+> xilinx_spips model.
 
-Here's my poor attempt:
+I like the general idea, but there's an awkward issue:
+at the moment our translation system assumes that when we're
+translating code then if the first instruction in the TB
+can be read OK then we won't ever get a fault trying to
+read subsequent bytes up to the end of the page. If we
+move from "we only translate code out of whole pages of
+RAM" to "we might translate code out of devices that
+are in subpages" then this assumption gets broken.
+(The symptom would be that we would report the fault
+in the wrong place, for the PC at the start of the TB.)
 
-The dotted syntax, as the simpler of two, can cover everyday use very well.  If
-we introduce an "@reference" extension to it which can help the expresiveness,
-we can have a hybrid solution. It's not the cleanest interface and syntax, but
-escaping, nesting and quoting can all be divide-and-conqured in their optimal way.
-What I'm imagining is something like:
-
-    -json "id=children0,text=[
-                { 'driver': 'null-co://' },
-                { 'driver': 'null-co://' },
-                { 'driver': 'null-co://' }
-            ]" \
-    -dot \
-      id=quorum0,driver=quorum,read-pattern=fifo,vote-threshold=1,children=@children0 \
-    -drive if=virtio,id=primary-disk0,driver=qcow2,file=@quorum0
-
-IOW "-json" and "-dot" define options that is intended to be referenced from
-other dotted keys (quorum0 uses children0, and in turn primary-disk0 uses
-quorum0).
-
-Note: "-dot" here could be replaced with a -blockdev in this specific case but
-I'm demostrating it just in case it is useful generically.
-
-Fam
+thanks
+-- PMM
