@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cZx9N-0000rC-RP
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:00:59 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cZxBc-0002XD-3k
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:03:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cZx9L-0002v1-N2
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:00:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cZx9L-0002uQ-E6
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:00:55 -0500
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Date: Sat,  4 Feb 2017 10:00:48 +0000
-Message-Id: <20170204100048.31850-2-rjones@redhat.com>
-In-Reply-To: <20170204100048.31850-1-rjones@redhat.com>
-References: <20170204100048.31850-1-rjones@redhat.com>
-Subject: [Qemu-devel] [PATCH v4] qemu-nbd: Implement socket activation.
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cZxBY-0003ei-3R
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 05:03:16 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<20170202202739.GA15804@work-vm> <87shnvhfwc.fsf@dusky.pond.sub.org>
+	<6e65ad3c-db00-0ce5-a9c6-0e8ba84ad3c6@redhat.com>
+	<87zii270hm.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <da71759e-5bce-2089-3be7-f0d256468ee8@redhat.com>
+Date: Sat, 4 Feb 2017 02:03:07 -0800
+MIME-Version: 1.0
+In-Reply-To: <87zii270hm.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,245 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, den@openvz.org, rkagan@virtuozzo.com, dplotnikov@virtuozzo.com, berrange@redhat.com, stefanha@gmail.com
+To: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Socket activation (sometimes known as systemd socket activation)
-allows an Internet superserver to pass a pre-opened listening socket
-to the process, instead of having qemu-nbd open a socket itself.  This
-is done via the LISTEN_FDS and LISTEN_PID environment variables, and a
-standard file descriptor range.
 
-This change partially implements socket activation for qemu-nbd.  If
-the environment variables are set correctly, then socket activation
-will happen automatically, otherwise everything works as before.  The
-limitation is that LISTEN_FDS must be 1.
 
-Signed-off-by: Richard W.M. Jones.
----
- qemu-nbd.c | 175 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 166 insertions(+), 9 deletions(-)
+On 04/02/2017 01:45, Markus Armbruster wrote:
+>>>      -drive driver=qcow2,
+>>>             file.driver=gluster,
+>>>                 .volume=testvol,
+>>>                 .path=/path/a.qcow2,
+>>>                 .debug=9,
+>>>             file.server.0.type=tcp,
+>>>                          .host=1.2.3.4,
+>>>                          .port=24007,
+>>>             file.server.1.type=unix,
+>>>                          .socket=/var/run/glusterd.socket
+>>>
+>>> Mind, I'm not at all sure this is a *good* idea.  I suspect it's more
+>>> magic than it's worth.
+>> As someone who likes dot syntax very much, I don't like it. If you
+>> structure it like this, it's OK, but then you can just write the full
+>> prefix (which gets the point across just as well because I can quickly
+>> tell from a glance that it's the same prefix).
+>>
+>> OTOH, when joined into a single line it doesn't change much in terms of
+>> legibility, in my opinion.
+> 
+> Thanks!
 
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index c734f62..c76fd76 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -463,6 +463,138 @@ static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, Error **errp)
-     return creds;
- }
- 
-+#define MACRO_EXPAND_STRINGIFY(x) STRINGIFY(x)
-+#define STRINGIFY(x) #x
-+
-+static void setup_address_and_port(const char **address, const char **port)
-+{
-+    if (*address == NULL) {
-+        *address = "0.0.0.0";
-+    }
-+
-+    if (*port == NULL) {
-+        *port = MACRO_EXPAND_STRINGIFY(NBD_DEFAULT_PORT);
-+    }
-+}
-+
-+#define FIRST_SOCKET_ACTIVATION_FD 3 /* defined by systemd ABI */
-+
-+#ifndef _WIN32
-+/*
-+ * Check if socket activation was requested via use of the
-+ * LISTEN_FDS and LISTEN_PID environment variables.
-+ *
-+ * Returns 0 if no socket activation, or the number of FDs.
-+ */
-+static unsigned int check_socket_activation(void)
-+{
-+    const char *s;
-+    unsigned long pid;
-+    unsigned long nr_fds;
-+    unsigned int i;
-+    int fd;
-+    int err;
-+
-+    s = getenv("LISTEN_PID");
-+    if (s == NULL) {
-+        return 0;
-+    }
-+    err = qemu_strtoul(s, NULL, 10, &pid);
-+    if (err) {
-+        if (verbose) {
-+            fprintf(stderr, "malformed %s environment variable (ignored)\n",
-+                    "LISTEN_PID");
-+        }
-+        return 0;
-+    }
-+    if (pid != getpid()) {
-+        if (verbose) {
-+            fprintf(stderr, "%s was not for us (ignored)\n",
-+                    "LISTEN_PID");
-+        }
-+        return 0;
-+    }
-+
-+    s = getenv("LISTEN_FDS");
-+    if (s == NULL) {
-+        return 0;
-+    }
-+    err = qemu_strtoul(s, NULL, 10, &nr_fds);
-+    if (err) {
-+        if (verbose) {
-+            fprintf(stderr, "malformed %s environment variable (ignored)\n",
-+                    "LISTEN_FDS");
-+        }
-+        return 0;
-+    }
-+    assert(nr_fds <= UINT_MAX);
-+
-+    /* A limitation of current qemu-nbd is that it can only listen on
-+     * a single socket.  When that limitation is lifted, we can change
-+     * this function to allow LISTEN_FDS > 1, and remove the assertion
-+     * in the main function below.
-+     */
-+    if (nr_fds > 1) {
-+        error_report("qemu-nbd does not support socket activation with %s > 1",
-+                     "LISTEN_FDS");
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    /* So these are not passed to any child processes we might start. */
-+    unsetenv("LISTEN_FDS");
-+    unsetenv("LISTEN_PID");
-+
-+    /* So the file descriptors don't leak into child processes. */
-+    for (i = 0; i < nr_fds; ++i) {
-+        fd = FIRST_SOCKET_ACTIVATION_FD + i;
-+        if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1) {
-+            /* If we cannot set FD_CLOEXEC then it probably means the file
-+             * descriptor is invalid, so socket activation has gone wrong
-+             * and we should exit.
-+             */
-+            error_report("Socket activation failed: "
-+                         "invalid file descriptor fd = %d: %m",
-+                         fd);
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-+    return (unsigned int) nr_fds;
-+}
-+
-+#else /* !_WIN32 */
-+static unsigned int check_socket_activation(void)
-+{
-+    return 0;
-+}
-+#endif
-+
-+/*
-+ * Check socket parameters compatibility when socket activation is used.
-+ */
-+static const char *socket_activation_validate_opts(const char *device,
-+                                                   const char *sockpath,
-+                                                   const char *address,
-+                                                   const char *port)
-+{
-+    if (device != NULL) {
-+        return "NBD device can't be set when using socket activation";
-+    }
-+
-+    if (sockpath != NULL) {
-+        return "Unix socket can't be set when using socket activation";
-+    }
-+
-+    if (address != NULL) {
-+        return "The interface can't be set when using socket activation";
-+    }
-+
-+    if (port != NULL) {
-+        return "TCP port number can't be set when using socket activation";
-+    }
-+
-+    return NULL;
-+}
- 
- int main(int argc, char **argv)
- {
-@@ -471,7 +603,7 @@ int main(int argc, char **argv)
-     off_t dev_offset = 0;
-     uint16_t nbdflags = 0;
-     bool disconnect = false;
--    const char *bindto = "0.0.0.0";
-+    const char *bindto = NULL;
-     const char *port = NULL;
-     char *sockpath = NULL;
-     char *device = NULL;
-@@ -533,6 +665,7 @@ int main(int argc, char **argv)
-     char *trace_file = NULL;
-     bool fork_process = false;
-     int old_stderr = -1;
-+    unsigned socket_activation;
- 
-     /* The client thread uses SIGTERM to interrupt the server.  A signal
-      * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
-@@ -751,6 +884,19 @@ int main(int argc, char **argv)
-     trace_init_file(trace_file);
-     qemu_set_log(LOG_TRACE);
- 
-+    socket_activation = check_socket_activation();
-+    if (socket_activation == 0) {
-+        setup_address_and_port(&bindto, &port);
-+    } else {
-+        /* Using socket activation - check user didn't use -p etc. */
-+        const char *err_msg = socket_activation_validate_opts(device, sockpath,
-+                                                              bindto, port);
-+        if (err_msg != NULL) {
-+            error_report("%s", err_msg);
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-     if (tlscredsid) {
-         if (sockpath) {
-             error_report("TLS is only supported with IPv4/IPv6");
-@@ -855,7 +1001,25 @@ int main(int argc, char **argv)
-         snprintf(sockpath, 128, SOCKET_PATH, basename(device));
-     }
- 
--    saddr = nbd_build_socket_address(sockpath, bindto, port);
-+    if (socket_activation == 0) {
-+        server_ioc = qio_channel_socket_new();
-+        saddr = nbd_build_socket_address(sockpath, bindto, port);
-+        if (qio_channel_socket_listen_sync(server_ioc, saddr, &local_err) < 0) {
-+            object_unref(OBJECT(server_ioc));
-+            error_report_err(local_err);
-+            return 1;
-+        }
-+    } else {
-+        /* See comment in check_socket_activation above. */
-+        assert(socket_activation == 1);
-+        server_ioc = qio_channel_socket_new_fd(FIRST_SOCKET_ACTIVATION_FD,
-+                                               &local_err);
-+        if (server_ioc == NULL) {
-+            error_report("Failed to use socket activation: %s",
-+                         error_get_pretty(local_err));
-+            exit(EXIT_FAILURE);
-+        }
-+    }
- 
-     if (qemu_init_main_loop(&local_err)) {
-         error_report_err(local_err);
-@@ -950,13 +1114,6 @@ int main(int argc, char **argv)
-         exit(EXIT_FAILURE);
-     }
- 
--    server_ioc = qio_channel_socket_new();
--    if (qio_channel_socket_listen_sync(server_ioc, saddr, &local_err) < 0) {
--        object_unref(OBJECT(server_ioc));
--        error_report_err(local_err);
--        return 1;
--    }
--
-     if (device) {
-         int ret;
- 
--- 
-2.10.2
+Actually I think it does improve legibility.
+
+It doesn't improve writability though, as anecdotally proved by Markus's
+own mistake.
+
+I am a fan of the dot syntax too.  It seems to be the most incremental
+solution, and it's still as expressive as JSON.
+
+_However_ we could also extend -readconfig to support JSON, i.e. instead of
+
+	[drive "abc"]
+		file = "foo"
+
+it could support
+
+	{ 'drive': { 'file: 'foo' }, 'id': 'abc' }
+
+In other words [ would introduce key-value QemuOpts with dot syntax,
+while { would introduce JSON.
+
+Paolo
