@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1cZynU-0002RM-1u
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 06:46:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1cZytV-00045o-TN
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 06:52:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1cZynQ-0001XM-Vd
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 06:46:28 -0500
-Received: from mail-dm3nam03on0044.outbound.protection.outlook.com
-	([104.47.41.44]:47776
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgari@xilinx.com>) id 1cZynQ-0001X0-Em
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 06:46:24 -0500
-Date: Sat, 4 Feb 2017 12:30:56 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20170204113056.GL12995@toto>
-References: <1486141597-13941-1-git-send-email-fred.konrad@greensocs.com>
-	<1486141597-13941-2-git-send-email-fred.konrad@greensocs.com>
+	(envelope-from <armbru@redhat.com>) id 1cZytV-00044D-8N
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 06:52:41 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<20170202202739.GA15804@work-vm> <87shnvhfwc.fsf@dusky.pond.sub.org>
+	<6e65ad3c-db00-0ce5-a9c6-0e8ba84ad3c6@redhat.com>
+	<87zii270hm.fsf@dusky.pond.sub.org>
+	<da71759e-5bce-2089-3be7-f0d256468ee8@redhat.com>
+Date: Sat, 04 Feb 2017 12:52:32 +0100
+In-Reply-To: <da71759e-5bce-2089-3be7-f0d256468ee8@redhat.com> (Paolo
+	Bonzini's message of "Sat, 4 Feb 2017 02:03:07 -0800")
+Message-ID: <87poiy2mwv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1486141597-13941-2-git-send-email-fred.konrad@greensocs.com>
-Subject: Re: [Qemu-devel] [RFC 1/5] cputlb: cleanup get_page_addr_code to
- use VICTIM_TLB_HIT
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: fred.konrad@greensocs.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, alistair.francis@xilinx.com, pbonzini@redhat.com, clg@kaod.org, mark.burton@greensocs.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, Feb 03, 2017 at 06:06:33PM +0100, fred.konrad@greensocs.com wrote:
-> From: KONRAD Frederic <fred.konrad@greensocs.com>
-> 
-> This replaces env1 and page_index variables by env and index
-> so we can use VICTIM_TLB_HIT macro later.
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 04/02/2017 01:45, Markus Armbruster wrote:
+>>>>      -drive driver=qcow2,
+>>>>             file.driver=gluster,
+>>>>                 .volume=testvol,
+>>>>                 .path=/path/a.qcow2,
+>>>>                 .debug=9,
+>>>>             file.server.0.type=tcp,
+>>>>                          .host=1.2.3.4,
+>>>>                          .port=24007,
+>>>>             file.server.1.type=unix,
+>>>>                          .socket=/var/run/glusterd.socket
+>>>>
+>>>> Mind, I'm not at all sure this is a *good* idea.  I suspect it's more
+>>>> magic than it's worth.
+>>> As someone who likes dot syntax very much, I don't like it. If you
+>>> structure it like this, it's OK, but then you can just write the full
+>>> prefix (which gets the point across just as well because I can quickly
+>>> tell from a glance that it's the same prefix).
+>>>
+>>> OTOH, when joined into a single line it doesn't change much in terms of
+>>> legibility, in my opinion.
+>> 
+>> Thanks!
 >
+> Actually I think it does improve legibility.
+>
+> It doesn't improve writability though, as anecdotally proved by Markus's
+> own mistake.
+>
+> I am a fan of the dot syntax too.  It seems to be the most incremental
+> solution, and it's still as expressive as JSON.
 
-Hi Fred,
+Noted.
 
-A question, wouldn't it be more readable to add env and index arguments to VICTIM_TLB_HIT?
-VICTIM_TLB_HIT could perhaps even be made a static inline?
+> _However_ we could also extend -readconfig to support JSON, i.e. instead of
+>
+> 	[drive "abc"]
+> 		file = "foo"
+>
+> it could support
+>
+> 	{ 'drive': { 'file: 'foo' }, 'id': 'abc' }
+>
+> In other words [ would introduce key-value QemuOpts with dot syntax,
+> while { would introduce JSON.
 
-Cheers,
-Edgar
-
-
- 
-> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
-> ---
->  cputlb.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
-> 
-> diff --git a/cputlb.c b/cputlb.c
-> index 6c39927..665caea 100644
-> --- a/cputlb.c
-> +++ b/cputlb.c
-> @@ -457,21 +457,21 @@ static void report_bad_exec(CPUState *cpu, target_ulong addr)
->   * is actually a ram_addr_t (in system mode; the user mode emulation
->   * version of this function returns a guest virtual address).
->   */
-> -tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
-> +tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
->  {
-> -    int mmu_idx, page_index, pd;
-> +    int mmu_idx, index, pd;
->      void *p;
->      MemoryRegion *mr;
-> -    CPUState *cpu = ENV_GET_CPU(env1);
-> +    CPUState *cpu = ENV_GET_CPU(env);
->      CPUIOTLBEntry *iotlbentry;
->  
-> -    page_index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-> -    mmu_idx = cpu_mmu_index(env1, true);
-> -    if (unlikely(env1->tlb_table[mmu_idx][page_index].addr_code !=
-> +    index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-> +    mmu_idx = cpu_mmu_index(env, true);
-> +    if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
->                   (addr & TARGET_PAGE_MASK))) {
-> -        cpu_ldub_code(env1, addr);
-> +        cpu_ldub_code(env, addr);
->      }
-> -    iotlbentry = &env1->iotlb[mmu_idx][page_index];
-> +    iotlbentry = &env->iotlb[mmu_idx][index];
->      pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
->      mr = iotlb_to_region(cpu, pd, iotlbentry->attrs);
->      if (memory_region_is_unassigned(mr)) {
-> @@ -484,7 +484,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
->              exit(1);
->          }
->      }
-> -    p = (void *)((uintptr_t)addr + env1->tlb_table[mmu_idx][page_index].addend);
-> +    p = (void *)((uintptr_t)addr + env->tlb_table[mmu_idx][index].addend);
->      return qemu_ram_addr_from_host_nofail(p);
->  }
->  
-> -- 
-> 1.8.3.1
-> 
+Yes, we should support config files in JSON syntax.  Not sure mixing INI
+and JSON syntax in the same file is a good idea, though.
