@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ca1OX-0004p8-JR
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:32:54 -0500
+	(envelope-from <famz@redhat.com>) id 1ca1e9-0000WJ-PH
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:49:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ca1OU-0002AW-Gj
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:32:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41452)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ca1OU-0002AK-Am
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:32:50 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4BABAC057FA5
-	for <qemu-devel@nongnu.org>; Sat,  4 Feb 2017 14:32:50 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1ca1e6-0008Fr-JT
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 09:49:01 -0500
+Date: Sat, 4 Feb 2017 22:48:54 +0800
 From: Fam Zheng <famz@redhat.com>
-Date: Sat,  4 Feb 2017 22:32:45 +0800
-Message-Id: <20170204143245.15974-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] Makefile: Make "install" depend on
- "trace-events-all"
+Message-ID: <20170204144854.GC15362@lemon>
+References: <1486144722-6021-1-git-send-email-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1486144722-6021-1-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] CODING_STYLE: Mention preferred comment
+ form
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>, patches@linaro.org
 
-We install this file to data dir but since 0ab8ed18 it's no longer
-required by any objects during "make". List it explicitly as a depended
-target of install and fix the broken "make install" command.
+On Fri, 02/03 17:58, Peter Maydell wrote:
+> Our defacto coding style strongly prefers /* */ style comments
+> over the single-line // style, and checkpatch enforces this,
+> but we don't actually document this. Mention it in CODING_STYLE.
+> 
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  CODING_STYLE | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/CODING_STYLE b/CODING_STYLE
+> index f53180b..2fa0c0b 100644
+> --- a/CODING_STYLE
+> +++ b/CODING_STYLE
+> @@ -116,3 +116,10 @@ if (a == 1) {
+>  Rationale: Yoda conditions (as in 'if (1 == a)') are awkward to read.
+>  Besides, good compilers already warn users when '==' is mis-typed as '=',
+>  even when the constant is on the right.
+> +
+> +7. Comment style
+> +
+> +We use traditional C-style /* */ comments and avoid // comments.
+> +
+> +Rationale: The // form is valid in C99, so this is purely a matter of
+> +consistency of style. The checkpatch script will warn you about this.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index 4b72a4c..b993741 100644
---- a/Makefile
-+++ b/Makefile
-@@ -589,7 +589,7 @@ endif
- endif
- 
- 
--install: all $(if $(BUILD_DOCS),install-doc) \
-+install: all $(if $(BUILD_DOCS),install-doc) $(BUILD_DIR)/trace-events-all \
- install-datadir install-localstatedir
- ifneq ($(TOOLS),)
- 	$(call install-prog,$(subst qemu-ga,qemu-ga$(EXESUF),$(TOOLS)),$(DESTDIR)$(bindir))
--- 
-2.9.3
+Reviewed-by: Fam Zheng <famz@redhat.com>
