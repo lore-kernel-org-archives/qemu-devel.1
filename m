@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1caIsK-0002f8-7u
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:49 -0500
+	(envelope-from <zxq_yx_007@163.com>) id 1caN1B-0000An-2U
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 08:38:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1caIsH-0001td-W0
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:48 -0500
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:34237)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1caIsH-0001tY-O2
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:45 -0500
-Received: by mail-pg0-x235.google.com with SMTP id 14so19485676pgg.1
-	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 01:12:45 -0800 (PST)
-From: ben@skyportsystems.com
-Date: Sun,  5 Feb 2017 01:12:05 -0800
-Message-Id: <b70c19b2d36463cabd14f5c24bf834004e325651.1486285434.git.ben@skyportsystems.com>
-In-Reply-To: <cover.1486285434.git.ben@skyportsystems.com>
-References: <cover.1486285434.git.ben@skyportsystems.com>
-In-Reply-To: <cover.1486285434.git.ben@skyportsystems.com>
-References: <cover.1486285434.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v5 10/10] tests: Add unit tests for the VM
- Generation ID feature
+	(envelope-from <zxq_yx_007@163.com>) id 1caN17-0003HB-Ty
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 08:38:13 -0500
+Received: from m12-14.163.com ([220.181.12.14]:60838)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zxq_yx_007@163.com>) id 1caN17-0003Ej-A9
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 08:38:09 -0500
+From: xiaoqiang zhao <zxq_yx_007@163.com>
+Date: Sun,  5 Feb 2017 21:37:18 +0800
+Message-Id: <20170205133727.23424-1-zxq_yx_007@163.com>
+Subject: [Qemu-devel] [RESEND PATCH 0/9] QOM'ify work for sparc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,236 +22,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, Ben Warren <ben@skyportsystems.com>
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com
 
-From: Ben Warren <ben@skyportsystems.com>
+Rebased on the latest master.
 
-The following tests are implemented:
-* test that a GUID passed in by command line is propagated to the guest.
-* test that changing the GUID at runtime via the monitor is reflected in
-  the guest.
-* test that the "auto" argument to the GUID generates a different, and
-  correct GUID as seen by the guest.
+This patch set aims for QOM'ifying code relate with sparc.
+It is part of my QOM'ify work of qemu code base.
 
-  This patch is loosely based on a previous patch from:
-  Gal Hammer <ghammer@redhat.com>  and Igor Mammedov <imammedo@redhat.com>
+xiaoqiang zhao (9):
+  hw/misc: QOM'ify eccmemctl.c
+  hw/dma: QOM'ify sparc32_dma.c
+  hw/dma: QOM'ify sun4m_iommu.c
+  hw/misc: QOM'ify slavio_misc.c
+  hw/timer: QOM'ify m48txx_sysbus (pass 1)
+  hw/timer: QOM'ify m48txx_sysbus (pass 2)
+  hw/timer: QOM'ify slavio_timer
+  hw/sparc: QOM'ify sun4m.c
+  hw/sparc64: QOM'ify sun4u.c
 
-Signed-off-by: Ben Warren <ben@skyportsystems.com>
----
- tests/Makefile.include |   2 +
- tests/vmgenid-test.c   | 184 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 186 insertions(+)
- create mode 100644 tests/vmgenid-test.c
+ hw/dma/sparc32_dma.c    | 25 ++++++++++++--------
+ hw/dma/sun4m_iommu.c    | 12 ++++------
+ hw/misc/eccmemctl.c     | 25 ++++++++++++--------
+ hw/misc/slavio_misc.c   | 43 ++++++++++++++--------------------
+ hw/sparc/sun4m.c        | 54 +++++++++++++++----------------------------
+ hw/sparc64/sun4u.c      | 20 ++++++++--------
+ hw/timer/m48t59.c       | 61 ++++++++++++++++++++++++++++++++++---------------
+ hw/timer/slavio_timer.c | 12 ++++------
+ 8 files changed, 128 insertions(+), 124 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 634394a..ca4b3f7 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -241,6 +241,7 @@ check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
- gcov-files-i386-y += hw/usb/hcd-xhci.c
- check-qtest-i386-y += tests/pc-cpu-test$(EXESUF)
- check-qtest-i386-y += tests/q35-test$(EXESUF)
-+check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
- gcov-files-i386-y += hw/pci-host/q35.c
- check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
- ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
-@@ -726,6 +727,7 @@ tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem
- tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o contrib/libvhost-user/libvhost-user.o $(test-util-obj-y)
- tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
- tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
-+tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o
- 
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-new file mode 100644
-index 0000000..0f5ba07
---- /dev/null
-+++ b/tests/vmgenid-test.c
-@@ -0,0 +1,184 @@
-+/*
-+ * QTest testcase for VM Generation ID
-+ *
-+ * Copyright (c) 2016 Red Hat, Inc.
-+ * Copyright (c) 2017 Skyport Systems
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include <glib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include "qemu/osdep.h"
-+#include "qemu/bitmap.h"
-+#include "qemu/uuid.h"
-+#include "hw/acpi/acpi-defs.h"
-+#include "acpi-utils.h"
-+#include "libqtest.h"
-+
-+#define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-+
-+static uint64_t vgia;
-+
-+typedef struct {
-+    AcpiTableHeader header;
-+    gchar name_op;
-+    gchar vgia[4];
-+    gchar val_op;
-+    uint64_t vgia_val;
-+} QEMU_PACKED VgidTable;
-+
-+static uint64_t find_vgia(void)
-+{
-+    uint32_t off;
-+    AcpiRsdpDescriptor rsdp_table;
-+    uint32_t rsdt;
-+    AcpiRsdtDescriptorRev1 rsdt_table;
-+    int tables_nr;
-+    uint32_t *tables;
-+    AcpiTableHeader ssdt_table;
-+    VgidTable vgid_table;
-+    int i;
-+
-+    /* First, find the RSDP */
-+    for (off = 0xf0000; off < 0x100000; off += 0x10) {
-+        uint8_t sig[] = "RSD PTR ";
-+
-+        for (i = 0; i < sizeof sig - 1; ++i) {
-+            sig[i] = readb(off + i);
-+        }
-+
-+        if (!memcmp(sig, "RSD PTR ", sizeof sig)) {
-+            break;
-+        }
-+    }
-+    g_assert_cmphex(off, <, 0x100000);
-+
-+    /* Parse the RSDP header so we can find the RSDT */
-+    ACPI_READ_FIELD(rsdp_table.signature, off);
-+    ACPI_ASSERT_CMP64(rsdp_table.signature, "RSD PTR ");
-+
-+    ACPI_READ_FIELD(rsdp_table.checksum, off);
-+    ACPI_READ_ARRAY(rsdp_table.oem_id, off);
-+    ACPI_READ_FIELD(rsdp_table.revision, off);
-+    ACPI_READ_FIELD(rsdp_table.rsdt_physical_address, off);
-+
-+    rsdt = rsdp_table.rsdt_physical_address;
-+    /* read the header */
-+    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-+    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
-+
-+    /* compute the table entries in rsdt */
-+    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
-+                sizeof(uint32_t);
-+    g_assert_cmpint(tables_nr, >, 0);
-+
-+    /* get the addresses of the tables pointed by rsdt */
-+    tables = g_new0(uint32_t, tables_nr);
-+    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
-+
-+    for (i = 0; i < tables_nr; i++) {
-+        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
-+        if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
-+            /* the first entry in the table should be VGIA
-+             * That's all we need */
-+            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
-+            g_assert(vgid_table.name_op == 0x08);  /* name */
-+            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
-+            g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
-+            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
-+            g_assert(vgid_table.val_op == 0x0E);  /* qword */
-+            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
-+            return vgid_table.vgia_val;
-+        }
-+    }
-+    return 0;
-+}
-+
-+static void vmgenid_read_guid(uint8_t *guid)
-+{
-+    int i;
-+
-+    if (vgia == 0) {
-+        vgia = find_vgia();
-+    }
-+    g_assert(vgia);
-+
-+    /* Read the GUID directly from guest memory */
-+    for (i = 0; i < 16; i++) {
-+        guid[i] = readb(vgia + i);
-+    }
-+}
-+
-+static void vmgenid_test(void)
-+{
-+    uint8_t measured[16];
-+    QemuUUID expected;
-+    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
-+    vmgenid_read_guid(measured);
-+    g_assert(memcmp(measured, expected.data, sizeof(measured)) == 0);
-+}
-+
-+static void vmgenid_set_guid_test(void)
-+{
-+    QDict *response;
-+    gchar *cmd;
-+    uint8_t measured[16];
-+    QemuUUID expected;
-+    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
-+    /* Change the GUID slightly */
-+    expected.data[0] += 1;
-+
-+    cmd = g_strdup_printf("{ 'execute': 'qom-set', 'arguments': { "
-+                   "'path': '/machine/peripheral/testvgid', "
-+                   "'property': 'guid', 'value': '%s' } }",
-+                   qemu_uuid_unparse_strdup(&expected));
-+    response = qmp(cmd);
-+    g_assert(qdict_haskey(response, "return"));
-+    QDECREF(response);
-+
-+    vmgenid_read_guid(measured);
-+    g_assert(memcmp(measured, expected.data, sizeof(measured)) == 0);
-+}
-+
-+static void vmgenid_set_guid_auto_test(void)
-+{
-+    QDict *response;
-+    QemuUUID measured;
-+    QemuUUID expected;
-+
-+    /* Read the initial value */
-+    vmgenid_read_guid(expected.data);
-+
-+    /* Setting to 'auto' generates a random GUID */
-+    response = qmp("{ 'execute': 'qom-set', 'arguments': { "
-+                   "'path': '/machine/peripheral/testvgid', "
-+                   "'property': 'guid', 'value': 'auto' } }");
-+
-+    g_assert(qdict_haskey(response, "return"));
-+    QDECREF(response);
-+
-+    vmgenid_read_guid(measured.data);
-+    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) != 0);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_start("-machine accel=tcg -device vmgenid,id=testvgid,"
-+                "guid=" VGID_GUID);
-+    qtest_add_func("/vmgenid/vmgenid", vmgenid_test);
-+    qtest_add_func("/vmgenid/vmgenid/set-guid", vmgenid_set_guid_test);
-+    qtest_add_func("/vmgenid/vmgenid/set-guid-auto",
-+                   vmgenid_set_guid_auto_test);
-+    ret = g_test_run();
-+
-+    qtest_end();
-+
-+    return ret;
-+}
 -- 
-2.7.4
+2.11.0
