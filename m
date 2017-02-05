@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1caIsF-0002Zw-MH
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:44 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1caIsG-0002b4-EH
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1caIsE-0001se-I7
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:43 -0500
-Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:34236)
+	(envelope-from <ben@skyportsystems.com>) id 1caIsF-0001sp-BR
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:44 -0500
+Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:36736)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1caIsE-0001sP-Cw
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:42 -0500
-Received: by mail-pg0-x22d.google.com with SMTP id 14so19485478pgg.1
-	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 01:12:42 -0800 (PST)
+	id 1caIsF-0001sk-5S
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:43 -0500
+Received: by mail-pf0-x22c.google.com with SMTP id 189so16301528pfu.3
+	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 01:12:43 -0800 (PST)
 From: ben@skyportsystems.com
-Date: Sun,  5 Feb 2017 01:12:01 -0800
-Message-Id: <867d090f5fb596a4e7068bc3283b3db195061df1.1486285434.git.ben@skyportsystems.com>
+Date: Sun,  5 Feb 2017 01:12:02 -0800
+Message-Id: <755a17f2d8daf7d2a62b23bb8957c114a93ccf12.1486285434.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1486285434.git.ben@skyportsystems.com>
 References: <cover.1486285434.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1486285434.git.ben@skyportsystems.com>
 References: <cover.1486285434.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v5 06/10] qmp/hmp: add query-vm-generation-id
- and 'info vm-generation-id' commands
+Subject: [Qemu-devel] [PATCH v5 07/10] qmp/hmp: add set-vm-generation-id
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,158 +34,137 @@ Cc: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, Ben Warren <ben@skyp
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Add commands to query Virtual Machine Generation ID counter.
+Add set-vm-generation-id command to set Virtual Machine
+Generation ID counter.
 
 QMP command example:
-    { "execute": "query-vm-generation-id" }
+    { "execute": "set-vm-generation-id",
+          "arguments": {
+              "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+          }
+    }
 
 HMP command example:
-    info vm-generation-id
+    set-vm-generation-id guid=324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Ben Warren <ben@skyportsystems.com>
 ---
- hmp-commands-info.hx | 13 +++++++++++++
- hmp.c                |  9 +++++++++
- hmp.h                |  1 +
- hw/acpi/vmgenid.c    | 20 ++++++++++++++++++++
- qapi-schema.json     | 20 ++++++++++++++++++++
- stubs/Makefile.objs  |  1 +
- stubs/vmgenid.c      |  8 ++++++++
- 7 files changed, 72 insertions(+)
- create mode 100644 stubs/vmgenid.c
+ hmp-commands.hx   | 13 +++++++++++++
+ hmp.c             | 12 ++++++++++++
+ hmp.h             |  1 +
+ hw/acpi/vmgenid.c | 12 ++++++++++++
+ qapi-schema.json  | 11 +++++++++++
+ stubs/vmgenid.c   |  6 ++++++
+ 6 files changed, 55 insertions(+)
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index b0f35e6..f3df793 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -802,6 +802,19 @@ Show information about hotpluggable CPUs
- ETEXI
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 8819281..56744aa 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1775,5 +1775,18 @@ ETEXI
+     },
  
  STEXI
-+@item info vm-generation-id
-+Show Virtual Machine Generation ID
++@item set-vm-generation-id @var{uuid}
++Set Virtual Machine Generation ID counter to @var{guid}
 +ETEXI
 +
 +    {
-+        .name       = "vm-generation-id",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Show Virtual Machine Generation ID",
-+        .cmd = hmp_info_vm_generation_id,
++        .name       = "set-vm-generation-id",
++        .args_type  = "guid:s",
++        .params     = "guid",
++        .help       = "Set Virtual Machine Generation ID counter",
++        .cmd = hmp_set_vm_generation_id,
 +    },
 +
 +STEXI
  @end table
  ETEXI
- 
 diff --git a/hmp.c b/hmp.c
-index 2bc4f06..535613d 100644
+index 535613d..39c8965 100644
 --- a/hmp.c
 +++ b/hmp.c
-@@ -2565,3 +2565,12 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
- 
-     qapi_free_HotpluggableCPUList(saved);
+@@ -2574,3 +2574,15 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
+     }
+     qapi_free_GuidInfo(info);
  }
 +
-+void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
++void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
 +{
-+    GuidInfo *info = qmp_query_vm_generation_id(NULL);
-+    if (info) {
-+        monitor_printf(mon, "%s\n", info->guid);
++    Error *errp = NULL;
++    const char *guid = qdict_get_str(qdict, "guid");
++
++    qmp_set_vm_generation_id(guid, &errp);
++    if (errp) {
++        hmp_handle_error(mon, &errp);
++        return;
 +    }
-+    qapi_free_GuidInfo(info);
 +}
 diff --git a/hmp.h b/hmp.h
-index 05daf7c..799fd37 100644
+index 799fd37..e0ac1e8 100644
 --- a/hmp.h
 +++ b/hmp.h
-@@ -137,5 +137,6 @@ void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
+@@ -138,5 +138,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
  void hmp_info_dump(Monitor *mon, const QDict *qdict);
  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
-+void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
++void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
  
  #endif
 diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-index 6c9ecfd..e148051 100644
+index e148051..af8b35c 100644
 --- a/hw/acpi/vmgenid.c
 +++ b/hw/acpi/vmgenid.c
-@@ -204,3 +204,23 @@ static void vmgenid_register_types(void)
+@@ -224,3 +224,15 @@ GuidInfo *qmp_query_vm_generation_id(Error **errp)
+     info->guid = qemu_uuid_unparse_strdup(&guid);
+     return info;
  }
- 
- type_init(vmgenid_register_types)
 +
-+GuidInfo *qmp_query_vm_generation_id(Error **errp)
++void qmp_set_vm_generation_id(const char *guid, Error **errp)
 +{
-+    GuidInfo *info;
-+    VmGenIdState *vdev;
-+    QemuUUID guid;
 +    Object *obj = find_vmgenid_dev(errp);
 +
 +    if (!obj) {
-+        return NULL;
++        return;
 +    }
-+    vdev = VMGENID(obj);
-+    /* Convert GUID back to big-endian before displaying */
-+    memcpy(&guid, &vdev->guid, sizeof(guid));
-+    qemu_uuid_bswap(&guid);
 +
-+    info = g_malloc0(sizeof(*info));
-+    info->guid = qemu_uuid_unparse_strdup(&guid);
-+    return info;
++    object_property_set_str(obj, guid, VMGENID_GUID, errp);
++    return;
 +}
 diff --git a/qapi-schema.json b/qapi-schema.json
-index cbdffdd..384a7f3 100644
+index 384a7f3..ed2657d 100644
 --- a/qapi-schema.json
 +++ b/qapi-schema.json
-@@ -6031,3 +6031,23 @@
- #
+@@ -6051,3 +6051,14 @@
+ # Since 2.9
  ##
- { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }
+ { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
 +
 +##
-+# @GuidInfo:
++# @set-vm-generation-id:
 +#
-+# GUID information.
++# Set Virtual Machine Generation ID
 +#
-+# @guid: the globally unique identifier
-+#
-+# Since: 2.9
-+##
-+{ 'struct': 'GuidInfo', 'data': {'guid': 'str'} }
-+
-+##
-+# @query-vm-generation-id:
-+#
-+# Show Virtual Machine Generation ID
++# @guid: new GUID to set as Virtual Machine Generation ID
 +#
 +# Since 2.9
 +##
-+{ 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index a187295..0bffca6 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -35,3 +35,4 @@ stub-obj-y += qmp_pc_dimm_device_list.o
- stub-obj-y += target-monitor-defs.o
- stub-obj-y += target-get-monitor-def.o
- stub-obj-y += pc_madt_cpu_entry.o
-+stub-obj-y += vmgenid.o
++{ 'command': 'set-vm-generation-id', 'data': {'guid': 'str'} }
 diff --git a/stubs/vmgenid.c b/stubs/vmgenid.c
-new file mode 100644
-index 0000000..8c448ac
---- /dev/null
+index 8c448ac..d25d41b 100644
+--- a/stubs/vmgenid.c
 +++ b/stubs/vmgenid.c
-@@ -0,0 +1,8 @@
-+#include "qemu/osdep.h"
-+#include "qmp-commands.h"
+@@ -6,3 +6,9 @@ GuidInfo *qmp_query_vm_generation_id(Error **errp)
+     error_setg(errp, "this command is not currently supported");
+     return NULL;
+ }
 +
-+GuidInfo *qmp_query_vm_generation_id(Error **errp)
++void qmp_set_vm_generation_id(const char *guid, Error **errp)
 +{
 +    error_setg(errp, "this command is not currently supported");
-+    return NULL;
++    return;
 +}
 -- 
 2.7.4
