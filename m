@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1caETV-0003xY-Gx
+	(envelope-from <bounces@canonical.com>) id 1caETV-0003xZ-H6
 	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 23:30:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1caETS-0007F1-QA
+	(envelope-from <bounces@canonical.com>) id 1caETU-0007FB-Fw
 	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 23:30:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46453)
+Received: from indium.canonical.com ([91.189.90.7]:46495)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1caETS-0007Er-KE
-	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 23:30:50 -0500
+	id 1caETU-0007F6-AK
+	for qemu-devel@nongnu.org; Sat, 04 Feb 2017 23:30:52 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1caETR-0006pz-Cs
-	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 04:30:49 +0000
+	id 1caETT-0006qM-C1
+	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 04:30:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5A4262E80CD
-	for <qemu-devel@nongnu.org>; Sun,  5 Feb 2017 04:30:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 25F2A2E80CC
+	for <qemu-devel@nongnu.org>; Sun,  5 Feb 2017 04:30:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 05 Feb 2017 04:17:37 -0000
-From: Launchpad Bug Tracker <1243639@bugs.launchpad.net>
-Reply-To: Bug 1243639 <1243639@bugs.launchpad.net>
+Date: Sun, 05 Feb 2017 04:17:39 -0000
+From: Launchpad Bug Tracker <1221966@bugs.launchpad.net>
+Reply-To: Bug 1221966 <1221966@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20131023102254.14749.56805.malonedeb@wampee.canonical.com>
-Message-Id: <20170205041737.20738.4424.malone@loganberry.canonical.com>
+References: <20130906230043.20668.15929.malonedeb@soybean.canonical.com>
+Message-Id: <20170205041739.20738.94512.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1243639] Re: qemu-1.5.3 segment fault with -vga
- qxl
+Subject: [Qemu-devel] [Bug 1221966] Re: SIGSEGV in static_code_gen_buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,107 +47,54 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1243639
+https://bugs.launchpad.net/bugs/1221966
 
 Title:
-  qemu-1.5.3   segment fault  with  -vga qxl
+  SIGSEGV in static_code_gen_buffer
 
 Status in QEMU:
   Expired
 
 Bug description:
-  execute " qemu-system-x86_64    -enable-kvm -machine accel=3Dkvm:tcg -m
-  1G  -drive file=3D/dev/sda  --full-screen -spice
-  addr=3D127.0.0.1,port=3D5900,disable-ticketing -vga qxl "  on shell will
-  get  segment fault  after  a few seconds   if  I  don't connect to it
-  with  spicec client  immediately.
+  Trying to run 'ls' (or, anything else as far as I can tell) from a
+  SunOS 5.8 box under RHEL 6.4 linux, I get a segfault.  I've tried
+  qemu-1.5.3, qemu-1.6.0, and I fetched git://git.qemu-
+  project.org/qemu.git.  I've also tried a statically linked sh from
+  /sbin/ and it also segfaulted.
 
-  IF  excute  "spicec -h 127.0.0.1 -p 5900 "  immediately !!!!    after
-  the  qemu-system-x86_64  execution, then  no segment fault happens
-  and  it runs well.
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  GDB output:
-
-  root@kali-john:~# gdb /usr/local/bin/qemu-system-x86_64
-  GNU gdb (GDB) 7.4.1-debian
-  (gdb) run -enable-kvm -machine accel=3Dkvm:tcg -m 1G  -drive file=3D/dev/=
-sda  --full-screen -spice addr=3D127.0.0.1,port=3D5900,disable-ticketing -v=
-ga qxl
-
+  wcolburn@anotheruvula</home/anotheruvula/qemu>$ gdb bin/qemu-sparc
+  GNU gdb (GDB) Red Hat Enterprise Linux (7.2-60.el6_4.1)
+  Copyright (C) 2010 Free Software Foundation, Inc.
+  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
+tml>
+  This is free software: you are free to change and redistribute it.
+  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+  and "show warranty" for details.
+  This GDB was configured as "x86_64-redhat-linux-gnu".
+  For bug reporting instructions, please see:
+  <http://www.gnu.org/software/gdb/bugs/>...
+  Reading symbols from /home/anotheruvula/qemu/bin/qemu-sparc...done.
+  (gdb) run ../sparc/ls
+  Starting program: /home/anotheruvula/qemu/bin/qemu-sparc ../sparc/ls
   [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
-  [New Thread 0x7ffff3737700 (LWP 14797)]
-  [New Thread 0x7ffff2d54700 (LWP 14798)]
-  [New Thread 0x7ffff0fff700 (LWP 14799)]
 
   Program received signal SIGSEGV, Segmentation fault.
-  0x00007ffff683ad70 in pixman_image_get_data () from /usr/lib/x86_64-linux=
--gnu/libpixman-1.so.0
-  (gdb) bt
-  #0  0x00007ffff683ad70 in pixman_image_get_data () from /usr/lib/x86_64-l=
-inux-gnu/libpixman-1.so.0
-  #1  0x000055555581060a in surface_data (s=3D0x5555566183a0) at /zh-downlo=
-ad/QEMU/qemu-1.5.3/include/ui/console.h:235
-  #2  0x0000555555818616 in vga_draw_graphic (s=3D0x55555662c778, full_upda=
-te=3D1) at /zh-download/QEMU/qemu-1.5.3/hw/display/vga.c:1788
-  #3  0x0000555555818c6a in vga_update_display (opaque=3D0x55555662c778) at=
- /zh-download/QEMU/qemu-1.5.3/hw/display/vga.c:1917
-  #4  0x000055555580eb15 in qxl_hw_update (opaque=3D0x55555662bd70) at /zh-=
-download/QEMU/qemu-1.5.3/hw/display/qxl.c:1766
-  #5  0x00005555557bd6bc in graphic_hw_update (con=3D0x555556618d00) at ui/=
-console.c:254
-  #6  0x00005555557c8426 in qemu_spice_display_refresh (ssd=3D0x55555662c41=
-8) at ui/spice-display.c:417
-  #7  0x000055555580eff0 in display_refresh (dcl=3D0x55555662c420) at /zh-d=
-ownload/QEMU/qemu-1.5.3/hw/display/qxl.c:1886
-  #8  0x00005555557c0cb1 in dpy_refresh (s=3D0x555556618370) at ui/console.=
-c:1436
-  #9  0x00005555557bd3af in gui_update (opaque=3D0x555556618370) at ui/cons=
-ole.c:192
-  #10 0x0000555555797f20 in qemu_run_timers (clock=3D0x5555565b5a30) at qem=
-u-timer.c:394
-  #11 0x0000555555798183 in qemu_run_all_timers () at qemu-timer.c:453
-  #12 0x0000555555760bb7 in main_loop_wait (nonblocking=3D0) at main-loop.c=
-:470
-  #13 0x00005555557cd19c in main_loop () at vl.c:2029
-  #14 0x00005555557d43f2 in main (argc=3D13, argv=3D0x7fffffffe2b8, envp=3D=
-0x7fffffffe328) at vl.c:4419
-  (gdb) =
-
-
-  =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  http://www.spice-space.org/download/releases/spice-0.12.4.tar.bz2
-  http://www.spice-space.org/download/releases/spice-protocol-0.12.6.tar.bz2
-  spice  compiling =
-
-        ./configure --enable-smartcard=3Dno   && make
-
-  qemu-1.5.3
-  compiling =
-
-      ./configure \
-  --disable-strip  --enable-debug \
-  --target-list=3Dx86_64-softmmu,x86_64-linux-user  \
-  --disable-sdl  --audio-drv-list=3Dalsa --disable-vnc --disable-xen --disa=
-ble-libiscsi  \
-  	--disable-seccomp --disable-glusterfs --disable-libssh2 --disable-smartc=
-ard-nss  \
-  	--disable-usb-redir --disable-brlapi --disable-curl  --disable-bsd-user =
-		    \
-    \
-  --enable-kvm --enable-spice --enable-system --enable-guest-agent --enable=
--vhost-net =
-
-
-  =
-
-  root@kali-john:~# qemu-system-x86_64 -version
-  QEMU emulator version 1.5.3, Copyright (c) 2003-2008 Fabrice Bellard
+  0x00007ffff8259116 in static_code_gen_buffer ()
+  Missing separate debuginfos, use: debuginfo-install glib2-2.22.5-7.el6.x8=
+6_64 glibc-2.12-1.107.el6_4.4.x86_64
+  (gdb) where
+  #0  0x00007ffff8259116 in static_code_gen_buffer ()
+  #1  0x00007ffff7f570cd in cpu_tb_exec (cpu=3D0x7ffffa2b1210, tb_ptr=3D
+      0x7ffff82590d0 "A\213n=C2=A0\205=C3=AD\017\205=C3=8D")
+      at /home/anotheruvula/qemu-devel/cpu-exec.c:56
+  #2  0x00007ffff7f57b2d in cpu_sparc_exec (env=3D0x7ffffa2b1348)
+      at /home/anotheruvula/qemu-devel/cpu-exec.c:631
+  #3  0x00007ffff7f77f36 in cpu_loop (env=3D0x7ffffa2b1348)
+      at /home/anotheruvula/qemu-devel/linux-user/main.c:1089
+  #4  0x00007ffff7f798ff in main (argc=3D2, argv=3D0x7fffffffdfc8, envp=3D
+      0x7fffffffdfe0) at /home/anotheruvula/qemu-devel/linux-user/main.c:40=
+83
+  (gdb)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1243639/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1221966/+subscriptions
