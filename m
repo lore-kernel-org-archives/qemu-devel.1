@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1caIsG-0002b4-EH
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:45 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1caIsK-0002f9-8C
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1caIsF-0001sp-BR
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:44 -0500
-Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:36736)
+	(envelope-from <ben@skyportsystems.com>) id 1caIsH-0001tP-3n
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:48 -0500
+Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:33307)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1caIsF-0001sk-5S
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:43 -0500
-Received: by mail-pf0-x22c.google.com with SMTP id 189so16301528pfu.3
-	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 01:12:43 -0800 (PST)
+	id 1caIsG-0001t9-Ry
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 04:12:45 -0500
+Received: by mail-pg0-x232.google.com with SMTP id 204so19502002pge.0
+	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 01:12:44 -0800 (PST)
 From: ben@skyportsystems.com
-Date: Sun,  5 Feb 2017 01:12:02 -0800
-Message-Id: <755a17f2d8daf7d2a62b23bb8957c114a93ccf12.1486285434.git.ben@skyportsystems.com>
+Date: Sun,  5 Feb 2017 01:12:04 -0800
+Message-Id: <ac935335012018c18e02052168fb4984dde2a451.1486285434.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1486285434.git.ben@skyportsystems.com>
 References: <cover.1486285434.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1486285434.git.ben@skyportsystems.com>
 References: <cover.1486285434.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v5 07/10] qmp/hmp: add set-vm-generation-id
- commands
+Subject: [Qemu-devel] [PATCH v5 09/10] tests: Move reusable ACPI macros into
+ a new header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,139 +32,194 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, Ben Warren <ben@skyportsystems.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Ben Warren <ben@skyportsystems.com>
 
-Add set-vm-generation-id command to set Virtual Machine
-Generation ID counter.
+Also usable by upcoming VM Generation ID tests
 
-QMP command example:
-    { "execute": "set-vm-generation-id",
-          "arguments": {
-              "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-          }
-    }
-
-HMP command example:
-    set-vm-generation-id guid=324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Ben Warren <ben@skyportsystems.com>
 ---
- hmp-commands.hx   | 13 +++++++++++++
- hmp.c             | 12 ++++++++++++
- hmp.h             |  1 +
- hw/acpi/vmgenid.c | 12 ++++++++++++
- qapi-schema.json  | 11 +++++++++++
- stubs/vmgenid.c   |  6 ++++++
- 6 files changed, 55 insertions(+)
+ tests/acpi-utils.h       | 75 ++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/bios-tables-test.c | 72 +---------------------------------------------
+ 2 files changed, 76 insertions(+), 71 deletions(-)
+ create mode 100644 tests/acpi-utils.h
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 8819281..56744aa 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1775,5 +1775,18 @@ ETEXI
-     },
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+new file mode 100644
+index 0000000..d5e5eff
+--- /dev/null
++++ b/tests/acpi-utils.h
+@@ -0,0 +1,75 @@
++#ifndef TEST_ACPI_UTILS_H
++#define TEST_ACPI_UTILS_H
++
++/* DSDT and SSDTs format */
++typedef struct {
++    AcpiTableHeader header;
++    gchar *aml;            /* aml bytecode from guest */
++    gsize aml_len;
++    gchar *aml_file;
++    gchar *asl;            /* asl code generated from aml */
++    gsize asl_len;
++    gchar *asl_file;
++    bool tmp_files_retain;   /* do not delete the temp asl/aml */
++} QEMU_PACKED AcpiSdtTable;
++
++#define ACPI_READ_FIELD(field, addr)           \
++    do {                                       \
++        switch (sizeof(field)) {               \
++        case 1:                                \
++            field = readb(addr);               \
++            break;                             \
++        case 2:                                \
++            field = readw(addr);               \
++            break;                             \
++        case 4:                                \
++            field = readl(addr);               \
++            break;                             \
++        case 8:                                \
++            field = readq(addr);               \
++            break;                             \
++        default:                               \
++            g_assert(false);                   \
++        }                                      \
++        addr += sizeof(field);                  \
++    } while (0);
++
++#define ACPI_READ_ARRAY_PTR(arr, length, addr)  \
++    do {                                        \
++        int idx;                                \
++        for (idx = 0; idx < length; ++idx) {    \
++            ACPI_READ_FIELD(arr[idx], addr);    \
++        }                                       \
++    } while (0);
++
++#define ACPI_READ_ARRAY(arr, addr)                               \
++    ACPI_READ_ARRAY_PTR(arr, sizeof(arr) / sizeof(arr[0]), addr)
++
++#define ACPI_READ_TABLE_HEADER(table, addr)                      \
++    do {                                                         \
++        ACPI_READ_FIELD((table)->signature, addr);               \
++        ACPI_READ_FIELD((table)->length, addr);                  \
++        ACPI_READ_FIELD((table)->revision, addr);                \
++        ACPI_READ_FIELD((table)->checksum, addr);                \
++        ACPI_READ_ARRAY((table)->oem_id, addr);                  \
++        ACPI_READ_ARRAY((table)->oem_table_id, addr);            \
++        ACPI_READ_FIELD((table)->oem_revision, addr);            \
++        ACPI_READ_ARRAY((table)->asl_compiler_id, addr);         \
++        ACPI_READ_FIELD((table)->asl_compiler_revision, addr);   \
++    } while (0);
++
++#define ACPI_ASSERT_CMP(actual, expected) do { \
++    uint32_t ACPI_ASSERT_CMP_le = cpu_to_le32(actual); \
++    char ACPI_ASSERT_CMP_str[5] = {}; \
++    memcpy(ACPI_ASSERT_CMP_str, &ACPI_ASSERT_CMP_le, 4); \
++    g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
++} while (0)
++
++#define ACPI_ASSERT_CMP64(actual, expected) do { \
++    uint64_t ACPI_ASSERT_CMP_le = cpu_to_le64(actual); \
++    char ACPI_ASSERT_CMP_str[9] = {}; \
++    memcpy(ACPI_ASSERT_CMP_str, &ACPI_ASSERT_CMP_le, 8); \
++    g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
++} while (0)
++
++#endif  /* TEST_ACPI_UTILS_H */
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 5404805..c642f7f 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -17,6 +17,7 @@
+ #include "hw/acpi/acpi-defs.h"
+ #include "hw/smbios/smbios.h"
+ #include "qemu/bitmap.h"
++#include "acpi-utils.h"
+ #include "boot-sector.h"
  
- STEXI
-+@item set-vm-generation-id @var{uuid}
-+Set Virtual Machine Generation ID counter to @var{guid}
-+ETEXI
-+
-+    {
-+        .name       = "set-vm-generation-id",
-+        .args_type  = "guid:s",
-+        .params     = "guid",
-+        .help       = "Set Virtual Machine Generation ID counter",
-+        .cmd = hmp_set_vm_generation_id,
-+    },
-+
-+STEXI
- @end table
- ETEXI
-diff --git a/hmp.c b/hmp.c
-index 535613d..39c8965 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2574,3 +2574,15 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
-     }
-     qapi_free_GuidInfo(info);
- }
-+
-+void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
-+{
-+    Error *errp = NULL;
-+    const char *guid = qdict_get_str(qdict, "guid");
-+
-+    qmp_set_vm_generation_id(guid, &errp);
-+    if (errp) {
-+        hmp_handle_error(mon, &errp);
-+        return;
-+    }
-+}
-diff --git a/hmp.h b/hmp.h
-index 799fd37..e0ac1e8 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -138,5 +138,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
- void hmp_info_dump(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
-+void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
+ #define MACHINE_PC "pc"
+@@ -24,18 +25,6 @@
  
- #endif
-diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-index e148051..af8b35c 100644
---- a/hw/acpi/vmgenid.c
-+++ b/hw/acpi/vmgenid.c
-@@ -224,3 +224,15 @@ GuidInfo *qmp_query_vm_generation_id(Error **errp)
-     info->guid = qemu_uuid_unparse_strdup(&guid);
-     return info;
- }
-+
-+void qmp_set_vm_generation_id(const char *guid, Error **errp)
-+{
-+    Object *obj = find_vmgenid_dev(errp);
-+
-+    if (!obj) {
-+        return;
-+    }
-+
-+    object_property_set_str(obj, guid, VMGENID_GUID, errp);
-+    return;
-+}
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 384a7f3..ed2657d 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -6051,3 +6051,14 @@
- # Since 2.9
- ##
- { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
-+
-+##
-+# @set-vm-generation-id:
-+#
-+# Set Virtual Machine Generation ID
-+#
-+# @guid: new GUID to set as Virtual Machine Generation ID
-+#
-+# Since 2.9
-+##
-+{ 'command': 'set-vm-generation-id', 'data': {'guid': 'str'} }
-diff --git a/stubs/vmgenid.c b/stubs/vmgenid.c
-index 8c448ac..d25d41b 100644
---- a/stubs/vmgenid.c
-+++ b/stubs/vmgenid.c
-@@ -6,3 +6,9 @@ GuidInfo *qmp_query_vm_generation_id(Error **errp)
-     error_setg(errp, "this command is not currently supported");
-     return NULL;
- }
-+
-+void qmp_set_vm_generation_id(const char *guid, Error **errp)
-+{
-+    error_setg(errp, "this command is not currently supported");
-+    return;
-+}
+ #define ACPI_REBUILD_EXPECTED_AML "TEST_ACPI_REBUILD_AML"
+ 
+-/* DSDT and SSDTs format */
+-typedef struct {
+-    AcpiTableHeader header;
+-    gchar *aml;            /* aml bytecode from guest */
+-    gsize aml_len;
+-    gchar *aml_file;
+-    gchar *asl;            /* asl code generated from aml */
+-    gsize asl_len;
+-    gchar *asl_file;
+-    bool tmp_files_retain;   /* do not delete the temp asl/aml */
+-} QEMU_PACKED AcpiSdtTable;
+-
+ typedef struct {
+     const char *machine;
+     const char *variant;
+@@ -53,65 +42,6 @@ typedef struct {
+     int required_struct_types_len;
+ } test_data;
+ 
+-#define ACPI_READ_FIELD(field, addr)           \
+-    do {                                       \
+-        switch (sizeof(field)) {               \
+-        case 1:                                \
+-            field = readb(addr);               \
+-            break;                             \
+-        case 2:                                \
+-            field = readw(addr);               \
+-            break;                             \
+-        case 4:                                \
+-            field = readl(addr);               \
+-            break;                             \
+-        case 8:                                \
+-            field = readq(addr);               \
+-            break;                             \
+-        default:                               \
+-            g_assert(false);                   \
+-        }                                      \
+-        addr += sizeof(field);                  \
+-    } while (0);
+-
+-#define ACPI_READ_ARRAY_PTR(arr, length, addr)  \
+-    do {                                        \
+-        int idx;                                \
+-        for (idx = 0; idx < length; ++idx) {    \
+-            ACPI_READ_FIELD(arr[idx], addr);    \
+-        }                                       \
+-    } while (0);
+-
+-#define ACPI_READ_ARRAY(arr, addr)                               \
+-    ACPI_READ_ARRAY_PTR(arr, sizeof(arr)/sizeof(arr[0]), addr)
+-
+-#define ACPI_READ_TABLE_HEADER(table, addr)                      \
+-    do {                                                         \
+-        ACPI_READ_FIELD((table)->signature, addr);               \
+-        ACPI_READ_FIELD((table)->length, addr);                  \
+-        ACPI_READ_FIELD((table)->revision, addr);                \
+-        ACPI_READ_FIELD((table)->checksum, addr);                \
+-        ACPI_READ_ARRAY((table)->oem_id, addr);                  \
+-        ACPI_READ_ARRAY((table)->oem_table_id, addr);            \
+-        ACPI_READ_FIELD((table)->oem_revision, addr);            \
+-        ACPI_READ_ARRAY((table)->asl_compiler_id, addr);         \
+-        ACPI_READ_FIELD((table)->asl_compiler_revision, addr);   \
+-    } while (0);
+-
+-#define ACPI_ASSERT_CMP(actual, expected) do { \
+-    uint32_t ACPI_ASSERT_CMP_le = cpu_to_le32(actual); \
+-    char ACPI_ASSERT_CMP_str[5] = {}; \
+-    memcpy(ACPI_ASSERT_CMP_str, &ACPI_ASSERT_CMP_le, 4); \
+-    g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
+-} while (0)
+-
+-#define ACPI_ASSERT_CMP64(actual, expected) do { \
+-    uint64_t ACPI_ASSERT_CMP_le = cpu_to_le64(actual); \
+-    char ACPI_ASSERT_CMP_str[9] = {}; \
+-    memcpy(ACPI_ASSERT_CMP_str, &ACPI_ASSERT_CMP_le, 8); \
+-    g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
+-} while (0)
+-
+ static char disk[] = "tests/acpi-test-disk-XXXXXX";
+ static const char *data_dir = "tests/acpi-test-data";
+ #ifdef CONFIG_IASL
 -- 
 2.7.4
