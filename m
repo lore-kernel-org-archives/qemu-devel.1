@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1calGB-0005qF-I8
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:20 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1calGB-0005qE-Hs
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1calG9-0008Vk-Mj
+	(envelope-from <alex.bennee@linaro.org>) id 1calG8-0008VN-H4
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:19 -0500
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35731)
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34801)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1calG9-0008VW-Hj
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:17 -0500
-Received: by mail-wr0-x22d.google.com with SMTP id 89so23879212wrr.2
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 07:31:17 -0800 (PST)
+	id 1calG8-0008V5-9K
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:16 -0500
+Received: by mail-wr0-x233.google.com with SMTP id o16so23931842wra.1
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 07:31:16 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  6 Feb 2017 15:31:02 +0000
-Message-Id: <20170206153113.27729-13-alex.bennee@linaro.org>
+Date: Mon,  6 Feb 2017 15:30:59 +0000
+Message-Id: <20170206153113.27729-10-alex.bennee@linaro.org>
 In-Reply-To: <20170206153113.27729-1-alex.bennee@linaro.org>
 References: <20170206153113.27729-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v10 12/23] tcg: handle EXCP_ATOMIC exception
- for system emulation
+Subject: [Qemu-devel] [PATCH v10 09/23] tcg: remove global exit_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +32,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, rth@twiddle.net
 Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-From: Pranith Kumar <bobby.prani@gmail.com>
+There are now only two uses of the global exit_request left.
 
-The patch enables handling atomic code in the guest. This should be
-preferably done in cpu_handle_exception(), but the current assumptions
-regarding when we can execute atomic sections cause a deadlock.
+The first ensures we exit the run_loop when we first start to process
+pending work and in the kick handler. This is just as easily done by
+setting the first_cpu->exit_request flag.
 
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-[AJB: tweak title]
+The second use is in the round robin kick routine. The global
+exit_request ensured every vCPU would set its local exit_request and
+cause a full exit of the loop. Now the iothread isn't being held while
+running we can just rely on the kick handler to push us out as intended.
+
+We lightly re-factor the main vCPU thread to ensure cpu->exit_requests
+cause us to exit the main loop and process any IO requests that might
+come along.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- cpus.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+v5
+  - minor merge conflict with kick patch
+v4
+  - moved to after iothread unlocking patch
+  - needed to remove kick exit_request as well.
+  - remove extraneous cpu->exit_request check
+  - remove stray exit_request setting
+  - remove needless atomic operation
+---
+ cpu-exec-common.c       |  2 --
+ cpu-exec.c              |  9 ++-------
+ cpus.c                  | 18 ++++++++++--------
+ include/exec/exec-all.h |  3 ---
+ 4 files changed, 12 insertions(+), 20 deletions(-)
 
+diff --git a/cpu-exec-common.c b/cpu-exec-common.c
+index e2bc053372..0504a9457b 100644
+--- a/cpu-exec-common.c
++++ b/cpu-exec-common.c
+@@ -23,8 +23,6 @@
+ #include "exec/exec-all.h"
+ #include "exec/memory-internal.h"
+ 
+-bool exit_request;
+-
+ /* exit the current TB, but without causing any exception to be raised */
+ void cpu_loop_exit_noexc(CPUState *cpu)
+ {
+diff --git a/cpu-exec.c b/cpu-exec.c
+index bd47609074..94628b90cd 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -565,9 +565,8 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+         /* Something asked us to stop executing
+          * chained TBs; just continue round the main
+          * loop. Whatever requested the exit will also
+-         * have set something else (eg exit_request or
+-         * interrupt_request) which we will handle
+-         * next time around the loop.  But we need to
++         * have set something else (eg interrupt_request) which we
++         * will handle next time around the loop.  But we need to
+          * ensure the tcg_exit_req read in generated code
+          * comes before the next read of cpu->exit_request
+          * or cpu->interrupt_request.
+@@ -623,10 +622,6 @@ int cpu_exec(CPUState *cpu)
+ 
+     rcu_read_lock();
+ 
+-    if (unlikely(atomic_mb_read(&exit_request))) {
+-        cpu->exit_request = 1;
+-    }
+-
+     cc->cpu_exec_enter(cpu);
+ 
+     /* Calculate difference between guest clock and host clock.
 diff --git a/cpus.c b/cpus.c
-index 1f0e2be18f..e1b82bcd49 100644
+index 5392f4ce60..813081f014 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -1346,6 +1346,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-                 if (r == EXCP_DEBUG) {
-                     cpu_handle_guest_debug(cpu);
-                     break;
-+                } else if (r == EXCP_ATOMIC) {
-+                    qemu_mutex_unlock_iothread();
-+                    cpu_exec_step_atomic(cpu);
-+                    qemu_mutex_lock_iothread();
-+                    break;
-                 }
-             } else if (cpu->stop) {
-                 if (cpu->unplug) {
-@@ -1456,6 +1461,10 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-                  */
-                 g_assert(cpu->halted);
+@@ -792,7 +792,6 @@ static inline int64_t qemu_tcg_next_kick(void)
+ static void qemu_cpu_kick_rr_cpu(void)
+ {
+     CPUState *cpu;
+-    atomic_mb_set(&exit_request, 1);
+     do {
+         cpu = atomic_mb_read(&tcg_current_rr_cpu);
+         if (cpu) {
+@@ -1315,11 +1314,11 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+ 
+     start_tcg_kick_timer();
+ 
+-    /* process any pending work */
+-    atomic_mb_set(&exit_request, 1);
+-
+     cpu = first_cpu;
+ 
++    /* process any pending work */
++    cpu->exit_request = 1;
++
+     while (1) {
+         /* Account partial waits to QEMU_CLOCK_VIRTUAL.  */
+         qemu_account_warp_timer();
+@@ -1328,7 +1327,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+             cpu = first_cpu;
+         }
+ 
+-        for (; cpu != NULL && !exit_request; cpu = CPU_NEXT(cpu)) {
++        while (cpu && !cpu->exit_request) {
+             atomic_mb_set(&tcg_current_rr_cpu, cpu);
+ 
+             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
+@@ -1348,12 +1347,15 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
                  break;
-+            case EXCP_ATOMIC:
-+                qemu_mutex_unlock_iothread();
-+                cpu_exec_step_atomic(cpu);
-+                qemu_mutex_lock_iothread();
-             default:
-                 /* Ignore everything else? */
-                 break;
+             }
+ 
+-        } /* for cpu.. */
++            cpu = CPU_NEXT(cpu);
++        } /* while (cpu && !cpu->exit_request).. */
++
+         /* Does not need atomic_mb_set because a spurious wakeup is okay.  */
+         atomic_set(&tcg_current_rr_cpu, NULL);
+ 
+-        /* Pairs with smp_wmb in qemu_cpu_kick.  */
+-        atomic_mb_set(&exit_request, 0);
++        if (cpu && cpu->exit_request) {
++            atomic_mb_set(&cpu->exit_request, 0);
++        }
+ 
+         handle_icount_deadline();
+ 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 3cbd359dd7..bd4622ac5d 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -403,7 +403,4 @@ bool memory_region_is_unassigned(MemoryRegion *mr);
+ /* vl.c */
+ extern int singlestep;
+ 
+-/* cpu-exec.c, accessed with atomic_mb_read/atomic_mb_set */
+-extern bool exit_request;
+-
+ #endif
 -- 
 2.11.0
