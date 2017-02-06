@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1carAM-0001jy-Ks
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:49:44 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1carD2-00030O-Kb
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1carAJ-0002jb-CF
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:49:42 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:32937)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1carAJ-0002jG-41
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:49:39 -0500
-Received: by mail-wm0-x241.google.com with SMTP id v77so24522045wmv.0
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 13:49:38 -0800 (PST)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1carD1-0003X4-T5
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:52:28 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
-	<20170206180523.5557.56952.malone@wampee.canonical.com>
-	<CAJs94EbfKZKVnR97-EuVfjMmhDhG=zwxGhdHGE_OjPCjLCXj2A@mail.gmail.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<20170206132321.GB11987@noname.redhat.com>
+	<877f53l4a5.fsf@dusky.pond.sub.org>
+	<dfb6b59b-07b9-a3d1-66e8-8b09ec63d634@redhat.com>
+	<87r33bfaso.fsf@dusky.pond.sub.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b7687a46-62d5-8d03-5766-844fef8abaa8@redhat.com>
-Date: Mon, 6 Feb 2017 22:49:35 +0100
+Message-ID: <32fa6b2c-e1cb-1ac5-2707-22861e908e21@redhat.com>
+Date: Mon, 6 Feb 2017 22:52:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJs94EbfKZKVnR97-EuVfjMmhDhG=zwxGhdHGE_OjPCjLCXj2A@mail.gmail.com>
+In-Reply-To: <87r33bfaso.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
- cpu->kvm_msr_buf->nmsrs' failed
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,19 +27,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1661386 <1661386@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 
 
-On 06/02/2017 20:38, Matwey V. Kornilov wrote:
->> OK, so that suggests the problem is that with PMU disabled in VMWare
->> config, it's not giving the right info to the guest to know it's
->> disabled.
-> How should it provide info? Can we check it?
+On 06/02/2017 19:12, Markus Armbruster wrote:
+>> QOM now supports class properties.  We can convert the wide majority of
+>> them, including qdev's "static" properties, to class properties.
+> 
+> Won't help object-add as long as dynamic properties remain.
 
-ver should have been 0 when PMU is disabled.
-
-Can you run "x86info -a" in the host (the VMware guest)?  Maybe it's not
-a VMware bug. :)
+Well, only as long as dynamic properties remain necessary for classes
+that the user can create.  The main user of dynamic properties is
+children properties.
 
 Paolo
