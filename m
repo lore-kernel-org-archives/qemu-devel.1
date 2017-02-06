@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1capkI-0002xO-Sw
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:18:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1caqXo-0003cQ-6A
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:09:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1capkF-0005SC-Nx
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:18:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1capkF-0005Ry-Fq
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:18:39 -0500
-References: <cover.1486285434.git.ben@skyportsystems.com>
-	<9a2d2cb01e42d6e61c6198356781dbb2919aca05.1486285434.git.ben@skyportsystems.com>
+	(envelope-from <eblake@redhat.com>) id 1caqXn-0001cz-9u
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:09:52 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-3-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <32b79ef4-6d0f-efa5-9da9-5955c4cf39ec@redhat.com>
-Date: Mon, 6 Feb 2017 14:18:36 -0600
+Message-ID: <3a47c84f-8edb-4be5-92cf-ffaf19006951@redhat.com>
+Date: Mon, 6 Feb 2017 15:09:43 -0600
 MIME-Version: 1.0
-In-Reply-To: <9a2d2cb01e42d6e61c6198356781dbb2919aca05.1486285434.git.ben@skyportsystems.com>
+In-Reply-To: <20170203154757.36140-3-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="qAkqcjRLAJqaJtoQo9RDxxM9RnPScJxNV"
-Subject: Re: [Qemu-devel] [PATCH v5 03/10] docs: VM Generation ID device
- description
+	boundary="noc2Tk2SGMSsk7eoxaDKjTAtmO25o18Ma"
+Subject: Re: [Qemu-devel] [PATCH 02/18] nbd-server: refactor simple reply
+ sending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com, qemu-devel@nongnu.org
-Cc: Gal Hammer <ghammer@redhat.com>, imammedo@redhat.com, lersek@redhat.com, mst@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qAkqcjRLAJqaJtoQo9RDxxM9RnPScJxNV
+--noc2Tk2SGMSsk7eoxaDKjTAtmO25o18Ma
 From: Eric Blake <eblake@redhat.com>
-To: ben@skyportsystems.com, qemu-devel@nongnu.org
-Cc: Gal Hammer <ghammer@redhat.com>, imammedo@redhat.com, lersek@redhat.com,
- mst@redhat.com
-Message-ID: <32b79ef4-6d0f-efa5-9da9-5955c4cf39ec@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 03/10] docs: VM Generation ID device
- description
-References: <cover.1486285434.git.ben@skyportsystems.com>
- <9a2d2cb01e42d6e61c6198356781dbb2919aca05.1486285434.git.ben@skyportsystems.com>
-In-Reply-To: <9a2d2cb01e42d6e61c6198356781dbb2919aca05.1486285434.git.ben@skyportsystems.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
+ stefanha@redhat.com
+Message-ID: <3a47c84f-8edb-4be5-92cf-ffaf19006951@redhat.com>
+Subject: Re: [PATCH 02/18] nbd-server: refactor simple reply sending
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+ <20170203154757.36140-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20170203154757.36140-3-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/05/2017 03:11 AM, ben@skyportsystems.com wrote:
-> From: Ben Warren <ben@skyportsystems.com>
+On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Rename functions appropriately and also make a separate copy of NBDRepl=
+y
+> - NBDSimpleReply, to replace NBDReply for the server. NBDReply itself
+> will be upgraded in future patches to handle both simple and structured=
+
+> replies in the client.
 >=20
-> This patch is based off an earlier version by
-> Gal Hammer (ghammer@redhat.com)
->=20
-> Requirements section, ASCII diagrams and overall help
-> provided by Laszlo Ersek (lersek@redhat.com)
->=20
-> Signed-off-by: Gal Hammer <ghammer@redhat.com>
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  docs/specs/vmgenid.txt | 239 +++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  1 file changed, 239 insertions(+)
->  create mode 100644 docs/specs/vmgenid.txt
+>  include/block/nbd.h |  7 +++++++
+>  nbd/server.c        | 25 +++++++++++++------------
+>  2 files changed, 20 insertions(+), 12 deletions(-)
 >=20
 
-> +
-
-> +
-> +Design Details:
-> +---------------
-> +
-> +Requirements R1a through R1e dicate that the memory holding the
-
-s/dicate/dictate/
-
-> +VM Generation ID must be allocated and owned by the guest operating sy=
-stem,
-
-> +
-> +GUID Storage Format:
-> +--------------------
-> +
-> +In order to work with OVMF "SDT Header Probe Supressor", the contents =
-of
-
-s/Supressor/Suppressor/
-
-> +the vmgenid fw_cfg blob are not simply a 128-bit GUID.  There is also
-> +significant padding in order to align and fill a memory page, as shown=
- in the
-> +following diagram:
-> +
-> ++----------------------------------+
-> +| SSDT with OEM Table ID =3D VMGENID |
-> ++----------------------------------+
-> +| ...                              |       TOP OF PAGE
-> +| VGIA dword object ---------------|-----> +--------------------------=
--+
-> +| ...                              |       | fw-allocated array for   =
- |
-> +| _STA method referring to VGIA    |       | "etc/vmgenid"        |
-
-Inconsistent whitespace
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---qAkqcjRLAJqaJtoQo9RDxxM9RnPScJxNV
+--noc2Tk2SGMSsk7eoxaDKjTAtmO25o18Ma
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -119,13 +76,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYmNocAAoJEKeha0olJ0NqcZ4H/2tu0PM1tn+YWvQLSOeuFBPp
-UZNZ+GDhWBvB94krWu1cXC4MJET/mhqaMNYsknFEWkshrLvlr3m8fBSC6YIwo2qJ
-87il/IHKWiuVkkNghlCKSJ/E8/qMzaRRhFmC4Eskhvkq96OVJd5kIAXA2gCkGnPZ
-1CCFPQMec+r0emymboxuuWb/Av2vOKcC6GL+CGZhe/RCio2Gg0pspg+vowvUEHap
-rhgz5GpNk3/koa82OppDNkg51x0GITMtJdt2EUS/J/yM+GxFA3yJ8q8zgPYhypn+
-sFnDu8e24zt2S8ZqJbtqVhqFX1so6Rg74dOB074+XGvXcjsqRvQFGHHdO4GRBKw=
-=HF6o
+iQEcBAEBCAAGBQJYmOYXAAoJEKeha0olJ0NqK9AIAIoDqzWaXxyOr6sO2i9rPIZG
+csvGsU6bJnx2yX7PEaUBs40u1diNuPCJY8e8TzL5Ar3y0DIru9ZDA5q39K+Jd9TE
+/dUAeQxRNCaVAqJ6S0nJJERtWkyeUsW8MQVLRe/2YUOPKypkYel0MA3C0Ml2WuTm
+Cgsg4qwKbitefU2gWJ2PqXK0qye4gegf1mnbk6oA7jrAYbpRjQG0WPXdLB0OfW6F
+cc+rNTj5T4Zq1ZJirBJeD2nvhoyI4J3CmJGr60nQIeR2zLuou+h9ntv8nk1u1jte
+hqPuWK801jpnwFiYcLz5+ppm7HwOekazpikgj6sjdgGQ05K8t/8U23t4hN8SUww=
+=LATb
 -----END PGP SIGNATURE-----
 
---qAkqcjRLAJqaJtoQo9RDxxM9RnPScJxNV--
+--noc2Tk2SGMSsk7eoxaDKjTAtmO25o18Ma--
