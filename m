@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cahTN-0002LC-BR
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:28:42 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cahTN-0002LD-Bb
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:28:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cahTJ-0002wM-Kr
+	(envelope-from <kraxel@redhat.com>) id 1cahTJ-0002vy-CS
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:28:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59738)
+Received: from mx1.redhat.com ([209.132.183.28]:50074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cahTJ-0002vZ-G8
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cahTJ-0002vA-5Q
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:28:37 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AB79C3B71B
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 11:28:36 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  6 Feb 2017 12:28:18 +0100
-Message-Id: <1486380501-13431-7-git-send-email-kraxel@redhat.com>
+Date: Mon,  6 Feb 2017 12:28:14 +0100
+Message-Id: <1486380501-13431-3-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1486380501-13431-1-git-send-email-kraxel@redhat.com>
 References: <1486380501-13431-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 6/9] xhci: don't kick in xhci_submit and
- xhci_fire_ctl_transfer
+Subject: [Qemu-devel] [PULL 2/9] usb/uas: more verbose error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +30,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, 1653384@bugs.launchpad.net
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-xhci_submit and xhci_fire_ctl_transfer are is called from
-xhci_kick_epctx processing loop only, so there is no need to call
-xhci_kick_epctx make sure processing continues.  Also eecursive calls
-into xhci_kick_epctx can cause trouble.
+Print some more details in case we get a unknown
+control request, to ease trouble-shooting.
 
-Drop the xhci_kick_epctx calls.
-
-Cc: 1653384@bugs.launchpad.net
-Fixes: 94b037f2a451b3dc855f9f2c346e5049a361bd55
-Reported-by: Fabian Lesniak <fabian@lesniak-it.de>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 1485790607-31399-4-git-send-email-kraxel@redhat.com
+Message-id: 1485870727-21956-1-git-send-email-kraxel@redhat.com
 ---
- hw/usb/hcd-xhci.c | 8 --------
- 1 file changed, 8 deletions(-)
+ hw/usb/dev-uas.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 7e863d3..f89d8da 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -2001,11 +2001,7 @@ static int xhci_fire_ctl_transfer(XHCIState *xhci, XHCITransfer *xfer)
-     xfer->packet.parameter = trb_setup->parameter;
- 
-     usb_handle_packet(xfer->packet.ep->dev, &xfer->packet);
--
-     xhci_try_complete_packet(xfer);
--    if (!xfer->running_async && !xfer->running_retry) {
--        xhci_kick_epctx(xfer->epctx, 0);
--    }
-     return 0;
- }
- 
-@@ -2105,11 +2101,7 @@ static int xhci_submit(XHCIState *xhci, XHCITransfer *xfer, XHCIEPContext *epctx
-         return -1;
+diff --git a/hw/usb/dev-uas.c b/hw/usb/dev-uas.c
+index 3a8ff18..da2fb70 100644
+--- a/hw/usb/dev-uas.c
++++ b/hw/usb/dev-uas.c
+@@ -653,7 +653,8 @@ static void usb_uas_handle_control(USBDevice *dev, USBPacket *p,
+     if (ret >= 0) {
+         return;
      }
-     usb_handle_packet(xfer->packet.ep->dev, &xfer->packet);
--
-     xhci_try_complete_packet(xfer);
--    if (!xfer->running_async && !xfer->running_retry) {
--        xhci_kick_epctx(xfer->epctx, xfer->streamid);
--    }
-     return 0;
+-    error_report("%s: unhandled control request", __func__);
++    error_report("%s: unhandled control request (req 0x%x, val 0x%x, idx 0x%x",
++                 __func__, request, value, index);
+     p->status = USB_RET_STALL;
  }
  
 -- 
