@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cahtc-0006mL-O4
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:55:49 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cahtc-0006mM-OO
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cahtZ-00043g-NF
+	(envelope-from <kraxel@redhat.com>) id 1cahtZ-00043t-O9
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:55:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60952)
+Received: from mx1.redhat.com ([209.132.183.28]:49170)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cahtZ-000438-Fi
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cahtZ-00043G-Gv
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:55:45 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 54E5D7E9D5
+	by mx1.redhat.com (Postfix) with ESMTPS id A25584E024
 	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 11:55:45 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  6 Feb 2017 12:55:38 +0100
-Message-Id: <1486382139-30630-4-git-send-email-kraxel@redhat.com>
+Date: Mon,  6 Feb 2017 12:55:37 +0100
+Message-Id: <1486382139-30630-3-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1486382139-30630-1-git-send-email-kraxel@redhat.com>
 References: <1486382139-30630-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] xhci: fix nec vendor quirk handling
+Subject: [Qemu-devel] [PATCH 2/4] xhci: add qemu xhci controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +30,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-Only the TYPE_NEC_XHCI controller will have the nec vendor quirks.
+Turn existing TYPE_XHCI into an abstract base class.
+Create two child classes, TYPE_NEC_XHCI (same name as old xhci
+controller) and TYPE_QEMU_XHCI (using an ID from our namespace).
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/hcd-xhci.c | 44 +++++++++++++++++++++++++++++---------------
- 1 file changed, 29 insertions(+), 15 deletions(-)
+ docs/specs/pci-ids.txt |  1 +
+ hw/usb/hcd-xhci.c      | 40 ++++++++++++++++++++++++++++++++++++----
+ include/hw/pci/pci.h   |  1 +
+ 3 files changed, 38 insertions(+), 4 deletions(-)
 
+diff --git a/docs/specs/pci-ids.txt b/docs/specs/pci-ids.txt
+index 16fdb0c..95adee0 100644
+--- a/docs/specs/pci-ids.txt
++++ b/docs/specs/pci-ids.txt
+@@ -61,6 +61,7 @@ PCI devices (other than virtio):
+ 1b36:0009  PCI Expander Bridge (-device pxb)
+ 1b36:000a  PCI-PCI bridge (multiseat)
+ 1b36:000b  PCIe Expander Bridge (-device pxb-pcie)
++1b36:000d  PCI xhci usb host adapter
+ 
+ All these devices are documented in docs/specs.
+ 
 diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 887bb39..0e25943 100644
+index 74184ac..887bb39 100644
 --- a/hw/usb/hcd-xhci.c
 +++ b/hw/usb/hcd-xhci.c
-@@ -485,6 +485,8 @@ struct XHCIState {
-     XHCIInterrupter intr[MAXINTRS];
- 
+@@ -487,7 +487,9 @@ struct XHCIState {
      XHCIRing cmd_ring;
-+
-+    bool nec_quirks;
  };
  
- #define TYPE_XHCI "base-xhci"
-@@ -2737,20 +2739,26 @@ static void xhci_process_commands(XHCIState *xhci)
-             xhci_via_challenge(xhci, trb.parameter);
-             break;
-         case CR_VENDOR_NEC_FIRMWARE_REVISION:
--            event.type = 48; /* NEC reply */
--            event.length = 0x3025;
-+            if (xhci->nec_quirks) {
-+                event.type = 48; /* NEC reply */
-+                event.length = 0x3025;
-+            } else {
-+                event.ccode = CC_TRB_ERROR;
-+            }
-             break;
-         case CR_VENDOR_NEC_CHALLENGE_RESPONSE:
--        {
--            uint32_t chi = trb.parameter >> 32;
--            uint32_t clo = trb.parameter;
--            uint32_t val = xhci_nec_challenge(chi, clo);
--            event.length = val & 0xFFFF;
--            event.epid = val >> 16;
--            slotid = val >> 24;
--            event.type = 48; /* NEC reply */
--        }
--        break;
-+            if (xhci->nec_quirks) {
-+                uint32_t chi = trb.parameter >> 32;
-+                uint32_t clo = trb.parameter;
-+                uint32_t val = xhci_nec_challenge(chi, clo);
-+                event.length = val & 0xFFFF;
-+                event.epid = val >> 16;
-+                slotid = val >> 24;
-+                event.type = 48; /* NEC reply */
-+            } else {
-+                event.ccode = CC_TRB_ERROR;
-+            }
-+            break;
-         default:
-             trace_usb_xhci_unimplemented("command", type);
-             event.ccode = CC_TRB_ERROR;
-@@ -3252,9 +3260,12 @@ static void xhci_runtime_write(void *ptr, hwaddr reg,
-         intr->erstsz = val & 0xffff;
-         break;
-     case 0x10: /* ERSTBA low */
--        /* XXX NEC driver bug: it doesn't align this to 64 bytes
--        intr->erstba_low = val & 0xffffffc0; */
--        intr->erstba_low = val & 0xfffffff0;
-+        if (xhci->nec_quirks) {
-+            /* NEC driver bug: it doesn't align this to 64 bytes */
-+            intr->erstba_low = val & 0xfffffff0;
-+        } else {
-+            intr->erstba_low = val & 0xffffffc0;
-+        }
-         break;
-     case 0x14: /* ERSTBA high */
-         intr->erstba_high = val;
-@@ -3549,6 +3560,9 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-     dev->config[PCI_CACHE_LINE_SIZE] = 0x10;
-     dev->config[0x60] = 0x30; /* release number */
+-#define TYPE_XHCI "nec-usb-xhci"
++#define TYPE_XHCI "base-xhci"
++#define TYPE_NEC_XHCI "nec-usb-xhci"
++#define TYPE_QEMU_XHCI "qemu-xhci"
  
-+    if (strcmp(object_get_typename(OBJECT(dev)), TYPE_NEC_XHCI) == 0) {
-+        xhci->nec_quirks = true;
-+    }
-     if (xhci->numintrs > MAXINTRS) {
-         xhci->numintrs = MAXINTRS;
-     }
+ #define XHCI(obj) \
+     OBJECT_CHECK(XHCIState, (obj), TYPE_XHCI)
+@@ -3868,10 +3870,7 @@ static void xhci_class_init(ObjectClass *klass, void *data)
+     set_bit(DEVICE_CATEGORY_USB, dc->categories);
+     k->realize      = usb_xhci_realize;
+     k->exit         = usb_xhci_exit;
+-    k->vendor_id    = PCI_VENDOR_ID_NEC;
+-    k->device_id    = PCI_DEVICE_ID_NEC_UPD720200;
+     k->class_id     = PCI_CLASS_SERIAL_USB;
+-    k->revision     = 0x03;
+     k->is_express   = 1;
+ }
+ 
+@@ -3880,11 +3879,44 @@ static const TypeInfo xhci_info = {
+     .parent        = TYPE_PCI_DEVICE,
+     .instance_size = sizeof(XHCIState),
+     .class_init    = xhci_class_init,
++    .abstract      = true,
++};
++
++static void nec_xhci_class_init(ObjectClass *klass, void *data)
++{
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->vendor_id    = PCI_VENDOR_ID_NEC;
++    k->device_id    = PCI_DEVICE_ID_NEC_UPD720200;
++    k->revision     = 0x03;
++}
++
++static const TypeInfo nec_xhci_info = {
++    .name          = TYPE_NEC_XHCI,
++    .parent        = TYPE_XHCI,
++    .class_init    = nec_xhci_class_init,
++};
++
++static void qemu_xhci_class_init(ObjectClass *klass, void *data)
++{
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->vendor_id    = PCI_VENDOR_ID_REDHAT;
++    k->device_id    = PCI_DEVICE_ID_REDHAT_XHCI;
++    k->revision     = 0x01;
++}
++
++static const TypeInfo qemu_xhci_info = {
++    .name          = TYPE_QEMU_XHCI,
++    .parent        = TYPE_XHCI,
++    .class_init    = qemu_xhci_class_init,
+ };
+ 
+ static void xhci_register_types(void)
+ {
+     type_register_static(&xhci_info);
++    type_register_static(&nec_xhci_info);
++    type_register_static(&qemu_xhci_info);
+ }
+ 
+ type_init(xhci_register_types)
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index cbc1fdf..05ef14b 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -97,6 +97,7 @@
+ #define PCI_DEVICE_ID_REDHAT_BRIDGE_SEAT 0x000a
+ #define PCI_DEVICE_ID_REDHAT_PXB_PCIE    0x000b
+ #define PCI_DEVICE_ID_REDHAT_PCIE_RP     0x000c
++#define PCI_DEVICE_ID_REDHAT_XHCI        0x000d
+ #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
+ 
+ #define FMT_PCIBUS                      PRIx64
 -- 
 1.8.3.1
