@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cadEw-0004Gl-Rv
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 01:57:31 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cadM8-0006VT-Sq
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:04:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cadEv-0000MM-JB
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 01:57:30 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87bmukmlau.fsf@dusky.pond.sub.org>
-Date: Mon, 06 Feb 2017 07:57:20 +0100
-In-Reply-To: <87bmukmlau.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Thu, 02 Feb 2017 20:42:33 +0100")
-Message-ID: <87vasnu7qn.fsf@dusky.pond.sub.org>
+	(envelope-from <bobby.prani@gmail.com>) id 1cadM5-00057i-M0
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:04:56 -0500
+Received: from mail-yw0-x243.google.com ([2607:f8b0:4002:c05::243]:35395)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cadM5-00057W-Fk
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:04:53 -0500
+Received: by mail-yw0-x243.google.com with SMTP id l16so6306846ywb.2
+	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 23:04:53 -0800 (PST)
+References: <20170125001041.14029-1-bobby.prani@gmail.com>
+	<24151c6e-2c30-ae82-9b91-aa1c6cad6e81@vivier.eu>
+From: Pranith Kumar <bobby.prani@gmail.com>
+In-reply-to: <24151c6e-2c30-ae82-9b91-aa1c6cad6e81@vivier.eu>
+Date: Mon, 06 Feb 2017 02:04:51 -0500
+Message-ID: <87wpd3pzos.fsf@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH] linux-user: Add signal handling for
+ x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,88 +31,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Allan Wirth <awirth@akamai.com>
 
-Markus Armbruster <armbru@redhat.com> writes:
 
-[...]
-> === Structured values ===
->
-> The dotted key convention messes with KEY syntax to permit structured
-> values.  Works, but the more conventional way to support structured
-> values is a syntax for structured values.  
->
-> An obvious one is to use { KEY=VALUE, ...} for objects, and [ VALUE,
-> ... ] for arrays.  Looks like this:
->
->     -drive 'driver=quorum,
->             child=[{ driver=file, filename=disk1.img },
->                    { driver=host_device, filename=/dev/sdb },
->                    { driver=nbd, host=localhost } ]'
->
-> Again, lines broken and indented for legibility; you need to join them
-> for actual use.
->
-> There's a syntactic catch, though: a value of the form [ ... ] can
-> either be an array or a string.  Which one it is depends on the type of
-> the key.  To parse this syntax, you need to know the types, unlike JSON
-> or traditional QemuOpts.  Unless we outlaw strings starting with '{' or
-> '[', which feels impractical.
+Hi Laurent,
 
-The parser having to know the types obviously precludes a design where a
-simple parser feeds into a type-aware visitor, which is how the JSON ->
-QObject -> QAPI pipeline works.
+Thanks for the review.
 
-Perhaps less obviously, it even precludes a design where the parser is
-derived from the QAPI schema to make it type-aware: the 'any' type
-spoils that.
+Laurent Vivier writes:
 
-Consider -object/object-add and -device/device_add.  These take a few
-statically known parameters such as "id".  Any additional parameters get
-collected in a dictionary.  The schema represents it as value of type
-'any'.  The code using this dictionary value matches its entries against
-QOM properties.
+> Le 25/01/2017 à 01:10, Pranith Kumar a écrit :
+>> Adopted from a previous patch posting:
+>> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg02079.html
+>> 
+>> CC: Allan Wirth <awirth@akamai.com>
+>> CC: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+>> ---
+>>  linux-user/signal.c      | 264 ++++++++++++++++++++++++++++++++++++++++-------
+>>  target/i386/cpu.h        |   2 +
+>>  target/i386/fpu_helper.c |  12 +++
+>>  3 files changed, 242 insertions(+), 36 deletions(-)
+>> 
+>> diff --git a/linux-user/signal.c b/linux-user/signal.c
+>> index 0a5bb4e26b..0248621d66 100644
+>> --- a/linux-user/signal.c
+>> +++ b/linux-user/signal.c
+>> @@ -253,8 +253,7 @@ int do_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
+>>      return 0;
+>>  }
+>>  
+>> -#if !defined(TARGET_OPENRISC) && !defined(TARGET_UNICORE32) && \
+>> -    !defined(TARGET_X86_64)
+>> +#if !defined(TARGET_OPENRISC) && !defined(TARGET_UNICORE32)
+>>  /* Just set the guest's signal mask to the specified value; the
+>>   * caller is assumed to have called block_signals() already.
+>>   */
+>> @@ -512,7 +511,7 @@ void signal_init(void)
+>>      }
+>>  }
+>>  
+>> -#if !(defined(TARGET_X86_64) || defined(TARGET_UNICORE32))
+>> +#ifndef TARGET_UNICORE32
+>>  /* Force a synchronously taken signal. The kernel force_sig() function
+>>   * also forces the signal to "not blocked, not ignored", but for QEMU
+>>   * that work is done in process_pending_signals().
+>> @@ -819,9 +818,8 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+>>      return ret;
+>>  }
+>>  
+>> -#if defined(TARGET_I386) && TARGET_ABI_BITS == 32
+>> -
+>> -/* from the Linux kernel */
+>> +#if defined(TARGET_I386)
+>> +/* from the Linux kernel - /arch/x86/include/uapi/asm/sigcontext.h */
+>>  
+>>  struct target_fpreg {
+>>      uint16_t significand[4];
+>> @@ -835,7 +833,7 @@ struct target_fpxreg {
+>>  };
+>>  
+>>  struct target_xmmreg {
+>> -    abi_ulong element[4];
+>> +    uint32_t element[4];
+>>  };
+>>  
+>>  struct target_fpstate {
+>> @@ -860,33 +858,117 @@ struct target_fpstate {
+>>      abi_ulong padding[56];
+>>  };
+>
+> I think you should remove the definition of the target_fpstate structure
+> as you overwrite it with #define below:
+> ...
+>> +
+>> +#ifndef TARGET_X86_64
+>> +# define target_fpstate target_fpstate_32
+>> +#else
+>> +# define target_fpstate target_fpstate_64
+>> +#endif
+>> +
 
-To parse these additional parameters, knowing the (compile-time static)
-schema isn't sufficient.  You also need to know the type of the QOM
-property they'll get matched to at run-time.
+Good catch. I'll do that.
 
-This is a special case.  For the general case, you need to know how code
-is going to use the value.  You generally can't know that until it's
-done, so we'd have to parse lazily.  Thanks, but no thanks.
+> ...
+>> @@ -959,12 +1052,49 @@ static void setup_sigcontext(struct target_sigcontext *sc,
+>>      /* non-iBCS2 extensions.. */
+>>      __put_user(mask, &sc->oldmask);
+>>      __put_user(env->cr[2], &sc->cr2);
+>> +#else
+>> +    __put_user(env->regs[8], &sc->r8);
+>> +    __put_user(env->regs[9], &sc->r9);
+>> +    __put_user(env->regs[10], &sc->r10);
+>> +    __put_user(env->regs[11], &sc->r11);
+>> +    __put_user(env->regs[12], &sc->r12);
+>> +    __put_user(env->regs[13], &sc->r13);
+>> +    __put_user(env->regs[14], &sc->r14);
+>> +    __put_user(env->regs[15], &sc->r15);
+>> +
+>> +    __put_user(env->regs[R_EDI], &sc->rdi);
+>> +    __put_user(env->regs[R_ESI], &sc->rsi);
+>> +    __put_user(env->regs[R_EBP], &sc->rbp);
+>> +    __put_user(env->regs[R_EBX], &sc->rbx);
+>> +    __put_user(env->regs[R_EDX], &sc->rdx);
+>> +    __put_user(env->regs[R_EAX], &sc->rax);
+>> +    __put_user(env->regs[R_ECX], &sc->rcx);
+>> +    __put_user(env->regs[R_ESP], &sc->rsp);
+>> +    __put_user(env->eip, &sc->rip);
+>> +
+>> +    __put_user(env->eflags, &sc->eflags);
+>> +
+>> +    __put_user(env->segs[R_CS].selector, &sc->cs);
+>> +    __put_user((uint16_t)0, &sc->gs);
+>> +    __put_user((uint16_t)0, &sc->fs);
+>> +    __put_user(env->segs[R_SS].selector, &sc->ss);
+>> +
+>> +    __put_user(env->error_code, &sc->err);
+>> +    __put_user(cs->exception_index, &sc->trapno);
+>> +    __put_user(mask, &sc->oldmask);
+>> +    __put_user(env->cr[2], &sc->cr2);
+>> +
+>> +    /* fpstate_addr must be 16 byte aligned for fxsave */
+>> +    assert(!(fpstate_addr & 0xf));
+>> +
+>> +    cpu_x86_fxsave(env, fpstate_addr);
+>> +    __put_user(fpstate_addr, &sc->fpstate);
+>> +#endif
+>
+> This part would be more readable if the registers were in the same order
+> as  in the kernel function setup_sigcontext().
 
-> But wait, there's another syntactic catch: in traditional QemuOpts, a
-> value ends at the next unescaped ',' or '\0'.  Inside an object, it now
-> also ends at the next unescaped '}', and inside an array, at the next
-> unescaped ']'.  Or perhaps at the next space (the example above assumes
-> it does).  That means we either have to provide a way to escape '}', ']'
-> and space, or find another way to delimit string values, say require '"'
-> around strings whenever the string contains "funny" characters.
+OK, noted this. I'll make the change.
+
+> ...
+>> +    if (info) {
+>> +        tswap_siginfo(&frame->info, info);
+>> +    }
 >
-> So, if escaped ',' wasn't ugly and confusing enough for you...
+> kernel checks "ksig->ka.sa.sa_flags & SA_SIGINFO" to know if there is
+> siginfo structure.
 >
-> === Comparison ===
+
+OK. I'll do the same as what the kernel is doing.
+
+> ...
+>>      /* Set up registers for signal handler */
+>>      env->regs[R_ESP] = frame_addr;
+>> +    env->regs[R_EAX] = 0;
+>> +    env->regs[R_EDI] = sig;
+>> +    env->regs[R_ESI] = (unsigned long)&frame->info;
+>> +    env->regs[R_EDX] = (unsigned long)&frame->uc;
+>>      env->eip = ka->_sa_handler;
 >
-> In my opinion, dotted keys are weird and ugly, but at least they don't
-> add to the quoting mess.  Structured values look better, except when
-> they do add to the quoting mess.
+> In kernel, 32bit handler seems to not use the same registers as 64bit
+> handler, for instance ax is sig, info is dx and uc is cx.
 >
-> I'm having a hard time deciding which one I like less :)
+
+Hmm.. how do I reproduce the same here? Should I check if we are in 32-bit environment?
+
+> ...
+>> @@ -6181,11 +6371,13 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
+>>          || defined(TARGET_PPC64) || defined(TARGET_HPPA)
+>>          /* These targets do not have traditional signals.  */
+>>          setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
+>> -#else
+>> +#elif !defined(TARGET_X86_64)
+>>          if (sa->sa_flags & TARGET_SA_SIGINFO)
+>>              setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
+>>          else
+>>              setup_frame(sig, sa, &target_old_set, cpu_env);
+>> +#else
+>> +        setup_rt_frame(sig, sa, 0, &target_old_set, cpu_env);
 >
-> Opinions?  Other ideas?
->
->
->
->
-> [1] [PATCH v14 00/21] QAPI/QOM work for non-scalar object properties
-> (actually v15)
-> Message-Id: <1475246744-29302-1-git-send-email-berrange@redhat.com>
-> http://lists.gnu.org/archive/html/qemu-devel/2016-09/msg08238.html
->
-> [2] [RFC PATCH] block: Crude initial implementation of -blockdev
-> Message-Id: <1485968933-9162-1-git-send-email-armbru@redhat.com>
-> http://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00182.html
->
-> [3] Message-ID: <87h989ncse.fsf@dusky.pond.sub.org>
-> http://lists.gnu.org/archive/html/qemu-devel/2016-10/msg04046.html
+> Why do we use "0" instead of "&k->info"?
+
+That is a miss by me. I'll fix this.
+
+Thanks,
+-- 
+Pranith
