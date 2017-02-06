@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1capDW-0007dr-QN
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 14:44:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1capEk-0008T7-OM
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 14:46:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1capDS-0004Eq-Rk
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 14:44:50 -0500
-Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:32779)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1capDS-0004Ej-ID
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 14:44:46 -0500
-Received: by mail-pg0-x22e.google.com with SMTP id 204so31052309pge.0
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 11:44:46 -0800 (PST)
-From: Ben Warren <ben@skyportsystems.com>
-Message-Id: <60804C9F-3FF6-4C90-A6EF-00D8EC257703@skyportsystems.com>
-Content-Type: multipart/signed;
-	boundary="Apple-Mail=_90A83697-B2C2-443C-BAC5-72852CAD7A69";
-	protocol="application/pkcs7-signature"; micalg=sha1
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Date: Mon, 6 Feb 2017 11:44:43 -0800
-In-Reply-To: <20170206210237-mutt-send-email-mst@kernel.org>
-References: <cover.1486285434.git.ben@skyportsystems.com>
-	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
-	<20170206170455-mutt-send-email-mst@kernel.org>
-	<E609277C-1E60-48F6-B83E-2A6AEFB242F3@skyportsystems.com>
-	<20170206193300-mutt-send-email-mst@kernel.org>
-	<769A787B-3A08-4A63-8521-9825C2DA0101@skyportsystems.com>
-	<20170206201249-mutt-send-email-mst@kernel.org>
-	<03506FD9-924D-445A-A1CB-73B2D4FCF032@skyportsystems.com>
-	<20170206210237-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
- Generation ID support
+	(envelope-from <bounces@canonical.com>) id 1capEg-0004Z6-QW
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 14:46:06 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1capEg-0004Yp-IG
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 14:46:02 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1capEc-0001SD-Ur
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 19:45:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0ECFA2E80C9
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 19:45:58 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Feb 2017 19:38:56 -0000
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
+	<20170206180523.5557.56952.malone@wampee.canonical.com>
+Message-Id: <CAJs94EbfKZKVnR97-EuVfjMmhDhG=zwxGhdHGE_OjPCjLCXj2A@mail.gmail.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
+ cpu->kvm_msr_buf->nmsrs' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,177 +38,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, imammedo@redhat.com
+To: qemu-devel@nongnu.org
+
+2017-02-06 21:05 GMT+03:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
+>>> So you didn't mention this was running inside VMWare; it looks to me as=
+ if that's rejecting the PMU MSR accesses.
+>>> For reference which version of VMWare are you using?
+>
+>>ESXi 6.0.0 Build 2494585
+>
+>>I also find that enabling perf counters in VMWare configuration also
+> helps.
+>
+> OK, so that suggests the problem is that with PMU disabled in VMWare
+> config, it's not giving the right info to the guest to know it's
+> disabled.
+
+How should it provide info? Can we check it?
+
+>
+>>But why did it just work before 48e1a45c3166 with perf counters
+> disabled?
+>
+> Before that bug it ignored the failure to write/read the PMU MSRs - but
+> also lost all the MSRs after the PMU access and we'd found that if we
+> ever had that happen we'd get lots of weird bugs related to the other
+> MSRs.
+>
+>>>
+>>> My colleague suggested that '-cpu host,pmu=3Doff'  might work instead of
+>>> having to hack around with the source.
+>
+>> Indeed, this also helps.
+>
+> --
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1661386
+>
+> Title:
+>   Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   Hello,
+>
+>
+>   I see the following when try to run qemu from master as the following:
+>
+>   # ./x86_64-softmmu/qemu-system-x86_64 --version
+>   QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+>   Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+>   # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+>   -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+>   -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+>   loglevel=3D7' -m 1024 -serial stdio
+>   qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+>   kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+>
+>   First broken commit has been bisected:
+>
+>   commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+>   Author: Paolo Bonzini <pbonzini@redhat.com>
+>   Date:   Wed Mar 30 22:55:29 2016 +0200
+>
+>       target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+>
+>       This would have caught the bug in the previous patch.
+>
+>       Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+>   My cpuinfo is the following:
+>
+>   processor       : 0
+>   vendor_id       : GenuineIntel
+>   cpu family      : 6
+>   model           : 44
+>   model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+>   stepping        : 2
+>   microcode       : 0x14
+>   cpu MHz         : 3066.775
+>   cache size      : 12288 KB
+>   physical id     : 0
+>   siblings        : 2
+>   core id         : 0
+>   cpu cores       : 2
+>   apicid          : 0
+>   initial apicid  : 0
+>   fpu             : yes
+>   fpu_exception   : yes
+>   cpuid level     : 11
+>   wp              : yes
+>   flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge =
+mca cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm=
+ constant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc=
+ aperfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hyperviso=
+r lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+>   bugs            :
+>   bogomips        : 6133.55
+>   clflush size    : 64
+>   cache_alignment : 64
+>   address sizes   : 40 bits physical, 48 bits virtual
+>   power management:
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
 
 
---Apple-Mail=_90A83697-B2C2-443C-BAC5-72852CAD7A69
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+-- =
 
+With best regards,
+Matwey V. Kornilov
+http://blog.matwey.name
+xmpp://0x2207@jabber.ru
 
-> On Feb 6, 2017, at 11:04 AM, Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->=20
-> On Mon, Feb 06, 2017 at 10:48:05AM -0800, Ben Warren wrote:
->>=20
->>> On Feb 6, 2017, at 10:17 AM, Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->>>=20
->>> On Mon, Feb 06, 2017 at 09:59:55AM -0800, Ben Warren wrote:
->>>>              +void vmgenid_add_fw_cfg(FWCfgState *s, GArray *guid)
->>>>              +{
->>>>              +    Object *obj =3D find_vmgenid_dev(NULL);
->>>>              +    assert(obj);
->>>>              +    VmGenIdState *vms =3D VMGENID(obj);
->>>>              +
->>>>              +    /* Create a read-only fw_cfg file for GUID */
->>>>              +    fw_cfg_add_file(s, VMGENID_GUID_FW_CFG_FILE, =
-guid->data,
->>>>              +                    VMGENID_FW_CFG_SIZE);
->>>>              +    /* Create a read-write fw_cfg file for Address */
->>>>              +    fw_cfg_add_file_callback(s, =
-VMGENID_ADDR_FW_CFG_FILE, NULL,
->>>>       NULL,
->>>>=20
->>>>=20
->>>>          Seems wrong. What if guest updates the address after =
-command line
->>>>          set it? You want a callback to copy guid there.
->>>>=20
->>>>=20
->>>>       Sure, I can do that.  My understanding was that this is a =
-read
->>>>       callback, but if
->>>>       it also is called upon a write, we should do what you =
-suggest.
->>>>=20
->>>>=20
->>>>   Hmm you are right. But we really need to call something
->>>>   on write though - unlike read, it must be called after write.
->>>>   Otherwise I don't see how it can work if you set gen id before
->>>>   guest boots.
->>>>=20
->>>>   I guess this means we need yet another callback per file.
->>>>   FWCfgWriteCallback ?
->>>>=20
->>>>   Can you implement this in hw/nvram/fw_cfg.c?
->>>>   It's rather straight-forward to do.
->>>>=20
->>>>=20
->>>> The reason it works is that we put the initial contents of the GUID =
-(as
->>>> supplied by command-line) into the GUID fw_cfg in the =
-=E2=80=98vmgenid_build_acpi()=E2=80=99
->>>> function, which is guaranteed to happen before the guest boots.  =
-The only time
->>>> QEMU needs to know VGIA is on later updates to the GUID (via =
-monitor) or when
->>>> restoring.  If you really think this extra complexity is needed, I =
-can do so,
->>>> but it seems to work very well as-is.
->>>=20
->>> I see. So it's a race condition I think.  It works unless you change =
-the
->>> gen id after bios read the guid from the guid file but before it =
-wrote
->>> out the address.
->>>=20
->>> Or do I miss something?
->>>=20
->> I don=E2=80=99t think it=E2=80=99s an issue because BIOS is not a =
-consumer of the
->> GUID.  I suppose there=E2=80=99s a window where another GUID could be =
-written
->> via monitor prior to bios writing back, but the change wouldn=E2=80=99t=
- be
->> applied to memory in vmgenid_update_guest() because vgia=3D0.  That
->> would be solved by a write callback and we could remove the GUID
->> copying from vmgenid_build_acpi().  It=E2=80=99s a very unlikely =
-scenario,
->> though.
->=20
-> When people run 100000 VMs and up, every unlikely scenario tends to
-> trigger.
->=20
-Right, your point is valid and I don=E2=80=99t want to ever have to =
-debug that type of race.  It turns out that the callback in fw_cfg is =
-tied to select(), not read(), so it is called upon write().  There =
-doesn=E2=80=99t seem to be a need to add a new callback after all.  =
-I=E2=80=99ll go down this path to remove this potential race.
->>> --=20
->>> MST
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661386
 
---Apple-Mail=_90A83697-B2C2-443C-BAC5-72852CAD7A69
-Content-Disposition: attachment;
-	filename=smime.p7s
-Content-Type: application/pkcs7-signature;
-	name=smime.p7s
-Content-Transfer-Encoding: base64
+Title:
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
-ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
-MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
-dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
-WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
-c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
-BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
-IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
-51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
-FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
-kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
-aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
-P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
-VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
-AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
-RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
-YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
-cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
-am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
-BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
-nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
-2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
-mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
-VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
-GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
-IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
-NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
-BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
-A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
-R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
-gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
-ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
-AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
-uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
-MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
-BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
-UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
-Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
-gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
-dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
-Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
-SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
-iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
-dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
-7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
-TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
-gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
-bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
-NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
-8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
-CQUxDxcNMTcwMjA2MTk0NDQ0WjAjBgkqhkiG9w0BCQQxFgQUdhrD2cXa4EX21qiVYT03irgISmgw
-gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
-Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
-BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
-YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
-QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
-KoZIhvcNAQEBBQAEggEAgYKa5UjS00hAjdSU/o7fAucStd994VH37VLetEQrV43gZkeRixLWVYeA
-2cl2aHfyf0ShXAgN0WOk6RkDxsdCYsjCM3xFYKQ+4TJA1YICPl5j0o8iaMh4QzhqKPhn6czuv7Rw
-El6RKQIj2sLIgq3lUv7xWg2MWA24x9ZS34kelfrl5fMdHZmVXY6PtICXa6Og676f2VUsfW2ctxa6
-z7s3n5Bivgvcm9AgkUTLhLX3nkU5GP45N28yA/yTCjdA+yQto+myu/2/kJHlVPBDhhSShBv/90p7
-RUhVmDdQnKBtXvrUAXR8k+mauRFa2owuuIQj8ookKV5cXY6buqDaHNCTtAAAAAAAAA==
---Apple-Mail=_90A83697-B2C2-443C-BAC5-72852CAD7A69--
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  =
+
+  I see the following when try to run qemu from master as the following:
+
+  # ./x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+  loglevel=3D7' -m 1024 -serial stdio
+  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  First broken commit has been bisected:
+
+  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Mar 30 22:55:29 2016 +0200
+
+      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+      =
+
+      This would have caught the bug in the previous patch.
+      =
+
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  My cpuinfo is the following:
+
+  processor       : 0
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 44
+  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+  stepping        : 2
+  microcode       : 0x14
+  cpu MHz         : 3066.775
+  cache size      : 12288 KB
+  physical id     : 0
+  siblings        : 2
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 0
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 11
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
+onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
+perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
+lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+  bugs            :
+  bogomips        : 6133.55
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 40 bits physical, 48 bits virtual
+  power management:
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
