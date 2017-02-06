@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cakE5-0001rQ-BD
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:25:09 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cakFE-0002oF-Oc
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:26:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cakE4-0005NR-Cl
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:25:05 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33688)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nirsof@gmail.com>) id 1cakE4-0005N7-8h
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:25:04 -0500
-Received: by mail-ot0-x242.google.com with SMTP id f9so10511264otd.0
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 06:25:03 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170206102019.GC5377@lemon.lan>
-References: <20170128035929.10168-2-nirsof@gmail.com>
-	<20170206102019.GC5377@lemon.lan>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Mon, 6 Feb 2017 16:25:02 +0200
-Message-ID: <CAMr-obtbdiSJb0zqOsdptJSv2PgcOANMEB_BYj2rg42mPjH8Sg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] qemu-io: Add regression tests
+	(envelope-from <kraxel@redhat.com>) id 1cakF6-0005iX-6k
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:26:11 -0500
+Message-ID: <1486391163.32329.24.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 06 Feb 2017 15:26:03 +0100
+In-Reply-To: <1486115549-9398-1-git-send-email-mjt@msgid.tls.msk.ru>
+References: <1486115549-9398-1-git-send-email-mjt@msgid.tls.msk.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2] vnc: do not disconnect on EAGAIN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +22,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, qemu-stable@nongnu.org
 
-This was created by mistake with --no-thread and no cover letter, I
-was confused by the instructions in the wiki, warning not to send
-multiple patches in the same thread.
+On Fr, 2017-02-03 at 12:52 +0300, Michael Tokarev wrote:
+> When qemu vnc server is trying to send large update to clients,
+> there might be a situation when system responds with something
+> like EAGAIN, indicating that there's no system memory to send
+> that much data (depending on the network speed, client and server
+> and what is happening).  In this case, something like this happens
+> on qemu side (from strace):
+>=20
+> sendmsg(16, {msg_name(0)=3DNULL,
+>         msg_iov(1)=3D[{"\244\"..., 729186}],
+>         msg_controllen=3D0, msg_flags=3D0}, 0) =3D 103950
+> sendmsg(16, {msg_name(0)=3DNULL,
+>         msg_iov(1)=3D[{"lz\346"..., 1559618}],
+>         msg_controllen=3D0, msg_flags=3D0}, 0) =3D -1 EAGAIN
+> sendmsg(-1, {msg_name(0)=3DNULL,
+>         msg_iov(1)=3D[{"lz\346"..., 1559618}],
+>         msg_controllen=3D0, msg_flags=3D0}, 0) =3D -1 EBADF
+>=20
+> qemu closes the socket before the retry, and obviously it gets EBADF
+> when trying to send to -1.
+>=20
+> This is because there WAS a special handling for EAGAIN, but now it doesn=
+'t
+> work anymore, after commit 04d2529da27db512dcbd5e99d0e26d333f16efcc, beca=
+use
+> now in all error-like cases we initiate vnc disconnect.
+>=20
+> This change were introduced in qemu 2.6, and caused numerous grief for ma=
+ny
+> people, resulting in their vnc clients reporting sporadic random disconne=
+cts
+> from vnc server.
+>=20
+> Fix that by doing the disconnect only when necessary, i.e. omitting this
+> very case of EAGAIN.
+>=20
+> Hopefully the existing condition (comparing with QIO_CHANNEL_ERR_BLOCK)
+> is sufficient, as the original code (before the above commit) were
+> checking for other errno values too.
+>=20
+> Apparently there's another (semi?)bug exist somewhere here, since the
+> code tries to write to fd# -1, it probably should check if the connection
+> is open before. But this isn't important.
+>=20
+> Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+> Fixes: 04d2529da27db512dcbd5e99d0e26d333f16efcc
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: qemu-stable@nongnu.org
 
-I already sent v4 and v5 properly.
+Added to ui patch queue.
 
-Thanks for the comments,
-Nir
-
-On Mon, Feb 6, 2017 at 12:20 PM, Fam Zheng <famz@redhat.com> wrote:
-> On Sat, 01/28 05:59, Nir Soffer wrote:
->> From: Nir Soffer <nsoffer@redhat.com>
->>
->> Add regression tests checking that qemu-io fail with non-zero exit code
->> when reading non-existing file or using the wrong format.
->>
->> Signed-off-by: Nir Soffer <nirsof@gmail.com>
->
-> This message is not correctly threaded as a reply to a v3 cover letter, and it's
-> hard to review. Please check your git command lines comform to the instructions
-> in
->
-> http://wiki.qemu-project.org/Contribute/SubmitAPatch#Submitting_your_Patches
->
-> Particularly, --cover-letter and --thread should be used in git-format-email.
->
-> Fam
+thanks,
+  Gerd
