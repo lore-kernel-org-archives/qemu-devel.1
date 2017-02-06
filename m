@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1calL7-0001MC-7f
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:36:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1calLg-0001xE-UW
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:37:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1calL5-0002AJ-CC
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:36:25 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1calL5-00029d-37
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:36:23 -0500
-Received: by mail-wr0-x231.google.com with SMTP id o16so23978403wra.1
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 07:36:22 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  6 Feb 2017 15:31:10 +0000
-Message-Id: <20170206153113.27729-21-alex.bennee@linaro.org>
-In-Reply-To: <20170206153113.27729-1-alex.bennee@linaro.org>
-References: <20170206153113.27729-1-alex.bennee@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1calLf-0002NC-E4
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:37:00 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<20170206132321.GB11987@noname.redhat.com>
+Date: Mon, 06 Feb 2017 16:36:50 +0100
+In-Reply-To: <20170206132321.GB11987@noname.redhat.com> (Kevin Wolf's message
+	of "Mon, 6 Feb 2017 14:23:21 +0100")
+Message-ID: <877f53l4a5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v10 20/23] target-arm/powerctl: defer cpu reset
- work to CPU context
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,328 +23,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, rth@twiddle.net
-Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-When switching a new vCPU on we want to complete a bunch of the setup
-work before we start scheduling the vCPU thread. To do this cleanly we
-defer vCPU setup to async work which will run the vCPUs execution
-context as the thread is woken up. The scheduling of the work will kick
-the vCPU awake.
+Kevin Wolf <kwolf@redhat.com> writes:
 
-This avoids potential races in MTTCG system emulation.
+> Am 02.02.2017 um 20:42 hat Markus Armbruster geschrieben:
+>> = Brief recap of dotted key convention =
+>> 
+>> We'll discuss use of dotted key convention later, so let me explain it
+>> briefly for the readers who don't know it already.
+>> 
+>> The dotted key convention interprets the KEY part as a sequence of names
+>> separated by dots.  If a name looks like an integer *handwave*, it's an
+>> array index, else it's an object member name.
+>
+> I think that's not really what we have, but just what it looks like to
+> you from your perspective of someone who wants to write a parser that
+> generically parses these things into nested QObjects.
+>
+> In reality, pretty much all users of the dotted syntax know from context
+> whether this is an array or an object. In the former case they call
+> something like qdict_array_entries()/split(), and in the latter case
+> qemu_opts_absorb_qdict(). Both of them are happy with numeric keys.
+>
+> The one exception is qdict_crumple(), which already is a parser like
+> you're intending to write. The difference is that it's used only in very
+> few specific cases where we know that the assumption holds true.
+>
+> In other words: To do things properly, you'd have to look at the schema.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+See discussion of 'any' types below.
 
----
-v7
-  - add const to static mode_for_el[] array
-  - fix checkpatch long lines
-v10
-  - use async work for arm_set_cpu_off, arm_reset_cpu as well
-  - model ON_PENDING to deal with racing arm_set_cpu_on
----
- target/arm/arm-powerctl.c | 192 ++++++++++++++++++++++++++++++----------------
- target/arm/arm-powerctl.h |   2 +
- target/arm/cpu.h          |  10 ++-
- 3 files changed, 139 insertions(+), 65 deletions(-)
+>> = Structured option argument syntax =
+>> 
+>> == JSON ==
+>> [...]
+>> There's also the -drive file=json:... syntax.  It's a bad fit for
+>> QemuOpts, because QemuOpts and JSON fight for the comma.  I'd show you
+>> if I could get it to work.
+>
+> Just double all the commas in the JSON object. It's not really that hard
+> to come up with something working, but it makes it even uglier than
+> plain JSON on the command line.
 
-diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-index fbb7a15daa..bf14740852 100644
---- a/target/arm/arm-powerctl.c
-+++ b/target/arm/arm-powerctl.c
-@@ -48,11 +48,93 @@ CPUState *arm_get_cpu_by_id(uint64_t id)
-     return NULL;
- }
- 
-+struct cpu_on_info {
-+    uint64_t entry;
-+    uint64_t context_id;
-+    uint32_t target_el;
-+    bool target_aa64;
-+};
-+
-+
-+static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
-+                                      run_on_cpu_data data)
-+{
-+    ARMCPU *target_cpu = ARM_CPU(target_cpu_state);
-+    struct cpu_on_info *info = (struct cpu_on_info *) data.host_ptr;
-+    bool old_powering_on;
-+
-+    /* Initialize the cpu we are turning on */
-+    cpu_reset(target_cpu_state);
-+    target_cpu_state->halted = 0;
-+
-+    if (info->target_aa64) {
-+        if ((info->target_el < 3) && arm_feature(&target_cpu->env,
-+                                                 ARM_FEATURE_EL3)) {
-+            /*
-+             * As target mode is AArch64, we need to set lower
-+             * exception level (the requested level 2) to AArch64
-+             */
-+            target_cpu->env.cp15.scr_el3 |= SCR_RW;
-+        }
-+
-+        if ((info->target_el < 2) && arm_feature(&target_cpu->env,
-+                                                 ARM_FEATURE_EL2)) {
-+            /*
-+             * As target mode is AArch64, we need to set lower
-+             * exception level (the requested level 1) to AArch64
-+             */
-+            target_cpu->env.cp15.hcr_el2 |= HCR_RW;
-+        }
-+
-+        target_cpu->env.pstate = aarch64_pstate_mode(info->target_el, true);
-+    } else {
-+        /* We are requested to boot in AArch32 mode */
-+        static const uint32_t mode_for_el[] = { 0,
-+                                                ARM_CPU_MODE_SVC,
-+                                                ARM_CPU_MODE_HYP,
-+                                                ARM_CPU_MODE_SVC };
-+
-+        cpsr_write(&target_cpu->env, mode_for_el[info->target_el], CPSR_M,
-+                   CPSRWriteRaw);
-+    }
-+
-+    if (info->target_el == 3) {
-+        /* Processor is in secure mode */
-+        target_cpu->env.cp15.scr_el3 &= ~SCR_NS;
-+    } else {
-+        /* Processor is not in secure mode */
-+        target_cpu->env.cp15.scr_el3 |= SCR_NS;
-+    }
-+
-+    /* We check if the started CPU is now at the correct level */
-+    assert(info->target_el == arm_current_el(&target_cpu->env));
-+
-+    if (info->target_aa64) {
-+        target_cpu->env.xregs[0] = info->context_id;
-+        target_cpu->env.thumb = false;
-+    } else {
-+        target_cpu->env.regs[0] = info->context_id;
-+        target_cpu->env.thumb = info->entry & 1;
-+        info->entry &= 0xfffffffe;
-+    }
-+
-+    /* Start the new CPU at the requested address */
-+    cpu_set_pc(target_cpu_state, info->entry);
-+
-+    g_free(info);
-+
-+    /* Finally set the power status */
-+    atomic_mb_set(&target_cpu->powered_off, false);
-+    old_powering_on = atomic_cmpxchg(&target_cpu->powering_on, true, false);
-+    assert(old_powering_on);
-+}
-+
- int arm_set_cpu_on(uint64_t cpuid, uint64_t entry, uint64_t context_id,
-                    uint32_t target_el, bool target_aa64)
- {
-     CPUState *target_cpu_state;
-     ARMCPU *target_cpu;
-+    struct cpu_on_info *info;
- 
-     DPRINTF("cpu %" PRId64 " (EL %d, %s) @ 0x%" PRIx64 " with R0 = 0x%" PRIx64
-             "\n", cpuid, target_el, target_aa64 ? "aarch64" : "aarch32", entry,
-@@ -77,7 +159,7 @@ int arm_set_cpu_on(uint64_t cpuid, uint64_t entry, uint64_t context_id,
-     }
- 
-     target_cpu = ARM_CPU(target_cpu_state);
--    if (!target_cpu->powered_off) {
-+    if (!atomic_mb_read(&target_cpu->powered_off)) {
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "[ARM]%s: CPU %" PRId64 " is already on\n",
-                       __func__, cpuid);
-@@ -109,69 +191,45 @@ int arm_set_cpu_on(uint64_t cpuid, uint64_t entry, uint64_t context_id,
-         return QEMU_ARM_POWERCTL_INVALID_PARAM;
-     }
- 
--    /* Initialize the cpu we are turning on */
--    cpu_reset(target_cpu_state);
--    target_cpu->powered_off = false;
--    target_cpu_state->halted = 0;
--
--    if (target_aa64) {
--        if ((target_el < 3) && arm_feature(&target_cpu->env, ARM_FEATURE_EL3)) {
--            /*
--             * As target mode is AArch64, we need to set lower
--             * exception level (the requested level 2) to AArch64
--             */
--            target_cpu->env.cp15.scr_el3 |= SCR_RW;
--        }
--
--        if ((target_el < 2) && arm_feature(&target_cpu->env, ARM_FEATURE_EL2)) {
--            /*
--             * As target mode is AArch64, we need to set lower
--             * exception level (the requested level 1) to AArch64
--             */
--            target_cpu->env.cp15.hcr_el2 |= HCR_RW;
--        }
--
--        target_cpu->env.pstate = aarch64_pstate_mode(target_el, true);
--    } else {
--        /* We are requested to boot in AArch32 mode */
--        static uint32_t mode_for_el[] = { 0,
--                                          ARM_CPU_MODE_SVC,
--                                          ARM_CPU_MODE_HYP,
--                                          ARM_CPU_MODE_SVC };
--
--        cpsr_write(&target_cpu->env, mode_for_el[target_el], CPSR_M,
--                   CPSRWriteRaw);
--    }
--
--    if (target_el == 3) {
--        /* Processor is in secure mode */
--        target_cpu->env.cp15.scr_el3 &= ~SCR_NS;
--    } else {
--        /* Processor is not in secure mode */
--        target_cpu->env.cp15.scr_el3 |= SCR_NS;
--    }
--
--    /* We check if the started CPU is now at the correct level */
--    assert(target_el == arm_current_el(&target_cpu->env));
--
--    if (target_aa64) {
--        target_cpu->env.xregs[0] = context_id;
--        target_cpu->env.thumb = false;
--    } else {
--        target_cpu->env.regs[0] = context_id;
--        target_cpu->env.thumb = entry & 1;
--        entry &= 0xfffffffe;
-+    /*
-+     * If another CPU has powered the target on we are in the state
-+     * ON_PENDING and additional attempts to power on the CPU should
-+     * fail (see 6.6 Implementation CPU_ON/CPU_OFF races in the PSCI
-+     * spec)
-+     */
-+    if (atomic_cmpxchg(&target_cpu->powering_on, false, true)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "[ARM]%s: CPU %" PRId64 " is already powering on\n",
-+                      __func__, cpuid);
-+        return QEMU_ARM_POWERCTL_ON_PENDING;
-     }
- 
--    /* Start the new CPU at the requested address */
--    cpu_set_pc(target_cpu_state, entry);
-+    /* To avoid racing with a CPU we are just kicking off we do the
-+     * final bit of preparation for the work in the target CPUs
-+     * context.
-+     */
-+    info = g_new(struct cpu_on_info, 1);
-+    info->entry = entry;
-+    info->context_id = context_id;
-+    info->target_el = target_el;
-+    info->target_aa64 = target_aa64;
- 
--    qemu_cpu_kick(target_cpu_state);
-+    async_run_on_cpu(target_cpu_state, arm_set_cpu_on_async_work,
-+                     RUN_ON_CPU_HOST_PTR(info));
- 
-     /* We are good to go */
-     return QEMU_ARM_POWERCTL_RET_SUCCESS;
- }
- 
-+static void arm_set_cpu_off_async_work(CPUState *target_cpu_state,
-+                                       run_on_cpu_data data)
-+{
-+    ARMCPU *target_cpu = ARM_CPU(target_cpu_state);
-+    atomic_mb_set(&target_cpu->powered_off, true);
-+    target_cpu_state->halted = 1;
-+    target_cpu_state->exception_index = EXCP_HLT;
-+}
-+
- int arm_set_cpu_off(uint64_t cpuid)
- {
-     CPUState *target_cpu_state;
-@@ -185,22 +243,27 @@ int arm_set_cpu_off(uint64_t cpuid)
-         return QEMU_ARM_POWERCTL_INVALID_PARAM;
-     }
-     target_cpu = ARM_CPU(target_cpu_state);
--    if (target_cpu->powered_off) {
-+    if (atomic_mb_read(&target_cpu->powered_off)) {
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "[ARM]%s: CPU %" PRId64 " is already off\n",
-                       __func__, cpuid);
-         return QEMU_ARM_POWERCTL_IS_OFF;
-     }
- 
--    target_cpu->powered_off = true;
--    target_cpu_state->halted = 1;
--    target_cpu_state->exception_index = EXCP_HLT;
--    cpu_loop_exit(target_cpu_state);
--    /* notreached */
-+    /* Queue work to run under the target vCPUs context */
-+    async_run_on_cpu(target_cpu_state, arm_set_cpu_off_async_work,
-+                     RUN_ON_CPU_NULL);
- 
-     return QEMU_ARM_POWERCTL_RET_SUCCESS;
- }
- 
-+static void arm_reset_cpu_async_work(CPUState *target_cpu_state,
-+                                     run_on_cpu_data data)
-+{
-+    /* Reset the cpu */
-+    cpu_reset(target_cpu_state);
-+}
-+
- int arm_reset_cpu(uint64_t cpuid)
- {
-     CPUState *target_cpu_state;
-@@ -221,8 +284,9 @@ int arm_reset_cpu(uint64_t cpuid)
-         return QEMU_ARM_POWERCTL_IS_OFF;
-     }
- 
--    /* Reset the cpu */
--    cpu_reset(target_cpu_state);
-+    /* Queue work to run under the target vCPUs context */
-+    async_run_on_cpu(target_cpu_state, arm_reset_cpu_async_work,
-+                     RUN_ON_CPU_NULL);
- 
-     return QEMU_ARM_POWERCTL_RET_SUCCESS;
- }
-diff --git a/target/arm/arm-powerctl.h b/target/arm/arm-powerctl.h
-index 98ee04989b..04353923c0 100644
---- a/target/arm/arm-powerctl.h
-+++ b/target/arm/arm-powerctl.h
-@@ -17,6 +17,7 @@
- #define QEMU_ARM_POWERCTL_INVALID_PARAM QEMU_PSCI_RET_INVALID_PARAMS
- #define QEMU_ARM_POWERCTL_ALREADY_ON QEMU_PSCI_RET_ALREADY_ON
- #define QEMU_ARM_POWERCTL_IS_OFF QEMU_PSCI_RET_DENIED
-+#define QEMU_ARM_POWERCTL_ON_PENDING QEMU_PSCI_RET_ON_PENDING
- 
- /*
-  * arm_get_cpu_by_id:
-@@ -43,6 +44,7 @@ CPUState *arm_get_cpu_by_id(uint64_t cpuid);
-  * Returns: QEMU_ARM_POWERCTL_RET_SUCCESS on success.
-  * QEMU_ARM_POWERCTL_INVALID_PARAM if bad parameters are provided.
-  * QEMU_ARM_POWERCTL_ALREADY_ON if the CPU was already started.
-+ * QEMU_ARM_POWERCTL_ON_PENDING if the CPU is still powering up
-  */
- int arm_set_cpu_on(uint64_t cpuid, uint64_t entry, uint64_t context_id,
-                    uint32_t target_el, bool target_aa64);
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 39bff86daf..b8f82d5d20 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -582,8 +582,16 @@ struct ARMCPU {
- 
-     /* Should CPU start in PSCI powered-off state? */
-     bool start_powered_off;
--    /* CPU currently in PSCI powered-off state */
-+    /* CPU PSCI state.
-+     *
-+     * For TCG these can be cross-vCPU accesses and should be done
-+     * atomically to avoid races.
-+     *
-+     *  - powered_off indicates the vCPU state
-+     *  - powering_on true if the vCPU has had a CPU_ON but not yet up
-+     */
-     bool powered_off;
-+    bool powering_on;  /* PSCI ON_PENDING */
-     /* CPU has virtualization extension */
-     bool has_el2;
-     /* CPU has security extension */
--- 
-2.11.0
+I tried, I failed, I suck :)
+
+> Bonus: You get to guess which options are parsed by QemuOpts and which
+> aren't. qemu-img usually takes parameters directs from argv, so doubling
+> the comma there like you have to in -drive will result in an error.
+>
+>> We obviously can't replace QemuOpts with JSON.  But accepting JSON in
+>> addition to QemuOpts is a debatable feature: it lets management
+>> applications reuse the code to build QMP arguments for option arguments.
+>
+> Management applications already have working code for the existing
+> syntax, they might not want to switch just because (and probe whether
+> qemu is new enough to even support JSON for QemuOpts).
+
+If it was my code, and that code converted from an internal
+representation of JSON either to JSON or QemuOpts as libvirt does, I'd
+gladly ditch the second conversion.  Less code, fewer bugs.
+
+Note that "less code, fewer bugs" applies both to the management
+application and QEMU: parsing KEY=VALUE,... in dotted key convention to
+QAPI object is additional code that is tricky in places, e.g. where it
+auto-converts string values.
+
+> When I talked to Peter, his concern wasn't really about what the exact
+> syntax was, but just that the content is a 1:1 mapping of QMP arguments.
+>
+> I take this as a sign that we should find something that works well
+> for human users, and management tools can easily cope with whatever we
+> choose.
+>
+>> === Dotted keys ===
+>> 
+>> One sufficiently powerful syntax extension already exists: the dotted
+>> key convention.  It's syntactically unambiguous only when none of the
+>> KEYs involved contains '.'  To adopt it across the board, we'd have to
+>> outlaw '.' in KEYs.  QAPI outlaws '.' already, but we have a bunch of
+>> QOM properties names with '.'.  We'd have to rename at least the ones
+>> that need to be accessible in -object.
+>> 
+>> Dotted keys can't express member names that look like integers.  We'd
+>> have to outlaw them at least for the objects that are accessible on the
+>> command line.  Once again, QAPI outlaws such names already.  QOM is
+>> anarchy when it comes to names, however.
+>> 
+>> The way dotted keys do arrays is inconsistent with how QOM's automatic
+>> arrayification (commit 3396590) do them: foo.0 vs. foo[0].  Backward
+>> compatibility makes changing the dotted key convention awkward.  Perhaps
+>> we can still change QOM.
+>
+> Dotted key syntax is a bit longwinded, but it's the simplest thinkable
+> extension of key=value and seems to be relatively easy to implement; the
+> necessary renaming should be possible to do.
+>
+> This is not perfect for human users because of its repetitive nature,
+> but it could be the first step for 2.9.
+>
+>> === Structured values ===
+>> 
+>> The dotted key convention messes with KEY syntax to permit structured
+>> values.  Works, but the more conventional way to support structured
+>> values is a syntax for structured values.  
+>> 
+>> An obvious one is to use { KEY=VALUE, ...} for objects, and [ VALUE,
+>> ... ] for arrays.  Looks like this:
+>> 
+>>     -drive 'driver=quorum,
+>>             child=[{ driver=file, filename=disk1.img },
+>>                    { driver=host_device, filename=/dev/sdb },
+>>                    { driver=nbd, host=localhost } ]'
+>> 
+>> Again, lines broken and indented for legibility; you need to join them
+>> for actual use.
+>
+> This looks more like what you really want to use. However, being able to
+> write a={b=x,c=y} for a.b=x,a.c=y is really just syntactic sugar and
+> could be a second step after we got the basics working.
+>
+> Note that treating it simply as syntactic sugar for the expanded dotted
+> form would also allow mixing (and I think that's a good thing):
+>
+>     -drive 'driver=qcow2,
+>             backing.file.filename=backing.qcow2,
+>             file={driver=file, filename=overlay.qcow2, aio=native}'
+>
+> Or even add to a previously defined thing, which should make Max happy
+> when he forgot a nested option at first:
+>
+>     -drive 'driver=qcow2,
+>             file={driver=nbd,host=localhost},
+>             lazy-refcounts=on,
+>             file.port=1234'
+>
+>> There's a syntactic catch, though: a value of the form [ ... ] can
+>> either be an array or a string.  Which one it is depends on the type of
+>> the key.  To parse this syntax, you need to know the types, unlike JSON
+>> or traditional QemuOpts.  Unless we outlaw strings starting with '{' or
+>> '[', which feels impractical.
+>
+> We would have to look at the schema and only treat it as a nested object
+> or an array if the expected type has one there.
+>
+> Your other mail says that even this doesn't work because of "any" types,
+> but I don't think this is a real problem: In that case, you simply use
+> the type that we always used, i.e. string. That's the fully backwards
+> compatible way.
+>
+> Want to make use of the shiny new QemuOpts and get things parsed into
+> a nested object? Well, provide a real schema instead of "any" then.
+
+Sadly, this is somewhere between impractical and impossible.
+
+The QAPI schema is fixed at compile-time.  It needs to be, because its
+purpose is to let us generate code we can compile and link into QEMU.
+
+We use 'any' basically for things that aren't fixed at compile-time.
+
+Example: qdev properties and device_add
+
+Even though traditional qdev properties are fixed at compile time, they
+are not known until run-time.  That's because they're defined in the
+device models, and the registry of device models is only built at
+run-time.
+
+I believe this would've been fixable with some effort: make the devices
+define suitable pieces of schema, and collect them somehow at
+compile-time.  "Would've been", because progress!  See next example.
+
+Example: QOM properties and object-add, qom-set, qom-get
+
+QOM properties are created at run-time.  They cannot be fixed at
+compile-time *by design*.  I always hated that part of the design, but I
+was assured we absolutely need that much rope^Wflexibility.
+
+So, all we know about the "props" argument of object-add is that it's a
+JSON object.  The tightest imaginable QAPI schema would be an 'object'
+type, except that doesn't exist, so we settle for 'any'.
+
+-object unwraps "props" to get a flat QemuOpts, but let's ignore that
+and pretend we'd want to parse -object qom-type=T,id=ID,props=...
+
+If we made "props" an 'object' in the schema, we'd know we need to parse
+the right hand side of props={foo=[bar]} as object, not as string.  We'd
+still not know (and cannot know at compile-time) whether to parse [bar]
+as array or as string.
+
+But it gets worse.  Consider
+
+    props={foo=[bar,baz=]}
+
+If foo turns out to an array of string, we need to parse this like JSON
+
+    { "foo": [ "bar", "baz=" ] }
+
+But if it's of string type, we need to parse it like JSON
+
+    { "foo": "[bar", "baz": ... }
+
+This isn't just a "can't decide between integer and string" problem,
+which Dan solved by auto-converting strings in the input visitor,
+i.e. by delaying some parsing of terminals.  It's a "can't even figure
+out the tree structure" problem.
+
+I'm afraid there's no way to make this syntax work without requiring
+some kind of quotes for at least "funny" strings.  Which makes me go
+"okay, what's the advantage over plain JSON again?"
+
+>> But wait, there's another syntactic catch: in traditional QemuOpts, a
+>> value ends at the next unescaped ',' or '\0'.  Inside an object, it now
+>> also ends at the next unescaped '}', and inside an array, at the next
+>> unescaped ']'.  Or perhaps at the next space (the example above assumes
+>> it does).  That means we either have to provide a way to escape '}', ']'
+>> and space, or find another way to delimit string values, say require '"'
+>> around strings whenever the string contains "funny" characters.
+>> 
+>> So, if escaped ',' wasn't ugly and confusing enough for you...
+>
+> This is actually the part that troubles me the most about adding such a
+> syntax with new special characters. Otherwise it's pretty close to
+> optimal, in my opinion.
+>
+> Kevin
