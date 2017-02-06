@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cagF6-0004fY-Ep
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:09:53 -0500
+	(envelope-from <bounces@canonical.com>) id 1cagGo-0005dp-Rc
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:11:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cagF3-0002oy-N9
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:09:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cagF3-0002oo-Ha
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:09:49 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D6D2D7E9D5
-	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 10:09:48 +0000 (UTC)
-References: <1485244958-25911-1-git-send-email-thuth@redhat.com>
-	<20170203111045.4367eb34@t450s.home>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <725c680a-f92d-3e64-439c-66cff5b5551c@redhat.com>
-Date: Mon, 6 Feb 2017 11:09:45 +0100
+	(envelope-from <bounces@canonical.com>) id 1cagGm-0003Ci-5L
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:11:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39256)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cagGl-0003Cc-Vr
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:11:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cagGk-0005qa-7h
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 10:11:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0616F2E80CB
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 10:11:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170203111045.4367eb34@t450s.home>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/vfio/pci-quirks: Set category of the
- "vfio-pci-igd-lpc-bridge" device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Feb 2017 10:02:45 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
+Message-Id: <20170206100245.27566.61856.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
+ cpu->kvm_msr_buf->nmsrs' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,26 +37,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 03.02.2017 19:10, Alex Williamson wrote:
-> On Tue, 24 Jan 2017 09:02:38 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
->> The device has "bridge" in its name, so it should obviously be in
->> the category DEVICE_CATEGORY_BRIDGE.
-> 
-> Well, physical device is a bridge, but this is really just a stub.
-> Does that count?  It doesn't create a subordinate bus that can actually
-> host devices.
+Hi Matwey,
+  1) Can you provide me with the output of the 'dmesg' command straight aft=
+er boot on your host.
+  2) If you look in target/i386/kvm.c in kvm_arch_init_vcpu around line 871=
+ is some code like:
 
-The device category is only used for sorting the device into a category
-in the help output when the user runs QEMU with "-device ?". The
-DEVICE_CATEGORY_BRIDGE is title there "Controller/Bridge/Hub devices",
-so IMHO that should be fine for this device. Otherwise it should maybe
-go into DEVICE_CATEGORY_MISC instead - but at least it should not stay
-uncategorized, all devices that show up in the "-device ?" help text
-should eventually get a category.
+        if ((ver & 0xff) > 0) {
+            has_msr_architectural_pmu =3D true;
+            num_architectural_pmu_counters =3D (ver & 0xff00) >> 8;
 
- Thomas
+            /* Shouldn't be more than 32, since that's the number of bits
+             * available in EBX to tell us _which_ counters are available.
+             * Play it safe.
+             */
+            if (num_architectural_pmu_counters > MAX_GP_COUNTERS) {
+                num_architectural_pmu_counters =3D MAX_GP_COUNTERS;
+            }
+
+    change the start of that to :
+    fprintf(stderr, "kvm_arch_init_vcpu ver=3D%x\n", ver);
+    if (0) {
+
+    I think that might make it work, but please tell us what it prints
+as ver=3D
+
+Dave
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661386
+
+Title:
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  =
+
+  I see the following when try to run qemu from master as the following:
+
+  # ./x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+  loglevel=3D7' -m 1024 -serial stdio
+  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  First broken commit has been bisected:
+
+  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Mar 30 22:55:29 2016 +0200
+
+      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+      =
+
+      This would have caught the bug in the previous patch.
+      =
+
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  My cpuinfo is the following:
+
+  processor       : 0
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 44
+  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+  stepping        : 2
+  microcode       : 0x14
+  cpu MHz         : 3066.775
+  cache size      : 12288 KB
+  physical id     : 0
+  siblings        : 2
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 0
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 11
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
+onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
+perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
+lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+  bugs            :
+  bogomips        : 6133.55
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 40 bits physical, 48 bits virtual
+  power management:
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
