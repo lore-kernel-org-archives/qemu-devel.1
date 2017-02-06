@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cahtc-0006mH-Nj
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:55:49 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cahtc-0006mK-Nv
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cahtZ-00043V-LX
+	(envelope-from <kraxel@redhat.com>) id 1cahtZ-00043c-NA
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:55:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40556)
+Received: from mx1.redhat.com ([209.132.183.28]:44528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cahtZ-00043A-G5
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cahtZ-000439-Gz
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:55:45 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 961C9FAF4D
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B1F1C04B302
 	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 11:55:45 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  6 Feb 2017 12:55:35 +0100
-Message-Id: <1486382139-30630-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/4] xhci: cleanups, add qemu-xhci device.
+Date: Mon,  6 Feb 2017 12:55:39 +0100
+Message-Id: <1486382139-30630-5-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1486382139-30630-1-git-send-email-kraxel@redhat.com>
+References: <1486382139-30630-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 4/4] xhci: drop via vendor command handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +32,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-  Hi,
+Seems pretty pointless, we don't emulate an via xhci controller.
 
-This series adds a new qemu-xhci device.  It is pretty much identical to
-the existing nec-usb-xhci device, except that some quirks needed to make
-the nec/renesas windows driver work will be disabled for the qemu-xhci
-device.  And qemu-xhci gets a PCI ID from the qemu PCi ID range.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/hcd-xhci.c | 31 -------------------------------
+ 1 file changed, 31 deletions(-)
 
-please review,
-  Gerd
-
-Gerd Hoffmann (4):
-  xhci: drop ER_FULL_HACK workaround
-  xhci: add qemu xhci controller
-  xhci: fix nec vendor quirk handling
-  xhci: drop via vendor command handling
-
- docs/specs/pci-ids.txt |   1 +
- hw/usb/hcd-xhci.c      | 232 ++++++++++++++++---------------------------------
- include/hw/pci/pci.h   |   1 +
- 3 files changed, 78 insertions(+), 156 deletions(-)
-
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 0e25943..fbf8a8b 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -196,7 +196,6 @@ typedef enum TRBType {
+     ER_DEVICE_NOTIFICATION,
+     ER_MFINDEX_WRAP,
+     /* vendor specific bits */
+-    CR_VENDOR_VIA_CHALLENGE_RESPONSE = 48,
+     CR_VENDOR_NEC_FIRMWARE_REVISION  = 49,
+     CR_VENDOR_NEC_CHALLENGE_RESPONSE = 50,
+ } TRBType;
+@@ -552,7 +551,6 @@ static const char *TRBType_names[] = {
+     [ER_HOST_CONTROLLER]               = "ER_HOST_CONTROLLER",
+     [ER_DEVICE_NOTIFICATION]           = "ER_DEVICE_NOTIFICATION",
+     [ER_MFINDEX_WRAP]                  = "ER_MFINDEX_WRAP",
+-    [CR_VENDOR_VIA_CHALLENGE_RESPONSE] = "CR_VENDOR_VIA_CHALLENGE_RESPONSE",
+     [CR_VENDOR_NEC_FIRMWARE_REVISION]  = "CR_VENDOR_NEC_FIRMWARE_REVISION",
+     [CR_VENDOR_NEC_CHALLENGE_RESPONSE] = "CR_VENDOR_NEC_CHALLENGE_RESPONSE",
+ };
+@@ -2614,32 +2612,6 @@ static uint32_t xhci_nec_challenge(uint32_t hi, uint32_t lo)
+     return ~val;
+ }
+ 
+-static void xhci_via_challenge(XHCIState *xhci, uint64_t addr)
+-{
+-    PCIDevice *pci_dev = PCI_DEVICE(xhci);
+-    uint32_t buf[8];
+-    uint32_t obuf[8];
+-    dma_addr_t paddr = xhci_mask64(addr);
+-
+-    pci_dma_read(pci_dev, paddr, &buf, 32);
+-
+-    memcpy(obuf, buf, sizeof(obuf));
+-
+-    if ((buf[0] & 0xff) == 2) {
+-        obuf[0] = 0x49932000 + 0x54dc200 * buf[2] + 0x7429b578 * buf[3];
+-        obuf[0] |=  (buf[2] * buf[3]) & 0xff;
+-        obuf[1] = 0x0132bb37 + 0xe89 * buf[2] + 0xf09 * buf[3];
+-        obuf[2] = 0x0066c2e9 + 0x2091 * buf[2] + 0x19bd * buf[3];
+-        obuf[3] = 0xd5281342 + 0x2cc9691 * buf[2] + 0x2367662 * buf[3];
+-        obuf[4] = 0x0123c75c + 0x1595 * buf[2] + 0x19ec * buf[3];
+-        obuf[5] = 0x00f695de + 0x26fd * buf[2] + 0x3e9 * buf[3];
+-        obuf[6] = obuf[2] ^ obuf[3] ^ 0x29472956;
+-        obuf[7] = obuf[2] ^ obuf[3] ^ 0x65866593;
+-    }
+-
+-    pci_dma_write(pci_dev, paddr, &obuf, 32);
+-}
+-
+ static void xhci_process_commands(XHCIState *xhci)
+ {
+     XHCITRB trb;
+@@ -2735,9 +2707,6 @@ static void xhci_process_commands(XHCIState *xhci)
+         case CR_GET_PORT_BANDWIDTH:
+             event.ccode = xhci_get_port_bandwidth(xhci, trb.parameter);
+             break;
+-        case CR_VENDOR_VIA_CHALLENGE_RESPONSE:
+-            xhci_via_challenge(xhci, trb.parameter);
+-            break;
+         case CR_VENDOR_NEC_FIRMWARE_REVISION:
+             if (xhci->nec_quirks) {
+                 event.type = 48; /* NEC reply */
 -- 
 1.8.3.1
