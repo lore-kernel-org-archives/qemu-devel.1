@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1calZ4-0004vo-TT
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:50:52 -0500
+	(envelope-from <clg@kaod.org>) id 1calhA-0003cu-Vw
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:59:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1calZ0-0007zO-0x
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:50:50 -0500
-Received: from mail-ua0-f169.google.com ([209.85.217.169]:36326)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1calYz-0007yn-QN
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:50:45 -0500
-Received: by mail-ua0-f169.google.com with SMTP id 96so63684584uaq.3
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 07:50:45 -0800 (PST)
+	(envelope-from <clg@kaod.org>) id 1calh6-0003SD-1m
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:59:13 -0500
+Received: from 3.mo3.mail-out.ovh.net ([46.105.44.175]:44102)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1calh5-0003OT-Od
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:59:07 -0500
+Received: from player693.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id F2D13A1A6D
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 16:58:59 +0100 (CET)
+References: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
+	<1485424060-12217-4-git-send-email-fred.konrad@greensocs.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d5dff1bc-7d71-7b5f-133c-c102da108c01@kaod.org>
+Date: Mon, 6 Feb 2017 16:58:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <a03be6ea-a7bd-3b99-a94b-f180ef6f9e0a@openvz.org>
-References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
-	<20170201102013.GC3232@redhat.com>
-	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
-	<20170201110320.GD3232@redhat.com>
-	<CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
-	<a03be6ea-a7bd-3b99-a94b-f180ef6f9e0a@openvz.org>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon, 6 Feb 2017 16:50:43 +0100
-Message-ID: <CABdb736+iGndMmYTVcrwRzEwGX9A8uizPthM3_-TYw34-+up_w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
+In-Reply-To: <1485424060-12217-4-git-send-email-fred.konrad@greensocs.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2 03/10] qemu-clk: allow to bind two
+ clocks together
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +31,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Aleksey Kostyushko <aleksko@virtuozzo.com>
+To: fred.konrad@greensocs.com, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, alistair.francis@xilinx.com
 
-On Mon, Feb 6, 2017 at 4:37 PM, Denis V. Lunev <den@openvz.org> wrote:
-> On 02/01/2017 04:41 PM, Ladi Prosek wrote:
->> On Wed, Feb 1, 2017 at 12:03 PM, Daniel P. Berrange <berrange@redhat.com> wrote:
->>> On Wed, Feb 01, 2017 at 11:50:43AM +0100, Ladi Prosek wrote:
->>>> On Wed, Feb 1, 2017 at 11:20 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
->>>>> On Wed, Feb 01, 2017 at 11:06:46AM +0100, Ladi Prosek wrote:
->>>>>> Analogous to guest-file-read and guest-file-write, this commit adds
->>>>>> support for issuing IOCTLs to files in the guest. With the goal of
->>>>>> abstracting away the differences between Posix ioctl() and Win32
->>>>>> DeviceIoControl() to provide one unified API, the schema distinguishes
->>>>>> between input and output buffer sizes (as required by Win32) and
->>>>>> allows the caller to supply either a 'buffer', pointer to which will
->>>>>> be passed to the Posix ioctl(), or an integer argument, passed to
->>>>>> ioctl() directly.
->>>>> What is the intended usage scenario for this ?
->>>> My specific case is extracting a piece of data from Windows guests.
->>>> Guest driver exposes a file object with a well-known IOCTL code to
->>>> return a data structure from the kernel.
->>> Please provide more information about what you're trying to do.
->>>
->>> If we can understand the full details it might suggest a different
->>> approach that exposing a generic ioctl passthrough facility.
->> The end goal is to be able to create a Window crash dump file from a
->> running (or crashed, but running is more interesting because Windows
->> can't do that by itself) Windows VM. To do that without resorting to
->> hacks, the host application driving this needs to get the crash dump
->> header, which Windows provides in its KeInitializeCrashDumpHeader
->> kernel API.
->>
->> I believe that the most natural way to do this is to have
->> 1) a driver installed in the guest providing a way to call
->> KeInitializeCrashDumpHeader from user space
->> 2) an agent in the guest, running in user space, calling the driver
->> and passing the result back to the host
->>
->> Now 2) may as well be an existing agent, such as the QEMU guest agent,
->> and that's why I am here :)
->>
->> KeInitializeCrashDumpHeader returns an opaque byte array, happens to
->> be 8192 bytes at the moment. My first choice for the kernel-user
->> interface in the guest is IOCTL because what I'm trying to get across
->> is a block, a "datagram", not a stream, and I have the option for
->> easily adding more functionality later by adding more IOCTL codes with
->> the file object still representing "the driver".
->>
->> I could use regular file I/O as well. I would either have to devise a
->> protocol for talking to the driver, have a way of delimiting messages,
->> re-syncing the channel etc., or make a slight semantic shift and
->> instead of the file object representing the driver, it would represent
->> this one particular function of the driver. Opening the file and
->> reading from it until eof would yield the crash dump header.
-> I think that this is not as good as can be for the whole design of the
-> feature.
-> The problem here is that userspace starts toooooooooo late and is not
-> accessible when the guest BSODS and we do need a dump for analysis.
+Hello,
+
+On 01/26/2017 10:47 AM, fred.konrad@greensocs.com wrote:
+> From: KONRAD Frederic <fred.konrad@greensocs.com>
+> 
+> This introduces the clock binding and the update part.
+> When the qemu_clk_rate_update(qemu_clk, int) function is called:
+>   * The clock callback is called on the qemu_clk so it can change the rate.
+>   * The qemu_clk_rate_update function is called on all the driven clock.
+> 
+> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+> 
+> V1 -> V2:
+>   * Rename qemu_clk_on_rate_update_cb to QEMUClkRateUpdateCallback and
+>     move the pointer to the structure instead of having a pointer-to-function
+>     type.
+> ---
+>  include/qemu/qemu-clock.h | 67 +++++++++++++++++++++++++++++++++++++++++++++++
+>  qemu-clock.c              | 56 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 123 insertions(+)
+> 
+> diff --git a/include/qemu/qemu-clock.h b/include/qemu/qemu-clock.h
+> index 3e692d3..6d30299 100644
+> --- a/include/qemu/qemu-clock.h
+> +++ b/include/qemu/qemu-clock.h
+> @@ -30,12 +30,25 @@
+>  #define TYPE_CLOCK "qemu-clk"
+>  #define QEMU_CLOCK(obj) OBJECT_CHECK(struct qemu_clk, (obj), TYPE_CLOCK)
+>  
+> +typedef struct ClkList ClkList;
+> +typedef uint64_t QEMUClkRateUpdateCallback(void *opaque, uint64_t rate);
+> +
+>  typedef struct qemu_clk {
+>      /*< private >*/
+>      Object parent_obj;
+>      char *name;            /* name of this clock in the device. */
+> +    uint64_t in_rate;      /* rate of the clock which drive this pin. */
+
+
+So if this is the reference clock rate, which can be divided by 
+settings in control registers, I would call the attribute 
+'ref_rate' or 'rate_reference' 
+
+> +    uint64_t out_rate;     /* rate of this clock pin. */
+
+and this attribute could just be 'rate' and may be if we make 
+a property out of it, we could get rid of FixedClock in patch
+7/10.
+   
+
+> +    void *opaque;
+> +    QEMUClkRateUpdateCallback *cb;
+
+If I understand correctly, the need is to be able to refresh
+the rate of a clock object depending on some settings in a 
+controller. I think we should be using a derived class and 
+an operation for it. it would look better from a QOM point 
+of view. 
+
+Here is a possibility,
+
+We could make 'rate' a property and use a set property handler 
+to call the derived class specific operation. This is very 
+similar to the callback but we would remove the need of  
+qemu_clk_update_rate() and use the std mechanisms already in
+place  :
+
+	object_property_set_int() 
+
+qemu_clk_refresh() would still be needed to propagate the 
+changes in the settings of a controller to the target clocks. 
+
+The 'opaque' attribute, which holds the pointer to a controller 
+object, would have to be passed to the derived clock object
+with 
+	object_property_add_const_link() 
+
+and then grabbed with 
+
+	object_property_get_link()
+
+in the realize function of the derived clock object, or whenever 
+it's needed, in the operation for instance.
+
+This clearly means more code than the actual solution, but 
+that is QOM way I think.  
+
+> +    QLIST_HEAD(, ClkList) bound;
+>  } *qemu_clk;
+>  
+> +struct ClkList {
+> +    qemu_clk clk;
+> +    QLIST_ENTRY(ClkList) node;
+> +};
+> +
+
+Do we really need this intermediate object ? Can't we just
+put the list_entry attribute under qemu_clk ? I haven't
+tried, may be I am wrong but that would simplify the code.
+
+>  /**
+>   * qemu_clk_device_add_clock:
+>   * @dev: the device on which the clock needs to be added.
+> @@ -59,4 +72,58 @@ void qemu_clk_device_add_clock(DeviceState *dev, qemu_clk clk,
+>   */
+>  qemu_clk qemu_clk_device_get_clock(DeviceState *dev, const char *name);
+>  
+> +/**
+> + * qemu_clk_bind_clock:
+> + * @out: the clock output.
+> + * @in: the clock input.
+> + *
+> + * Connect the clock together. This is unidirectional so a
+> + * qemu_clk_update_rate will go from @out to @in.
+> + *
+> + */
+> +void qemu_clk_bind_clock(qemu_clk out, qemu_clk in);
+
+maybe remove the  _clock suffix. It feels redundant.
+
+Thanks,
+
+C. 
+
+> +
+> +/**
+> + * qemu_clk_unbind:
+> + * @out: the clock output.
+> + * @in: the clock input.
+> + *
+> + * Disconnect the clocks if they were bound together.
+> + *
+> + */
+> +void qemu_clk_unbind(qemu_clk out, qemu_clk in);
+> +
+> +/**
+> + * qemu_clk_update_rate:
+> + * @clk: the clock to update.
+> + * @rate: the new rate in Hz.
+> + *
+> + * Update the @clk to the new @rate.
+> + *
+> + */
+> +void qemu_clk_update_rate(qemu_clk clk, uint64_t rate);
+> +
+> +/**
+> + * qemu_clk_refresh:
+> + * @clk: the clock to be refreshed.
+> + *
+> + * If a model alters the topology of a clock tree, it must call this function on
+> + * the clock source to refresh the clock tree.
+> + *
+> + */
+> +void qemu_clk_refresh(qemu_clk clk);
 >
-> May be it worth to push this header to QEMU at boot time through virtio bus?
-
-Yes, definitely an option. I believe that having the ability to create
-a dump out of a live system, i.e. without crashing it, is what adds
-the most value here. And that would most likely happen on an
-up-and-running guest so the difference between being able to do it
-after a kernel driver loads and after a user space service starts is
-not that significant.
-
-Still, the sooner the better, for sure. I think I've seen
-virtio-pstore suggested as a possible channel to use to push the
-header.
-
-Thanks!
-
-> Den
+> +
+> +/**
+> + * qemu_clk_set_callback:
+> + * @clk: the clock associated to the callback.
+> + * @cb: the function which is called when a refresh happen on the clock @clk.
+> + * @opaque: the opaque data passed to the callback.
+> + *
+> + * Set the callback @cb which will be called when the clock @clk is updated.
+> + *
+> + */
+> +void qemu_clk_set_callback(qemu_clk clk,
+> +                           QEMUClkRateUpdateCallback *cb,
+> +                           void *opaque);
+> +
+>  #endif /* QEMU_CLOCK_H */
+> diff --git a/qemu-clock.c b/qemu-clock.c
+> index 803deb3..8c12368 100644
+> --- a/qemu-clock.c
+> +++ b/qemu-clock.c
+> @@ -37,6 +37,62 @@
+>      }                                                                        \
+>  } while (0);
+>  
+> +void qemu_clk_refresh(qemu_clk clk)
+> +{
+> +    qemu_clk_update_rate(clk, clk->in_rate);
+> +}
+> +
+> +void qemu_clk_update_rate(qemu_clk clk, uint64_t rate)
+> +{
+> +    ClkList *child;
+> +
+> +    clk->in_rate = rate;
+> +    clk->out_rate = rate;
+> +
+> +    if (clk->cb) {
+> +        clk->out_rate = clk->cb(clk->opaque, rate);
+> +    }
+> +
+> +    DPRINTF("%s output rate updated to %" PRIu64 "\n",
+> +            object_get_canonical_path(OBJECT(clk)),
+> +            clk->out_rate);
+> +
+> +    QLIST_FOREACH(child, &clk->bound, node) {
+> +        qemu_clk_update_rate(child->clk, clk->out_rate);
+> +    }
+> +}
+> +
+> +void qemu_clk_bind_clock(qemu_clk out, qemu_clk in)
+> +{
+> +    ClkList *child;
+> +
+> +    child = g_malloc(sizeof(child));
+> +    assert(child);
+> +    child->clk = in;
+> +    QLIST_INSERT_HEAD(&out->bound, child, node);
+> +    qemu_clk_update_rate(in, out->out_rate);
+> +}
+> +
+> +void qemu_clk_unbind(qemu_clk out, qemu_clk in)
+> +{
+> +    ClkList *child, *next;
+> +
+> +    QLIST_FOREACH_SAFE(child, &out->bound, node, next) {
+> +        if (child->clk == in) {
+> +            QLIST_REMOVE(child, node);
+> +            g_free(child);
+> +        }
+> +    }
+> +}
+> +
+> +void qemu_clk_set_callback(qemu_clk clk,
+> +                           QEMUClkRateUpdateCallback *cb,
+> +                           void *opaque)
+> +{
+> +    clk->cb = cb;
+> +    clk->opaque = opaque;
+> +}
+> +
+>  void qemu_clk_device_add_clock(DeviceState *dev, qemu_clk clk,
+>                                 const char *name)
+>  {
+> 
