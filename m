@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cahhC-0005eD-7L
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:42:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cahiT-0006fh-Pe
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:44:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cahh8-0007kR-RC
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:42:58 -0500
-Received: from smtp3.mundo-r.com ([212.51.32.191]:50087 helo=smtp4.mundo-r.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cahh8-0007aM-JY
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:42:54 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170206112953.16993-1-berrange@redhat.com>
-References: <20170206112953.16993-1-berrange@redhat.com>
-Date: Mon, 06 Feb 2017 12:42:16 +0100
-Message-ID: <w51o9yfeeav.fsf@maestria.local.igalia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cahiS-000871-T5
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:44:17 -0500
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:36114)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cahiS-00086n-My
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:44:16 -0500
+Received: by mail-wm0-x22e.google.com with SMTP id c85so116365143wmi.1
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 03:44:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] rules: don't try to create missing include
- dirs
+In-Reply-To: <20170206013927.13693-1-david@gibson.dropbear.id.au>
+References: <20170206013927.13693-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Feb 2017 11:43:54 +0000
+Message-ID: <CAFEAcA9yOkJ4kghewFNrMVBHutiiZ1CE-LD7mT_VqpuO7soo9A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/3] isa-cleanup queue 20170206
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,18 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Jia Liu <proljc@gmail.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Max Filippov <jcmvbkbc@gmail.com>, Veronia Bahaa <veroniabahaa@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon 06 Feb 2017 12:29:53 PM CET, "Daniel P. Berrange" wrote:
-
-> Rather than trying to workaround this, just revert the code that
-> attempted to mkdir the missing include directories. Instead just turn
-> off the compiler warning in question as the missing dir is expected &
-> harmless in general.
+On 6 February 2017 at 01:39, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit a951316b8a5c3c63254f20a826afeed940dd4cba:
 >
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-02-03 14:41:49 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/isa-cleanup-20170206
+>
+> for you to fetch changes up to c124c4d13bcb19fc866e7f6de075f906fca6af4a:
+>
+>   Split ISA and sysbus versions of m48t59 device (2017-02-06 12:33:21 +1100)
+>
+> ----------------------------------------------------------------
+> Allow ISA to be disabled on some platforms (v3)
+>
+> This makes some cleanups that are a start on allowing ISA to be
+> compiled out for platforms which don't use it.
+>
+> I posted this series last November, and it collected a number of R-bs
+> and no apparent objections.  So, I've now rebased it (trivially) and
+> am sending a pull request in the hopes of merge.  A lot of the pieces
+> here don't have a clear maintainer, so I'm sending it directly to
+> Peter.
+>
+> Notes:
+>   * Patch 3/3 triggers a style warning, but that's just because I'm
+>     moving a C++ // comment verbatim from one file to another
+>
+> Changes since v2:
+>   * Trivial rebase
+>
+> Changes since v1:
+>   * Fixed some silly compile errors in 3/3 exposed by some
+>     changes in other headers
 
-Tested-by: Alberto Garcia <berto@igalia.com>
+I think one or two platforms have appeared since (notably
+nios) but they don't need CONFIG_SERIAL_ISA so that's ok.
 
-Berto
+Applied, thanks.
+
+-- PMM
