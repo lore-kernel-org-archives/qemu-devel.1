@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1calGD-0005rv-0L
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:24 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1calGG-0005x5-NR
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1calGB-00005i-Qk
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:20 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34989)
+	(envelope-from <alex.bennee@linaro.org>) id 1calGF-00007M-Fl
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:24 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:37322)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1calGB-000054-KD
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:19 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id b65so125315764wmf.0
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 07:31:19 -0800 (PST)
+	id 1calGF-00006w-7g
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:23 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id v77so119964789wmv.0
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 07:31:23 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  6 Feb 2017 15:31:04 +0000
-Message-Id: <20170206153113.27729-15-alex.bennee@linaro.org>
+Date: Mon,  6 Feb 2017 15:31:07 +0000
+Message-Id: <20170206153113.27729-18-alex.bennee@linaro.org>
 In-Reply-To: <20170206153113.27729-1-alex.bennee@linaro.org>
 References: <20170206153113.27729-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v10 14/23] cputlb: tweak
- qemu_ram_addr_from_host_nofail reporting
+Subject: [Qemu-devel] [PATCH v10 17/23] cputlb: add tlb_flush_by_mmuidx
+ async routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +33,220 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, rth@twiddle.net
 Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-This moves the helper function closer to where it is called and updates
-the error message to report via error_report instead of the deprecated
-fprintf.
+This converts the remaining TLB flush routines to use async work when
+detecting a cross-vCPU flush. The only minor complication is having to
+serialise the var_list of MMU indexes into a form that can be punted
+to an asynchronous job.
+
+The pending_tlb_flush field on QOM's CPU structure also becomes a
+bitfield rather than a boolean.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- cputlb.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+v7
+  - un-merged from the atomic cputlb patch in the last series
+  - fix long line reported by checkpatch
+v8
+  - re-base merge/fixes
+---
+ cputlb.c          | 110 +++++++++++++++++++++++++++++++++++++++++++-----------
+ include/qom/cpu.h |   2 +-
+ 2 files changed, 89 insertions(+), 23 deletions(-)
 
 diff --git a/cputlb.c b/cputlb.c
-index af0e65cd2c..94fa9977c5 100644
+index 97e5c12de8..c50254be26 100644
 --- a/cputlb.c
 +++ b/cputlb.c
-@@ -246,18 +246,6 @@ void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+@@ -68,6 +68,11 @@
+  * target_ulong even on 32 bit builds */
+ QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
+ 
++/* We currently can't handle more than 16 bits in the MMUIDX bitmask.
++ */
++QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
++#define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
++
+ /* statistics */
+ int tlb_flush_count;
+ 
+@@ -102,7 +107,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
+ 
+     tb_unlock();
+ 
+-    atomic_mb_set(&cpu->pending_tlb_flush, false);
++    atomic_mb_set(&cpu->pending_tlb_flush, 0);
+ }
+ 
+ static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
+@@ -113,7 +118,8 @@ static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
+ void tlb_flush(CPUState *cpu)
+ {
+     if (cpu->created && !qemu_cpu_is_self(cpu)) {
+-        if (atomic_cmpxchg(&cpu->pending_tlb_flush, false, true) == true) {
++        if (atomic_mb_read(&cpu->pending_tlb_flush) != ALL_MMUIDX_BITS) {
++            atomic_mb_set(&cpu->pending_tlb_flush, ALL_MMUIDX_BITS);
+             async_run_on_cpu(cpu, tlb_flush_global_async_work,
+                              RUN_ON_CPU_NULL);
+         }
+@@ -122,17 +128,18 @@ void tlb_flush(CPUState *cpu)
      }
  }
  
--static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
--{
--    ram_addr_t ram_addr;
--
--    ram_addr = qemu_ram_addr_from_host(ptr);
--    if (ram_addr == RAM_ADDR_INVALID) {
--        fprintf(stderr, "Bad ram pointer %p\n", ptr);
--        abort();
--    }
--    return ram_addr;
--}
--
- void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
+-static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
++static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
  {
-     CPUArchState *env;
-@@ -469,6 +457,18 @@ static void report_bad_exec(CPUState *cpu, target_ulong addr)
-     log_cpu_state_mask(LOG_GUEST_ERROR, cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
+     CPUArchState *env = cpu->env_ptr;
+-    unsigned long mmu_idx_bitmask = idxmap;
++    unsigned long mmu_idx_bitmask = data.host_int;
+     int mmu_idx;
+ 
+     assert_cpu_is_self(cpu);
+-    tlb_debug("start\n");
+ 
+     tb_lock();
+ 
++    tlb_debug("start: mmu_idx:0x%04lx\n", mmu_idx_bitmask);
++
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+ 
+         if (test_bit(mmu_idx, &mmu_idx_bitmask)) {
+@@ -145,12 +152,30 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
+ 
+     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
+ 
++    tlb_debug("done\n");
++
+     tb_unlock();
  }
  
-+static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
-+{
-+    ram_addr_t ram_addr;
+ void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
+ {
+-    v_tlb_flush_by_mmuidx(cpu, idxmap);
++    tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
 +
-+    ram_addr = qemu_ram_addr_from_host(ptr);
-+    if (ram_addr == RAM_ADDR_INVALID) {
-+        error_report("Bad ram pointer %p", ptr);
-+        abort();
++    if (!qemu_cpu_is_self(cpu)) {
++        uint16_t pending_flushes = idxmap;
++        pending_flushes &= ~atomic_mb_read(&cpu->pending_tlb_flush);
++
++        if (pending_flushes) {
++            tlb_debug("reduced mmu_idx: 0x%" PRIx16 "\n", pending_flushes);
++
++            atomic_or(&cpu->pending_tlb_flush, pending_flushes);
++            async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
++                             RUN_ON_CPU_HOST_INT(pending_flushes));
++        }
++    } else {
++        tlb_flush_by_mmuidx_async_work(cpu,
++                                       RUN_ON_CPU_HOST_INT(idxmap));
 +    }
-+    return ram_addr;
+ }
+ 
+ static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
+@@ -215,27 +240,26 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
+     }
+ }
+ 
+-void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
++/* As we are going to hijack the bottom bits of the page address for a
++ * mmuidx bit mask we need to fail to build if we can't do that
++ */
++QEMU_BUILD_BUG_ON(NB_MMU_MODES > TARGET_PAGE_BITS_MIN);
++
++static void tlb_flush_page_by_mmuidx_async_work(CPUState *cpu,
++                                                run_on_cpu_data data)
+ {
+     CPUArchState *env = cpu->env_ptr;
+-    unsigned long mmu_idx_bitmap = idxmap;
+-    int i, page, mmu_idx;
++    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
++    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
++    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
++    int page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    int mmu_idx;
++    int i;
+ 
+     assert_cpu_is_self(cpu);
+-    tlb_debug("addr "TARGET_FMT_lx"\n", addr);
+-
+-    /* Check if we need to flush due to large pages.  */
+-    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
+-        tlb_debug("forced full flush ("
+-                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
+-                  env->tlb_flush_addr, env->tlb_flush_mask);
+-
+-        v_tlb_flush_by_mmuidx(cpu, idxmap);
+-        return;
+-    }
+ 
+-    addr &= TARGET_PAGE_MASK;
+-    page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    tlb_debug("page:%d addr:"TARGET_FMT_lx" mmu_idx:0x%lx\n",
++              page, addr, mmu_idx_bitmap);
+ 
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+         if (test_bit(mmu_idx, &mmu_idx_bitmap)) {
+@@ -251,6 +275,48 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
+     tb_flush_jmp_cache(cpu, addr);
+ }
+ 
++static void tlb_check_page_and_flush_by_mmuidx_async_work(CPUState *cpu,
++                                                          run_on_cpu_data data)
++{
++    CPUArchState *env = cpu->env_ptr;
++    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
++    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
++    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
++
++    tlb_debug("addr:"TARGET_FMT_lx" mmu_idx: %04lx\n", addr, mmu_idx_bitmap);
++
++    /* Check if we need to flush due to large pages.  */
++    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
++        tlb_debug("forced full flush ("
++                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
++                  env->tlb_flush_addr, env->tlb_flush_mask);
++
++        tlb_flush_by_mmuidx_async_work(cpu,
++                                       RUN_ON_CPU_HOST_INT(mmu_idx_bitmap));
++    } else {
++        tlb_flush_page_by_mmuidx_async_work(cpu, data);
++    }
 +}
 +
- /* NOTE: this function can trigger an exception */
- /* NOTE2: the returned address is not exactly the physical address: it
-  * is actually a ram_addr_t (in system mode; the user mode emulation
++void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
++{
++    target_ulong addr_and_mmu_idx;
++
++    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%" PRIx16 "\n", addr, idxmap);
++
++    /* This should already be page aligned */
++    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
++    addr_and_mmu_idx |= idxmap;
++
++    if (!qemu_cpu_is_self(cpu)) {
++        async_run_on_cpu(cpu, tlb_check_page_and_flush_by_mmuidx_async_work,
++                         RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    } else {
++        tlb_check_page_and_flush_by_mmuidx_async_work(
++            cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    }
++}
++
+ void tlb_flush_page_all(target_ulong addr)
+ {
+     CPUState *cpu;
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 7f1d6a81a0..d996e5a0f4 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -403,7 +403,7 @@ struct CPUState {
+      * avoid potential races. The aim of the flag is to avoid
+      * unnecessary flushes.
+      */
+-    bool pending_tlb_flush;
++    uint16_t pending_tlb_flush;
+ };
+ 
+ QTAILQ_HEAD(CPUTailQ, CPUState);
 -- 
 2.11.0
