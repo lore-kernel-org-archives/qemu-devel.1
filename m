@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cana6-0000fS-9v
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:00:10 -0500
+	(envelope-from <bounces@canonical.com>) id 1canbW-0001rD-AO
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:01:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cana2-0007y9-M8
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:00:02 -0500
-Received: from mail-pf0-x234.google.com ([2607:f8b0:400e:c00::234]:35803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cana2-0007xb-70
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:59:58 -0500
-Received: by mail-pf0-x234.google.com with SMTP id f144so25661929pfa.2
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 09:59:58 -0800 (PST)
-From: Ben Warren <ben@skyportsystems.com>
-Message-Id: <769A787B-3A08-4A63-8521-9825C2DA0101@skyportsystems.com>
-Content-Type: multipart/signed;
-	boundary="Apple-Mail=_4ECD2D4E-44E6-414A-9C3B-00E4AB0FF779";
-	protocol="application/pkcs7-signature"; micalg=sha1
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Date: Mon, 6 Feb 2017 09:59:55 -0800
-In-Reply-To: <20170206193300-mutt-send-email-mst@kernel.org>
-References: <cover.1486285434.git.ben@skyportsystems.com>
-	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
-	<20170206170455-mutt-send-email-mst@kernel.org>
-	<E609277C-1E60-48F6-B83E-2A6AEFB242F3@skyportsystems.com>
-	<20170206193300-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
- Generation ID support
+	(envelope-from <bounces@canonical.com>) id 1canbT-0000Au-7S
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:01:30 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50117)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1canbT-0000Ai-2H
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:01:27 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1canbS-0002Py-0f
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 18:01:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E92992E80C6
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 18:01:25 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Feb 2017 17:45:52 -0000
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
+	<20170206171126.29967.37304.malone@gac.canonical.com>
+Message-Id: <CAJs94EbQV78cseVe=fqi-DeT1xDZ1jq-CGkux+L61oh34mkmYQ@mail.gmail.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
+ cpu->kvm_msr_buf->nmsrs' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,731 +38,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, imammedo@redhat.com
+To: qemu-devel@nongnu.org
+
+2017-02-06 20:11 GMT+03:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
+> Ahha!
+> [    0.000000] DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Re=
+ference Platform, BIOS 6.00 09/30/2014
+> [    0.000000] Hypervisor detected: VMware
+>
+> So you didn't mention this was running inside VMWare; it looks to me as i=
+f that's rejecting the PMU MSR accesses.
+> For reference which version of VMWare are you using?
+
+ESXi 6.0.0 Build 2494585
+
+I also find that enabling perf counters in VMWare configuration also helps.
+But why did it just work before 48e1a45c3166 with perf counters disabled?
+
+>
+> My colleague suggested that '-cpu host,pmu=3Doff'  might work instead of
+> having to hack around with the source.
+
+Indeed, this also helps.
+
+>
+> --
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1661386
+>
+> Title:
+>   Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   Hello,
+>
+>
+>   I see the following when try to run qemu from master as the following:
+>
+>   # ./x86_64-softmmu/qemu-system-x86_64 --version
+>   QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+>   Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+>   # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+>   -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+>   -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+>   loglevel=3D7' -m 1024 -serial stdio
+>   qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+>   kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+>
+>   First broken commit has been bisected:
+>
+>   commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+>   Author: Paolo Bonzini <pbonzini@redhat.com>
+>   Date:   Wed Mar 30 22:55:29 2016 +0200
+>
+>       target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+>
+>       This would have caught the bug in the previous patch.
+>
+>       Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+>   My cpuinfo is the following:
+>
+>   processor       : 0
+>   vendor_id       : GenuineIntel
+>   cpu family      : 6
+>   model           : 44
+>   model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+>   stepping        : 2
+>   microcode       : 0x14
+>   cpu MHz         : 3066.775
+>   cache size      : 12288 KB
+>   physical id     : 0
+>   siblings        : 2
+>   core id         : 0
+>   cpu cores       : 2
+>   apicid          : 0
+>   initial apicid  : 0
+>   fpu             : yes
+>   fpu_exception   : yes
+>   cpuid level     : 11
+>   wp              : yes
+>   flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge =
+mca cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm=
+ constant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc=
+ aperfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hyperviso=
+r lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+>   bugs            :
+>   bogomips        : 6133.55
+>   clflush size    : 64
+>   cache_alignment : 64
+>   address sizes   : 40 bits physical, 48 bits virtual
+>   power management:
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
 
 
---Apple-Mail=_4ECD2D4E-44E6-414A-9C3B-00E4AB0FF779
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+-- =
 
+With best regards,
+Matwey V. Kornilov
+http://blog.matwey.name
+xmpp://0x2207@jabber.ru
 
-> On Feb 6, 2017, at 9:41 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
->=20
-> On Mon, Feb 06, 2017 at 09:29:30AM -0800, Ben Warren wrote:
->>=20
->>    On Feb 6, 2017, at 8:15 AM, Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->>=20
->>    On Sun, Feb 05, 2017 at 01:12:00AM -0800, ben@skyportsystems.com =
-wrote:
->>=20
->>        From: Ben Warren <ben@skyportsystems.com>
->>=20
->>        This implements the VM Generation ID feature by passing a =
-128-bit
->>        GUID to the guest via a fw_cfg blob.
->>        Any time the GUID changes, an ACPI notify event is sent to the =
-guest
->>=20
->>        The user interface is a simple device with one parameter:
->>        - guid (string, must be "auto" or in UUID format
->>          xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
->>=20
->>        Signed-off-by: Ben Warren <ben@skyportsystems.com>
->>=20
->>=20
->>=20
->>    Thanks!
->>    I think it's mostly in a good shape.
->>    Comments inside.
->>=20
->>=20
->> Thanks!  Hopefully the next rev has everything you want.
->>=20
->>=20
->>=20
->>        ---
->>        default-configs/i386-softmmu.mak     |   1 +
->>        default-configs/x86_64-softmmu.mak   |   1 +
->>        hw/acpi/Makefile.objs                |   1 +
->>        hw/acpi/vmgenid.c                    | 206
->>        +++++++++++++++++++++++++++++++++++
->>        hw/i386/acpi-build.c                 |  10 ++
->>        include/hw/acpi/acpi_dev_interface.h |   1 +
->>        include/hw/acpi/vmgenid.h            |  37 +++++++
->>        7 files changed, 257 insertions(+)
->>        create mode 100644 hw/acpi/vmgenid.c
->>        create mode 100644 include/hw/acpi/vmgenid.h
->>=20
->>        diff --git a/default-configs/i386-softmmu.mak =
-b/default-configs/
->>        i386-softmmu.mak
->>        index 384cefb..1a43542 100644
->>        --- a/default-configs/i386-softmmu.mak
->>        +++ b/default-configs/i386-softmmu.mak
->>        @@ -58,3 +58,4 @@ CONFIG_I82801B11=3Dy
->>        CONFIG_SMBIOS=3Dy
->>        CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
->>        CONFIG_PXB=3Dy
->>        +CONFIG_ACPI_VMGENID=3Dy
->>        diff --git a/default-configs/x86_64-softmmu.mak =
-b/default-configs/
->>        x86_64-softmmu.mak
->>        index 491a191..aee8b08 100644
->>        --- a/default-configs/x86_64-softmmu.mak
->>        +++ b/default-configs/x86_64-softmmu.mak
->>        @@ -58,3 +58,4 @@ CONFIG_I82801B11=3Dy
->>        CONFIG_SMBIOS=3Dy
->>        CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
->>        CONFIG_PXB=3Dy
->>        +CONFIG_ACPI_VMGENID=3Dy
->>        diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
->>        index 6acf798..11c35bc 100644
->>        --- a/hw/acpi/Makefile.objs
->>        +++ b/hw/acpi/Makefile.objs
->>        @@ -5,6 +5,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D =
-cpu_hotplug.o
->>        common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) +=3D memory_hotplug.o
->>        common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D cpu.o
->>        common-obj-$(CONFIG_ACPI_NVDIMM) +=3D nvdimm.o
->>        +common-obj-$(CONFIG_ACPI_VMGENID) +=3D vmgenid.o
->>        common-obj-$(call lnot,$(CONFIG_ACPI_X86)) +=3D acpi-stub.o
->>=20
->>        common-obj-y +=3D acpi_interface.o
->>        diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
->>        new file mode 100644
->>        index 0000000..6c9ecfd
->>        --- /dev/null
->>        +++ b/hw/acpi/vmgenid.c
->>        @@ -0,0 +1,206 @@
->>        +/*
->>        + *  Virtual Machine Generation ID Device
->>        + *
->>        + *  Copyright (C) 2017 Skyport Systems.
->>        + *
->>        + *  Author: Ben Warren <ben@skyportsystems.com>
->>        + *
->>        + * This work is licensed under the terms of the GNU GPL, =
-version 2 or
->>        later.
->>        + * See the COPYING file in the top-level directory.
->>        + *
->>        + */
->>        +
->>        +#include "qemu/osdep.h"
->>        +#include "qmp-commands.h"
->>        +#include "hw/acpi/acpi.h"
->>        +#include "hw/acpi/aml-build.h"
->>        +#include "hw/acpi/vmgenid.h"
->>        +#include "hw/nvram/fw_cfg.h"
->>        +#include "sysemu/sysemu.h"
->>        +
->>        +void vmgenid_build_acpi(GArray *table_data, GArray *guid, =
-BIOSLinker
->>        *linker)
->>        +{
->>        +    Object *obj;
->>        +    VmGenIdState *s;
->>        +    Aml *ssdt, *dev, *scope, *method, *addr, *if_ctx;
->>        +    uint32_t vgia_offset;
->>        +
->>        +    obj =3D find_vmgenid_dev(NULL);
->>        +    assert(obj);
->>        +    s =3D VMGENID(obj);
->>        +
->>        +    /* Fill in the GUID values */
->>        +    if (guid->len !=3D VMGENID_FW_CFG_SIZE) {
->>        +        g_array_set_size(guid, VMGENID_FW_CFG_SIZE);
->>        +    }
->>        +    g_array_insert_vals(guid, VMGENID_GUID_OFFSET, =
-s->guid.data, 16);
->>=20
->>=20
->>    ARRAY_SIZE(s->guid.data);
->>=20
->>=20
->> OK
->>=20
->>        +
->>        +    /* Put this in a separate SSDT table */
->>        +    ssdt =3D init_aml_allocator();
->>        +
->>        +    /* Reserve space for header */
->>        +    acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
->>        +
->>        +    /* Storage for the GUID address */
->>        +    vgia_offset =3D table_data->len +
->>        +        build_append_named_dword(ssdt->buf, "VGIA");
->>        +    scope =3D aml_scope("\\_SB");
->>        +    dev =3D aml_device("VGEN");
->>        +    aml_append(dev, aml_name_decl("_HID", =
-aml_string("QEMUVGID")));
->>        +    aml_append(dev, aml_name_decl("_CID", aml_string
->>        ("VM_Gen_Counter")));
->>        +    aml_append(dev, aml_name_decl("_DDN", aml_string
->>        ("VM_Gen_Counter")));
->>        +
->>        +    /* Simple status method to check that address is linked =
-and
->>        non-zero */
->>        +    method =3D aml_method("_STA", 0, AML_NOTSERIALIZED);
->>        +    addr =3D aml_local(0);
->>        +    aml_append(method, aml_store(aml_int(0xf), addr));
->>        +    if_ctx =3D aml_if(aml_equal(aml_name("VGIA"), =
-aml_int(0)));
->>        +    aml_append(if_ctx, aml_store(aml_int(0), addr));
->>        +    aml_append(method, if_ctx);
->>        +    aml_append(method, aml_return(addr));
->>        +    aml_append(dev, method);
->>        +
->>        +    /* the ADDR method returns two 32-bit words representing =
-the lower
->>        and
->>        +     * upper halves * of the physical address of the fw_cfg =
-blob
->>        +     * (holding the GUID) */
->>=20
->>=20
->>    /*
->>    * multiline comments
->>    * look like this
->>    */
->>=20
->>=20
->> OK
->>=20
->>        +    method =3D aml_method("ADDR", 0, AML_NOTSERIALIZED);
->>        +
->>        +    addr =3D aml_local(0);
->>        +    aml_append(method, aml_store(aml_package(2), addr));
->>        +
->>        +    aml_append(method, aml_store(aml_add(aml_name("VGIA"),
->>        +                                         =
-aml_int(VMGENID_GUID_OFFSET),
->>        NULL),
->>        +                                 aml_index(addr, =
-aml_int(0))));
->>        +    aml_append(method, aml_store(aml_int(0), aml_index(addr, =
-aml_int
->>        (1))));
->>        +    aml_append(method, aml_return(addr));
->>        +
->>        +    aml_append(dev, method);
->>        +    aml_append(scope, dev);
->>        +    aml_append(ssdt, scope);
->>        +
->>        +    /* attach an ACPI notify */
->>        +    method =3D aml_method("\\_GPE._E05", 0, =
-AML_NOTSERIALIZED);
->>        +    aml_append(method, aml_notify(aml_name("\\_SB.VGEN"), =
-aml_int
->>        (0x80)));
->>        +    aml_append(ssdt, method);
->>        +
->>        +    g_array_append_vals(table_data, ssdt->buf->data, =
-ssdt->buf->len);
->>        +
->>        +    /* Allocate guest memory for the Data fw_cfg blob */
->>        +    bios_linker_loader_alloc(linker, =
-VMGENID_GUID_FW_CFG_FILE, guid,
->>        4096,
->>        +                             false /* page boundary, high =
-memory */);
->>        +
->>        +    /* Patch address of GUID fw_cfg blob into the ADDR fw_cfg =
-blob */
->>=20
->>=20
->>    add ... so QEMU can write GUID there
->>=20
->>=20
->> OK
->>=20
->>        +    bios_linker_loader_add_pointer(linker,
->>        +        VMGENID_ADDR_FW_CFG_FILE, 0, sizeof(uint32_t),
->>        +        VMGENID_GUID_FW_CFG_FILE, 0, true);
->>        +
->>        +    /* Patch address of GUID fw_cfg blob into the AML */
->>=20
->>=20
->>    add ... so OSPM can retrieve and read it
->>=20
->>=20
->> OK
->>=20
->>        +    bios_linker_loader_add_pointer(linker,
->>        +        ACPI_BUILD_TABLE_FILE, vgia_offset, sizeof(uint32_t),
->>        +        VMGENID_GUID_FW_CFG_FILE, 0, false);
->>        +
->>        +    build_header(linker, table_data,
->>        +        (void *)(table_data->data + table_data->len - =
-ssdt->buf->len),
->>        +        "SSDT", ssdt->buf->len, 1, NULL, "VMGENID");
->>        +    free_aml_allocator();
->>        +}
->>        +
->>        +void vmgenid_add_fw_cfg(FWCfgState *s, GArray *guid)
->>        +{
->>        +    Object *obj =3D find_vmgenid_dev(NULL);
->>        +    assert(obj);
->>        +    VmGenIdState *vms =3D VMGENID(obj);
->>        +
->>        +    /* Create a read-only fw_cfg file for GUID */
->>        +    fw_cfg_add_file(s, VMGENID_GUID_FW_CFG_FILE, guid->data,
->>        +                    VMGENID_FW_CFG_SIZE);
->>        +    /* Create a read-write fw_cfg file for Address */
->>        +    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, =
-NULL, NULL,
->>=20
->>=20
->>    Seems wrong. What if guest updates the address after command line
->>    set it? You want a callback to copy guid there.
->>=20
->>=20
->> Sure, I can do that.  My understanding was that this is a read =
-callback, but if
->> it also is called upon a write, we should do what you suggest.
->=20
-> Hmm you are right. But we really need to call something
-> on write though - unlike read, it must be called after write.
-> Otherwise I don't see how it can work if you set gen id before
-> guest boots.
->=20
-> I guess this means we need yet another callback per file.
-> FWCfgWriteCallback ?
->=20
-> Can you implement this in hw/nvram/fw_cfg.c?
-> It's rather straight-forward to do.
->=20
-The reason it works is that we put the initial contents of the GUID (as =
-supplied by command-line) into the GUID fw_cfg in the =
-=E2=80=98vmgenid_build_acpi()=E2=80=99 function, which is guaranteed to =
-happen before the guest boots.  The only time QEMU needs to know VGIA is =
-on later updates to the GUID (via monitor) or when restoring.  If you =
-really think this extra complexity is needed, I can do so, but it seems =
-to work very well as-is.
->=20
->>=20
->>=20
->>        +                             vms->vgia_le, sizeof(uint32_t), =
-false);
->>=20
->>=20
->>    Should be ARRAY_SIZE(vms->vgia_le).
->>=20
->>    Also, I thought GUID is at an offset from the beginning
->>    in order to trick OVMF, isn't it?
->>=20
->>=20
->> The offset is taken into account in the GUID fw_cfg file.  The =
-writing to guest
->> memory, we add the offset to VGIA.
->=20
-> I keep forgetting it's the address. Really please rename it
-> using full words.
->=20
-Will do.
->=20
->>=20
->>        +}
->>        +
->>        +static void vmgenid_update_guest(VmGenIdState *s)
->>        +{
->>        +    Object *obj =3D object_resolve_path_type("", =
-TYPE_ACPI_DEVICE_IF,
->>        NULL);
->>        +    uint32_t vgia;
->>        +
->>        +    if (obj) {
->>        +        /* Write the GUID to guest memory */
->>        +        memcpy(&vgia, s->vgia_le, sizeof(vgia));
->>        +        vgia =3D le32_to_cpu(vgia);
->>        +        if (vgia) {
->>=20
->>=20
->>    add a comment saying 0 means bios did not run yet.
->>=20
->> OK
->>=20
->>=20
->>=20
->>        +            cpu_physical_memory_write(vgia + =
-VMGENID_GUID_OFFSET,
->>        +                                      s->guid.data, =
-sizeof(s->
->>        guid.data));
->>=20
->>=20
->>    Avoid this. You want dma.h APIs.
->>=20
->> I=E2=80=99ll have a look at those.  This function was recommended to =
-me in an earlier
->> patch version.
->>=20
->>=20
->>=20
->>        +            /* Send _GPE.E05 event */
->>        +            acpi_send_event(DEVICE(obj), =
-ACPI_VMGENID_CHANGE_STATUS);
->>        +        }
->>        +    }
->>        +}
->>        +
->>        +static void vmgenid_set_guid(Object *obj, const char *value, =
-Error
->>        **errp)
->>        +{
->>        +    VmGenIdState *s =3D VMGENID(obj);
->>        +
->>        +    if (!strncmp(value, "auto", 4)) {
->>=20
->>=20
->>    I'd use strcmp here.
->>=20
->> OK
->>=20
->>=20
->>=20
->>        +        qemu_uuid_generate(&s->guid);
->>        +    } else if (qemu_uuid_parse(value, &s->guid) < 0) {
->>        +        error_setg(errp, "'%s. %s': Failed to parse GUID =
-string: %s",
->>        +                   object_get_typename(OBJECT(s)), =
-VMGENID_GUID,
->>        value);
->>        +        return;
->>        +    }
->>        +    /* QemuUUID has the first three words as big-endian, and =
-expect
->>        that any
->>        +     * GUIDs passed in will always be BE.  The guest, however =
-will
->>        expect
->>        +     * the fields to be little-endian, so store that way =
-internally.
->>=20
->>=20
->>    This makes my head spin. It's the actual guid, right? Only place =
-we need it
->>    is when
->>    we copy it into guest memory. So swap there -
->>    and do it to a copy so you won't need these comments.
->>=20
->> I understand.  I wanted to only do the swap at one place and decided =
-to do it
->> closest to the user interface, but can do it at the other end =
-instead.
->>=20
->>=20
->>=20
->>        Make
->>        +     * sure to swap back whenever reporting via monitor */
->>=20
->>=20
->>    And what code does this swap back?
->>=20
->> A later patch where the QMP code is added.  But I=E2=80=99ll remove =
-that necessity.
->>=20
->>=20
->>=20
->>        +    qemu_uuid_bswap(&s->guid);
->>        +
->>        +    /* Send the ACPI notify */
->>        +    vmgenid_update_guest(s);
->>        +}
->>        +
->>        +/* After restoring an image, we need to update the guest =
-memory and
->>        notify
->>        + * it of a potential change to VM Generation ID */
->>        +static int vmgenid_post_load(void *opaque, int version_id)
->>        +{
->>        +    VmGenIdState *s =3D opaque;
->>        +    vmgenid_update_guest(s);
->>        +    return 0;
->>        +}
->>        +
->>        +static const VMStateDescription vmstate_vmgenid =3D {
->>        +    .name =3D "vmgenid",
->>        +    .version_id =3D 1,
->>        +    .minimum_version_id =3D 1,
->>        +    .post_load =3D vmgenid_post_load,
->>        +    .fields =3D (VMStateField[]) {
->>        +        VMSTATE_UINT8_ARRAY(vgia_le, VmGenIdState, =
-sizeof(uint32_t)),
->>        +        VMSTATE_END_OF_LIST()
->>        +    },
->>        +};
->>        +
->>        +static void vmgenid_initfn(Object *obj)
->>        +{
->>        +    object_property_add_str(obj, VMGENID_GUID, NULL, =
-vmgenid_set_guid,
->>        NULL);
->>        +}
->>        +
->>        +static void vmgenid_device_class_init(ObjectClass *klass, =
-void *data)
->>        +{
->>        +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->>        +
->>        +    dc->vmsd =3D &vmstate_vmgenid;
->>        +}
->>        +
->>        +static const TypeInfo vmgenid_device_info =3D {
->>        +    .name          =3D VMGENID_DEVICE,
->>        +    .parent        =3D TYPE_SYS_BUS_DEVICE,
->>        +    .instance_size =3D sizeof(VmGenIdState),
->>        +    .instance_init =3D vmgenid_initfn,
->>        +    .class_init    =3D vmgenid_device_class_init,
->>        +};
->>        +
->>        +static void vmgenid_register_types(void)
->>        +{
->>        +    type_register_static(&vmgenid_device_info);
->>        +}
->>        +
->>        +type_init(vmgenid_register_types)
->>        diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->>        index 78a1d84..4c40f76 100644
->>        --- a/hw/i386/acpi-build.c
->>        +++ b/hw/i386/acpi-build.c
->>        @@ -42,6 +42,7 @@
->>        #include "hw/acpi/memory_hotplug.h"
->>        #include "sysemu/tpm.h"
->>        #include "hw/acpi/tpm.h"
->>        +#include "hw/acpi/vmgenid.h"
->>        #include "sysemu/tpm_backend.h"
->>        #include "hw/timer/mc146818rtc_regs.h"
->>        #include "sysemu/numa.h"
->>        @@ -2653,6 +2654,11 @@ void acpi_build(AcpiBuildTables =
-*tables,
->>        MachineState *machine)
->>            acpi_add_table(table_offsets, tables_blob);
->>            build_madt(tables_blob, tables->linker, pcms);
->>=20
->>        +    if (find_vmgenid_dev(NULL)) {
->>        +        acpi_add_table(table_offsets, tables_blob);
->>        +        vmgenid_build_acpi(tables_blob, tables->vmgenid, =
-tables->
->>        linker);
->>        +    }
->>        +
->>            if (misc.has_hpet) {
->>                acpi_add_table(table_offsets, tables_blob);
->>                build_hpet(tables_blob, tables->linker);
->>        @@ -2859,6 +2865,10 @@ void acpi_setup(void)
->>            fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
->>                            tables.tcpalog->data, acpi_data_len
->>        (tables.tcpalog));
->>=20
->>        +    if (find_vmgenid_dev(NULL)) {
->>        +        vmgenid_add_fw_cfg(pcms->fw_cfg, tables.vmgenid);
->>        +    }
->>        +
->>            if (!pcmc->rsdp_in_ram) {
->>                /*
->>                 * Keep for compatibility with old machine types.
->>        diff --git a/include/hw/acpi/acpi_dev_interface.h =
-b/include/hw/acpi/
->>        acpi_dev_interface.h
->>        index 71d3c48..3c2e4e9 100644
->>        --- a/include/hw/acpi/acpi_dev_interface.h
->>        +++ b/include/hw/acpi/acpi_dev_interface.h
->>        @@ -11,6 +11,7 @@ typedef enum {
->>            ACPI_CPU_HOTPLUG_STATUS =3D 4,
->>            ACPI_MEMORY_HOTPLUG_STATUS =3D 8,
->>            ACPI_NVDIMM_HOTPLUG_STATUS =3D 16,
->>        +    ACPI_VMGENID_CHANGE_STATUS =3D 32,
->>        } AcpiEventStatusBits;
->>=20
->>        #define TYPE_ACPI_DEVICE_IF "acpi-device-interface"
->>        diff --git a/include/hw/acpi/vmgenid.h =
-b/include/hw/acpi/vmgenid.h
->>        new file mode 100644
->>        index 0000000..b60437a
->>        --- /dev/null
->>        +++ b/include/hw/acpi/vmgenid.h
->>        @@ -0,0 +1,37 @@
->>        +#ifndef ACPI_VMGENID_H
->>        +#define ACPI_VMGENID_H
->>        +
->>        +#include "hw/acpi/bios-linker-loader.h"
->>        +#include "hw/sysbus.h"
->>        +#include "qemu/uuid.h"
->>        +
->>        +#define VMGENID_DEVICE           "vmgenid"
->>        +#define VMGENID_GUID             "guid"
->>        +#define VMGENID_GUID_FW_CFG_FILE      "etc/vmgenid"
->>=20
->>=20
->>    Maybe vmgenid_guid ?
->>=20
->> Sure.
->>=20
->>=20
->>=20
->>        +#define VMGENID_ADDR_FW_CFG_FILE      "etc/vmgenid_addr"
->>        +
->>        +#define VMGENID_FW_CFG_SIZE      4096 /* Occupy a page of =
-memory */
->>        +#define VMGENID_GUID_OFFSET      40   /* allow space for
->>        +                                       * OVMF SDT Header =
-Probe
->>        Supressor */
->>=20
->>=20
->>    ACPI header size is 36 bytes. I'd expect just to use that.
->>    Where does 40 come from? I think it's an 8 bytes alignment =
-requirement.
->>=20
->>=20
->> The number 40 was asked for by Laszlo for the OVMF SDT Header Probe =
-Suppressor,
->> which I don=E2=80=99t know anything about.
->=20
-> I think I do though :)
->=20
->> This GUID isn=E2=80=99t going in an ACPI table, so
->> I=E2=80=99m not sure what you mean here.  We allocate on a page =
-boundary and 40 bytes
->> in should be 8-byte aligned.
->>=20
->>    So do QEMU_ALIGN_UP(sizeof(AcpiTableHeader), 8)
->>=20
->>    Add a comment explaining that 8.
->=20
-> Laszlo could you suggest a comment explaining a bit about what
-> OVMF does here?
->=20
->>=20
->>        +
->>        +void vmgenid_add_fw_cfg(FWCfgState *s, GArray *guid);
->>        +void vmgenid_build_acpi(GArray *table_data, GArray *guid, =
-BIOSLinker
->>        *linker);
->>        +
->>        +#define VMGENID(obj) OBJECT_CHECK(VmGenIdState, (obj), =
-VMGENID_DEVICE)
->>        +
->>        +typedef struct VmGenIdState {
->>        +    SysBusDevice parent_obj;
->>        +    QemuUUID guid;
->>        +    uint8_t vgia_le[4];
->>=20
->>=20
->>    Please give this fields a better name. Is this the address?
->>    Pls add comments, too.
->>=20
->>=20
->> This variable name was suggested by Laszlo.  the =E2=80=98a=E2=80=99 =
-in =E2=80=98vgia=E2=80=99 refers to
->> address, but I=E2=80=99ll add some comments.
->=20
-> vmgenid_addr_le?
->=20
->=20
->>    How about we make it 8 byte so it's future proof?
->>=20
->> I can do that, but a previous conversation we had made it clear that =
-guests
->> would never allocate above 4GB so 64 bits wasn=E2=80=99t necessary.
->=20
-> Right, it's just very painful to change once we make it 32 bit.
->=20
-OK, make sense.  I=E2=80=99ll wait to hear from Laszlo before =
-continuing.
->>    alternatively put it in a ram block instead.
->>=20
->>=20
->>        +} VmGenIdState;
->>        +
->>        +static Object *find_vmgenid_dev(Error **errp)
->>        +{
->>        +    Object *obj =3D object_resolve_path_type("", =
-VMGENID_DEVICE, NULL);
->>        +    if (!obj && errp) {
->>        +        error_setg(errp, "%s is not found", VMGENID_DEVICE);
->>        +    }
->>        +    return obj;
->>        +}
->>        +
->>        +#endif
->>        --=20
->>        2.7.4
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661386
 
---Apple-Mail=_4ECD2D4E-44E6-414A-9C3B-00E4AB0FF779
-Content-Disposition: attachment;
-	filename=smime.p7s
-Content-Type: application/pkcs7-signature;
-	name=smime.p7s
-Content-Transfer-Encoding: base64
+Title:
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
-ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
-MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
-dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
-WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
-c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
-BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
-IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
-51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
-FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
-kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
-aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
-P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
-VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
-AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
-RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
-YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
-cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
-am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
-BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
-nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
-2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
-mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
-VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
-GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
-IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
-NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
-BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
-A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
-R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
-gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
-ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
-AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
-uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
-MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
-BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
-UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
-Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
-gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
-dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
-Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
-SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
-iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
-dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
-7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
-TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
-gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
-bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
-NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
-8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
-CQUxDxcNMTcwMjA2MTc1OTU1WjAjBgkqhkiG9w0BCQQxFgQUvZ7pB2BZ56xZM/XEYeZXlRzQtWYw
-gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
-Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
-BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
-YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
-QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
-KoZIhvcNAQEBBQAEggEAe57MWSisQ8gS1QmA0etPuqGjQdr2/xVqtNED2YDimUOdmC0iTaYGGBqA
-3Zxk5w3VmOrN0XjoHOc+ZuRF0YnhR374XCCSO0YxwZ9YSWIroekYwXtfO9udiuia//D6EsspS15p
-kr9Bb9g3tA4dtmPhq7TLteRI8OsP1YSRGgfV0eC0Lk+j36Zyhz9YP0liK9fTlUbZ5nC5VRaafo7H
-MzMdPyhHbVSCe11yTyqHcaJj1oHS7nmkagEBcgkx7gbg+ZnVy1SkEALtjyuWyXVVOCiLAhi64v5G
-L+9Q8m1j/nk3ejx+LCodFDw1FTG5l8k3aGKi1eWBysSpk5ePeyv9qccgXgAAAAAAAA==
---Apple-Mail=_4ECD2D4E-44E6-414A-9C3B-00E4AB0FF779--
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  =
+
+  I see the following when try to run qemu from master as the following:
+
+  # ./x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+  loglevel=3D7' -m 1024 -serial stdio
+  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  First broken commit has been bisected:
+
+  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Mar 30 22:55:29 2016 +0200
+
+      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+      =
+
+      This would have caught the bug in the previous patch.
+      =
+
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  My cpuinfo is the following:
+
+  processor       : 0
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 44
+  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+  stepping        : 2
+  microcode       : 0x14
+  cpu MHz         : 3066.775
+  cache size      : 12288 KB
+  physical id     : 0
+  siblings        : 2
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 0
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 11
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
+onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
+perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
+lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+  bugs            :
+  bogomips        : 6133.55
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 40 bits physical, 48 bits virtual
+  power management:
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
