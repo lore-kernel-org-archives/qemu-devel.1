@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cakVe-0002I2-E7
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:43:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cakgF-0004HQ-Pf
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:54:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cakVZ-0003zb-Ph
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:43:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56619)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cakVZ-0003zR-KV
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:43:09 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C40BB80F8F
-	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 14:43:09 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-117-14.ams2.redhat.com
-	[10.36.117.14])
-	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v16Eh8pA002818
-	for <qemu-devel@nongnu.org>; Mon, 6 Feb 2017 09:43:09 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  6 Feb 2017 15:43:07 +0100
-Message-Id: <20170206144307.18290-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH qemu-web] add <link> tag for /feed.xml
+	(envelope-from <peter.maydell@linaro.org>) id 1cakgF-0003dg-3I
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:54:11 -0500
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33248)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cakgE-0003dN-S0
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:54:11 -0500
+Received: by mail-wr0-x22a.google.com with SMTP id i10so23552815wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 06:54:10 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170204143132.GP9606@toto>
+References: <1486144135-4894-1-git-send-email-peter.maydell@linaro.org>
+	<1486144135-4894-3-git-send-email-peter.maydell@linaro.org>
+	<20170204143132.GP9606@toto>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Feb 2017 14:53:49 +0000
+Message-ID: <CAFEAcA9ybZzMPKMUUyrALGq4ufwBbWPFAtZEctHmA1CKnnpLgQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] target/arm: A32,
+ T32: Create Instruction Syndromes for Data Aborts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
-	Just an example of what a website patch would look like.
+On 4 February 2017 at 14:31, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> On Fri, Feb 03, 2017 at 05:48:55PM +0000, Peter Maydell wrote:
+>> Add support for generating the ISS (Instruction Specific Syndrome)
+>> for Data Abort exceptions taken from AArch32. These syndromes are
+>> used by hypervisors for example to trap and emulate memory accesses.
+>>
+>> This is the equivalent for AArch32 guests of the work done for AArch64
+>> guests in commit aaa1f954d4cab243.
 
- _includes/assets.html | 1 +
- 1 file changed, 1 insertion(+)
+>> +static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+>> +{
+>> +    /* We don't need to save all of the syndrome so we mask and shift
+>> +     * out uneeded bits to help the sleb128 encoder do a better job.
+>> +     */
+>> +    syn &= ARM_INSN_START_WORD2_MASK;
+>> +    syn >>= ARM_INSN_START_WORD2_SHIFT;
+>> +
+>> +    /* We check and clear insn_start_idx to catch multiple updates.  */
+>> +    assert(s->insn_start_idx != 0);
+>> +    tcg_set_insn_param(s->insn_start_idx, 2, syn);
+>> +    s->insn_start_idx = 0;
+>> +}
+>
+> Could we move this into translate.h and share it with translate-a64.c?
 
-diff --git a/_includes/assets.html b/_includes/assets.html
-index e3f09e0..77c2942 100644
---- a/_includes/assets.html
-+++ b/_includes/assets.html
-@@ -9,6 +9,7 @@
- 	<link rel="stylesheet" href="/assets/css/style.css" />
- 	<link rel="stylesheet" href="/assets/css/style-mobile.css" media="(max-width:699px)"/>
- 	<link rel="stylesheet" href="/assets/css/style-desktop.css" media="(min-width:700px)" />
-+	<link rel="alternate" title="QEMU Blog (Atom feed)" href="/feed.xml" type="application/atom+xml" />
- 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
- 	{% if page.colorbox %}
- 	<script src="/assets/js/jquery.colorbox.js"></script>
--- 
-2.9.3
+Sure; I'll just squash that change into this patch and put the
+results into the target-arm queue, rather than burdening the
+list with a v3 respin, if that's OK.
+
+thanks
+-- PMM
