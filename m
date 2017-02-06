@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1casRt-0002jM-EY
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:11:54 -0500
+	(envelope-from <groug@kaod.org>) id 1casVf-0004Un-1q
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:15:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1casRo-0001j2-EN
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:11:53 -0500
-Received: from mail-ve1eur01on0112.outbound.protection.outlook.com
-	([104.47.1.112]:45292
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1casRn-0001ij-Qs
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:11:48 -0500
-References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
-	<20170201102013.GC3232@redhat.com>
-	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
-	<20170201110320.GD3232@redhat.com>
-	<CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <a03be6ea-a7bd-3b99-a94b-f180ef6f9e0a@openvz.org>
-Date: Mon, 6 Feb 2017 18:37:29 +0300
+	(envelope-from <groug@kaod.org>) id 1casVa-0003Lx-4l
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:15:47 -0500
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:59709)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1casVZ-0003LW-Qg
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:15:41 -0500
+Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 59F821E986
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 00:15:40 +0100 (CET)
+Date: Tue, 7 Feb 2017 00:15:33 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170207001533.3f18e4ea@bahia.lan>
+In-Reply-To: <71b1733d-7638-5e27-e828-fad57f76f507@redhat.com>
+References: <1486123043-26493-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1486123043-26493-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<71b1733d-7638-5e27-e828-fad57f76f507@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/2vaI71pYDuic=5Om9BgmgVm";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 1/2 v16] fsdev: add IO throttle support to
+ fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +33,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com, Aleksey
-	Kostyushko <aleksko@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
 
-On 02/01/2017 04:41 PM, Ladi Prosek wrote:
-> On Wed, Feb 1, 2017 at 12:03 PM, Daniel P. Berrange <berrange@redhat.com> wrote:
->> On Wed, Feb 01, 2017 at 11:50:43AM +0100, Ladi Prosek wrote:
->>> On Wed, Feb 1, 2017 at 11:20 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
->>>> On Wed, Feb 01, 2017 at 11:06:46AM +0100, Ladi Prosek wrote:
->>>>> Analogous to guest-file-read and guest-file-write, this commit adds
->>>>> support for issuing IOCTLs to files in the guest. With the goal of
->>>>> abstracting away the differences between Posix ioctl() and Win32
->>>>> DeviceIoControl() to provide one unified API, the schema distinguishes
->>>>> between input and output buffer sizes (as required by Win32) and
->>>>> allows the caller to supply either a 'buffer', pointer to which will
->>>>> be passed to the Posix ioctl(), or an integer argument, passed to
->>>>> ioctl() directly.
->>>> What is the intended usage scenario for this ?
->>> My specific case is extracting a piece of data from Windows guests.
->>> Guest driver exposes a file object with a well-known IOCTL code to
->>> return a data structure from the kernel.
->> Please provide more information about what you're trying to do.
->>
->> If we can understand the full details it might suggest a different
->> approach that exposing a generic ioctl passthrough facility.
-> The end goal is to be able to create a Window crash dump file from a
-> running (or crashed, but running is more interesting because Windows
-> can't do that by itself) Windows VM. To do that without resorting to
-> hacks, the host application driving this needs to get the crash dump
-> header, which Windows provides in its KeInitializeCrashDumpHeader
-> kernel API.
->
-> I believe that the most natural way to do this is to have
-> 1) a driver installed in the guest providing a way to call
-> KeInitializeCrashDumpHeader from user space
-> 2) an agent in the guest, running in user space, calling the driver
-> and passing the result back to the host
->
-> Now 2) may as well be an existing agent, such as the QEMU guest agent,
-> and that's why I am here :)
->
-> KeInitializeCrashDumpHeader returns an opaque byte array, happens to
-> be 8192 bytes at the moment. My first choice for the kernel-user
-> interface in the guest is IOCTL because what I'm trying to get across
-> is a block, a "datagram", not a stream, and I have the option for
-> easily adding more functionality later by adding more IOCTL codes with
-> the file object still representing "the driver".
->
-> I could use regular file I/O as well. I would either have to devise a
-> protocol for talking to the driver, have a way of delimiting messages,
-> re-syncing the channel etc., or make a slight semantic shift and
-> instead of the file object representing the driver, it would represent
-> this one particular function of the driver. Opening the file and
-> reading from it until eof would yield the crash dump header.
-I think that this is not as good as can be for the whole design of the
-feature.
-The problem here is that userspace starts toooooooooo late and is not
-accessible when the guest BSODS and we do need a dump for analysis.
+--Sig_/2vaI71pYDuic=5Om9BgmgVm
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-May be it worth to push this header to QEMU at boot time through virtio bus?
+On Mon, 6 Feb 2017 13:36:43 -0600
+Eric Blake <eblake@redhat.com> wrote:
 
-Den
+> On 02/03/2017 05:57 AM, Pradeep Jagadeesh wrote:
+> > This patchset adds the throttle support for the 9p-local driver.
+> > For now this functionality can be enabled only through qemu cli options.
+> > QMP interface and support to other drivers need further extensions. =20
+>=20
+> This part is a bit scary - if 2.9 is released with just the cli option
+> and not the QMP interface, then how does someone like libvirt introspect
+> whether the feature is available for use?
+>=20
+
+I'm not aware of anything related to fsdev in QMP... and libvirt seems to
+only parse the output of -help to guess fsdev capabilities. And indeed,
+qemu-options.hx doesn't expose this new feature.
+
+> Please make sure we don't reach 2.9 with only a half-baked feature;
+> whether that means finishing the QMP work or temporarily disabling the
+> cli additions until a later release can finish the work.
+>=20
+
+Would this be ok to add the missing bits in qemu-options.hx or do you
+expect more ?
+
+Cheers.
+
+--
+Greg
+
+--Sig_/2vaI71pYDuic=5Om9BgmgVm
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAliZA5UACgkQAvw66wEB28KVswCfckL0Ua4jmsd3jL279QWvjFBC
+fh0An0GQYxIj68/YlqjqWISJ5Oi9Zqx8
+=EKm0
+-----END PGP SIGNATURE-----
+
+--Sig_/2vaI71pYDuic=5Om9BgmgVm--
