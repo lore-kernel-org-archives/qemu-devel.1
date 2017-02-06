@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1canMA-0006FO-Md
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:45:39 -0500
+	(envelope-from <berrange@redhat.com>) id 1canRT-00021D-Oh
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:51:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1canM7-0002Tt-Ib
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:45:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1canM7-0002Tj-AC
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:45:35 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 58BB361BAC
-	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 17:45:34 +0000 (UTC)
-Date: Mon, 6 Feb 2017 17:45:30 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170206174529.GI2524@work-vm>
-References: <20170206173306.20603-1-dgilbert@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1canRS-0004Ks-H5
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:51:07 -0500
+Date: Mon, 6 Feb 2017 17:50:55 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170206175055.GB3249@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<20170206132321.GB11987@noname.redhat.com>
+	<877f53l4a5.fsf@dusky.pond.sub.org>
+	<20170206163331.GF31991@redhat.com>
+	<87d1evi65h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170206173306.20603-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] Postcopy: Hugepage support
+In-Reply-To: <87d1evi65h.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com
-Cc: aarcange@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Mon, Feb 06, 2017 at 06:24:42PM +0100, Markus Armbruster wrote:
+> "Daniel P. Berrange" <berrange@redhat.com> writes:
 > 
-> Hi,
->   The existing postcopy code, and the userfault kernel
-> code that supports it, only works for normal anonymous memory.
-> Kernel support for userfault on hugetlbfs is working
-> it's way upstream; it's in the linux-mm tree,
-> You can get a version at:
->    git://git.kernel.org/pub/scm/linux/kernel/git/andrea/aa.git
-> on the origin/userfault branch.
+> > On Mon, Feb 06, 2017 at 04:36:50PM +0100, Markus Armbruster wrote:
+> >> Kevin Wolf <kwolf@redhat.com> writes:
+> >> > Want to make use of the shiny new QemuOpts and get things parsed into
+> >> > a nested object? Well, provide a real schema instead of "any" then.
+> >> 
+> >> Sadly, this is somewhere between impractical and impossible.
+> >> 
+> >> The QAPI schema is fixed at compile-time.  It needs to be, because its
+> >> purpose is to let us generate code we can compile and link into QEMU.
+> >> 
+> >> We use 'any' basically for things that aren't fixed at compile-time.
+> >> 
+> >> Example: qdev properties and device_add
+> >> 
+> >> Even though traditional qdev properties are fixed at compile time, they
+> >> are not known until run-time.  That's because they're defined in the
+> >> device models, and the registry of device models is only built at
+> >> run-time.
+> >> 
+> >> I believe this would've been fixable with some effort: make the devices
+> >> define suitable pieces of schema, and collect them somehow at
+> >> compile-time.  "Would've been", because progress!  See next example.
+> >> 
+> >> Example: QOM properties and object-add, qom-set, qom-get
+> >> 
+> >> QOM properties are created at run-time.  They cannot be fixed at
+> >> compile-time *by design*.  I always hated that part of the design, but I
+> >> was assured we absolutely need that much rope^Wflexibility.
+> >> 
+> >> So, all we know about the "props" argument of object-add is that it's a
+> >> JSON object.  The tightest imaginable QAPI schema would be an 'object'
+> >> type, except that doesn't exist, so we settle for 'any'.
+> >
+> > The CLI parser is executing at runtime though, so I would think
+> > it should need to care if the schema its using to parse the CLI
+> > args was defined at build time or execution time. It merely needs
+> > the schema to be present at the time it parses the data.
 > 
-> Note that while this code supports arbitrary sized hugepages,
-> it doesn't make sense with pages above the few-MB region,
-> so while 2MB is fine, 1GB is probably a bad idea;
-> this code waits for and transmits whole huge pages, and a
-> 1GB page would take about 1 second to transfer over a 10Gbps
-> link - which is way too long to pause the destination for.
+> Whatever "the schema" is, it can't be the QAPI schema, and it can't be
+> used by generating code (which is how the visitors use the QAPI schema).
 > 
-> Dave
+> Let's assume for the moment that QOM is the only source of schema stuff
+> that becomes known only at run-time.  Then "the schema" is an
+> amalgamation of the QAPI schema and QOM reflection.  I say "reflection",
+> not "schema", because there is no QOM schema, only ways to examine (the
+> current structure of) QOM objects.
+> 
+> > So is there a way we dynamically report the info we need by improving
+> > visitor support for QOM somehow.
+> 
+> To parse the argument of -object, we need to create a QOM object of the
+> type given by qom-type, so we can examine it to find its properties and
+> their types.
+> 
+> Consider
+> 
+>     -object foo=[eins,qom-type=zwei,bar={x=y,qom-type=drei,baz=}]
+> 
+> What's the value of qom-type?  Remember, -object has "props" unwrapped
+> so that everything stays flat.
+> 
+> If foo is an array, qom-type is missing.
+> 
+> If foo is a string, then qom-type is zwei.  Except when bar is a string,
+> because then it gets overridden to drei.
 
-Oops I missed the v2 changes from the message:
+That's a strange syntax you've used for illustration there - a half
+way between json and nested-dotted syntax. For pure json syntax it
+would be a clear if qom-type was missing at the top level. for nested
+dotted syntax, it again seems clear to me - split on ',' and find the
+unqualified qom-type key (or the leading default arg)
 
-v2
-  Flip ram-size summary word/compare individual page size patches around
-  Individual page size comparison is done in ram_load if 'advise' has been
-    received rather than checking migrate_postcopy_ram()
-  Moved discard code into exec.c, reworked ram_discard_range
 
-Dave
-
-> Dr. David Alan Gilbert (16):
->   postcopy: Transmit ram size summary word
->   postcopy: Transmit and compare individual page sizes
->   postcopy: Chunk discards for hugepages
->   exec: ram_block_discard_range
->   postcopy: enhance ram_block_discard_range for hugepages
->   Fold postcopy_ram_discard_range into ram_discard_range
->   postcopy: Record largest page size
->   postcopy: Plumb pagesize down into place helpers
->   postcopy: Use temporary for placing zero huge pages
->   postcopy: Load huge pages in one go
->   postcopy: Mask fault addresses to huge page boundary
->   postcopy: Send whole huge pages
->   postcopy: Allow hugepages
->   postcopy: Update userfaultfd.h header
->   postcopy: Check for userfault+hugepage feature
->   postcopy: Add doc about hugepages and postcopy
-> 
->  docs/migration.txt                |  13 ++++
->  exec.c                            |  83 +++++++++++++++++++++++
->  include/exec/cpu-common.h         |   2 +
->  include/exec/memory.h             |   1 -
->  include/migration/migration.h     |   3 +
->  include/migration/postcopy-ram.h  |  13 ++--
->  linux-headers/linux/userfaultfd.h |  81 +++++++++++++++++++---
->  migration/migration.c             |   1 +
->  migration/postcopy-ram.c          | 138 +++++++++++++++++---------------------
->  migration/ram.c                   | 109 ++++++++++++++++++------------
->  migration/savevm.c                |  32 ++++++---
->  migration/trace-events            |   2 +-
->  12 files changed, 328 insertions(+), 150 deletions(-)
-> 
-> -- 
-> 2.9.3
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
