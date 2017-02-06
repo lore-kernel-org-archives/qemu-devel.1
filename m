@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1canrN-00036F-8p
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:17:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1canse-0003id-Il
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:19:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1canrH-0005Ls-M5
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:17:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38950)
+	(envelope-from <eblake@redhat.com>) id 1cansc-00060Q-Ao
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:19:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39644)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1canrH-0005L1-D9
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:17:47 -0500
-Date: Mon, 6 Feb 2017 20:17:46 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170206201249-mutt-send-email-mst@kernel.org>
-References: <cover.1486285434.git.ben@skyportsystems.com>
-	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
-	<20170206170455-mutt-send-email-mst@kernel.org>
-	<E609277C-1E60-48F6-B83E-2A6AEFB242F3@skyportsystems.com>
-	<20170206193300-mutt-send-email-mst@kernel.org>
-	<769A787B-3A08-4A63-8521-9825C2DA0101@skyportsystems.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cansc-00060B-37
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 13:19:10 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 05AC28046D
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 18:19:10 +0000 (UTC)
+References: <20170206132835.9440-1-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d8014ca2-ebf5-0124-353d-3b37a206f677@redhat.com>
+Date: Mon, 6 Feb 2017 12:19:07 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <769A787B-3A08-4A63-8521-9825C2DA0101@skyportsystems.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
- Generation ID support
+In-Reply-To: <20170206132835.9440-1-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vnROu6P2U7MF86hHeN7NIpxVI67U2xrmP"
+Subject: Re: [Qemu-devel] [PATCH] qemu-option: reject empty number value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ben Warren <ben@skyportsystems.com>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, imammedo@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Feb 06, 2017 at 09:59:55AM -0800, Ben Warren wrote:
->                +void vmgenid_add_fw_cfg(FWCfgState *s, GArray *guid)
->                +{
->                +    Object *obj =3D find_vmgenid_dev(NULL);
->                +    assert(obj);
->                +    VmGenIdState *vms =3D VMGENID(obj);
->                +
->                +    /* Create a read-only fw_cfg file for GUID */
->                +    fw_cfg_add_file(s, VMGENID_GUID_FW_CFG_FILE, guid->=
-data,
->                +                    VMGENID_FW_CFG_SIZE);
->                +    /* Create a read-write fw_cfg file for Address */
->                +    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FIL=
-E, NULL,
->         NULL,
->=20
->=20
->            Seems wrong. What if guest updates the address after command=
- line
->            set it? You want a callback to copy guid there.
->=20
->=20
->         Sure, I can do that.  My understanding was that this is a read
->         callback, but if
->         it also is called upon a write, we should do what you suggest.
->=20
->=20
->     Hmm you are right. But we really need to call something
->     on write though - unlike read, it must be called after write.
->     Otherwise I don't see how it can work if you set gen id before
->     guest boots.
->=20
->     I guess this means we need yet another callback per file.
->     FWCfgWriteCallback ?
->=20
->     Can you implement this in hw/nvram/fw_cfg.c?
->     It's rather straight-forward to do.
->=20
->=20
-> The reason it works is that we put the initial contents of the GUID (as
-> supplied by command-line) into the GUID fw_cfg in the =E2=80=98vmgenid_=
-build_acpi()=E2=80=99
-> function, which is guaranteed to happen before the guest boots.  The on=
-ly time
-> QEMU needs to know VGIA is on later updates to the GUID (via monitor) o=
-r when
-> restoring.  If you really think this extra complexity is needed, I can =
-do so,
-> but it seems to work very well as-is.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vnROu6P2U7MF86hHeN7NIpxVI67U2xrmP
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <d8014ca2-ebf5-0124-353d-3b37a206f677@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-option: reject empty number value
+References: <20170206132835.9440-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20170206132835.9440-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I see. So it's a race condition I think.  It works unless you change the
-gen id after bios read the guid from the guid file but before it wrote
-out the address.
+On 02/06/2017 07:28 AM, Marc-Andr=C3=A9 Lureau wrote:
+> When no number is provided, return an invalid number error.
+> (note: this may break some users relying on default 0 value)
 
-Or do I miss something?
+Anyone that writes 'size=3D' instead of 'size=3D0' deserves the breakage.=
+
+
+>=20
+> Fixes:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1417864
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  util/qemu-option.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
-MST
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--vnROu6P2U7MF86hHeN7NIpxVI67U2xrmP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYmL4bAAoJEKeha0olJ0NqB+0H/19/Pi+niSnKg284HtwcbPX/
+n6EWYmiJvfhibQfOsdoUTEFOGTGiCs1v7yiv3i41/bpoNPErwIsVzdtvmy2sUMcv
+wS0dSr4ROiWeYfe7ZJPEObhxPrOd+mFlEkYJ6e7Jlwe7MIoQHWEgscJeFUIeN/6Y
+JQVzO5DxgASdZyoh1EA+qJB357OnRvWqejp0yIjkH5PsAbXq/BWCdsDptBKzPD7u
+vWwioubEu2LfKo8DQqB8DBMC0vz2P0q+IYHVwtGPuhVBCIsP8Shu4nKabWUtyTC7
+tXQj3WAbV9raSmUH/BUZu3FltA0skf1z1zZy8vgQe2JDcN2Lc88V+brDd0Jf4gA=
+=/TQA
+-----END PGP SIGNATURE-----
+
+--vnROu6P2U7MF86hHeN7NIpxVI67U2xrmP--
