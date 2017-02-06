@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1canAH-0003y7-Qy
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:33:23 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1canA8-0003sT-LF
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:33:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1canAG-0006Qv-03
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:33:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37760)
+	(envelope-from <dgilbert@redhat.com>) id 1canA5-0006Nj-GU
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:33:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1canAF-0006Qn-RP
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:33:19 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1canA5-0006Nc-Br
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:33:09 -0500
 Received: from int-mx14.intmail.prod.int.phx2.redhat.com
 	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0C4647E9D7
-	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 17:33:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 88FCF63E2C
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 17:33:09 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon,  6 Feb 2017 17:32:59 +0000
-Message-Id: <20170206173306.20603-10-dgilbert@redhat.com>
-In-Reply-To: <20170206173306.20603-1-dgilbert@redhat.com>
-References: <20170206173306.20603-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 09/16] postcopy: Use temporary for placing
- zero huge pages
+Date: Mon,  6 Feb 2017 17:32:50 +0000
+Message-Id: <20170206173306.20603-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/16] Postcopy: Hugepage support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +32,55 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The kernel can't do UFFDIO_ZEROPAGE for huge pages, so we have
-to allocate a temporary (always zero) page and use UFFDIO_COPYPAGE
-on it.
+Hi,
+  The existing postcopy code, and the userfault kernel
+code that supports it, only works for normal anonymous memory.
+Kernel support for userfault on hugetlbfs is working
+it's way upstream; it's in the linux-mm tree,
+You can get a version at:
+   git://git.kernel.org/pub/scm/linux/kernel/git/andrea/aa.git
+on the origin/userfault branch.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
----
- include/migration/migration.h |  1 +
- migration/postcopy-ram.c      | 23 +++++++++++++++++++++--
- 2 files changed, 22 insertions(+), 2 deletions(-)
+Note that while this code supports arbitrary sized hugepages,
+it doesn't make sense with pages above the few-MB region,
+so while 2MB is fine, 1GB is probably a bad idea;
+this code waits for and transmits whole huge pages, and a
+1GB page would take about 1 second to transfer over a 10Gbps
+link - which is way too long to pause the destination for.
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index c9c1d5f..bd399fc 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -108,6 +108,7 @@ struct MigrationIncomingState {
-     QEMUFile *to_src_file;
-     QemuMutex rp_mutex;    /* We send replies from multiple threads */
-     void     *postcopy_tmp_page;
-+    void     *postcopy_tmp_zero_page;
- 
-     QEMUBH *bh;
- 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index a8b7fed..4c736d2 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -324,6 +324,10 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
-         munmap(mis->postcopy_tmp_page, mis->largest_page_size);
-         mis->postcopy_tmp_page = NULL;
-     }
-+    if (mis->postcopy_tmp_zero_page) {
-+        munmap(mis->postcopy_tmp_zero_page, mis->largest_page_size);
-+        mis->postcopy_tmp_zero_page = NULL;
-+    }
-     trace_postcopy_ram_incoming_cleanup_exit();
-     return 0;
- }
-@@ -593,8 +597,23 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-             return -e;
-         }
-     } else {
--        /* TODO: The kernel can't use UFFDIO_ZEROPAGE for hugepages */
--        assert(0);
-+        /* The kernel can't use UFFDIO_ZEROPAGE for hugepages */
-+        if (!mis->postcopy_tmp_zero_page) {
-+            mis->postcopy_tmp_zero_page = mmap(NULL, mis->largest_page_size,
-+                                               PROT_READ | PROT_WRITE,
-+                                               MAP_PRIVATE | MAP_ANONYMOUS,
-+                                               -1, 0);
-+            if (mis->postcopy_tmp_zero_page == MAP_FAILED) {
-+                int e = errno;
-+                mis->postcopy_tmp_zero_page = NULL;
-+                error_report("%s: %s mapping large zero page",
-+                             __func__, strerror(e));
-+                return -e;
-+            }
-+            memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
-+        }
-+        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
-+                                   pagesize);
-     }
- 
-     return 0;
+Dave
+
+Dr. David Alan Gilbert (16):
+  postcopy: Transmit ram size summary word
+  postcopy: Transmit and compare individual page sizes
+  postcopy: Chunk discards for hugepages
+  exec: ram_block_discard_range
+  postcopy: enhance ram_block_discard_range for hugepages
+  Fold postcopy_ram_discard_range into ram_discard_range
+  postcopy: Record largest page size
+  postcopy: Plumb pagesize down into place helpers
+  postcopy: Use temporary for placing zero huge pages
+  postcopy: Load huge pages in one go
+  postcopy: Mask fault addresses to huge page boundary
+  postcopy: Send whole huge pages
+  postcopy: Allow hugepages
+  postcopy: Update userfaultfd.h header
+  postcopy: Check for userfault+hugepage feature
+  postcopy: Add doc about hugepages and postcopy
+
+ docs/migration.txt                |  13 ++++
+ exec.c                            |  83 +++++++++++++++++++++++
+ include/exec/cpu-common.h         |   2 +
+ include/exec/memory.h             |   1 -
+ include/migration/migration.h     |   3 +
+ include/migration/postcopy-ram.h  |  13 ++--
+ linux-headers/linux/userfaultfd.h |  81 +++++++++++++++++++---
+ migration/migration.c             |   1 +
+ migration/postcopy-ram.c          | 138 +++++++++++++++++---------------------
+ migration/ram.c                   | 109 ++++++++++++++++++------------
+ migration/savevm.c                |  32 ++++++---
+ migration/trace-events            |   2 +-
+ 12 files changed, 328 insertions(+), 150 deletions(-)
+
 -- 
 2.9.3
