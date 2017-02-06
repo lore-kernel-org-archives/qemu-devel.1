@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cakid-0005Qm-Ue
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:56:41 -0500
+	(envelope-from <groug@kaod.org>) id 1cakkp-0006Vp-4l
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:58:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cakia-0004Y0-SB
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:56:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48146)
+	(envelope-from <groug@kaod.org>) id 1cakkm-0005Nq-3K
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:58:55 -0500
+Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:52853)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cakia-0004XV-K8
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:56:36 -0500
-Date: Mon, 6 Feb 2017 16:56:34 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170206165517-mutt-send-email-mst@kernel.org>
-References: <cover.1486285434.git.ben@skyportsystems.com>
-	<2bb2dd455ea355b279867a312924add82ae685e4.1486285434.git.ben@skyportsystems.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cakkl-0005My-Pj
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 09:58:52 -0500
+Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 48EA720673
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 15:58:49 +0100 (CET)
+Date: Mon, 6 Feb 2017 15:58:43 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170206155843.27adcaed@bahia.lan>
+In-Reply-To: <1486123043-26493-3-git-send-email-pradeep.jagadeesh@huawei.com>
+References: <1486123043-26493-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1486123043-26493-3-git-send-email-pradeep.jagadeesh@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2bb2dd455ea355b279867a312924add82ae685e4.1486285434.git.ben@skyportsystems.com>
-Subject: Re: [Qemu-devel] [PATCH v5 02/10] linker-loader: Add new 'write
- pointer' command
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2 v16] throttle: factor out duplicate code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,220 +30,334 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, imammedo@redhat.com
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
-On Sun, Feb 05, 2017 at 01:11:57AM -0800, ben@skyportsystems.com wrote:
-> From: Ben Warren <ben@skyportsystems.com>
+On Fri,  3 Feb 2017 06:57:23 -0500
+Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
+
+> This patch removes the redundant throttle code that was present in
+> block and fsdev device files. Now the common code is moved
+> to a single file.
 > 
-> This adds to the existing 'add pointer' functionality in that it
-> instructs the guest (BIOS or UEFI) to not patch memory but to instead
-> write the changes back to QEMU via a writeable fw_cfg file.
+> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
 > 
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg04637.html
 > ---
->  hw/acpi/aml-build.c                  |  2 +-
->  hw/acpi/bios-linker-loader.c         | 35 ++++++++++++++++++++++++-----------
->  hw/acpi/nvdimm.c                     |  2 +-
->  hw/arm/virt-acpi-build.c             |  4 ++--
->  hw/i386/acpi-build.c                 |  8 ++++----
->  include/hw/acpi/bios-linker-loader.h |  3 ++-
->  6 files changed, 34 insertions(+), 20 deletions(-)
+>  blockdev.c                      | 81 ++----------------------------------
+>  fsdev/qemu-fsdev-opts.c         | 80 ++---------------------------------
+>  include/qemu/throttle-options.h | 92 +++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 100 insertions(+), 153 deletions(-)
+>  create mode 100644 include/qemu/throttle-options.h
 > 
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 9fc54c9..03b6c6c 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -1626,7 +1626,7 @@ build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
->          /* rsdt->table_offset_entry to be filled by Guest linker */
->          bios_linker_loader_add_pointer(linker,
->              ACPI_BUILD_TABLE_FILE, rsdt_entry_offset, rsdt_entry_size,
-> -            ACPI_BUILD_TABLE_FILE, ref_tbl_offset);
-> +            ACPI_BUILD_TABLE_FILE, ref_tbl_offset, false);
->      }
->      build_header(linker, table_data,
->                   (void *)rsdt, "RSDT", rsdt_len, 1, oem_id, oem_table_id);
-> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
-> index d963ebe..e46bc29 100644
-> --- a/hw/acpi/bios-linker-loader.c
-> +++ b/hw/acpi/bios-linker-loader.c
-> @@ -52,10 +52,13 @@ struct BiosLinkerLoaderEntry {
->          } alloc;
+> diff --git a/blockdev.c b/blockdev.c
+> index 245e1e1..9320c8a 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -52,6 +52,7 @@
+>  #include "sysemu/arch_init.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/help_option.h"
+> +#include "qemu/throttle-options.h"
 >  
->          /*
-> -         * COMMAND_ADD_POINTER - patch the table (originating from
-> -         * @dest_file) at @pointer.offset, by adding a pointer to the table
-> +         * COMMAND_ADD_POINTER &
-> +         * COMMAND_WRITE_POINTER - patch guest memory (originating from
-> +         * @dest_file) at @pointer.offset, by adding a pointer to the memory
->           * originating from @src_file. 1,2,4 or 8 byte unsigned
->           * addition is used depending on @pointer.size.
-> +         * Instead of patching memory, COMMAND_WRITE_POINTER writes the changes
-> +         * to @dest_file in QEMU via fw_cfg DMA.
->           */
->          struct {
->              char dest_file[BIOS_LINKER_LOADER_FILESZ];
-> @@ -85,9 +88,10 @@ struct BiosLinkerLoaderEntry {
->  typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
+>  static QTAILQ_HEAD(, BlockDriverState) monitor_bdrv_states =
+>      QTAILQ_HEAD_INITIALIZER(monitor_bdrv_states);
+> @@ -3999,83 +4000,9 @@ QemuOptsList qemu_common_drive_opts = {
+>              .name = BDRV_OPT_READ_ONLY,
+>              .type = QEMU_OPT_BOOL,
+>              .help = "open drive file as read-only",
+> -        },{
+> -            .name = "throttling.iops-total",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit total I/O operations per second",
+> -        },{
+> -            .name = "throttling.iops-read",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit read operations per second",
+> -        },{
+> -            .name = "throttling.iops-write",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit write operations per second",
+> -        },{
+> -            .name = "throttling.bps-total",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit total bytes per second",
+> -        },{
+> -            .name = "throttling.bps-read",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit read bytes per second",
+> -        },{
+> -            .name = "throttling.bps-write",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit write bytes per second",
+> -        },{
+> -            .name = "throttling.iops-total-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "I/O operations burst",
+> -        },{
+> -            .name = "throttling.iops-read-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "I/O operations read burst",
+> -        },{
+> -            .name = "throttling.iops-write-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "I/O operations write burst",
+> -        },{
+> -            .name = "throttling.bps-total-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "total bytes burst",
+> -        },{
+> -            .name = "throttling.bps-read-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "total bytes read burst",
+> -        },{
+> -            .name = "throttling.bps-write-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "total bytes write burst",
+> -        },{
+> -            .name = "throttling.iops-total-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the iops-total-max burst period, in seconds",
+> -        },{
+> -            .name = "throttling.iops-read-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the iops-read-max burst period, in seconds",
+> -        },{
+> -            .name = "throttling.iops-write-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the iops-write-max burst period, in seconds",
+> -        },{
+> -            .name = "throttling.bps-total-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the bps-total-max burst period, in seconds",
+> -        },{
+> -            .name = "throttling.bps-read-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the bps-read-max burst period, in seconds",
+> -        },{
+> -            .name = "throttling.bps-write-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the bps-write-max burst period, in seconds",
+> -        },{
+> -            .name = "throttling.iops-size",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "when limiting by iops max size of an I/O in bytes",
+> -        },{
+> +        },
+> +            THROTTLE_OPTS,
+> +          {
+
+Indent nit ^^. Also this could be surrounded by some empty lines as you
+did in fsdev/qemu-fsdev-opts.c below.
+
+I wouldn't ask you to send a v17 for this though and I've updated your
+patch instead. I've also added Stefan's and Berto's Reviewed-by, and
+pushed the whole series to my 9p-next tree at:
+
+https://github.com/gkurz/qemu/commits/9p-next
+
+Cheers.
+
+--
+Greg
+
+>              .name = "throttling.group",
+>              .type = QEMU_OPT_STRING,
+>              .help = "name of the block throttling group",
+> diff --git a/fsdev/qemu-fsdev-opts.c b/fsdev/qemu-fsdev-opts.c
+> index 385423f0..bf57130 100644
+> --- a/fsdev/qemu-fsdev-opts.c
+> +++ b/fsdev/qemu-fsdev-opts.c
+> @@ -9,6 +9,7 @@
+>  #include "qemu/config-file.h"
+>  #include "qemu/option.h"
+>  #include "qemu/module.h"
+> +#include "qemu/throttle-options.h"
 >  
->  enum {
-> -    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
-> -    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
-> -    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
-> +    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
-> +    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
-> +    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
-> +    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
+>  static QemuOptsList qemu_fsdev_opts = {
+>      .name = "fsdev",
+> @@ -37,83 +38,10 @@ static QemuOptsList qemu_fsdev_opts = {
+>          }, {
+>              .name = "sock_fd",
+>              .type = QEMU_OPT_NUMBER,
+> -        }, {
+> -            .name = "throttling.iops-total",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit total I/O operations per second",
+> -        }, {
+> -            .name = "throttling.iops-read",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit read operations per second",
+> -        }, {
+> -            .name = "throttling.iops-write",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit write operations per second",
+> -        }, {
+> -            .name = "throttling.bps-total",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit total bytes per second",
+> -        }, {
+> -            .name = "throttling.bps-read",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit read bytes per second",
+> -        }, {
+> -            .name = "throttling.bps-write",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "limit write bytes per second",
+> -        }, {
+> -            .name = "throttling.iops-total-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "I/O operations burst",
+> -        }, {
+> -            .name = "throttling.iops-read-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "I/O operations read burst",
+> -        }, {
+> -            .name = "throttling.iops-write-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "I/O operations write burst",
+> -        }, {
+> -            .name = "throttling.bps-total-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "total bytes burst",
+> -        }, {
+> -            .name = "throttling.bps-read-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "total bytes read burst",
+> -        }, {
+> -            .name = "throttling.bps-write-max",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "total bytes write burst",
+> -        }, {
+> -            .name = "throttling.iops-total-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the iops-total-max burst period, in seconds",
+> -        }, {
+> -            .name = "throttling.iops-read-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the iops-read-max burst period, in seconds",
+> -        }, {
+> -            .name = "throttling.iops-write-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the iops-write-max burst period, in seconds",
+> -        }, {
+> -            .name = "throttling.bps-total-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the bps-total-max burst period, in seconds",
+> -        }, {
+> -            .name = "throttling.bps-read-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the bps-read-max burst period, in seconds",
+> -        }, {
+> -            .name = "throttling.bps-write-max-length",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "length of the bps-write-max burst period, in seconds",
+> -        }, {
+> -            .name = "throttling.iops-size",
+> -            .type = QEMU_OPT_NUMBER,
+> -            .help = "when limiting by iops max size of an I/O in bytes",
+>          },
+> +
+> +        THROTTLE_OPTS,
+> +
+>          { /*End of list */ }
+>      },
 >  };
->  
->  enum {
-> @@ -242,13 +246,15 @@ void bios_linker_loader_add_checksum(BIOSLinker *linker, const char *file_name,
->   * @src_offset: location within source file blob to which
->   *              @dest_file+@dst_patched_offset will point to after
->   *              firmware's executed ADD_POINTER command
-> + * @write_back: guest should write change contents back to QEMU after patching
->   */
->  void bios_linker_loader_add_pointer(BIOSLinker *linker,
->                                      const char *dest_file,
->                                      uint32_t dst_patched_offset,
->                                      uint8_t dst_patched_size,
->                                      const char *src_file,
-> -                                    uint32_t src_offset)
-> +                                    uint32_t src_offset,
-> +                                    bool write_back)
->  {
->      uint64_t le_src_offset;
->      BiosLinkerLoaderEntry entry;
-
-Frankly I prefer a new bios_linker_loader_write_pointer.
-
-
-> @@ -257,8 +263,11 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
->      const BiosLinkerFileEntry *source_file =
->          bios_linker_find_file(linker, src_file);
->  
-> -    assert(dst_patched_offset < dst_file->blob->len);
-> -    assert(dst_patched_offset + dst_patched_size <= dst_file->blob->len);
-> +    /* dst_file need not exist if writing back */
-
-Why not?
-
-> +    if (!write_back) {
-> +        assert(dst_patched_offset < dst_file->blob->len);
-> +        assert(dst_patched_offset + dst_patched_size <= dst_file->blob->len);
-> +    }
->      assert(src_offset < source_file->blob->len);
->  
->      memset(&entry, 0, sizeof entry);
-> @@ -266,15 +275,19 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
->              sizeof entry.pointer.dest_file - 1);
->      strncpy(entry.pointer.src_file, src_file,
->              sizeof entry.pointer.src_file - 1);
-> -    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_ADD_POINTER);
-> +    entry.command = cpu_to_le32(write_back ?
-> +                                BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER :
-> +                                BIOS_LINKER_LOADER_COMMAND_ADD_POINTER);
->      entry.pointer.offset = cpu_to_le32(dst_patched_offset);
->      entry.pointer.size = dst_patched_size;
->      assert(dst_patched_size == 1 || dst_patched_size == 2 ||
->             dst_patched_size == 4 || dst_patched_size == 8);
->  
->      le_src_offset = cpu_to_le64(src_offset);
-> -    memcpy(dst_file->blob->data + dst_patched_offset,
-> -           &le_src_offset, dst_patched_size);
-> +    if (!write_back) {
-> +        memcpy(dst_file->blob->data + dst_patched_offset,
-> +               &le_src_offset, dst_patched_size);
-> +    }
->  
->      g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
->  }
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index 8e7d6ec..175996e 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -1266,7 +1266,7 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
->                               sizeof(NvdimmDsmIn), false /* high memory */);
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_TABLE_FILE, mem_addr_offset, sizeof(uint32_t),
-> -        NVDIMM_DSM_MEM_FILE, 0);
-> +        NVDIMM_DSM_MEM_FILE, 0, false);
->      build_header(linker, table_data,
->          (void *)(table_data->data + nvdimm_ssdt),
->          "SSDT", table_data->len - nvdimm_ssdt, 1, NULL, "NVDIMM");
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 07a10ac..a13f40d 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -380,7 +380,7 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
->      /* Address to be filled by Guest linker */
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
-> -        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
-> +        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset, false);
->  
->      /* Checksum to be filled by Guest linker */
->      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> @@ -684,7 +684,7 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
->      /* DSDT address to be filled by Guest linker */
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
-> -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> +        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset, false);
->  
->      build_header(linker, table_data,
->                   (void *)fadt, "FACP", sizeof(*fadt), 5, NULL, NULL);
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 1c928ab..78a1d84 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -319,13 +319,13 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
->      /* FACS address to be filled by Guest linker */
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_TABLE_FILE, fw_ctrl_offset, sizeof(fadt->firmware_ctrl),
-> -        ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
-> +        ACPI_BUILD_TABLE_FILE, facs_tbl_offset, false);
->  
->      /* DSDT address to be filled by Guest linker */
->      fadt_setup(fadt, pm);
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
-> -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> +        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset, false);
->  
->      build_header(linker, table_data,
->                   (void *)fadt, "FACP", sizeof(*fadt), 1, oem_id, oem_table_id);
-> @@ -2262,7 +2262,7 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->      /* log area start address to be filled by Guest linker */
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_TABLE_FILE, log_addr_offset, log_addr_size,
-> -        ACPI_BUILD_TPMLOG_FILE, 0);
-> +        ACPI_BUILD_TPMLOG_FILE, 0, false);
->  
->      build_header(linker, table_data,
->                   (void *)tcpa, "TCPA", sizeof(*tcpa), 2, NULL, NULL);
-> @@ -2552,7 +2552,7 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
->      /* Address to be filled by Guest linker */
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
-> -        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
-> +        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset, false);
->  
->      /* Checksum to be filled by Guest linker */
->      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
-> index fa1e5d1..d97e39d 100644
-> --- a/include/hw/acpi/bios-linker-loader.h
-> +++ b/include/hw/acpi/bios-linker-loader.h
-> @@ -24,7 +24,8 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
->                                      uint32_t dst_patched_offset,
->                                      uint8_t dst_patched_size,
->                                      const char *src_file,
-> -                                    uint32_t src_offset);
-> +                                    uint32_t src_offset,
-> +                                    bool write_back);
->  
->  void bios_linker_loader_cleanup(BIOSLinker *linker);
->  #endif
-> -- 
-> 2.7.4
+> diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
+> new file mode 100644
+> index 0000000..3133d1c
+> --- /dev/null
+> +++ b/include/qemu/throttle-options.h
+> @@ -0,0 +1,92 @@
+> +/*
+> + * QEMU throttling command line options
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * (at your option) any later version.
+> + *
+> + * See the COPYING file in the top-level directory for details.
+> + *
+> + */
+> +#ifndef THROTTLE_OPTIONS_H
+> +#define THROTTLE_OPTIONS_H
+> +
+> +#define THROTTLE_OPTS \
+> +          { \
+> +            .name = "throttling.iops-total",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "limit total I/O operations per second",\
+> +        },{ \
+> +            .name = "throttling.iops-read",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "limit read operations per second",\
+> +        },{ \
+> +            .name = "throttling.iops-write",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "limit write operations per second",\
+> +        },{ \
+> +            .name = "throttling.bps-total",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "limit total bytes per second",\
+> +        },{ \
+> +            .name = "throttling.bps-read",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "limit read bytes per second",\
+> +        },{ \
+> +            .name = "throttling.bps-write",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "limit write bytes per second",\
+> +        },{ \
+> +            .name = "throttling.iops-total-max",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "I/O operations burst",\
+> +        },{ \
+> +            .name = "throttling.iops-read-max",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "I/O operations read burst",\
+> +        },{ \
+> +            .name = "throttling.iops-write-max",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "I/O operations write burst",\
+> +        },{ \
+> +            .name = "throttling.bps-total-max",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "total bytes burst",\
+> +        },{ \
+> +            .name = "throttling.bps-read-max",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "total bytes read burst",\
+> +        },{ \
+> +            .name = "throttling.bps-write-max",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "total bytes write burst",\
+> +        },{ \
+> +            .name = "throttling.iops-total-max-length",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "length of the iops-total-max burst period, in seconds",\
+> +        },{ \
+> +            .name = "throttling.iops-read-max-length",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "length of the iops-read-max burst period, in seconds",\
+> +        },{ \
+> +            .name = "throttling.iops-write-max-length",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "length of the iops-write-max burst period, in seconds",\
+> +        },{ \
+> +            .name = "throttling.bps-total-max-length",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "length of the bps-total-max burst period, in seconds",\
+> +        },{ \
+> +            .name = "throttling.bps-read-max-length",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "length of the bps-read-max burst period, in seconds",\
+> +        },{ \
+> +            .name = "throttling.bps-write-max-length",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "length of the bps-write-max burst period, in seconds",\
+> +        },{ \
+> +            .name = "throttling.iops-size",\
+> +            .type = QEMU_OPT_NUMBER,\
+> +            .help = "when limiting by iops max size of an I/O in bytes",\
+> +        }
+> +
+> +#endif
