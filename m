@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1caYuu-0000WS-RN
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 21:20:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1caZT5-0004C2-VL
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 21:55:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1caYut-0002Kp-KY
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 21:20:32 -0500
-Date: Mon, 6 Feb 2017 13:20:20 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170206022020.GG17644@umbus.fritz.box>
-References: <1486159277-25949-1-git-send-email-joserz@linux.vnet.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1caZT2-0005iT-OQ
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 21:55:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45418)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1caZT2-0005iL-Is
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 21:55:48 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1caZT0-0001l2-Mp
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 02:55:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E4B4E2E80CC
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 02:55:44 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3607uds81ZQvwCD0"
-Content-Disposition: inline
-In-Reply-To: <1486159277-25949-1-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] POWER9 TCG enablements - part 13
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Feb 2017 02:45:35 -0000
+From: wayen <1662050@bugs.launchpad.net>
+Reply-To: Bug 1662050 <1662050@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1662050] [NEW] qemu-img convert a delta qcow2
+ image into a complete image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, nikunj@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+
+Public bug reported:
+
+I have a base image file "base.qcow2" and a delta qcow2 image file
+"delta.qcow2" whose backing file is "base.qcow2".
+
+Now I use qemu-img to convert "delta.qcow2" and will get a new image
+file "new.qcow2" which is complete and equivalent to combination of
+"base.qcow2" and "delta.qcow2".
+
+In fact, i just want to convert the delta qcow2 image file and get a new
+delta overlay qcow2 image file. So the "new.qcow2" is not what i want. I
+have to admit that this is not bug. Could you please take this as a new
+feature and enable qemu-img to convert images in-place?
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 
---3607uds81ZQvwCD0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Tags: feature
 
-On Fri, Feb 03, 2017 at 08:01:13PM -0200, Jose Ricardo Ziviani wrote:
-> This set contains 4 new instructions
->=20
-> xsrqpi[x] - VSX Scalar Round to Quad-Precision Integer
-> xsrqpxp - VSX Scalar Round Quad-Precision to Double-Extended Precision
-> xssqrtqp - VSX Scalar Square Root Quad-Precision
-> xssubqp - VSX Scalar Subtract Quad-Precision
->=20
-> Note:
->  - xssqrtqpo and xssubqpo will be implemented when round-to-odd is
-> ready.
+-- =
 
-Applied to ppc-for-2.9.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1662050
 
-Note that I haven't reviewed these particularly closely.  Since
-they're new instructions, I figure it won't cause a regression, even
-if they're buggy.
+Title:
+  qemu-img convert a delta qcow2 image into a complete image
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Status in QEMU:
+  New
 
---3607uds81ZQvwCD0
-Content-Type: application/pgp-signature; name="signature.asc"
+Bug description:
+  I have a base image file "base.qcow2" and a delta qcow2 image file
+  "delta.qcow2" whose backing file is "base.qcow2".
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+  Now I use qemu-img to convert "delta.qcow2" and will get a new image
+  file "new.qcow2" which is complete and equivalent to combination of
+  "base.qcow2" and "delta.qcow2".
 
-iQIcBAEBCAAGBQJYl91kAAoJEGw4ysog2bOSiMsP/jO1ACOsoAdcflm1JDDCchQp
-Jy/cH5YjwjOiktrZT1AnBQaWAbidreeQFN8qjo8f4Qn9bdr67qM9ADQQhZFjC0uS
-vxZOUhPc4eGFgeLdNRS71iOGOkrVbF7JvLcuU527JlKSrW5japbaJshbKdV3sCmv
-JcphlaumVJOYBfS6fnFnwxOffnWNOYRnHzDMzgpPv6yst9CE8LVeYOFE/ELUXDHg
-Hb4op2fJgWMhVBbHDXyN+p3EJVu9pnAW3DYP+OO0MQufDF4kkkHNYyTih8TJhiHC
-UVluvC6erXk3jZbAbTTfcpURl9UM5AkQK92omCVxRPeqbamv4CPUVW9KQcRZS1Np
-OCvLOpqAQz55PUN9aTrINYvfAvRIGzpisnnGX3hYuKX8PBj4CnQ7UoMU+mwoiWdZ
-pcn9V+itq1vH7AeML/d7el5J/qcuUFr5aud8pxoS3tU89ESiopipiUr2E5qZM6eg
-sIFmGJGHNrfFWwQ1syRS5g0riyPQqORO/igxKOHuOkPnfalmK19vhsknRi/Om1ut
-l4/9iz5GSiNMlgHVINkaVyC0kJ0or+VjFVpTpItePYDcIqgeChliqC1qiaoQGke9
-sxNDST96LAuaFDCJsx8+7r2AXLa9xL6Ooy+ybRgXSnikuyCkY/79eQ4Rz/m+r+Uz
-lWUL7Xrzdty/rJeLA2GS
-=qWOm
------END PGP SIGNATURE-----
+  In fact, i just want to convert the delta qcow2 image file and get a
+  new delta overlay qcow2 image file. So the "new.qcow2" is not what i
+  want. I have to admit that this is not bug. Could you please take this
+  as a new feature and enable qemu-img to convert images in-place?
 
---3607uds81ZQvwCD0--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1662050/+subscriptions
