@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cahgo-0005NV-K4
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:42:35 -0500
+	(envelope-from <berto@igalia.com>) id 1cahhC-0005eD-7L
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cahgl-0007eP-CN
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:42:34 -0500
-Resent-Message-Id: <E1cahgl-0007eP-CN@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21445)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cahgl-0007eF-4l
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:42:31 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1486380501-13431-1-git-send-email-kraxel@redhat.com>
-Message-ID: <148638134706.33.9393926889067164709@eba24e3a0d7f>
+	(envelope-from <berto@igalia.com>) id 1cahh8-0007kR-RC
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:42:58 -0500
+Received: from smtp3.mundo-r.com ([212.51.32.191]:50087 helo=smtp4.mundo-r.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berto@igalia.com>) id 1cahh8-0007aM-JY
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:42:54 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170206112953.16993-1-berrange@redhat.com>
+References: <20170206112953.16993-1-berrange@redhat.com>
+Date: Mon, 06 Feb 2017 12:42:16 +0100
+Message-ID: <w51o9yfeeav.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 6 Feb 2017 03:42:27 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/9] usb: various bugfixes, mostly xhci.
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] rules: don't try to create missing include
+ dirs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +26,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzldIHVzYjogdmFyaW91cyBidWdmaXhlcywgbW9z
-dGx5IHhoY2kuCk1lc3NhZ2UtaWQ6IDE0ODYzODA1MDEtMTM0MzEtMS1naXQtc2VuZC1lbWFpbC1r
-cmF4ZWxAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
-QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
-ZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRz
-PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
-bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
-IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
-bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
-aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
-bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
-amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NjM4MDUwMS0xMzQzMS0x
-LWdpdC1zZW5kLWVtYWlsLWtyYXhlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4NjM4MDUwMS0x
-MzQzMS0xLWdpdC1zZW5kLWVtYWlsLWtyYXhlbEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3
-IGJyYW5jaCAndGVzdCcKNGRiZDBkMSB4aGNpOiBmaXggZXZlbnQgcXVldWUgSVJRIGhhbmRsaW5n
-CmMyZTE1MWIgdXNiOiBjY2lkOiBjaGVjayBjY2lkIGFwZHUgbGVuZ3RoCmQyZTM5NmMgeGhjaTog
-Z3VhcmQgeGhjaV9raWNrX2VwY3R4IGFnYWluc3QgcmVjdXJzaXZlIGNhbGxzCjhmMDQzOTcgeGhj
-aTogZG9uJ3Qga2ljayBpbiB4aGNpX3N1Ym1pdCBhbmQgeGhjaV9maXJlX2N0bF90cmFuc2Zlcgox
-MzYxZmM5IHhoY2k6IHJlbmFtZSB4aGNpX2NvbXBsZXRlX3BhY2tldCB0byB4aGNpX3RyeV9jb21w
-bGV0ZV9wYWNrZXQKOTNjZDVkNCB4aGNpOiBvbmx5IGZyZWUgY29tcGxldGVkIHRyYW5zZmVycwo4
-MWZhYzE3IHVzYjogYWNjZXB0IHVzYjMgY29udHJvbCByZXF1ZXN0cwozNmZlYzA4IHVzYi91YXM6
-IG1vcmUgdmVyYm9zZSBlcnJvciBtZXNzYWdlCmVjZjhmYjQgaHcvdXNiL2Rldi1oaWQ6IEltcHJv
-dmUgZ3Vlc3QgY29tcGF0aWJpbGl0eSBvZiB1c2ItdGFibGV0Cgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzk6IGh3L3VzYi9kZXYtaGlkOiBJbXByb3ZlIGd1ZXN0IGNvbXBh
-dGliaWxpdHkgb2YgdXNiLXRhYmxldC4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
-IHVzZSB0YWJzCiM1MzogRklMRTogaHcvdXNiL2Rldi1oaWQuYzo0OTA6CisgICAgMHgwOSwgMHgw
-MixeSV5JLyogVXNhZ2UgKE1vdXNlKSAqLyQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
-MjQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-Q2hlY2tpbmcgUEFUQ0ggMi85OiB1c2IvdWFzOiBtb3JlIHZlcmJvc2UgZXJyb3IgbWVzc2FnZS4u
-LgpDaGVja2luZyBQQVRDSCAzLzk6IHVzYjogYWNjZXB0IHVzYjMgY29udHJvbCByZXF1ZXN0cy4u
-LgpDaGVja2luZyBQQVRDSCA0Lzk6IHhoY2k6IG9ubHkgZnJlZSBjb21wbGV0ZWQgdHJhbnNmZXJz
-Li4uCkNoZWNraW5nIFBBVENIIDUvOTogeGhjaTogcmVuYW1lIHhoY2lfY29tcGxldGVfcGFja2V0
-IHRvIHhoY2lfdHJ5X2NvbXBsZXRlX3BhY2tldC4uLgpDaGVja2luZyBQQVRDSCA2Lzk6IHhoY2k6
-IGRvbid0IGtpY2sgaW4geGhjaV9zdWJtaXQgYW5kIHhoY2lfZmlyZV9jdGxfdHJhbnNmZXIuLi4K
-Q2hlY2tpbmcgUEFUQ0ggNy85OiB4aGNpOiBndWFyZCB4aGNpX2tpY2tfZXBjdHggYWdhaW5zdCBy
-ZWN1cnNpdmUgY2FsbHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC85OiB1c2I6IGNjaWQ6IGNoZWNrIGNj
-aWQgYXBkdSBsZW5ndGguLi4KQ2hlY2tpbmcgUEFUQ0ggOS85OiB4aGNpOiBmaXggZXZlbnQgcXVl
-dWUgSVJRIGhhbmRsaW5nLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Mon 06 Feb 2017 12:29:53 PM CET, "Daniel P. Berrange" wrote:
+
+> Rather than trying to workaround this, just revert the code that
+> attempted to mkdir the missing include directories. Instead just turn
+> off the compiler warning in question as the missing dir is expected &
+> harmless in general.
+>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+
+Tested-by: Alberto Garcia <berto@igalia.com>
+
+Berto
