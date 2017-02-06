@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gauravs.2010@gmail.com>) id 1cacKR-0004Jx-99
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 00:59:08 -0500
+	(envelope-from <armbru@redhat.com>) id 1cacjE-0007Bu-SF
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 01:24:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gauravs.2010@gmail.com>) id 1cacKQ-00051x-O8
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 00:59:07 -0500
-Received: from mail-ua0-x22c.google.com ([2607:f8b0:400c:c08::22c]:35397)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gauravs.2010@gmail.com>)
-	id 1cacKQ-00051j-Im
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 00:59:06 -0500
-Received: by mail-ua0-x22c.google.com with SMTP id y9so53810703uae.2
-	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 21:59:06 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1cacjE-0005Dg-24
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 01:24:44 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org> <20170204122150.GA15362@lemon>
+	<871sve13l4.fsf@dusky.pond.sub.org> <20170204141056.GB15362@lemon>
+Date: Mon, 06 Feb 2017 07:24:34 +0100
+In-Reply-To: <20170204141056.GB15362@lemon> (Fam Zheng's message of "Sat, 4
+	Feb 2017 22:10:56 +0800")
+Message-ID: <87a89zx2e5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-From: Gaurav Sharma <gauravs.2010@gmail.com>
-Date: Mon, 6 Feb 2017 11:28:24 +0530
-Message-ID: <CABiB5K4pvPnNmi7q=e=PXaanMNq7QYrqZgdWLX4VRhqyR_k+LQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] Query for PCI burst support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,10 +23,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Is it possible to generate a PCIe burst of greater than 2dw for any MMIO.
-I see we have limit of max 2dw operation for any MemoryRegion defined by
-the max access size.
+Fam Zheng <famz@redhat.com> writes:
 
---Thanks
+> On Sat, 02/04 14:35, Markus Armbruster wrote:
+>> Fam Zheng <famz@redhat.com> writes:
+>> 
+>> > On Thu, 02/02 20:42, Markus Armbruster wrote:
+>> >> === Comparison ===
+>> >> 
+>> >> In my opinion, dotted keys are weird and ugly, but at least they don't
+>> >> add to the quoting mess.  Structured values look better, except when
+>> >> they do add to the quoting mess.
+>> >> 
+>> >> I'm having a hard time deciding which one I like less :)
+>> >> 
+>> >> Opinions?  Other ideas?
+>> >
+>> > Here's my poor attempt:
+>> >
+>> > The dotted syntax, as the simpler of two, can cover everyday use very well.  If
+>> > we introduce an "@reference" extension to it which can help the expresiveness,
+>> > we can have a hybrid solution. It's not the cleanest interface and syntax, but
+>> > escaping, nesting and quoting can all be divide-and-conqured in their optimal way.
+>> > What I'm imagining is something like:
+>> >
+>> >     -json "id=children0,text=[
+>> >                 { 'driver': 'null-co://' },
+>> >                 { 'driver': 'null-co://' },
+>> >                 { 'driver': 'null-co://' }
+>> >             ]" \
+>> >     -dot \
+>> >       id=quorum0,driver=quorum,read-pattern=fifo,vote-threshold=1,children=@children0 \
+>> >     -drive if=virtio,id=primary-disk0,driver=qcow2,file=@quorum0
+>> >
+>> > IOW "-json" and "-dot" define options that is intended to be referenced from
+>> > other dotted keys (quorum0 uses children0, and in turn primary-disk0 uses
+>> > quorum0).
+>> >
+>> > Note: "-dot" here could be replaced with a -blockdev in this specific case but
+>> > I'm demostrating it just in case it is useful generically.
+>> >
+>> > Fam
+>> 
+>> KEY=@REF for references creates the same issue as KEY=[VALUE,...] for
+>> arrays: you need to know the type of KEY to decide whether @REF is a
+>> reference or a string, unless we outlaw strings starting with '@'.
+>> 
+>> Not a show-stopper, but it does preclude a design where a simple parser
+>> feeds into a type-aware visitor, which is how the JSON -> QObject ->
+>> QAPI pipeline works.
+>> 
+>> If you get creative in the VALUE part, you complicate the parser and/or
+>> need to add quoting.
+>> 
+>> If you get creative in the KEY part, you need to restrict valid names.
+>
+> How about KEY@=REF?
+
+Requires outlawing KEYs ending with '@'.  QAPI outlaws such names
+already.  QOM doesn't, but I figure no such names exist so far.
