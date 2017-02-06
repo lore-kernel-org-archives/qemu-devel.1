@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1capMj-0004FE-F1
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 14:54:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1capXF-0000EE-U2
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:05:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1capMi-0006ke-Pu
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 14:54:21 -0500
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-	<20170203154757.36140-2-vsementsov@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1capXB-0002Cp-Kx
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:05:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58446)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1capXB-0002CJ-Cq
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:05:09 -0500
+References: <20170206153113.27729-1-alex.bennee@linaro.org>
+	<CAJhHMCCHhZ6JnH=NaZ=htb259pCCp4ooHixuj-UxWywF0ug8mw@mail.gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <8cac924a-44a7-116c-3d20-f37fe4ece46e@redhat.com>
-Date: Mon, 6 Feb 2017 13:54:13 -0600
+Message-ID: <23242d7d-c25c-9486-a845-47b58867b543@redhat.com>
+Date: Mon, 6 Feb 2017 14:05:00 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170203154757.36140-2-vsementsov@virtuozzo.com>
+In-Reply-To: <CAJhHMCCHhZ6JnH=NaZ=htb259pCCp4ooHixuj-UxWywF0ug8mw@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="NVX1jkdrSN7KIxgisRJpDe4jAopWxVohJ"
-Subject: Re: [Qemu-devel] [PATCH 01/18] nbd: rename NBD_REPLY_MAGIC to
- NBD_SIMPLE_REPLY_MAGIC
+	boundary="rq7mK4tlf5Nvmo0HAr0LQNrAadaFuHoEk"
+Subject: Re: [Qemu-devel] [PATCH v10 00/23] MTTCG Base enabling patches with
+ ARM enablement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
+To: Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: MTTCG Devel <mttcg@greensocs.com>, Peter Maydell <peter.maydell@linaro.org>, nikunj@linux.vnet.ibm.com, Jan Kiszka <jan.kiszka@siemens.com>, Mark Burton <mark.burton@greensocs.com>, alvise rigo <a.rigo@virtualopensystems.com>, qemu-devel <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Sergey Fedorov <serge.fdrv@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NVX1jkdrSN7KIxgisRJpDe4jAopWxVohJ
+--rq7mK4tlf5Nvmo0HAr0LQNrAadaFuHoEk
 From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
- pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
- stefanha@redhat.com
-Message-ID: <8cac924a-44a7-116c-3d20-f37fe4ece46e@redhat.com>
-Subject: Re: [PATCH 01/18] nbd: rename NBD_REPLY_MAGIC to
- NBD_SIMPLE_REPLY_MAGIC
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
- <20170203154757.36140-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20170203154757.36140-2-vsementsov@virtuozzo.com>
+To: Pranith Kumar <bobby.prani@gmail.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: MTTCG Devel <mttcg@greensocs.com>,
+ Peter Maydell <peter.maydell@linaro.org>, nikunj@linux.vnet.ibm.com,
+ Jan Kiszka <jan.kiszka@siemens.com>, Mark Burton
+ <mark.burton@greensocs.com>, alvise rigo <a.rigo@virtualopensystems.com>,
+ qemu-devel <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>,
+ Sergey Fedorov <serge.fdrv@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>,
+ =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>
+Message-ID: <23242d7d-c25c-9486-a845-47b58867b543@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v10 00/23] MTTCG Base enabling patches with
+ ARM enablement
+References: <20170206153113.27729-1-alex.bennee@linaro.org>
+ <CAJhHMCCHhZ6JnH=NaZ=htb259pCCp4ooHixuj-UxWywF0ug8mw@mail.gmail.com>
+In-Reply-To: <CAJhHMCCHhZ6JnH=NaZ=htb259pCCp4ooHixuj-UxWywF0ug8mw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-> To be consistent when NBD_STRUCTURED_REPLY_MAGIC will be introduced.
+On 02/06/2017 01:06 PM, Pranith Kumar wrote:
+
+>> A version of the tree can be found at:
+>>
+>>   https://github.com/stsquad/qemu/tree/mttcg/base-patches-v10
+>>
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  nbd/client.c                             | 4 ++--
->  nbd/nbd-internal.h                       | 2 +-
->  nbd/server.c                             | 4 ++--
->  tests/qemu-iotests/nbd-fault-injector.py | 4 ++--
->  4 files changed, 7 insertions(+), 7 deletions(-)
+> I've sent my Reviewed-by/tested-by for v9 but those seem to be lost.
+> I've tested v10 too.
+>=20
+> So please add my tested and reviewed tags:
+>=20
+> Tested-and-Reviewed-by: Pranith Kumar <bobby.prani@gmail.com>
 
-Mechanical, and makes sense.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I don't know if all the tools honor this spelling; but if it were me,
+I'd assume it is better to split it into two lines, one for Tested-by:
+and the other for Reviewed-by:
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---NVX1jkdrSN7KIxgisRJpDe4jAopWxVohJ
+--rq7mK4tlf5Nvmo0HAr0LQNrAadaFuHoEk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -75,13 +88,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYmNRlAAoJEKeha0olJ0NqhMIH/jc//TEQrzN1Yb6wsDqdgToU
-07koMvioYQakJNV5OI7jcVow40vMhnHM1gX13c6Ck2Axb0AkuIR1CwWlRxwlTdGk
-/OupsZfguXsL5rit3FkckHM0lcx6+sQqJ8V1M4hb9McgxHjcQazGxqCVHUAgSv8i
-/XBhTcrRPHJng2cg3aQF1tOwOlkWxM/YeIIslxvhcGCVuUvHn7ujSWlzQ60Ec5AG
-fi1n76OiAWa5d7NrEzena69Xwb0mCO39dQO5j88UH8GkMgTe/StF56BrzjK2MXcS
-CmOh/Du/jC0fqp8xXaI3kzusycwx2smZHI6oLSkxhP0cV63KJKQ1VnNjG8rmaco=
-=AKya
+iQEcBAEBCAAGBQJYmNbsAAoJEKeha0olJ0NqAjIH/i/dSv9SRtm0KR+0nNsOkhJR
+EJD8pbzD/h9rHdl1PZyjyEm+w/ATC6eFbWtot5chU+f7IHB94XdZAsJzlslO+k90
+v9HwUwYsgbGX0YnR7Gpz+LSExNjSd6x/cXdSOebjalggy6TmXj3mVEWGYGEeZzQV
+kqaadn0apQ9USvYZbkrVxDCXjYRCwj4Fo6dV788j29UBVDpi+a5q5Oznt+nW2GMU
+yOELjQKq6zwnUsxudAF4wJDTAp09/V5S64B4WT04EkIirt8N4FV6RHrD/bp6E20n
+iodisImOPN81nnIauLTC/UBPxZUrSTafdu0CXuI0XIKK0A+b+2YzgFe7Yv1IDs4=
+=Ubkb
 -----END PGP SIGNATURE-----
 
---NVX1jkdrSN7KIxgisRJpDe4jAopWxVohJ--
+--rq7mK4tlf5Nvmo0HAr0LQNrAadaFuHoEk--
