@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1caYHJ-0004cY-HM
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 20:39:38 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1caYHM-0004dF-40
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 20:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1caYHI-00008U-FK
-	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 20:39:37 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1caYHI-00008A-14
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 20:39:40 -0500
+Received: from ozlabs.org ([103.22.144.67]:45793)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1caYHH-00007t-L6
+	for qemu-devel@nongnu.org; Sun, 05 Feb 2017 20:39:35 -0500
+Date: Mon, 6 Feb 2017 12:27:41 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  6 Feb 2017 12:39:26 +1100
-Message-Id: <20170206013927.13693-3-david@gibson.dropbear.id.au>
-In-Reply-To: <20170206013927.13693-1-david@gibson.dropbear.id.au>
-References: <20170206013927.13693-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 2/3] Allow ISA bus to be configured out
+Message-ID: <20170206012741.GC17644@umbus.fritz.box>
+References: <1486110164-13797-1-git-send-email-peterx@redhat.com>
+	<1486110164-13797-2-git-send-email-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="lMM8JwqTlfDpEaS6"
+Content-Disposition: inline
+In-Reply-To: <1486110164-13797-2-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 01/18] vfio: trace map/unmap for notify
+ as well
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,94 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, edgar.iglesias@gmail.com, michael@walle.cc, proljc@gmail.com, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, kbastian@mail.uni-paderborn.de, jcmvbkbc@gmail.com, veroniabahaa@gmail.com, mst@redhat.com, armbru@redhat.com, agraf@suse.de, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-Currently, the code to handle the legacy ISA bus is always included in
-qemu.  However there are lots of platforms that don't include ISA legacy
-devies, and quite a few that have never used ISA legacy devices at all.
 
-This patch allows the ISA bus code to be disabled in the configuration for
-platforms where it doesn't make sense.
+--lMM8JwqTlfDpEaS6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-For now, the default configs are adjusted to include ISA on all platforms
-including PCI: anything with PCI can at least in principle add an i82378
-PCI->ISA bridge.  Also, CONFIG_IDE_CORE which is already in pci.mak
-requires ISA support.
+On Fri, Feb 03, 2017 at 04:22:27PM +0800, Peter Xu wrote:
+> We traces its range, but we don't know whether it's a MAP/UNMAP. Let's
+> dump it as well.
+>=20
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-We also explicitly enable ISA on some other non-PCI platforms which include
-ISA devices: moxie, sparc and unicore32.  We may want to pare this down in
-future.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-The platforms that will lose ISA by default are: cris, lm32, microblazeel,
-microblaze, openrisc, s390x, tricore, xtensaeb, xtensa.  As far as I can
-tell none of these ever used ISA.
+> ---
+>  hw/vfio/common.c     | 3 ++-
+>  hw/vfio/trace-events | 2 +-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 801578b..174f351 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -305,7 +305,8 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, I=
+OMMUTLBEntry *iotlb)
+>      void *vaddr;
+>      int ret;
+> =20
+> -    trace_vfio_iommu_map_notify(iova, iova + iotlb->addr_mask);
+> +    trace_vfio_iommu_map_notify(iotlb->perm =3D=3D IOMMU_NONE ? "UNMAP" =
+: "MAP",
+> +                                iova, iova + iotlb->addr_mask);
+> =20
+>      if (iotlb->target_as !=3D &address_space_memory) {
+>          error_report("Wrong target AS \"%s\", only system memory is allo=
+wed",
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index 8de8281..2561c6d 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -84,7 +84,7 @@ vfio_pci_igd_lpc_bridge_enabled(const char *name) "%s"
+>  # hw/vfio/common.c
+>  vfio_region_write(const char *name, int index, uint64_t addr, uint64_t d=
+ata, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
+>  vfio_region_read(char *name, int index, uint64_t addr, unsigned size, ui=
+nt64_t data) " (%s:region%d+0x%"PRIx64", %d) =3D 0x%"PRIx64
+> -vfio_iommu_map_notify(uint64_t iova_start, uint64_t iova_end) "iommu map=
+ @ %"PRIx64" - %"PRIx64
+> +vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova=
+_end) "iommu %s @ %"PRIx64" - %"PRIx64
+>  vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING re=
+gion_add %"PRIx64" - %"PRIx64
+>  vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add=
+ [iommu] %"PRIx64" - %"PRIx64
+>  vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, voi=
+d *vaddr) "region_add [ram] %"PRIx64" - %"PRIx64" [%p]"
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
----
- default-configs/moxie-softmmu.mak     | 1 +
- default-configs/pci.mak               | 2 ++
- default-configs/sparc-softmmu.mak     | 1 +
- default-configs/unicore32-softmmu.mak | 1 +
- hw/isa/Makefile.objs                  | 2 +-
- 5 files changed, 6 insertions(+), 1 deletion(-)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-diff --git a/default-configs/moxie-softmmu.mak b/default-configs/moxie-softmmu.mak
-index 7e22863..e00d099 100644
---- a/default-configs/moxie-softmmu.mak
-+++ b/default-configs/moxie-softmmu.mak
-@@ -1,5 +1,6 @@
- # Default configuration for moxie-softmmu
- 
-+CONFIG_ISA_BUS=y
- CONFIG_MC146818RTC=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index d8d6548..60dc651 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -1,4 +1,6 @@
- CONFIG_PCI=y
-+# For now, CONFIG_IDE_CORE requires ISA, so we enable it here
-+CONFIG_ISA_BUS=y
- CONFIG_VIRTIO_PCI=y
- CONFIG_VIRTIO=y
- CONFIG_USB_UHCI=y
-diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
-index ab796b3..004b0f4 100644
---- a/default-configs/sparc-softmmu.mak
-+++ b/default-configs/sparc-softmmu.mak
-@@ -1,5 +1,6 @@
- # Default configuration for sparc-softmmu
- 
-+CONFIG_ISA_BUS=y
- CONFIG_ECC=y
- CONFIG_ESP=y
- CONFIG_ESCC=y
-diff --git a/default-configs/unicore32-softmmu.mak b/default-configs/unicore32-softmmu.mak
-index de38577..5f6c4a8 100644
---- a/default-configs/unicore32-softmmu.mak
-+++ b/default-configs/unicore32-softmmu.mak
-@@ -1,4 +1,5 @@
- # Default configuration for unicore32-softmmu
-+CONFIG_ISA_BUS=y
- CONFIG_PUV3=y
- CONFIG_PTIMER=y
- CONFIG_PCKBD=y
-diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
-index 9164556..fb37c55 100644
---- a/hw/isa/Makefile.objs
-+++ b/hw/isa/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-y += isa-bus.o
-+common-obj-$(CONFIG_ISA_BUS) += isa-bus.o
- common-obj-$(CONFIG_APM) += apm.o
- common-obj-$(CONFIG_I82378) += i82378.o
- common-obj-$(CONFIG_PC87312) += pc87312.o
--- 
-2.9.3
+--lMM8JwqTlfDpEaS6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYl9ELAAoJEGw4ysog2bOS8HcQANZpZIKz80ejXAOZNUPHA+ae
+Ea9r/K1/QuIDDkBzcG2ZPrlloweLFpw+zD+8lNQqfIg1EeIvrlkuEe0O+gqE2b+M
+Sb3Zn/zdFqma0WWWHux3JQmtEEedzW+hnF2QNaO1N+pWouOdqzGoA+TAwNDExLip
+BlYsfGZx3P75cyzE6W1/EC+Je8P3syslGwGas8nSFwmYrR9PBWLYw9H4eL1tb/uJ
+cIu5Ep92P8wuZ4jqdctX2dpx2LFecjlfoFNDBmv3qcvBFYM6PjmSMLtasUUWCf8P
+m6QJbC8JVzIJGxePRs5mecCKvedF6AthW4QtvkBZfCeHgf/9sqlxgAo9Rn6ap9o9
+k6UyTZ6bK5cf6iu1tMQMoDqEFu+uhVDaB/vAYzbotCUuzEc5gxNWm3h1/Im9UoAu
+sxZcSeruXGqig1+ha0S1XU3CpINusVi1Ai7+p0qTroskTBMslMvoxSpr33WQIdDK
+SqtsbsDC691O8Ld5LzmOxxdSgfIrJtbrWw+16NCm2jijhCVacqZ++MpCxJxOXJGZ
+4ksgOv+WHhIimdTIIFUy1LkfvDBG3CfAhlYdK5Hd+EGS//B5nO9u8TY91D3VClvY
+IkZouLsu/xvrsRaX8lWorMzWQxfACw6gVaXHNjXOIJk4sE/3RaWEt1GVojyxNri5
+3EhqlkatHwgwCRTq4aTC
+=6KhO
+-----END PGP SIGNATURE-----
+
+--lMM8JwqTlfDpEaS6--
