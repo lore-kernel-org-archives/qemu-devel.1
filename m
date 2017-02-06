@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cadM8-0006VT-Sq
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:04:58 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cadgW-0000yk-6R
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cadM5-00057i-M0
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:04:56 -0500
-Received: from mail-yw0-x243.google.com ([2607:f8b0:4002:c05::243]:35395)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cadM5-00057W-Fk
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:04:53 -0500
-Received: by mail-yw0-x243.google.com with SMTP id l16so6306846ywb.2
-	for <qemu-devel@nongnu.org>; Sun, 05 Feb 2017 23:04:53 -0800 (PST)
-References: <20170125001041.14029-1-bobby.prani@gmail.com>
-	<24151c6e-2c30-ae82-9b91-aa1c6cad6e81@vivier.eu>
-From: Pranith Kumar <bobby.prani@gmail.com>
-In-reply-to: <24151c6e-2c30-ae82-9b91-aa1c6cad6e81@vivier.eu>
-Date: Mon, 06 Feb 2017 02:04:51 -0500
-Message-ID: <87wpd3pzos.fsf@gmail.com>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cadgT-0004A3-2y
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:26:00 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:47511)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cadgS-000466-FS
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:25:57 -0500
+References: <1485327241-15104-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1485327241-15104-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170131100528.GC2395@work-vm>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <589824D5.4070302@huawei.com>
+Date: Mon, 6 Feb 2017 15:25:09 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] linux-user: Add signal handling for
- x86_64
+In-Reply-To: <20170131100528.GC2395@work-vm>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] savevm: Add new helpers to process the
+ different stages of loadvm/savevm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,183 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Allan Wirth <awirth@akamai.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, amit.shah@redhat.com, quintela@redhat.com, Li Zhijian <lizhijian@cn.fujitsu.com>
 
+On 2017/1/31 18:05, Dr. David Alan Gilbert wrote:
+> * zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+>> There are several stages during loadvm/savevm process. In different stage,
+>> migration incoming processes different types of sections.
+>> We want to control these stages more accuracy, it will benefit COLO
+>> performance, we don't have to save type of QEMU_VM_SECTION_START
+>> sections everytime while do checkpoint, besides, we want to separate
+>> the process of saving/loading memory and devices state.
+>>
+>> So we add three new helper functions: qemu_loadvm_state_begin(),
+>> qemu_load_device_state() and qemu_savevm_live_state() to achieve
+>> different process during migration.
+>>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+> I don't think this one can go in without the patch that follows which
+> uses these functions; we don't normally add functions
+> without the patch that uses them.
+>
 
-Hi Laurent,
+Yes, this series is prerequisite for the later COLO optimization,
+that will be a bigger series, that's why i picked these two patches,
+but since it is irrational, I'll post these series with the later one
+where we use this functions. Thanks. :)
 
-Thanks for the review.
-
-Laurent Vivier writes:
-
-> Le 25/01/2017 à 01:10, Pranith Kumar a écrit :
->> Adopted from a previous patch posting:
->> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg02079.html
->> 
->> CC: Allan Wirth <awirth@akamai.com>
->> CC: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+> Dave
+>
 >> ---
->>  linux-user/signal.c      | 264 ++++++++++++++++++++++++++++++++++++++++-------
->>  target/i386/cpu.h        |   2 +
->>  target/i386/fpu_helper.c |  12 +++
->>  3 files changed, 242 insertions(+), 36 deletions(-)
->> 
->> diff --git a/linux-user/signal.c b/linux-user/signal.c
->> index 0a5bb4e26b..0248621d66 100644
->> --- a/linux-user/signal.c
->> +++ b/linux-user/signal.c
->> @@ -253,8 +253,7 @@ int do_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
->>      return 0;
->>  }
->>  
->> -#if !defined(TARGET_OPENRISC) && !defined(TARGET_UNICORE32) && \
->> -    !defined(TARGET_X86_64)
->> +#if !defined(TARGET_OPENRISC) && !defined(TARGET_UNICORE32)
->>  /* Just set the guest's signal mask to the specified value; the
->>   * caller is assumed to have called block_signals() already.
->>   */
->> @@ -512,7 +511,7 @@ void signal_init(void)
->>      }
->>  }
->>  
->> -#if !(defined(TARGET_X86_64) || defined(TARGET_UNICORE32))
->> +#ifndef TARGET_UNICORE32
->>  /* Force a synchronously taken signal. The kernel force_sig() function
->>   * also forces the signal to "not blocked, not ignored", but for QEMU
->>   * that work is done in process_pending_signals().
->> @@ -819,9 +818,8 @@ int do_sigaction(int sig, const struct target_sigaction *act,
->>      return ret;
->>  }
->>  
->> -#if defined(TARGET_I386) && TARGET_ABI_BITS == 32
->> -
->> -/* from the Linux kernel */
->> +#if defined(TARGET_I386)
->> +/* from the Linux kernel - /arch/x86/include/uapi/asm/sigcontext.h */
->>  
->>  struct target_fpreg {
->>      uint16_t significand[4];
->> @@ -835,7 +833,7 @@ struct target_fpxreg {
->>  };
->>  
->>  struct target_xmmreg {
->> -    abi_ulong element[4];
->> +    uint32_t element[4];
->>  };
->>  
->>  struct target_fpstate {
->> @@ -860,33 +858,117 @@ struct target_fpstate {
->>      abi_ulong padding[56];
->>  };
->
-> I think you should remove the definition of the target_fpstate structure
-> as you overwrite it with #define below:
-> ...
+>>   include/sysemu/sysemu.h |  4 ++++
+>>   migration/savevm.c      | 41 +++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 45 insertions(+)
+>>
+>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+>> index ff8ffb5..d9214bf 100644
+>> --- a/include/sysemu/sysemu.h
+>> +++ b/include/sysemu/sysemu.h
+>> @@ -126,7 +126,11 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
+>>                                              uint64_t *start_list,
+>>                                              uint64_t *length_list);
+>>
+>> +void qemu_savevm_live_state(QEMUFile *f);
 >> +
->> +#ifndef TARGET_X86_64
->> +# define target_fpstate target_fpstate_32
->> +#else
->> +# define target_fpstate target_fpstate_64
->> +#endif
+>>   int qemu_loadvm_state(QEMUFile *f);
+>> +int qemu_loadvm_state_begin(QEMUFile *f);
+>> +int qemu_load_device_state(QEMUFile *f);
+>>
+>>   extern int autostart;
+>>
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index 92b3d6c..04dee4f 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -1264,6 +1264,13 @@ done:
+>>       return ret;
+>>   }
+>>
+>> +void qemu_savevm_live_state(QEMUFile *f)
+>> +{
+>> +    /* save QEMU_VM_SECTION_END section */
+>> +    qemu_savevm_state_complete_precopy(f, true);
+>> +    qemu_put_byte(f, QEMU_VM_EOF);
+>> +}
 >> +
-
-Good catch. I'll do that.
-
-> ...
->> @@ -959,12 +1052,49 @@ static void setup_sigcontext(struct target_sigcontext *sc,
->>      /* non-iBCS2 extensions.. */
->>      __put_user(mask, &sc->oldmask);
->>      __put_user(env->cr[2], &sc->cr2);
->> +#else
->> +    __put_user(env->regs[8], &sc->r8);
->> +    __put_user(env->regs[9], &sc->r9);
->> +    __put_user(env->regs[10], &sc->r10);
->> +    __put_user(env->regs[11], &sc->r11);
->> +    __put_user(env->regs[12], &sc->r12);
->> +    __put_user(env->regs[13], &sc->r13);
->> +    __put_user(env->regs[14], &sc->r14);
->> +    __put_user(env->regs[15], &sc->r15);
+>>   static int qemu_save_device_state(QEMUFile *f)
+>>   {
+>>       SaveStateEntry *se;
+>> @@ -2064,6 +2071,40 @@ int qemu_loadvm_state(QEMUFile *f)
+>>       return ret;
+>>   }
+>>
+>> +int qemu_loadvm_state_begin(QEMUFile *f)
+>> +{
+>> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>> +    Error *local_err = NULL;
+>> +    int ret;
 >> +
->> +    __put_user(env->regs[R_EDI], &sc->rdi);
->> +    __put_user(env->regs[R_ESI], &sc->rsi);
->> +    __put_user(env->regs[R_EBP], &sc->rbp);
->> +    __put_user(env->regs[R_EBX], &sc->rbx);
->> +    __put_user(env->regs[R_EDX], &sc->rdx);
->> +    __put_user(env->regs[R_EAX], &sc->rax);
->> +    __put_user(env->regs[R_ECX], &sc->rcx);
->> +    __put_user(env->regs[R_ESP], &sc->rsp);
->> +    __put_user(env->eip, &sc->rip);
->> +
->> +    __put_user(env->eflags, &sc->eflags);
->> +
->> +    __put_user(env->segs[R_CS].selector, &sc->cs);
->> +    __put_user((uint16_t)0, &sc->gs);
->> +    __put_user((uint16_t)0, &sc->fs);
->> +    __put_user(env->segs[R_SS].selector, &sc->ss);
->> +
->> +    __put_user(env->error_code, &sc->err);
->> +    __put_user(cs->exception_index, &sc->trapno);
->> +    __put_user(mask, &sc->oldmask);
->> +    __put_user(env->cr[2], &sc->cr2);
->> +
->> +    /* fpstate_addr must be 16 byte aligned for fxsave */
->> +    assert(!(fpstate_addr & 0xf));
->> +
->> +    cpu_x86_fxsave(env, fpstate_addr);
->> +    __put_user(fpstate_addr, &sc->fpstate);
->> +#endif
->
-> This part would be more readable if the registers were in the same order
-> as  in the kernel function setup_sigcontext().
-
-OK, noted this. I'll make the change.
-
-> ...
->> +    if (info) {
->> +        tswap_siginfo(&frame->info, info);
+>> +    if (qemu_savevm_state_blocked(&local_err)) {
+>> +        error_report_err(local_err);
+>> +        return -EINVAL;
 >> +    }
+>> +    /* Load QEMU_VM_SECTION_START section */
+>> +    ret = qemu_loadvm_state_main(f, mis);
+>> +    if (ret < 0) {
+>> +        error_report("Failed to loadvm begin work: %d", ret);
+>> +    }
+>> +    return ret;
+>> +}
+>> +
+>> +int qemu_load_device_state(QEMUFile *f)
+>> +{
+>> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>> +    int ret;
+>> +
+>> +    /* Load QEMU_VM_SECTION_FULL section */
+>> +    ret = qemu_loadvm_state_main(f, mis);
+>> +    if (ret < 0) {
+>> +        error_report("Failed to load device state: %d", ret);
+>> +        return ret;
+>> +    }
+>> +
+>> +    cpu_synchronize_all_post_init();
+>> +    return 0;
+>> +}
+>> +
+>>   void hmp_savevm(Monitor *mon, const QDict *qdict)
+>>   {
+>>       BlockDriverState *bs, *bs1;
+>> --
+>> 1.8.3.1
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 >
-> kernel checks "ksig->ka.sa.sa_flags & SA_SIGINFO" to know if there is
-> siginfo structure.
+> .
 >
-
-OK. I'll do the same as what the kernel is doing.
-
-> ...
->>      /* Set up registers for signal handler */
->>      env->regs[R_ESP] = frame_addr;
->> +    env->regs[R_EAX] = 0;
->> +    env->regs[R_EDI] = sig;
->> +    env->regs[R_ESI] = (unsigned long)&frame->info;
->> +    env->regs[R_EDX] = (unsigned long)&frame->uc;
->>      env->eip = ka->_sa_handler;
->
-> In kernel, 32bit handler seems to not use the same registers as 64bit
-> handler, for instance ax is sig, info is dx and uc is cx.
->
-
-Hmm.. how do I reproduce the same here? Should I check if we are in 32-bit environment?
-
-> ...
->> @@ -6181,11 +6371,13 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
->>          || defined(TARGET_PPC64) || defined(TARGET_HPPA)
->>          /* These targets do not have traditional signals.  */
->>          setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
->> -#else
->> +#elif !defined(TARGET_X86_64)
->>          if (sa->sa_flags & TARGET_SA_SIGINFO)
->>              setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
->>          else
->>              setup_frame(sig, sa, &target_old_set, cpu_env);
->> +#else
->> +        setup_rt_frame(sig, sa, 0, &target_old_set, cpu_env);
->
-> Why do we use "0" instead of "&k->info"?
-
-That is a miss by me. I'll fix this.
-
-Thanks,
--- 
-Pranith
