@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1casKt-0000Ib-5B
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:04:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1casQG-0001pZ-4N
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:10:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1casKo-0007tq-8Z
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:04:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52694)
+	(envelope-from <bounces@canonical.com>) id 1casQB-000151-6L
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:10:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53312)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1casKo-0007th-3X
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:04:34 -0500
+	id 1casQA-00013P-Uf
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:10:07 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1casKm-0002zo-72
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 23:04:32 +0000
+	id 1casQ9-0003UN-Ji
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 23:10:05 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 22D652E80C6
-	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 23:04:32 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8F1752E80C0
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 23:10:05 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Feb 2017 22:52:38 -0000
-From: Thomas Huth <808588@bugs.launchpad.net>
-Reply-To: Bug 808588 <808588@bugs.launchpad.net>
+Date: Mon, 06 Feb 2017 22:57:54 -0000
+From: Thomas Huth <785668@bugs.launchpad.net>
+Reply-To: Bug 785668 <785668@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20110711030201.19964.12865.malonedeb@gac.canonical.com>
-Message-Id: <20170206225238.6191.8738.malone@wampee.canonical.com>
+References: <20110520100201.21566.45400.malonedeb@gac.canonical.com>
+Message-Id: <20170206225755.4601.69769.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 808588] Re: Netperf tests cause i82551 network
- down
+Subject: [Qemu-devel] [Bug 785668] Re: bonding inside a bridge does not
+ update ARP correctly when bridged net accessed from within a VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,89 +39,197 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The patch mentioned in comment #3 had been included in the kernel here:
-http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=
-=3D7734f6e6bcd7ba78b00e93e74a4ddafd9886cdea
-So I guess we can close this bug nowadays? Or can you still reproduce this =
-issue with the current kernel and current version of QEMU?
-
-** Changed in: qemu
-       Status: New =3D> Incomplete
+** No longer affects: qemu
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/808588
+https://bugs.launchpad.net/bugs/785668
 
 Title:
-  Netperf tests cause i82551 network down
+  bonding inside a bridge does not update ARP correctly when bridged net
+  accessed from within a VM
 
-Status in QEMU:
-  Incomplete
+Status in linux package in Ubuntu:
+  Confirmed
+Status in qemu-kvm package in Ubuntu:
+  Invalid
 
 Bug description:
-  1. boot up a guest with 82551 nic
-  # qemu-kvm -net nic,model=3Di82551 ...
-  2. launch netperf server in the guest
-  3.on the host =
+  Binary package hint: qemu-kvm
 
-  for b in 32 64 128 256 512 1024 1460 2048 4096 8192  9000 16384 32768  65=
-495 65507
-  do ./netperf -t TCP_STREAM -f m -H <guest ip> -P 0 -l 10 -- -m $b
-  done
+  Description: Ubuntu 10.4.2
+  Release: 10.04
 
-  for b in 32 64 128 256 512 1024 1460 2048 4096 8192  9000 16384 32768  65=
-495 65507
-  do ./netperf -t UDP_STREAM -f m -H <guest ip> -P 0 -l 10 -- -m $b
-  done
+  When setting a KVM host with a bond0 interface made of eth0 and eth1
+  and using this bond0 interface for a bridge to KVM VMs, the ARP tables
+  do not get updated correctly so it is not possible for a VM to reach
+  an IP on the bridged network up until that remote system has pinged
+  the VM itself.
 
-  =
+  Reproducible: 100%, with any of the load balancing mode
 
-  Result:
-  Guest network becomes down
+  How to reproduce the problem
 
-  =
+  - Prerequisites:
+  1 One KVM system with 10.04.02 server,  configured as a virtual host is n=
+eeded. The following /etc/network/interfaces was used for the test :
 
-  netperf client output:
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 32
-   87380  16384     32    10.97      19.61
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 64
-   87380  16384     64    11.55      79.68
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 128
-   87380  16384    128    10.16      14.20
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 256
-   87380  16384    256    11.17      12.85
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 512
-   87380  16384    512    10.01      16.38
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 1024
-  Interrupted system call
-  netperf: remote error 4./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l=
- 10 -- -m 1460
-  establish control: are you sure there is a netserver listening on 10.66.9=
-.39 at port 12865?
-  establish_control could not establish the control connection from 0.0.0.0=
- port 0 address family AF_UNSPEC to 10.66.9.39 port 12865 address family AF=
-_UNSPEC
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 2048
+  # grep  -v ^# /etc/network/interfaces
+  auto lo
+  iface lo inet loopback
 
-  =
+  auto bond0
+  iface bond0 inet manual
+  =C2=A0post-up ifconfig $IFACE up
+  =C2=A0pre-down ifconfig $IFACE down
+  =C2=A0bond-slaves none
+  =C2=A0bond_mode balance-rr
+  =C2=A0bond-downdelay 250
+  =C2=A0bond-updelay 120
+  auto eth0
+  allow-bond0 eth0
+  iface eth0 inet manual
+  =C2=A0bond-master bond0
+  auto eth1
+  allow-bond0 eth1
+  iface eth1 inet manual
+  =C2=A0bond-master bond0
 
-  qemu debug message:
-  ....
-  EE100   nic_receive             command 0x0000, link 0x3d3e6822, addr 0xf=
-fffffff, size 1518
-  EE100   nic_can_receive         0x29a0180
-  EE100   nic_receive             0x29a0180 received broadcast, len=3D60
-  EE100   nic_receive             Receive buffer (0 bytes) too small for da=
-ta (60 bytes); data truncated
-  EE100   nic_receive             command 0x8000, link 0x37b32022, addr 0xf=
-fffffff, size 0
-                                                   ^^^^^^^^^^^^^^^^^^^^^^^^=
-^^^^^^^^^^^^^^^^^^^^^^
-  EE100   nic_receive             receive: Running out of frames
-                                                   ^^^^^^^^^^^^^^^^^^^^^^^^
-  EE100   eepro100_write1         addr=3DCommand/Status+1 val=3D0x20
+  auto br0
+  iface br0 inet dhcp
+  =C2=A0# dns-* options are implemented by the resolvconf package, if insta=
+lled
+  =C2=A0bridge-ports bond0
+  =C2=A0bridge-stp off
+  =C2=A0bridge-fd 9
+  =C2=A0bridge-hello 2
+  =C2=A0bridge-maxage 12
+  =C2=A0bridge_max_wait 0
+
+  One VM running Maverick 10.10 server, standard installation, using the
+  following /etc/network/interfaces file :
+
+  grep -v ^# /etc/network/interfaces
+
+  auto lo
+  iface lo inet loopback
+
+  auto eth0
+  iface eth0 inet static
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0address 10.153.107.92
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0netmask 255.255.255.0
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0network 10.153.107.0
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0broadcast 10.153.107.255
+
+  --------------
+  On a remote bridged network system :
+  $ arp -an
+  ? (10.153.107.188) =C3=A0 00:1c:c4:6a:c0:dc [ether] sur tap0
+  ? (16.1.1.1) =C3=A0 00:17:33:e9:ee:3c [ether] sur wlan0
+  ? (10.153.107.52) =C3=A0 00:1c:c4:6a:c0:de [ether] sur tap0
+
+  On KVMhost
+  $ arp -an
+  ? (10.153.107.80) at ee:99:73:68:f0:a5 [ether] on br0
+
+  On VM
+  $ arp -an
+  ? (10.153.107.61) at <incomplete> on eth0
+
+  1) Test #1 : ping from VM (10.153.107.92) to remote bridged network
+  system (10.153.107.80) :
+
+  - On remote bridged network system :
+  caribou@marvin:~$ arp -an
+  ? (10.153.107.188) =C3=A0 00:1c:c4:6a:c0:dc [ether] sur tap0
+  ? (16.1.1.1) =C3=A0 00:17:33:e9:ee:3c [ether] sur wlan0
+  ? (10.153.107.52) =C3=A0 00:1c:c4:6a:c0:de [ether] sur tap0
+
+  - On KVMhost
+  ubuntu@VMhost:~$ arp -an
+  ? (10.153.107.80) at ee:99:73:68:f0:a5 [ether] on br0
+
+  - On VM
+  ubuntu@vm1:~$ ping 10.153.107.80
+  PING 10.153.107.80 (10.153.107.80) 56(84) bytes of data.
+  From 10.153.107.92 icmp_seq=3D1 Destination Host Unreachable
+  From 10.153.107.92 icmp_seq=3D2 Destination Host Unreachable
+  From 10.153.107.92 icmp_seq=3D3 Destination Host Unreachable
+  ^C
+  --- 10.153.107.80 ping statistics ---
+  4 packets transmitted, 0 received, +3 errors, 100% packet loss, time 3010=
+ms
+  pipe 3
+  ubuntu@vm1:~$ arp -an
+  ? (10.153.107.61) at <incomplete> on eth0
+  ? (10.153.107.80) at <incomplete> on eth0
+
+  2) Test #2 : ping from remote bridged network system (10.153.107.80)
+  to VM (10.153.107.92) :
+
+  - On remote bridged network system :
+  $ ping 10.153.107.92
+  PING 10.153.107.92 (10.153.107.92) 56(84) bytes of data.
+  64 bytes from 10.153.107.92: icmp_req=3D1 ttl=3D64 time=3D327 ms
+  64 bytes from 10.153.107.92: icmp_req=3D2 ttl=3D64 time=3D158 ms
+  64 bytes from 10.153.107.92: icmp_req=3D3 ttl=3D64 time=3D157 ms
+  ^C
+  --- 10.153.107.92 ping statistics ---
+  3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+  rtt min/avg/max/mdev =3D 157.289/214.500/327.396/79.831 ms
+  caribou@marvin:~$ arp -an
+  ? (10.153.107.188) =C3=A0 00:1c:c4:6a:c0:dc [ether] sur tap0
+  ? (16.1.1.1) =C3=A0 00:17:33:e9:ee:3c [ether] sur wlan0
+  ? (10.153.107.52) =C3=A0 00:1c:c4:6a:c0:de [ether] sur tap0
+  ? (10.153.107.92) =C3=A0 52:54:00:8c:e0:3c [ether] sur tap0
+
+  - On KVMhost
+  $ arp -an
+  ? (10.153.107.80) at ee:99:73:68:f0:a5 [ether] on br0
+
+  - On VM
+  arp -an
+  ? (10.153.107.61) at <incomplete> on eth0
+  ? (10.153.107.80) at ee:99:73:68:f0:a5 [ether] on eth0
+
+  3) Test #3 : New ping from VM (10.153.107.92) to remote bridged network s=
+ystem (10.153.107.80) :
+  - On remote bridged network system :
+  $ arp -an
+  ? (10.153.107.188) =C3=A0 00:1c:c4:6a:c0:dc [ether] sur tap0
+  ? (16.1.1.1) =C3=A0 00:17:33:e9:ee:3c [ether] sur wlan0
+  ? (10.153.107.52) =C3=A0 00:1c:c4:6a:c0:de [ether] sur tap0
+  ? (10.153.107.92) =C3=A0 52:54:00:8c:e0:3c [ether] sur tap0
+
+  - On KVMhost
+  ubuntu@VMhost:~$ arp -an
+  ? (10.153.107.80) at ee:99:73:68:f0:a5 [ether] on br0
+
+  - On VM
+  ubuntu@vm1:~$ ping 10.153.107.80
+  PING 10.153.107.80 (10.153.107.80) 56(84) bytes of data.
+  64 bytes from 10.153.107.80: icmp_req=3D1 ttl=3D64 time=3D154 ms
+  64 bytes from 10.153.107.80: icmp_req=3D2 ttl=3D64 time=3D170 ms
+  64 bytes from 10.153.107.80: icmp_req=3D3 ttl=3D64 time=3D154 ms
+  ^C
+  --- 10.153.107.80 ping statistics ---
+  3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+  rtt min/avg/max/mdev =3D 154.072/159.465/170.058/7.504 ms
+
+  tcpdump traces are available for those tests. Test system is available
+  upon request.
+
+  Workaround:
+
+  Use the bonded device in "active-backup" mode
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 10.04.02
+  Package: qemu-kvm-0.12.3+noroms-0ubuntu9.6
+  Uname: Linux 2.6.35-25-serverr x86_64
+  Architecture: amd64
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/808588/+subscriptions
+https://bugs.launchpad.net/ubuntu/+source/linux/+bug/785668/+subscriptions
