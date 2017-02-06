@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1calrx-00042p-Sb
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:10:23 -0500
+	(envelope-from <clg@kaod.org>) id 1cals9-0004Di-Hf
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:10:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1calru-00015T-Om
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:10:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50570)
+	(envelope-from <clg@kaod.org>) id 1cals6-0001Hn-Dj
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:10:33 -0500
+Received: from 11.mo3.mail-out.ovh.net ([87.98.184.158]:39265)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1calru-00014V-GK
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:10:18 -0500
-References: <20170204100317.32425-1-rjones@redhat.com>
-	<20170204100317.32425-2-rjones@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ec715a97-ad0e-b8e9-3db7-0bd50a1b7060@redhat.com>
-Date: Mon, 6 Feb 2017 17:10:13 +0100
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cals6-0001Ge-7E
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:10:30 -0500
+Received: from player693.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id D14A8A1820
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 17:10:28 +0100 (CET)
+References: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
+	<1485424060-12217-6-git-send-email-fred.konrad@greensocs.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <52fa3824-5a5e-dc06-aee5-cf56bf127bc4@kaod.org>
+Date: Mon, 6 Feb 2017 17:10:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170204100317.32425-2-rjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1485424060-12217-6-git-send-email-fred.konrad@greensocs.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5] qemu-nbd: Implement socket activation.
+Subject: Re: [Qemu-devel] [PATCH V2 05/10] qdev-monitor: print the device's
+ clock with info qtree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,248 +31,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-devel@nongnu.org, den@openvz.org, rkagan@virtuozzo.com, dplotnikov@virtuozzo.com, berrange@redhat.com, stefanha@gmail.com, armbru@redhat.com
+To: fred.konrad@greensocs.com, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, alistair.francis@xilinx.com
 
-
-
-On 04/02/2017 11:03, Richard W.M. Jones wrote:
-> Socket activation (sometimes known as systemd socket activation)
-> allows an Internet superserver to pass a pre-opened listening socket
-> to the process, instead of having qemu-nbd open a socket itself.  This
-> is done via the LISTEN_FDS and LISTEN_PID environment variables, and a
-> standard file descriptor range.
+On 01/26/2017 10:47 AM, fred.konrad@greensocs.com wrote:
+> From: KONRAD Frederic <fred.konrad@greensocs.com>
 > 
-> This change partially implements socket activation for qemu-nbd.  If
-> the environment variables are set correctly, then socket activation
-> will happen automatically, otherwise everything works as before.  The
-> limitation is that LISTEN_FDS must be 1.
+> This prints the clock attached to a DeviceState when using "info qtree" monitor
+> command.
+
+It would be nice to print the bound clocks also.  
+
+And so, may be, we could handle this binding between clocks
+simply by using object_property_add_child() on the objects 
+and build a QOM clock hierarchy. 
+
+I would certainly make sense from a physical POV but would 
+that be possible ? 
+
+Thanks,
+
+C.   
+
+
+> For example:
 > 
-> Signed-off-by: Richard W.M. Jones.
+> bus: main-system-bus
+>   type System
+>   dev: xlnx.zynqmp_crf, id ""
+>     gpio-out "sysbus-irq" 1
+>     gpio-out "RST_A9" 4
+>     qemu-clk "dbg_trace" 0.0
+>     qemu-clk "vpll_to_lpd" 12500000.0
+>     qemu-clk "dp_stc_ref" 0.0
+>     qemu-clk "dpll_to_lpd" 12500000.0
+>     qemu-clk "acpu_clk" 0.0
+>     qemu-clk "pcie_ref" 0.0
+>     qemu-clk "topsw_main" 0.0
+>     qemu-clk "topsw_lsbus" 0.0
+>     qemu-clk "dp_audio_ref" 0.0
+>     qemu-clk "sata_ref" 0.0
+>     qemu-clk "dp_video_ref" 1428571.4
+>     qemu-clk "vpll_clk" 50000000.0
+>     qemu-clk "apll_to_lpd" 12500000.0
+>     qemu-clk "dpll_clk" 50000000.0
+>     qemu-clk "gpu_ref" 0.0
+>     qemu-clk "aux_refclk" 0.0
+>     qemu-clk "video_clk" 27000000.0
+>     qemu-clk "gdma_ref" 0.0
+>     qemu-clk "gt_crx_ref_clk" 0.0
+>     qemu-clk "dbg_fdp" 0.0
+>     qemu-clk "apll_clk" 50000000.0
+>     qemu-clk "pss_alt_ref_clk" 0.0
+>     qemu-clk "ddr" 0.0
+>     qemu-clk "pss_ref_clk" 50000000.0
+>     qemu-clk "dpdma_ref" 0.0
+>     qemu-clk "dbg_tstmp" 0.0
+>     mmio 00000000fd1a0000/000000000000010c
+> 
+> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
 > ---
->  qemu-nbd.c | 172 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 163 insertions(+), 9 deletions(-)
+>  include/qemu/qemu-clock.h |  9 +++++++++
+>  qdev-monitor.c            |  2 ++
+>  qemu-clock.c              | 28 ++++++++++++++++++++++++++++
+>  3 files changed, 39 insertions(+)
 > 
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index c734f62..e4fede6 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -463,6 +463,135 @@ static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, Error **errp)
->      return creds;
+> diff --git a/include/qemu/qemu-clock.h b/include/qemu/qemu-clock.h
+> index 45f8766..ccc381c 100644
+> --- a/include/qemu/qemu-clock.h
+> +++ b/include/qemu/qemu-clock.h
+> @@ -149,4 +149,13 @@ void qemu_clk_set_callback(qemu_clk clk,
+>                             QEMUClkRateUpdateCallback *cb,
+>                             void *opaque);
+>  
+> +/**
+> + * qemu_clk_print:
+> + * @dev: the device for which the clock need to be printed.
+> + *
+> + * Print the clock information for a given device.
+> + *
+> + */
+> +void qemu_clk_print(Monitor *mon, DeviceState *dev, int indent);
+> +
+>  #endif /* QEMU_CLOCK_H */
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index c73410c..8f6bbdf 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -29,6 +29,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/help_option.h"
+>  #include "sysemu/block-backend.h"
+> +#include "qemu/qemu-clock.h"
+>  
+>  /*
+>   * Aliases were a bad idea from the start.  Let's keep them
+> @@ -689,6 +690,7 @@ static void qdev_print(Monitor *mon, DeviceState *dev, int indent)
+>                          ngl->num_out);
+>          }
+>      }
+> +    qemu_clk_print(mon, dev, indent);
+>      class = object_get_class(OBJECT(dev));
+>      do {
+>          qdev_print_props(mon, dev, DEVICE_CLASS(class)->props, indent);
+> diff --git a/qemu-clock.c b/qemu-clock.c
+> index 300e38f..b34021c 100644
+> --- a/qemu-clock.c
+> +++ b/qemu-clock.c
+> @@ -27,6 +27,7 @@
+>  #include "qemu/log.h"
+>  #include "qapi/error.h"
+>  #include "hw/qdev-core.h"
+> +#include "monitor/monitor.h"
+>  
+>  #ifndef DEBUG_QEMU_CLOCK
+>  #define DEBUG_QEMU_CLOCK 0
+> @@ -132,6 +133,33 @@ qemu_clk qemu_clk_device_get_clock(DeviceState *dev, const char *name)
+>      return QEMU_CLOCK(clk);
 >  }
 >  
-> +static void setup_address_and_port(const char **address, const char **port)
+> +struct print_opaque {
+> +    Monitor *mon;
+> +    int indent;
+> +};
+> +
+> +static int qemu_clk_print_rec(Object *obj, void *opaque)
 > +{
-> +    if (*address == NULL) {
-> +        *address = "0.0.0.0";
+> +    qemu_clk clk = (qemu_clk)(object_dynamic_cast(obj, TYPE_CLOCK));
+> +    struct print_opaque *po = opaque;
+> +
+> +    if (clk) {
+> +        monitor_printf(po->mon, "%*s" "qemu-clk \"%s\" %" PRIu64 "\n",
+> +                       po->indent, " ", clk->name, clk->out_rate);
 > +    }
 > +
-> +    if (*port == NULL) {
-> +        *port = stringify(NBD_DEFAULT_PORT);
-> +    }
-> +}
-> +
-> +#define FIRST_SOCKET_ACTIVATION_FD 3 /* defined by systemd ABI */
-> +
-> +#ifndef _WIN32
-> +/*
-> + * Check if socket activation was requested via use of the
-> + * LISTEN_FDS and LISTEN_PID environment variables.
-> + *
-> + * Returns 0 if no socket activation, or the number of FDs.
-> + */
-> +static unsigned int check_socket_activation(void)
-> +{
-> +    const char *s;
-> +    unsigned long pid;
-> +    unsigned long nr_fds;
-> +    unsigned int i;
-> +    int fd;
-> +    int err;
-> +
-> +    s = getenv("LISTEN_PID");
-> +    if (s == NULL) {
-> +        return 0;
-> +    }
-> +    err = qemu_strtoul(s, NULL, 10, &pid);
-> +    if (err) {
-> +        if (verbose) {
-> +            fprintf(stderr, "malformed %s environment variable (ignored)\n",
-> +                    "LISTEN_PID");
-> +        }
-> +        return 0;
-> +    }
-> +    if (pid != getpid()) {
-> +        if (verbose) {
-> +            fprintf(stderr, "%s was not for us (ignored)\n",
-> +                    "LISTEN_PID");
-> +        }
-> +        return 0;
-> +    }
-> +
-> +    s = getenv("LISTEN_FDS");
-> +    if (s == NULL) {
-> +        return 0;
-> +    }
-> +    err = qemu_strtoul(s, NULL, 10, &nr_fds);
-> +    if (err) {
-> +        if (verbose) {
-> +            fprintf(stderr, "malformed %s environment variable (ignored)\n",
-> +                    "LISTEN_FDS");
-> +        }
-> +        return 0;
-> +    }
-> +    assert(nr_fds <= UINT_MAX);
-> +
-> +    /* A limitation of current qemu-nbd is that it can only listen on
-> +     * a single socket.  When that limitation is lifted, we can change
-> +     * this function to allow LISTEN_FDS > 1, and remove the assertion
-> +     * in the main function below.
-> +     */
-> +    if (nr_fds > 1) {
-> +        error_report("qemu-nbd does not support socket activation with %s > 1",
-> +                     "LISTEN_FDS");
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
-> +    /* So these are not passed to any child processes we might start. */
-> +    unsetenv("LISTEN_FDS");
-> +    unsetenv("LISTEN_PID");
-> +
-> +    /* So the file descriptors don't leak into child processes. */
-> +    for (i = 0; i < nr_fds; ++i) {
-> +        fd = FIRST_SOCKET_ACTIVATION_FD + i;
-> +        if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1) {
-> +            /* If we cannot set FD_CLOEXEC then it probably means the file
-> +             * descriptor is invalid, so socket activation has gone wrong
-> +             * and we should exit.
-> +             */
-> +            error_report("Socket activation failed: "
-> +                         "invalid file descriptor fd = %d: %m",
-> +                         fd);
-> +            exit(EXIT_FAILURE);
-> +        }
-> +    }
-> +
-> +    return (unsigned int) nr_fds;
-> +}
-> +
-> +#else /* !_WIN32 */
-> +static unsigned int check_socket_activation(void)
-> +{
 > +    return 0;
 > +}
-> +#endif
 > +
-> +/*
-> + * Check socket parameters compatibility when socket activation is used.
-> + */
-> +static const char *socket_activation_validate_opts(const char *device,
-> +                                                   const char *sockpath,
-> +                                                   const char *address,
-> +                                                   const char *port)
+> +void qemu_clk_print(Monitor *mon, DeviceState *dev, int indent)
 > +{
-> +    if (device != NULL) {
-> +        return "NBD device can't be set when using socket activation";
-> +    }
+> +    struct print_opaque po;
 > +
-> +    if (sockpath != NULL) {
-> +        return "Unix socket can't be set when using socket activation";
-> +    }
-> +
-> +    if (address != NULL) {
-> +        return "The interface can't be set when using socket activation";
-> +    }
-> +
-> +    if (port != NULL) {
-> +        return "TCP port number can't be set when using socket activation";
-> +    }
-> +
-> +    return NULL;
+> +    po.indent = indent;
+> +    po.mon = mon;
+> +    object_child_foreach(OBJECT(dev), qemu_clk_print_rec, &po);
 > +}
->  
->  int main(int argc, char **argv)
->  {
-> @@ -471,7 +600,7 @@ int main(int argc, char **argv)
->      off_t dev_offset = 0;
->      uint16_t nbdflags = 0;
->      bool disconnect = false;
-> -    const char *bindto = "0.0.0.0";
-> +    const char *bindto = NULL;
->      const char *port = NULL;
->      char *sockpath = NULL;
->      char *device = NULL;
-> @@ -533,6 +662,7 @@ int main(int argc, char **argv)
->      char *trace_file = NULL;
->      bool fork_process = false;
->      int old_stderr = -1;
-> +    unsigned socket_activation;
->  
->      /* The client thread uses SIGTERM to interrupt the server.  A signal
->       * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
-> @@ -751,6 +881,19 @@ int main(int argc, char **argv)
->      trace_init_file(trace_file);
->      qemu_set_log(LOG_TRACE);
->  
-> +    socket_activation = check_socket_activation();
-> +    if (socket_activation == 0) {
-> +        setup_address_and_port(&bindto, &port);
-> +    } else {
-> +        /* Using socket activation - check user didn't use -p etc. */
-> +        const char *err_msg = socket_activation_validate_opts(device, sockpath,
-> +                                                              bindto, port);
-> +        if (err_msg != NULL) {
-> +            error_report("%s", err_msg);
-> +            exit(EXIT_FAILURE);
-> +        }
-> +    }
 > +
->      if (tlscredsid) {
->          if (sockpath) {
->              error_report("TLS is only supported with IPv4/IPv6");
-> @@ -855,7 +998,25 @@ int main(int argc, char **argv)
->          snprintf(sockpath, 128, SOCKET_PATH, basename(device));
->      }
->  
-> -    saddr = nbd_build_socket_address(sockpath, bindto, port);
-> +    if (socket_activation == 0) {
-> +        server_ioc = qio_channel_socket_new();
-> +        saddr = nbd_build_socket_address(sockpath, bindto, port);
-> +        if (qio_channel_socket_listen_sync(server_ioc, saddr, &local_err) < 0) {
-> +            object_unref(OBJECT(server_ioc));
-> +            error_report_err(local_err);
-> +            return 1;
-> +        }
-> +    } else {
-> +        /* See comment in check_socket_activation above. */
-> +        assert(socket_activation == 1);
-> +        server_ioc = qio_channel_socket_new_fd(FIRST_SOCKET_ACTIVATION_FD,
-> +                                               &local_err);
-> +        if (server_ioc == NULL) {
-> +            error_report("Failed to use socket activation: %s",
-> +                         error_get_pretty(local_err));
-> +            exit(EXIT_FAILURE);
-> +        }
-> +    }
->  
->      if (qemu_init_main_loop(&local_err)) {
->          error_report_err(local_err);
-> @@ -950,13 +1111,6 @@ int main(int argc, char **argv)
->          exit(EXIT_FAILURE);
->      }
->  
-> -    server_ioc = qio_channel_socket_new();
-> -    if (qio_channel_socket_listen_sync(server_ioc, saddr, &local_err) < 0) {
-> -        object_unref(OBJECT(server_ioc));
-> -        error_report_err(local_err);
-> -        return 1;
-> -    }
-> -
->      if (device) {
->          int ret;
->  
+>  static const TypeInfo qemu_clk_info = {
+>      .name          = TYPE_CLOCK,
+>      .parent        = TYPE_OBJECT,
 > 
-
-Queued, thanks.
-
-Paolo
