@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1caiRn-0000YC-IW
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 07:31:12 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1caiVv-0002LQ-3q
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 07:35:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1caiRj-0001CH-LB
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 07:31:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56114)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1caiRj-0001C5-GC
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 07:31:03 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1caiRf-0006c8-7h
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 12:30:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B41532E80D5
-	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 12:30:52 +0000 (UTC)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1caiVr-0002Zv-OC
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 07:35:23 -0500
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58986D54.8030002@huawei.com>
+Date: Mon, 6 Feb 2017 20:34:28 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Feb 2017 12:17:08 -0000
-From: shqking <1661815@bugs.launchpad.net>
-Reply-To: Bug 1661815 <1661815@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170204082040.20702.26524.malonedeb@gac.canonical.com>
-Message-Id: <20170206121708.23918.87313.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1661815] Re: Stack address is returned from
- function translate_one
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [Block Replication] Question about supporting COLO in
+ libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +21,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, stefanha@gmail.com, libvir-list@redhat.com
+Cc: xuquan8@huawei.com, qemu block <qemu-block@nongnu.org>, stefanha@redhat.com, armbru@redhat.com, kwolf@redhat.com, wencongyang2@huawei.com, "Dong, Eddie" <eddie.dong@intel.com>, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com
 
-Thanks for your reply.
+Hi,
+I'm trying to implement supporting COLO in libvirt,
+But i found an annoying problem that libvirt does not
+support the command line option argument syntax we used
+for block replication in QEMU.
 
-Inspired by this issue in apache httpd (https://bz.apache.org/bugzilla/show=
-_bug.cgi?id=3D59844#c0),
-we customized a checker based on the Clang Static Analyzer to detect such u=
-ndefined behavior.
+That is libvirt does not support the bellow syntax for block:
+-drive driver=qcow2,file.filename=test:a.qcow2
+-drive file=test.qcow2,\
+backing.file.filename=/dev/fdset/1
 
-Yes. =
+It seems to be a new syntax that libvirt does not support
+thought it has been exist in QEMU for a time.
+I found some introductions from
+http://www.linux-kvm.org/images/3/34/Kvm-forum-2013-block-dev-configuration.pdf
 
-After examining the code carefully, we didn't find any place where the "->f=
-ields" is accessed, either. However, we think this kind of defect seems lik=
-e a 'time bomb' and we'd better fix it just to be on the safe side.
+The command line we use for COLO is just like the above syntax,
+For example, for the shared disk in COLO, it is:
+  -drive if=none,driver=qcow2,file.filename=/mnt/ramfs/hidden_disk.img,id=hidden_disk0,\
+         backing.driver=raw,backing.file.filename=1.raw \
+  -drive if=virtio,id=active-disk0,driver=replication,mode=secondary,\
+         file.driver=qcow2,top-id=active-disk0,\
+         file.file.filename=/mnt/ramfs/active_disk.img,\
+         file.backing=hidden_disk0,shared-disk=on
 
-** Bug watch added: bz.apache.org/bugzilla/ #59844
-   https://bz.apache.org/bugzilla/show_bug.cgi?id=3D59844
+For the none-shared disk in COLO, it is quite same with the shared-disk:
+   -drive if=none,driver=raw,file.filename=1.raw,id=colo1 \
+   -drive if=xxx,id=topxxx,driver=replication,mode=secondary,top-id=topxxx\
+          file.file.filename=active_disk.qcow2,\
+          file.driver=qcow2,\
+          file.backing.file.filename=hidden_disk.qcow2,\
+          file.backing.driver=qcow2,\
+          file.backing.backing=colo1
 
--- =
+So there seems to be two ways to solve this problem.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1661815
+One is to support this new option argument syntax in libvirt,
+but I'm not sure if it is difficult or not to implement it,
+and i don't know where to start either.
 
-Title:
-  Stack address is returned from function translate_one
+Another way is to convert these command line options in QEMU totally,
+I mean hidden the descriptions of 'active_disk' and 'hidden_disk' disks.
+Create/add them dynamicly by qmp commands while users want to make VM goes
+into COLO state. That's just like to support live image clone in QEMU.
 
-Status in QEMU:
-  New
+Any ideas ?
 
-Bug description:
-  The vulnerable version is qemu-2.8.0, and the vulnerable function is
-  in "target-s390x/translate.c".
 
-  The code snippet is as following.
-
-  static ExitStatus translate_one(CPUS390XState *env, DisasContext *s)
-  {
-      const DisasInsn *insn;
-      ExitStatus ret =3D NO_EXIT;
-      DisasFields f;
-      ...
-      s->fields =3D &f;
-      ...
-      s->pc =3D s->next_pc;
-      return ret;
-  }
-
-  A stack address, i.e. the address of local variable "f" is returned
-  from current function through the output parameter "s->fields" as a
-  side effect.
-
-  This issue is one kind of undefined behaviors, according the C
-  Standard, 6.2.4 [ISO/IEC 9899:2011]
-  (https://www.securecoding.cert.org/confluence/display/c/DCL30-C.+Declare+=
-objects+with+appropriate+storage+durations)
-
-  This dangerous defect may lead to an exploitable vulnerability.
-  We suggest sanitizing "s->fields" as null before return.
-
-  Note that this issue is reported by shqking and Zhenwei Zou together.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1661815/+subscriptions
+Thanks,
+Hailiang
