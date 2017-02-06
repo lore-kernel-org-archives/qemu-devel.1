@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1caj7K-0003ID-PW
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 08:14:07 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cajGa-0005jV-VU
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 08:23:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1caj7G-0006yS-MM
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 08:14:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51235)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1caj7G-0006yK-GA
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 08:13:58 -0500
-Date: Mon, 6 Feb 2017 13:13:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170206131352.GD2524@work-vm>
-References: <1483596532-14552-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<6a928d63-59c5-a763-0156-40e5958512c5@cn.fujitsu.com>
-	<71bda662-8a14-01d4-9db6-ce96640dfee9@cn.fujitsu.com>
-	<61ae330c-b431-fff3-dd58-ba24b081dc60@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1cajGU-0001gr-Rt
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 08:23:36 -0500
+Date: Mon, 6 Feb 2017 14:23:21 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170206132321.GB11987@noname.redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <61ae330c-b431-fff3-dd58-ba24b081dc60@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V6 0/2] Add new qmp commands to suppurt Xen
- COLO
+In-Reply-To: <87bmukmlau.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +22,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, "eddie . dong" <eddie.dong@intel.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Bian Naimeng <biannm@cn.fujitsu.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Peter Krempa <pkrempa@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-* Jason Wang (jasowang@redhat.com) wrote:
->=20
->=20
-> On 2017=E5=B9=B401=E6=9C=8826=E6=97=A5 11:04, Zhang Chen wrote:
-> > Hi~
-> >=20
-> > No news for a week.
-> >=20
-> > We need comments ~~
-> >=20
-> > Ping...
-> >=20
->=20
-> Cc David who is one of the maintainer of migration.
+Am 02.02.2017 um 20:42 hat Markus Armbruster geschrieben:
+> = Brief recap of dotted key convention =
+> 
+> We'll discuss use of dotted key convention later, so let me explain it
+> briefly for the readers who don't know it already.
+> 
+> The dotted key convention interprets the KEY part as a sequence of names
+> separated by dots.  If a name looks like an integer *handwave*, it's an
+> array index, else it's an object member name.
 
-My difficulty is I don't know any Xen and I don't understand
-the block replication code much either; so I hadn't really looked at it.
+I think that's not really what we have, but just what it looks like to
+you from your perspective of someone who wants to write a parser that
+generically parses these things into nested QObjects.
 
-Dave
+In reality, pretty much all users of the dotted syntax know from context
+whether this is an array or an object. In the former case they call
+something like qdict_array_entries()/split(), and in the latter case
+qemu_opts_absorb_qdict(). Both of them are happy with numeric keys.
 
->=20
-> >=20
-> > Thanks
-> >=20
-> > Zhang Chen
-> >=20
-> >=20
-> > On 01/19/2017 05:57 PM, Zhang Chen wrote:
-> > > Hi~~
-> > >=20
-> > > Anyone have any comments?
-> > >=20
-> > > Ping....
-> > >=20
-> > >=20
-> > > Thanks
-> > >=20
-> > > Zhang Chen
-> > >=20
-> > >=20
-> > > On 01/05/2017 02:08 PM, Zhang Chen wrote:
-> > > > Xen COLO depend on qemu COLO replication function.
-> > > > So, We need new qmp commands for Xen to use qemu replication.
-> > > >=20
-> > > > Corresponding libxl patches already in xen.git.
-> > > > Commit ID:
-> > > >=20
-> > > > ed37ef1f91c20f0ab162ce60f8c38400b917fa64
-> > > > COLO: introduce new API to prepare/start/do/get_error/stop replic=
-ation
-> > > >=20
-> > > > a0ddc0b359375b2418213966dfbdbfab593ecc6f
-> > > > tools/libxl: introduction of libxl__qmp_restore to load qemu stat=
-e
-> > > >=20
-> > > >=20
-> > > > Zhang Chen (2):
-> > > >    Add a new qmp command to start/stop replication
-> > > >    Add a new qmp command to do checkpoint, query xen replication =
-status
-> > > >=20
-> > > >   docs/qmp-commands.txt | 42 +++++++++++++++++++++++++++++++
-> > > >   migration/colo.c      | 40 +++++++++++++++++++++++++++++
-> > > >   qapi-schema.json      | 69
-> > > > +++++++++++++++++++++++++++++++++++++++++++++++++++
-> > > >   3 files changed, 151 insertions(+)
-> > > >=20
-> > >=20
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The one exception is qdict_crumple(), which already is a parser like
+you're intending to write. The difference is that it's used only in very
+few specific cases where we know that the assumption holds true.
+
+In other words: To do things properly, you'd have to look at the schema.
+
+> = Structured option argument syntax =
+> 
+> == JSON ==
+> [...]
+> There's also the -drive file=json:... syntax.  It's a bad fit for
+> QemuOpts, because QemuOpts and JSON fight for the comma.  I'd show you
+> if I could get it to work.
+
+Just double all the commas in the JSON object. It's not really that hard
+to come up with something working, but it makes it even uglier than
+plain JSON on the command line.
+
+Bonus: You get to guess which options are parsed by QemuOpts and which
+aren't. qemu-img usually takes parameters directs from argv, so doubling
+the comma there like you have to in -drive will result in an error.
+
+> We obviously can't replace QemuOpts with JSON.  But accepting JSON in
+> addition to QemuOpts is a debatable feature: it lets management
+> applications reuse the code to build QMP arguments for option arguments.
+
+Management applications already have working code for the existing
+syntax, they might not want to switch just because (and probe whether
+qemu is new enough to even support JSON for QemuOpts).
+
+When I talked to Peter, his concern wasn't really about what the exact
+syntax was, but just that the content is a 1:1 mapping of QMP arguments.
+
+I take this as a sign that we should find something that works well
+for human users, and management tools can easily cope with whatever we
+choose.
+
+> === Dotted keys ===
+> 
+> One sufficiently powerful syntax extension already exists: the dotted
+> key convention.  It's syntactically unambiguous only when none of the
+> KEYs involved contains '.'  To adopt it across the board, we'd have to
+> outlaw '.' in KEYs.  QAPI outlaws '.' already, but we have a bunch of
+> QOM properties names with '.'.  We'd have to rename at least the ones
+> that need to be accessible in -object.
+> 
+> Dotted keys can't express member names that look like integers.  We'd
+> have to outlaw them at least for the objects that are accessible on the
+> command line.  Once again, QAPI outlaws such names already.  QOM is
+> anarchy when it comes to names, however.
+> 
+> The way dotted keys do arrays is inconsistent with how QOM's automatic
+> arrayification (commit 3396590) do them: foo.0 vs. foo[0].  Backward
+> compatibility makes changing the dotted key convention awkward.  Perhaps
+> we can still change QOM.
+
+Dotted key syntax is a bit longwinded, but it's the simplest thinkable
+extension of key=value and seems to be relatively easy to implement; the
+necessary renaming should be possible to do.
+
+This is not perfect for human users because of its repetitive nature,
+but it could be the first step for 2.9.
+
+> === Structured values ===
+> 
+> The dotted key convention messes with KEY syntax to permit structured
+> values.  Works, but the more conventional way to support structured
+> values is a syntax for structured values.  
+> 
+> An obvious one is to use { KEY=VALUE, ...} for objects, and [ VALUE,
+> ... ] for arrays.  Looks like this:
+> 
+>     -drive 'driver=quorum,
+>             child=[{ driver=file, filename=disk1.img },
+>                    { driver=host_device, filename=/dev/sdb },
+>                    { driver=nbd, host=localhost } ]'
+> 
+> Again, lines broken and indented for legibility; you need to join them
+> for actual use.
+
+This looks more like what you really want to use. However, being able to
+write a={b=x,c=y} for a.b=x,a.c=y is really just syntactic sugar and
+could be a second step after we got the basics working.
+
+Note that treating it simply as syntactic sugar for the expanded dotted
+form would also allow mixing (and I think that's a good thing):
+
+    -drive 'driver=qcow2,
+            backing.file.filename=backing.qcow2,
+            file={driver=file, filename=overlay.qcow2, aio=native}'
+
+Or even add to a previously defined thing, which should make Max happy
+when he forgot a nested option at first:
+
+    -drive 'driver=qcow2,
+            file={driver=nbd,host=localhost},
+            lazy-refcounts=on,
+            file.port=1234'
+
+> There's a syntactic catch, though: a value of the form [ ... ] can
+> either be an array or a string.  Which one it is depends on the type of
+> the key.  To parse this syntax, you need to know the types, unlike JSON
+> or traditional QemuOpts.  Unless we outlaw strings starting with '{' or
+> '[', which feels impractical.
+
+We would have to look at the schema and only treat it as a nested object
+or an array if the expected type has one there.
+
+Your other mail says that even this doesn't work because of "any" types,
+but I don't think this is a real problem: In that case, you simply use
+the type that we always used, i.e. string. That's the fully backwards
+compatible way.
+
+Want to make use of the shiny new QemuOpts and get things parsed into
+a nested object? Well, provide a real schema instead of "any" then.
+
+> But wait, there's another syntactic catch: in traditional QemuOpts, a
+> value ends at the next unescaped ',' or '\0'.  Inside an object, it now
+> also ends at the next unescaped '}', and inside an array, at the next
+> unescaped ']'.  Or perhaps at the next space (the example above assumes
+> it does).  That means we either have to provide a way to escape '}', ']'
+> and space, or find another way to delimit string values, say require '"'
+> around strings whenever the string contains "funny" characters.
+> 
+> So, if escaped ',' wasn't ugly and confusing enough for you...
+
+This is actually the part that troubles me the most about adding such a
+syntax with new special characters. Otherwise it's pretty close to
+optimal, in my opinion.
+
+Kevin
