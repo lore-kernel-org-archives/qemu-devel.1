@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1carEe-0003sC-BN
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:54:09 -0500
+	(envelope-from <aleksko@virtuozzo.com>) id 1caq8U-0000G0-63
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:43:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1carEb-0004H3-8k
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:54:08 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34779)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1carEb-0004Gz-1d
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:54:05 -0500
-Received: by mail-wm0-x243.google.com with SMTP id c85so24610323wmi.1
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 13:54:04 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170204100317.32425-1-rjones@redhat.com>
-	<20170204100317.32425-2-rjones@redhat.com>
-	<21e1f16f-59f3-479c-a8f7-42cf5ada40b4@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1fef8862-3d19-c8fc-76e3-ce0ef30a6899@redhat.com>
-Date: Mon, 6 Feb 2017 22:54:02 +0100
+	(envelope-from <aleksko@virtuozzo.com>) id 1caq8P-0002tt-8M
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:43:42 -0500
+Received: from mail-db5eur01on0117.outbound.protection.outlook.com
+	([104.47.2.117]:56608
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksko@virtuozzo.com>)
+	id 1caq8O-0002t9-Ij
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:43:37 -0500
+From: Alexey Kostyushko <aleksko@virtuozzo.com>
+Date: Mon, 6 Feb 2017 16:10:57 +0000
+Message-ID: <HE1PR0802MB2265F12CE6DF970BC8D0D252AD400@HE1PR0802MB2265.eurprd08.prod.outlook.com>
+References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
+	<20170201102013.GC3232@redhat.com>
+	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
+	<20170201110320.GD3232@redhat.com>
+	<CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
+	<a03be6ea-a7bd-3b99-a94b-f180ef6f9e0a@openvz.org>,
+	<CABdb736+iGndMmYTVcrwRzEwGX9A8uizPthM3_-TYw34-+up_w@mail.gmail.com>
+In-Reply-To: <CABdb736+iGndMmYTVcrwRzEwGX9A8uizPthM3_-TYw34-+up_w@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <21e1f16f-59f3-479c-a8f7-42cf5ada40b4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5] qemu-nbd: Implement socket activation.
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +36,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
-Cc: stefanha@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com, dplotnikov@virtuozzo.com, rkagan@virtuozzo.com, den@openvz.org
+To: Ladi Prosek <lprosek@redhat.com>, Denis Lunev <den@virtuozzo.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
+This info is more about pvpanic patch, but may be relevant here also.
 
+Consider that KeInitializeCrashDumpHeader is not enough to create dumps bec=
+ause it copy only primary header
 
-On 06/02/2017 20:04, Eric Blake wrote:
-> This is not the right way to do things (it risks clearing any other FD_
-> flags currently set on the fd, even though there aren't any such FD_
-> flags in common use).
+and doesn't copy KdDebuggerBlock. Look to combine info from KeCapturePersis=
+tentThreadState.
 
-There aren't any such flags at all really, and because no one uses
-F_GETFD, it's unlikely that there will ever be any.  Has any other POSIX
-OS ever had one?
+Also whenever amount of RAM is changed (memory hot-plug) you need to recrea=
+te headers.
 
-Paolo
+I think that there should be virtio direct channel for general purposes of =
+dumping and guest-agent channel may be usefull for obtainin varoius
+
+info from guest drivers through ioctls and providing live-dump feature.
+
+________________________________
+From: Ladi Prosek <lprosek@redhat.com>
+Sent: Monday, February 6, 2017 6:50:43 PM
+To: Denis Lunev
+Cc: Daniel P. Berrange; qemu-devel; Michael Roth; Alexey Kostyushko
+Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
+
+On Mon, Feb 6, 2017 at 4:37 PM, Denis V. Lunev <den@openvz.org> wrote:
+> On 02/01/2017 04:41 PM, Ladi Prosek wrote:
+>> On Wed, Feb 1, 2017 at 12:03 PM, Daniel P. Berrange <berrange@redhat.com=
+> wrote:
+>>> On Wed, Feb 01, 2017 at 11:50:43AM +0100, Ladi Prosek wrote:
+>>>> On Wed, Feb 1, 2017 at 11:20 AM, Daniel P. Berrange <berrange@redhat.c=
+om> wrote:
+>>>>> On Wed, Feb 01, 2017 at 11:06:46AM +0100, Ladi Prosek wrote:
+>>>>>> Analogous to guest-file-read and guest-file-write, this commit adds
+>>>>>> support for issuing IOCTLs to files in the guest. With the goal of
+>>>>>> abstracting away the differences between Posix ioctl() and Win32
+>>>>>> DeviceIoControl() to provide one unified API, the schema distinguish=
+es
+>>>>>> between input and output buffer sizes (as required by Win32) and
+>>>>>> allows the caller to supply either a 'buffer', pointer to which will
+>>>>>> be passed to the Posix ioctl(), or an integer argument, passed to
+>>>>>> ioctl() directly.
+>>>>> What is the intended usage scenario for this ?
+>>>> My specific case is extracting a piece of data from Windows guests.
+>>>> Guest driver exposes a file object with a well-known IOCTL code to
+>>>> return a data structure from the kernel.
+>>> Please provide more information about what you're trying to do.
+>>>
+>>> If we can understand the full details it might suggest a different
+>>> approach that exposing a generic ioctl passthrough facility.
+>> The end goal is to be able to create a Window crash dump file from a
+>> running (or crashed, but running is more interesting because Windows
+>> can't do that by itself) Windows VM. To do that without resorting to
+>> hacks, the host application driving this needs to get the crash dump
+>> header, which Windows provides in its KeInitializeCrashDumpHeader
+>> kernel API.
+>>
+>> I believe that the most natural way to do this is to have
+>> 1) a driver installed in the guest providing a way to call
+>> KeInitializeCrashDumpHeader from user space
+>> 2) an agent in the guest, running in user space, calling the driver
+>> and passing the result back to the host
+>>
+>> Now 2) may as well be an existing agent, such as the QEMU guest agent,
+>> and that's why I am here :)
+>>
+>> KeInitializeCrashDumpHeader returns an opaque byte array, happens to
+>> be 8192 bytes at the moment. My first choice for the kernel-user
+>> interface in the guest is IOCTL because what I'm trying to get across
+>> is a block, a "datagram", not a stream, and I have the option for
+>> easily adding more functionality later by adding more IOCTL codes with
+>> the file object still representing "the driver".
+>>
+>> I could use regular file I/O as well. I would either have to devise a
+>> protocol for talking to the driver, have a way of delimiting messages,
+>> re-syncing the channel etc., or make a slight semantic shift and
+>> instead of the file object representing the driver, it would represent
+>> this one particular function of the driver. Opening the file and
+>> reading from it until eof would yield the crash dump header.
+> I think that this is not as good as can be for the whole design of the
+> feature.
+> The problem here is that userspace starts toooooooooo late and is not
+> accessible when the guest BSODS and we do need a dump for analysis.
+>
+> May be it worth to push this header to QEMU at boot time through virtio b=
+us?
+
+Yes, definitely an option. I believe that having the ability to create
+a dump out of a live system, i.e. without crashing it, is what adds
+the most value here. And that would most likely happen on an
+up-and-running guest so the difference between being able to do it
+after a kernel driver loads and after a user space service starts is
+not that significant.
+
+Still, the sooner the better, for sure. I think I've seen
+virtio-pstore suggested as a possible channel to use to push the
+header.
+
+Thanks!
+
+> Den
