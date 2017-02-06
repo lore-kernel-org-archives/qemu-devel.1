@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cahTN-0002LB-BK
+	(envelope-from <kraxel@redhat.com>) id 1cahTN-0002LH-Ee
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:28:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cahTJ-0002vz-BU
+	(envelope-from <kraxel@redhat.com>) id 1cahTJ-0002wG-Dl
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:28:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36512)
+Received: from mx1.redhat.com ([209.132.183.28]:55018)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cahTJ-0002vB-5a
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cahTJ-0002vJ-6c
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:28:37 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  6 Feb 2017 12:28:16 +0100
-Message-Id: <1486380501-13431-5-git-send-email-kraxel@redhat.com>
+Date: Mon,  6 Feb 2017 12:28:13 +0100
+Message-Id: <1486380501-13431-2-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1486380501-13431-1-git-send-email-kraxel@redhat.com>
 References: <1486380501-13431-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 4/9] xhci: only free completed transfers
+Subject: [Qemu-devel] [PULL 1/9] hw/usb/dev-hid: Improve guest compatibility
+ of usb-tablet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +25,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, 1653384@bugs.launchpad.net
+Cc: Phil Dennis-Jordan <phil@philjordan.eu>, Gerd Hoffmann <kraxel@redhat.com>
 
-Most callsites check already, one was missed.
+From: Phil Dennis-Jordan <phil@philjordan.eu>
 
-Cc: 1653384@bugs.launchpad.net
-Fixes: 94b037f2a451b3dc855f9f2c346e5049a361bd55
-Reported-by: Fabian Lesniak <fabian@lesniak-it.de>
+ 1. Set bInterfaceProtocol to 0x00 for usb-tablet. This should be
+    non-zero for boot protocol devices only, which the usb-tablet is not.
+ 2. Set the usb-tablet's usage to "mouse" in the report descriptor.
+
+The boot protocol of 0x02 specifically confused OS X/macOS' HID driver
+stack, causing it to generate additional bogus HID events with relative
+motion in addition to the tablet's absolute coordinate events.
+
+Absolute pointing devices with HID Report Descriptor usage of 0x01
+(pointing) are treated by the macOS HID driver as analog sticks, and
+absolute coordinates are not directly translated to absolute mouse
+cursor positions. Changing it to 0x02 (mouse) fixes the problem, and
+does not have any adverse effect in other operating systems and
+windowing systems. (VMWare does the same thing.)
+
+Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+Message-id: 1485365075-32702-1-git-send-email-phil@philjordan.eu
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 1485790607-31399-2-git-send-email-kraxel@redhat.com
 ---
- hw/usb/hcd-xhci.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/usb/dev-hid.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index f810678..6a1d3dc 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -2198,7 +2198,9 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, unsigned int streamid)
-             xhci_complete_packet(xfer);
-         }
-         assert(!xfer->running_retry);
--        xhci_ep_free_xfer(epctx->retry);
-+        if (xfer->complete) {
-+            xhci_ep_free_xfer(epctx->retry);
-+        }
-         epctx->retry = NULL;
-     }
+diff --git a/hw/usb/dev-hid.c b/hw/usb/dev-hid.c
+index 24d05f7..dda0bf0 100644
+--- a/hw/usb/dev-hid.c
++++ b/hw/usb/dev-hid.c
+@@ -144,7 +144,7 @@ static const USBDescIface desc_iface_tablet = {
+     .bInterfaceNumber              = 0,
+     .bNumEndpoints                 = 1,
+     .bInterfaceClass               = USB_CLASS_HID,
+-    .bInterfaceProtocol            = 0x02,
++    .bInterfaceProtocol            = 0x00,
+     .ndesc                         = 1,
+     .descs = (USBDescOther[]) {
+         {
+@@ -174,7 +174,7 @@ static const USBDescIface desc_iface_tablet2 = {
+     .bInterfaceNumber              = 0,
+     .bNumEndpoints                 = 1,
+     .bInterfaceClass               = USB_CLASS_HID,
+-    .bInterfaceProtocol            = 0x02,
++    .bInterfaceProtocol            = 0x00,
+     .ndesc                         = 1,
+     .descs = (USBDescOther[]) {
+         {
+@@ -487,7 +487,7 @@ static const uint8_t qemu_mouse_hid_report_descriptor[] = {
  
+ static const uint8_t qemu_tablet_hid_report_descriptor[] = {
+     0x05, 0x01,		/* Usage Page (Generic Desktop) */
+-    0x09, 0x01,		/* Usage (Pointer) */
++    0x09, 0x02,		/* Usage (Mouse) */
+     0xa1, 0x01,		/* Collection (Application) */
+     0x09, 0x01,		/*   Usage (Pointer) */
+     0xa1, 0x00,		/*   Collection (Physical) */
 -- 
 1.8.3.1
