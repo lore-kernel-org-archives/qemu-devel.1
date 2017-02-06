@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksko@virtuozzo.com>) id 1caq8U-0000G0-63
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:43:44 -0500
+	(envelope-from <bruce@cran.org.uk>) id 1caqVX-0003Q0-1N
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:07:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksko@virtuozzo.com>) id 1caq8P-0002tt-8M
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:43:42 -0500
-Received: from mail-db5eur01on0117.outbound.protection.outlook.com
-	([104.47.2.117]:56608
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksko@virtuozzo.com>)
-	id 1caq8O-0002t9-Ij
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 15:43:37 -0500
-From: Alexey Kostyushko <aleksko@virtuozzo.com>
-Date: Mon, 6 Feb 2017 16:10:57 +0000
-Message-ID: <HE1PR0802MB2265F12CE6DF970BC8D0D252AD400@HE1PR0802MB2265.eurprd08.prod.outlook.com>
-References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
-	<20170201102013.GC3232@redhat.com>
-	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
-	<20170201110320.GD3232@redhat.com>
-	<CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
-	<a03be6ea-a7bd-3b99-a94b-f180ef6f9e0a@openvz.org>,
-	<CABdb736+iGndMmYTVcrwRzEwGX9A8uizPthM3_-TYw34-+up_w@mail.gmail.com>
-In-Reply-To: <CABdb736+iGndMmYTVcrwRzEwGX9A8uizPthM3_-TYw34-+up_w@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <bruce@cran.org.uk>) id 1caqVT-0000fv-TO
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:07:31 -0500
+Received: from muon.bluestop.org ([74.50.51.35]:63800 helo=muon.cran.org.uk)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bruce@cran.org.uk>) id 1caqVT-0000fJ-OH
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 16:07:27 -0500
+Received: from muon.bluestop.org (localhost [127.0.0.1])
+	by muon.cran.org.uk (Postfix) with ESMTP id 3273334797
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 21:07:25 +0000 (UTC)
+Received: from muon.cran.org.uk ([127.0.0.1])
+	by muon.bluestop.org (muon.bluestop.org [127.0.0.1]) (amavisd-new,
+	port 10026) with ESMTP id XhZouGcImfY8 for <qemu-devel@nongnu.org>;
+	Mon,  6 Feb 2017 21:07:24 +0000 (UTC)
+Received: from [192.168.1.19] (c-73-20-20-155.hsd1.ut.comcast.net
+	[73.20.20.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by muon.cran.org.uk (Postfix) with ESMTPSA
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 21:07:24 +0000 (UTC)
+From: Rebecca Cran <rebecca@bluestop.org>
+Message-ID: <8b845abb-ea7c-b256-97db-ebf178df37d1@cran.org.uk>
+Date: Mon, 6 Feb 2017 14:07:24 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Build of master pollutes parent directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,105 +37,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-This info is more about pvpanic patch, but may be relevant here also.
+Building commit 7d2c6c95511e42dffe2b263275e09957723d0ff4 is causing 
+pollution of the parent directory: e.g. ~/workspace/qemu/.. contains the 
+following extra directories:
 
-Consider that KeInitializeCrashDumpHeader is not enough to create dumps bec=
-ause it copy only primary header
+audio backends block chardev crypto disas fsdev hw io linux-user 
+migration ndb net qapi qom replay slirp target ui util
 
-and doesn't copy KdDebuggerBlock. Look to combine info from KeCapturePersis=
-tentThreadState.
+I'm configuring QEMU with:
 
-Also whenever amount of RAM is changed (memory hot-plug) you need to recrea=
-te headers.
+./configure --prefix=$HOME --enable-sdl --enable-kvm --enable-linux-aio 
+--enable-vhost-net --enable-spice --enable-vnc --enable-system 
+--disable-smartcard --disable-tpm --disable-libssh2 --disable-curses 
+--disable-libusb --disable-usb-redir --disable-xen   --disable-bluez 
+--disable-user --disable-vde --target-list=x86_64-softmmu,aarch64-softmmu
 
-I think that there should be virtio direct channel for general purposes of =
-dumping and guest-agent channel may be usefull for obtainin varoius
-
-info from guest drivers through ioctls and providing live-dump feature.
-
-________________________________
-From: Ladi Prosek <lprosek@redhat.com>
-Sent: Monday, February 6, 2017 6:50:43 PM
-To: Denis Lunev
-Cc: Daniel P. Berrange; qemu-devel; Michael Roth; Alexey Kostyushko
-Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
-
-On Mon, Feb 6, 2017 at 4:37 PM, Denis V. Lunev <den@openvz.org> wrote:
-> On 02/01/2017 04:41 PM, Ladi Prosek wrote:
->> On Wed, Feb 1, 2017 at 12:03 PM, Daniel P. Berrange <berrange@redhat.com=
-> wrote:
->>> On Wed, Feb 01, 2017 at 11:50:43AM +0100, Ladi Prosek wrote:
->>>> On Wed, Feb 1, 2017 at 11:20 AM, Daniel P. Berrange <berrange@redhat.c=
-om> wrote:
->>>>> On Wed, Feb 01, 2017 at 11:06:46AM +0100, Ladi Prosek wrote:
->>>>>> Analogous to guest-file-read and guest-file-write, this commit adds
->>>>>> support for issuing IOCTLs to files in the guest. With the goal of
->>>>>> abstracting away the differences between Posix ioctl() and Win32
->>>>>> DeviceIoControl() to provide one unified API, the schema distinguish=
-es
->>>>>> between input and output buffer sizes (as required by Win32) and
->>>>>> allows the caller to supply either a 'buffer', pointer to which will
->>>>>> be passed to the Posix ioctl(), or an integer argument, passed to
->>>>>> ioctl() directly.
->>>>> What is the intended usage scenario for this ?
->>>> My specific case is extracting a piece of data from Windows guests.
->>>> Guest driver exposes a file object with a well-known IOCTL code to
->>>> return a data structure from the kernel.
->>> Please provide more information about what you're trying to do.
->>>
->>> If we can understand the full details it might suggest a different
->>> approach that exposing a generic ioctl passthrough facility.
->> The end goal is to be able to create a Window crash dump file from a
->> running (or crashed, but running is more interesting because Windows
->> can't do that by itself) Windows VM. To do that without resorting to
->> hacks, the host application driving this needs to get the crash dump
->> header, which Windows provides in its KeInitializeCrashDumpHeader
->> kernel API.
->>
->> I believe that the most natural way to do this is to have
->> 1) a driver installed in the guest providing a way to call
->> KeInitializeCrashDumpHeader from user space
->> 2) an agent in the guest, running in user space, calling the driver
->> and passing the result back to the host
->>
->> Now 2) may as well be an existing agent, such as the QEMU guest agent,
->> and that's why I am here :)
->>
->> KeInitializeCrashDumpHeader returns an opaque byte array, happens to
->> be 8192 bytes at the moment. My first choice for the kernel-user
->> interface in the guest is IOCTL because what I'm trying to get across
->> is a block, a "datagram", not a stream, and I have the option for
->> easily adding more functionality later by adding more IOCTL codes with
->> the file object still representing "the driver".
->>
->> I could use regular file I/O as well. I would either have to devise a
->> protocol for talking to the driver, have a way of delimiting messages,
->> re-syncing the channel etc., or make a slight semantic shift and
->> instead of the file object representing the driver, it would represent
->> this one particular function of the driver. Opening the file and
->> reading from it until eof would yield the crash dump header.
-> I think that this is not as good as can be for the whole design of the
-> feature.
-> The problem here is that userspace starts toooooooooo late and is not
-> accessible when the guest BSODS and we do need a dump for analysis.
->
-> May be it worth to push this header to QEMU at boot time through virtio b=
-us?
-
-Yes, definitely an option. I believe that having the ability to create
-a dump out of a live system, i.e. without crashing it, is what adds
-the most value here. And that would most likely happen on an
-up-and-running guest so the difference between being able to do it
-after a kernel driver loads and after a user space service starts is
-not that significant.
-
-Still, the sooner the better, for sure. I think I've seen
-virtio-pstore suggested as a possible channel to use to push the
-header.
-
-Thanks!
-
-> Den
+-- 
+Rebecca
