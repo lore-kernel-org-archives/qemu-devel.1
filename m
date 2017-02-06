@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cahUj-0003TC-6D
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:30:06 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cahVj-0004Lv-40
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cahUf-0003NL-96
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:30:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35836)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cahUf-0003N2-3w
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:30:01 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon,  6 Feb 2017 11:29:53 +0000
-Message-Id: <20170206112953.16993-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] rules: don't try to create missing include dirs
+	(envelope-from <dgilbert@redhat.com>) id 1cahVh-0003jC-Ph
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 06:31:07 -0500
+Date: Mon, 6 Feb 2017 11:30:53 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170206113052.GB2524@work-vm>
+References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479837270-79005-4-git-send-email-vsementsov@virtuozzo.com>
+	<87mvegajzv.fsf@emacs.mitica>
+	<7890fa87-faa1-fd99-e8c8-76b51f039ad6@virtuozzo.com>
+	<20170124195334.GF2220@work-vm>
+	<fbd41584-8300-c13f-0244-90e6ea9aa445@virtuozzo.com>
+	<011f92ba-e992-f44f-fdf1-257635d667a3@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <011f92ba-e992-f44f-fdf1-257635d667a3@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 03/17] migration: split common postcopy out
+ of ram postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,64 +29,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: quintela@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-In
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> 01.02.2017 14:06, Vladimir Sementsov-Ogievskiy wrote:
+> > 24.01.2017 22:53, Dr. David Alan Gilbert wrote:
+> > > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> > > > 24.01.2017 12:24, Juan Quintela wrote:
+> > > > > Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+> > > > > > Split common postcopy staff from ram postcopy staff.
+> > > > > > 
+> > > > > > Signed-off-by: Vladimir Sementsov-Ogievskiy
+> > > > > > <vsementsov@virtuozzo.com>
+> > > > > > ---
+> > > > > >    include/migration/migration.h |  1 +
+> > > > > >    migration/migration.c         | 39
+> > > > > > +++++++++++++++++++++++++++------------
+> > > > > >    migration/postcopy-ram.c      |  4 +++-
+> > > > > >    migration/savevm.c            | 31 ++++++++++++++++++++++---------
+> > > > > >    4 files changed, 53 insertions(+), 22 deletions(-)
+> > > > > > 
+> > > > > Hi
+> > > > > 
+> > > > > {
+> > > > > >        MigrationState *s;
+> > > > > > @@ -1587,9 +1592,11 @@ static int
+> > > > > > postcopy_start(MigrationState *ms, bool *old_vm_running)
+> > > > > >         * need to tell the destination to throw any
+> > > > > > pages it's already received
+> > > > > >         * that are dirty
+> > > > > >         */
+> > > > > > -    if (ram_postcopy_send_discard_bitmap(ms)) {
+> > > > > > -        error_report("postcopy send discard bitmap failed");
+> > > > > > -        goto fail;
+> > > > > > +    if (migrate_postcopy_ram()) {
+> > > > > > +        if (ram_postcopy_send_discard_bitmap(ms)) {
+> > > > > > +            error_report("postcopy send discard bitmap failed");
+> > > > > > +            goto fail;
+> > > > > > +        }
+> > > > > I will have preffered that for the ram commands, to embed the
+> > > > > migrate_postocpy_ram() check inside them, but that is taste, and
+> > > > > everyone has its own O:-)
+> > > > > 
+> > > > > > diff --git a/migration/savevm.c b/migration/savevm.c
+> > > > > > index e436cb2..c8a71c8 100644
+> > > > > > --- a/migration/savevm.c
+> > > > > > +++ b/migration/savevm.c
+> > > > > > @@ -73,7 +73,7 @@ static struct mig_cmd_args {
+> > > > > >        [MIG_CMD_INVALID]          = { .len = -1, .name = "INVALID" },
+> > > > > >        [MIG_CMD_OPEN_RETURN_PATH] = { .len =  0, .name =
+> > > > > > "OPEN_RETURN_PATH" },
+> > > > > >        [MIG_CMD_PING]             = { .len =
+> > > > > > sizeof(uint32_t), .name = "PING" },
+> > > > > > -    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = 16, .name =
+> > > > > > "POSTCOPY_ADVISE" },
+> > > > > > +    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = -1, .name =
+> > > > > > "POSTCOPY_ADVISE" },
+> > > > > >        [MIG_CMD_POSTCOPY_LISTEN]  = { .len =  0, .name =
+> > > > > > "POSTCOPY_LISTEN" },
+> > > > > >        [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name =
+> > > > > > "POSTCOPY_RUN" },
+> > > > > >        [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
+> > > > > > @@ -827,12 +827,17 @@ int
+> > > > > > qemu_savevm_send_packaged(QEMUFile *f, const uint8_t
+> > > > > > *buf, size_t len)
+> > > > > >    /* Send prior to any postcopy transfer */
+> > > > > >    void qemu_savevm_send_postcopy_advise(QEMUFile *f)
+> > > > > >    {
+> > > > > > -    uint64_t tmp[2];
+> > > > > > -    tmp[0] = cpu_to_be64(getpagesize());
+> > > > > > -    tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
+> > > > > > +    if (migrate_postcopy_ram()) {
+> > > > > > +        uint64_t tmp[2];
+> > > > > > +        tmp[0] = cpu_to_be64(getpagesize());
+> > > > > > +        tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
+> > > > > > -    trace_qemu_savevm_send_postcopy_advise();
+> > > > > > -    qemu_savevm_command_send(f,
+> > > > > > MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
+> > > > > > +        trace_qemu_savevm_send_postcopy_advise();
+> > > > > > +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE,
+> > > > > > +                                 16, (uint8_t *)tmp);
+> > > > > > +    } else {
+> > > > > > +        qemu_savevm_command_send(f,
+> > > > > > MIG_CMD_POSTCOPY_ADVISE, 0, NULL);
+> > > > > > +    }
+> > > > > >    }
+> > > > > >    /* Sent prior to starting the destination running in
+> > > > > > postcopy, discard pages
+> > > > > I haven't yet figured out why you are reusing this command with a
+> > > > > different number of parameters.
+> > > > > For this to pass, I need that Dave comment on this.
+> > > > > 
+> > > > > So,
+> > > > > 
+> > > > > Reviewed-by: Juan Quintela <quintela@redhat.com>
+> > > > > 
+> > > > > conditioned that Dave agrees with this.
+> > > > These parameters are unrelated if ram postcopy is disabled. So,
+> > > > I should be
+> > > > better to have a possibility of skipping them, then to send
+> > > > unneeded numbers
+> > > > and write separate code to read them from the stream (rewriting
+> > > > loadvm_postcopy_handle_advise to just read these two numbers and
+> > > > do nothing
+> > > > about ram postcopy for this case).
+> > > I think I'd prefer either a new command or keeping these fields
+> > > (probably all 0 ?)
+> > > my worry is what happens in the case if we add a 3rd postcopy
+> > > subfeature;
+> > > In your case we have three possibilities:
+> > > 
+> > >      a) Postcopy RAM only - 16 bytes
+> > >      b) Postcopy persistent-dirty-bitmap only - 0 bytes
+> > >      c) Both - 16 bytes
+> > > 
+> > > Lets say we added postcopy-foo in the future and it wanted to add
+> > > another 16 bytes, what would it send if it was
+> > > foo+persistent-dirty-bitmap and no RAM?
+> > > We'd end up with 16 bytes sent but you'd have to be very careful
+> > > never to get that confused with case (a) above.
+> > > 
+> > > (I don't feel too strongly about it though)
+> > 
+> > We would like to stick current solution if it is not a problem. About
+> > postcopy-foo: on the one hand, the format may be determined from
+> > migration capabilities, on the other hand we can add for example 4bytes
+> > format identifier starting from postcopy-foo and make all parameters
+> > size to be at least 20 bytes. Or something like this.
+> > 
+> 
+> Ok?
 
-  commit ba78db44f6532d66a1e704bd44613e841baa2fc5
-  Author: Daniel P. Berrange <berrange@redhat.com>
-  Date:   Wed Jan 25 16:14:10 2017 +0000
+Yes OK; just please make sure it's all very commented and obvious.
 
-  make: move top level dir to end of include search path
+Dave
 
-The dir $(BUILD_DIR)/$(@D) was added to the include
-path. This would sometimes point to a non-existant
-directory, if the sub-dir in question did not contain
-any target-independant files (eg tcg/). To deal with
-this the rules.mak attempted to create the directory.
-
-While this was succesful, it also caused accidental
-creation of files in the parent of the build dir.
-e.g. when building common source files into target
-specific output files.
-
-Rather than trying to workaround this, just revert
-the code that attempted to mkdir the missing include
-directories. Instead just turn off the compiler warning
-in question as the missing dir is expected & harmless
-in general.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- configure | 2 +-
- rules.mak | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/configure b/configure
-index 86fd833..6325339 100755
---- a/configure
-+++ b/configure
-@@ -1474,7 +1474,7 @@ fi
- 
- gcc_flags="-Wold-style-declaration -Wold-style-definition -Wtype-limits"
- gcc_flags="-Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers $gcc_flags"
--gcc_flags="-Wmissing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
-+gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
- gcc_flags="-Wendif-labels -Wno-shift-negative-value $gcc_flags"
- gcc_flags="-Wno-initializer-overrides $gcc_flags"
- gcc_flags="-Wno-string-plus-int $gcc_flags"
-diff --git a/rules.mak b/rules.mak
-index 575a3af..83d6dd1 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -374,7 +374,6 @@ define unnest-vars
-                 $(eval $(o:%.mo=%$(DSOSUF)): module-common.o $($o-objs)),
-                 $(error $o added in $v but $o-objs is not set)))
-         $(shell mkdir -p ./ $(sort $(dir $($v))))
--        $(shell cd $(BUILD_DIR) && mkdir -p ./ $(sort $(dir $($v))))
-         # Include all the .d files
-         $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$($v))))
-         $(eval $v := $(filter-out %/,$($v))))
--- 
-2.9.3
+> > 
+> > 
+> > > 
+> > > Dave
+> > > 
+> > > > -- 
+> > > > Best regards,
+> > > > Vladimir
+> > > > 
+> > > -- 
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> > 
+> 
+> 
+> -- 
+> Best regards,
+> Vladimir
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
