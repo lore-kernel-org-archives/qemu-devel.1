@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1calGK-0005zk-D8
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:29 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1calGL-000603-0H
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1calGD-00006b-Vj
+	(envelope-from <alex.bennee@linaro.org>) id 1calGG-00007i-Eg
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:28 -0500
-Received: from mail-wj0-x232.google.com ([2a00:1450:400c:c01::232]:35044)
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37333)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1calGD-00006F-N3
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:21 -0500
-Received: by mail-wj0-x232.google.com with SMTP id b20so3653866wjs.2
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 07:31:21 -0800 (PST)
+	id 1calGG-00007R-5a
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 10:31:24 -0500
+Received: by mail-wm0-x231.google.com with SMTP id v77so119965473wmv.0
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 07:31:24 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  6 Feb 2017 15:31:05 +0000
-Message-Id: <20170206153113.27729-16-alex.bennee@linaro.org>
+Date: Mon,  6 Feb 2017 15:31:08 +0000
+Message-Id: <20170206153113.27729-19-alex.bennee@linaro.org>
 In-Reply-To: <20170206153113.27729-1-alex.bennee@linaro.org>
 References: <20170206153113.27729-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v10 15/23] cputlb: introduce tlb_flush_* async
- work.
+Subject: [Qemu-devel] [PATCH v10 18/23] cputlb: atomically update tlb fields
+ used by tlb_reset_dirty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,214 +33,245 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, rth@twiddle.net
 Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-From: KONRAD Frederic <fred.konrad@greensocs.com>
+The main use case for tlb_reset_dirty is to set the TLB_NOTDIRTY flags
+in TLB entries to force the slow-path on writes. This is used to mark
+page ranges containing code which has been translated so it can be
+invalidated if written to. To do this safely we need to ensure the TLB
+entries in question for all vCPUs are updated before we attempt to run
+the code otherwise a race could be introduced.
 
-Some architectures allow to flush the tlb of other VCPUs. This is not a problem
-when we have only one thread for all VCPUs but it definitely needs to be an
-asynchronous work when we are in true multithreaded work.
+To achieve this we atomically set the flag in tlb_reset_dirty_range and
+take care when setting it when the TLB entry is filled.
 
-We take the tb_lock() when doing this to avoid racing with other threads
-which may be invalidating TB's at the same time. The alternative would
-be to use proper atomic primitives to clear the tlb entries en-mass.
+On 32 bit systems attempting to emulate 64 bit guests we don't even
+bother as we might not have the atomic primitives available. MTTCG is
+disabled in this case and can't be forced on. The copy_tlb_helper
+function helps keep the atomic semantics in one place to avoid
+confusion.
 
-This patch doesn't do anything to protect other cputlb function being
-called in MTTCG mode making cross vCPU changes.
+The dirty helper function is made static as it isn't used outside of
+cputlb.
 
-Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
-[AJB: remove need for g_malloc on defer, make check fixes, tb_lock]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-
 ---
-v8
-  - fix merge failure mentioning global flush
-v6 (base patches)
-  - don't use cmpxchg_bool (we drop it later anyway)
-  - use RUN_ON_CPU macros instead of inlines
-  - bug out of tlb_flush if !tcg_enabled() (MacOSX make check failure)
-v5 (base patches)
-  - take tb_lock() for memset
-  - ensure tb_flush_page properly asyncs work for other vCPUs
-  - use run_on_cpu_data
-v4 (base_patches)
-  - brought forward from arm enabling series
-  - restore pending_tlb_flush flag
-v1
-  - Remove tlb_flush_all just do the check in tlb_flush.
-  - remove the need to g_malloc
-  - tlb_flush calls direct if !cpu->created
+v6
+  - use TARGET_PAGE_BITS_MIN
+  - use run_on_cpu helpers
+v7
+  - fix tlb_debug fmt for 32bit build
+  - un-merged the mmuidx async work which got mashed in last round
+  - introduced copy_tlb_helper function and made TCG_OVERSIZED_GUEST aware
 ---
- cputlb.c                | 66 +++++++++++++++++++++++++++++++++++++++++++++++--
- include/exec/exec-all.h |  1 +
- include/qom/cpu.h       |  6 +++++
- 3 files changed, 71 insertions(+), 2 deletions(-)
+ cputlb.c              | 120 +++++++++++++++++++++++++++++++++++++++-----------
+ include/exec/cputlb.h |   2 -
+ 2 files changed, 95 insertions(+), 27 deletions(-)
 
 diff --git a/cputlb.c b/cputlb.c
-index 94fa9977c5..5dfd3c3ba9 100644
+index c50254be26..65003350e3 100644
 --- a/cputlb.c
 +++ b/cputlb.c
-@@ -64,6 +64,10 @@
-         }                                                         \
-     } while (0)
+@@ -342,32 +342,90 @@ void tlb_unprotect_code(ram_addr_t ram_addr)
+     cpu_physical_memory_set_dirty_flag(ram_addr, DIRTY_MEMORY_CODE);
+ }
  
-+/* run_on_cpu_data.target_ptr should always be big enough for a
-+ * target_ulong even on 32 bit builds */
-+QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
+-static bool tlb_is_dirty_ram(CPUTLBEntry *tlbe)
+-{
+-    return (tlbe->addr_write & (TLB_INVALID_MASK|TLB_MMIO|TLB_NOTDIRTY)) == 0;
+-}
+ 
+-void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
++/*
++ * Dirty write flag handling
++ *
++ * When the TCG code writes to a location it looks up the address in
++ * the TLB and uses that data to compute the final address. If any of
++ * the lower bits of the address are set then the slow path is forced.
++ * There are a number of reasons to do this but for normal RAM the
++ * most usual is detecting writes to code regions which may invalidate
++ * generated code.
++ *
++ * Because we want other vCPUs to respond to changes straight away we
++ * update the te->addr_write field atomically. If the TLB entry has
++ * been changed by the vCPU in the mean time we skip the update.
++ *
++ * As this function uses atomic accesses we also need to ensure
++ * updates to tlb_entries follow the same access rules. We don't need
++ * to worry about this for oversized guests as MTTCG is disabled for
++ * them.
++ */
 +
- /* statistics */
- int tlb_flush_count;
- 
-@@ -72,13 +76,22 @@ int tlb_flush_count;
-  * flushing more entries than required is only an efficiency issue,
-  * not a correctness issue.
-  */
--void tlb_flush(CPUState *cpu)
-+static void tlb_flush_nocheck(CPUState *cpu)
++static void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+                            uintptr_t length)
  {
-     CPUArchState *env = cpu->env_ptr;
+-    uintptr_t addr;
++#if TCG_OVERSIZED_GUEST
++    uintptr_t addr = tlb_entry->addr_write;
  
-+    /* The QOM tests will trigger tlb_flushes without setting up TCG
-+     * so we bug out here in that case.
-+     */
-+    if (!tcg_enabled()) {
-+        return;
-+    }
+-    if (tlb_is_dirty_ram(tlb_entry)) {
+-        addr = (tlb_entry->addr_write & TARGET_PAGE_MASK) + tlb_entry->addend;
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += tlb_entry->addend;
+         if ((addr - start) < length) {
+             tlb_entry->addr_write |= TLB_NOTDIRTY;
+         }
+     }
++#else
++    /* paired with atomic_mb_set in tlb_set_page_with_attrs */
++    uintptr_t orig_addr = atomic_mb_read(&tlb_entry->addr_write);
++    uintptr_t addr = orig_addr;
 +
-     assert_cpu_is_self(cpu);
-     tlb_debug("(count: %d)\n", tlb_flush_count++);
- 
-+    tb_lock();
-+
-     memset(env->tlb_table, -1, sizeof(env->tlb_table));
-     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
-     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
-@@ -86,6 +99,27 @@ void tlb_flush(CPUState *cpu)
-     env->vtlb_index = 0;
-     env->tlb_flush_addr = -1;
-     env->tlb_flush_mask = 0;
-+
-+    tb_unlock();
-+
-+    atomic_mb_set(&cpu->pending_tlb_flush, false);
-+}
-+
-+static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
-+{
-+    tlb_flush_nocheck(cpu);
-+}
-+
-+void tlb_flush(CPUState *cpu)
-+{
-+    if (cpu->created && !qemu_cpu_is_self(cpu)) {
-+        if (atomic_cmpxchg(&cpu->pending_tlb_flush, false, true) == true) {
-+            async_run_on_cpu(cpu, tlb_flush_global_async_work,
-+                             RUN_ON_CPU_NULL);
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += atomic_read(&tlb_entry->addend);
++        if ((addr - start) < length) {
++            uintptr_t notdirty_addr = orig_addr | TLB_NOTDIRTY;
++            atomic_cmpxchg(&tlb_entry->addr_write, orig_addr, notdirty_addr);
 +        }
-+    } else {
-+        tlb_flush_nocheck(cpu);
 +    }
- }
- 
- static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
-@@ -95,6 +129,8 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
-     assert_cpu_is_self(cpu);
-     tlb_debug("start\n");
- 
-+    tb_lock();
++#endif
++}
 +
-     for (;;) {
-         int mmu_idx = va_arg(argp, int);
- 
-@@ -109,6 +145,8 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
-     }
- 
-     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
-+
-+    tb_unlock();
++/* For atomic correctness when running MTTCG we need to use the right
++ * primitives when copying entries */
++static inline void copy_tlb_helper(CPUTLBEntry *d, CPUTLBEntry *s,
++                                   bool atomic_set)
++{
++#if TCG_OVERSIZED_GUEST
++    *d = *s;
++#else
++    if (atomic_set) {
++        d->addr_read = s->addr_read;
++        d->addr_code = s->addr_code;
++        atomic_set(&d->addend, atomic_read(&s->addend));
++        /* Pairs with flag setting in tlb_reset_dirty_range */
++        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
++    } else {
++        d->addr_read = s->addr_read;
++        d->addr_write = atomic_read(&s->addr_write);
++        d->addr_code = s->addr_code;
++        d->addend = atomic_read(&s->addend);
++    }
++#endif
  }
  
- void tlb_flush_by_mmuidx(CPUState *cpu, ...)
-@@ -131,13 +169,15 @@ static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
-     }
- }
- 
--void tlb_flush_page(CPUState *cpu, target_ulong addr)
-+static void tlb_flush_page_async_work(CPUState *cpu, run_on_cpu_data data)
++/* This is a cross vCPU call (i.e. another vCPU resetting the flags of
++ * the target vCPU). As such care needs to be taken that we don't
++ * dangerously race with another vCPU update. The only thing actually
++ * updated is the target TLB entry ->addr_write flags.
++ */
+ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
  {
-     CPUArchState *env = cpu->env_ptr;
-+    target_ulong addr = (target_ulong) data.target_ptr;
-     int i;
+     CPUArchState *env;
+ 
      int mmu_idx;
  
-     assert_cpu_is_self(cpu);
-+
-     tlb_debug("page :" TARGET_FMT_lx "\n", addr);
+-    assert_cpu_is_self(cpu);
+-
+     env = cpu->env_ptr;
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+         unsigned int i;
+@@ -455,7 +513,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+     target_ulong address;
+     target_ulong code_address;
+     uintptr_t addend;
+-    CPUTLBEntry *te;
++    CPUTLBEntry *te, *tv, tn;
+     hwaddr iotlb, xlat, sz;
+     unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
+     int asidx = cpu_asidx_from_attrs(cpu, attrs);
+@@ -490,41 +548,50 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
  
-     /* Check if we need to flush due to large pages.  */
-@@ -167,6 +207,18 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
-     tb_flush_jmp_cache(cpu, addr);
+     index = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+     te = &env->tlb_table[mmu_idx][index];
+-
+     /* do not discard the translation in te, evict it into a victim tlb */
+-    env->tlb_v_table[mmu_idx][vidx] = *te;
++    tv = &env->tlb_v_table[mmu_idx][vidx];
++
++    /* addr_write can race with tlb_reset_dirty_range */
++    copy_tlb_helper(tv, te, true);
++
+     env->iotlb_v[mmu_idx][vidx] = env->iotlb[mmu_idx][index];
+ 
+     /* refill the tlb */
+     env->iotlb[mmu_idx][index].addr = iotlb - vaddr;
+     env->iotlb[mmu_idx][index].attrs = attrs;
+-    te->addend = addend - vaddr;
++
++    /* Now calculate the new entry */
++    tn.addend = addend - vaddr;
+     if (prot & PAGE_READ) {
+-        te->addr_read = address;
++        tn.addr_read = address;
+     } else {
+-        te->addr_read = -1;
++        tn.addr_read = -1;
+     }
+ 
+     if (prot & PAGE_EXEC) {
+-        te->addr_code = code_address;
++        tn.addr_code = code_address;
+     } else {
+-        te->addr_code = -1;
++        tn.addr_code = -1;
+     }
++
++    tn.addr_write = -1;
+     if (prot & PAGE_WRITE) {
+         if ((memory_region_is_ram(section->mr) && section->readonly)
+             || memory_region_is_romd(section->mr)) {
+             /* Write access calls the I/O callback.  */
+-            te->addr_write = address | TLB_MMIO;
++            tn.addr_write = address | TLB_MMIO;
+         } else if (memory_region_is_ram(section->mr)
+                    && cpu_physical_memory_is_clean(
+                         memory_region_get_ram_addr(section->mr) + xlat)) {
+-            te->addr_write = address | TLB_NOTDIRTY;
++            tn.addr_write = address | TLB_NOTDIRTY;
+         } else {
+-            te->addr_write = address;
++            tn.addr_write = address;
+         }
+-    } else {
+-        te->addr_write = -1;
+     }
++
++    /* Pairs with flag setting in tlb_reset_dirty_range */
++    copy_tlb_helper(te, &tn, true);
++    /* atomic_mb_set(&te->addr_write, write_address); */
  }
  
-+void tlb_flush_page(CPUState *cpu, target_ulong addr)
-+{
-+    tlb_debug("page :" TARGET_FMT_lx "\n", addr);
+ /* Add a new TLB entry, but without specifying the memory
+@@ -687,10 +754,13 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
+         if (cmp == page) {
+             /* Found entry in victim tlb, swap tlb and iotlb.  */
+             CPUTLBEntry tmptlb, *tlb = &env->tlb_table[mmu_idx][index];
 +
-+    if (!qemu_cpu_is_self(cpu)) {
-+        async_run_on_cpu(cpu, tlb_flush_page_async_work,
-+                         RUN_ON_CPU_TARGET_PTR(addr));
-+    } else {
-+        tlb_flush_page_async_work(cpu, RUN_ON_CPU_TARGET_PTR(addr));
-+    }
-+}
++            copy_tlb_helper(&tmptlb, tlb, false);
++            copy_tlb_helper(tlb, vtlb, true);
++            copy_tlb_helper(vtlb, &tmptlb, true);
 +
- void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, ...)
- {
-     CPUArchState *env = cpu->env_ptr;
-@@ -213,6 +265,16 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, ...)
-     tb_flush_jmp_cache(cpu, addr);
- }
+             CPUIOTLBEntry tmpio, *io = &env->iotlb[mmu_idx][index];
+             CPUIOTLBEntry *vio = &env->iotlb_v[mmu_idx][vidx];
+-
+-            tmptlb = *tlb; *tlb = *vtlb; *vtlb = tmptlb;
+             tmpio = *io; *io = *vio; *vio = tmpio;
+             return true;
+         }
+diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
+index d454c005b7..3f941783c5 100644
+--- a/include/exec/cputlb.h
++++ b/include/exec/cputlb.h
+@@ -23,8 +23,6 @@
+ /* cputlb.c */
+ void tlb_protect_code(ram_addr_t ram_addr);
+ void tlb_unprotect_code(ram_addr_t ram_addr);
+-void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+-                           uintptr_t length);
+ extern int tlb_flush_count;
  
-+void tlb_flush_page_all(target_ulong addr)
-+{
-+    CPUState *cpu;
-+
-+    CPU_FOREACH(cpu) {
-+        async_run_on_cpu(cpu, tlb_flush_page_async_work,
-+                         RUN_ON_CPU_TARGET_PTR(addr));
-+    }
-+}
-+
- /* update the TLBs so that writes to code in the virtual page 'addr'
-    can be detected */
- void tlb_protect_code(ram_addr_t ram_addr)
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index bd4622ac5d..e43cb68355 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -158,6 +158,7 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
- void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr);
- void probe_write(CPUArchState *env, target_ulong addr, int mmu_idx,
-                  uintptr_t retaddr);
-+void tlb_flush_page_all(target_ulong addr);
- #else
- static inline void tlb_flush_page(CPUState *cpu, target_ulong addr)
- {
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 1a06ae5938..7f1d6a81a0 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -398,6 +398,12 @@ struct CPUState {
- 
-     bool hax_vcpu_dirty;
-     struct hax_vcpu_state *hax_vcpu;
-+
-+    /* The pending_tlb_flush flag is set and cleared atomically to
-+     * avoid potential races. The aim of the flag is to avoid
-+     * unnecessary flushes.
-+     */
-+    bool pending_tlb_flush;
- };
- 
- QTAILQ_HEAD(CPUTailQ, CPUState);
+ #endif
 -- 
 2.11.0
