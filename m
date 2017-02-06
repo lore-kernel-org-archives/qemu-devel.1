@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1camy8-0005bb-VH
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:20:50 -0500
+	(envelope-from <bounces@canonical.com>) id 1camyA-0005bg-Pt
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:20:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1camy5-0001Y7-O1
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:20:48 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54530)
+	(envelope-from <bounces@canonical.com>) id 1camy7-0001Yu-If
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:20:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40188)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1camy5-0001Xm-DJ
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:20:45 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v16HEK3F054114
-	for <qemu-devel@nongnu.org>; Mon, 6 Feb 2017 12:20:44 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28eu3e6qxa-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 12:20:44 -0500
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 6 Feb 2017 12:20:42 -0500
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 06 Feb 2017 18:20:37 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1camy7-0001YW-C3
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 12:20:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1camy6-0007VZ-Ak
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 17:20:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4CD302E80C0
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 17:20:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <148640163738.20116.15256467457494672940.stgit@bahia>
-Subject: [Qemu-devel] [PATCH] 9pfs: proxy: assert if unmarshal fails
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Feb 2017 17:11:26 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
+Message-Id: <20170206171126.29967.37304.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
+ cpu->kvm_msr_buf->nmsrs' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,96 +38,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-Replies from the virtfs proxy are made up of a fixed-size header (8 bytes)
-and a payload of variable size (maximum 64kb). When receiving a reply,
-the proxy backend first reads the whole header and then unmarshals it.
-If the header is okay, it then does the same operation with the payload.
+Ahha!
+[    0.000000] DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Refe=
+rence Platform, BIOS 6.00 09/30/2014
+[    0.000000] Hypervisor detected: VMware
 
-Since the proxy backend uses a pre-allocated buffer which has enough room
-for a header and the maximum payload size, marshalling should never fail
-with fixed size arguments. Let's make this clear with assertions.
+So you didn't mention this was running inside VMWare; it looks to me as if =
+that's rejecting the PMU MSR accesses.
+For reference which version of VMWare are you using?
 
-This should also address Coverity's complaints CID 1348519 and CID 1348520,
-about not always checking the return value of proxy_unmarshal().
+My colleague suggested that '-cpu host,pmu=3Doff'  might work instead of
+having to hack around with the source.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/9pfs/9p-proxy.c |   22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+-- =
 
-diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
-index f4aa7a9d70f8..4ad42a1ad158 100644
---- a/hw/9pfs/9p-proxy.c
-+++ b/hw/9pfs/9p-proxy.c
-@@ -165,7 +165,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-         return retval;
-     }
-     reply->iov_len = PROXY_HDR_SZ;
--    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-+    retval = proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-+    assert(retval == 8);
-     /*
-      * if response size > PROXY_MAX_IO_SZ, read the response but ignore it and
-      * return -ENOBUFS
-@@ -194,9 +195,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-     if (header.type == T_ERROR) {
-         int ret;
-         ret = proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
--        if (ret < 0) {
--            *status = ret;
--        }
-+        assert(ret == 4);
-         return 0;
-     }
- 
-@@ -213,6 +212,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-                                  &prstat.st_atim_sec, &prstat.st_atim_nsec,
-                                  &prstat.st_mtim_sec, &prstat.st_mtim_nsec,
-                                  &prstat.st_ctim_sec, &prstat.st_ctim_nsec);
-+        assert(retval == sizeof(prstat));
-         prstat_to_stat(response, &prstat);
-         break;
-     }
-@@ -225,6 +225,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-                                  &prstfs.f_files, &prstfs.f_ffree,
-                                  &prstfs.f_fsid[0], &prstfs.f_fsid[1],
-                                  &prstfs.f_namelen, &prstfs.f_frsize);
-+        assert(retval == sizeof(prstfs));
-         prstatfs_to_statfs(response, &prstfs);
-         break;
-     }
-@@ -246,7 +247,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-         break;
-     }
-     case T_GETVERSION:
--        proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
-+        retval = proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
-+        assert(retval == 8);
-         break;
-     default:
-         return -1;
-@@ -274,18 +276,16 @@ static int v9fs_receive_status(V9fsProxy *proxy,
-         return retval;
-     }
-     reply->iov_len = PROXY_HDR_SZ;
--    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
--    if (header.size != sizeof(int)) {
--        *status = -ENOBUFS;
--        return 0;
--    }
-+    retval = proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-+    assert(retval == 8);
-     retval = socket_read(proxy->sockfd,
-                          reply->iov_base + PROXY_HDR_SZ, header.size);
-     if (retval < 0) {
-         return retval;
-     }
-     reply->iov_len += header.size;
--    proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-+    retval = proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-+    assert(retval == 4);
-     return 0;
- }
- 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661386
+
+Title:
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  =
+
+  I see the following when try to run qemu from master as the following:
+
+  # ./x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+  loglevel=3D7' -m 1024 -serial stdio
+  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  First broken commit has been bisected:
+
+  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Mar 30 22:55:29 2016 +0200
+
+      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+      =
+
+      This would have caught the bug in the previous patch.
+      =
+
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  My cpuinfo is the following:
+
+  processor       : 0
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 44
+  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+  stepping        : 2
+  microcode       : 0x14
+  cpu MHz         : 3066.775
+  cache size      : 12288 KB
+  physical id     : 0
+  siblings        : 2
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 0
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 11
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
+onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
+perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
+lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+  bugs            :
+  bogomips        : 6133.55
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 40 bits physical, 48 bits virtual
+  power management:
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
