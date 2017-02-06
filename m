@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1casVf-0004Un-1q
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:15:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1casXb-0005WV-Tj
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:17:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1casVa-0003Lx-4l
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:15:47 -0500
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:59709)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1casVZ-0003LW-Qg
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:15:41 -0500
-Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 59F821E986
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 00:15:40 +0100 (CET)
-Date: Tue, 7 Feb 2017 00:15:33 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170207001533.3f18e4ea@bahia.lan>
-In-Reply-To: <71b1733d-7638-5e27-e828-fad57f76f507@redhat.com>
-References: <1486123043-26493-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1486123043-26493-2-git-send-email-pradeep.jagadeesh@huawei.com>
-	<71b1733d-7638-5e27-e828-fad57f76f507@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1casXa-0003sN-PZ
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 18:17:47 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-6-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
+Date: Mon, 6 Feb 2017 17:17:34 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/2vaI71pYDuic=5Om9BgmgVm";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 1/2 v16] fsdev: add IO throttle support to
- fsdev devices
+In-Reply-To: <20170203154757.36140-6-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6BgRc7uCFxLVkXhjXTnFcLqTmRXs5C6P2"
+Subject: Re: [Qemu-devel] [PATCH 05/18] nbd/client: fix drop_sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,53 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com, qemu-stable <qemu-stable@nongnu.org>
 
---Sig_/2vaI71pYDuic=5Om9BgmgVm
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6BgRc7uCFxLVkXhjXTnFcLqTmRXs5C6P2
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
+ stefanha@redhat.com, qemu-stable <qemu-stable@nongnu.org>
+Message-ID: <e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
+Subject: Re: [PATCH 05/18] nbd/client: fix drop_sync
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+ <20170203154757.36140-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20170203154757.36140-6-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 6 Feb 2017 13:36:43 -0600
-Eric Blake <eblake@redhat.com> wrote:
-
-> On 02/03/2017 05:57 AM, Pradeep Jagadeesh wrote:
-> > This patchset adds the throttle support for the 9p-local driver.
-> > For now this functionality can be enabled only through qemu cli options.
-> > QMP interface and support to other drivers need further extensions. =20
+On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Comparison symbol is misused. It may lead to memory corruption.
 >=20
-> This part is a bit scary - if 2.9 is released with just the cli option
-> and not the QMP interface, then how does someone like libvirt introspect
-> whether the feature is available for use?
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/client.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Adding qemu-stable; this needs to be back-ported, and can be applied
+independently from your series.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/nbd/client.c b/nbd/client.c
+> index 6caf6bda6d..351731bc63 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -94,7 +94,7 @@ static ssize_t drop_sync(QIOChannel *ioc, size_t size=
+)
+>      char small[1024];
+>      char *buffer;
+> =20
+> -    buffer =3D sizeof(small) < size ? small : g_malloc(MIN(65536, size=
+));
+> +    buffer =3D sizeof(small) > size ? small : g_malloc(MIN(65536, size=
+));
+>      while (size > 0) {
+>          ssize_t count =3D read_sync(ioc, buffer, MIN(65536, size));
+> =20
 >=20
 
-I'm not aware of anything related to fsdev in QMP... and libvirt seems to
-only parse the output of -help to guess fsdev capabilities. And indeed,
-qemu-options.hx doesn't expose this new feature.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-> Please make sure we don't reach 2.9 with only a half-baked feature;
-> whether that means finishing the QMP work or temporarily disabling the
-> cli additions until a later release can finish the work.
->=20
 
-Would this be ok to add the missing bits in qemu-options.hx or do you
-expect more ?
-
-Cheers.
-
---
-Greg
-
---Sig_/2vaI71pYDuic=5Om9BgmgVm
-Content-Type: application/pgp-signature
+--6BgRc7uCFxLVkXhjXTnFcLqTmRXs5C6P2
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAliZA5UACgkQAvw66wEB28KVswCfckL0Ua4jmsd3jL279QWvjFBC
-fh0An0GQYxIj68/YlqjqWISJ5Oi9Zqx8
-=EKm0
+iQEcBAEBCAAGBQJYmQQOAAoJEKeha0olJ0NquBsH/Aq+Pv3njVgET3t7Ae+GdYZ2
++xUQzExksKmUvNm36arR0P5mRu4iZhtrhyafFIZkVTJMfz7S6UHiSw1kNjU6urXx
+MZCvHfiv7bC3Uc7X1Hsl1qYd58ja2O+avIit2KSADp/eNOaP9dQf/K03HLRZYM9w
+KEa2xqAusjNyZotchdgg/yBcJx7V2C7h5T/+vN4NCEx2pfiVEM9lxQJ5Qp3BTXVf
+URlGiPMsDVQz2LKXVVs9UzI9DrYeV8vmJoNw4sUYCAa6RDq32uDn7060ziqfVPOF
+eES6xAxqgpd+TgwJtl+HKovKz3pVvZQGcXfKGZbcZWEz7WBm1knX9qvS//NQel8=
+=OSNe
 -----END PGP SIGNATURE-----
 
---Sig_/2vaI71pYDuic=5Om9BgmgVm--
+--6BgRc7uCFxLVkXhjXTnFcLqTmRXs5C6P2--
