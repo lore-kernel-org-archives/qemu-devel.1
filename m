@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1camEa-0002Sl-Bp
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:33:46 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1camIr-0005Jm-9B
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:38:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1camEZ-0005LY-8D
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:33:44 -0500
-Date: Mon, 6 Feb 2017 16:33:31 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170206163331.GF31991@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <87bmukmlau.fsf@dusky.pond.sub.org>
-	<20170206132321.GB11987@noname.redhat.com>
-	<877f53l4a5.fsf@dusky.pond.sub.org>
+	(envelope-from <alex.williamson@redhat.com>) id 1camIn-0007R7-E2
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:38:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1camIn-0007QT-8F
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 11:38:05 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 98D0A83F38
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 16:38:04 +0000 (UTC)
+Date: Mon, 6 Feb 2017 09:38:02 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170206093802.72366e44@t450s.home>
+In-Reply-To: <725c680a-f92d-3e64-439c-66cff5b5551c@redhat.com>
+References: <1485244958-25911-1-git-send-email-thuth@redhat.com>
+	<20170203111045.4367eb34@t450s.home>
+	<725c680a-f92d-3e64-439c-66cff5b5551c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <877f53l4a5.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/vfio/pci-quirks: Set category of the
+ "vfio-pci-igd-lpc-bridge" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +36,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, Feb 06, 2017 at 04:36:50PM +0100, Markus Armbruster wrote:
-> Kevin Wolf <kwolf@redhat.com> writes:
-> > Want to make use of the shiny new QemuOpts and get things parsed into
-> > a nested object? Well, provide a real schema instead of "any" then.
-> 
-> Sadly, this is somewhere between impractical and impossible.
-> 
-> The QAPI schema is fixed at compile-time.  It needs to be, because its
-> purpose is to let us generate code we can compile and link into QEMU.
-> 
-> We use 'any' basically for things that aren't fixed at compile-time.
-> 
-> Example: qdev properties and device_add
-> 
-> Even though traditional qdev properties are fixed at compile time, they
-> are not known until run-time.  That's because they're defined in the
-> device models, and the registry of device models is only built at
-> run-time.
-> 
-> I believe this would've been fixable with some effort: make the devices
-> define suitable pieces of schema, and collect them somehow at
-> compile-time.  "Would've been", because progress!  See next example.
-> 
-> Example: QOM properties and object-add, qom-set, qom-get
-> 
-> QOM properties are created at run-time.  They cannot be fixed at
-> compile-time *by design*.  I always hated that part of the design, but I
-> was assured we absolutely need that much rope^Wflexibility.
-> 
-> So, all we know about the "props" argument of object-add is that it's a
-> JSON object.  The tightest imaginable QAPI schema would be an 'object'
-> type, except that doesn't exist, so we settle for 'any'.
+On Mon, 6 Feb 2017 11:09:45 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-The CLI parser is executing at runtime though, so I would think
-it should need to care if the schema its using to parse the CLI
-args was defined at build time or execution time. It merely needs
-the schema to be present at the time it parses the data.
+> On 03.02.2017 19:10, Alex Williamson wrote:
+> > On Tue, 24 Jan 2017 09:02:38 +0100
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >   
+> >> The device has "bridge" in its name, so it should obviously be in
+> >> the category DEVICE_CATEGORY_BRIDGE.  
+> > 
+> > Well, physical device is a bridge, but this is really just a stub.
+> > Does that count?  It doesn't create a subordinate bus that can actually
+> > host devices.  
+> 
+> The device category is only used for sorting the device into a category
+> in the help output when the user runs QEMU with "-device ?". The
+> DEVICE_CATEGORY_BRIDGE is title there "Controller/Bridge/Hub devices",
+> so IMHO that should be fine for this device. Otherwise it should maybe
+> go into DEVICE_CATEGORY_MISC instead - but at least it should not stay
+> uncategorized, all devices that show up in the "-device ?" help text
+> should eventually get a category.
 
-So is there a way we dynamically report the info we need by improving
-visitor support for QOM somehow.
+Ok, I'll queue this for my next pull request.  Thanks,
 
-
-> This isn't just a "can't decide between integer and string" problem,
-> which Dan solved by auto-converting strings in the input visitor,
-> i.e. by delaying some parsing of terminals.  It's a "can't even figure
-> out the tree structure" problem.
-
-Yep, my gross hack was because I was explicitly trying to avoid making
-any changes to QemuOpts. I wanted to tokenize the string without knowing
-anything about the schema, then convert to QDict, and then visit it to
-create the object. Only the 3rd step had any kind of access to QOM type
-information.
-
-It feels like the gross hacks in this area could have been avoided if
-I had been willing to sacrifice the layering to make schema info
-available to the QemuOpts parser somehow. Then it could have dynamically
-queried the QOM props to determine their expected types and parses the
-opts accordingly.
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Alex
