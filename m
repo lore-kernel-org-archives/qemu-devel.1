@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1caghq-0001NJ-Dx
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:39:35 -0500
+	(envelope-from <bounces@canonical.com>) id 1cagjj-00030k-WA
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:41:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1caghp-0001sz-GO
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:39:34 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35818)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1caghp-0001sb-Ai
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:39:33 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id b65so114048706wmf.0
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 02:39:33 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cagja-0002G1-Lk
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:41:27 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47655)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cagja-0002FZ-Gz
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 05:41:22 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cagjZ-00053T-4n
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 10:41:21 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 22DB62E80CC
+	for <qemu-devel@nongnu.org>; Mon,  6 Feb 2017 10:41:21 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <40A49F91-60AF-4CDF-B2B6-B6DC2E93EF78@kent.ac.uk>
-References: <24f4e37d0c554e379d13a13026efb36f@ex13-live-mbn2.ad.kent.ac.uk>
-	<20170203144615.GD642@stefanha-x1.localdomain>
-	<40A49F91-60AF-4CDF-B2B6-B6DC2E93EF78@kent.ac.uk>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 6 Feb 2017 10:39:11 +0000
-Message-ID: <CAFEAcA_ePwJUVrEh=jXu9Mup=zRwH=CWTjJsKcT7p7tA41ndtw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] TCG semantics
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Feb 2017 10:26:05 -0000
+From: Thomas Huth <1661815@bugs.launchpad.net>
+Reply-To: Bug 1661815 <1661815@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170204082040.20702.26524.malonedeb@gac.canonical.com>
+Message-Id: <20170206102605.27996.17379.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1661815] Re: Stack address is returned from
+ function translate_one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Robbins <er209@kent.ac.uk>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 6 February 2017 at 10:14, Ed Robbins <er209@kent.ac.uk> wrote:
-> It seems pretty good. I was surprised that call instructions can
-> have arguments/return specified, and wonder if those are normally
-> just empty, so that emulation of the target stack/registers just
-> carries the args/return in the background. Otherwise TCG must be
-> detecting the target's arguments/return for each call which would
-> need a clever dataflow analysis, or to follow calling convention
-> and just hope, right?
+The calling function never uses "->fields", so I do not see a real
+vulnerability here, is there? Did you use a code analyser for this, or
+how did you come across this issue?
 
-"target" is a tricky word here, because it's unclear whether it
-means the guest or the host CPU architecture. Note that tcg/README
-always means "TCG target" (ie host) when it says "target", as
-per section 2.
+-- =
 
-The "call" instruction is a call to a host function, so the
-only calling convention in play is the host OS's ABI. (This
-is what we use for calling C helper functions to implement
-more complex bits of the guest emulation.) We don't know or
-care about the guest's calling convention, because TCG only
-sees things at the level of guest instructions and registers.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661815
 
-> I also am not clear about the precise operation of the byte
-> swap instruction, but guess it follows the x86 bswap semantics.
+Title:
+  Stack address is returned from function translate_one
 
-Er, there's more than one definition of how to do byteswaps?
-These instructions just swap the bytes in the however-many-bytes
-wide lump of data they're defined to operate on. (If the
-value type is wider than that lump of data then the insns
-are allowed to assume the high bytes are zeroes, ie undefined
-result if they're not.) Happy to take patches for clarifying
-the docs, though.
+Status in QEMU:
+  New
 
-thanks
--- PMM
+Bug description:
+  The vulnerable version is qemu-2.8.0, and the vulnerable function is
+  in "target-s390x/translate.c".
+
+  The code snippet is as following.
+
+  static ExitStatus translate_one(CPUS390XState *env, DisasContext *s)
+  {
+      const DisasInsn *insn;
+      ExitStatus ret =3D NO_EXIT;
+      DisasFields f;
+      ...
+      s->fields =3D &f;
+      ...
+      s->pc =3D s->next_pc;
+      return ret;
+  }
+
+  A stack address, i.e. the address of local variable "f" is returned
+  from current function through the output parameter "s->fields" as a
+  side effect.
+
+  This issue is one kind of undefined behaviors, according the C
+  Standard, 6.2.4 [ISO/IEC 9899:2011]
+  (https://www.securecoding.cert.org/confluence/display/c/DCL30-C.+Declare+=
+objects+with+appropriate+storage+durations)
+
+  This dangerous defect may lead to an exploitable vulnerability.
+  We suggest sanitizing "s->fields" as null before return.
+
+  Note that this issue is reported by shqking and Zhenwei Zou together.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661815/+subscriptions
