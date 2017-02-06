@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cadgW-0000yk-6R
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:26:01 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1caduu-0003Dk-SA
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:40:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cadgT-0004A3-2y
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:26:00 -0500
-Received: from szxga02-in.huawei.com ([119.145.14.65]:47511)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1caduq-0000N5-5Q
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:40:52 -0500
+Received: from szxga01-in.huawei.com ([58.251.152.64]:24850)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cadgS-000466-FS
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:25:57 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cadup-0000LV-Db
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 02:40:48 -0500
 References: <1485327241-15104-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1485327241-15104-3-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170131100528.GC2395@work-vm>
+	<1485327241-15104-2-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170131100432.GB2395@work-vm>
 From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <589824D5.4070302@huawei.com>
-Date: Mon, 6 Feb 2017 15:25:09 +0800
+Message-ID: <5898221E.9060602@huawei.com>
+Date: Mon, 6 Feb 2017 15:13:34 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170131100528.GC2395@work-vm>
+In-Reply-To: <20170131100432.GB2395@work-vm>
 Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] savevm: Add new helpers to process the
- different stages of loadvm/savevm
+Subject: Re: [Qemu-devel] [PATCH 1/2] savevm: split save/find
+ loadvm_handlers entry into two helper functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +30,118 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, amit.shah@redhat.com, quintela@redhat.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, amit.shah@redhat.com, quintela@redhat.com
 
-On 2017/1/31 18:05, Dr. David Alan Gilbert wrote:
+On 2017/1/31 18:04, Dr. David Alan Gilbert wrote:
 > * zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
->> There are several stages during loadvm/savevm process. In different stage,
->> migration incoming processes different types of sections.
->> We want to control these stages more accuracy, it will benefit COLO
->> performance, we don't have to save type of QEMU_VM_SECTION_START
->> sections everytime while do checkpoint, besides, we want to separate
->> the process of saving/loading memory and devices state.
+>> COLO's checkpoint process is based on migration process,
+>> everytime we do checkpoint we will repeat the process of savevm and loadvm.
 >>
->> So we add three new helper functions: qemu_loadvm_state_begin(),
->> qemu_load_device_state() and qemu_savevm_live_state() to achieve
->> different process during migration.
+>> So we will call qemu_loadvm_section_start_full() repeatedly, It will
+>> add all migration sections information into loadvm_handlers list everytime,
+>> which will lead to memory leak.
+>>
+>> To fix it, we split the process of saving and finding section entry into two
+>> helper functions, we will check if section info was exist in loadvm_handlers
+>> list before save it.
+>>
+>> This modifications have no side effect for normal migration.
 >>
 >> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>>   migration/savevm.c | 55 +++++++++++++++++++++++++++++++++++++++---------------
+>>   1 file changed, 40 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index f9c06e9..92b3d6c 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -1805,6 +1805,37 @@ void loadvm_free_handlers(MigrationIncomingState *mis)
+>>       }
+>>   }
+>>
+>> +static LoadStateEntry *loadvm_save_section_entry(MigrationIncomingState *mis,
 >
-> I don't think this one can go in without the patch that follows which
-> uses these functions; we don't normally add functions
-> without the patch that uses them.
+> Can you change that to loadvm_add_section_entry please;  it's a bit
+> confusing using 'save' in a function name that's part of the 'load' path.
 >
 
-Yes, this series is prerequisite for the later COLO optimization,
-that will be a bigger series, that's why i picked these two patches,
-but since it is irrational, I'll post these series with the later one
-where we use this functions. Thanks. :)
+OK, will fix it in next version, thanks.
 
 > Dave
 >
->> ---
->>   include/sysemu/sysemu.h |  4 ++++
->>   migration/savevm.c      | 41 +++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 45 insertions(+)
->>
->> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->> index ff8ffb5..d9214bf 100644
->> --- a/include/sysemu/sysemu.h
->> +++ b/include/sysemu/sysemu.h
->> @@ -126,7 +126,11 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
->>                                              uint64_t *start_list,
->>                                              uint64_t *length_list);
->>
->> +void qemu_savevm_live_state(QEMUFile *f);
->> +
->>   int qemu_loadvm_state(QEMUFile *f);
->> +int qemu_loadvm_state_begin(QEMUFile *f);
->> +int qemu_load_device_state(QEMUFile *f);
->>
->>   extern int autostart;
->>
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index 92b3d6c..04dee4f 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -1264,6 +1264,13 @@ done:
->>       return ret;
->>   }
->>
->> +void qemu_savevm_live_state(QEMUFile *f)
+>> +                                                 SaveStateEntry *se,
+>> +                                                 uint32_t section_id,
+>> +                                                 uint32_t version_id)
 >> +{
->> +    /* save QEMU_VM_SECTION_END section */
->> +    qemu_savevm_state_complete_precopy(f, true);
->> +    qemu_put_byte(f, QEMU_VM_EOF);
+>> +    LoadStateEntry *le;
+>> +
+>> +    /* Add entry */
+>> +    le = g_malloc0(sizeof(*le));
+>> +
+>> +    le->se = se;
+>> +    le->section_id = section_id;
+>> +    le->version_id = version_id;
+>> +    QLIST_INSERT_HEAD(&mis->loadvm_handlers, le, entry);
+>> +    return le;
 >> +}
 >> +
->>   static int qemu_save_device_state(QEMUFile *f)
+>> +static LoadStateEntry *loadvm_find_section_entry(MigrationIncomingState *mis,
+>> +                                                 uint32_t section_id)
+>> +{
+>> +    LoadStateEntry *le;
+>> +
+>> +    QLIST_FOREACH(le, &mis->loadvm_handlers, entry) {
+>> +        if (le->section_id == section_id) {
+>> +            break;
+>> +        }
+>> +    }
+>> +
+>> +    return le;
+>> +}
+>> +
+>>   static int
+>>   qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
 >>   {
->>       SaveStateEntry *se;
->> @@ -2064,6 +2071,40 @@ int qemu_loadvm_state(QEMUFile *f)
->>       return ret;
->>   }
+>> @@ -1847,15 +1878,12 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
+>>           return -EINVAL;
+>>       }
 >>
->> +int qemu_loadvm_state_begin(QEMUFile *f)
->> +{
->> +    MigrationIncomingState *mis = migration_incoming_get_current();
->> +    Error *local_err = NULL;
->> +    int ret;
->> +
->> +    if (qemu_savevm_state_blocked(&local_err)) {
->> +        error_report_err(local_err);
->> +        return -EINVAL;
+>> -    /* Add entry */
+>> -    le = g_malloc0(sizeof(*le));
+>> -
+>> -    le->se = se;
+>> -    le->section_id = section_id;
+>> -    le->version_id = version_id;
+>> -    QLIST_INSERT_HEAD(&mis->loadvm_handlers, le, entry);
+>> -
+>> -    ret = vmstate_load(f, le->se, le->version_id);
+>> +     /* Check if we have saved this section info before, if not, save it */
+>> +    le = loadvm_find_section_entry(mis, section_id);
+>> +    if (!le) {
+>> +        le = loadvm_save_section_entry(mis, se, section_id, version_id);
 >> +    }
->> +    /* Load QEMU_VM_SECTION_START section */
->> +    ret = qemu_loadvm_state_main(f, mis);
->> +    if (ret < 0) {
->> +        error_report("Failed to loadvm begin work: %d", ret);
->> +    }
->> +    return ret;
->> +}
+>> +    ret = vmstate_load(f, se, version_id);
+>>       if (ret < 0) {
+>>           error_report("error while loading state for instance 0x%x of"
+>>                        " device '%s'", instance_id, idstr);
+>> @@ -1878,12 +1906,9 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+>>       section_id = qemu_get_be32(f);
+>>
+>>       trace_qemu_loadvm_state_section_partend(section_id);
+>> -    QLIST_FOREACH(le, &mis->loadvm_handlers, entry) {
+>> -        if (le->section_id == section_id) {
+>> -            break;
+>> -        }
+>> -    }
+>> -    if (le == NULL) {
 >> +
->> +int qemu_load_device_state(QEMUFile *f)
->> +{
->> +    MigrationIncomingState *mis = migration_incoming_get_current();
->> +    int ret;
->> +
->> +    /* Load QEMU_VM_SECTION_FULL section */
->> +    ret = qemu_loadvm_state_main(f, mis);
->> +    if (ret < 0) {
->> +        error_report("Failed to load device state: %d", ret);
->> +        return ret;
->> +    }
->> +
->> +    cpu_synchronize_all_post_init();
->> +    return 0;
->> +}
->> +
->>   void hmp_savevm(Monitor *mon, const QDict *qdict)
->>   {
->>       BlockDriverState *bs, *bs1;
+>> +    le = loadvm_find_section_entry(mis, section_id);
+>> +    if (!le) {
+>>           error_report("Unknown savevm section %d", section_id);
+>>           return -EINVAL;
+>>       }
 >> --
 >> 1.8.3.1
 >>
