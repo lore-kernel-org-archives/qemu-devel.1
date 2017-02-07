@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cbDdq-0002zN-6C
+	(envelope-from <wei@redhat.com>) id 1cbDdq-0002zO-7P
 	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 16:49:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cbDdo-0007cT-US
+	(envelope-from <wei@redhat.com>) id 1cbDdp-0007cZ-1S
 	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 16:49:38 -0500
 From: Wei Huang <wei@redhat.com>
-Date: Tue,  7 Feb 2017 16:49:27 -0500
-Message-Id: <1486504171-26807-1-git-send-email-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V3 0/4] Add vPMU vPMU support under TCG mode
+Date: Tue,  7 Feb 2017 16:49:29 -0500
+Message-Id: <1486504171-26807-3-git-send-email-wei@redhat.com>
+In-Reply-To: <1486504171-26807-1-git-send-email-wei@redhat.com>
+References: <1486504171-26807-1-git-send-email-wei@redhat.com>
+Subject: [Qemu-devel] [PATCH V3 2/4] target-arm: Add support for AArch64 PMU
+ register PMXEVTYPER_EL0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,56 +23,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-QEMU has implemented cycle count support for guest VM under TCG mode.
-But this feature is not complete. In fact using perf inside a
-64-bit Linux guest VM (under TCG) can cause the following kernel panic
-because some PMU registers are not implemented.
+In order to support Linux perf, which uses PMXEVTYPER register,
+this patch adds read/write access support for PMXEVTYPER. The access
+is CONSTRAINED UNPREDICTABLE when PMSELR is not 0x1f. Additionally
+this patch adds support for PMXEVTYPER_EL0.
 
-[  329.445970] [<fffffe000009e600>] armv8pmu_enable_event+0x58/0x8c
-[  329.446713] [<fffffe0000621e74>] armpmu_start+0x4c/0x74
+Signed-off-by: Wei Huang <wei@redhat.com>
+---
+ target/arm/cpu.h    |  1 -
+ target/arm/helper.c | 30 +++++++++++++++++++++++++-----
+ 2 files changed, 25 insertions(+), 6 deletions(-)
 
-This patchset solves the problem by adding support for missing vPMU
-registers. Basic perf test can work (both ACPI and DT) now under TCG
-by applying this patchset.
-
-address@hidden ~]# perf stat ls
- Performance counter stats for 'ls':
-
-        226.740256      task-clock (msec)         #    0.312 CPUs utilized    
-                76      context-switches          #    0.335 K/sec
-                 0      cpu-migrations            #    0.000 K/sec
-                64      page-faults               #    0.282 K/sec
-       186,031,410      cycles                    #    0.820 GHz      (36.40%)
-   <not supported>      stalled-cycles-frontend
-   <not supported>      stalled-cycles-backend
-     <not counted>      instructions               (0.00%)
-   <not supported>      branches
-     <not counted>      branch-misses              (0.00%)
-
-V2->V3:
- * Remove PMXEVCNTR_EL0 support
- * Add read access support for PMXEVTYPER and change the CONSTRAINED
-   UNPREDICTABLE behavior of PMXEVTYPER to RAZ/WI.
-
-V1->V2:
-  * Change most PMU registers to 64bit and the behavior of PMXEVTYPER
-  * Add support for PMXEVCNTR_EL0
-  * Misc fixes (DT, ID_AA64DFR0_EL1, ...) under TCG mode
-
-Thanks,
--Wei
-
-Wei Huang (4):
-  target-arm: Add support for PMU register PMSELR_EL0
-  target-arm: Add support for AArch64 PMU register PMXEVTYPER_EL0
-  target-arm: Add support for PMU register PMINTENSET_EL1
-  target-arm: Enable vPMU support under TCG mode
-
- hw/arm/virt.c       |  2 +-
- target/arm/cpu.c    |  2 +-
- target/arm/cpu.h    |  4 +--
- target/arm/helper.c | 72 ++++++++++++++++++++++++++++++++++++++++-------------
- 4 files changed, 59 insertions(+), 21 deletions(-)
-
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 8a82c73..f46607e 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -307,7 +307,6 @@ typedef struct CPUARMState {
+         uint64_t c9_pmcr; /* performance monitor control register */
+         uint64_t c9_pmcnten; /* perf monitor counter enables */
+         uint32_t c9_pmovsr; /* perf monitor overflow status */
+-        uint32_t c9_pmxevtyper; /* perf monitor event type */
+         uint32_t c9_pmuserenr; /* perf monitor user enable */
+         uint64_t c9_pmselr; /* perf monitor counter selection register */
+         uint32_t c9_pminten; /* perf monitor interrupt enables */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 67520ea..ec5cf1f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1054,7 +1054,25 @@ static void pmovsr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void pmxevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                              uint64_t value)
+ {
+-    env->cp15.c9_pmxevtyper = value & 0xff;
++    /* Attempts to access PMXEVTYPER are CONSTRAINED UNPREDICTABLE when
++     * PMSELR value is equal to or greater than the number of implemented
++     * counters, but not equal to 0x1f. We opt to behave as a RAZ/WI.
++     */
++    if (env->cp15.c9_pmselr == 0x1f) {
++        pmccfiltr_write(env, ri, value);
++    }
++}
++
++static uint64_t pmxevtyper_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    /* We opt to behave as a RAZ/WI when attempts to access PMXEVTYPER
++     * are CONSTRAINED UNPREDICTABLE. See comments in pmxevtyper_write().
++     */
++    if (env->cp15.c9_pmselr == 0x1f) {
++        return env->cp15.pmccfiltr_el0;
++    } else {
++        return 0;
++    }
+ }
+ 
+ static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -1234,10 +1252,12 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .fieldoffset = offsetof(CPUARMState, cp15.pmccfiltr_el0),
+       .resetvalue = 0, },
+     { .name = "PMXEVTYPER", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 1,
+-      .access = PL0_RW,
+-      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmxevtyper),
+-      .accessfn = pmreg_access, .writefn = pmxevtyper_write,
+-      .raw_writefn = raw_write },
++      .access = PL0_RW, .type = ARM_CP_NO_RAW, .accessfn = pmreg_access,
++      .writefn = pmxevtyper_write, .readfn = pmxevtyper_read },
++    { .name = "PMXEVTYPER_EL0", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 13, .opc2 = 1,
++      .access = PL0_RW, .type = ARM_CP_NO_RAW, .accessfn = pmreg_access,
++      .writefn = pmxevtyper_write, .readfn = pmxevtyper_read },
+     /* Unimplemented, RAZ/WI. */
+     { .name = "PMXEVCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 2,
+       .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
 -- 
 1.8.3.1
