@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cbDdp-0002z4-QO
+	(envelope-from <wei@redhat.com>) id 1cbDdq-0002zN-6C
 	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 16:49:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cbDdo-0007cK-RA
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 16:49:37 -0500
+	(envelope-from <wei@redhat.com>) id 1cbDdo-0007cT-US
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 16:49:38 -0500
 From: Wei Huang <wei@redhat.com>
-Date: Tue,  7 Feb 2017 16:49:30 -0500
-Message-Id: <1486504171-26807-4-git-send-email-wei@redhat.com>
-In-Reply-To: <1486504171-26807-1-git-send-email-wei@redhat.com>
-References: <1486504171-26807-1-git-send-email-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V3 3/4] target-arm: Add support for PMU
- register PMINTENSET_EL1
+Date: Tue,  7 Feb 2017 16:49:27 -0500
+Message-Id: <1486504171-26807-1-git-send-email-wei@redhat.com>
+Subject: [Qemu-devel] [PATCH V3 0/4] Add vPMU vPMU support under TCG mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +20,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-This patch adds access support for PMINTENSET_EL1.
+QEMU has implemented cycle count support for guest VM under TCG mode.
+But this feature is not complete. In fact using perf inside a
+64-bit Linux guest VM (under TCG) can cause the following kernel panic
+because some PMU registers are not implemented.
 
-Signed-off-by: Wei Huang <wei@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.h    |  2 +-
- target/arm/helper.c | 10 +++++++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+[  329.445970] [<fffffe000009e600>] armv8pmu_enable_event+0x58/0x8c
+[  329.446713] [<fffffe0000621e74>] armpmu_start+0x4c/0x74
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index f46607e..e28cd2e 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -309,7 +309,7 @@ typedef struct CPUARMState {
-         uint32_t c9_pmovsr; /* perf monitor overflow status */
-         uint32_t c9_pmuserenr; /* perf monitor user enable */
-         uint64_t c9_pmselr; /* perf monitor counter selection register */
--        uint32_t c9_pminten; /* perf monitor interrupt enables */
-+        uint64_t c9_pminten; /* perf monitor interrupt enables */
-         union { /* Memory attribute redirection */
-             struct {
- #ifdef HOST_WORDS_BIGENDIAN
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index ec5cf1f..c4daa6e 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1275,9 +1275,17 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .writefn = pmuserenr_write, .raw_writefn = raw_write },
-     { .name = "PMINTENSET", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 1,
-       .access = PL1_RW, .accessfn = access_tpm,
--      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
-+      .type = ARM_CP_ALIAS,
-+      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pminten),
-       .resetvalue = 0,
-       .writefn = pmintenset_write, .raw_writefn = raw_write },
-+    { .name = "PMINTENSET_EL1", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 1,
-+      .access = PL1_RW, .accessfn = access_tpm,
-+      .type = ARM_CP_IO,
-+      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
-+      .writefn = pmintenset_write, .raw_writefn = raw_write,
-+      .resetvalue = 0x0 },
-     { .name = "PMINTENCLR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 2,
-       .access = PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
-       .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
+This patchset solves the problem by adding support for missing vPMU
+registers. Basic perf test can work (both ACPI and DT) now under TCG
+by applying this patchset.
+
+address@hidden ~]# perf stat ls
+ Performance counter stats for 'ls':
+
+        226.740256      task-clock (msec)         #    0.312 CPUs utilized    
+                76      context-switches          #    0.335 K/sec
+                 0      cpu-migrations            #    0.000 K/sec
+                64      page-faults               #    0.282 K/sec
+       186,031,410      cycles                    #    0.820 GHz      (36.40%)
+   <not supported>      stalled-cycles-frontend
+   <not supported>      stalled-cycles-backend
+     <not counted>      instructions               (0.00%)
+   <not supported>      branches
+     <not counted>      branch-misses              (0.00%)
+
+V2->V3:
+ * Remove PMXEVCNTR_EL0 support
+ * Add read access support for PMXEVTYPER and change the CONSTRAINED
+   UNPREDICTABLE behavior of PMXEVTYPER to RAZ/WI.
+
+V1->V2:
+  * Change most PMU registers to 64bit and the behavior of PMXEVTYPER
+  * Add support for PMXEVCNTR_EL0
+  * Misc fixes (DT, ID_AA64DFR0_EL1, ...) under TCG mode
+
+Thanks,
+-Wei
+
+Wei Huang (4):
+  target-arm: Add support for PMU register PMSELR_EL0
+  target-arm: Add support for AArch64 PMU register PMXEVTYPER_EL0
+  target-arm: Add support for PMU register PMINTENSET_EL1
+  target-arm: Enable vPMU support under TCG mode
+
+ hw/arm/virt.c       |  2 +-
+ target/arm/cpu.c    |  2 +-
+ target/arm/cpu.h    |  4 +--
+ target/arm/helper.c | 72 ++++++++++++++++++++++++++++++++++++++++-------------
+ 4 files changed, 59 insertions(+), 21 deletions(-)
+
 -- 
 1.8.3.1
