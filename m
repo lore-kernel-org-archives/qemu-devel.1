@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cb7i4-0004fN-WB
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:38 -0500
+	(envelope-from <mst@redhat.com>) id 1cb7ni-0000eR-QT
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cb7i3-0008P8-Vq
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:37 -0500
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:34932)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cb7i3-0008Ow-Q0
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:35 -0500
-Received: by mail-wr0-x235.google.com with SMTP id 89so40948812wrr.2
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 07:29:35 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1cb7nf-0003KL-Kq
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:35:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cb7nf-0003Js-FP
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:35:23 -0500
+Date: Tue, 7 Feb 2017 17:35:19 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170207173429-mutt-send-email-mst@kernel.org>
+References: <cover.1486285434.git.ben@skyportsystems.com>
+	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
+	<20170206170455-mutt-send-email-mst@kernel.org>
+	<E609277C-1E60-48F6-B83E-2A6AEFB242F3@skyportsystems.com>
+	<20170206193300-mutt-send-email-mst@kernel.org>
+	<20170207150032.2807d29f@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170207023229.29431-1-rth@twiddle.net>
-References: <20170207023229.29431-1-rth@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Feb 2017 15:29:14 +0000
-Message-ID: <CAFEAcA8=mwGoNn070RiCwDgHacO_VU6KZbyv9qb6E65UO=2CGw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/5] target/hppa patch queue
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170207150032.2807d29f@nial.brq.redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +33,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Ben Warren <ben@skyportsystems.com>, qemu-devel@nongnu.org, lersek@redhat.com
 
-On 7 February 2017 at 02:32, Richard Henderson <rth@twiddle.net> wrote:
-> Nothing complicated here.  Two bugs from Laurent, two noticed
-> by Coverity (through multiple channels).
->
->
-> r~
->
->
->
-> The following changes since commit 7d2c6c95511e42dffe2b263275e09957723d0ff4:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/pull-usb-20170206-1' into staging (2017-02-06 11:44:08 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-hppa-20170206
->
-> for you to fetch changes up to 6836a8fb96963a29f309d49873062bbca9ab0e28:
->
->   target/hppa: Fix gdb_write_register (2017-02-06 18:25:31 -0800)
->
-> ----------------------------------------------------------------
-> Misc hppa fixes.
->
-> ----------------------------------------------------------------
+On Tue, Feb 07, 2017 at 03:00:32PM +0100, Igor Mammedov wrote:
+> On Mon, 6 Feb 2017 19:41:36 +0200
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>=20
+> > On Mon, Feb 06, 2017 at 09:29:30AM -0800, Ben Warren wrote:
+> > >=20
+> > >     On Feb 6, 2017, at 8:15 AM, Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+> > >=20
+> > >     On Sun, Feb 05, 2017 at 01:12:00AM -0800, ben@skyportsystems.co=
+m wrote:
+> > >=20
+> > >         From: Ben Warren <ben@skyportsystems.com>
+> > >=20
+> > >         This implements the VM Generation ID feature by passing a 1=
+28-bit
+> > >         GUID to the guest via a fw_cfg blob.
+> > >         Any time the GUID changes, an ACPI notify event is sent to =
+the guest
+> > >=20
+> > >         The user interface is a simple device with one parameter:
+> > >         - guid (string, must be "auto" or in UUID format
+> > >           xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+> > >=20
+> > >         Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> > >=20
+> [...]
+>=20
+> > >=20
+> > > This variable name was suggested by Laszlo.  the =E2=80=98a=E2=80=99=
+ in =E2=80=98vgia=E2=80=99 refers to
+> > > address, but I=E2=80=99ll add some comments. =20
+> >=20
+> > vmgenid_addr_le?
+> >=20
+> >=20
+> > >     How about we make it 8 byte so it's future proof?
+> > >=20
+> > > I can do that, but a previous conversation we had made it clear tha=
+t guests
+> > > would never allocate above 4GB so 64 bits wasn=E2=80=99t necessary.=
+ =20
+> >=20
+> > Right, it's just very painful to change once we make it 32 bit.
+> I'd keep it 32 bit since it's in variable in global AML context and our
+> table revision is 1, so per spec OSPM should handle it as 32 number.
+> Chances of guest survival on boot would depend on AML interpreter toler=
+ance
+> to AML errors, which for windows usually is 0 and leads to non obvious =
+BSOD.
+> If we leave DWORD, even XP will be able to boot fine and only report
+> unknown device.
 
-Applied, thanks.
-
--- PMM
+AML reports 2 DWORDS per spec, no issue there. I guess it's exactly for
+XP compatibility.
