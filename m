@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cb27U-0004OJ-Ll
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:31:29 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb28D-0004tk-Rl
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:32:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cb27P-00081p-O1
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:31:28 -0500
-Received: from 12.mo6.mail-out.ovh.net ([178.32.125.228]:44514)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cb27P-00080x-Hg
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:31:23 -0500
-Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 39A59A8439
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 10:31:20 +0100 (CET)
-References: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
-	<1485424060-12217-3-git-send-email-fred.konrad@greensocs.com>
-	<6b974238-ab18-8bd5-ffe7-6f07627f59f3@kaod.org>
-	<5850976f-7e05-dbcf-3fdf-cf9d11038b3d@greensocs.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <682b8d3a-bf00-012e-a79e-434358d181bb@kaod.org>
-Date: Tue, 7 Feb 2017 10:31:11 +0100
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb289-0008Kk-1z
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:32:13 -0500
+Received: from szxga01-in.huawei.com ([58.251.152.64]:36650)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb287-0008Ho-9n
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:32:08 -0500
+References: <1485266748-15340-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1485266748-15340-2-git-send-email-zhang.zhanghailiang@huawei.com>
+	<4d0b52bc-bcdd-5b96-465c-f0e624cb4add@redhat.com>
+	<58983015.40300@huawei.com>
+	<0b5891cc-0170-0773-a4b2-31cf3ff2b6d7@redhat.com>
+	<589859CA.5030903@huawei.com>
+	<3c6e13ab-4f5a-fbe3-ef95-196c6b3e59c9@redhat.com>
+	<58997D40.60604@huawei.com>
+	<e8c2510f-f755-3ec1-f085-e3053480b772@redhat.com>
+	<5899831D.30005@huawei.com>
+	<2e301620-0362-f43e-9194-e438f2091546@redhat.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <5899939B.4000905@huawei.com>
+Date: Tue, 7 Feb 2017 17:30:03 +0800
 MIME-Version: 1.0
-In-Reply-To: <5850976f-7e05-dbcf-3fdf-cf9d11038b3d@greensocs.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 02/10] qemu-clk: allow to add a clock to
- a device
+In-Reply-To: <2e301620-0362-f43e-9194-e438f2091546@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: reconstruct the mutex
+ lock usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +37,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Frederic Konrad <fred.konrad@greensocs.com>
-Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, alistair.francis@xilinx.com
+To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, lizhijian@cn.fujitsu.com
 
-On 02/07/2017 10:22 AM, Frederic Konrad wrote:
->> I see how these routines are used in patch 10/10. But if we were
->> open coding device CRF_APB, I don't think we would need them at
->> all and it would make the code a little simple IMHO.
-> What do you mean by open coding?
+On 2017/2/7 17:21, Jason Wang wrote:
+>
+>
+> On 2017年02月07日 16:19, Hailiang Zhang wrote:
+>> On 2017/2/7 15:57, Jason Wang wrote:
+>>>
+>>>
+>>> On 2017年02月07日 15:54, Hailiang Zhang wrote:
+>>>> Hi Jason,
+>>>>
+>>>> On 2017/2/6 20:53, Jason Wang wrote:
+>>>>>
+>>>>>
+>>>>> On 2017年02月06日 19:11, Hailiang Zhang wrote:
+>>>>>> On 2017/2/6 17:35, Jason Wang wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 2017年02月06日 16:13, Hailiang Zhang wrote:
+>>>>>>>> On 2017/2/3 11:47, Jason Wang wrote:
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> On 2017年01月24日 22:05, zhanghailiang wrote:
+>>>>>>>>>> The original 'timer_check_lock' mutex lock of struct CompareState
+>>>>>>>>>> is used to protect the 'conn_list' queue and its child queues
+>>>>>>>>>> which
+>>>>>>>>>> are 'primary_list' and 'secondary_list', which is a little abused
+>>>>>>>>>> and confusing
+>>>>>>>>>>
+>>>>>>>>>> To make it clearer, we rename 'timer_check_lock' to
+>>>>>>>>>> 'conn_list_lock'
+>>>>>>>>>> which is used to protect 'conn_list' queue, use another
+>>>>>>>>>> 'conn_lock'
+>>>>>>>>>> to protect 'primary_list' and 'secondary_list'.
+>>>>>>>>>>
+>>>>>>>>>> Besides, fix some missing places which need these mutex lock.
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
+>>>>>>>>>
+>>>>>>>>> Instead of sticking to such kind of mutex, I think it's time to
+>>>>>>>>> make
+>>>>>>>>> colo timer run in colo thread (there's a TODO in the code).
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> Er, it seems that, we still need these mutex locks even we make
+>>>>>>>> colo
+>>>>>>>> timer and colo thread run in the same thread, because we may access
+>>>>>>>> the connect/primary/secondary list from colo (migratioin) thread
+>>>>>>>> concurrently.
+>>>>>>>
+>>>>>>> Just make sure I understand the issue, why need it access the list?
+>>>>>>>
+>>>>>>>>
+>>>>>>>> Besides, it seems to be a little complex to make colo timer run in
+>>>>>>>> colo
+>>>>>>>> compare thread, and it is not this series' goal.
+>>>>>>>
+>>>>>>> Seems not by just looking at how it was implemented in main loop,
+>>>>>>> but
+>>>>>>> maybe I was wrong.
+>>>>>>>
+>>>>>>>> This series is preparing
+>>>>>>>> work for integrating COLO compare with COLO frame and it is
+>>>>>>>> prerequisite.
+>>>>>>>>
+>>>>>>>> So, we may consider implementing it later in another series.
+>>>>>>>> Zhang Chen, what's your opinion ?
+>>>>>>>
+>>>>>>> The problem is this patch make things even worse, it introduces one
+>>>>>>> more
+>>>>>>> mutex.
+>>>>>>>
+>>>>>>
+>>>>>> Hmm, for most cases, we need to get these two locks at the same time.
+>>>>>> We can use one lock to protect conn_list/primary_list/secondary_list,
+>>>>>> (We need to get this lock before operate all these lists, as you can
+>>>>>> see
+>>>>>> in patch 2, while do checkpoint, we may operate these lists in
+>>>>>> COLO checkpoint thread concurrently.)
+>>>>>>
+>>>>>> But for the original codes, we didn't got timer_check_lock in
+>>>>>> packet_enqueue() while operate conn_list/primary_list/secondary_list,
+>>>>>> and didn't got this lock in colo_compare_connection while operate
+>>>>>> secondary_list either.
+>>>>>>
+>>>>>> So, is it OK to use the conn_lock instead of timer_check_lock, and
+>>>>>> add the lock where it is need ?
+>>>>>
+>>>>> I'd like to know if timer were run in colo thread (this looks as
+>>>>> simple
+>>>>> as a g_timeout_source_new() followed by a g_source_attach()), why
+>>>>> do we
+>>>>> still need a mutex. And if we need it now but plan to remove it in the
+>>>>> future, I'd like to use big lock to simplify the codes.
+>>>>>
+>>>>
+>>>> After investigated your above suggestion, I think it works by using
+>>>> g_timeout_source_new() and g_source_attach(), but I'm not sure
+>>>> if it is a good idea to use the big lock to protect the possible
+>>>> concurrent cases which seem to only happen between COLO migration
+>>>> thread and COLO compare thread, any further suggestions ?
+>>>
+>>> I think I need first understand why migration thread need to access the
+>>> list?
+>>>
+>>
+>> Er, sorry to confuse you here, to be exactly, it is COLO checkpoint
+>> thread,
+>> we reuse the migration thread to realize checkpoint process for COLO,
+>> Because qemu enters into COLO state after a complete migration, so we
+>> reuse it.
+>>
+>> While do checkpoint, we need to release all the buffered packets that
+>> have not
+>> yet been compared, so we need to access the list in COLO checkpoint
+>> thread.
+>
+> I think the better way is notify the comparing thread and let it do the
+> releasing. You probably need similar mechanism to notify from comparing
+> thread to checkpoint thread.
+>
 
-I mean to externalize the definition of the objects in a 
-header file. 
+Hmm, that's really a good idea, it can avoid using the mutex lock,
+I'll try to implement it in next version, thanks very much. :)
 
-Then you can replace the type 'Object *' of the attribute 
-holding a reference to an instance by a non pointer type.
-
-Anyhow, I think we need to replace object_new() by 
-object_initialize() for QOM, and so we need to expose a 
-little more the object internals. 
-
-Thanks,
-
-C.
+> Thanks
+>
+>>
+>> Thanks.
+>
+>
+> .
+>
