@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cb18e-0001L8-VB
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:28:38 -0500
+	(envelope-from <peterx@redhat.com>) id 1cb18g-0001LG-Ve
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:28:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cb18a-0003f8-Uz
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:28:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60432)
+	(envelope-from <peterx@redhat.com>) id 1cb18g-0003k3-0T
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:28:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41948)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cb18a-0003e8-NL
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:28:32 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cb18f-0003j1-Rd
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:28:37 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  7 Feb 2017 16:28:02 +0800
-Message-Id: <1486456099-7345-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 00/17] VT-d: vfio enablement and misc
- enhances
+Date: Tue,  7 Feb 2017 16:28:03 +0800
+Message-Id: <1486456099-7345-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 01/17] vfio: trace map/unmap for notify as
+ well
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,230 +27,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-This is v7 of vt-d vfio enablement series.
+We traces its range, but we don't know whether it's a MAP/UNMAP. Let's
+dump it as well.
 
-v7:
-- for the two traces patches: Change subjects. Remove vtd_err() and
-  vtd_err_nonzero_rsvd() tracers, instead using standalone trace for
-  each of the places. Don't remove any DPRINTF() if there is no
-  replacement. [Jason]
-- add r-b and a-b for Alex/David/Jason.
-- in patch "intel_iommu: renaming gpa to iova where proper", convert
-  one more place where I missed [Jason]
-- fix the place where I should use "~0ULL" not "~0" [Jason]
-- squash patch 16 into 18 [Jason]
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/vfio/common.c     | 3 ++-
+ hw/vfio/trace-events | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-v6:
-- do unmap in all cases when replay [Jason]
-- do global replay even if context entry is invalidated [Jason]
-- when iommu reset, send unmap to all registered notifiers [Jason]
-- use rcu read lock to protect the whole vfio_iommu_map_notify()
-  [Alex, Paolo]
-
-v5:
-- fix patch 4 subject too long, and error spelling [Eric]
-- add ack-by for alex in patch 1 [Alex]
-- squashing patch 19/20 into patch 18 [Jason]
-- fix comments in vtd_page_walk() [Jason]
-- remove all error_report() [Jason]
-- add comment for patch 18, mention about that enabled vhost without
-  ATS as well [Jason]
-- remove skipped debug thing during page walk [Jason]
-- remove duplicated page walk trace [Jason]
-- some tunings in vtd_address_space_unmap(), to provide correct iova
-  and addr_mask. For this, I tuned this patch as well a bit:
-  "memory: add section range info for IOMMU notifier"
-  to loosen the range check
-
-v4:
-- convert all error_report()s into traces (in the two patches that did
-  that)
-- rebased to Jason's DMAR series (master + one more patch:
-  "[PATCH V4 net-next] vhost_net: device IOTLB support")
-- let vhost use the new api iommu_notifier_init() so it won't break
-  vhost dmar [Jason]
-- touch commit message of the patch:
-  "intel_iommu: provide its own replay() callback"
-  old replay is not a dead loop, but it will just consume lots of time
-  [Jason]
-- add comment for patch:
-  "intel_iommu: do replay when context invalidate"
-  telling why replay won't be a problem even without CM=1 [Jason]
-- remove a useless comment line [Jason]
-- remove dmar_enabled parameter for vtd_switch_address_space() and
-  vtd_switch_address_space_all() [Mst, Jason]
-- merged the vfio patches in, to support unmap of big ranges at the
-  beginning ("[PATCH RFC 0/3] vfio: allow to notify unmap for very big
-  region")
-- using caching_mode instead of cache_mode_enabled, and "caching-mode"
-  instead of "cache-mode" [Kevin]
-- when receive context entry invalidation, we unmap the entire region
-  first, then replay [Alex]
-- fix commit message for patch:
-  "intel_iommu: simplify irq region translation" [Kevin]
-- handle domain/global invalidation, and notify where proper [Jason,
-  Kevin]
-
-v3:
-- fix style error reported by patchew
-- fix comment in domain switch patch: use "IOMMU address space" rather
-  than "IOMMU region" [Kevin]
-- add ack-by for Paolo in patch:
-  "memory: add section range info for IOMMU notifier"
-  (this is seperately collected besides this thread)
-- remove 3 patches which are merged already (from Jason)
-- rebase to master b6c0897
-
-v2:
-- change comment for "end" parameter in vtd_page_walk() [Tianyu]
-- change comment for "a iova" to "an iova" [Yi]
-- fix fault printed val for GPA address in vtd_page_walk_level (debug
-  only)
-- rebased to master (rather than Aviv's v6 series) and merged Aviv's
-  series v6: picked patch 1 (as patch 1 in this series), dropped patch
-  2, re-wrote patch 3 (as patch 17 of this series).
-- picked up two more bugfix patches from Jason's DMAR series
-- picked up the following patch as well:
-  "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
-
-This RFC series is a re-work for Aviv B.D.'s vfio enablement series
-with vt-d:
-
-  https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
-
-Aviv has done a great job there, and what we still lack there are
-mostly the following:
-
-(1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
-    memory region.
-
-(2) VT-d still haven't provide a correct replay() mechanism (e.g.,
-    when IOMMU domain switches, things will broke).
-
-This series should have solved the above two issues.
-
-Online repo:
-
-  https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement-v7
-
-I would be glad to hear about any review comments for above patches.
-
-=========
-Test Done
-=========
-
-Build test passed for x86_64/arm/ppc64.
-
-Simply tested with x86_64, assigning two PCI devices to a single VM,
-boot the VM using:
-
-bin=x86_64-softmmu/qemu-system-x86_64
-$bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
-     -device intel-iommu,intremap=on,eim=off,caching-mode=on \
-     -netdev user,id=net0,hostfwd=tcp::5555-:22 \
-     -device virtio-net-pci,netdev=net0 \
-     -device vfio-pci,host=03:00.0 \
-     -device vfio-pci,host=02:00.0 \
-     -trace events=".trace.vfio" \
-     /var/lib/libvirt/images/vm1.qcow2
-
-pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
-vtd_page_walk*
-vtd_replay*
-vtd_inv_desc*
-
-Then, in the guest, run the following tool:
-
-  https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
-
-With parameter:
-
-  ./vfio-bind-group 00:03.0 00:04.0
-
-Check host side trace log, I can see pages are replayed and mapped in
-00:04.0 device address space, like:
-
-...
-vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
-vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
-vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
-vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
-vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
-...
-
-=========
-Todo List
-=========
-
-- error reporting for the assigned devices (as Tianyu has mentioned)
-
-- per-domain address-space: A better solution in the future may be -
-  we maintain one address space per IOMMU domain in the guest (so
-  multiple devices can share a same address space if they are sharing
-  the same IOMMU domains in the guest), rather than one address space
-  per device (which is current implementation of vt-d). However that's
-  a step further than this series, and let's see whether we can first
-  provide a workable version of device assignment with vt-d
-  protection.
-
-- don't need to notify IOTLB (psi/gsi/global) invalidations to devices
-  that with ATS enabled
-
-- investigate when guest map page while mask contains existing mapped
-  pages (e.g. map 12k-16k first, then map 0-12k)
-
-- coalesce unmap during page walk (currently, we send it once per
-  page)
-
-- when do PSI for unmap, whether we can send one notify directly
-  instead of walking over the page table?
-
-- more to come...
-
-Thanks,
-
-Aviv Ben-David (1):
-  intel_iommu: add "caching-mode" option
-
-Peter Xu (16):
-  vfio: trace map/unmap for notify as well
-  vfio: introduce vfio_get_vaddr()
-  vfio: allow to notify unmap for very large region
-  intel_iommu: simplify irq region translation
-  intel_iommu: renaming gpa to iova where proper
-  intel_iommu: convert dbg macros to traces for inv
-  intel_iommu: convert dbg macros to trace for trans
-  intel_iommu: vtd_slpt_level_shift check level
-  memory: add section range info for IOMMU notifier
-  memory: provide IOMMU_NOTIFIER_FOREACH macro
-  memory: provide iommu_replay_all()
-  memory: introduce memory_region_notify_one()
-  memory: add MemoryRegionIOMMUOps.replay() callback
-  intel_iommu: provide its own replay() callback
-  intel_iommu: allow dynamic switch of IOMMU region
-  intel_iommu: enable vfio devices
-
- hw/i386/intel_iommu.c          | 669 +++++++++++++++++++++++++++++++----------
- hw/i386/intel_iommu_internal.h |   2 +
- hw/i386/trace-events           |  36 +++
- hw/vfio/common.c               |  77 +++--
- hw/vfio/trace-events           |   2 +-
- hw/virtio/vhost.c              |   4 +-
- include/exec/memory.h          |  49 ++-
- include/hw/i386/intel_iommu.h  |  12 +
- memory.c                       |  52 +++-
- 9 files changed, 710 insertions(+), 193 deletions(-)
-
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 801578b..174f351 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -305,7 +305,8 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+     void *vaddr;
+     int ret;
+ 
+-    trace_vfio_iommu_map_notify(iova, iova + iotlb->addr_mask);
++    trace_vfio_iommu_map_notify(iotlb->perm == IOMMU_NONE ? "UNMAP" : "MAP",
++                                iova, iova + iotlb->addr_mask);
+ 
+     if (iotlb->target_as != &address_space_memory) {
+         error_report("Wrong target AS \"%s\", only system memory is allowed",
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index 8de8281..2561c6d 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -84,7 +84,7 @@ vfio_pci_igd_lpc_bridge_enabled(const char *name) "%s"
+ # hw/vfio/common.c
+ vfio_region_write(const char *name, int index, uint64_t addr, uint64_t data, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
+ vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t data) " (%s:region%d+0x%"PRIx64", %d) = 0x%"PRIx64
+-vfio_iommu_map_notify(uint64_t iova_start, uint64_t iova_end) "iommu map @ %"PRIx64" - %"PRIx64
++vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "iommu %s @ %"PRIx64" - %"PRIx64
+ vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add %"PRIx64" - %"PRIx64
+ vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] %"PRIx64" - %"PRIx64
+ vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] %"PRIx64" - %"PRIx64" [%p]"
 -- 
 2.7.4
