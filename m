@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cbAab-0004tP-Ub
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:07 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cbAaf-0004ty-0G
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cbAaX-0001Tq-PM
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:05 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:56465)
+	(envelope-from <laurent@vivier.eu>) id 1cbAaY-0001UB-1v
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:08 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:59604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cbAaX-0001S4-Dz
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:01 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cbAaX-0001Sx-KF
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:02 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  7 Feb 2017 19:33:52 +0100
-Message-Id: <20170207183356.17840-2-laurent@vivier.eu>
+Date: Tue,  7 Feb 2017 19:33:53 +0100
+Message-Id: <20170207183356.17840-3-laurent@vivier.eu>
 In-Reply-To: <20170207183356.17840-1-laurent@vivier.eu>
 References: <20170207183356.17840-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 1/5] m68k: implement risugen module
+Subject: [Qemu-devel] [PATCH 2/5] m68k: implement server and client side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,311 +26,435 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 
----
- risugen_m68k.pm | 295 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 295 insertions(+)
- create mode 100644 risugen_m68k.pm
+This also adds the basic test file and the configuration update.
 
-diff --git a/risugen_m68k.pm b/risugen_m68k.pm
+This implementation can only test instructions with values in register and
+no memory access.
+
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ configure           |   6 ++-
+ risu_m68k.c         | 153 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ risu_reginfo_m68k.c | 151 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ risu_reginfo_m68k.h |  32 +++++++++++
+ test_m68k.s         |  28 ++++++++++
+ 5 files changed, 368 insertions(+), 2 deletions(-)
+ create mode 100644 risu_m68k.c
+ create mode 100644 risu_reginfo_m68k.c
+ create mode 100644 risu_reginfo_m68k.h
+ create mode 100644 test_m68k.s
+
+diff --git a/configure b/configure
+index f81bdb5..f5921ee 100755
+--- a/configure
++++ b/configure
+@@ -18,7 +18,9 @@ EOF
+ }
+ 
+ guess_arch() {
+-    if check_define __arm__ ; then
++    if check_define __m68k__ ; then
++        ARCH="m68k"
++    elif check_define __arm__ ; then
+         ARCH="arm"
+     elif check_define __aarch64__ ; then
+         ARCH="aarch64"
+@@ -63,7 +65,7 @@ Some influential environment variables:
+                prefixed with the given string.
+ 
+   ARCH         force target architecture instead of trying to detect it.
+-               Valid values=[arm|aarch64|ppc64|ppc64le]
++               Valid values=[arm|aarch64|ppc64|ppc64le|m68k]
+ 
+   CC           C compiler command
+   CFLAGS       C compiler flags
+diff --git a/risu_m68k.c b/risu_m68k.c
 new file mode 100644
-index 0000000..a9a4341
+index 0000000..15e30b1
 --- /dev/null
-+++ b/risugen_m68k.pm
-@@ -0,0 +1,295 @@
-+#!/usr/bin/perl -w
-+###############################################################################
-+# Copyright (c) 2016 Laurent Vivier
-+# All rights reserved. This program and the accompanying materials
-+# are made available under the terms of the Eclipse Public License v1.0
-+# which accompanies this distribution, and is available at
-+# http://www.eclipse.org/legal/epl-v10.html
-+###############################################################################
++++ b/risu_m68k.c
+@@ -0,0 +1,153 @@
++/*******************************************************************************
++ * Copyright (c) 2016 Laurent Vivier
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ ******************************************************************************/
 +
++#include <stdio.h>
++#include <ucontext.h>
++#include <string.h>
 +
-+# risugen -- generate a test binary file for use with risu
-+# See 'risugen --help' for usage information.
-+package risugen_m68k;
++#include "risu.h"
++#include "risu_reginfo_m68k.h"
 +
-+use strict;
-+use warnings;
++struct reginfo master_ri, apprentice_ri;
++static int mem_used = 0;
++static int packet_mismatch = 0;
 +
-+require Exporter;
++uint8_t apprentice_memblock[MEMBLOCKLEN];
 +
-+our @ISA    = qw(Exporter);
-+our @EXPORT = qw(write_test_code);
-+
-+my $periodic_reg_random = 1;
-+
-+my $bytecount;
-+#
-+# Maximum alignment restriction permitted for a memory op.
-+my $MAXALIGN = 64;
-+
-+sub open_bin
++void advance_pc(void *vuc)
 +{
-+    my ($fname) = @_;
-+    open(BIN, ">", $fname) or die "can't open %fname: $!";
-+    $bytecount = 0;
++    ucontext_t *uc = (ucontext_t*)vuc;
++    uc->uc_mcontext.gregs[R_PC] += 4;
 +}
 +
-+sub close_bin
++void set_a0(void *vuc, uint32_t a0)
 +{
-+    close(BIN) or die "can't close output file: $!";
++    ucontext_t *uc = vuc;
++    uc->uc_mcontext.gregs[R_A0] = a0;
 +}
 +
-+sub insn32($)
++static int get_risuop(uint32_t insn)
 +{
-+    my ($insn) = @_;
-+    print BIN pack("N", $insn);
-+    $bytecount += 4;
++    uint32_t op = insn & 0xf;
++    uint32_t key = insn & ~0xf;
++    uint32_t risukey = 0x4afc7000;
++    return (key != risukey) ? -1 : op;
 +}
 +
-+sub insn16($)
++int send_register_info(int sock, void *uc)
 +{
-+    my ($insn) = @_;
-+    print BIN pack("n", $insn);
-+    $bytecount += 2;
-+}
++    struct reginfo ri;
++    int op;
 +
-+sub write_risuop($)
-+{
-+    my ($op) = @_;
-+    insn32(0x4afc7000 | $op);
-+}
++    reginfo_init(&ri, uc);
++    op = get_risuop(ri.faulting_insn);
 +
-+sub write_mov_ccr($)
-+{
-+    my ($imm) = @_;
-+    insn16(0x44fc);
-+    insn16($imm);
-+}
-+
-+sub write_movb_di($$)
-+{
-+    my ($r, $imm) = @_;
-+
-+    # move.b #imm,%dr
-+    insn16(0x103c | ($r << 9));
-+    insn16($imm)
-+}
-+
-+sub write_mov_di($$)
-+{
-+    my ($r, $imm) = @_;
-+
-+    # move.l #imm,%dr
-+    insn16(0x203c | ($r << 9));
-+    insn32($imm)
-+}
-+
-+sub write_mov_ai($$)
-+{
-+    my ($r, $imm) = @_;
-+
-+    # movea.l #imm,%ar
-+    insn16(0x207c | ($r << 9));
-+    insn32($imm)
-+}
-+
-+sub write_mov_ri($$)
-+{
-+    my ($r, $imm) = @_;
-+
-+    if ($r < 8) {
-+        write_mov_di($r, $imm);
-+    } else {
-+        write_mov_ai($r - 8, $imm);
++    switch (op) {
++    case OP_COMPARE:
++    case OP_TESTEND:
++    default:
++        return send_data_pkt(sock, &ri, sizeof(ri));
++    case OP_SETMEMBLOCK:
++        memblock = (void*)ri.gregs[R_A0];
++        break;
++    case OP_GETMEMBLOCK:
++        set_a0(uc, ri.gregs[R_A0] + (uintptr_t)memblock);
++        break;
++    case OP_COMPAREMEM:
++        return send_data_pkt(sock, memblock, MEMBLOCKLEN);
++        break;
 +    }
++    return 0;
 +}
 +
-+sub write_random_regdata()
++/* Read register info from the socket and compare it with that from the
++ * ucontext. Return 0 for match, 1 for end-of-test, 2 for mismatch.
++ * NB: called from a signal handler.
++ */
++int recv_and_compare_register_info(int sock, void *uc)
 +{
-+    # general purpose registers (except A6 (FP) and A7 (SP))
-+    for (my $i = 0; $i < 14; $i++) {
-+        write_mov_ri($i, rand(0xffffffff));
-+    }
-+    # initialize condition register
-+    write_mov_ccr(rand(0x10000));
-+}
++    int resp = 0;
++    int op;
 +
-+my $OP_COMPARE = 0;        # compare registers
-+my $OP_TESTEND = 1;        # end of test, stop
-+my $OP_SETMEMBLOCK = 2;    # r0 is address of memory block (8192 bytes)
-+my $OP_GETMEMBLOCK = 3;    # add the address of memory block to r0
-+my $OP_COMPAREMEM = 4;     # compare memory block
++    reginfo_init(&master_ri, uc);
++    op = get_risuop(master_ri.faulting_insn);
 +
-+sub write_random_register_data()
-+{
-+    write_random_regdata();
-+    write_risuop($OP_COMPARE);
-+}
-+
-+sub eval_with_fields($$$$$) {
-+    # Evaluate the given block in an environment with Perl variables
-+    # set corresponding to the variable fields for the insn.
-+    # Return the result of the eval; we die with a useful error
-+    # message in case of syntax error.
-+    my ($insnname, $insn, $rec, $blockname, $block) = @_;
-+    my $evalstr = "{ ";
-+    for my $tuple (@{ $rec->{fields} }) {
-+        my ($var, $pos, $mask) = @$tuple;
-+        my $val = ($insn >> $pos) & $mask;
-+        $evalstr .= "my (\$$var) = $val; ";
-+    }
-+    $evalstr .= $block;
-+    $evalstr .= "}";
-+    my $v = eval $evalstr;
-+    if ($@) {
-+        print "Syntax error detected evaluating $insnname $blockname string:\n$block\n$@";
-+        exit(1);
-+    }
-+    return $v;
-+}
-+
-+sub gen_one_insn($$)
-+{
-+    # Given an instruction-details array, generate an instruction
-+    my $constraintfailures = 0;
-+
-+    INSN: while(1) {
-+        my ($forcecond, $rec) = @_;
-+        my $insn = int(rand(0xffffffff));
-+        my $insnname = $rec->{name};
-+        my $insnwidth = $rec->{width};
-+        my $fixedbits = $rec->{fixedbits};
-+        my $fixedbitmask = $rec->{fixedbitmask};
-+        my $constraint = $rec->{blocks}{"constraints"};
-+        my $memblock = $rec->{blocks}{"memory"};
-+
-+        $insn &= ~$fixedbitmask;
-+        $insn |= $fixedbits;
-+
-+        for my $tuple (@{ $rec->{fields} }) {
-+            my ($var, $pos, $mask) = @$tuple;
-+            my $val = ($insn >> $pos) & $mask;
-+            # Check constraints here:
-+            # not allowed to use or modify sp (A7) or fp (A6)
-+            next INSN if ($var =~ /^A/ && (($val == 6) || ($val == 7)));
++    switch (op) {
++    case OP_COMPARE:
++    case OP_TESTEND:
++    default:
++        if (recv_data_pkt(sock, &apprentice_ri, sizeof(apprentice_ri))) {
++            packet_mismatch = 1;
++            resp = 2;
++        } else if (!reginfo_is_eq(&master_ri, &apprentice_ri, uc)) {
++            resp = 2;
 +        }
-+        if (defined $constraint) {
-+            # user-specified constraint: evaluate in an environment
-+            # with variables set corresponding to the variable fields.
-+            my $v = eval_with_fields($insnname, $insn, $rec, "constraints", $constraint);
-+            if (!$v) {
-+                $constraintfailures++;
-+                if ($constraintfailures > 10000) {
-+                    print "10000 consecutive constraint failures for $insnname constraints string:\n$constraint\n";
-+                    exit (1);
-+                }
-+                next INSN;
-+            }
++        else if (op == OP_TESTEND) {
++            resp = 1;
 +        }
-+
-+        # OK, we got a good one
-+        $constraintfailures = 0;
-+
-+        insn16($insn >> 16);
-+        if ($insnwidth == 32) {
-+            insn16($insn & 0xffff);
++        send_response_byte(sock, resp);
++        break;
++    case OP_SETMEMBLOCK:
++        memblock = (void*)master_ri.gregs[R_A0];
++        break;
++    case OP_GETMEMBLOCK:
++        set_a0(uc, master_ri.gregs[R_A0] + (uintptr_t)memblock);
++        break;
++    case OP_COMPAREMEM:
++        mem_used = 1;
++        if (recv_data_pkt(sock, apprentice_memblock, MEMBLOCKLEN)) {
++            packet_mismatch = 1;
++            resp = 2;
++        } else if (memcmp(memblock, apprentice_memblock, MEMBLOCKLEN) != 0) {
++            resp = 2;
 +        }
++        send_response_byte(sock, resp);
++        break;
++    }
++    return resp;
++}
 +
-+        return;
++/* Print a useful report on the status of the last comparison
++ * done in recv_and_compare_register_info(). This is called on
++ * exit, so need not restrict itself to signal-safe functions.
++ * Should return 0 if it was a good match (ie end of test)
++ * and 1 for a mismatch.
++ */
++int report_match_status(void)
++{
++    int resp = 0;
++    fprintf(stderr, "match status...\n");
++
++    if (packet_mismatch) {
++        fprintf(stderr, "packet mismatch (probably disagreement "
++                "about UNDEF on load/store)\n");
++        fprintf(stderr, "master reginfo:\n");
++        reginfo_dump(&master_ri, 0);
++    }
++    if (!reginfo_is_eq(&master_ri, &apprentice_ri, NULL)) {
++        fprintf(stderr, "mismatch on regs!\n");
++        resp = 1;
++    }
++    if (mem_used && memcmp(memblock, &apprentice_memblock, MEMBLOCKLEN) != 0) {
++        fprintf(stderr, "mismatch on memory!\n");
++        resp = 1;
++    }
++    if (!resp) {
++        fprintf(stderr, "match!\n");
++        return 0;
++    }
++
++    fprintf(stderr, "master reginfo:\n");
++    reginfo_dump(&master_ri, 1);
++
++    fprintf(stderr, "apprentice reginfo:\n");
++    reginfo_dump(&apprentice_ri, 0);
++
++    reginfo_dump_mismatch(&master_ri, &apprentice_ri, stderr);
++    return resp;
++}
+diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
+new file mode 100644
+index 0000000..c9d21cc
+--- /dev/null
++++ b/risu_reginfo_m68k.c
+@@ -0,0 +1,151 @@
++/*****************************************************************************
++ * Copyright (c) 2016 Laurent Vivier
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *****************************************************************************/
++
++#include <stdio.h>
++#include <ucontext.h>
++#include <string.h>
++#include <math.h>
++
++#include "risu.h"
++#include "risu_reginfo_m68k.h"
++
++/* reginfo_init: initialize with a ucontext */
++void reginfo_init(struct reginfo *ri, ucontext_t *uc)
++{
++    int i;
++    memset(ri, 0, sizeof(*ri));
++
++    ri->faulting_insn = *((uint32_t *)uc->uc_mcontext.gregs[R_PC]);
++    ri->pc = uc->uc_mcontext.gregs[R_PC] - image_start_address;
++
++    for (i = 0; i < NGREG; i++) {
++        ri->gregs[i] = uc->uc_mcontext.gregs[i];
++    }
++
++    ri->fpregs.f_pcr = uc->uc_mcontext.fpregs.f_pcr;
++    ri->fpregs.f_psr = uc->uc_mcontext.fpregs.f_psr;
++    ri->fpregs.f_fpiaddr = uc->uc_mcontext.fpregs.f_fpiaddr;
++    for (i = 0; i < 8; i++) {
++        memcpy(&ri->fpregs.f_fpregs[i * 3],
++               &uc->uc_mcontext.fpregs.f_fpregs[i * 3],
++               3 * sizeof(int));
 +    }
 +}
 +
-+my $lastprog;
-+my $proglen;
-+my $progmax;
-+
-+sub progress_start($$)
++/* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal */
++int reginfo_is_eq(struct reginfo *m, struct reginfo *a, ucontext_t *uc)
 +{
-+    ($proglen, $progmax) = @_;
-+    $proglen -= 2; # allow for [] chars
-+    $| = 1;        # disable buffering so we can see the meter...
-+    print "[" . " " x $proglen . "]\r";
-+    $lastprog = 0;
-+}
++    int i;
 +
-+sub progress_update($)
-+{
-+    # update the progress bar with current progress
-+    my ($done) = @_;
-+    my $barlen = int($proglen * $done / $progmax);
-+    if ($barlen != $lastprog) {
-+        $lastprog = $barlen;
-+        print "[" . "-" x $barlen . " " x ($proglen - $barlen) . "]\r";
-+    }
-+}
-+
-+sub progress_end()
-+{
-+    print "[" . "-" x $proglen . "]\n";
-+    $| = 0;
-+}
-+
-+sub write_test_code($)
-+{
-+    my ($params) = @_;
-+
-+    my $condprob = $params->{ 'condprob' };
-+    my $numinsns = $params->{ 'numinsns' };
-+    my $outfile = $params->{ 'outfile' };
-+
-+    my @pattern_re = @{ $params->{ 'pattern_re' } };
-+    my @not_pattern_re = @{ $params->{ 'not_pattern_re' } };
-+    my %insn_details = %{ $params->{ 'details' } };
-+
-+    open_bin($outfile);
-+
-+    # convert from probability that insn will be conditional to
-+    # probability of forcing insn to unconditional
-+    $condprob = 1 - $condprob;
-+
-+    # TODO better random number generator?
-+    srand(0);
-+
-+    # Get a list of the insn keys which are permitted by the re patterns
-+    my @keys = sort keys %insn_details;
-+    if (@pattern_re) {
-+        my $re = '\b((' . join(')|(',@pattern_re) . '))\b';
-+        @keys = grep /$re/, @keys;
-+    }
-+    # exclude any specifics
-+    if (@not_pattern_re) {
-+        my $re = '\b((' . join(')|(',@not_pattern_re) . '))\b';
-+        @keys = grep !/$re/, @keys;
-+    }
-+    if (!@keys) {
-+        print STDERR "No instruction patterns available! (bad config file or --pattern argument?)\n";
-+        exit(1);
-+    }
-+    print "Generating code using patterns: @keys...\n";
-+    progress_start(78, $numinsns);
-+
-+    if (grep { defined($insn_details{$_}->{blocks}->{"memory"}) } @keys) {
-+        write_memblock_setup();
++    if (m->gregs[R_PS] != a->gregs[R_PS]) {
++        return 0;
 +    }
 +
-+    # memblock setup doesn't clean its registers, so this must come afterwards.
-+    write_random_register_data();
-+
-+    for my $i (1..$numinsns) {
-+        my $insn_enc = $keys[int rand (@keys)];
-+        my $forcecond = (rand() < $condprob) ? 1 : 0;
-+        gen_one_insn($forcecond, $insn_details{$insn_enc});
-+        write_risuop($OP_COMPARE);
-+        # Rewrite the registers periodically. This avoids the tendency
-+        # for the VFP registers to decay to NaNs and zeroes.
-+        if ($periodic_reg_random && ($i % 100) == 0) {
-+            write_random_register_data();
++    for (i = 0; i < 16; i++) {
++        if (i == R_SP || i == R_A6) {
++            continue;
 +        }
-+        progress_update($i);
++        if (m->gregs[i] != a->gregs[i]) {
++            return 0;
++        }
 +    }
-+    write_risuop($OP_TESTEND);
-+    progress_end();
-+    close_bin();
++
++    if (m->fpregs.f_pcr != a->fpregs.f_pcr) {
++        return 0;
++    }
++
++    if (m->fpregs.f_psr != a->fpregs.f_psr) {
++        return 0;
++    }
++
++    for (i = 0; i < 8; i++) {
++        if (m->fpregs.f_fpregs[i * 3] != a->fpregs.f_fpregs[i * 3] ||
++            m->fpregs.f_fpregs[i * 3 + 1] != a->fpregs.f_fpregs[i * 3 + 1] ||
++            m->fpregs.f_fpregs[i * 3 + 2] != a->fpregs.f_fpregs[i * 3 + 2]) {
++            return 0;
++        }
++    }
++
++    return 1;
 +}
 +
-+1;
++/* reginfo_dump: print state to a stream, returns nonzero on success */
++void reginfo_dump(struct reginfo *ri, int is_master)
++{
++    int i;
++    if (is_master) {
++        fprintf(stderr, "  pc            \e[1;101;37m0x%08x\e[0m\n",
++                ri->pc);
++    }
++    fprintf(stderr, "\tPC: %08x\n", ri->gregs[R_PC]);
++    fprintf(stderr, "\tPS: %04x\n", ri->gregs[R_PS]);
++
++    for (i = 0; i < 8; i++) {
++        fprintf(stderr, "\tD%d: %8x\tA%d: %8x\n", i, ri->gregs[i],
++                i, ri->gregs[i + 8]);
++    }
++
++
++    for (i = 0; i < 8; i++) {
++        fprintf(stderr, "\tFP%d: %08x %08x %08x\n", i,
++                ri->fpregs.f_fpregs[i * 3], ri->fpregs.f_fpregs[i * 3 + 1],
++                ri->fpregs.f_fpregs[i * 3 + 2]);
++    }
++
++    fprintf(stderr, "\n");
++}
++
++int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
++{
++    int i;
++
++    if (m->gregs[R_PS] != a->gregs[R_PS]) {
++            fprintf(f, "Mismatch: Register PS\n");
++            fprintf(f, "master: [%x] - apprentice: [%x]\n",
++                    m->gregs[R_PS], a->gregs[R_PS]);
++    }
++
++    for (i = 0; i < 16; i++) {
++        if (i == R_SP || i == R_A6) {
++            continue;
++        }
++        if (m->gregs[i] != a->gregs[i]) {
++            fprintf(f, "Mismatch: Register %c%d\n", i < 8 ? 'D' : 'A', i % 8);
++            fprintf(f, "master: [%x] - apprentice: [%x]\n",
++                    m->gregs[i], a->gregs[i]);
++        }
++    }
++
++    if (m->fpregs.f_pcr != a->fpregs.f_pcr) {
++        fprintf(f, "Mismatch: Register FPCR\n");
++        fprintf(f, "m: [%04x] != a: [%04x]\n",
++                m->fpregs.f_pcr, a->fpregs.f_pcr);
++    }
++
++    if (m->fpregs.f_psr != a->fpregs.f_psr) {
++        fprintf(f, "Mismatch: Register FPSR\n");
++        fprintf(f, "m: [%08x] != a: [%08x]\n",
++                m->fpregs.f_psr, a->fpregs.f_psr);
++    }
++
++    for (i = 0; i < 8; i++) {
++        if (m->fpregs.f_fpregs[i * 3] != a->fpregs.f_fpregs[i * 3] ||
++            m->fpregs.f_fpregs[i * 3 + 1] != a->fpregs.f_fpregs[i * 3 + 1] ||
++            m->fpregs.f_fpregs[i * 3 + 2] != a->fpregs.f_fpregs[i * 3 + 2]) {
++            fprintf(f, "Mismatch: Register FP%d\n", i);
++            fprintf(f, "m: [%08x %08x %08x] != a: [%08x %08x %08x]\n",
++                    m->fpregs.f_fpregs[i * 3], m->fpregs.f_fpregs[i * 3 + 1],
++                    m->fpregs.f_fpregs[i * 3 + 2], a->fpregs.f_fpregs[i * 3],
++                    a->fpregs.f_fpregs[i * 3 + 1],
++                    a->fpregs.f_fpregs[i * 3 + 2]);
++        }
++    }
++
++
++    return !ferror(f);
++}
+diff --git a/risu_reginfo_m68k.h b/risu_reginfo_m68k.h
+new file mode 100644
+index 0000000..9dd8f32
+--- /dev/null
++++ b/risu_reginfo_m68k.h
+@@ -0,0 +1,32 @@
++/*****************************************************************************
++ * Copyright (c) 2016 Laurent Vivier
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *****************************************************************************/
++
++#ifndef RISU_REGINFO_M68K_H
++#define RISU_REGINFO_M68K_H
++
++struct reginfo
++{
++    uint32_t faulting_insn;
++    uint32_t pc;
++    gregset_t gregs;
++    fpregset_t fpregs;
++};
++
++/* initialize structure from a ucontext */
++void reginfo_init(struct reginfo *ri, ucontext_t *uc);
++
++/* return 1 if structs are equal, 0 otherwise. */
++int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2, ucontext_t *uc);
++
++/* print reginfo state to a stream */
++void reginfo_dump(struct reginfo *ri, int is_master);
++
++/* reginfo_dump_mismatch: print mismatch details to a stream, ret nonzero=ok */
++int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f);
++
++#endif /* RISU_REGINFO_M68K_H */
+diff --git a/test_m68k.s b/test_m68k.s
+new file mode 100644
+index 0000000..6ca8a92
+--- /dev/null
++++ b/test_m68k.s
+@@ -0,0 +1,28 @@
++/*******************************************************************************
++ * Copyright (c) 2016 Laurent Vivier
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *******************************************************************************
++
++/* Initialise the gp regs */
++moveq.l #0, %d0
++move.l %d0, %d1
++move.l %d0, %d2
++move.l %d0, %d3
++move.l %d0, %d4
++move.l %d0, %d5
++move.l %d0, %d6
++move.l %d0, %d7
++move.l %d0, %a0
++move.l %d0, %a1
++move.l %d0, %a2
++move.l %d0, %a3
++move.l %d0, %a4
++move.l %d0, %a5
++
++/* do compare */
++.int 0x4afc7000
++/* exit test */
++.int 0x4afc7001
 -- 
 2.9.3
