@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cb8jb-00077h-2A
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:35:16 -0500
+	(envelope-from <groug@kaod.org>) id 1cb8rM-0001Lj-6n
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cb8jX-0000x3-SE
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:35:15 -0500
-Received: from 7.mo179.mail-out.ovh.net ([46.105.61.94]:37196)
+	(envelope-from <groug@kaod.org>) id 1cb8rH-0006fx-5D
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:43:16 -0500
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:41621)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cb8jX-0000uq-Md
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:35:11 -0500
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cb8rG-0006e4-Un
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:43:11 -0500
 Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id ED56214AFB
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 17:35:07 +0100 (CET)
-Date: Tue, 7 Feb 2017 17:35:04 +0100
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 2EBA621A4D
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 17:43:09 +0100 (CET)
+Date: Tue, 7 Feb 2017 17:43:05 +0100
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170207173504.46aa7258@bahia.lan>
-In-Reply-To: <20170207135211.15870-5-marcandre.lureau@redhat.com>
+Message-ID: <20170207174305.4fdd37ef@bahia.lan>
+In-Reply-To: <20170207135211.15870-22-marcandre.lureau@redhat.com>
 References: <20170207135211.15870-1-marcandre.lureau@redhat.com>
-	<20170207135211.15870-5-marcandre.lureau@redhat.com>
+	<20170207135211.15870-22-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/28] timer: use an inline function for
- free
+Subject: Re: [Qemu-devel] [PATCH 21/28] tests: fix virtio-9p-test leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +31,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On Tue,  7 Feb 2017 17:51:47 +0400
+On Tue,  7 Feb 2017 17:52:04 +0400
 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-> Similarly to allocation, do it from an inline function. This allows
-> tests to only use the headers for allocation/free of timer.
+> Spotted by ASAN.
 >=20
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+> Cc: Greg Kurz <groug@kaod.org>
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
 
+I was a bit confused at first but hopefully I could find the definition of
+qvirtio_pci_device_free() in patch 08/28 :)
+
 Reviewed-by: Greg Kurz <groug@kaod.org>
 
->  include/qemu/timer.h | 5 ++++-
->  qemu-timer.c         | 5 -----
->  2 files changed, 4 insertions(+), 6 deletions(-)
+>  tests/virtio-9p-test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-> index 9abed51ae8..26e628584c 100644
-> --- a/include/qemu/timer.h
-> +++ b/include/qemu/timer.h
-> @@ -610,7 +610,10 @@ void timer_deinit(QEMUTimer *ts);
->   *
->   * Free a timer (it must not be on the active list)
->   */
-> -void timer_free(QEMUTimer *ts);
-> +static inline void timer_free(QEMUTimer *ts)
-> +{
-> +    g_free(ts);
-> +}
-> =20
->  /**
->   * timer_del:
-> diff --git a/qemu-timer.c b/qemu-timer.c
-> index ff620ecff7..6cf70b96f6 100644
-> --- a/qemu-timer.c
-> +++ b/qemu-timer.c
-> @@ -355,11 +355,6 @@ void timer_deinit(QEMUTimer *ts)
->      ts->timer_list =3D NULL;
+> diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
+> index 9556291567..43a1ad813f 100644
+> --- a/tests/virtio-9p-test.c
+> +++ b/tests/virtio-9p-test.c
+> @@ -80,7 +80,7 @@ static void qvirtio_9p_pci_stop(QVirtIO9P *v9p)
+>  {
+>      qvirtqueue_cleanup(v9p->dev->bus, v9p->vq, v9p->qs->alloc);
+>      qvirtio_pci_device_disable(container_of(v9p->dev, QVirtioPCIDevice, =
+vdev));
+> -    g_free(v9p->dev);
+> +    qvirtio_pci_device_free((QVirtioPCIDevice *)v9p->dev);
+>      qvirtio_9p_stop(v9p);
 >  }
 > =20
-> -void timer_free(QEMUTimer *ts)
-> -{
-> -    g_free(ts);
-> -}
-> -
->  static void timer_del_locked(QEMUTimerList *timer_list, QEMUTimer *ts)
->  {
->      QEMUTimer **pt, *t;
