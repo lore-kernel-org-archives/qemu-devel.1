@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cbDdq-0002zO-7P
+	(envelope-from <wei@redhat.com>) id 1cbDdq-0002zT-9V
 	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 16:49:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cbDdp-0007cZ-1S
+	(envelope-from <wei@redhat.com>) id 1cbDdp-0007cp-5a
 	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 16:49:38 -0500
 From: Wei Huang <wei@redhat.com>
-Date: Tue,  7 Feb 2017 16:49:29 -0500
-Message-Id: <1486504171-26807-3-git-send-email-wei@redhat.com>
+Date: Tue,  7 Feb 2017 16:49:31 -0500
+Message-Id: <1486504171-26807-5-git-send-email-wei@redhat.com>
 In-Reply-To: <1486504171-26807-1-git-send-email-wei@redhat.com>
 References: <1486504171-26807-1-git-send-email-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V3 2/4] target-arm: Add support for AArch64 PMU
- register PMXEVTYPER_EL0
+Subject: [Qemu-devel] [PATCH V3 4/4] target-arm: Enable vPMU support under
+ TCG mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +23,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-In order to support Linux perf, which uses PMXEVTYPER register,
-this patch adds read/write access support for PMXEVTYPER. The access
-is CONSTRAINED UNPREDICTABLE when PMSELR is not 0x1f. Additionally
-this patch adds support for PMXEVTYPER_EL0.
+This patch contains several fixes to enable vPMU under TCG mode. It
+first removes the checking of kvm_enabled() while unsetting
+ARM_FEATURE_PMU. With it, the .pmu option can be used to turn on/off vPMU
+under TCG mode. Secondly the PMU node of DT table is now created under TCG.
+The last fix is to disable the masking of PMUver field of ID_AA64DFR0_EL1.
 
 Signed-off-by: Wei Huang <wei@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h    |  1 -
- target/arm/helper.c | 30 +++++++++++++++++++++++++-----
- 2 files changed, 25 insertions(+), 6 deletions(-)
+ hw/arm/virt.c       | 2 +-
+ target/arm/cpu.c    | 2 +-
+ target/arm/helper.c | 7 +------
+ 3 files changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 8a82c73..f46607e 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -307,7 +307,6 @@ typedef struct CPUARMState {
-         uint64_t c9_pmcr; /* performance monitor control register */
-         uint64_t c9_pmcnten; /* perf monitor counter enables */
-         uint32_t c9_pmovsr; /* perf monitor overflow status */
--        uint32_t c9_pmxevtyper; /* perf monitor event type */
-         uint32_t c9_pmuserenr; /* perf monitor user enable */
-         uint64_t c9_pmselr; /* perf monitor counter selection register */
-         uint32_t c9_pminten; /* perf monitor interrupt enables */
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 1f216cf..8eef143 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -471,7 +471,7 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+     CPU_FOREACH(cpu) {
+         armcpu = ARM_CPU(cpu);
+         if (!arm_feature(&armcpu->env, ARM_FEATURE_PMU) ||
+-            !kvm_arm_pmu_create(cpu, PPI(VIRTUAL_PMU_IRQ))) {
++            (kvm_enabled() && !kvm_arm_pmu_create(cpu, PPI(VIRTUAL_PMU_IRQ)))) {
+             return;
+         }
+     }
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index e9f10f7..9a2bc8a 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -745,7 +745,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         unset_feature(env, ARM_FEATURE_EL2);
+     }
+ 
+-    if (!cpu->has_pmu || !kvm_enabled()) {
++    if (!cpu->has_pmu) {
+         cpu->has_pmu = false;
+         unset_feature(env, ARM_FEATURE_PMU);
+     }
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 67520ea..ec5cf1f 100644
+index c4daa6e..d363d02 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -1054,7 +1054,25 @@ static void pmovsr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void pmxevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    env->cp15.c9_pmxevtyper = value & 0xff;
-+    /* Attempts to access PMXEVTYPER are CONSTRAINED UNPREDICTABLE when
-+     * PMSELR value is equal to or greater than the number of implemented
-+     * counters, but not equal to 0x1f. We opt to behave as a RAZ/WI.
-+     */
-+    if (env->cp15.c9_pmselr == 0x1f) {
-+        pmccfiltr_write(env, ri, value);
-+    }
-+}
-+
-+static uint64_t pmxevtyper_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    /* We opt to behave as a RAZ/WI when attempts to access PMXEVTYPER
-+     * are CONSTRAINED UNPREDICTABLE. See comments in pmxevtyper_write().
-+     */
-+    if (env->cp15.c9_pmselr == 0x1f) {
-+        return env->cp15.pmccfiltr_el0;
-+    } else {
-+        return 0;
-+    }
- }
- 
- static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -1234,10 +1252,12 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .fieldoffset = offsetof(CPUARMState, cp15.pmccfiltr_el0),
-       .resetvalue = 0, },
-     { .name = "PMXEVTYPER", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 1,
--      .access = PL0_RW,
--      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmxevtyper),
--      .accessfn = pmreg_access, .writefn = pmxevtyper_write,
--      .raw_writefn = raw_write },
-+      .access = PL0_RW, .type = ARM_CP_NO_RAW, .accessfn = pmreg_access,
-+      .writefn = pmxevtyper_write, .readfn = pmxevtyper_read },
-+    { .name = "PMXEVTYPER_EL0", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 13, .opc2 = 1,
-+      .access = PL0_RW, .type = ARM_CP_NO_RAW, .accessfn = pmreg_access,
-+      .writefn = pmxevtyper_write, .readfn = pmxevtyper_read },
-     /* Unimplemented, RAZ/WI. */
-     { .name = "PMXEVCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 2,
-       .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
+@@ -4633,12 +4633,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+             { .name = "ID_AA64DFR0_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 5, .opc2 = 0,
+               .access = PL1_R, .type = ARM_CP_CONST,
+-              /* We mask out the PMUVer field, because we don't currently
+-               * implement the PMU. Not advertising it prevents the guest
+-               * from trying to use it and getting UNDEFs on registers we
+-               * don't implement.
+-               */
+-              .resetvalue = cpu->id_aa64dfr0 & ~0xf00 },
++              .resetvalue = cpu->id_aa64dfr0 },
+             { .name = "ID_AA64DFR1_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 5, .opc2 = 1,
+               .access = PL1_R, .type = ARM_CP_CONST,
 -- 
 1.8.3.1
