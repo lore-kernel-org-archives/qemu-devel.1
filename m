@@ -1,41 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cbEes-0005wh-NV
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 17:54:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1cbEfz-0006d4-TX
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 17:55:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cbEen-0007C6-S9
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 17:54:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37934
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1cbEen-0007Bc-Me
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 17:54:41 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v17Ms9tt092897
-	for <qemu-devel@nongnu.org>; Tue, 7 Feb 2017 17:54:39 -0500
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28fgmta3v5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 17:54:39 -0500
-Received: from localhost
-	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Wed, 8 Feb 2017 08:54:36 +1000
-Date: Wed, 8 Feb 2017 09:53:36 +1100
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-References: <cover.1486436185.git.sam.bobroff@au1.ibm.com>
-	<900ea185630c17f315c4984b2a595b2d3fba7c9a.1486436186.git.sam.bobroff@au1.ibm.com>
-	<148650556725.30868.4471226211017570314@loki>
+	(envelope-from <eblake@redhat.com>) id 1cbEfy-0007aJ-TG
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 17:55:55 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-9-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4cfafc14-f9af-f992-b0be-8f283d0ddcfa@redhat.com>
+Date: Tue, 7 Feb 2017 16:55:45 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <148650556725.30868.4471226211017570314@loki>
-Message-Id: <20170207225336.GA10569@tungsten.ozlabs.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/9] spapr: fix off-by-one error in
- spapr_ovec_populate_dt()
+In-Reply-To: <20170203154757.36140-9-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KuqDe2AuKAtSSjLktCXvlIMARP6DxVj9I"
+Subject: Re: [Qemu-devel] [PATCH 08/18] hbitmap: add next_zero function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,46 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-On Tue, Feb 07, 2017 at 04:12:47PM -0600, Michael Roth wrote:
-> Quoting Sam Bobroff (2017-02-06 20:56:44)
-> > The last byte of the option vector was missing due to an off-by-one
-> > error. Without this fix, client architecture support negotiation will
-> > fail because the last byte of option vector 5, which contains the MMU
-> > support, will be missed.
-> > 
-> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-> > ---
-> >  hw/ppc/spapr_ovec.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
-> > index 4f4c090a29..18dbc4a9ac 100644
-> > --- a/hw/ppc/spapr_ovec.c
-> > +++ b/hw/ppc/spapr_ovec.c
-> > @@ -251,7 +251,7 @@ int spapr_ovec_populate_dt(void *fdt, int fdt_offset,
-> >          }
-> >      }
-> > 
-> > -    return fdt_setprop(fdt, fdt_offset, name, vec, vec_len);
-> > +    return fdt_setprop(fdt, fdt_offset, name, vec, vec_len + 1);
-> >  }
-> > 
-> >  void spapr_ovec_ruler(int width, sPAPROptionVector *ov)
-> > -- 
-> > 2.11.0
-> > 
-> 
-> I noticed this working on another series and ended up with the same fix.
-> 
-> The patch doesn't apply cleanly for me though due to the "spapr_ovec_ruler"
-> reference. But, assuming that is unrelated to this series:
-> 
-> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KuqDe2AuKAtSSjLktCXvlIMARP6DxVj9I
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
+ stefanha@redhat.com
+Message-ID: <4cfafc14-f9af-f992-b0be-8f283d0ddcfa@redhat.com>
+Subject: Re: [PATCH 08/18] hbitmap: add next_zero function
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+ <20170203154757.36140-9-vsementsov@virtuozzo.com>
+In-Reply-To: <20170203154757.36140-9-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-You're corret, that line is unrelated.
+On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> The function searches for next zero bit.
+> Also add interface for BdrvDirtyBitmap.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/dirty-bitmap.c         |  5 +++++
+>  include/block/dirty-bitmap.h |  2 ++
+>  include/qemu/hbitmap.h       |  8 ++++++++
+>  util/hbitmap.c               | 26 ++++++++++++++++++++++++++
+>  4 files changed, 41 insertions(+)
+>=20
 
-Thanks!
-Sam.
+It would be nice to enhance the testsuite to cover hbitmap_next_zero().
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--KuqDe2AuKAtSSjLktCXvlIMARP6DxVj9I
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYmlBxAAoJEKeha0olJ0Nqk6sH/3SkfImEftzppDWXr66DzHnB
+490kItKX21B8SMQGGu5OAN1httPoVpZoi+XasqF20FycYeHz7O1IzjM44jX0V/QV
+Q8BKDhDSvPqEw2pVP/J2aPQ2KEZqiWga/Ham81OraBr9SUSo8ESCGGjseykCUuD1
+S7lC6HapZiK5Gzod3wAatWmMtgH10Dcf4dWx3BN9zqsh++gWXlCT7DAUR8ZvxnX/
+Uad1Dt2e4r4VYOOEmk8lU+SePoW7ksty32b1MgpCqDEoMiJkVgGIkDtCU1Rigmfm
+MFqbaOyO4GDfRUFLk83Y2fGlWpfFaq9fDFZKfGTvEt7JsbkihH/W0VRSd67GBfI=
+=Z91D
+-----END PGP SIGNATURE-----
+
+--KuqDe2AuKAtSSjLktCXvlIMARP6DxVj9I--
