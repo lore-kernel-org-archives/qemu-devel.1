@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1caz99-0001dv-8z
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:21:00 -0500
+	(envelope-from <jasowang@redhat.com>) id 1caz9v-0002GP-MV
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:21:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1caz96-0006OC-70
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:20:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60794)
+	(envelope-from <jasowang@redhat.com>) id 1caz9s-0006fH-Jb
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:21:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1caz96-0006O1-0t
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:20:56 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1caz9s-0006f7-E6
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:21:44 -0500
 References: <1486110164-13797-1-git-send-email-peterx@redhat.com>
-	<1486110164-13797-8-git-send-email-peterx@redhat.com>
-	<a743f890-9c55-1edc-e9a6-783bbd5a179b@redhat.com>
-	<20170207060859.GU5151@pxdev.xzpeter.org>
+	<1486110164-13797-7-git-send-email-peterx@redhat.com>
+	<c72ca105-fad5-4200-fc6f-6ec3e15bc7f7@redhat.com>
+	<20170207061630.GV5151@pxdev.xzpeter.org>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <3fbb12d7-1f39-6d4e-84f8-99f724145ca2@redhat.com>
-Date: Tue, 7 Feb 2017 14:20:49 +0800
+Message-ID: <0a5e74e0-c096-5ca6-071a-339e4c4ef219@redhat.com>
+Date: Tue, 7 Feb 2017 14:21:31 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170207060859.GU5151@pxdev.xzpeter.org>
+In-Reply-To: <20170207061630.GV5151@pxdev.xzpeter.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 07/18] intel_iommu: fix trace for inv
- desc handling
+Subject: Re: [Qemu-devel] [PATCH v6 06/18] intel_iommu: renaming gpa to iova
+ where proper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +31,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
 
 
 
-On 2017=E5=B9=B402=E6=9C=8807=E6=97=A5 14:08, Peter Xu wrote:
-> On Tue, Feb 07, 2017 at 01:38:30PM +0800, Jason Wang wrote:
+On 2017=E5=B9=B402=E6=9C=8807=E6=97=A5 14:16, Peter Xu wrote:
+> On Tue, Feb 07, 2017 at 01:27:37PM +0800, Jason Wang wrote:
 >>
 >> On 2017=E5=B9=B402=E6=9C=8803=E6=97=A5 16:22, Peter Xu wrote:
->>> VT-d codes are still using static DEBUG_INTEL_IOMMU macro. That's not
->>> good, and we should end the day when we need to recompile the code
->>> before getting useful debugging information for vt-d. Time to switch =
-to
->>> the trace system.
->> Looks like we end up with using debug macros and tracepoints at the sa=
-me
->> time (even with patch 8), this will cause even more troubles.
-> I was converting debug macros into traces gradually rather than in a
-> single big patch. Those ones that were converted are possibly useful
-> for debugging of current series. I can do the rest of convertion in
-> another standalone patch after this series.
-
-That's fine.
-
->
+>>> There are lots of places in current intel_iommu.c codes that named
+>>> "iova" as "gpa". It is really confusing to use a name "gpa" in these
+>>> places (which is very easily to be understood as "Guest Physical
+>>> Address", while it's not). To make the codes (much) easier to be read=
+, I
+>>> decided to do this once and for all.
+>>>
+>>> No functional change is made. Only literal ones.
+>>>
+>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>> Reviewed-by: Jason Wang <jasowang@redhat.com>
 >>
->>> This is the first patch to do it.
->>>
->>> Generally, the rule of mine is:
->>>
->>> - for the old GENERAL typed message, I use trace_vtd_err*() in genera=
-l.
->>>
->>> - for the non-GENERAL typed messages, convert into specified trace_*(=
-).
->>>
->>> - for useless DPRINTFs, I removed them.
->>>
->>> Signed-off-by: Peter Xu<peterx@redhat.com>
->>> ---
->> The title is a little bit confusing, this in fact convert from debug m=
-acros
->> to tracepoints.
-> I'll find a better subject. Thanks,
+>> Actually, there's one more left:
+>>
+>> $git grep gpa hw/i386/intel_iommu.c
+>> hw/i386/intel_iommu.c:static int vtd_gpa_to_slpte(VTDContextEntry *ce,
+>> uint64_t iova, bool is_write,
+>> hw/i386/intel_iommu.c:    ret_fr =3D vtd_gpa_to_slpte(&ce, addr, is_wr=
+ite,
+>> &slpte, &level,
+> Yes, will fix this as well. Thanks,
 >
 > -- peterx
->
+
+You can keep my Reviewed-by with this fixed.
 
 Thanks
-
-Reviewed-by: Jason Wang <jasowang@redhat.com>
