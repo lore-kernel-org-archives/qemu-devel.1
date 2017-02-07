@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6DW-0000V8-6s
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1cb6Ea-0001Sg-SK
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:55:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6DV-0000HN-CL
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34274)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cb6DV-0000HF-3c
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:57 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C68E3D952
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 13:53:57 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  7 Feb 2017 17:52:11 +0400
-Message-Id: <20170207135211.15870-29-marcandre.lureau@redhat.com>
-In-Reply-To: <20170207135211.15870-1-marcandre.lureau@redhat.com>
-References: <20170207135211.15870-1-marcandre.lureau@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cb6EX-0000lp-R0
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:55:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47530)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cb6EX-0000lZ-LC
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:55:01 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cb6EV-0000VM-Ro
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 13:54:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BC3BA2E80C1
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 13:54:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 28/28] tests: fix virtio-blk-test leaks
+Date: Tue, 07 Feb 2017 13:45:19 -0000
+From: Justin Fletcher <855800@bugs.launchpad.net>
+Reply-To: Bug 855800 <855800@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110921182430.29459.49832.malonedeb@wampee.canonical.com>
+Message-Id: <20170207134519.30329.68725.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 855800] Re: KVM crashes when attempting to
+ restart migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,99 +38,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Use qvirtio_pci_device_find_slot() to avoid leaking the non-hp
-device. Add assert() to avoid further leaks in the future.
+I haven't attempted to reproduce the issue recently, I'm afraid. I've
+changed jobs twice in the intervening time, so the immediate issue for
+me has gone away. If I find an opportunity, I shall try to reproduce
+with the most recent versions.
 
-Use qvirtio_pci_device_free() to correctly free QVirtioPCIDevice.
+-- =
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- tests/libqos/virtio-pci.c |  1 +
- tests/virtio-blk-test.c   | 14 +++++++-------
- 2 files changed, 8 insertions(+), 7 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/855800
 
-diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-index 8a0904bbf0..7ac15c04e1 100644
---- a/tests/libqos/virtio-pci.c
-+++ b/tests/libqos/virtio-pci.c
-@@ -68,6 +68,7 @@ static void qvirtio_pci_foreach_callback(
- static void qvirtio_pci_assign_device(QVirtioDevice *d, void *data)
- {
-     QVirtioPCIDevice **vpcidev =3D data;
-+    assert(!*vpcidev);
-     *vpcidev =3D (QVirtioPCIDevice *)d;
- }
-=20
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 10a92b410a..1eee95df49 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -108,7 +108,7 @@ static QVirtioPCIDevice *virtio_blk_pci_init(QPCIBus =
-*bus, int slot)
- {
-     QVirtioPCIDevice *dev;
-=20
--    dev =3D qvirtio_pci_device_find(bus, VIRTIO_ID_BLOCK);
-+    dev =3D qvirtio_pci_device_find_slot(bus, VIRTIO_ID_BLOCK, slot);
-     g_assert(dev !=3D NULL);
-     g_assert_cmphex(dev->vdev.device_type, =3D=3D, VIRTIO_ID_BLOCK);
-     g_assert_cmphex(dev->pdev->devfn, =3D=3D, ((slot << 3) | PCI_FN));
-@@ -296,7 +296,7 @@ static void pci_basic(void)
-     /* End test */
-     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
- }
-=20
-@@ -389,7 +389,7 @@ static void pci_indirect(void)
-     /* End test */
-     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
- }
-=20
-@@ -418,7 +418,7 @@ static void pci_config(void)
-     g_assert_cmpint(capacity, =3D=3D, n_size / 512);
-=20
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-=20
-     qtest_shutdown(qs);
- }
-@@ -526,7 +526,7 @@ static void pci_msix(void)
-     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-     qpci_msix_disable(dev->pdev);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
- }
-=20
-@@ -642,7 +642,7 @@ static void pci_idx(void)
-     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-     qpci_msix_disable(dev->pdev);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
- }
-=20
-@@ -661,7 +661,7 @@ static void pci_hotplug(void)
-     dev =3D virtio_blk_pci_init(qs->pcibus, PCI_SLOT_HP);
-     g_assert(dev);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-=20
-     /* unplug secondary disk */
-     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
-) {
---=20
-2.11.0.295.gd7dffce1c.dirty
+Title:
+  KVM crashes when attempting to restart migration
+
+Status in QEMU:
+  Incomplete
+Status in qemu-kvm package in Ubuntu:
+  Confirmed
+
+Bug description:
+  Operations performed:
+  Sequence to trigger crash:
+
+      * Start two kvm systems, one on gerph (primary), one on nbuild2 (list=
+ening for incoming migration) - do not use -daemonize
+      * On gerph, connect to monitor.
+      * "migrate -d -b tcp:nbuild2:4444"
+      * "info migrate"
+      * "migrate_cancel"
+      * "info migrate"
+      * "migrate -d -b tcp:nbuild2:4444"
+      * crashed with assertion:
+  kvm: block-migration.c:355: flush_blks: Assertion `block_mig_state.read_d=
+one >=3D 0' failed.
+                   Connection closed by foreign host.
+  [1]+  Aborted                 (core dumped) kvm -drive file=3D./copy-disk=
+2.img,boot=3Don -m 4096 -serial mon:telnet::23023,server,nowait -balloon vi=
+rtio -vnc :99 -usbdevice tablet -net nic,macaddr=3Df6:a6:31:53:89:9a,model=
+=3Drtl8139,vlan=3D0 -net tap,vlan=3D0
+
+  =
+
+  Repeating the operations above often dies in different places; just repea=
+t the cancel and restart the operation. Because the KVM system dies, the un=
+derlying VM is obviously terminated.
+
+  Distribution:
+
+  jfletcher@gerph:~$ lsb_release -rd
+  Description:	Ubuntu 10.04.3 LTS
+  Release:	10.04
+
+  Package:
+
+  jfletcher@gerph:~$ apt-cache policy kvm
+  kvm:
+    Installed: 1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9.15
+    Candidate: 1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9.15
+    Version table:
+   *** 1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9.15 0
+          500 http://gb.archive.ubuntu.com/ubuntu/ lucid-updates/main Packa=
+ges
+          500 http://security.ubuntu.com/ubuntu/ lucid-security/main Packag=
+es
+          100 /var/lib/dpkg/status
+       1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9 0
+          500 http://gb.archive.ubuntu.com/ubuntu/ lucid/main Packages
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/855800/+subscriptions
