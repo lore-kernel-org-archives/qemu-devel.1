@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cb8eK-0003Ve-Jg
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:29:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1cb8gc-0005Bz-9u
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:32:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cb8eH-0004UV-Ca
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:29:48 -0500
-Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:34816)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cb8eH-0004TY-6F
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:29:45 -0500
-Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id B207D21A77
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 17:29:42 +0100 (CET)
-Date: Tue, 7 Feb 2017 17:29:33 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170207172933.05574f60@bahia.lan>
-In-Reply-To: <6b702369-7891-4e38-7240-57ad643657bd@redhat.com>
-References: <1486123043-26493-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1486123043-26493-2-git-send-email-pradeep.jagadeesh@huawei.com>
-	<71b1733d-7638-5e27-e828-fad57f76f507@redhat.com>
-	<20170207001533.3f18e4ea@bahia.lan>
-	<20170207113231.44e35be6@bahia.lan>
-	<6b702369-7891-4e38-7240-57ad643657bd@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cb8ga-0006Nf-VS
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:32:10 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-5-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
+Date: Tue, 7 Feb 2017 10:32:00 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/7nO+FYEDC9WBP+Ini.Z96S_";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 1/2 v16] fsdev: add IO throttle support to
- fsdev devices
+In-Reply-To: <20170203154757.36140-5-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="v3DlCPL5OaT8vNXB4ojaK1dMlnNKk0wiX"
+Subject: Re: [Qemu-devel] [PATCH 04/18] nbd/client: refactor
+ nbd_receive_starttls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,74 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
---Sig_/7nO+FYEDC9WBP+Ini.Z96S_
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--v3DlCPL5OaT8vNXB4ojaK1dMlnNKk0wiX
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
+ stefanha@redhat.com
+Message-ID: <7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
+Subject: Re: [PATCH 04/18] nbd/client: refactor nbd_receive_starttls
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+ <20170203154757.36140-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20170203154757.36140-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Cc'ing Stefan who reviewed patch 2/2.
-
-On Tue, 7 Feb 2017 09:56:08 -0600
-Eric Blake <eblake@redhat.com> wrote:
-
-> On 02/07/2017 04:32 AM, Greg Kurz wrote:
-> >>
-> >> I'm not aware of anything related to fsdev in QMP... and libvirt seems=
- to
-> >> only parse the output of -help to guess fsdev capabilities. =20
-> >=20
-> > Oops, reading some more libvirt code I now see that libvirt doesn't par=
-se
-> > -help anymore with QEMU >=3D 1.2.0... sorry for the noise :)
-> >  =20
-> >> And indeed,
-> >> qemu-options.hx doesn't expose this new feature.
-> >> =20
-> >>> Please make sure we don't reach 2.9 with only a half-baked feature;
-> >>> whether that means finishing the QMP work or temporarily disabling the
-> >>> cli additions until a later release can finish the work.
-> >>>    =20
-> >>
-> >> Would this be ok to add the missing bits in qemu-options.hx or do you
-> >> expect more ? =20
+On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Split out nbd_receive_simple_option to be reused for structured reply
+> option.
 >=20
-> If it cannot be probed via QMP, then libvirt will most likely assume
-> that it does not exist.  I guess we're okay having command line only in
-> 2.9 if you can't get QMP working, because libvirt will just never drive
-> the feature until 2.10 when QMP is available; but then we risk the
-> command line subtly changing and breaking someone else that was using
-> the command line without QMP.  Maybe the safest approach is to just use
-> the 'x-' prefix to the command line portion, until the feature is complet=
-e.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/client.c       | 54 +++++++++++++++++++++++++++++++++++-----------=
+--------
+>  nbd/nbd-internal.h | 14 ++++++++++++++
+>  2 files changed, 49 insertions(+), 19 deletions(-)
 >=20
 
-The semantics here are exactly the same as for block devices. The
-command line options added to -fsdev are the very same already used
-by -drive for years.
+> +++ b/nbd/nbd-internal.h
+> @@ -96,6 +96,20 @@
+>  #define NBD_ENOSPC     28
+>  #define NBD_ESHUTDOWN  108
+> =20
+> +static inline const char *nbd_opt_name(int opt)
+> +{
+> +    switch (opt) {
+> +    case NBD_OPT_EXPORT_NAME: return "export_name";
 
-Patch 2/2 in this series even factors them out to a common header file
-to be used by fsdev and blockdev. I really don't expect any modification
-at all on the command line (nor the other people who reviewed that patch
-obviously)... are you suggesting that we should put 2/2 on hold and
-use the 'x-' prefix anyway ?
+Does this really get past checkpatch?
 
-Cheers.
+> +    case NBD_OPT_ABORT: return "abort";
+> +    case NBD_OPT_LIST: return "list";
+> +    case NBD_OPT_PEEK_EXPORT: return "peek_export";
+> +    case NBD_OPT_STARTTLS: return "tls";
 
---
-Greg
+Why just 'tls' instead of 'starttls'?
 
---Sig_/7nO+FYEDC9WBP+Ini.Z96S_
-Content-Type: application/pgp-signature
+> +    case NBD_OPT_STRUCTURED_REPLY: return "structured_reply";
+> +    }
+> +
+> +    return "<unknown option>";
+
+Can you please consider making this include the %d representation of the
+unknown option; perhaps by snprintf'ing into static storage?  While it
+is unlikely that a well-behaved server will respond to a client with an
+option the client doesn't recognize, it is much more likely that this
+reverse lookup function will be used in a server to respond to an
+unknown option from a client.
+
+In fact, I might have split this into two patches: one providing
+nbd_opt_name() and using it throughout the code base where appropriate,
+and the other refactoring starttls in the client.
+
+I'm not sure if the reverse lookup function needs to be inline in the
+header; it could reasonably live in nbd/common.c, particularly if you
+are going to take my advice to have it format a message for unknown value=
+s.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--v3DlCPL5OaT8vNXB4ojaK1dMlnNKk0wiX
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAliZ9e0ACgkQAvw66wEB28IKdgCgi1e6649v+OiwCHGtduPat9Gf
-ilIAn1PwN+ZEQaCAGYB5RzosqedRDNYJ
-=1XZX
+iQEcBAEBCAAGBQJYmfaAAAoJEKeha0olJ0NqEFgH/37ZUQXzYYLuhfsoI7AACUtV
+J5PrFcVwoDBUru/evO/sOrd3QwMyiGq7rgjTiv+VolpPNS0fz1tN3eJkfdCWCx2l
+DgUc5HMgWh3Ly98hNmyAW3/qgXgnNIqxdmsNScIhVizb7GC1OBtwuqGhmIctvvAi
+IdzzGptfC4awtveDCFHZ5zVitpB5JDk1H716k8MnaHOX1f/kok6+bUdCkFl6vvS/
+aqxXMfuZ894Rg+UeO+KaaNYJjL05OnOK2qMHS0IJHdWVh0MJGYV7un2FfswNoN0h
+MkV+9W8RIocQcotIcObsBFQyF+uaInbo1eXD+3IOUoL6BBpTt+OlUv7AjT/8kMs=
+=zUde
 -----END PGP SIGNATURE-----
 
---Sig_/7nO+FYEDC9WBP+Ini.Z96S_--
+--v3DlCPL5OaT8vNXB4ojaK1dMlnNKk0wiX--
