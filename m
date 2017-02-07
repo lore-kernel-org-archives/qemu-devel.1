@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb0cp-0005Vs-5J
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 02:55:44 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cb0eO-0006Pg-Aa
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 02:57:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb0cm-0006R6-1K
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 02:55:43 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:48838)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb0cl-0006Ly-1E
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 02:55:39 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cb0eL-0007JQ-8B
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 02:57:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cb0eK-0007J3-Vu
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 02:57:17 -0500
 References: <1485266748-15340-1-git-send-email-zhang.zhanghailiang@huawei.com>
 	<1485266748-15340-2-git-send-email-zhang.zhanghailiang@huawei.com>
 	<4d0b52bc-bcdd-5b96-465c-f0e624cb4add@redhat.com>
@@ -16,13 +16,14 @@ References: <1485266748-15340-1-git-send-email-zhang.zhanghailiang@huawei.com>
 	<0b5891cc-0170-0773-a4b2-31cf3ff2b6d7@redhat.com>
 	<589859CA.5030903@huawei.com>
 	<3c6e13ab-4f5a-fbe3-ef95-196c6b3e59c9@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58997D40.60604@huawei.com>
-Date: Tue, 7 Feb 2017 15:54:40 +0800
+	<58997D40.60604@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <e8c2510f-f755-3ec1-f085-e3053480b772@redhat.com>
+Date: Tue, 7 Feb 2017 15:57:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <3c6e13ab-4f5a-fbe3-ef95-196c6b3e59c9@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <58997D40.60604@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: reconstruct the mutex
  lock usage
 List-Id: <qemu-devel.nongnu.org>
@@ -33,121 +34,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com
 Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, lizhijian@cn.fujitsu.com
 
-Hi Jason,
 
-On 2017/2/6 20:53, Jason Wang wrote:
+
+On 2017=E5=B9=B402=E6=9C=8807=E6=97=A5 15:54, Hailiang Zhang wrote:
+> Hi Jason,
 >
->
-> On 2017年02月06日 19:11, Hailiang Zhang wrote:
->> On 2017/2/6 17:35, Jason Wang wrote:
->>>
->>>
->>> On 2017年02月06日 16:13, Hailiang Zhang wrote:
->>>> On 2017/2/3 11:47, Jason Wang wrote:
->>>>>
->>>>>
->>>>> On 2017年01月24日 22:05, zhanghailiang wrote:
->>>>>> The original 'timer_check_lock' mutex lock of struct CompareState
->>>>>> is used to protect the 'conn_list' queue and its child queues which
->>>>>> are 'primary_list' and 'secondary_list', which is a little abused
->>>>>> and confusing
+> On 2017/2/6 20:53, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B402=E6=9C=8806=E6=97=A5 19:11, Hailiang Zhang wrote:
+>>> On 2017/2/6 17:35, Jason Wang wrote:
+>>>>
+>>>>
+>>>> On 2017=E5=B9=B402=E6=9C=8806=E6=97=A5 16:13, Hailiang Zhang wrote:
+>>>>> On 2017/2/3 11:47, Jason Wang wrote:
 >>>>>>
->>>>>> To make it clearer, we rename 'timer_check_lock' to 'conn_list_lock'
->>>>>> which is used to protect 'conn_list' queue, use another 'conn_lock'
->>>>>> to protect 'primary_list' and 'secondary_list'.
 >>>>>>
->>>>>> Besides, fix some missing places which need these mutex lock.
+>>>>>> On 2017=E5=B9=B401=E6=9C=8824=E6=97=A5 22:05, zhanghailiang wrote:
+>>>>>>> The original 'timer_check_lock' mutex lock of struct CompareState
+>>>>>>> is used to protect the 'conn_list' queue and its child queues whi=
+ch
+>>>>>>> are 'primary_list' and 'secondary_list', which is a little abused
+>>>>>>> and confusing
+>>>>>>>
+>>>>>>> To make it clearer, we rename 'timer_check_lock' to=20
+>>>>>>> 'conn_list_lock'
+>>>>>>> which is used to protect 'conn_list' queue, use another 'conn_loc=
+k'
+>>>>>>> to protect 'primary_list' and 'secondary_list'.
+>>>>>>>
+>>>>>>> Besides, fix some missing places which need these mutex lock.
+>>>>>>>
+>>>>>>> Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
 >>>>>>
->>>>>> Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
+>>>>>> Instead of sticking to such kind of mutex, I think it's time to ma=
+ke
+>>>>>> colo timer run in colo thread (there's a TODO in the code).
+>>>>>>
 >>>>>
->>>>> Instead of sticking to such kind of mutex, I think it's time to make
->>>>> colo timer run in colo thread (there's a TODO in the code).
+>>>>> Er, it seems that, we still need these mutex locks even we make col=
+o
+>>>>> timer and colo thread run in the same thread, because we may access
+>>>>> the connect/primary/secondary list from colo (migratioin) thread
+>>>>> concurrently.
+>>>>
+>>>> Just make sure I understand the issue, why need it access the list?
+>>>>
 >>>>>
+>>>>> Besides, it seems to be a little complex to make colo timer run in=20
+>>>>> colo
+>>>>> compare thread, and it is not this series' goal.
 >>>>
->>>> Er, it seems that, we still need these mutex locks even we make colo
->>>> timer and colo thread run in the same thread, because we may access
->>>> the connect/primary/secondary list from colo (migratioin) thread
->>>> concurrently.
->>>
->>> Just make sure I understand the issue, why need it access the list?
->>>
+>>>> Seems not by just looking at how it was implemented in main loop, bu=
+t
+>>>> maybe I was wrong.
 >>>>
->>>> Besides, it seems to be a little complex to make colo timer run in colo
->>>> compare thread, and it is not this series' goal.
->>>
->>> Seems not by just looking at how it was implemented in main loop, but
->>> maybe I was wrong.
->>>
->>>> This series is preparing
->>>> work for integrating COLO compare with COLO frame and it is
->>>> prerequisite.
+>>>>> This series is preparing
+>>>>> work for integrating COLO compare with COLO frame and it is
+>>>>> prerequisite.
+>>>>>
+>>>>> So, we may consider implementing it later in another series.
+>>>>> Zhang Chen, what's your opinion ?
 >>>>
->>>> So, we may consider implementing it later in another series.
->>>> Zhang Chen, what's your opinion ?
+>>>> The problem is this patch make things even worse, it introduces one=20
+>>>> more
+>>>> mutex.
+>>>>
 >>>
->>> The problem is this patch make things even worse, it introduces one more
->>> mutex.
+>>> Hmm, for most cases, we need to get these two locks at the same time.
+>>> We can use one lock to protect conn_list/primary_list/secondary_list,
+>>> (We need to get this lock before operate all these lists, as you can=20
+>>> see
+>>> in patch 2, while do checkpoint, we may operate these lists in
+>>> COLO checkpoint thread concurrently.)
 >>>
+>>> But for the original codes, we didn't got timer_check_lock in
+>>> packet_enqueue() while operate conn_list/primary_list/secondary_list,
+>>> and didn't got this lock in colo_compare_connection while operate
+>>> secondary_list either.
+>>>
+>>> So, is it OK to use the conn_lock instead of timer_check_lock, and
+>>> add the lock where it is need ?
 >>
->> Hmm, for most cases, we need to get these two locks at the same time.
->> We can use one lock to protect conn_list/primary_list/secondary_list,
->> (We need to get this lock before operate all these lists, as you can see
->> in patch 2, while do checkpoint, we may operate these lists in
->> COLO checkpoint thread concurrently.)
+>> I'd like to know if timer were run in colo thread (this looks as simpl=
+e
+>> as a g_timeout_source_new() followed by a g_source_attach()), why do w=
+e
+>> still need a mutex. And if we need it now but plan to remove it in the
+>> future, I'd like to use big lock to simplify the codes.
 >>
->> But for the original codes, we didn't got timer_check_lock in
->> packet_enqueue() while operate conn_list/primary_list/secondary_list,
->> and didn't got this lock in colo_compare_connection while operate
->> secondary_list either.
->>
->> So, is it OK to use the conn_lock instead of timer_check_lock, and
->> add the lock where it is need ?
 >
-> I'd like to know if timer were run in colo thread (this looks as simple
-> as a g_timeout_source_new() followed by a g_source_attach()), why do we
-> still need a mutex. And if we need it now but plan to remove it in the
-> future, I'd like to use big lock to simplify the codes.
->
+> After investigated your above suggestion, I think it works by using
+> g_timeout_source_new() and g_source_attach(), but I'm not sure
+> if it is a good idea to use the big lock to protect the possible
+> concurrent cases which seem to only happen between COLO migration
+> thread and COLO compare thread, any further suggestions ?
 
-After investigated your above suggestion, I think it works by using
-g_timeout_source_new() and g_source_attach(), but I'm not sure
-if it is a good idea to use the big lock to protect the possible
-concurrent cases which seem to only happen between COLO migration
-thread and COLO compare thread, any further suggestions ?
+I think I need first understand why migration thread need to access the=20
+list?
 
-Thanks,
-Hailiang
+Thanks
 
-
-> Thanks
 >
->>
->> Thanks.
->> Hailiang
->>
->>> Thanks
->>>
->>>>
->>>>
->>>> Thanks,
->>>> Hailiang
->>>>
->>>>> Thought?
->>>>>
->>>>> Thanks
->>>>>
->>>>> .
->>>>>
->>>>
->>>
->>>
->>> .
->>>
->>
+> Thanks,
+> Hailiang
 >
 >
-> .
+>> Thanks
+>>
+>>>
+>>> Thanks.
+>>> Hailiang
+>>>
+>>>> Thanks
+>>>>
+>>>>>
+>>>>>
+>>>>> Thanks,
+>>>>> Hailiang
+>>>>>
+>>>>>> Thought?
+>>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>> .
+>>>>>>
+>>>>>
+>>>>
+>>>>
+>>>> .
+>>>>
+>>>
+>>
+>>
+>> .
+>>
 >
