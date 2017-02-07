@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cavVU-0000ov-Hv
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:27:49 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cavZZ-0002vG-DJ
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:32:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cavVR-0004LL-W1
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:27:48 -0500
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:34115)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cavVR-0004LC-Ry
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:27:45 -0500
-Received: by mail-io0-x243.google.com with SMTP id c80so11548629iod.1
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 18:27:44 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170123021748.13170-1-rth@twiddle.net>
-	<20170123021748.13170-19-rth@twiddle.net>
-	<CAFEAcA_YbHYSL4hS7_K3rA9VTU+eYmE7CG+dSgnTB+GKOnPRLw@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <caf325cb-1bba-8baf-9942-d63e30a4dd8c@twiddle.net>
-Date: Mon, 6 Feb 2017 18:27:28 -0800
+	(envelope-from <jasowang@redhat.com>) id 1cavZW-0005C8-QP
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:32:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49558)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cavZW-0005Br-Hw
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:31:58 -0500
+References: <1486110164-13797-1-git-send-email-peterx@redhat.com>
+	<1486110164-13797-5-git-send-email-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <d0849f60-0926-30df-bbbb-656c82fa1753@redhat.com>
+Date: Tue, 7 Feb 2017 10:31:51 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_YbHYSL4hS7_K3rA9VTU+eYmE7CG+dSgnTB+GKOnPRLw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 18/26] target-hppa: Add framework and enable
- compilation
+In-Reply-To: <1486110164-13797-5-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 04/18] intel_iommu: add "caching-mode"
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,16 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-On 01/30/2017 05:49 AM, Peter Maydell wrote:
->> +    case 35:
->> +        env->iaoq_b = val;
+
+
+On 2017=E5=B9=B402=E6=9C=8803=E6=97=A5 16:22, Peter Xu wrote:
+> From: Aviv Ben-David <bd.aviv@gmail.com>
 >
-> Is this a missing "break;" or a missing "/* fall through */" ?
+> This capability asks the guest to invalidate cache before each map oper=
+ation.
+> We can use this invalidation to trap map operations in the hypervisor.
+>
+> Signed-off-by: Aviv Ben-David <bd.aviv@gmail.com>
+> [peterx: using "caching-mode" instead of "cache-mode" to align with spe=
+c]
+> [peterx: re-write the subject to make it short and clear]
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
 
-Yep, thanks.
+Reviewed-by: Jason Wang <jasowang@redhat.com>
 
-
-r~
+>   hw/i386/intel_iommu.c          | 5 +++++
+>   hw/i386/intel_iommu_internal.h | 1 +
+>   include/hw/i386/intel_iommu.h  | 2 ++
+>   3 files changed, 8 insertions(+)
+>
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 3270fb9..50251c3 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -2115,6 +2115,7 @@ static Property vtd_properties[] =3D {
+>       DEFINE_PROP_ON_OFF_AUTO("eim", IntelIOMMUState, intr_eim,
+>                               ON_OFF_AUTO_AUTO),
+>       DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false=
+),
+> +    DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FA=
+LSE),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>  =20
+> @@ -2496,6 +2497,10 @@ static void vtd_init(IntelIOMMUState *s)
+>           s->ecap |=3D VTD_ECAP_DT;
+>       }
+>  =20
+> +    if (s->caching_mode) {
+> +        s->cap |=3D VTD_CAP_CM;
+> +    }
+> +
+>       vtd_reset_context_cache(s);
+>       vtd_reset_iotlb(s);
+>  =20
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_inter=
+nal.h
+> index 356f188..4104121 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -202,6 +202,7 @@
+>   #define VTD_CAP_MAMV                (VTD_MAMV << 48)
+>   #define VTD_CAP_PSI                 (1ULL << 39)
+>   #define VTD_CAP_SLLPS               ((1ULL << 34) | (1ULL << 35))
+> +#define VTD_CAP_CM                  (1ULL << 7)
+>  =20
+>   /* Supported Adjusted Guest Address Widths */
+>   #define VTD_CAP_SAGAW_SHIFT         8
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iomm=
+u.h
+> index 405c9d1..fe645aa 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -257,6 +257,8 @@ struct IntelIOMMUState {
+>       uint8_t womask[DMAR_REG_SIZE];  /* WO (write only - read returns =
+0) */
+>       uint32_t version;
+>  =20
+> +    bool caching_mode;          /* RO - is cap CM enabled? */
+> +
+>       dma_addr_t root;                /* Current root table pointer */
+>       bool root_extended;             /* Type of root table (extended o=
+r not) */
+>       bool dmar_enabled;              /* Set if DMA remapping is enable=
+d */
