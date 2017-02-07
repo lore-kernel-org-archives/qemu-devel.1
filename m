@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1cb4jU-0007LH-9n
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:18:53 -0500
+	(envelope-from <bounces@canonical.com>) id 1cb4ld-0008Lh-Lf
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:21:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1cb4jP-0004aU-Bm
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:18:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45116)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1cb4jP-0004aN-35
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:18:47 -0500
-Date: Tue, 7 Feb 2017 10:18:25 -0200
-From: Marcelo Tosatti <mtosatti@redhat.com>
-Message-ID: <20170207121822.GA6270@amt.cnet>
-References: <20161104094322.GA16930@amt.cnet> <20161104165933.GA3027@amt.cnet>
-	<20161107154610.GG2054@work-vm> <20161107194058.GB28327@amt.cnet>
-	<CANRm+CyzwtZqaGmhTj2pdk8ipjWSXuwtSHp9NzwA7aQR3ZG=cA@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1cb4lZ-0005RF-NG
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:21:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42845)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cb4lZ-0005Qt-Gz
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:21:01 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cb4lW-0002Xv-GL
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 12:20:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C87DE2E80DB
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 12:20:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANRm+CyzwtZqaGmhTj2pdk8ipjWSXuwtSHp9NzwA7aQR3ZG=cA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [QEMU PATCH v2] kvmclock: advance clock by time
- window between vm_stop and pre_save
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Feb 2017 12:13:19 -0000
+From: Thomas Huth <1662468@bugs.launchpad.net>
+Reply-To: Bug 1662468 <1662468@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170207100302.3995.67911.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170207121320.29592.5134.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1662468] Re: [feature request] qemu-img convert
+ should respond to control-T like dd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +37,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wanpeng Li <kernellwp@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvm <kvm@vger.kernel.org>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Juan Quintela <quintela@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Feb 07, 2017 at 06:02:13PM +0800, Wanpeng Li wrote:
-> 2016-11-08 3:41 GMT+08:00 Marcelo Tosatti <mtosatti@redhat.com>:
-> > On Mon, Nov 07, 2016 at 03:46:11PM +0000, Dr. David Alan Gilbert wrote:
-> >> * Marcelo Tosatti (mtosatti@redhat.com) wrote:
-> >> > This patch, relative to pre-copy migration codepath,
-> >> > measures the time between vm_stop() and pre_save(),
-> >> > which includes copying the remaining RAM to destination,
-> >> > and advances the clock by that amount.
-> >> >
-> >> > In a VM with 5 seconds downtime, this reduces the guest
-> >> > clock difference on destination from 5s to 0.2s.
-> >> >
-> >> > Tested with Linux and Windows 2012 R2 guests with -cpu XXX,+hv-time.
-> >>
-> >> One thing that bothers me is that it's only this clock that's
-> >> getting corrected; doesn't it cause things to get upset when
-> >> one clock moves and the others dont?
-> >
-> > If you are correlating the clocks, then yes.
-> >
-> > Older Linux guests get upset (marking the TSC clocksource unstable
-> > because the watchdog checks TSC vs kvmclock), but there is a workaround for it
-> > in newer guests
-> > (kvmclock interface to notify watchdog to not complain).
-> 
-> Could you point out which interface? I didn't find it.
-> 
-> Regards,
-> Wanpeng Li
+** Changed in: qemu
+   Importance: Undecided =3D> Wishlist
 
-PVCLOCK_GUEST_STOPPED flag.
+-- =
 
-> 
-> >
-> > Note marking TSC clocksource unstable on older guests is harmless
-> > because kvmclock is the standard clocksource.
-> >
-> > For Windows guests, i don't know that Windows correlates between different
-> > clocks.
-> >
-> > That is, there is relative control as to which software reads kvmclock
-> > or Windows TIMER MSR, so i don't see the need to advance every clock
-> > exposed.
-> >
-> >> Shouldn't the pause delay be recorded somewhere architecturally
-> >> independent and then be a thing that kvm-clock happens to use and
-> >> other clocks might as well?
-> >
-> > In theory, yes. In practice, i don't see the need for this...
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe kvm" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1662468
+
+Title:
+  [feature request] qemu-img convert should respond to control-T like dd
+
+Status in QEMU:
+  New
+
+Bug description:
+  Since qemu-img convert is a long-running operation, it would be nice
+  if it reported progress in response to control-T (SIGINFO) to show
+  progress information, much like dd, fsck, dump, cp, etc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1662468/+subscriptions
