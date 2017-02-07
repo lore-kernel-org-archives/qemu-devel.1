@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cb8Vr-0004wl-Te
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:21:06 -0500
+	(envelope-from <mst@redhat.com>) id 1cb8Wt-0005kz-HZ
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:22:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cb8Vq-0004bd-Pj
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:21:03 -0500
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36948)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cb8Vq-0004aU-Hd
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:21:02 -0500
-Received: by mail-wm0-x233.google.com with SMTP id v77so161721754wmv.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 08:21:02 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1cb8Wq-0005Z8-1W
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:22:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50872)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cb8Wp-0005X0-Nv
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:22:03 -0500
+Date: Tue, 7 Feb 2017 18:22:01 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170207181859-mutt-send-email-mst@kernel.org>
+References: <cover.1486285434.git.ben@skyportsystems.com>
+	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
+	<20170206170455-mutt-send-email-mst@kernel.org>
+	<E609277C-1E60-48F6-B83E-2A6AEFB242F3@skyportsystems.com>
+	<20170206193300-mutt-send-email-mst@kernel.org>
+	<20170207150032.2807d29f@nial.brq.redhat.com>
+	<20170207173429-mutt-send-email-mst@kernel.org>
+	<20170207170456.77fd16d7@Igors-MacBook-Pro.local>
 MIME-Version: 1.0
-In-Reply-To: <1481239260-21595-1-git-send-email-laurent@vivier.eu>
-References: <1481239260-21595-1-git-send-email-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Feb 2017 16:20:41 +0000
-Message-ID: <CAFEAcA8+65f-JvER5K1h+uq=fyPOJvJ92puPoG7qQQsu+6K6+Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH risu] A script to run concurrently the
- master and the apprentice
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170207170456.77fd16d7@Igors-MacBook-Pro.local>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +35,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Ben Warren <ben@skyportsystems.com>, qemu-devel@nongnu.org, lersek@redhat.com
 
-On 8 December 2016 at 23:21, Laurent Vivier <laurent@vivier.eu> wrote:
-> This expect script will generate the .out file and then
-> start the apprentice in a chroot and the master on the reference
-> hardware. The list of patterns is given on the command line.
->
-> As my reference system is very slow, ssh can take more than 2 minutes,
-> this script starts a ssh and a chroot once, and interacts with
-> them to run the list of instruction patterns given on the command line.
->
-> Some environment variables define the test environment:
-> - RISU_ARCH: the pattern file used will be $RISU_ARCH.risu
-> - RISU_MASTER: the IP address or name of the reference hardware (for ssh)
-> - RISU_CHROOT: the path of the QEMU chroot to start the apprentice
-> - RISU_PATH: the path, common to master and apprentice (you can use NFS),
->              where the risu files are stored (binaries and data).
->
+On Tue, Feb 07, 2017 at 05:04:56PM +0100, Igor Mammedov wrote:
+> On Tue, 7 Feb 2017 17:35:19 +0200
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>=20
+> > On Tue, Feb 07, 2017 at 03:00:32PM +0100, Igor Mammedov wrote:
+> > > On Mon, 6 Feb 2017 19:41:36 +0200
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >=20
+> > > > On Mon, Feb 06, 2017 at 09:29:30AM -0800, Ben Warren wrote:
+> > > > >=20
+> > > > >     On Feb 6, 2017, at 8:15 AM, Michael S. Tsirkin <mst@redhat.=
+com> wrote:
+> > > > >=20
+> > > > >     On Sun, Feb 05, 2017 at 01:12:00AM -0800, ben@skyportsystem=
+s.com wrote:
+> > > > >=20
+> > > > >         From: Ben Warren <ben@skyportsystems.com>
+> > > > >=20
+> > > > >         This implements the VM Generation ID feature by passing=
+ a 128-bit
+> > > > >         GUID to the guest via a fw_cfg blob.
+> > > > >         Any time the GUID changes, an ACPI notify event is sent=
+ to the guest
+> > > > >=20
+> > > > >         The user interface is a simple device with one paramete=
+r:
+> > > > >         - guid (string, must be "auto" or in UUID format
+> > > > >           xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+> > > > >=20
+> > > > >         Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> > > > >=20
+> > > [...]
+> > >=20
+> > > > >=20
+> > > > > This variable name was suggested by Laszlo.  the =E2=80=98a=E2=80=
+=99 in =E2=80=98vgia=E2=80=99 refers to
+> > > > > address, but I=E2=80=99ll add some comments. =20
+> > > >=20
+> > > > vmgenid_addr_le?
+> > > >=20
+> > > >=20
+> > > > >     How about we make it 8 byte so it's future proof?
+> > > > >=20
+> > > > > I can do that, but a previous conversation we had made it clear=
+ that guests
+> > > > > would never allocate above 4GB so 64 bits wasn=E2=80=99t necess=
+ary. =20
+> > > >=20
+> > > > Right, it's just very painful to change once we make it 32 bit.
+> > > I'd keep it 32 bit since it's in variable in global AML context and=
+ our
+> > > table revision is 1, so per spec OSPM should handle it as 32 number=
+.
+> > > Chances of guest survival on boot would depend on AML interpreter t=
+olerance
+> > > to AML errors, which for windows usually is 0 and leads to non obvi=
+ous BSOD.
+> > > If we leave DWORD, even XP will be able to boot fine and only repor=
+t
+> > > unknown device.
+> >=20
+> > AML reports 2 DWORDS per spec, no issue there. I guess it's exactly f=
+or
+> > XP compatibility.=20
+> =20
+> it's only ADDR method thought but we are talking about
+> Named DWORD vs QWORD VGIA variable which is patched by linker command=20
 
-Thanks, and sorry I didn't get round to replying to this sooner.
-I'm not sure this is something I would use personally, but it
-might be helpful to others, so I've opted to put it into a new
-contrib/ subdirectory, and added a note to the README about contrib/.
-Pushed to risu master.
+Oh sorry. Yes, you want to keep that one a DWORD. Does not affect
+the interface. So write 64 bits into fw cfg, but patch 32 bits
+into AML.
 
-thanks
--- PMM
+--=20
+MST
