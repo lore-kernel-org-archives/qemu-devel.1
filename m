@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb28D-0004tk-Rl
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:32:15 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cb2J8-0007Zp-1L
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:43:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb289-0008Kk-1z
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:32:13 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:36650)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb287-0008Ho-9n
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:32:08 -0500
-References: <1485266748-15340-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1485266748-15340-2-git-send-email-zhang.zhanghailiang@huawei.com>
-	<4d0b52bc-bcdd-5b96-465c-f0e624cb4add@redhat.com>
-	<58983015.40300@huawei.com>
-	<0b5891cc-0170-0773-a4b2-31cf3ff2b6d7@redhat.com>
-	<589859CA.5030903@huawei.com>
-	<3c6e13ab-4f5a-fbe3-ef95-196c6b3e59c9@redhat.com>
-	<58997D40.60604@huawei.com>
-	<e8c2510f-f755-3ec1-f085-e3053480b772@redhat.com>
-	<5899831D.30005@huawei.com>
-	<2e301620-0362-f43e-9194-e438f2091546@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <5899939B.4000905@huawei.com>
-Date: Tue, 7 Feb 2017 17:30:03 +0800
-MIME-Version: 1.0
-In-Reply-To: <2e301620-0362-f43e-9194-e438f2091546@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: reconstruct the mutex
- lock usage
+	(envelope-from <liq3ea@gmail.com>) id 1cb2J4-00044H-T1
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:43:30 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35822)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cb2J4-00043f-Lq
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:43:26 -0500
+Received: by mail-lf0-x241.google.com with SMTP id v186so6159789lfa.2
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 01:43:25 -0800 (PST)
+Message-ID: <589996bb.02482e0a.10629.5b0e@mx.google.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue,  7 Feb 2017 01:43:08 -0800
+Subject: [Qemu-devel] [PATCH] net: e1000e: fix an infinite loop issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,138 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, lizhijian@cn.fujitsu.com
+To: dmitry@daynix.com, jasowang@redhat.com, qemu-devel@nongnu.org
+Cc: Li Qiang <liqiang6-s@360.cn>
 
-On 2017/2/7 17:21, Jason Wang wrote:
->
->
-> On 2017年02月07日 16:19, Hailiang Zhang wrote:
->> On 2017/2/7 15:57, Jason Wang wrote:
->>>
->>>
->>> On 2017年02月07日 15:54, Hailiang Zhang wrote:
->>>> Hi Jason,
->>>>
->>>> On 2017/2/6 20:53, Jason Wang wrote:
->>>>>
->>>>>
->>>>> On 2017年02月06日 19:11, Hailiang Zhang wrote:
->>>>>> On 2017/2/6 17:35, Jason Wang wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 2017年02月06日 16:13, Hailiang Zhang wrote:
->>>>>>>> On 2017/2/3 11:47, Jason Wang wrote:
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> On 2017年01月24日 22:05, zhanghailiang wrote:
->>>>>>>>>> The original 'timer_check_lock' mutex lock of struct CompareState
->>>>>>>>>> is used to protect the 'conn_list' queue and its child queues
->>>>>>>>>> which
->>>>>>>>>> are 'primary_list' and 'secondary_list', which is a little abused
->>>>>>>>>> and confusing
->>>>>>>>>>
->>>>>>>>>> To make it clearer, we rename 'timer_check_lock' to
->>>>>>>>>> 'conn_list_lock'
->>>>>>>>>> which is used to protect 'conn_list' queue, use another
->>>>>>>>>> 'conn_lock'
->>>>>>>>>> to protect 'primary_list' and 'secondary_list'.
->>>>>>>>>>
->>>>>>>>>> Besides, fix some missing places which need these mutex lock.
->>>>>>>>>>
->>>>>>>>>> Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
->>>>>>>>>
->>>>>>>>> Instead of sticking to such kind of mutex, I think it's time to
->>>>>>>>> make
->>>>>>>>> colo timer run in colo thread (there's a TODO in the code).
->>>>>>>>>
->>>>>>>>
->>>>>>>> Er, it seems that, we still need these mutex locks even we make
->>>>>>>> colo
->>>>>>>> timer and colo thread run in the same thread, because we may access
->>>>>>>> the connect/primary/secondary list from colo (migratioin) thread
->>>>>>>> concurrently.
->>>>>>>
->>>>>>> Just make sure I understand the issue, why need it access the list?
->>>>>>>
->>>>>>>>
->>>>>>>> Besides, it seems to be a little complex to make colo timer run in
->>>>>>>> colo
->>>>>>>> compare thread, and it is not this series' goal.
->>>>>>>
->>>>>>> Seems not by just looking at how it was implemented in main loop,
->>>>>>> but
->>>>>>> maybe I was wrong.
->>>>>>>
->>>>>>>> This series is preparing
->>>>>>>> work for integrating COLO compare with COLO frame and it is
->>>>>>>> prerequisite.
->>>>>>>>
->>>>>>>> So, we may consider implementing it later in another series.
->>>>>>>> Zhang Chen, what's your opinion ?
->>>>>>>
->>>>>>> The problem is this patch make things even worse, it introduces one
->>>>>>> more
->>>>>>> mutex.
->>>>>>>
->>>>>>
->>>>>> Hmm, for most cases, we need to get these two locks at the same time.
->>>>>> We can use one lock to protect conn_list/primary_list/secondary_list,
->>>>>> (We need to get this lock before operate all these lists, as you can
->>>>>> see
->>>>>> in patch 2, while do checkpoint, we may operate these lists in
->>>>>> COLO checkpoint thread concurrently.)
->>>>>>
->>>>>> But for the original codes, we didn't got timer_check_lock in
->>>>>> packet_enqueue() while operate conn_list/primary_list/secondary_list,
->>>>>> and didn't got this lock in colo_compare_connection while operate
->>>>>> secondary_list either.
->>>>>>
->>>>>> So, is it OK to use the conn_lock instead of timer_check_lock, and
->>>>>> add the lock where it is need ?
->>>>>
->>>>> I'd like to know if timer were run in colo thread (this looks as
->>>>> simple
->>>>> as a g_timeout_source_new() followed by a g_source_attach()), why
->>>>> do we
->>>>> still need a mutex. And if we need it now but plan to remove it in the
->>>>> future, I'd like to use big lock to simplify the codes.
->>>>>
->>>>
->>>> After investigated your above suggestion, I think it works by using
->>>> g_timeout_source_new() and g_source_attach(), but I'm not sure
->>>> if it is a good idea to use the big lock to protect the possible
->>>> concurrent cases which seem to only happen between COLO migration
->>>> thread and COLO compare thread, any further suggestions ?
->>>
->>> I think I need first understand why migration thread need to access the
->>> list?
->>>
->>
->> Er, sorry to confuse you here, to be exactly, it is COLO checkpoint
->> thread,
->> we reuse the migration thread to realize checkpoint process for COLO,
->> Because qemu enters into COLO state after a complete migration, so we
->> reuse it.
->>
->> While do checkpoint, we need to release all the buffered packets that
->> have not
->> yet been compared, so we need to access the list in COLO checkpoint
->> thread.
->
-> I think the better way is notify the comparing thread and let it do the
-> releasing. You probably need similar mechanism to notify from comparing
-> thread to checkpoint thread.
->
+From: Li Qiang <liqiang6-s@360.cn>
 
-Hmm, that's really a good idea, it can avoid using the mutex lock,
-I'll try to implement it in next version, thanks very much. :)
+This issue is the same as e1000 network card in this commit:
+e1000: eliminate infinite loops on out-of-bounds transfer start.
 
-> Thanks
->
->>
->> Thanks.
->
->
-> .
->
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+---
+ hw/net/e1000e_core.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index 2b11499..53f2b1d 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -914,7 +914,8 @@ e1000e_start_xmit(E1000ECore *core, const E1000E_TxRing *txr)
+     struct e1000_tx_desc desc;
+     bool ide = false;
+     const E1000E_RingInfo *txi = txr->i;
+-    uint32_t cause = E1000_ICS_TXQE;
++    uint32_t tdh_start = core->mac[txi->dh], cause = E1000_ICS_TXQE;
++
+ 
+     if (!(core->mac[TCTL] & E1000_TCTL_EN)) {
+         trace_e1000e_tx_disabled();
+@@ -933,6 +934,14 @@ e1000e_start_xmit(E1000ECore *core, const E1000E_TxRing *txr)
+         cause |= e1000e_txdesc_writeback(core, base, &desc, &ide, txi->idx);
+ 
+         e1000e_ring_advance(core, txi, 1);
++
++        /*
++         * The following avoid infinite loop, just as the e1000
++         */
++        if (core->mac[txi->dh] == tdh_start ||
++            tdh_start >= core->mac[txi->dlen] / E1000_RING_DESC_LEN) {
++            break;
++            }
+     }
+ 
+     if (!ide || !e1000e_intrmgr_delay_tx_causes(core, &cause)) {
+@@ -1500,6 +1509,7 @@ e1000e_write_packet_to_guest(E1000ECore *core, struct NetRxPkt *pkt,
+     size_t desc_size;
+     size_t desc_offset = 0;
+     size_t iov_ofs = 0;
++    uint32_t rdh_start;
+ 
+     struct iovec *iov = net_rx_pkt_get_iovec(pkt);
+     size_t size = net_rx_pkt_get_total_len(pkt);
+@@ -1509,6 +1519,7 @@ e1000e_write_packet_to_guest(E1000ECore *core, struct NetRxPkt *pkt,
+     bool do_ps = e1000e_do_ps(core, pkt, &ps_hdr_len);
+ 
+     rxi = rxr->i;
++    rdh_start = core->mac[rxi->dh];
+ 
+     do {
+         hwaddr ba[MAX_PS_BUFFERS];
+@@ -1605,6 +1616,10 @@ e1000e_write_packet_to_guest(E1000ECore *core, struct NetRxPkt *pkt,
+         e1000e_ring_advance(core, rxi,
+                             core->rx_desc_len / E1000_MIN_RX_DESC_LEN);
+ 
++        if (core->mac[rxi->dh] == rdh_start ||
++            rdh_start >= core->mac[rxi->dlen] / E1000_RING_DESC_LEN) {
++            break;
++            }
+     } while (desc_offset < total_size);
+ 
+     e1000e_update_rx_stats(core, size, total_size);
+-- 
+1.8.3.1
