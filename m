@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cb2J8-0007Zp-1L
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:43:30 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cb2L1-0000A7-Gm
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:45:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cb2J4-00044H-T1
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:43:30 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35822)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cb2J4-00043f-Lq
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:43:26 -0500
-Received: by mail-lf0-x241.google.com with SMTP id v186so6159789lfa.2
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 01:43:25 -0800 (PST)
-Message-ID: <589996bb.02482e0a.10629.5b0e@mx.google.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue,  7 Feb 2017 01:43:08 -0800
-Subject: [Qemu-devel] [PATCH] net: e1000e: fix an infinite loop issue
+	(envelope-from <fred.konrad@greensocs.com>) id 1cb2Ky-0004X8-B1
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:45:27 -0500
+Received: from greensocs.com ([193.104.36.180]:59814)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fred.konrad@greensocs.com>) id 1cb2Kx-0004Wo-Tr
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:45:24 -0500
+References: <1485424060-12217-1-git-send-email-fred.konrad@greensocs.com>
+	<1485424060-12217-4-git-send-email-fred.konrad@greensocs.com>
+	<d5dff1bc-7d71-7b5f-133c-c102da108c01@kaod.org>
+From: Frederic Konrad <fred.konrad@greensocs.com>
+Message-ID: <7a926039-796c-9d00-0895-4b31fa72b8ba@greensocs.com>
+Date: Tue, 7 Feb 2017 10:45:20 +0100
+MIME-Version: 1.0
+In-Reply-To: <d5dff1bc-7d71-7b5f-133c-c102da108c01@kaod.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V2 03/10] qemu-clk: allow to bind two
+ clocks together
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +29,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dmitry@daynix.com, jasowang@redhat.com, qemu-devel@nongnu.org
-Cc: Li Qiang <liqiang6-s@360.cn>
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, alistair.francis@xilinx.com
 
-From: Li Qiang <liqiang6-s@360.cn>
-
-This issue is the same as e1000 network card in this commit:
-e1000: eliminate infinite loops on out-of-bounds transfer start.
-
-Signed-off-by: Li Qiang <liqiang6-s@360.cn>
----
- hw/net/e1000e_core.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-index 2b11499..53f2b1d 100644
---- a/hw/net/e1000e_core.c
-+++ b/hw/net/e1000e_core.c
-@@ -914,7 +914,8 @@ e1000e_start_xmit(E1000ECore *core, const E1000E_TxRing *txr)
-     struct e1000_tx_desc desc;
-     bool ide = false;
-     const E1000E_RingInfo *txi = txr->i;
--    uint32_t cause = E1000_ICS_TXQE;
-+    uint32_t tdh_start = core->mac[txi->dh], cause = E1000_ICS_TXQE;
+On 02/06/2017 04:58 PM, C=E9dric Le Goater wrote:
+> Hello,
+>=20
+> On 01/26/2017 10:47 AM, fred.konrad@greensocs.com wrote:
+>> From: KONRAD Frederic <fred.konrad@greensocs.com>
+>>
+>> This introduces the clock binding and the update part.
+>> When the qemu_clk_rate_update(qemu_clk, int) function is called:
+>>   * The clock callback is called on the qemu_clk so it can change the =
+rate.
+>>   * The qemu_clk_rate_update function is called on all the driven cloc=
+k.
+>>
+>> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+>>
+>> V1 -> V2:
+>>   * Rename qemu_clk_on_rate_update_cb to QEMUClkRateUpdateCallback and
+>>     move the pointer to the structure instead of having a pointer-to-f=
+unction
+>>     type.
+>> ---
+>>  include/qemu/qemu-clock.h | 67 ++++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  qemu-clock.c              | 56 ++++++++++++++++++++++++++++++++++++++=
 +
- 
-     if (!(core->mac[TCTL] & E1000_TCTL_EN)) {
-         trace_e1000e_tx_disabled();
-@@ -933,6 +934,14 @@ e1000e_start_xmit(E1000ECore *core, const E1000E_TxRing *txr)
-         cause |= e1000e_txdesc_writeback(core, base, &desc, &ide, txi->idx);
- 
-         e1000e_ring_advance(core, txi, 1);
-+
-+        /*
-+         * The following avoid infinite loop, just as the e1000
-+         */
-+        if (core->mac[txi->dh] == tdh_start ||
-+            tdh_start >= core->mac[txi->dlen] / E1000_RING_DESC_LEN) {
-+            break;
-+            }
-     }
- 
-     if (!ide || !e1000e_intrmgr_delay_tx_causes(core, &cause)) {
-@@ -1500,6 +1509,7 @@ e1000e_write_packet_to_guest(E1000ECore *core, struct NetRxPkt *pkt,
-     size_t desc_size;
-     size_t desc_offset = 0;
-     size_t iov_ofs = 0;
-+    uint32_t rdh_start;
- 
-     struct iovec *iov = net_rx_pkt_get_iovec(pkt);
-     size_t size = net_rx_pkt_get_total_len(pkt);
-@@ -1509,6 +1519,7 @@ e1000e_write_packet_to_guest(E1000ECore *core, struct NetRxPkt *pkt,
-     bool do_ps = e1000e_do_ps(core, pkt, &ps_hdr_len);
- 
-     rxi = rxr->i;
-+    rdh_start = core->mac[rxi->dh];
- 
-     do {
-         hwaddr ba[MAX_PS_BUFFERS];
-@@ -1605,6 +1616,10 @@ e1000e_write_packet_to_guest(E1000ECore *core, struct NetRxPkt *pkt,
-         e1000e_ring_advance(core, rxi,
-                             core->rx_desc_len / E1000_MIN_RX_DESC_LEN);
- 
-+        if (core->mac[rxi->dh] == rdh_start ||
-+            rdh_start >= core->mac[rxi->dlen] / E1000_RING_DESC_LEN) {
-+            break;
-+            }
-     } while (desc_offset < total_size);
- 
-     e1000e_update_rx_stats(core, size, total_size);
--- 
-1.8.3.1
+>>  2 files changed, 123 insertions(+)
+>>
+>> diff --git a/include/qemu/qemu-clock.h b/include/qemu/qemu-clock.h
+>> index 3e692d3..6d30299 100644
+>> --- a/include/qemu/qemu-clock.h
+>> +++ b/include/qemu/qemu-clock.h
+>> @@ -30,12 +30,25 @@
+>>  #define TYPE_CLOCK "qemu-clk"
+>>  #define QEMU_CLOCK(obj) OBJECT_CHECK(struct qemu_clk, (obj), TYPE_CLO=
+CK)
+>> =20
+>> +typedef struct ClkList ClkList;
+>> +typedef uint64_t QEMUClkRateUpdateCallback(void *opaque, uint64_t rat=
+e);
+>> +
+>>  typedef struct qemu_clk {
+>>      /*< private >*/
+>>      Object parent_obj;
+>>      char *name;            /* name of this clock in the device. */
+>> +    uint64_t in_rate;      /* rate of the clock which drive this pin.=
+ */
+>=20
+>=20
+> So if this is the reference clock rate, which can be divided by=20
+> settings in control registers, I would call the attribute=20
+> 'ref_rate' or 'rate_reference'=20
+>=20
+>> +    uint64_t out_rate;     /* rate of this clock pin. */
+>=20
+> and this attribute could just be 'rate' and may be if we make=20
+> a property out of it, we could get rid of FixedClock in patch
+> 7/10.
+>   =20
+>=20
+>> +    void *opaque;
+>> +    QEMUClkRateUpdateCallback *cb;
+>=20
+> If I understand correctly, the need is to be able to refresh
+> the rate of a clock object depending on some settings in a=20
+> controller. I think we should be using a derived class and=20
+> an operation for it. it would look better from a QOM point=20
+> of view.=20
+>=20
+> Here is a possibility,
+>=20
+> We could make 'rate' a property and use a set property handler=20
+> to call the derived class specific operation. This is very=20
+> similar to the callback but we would remove the need of =20
+> qemu_clk_update_rate() and use the std mechanisms already in
+> place  :
+>=20
+> 	object_property_set_int()=20
+>=20
+> qemu_clk_refresh() would still be needed to propagate the=20
+> changes in the settings of a controller to the target clocks.=20
+>=20
+> The 'opaque' attribute, which holds the pointer to a controller=20
+> object, would have to be passed to the derived clock object
+> with=20
+> 	object_property_add_const_link()=20
+>=20
+> and then grabbed with=20
+>=20
+> 	object_property_get_link()
+>=20
+> in the realize function of the derived clock object, or whenever=20
+> it's needed, in the operation for instance.
+>=20
+> This clearly means more code than the actual solution, but=20
+> that is QOM way I think. =20
+
+Yes, the big issue here is that there are several clock inputs and clock
+outputs. We need to be able to bind / unbind them if there is a selector
+or some such.
+
+So a device will have more than one clock object internally in it which
+are "chained" to form a clock tree.
+
+It seems overkill to me to implement one derived object per clock
+"block" in the device to get the callback.
+
+>=20
+>> +    QLIST_HEAD(, ClkList) bound;
+>>  } *qemu_clk;
+>> =20
+>> +struct ClkList {
+>> +    qemu_clk clk;
+>> +    QLIST_ENTRY(ClkList) node;
+>> +};
+>> +
+>=20
+> Do we really need this intermediate object ? Can't we just
+> put the list_entry attribute under qemu_clk ? I haven't
+> tried, may be I am wrong but that would simplify the code.
+
+Yes I think it is needed. Actually I didn't find anything which
+does this differently.
+
+>=20
+>>  /**
+>>   * qemu_clk_device_add_clock:
+>>   * @dev: the device on which the clock needs to be added.
+>> @@ -59,4 +72,58 @@ void qemu_clk_device_add_clock(DeviceState *dev, qe=
+mu_clk clk,
+>>   */
+>>  qemu_clk qemu_clk_device_get_clock(DeviceState *dev, const char *name=
+);
+>> =20
+>> +/**
+>> + * qemu_clk_bind_clock:
+>> + * @out: the clock output.
+>> + * @in: the clock input.
+>> + *
+>> + * Connect the clock together. This is unidirectional so a
+>> + * qemu_clk_update_rate will go from @out to @in.
+>> + *
+>> + */
+>> +void qemu_clk_bind_clock(qemu_clk out, qemu_clk in);
+>=20
+> maybe remove the  _clock suffix. It feels redundant.
+
+Ok.
+
+Thanks,
+Fred
+
+>=20
+> Thanks,
+>=20
+> C.=20
+>=20
+>> +
+>> +/**
+>> + * qemu_clk_unbind:
+>> + * @out: the clock output.
+>> + * @in: the clock input.
+>> + *
+>> + * Disconnect the clocks if they were bound together.
+>> + *
+>> + */
+>> +void qemu_clk_unbind(qemu_clk out, qemu_clk in);
+>> +
+>> +/**
+>> + * qemu_clk_update_rate:
+>> + * @clk: the clock to update.
+>> + * @rate: the new rate in Hz.
+>> + *
+>> + * Update the @clk to the new @rate.
+>> + *
+>> + */
+>> +void qemu_clk_update_rate(qemu_clk clk, uint64_t rate);
+>> +
+>> +/**
+>> + * qemu_clk_refresh:
+>> + * @clk: the clock to be refreshed.
+>> + *
+>> + * If a model alters the topology of a clock tree, it must call this =
+function on
+>> + * the clock source to refresh the clock tree.
+>> + *
+>> + */
+>> +void qemu_clk_refresh(qemu_clk clk);
+>>
+>> +
+>> +/**
+>> + * qemu_clk_set_callback:
+>> + * @clk: the clock associated to the callback.
+>> + * @cb: the function which is called when a refresh happen on the clo=
+ck @clk.
+>> + * @opaque: the opaque data passed to the callback.
+>> + *
+>> + * Set the callback @cb which will be called when the clock @clk is u=
+pdated.
+>> + *
+>> + */
+>> +void qemu_clk_set_callback(qemu_clk clk,
+>> +                           QEMUClkRateUpdateCallback *cb,
+>> +                           void *opaque);
+>> +
+>>  #endif /* QEMU_CLOCK_H */
+>> diff --git a/qemu-clock.c b/qemu-clock.c
+>> index 803deb3..8c12368 100644
+>> --- a/qemu-clock.c
+>> +++ b/qemu-clock.c
+>> @@ -37,6 +37,62 @@
+>>      }                                                                =
+        \
+>>  } while (0);
+>> =20
+>> +void qemu_clk_refresh(qemu_clk clk)
+>> +{
+>> +    qemu_clk_update_rate(clk, clk->in_rate);
+>> +}
+>> +
+>> +void qemu_clk_update_rate(qemu_clk clk, uint64_t rate)
+>> +{
+>> +    ClkList *child;
+>> +
+>> +    clk->in_rate =3D rate;
+>> +    clk->out_rate =3D rate;
+>> +
+>> +    if (clk->cb) {
+>> +        clk->out_rate =3D clk->cb(clk->opaque, rate);
+>> +    }
+>> +
+>> +    DPRINTF("%s output rate updated to %" PRIu64 "\n",
+>> +            object_get_canonical_path(OBJECT(clk)),
+>> +            clk->out_rate);
+>> +
+>> +    QLIST_FOREACH(child, &clk->bound, node) {
+>> +        qemu_clk_update_rate(child->clk, clk->out_rate);
+>> +    }
+>> +}
+>> +
+>> +void qemu_clk_bind_clock(qemu_clk out, qemu_clk in)
+>> +{
+>> +    ClkList *child;
+>> +
+>> +    child =3D g_malloc(sizeof(child));
+>> +    assert(child);
+>> +    child->clk =3D in;
+>> +    QLIST_INSERT_HEAD(&out->bound, child, node);
+>> +    qemu_clk_update_rate(in, out->out_rate);
+>> +}
+>> +
+>> +void qemu_clk_unbind(qemu_clk out, qemu_clk in)
+>> +{
+>> +    ClkList *child, *next;
+>> +
+>> +    QLIST_FOREACH_SAFE(child, &out->bound, node, next) {
+>> +        if (child->clk =3D=3D in) {
+>> +            QLIST_REMOVE(child, node);
+>> +            g_free(child);
+>> +        }
+>> +    }
+>> +}
+>> +
+>> +void qemu_clk_set_callback(qemu_clk clk,
+>> +                           QEMUClkRateUpdateCallback *cb,
+>> +                           void *opaque)
+>> +{
+>> +    clk->cb =3D cb;
+>> +    clk->opaque =3D opaque;
+>> +}
+>> +
+>>  void qemu_clk_device_add_clock(DeviceState *dev, qemu_clk clk,
+>>                                 const char *name)
+>>  {
+>>
+>=20
+>=20
