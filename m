@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cb3jc-00085h-Ua
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 06:14:57 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cb3ju-0008KV-TK
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 06:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cb3jc-0002n6-8A
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 06:14:56 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:36290)
+	(envelope-from <liq3ea@gmail.com>) id 1cb3jr-0002uW-Ps
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 06:15:14 -0500
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:35392)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cb3jc-0002mP-2A
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 06:14:56 -0500
-Received: by mail-wm0-x231.google.com with SMTP id c85so156025187wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 03:14:54 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <7c016bdc97ed45dc2eb5002db98efcee26c4d8bf.1486437689.git.sam.bobroff@au1.ibm.com>
-References: <7c016bdc97ed45dc2eb5002db98efcee26c4d8bf.1486437689.git.sam.bobroff@au1.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Feb 2017 11:14:32 +0000
-Message-ID: <CAFEAcA9yV=O=qj9iRcWs1GECL5rY6S=qfq2pxwHrfgD5MDj2eA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] target-ppc,
- tcg: fix usermode segfault with pthread_create()
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cb3jr-0002uN-LA
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 06:15:11 -0500
+Received: by mail-io0-x242.google.com with SMTP id m98so12484407iod.2
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 03:15:11 -0800 (PST)
+Message-ID: <5899ac3e.1033240a.944d5.9a2d@mx.google.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue,  7 Feb 2017 03:15:03 -0800
+Subject: [Qemu-devel] [PATCH] usb: ohci: fix error return code in servicing
+ iso td
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?B?QW7DrWJhbCBMaW3Ds24=?= <anibal.limon@linux.intel.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: kraxel@redhat.com, qemu-devel@nongnu.org
+Cc: Li Qiang <liqiang6-s@360.cn>
 
-On 7 February 2017 at 03:21, Sam Bobroff <sam.bobroff@au1.ibm.com> wrote:
-> Programs run under qemu-ppc64 on an x86_64 host currently segfault
-> if they use pthread_create() due to the adjustment made to the NIP in
-> commit bd6fefe71cec5a0c7d2be4ac96307f25db56abf9.
->
-> This patch changes cpu_loop() to set the NIP back to the
-> pre-incremented value before calling do_syscall(), which causes the
-> correct address to be used for the new thread and corrects the fault.
->
-> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+From: Li Qiang <liqiang6-s@360.cn>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+It should return 1 if an error occurs when reading iso td.
+This will avoid an infinite loop issue in ohci_service_ed_list.
 
-thanks
--- PMM
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+---
+ hw/usb/hcd-ohci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+index 4a63f3b..21c93e0 100644
+--- a/hw/usb/hcd-ohci.c
++++ b/hw/usb/hcd-ohci.c
+@@ -727,7 +727,7 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
+     if (ohci_read_iso_td(ohci, addr, &iso_td)) {
+         trace_usb_ohci_iso_td_read_failed(addr);
+         ohci_die(ohci);
+-        return 0;
++        return 1;
+     }
+ 
+     starting_frame = OHCI_BM(iso_td.flags, TD_SF);
+-- 
+1.8.3.1
