@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cb7gr-0003d1-0p
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:28:26 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cb7he-0004JF-Pu
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cb7go-0007bx-0D
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:28:21 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35101)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cb7gn-0007aj-QB
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:28:17 -0500
-Received: by mail-wm0-x244.google.com with SMTP id u63so28937188wmu.2
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 07:28:17 -0800 (PST)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cb7hY-00084J-Pd
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:10 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <002801d2810f$18809c20$4981d460$@ru>
+References: <20170127094154.19778-1-berto@igalia.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4ff40db3-ca73-42a3-c565-7b450e1ea2ea@redhat.com>
-Date: Tue, 7 Feb 2017 16:28:15 +0100
+Message-ID: <5370d078-6f29-3d56-635b-5871a6b95983@redhat.com>
+Date: Tue, 7 Feb 2017 16:28:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <002801d2810f$18809c20$4981d460$@ru>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20170127094154.19778-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] icount: remove useless exit_request
- assignment
+Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Clarify that -vga std is now the
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
 
 
-On 07/02/2017 07:54, Pavel Dovgalyuk wrote:
-> This patch removes unneeded assignment to cpu->exit_request.
-> cpu_exec_nocache executes all available instructions and therefore
-> icount becomes 0. Then other conditions will break the execution
-> loop, making assignment to cpu->exit_request useless.
+On 27/01/2017 10:41, Alberto Garcia wrote:
+> The QEMU manual page states that Cirrus Logic is the default video
+> card if the user doesn't specify any. However this is not true since
+> QEMU 2.2.
 > 
-> This patch should be applied over Paolo's series:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg426058.html
-> 
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  cpu-exec.c | 1 -
->  1 file changed, 1 deletion(-)
+>  qemu-options.hx | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/cpu-exec.c b/cpu-exec.c
-> index 5cef8bc..91d1faf 100644
-> --- a/cpu-exec.c
-> +++ b/cpu-exec.c
-> @@ -577,7 +577,6 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
->          if (insns_left > 0) {
->              cpu_exec_nocache(cpu, insns_left, tb, false);
->          }
-> -        atomic_set(&cpu->exit_request, 1);
->      }
->  }
->  
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 80df52651a..66ee562821 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1195,12 +1195,12 @@ Select type of VGA card to emulate. Valid values for @var{type} are
+>  Cirrus Logic GD5446 Video card. All Windows versions starting from
+>  Windows 95 should recognize and use this graphic card. For optimal
+>  performances, use 16 bit color depth in the guest and the host OS.
+> -(This one is the default)
+> +(This card was the default before QEMU 2.2)
+>  @item std
+>  Standard VGA card with Bochs VBE extensions.  If your guest OS
+>  supports the VESA 2.0 VBE extensions (e.g. Windows XP) and if you want
+>  to use high resolution modes (>= 1280x1024x16) then you should use
+> -this option.
+> +this option. (This card is the default since QEMU 2.2)
+>  @item vmware
+>  VMWare SVGA-II compatible adapter. Use it if you have sufficiently
+>  recent XFree86/XOrg server or Windows guest with a driver for this
 > 
 
-Nice, thanks.  We can just squash the two patches with my 7/7 like this:
+Queued, thanks.
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 9a7ff1b..1026cd0 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -517,7 +517,10 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-             *last_tb = NULL;
-         }
-     }
--    if (unlikely(atomic_read(&cpu->exit_request) || replay_has_interrupt())) {
-+
-+    /* Finally, check if we need to exit to the main loop.  */
-+    if (unlikely(atomic_read(&cpu->exit_request)
-+        || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
-         atomic_set(&cpu->exit_request, 0);
-         cpu->exception_index = EXCP_INTERRUPT;
-         return true;
-@@ -527,8 +530,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
- }
- 
- static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
--                                    TranslationBlock **last_tb, int *tb_exit,
--                                    SyncClocks *sc)
-+                                    TranslationBlock **last_tb, int *tb_exit)
- {
-     uintptr_t ret;
-     int32_t insns_left;
-@@ -578,10 +580,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-          */
-         if (insns_left > 0) {
-             cpu_exec_nocache(cpu, insns_left, tb, false);
--            align_clocks(sc, cpu);
-         }
--        cpu->exception_index = EXCP_INTERRUPT;
--        cpu_loop_exit(cpu);
-     }
- }
- 
-@@ -641,7 +640,7 @@ int cpu_exec(CPUState *cpu)
- 
-         while (!cpu_handle_interrupt(cpu, &last_tb)) {
-             TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
--            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
-+            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit);
-             /* Try to align the host and virtual clocks
-                if the guest is in advance */
-             align_clocks(&sc, cpu);
+Paolo
