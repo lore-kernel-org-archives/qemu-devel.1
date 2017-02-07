@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6DS-0000RW-KP
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:55 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6DW-0000V8-6s
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6DR-0000Fx-Lv
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39354)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6DV-0000HN-CL
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cb6DR-0000FA-Dv
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:53 -0500
+	id 1cb6DV-0000HF-3c
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:57 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8911780F6D
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 13:53:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C68E3D952
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 13:53:57 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  7 Feb 2017 17:52:10 +0400
-Message-Id: <20170207135211.15870-28-marcandre.lureau@redhat.com>
+Date: Tue,  7 Feb 2017 17:52:11 +0400
+Message-Id: <20170207135211.15870-29-marcandre.lureau@redhat.com>
 In-Reply-To: <20170207135211.15870-1-marcandre.lureau@redhat.com>
 References: <20170207135211.15870-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 27/28] tests: add specialized device_find
- function
+Subject: [Qemu-devel] [PATCH 28/28] tests: fix virtio-blk-test leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,107 +36,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Allows to specify which slot to look for the device.
+Use qvirtio_pci_device_find_slot() to avoid leaking the non-hp
+device. Add assert() to avoid further leaks in the future.
 
-This will be used in the following patch to avoid leaking when multiple
-devices exists and we want to lookup the hotplug one.
+Use qvirtio_pci_device_free() to correctly free QVirtioPCIDevice.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/libqos/virtio-pci.h |  4 ++--
- tests/libqos/virtio-pci.c | 31 ++++++++++++++++++++++++++-----
- 2 files changed, 28 insertions(+), 7 deletions(-)
+ tests/libqos/virtio-pci.c |  1 +
+ tests/virtio-blk-test.c   | 14 +++++++-------
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
-index 0fab916cf8..6ef19094cb 100644
---- a/tests/libqos/virtio-pci.h
-+++ b/tests/libqos/virtio-pci.h
-@@ -31,9 +31,9 @@ typedef struct QVirtQueuePCI {
-=20
- extern const QVirtioBus qvirtio_pci;
-=20
--void qvirtio_pci_foreach(QPCIBus *bus, uint16_t device_type,
--                void (*func)(QVirtioDevice *d, void *data), void *data);
- QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_=
-type);
-+QVirtioPCIDevice *qvirtio_pci_device_find_slot(QPCIBus *bus,
-+                                               uint16_t device_type, int=
- slot);
- void qvirtio_pci_device_free(QVirtioPCIDevice *dev);
-=20
- void qvirtio_pci_device_enable(QVirtioPCIDevice *d);
 diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-index 456cccdc7b..8a0904bbf0 100644
+index 8a0904bbf0..7ac15c04e1 100644
 --- a/tests/libqos/virtio-pci.c
 +++ b/tests/libqos/virtio-pci.c
-@@ -24,6 +24,8 @@
- typedef struct QVirtioPCIForeachData {
-     void (*func)(QVirtioDevice *d, void *data);
-     uint16_t device_type;
-+    bool has_slot;
-+    int slot;
-     void *user_data;
- } QVirtioPCIForeachData;
-=20
-@@ -55,10 +57,11 @@ static void qvirtio_pci_foreach_callback(
-     QVirtioPCIForeachData *d =3D data;
-     QVirtioPCIDevice *vpcidev =3D qpcidevice_to_qvirtiodevice(dev);
-=20
--    if (vpcidev->vdev.device_type =3D=3D d->device_type) {
-+    if (vpcidev->vdev.device_type =3D=3D d->device_type &&
-+        (!d->has_slot || vpcidev->pdev->devfn =3D=3D d->slot << 3)) {
-         d->func(&vpcidev->vdev, d->user_data);
-     } else {
--        g_free(vpcidev);
-+        qvirtio_pci_device_free(vpcidev);
-     }
+@@ -68,6 +68,7 @@ static void qvirtio_pci_foreach_callback(
+ static void qvirtio_pci_assign_device(QVirtioDevice *d, void *data)
+ {
+     QVirtioPCIDevice **vpcidev =3D data;
++    assert(!*vpcidev);
+     *vpcidev =3D (QVirtioPCIDevice *)d;
  }
 =20
-@@ -290,21 +293,39 @@ const QVirtioBus qvirtio_pci =3D {
-     .virtqueue_kick =3D qvirtio_pci_virtqueue_kick,
- };
-=20
--void qvirtio_pci_foreach(QPCIBus *bus, uint16_t device_type,
-+static void qvirtio_pci_foreach(QPCIBus *bus, uint16_t device_type,
-+                bool has_slot, int slot,
-                 void (*func)(QVirtioDevice *d, void *data), void *data)
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 10a92b410a..1eee95df49 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -108,7 +108,7 @@ static QVirtioPCIDevice *virtio_blk_pci_init(QPCIBus =
+*bus, int slot)
  {
-     QVirtioPCIForeachData d =3D { .func =3D func,
-                                 .device_type =3D device_type,
-+                                .has_slot =3D has_slot,
-+                                .slot =3D slot,
-                                 .user_data =3D data };
+     QVirtioPCIDevice *dev;
 =20
-     qpci_device_foreach(bus, PCI_VENDOR_ID_REDHAT_QUMRANET, -1,
--                                qvirtio_pci_foreach_callback, &d);
-+                        qvirtio_pci_foreach_callback, &d);
+-    dev =3D qvirtio_pci_device_find(bus, VIRTIO_ID_BLOCK);
++    dev =3D qvirtio_pci_device_find_slot(bus, VIRTIO_ID_BLOCK, slot);
+     g_assert(dev !=3D NULL);
+     g_assert_cmphex(dev->vdev.device_type, =3D=3D, VIRTIO_ID_BLOCK);
+     g_assert_cmphex(dev->pdev->devfn, =3D=3D, ((slot << 3) | PCI_FN));
+@@ -296,7 +296,7 @@ static void pci_basic(void)
+     /* End test */
+     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
+     qvirtio_pci_device_disable(dev);
+-    g_free(dev);
++    qvirtio_pci_device_free(dev);
+     qtest_shutdown(qs);
  }
 =20
- QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_=
-type)
- {
-     QVirtioPCIDevice *dev =3D NULL;
--    qvirtio_pci_foreach(bus, device_type, qvirtio_pci_assign_device, &de=
-v);
-+
-+    qvirtio_pci_foreach(bus, device_type, false, 0,
-+                        qvirtio_pci_assign_device, &dev);
-+
-+    dev->vdev.bus =3D &qvirtio_pci;
-+
-+    return dev;
-+}
-+
-+QVirtioPCIDevice *qvirtio_pci_device_find_slot(QPCIBus *bus,
-+                                               uint16_t device_type, int=
- slot)
-+{
-+    QVirtioPCIDevice *dev =3D NULL;
-+
-+    qvirtio_pci_foreach(bus, device_type, true, slot,
-+                        qvirtio_pci_assign_device, &dev);
+@@ -389,7 +389,7 @@ static void pci_indirect(void)
+     /* End test */
+     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
+     qvirtio_pci_device_disable(dev);
+-    g_free(dev);
++    qvirtio_pci_device_free(dev);
+     qtest_shutdown(qs);
+ }
 =20
-     dev->vdev.bus =3D &qvirtio_pci;
+@@ -418,7 +418,7 @@ static void pci_config(void)
+     g_assert_cmpint(capacity, =3D=3D, n_size / 512);
 =20
+     qvirtio_pci_device_disable(dev);
+-    g_free(dev);
++    qvirtio_pci_device_free(dev);
+=20
+     qtest_shutdown(qs);
+ }
+@@ -526,7 +526,7 @@ static void pci_msix(void)
+     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
+     qpci_msix_disable(dev->pdev);
+     qvirtio_pci_device_disable(dev);
+-    g_free(dev);
++    qvirtio_pci_device_free(dev);
+     qtest_shutdown(qs);
+ }
+=20
+@@ -642,7 +642,7 @@ static void pci_idx(void)
+     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
+     qpci_msix_disable(dev->pdev);
+     qvirtio_pci_device_disable(dev);
+-    g_free(dev);
++    qvirtio_pci_device_free(dev);
+     qtest_shutdown(qs);
+ }
+=20
+@@ -661,7 +661,7 @@ static void pci_hotplug(void)
+     dev =3D virtio_blk_pci_init(qs->pcibus, PCI_SLOT_HP);
+     g_assert(dev);
+     qvirtio_pci_device_disable(dev);
+-    g_free(dev);
++    qvirtio_pci_device_free(dev);
+=20
+     /* unplug secondary disk */
+     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
+) {
 --=20
 2.11.0.295.gd7dffce1c.dirty
