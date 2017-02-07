@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cb7p7-0001Zf-2f
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:36:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cb7rb-0003YP-06
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:39:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cb7p4-0003uy-2B
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:36:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:27670)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cb7p3-0003uF-T5
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:36:50 -0500
-References: <CAHwdxNf8CZ2x-UdFWUJ2BhgZQC6yKPnbM6T7FNGwow-=ez+rvw@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3b1b880d-8e1f-a447-1d00-a1c9b6cbe44e@redhat.com>
-Date: Tue, 7 Feb 2017 09:36:47 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cb7rZ-000582-Mg
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:39:27 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36245)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cb7rZ-00057i-FI
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:39:25 -0500
+Received: by mail-wm0-x234.google.com with SMTP id c85so166093796wmi.1
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 07:39:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAHwdxNf8CZ2x-UdFWUJ2BhgZQC6yKPnbM6T7FNGwow-=ez+rvw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PlMii4OXiSfkEWROjbhJsGtiBi6rRMj0K"
-Subject: Re: [Qemu-devel] How to find backing file for qemu-nbd?
+In-Reply-To: <1484558821-15512-5-git-send-email-zhaoshenglong@huawei.com>
+References: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
+	<1484558821-15512-5-git-send-email-zhaoshenglong@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Feb 2017 15:39:03 +0000
+Message-ID: <CAFEAcA90zm3gqvNO6QTGcpg2=rYMbC=G0E+p-6ERXf=UXSXe9Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH RFC 4/6] target: arm: Add a generic type cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikolay Ivanets <stenavin@gmail.com>, qemu-devel@nongnu.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, wu.wubin@huawei.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PlMii4OXiSfkEWROjbhJsGtiBi6rRMj0K
-From: Eric Blake <eblake@redhat.com>
-To: Nikolay Ivanets <stenavin@gmail.com>, qemu-devel@nongnu.org
-Message-ID: <3b1b880d-8e1f-a447-1d00-a1c9b6cbe44e@redhat.com>
-Subject: Re: [Qemu-devel] How to find backing file for qemu-nbd?
-References: <CAHwdxNf8CZ2x-UdFWUJ2BhgZQC6yKPnbM6T7FNGwow-=ez+rvw@mail.gmail.com>
-In-Reply-To: <CAHwdxNf8CZ2x-UdFWUJ2BhgZQC6yKPnbM6T7FNGwow-=ez+rvw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 16 January 2017 at 09:26, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+>
+> Add a generic type cpu, it's useful for migration when running on
+> different hardwares.
+>
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  target/arm/cpu64.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 54 insertions(+)
+>
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 549cb1e..223f31e 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -204,6 +204,59 @@ static void aarch64_a53_initfn(Object *obj)
+>      define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
+>  }
+>
+> +static void aarch64_generic_initfn(Object *obj)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +
+> +    cpu->dtb_compatible = "arm,armv8";
+> +    set_feature(&cpu->env, ARM_FEATURE_V8);
+> +    set_feature(&cpu->env, ARM_FEATURE_VFP4);
+> +    set_feature(&cpu->env, ARM_FEATURE_NEON);
+> +    set_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER);
+> +    set_feature(&cpu->env, ARM_FEATURE_AARCH64);
+> +    set_feature(&cpu->env, ARM_FEATURE_CBAR_RO);
+> +    set_feature(&cpu->env, ARM_FEATURE_V8_AES);
+> +    set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
+> +    set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
+> +    set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
+> +    set_feature(&cpu->env, ARM_FEATURE_CRC);
+> +    set_feature(&cpu->env, ARM_FEATURE_EL3);
+> +    cpu->kvm_target = QEMU_KVM_ARM_TARGET_GENERIC_V8;
+> +    cpu->midr = 0x410fd000; /* FIXME: this needs to adjust */
+> +    cpu->revidr = 0x00000000;
+> +    cpu->reset_fpsid = 0x41034070;
+> +    cpu->mvfr0 = 0x10110222;
+> +    cpu->mvfr1 = 0x12111111;
+> +    cpu->mvfr2 = 0x00000043;
+> +    cpu->ctr = 0x84448004; /* L1Ip = VIPT */
+> +    cpu->reset_sctlr = 0x00c50838;
+> +    cpu->id_pfr0 = 0x00000131;
+> +    cpu->id_pfr1 = 0x00011011;
+> +    cpu->id_dfr0 = 0x03010066;
+> +    cpu->id_afr0 = 0x00000000;
+> +    cpu->id_mmfr0 = 0x10101105;
+> +    cpu->id_mmfr1 = 0x40000000;
+> +    cpu->id_mmfr2 = 0x01260000;
+> +    cpu->id_mmfr3 = 0x02102211;
+> +    cpu->id_isar0 = 0x02101110;
+> +    cpu->id_isar1 = 0x13112111;
+> +    cpu->id_isar2 = 0x21232042;
+> +    cpu->id_isar3 = 0x01112131;
+> +    cpu->id_isar4 = 0x00011142;
+> +    cpu->id_isar5 = 0x00011121;
+> +    cpu->id_aa64pfr0 = 0x00002222;
+> +    cpu->id_aa64dfr0 = 0x10305106;
+> +    cpu->id_aa64isar0 = 0x00011120;
+> +    cpu->id_aa64mmfr0 = 0x0f001101; /* only support 4k page, 36 bit physical addr */
 
-On 02/07/2017 08:25 AM, Nikolay Ivanets wrote:
-> Is there any way to find source file supplied for qemu-nbd similar to l=
-oop
-> device:
->=20
-> cat /sys/block/loop0/loop/backing_file
+Not 64K as well? That seems rather limiting.
 
-qemu-nbd is userspace, so there's no way it will be found in /sys/.  But
-since it is userspace, is it not sufficient to just use 'ps' or
-/proc/$n/cmdline to determine what command line qemu-nbd was started with=
-?
+> +    cpu->dbgdidr = 0x3516d000;
+> +    cpu->clidr = 0x0a200023;
+> +    cpu->ccsidr[0] = 0x7003e01a; /* 8KB L1 dcache */
+> +    cpu->ccsidr[1] = 0x2007e00a; /* 8KB L1 icache */
+> +    cpu->ccsidr[2] = 0x700fe07a; /* 128KB L2 cache */
+> +    cpu->dcz_blocksize = 4; /* 64 bytes */
+> +    define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
+> +}
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+What's the general principle behind the values we're using
+here for the various ID and feature registers?
 
-
---PlMii4OXiSfkEWROjbhJsGtiBi6rRMj0K
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYmemPAAoJEKeha0olJ0Nqj/oIAKxvPgykU2OvLZ0P2noYWYo9
-r4CSyG8Mfw82t0wC6RtQGJyRqxQHedtL0x0ogruIzp/32VSHKdfF+Ozrp2nfsu4l
-2wzb6D1XtRca48sI2d8VI0AMOdgMHHS6W+cB6apoBceylujoT7+bnit4FqkkTc6A
-ACnI2AWurIfF2blG1ng+CRyGZKZIQ1etBcj6uoccGSgwwClVml3CFNvhn/j1UCXu
-FH859//DeKa0qjjFcFQVIaBmyaWCvpO/ANgMJPTKHC9GCwggOr6Ie4ZSMwLq1lDM
-AfDJ3giCEsMhK3BRNJ+Vi6t1DMe489tXu5MTcyhz+SZ7WaBNoIzFLrz63f2jzBI=
-=DS8O
------END PGP SIGNATURE-----
-
---PlMii4OXiSfkEWROjbhJsGtiBi6rRMj0K--
+thanks
+-- PMM
