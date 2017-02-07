@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1cb2bJ-0005vZ-UJ
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:02:18 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cb2fR-00078w-Qb
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:06:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1cb2bI-0002QX-Sq
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:02:18 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33933)
+	(envelope-from <alex.bennee@linaro.org>) id 1cb2fN-0004az-QG
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:06:33 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37410)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1cb2bI-0002Pr-MX
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:02:16 -0500
-Received: by mail-wr0-x242.google.com with SMTP id 89so5197207wrr.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 02:02:14 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cb2fN-0004aO-Ff
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:06:29 -0500
+Received: by mail-wm0-x236.google.com with SMTP id v77so147212513wmv.0
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 02:06:29 -0800 (PST)
+References: <20170206153113.27729-1-alex.bennee@linaro.org>
+	<20170206153113.27729-6-alex.bennee@linaro.org>
+	<CAJhHMCDJS31TtUs0z4g5bjZctPG9nV9fBdENgJeD7OrqqvOzcg@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAJhHMCDJS31TtUs0z4g5bjZctPG9nV9fBdENgJeD7OrqqvOzcg@mail.gmail.com>
+Date: Tue, 07 Feb 2017 10:06:37 +0000
+Message-ID: <87a89yxqky.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20161107194058.GB28327@amt.cnet>
-References: <20161104094322.GA16930@amt.cnet> <20161104165933.GA3027@amt.cnet>
-	<20161107154610.GG2054@work-vm> <20161107194058.GB28327@amt.cnet>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Tue, 7 Feb 2017 18:02:13 +0800
-Message-ID: <CANRm+CyzwtZqaGmhTj2pdk8ipjWSXuwtSHp9NzwA7aQR3ZG=cA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [QEMU PATCH v2] kvmclock: advance clock by time
- window between vm_stop and pre_save
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v10 05/23] tcg: add options for enabling
+ MTTCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +32,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcelo Tosatti <mtosatti@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvm <kvm@vger.kernel.org>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Juan Quintela <quintela@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, MTTCG Devel <mttcg@listserver.greensocs.com>, qemu-devel <qemu-devel@nongnu.org>, KONRAD =?utf-8?B?RnLDqWTDqXJpYw==?= <fred.konrad@greensocs.com>, alvise rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, nikunj@linux.vnet.ibm.com, Mark Burton <mark.burton@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Sergey Fedorov <serge.fdrv@gmail.com>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-2016-11-08 3:41 GMT+08:00 Marcelo Tosatti <mtosatti@redhat.com>:
-> On Mon, Nov 07, 2016 at 03:46:11PM +0000, Dr. David Alan Gilbert wrote:
->> * Marcelo Tosatti (mtosatti@redhat.com) wrote:
->> > This patch, relative to pre-copy migration codepath,
->> > measures the time between vm_stop() and pre_save(),
->> > which includes copying the remaining RAM to destination,
->> > and advances the clock by that amount.
->> >
->> > In a VM with 5 seconds downtime, this reduces the guest
->> > clock difference on destination from 5s to 0.2s.
->> >
->> > Tested with Linux and Windows 2012 R2 guests with -cpu XXX,+hv-time.
+
+Pranith Kumar <bobby.prani@gmail.com> writes:
+
+> Hi Alex,
+>
+> I just spotted this:
+>
+> On Mon, Feb 6, 2017 at 10:30 AM, Alex Bennée <alex.bennee@linaro.org> wrote:
+>
+>> From: KONRAD Frederic <fred.konrad@greensocs.com>
 >>
->> One thing that bothers me is that it's only this clock that's
->> getting corrected; doesn't it cause things to get upset when
->> one clock moves and the others dont?
+>> We know there will be cases where MTTCG won't work until additional work
+>> is done in the front/back ends to support. It will however be useful to
+>> be able to turn it on.
+>>
+>> As a result MTTCG will default to off unless the combination is
+>> supported. However the user can turn it on for the sake of testing.
+>>
+>> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+>> [AJB: move to -accel tcg,thread=multi|single, defaults]
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> Reviewed-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>> v1:
+>>   - merge with add mttcg option.
+>>   - update commit message
+>> v2:
+>>   - machine_init->opts_init
+>> v3:
+>>   - moved from -tcg to -accel tcg,thread=single|multi
+>>   - fix checkpatch warnings
+>> v4:
+>>   - make mttcg_enabled extern, qemu_tcg_mttcg_enabled() now just macro
+>>   - qemu_tcg_configure now propagates Error instead of exiting
+>>   - better error checking of thread=foo
+>>   - use CONFIG flags for default_mttcg_enabled()
+>>   - disable mttcg with icount, error if both forced on
+>> v7
+>>   - explicitly disable MTTCG for TCG_OVERSIZED_GUEST
+>>   - use check_tcg_memory_orders_compatible() instead of CONFIG_MTTCG_HOST
+>>   - change CONFIG_MTTCG_TARGET to TARGET_SUPPORTS_MTTCG
+>> v8
+>>   - fix missing include tcg.h
+>>   - change mismatched MOs to a warning instead of error
+>> v10
+>>   - TCG_DEFAULT_MO -> TCG_GUEST_DEFAULT_MO
+>> ---
+>>  cpus.c                | 72 ++++++++++++++++++++++++++++++
+>> +++++++++++++++++++++
+>>  include/qom/cpu.h     |  9 +++++++
+>>  include/sysemu/cpus.h |  2 ++
+>>  qemu-options.hx       | 20 ++++++++++++++
+>>  tcg/tcg.h             |  9 +++++++
+>>  vl.c                  | 49 ++++++++++++++++++++++++++++++++++-
+>>  6 files changed, 160 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/cpus.c b/cpus.c
+>> index 71a82e5004..6a7e5a50d8 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+>> @@ -25,6 +25,7 @@
+>>  /* Needed early for CONFIG_BSD etc. */
+>>  #include "qemu/osdep.h"
+>>  #include "qemu-common.h"
+>> +#include "qemu/config-file.h"
+>>  #include "cpu.h"
+>>  #include "monitor/monitor.h"
+>>  #include "qapi/qmp/qerror.h"
+>> @@ -45,6 +46,7 @@
+>>  #include "qemu/main-loop.h"
+>>  #include "qemu/bitmap.h"
+>>  #include "qemu/seqlock.h"
+>> +#include "tcg.h"
+>>  #include "qapi-event.h"
+>>  #include "hw/nmi.h"
+>>  #include "sysemu/replay.h"
+>> @@ -150,6 +152,76 @@ typedef struct TimersState {
+>>  } TimersState;
+>>
+>>  static TimersState timers_state;
+>> +bool mttcg_enabled;
+>> +
+>> +/*
+>> + * We default to false if we know other options have been enabled
+>> + * which are currently incompatible with MTTCG. Otherwise when each
+>> + * guest (target) has been updated to support:
+>> + *   - atomic instructions
+>> + *   - memory ordering primitives (barriers)
+>> + * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
+>> + *
+>> + * Once a guest architecture has been converted to the new primitives
+>> + * there are two remaining limitations to check.
+>> + *
+>> + * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
+>> + * - The host must have a stronger memory order than the guest
+>> + *
+>> + * It may be possible in future to support strong guests on weak hosts
+>> + * but that will require tagging all load/stores in a guest with their
+>> + * implicit memory order requirements which would likely slow things
+>> + * down a lot.
+>> + */
+>> +
+>> +static bool check_tcg_memory_orders_compatible(void)
+>> +{
+>> +#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
+>> +    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
+>> +#else
+>> +    return false;
+>> +#endif
+>> +}
+>> +
+>> +static bool default_mttcg_enabled(void)
+>> +{
+>> +    QemuOpts *icount_opts = qemu_find_opts_singleton("icount");
+>> +    const char *rr = qemu_opt_get(icount_opts, "rr");
+>> +
+>> +    if (rr || TCG_OVERSIZED_GUEST) {
+>> +        return false;
+>> +    } else {
+>> +#ifdef TARGET_SUPPORTS_MTTCG
+>> +        return check_tcg_memory_orders_compatible();
+>> +#else
+>> +        return false;
+>> +#endif
+>> +    }
+>> +}
+>> +
+>> +void qemu_tcg_configure(QemuOpts *opts, Error **errp)
+>> +{
+>> +    const char *t = qemu_opt_get(opts, "thread");
+>> +    if (t) {
+>> +        if (strcmp(t, "multi") == 0) {
+>> +            if (TCG_OVERSIZED_GUEST) {
+>> +                error_setg(errp, "No MTTCG when guest word size > hosts");
+>> +            } else {
+>> +                if (!check_tcg_memory_orders_compatible()) {
+>> +                    error_report("Guest requires stronger MO that host");
+>>
 >
-> If you are correlating the clocks, then yes.
->
-> Older Linux guests get upset (marking the TSC clocksource unstable
-> because the watchdog checks TSC vs kvmclock), but there is a workaround for it
-> in newer guests
-> (kvmclock interface to notify watchdog to not complain).
+> s/MO that host/MO than host/?
 
-Could you point out which interface? I didn't find it.
-
-Regards,
-Wanpeng Li
+Good catch.
 
 >
-> Note marking TSC clocksource unstable on older guests is harmless
-> because kvmclock is the standard clocksource.
+> Also, this message is a bit cryptic for end users. How about saying "Guest
+> and host architectures are incompatible, you may encounter errors!" or
+> something similar?
+
+"Guest assumes a stronger memory ordering than the host provides, this
+may cause strange/hard to debug errors."
+
+?
 >
-> For Windows guests, i don't know that Windows correlates between different
-> clocks.
->
-> That is, there is relative control as to which software reads kvmclock
-> or Windows TIMER MSR, so i don't see the need to advance every clock
-> exposed.
->
->> Shouldn't the pause delay be recorded somewhere architecturally
->> independent and then be a thing that kvm-clock happens to use and
->> other clocks might as well?
->
-> In theory, yes. In practice, i don't see the need for this...
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Thanks,
+
+
+--
+Alex Bennée
