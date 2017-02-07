@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cb2mo-0003PQ-0F
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:14:11 -0500
+	(envelope-from <famz@redhat.com>) id 1cb2pV-0005DC-7I
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:17:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cb2mm-0000Ji-SZ
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:14:09 -0500
-Date: Tue, 7 Feb 2017 18:13:59 +0800
+	(envelope-from <famz@redhat.com>) id 1cb2pU-0003Yv-7a
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:16:57 -0500
+Date: Tue, 7 Feb 2017 18:16:46 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170207101359.GD19280@lemon.lan>
+Message-ID: <20170207101646.GE19280@lemon.lan>
 References: <cover.1485365834.git.jcody@redhat.com>
-	<a252efad890c55d5d59e7fe77a9a9b994ee83074.1485365834.git.jcody@redhat.com>
+	<41e841d9de1590fb49bf819836ee958a5d2f8084.1485365834.git.jcody@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a252efad890c55d5d59e7fe77a9a9b994ee83074.1485365834.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] iscsi: Handle -iscsi user/password
- in bdrv_parse_filename()
+In-Reply-To: <41e841d9de1590fb49bf819836ee958a5d2f8084.1485365834.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] iscsi: Add initiator-name option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,180 +29,96 @@ Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, qemu-block@non
 On Wed, 01/25 12:42, Jeff Cody wrote:
 > From: Kevin Wolf <kwolf@redhat.com>
 > 
-> This splits the logic in the old parse_chap() function into a part that
-> parses the -iscsi options into the new driver-specific options, and
-> another part that actually applies those options (called apply_chap()
-> now).
+> This was previously only available with -iscsi. Again, after this patch,
+> the -iscsi option only takes effect if an URL is given. New users are
+> supposed to use the new driver-specific option.
 > 
-> Note that this means that username and password specified with -iscsi
-> only take effect when a URL is provided. This is intentional, -iscsi is
-> a legacy interface only supported for compatibility, new users should
-> use the proper driver-specific options.
-> 
+> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  block/iscsi.c | 78 +++++++++++++++++++++++++++++++++--------------------------
->  1 file changed, 44 insertions(+), 34 deletions(-)
+>  block/iscsi.c | 32 +++++++++++++++-----------------
+>  1 file changed, 15 insertions(+), 17 deletions(-)
 > 
 > diff --git a/block/iscsi.c b/block/iscsi.c
-> index 97cff30..fc91d0f 100644
+> index fc91d0f..3401b7e 100644
 > --- a/block/iscsi.c
 > +++ b/block/iscsi.c
-> @@ -1236,29 +1236,14 @@ retry:
->      return 0;
+> @@ -1312,26 +1312,15 @@ static void parse_header_digest(struct iscsi_context *iscsi, const char *target,
+>      }
 >  }
 >  
-> -static void parse_chap(struct iscsi_context *iscsi, const char *target,
-> +static void apply_chap(struct iscsi_context *iscsi, QemuOpts *opts,
->                         Error **errp)
+> -static char *parse_initiator_name(const char *target)
+> +static char *get_initiator_name(QemuOpts *opts)
 >  {
 > -    QemuOptsList *list;
 > -    QemuOpts *opts;
->      const char *user = NULL;
->      const char *password = NULL;
->      const char *secretid;
->      char *secret = NULL;
+>      const char *name;
+>      char *iscsi_name;
+>      UuidInfo *uuid_info;
 >  
 > -    list = qemu_find_opts("iscsi");
-> -    if (!list) {
-> -        return;
-> -    }
-> -
-> -    opts = qemu_opts_find(list, target);
-> -    if (opts == NULL) {
-> -        opts = QTAILQ_FIRST(&list->head);
+> -    if (list) {
+> -        opts = qemu_opts_find(list, target);
 > -        if (!opts) {
-> -            return;
+> -            opts = QTAILQ_FIRST(&list->head);
 > -        }
-> -    }
-> -
->      user = qemu_opt_get(opts, "user");
->      if (!user) {
->          return;
-> @@ -1587,6 +1572,41 @@ out:
+> -        if (opts) {
+> -            name = qemu_opt_get(opts, "initiator-name");
+> -            if (name) {
+> -                return g_strdup(name);
+> -            }
+> -        }
+> +    name = qemu_opt_get(opts, "initiator-name");
+> +    if (name) {
+> +        return g_strdup(name);
 >      }
+>  
+>      uuid_info = qmp_query_uuid(NULL);
+> @@ -1576,7 +1565,7 @@ static void iscsi_parse_iscsi_option(const char *target, QDict *options)
+>  {
+>      QemuOptsList *list;
+>      QemuOpts *opts;
+> -    const char *user, *password, *password_secret;
+> +    const char *user, *password, *password_secret, *initiator_name;
+>  
+>      list = qemu_find_opts("iscsi");
+>      if (!list) {
+> @@ -1605,6 +1594,11 @@ static void iscsi_parse_iscsi_option(const char *target, QDict *options)
+>      if (password_secret) {
+>          qdict_set_default_str(options, "password-secret", password_secret);
+>      }
+> +
+> +    initiator_name = qemu_opt_get(opts, "initiator-name");
+> +    if (initiator_name) {
+> +        qdict_set_default_str(options, "initiator-name", initiator_name);
+> +    }
 >  }
 >  
-> +static void iscsi_parse_iscsi_option(const char *target, QDict *options)
-> +{
-> +    QemuOptsList *list;
-> +    QemuOpts *opts;
-> +    const char *user, *password, *password_secret;
-> +
-> +    list = qemu_find_opts("iscsi");
-> +    if (!list) {
-> +        return;
-> +    }
-> +
-> +    opts = qemu_opts_find(list, target);
-> +    if (opts == NULL) {
-> +        opts = QTAILQ_FIRST(&list->head);
-> +        if (!opts) {
-> +            return;
-> +        }
-> +    }
-> +
-> +    user = qemu_opt_get(opts, "user");
-> +    if (user) {
-> +        qdict_set_default_str(options, "user", user);
-> +    }
-> +
-> +    password = qemu_opt_get(opts, "password");
-> +    if (password) {
-> +        qdict_set_default_str(options, "password", password);
-> +    }
-> +
-> +    password_secret = qemu_opt_get(opts, "password-secret");
-> +    if (password_secret) {
-> +        qdict_set_default_str(options, "password-secret", password_secret);
-> +    }
-> +}
-> +
 >  /*
->   * We support iscsi url's on the form
->   * iscsi://[<username>%<password>@]<host>[:<port>]/<targetname>/<lun>
-> @@ -1625,6 +1645,9 @@ static void iscsi_parse_filename(const char *filename, QDict *options,
->      qdict_set_default_str(options, "lun", lun_str);
->      g_free(lun_str);
->  
-> +    /* User/password from -iscsi take precedence over those from the URL */
-> +    iscsi_parse_iscsi_option(iscsi_url->target, options);
-> +
-
-Isn't more natural to let the local option take precedence over the global one?
-
->      if (iscsi_url->user[0] != '\0') {
->          qdict_set_default_str(options, "user", iscsi_url->user);
->          qdict_set_default_str(options, "password", iscsi_url->passwd);
-> @@ -1659,6 +1682,10 @@ static QemuOptsList runtime_opts = {
->              .type = QEMU_OPT_STRING,
->          },
->          {
-> +            .name = "password-secret",
-> +            .type = QEMU_OPT_STRING,
-> +        },
-> +        {
-
-I think this added password-secret is not the one looked up in
-iscsi_parse_iscsi_option(), which is from -iscsi
-(block/iscsi-opts.c:qemu_iscsi_opts). Is this intended? Or does it belong to a
-different patch?
-
-Fam
-
+> @@ -1689,6 +1683,10 @@ static QemuOptsList runtime_opts = {
 >              .name = "lun",
 >              .type = QEMU_OPT_NUMBER,
 >          },
-> @@ -1678,7 +1705,6 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
->      QemuOpts *opts;
->      Error *local_err = NULL;
->      const char *transport_name, *portal, *target;
-> -    const char *user, *password;
->  #if LIBISCSI_API_VERSION >= (20160603)
->      enum iscsi_transport_type transport;
->  #endif
-> @@ -1695,8 +1721,6 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
->      transport_name = qemu_opt_get(opts, "transport");
->      portal = qemu_opt_get(opts, "portal");
->      target = qemu_opt_get(opts, "target");
-> -    user = qemu_opt_get(opts, "user");
-> -    password = qemu_opt_get(opts, "password");
->      lun = qemu_opt_get_number(opts, "lun", 0);
+> +        {
+> +            .name = "initiator-name",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+>          { /* end of list */ }
+>      },
+>  };
+> @@ -1745,7 +1743,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
 >  
->      if (!transport_name || !portal || !target) {
-> @@ -1704,11 +1728,6 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
->          ret = -EINVAL;
->          goto out;
->      }
-> -    if (user && !password) {
-> -        error_setg(errp, "If a user name is given, a password is required");
-> -        ret = -EINVAL;
-> -        goto out;
-> -    }
+>      memset(iscsilun, 0, sizeof(IscsiLun));
 >  
->      if (!strcmp(transport_name, "tcp")) {
->  #if LIBISCSI_API_VERSION >= (20160603)
-> @@ -1747,17 +1766,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
->          goto out;
->      }
+> -    initiator_name = parse_initiator_name(target);
+> +    initiator_name = get_initiator_name(opts);
 >  
-> -    if (user) {
-> -        ret = iscsi_set_initiator_username_pwd(iscsi, user, password);
-> -        if (ret != 0) {
-> -            error_setg(errp, "Failed to set initiator username and password");
-> -            ret = -EINVAL;
-> -            goto out;
-> -        }
-> -    }
-> -
->      /* check if we got CHAP username/password via the options */
-> -    parse_chap(iscsi, target, &local_err);
-> +    apply_chap(iscsi, opts, &local_err);
->      if (local_err != NULL) {
->          error_propagate(errp, local_err);
->          ret = -EINVAL;
+>      iscsi = iscsi_create_context(initiator_name);
+>      if (iscsi == NULL) {
 > -- 
 > 2.9.3
 > 
 > 
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
