@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cb2tY-0007nX-HJ
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:21:09 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cb2w7-0000rT-6b
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:23:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cb2tX-0007gt-FQ
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:21:08 -0500
-Date: Tue, 7 Feb 2017 18:21:01 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170207102101.GG19280@lemon.lan>
-References: <cover.1485365834.git.jcody@redhat.com>
-	<71fd2883819899ef964826c72c9e0cc41246e8c1.1485365834.git.jcody@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <71fd2883819899ef964826c72c9e0cc41246e8c1.1485365834.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] iscsi: Add timeout option
+	(envelope-from <liq3ea@gmail.com>) id 1cb2w4-0002NI-3q
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:23:47 -0500
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:33972)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cb2w3-0002NC-Vi
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:23:44 -0500
+Received: by mail-it0-x243.google.com with SMTP id o185so11886960itb.1
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 02:23:43 -0800 (PST)
+Message-ID: <5899a02e.45ca240a.6c373.93c1@mx.google.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue,  7 Feb 2017 02:23:33 -0800
+Subject: [Qemu-devel] [PATCH] usb: ohci: limit the number of link eds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,112 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org
+To: kraxel@redhat.com, qemu-devel@nongnu.org
+Cc: Li Qiang <liqiang6-s@360.cn>
 
-On Wed, 01/25 12:42, Jeff Cody wrote:
-> From: Kevin Wolf <kwolf@redhat.com>
-> 
-> This was previously only available with -iscsi. Again, after this patch,
-> the -iscsi option only takes effect if an URL is given. New users are
-> supposed to use the new driver-specific option.
-> 
-> All -iscsi options have a corresponding driver-specific option for the
-> iscsi block driver now.
-> 
-> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/iscsi.c | 37 +++++++++++--------------------------
->  1 file changed, 11 insertions(+), 26 deletions(-)
-> 
-> diff --git a/block/iscsi.c b/block/iscsi.c
-> index a989b52..4701a27 100644
-> --- a/block/iscsi.c
-> +++ b/block/iscsi.c
-> @@ -1318,29 +1318,6 @@ static char *get_initiator_name(QemuOpts *opts)
->      return iscsi_name;
->  }
->  
-> -static int parse_timeout(const char *target)
-> -{
-> -    QemuOptsList *list;
-> -    QemuOpts *opts;
-> -    const char *timeout;
-> -
-> -    list = qemu_find_opts("iscsi");
-> -    if (list) {
-> -        opts = qemu_opts_find(list, target);
-> -        if (!opts) {
-> -            opts = QTAILQ_FIRST(&list->head);
-> -        }
-> -        if (opts) {
-> -            timeout = qemu_opt_get(opts, "timeout");
-> -            if (timeout) {
-> -                return atoi(timeout);
-> -            }
-> -        }
-> -    }
-> -
-> -    return 0;
-> -}
-> -
->  static void iscsi_nop_timed_event(void *opaque)
->  {
->      IscsiLun *iscsilun = opaque;
-> @@ -1549,7 +1526,7 @@ static void iscsi_parse_iscsi_option(const char *target, QDict *options)
->      QemuOptsList *list;
->      QemuOpts *opts;
->      const char *user, *password, *password_secret, *initiator_name,
-> -               *header_digest;
-> +               *header_digest, *timeout;
->  
->      list = qemu_find_opts("iscsi");
->      if (!list) {
-> @@ -1588,6 +1565,11 @@ static void iscsi_parse_iscsi_option(const char *target, QDict *options)
->      if (header_digest) {
->          qdict_set_default_str(options, "header-digest", header_digest);
->      }
-> +
-> +    timeout = qemu_opt_get(opts, "timeout");
-> +    if (timeout) {
-> +        qdict_set_default_str(options, "timeout", timeout);
-> +    }
->  }
->  
->  /*
-> @@ -1639,7 +1621,6 @@ static void iscsi_parse_filename(const char *filename, QDict *options,
->      iscsi_destroy_url(iscsi_url);
->  }
->  
-> -/* TODO Add -iscsi options */
->  static QemuOptsList runtime_opts = {
->      .name = "iscsi",
->      .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
-> @@ -1680,6 +1661,10 @@ static QemuOptsList runtime_opts = {
->              .name = "header-digest",
->              .type = QEMU_OPT_STRING,
->          },
-> +        {
-> +            .name = "timeout",
-> +            .type = QEMU_OPT_NUMBER,
-> +        },
->          { /* end of list */ }
->      },
->  };
-> @@ -1780,7 +1765,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
->      }
->  
->      /* timeout handling is broken in libiscsi before 1.15.0 */
-> -    timeout = parse_timeout(target);
-> +    timeout = qemu_opt_get_number(opts, "timeout", 0);
->  #if LIBISCSI_API_VERSION >= 20150621
->      iscsi_set_timeout(iscsi, timeout);
->  #else
-> -- 
-> 2.9.3
-> 
-> 
+From: Li Qiang <liqiang6-s@360.cn>
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+The guest may builds an infinite loop with link eds. This patch
+limit the number of linked ed to avoid this.
+
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+---
+ hw/usb/hcd-ohci.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+index c82a92f..4a63f3b 100644
+--- a/hw/usb/hcd-ohci.c
++++ b/hw/usb/hcd-ohci.c
+@@ -42,6 +42,8 @@
+ 
+ #define OHCI_MAX_PORTS 15
+ 
++#define ED_LINK_LIMIT 4
++
+ static int64_t usb_frame_time;
+ static int64_t usb_bit_time;
+ 
+@@ -1184,7 +1186,7 @@ static int ohci_service_ed_list(OHCIState *ohci, uint32_t head, int completion)
+     uint32_t next_ed;
+     uint32_t cur;
+     int active;
+-
++    uint32_t link_cnt = 0;
+     active = 0;
+ 
+     if (head == 0)
+@@ -1199,6 +1201,11 @@ static int ohci_service_ed_list(OHCIState *ohci, uint32_t head, int completion)
+ 
+         next_ed = ed.next & OHCI_DPTR_MASK;
+ 
++        if (++link_cnt > ED_LINK_LIMIT) {
++            ohci_die(ohci);
++            return 0;
++        }
++
+         if ((ed.head & OHCI_ED_H) || (ed.flags & OHCI_ED_K)) {
+             uint32_t addr;
+             /* Cancel pending packets for ED that have been paused.  */
+-- 
+1.8.3.1
