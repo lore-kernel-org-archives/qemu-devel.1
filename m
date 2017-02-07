@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cau8v-00056f-5S
+	(envelope-from <laurent@vivier.eu>) id 1cau8v-00056g-6H
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cau8q-00068A-9P
+	(envelope-from <laurent@vivier.eu>) id 1cau8q-00068G-Bw
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:25 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:64342)
+Received: from mout.kundenserver.de ([212.227.126.134]:63498)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cau8p-00067h-VS
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cau8p-00067f-Vz
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:20 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  7 Feb 2017 01:59:22 +0100
-Message-Id: <20170207005930.28327-9-laurent@vivier.eu>
+Date: Tue,  7 Feb 2017 01:59:18 +0100
+Message-Id: <20170207005930.28327-5-laurent@vivier.eu>
 In-Reply-To: <20170207005930.28327-1-laurent@vivier.eu>
 References: <20170207005930.28327-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v3 08/16] target-m68k: define 96bit FP
- registers for gdb on 680x0
+Subject: [Qemu-devel] [PATCH v3 04/16] target-m68k: define ext_opsize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +28,89 @@ Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, 
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- configure            |  2 +-
- gdb-xml/m68k-fp.xml  | 21 +++++++++++++++++++++
- target/m68k/helper.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 67 insertions(+), 1 deletion(-)
- create mode 100644 gdb-xml/m68k-fp.xml
+ target/m68k/translate.c | 43 ++++++++++++++++++++++++-------------------
+ 1 file changed, 24 insertions(+), 19 deletions(-)
 
-diff --git a/configure b/configure
-index 86fd833..4373ec5 100755
---- a/configure
-+++ b/configure
-@@ -5912,7 +5912,7 @@ case "$target_name" in
-   ;;
-   m68k)
-     bflt="yes"
--    gdb_xml_files="cf-core.xml cf-fp.xml"
-+    gdb_xml_files="cf-core.xml cf-fp.xml m68k-fp.xml"
-   ;;
-   microblaze|microblazeel)
-     TARGET_ARCH=microblaze
-diff --git a/gdb-xml/m68k-fp.xml b/gdb-xml/m68k-fp.xml
-new file mode 100644
-index 0000000..64290d1
---- /dev/null
-+++ b/gdb-xml/m68k-fp.xml
-@@ -0,0 +1,21 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2008 Free Software Foundation, Inc.
-+
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.coldfire.fp">
-+  <reg name="fp0" bitsize="96" type="float" group="float"/>
-+  <reg name="fp1" bitsize="96" type="float" group="float"/>
-+  <reg name="fp2" bitsize="96" type="float" group="float"/>
-+  <reg name="fp3" bitsize="96" type="float" group="float"/>
-+  <reg name="fp4" bitsize="96" type="float" group="float"/>
-+  <reg name="fp5" bitsize="96" type="float" group="float"/>
-+  <reg name="fp6" bitsize="96" type="float" group="float"/>
-+  <reg name="fp7" bitsize="96" type="float" group="float"/>
-+
-+  <reg name="fpcontrol" bitsize="32" group="float"/>
-+  <reg name="fpstatus" bitsize="32" group="float"/>,
-+  <reg name="fpiaddr" bitsize="32" type="code_ptr" group="float"/>
-+</feature>
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index cff93dc..d93fad9 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -114,6 +114,48 @@ static int cf_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
-     return 0;
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 9f60fbc..d9ba735 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -669,6 +669,21 @@ static inline int insn_opsize(int insn)
+     }
  }
  
-+static int m68k_fpu_gdb_get_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
++static inline int ext_opsize(int ext, int pos)
 +{
-+    if (n < 8) {
-+        stw_be_p(mem_buf, env->fregs[n].l.upper);
-+        memset(mem_buf + 2, 0, 2);
-+        stq_be_p(mem_buf + 4, env->fregs[n].l.lower);
-+        return 12;
++    switch ((ext >> pos) & 7) {
++    case 0: return OS_LONG;
++    case 1: return OS_SINGLE;
++    case 2: return OS_EXTENDED;
++    case 3: return OS_PACKED;
++    case 4: return OS_WORD;
++    case 5: return OS_DOUBLE;
++    case 6: return OS_BYTE;
++    default:
++        g_assert_not_reached();
 +    }
-+    switch (n) {
-+    case 8: /* fpcontrol */
-+        stl_be_p(mem_buf, env->fpcr);
-+        return 4;
-+    case 9: /* fpstatus */
-+        stl_be_p(mem_buf, env->fpsr);
-+        return 4;
-+    case 10: /* fpiar, not implemented */
-+        memset(mem_buf, 0, 4);
-+        return 4;
-+    }
-+    return 0;
 +}
 +
-+static int m68k_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
-+{
-+    if (n < 8) {
-+        env->fregs[n].l.upper = lduw_be_p(mem_buf);
-+        env->fregs[n].l.lower = ldq_be_p(mem_buf + 4);
-+        return 12;
-+    }
-+    switch (n) {
-+    case 8: /* fpcontrol */
-+        env->fpcr = ldl_p(mem_buf);
-+        return 4;
-+    case 9: /* fpstatus */
-+        env->fpsr = ldl_p(mem_buf);
-+        return 4;
-+    case 10: /* fpiar, not implemented */
-+        return 4;
-+    }
-+    return 0;
-+}
+ /* Assign value to a register.  If the width is less than the register width
+    only the low part of the register is set.  */
+ static void gen_partset_reg(int opsize, TCGv reg, TCGv val)
+@@ -4101,20 +4116,19 @@ DISAS_INSN(fpu)
+         tmp32 = tcg_temp_new_i32();
+         /* fmove */
+         /* ??? TODO: Proper behavior on overflow.  */
+-        switch ((ext >> 10) & 7) {
+-        case 0:
+-            opsize = OS_LONG;
 +
- M68kCPU *cpu_m68k_init(const char *cpu_model)
- {
-     M68kCPU *cpu;
-@@ -142,6 +184,9 @@ void m68k_cpu_init_gdb(M68kCPU *cpu)
-     if (m68k_feature(env, M68K_FEATURE_CF_FPU)) {
-         gdb_register_coprocessor(cs, cf_fpu_gdb_get_reg, cf_fpu_gdb_set_reg,
-                                  11, "cf-fp.xml", 18);
-+    } else if (m68k_feature(env, M68K_FEATURE_FPU)) {
-+        gdb_register_coprocessor(cs, m68k_fpu_gdb_get_reg,
-+                                 m68k_fpu_gdb_set_reg, 11, "m68k-fp.xml", 18);
++        opsize = ext_opsize(ext, 10);
++        switch (opsize) {
++        case OS_LONG:
+             gen_helper_f64_to_i32(tmp32, cpu_env, src);
+             break;
+-        case 1:
+-            opsize = OS_SINGLE;
++        case OS_SINGLE:
+             gen_helper_f64_to_f32(tmp32, cpu_env, src);
+             break;
+-        case 4:
+-            opsize = OS_WORD;
++        case OS_WORD:
+             gen_helper_f64_to_i32(tmp32, cpu_env, src);
+             break;
+-        case 5: /* OS_DOUBLE */
++        case OS_DOUBLE:
+             tcg_gen_mov_i32(tmp32, AREG(insn, 0));
+             switch ((insn >> 3) & 7) {
+             case 2:
+@@ -4143,8 +4157,7 @@ DISAS_INSN(fpu)
+             }
+             tcg_temp_free_i32(tmp32);
+             return;
+-        case 6:
+-            opsize = OS_BYTE;
++        case OS_BYTE:
+             gen_helper_f64_to_i32(tmp32, cpu_env, src);
+             break;
+         default:
+@@ -4217,15 +4230,7 @@ DISAS_INSN(fpu)
      }
-     /* TODO: Add [E]MAC registers.  */
- }
+     if (ext & (1 << 14)) {
+         /* Source effective address.  */
+-        switch ((ext >> 10) & 7) {
+-        case 0: opsize = OS_LONG; break;
+-        case 1: opsize = OS_SINGLE; break;
+-        case 4: opsize = OS_WORD; break;
+-        case 5: opsize = OS_DOUBLE; break;
+-        case 6: opsize = OS_BYTE; break;
+-        default:
+-            goto undef;
+-        }
++        opsize = ext_opsize(ext, 10);
+         if (opsize == OS_DOUBLE) {
+             tmp32 = tcg_temp_new_i32();
+             tcg_gen_mov_i32(tmp32, AREG(insn, 0));
 -- 
 2.9.3
